@@ -31,6 +31,7 @@ import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 
 const useStyles = makeStyles((theme) => ({
    chatInput: {
@@ -370,14 +371,16 @@ const QuestionContainer = memo(
          >
             <Paper elevation={4} className={classes.questionContainer}>
                <div style={{ padding: "20px 20px 5px 20px" }}>
-                  {question?.badges?.includes(NetworkerBadge.key) && (
+                  {question?.badges?.includes(
+                     UserPresenter.questionsHighlightedRequiredBadge().key
+                  ) && (
                      <div className={classes.badge}>
                         <BadgeButton
-                           badge={NetworkerBadge}
+                           badge={UserPresenter.questionsHighlightedRequiredBadge()}
                            showBadgeSuffix={false}
                            onlyIcon
                            activeTooltip={(badge) =>
-                              `${badge.name} Badge, this user has referred more than 3 people.`
+                              `${badge.name} Level ${badge.level} Badge`
                            }
                            buttonProps={{
                               color: "gold",

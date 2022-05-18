@@ -25,6 +25,7 @@ import BadgeSimpleButton from "../../BadgeSimpleButton"
 import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 import { StylesProps } from "../../../../../types/commonTypes"
 import { useRouter } from "next/router"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 
 const styles: StylesProps = {
    avatar: {
@@ -49,6 +50,7 @@ const styles: StylesProps = {
 }
 
 const PersonalInfo = ({ userData }) => {
+   const { userPresenter } = useAuth()
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
    const router = useRouter()
@@ -159,8 +161,8 @@ const PersonalInfo = ({ userData }) => {
                         <Grid item xs={4} sx={{ textAlign: "right" }}>
                            <BadgeSimpleButton
                               badge={NetworkerBadge}
-                              isActive={userData?.badges?.includes(
-                                 NetworkerBadge.key
+                              isActive={Boolean(
+                                 userPresenter?.badges?.networkerBadge()
                               )}
                               onClick={navigateToReferrals}
                            />

@@ -15,6 +15,10 @@ import CheckIcon from "@mui/icons-material/Check"
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
 import React from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import {
+   careerSkillsLinkWithContext,
+   My_Recruiters_NoAccess,
+} from "../../../../constants/contextInfoCareerSkills"
 
 export const NoAccessMyRecruiters = () => {
    const { userStats, userData } = useAuth()
@@ -46,8 +50,13 @@ export const NoAccessMyRecruiters = () => {
                   variant="h6"
                >
                   You need to unlock the{" "}
-                  <Link href="#">{requiredBadge.name} Badge</Link> to access
-                  this feature.
+                  <Link
+                     href={careerSkillsLinkWithContext(My_Recruiters_NoAccess)}
+                     color="secondary"
+                  >
+                     {requiredBadge.name} Badge Level {requiredBadge.level}
+                  </Link>{" "}
+                  to access this feature.
                </Typography>
                <Typography
                   sx={{ color: "text.secondary", textAlign: "center" }}

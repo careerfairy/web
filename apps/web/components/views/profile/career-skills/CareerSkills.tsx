@@ -16,23 +16,24 @@ import Box from "@mui/material/Box"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { styles as profileStyles } from "../profileStyles"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import { BadgeStepper } from "./BadgeStepper"
+import { BadgeStepper, LevelInformationPopupListItem } from "./BadgeStepper"
 import { sxStyles } from "types/commonTypes"
 import { ResearchBadge } from "@careerfairy/shared-lib/dist/badges/ResearchBadges"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import { EngageBadge } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
 import Button from "@mui/material/Button"
 import Link from "../../common/Link"
-import Paper from "@mui/material/Paper"
 import Card from "@mui/material/Card"
 import { DefaultTheme } from "@mui/styles"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import ExpandLessIcon from "@mui/icons-material/ExpandLess"
 import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import CheckIcon from "@mui/icons-material/Check"
-import CircleIcon from "@mui/icons-material/Circle"
 import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutline"
+import { useRouter } from "next/router"
+import {
+   ContextInfoDetail,
+   ContextInfoMap,
+} from "../../../../constants/contextInfoCareerSkills"
 
 const styles = sxStyles({
    laneTitle: {
@@ -42,6 +43,19 @@ const styles = sxStyles({
    step: {
       "& .MuiStepLabel-iconContainer": {
          backgroundColor: "black",
+      },
+   },
+   contextInfo: {
+      padding: 2,
+      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_3_7_20,
+   },
+   unlockedSummary: {
+      justifyContent: "start",
+      paddingX: 1,
+      minHeight: 0,
+      ".MuiAccordionSummary-content": {
+         flexGrow: 0,
+         margin: 0,
       },
    },
 })
@@ -85,19 +99,7 @@ const CareerSkills = () => {
                </Box>
             </Grid>
 
-            {/*<Grid item xs={12} lg={8}>*/}
-            {/*   <Box mb={4}>*/}
-            {/*      <Card*/}
-            {/*         sx={{*/}
-            {/*            padding: 2,*/}
-            {/*            boxShadow: (theme: DefaultTheme) =>*/}
-            {/*               theme.boxShadows.dark_3_7_20,*/}
-            {/*         }}*/}
-            {/*      >*/}
-            {/*         Placeholder for context info*/}
-            {/*      </Card>*/}
-            {/*   </Box>*/}
-            {/*</Grid>*/}
+            <ContextInfo />
          </Grid>
 
          <BadgeProgress
@@ -152,6 +154,43 @@ const BadgeProgress = ({ name, badge, helperText }) => {
    )
 }
 
+const ContextInfo = () => {
+   const {
+      query: { contextInfoKey },
+   } = useRouter()
+
+   if (!contextInfoKey) return null
+
+   const contextInfoDetail: ContextInfoDetail =
+      ContextInfoMap[contextInfoKey as string]
+
+   if (!contextInfoDetail) return null
+
+   return (
+      <Grid item xs={12} lg={8}>
+         <Box mb={4}>
+            <Card sx={styles.contextInfo}>
+               <Typography
+                  mb={2}
+                  dangerouslySetInnerHTML={{
+                     __html: contextInfoDetail.message,
+                  }}
+               />
+
+               {contextInfoDetail.showRequirements && (
+                  <>
+                     <Typography mb={1}>Requirements:</Typography>
+                     <RequirementsForABadge
+                        badge={contextInfoDetail.badgeRequired}
+                     />
+                  </>
+               )}
+            </Card>
+         </Box>
+      </Grid>
+   )
+}
+
 const UnlockedRewardsAccordion = ({ badge }: { badge: Badge }) => {
    const { userPresenter } = useAuth()
    const currentUserBadgeLevel =
@@ -163,17 +202,9 @@ const UnlockedRewardsAccordion = ({ badge }: { badge: Badge }) => {
       <Accordion elevation={0} disableGutters>
          <AccordionSummary
             expandIcon={<ExpandMoreIcon color="secondary" />}
-            aria-controls="panel1a-content"
-            id="panel1a-header"
-            sx={{
-               justifyContent: "start",
-               paddingX: 1,
-               minHeight: 0,
-               ".MuiAccordionSummary-content": {
-                  flexGrow: 0,
-                  margin: 0,
-               },
-            }}
+            aria-controls="unlockedRewards-content"
+            id="unlockedRewards-header"
+            sx={styles.unlockedSummary}
          >
             <Typography>Unlocked Rewards</Typography>
          </AccordionSummary>
@@ -208,6 +239,21 @@ const UnlockedRewardsAccordion = ({ badge }: { badge: Badge }) => {
             </List>
          </AccordionDetails>
       </Accordion>
+   )
+}
+
+const RequirementsForABadge = ({ badge }: { badge: Badge }) => {
+   const { userData, userStats } = useAuth()
+   return (
+      <List disablePadding>
+         {badge.requirements.map((requirement, index) => (
+            <LevelInformationPopupListItem
+               key={`context_reward_${index}`}
+               description={requirement.description}
+               isComplete={requirement.isComplete(userData, userStats)}
+            />
+         ))}
+      </List>
    )
 }
 

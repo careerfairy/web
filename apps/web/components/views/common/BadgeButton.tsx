@@ -14,7 +14,7 @@ const styles = {
 }
 
 const defaultActiveTooltip = (badge: Badge) =>
-   `You've been granted the ${badge.name} Badge! (${badge.requirements[0].description}) Congrats!`
+   `You've been granted the ${badge.name} Level ${badge.level} Badge! (${badge.requirements[0].description}) Congrats!`
 const defaultInactiveTooltip = (badge: Badge) =>
    `You need to ${badge.requirements[0].description} to activate this badge.`
 
