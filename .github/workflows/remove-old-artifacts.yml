@@ -2,7 +2,7 @@ name: Remove old artifacts
 
 on:
    schedule:
-      # Every day at 1am
+      # Every day at 8am
       - cron: "0 8 * * *"
 
 jobs:
