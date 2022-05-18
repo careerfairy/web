@@ -24,6 +24,7 @@ import CircleIcon from "@mui/icons-material/Circle"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import CheckIcon from "@mui/icons-material/Check"
 import CelebrationIcon from "@mui/icons-material/Celebration"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
 const styles = createStyles({
    step: {
@@ -67,6 +68,8 @@ const styles = createStyles({
       width: "1.2em",
       height: "1.2em",
       padding: "2px",
+      color: "background.default",
+      backgroundColor: "secondary.main",
    },
    stepperIconInfo: {
       width: "1.2em",
@@ -199,7 +202,7 @@ const IconContainer = ({
    const currentBadgeLevel =
       userPresenter.badges?.getCurrentBadgeLevelForBadgeType(badge)
 
-   let Icon = <InfoIcon color="secondary" sx={styles.stepperIconInfo} />
+   let Icon = <InfoOutlinedIcon color="secondary" sx={styles.stepperIconInfo} />
    if (currentBadgeLevel) {
       // user has this badge
       Icon = <CheckIcon color="secondary" sx={styles.stepperIconCheck} />
