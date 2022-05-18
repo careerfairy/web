@@ -9,6 +9,7 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { sleep } from "../utils"
+import { EngageBadgeLevel3 } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
 
 test.beforeEach(async () => {
    await clearAuthData()
@@ -83,5 +84,39 @@ test.describe("My Recruiters", () => {
       expect(
          await page.isVisible(`text=${recruiter.streamerDetails.firstName}`)
       ).toBeFalsy()
+   })
+})
+
+test.describe("Career Skills", () => {
+   test("Should have progression on a level", async ({ page }) => {
+      const profilePage = new ProfilePage(page)
+
+      await LoginPage.login(page, { badges: [EngageBadgeLevel3.key] })
+
+      // open page
+      await profilePage.openCareerSkills()
+
+      const thereIsProgress = await page
+         .locator(
+            ".MuiStepConnector-root.MuiStepConnector-horizontal.Mui-completed .MuiStepConnector-line"
+         )
+         .isVisible()
+      expect(thereIsProgress).toBeTruthy()
+   })
+
+   test("Should not have any progression", async ({ page }) => {
+      const profilePage = new ProfilePage(page)
+
+      await LoginPage.login(page)
+
+      // open page
+      await profilePage.openCareerSkills()
+
+      const thereIsProgress = await page
+         .locator(
+            ".MuiStepConnector-root.MuiStepConnector-horizontal.Mui-completed .MuiStepConnector-line"
+         )
+         .isVisible()
+      expect(thereIsProgress).toBeFalsy()
    })
 })

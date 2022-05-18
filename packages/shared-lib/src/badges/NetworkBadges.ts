@@ -52,10 +52,10 @@ export const NetworkerBadgeLevel3: Badge = new Badge(
       {
          description: "Invite 5 friends to events",
          isComplete: (userData: UserData, userStats: UserStats) =>
-            userStats?.totalLivestreamInvites >= 5,
+            userData?.totalLivestreamInvites >= 5,
          progress: (userData: UserData, userStats: UserStats) =>
             calculateProgressForNumericField(
-               userStats?.totalLivestreamInvites,
+               userData?.totalLivestreamInvites,
                5
             ),
       },
