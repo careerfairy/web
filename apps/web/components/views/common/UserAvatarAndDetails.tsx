@@ -63,6 +63,7 @@ const UserAvatarAndDetails = () => {
                         void router.push(`/profile/career-skills`)
                      }}
                      buttonProps={{ sx: { padding: 0 } }}
+                     badgeIconProps={{ noBg: true }}
                   />
                )}
                {userData?.linkedinUrl && (
