@@ -10,7 +10,10 @@ const {
 } = require("./lib/user")
 const { rewardCreateReferralSignUpFollower } = require("./lib/reward")
 const config = require("./config")
-const { handleUserBadges } = require("./lib/badge")
+const {
+   handleUserNetworkerBadges,
+   handleUserStatsBadges,
+} = require("./lib/badge")
 
 const getRandomInt = (max) => {
    let variable = Math.floor(Math.random() * Math.floor(max))
@@ -479,11 +482,22 @@ exports.onUserUpdate = functions
       const newValue = change.after.data()
 
       try {
-         await handleUserBadges(
-            context.params.userDataId,
-            previousValue,
-            newValue
-         )
+         await handleUserNetworkerBadges(context.params.userDataId, newValue)
+      } catch (e) {
+         functions.logger.log(previousValue, newValue)
+         functions.logger.error("Failed to update user badges", e)
+      }
+   })
+
+exports.onUserStatsUpdate = functions
+   .region(config.region)
+   .firestore.document("userData/{userDataId}/stats/stats")
+   .onUpdate(async (change, context) => {
+      const previousValue = change.before.data()
+      const newValue = change.after.data()
+
+      try {
+         await handleUserStatsBadges(context.params.userDataId, newValue)
       } catch (e) {
          functions.logger.log(previousValue, newValue)
          functions.logger.error("Failed to update user badges", e)

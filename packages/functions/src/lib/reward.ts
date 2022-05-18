@@ -1,6 +1,7 @@
 import { admin } from "../api/firestoreAdmin"
 import { RewardActions, RewardDoc } from "@careerfairy/shared-lib/dist/rewards"
 import pick = require("lodash/pick")
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export const rewardCreateReferralSignUpLeader = (
    leaderId,
@@ -38,6 +39,25 @@ export const rewardCreateLivestream = (
       userData: pickDetailsFromUserData(relatedUserData),
       livestreamData: pickDetailsFromLivestreamData(relatedLivestreamData),
    })
+}
+
+export const rewardCreateUserAction = (
+   userBeingRewardedId,
+   action,
+   relatedLivestreamData?: LivestreamEvent
+) => {
+   // do not send reward notifications for user actions
+   // by marking the reward as seen the user doesn't receive a notification
+   const otherData: Partial<RewardDoc> = { seenByUser: true }
+
+   if (relatedLivestreamData) {
+      otherData.livestreamId = relatedLivestreamData.id
+      otherData.livestreamData = pickDetailsFromLivestreamData(
+         relatedLivestreamData
+      )
+   }
+
+   return rewardCreate(userBeingRewardedId, action, otherData)
 }
 
 const rewardCreate = async (
@@ -88,7 +108,7 @@ const pickDetailsFromUserData = (userData) => {
    return pick(userData, ["firstName", "lastName"])
 }
 
-const pickDetailsFromLivestreamData = (livestreamData) => {
+export const pickDetailsFromLivestreamData = (livestreamData) => {
    return pick(livestreamData, [
       "title",
       "summary",

@@ -44,8 +44,6 @@ const BadgeButton = ({
       buttonProps.sx = Object.assign(buttonProps.sx, buttonStyles)
    }
 
-   console.log("styles", buttonStyles)
-
    return (
       <Tooltip title={title}>
          <span>

@@ -25,7 +25,10 @@ export interface UserData extends Identifiable {
       uid: string
       name: string
    }
+
+   // need data migrations to be moved to the user stats doc
    referralsCount?: number
+   totalLivestreamInvites?: number
 }
 
 export interface UserStats {
@@ -33,7 +36,6 @@ export interface UserStats {
    totalLivestreamAttendances?: number
    totalQuestionsAsked?: number
    totalHandRaises?: number
-   totalLivestreamInvites?: number
 }
 
 export interface SavedRecruiter extends Identifiable {

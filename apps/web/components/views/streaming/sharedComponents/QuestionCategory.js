@@ -249,6 +249,16 @@ const QuestionCategory = (props) => {
             newQuestion.badges = userData?.badges
          }
          await firebase.addLivestreamQuestion(streamRef, newQuestion)
+
+         if (userData) {
+            firebase
+               .rewardUserAction(
+                  "LIVESTREAM_USER_ASKED_QUESTION",
+                  livestream.id
+               )
+               .then((_) => console.log("Rewarded Question Asked"))
+               .catch(console.error)
+         }
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }

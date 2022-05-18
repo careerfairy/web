@@ -3015,6 +3015,13 @@ class FirebaseService {
       })
    }
 
+   rewardUserAction = async (action: string, livestreamId?: string) => {
+      return this.functions.httpsCallable("rewardUserAction")({
+         action,
+         livestreamId,
+      })
+   }
+
    rewardListenToUnSeenUserRewards = (
       userDataId,
       callback: (QuerySnapshot) => void
