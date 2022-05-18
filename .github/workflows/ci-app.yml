@@ -167,11 +167,14 @@ jobs:
       steps:
          - uses: actions/checkout@v2
          - uses: amondnet/vercel-action@v20.0.1 #deploy
+           id: vercel-action
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
               github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
               vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
               vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
               vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
-              alias-domains: | #Optional
-                 careerfairy-ssr-webapp-git-{{BRANCH}}-careerfairy-ssr.vercel.app
+#      - name: preview-url
+#      run: |
+#        echo ${{ steps.vercel-action.outputs.preview-url }}
+
