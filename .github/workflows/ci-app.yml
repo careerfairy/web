@@ -161,6 +161,7 @@ jobs:
    # Deploy
    deploy:
       name: "Deploy"
+      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       needs: [e2e_tests, unit_tests]
       runs-on: ubuntu-latest
       steps:
