@@ -13,6 +13,7 @@ import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
 import userRepo from "../../../../data/firebase/UserRepository"
 import { styles } from "../profileStyles"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import { DefaultTheme } from "@mui/styles"
 
 const MyRecruitersTab = () => {
    const { userPresenter } = useAuth()
@@ -32,23 +33,7 @@ const MyRecruitersTab = () => {
             </Grid>
          </Grid>
 
-         <Box mt={4} mb={4}>
-            <Button
-               component={Link}
-               // @ts-ignore
-               href={{
-                  pathname: `/next-livestreams`,
-               }}
-               style={{ textDecoration: "none" }}
-               color="secondary"
-               variant="contained"
-               sx={{
-                  padding: "10px 40px",
-               }}
-            >
-               Browse Events
-            </Button>
-         </Box>
+         <BrowseButton />
 
          {userPresenter.canSaveRecruiters() && (
             <RecruiterList userEmail={userPresenter.model.userEmail} />
@@ -88,6 +73,8 @@ const RecruiterList = ({ userEmail }) => {
       return <LoadingSkeleton />
    }
 
+   if (recruiters.length === 0) return <EmptyList />
+
    return (
       <Box>
          {recruiters.map((recruiter, i) => (
@@ -100,6 +87,31 @@ const RecruiterList = ({ userEmail }) => {
             </Box>
          ))}
       </Box>
+   )
+}
+
+const EmptyList = () => {
+   return (
+      <>
+         <Grid item xs={12} lg={8}>
+            <Card
+               sx={{
+                  padding: 2,
+                  boxShadow: (theme: DefaultTheme) =>
+                     theme.boxShadows.dark_3_7_20,
+               }}
+            >
+               <Typography mb={2} sx={{ fontWeight: "bold" }}>
+                  Unfortunately you haven’t saved any recruiter yet.
+               </Typography>
+               <Typography mb={2}>
+                  Click on {`"`}Browse events{`"`} to find interesting events to
+                  follow. Then save the profile of the recruiters with whom you
+                  want to keep contact. Their profile will appear on this page.
+               </Typography>
+            </Card>
+         </Grid>
+      </>
    )
 }
 
@@ -137,5 +149,27 @@ const LoadingSkeleton = () => (
       </Box>
    </>
 )
+
+const BrowseButton = () => {
+   return (
+      <Box mt={4} mb={4}>
+         <Button
+            component={Link}
+            // @ts-ignore
+            href={{
+               pathname: `/next-livestreams`,
+            }}
+            style={{ textDecoration: "none" }}
+            color="secondary"
+            variant="contained"
+            sx={{
+               padding: "10px 40px",
+            }}
+         >
+            Browse Events
+         </Button>
+      </Box>
+   )
+}
 
 export default MyRecruitersTab
