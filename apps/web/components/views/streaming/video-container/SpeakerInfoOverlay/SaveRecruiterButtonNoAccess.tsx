@@ -58,23 +58,18 @@ export const SaveRecruiterButtonNoAccess = () => {
 
    return (
       <>
-         <Button variant="contained" startIcon={<SaveIcon />} disabled={true}>
-            {isMobile ? "Save" : "Save For Later"}
-         </Button>
-         <Tooltip
-            title={popoverContent}
-            placement="right"
-            componentsProps={{
-               tooltip: {
-                  sx: styles.tooltip,
-               },
-               arrow: {
-                  sx: {
-                     color: "background.paper",
-                  },
-               },
-            }}
-         >
+         <WrapperTooltip title={popoverContent} position="bottom">
+            <span>
+               <Button
+                  variant="contained"
+                  startIcon={<SaveIcon />}
+                  disabled={true}
+               >
+                  {isMobile ? "Save" : "Save For Later"}
+               </Button>
+            </span>
+         </WrapperTooltip>
+         <WrapperTooltip title={popoverContent}>
             <IconButton
                aria-owns={open ? "mouse-over-popover" : undefined}
                aria-haspopup="true"
@@ -85,7 +80,28 @@ export const SaveRecruiterButtonNoAccess = () => {
             >
                <InfoOutlinedIcon />
             </IconButton>
-         </Tooltip>
+         </WrapperTooltip>
       </>
+   )
+}
+
+const WrapperTooltip = ({ children, title, position = "right" }) => {
+   return (
+      <Tooltip
+         title={title}
+         placement={position as any}
+         componentsProps={{
+            tooltip: {
+               sx: styles.tooltip,
+            },
+            arrow: {
+               sx: {
+                  color: "background.paper",
+               },
+            },
+         }}
+      >
+         {children}
+      </Tooltip>
    )
 }
