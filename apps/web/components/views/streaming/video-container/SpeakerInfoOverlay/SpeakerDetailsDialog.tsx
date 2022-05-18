@@ -107,7 +107,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
                            sx={styles.linkedInbutton}
                            onClick={() => handleLinkedInClick(speaker.linkedIn)}
                         >
-                           LinkedIn
+                           View Profile
                         </Button>
                      </Tooltip>
                   )}
