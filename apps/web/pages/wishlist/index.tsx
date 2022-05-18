@@ -30,6 +30,9 @@ const getQueryVariables = (query) => {
 interface Props {
    serverSearchResponse: SearchResponse<Wish> | null
 }
+
+export type HandleAddNewWishToHits = (wish: Wish) => void
+
 const Wishlist = ({ serverSearchResponse }: Props) => {
    const { query, pathname } = useRouter()
    const [loading, setLoading] = useState(false)
@@ -63,6 +66,22 @@ const Wishlist = ({ serverSearchResponse }: Props) => {
       })()
    }, [searchQuery, sortType, interests, currentPage])
 
+   const handleAddNewWishToHits = (wish: Wish) => {
+      if (searchResponse) {
+         setSearchResponse((prev) => ({
+            ...prev,
+            hits: [convertWishToHit(wish), ...searchResponse.hits],
+         }))
+      }
+   }
+
+   const convertWishToHit = (wish: Wish) => {
+      return {
+         ...wish,
+         objectID: wish.id,
+      }
+   }
+
    return (
       <>
          <SEO
@@ -85,7 +104,9 @@ const Wishlist = ({ serverSearchResponse }: Props) => {
                      />
                   </Grid>
                   <Grid item xs={12}>
-                     <CreateAndFilter />
+                     <CreateAndFilter
+                        handleAddNewWishToHits={handleAddNewWishToHits}
+                     />
                   </Grid>
                   <Grid item xs={12}>
                      <WishSection

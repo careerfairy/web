@@ -2,14 +2,18 @@ import React from "react"
 import { Grid } from "@mui/material"
 import CreateWishButton from "./CreateWishButton"
 import Search from "./Search"
+import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 
-const CreateAndFilter = () => {
+interface Props {
+   handleAddNewWishToHits: HandleAddNewWishToHits
+}
+const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {
    return (
       <Grid container spacing={2}>
-         <Grid item xs={12} md={6}>
-            <CreateWishButton />
+         <Grid item xs={12}>
+            <CreateWishButton handleAddNewWishToHits={handleAddNewWishToHits} />
          </Grid>
-         <Grid item xs={12} md={6}>
+         <Grid item xs={12}>
             <Search />
          </Grid>
       </Grid>

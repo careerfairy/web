@@ -38,7 +38,6 @@ const WishSection = ({
    empty,
 }: WishSectionProps) => {
    // use interests collection
-   const { data: interests } = useInterests()
    if (loadingError) {
       return (
          <Box>
@@ -84,7 +83,7 @@ const WishSection = ({
       <Stack spacing={2}>
          <Stack spacing={2}>
             {wishes.map((wish) => (
-               <WishCard interests={interests} key={wish.id} wish={wish} />
+               <WishCard key={wish.id} wish={wish} />
             ))}
          </Stack>
          {loadingMore && (

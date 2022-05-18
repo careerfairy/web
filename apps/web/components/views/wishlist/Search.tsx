@@ -110,6 +110,7 @@ const Search = () => {
             >
                <InputBase
                   sx={styles.inputRoot}
+                  fullWidth
                   startAdornment={<SearchIcon />}
                   value={searchValue}
                   onChange={handleSearch}

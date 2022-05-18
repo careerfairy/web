@@ -24,12 +24,14 @@ import Box from "@mui/material/Box"
 import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
+import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 
 interface CreateWishDialogProps {
    open: boolean
    onClose: () => void
    wishToEdit?: Wish
    onUpdateWish?: (newInterests: Interest[], newDescription: string) => void
+   handleAddNewWishToHits: HandleAddNewWishToHits
 }
 
 const maxInterests = 5
@@ -124,6 +126,7 @@ const CreateOrEditWishDialog = ({
    onClose,
    wishToEdit,
    onUpdateWish,
+   handleAddNewWishToHits,
 }: CreateWishDialogProps) => {
    // Material dialog
    const { userData } = useAuth()
@@ -160,7 +163,8 @@ const CreateOrEditWishDialog = ({
             }
          } else {
             // create wish
-            await wishlistRepo.createWish(values)
+            const newWish = await wishlistRepo.createWish(values)
+            handleAddNewWishToHits(newWish)
          }
          dispatch(
             actions.sendSuccessMessage(

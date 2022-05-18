@@ -12,6 +12,7 @@ import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
 import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
+import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 
 const styles: StylesProps = {
    paper: {
@@ -44,7 +45,11 @@ const styles: StylesProps = {
       ...getMaxLineStyles(1),
    },
 }
-const CreateWishButton = () => {
+
+interface Props {
+   handleAddNewWishToHits: HandleAddNewWishToHits
+}
+const CreateWishButton = ({ handleAddNewWishToHits }: Props) => {
    const { isLoggedIn } = useAuth()
    const { asPath } = useRouter()
    const [createWishDialogOpen, handleOpenWishDialog, handleCloseWishDialog] =
@@ -81,6 +86,7 @@ const CreateWishButton = () => {
             <CreateOrEditWishDialog
                onClose={handleCloseWishDialog}
                open={createWishDialogOpen}
+               handleAddNewWishToHits={handleAddNewWishToHits}
             />
          )}
       </>

@@ -29,7 +29,6 @@ import WishSEO from "../common/WishSEO"
 
 interface WishCardProps {
    wish: Hit<Wish>
-   interests: Interest[]
 }
 
 const styles: StylesProps = {
@@ -62,7 +61,7 @@ const styles: StylesProps = {
       whiteSpace: "pre-line",
    },
    description: {
-      fontWeight: 600,
+      fontWeight: 500,
    },
    totalLikes: {
       border: "none !important",
@@ -94,22 +93,15 @@ const bull = (
    </Box>
 )
 
-interface WishInterest extends Interest {
-   highlighted?: boolean
-}
-
-const WishCard = ({ wish, interests }: WishCardProps) => {
+const WishCard = ({ wish }: WishCardProps) => {
    // get wish author from authorUid
    const [authorData, setAuthorData] = useState<UserData>(null)
    const [deleted, setDeleted] = useState(false)
    const [description, setDescription] = useState(
-      wish._highlightResult.description.value
+      wish._highlightResult?.description?.value || wish.description
    )
    const [userRating, setUserRating] = useState<Rating>(null)
-   const [wishInterests, setWishInterests] = useState<
-      Hit<Wish>["_highlightResult"]["interests"]
-   >([])
-   console.log("-> wishInterests", wishInterests)
+   const [wishInterestNames, setWishInterestNames] = useState<string[]>([])
    const [gettingAuthor, setGettingAuthor] = useState(false)
    const [upvoters, setUpvoters] = useState<UserData[]>(
       Array(wish.uidsOfRecentUpvoters.length || 0).fill(null)
@@ -123,8 +115,10 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
    const [voting, setVoting] = useState(false)
 
    useEffect(() => {
-      setDescription(wish._highlightResult.description.value)
-   }, [wish._highlightResult.description.value])
+      setDescription(
+         wish._highlightResult?.description?.value || wish.description
+      )
+   }, [wish?._highlightResult?.description?.value])
 
    useEffect(() => {
       ;(async function getUpvotersData() {
@@ -137,12 +131,13 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       })()
    }, [wish.uidsOfRecentUpvoters])
    useEffect(() => {
-      setWishInterests(
-         [...(wish?._highlightResult?.interests || [])].sort((a) =>
-            a.name.matchedWords.length ? -1 : 1
-         ) || []
-      )
-   }, [wish._highlightResult?.interests])
+      const interests = wish._highlightResult?.interests?.length
+         ? wish._highlightResult.interests.map(
+              (interest) => interest.name.value
+           )
+         : wish.interests.map((interest) => interest.name)
+      setWishInterestNames(interests)
+   }, [wish._highlightResult?.interests, wish.interests])
 
    useEffect(() => {
       ;(async () => {
@@ -239,7 +234,6 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
       wish.interestIds = newInterests.map((interest) => interest.id)
       wish.interests = [...newInterests]
       wish.description = newDescription
-      setWishInterests(newInterests)
       setDescription(newDescription)
    }
 
@@ -271,6 +265,7 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
 
    if (deleted) return null
 
+   // @ts-ignore
    return (
       <Box component={"article"} sx={styles.root}>
          <WishCardMenuButton
@@ -320,13 +315,13 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
                      variant="subtitle2"
                      component="div"
                   >
-                     {wishInterests.map((int, index) => (
-                        <Fragment key={int.name.value + index}>
+                     {wishInterestNames.map((intName, index) => (
+                        <Fragment key={intName + index}>
                            {!!index && bull}
                            <Box
                               component={"span"}
                               dangerouslySetInnerHTML={{
-                                 __html: int.name.value,
+                                 __html: intName,
                               }}
                            />
                         </Fragment>
@@ -403,10 +398,14 @@ const WishCard = ({ wish, interests }: WishCardProps) => {
          </Paper>
          <WishSEO
             wishAuthor={authorDisplayName || "User"}
-            // @ts-ignore
-            wishCreationDate={new Date(wish.createdAt)}
-            // @ts-ignore
-            wishUpdateDate={wish.updatedAt ? new Date(wish.updatedAt) : null}
+            wishCreationDate={
+               // @ts-ignore
+               isNaN(wish.createdAt) ? null : new Date(wish.createdAt)
+            }
+            wishUpdateDate={
+               // @ts-ignore
+               isNaN(wish.updatedAt) ? null : new Date(wish.updatedAt)
+            }
             wishDescription={wish.description}
             wishRating={`${parseInt(ratingValue)}`}
             // @ts-ignore
