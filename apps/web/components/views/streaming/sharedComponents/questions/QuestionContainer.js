@@ -30,7 +30,6 @@ import useStreamRef from "../../../../custom-hook/useStreamRef"
 import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 
 const useStyles = makeStyles((theme) => ({
@@ -371,8 +370,9 @@ const QuestionContainer = memo(
          >
             <Paper elevation={4} className={classes.questionContainer}>
                <div style={{ padding: "20px 20px 5px 20px" }}>
-                  {question?.badges?.includes(
-                     UserPresenter.questionsHighlightedRequiredBadge().key
+                  {containsBadgeOrLevelsAbove(
+                     question?.badges,
+                     UserPresenter.questionsHighlightedRequiredBadge()
                   ) && (
                      <div className={classes.badge}>
                         <BadgeButton
@@ -573,6 +573,22 @@ QuestionContainer.propTypes = {
    user: PropTypes.object,
    setOpenQuestionId: PropTypes.func.isRequired,
    openQuestionId: PropTypes.string,
+}
+
+// Temporary function while this file isn't converted into TS
+// reuse UserBadges.ts version at that time
+const containsBadgeOrLevelsAbove = (badges, badge) => {
+   if (!badges) return false
+
+   let curr = badge
+
+   while (curr) {
+      if (badges.includes(curr.key)) {
+         return true
+      }
+      curr = curr.next
+   }
+   return false
 }
 
 export default compose(withFirebase)(QuestionContainer)
