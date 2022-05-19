@@ -125,7 +125,9 @@ export function stringToColor(string: string) {
 const removeSpecialChars = (str: string) => {
    return str.replace(/[^a-zA-Z ]/g, "")
 }
-
+/*
+ * inspired from the stackoverflow [answer](https://stackoverflow.com/questions/33076177/getting-name-initials-using-js#answer-63763497)
+ * */
 const getInitials = (fullName: string) => {
    return removeSpecialChars(fullName)
       .match(/(^\S\S?|\s\S)?/g)
