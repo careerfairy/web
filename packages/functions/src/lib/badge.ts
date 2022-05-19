@@ -16,19 +16,20 @@ import {
    EngageBadgeLevel2,
    EngageBadge,
 } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
+import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 
 /**
  * Applies user badges based on the userData document
  */
 export const handleUserNetworkerBadges = async (
    userDataId: string,
-   newValue: any
+   newUserData: UserData
 ): Promise<void> => {
-   if (!newValue.referralsCount) {
+   if (!newUserData.referralsCount) {
       // no point in continuing, to update the Networker badge we need some referrals
       return
    }
-   const badges = newValue.badges
+   const badges = newUserData.badges
    let newBadges
 
    functions.logger.log(
@@ -38,24 +39,21 @@ export const handleUserNetworkerBadges = async (
 
    // Assign Networker badge level 3
    if (isEligibleForBadge(badges, NetworkerBadgeLevel3)) {
-      if (
-         newValue.referralsCount >= 10 &&
-         newValue.totalLivestreamInvites >= 5
-      ) {
+      if (NetworkerBadgeLevel3.isComplete(newUserData, null)) {
          newBadges = replaceBadge(badges, NetworkerBadgeLevel3)
       }
    }
 
    // Assign Networker badge level 2
    if (isEligibleForBadge(badges, NetworkerBadgeLevel2)) {
-      if (newValue.referralsCount >= 3) {
+      if (NetworkerBadgeLevel2.isComplete(newUserData, null)) {
          newBadges = replaceBadge(badges, NetworkerBadgeLevel2)
       }
    }
 
    // Assign Networker badge level 1
    if (isEligibleForBadge(badges, NetworkerBadge)) {
-      if (newValue.referralsCount >= 1) {
+      if (NetworkerBadge.isComplete(newUserData, null)) {
          newBadges = addBadge(badges, NetworkerBadge.key)
       }
    }
@@ -70,9 +68,10 @@ export const handleUserNetworkerBadges = async (
  */
 export const handleUserStatsBadges = async (
    userDataId: string,
-   newValue: any
+   newUserStats: UserStats
 ): Promise<void> => {
-   const badges = (await userGetByEmail(userDataId)).badges
+   const userData: UserData = (await userGetByEmail(userDataId)) as UserData
+   const badges = userData.badges
    let newBadges
 
    functions.logger.log(
@@ -84,21 +83,21 @@ export const handleUserStatsBadges = async (
 
    // Assign Research badge level 3
    if (isEligibleForBadge(badges, ResearchBadgeLevel3)) {
-      if (newValue.totalLivestreamAttendances >= 10) {
+      if (ResearchBadgeLevel3.isComplete(userData, newUserStats)) {
          newBadges = replaceBadge(badges, ResearchBadgeLevel3)
       }
    }
 
    // Assign Research badge level 2
    if (isEligibleForBadge(badges, ResearchBadgeLevel2)) {
-      if (newValue.totalLivestreamAttendances >= 3) {
+      if (ResearchBadgeLevel2.isComplete(userData, newUserStats)) {
          newBadges = replaceBadge(badges, ResearchBadgeLevel2)
       }
    }
 
    // Assign Research badge level 1
    if (isEligibleForBadge(badges, ResearchBadge)) {
-      if (newValue.totalLivestreamAttendances >= 1) {
+      if (ResearchBadge.isComplete(userData, newUserStats)) {
          newBadges = addBadge(badges, ResearchBadge.key)
       }
    }
@@ -107,22 +106,21 @@ export const handleUserStatsBadges = async (
 
    // Assign Engage badge level 3
    if (isEligibleForBadge(badges, EngageBadgeLevel3)) {
-      if (newValue.totalQuestionsAsked >= 25 && newValue.totalHandRaises >= 3) {
+      if (EngageBadgeLevel3.isComplete(userData, newUserStats)) {
          newBadges = replaceBadge(badges, EngageBadgeLevel3)
       }
    }
 
    // Assign Engage badge level 2
    if (isEligibleForBadge(badges, EngageBadgeLevel2)) {
-      if (newValue.totalQuestionsAsked >= 10 && newValue.totalHandRaises >= 1) {
+      if (EngageBadgeLevel2.isComplete(userData, newUserStats)) {
          newBadges = replaceBadge(badges, EngageBadgeLevel2)
       }
    }
 
    // Assign Engage badge level 1
    if (isEligibleForBadge(badges, EngageBadge)) {
-      // if (newValue.totalQuestionsAsked >= 5) {
-      if (newValue.totalQuestionsAsked >= 1) {
+      if (EngageBadge.isComplete(userData, newUserStats)) {
          newBadges = addBadge(badges, EngageBadge.key)
       }
    }
