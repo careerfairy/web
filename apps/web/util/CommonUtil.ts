@@ -125,6 +125,18 @@ export function stringToColor(string: string) {
 const removeSpecialChars = (str: string) => {
    return str.replace(/[^a-zA-Z ]/g, "")
 }
+/*
+ * inspired from the stackoverflow [answer](https://stackoverflow.com/questions/33076177/getting-name-initials-using-js#answer-63763497)
+ * */
+const getInitials = (fullName: string) => {
+   return removeSpecialChars(fullName)
+      .match(/(^\S\S?|\s\S)?/g)
+      .map((v) => v.trim())
+      .join("")
+      .match(/(^\S|\S$)?/g)
+      .join("")
+      .toLocaleUpperCase()
+}
 export function stringAvatar(firstName: string, lastName: string) {
    let name = ""
    // we trim the last name to avoid
@@ -138,14 +150,10 @@ export function stringAvatar(firstName: string, lastName: string) {
    if (lastName) {
       name += ` ${lastName.trim()}`
    }
-   name = removeSpecialChars(name)
    if (name === "") {
       name = "Anonymous"
    }
-   const initials = name
-      .split(" ")
-      .map((word) => word[0])
-      .join("")
+   const initials = getInitials(`${firstName || ""} ${lastName || ""}`)
 
    return {
       sx: {
