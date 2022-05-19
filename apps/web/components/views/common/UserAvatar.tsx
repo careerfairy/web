@@ -70,7 +70,6 @@ const UserAvatar = ({ sx, size, data }: UserAvatarProps) => {
          // @ts-ignore
          component={isLoggedInUser ? Link : undefined}
          href={isLoggedInUser ? "/profile" : undefined}
-         // imageUrl="https://images.unsplash.com/photo-1518791841217-8f162f1e1131?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=800&q=60"
       />
    )
 }
