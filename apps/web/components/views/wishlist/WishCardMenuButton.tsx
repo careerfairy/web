@@ -14,7 +14,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline"
 import FlagIcon from "@mui/icons-material/FlagOutlined"
 import EditIcon from "@mui/icons-material/Edit"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import useDialog from "../../custom-hook/useDialog"
+import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
@@ -60,14 +60,14 @@ const WishCardMenuButton = ({
       confirmDeleteModalOpen,
       handleOpenConfirmDeleteModal,
       handleCloseConfirmDeleteModal,
-   ] = useDialog()
+   ] = useDialogStateHandler()
    const [flagModalOpen, handleOpenFlagModal, handleCloseFlagModal] =
-      useDialog()
+      useDialogStateHandler()
    const [
       editWishModalOpen,
       handleOpenEditWishModal,
       handleCloseEditWishModal,
-   ] = useDialog()
+   ] = useDialogStateHandler()
    const dispatch = useDispatch()
    const [deleting, setDeleting] = useState(false)
    const { isLoggedIn, authenticatedUser, userData } = useAuth()

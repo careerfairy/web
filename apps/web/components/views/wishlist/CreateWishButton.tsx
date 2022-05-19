@@ -6,13 +6,13 @@ import { wishListBorderRadius } from "../../../constants/pages"
 import CreateOrEditWishDialog from "./CreateOrEditWishDialog"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
-import useDialog from "../../custom-hook/useDialog"
+import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
 import { StylesProps } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
 import { getMaxLineStyles } from "../../helperFunctions/HelperFunctions"
-import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
 import { HandleAddNewWishToHits } from "../../../pages/wishlist"
+import UserAvatar from "../common/UserAvatar"
 
 const styles: StylesProps = {
    paper: {
@@ -53,7 +53,7 @@ const CreateWishButton = ({ handleAddNewWishToHits }: Props) => {
    const { isLoggedIn } = useAuth()
    const { asPath } = useRouter()
    const [createWishDialogOpen, handleOpenWishDialog, handleCloseWishDialog] =
-      useDialog()
+      useDialogStateHandler()
    return (
       <>
          <Stack
@@ -63,7 +63,7 @@ const CreateWishButton = ({ handleAddNewWishToHits }: Props) => {
             alignItems={"center"}
             spacing={1}
          >
-            {isLoggedIn && <LoggedInUserAvatar size={"medium"} />}
+            {isLoggedIn && <UserAvatar size={"medium"} />}
             <Box className={"prompt"} sx={styles.prompt}>
                <Typography sx={styles.promptText}>
                   What would you like to wish for?

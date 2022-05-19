@@ -21,10 +21,10 @@ import { StylesProps } from "../../../types/commonTypes"
 import Typography from "@mui/material/Typography"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Box from "@mui/material/Box"
-import LoggedInUserAvatar from "../common/LoggedInUserAvatar"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import { HandleAddNewWishToHits } from "../../../pages/wishlist"
+import UserAvatar from "../common/UserAvatar"
 
 interface CreateWishDialogProps {
    open: boolean
@@ -208,7 +208,7 @@ const CreateOrEditWishDialog = ({
                >
                   <DialogTitle sx={styles.title}>Create Wish</DialogTitle>
                   <DialogContent sx={styles.content} dividers>
-                     <LoggedInUserAvatar sx={styles.avatar} size={"large"} />
+                     <UserAvatar sx={styles.avatar} size={"large"} />
                      <Stack sx={styles.fields} spacing={2}>
                         <Box>
                            <Label
