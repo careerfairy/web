@@ -122,7 +122,9 @@ export function stringToColor(string: string) {
 
    return color
 }
-
+const removeSpecialChars = (str: string) => {
+   return str.replace(/[^a-zA-Z ]/g, "")
+}
 export function stringAvatar(firstName: string, lastName: string) {
    let name = ""
    // we trim the last name to avoid
@@ -136,6 +138,7 @@ export function stringAvatar(firstName: string, lastName: string) {
    if (lastName) {
       name += ` ${lastName.trim()}`
    }
+   name = removeSpecialChars(name)
    if (name === "") {
       name = "Anonymous"
    }

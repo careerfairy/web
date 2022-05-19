@@ -17,11 +17,13 @@ type DefaultContext = {
    authenticatedUser?: FirebaseReducer.AuthState
    userData?: UserData
    isLoggedOut: boolean
+   isLoggedIn: boolean
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
    userData: undefined,
    isLoggedOut: undefined,
+   isLoggedIn: undefined,
 })
 
 const securePaths = [
@@ -64,6 +66,7 @@ const AuthProvider = ({ children }) => {
    )
 
    const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
+   const isLoggedIn = Boolean(auth.isLoaded && !auth.isEmpty)
 
    useEffect(() => {
       // Check that initial route is OK
@@ -146,6 +149,7 @@ const AuthProvider = ({ children }) => {
             authenticatedUser: auth,
             userData: isLoggedOut ? undefined : userData,
             isLoggedOut,
+            isLoggedIn,
          }}
       >
          {children}

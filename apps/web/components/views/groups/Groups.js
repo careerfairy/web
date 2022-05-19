@@ -44,13 +44,13 @@ export const Highlights = ({
             renderOption={(props, option, { inputValue }) => {
                const matches = match(option.universityName, inputValue)
                const parts = parse(option.universityName, matches)
-
+               const key = `listItem-${option.groupId}-${option.id}`
                return (
-                  <li {...props}>
+                  <li {...props} key={key}>
                      <div>
                         {parts.map((part, index) => (
                            <span
-                              key={index}
+                              key={index + part.text}
                               style={{
                                  fontWeight: part.highlight ? 700 : 400,
                               }}

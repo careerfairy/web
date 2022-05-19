@@ -40,7 +40,7 @@ const styles: StylesProps = {
          position: "absolute",
          background: "inherit",
          backgroundPosition: "center center",
-         filter: "drop-shadow(0px 0px 10px rgba(0, 0, 0, 0.50)) blur(20px)",
+         filter: "drop-shadow(0px 0px 5px rgba(0, 0, 0, 0.10)) blur(15px)",
          zIndex: -1,
       },
    },

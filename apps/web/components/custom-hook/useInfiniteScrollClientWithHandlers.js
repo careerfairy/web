@@ -7,9 +7,9 @@ const useInfiniteScrollClientWithHandlers = (
    loadAdditional = 0
 ) => {
    const [hasMore, setHasMore] = useState(true)
-   const [totalItems, setTotalItems] = useState(initialTotal)
+   const [totalItems, setTotalItems] = useState(data || initialTotal)
    const [end, setEnd] = useState(limit)
-   const [items, setItems] = useState([])
+   const [items, setItems] = useState(totalItems.slice(0, end))
 
    useEffect(() => {
       const paginatedItems = totalItems.slice(0, end)
