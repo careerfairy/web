@@ -1,0 +1,58 @@
+import React from "react"
+import { StylesProps } from "types/commonTypes"
+import Stack from "@mui/material/Stack"
+import { Alert, Typography } from "@mui/material"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { alpha } from "@mui/material/styles"
+import InfoIcon from "@mui/icons-material/InfoOutlined"
+import Box from "@mui/material/Box"
+import ReferralWidget from "../../common/ReferralWidget"
+
+const styles: StylesProps = {
+   root: {
+      textAlign: "center",
+      backgroundColor: alpha("#FFF1CC", 0.5),
+      borderRadius: 2,
+      p: 3,
+   },
+   sharePrompt: {
+      p: 1,
+      backgroundColor: "secondary.main",
+      color: (theme) =>
+         theme.palette.getContrastText(theme.palette.secondary.main),
+      width: "fit-content",
+      borderRadius: 2,
+   },
+   alert: {
+      backgroundColor: (theme) => theme.palette.grey["200"],
+      borderRadius: 2,
+      "& svg": {
+         color: (theme) => theme.palette.common.black,
+      },
+   },
+}
+
+interface Props {
+   event: LivestreamEvent
+}
+const Referral = ({ event }: Props) => {
+   return (
+      <Stack spacing={2} alignItems={"center"} sx={styles.root}>
+         <Box sx={styles.sharePrompt}>
+            <Typography variant="h6">SHARE</Typography>
+         </Box>
+         <ReferralWidget
+            event={event}
+            noBackgroundColor
+            iconsColor={"grey"}
+            justifyContent={"center"}
+         />
+         <Alert sx={styles.alert} icon={<InfoIcon />} severity="info">
+            Share the event with your network! Your questions will be shown on
+            top and answered first!
+         </Alert>
+      </Stack>
+   )
+}
+
+export default Referral

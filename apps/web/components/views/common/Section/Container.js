@@ -13,10 +13,10 @@ const styles = {
    },
 }
 const SectionContainer = ({
-   className,
+   className = undefined,
    maxWidth = "md",
-   children,
-   sx,
+   children = undefined,
+   sx = undefined,
    ...props
 }) => {
    return (
