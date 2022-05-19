@@ -38,20 +38,11 @@ export class Badge {
 
    /**
     * Check if the badge has all requirements met
-    * The previous badge must be complete too
     *
     * @param userData
     * @param userStats
     */
    isComplete(userData: UserData, userStats: UserStats): boolean {
-      const prevBadgeComplete = this.prev
-         ? this.prev.isComplete(userData, userStats)
-         : true
-
-      if (!prevBadgeComplete) {
-         return false
-      }
-
       return this.requirements.every((r) => r.isComplete(userData, userStats))
    }
 
