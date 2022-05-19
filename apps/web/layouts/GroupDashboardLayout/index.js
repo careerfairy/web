@@ -10,24 +10,19 @@ import TopBar from "./TopBar"
 import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect"
 import useAdminGroup from "../../components/custom-hook/useAdminGroup"
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks"
-import { CircularProgress, Typography, useMediaQuery } from "@mui/material"
+import { CircularProgress, Typography } from "@mui/material"
 import Page, {
    PageChildrenWrapper,
    PageContentWrapper,
 } from "../../components/views/common/Page"
-import { useTheme } from "@mui/material/styles"
-
-const desktopProp = "md"
+import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 
 const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
    const scrollRef = useRef(null)
-   const theme = useTheme()
 
-   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
-      noSsr: true,
-   })
+   const isDesktop = useIsDesktop()
    const {
       query: { groupId },
    } = useRouter()

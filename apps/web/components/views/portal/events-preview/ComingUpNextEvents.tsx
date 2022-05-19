@@ -12,7 +12,7 @@ import { parseStreamDates } from "../../../../util/serverUtil"
 import { useMountedState } from "react-use"
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
-   const { isLoggedOut } = useAuth()
+   const { isLoggedIn } = useAuth()
    const {
       query: { livestreamId },
    } = useRouter()
@@ -28,7 +28,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    }, [])
 
    const { items: events, isLoading } = usePagination<LiveStreamEvent>(query, {
-      limit: isLoggedOut ? 80 : limit,
+      limit: isLoggedIn ? limit : 80,
    })
 
    useEffect(() => {
@@ -64,7 +64,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       setLocalEvents(newLocalEvents)
    }, [eventFromQuery, events])
 
-   if (isLoggedOut || !mounted) {
+   if (!isLoggedIn || !mounted) {
       return (
          <EventsPreviewGrid
             id={"upcoming-events"}

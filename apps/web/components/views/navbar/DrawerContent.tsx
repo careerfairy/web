@@ -26,17 +26,17 @@ const DrawerContent = () => {
       authenticatedUserTopLinks,
       eventLinks,
    } = useGeneralLinks()
-   const { isLoggedOut, authenticatedUser } = useAuth()
+   const { isLoggedOut, authenticatedUser, isLoggedIn, userData } = useAuth()
    const dispatch = useDispatch()
    const signOut = () => dispatch(actions.signOut())
 
    return (
       <Stack divider={<Divider flexItem />} sx={styles.root} spacing={1}>
-         {!isLoggedOut && <UserAvatarAndDetails />}
+         {isLoggedIn && userData && <UserAvatarAndDetails />}
          <Stack spacing={1}>
             <List>
                {isLoggedOut && (
-                  <ListItem>
+                  <ListItem disableGutters>
                      <LoginButton />
                   </ListItem>
                )}
@@ -45,7 +45,7 @@ const DrawerContent = () => {
                ))}
             </List>
          </Stack>
-         {!isLoggedOut && (
+         {isLoggedIn && (
             <>
                <List>
                   {authenticatedUserTopLinks.map((item) => (
