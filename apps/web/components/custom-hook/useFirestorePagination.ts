@@ -145,9 +145,9 @@ export default function useFirestorePagination(
    }, [state.after])
 
    // trigger firebase to load more
-   function loadMore() {
+   const loadMore = useCallback(() => {
       dispatch({ type: "LOAD-MORE" })
-   }
+   }, [])
 
    return {
       loadingMore: state.loadingMore,
