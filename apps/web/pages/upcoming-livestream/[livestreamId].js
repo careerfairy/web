@@ -23,6 +23,8 @@ import { useMediaQuery } from "@mui/material"
 import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions"
 import { getRelevantHosts } from "../../util/streamUtil"
 import { useInterests } from "../../components/custom-hook/useCollection"
+import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
+import SEO from "../../components/util/SEO"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -350,9 +352,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    return (
       <UpcomingLayout>
-         <HeadWithMeta
-            {...getStreamMetaInfo({ stream, groupId: query.groupId })}
-         />
+         <SEO {...getStreamMetaInfo(stream)} />
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
             stream={stream}
@@ -414,8 +414,11 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             questions={handlers.docs}
             questionSortType={questionSortType}
          />
+
          {!stream.hasNoTalentPool && <TalentPoolSection stream={stream} />}
+         <ReferralSection event={stream} />
          <ContactSection
+            backgroundColor={theme.palette.common.white}
             subtitle={"Any problem or question ? We want to hear from you"}
          />
          <RegistrationModal
