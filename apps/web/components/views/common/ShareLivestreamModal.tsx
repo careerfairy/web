@@ -23,7 +23,7 @@ import {
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import React, { useEffect, useState } from "react"
 import { streamIsOld } from "../../../util/CommonUtil"
-import ReferralWidget from "./ReferralWidget"
+import ReferralPrompt from "./ReferralPrompt"
 
 const styles = {
    title: {
@@ -115,7 +115,7 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
                      </Box>
                   </Stack>
                </Box>
-               <ReferralWidget event={livestreamData} />
+               <ReferralPrompt event={livestreamData} />
                <Box sx={{ display: "flex", flexWrap: "wrap" }}>
                   <TextField
                      sx={{ flex: 1, marginRight: "10px" }}

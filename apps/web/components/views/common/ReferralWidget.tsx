@@ -1,23 +1,21 @@
 import React from "react"
-import { StylesProps } from "types/commonTypes"
-import Stack from "@mui/material/Stack"
-import {
-   Button,
-   IconButton,
-   Tooltip,
-   Typography,
-   useMediaQuery,
-} from "@mui/material"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import useSocials from "../../custom-hook/useSocials"
+import Stack, { StackProps } from "@mui/material/Stack"
 import { alpha, useTheme } from "@mui/material/styles"
+import { Button, IconButton, Tooltip, useMediaQuery } from "@mui/material"
+import useSocials from "../../custom-hook/useSocials"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { StylesProps } from "../../../types/commonTypes"
 const mobileProp = "sm"
+
+interface WidgetButtonProps extends StackProps {
+   event: LivestreamEvent
+   iconsColor?: "grey" | "primary" | "secondary"
+   noBackgroundColor?: boolean
+}
 const styles: StylesProps = {
-   root: {
-      textAlign: "center",
-   },
    socialIcons: {
       color: "secondary.main",
+      width: "100%",
       borderRadius: 2,
       backgroundColor: (theme) => ({
          xs: "transparent",
@@ -25,7 +23,6 @@ const styles: StylesProps = {
       }),
    },
    icon: {
-      color: "secondary.main",
       fontSize: "4rem",
    },
    iconButton: {
@@ -34,61 +31,60 @@ const styles: StylesProps = {
       },
    },
 }
-
-interface Props {
-   event: LivestreamEvent
-   title?: string
-   subtitle?: string
-}
-const ReferralWidget = ({ event, title, subtitle }: Props) => {
-   const socials = useSocials(event)
+export const ReferralWidget = ({
+   event,
+   iconsColor = "secondary",
+   noBackgroundColor,
+   ...rest
+}: WidgetButtonProps) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down(mobileProp))
+   const socials = useSocials(event)
+
    return (
-      <Stack spacing={2} sx={styles.root}>
-         {(title || subtitle) && (
-            <span>
-               {title && <Typography variant="h6">{title}</Typography>}
-               {subtitle && <Typography variant="body1">{subtitle}</Typography>}
-            </span>
-         )}
-         <Stack
-            direction={{ xs: "column", [mobileProp]: "row" }}
-            justifyContent={"space-evenly"}
-            sx={styles.socialIcons}
-            spacing={1}
-         >
-            {socials.map((icon) =>
-               mobile ? (
-                  <Button
-                     fullWidth
-                     key={icon.name}
-                     color={"secondary"}
-                     variant={"outlined"}
+      <Stack
+         direction={{ xs: "column", [mobileProp]: "row" }}
+         justifyContent={"space-evenly"}
+         sx={[
+            styles.socialIcons,
+            noBackgroundColor && { backgroundColor: "transparent !important" },
+         ]}
+         spacing={1}
+         {...rest}
+      >
+         {socials.map((icon) =>
+            mobile ? (
+               <Button
+                  fullWidth
+                  key={icon.name}
+                  color={iconsColor}
+                  variant={"outlined"}
+                  size={"large"}
+                  startIcon={<icon.icon />}
+               >
+                  {icon.name}
+               </Button>
+            ) : (
+               <Tooltip key={icon.name} arrow title={icon.name}>
+                  <IconButton
+                     sx={[
+                        styles.iconButton,
+                        {
+                           color:
+                              iconsColor === "grey"
+                                 ? "common.black"
+                                 : `${iconsColor}.main`,
+                        },
+                     ]}
+                     onClick={icon.onClick}
                      size={"large"}
-                     startIcon={<icon.icon />}
+                     href={icon.href}
                   >
-                     {icon.name}
-                  </Button>
-               ) : (
-                  <Tooltip key={icon.name} arrow title={icon.name}>
-                     <IconButton
-                        sx={styles.iconButton}
-                        onClick={icon.onClick}
-                        size={"large"}
-                        href={icon.href}
-                        color={"secondary"}
-                     >
-                        <icon.icon sx={styles.icon} />
-                     </IconButton>
-                  </Tooltip>
-               )
-            )}
-         </Stack>
-         <Typography variant="body1">
-            <b>Pro tip:</b> By sharing the event your questions will be more
-            visible for the event hosts
-         </Typography>
+                     <icon.icon color={"inherit"} sx={styles.icon} />
+                  </IconButton>
+               </Tooltip>
+            )
+         )}
       </Stack>
    )
 }

@@ -13,7 +13,7 @@ import { RegistrationContext } from "../../../../../../context/registration/Regi
 import SuccessCheckmark from "./SuccessCheckmark"
 import { useRouter } from "next/router"
 import { StylesProps } from "../../../../../../types/commonTypes"
-import ReferralWidget from "../../../ReferralWidget"
+import ReferralPrompt from "../../../ReferralPrompt"
 
 const styles: StylesProps = {
    root: {},
@@ -88,7 +88,7 @@ const RegistrationComplete = () => {
          </DialogContent>
          <DialogActions>
             <Stack divider={<Divider />} spacing={2} sx={styles.actionsWrapper}>
-               <ReferralWidget
+               <ReferralPrompt
                   subtitle={
                      "You have successfully completed your first step towards " +
                      "becoming a member of the community. You can share the event " +
