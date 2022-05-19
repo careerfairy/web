@@ -9,7 +9,7 @@ interface EventSEOProps {
    eventDescription: string
    eventCompany: string
 }
-const EventSEO = ({
+const EventSEOSchemaScriptTag = ({
    eventDate,
    eventDescription,
    eventName,
@@ -57,4 +57,4 @@ const EventSEO = ({
    )
 }
 
-export default EventSEO
+export default EventSEOSchemaScriptTag

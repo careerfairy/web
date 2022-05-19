@@ -9,7 +9,7 @@ interface WishSEOProps {
    wishRating: string
    wishRatingCount: number
 }
-const WishSEO = ({
+const WishSEOSchemaScriptTag = ({
    wishDescription,
    wishCreationDate,
    wishUpdateDate,
@@ -58,4 +58,4 @@ const WishSEO = ({
    )
 }
 
-export default WishSEO
+export default WishSEOSchemaScriptTag

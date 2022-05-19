@@ -25,7 +25,7 @@ import Skeleton from "@mui/material/Skeleton"
 import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
-import EventSEO from "../EventSEO"
+import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 
 const styles = {
    hideOnHoverContent: {
@@ -523,7 +523,7 @@ const EventPreviewCard = ({
             </Box>
          </Box>
          {event && (
-            <EventSEO
+            <EventSEOSchemaScriptTag
                eventDate={
                   event?.startDate ? new Date(event?.startDate) : new Date()
                }

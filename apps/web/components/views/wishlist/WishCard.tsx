@@ -25,7 +25,7 @@ import DateUtil from "../../../util/DateUtil"
 import { useRouter } from "next/router"
 import { Hit } from "../../../types/algolia"
 import WishCardMenuButton from "./WishCardMenuButton"
-import WishSEO from "../common/WishSEO"
+import WishSEOSchemaScriptTag from "../common/WishSEOSchemaScriptTag"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -396,7 +396,7 @@ const WishCard = ({ wish }: WishCardProps) => {
                </Box>
             </Stack>
          </Paper>
-         <WishSEO
+         <WishSEOSchemaScriptTag
             wishAuthor={authorDisplayName || "User"}
             wishCreationDate={
                // @ts-ignore
