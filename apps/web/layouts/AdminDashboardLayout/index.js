@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo } from "react"
 import NavBar from "./NavBar"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { CircularProgress, useMediaQuery } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import useAdminLinks from "../../components/custom-hook/useAdminLinks"
 import { useRouter } from "next/router"
 import * as actions from "../../store/actions"
@@ -11,18 +11,15 @@ import Page, {
    PageChildrenWrapper,
    PageContentWrapper,
 } from "../../components/views/common/Page"
-import { useTheme } from "@mui/material/styles"
+import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 
 const desktopProp = "md"
 
 const AdminDashboardLayout = (props) => {
    const { children } = props
    const dispatch = useDispatch()
-   const theme = useTheme()
 
-   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
-      noSsr: true,
-   })
+   const isDesktop = useIsDesktop()
    const { userData, authenticatedUser } = useAuth()
    const { replace } = useRouter()
    const enqueueSnackbar = (...args) =>

@@ -50,7 +50,7 @@ interface Props {
    handleAddNewWishToHits: HandleAddNewWishToHits
 }
 const CreateWishButton = ({ handleAddNewWishToHits }: Props) => {
-   const { isLoggedIn } = useAuth()
+   const { isLoggedIn, userData } = useAuth()
    const { asPath } = useRouter()
    const [createWishDialogOpen, handleOpenWishDialog, handleCloseWishDialog] =
       useDialogStateHandler()
@@ -63,7 +63,7 @@ const CreateWishButton = ({ handleAddNewWishToHits }: Props) => {
             alignItems={"center"}
             spacing={1}
          >
-            {isLoggedIn && <UserAvatar size={"medium"} />}
+            {isLoggedIn && <UserAvatar data={userData} size={"medium"} />}
             <Box className={"prompt"} sx={styles.prompt}>
                <Typography sx={styles.promptText}>
                   What would you like to wish for?

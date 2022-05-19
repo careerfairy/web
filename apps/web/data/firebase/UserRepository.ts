@@ -4,7 +4,9 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
-   getUserDataByUid(uid: string): Promise<null | UserData>
+
+   getUserDataByUid(uid: string): Promise<UserData>
+
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
 }
 
@@ -18,6 +20,7 @@ class FirebaseUserRepository implements IUserRepository {
          interestsIds: Array.from(new Set(interestIds)),
       })
    }
+
    async getUserDataByUid(uid: string): Promise<UserData> {
       const snap = await this.firestore
          .collection("userData")

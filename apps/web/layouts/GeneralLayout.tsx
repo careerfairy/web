@@ -6,9 +6,7 @@ import Page, {
    PageChildrenWrapper,
    PageContentWrapper,
 } from "../components/views/common/Page"
-import { useTheme } from "@mui/material/styles"
-import { useMediaQuery } from "@mui/material"
-import { desktopProp } from "../constants/pages"
+import useIsDesktop from "../components/custom-hook/useIsDesktop"
 
 interface Props {
    children: React.ReactNode
@@ -17,6 +15,7 @@ interface Props {
    hideNavOnScroll?: boolean
    persistent?: boolean
 }
+
 const GeneralLayout = ({
    children,
    fullScreen,
@@ -24,11 +23,7 @@ const GeneralLayout = ({
    hideNavOnScroll = false,
    persistent = false,
 }: Props) => {
-   const theme = useTheme()
-
-   const isDesktop = useMediaQuery(theme.breakpoints.up(desktopProp), {
-      // noSsr: true,
-   })
+   const isDesktop = useIsDesktop()
 
    return (
       <Page

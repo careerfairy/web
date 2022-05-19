@@ -8,7 +8,7 @@ export interface IWishRepository {
       options?: GetWishesOptions
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
    getWishes(options?: GetWishesOptions): Promise<Wish[]>
-   createWish(data: CreateWishFormValues): Promise<Wish>
+   createWish(userUid: string, data: CreateWishFormValues): Promise<Wish>
    updateWish(
       wishData: CreateWishFormValues,
       wishId: string
@@ -20,13 +20,16 @@ export interface IWishRepository {
       type: "upvote" | "downvote"
    ): Promise<Rating>
    deleteWish(wishId: string): Promise<Partial<Wish>>
-   restoreDeletedWish(wishId: string): Promise<Partial<Wish>>
+   restoreDeletedWish(userEmail: string, wishId: string): Promise<Partial<Wish>>
    flagWish(
+      userUid: string,
+      userEmail: string,
       wishId: string,
       reasons: FlagReason[],
       message?: string
    ): Promise<Partial<Wish>>
    listenToWishRating(
+      uid: string,
       wishId: string,
       callback: {
          next?: (
@@ -89,7 +92,10 @@ class FirebaseWishRepository implements IWishRepository {
       return snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() } as Wish))
    }
 
-   async createWish(wishFormValues: CreateWishFormValues): Promise<Wish> {
+   async createWish(
+      userUid,
+      wishFormValues: CreateWishFormValues
+   ): Promise<Wish> {
       const docRef = await this.firestore.collection("wishes").doc()
       const newWish: Wish = {
          description: wishFormValues.description.trim(),
@@ -97,7 +103,7 @@ class FirebaseWishRepository implements IWishRepository {
          interestIds: wishFormValues.interests.map((interest) => interest.id),
          interests: wishFormValues.interests,
          createdAt: firebase.firestore.FieldValue.serverTimestamp(),
-         authorUid: firebase.auth().currentUser?.uid,
+         authorUid: userUid,
          updatedAt: null,
          deletedAt: null,
          uidsOfRecentUpvoters: [],
@@ -143,11 +149,12 @@ class FirebaseWishRepository implements IWishRepository {
 
       return updatedWish
    }
-   async restoreDeletedWish(wishId: string): Promise<Partial<Wish>> {
+   async restoreDeletedWish(
+      userEmail: string,
+      wishId: string
+   ): Promise<Partial<Wish>> {
       const wishRef = this.firestore.collection("wishes").doc(wishId)
-      const userRef = this.firestore
-         .collection("userData")
-         .doc(firebase.auth().currentUser?.email)
+      const userRef = this.firestore.collection("userData").doc(userEmail)
       // run transaction
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userDoc) => {
@@ -170,6 +177,7 @@ class FirebaseWishRepository implements IWishRepository {
    }
 
    listenToWishRating(
+      uid: string,
       wishId: string,
       callback: {
          next?: (
@@ -183,7 +191,7 @@ class FirebaseWishRepository implements IWishRepository {
          .collection("wishes")
          .doc(wishId)
          .collection("ratings")
-         .doc(firebase.auth().currentUser?.uid)
+         .doc(uid)
          .onSnapshot(callback)
    }
 
@@ -242,19 +250,19 @@ class FirebaseWishRepository implements IWishRepository {
    }
 
    async flagWish(
+      userUid: string,
+      userEmail: string,
       wishId: string,
       reasons: FlagReason[],
       message?: string
    ): Promise<Partial<Wish>> {
       const wishRef = this.firestore.collection("wishes").doc(wishId)
-      const userRef = this.firestore
-         .collection("userData")
-         .doc(firebase.auth().currentUser?.email)
+      const userRef = this.firestore.collection("userData").doc(userEmail)
       const flagRef = this.firestore
          .collection("wishes")
          .doc(wishId)
          .collection("flags")
-         .doc(firebase.auth().currentUser?.uid)
+         .doc(userUid)
 
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userDoc) => {

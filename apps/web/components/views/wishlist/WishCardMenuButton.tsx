@@ -135,7 +135,13 @@ const WishCardMenuButton = ({
    ) => {
       try {
          setDeleting(true)
-         await wishRepo.flagWish(wish.id, flagReasons, message)
+         await wishRepo.flagWish(
+            authenticatedUser.uid,
+            authenticatedUser.email,
+            wish.id,
+            flagReasons,
+            message
+         )
       } catch (error) {
          dispatch(actions.sendGeneralError(error))
       }

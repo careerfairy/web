@@ -129,7 +129,7 @@ const CreateOrEditWishDialog = ({
    handleAddNewWishToHits,
 }: CreateWishDialogProps) => {
    // Material dialog
-   const { userData } = useAuth()
+   const { userData, authenticatedUser } = useAuth()
    const dispatch = useDispatch()
    const { data: allInterests } = useInterests()
    const initialValues = useMemo<CreateWishFormValues>(
@@ -163,7 +163,10 @@ const CreateOrEditWishDialog = ({
             }
          } else {
             // create wish
-            const newWish = await wishlistRepo.createWish(values)
+            const newWish = await wishlistRepo.createWish(
+               authenticatedUser.uid,
+               values
+            )
             handleAddNewWishToHits(newWish)
          }
          dispatch(
@@ -174,7 +177,7 @@ const CreateOrEditWishDialog = ({
             )
          )
       } catch (e) {
-         console.error("error in creating wish", e)
+         dispatch(actions.sendGeneralError(e))
       }
       // close dialog
       handleClose()
@@ -208,7 +211,11 @@ const CreateOrEditWishDialog = ({
                >
                   <DialogTitle sx={styles.title}>Create Wish</DialogTitle>
                   <DialogContent sx={styles.content} dividers>
-                     <UserAvatar sx={styles.avatar} size={"large"} />
+                     <UserAvatar
+                        data={userData}
+                        sx={styles.avatar}
+                        size={"large"}
+                     />
                      <Stack sx={styles.fields} spacing={2}>
                         <Box>
                            <Label
