@@ -10,6 +10,8 @@ export interface LivestreamEvent extends Identifiable {
    backgroundImageUrl?: string
    company?: string
    companyId?: string
+   participants?: string[]
+   participatingStudents?: string[]
    companyLogoUrl?: string
    created?: firebase.firestore.Timestamp
    currentSpeakerId?: string

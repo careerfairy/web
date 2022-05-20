@@ -342,7 +342,7 @@ const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
          logoTooltip={stream.company}
          hovered={hovered}
          brand={<MainLogo white className={classes.careerFairyLogo} />}
-         date={stream.start.toDate()}
+         date={stream.startDate || stream.start.toDate()}
          cover={getResizedUrl(stream.backgroundImageUrl, "md")}
          logo={getResizedUrl(stream.companyLogoUrl, "xs")}
          title={stream.title}
