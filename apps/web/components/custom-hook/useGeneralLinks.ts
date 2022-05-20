@@ -10,6 +10,7 @@ import GroupsIcon from "@mui/icons-material/Groups"
 import ContactPageIcon from "@mui/icons-material/ContactPage"
 import AutoModeIcon from "@mui/icons-material/AutoMode"
 
+import WishListIcon from "@mui/icons-material/FavoriteRounded"
 const initialMainLinks = [
    {
       href: `/portal`,
@@ -22,6 +23,12 @@ const initialMainLinks = [
       title: "NEXT LIVE STREAMS",
       basePath: "/next-livestreams",
       icon: NextLivestreamsIcon,
+   },
+   {
+      href: `/wishlist`,
+      title: "WISHLIST",
+      basePath: "/wishlist",
+      icon: WishListIcon,
    },
 ]
 const initialSecondaryLinks = [
@@ -122,6 +129,12 @@ const eventLinks: PageLinkProps[] = [
       title: "NEXT LIVE STREAMS",
       basePath: "/next-livestreams",
       icon: NextLivestreamsIcon,
+   },
+   {
+      href: `/wishlist`,
+      title: "WISHLIST",
+      basePath: "/wishlist",
+      icon: WishListIcon,
    },
 ]
 const useGeneralLinks = () => {

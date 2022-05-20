@@ -181,6 +181,7 @@ const Groups = () => {
             >
                {tabs.map(({ label, ...tab }) => (
                   <Tab
+                     key={label}
                      component={Link}
                      label={<ContentCardTitle>{label}</ContentCardTitle>}
                      shallow

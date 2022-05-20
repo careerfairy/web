@@ -47,7 +47,7 @@ const styles = sxStyles({
    },
    contextInfo: {
       padding: 2,
-      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_3_7_20,
+      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_8_25_10,
    },
    unlockedSummary: {
       justifyContent: "start",

@@ -98,7 +98,7 @@ const EmptyList = () => {
                sx={{
                   padding: 2,
                   boxShadow: (theme: DefaultTheme) =>
-                     theme.boxShadows.dark_3_7_20,
+                     theme.boxShadows.dark_8_25_10,
                }}
             >
                <Typography mb={2} sx={{ fontWeight: "bold" }}>

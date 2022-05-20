@@ -18,6 +18,7 @@ import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
+import wishes = require("./wishes")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
@@ -51,8 +52,7 @@ exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData = groupAdmin.getLivestreamReportData
-exports.getLivestreamReportData_TEMP_NAME =
-   groupAdmin.getLivestreamReportData_TEMP_NAME
+exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData_v2
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
 
@@ -126,3 +126,7 @@ exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
 exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
 exports.rewardUserAction = rewards.rewardUserAction
+
+// Ratings
+
+exports.onUserRateWish = wishes.onUserRateWish

@@ -20,11 +20,13 @@ type DefaultContext = {
    isLoggedOut: boolean
    userPresenter?: UserPresenter
    userStats?: UserStats
+   isLoggedIn: boolean
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
    userData: undefined,
    isLoggedOut: undefined,
+   isLoggedIn: undefined,
    userPresenter: undefined,
    userStats: undefined,
 })
@@ -79,6 +81,7 @@ const AuthProvider = ({ children }) => {
    )
 
    const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
+   const isLoggedIn = Boolean(auth.isLoaded && !auth.isEmpty)
 
    useEffect(() => {
       // Check that initial route is OK
@@ -161,6 +164,7 @@ const AuthProvider = ({ children }) => {
             authenticatedUser: auth,
             userData: isLoggedOut ? undefined : userData,
             isLoggedOut,
+            isLoggedIn,
             userPresenter: userData ? new UserPresenter(userData) : undefined,
             userStats: userStats,
          }}

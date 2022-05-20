@@ -44,7 +44,11 @@ const GenericHeader = ({
          <Box display="flex" alignItems="center">
             {!isDesktop && (
                <IconButton
-                  sx={{ mr: 1, color: darkMode && !scrolledDown && "white" }}
+                  sx={{
+                     mr: 1,
+                     color: darkMode && !scrolledDown && "white",
+                     zIndex: 1,
+                  }}
                   color="primary"
                   onClick={handleDrawerToggle}
                   size="large"

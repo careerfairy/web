@@ -25,6 +25,7 @@ import Skeleton from "@mui/material/Skeleton"
 import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
+import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 
 const styles = {
    hideOnHoverContent: {
@@ -71,7 +72,7 @@ const styles = {
          },
          "& .title": (theme) => ({
             [theme.breakpoints.up("md")]: {
-               ...getMaxLineStyles(3),
+               ...getMaxLineStyles(2),
             },
          }),
          "& .chipsWrapper": {
@@ -520,6 +521,18 @@ const EventPreviewCard = ({
                </Box>
             </Box>
          </Box>
+         {event && (
+            <EventSEOSchemaScriptTag
+               eventDate={
+                  event?.startDate ? new Date(event?.startDate) : new Date()
+               }
+               eventImageUrl={getResizedUrl(event?.companyLogoUrl, "md")}
+               eventName={event?.title}
+               eventDescription={event?.summary}
+               eventCompany={event?.company}
+               detailPageUrl={`https://www.careerfairy.io/upcoming-livestream/${event?.id}`}
+            />
+         )}
       </>
    )
 }
