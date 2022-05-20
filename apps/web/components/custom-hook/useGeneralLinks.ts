@@ -56,7 +56,7 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
    },
    {
       href: "/profile/career-skills",
-      title: "Career Skills",
+      title: "My Career Skills",
       basePath: "/profile/career-skills",
       icon: AutoModeIcon,
    },
@@ -68,7 +68,7 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
    },
    {
       href: "/profile/saved-recruiters",
-      title: "Recruiters",
+      title: "My Recruiters",
       basePath: "/profile/saved-recruiters",
       icon: ContactPageIcon,
    },
