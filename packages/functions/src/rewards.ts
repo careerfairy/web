@@ -325,6 +325,11 @@ async function validateLivestreamEvent(
       )
    }
 
+   // when testing, pass all validations
+   if (livestreamDoc.test === true) {
+      return livestreamDoc
+   }
+
    if (
       livestreamMustBeLive &&
       (!livestreamDoc.hasStarted || livestreamDoc.hasEnded)
