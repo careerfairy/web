@@ -6,6 +6,10 @@ import { Divider, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import ResumeIcon from "@mui/icons-material/PictureAsPdf"
+import BadgeIcon from "./BadgeIcon"
+import BadgeButton from "./BadgeButton"
+import Link from "./Link"
+import { useRouter } from "next/router"
 const styles: StylesProps = {
    root: {
       width: "100%",
@@ -30,7 +34,8 @@ const styles: StylesProps = {
    },
 }
 const UserAvatarAndDetails = () => {
-   const { userData } = useAuth()
+   const { userData, userPresenter } = useAuth()
+   const router = useRouter()
    return (
       <Stack alignItems={"center"} spacing={2} sx={styles.root}>
          <ColorizedAvatar
@@ -41,13 +46,26 @@ const UserAvatarAndDetails = () => {
          <Typography sx={styles.name} align="center" variant="h5">
             {userData?.firstName} {userData?.lastName}
          </Typography>
-         {(userData?.linkedinUrl || userData?.userResume) && (
+         {(userData?.linkedinUrl ||
+            userData?.userResume ||
+            userPresenter?.badges?.hasAnyBadge()) && (
             <Stack
                direction="row"
                divider={<Divider orientation="vertical" flexItem />}
                spacing={2}
                justifyContent="center"
             >
+               {userPresenter?.badges?.hasAnyBadge() && (
+                  <BadgeButton
+                     badge={userPresenter?.badges?.getOneBadge()}
+                     iconButton
+                     onClick={() => {
+                        void router.push(`/profile/career-skills`)
+                     }}
+                     buttonProps={{ sx: { padding: 0 } }}
+                     badgeIconProps={{ noBg: true }}
+                  />
+               )}
                {userData?.linkedinUrl && (
                   <a
                      href={userData.linkedinUrl}

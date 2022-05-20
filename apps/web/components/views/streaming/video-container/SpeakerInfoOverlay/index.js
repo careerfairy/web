@@ -5,6 +5,8 @@ import PropTypes from "prop-types"
 import dynamic from "next/dynamic"
 import { IconButton, Tooltip } from "@mui/material"
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
+import RubberBand from "@stahl.luke/react-reveal/RubberBand"
+import { useSelector } from "react-redux"
 
 const useStyles = makeStyles((theme) => ({
    speakerInformation: {
@@ -55,6 +57,9 @@ const useStyles = makeStyles((theme) => ({
 
 const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
    const [DialogComponent, setDialogComponent] = React.useState(null)
+   const animateProfileIcons = useSelector(
+      (state) => state.stream.layout.animateProfileIcons
+   )
 
    const closeDialog = useCallback(async () => {
       setDialogComponent(null)
@@ -99,9 +104,11 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
                      onClick={openDialog}
                      size="large"
                   >
-                     <AccountCircleOutlinedIcon
-                        className={classes.speakerActionButton}
-                     />
+                     <RubberBand spy={animateProfileIcons} count={2}>
+                        <AccountCircleOutlinedIcon
+                           className={classes.speakerActionButton}
+                        />
+                     </RubberBand>
                   </IconButton>
                </Tooltip>
             </div>

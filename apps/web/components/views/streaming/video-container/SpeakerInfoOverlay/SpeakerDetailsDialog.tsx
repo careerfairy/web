@@ -75,8 +75,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
          <IconButton onClick={onClose} sx={styles.dialogClose}>
             <CloseIcon />
          </IconButton>
-         <Divider />
-         <DialogContent sx={{ paddingBottom: 0 }}>
+         <DialogContent sx={{ paddingBottom: 0 }} dividers={true}>
             <Card sx={{ boxShadow: "none" }}>
                <CardHeader
                   sx={{ padding: "16px 0", alignItems: "start" }}
@@ -115,7 +114,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
                            sx={styles.linkedInbutton}
                            onClick={() => handleLinkedInClick(speaker.linkedIn)}
                         >
-                           LinkedIn
+                           View Profile
                         </Button>
                      </Tooltip>
                   )}

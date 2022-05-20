@@ -105,7 +105,7 @@ export const RecruiterCard = ({
                      <IconButton
                         component={Link}
                         noLinkStyle
-                        href="/"
+                        href={recruiter.streamerDetails.linkedIn}
                         target="_blank"
                         aria-label="linkedin"
                         sx={styles.linkedInButton}

@@ -14,12 +14,14 @@ import List from "@mui/material/List"
 import CheckIcon from "@mui/icons-material/Check"
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
 import React from "react"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import {
+   careerSkillsLinkWithContext,
+   My_Recruiters_NoAccess,
+} from "../../../../constants/contextInfoCareerSkills"
 
-export const NoAccess = ({
-   userPresenter,
-}: {
-   userPresenter: UserPresenter
-}) => {
+export const NoAccessMyRecruiters = () => {
+   const { userStats, userData } = useAuth()
    const requiredBadge: Badge = UserPresenter.saveRecruitersRequiredBadge()
 
    return (
@@ -48,8 +50,13 @@ export const NoAccess = ({
                   variant="h6"
                >
                   You need to unlock the{" "}
-                  <Link href="#">{requiredBadge.name} Badge</Link> to access
-                  this feature.
+                  <Link
+                     href={careerSkillsLinkWithContext(My_Recruiters_NoAccess)}
+                     color="secondary"
+                  >
+                     {requiredBadge.name} Badge Level {requiredBadge.level}
+                  </Link>{" "}
+                  to access this feature.
                </Typography>
                <Typography
                   sx={{ color: "text.secondary", textAlign: "center" }}
@@ -65,7 +72,7 @@ export const NoAccess = ({
                   {requiredBadge.requirements.map((r, i) => (
                      <ListItem key={i}>
                         <ListItemIcon sx={{ minWidth: "30px" }}>
-                           {r.isComplete(userPresenter.model) ? (
+                           {r.isComplete(userData, userStats) ? (
                               <CheckIcon color="success" />
                            ) : (
                               <RadioButtonUncheckedIcon />

@@ -8,6 +8,7 @@ import { SvgIconTypeMap } from "@mui/material"
 import ReferralIcon from "@mui/icons-material/GroupAdd"
 import GroupsIcon from "@mui/icons-material/Groups"
 import ContactPageIcon from "@mui/icons-material/ContactPage"
+import AutoModeIcon from "@mui/icons-material/AutoMode"
 
 const initialMainLinks = [
    {
@@ -54,6 +55,12 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
       icon: ProfileIcon,
    },
    {
+      href: "/profile/career-skills",
+      title: "My Career Skills",
+      basePath: "/profile/career-skills",
+      icon: AutoModeIcon,
+   },
+   {
       href: "/profile/referrals",
       title: "Referrals",
       basePath: "/profile/referrals",
@@ -61,7 +68,7 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
    },
    {
       href: "/profile/saved-recruiters",
-      title: "Recruiters",
+      title: "My Recruiters",
       basePath: "/profile/saved-recruiters",
       icon: ContactPageIcon,
    },

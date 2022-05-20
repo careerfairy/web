@@ -47,8 +47,7 @@ import { compose } from "redux"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { v4 as uuidv4 } from "uuid"
-import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 
 const useStyles = makeStyles((theme) => ({
    view: {
@@ -123,7 +122,7 @@ const QuestionCategory = (props) => {
    const [goingToQuestion, setGoingToQuestion] = useState(false)
    const [newQuestionTitle, setNewQuestionTitle] = useState("")
    const [openQuestionId, setOpenQuestionId] = useState("")
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, userPresenter } = useAuth()
    const [parentHeight, setParentHeight] = useState(400)
 
    const parentRef = useRef()
@@ -249,6 +248,16 @@ const QuestionCategory = (props) => {
             newQuestion.badges = userData?.badges
          }
          await firebase.addLivestreamQuestion(streamRef, newQuestion)
+
+         if (userData) {
+            firebase
+               .rewardUserAction(
+                  "LIVESTREAM_USER_ASKED_QUESTION",
+                  livestream.id
+               )
+               .then((_) => console.log("Rewarded Question Asked"))
+               .catch(console.error)
+         }
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }
@@ -258,7 +267,7 @@ const QuestionCategory = (props) => {
    }
 
    let upcomingQuestionsElements = itemsUpcoming
-      .sort(sortByNetworkerBadge)
+      .sort(sortByQuestionsHighlightBadge)
       .map((question, index) => {
          return (
             <QuestionContainer
@@ -281,7 +290,7 @@ const QuestionCategory = (props) => {
       })
 
    let pastQuestionsElements = itemsPast
-      .sort(sortByNetworkerBadge)
+      .sort(sortByQuestionsHighlightBadge)
       .map((question, index) => {
          return (
             <QuestionContainer
@@ -308,8 +317,6 @@ const QuestionCategory = (props) => {
       const hasMore = isUpcoming ? hasMoreUpcoming : hasMorePast
       return elements.length ? `${elements.length}${hasMore ? "+" : ""}` : 0
    }
-
-   const networkerBadge = getUserBadges(userData?.badges)?.networkerBadge()
 
    return (
       <CategoryContainerTopAligned>
@@ -428,10 +435,11 @@ const QuestionCategory = (props) => {
                      </Typography>
                   </Collapse>
 
-                  {networkerBadge && (
+                  {userPresenter?.questionsShouldBeHighlighted() && (
                      <Typography color="lightgrey" mt={1}>
                         Your question will be highlighted with your{" "}
-                        {networkerBadge.name} badge.
+                        {UserPresenter.questionsHighlightedRequiredBadge().name}{" "}
+                        badge.
                      </Typography>
                   )}
                </DialogContent>
@@ -481,12 +489,14 @@ QuestionCategory.propTypes = {
  * @param right
  * @returns {number}
  */
-function sortByNetworkerBadge(left, right) {
+function sortByQuestionsHighlightBadge(left, right) {
    if (
       left.votes === right.votes &&
-      left?.badges?.includes(NetworkerBadge.key)
+      right?.badges?.includes(
+         UserPresenter.questionsHighlightedRequiredBadge().key
+      )
    ) {
-      return -1
+      return 1
    }
 
    return 0 // keep original order

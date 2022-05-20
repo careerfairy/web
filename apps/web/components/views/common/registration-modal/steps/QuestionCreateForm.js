@@ -66,7 +66,7 @@ const QuestionCreateForm = () => {
       useContext(RegistrationContext)
    const classes = useStyles()
    const { replace } = useRouter()
-   const { putLivestreamQuestion } = useFirebaseService()
+   const { putLivestreamQuestion, rewardUserAction } = useFirebaseService()
    const { authenticatedUser, userData } = useAuth()
    const {
       handleChange,
@@ -92,6 +92,11 @@ const QuestionCreateForm = () => {
                author: authenticatedUser.email,
             }
             await putLivestreamQuestion(livestream.id, newQuestion)
+
+            rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", livestream.id)
+               .then((_) => console.log("Rewarded Question Asked"))
+               .catch(console.error)
+
             customHandleNext()
          } catch (e) {}
       },

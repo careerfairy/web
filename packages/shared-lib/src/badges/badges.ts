@@ -1,4 +1,4 @@
-import { UserData } from "../users"
+import { UserData, UserStats } from "../users"
 
 /**
  * Badges are a linked list to allow multiple levels per badge type
@@ -28,9 +28,9 @@ export class Badge {
    /**
     * Total average progress of all requirements
     */
-   progress(userData: UserData): number {
+   progress(userData: UserData, userStats: UserStats): number {
       const sum = this.requirements.reduce(
-         (acc, cur) => acc + cur.progress(userData),
+         (acc, cur) => acc + cur.progress(userData, userStats),
          0
       )
       return Math.round(sum / this.requirements.length)
@@ -38,32 +38,60 @@ export class Badge {
 
    /**
     * Check if the badge has all requirements met
-    * The previous badge must be complete too
     *
     * @param userData
+    * @param userStats
     */
-   isComplete(userData: UserData): boolean {
-      const prevBadgeComplete = this.prev
-         ? this.prev.isComplete(userData)
-         : true
-
-      if (!prevBadgeComplete) {
-         return false
-      }
-
-      return this.requirements.every((r) => r.isComplete(userData))
+   isComplete(userData: UserData, userStats: UserStats): boolean {
+      return this.requirements.every((r) => r.isComplete(userData, userStats))
    }
 
+   /**
+    * Links the two badges in a bidirectional linked list
+    * @param badge
+    */
    setNextBadge(badge: Badge) {
       this.next = badge
       badge.prev = this
+   }
+
+   /**
+    * Get all the rewards for this badge chain
+    */
+   getAllRewards(): string[] {
+      const res: string[] = [...this.rewardsDescription]
+
+      let curr: Badge = this.prev
+      while (curr) {
+         const items = [...curr.rewardsDescription]
+         items.forEach((item) => res.push(item))
+
+         curr = curr.prev
+      }
+
+      return res
+   }
+
+   /**
+    * Convert the linked list of badges to an array
+    */
+   getBadgesArray(): Badge[] {
+      const badges: Badge[] = [this]
+
+      let curr: Badge = this.next
+      while (curr) {
+         badges.push(curr)
+         curr = curr.next
+      }
+
+      return badges
    }
 }
 
 export interface Requirement {
    description: string
-   isComplete: (userData: UserData) => boolean
-   progress: (userData: UserData) => number
+   isComplete: (userData: UserData, userStats: UserStats) => boolean
+   progress: (userData: UserData, userStats: UserStats) => number
 }
 
 /**
@@ -88,3 +116,5 @@ export const calculateProgressForNumericField = (
 
    return res
 }
+
+export const DEFAULT_REWARDS = ["A cool badge!"]

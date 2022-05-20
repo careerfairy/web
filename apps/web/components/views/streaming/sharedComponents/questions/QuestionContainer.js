@@ -30,7 +30,7 @@ import useStreamRef from "../../../../custom-hook/useStreamRef"
 import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 
 const useStyles = makeStyles((theme) => ({
    chatInput: {
@@ -370,14 +370,17 @@ const QuestionContainer = memo(
          >
             <Paper elevation={4} className={classes.questionContainer}>
                <div style={{ padding: "20px 20px 5px 20px" }}>
-                  {question?.badges?.includes(NetworkerBadge.key) && (
+                  {containsBadgeOrLevelsAbove(
+                     question?.badges,
+                     UserPresenter.questionsHighlightedRequiredBadge()
+                  ) && (
                      <div className={classes.badge}>
                         <BadgeButton
-                           badge={NetworkerBadge}
+                           badge={UserPresenter.questionsHighlightedRequiredBadge()}
                            showBadgeSuffix={false}
                            onlyIcon
                            activeTooltip={(badge) =>
-                              `${badge.name} Badge, this user has referred more than 3 people.`
+                              `${badge.name} Level ${badge.level} Badge`
                            }
                            buttonProps={{
                               color: "gold",
@@ -570,6 +573,22 @@ QuestionContainer.propTypes = {
    user: PropTypes.object,
    setOpenQuestionId: PropTypes.func.isRequired,
    openQuestionId: PropTypes.string,
+}
+
+// Temporary function while this file isn't converted into TS
+// reuse UserBadges.ts version at that time
+const containsBadgeOrLevelsAbove = (badges, badge) => {
+   if (!badges) return false
+
+   let curr = badge
+
+   while (curr) {
+      if (badges.includes(curr.key)) {
+         return true
+      }
+      curr = curr.next
+   }
+   return false
 }
 
 export default compose(withFirebase)(QuestionContainer)

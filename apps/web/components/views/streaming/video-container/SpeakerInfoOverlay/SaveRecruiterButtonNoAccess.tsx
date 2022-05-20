@@ -1,31 +1,40 @@
-import React, { useEffect } from "react"
+import React from "react"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { Button, Popover, Typography } from "@mui/material"
+import { Button, Tooltip, Typography } from "@mui/material"
 import SaveIcon from "@mui/icons-material/Save"
 import IconButton from "@mui/material/IconButton"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Link from "../../../common/Link"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
+import {
+   careerSkillsLinkWithContext,
+   My_Recruiters_NoAccess,
+} from "../../../../../constants/contextInfoCareerSkills"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { sxStyles } from "../../../../../types/commonTypes"
+
+const styles = sxStyles({
+   tooltip: {
+      backgroundColor: "background.paper",
+      color: "text.primary",
+      boxShadow: (theme: DefaultTheme) => theme.boxShadows.dark_8_25_10,
+      padding: 1,
+      borderRadius: "10px",
+   },
+})
 
 export const SaveRecruiterButtonNoAccess = () => {
-   const [anchorEl, setAnchorEl] = React.useState(null)
    const { isLoggedOut } = useAuth()
-   const [timeout, setTimeoutValue] = React.useState(null)
 
    const isMobile = useIsMobile()
    const requiredBadge = UserPresenter.saveRecruitersRequiredBadge()
 
-   useEffect(() => {
-      return () => {
-         if (timeout) {
-            clearTimeout(timeout)
-         }
-      }
-   }, [timeout])
-
    const openProfilePage = () => {
-      const win = window.open("/profile", "_blank")
+      const win = window.open(
+         careerSkillsLinkWithContext(My_Recruiters_NoAccess),
+         "_blank"
+      )
       win.focus()
    }
 
@@ -47,61 +56,52 @@ export const SaveRecruiterButtonNoAccess = () => {
       )
    }
 
-   const handlePopoverOpen = (event) => {
-      if (timeout) {
-         clearTimeout(timeout)
-      }
-      setAnchorEl(event.currentTarget)
-   }
-
-   const handlePopoverClose = () => {
-      // give some time for the user to click on the link
-      setTimeoutValue(
-         setTimeout(() => {
-            setAnchorEl(null)
-         }, 1000)
-      )
-   }
-
-   const open = Boolean(anchorEl)
-
    return (
       <>
-         <Button variant="contained" startIcon={<SaveIcon />} disabled={true}>
-            {isMobile ? "Save" : "Save For Later"}
-         </Button>
-         <IconButton
-            aria-owns={open ? "mouse-over-popover" : undefined}
-            aria-haspopup="true"
-            onMouseEnter={handlePopoverOpen}
-            onMouseLeave={handlePopoverClose}
-            sx={{
-               marginLeft: "5px",
-            }}
-            onClick={openProfilePage}
-         >
-            <InfoOutlinedIcon />
-         </IconButton>
-         <Popover
-            id="mouse-over-popover"
-            sx={{
-               pointerEvents: "none",
-            }}
-            open={open}
-            anchorEl={anchorEl}
-            anchorOrigin={{
-               vertical: "bottom",
-               horizontal: "left",
-            }}
-            transformOrigin={{
-               vertical: "top",
-               horizontal: "left",
-            }}
-            onClose={handlePopoverClose}
-            disableRestoreFocus
-         >
-            {popoverContent}
-         </Popover>
+         <WrapperTooltip title={popoverContent} position="bottom">
+            <span>
+               <Button
+                  variant="contained"
+                  startIcon={<SaveIcon />}
+                  disabled={true}
+               >
+                  {isMobile ? "Save" : "Save For Later"}
+               </Button>
+            </span>
+         </WrapperTooltip>
+         <WrapperTooltip title={popoverContent}>
+            <IconButton
+               aria-owns={open ? "mouse-over-popover" : undefined}
+               aria-haspopup="true"
+               sx={{
+                  marginLeft: "5px",
+               }}
+               onClick={openProfilePage}
+            >
+               <InfoOutlinedIcon />
+            </IconButton>
+         </WrapperTooltip>
       </>
+   )
+}
+
+const WrapperTooltip = ({ children, title, position = "right" }) => {
+   return (
+      <Tooltip
+         title={title}
+         placement={position as any}
+         componentsProps={{
+            tooltip: {
+               sx: styles.tooltip,
+            },
+            arrow: {
+               sx: {
+                  color: "background.paper",
+               },
+            },
+         }}
+      >
+         {children}
+      </Tooltip>
    )
 }
