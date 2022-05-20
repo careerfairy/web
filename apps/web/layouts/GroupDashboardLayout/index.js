@@ -17,6 +17,11 @@ import Page, {
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 
+const styles = {
+   childrenWrapperResponsive: {
+      width: (theme) => `calc(100% - ${theme.drawerWidth.small})`,
+   },
+}
 const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
@@ -26,7 +31,7 @@ const GroupDashboardLayout = (props) => {
    const {
       query: { groupId },
    } = useRouter()
-   const { userData, authenticatedUser } = useAuth()
+   const { userData, authenticatedUser, isLoggedIn } = useAuth()
    const notifications = useSelector(
       ({ firestore }) => firestore.ordered.notifications || []
    )
@@ -61,8 +66,10 @@ const GroupDashboardLayout = (props) => {
                   isDesktop={isDesktop}
                />
             )}
-            <PageChildrenWrapper>
-               {!isLoaded(group) ? (
+            <PageChildrenWrapper
+               sx={[isDesktop && styles.childrenWrapperResponsive]}
+            >
+               {!isLoaded(group) || !isLoggedIn ? (
                   <CircularProgress sx={{ margin: "auto" }} />
                ) : isEmpty(group) || !isCorrectGroup ? (
                   <Typography variant={"h6"} sx={{ margin: "auto" }}>

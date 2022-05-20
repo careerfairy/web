@@ -66,7 +66,7 @@ const Audience = ({
    return (
       <Container className={classes.root} maxWidth={false}>
          <Grid container spacing={3}>
-            <Grid item lg={12} md={12} xl={12} xs={12}>
+            <Grid item xs={12}>
                <LatestEvents
                   timeFrames={globalTimeFrame.timeFrames}
                   setCurrentStream={setCurrentStream}
@@ -83,7 +83,7 @@ const Audience = ({
                   group={group}
                />
             </Grid>
-            <Grid item lg={12} md={12} xl={12} xs={12}>
+            <Grid item xs={12}>
                <UsersTable
                   totalUniqueUsers={totalUniqueUsers}
                   currentStream={currentStream}
