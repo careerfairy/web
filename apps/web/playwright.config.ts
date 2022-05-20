@@ -10,6 +10,38 @@ import { devices } from "@playwright/test"
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
+
+const chromium = {
+   name: "chromium",
+   use: {
+      ...devices["Desktop Chrome"],
+   },
+}
+const firefox = {
+   name: "firefox",
+   use: {
+      ...devices["Desktop Firefox"],
+   },
+}
+const webkit = {
+   name: "webkit",
+   use: {
+      ...devices["Desktop Safari"],
+   },
+}
+const getBrowserProjects = (type: string): PlaywrightTestConfig["projects"] => {
+   switch (type) {
+      case "chromium":
+         return [chromium]
+      case "firefox":
+         return [firefox]
+      case "webkit":
+         return [webkit]
+      default:
+         return [webkit, chromium, firefox]
+   }
+}
+
 const config: PlaywrightTestConfig = {
    testDir: "./tests/e2e",
    testIgnore: "**/streaming/test**",
@@ -47,54 +79,7 @@ const config: PlaywrightTestConfig = {
    globalTeardown: "./playwright.teardown",
 
    /* Configure projects for major browsers */
-   projects: [
-      {
-         name: "chromium",
-         use: {
-            ...devices["Desktop Chrome"],
-         },
-      },
-      {
-         name: "firefox",
-         use: {
-            ...devices["Desktop Firefox"],
-         },
-      },
-      {
-         name: "webkit",
-         use: {
-            ...devices["Desktop Safari"],
-         },
-      },
-
-      /* Test against mobile viewports. */
-      // {
-      //   name: 'Mobile Chrome',
-      //   use: {
-      //     ...devices['Pixel 5'],
-      //   },
-      // },
-      // {
-      //   name: 'Mobile Safari',
-      //   use: {
-      //     ...devices['iPhone 12'],
-      //   },
-      // },
-
-      /* Test against branded browsers. */
-      // {
-      //   name: 'Microsoft Edge',
-      //   use: {
-      //     channel: 'msedge',
-      //   },
-      // },
-      // {
-      //   name: 'Google Chrome',
-      //   use: {
-      //     channel: 'chrome',
-      //   },
-      // },
-   ],
+   projects: getBrowserProjects(process.env.BROWSER),
 
    /* Folder for test artifacts such as screenshots, videos, traces, etc. */
    outputDir: "./test-results",

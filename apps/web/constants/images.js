@@ -92,3 +92,6 @@ export const edgeLogo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fedge.svg?alt=media&token=f4165230-170e-454f-9fca-adea53798b9f"
 export const safariLogo =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fsafari-logo.svg?alt=media&token=d939e1f5-424e-44be-91d1-78b0e171f1de"
+
+export const registerIllustrationSvg =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fregister-icon.svg?alt=media&token=d0156136-682b-4d01-99de-80fde06d8eb1"

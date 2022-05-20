@@ -102,10 +102,9 @@ const ManageStreamActions = ({
          <Button
             className={clsx(classes.root, classes.btn)}
             fullWidth
-            size="large"
             disableElevation
             variant="contained"
-            color="inherit"
+            color="grey"
             onClick={toggle}
             startIcon={<SettingsIcon />}
             endIcon={

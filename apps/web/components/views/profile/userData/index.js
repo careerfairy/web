@@ -1,48 +1,36 @@
 import React from "react"
 import UserResume from "./user-resume/UserResume"
 import PersonalInfo from "./personal-info/PersonalInfo"
-import { Box, Container } from "@mui/material"
 import UserInterests from "./personalise/UserInterests"
+import ContentCard from "../../../../layouts/UserLayout/ContentCard"
+import { Grid } from "@mui/material"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
-const styles = {
-   paper: {
-      marginTop: (theme) => theme.spacing(8),
-      display: "flex",
-      flexDirection: "column",
-      alignItems: "center",
-   },
-   box: {
-      width: "100%", // Fix IE 11 issue.
-      backgroundColor: (theme) => theme.palette.background.paper,
-      // marginTop: theme.spacing(3),
-      borderRadius: 0.8,
-      marginTop: 2,
-   },
-   container: { px: { xs: 0.5, sm: 1, md: 2 } },
-}
+const UserData = () => {
+   const { userData } = useAuth()
 
-const UserData = ({ userData, redirectToReferralsTab }) => {
    return (
-      <>
-         <Container sx={styles.container} component="main" maxWidth="md">
-            <Box boxShadow={1} p={4} sx={styles.box}>
-               <PersonalInfo
-                  userData={userData}
-                  redirectToReferralsTab={redirectToReferralsTab}
-               />
-            </Box>
-         </Container>
-         <Container sx={styles.container} component="main" maxWidth="md">
-            <Box boxShadow={1} p={4} sx={styles.box}>
-               <UserResume userData={userData} />
-            </Box>
-         </Container>
-         <Container sx={styles.container} component="main" maxWidth="md">
-            <Box boxShadow={1} p={4} sx={styles.box}>
-               <UserInterests userData={userData} />
-            </Box>
-         </Container>
-      </>
+      <Grid container spacing={2}>
+         <Grid item xs={12} lg={8}>
+            <ContentCard>
+               <PersonalInfo userData={userData} />
+            </ContentCard>
+         </Grid>
+         <Grid item xs={12} lg={4}>
+            <Grid container spacing={2}>
+               <Grid item xs={12}>
+                  <ContentCard>
+                     <UserResume userData={userData} />
+                  </ContentCard>
+               </Grid>
+               <Grid item xs={12}>
+                  <ContentCard>
+                     <UserInterests userData={userData} />
+                  </ContentCard>
+               </Grid>
+            </Grid>
+         </Grid>
+      </Grid>
    )
 }
 

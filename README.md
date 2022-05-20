@@ -130,3 +130,10 @@ Useful to find test flaws that appear during CI.
 ```sh
 docker build -t tests -f apps/web/Dockerfile.test . && docker run -p 9323:9323 -it tests
 ```
+
+### Emulator Functions - Sending Emails
+
+There are functions that try to send emails, but when running the emulators locally, both Postmark and Mailgun providers are setup to use their sandbox environments.
+
+-  Mailgun: Emails are only sent to whitelisted addresses on their sandbox environment.
+-  Postmark: You need to check the outbound emails on their sandbox environment dashboard.

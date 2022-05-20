@@ -4,6 +4,8 @@ const { withSentryConfig } = require("@sentry/nextjs")
 //    enabled: process.env.ANALYZE === "true",
 // });
 
+const notProduction = process.env.NODE_ENV !== "production"
+
 const securityHeaders = [
    // {
    //    key: "X-Frame-Options",
@@ -12,10 +14,12 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         "default-src blob: 'self' *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.youtube.com; " +
-         "script-src blob: 'self' js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.youtube.com; " +
+         `default-src blob: 'self' *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.youtube.com ${
+            notProduction && "localhost:*"
+         }; ` +
+         "script-src blob: 'self' js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.youtube.com apis.google.com ajax.googleapis.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
-         "connect-src js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io;" +
+         "connect-src *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com;" +
          "img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
    },
    {
@@ -95,7 +99,7 @@ const moduleExports = {
 }
 
 // test or development environment
-if (process.env.NODE_ENV !== "production") {
+if (notProduction) {
    // add image domains used by faker.js
    moduleExports.images.domains.push("loremflickr.com")
 }
@@ -115,7 +119,7 @@ const sentryWebpackPluginOptions = {
 // Only use sentry if we're building the app from continuous integration (Vercel)
 // This allows us to build the app locally without having a SENTRY_AUTH_TOKEN variable
 // which is required for sentry to upload the sourcemaps files
-if (process.env.CI && process.env.NODE_ENV === "production") {
+if (process.env.CI && notProduction) {
    /**
     * withSentryConfig() docs:
     *

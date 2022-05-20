@@ -1,3 +1,5 @@
+import { UserData, UserStats } from "../users"
+
 /**
  * Badges are a linked list to allow multiple levels per badge type
  *
@@ -11,91 +13,108 @@
  * We store the current badge level of each type in the array
  * from those we can navigate to the prev/next levels
  */
-export interface Badge {
-   key: string
-   name: string
-   achievementDescription: string
-   rewardsDescription: string[]
-   progress: (userData) => number // 0 to 100
-   next?: Badge
-   prev?: Badge
-}
+export class Badge {
+   public next?: Badge
+   public prev?: Badge
 
-// Networker Badges
-export const NetworkerBadge: Badge = {
-   key: "Networker",
-   name: "Networker",
-   achievementDescription: "Refer at least 3 friends",
-   rewardsDescription: ["Questions during an event will be highlighted"],
-   progress: (userData) => {
-      if (!userData.referralsCount) return 0
-      if (userData.referralsCount >= 3) return 100
-      return Math.round((userData.referralsCount / 3) * 100)
-   },
-}
+   constructor(
+      public readonly key: string,
+      public readonly name: string,
+      public readonly level: number, // 1, 2, 3, etc
+      public readonly requirements: Requirement[],
+      public readonly rewardsDescription: string[]
+   ) {}
 
-// not used atm, just an example
-export const NetworkerAdvancedBadge: Badge = {
-   key: "NetworkerAdvanced",
-   name: "Networker Advanced",
-   achievementDescription: "Refer at least 6 friends",
-   rewardsDescription: ["Questions during an event will be highlighted"],
-   progress: (userData) => {
-      if (!userData.referralsCount) return 0
-      if (userData.referralsCount >= 6) return 100
-      return Math.round((userData.referralsCount / 6) * 100)
-   },
-}
-
-// Relations
-NetworkerBadge.next = NetworkerAdvancedBadge
-NetworkerAdvancedBadge.prev = NetworkerBadge
-
-/**
- * All active Badges
- * These keys are stored in the userData.badges[] field
- */
-export const Badges: Record<string, Badge> = {
-   [NetworkerBadge.key]: NetworkerBadge,
-   [NetworkerAdvancedBadge.key]: NetworkerAdvancedBadge,
-}
-
-export type ExistingBadgesKeys = keyof typeof Badges
-
-/**
- * Convert a userData.badges[] field (that contains only keys)
- * to an object that contains the Badges objects
- *
- * {[key: ExistingBadgesKeys]: Badge}
- * @param userDataBadgesArray
- */
-export const getUserBadges = (userDataBadgesArray: string[]): UserBadges => {
-   if (!userDataBadgesArray || userDataBadgesArray.length === 0)
-      return new UserBadges({})
-
-   return new UserBadges(
-      // convert user badges array to object key -> Badge
-      userDataBadgesArray.reduce((acc, curr) => {
-         if (Badges[curr]) {
-            return { ...acc, [curr]: Badges[curr] }
-         } else {
-            return acc
-         }
-      }, {})
-   )
-}
-
-class UserBadges {
-   constructor(public readonly badges: Record<ExistingBadgesKeys, Badge>) {}
-
-   networkerBadge() {
-      const currentNetworkerLevel = Object.keys(this.badges).find((key) =>
-         /^Networker/.test(key)
+   /**
+    * Total average progress of all requirements
+    */
+   progress(userData: UserData, userStats: UserStats): number {
+      const sum = this.requirements.reduce(
+         (acc, cur) => acc + cur.progress(userData, userStats),
+         0
       )
-      return this.badges?.[currentNetworkerLevel]
+      return Math.round(sum / this.requirements.length)
    }
 
-   hasAnyBadge() {
-      return Object.keys(this.badges).length > 0
+   /**
+    * Check if the badge has all requirements met
+    *
+    * @param userData
+    * @param userStats
+    */
+   isComplete(userData: UserData, userStats: UserStats): boolean {
+      return this.requirements.every((r) => r.isComplete(userData, userStats))
+   }
+
+   /**
+    * Links the two badges in a bidirectional linked list
+    * @param badge
+    */
+   setNextBadge(badge: Badge) {
+      this.next = badge
+      badge.prev = this
+   }
+
+   /**
+    * Get all the rewards for this badge chain
+    */
+   getAllRewards(): string[] {
+      const res: string[] = [...this.rewardsDescription]
+
+      let curr: Badge = this.prev
+      while (curr) {
+         const items = [...curr.rewardsDescription]
+         items.forEach((item) => res.push(item))
+
+         curr = curr.prev
+      }
+
+      return res
+   }
+
+   /**
+    * Convert the linked list of badges to an array
+    */
+   getBadgesArray(): Badge[] {
+      const badges: Badge[] = [this]
+
+      let curr: Badge = this.next
+      while (curr) {
+         badges.push(curr)
+         curr = curr.next
+      }
+
+      return badges
    }
 }
+
+export interface Requirement {
+   description: string
+   isComplete: (userData: UserData, userStats: UserStats) => boolean
+   progress: (userData: UserData, userStats: UserStats) => number
+}
+
+/**
+ * Calculate the % progress of a field considering a target value
+ *
+ * @param fieldValue
+ * @param targetNumber
+ */
+export const calculateProgressForNumericField = (
+   fieldValue: number | undefined | null,
+   targetNumber: number
+): number => {
+   let res = 0
+
+   if (fieldValue) {
+      if (fieldValue >= targetNumber) {
+         res = 100
+      } else {
+         res = Math.round((fieldValue / targetNumber) * 100)
+      }
+   }
+
+   return res
+}
+
+export const DEFAULT_REWARDS = ["A cool badge!"]

@@ -86,6 +86,11 @@ export const toggleLeftMenu = () => async (dispatch) => {
    dispatch({ type: actions.TOGGLE_LEFT_MENU })
 }
 
+// Animate the Profile icon on the speaker details overlay
+export const animateProfileIcon = () => async (dispatch) => {
+   dispatch({ type: actions.ANIMATE_PROFILE_ICON, payload: true })
+}
+
 export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
    // If mode is null or undefined, the new mode will be the opposite of the current mode
    const newFocusMode = Boolean(

@@ -62,6 +62,12 @@ interface StreamReducer {
    }
 }
 
+interface GeneralLayout {
+   layout: {
+      drawerOpen: boolean
+   }
+}
+
 // Optional: You can define the schema of your Firebase Redux store.
 // This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
 interface Schema {
@@ -70,7 +76,7 @@ interface Schema {
 }
 
 export default interface RootState extends DefaultRootState {
-   generalLayout: any
+   generalLayout: GeneralLayout
    auth: AuthReducer
    stream: StreamReducer
    firebase: FirebaseReducer.Reducer<{}, Schema>

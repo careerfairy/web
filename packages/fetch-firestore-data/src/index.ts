@@ -30,7 +30,7 @@ async function run(): Promise<void> {
    emulatorsProcess = await runEmulatorsInBackground()
    h1Text(`Emulators ready to receive commands`)
 
-   const collections = ["userData"]
+   const collections = ["userData", "users"]
    h1Text(`Removing collections: ${collections.join(",")}`)
    await removeExistingCollections(collections)
 
@@ -66,6 +66,8 @@ async function createUser(email: string) {
    } catch (e) {
       if (e.errorInfo?.code === "auth/email-already-exists") {
          return null
+      } else {
+         h1Text(e)
       }
 
       throw e
@@ -145,7 +147,7 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             env: {
                ...process.env,
                // emulators need a big heap to load the data
-               JAVA_TOOL_OPTIONS: "-Xmx10g",
+               JAVA_TOOL_OPTIONS: "-Xmx20g",
             },
          },
          handleProcess

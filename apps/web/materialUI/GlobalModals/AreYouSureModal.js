@@ -40,7 +40,7 @@ const AreYouSureModal = ({
    open,
    handleClose,
    loading,
-   confirmButtonText,
+   confirmButtonText = "Confirm",
    confirmSecurityText,
 }) => {
    const classes = useStyles()
@@ -69,36 +69,38 @@ const AreYouSureModal = ({
             aria-describedby="alert-dialog-description"
          >
             <DialogTitle id="alert-dialog-title">{title}</DialogTitle>
-            <DialogContent>
-               <DialogContentText id="alert-dialog-description">
-                  {message}
-               </DialogContentText>
-               {confirmSecurityText && (
-                  <div className={classes.securityTextPaper}>
-                     <Typography
-                        className={classes.noSelect}
-                        variant="subtitle1"
-                        gutterBottom
-                     >
-                        {confirmSecurityText}
-                     </Typography>
-                     <TextField
-                        onChange={(e) => {
-                           if (fieldError) setFieldError("")
-                           setRepeatSecurityText(e.currentTarget.value)
-                        }}
-                        fullWidth
-                        label="Please type the message above to confirm"
-                        variant="outlined"
-                        error={Boolean(fieldError)}
-                        value={repeatSecurityText}
-                        type="text"
-                        disabled={loading}
-                     />
-                     <FormHelperText error>{fieldError}</FormHelperText>
-                  </div>
-               )}
-            </DialogContent>
+            {(message || confirmSecurityText) && (
+               <DialogContent>
+                  <DialogContentText id="alert-dialog-description">
+                     {message}
+                  </DialogContentText>
+                  {confirmSecurityText && (
+                     <div className={classes.securityTextPaper}>
+                        <Typography
+                           className={classes.noSelect}
+                           variant="subtitle1"
+                           gutterBottom
+                        >
+                           {confirmSecurityText}
+                        </Typography>
+                        <TextField
+                           onChange={(e) => {
+                              if (fieldError) setFieldError("")
+                              setRepeatSecurityText(e.currentTarget.value)
+                           }}
+                           fullWidth
+                           label="Please type the message above to confirm"
+                           variant="outlined"
+                           error={Boolean(fieldError)}
+                           value={repeatSecurityText}
+                           type="text"
+                           disabled={loading}
+                        />
+                        <FormHelperText error>{fieldError}</FormHelperText>
+                     </div>
+                  )}
+               </DialogContent>
+            )}
             <DialogActions>
                <Button color="grey" onClick={onClose}>
                   Cancel
@@ -112,7 +114,7 @@ const AreYouSureModal = ({
                   variant="contained"
                   color="primary"
                >
-                  {confirmButtonText || "Confirm"}
+                  {confirmButtonText}
                </Button>
             </DialogActions>
          </Dialog>

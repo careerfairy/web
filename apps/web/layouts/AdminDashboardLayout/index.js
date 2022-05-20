@@ -1,20 +1,25 @@
-import PropTypes from "prop-types"
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useEffect, useMemo } from "react"
 import NavBar from "./NavBar"
-import { withFirebase } from "../../context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
-import TopBar from "./TopBar"
-import { Box, CircularProgress } from "@mui/material"
+import { CircularProgress } from "@mui/material"
 import useAdminLinks from "../../components/custom-hook/useAdminLinks"
 import { useRouter } from "next/router"
 import * as actions from "../../store/actions"
 import { useDispatch } from "react-redux"
-import { styles } from "materialUI/styles/layoutStyles/basicLayoutStyles"
+import GenericHeader from "../../components/views/header/GenericHeader"
+import Page, {
+   PageChildrenWrapper,
+   PageContentWrapper,
+} from "../../components/views/common/Page"
+import useIsDesktop from "../../components/custom-hook/useIsDesktop"
+
+const desktopProp = "md"
 
 const AdminDashboardLayout = (props) => {
    const { children } = props
    const dispatch = useDispatch()
-   const [isMobileNavOpen, setMobileNavOpen] = useState(false)
+
+   const isDesktop = useIsDesktop()
    const { userData, authenticatedUser } = useAuth()
    const { replace } = useRouter()
    const enqueueSnackbar = (...args) =>
@@ -46,44 +51,32 @@ const AdminDashboardLayout = (props) => {
    const isAdmin = useMemo(() => userData?.isAdmin, [userData?.isAdmin])
 
    return (
-      <Box sx={styles.root}>
-         <TopBar
-            links={headerLinks}
-            onMobileNavOpen={() => setMobileNavOpen(true)}
-         />
-         {isAdmin && (
-            <NavBar
-               drawerTopLinks={drawerTopLinks}
-               drawerBottomLinks={drawerBottomLinks}
-               headerLinks={headerLinks}
-               onMobileClose={() => setMobileNavOpen(false)}
-               openMobile={isMobileNavOpen}
-            />
-         )}
-         <Box sx={styles.wrapper}>
-            <Box sx={styles.contentContainer}>
-               <Box sx={styles.content}>
-                  {isAdmin ? (
-                     React.Children.map(children, (child) =>
-                        React.cloneElement(child, {
-                           isAdmin,
-                           ...props,
-                        })
-                     )
-                  ) : (
-                     <CircularProgress style={{ margin: "auto" }} />
-                  )}
-               </Box>
-            </Box>
-         </Box>
-      </Box>
+      <Page>
+         <GenericHeader position={"sticky"} />
+         <PageContentWrapper>
+            {isAdmin && (
+               <NavBar
+                  drawerTopLinks={drawerTopLinks}
+                  drawerBottomLinks={drawerBottomLinks}
+                  headerLinks={headerLinks}
+                  isDesktop={isDesktop}
+               />
+            )}
+            <PageChildrenWrapper sx={{ overflow: "auto" }}>
+               {isAdmin ? (
+                  React.Children.map(children, (child) =>
+                     React.cloneElement(child, {
+                        isAdmin,
+                        ...props,
+                     })
+                  )
+               ) : (
+                  <CircularProgress style={{ margin: "auto" }} />
+               )}
+            </PageChildrenWrapper>
+         </PageContentWrapper>
+      </Page>
    )
 }
 
-AdminDashboardLayout.propTypes = {
-   children: PropTypes.node.isRequired,
-   firebase: PropTypes.object,
-}
-
-AdminDashboardLayout.defaultProps = {}
-export default withFirebase(AdminDashboardLayout)
+export default AdminDashboardLayout

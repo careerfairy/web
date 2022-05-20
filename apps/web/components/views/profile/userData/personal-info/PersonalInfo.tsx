@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { Formik } from "formik"
 
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import makeStyles from "@mui/styles/makeStyles"
 import {
    Typography,
    TextField,
@@ -21,36 +20,40 @@ import { GENERAL_ERROR, URL_REGEX } from "components/util/constants"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useSnackbar } from "notistack"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import BadgeSimpleButton from "../../BadgeSimpleButton"
+import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
+import { StylesProps } from "../../../../../types/commonTypes"
+import { useRouter } from "next/router"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 
-const useStyles = makeStyles((theme) => ({
+const styles: StylesProps = {
    avatar: {
-      margin: theme.spacing(1),
-      backgroundColor: theme.palette.secondary.main,
+      margin: 1,
+      backgroundColor: (theme) => theme.palette.secondary.main,
    },
    submit: {
-      margin: theme.spacing(3, 0, 2),
+      margin: (theme) => theme.spacing(3, 0, 2),
       marginBottom: 0,
    },
    title: {
-      color: theme.palette.text.secondary,
       textTransform: "uppercase",
       fontSize: "1.8rem",
-      marginBottom: 30,
+      marginBottom: 3,
    },
    subtitle: {
       textTransform: "uppercase",
-      fontSize: "0.8rem",
+      fontSize: "0.8rem !important",
       fontWeight: "bold",
-      marginBottom: 20,
+      marginBottom: 1,
    },
-}))
+}
 
-const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
-   const classes = useStyles()
+const PersonalInfo = ({ userData }) => {
+   const { userPresenter } = useAuth()
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
+   const router = useRouter()
    const dispatch = useDispatch()
    // @ts-ignore
    const { loading, error } = useSelector((state) => state.auth.profileEdit)
@@ -84,6 +87,14 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
    const handleUpdate = async (values) => {
       await dispatch(actions.editUserProfile(values))
    }
+
+   const navigateToReferrals = useCallback(() => {
+      void router.push({
+         pathname: "/profile/referrals",
+      })
+
+      return {} // match event handler signature
+   }, [router])
 
    return (
       <Formik
@@ -143,17 +154,17 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                   <>
                      <Grid container spacing={2}>
                         <Grid item xs={8}>
-                           <Typography className={classes.title} variant="h4">
+                           <ContentCardTitle sx={styles.title}>
                               Personal Info
-                           </Typography>
+                           </ContentCardTitle>
                         </Grid>
                         <Grid item xs={4} sx={{ textAlign: "right" }}>
                            <BadgeSimpleButton
                               badge={NetworkerBadge}
-                              isActive={userData?.badges?.includes(
-                                 NetworkerBadge.key
+                              isActive={Boolean(
+                                 userPresenter?.badges?.networkerBadge()
                               )}
-                              onClick={redirectToReferralsTab}
+                              onClick={navigateToReferrals}
                            />
                         </Grid>
                      </Grid>
@@ -237,10 +248,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                            </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                           <Typography
-                              className={classes.subtitle}
-                              variant="h5"
-                           >
+                           <Typography sx={styles.subtitle} variant="h5">
                               University
                            </Typography>
                         </Grid>
@@ -277,10 +285,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                            />
                         </Grid>
                         <Grid item xs={12}>
-                           <Typography
-                              className={classes.subtitle}
-                              variant="h5"
-                           >
+                           <Typography sx={styles.subtitle} variant="h5">
                               Social
                            </Typography>
                         </Grid>
@@ -318,10 +323,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                            </FormControl>
                         </Grid>
                         <Grid item xs={12}>
-                           <Typography
-                              className={classes.subtitle}
-                              variant="h5"
-                           >
+                           <Typography sx={styles.subtitle} variant="h5">
                               Newsletter
                            </Typography>
                         </Grid>
@@ -357,7 +359,7 @@ const PersonalInfo = ({ firebase, userData, redirectToReferralsTab }) => {
                               <CircularProgress size={20} color="inherit" />
                            )
                         }
-                        className={classes.submit}
+                        sx={styles.submit}
                      >
                         {isSubmitting ? "Updating" : "Update"}
                      </Button>
