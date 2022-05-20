@@ -29,7 +29,7 @@ export const handleUserNetworkerBadges = async (
       // no point in continuing, to update the Networker badge we need some referrals
       return
    }
-   const badges = newUserData.badges
+   const badges = newUserData.badges || []
    let newBadges
 
    functions.logger.log(
@@ -71,7 +71,7 @@ export const handleUserStatsBadges = async (
    newUserStats: UserStats
 ): Promise<void> => {
    const userData: UserData = (await userGetByEmail(userDataId)) as UserData
-   const badges = userData.badges
+   const badges = userData.badges || []
    let newBadges
 
    functions.logger.log(
