@@ -19,6 +19,7 @@ const styles: StylesProps = {
    },
    drawerOpen: {
       width: (theme) => theme.drawerWidth.small,
+      borderRadius: 0,
    },
    drawerClosed: {
       width: 0,
@@ -132,6 +133,11 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
             styles.tempDrawer,
             ...(Array.isArray(sx) ? sx : [sx]),
          ]}
+         PaperProps={{
+            sx: {
+               borderRadius: 0,
+            },
+         }}
          onClose={closeDrawer}
          open={drawerOpen}
          variant="temporary"

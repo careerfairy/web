@@ -19,6 +19,7 @@ import { URL_REGEX } from "components/util/constants"
 import usePreparationOverlay from "../../../custom-hook/usePreparationOverlay"
 import { useRouter } from "next/router"
 import { useTheme } from "@mui/material/styles"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
 const useStyles = makeStyles((theme) => ({
    background: {
@@ -111,6 +112,8 @@ const useStyles = makeStyles((theme) => ({
 function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
    const classes = useStyles()
    const { updateSpeaker, addSpeaker } = usePreparationOverlay()
+   const { userData } = useAuth()
+
    const {
       query: { auto },
    } = useRouter()
@@ -172,6 +175,11 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
          newSpeaker.speakerUuid = streamerUuid
          newSpeaker.showLinkedIn = showLinkedIn
          newSpeaker.linkedIn = linkedInUrl
+
+         if (userData?.authId) {
+            // user is logged in, save the user id
+            newSpeaker.userId = userData.authId
+         }
 
          if (newSpeaker.id) {
             updateSpeaker(newSpeaker).then(() => {

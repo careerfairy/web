@@ -6,7 +6,10 @@ import {
 } from "../../constants/localStorageKeys"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
-import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
+import {
+   REWARD_LIVESTREAM_ATTENDANCE_SECONDS,
+   RewardActions,
+} from "@careerfairy/shared-lib/dist/rewards"
 
 const useRewardLivestreamAttendance = (livestreamData) => {
    const [invite] = useLocalStorage(localStorageInvite, null, { raw: true })
@@ -30,9 +33,8 @@ const useRewardLivestreamAttendance = (livestreamData) => {
          return // do nothing, stream is not live
       }
 
-      if (!invite || !referralCode || invite !== livestreamData.id) {
-         return // no invite for this livestream event
-      }
+      const isInvitation =
+         invite && referralCode && invite !== livestreamData.id
 
       if (alreadyRewarded === livestreamData.id) {
          return // do nothing, user already has been rewarded
@@ -49,10 +51,10 @@ const useRewardLivestreamAttendance = (livestreamData) => {
          }
 
          if (seconds <= 0) {
-            reward()
+            reward(isInvitation)
          } else {
             const interval = setTimeout(() => {
-               reward()
+               reward(isInvitation)
             }, seconds * 1000)
 
             return () => {
@@ -71,18 +73,32 @@ const useRewardLivestreamAttendance = (livestreamData) => {
       referralCode,
    ])
 
-   const reward = () => {
+   const reward = (isInvitation) => {
       setAlreadyRewarded(livestreamData.id)
       setStarted(null)
 
       firebaseService
-         .rewardLivestreamAttendance(livestreamData.id, referralCode)
+         .rewardUserAction(
+            RewardActions.LIVESTREAM_USER_ATTENDED,
+            livestreamData.id
+         )
          .then((r) => {
-            console.log("Participation rewarded!")
+            console.log("User Attendance rewarded!")
          })
          .catch((e) => {
             console.error(e)
          })
+
+      if (isInvitation) {
+         firebaseService
+            .rewardLivestreamAttendance(livestreamData.id, referralCode)
+            .then((r) => {
+               console.log("Participation rewarded!")
+            })
+            .catch((e) => {
+               console.error(e)
+            })
+      }
    }
 }
 

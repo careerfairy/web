@@ -10,6 +10,7 @@ import {
    TableHead,
    TableRow,
    TextField,
+   Typography,
 } from "@mui/material"
 import React, { useCallback } from "react"
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
@@ -25,11 +26,14 @@ import useCollection from "../../../custom-hook/useCollection"
 import { Reward } from "../../../../types/reward"
 import BadgeSimpleButton from "../BadgeSimpleButton"
 import BadgeProgress from "./BadgeProgress"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { styles } from "../profileStyles"
 
-const ReferralProfileTab = ({ userData }) => {
+const ReferralProfileTab = () => {
+   const { userData, userPresenter } = useAuth()
    const { enqueueSnackbar } = useSnackbar()
 
    if (!userData?.referralCode) {
@@ -67,16 +71,20 @@ const ReferralProfileTab = ({ userData }) => {
             <Grid item xs={4} sx={{ textAlign: "right" }}>
                <BadgeSimpleButton
                   badge={NetworkerBadge}
-                  isActive={userData?.badges?.includes(NetworkerBadge.key)}
+                  isActive={Boolean(userPresenter?.badges?.networkerBadge())}
                />
             </Grid>
-         </Grid>
 
-         <p>
-            Share your personal referral link with friends who want to sign up
-            to the platform. You will stand out from the crowd with very cool
-            badges!
-         </p>
+            <Grid item xs={9}>
+               <Box mb={4}>
+                  <Typography sx={styles.subtitle}>
+                     Share your personal referral link with friends who want to
+                     sign up to the platform. You will stand out from the crowd
+                     with very cool badges!
+                  </Typography>
+               </Box>
+            </Grid>
+         </Grid>
 
          <Grid container spacing={2} mt={2}>
             <Grid item xs={12} sx={{ display: "flex", flexWrap: "wrap" }}>
@@ -100,7 +108,7 @@ const ReferralProfileTab = ({ userData }) => {
             </Grid>
 
             <Grid item xs={12}>
-               <BadgeProgress userData={userData} />
+               <BadgeProgress />
             </Grid>
 
             <Grid item xs={12}>
@@ -182,7 +190,7 @@ const RewardsTable = ({ userDataId }) => {
                         {getHumanStringDescriptionForAction(reward.action)}
                      </TableCell>
                      <TableCell sx={localStyles.cell}>
-                        {reward.userData.firstName} {reward.userData.lastName}
+                        {reward.userData?.firstName} {reward.userData?.lastName}
                      </TableCell>
                      <TableCell sx={localStyles.cell}>
                         {getTimeFromNow(reward.createdAt)}

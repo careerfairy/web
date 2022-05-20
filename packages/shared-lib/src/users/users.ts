@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import firebase from "firebase"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -8,10 +9,10 @@ export interface UserData extends Identifiable {
       code: string
       name: string
    }
-   badges: string[]
+   badges?: string[]
    groupIds: string[]
    linkedinUrl: string
-   isAdmin: boolean
+   isAdmin?: boolean
    userResume: string
    universityCountryCode: string
    unsubscribed?: boolean
@@ -24,5 +25,38 @@ export interface UserData extends Identifiable {
       uid: string
       name: string
    }
+
+   // need data migrations to be moved to the user stats doc
    referralsCount?: number
+   totalLivestreamInvites?: number
+}
+
+export interface UserStats {
+   userId: string
+   totalLivestreamAttendances?: number
+   totalQuestionsAsked?: number
+   totalHandRaises?: number
+}
+
+export interface SavedRecruiter extends Identifiable {
+   livestreamId: string
+   userId: string
+   savedAt: firebase.firestore.Timestamp
+
+   livestreamDetails: {
+      title: string
+      company: string
+      start: firebase.firestore.Timestamp
+      companyLogoUrl: string
+   }
+
+   streamerDetails: {
+      id: string
+      avatar?: string
+      linkedIn?: string
+      firstName: string
+      lastName: string
+      position: string
+      background?: string
+   }
 }
