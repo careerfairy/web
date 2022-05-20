@@ -105,14 +105,18 @@ const CareerSkills = () => {
          <BadgeProgress
             name="Research"
             badge={ResearchBadge}
-            helperText="Research"
+            helperText="You'll have access to more exclusive content with this level progressions."
          />
          <BadgeProgress
             name="Network"
             badge={NetworkerBadge}
-            helperText="Network"
+            helperText="Increase your Network with this level progressions."
          />
-         <BadgeProgress name="Engage" badge={EngageBadge} helperText="Engage" />
+         <BadgeProgress
+            name="Engage"
+            badge={EngageBadge}
+            helperText="You'll be able to engage more with company recruiters with this level progressions."
+         />
       </ContentCard>
    )
 }
