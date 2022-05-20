@@ -50,10 +50,6 @@ export interface ILivestreamRepository {
       showHidden?: boolean
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
 
-   upcomingEventsOfGroupQuery(
-      groupId: string
-   ): firebase.firestore.Query<firebase.firestore.DocumentData>
-
    registeredEventsQuery(
       userEmail: string
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
