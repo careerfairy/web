@@ -30,6 +30,8 @@ const useStyles = makeStyles((theme) => ({
    },
    header: {
       paddingLeft: theme.spacing(3),
+      paddingTop: 0,
+      paddingBottom: 0,
    },
    titleButton: {},
    menuItem: {

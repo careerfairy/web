@@ -216,6 +216,9 @@ const getComponents = (theme: DefaultTheme): Components => ({
             boxShadow: "none",
             filter: theme.boxShadows.dark_15_60_15,
          },
+         paperFullScreen: {
+            borderRadius: 0,
+         },
       },
    },
    MuiPaper: {

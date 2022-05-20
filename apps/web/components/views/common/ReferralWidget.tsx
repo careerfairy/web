@@ -60,6 +60,8 @@ export const ReferralWidget = ({
                   color={iconsColor}
                   variant={"outlined"}
                   size={"large"}
+                  onClick={icon.onClick}
+                  href={icon.href}
                   startIcon={<icon.icon />}
                >
                   {icon.name}
@@ -76,8 +78,8 @@ export const ReferralWidget = ({
                                  : `${iconsColor}.main`,
                         },
                      ]}
-                     onClick={icon.onClick}
                      size={"large"}
+                     onClick={icon.onClick}
                      href={icon.href}
                   >
                      <icon.icon color={"inherit"} sx={styles.icon} />
