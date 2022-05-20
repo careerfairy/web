@@ -11,6 +11,8 @@ import { AlertProps } from "@mui/material/Alert/Alert"
 import { OptionCardProps } from "./common/OptionCard"
 import { useRouter } from "next/router"
 import ScreenShareDeniedModal from "./ModalViews/ScreenShareDeniedModal"
+import { animateProfileIcon } from "../../../../../store/actions/streamActions"
+import { ANIMATE_PROFILE_ICON_AFTER_MS } from "../../../../../constants/streams"
 
 interface Props {}
 
@@ -63,6 +65,10 @@ const AgoraStateHandler: FC<Props> = () => {
                closeToast(prevState)
                sendConnectedToast()
                setView(null)
+
+               setTimeout(() => {
+                  void dispatch(animateProfileIcon())
+               }, ANIMATE_PROFILE_ICON_AFTER_MS)
                break
             case "RECONNECTING":
                if (prevState === "CONNECTED") {

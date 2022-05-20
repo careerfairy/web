@@ -11,7 +11,7 @@ import {
    TextField,
 } from "@mui/material"
 import { v4 as uuidv4 } from "uuid"
-import { Warning } from "@mui/icons-material"
+import Warning from "@mui/icons-material/Warning"
 
 const requiredTxt = "Please fill this field"
 const duplicateTxt = "Cannot be a duplicate"

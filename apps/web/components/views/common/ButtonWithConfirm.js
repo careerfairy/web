@@ -66,7 +66,7 @@ function ButtonWithConfirm({
                   </IconButton>
                ) : (
                   <Button
-                     style={{ background: color }}
+                     style={{ background: color, boxShadow: "none" }}
                      color="primary"
                      variant="contained"
                      startIcon={rest.startIcon}

@@ -1,20 +1,3 @@
-/**
- * Copyright 2016 Google Inc. All Rights Reserved.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for t`he specific language governing permissions and
- * limitations under the License.
- */
-"use strict"
-
 import dotenv = require("dotenv")
 
 // load values from the .env file in this directory into process.env
@@ -35,10 +18,12 @@ import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
+import wishes = require("./wishes")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
 exports.onUserUpdate = auth.onUserUpdate
+exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
 exports.validateUserEmailWithPin = auth.validateUserEmailWithPin
@@ -140,3 +125,8 @@ exports.slackHandleInteractions = slack.slackHandleInteractions
 exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
 exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
+exports.rewardUserAction = rewards.rewardUserAction
+
+// Ratings
+
+exports.onUserRateWish = wishes.onUserRateWish

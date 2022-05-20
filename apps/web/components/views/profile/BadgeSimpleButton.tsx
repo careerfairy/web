@@ -1,6 +1,6 @@
 import { Button, Tooltip, useMediaQuery } from "@mui/material"
 import React from "react"
-import { Badge } from "@careerfairy/shared-lib/dist/badges"
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../common/BadgeIcon"
 
 const styles = {
@@ -14,8 +14,8 @@ const styles = {
 
 const BadgeSimpleButton = ({ badge, isActive, onClick }: Props) => {
    const title = isActive
-      ? `You've been granted the ${badge.name} Badge! (${badge.achievementDescription}) Congrats!`
-      : `You need to ${badge.achievementDescription} to activate this badge.`
+      ? `You've been granted the ${badge.name} Badge! (${badge.requirements[0].description}) Congrats!`
+      : `You need to ${badge.requirements[0].description} to activate this badge.`
 
    const isXS = useMediaQuery((theme: any) => theme.breakpoints.down("sm"))
 

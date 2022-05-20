@@ -1,6 +1,7 @@
 import { Locator, Page } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import { credentials } from "../../constants"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 export class LoginPage {
    readonly page: Page
@@ -44,6 +45,7 @@ export class LoginPage {
    async open() {
       await this.page.goto("/login")
    }
+
    async createUserAndLogin(options?: { emailVerified?: boolean }) {
       const userData = await UserSeed.createUser(
          credentials.correctEmail,
@@ -57,6 +59,29 @@ export class LoginPage {
       await this.enterEmail(credentials.correctEmail)
       await this.enterPassword(credentials.correctPassword)
       await this.clickLogin()
+      return userData
+   }
+
+   /**
+    * Utility method to login before running tests
+    * @param page
+    * @param extraUserData
+    */
+   static async login(page: Page, extraUserData?: Partial<UserData>) {
+      const handler = new LoginPage(page)
+
+      const userData = await UserSeed.createUser(
+         credentials.correctEmail,
+         extraUserData
+      )
+
+      await handler.open()
+      await handler.enterEmail(credentials.correctEmail)
+      await handler.enterPassword(credentials.defaultPassword)
+      await handler.clickLogin()
+
+      await page.waitForURL("/portal")
+
       return userData
    }
 }

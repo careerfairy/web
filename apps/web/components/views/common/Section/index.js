@@ -32,11 +32,11 @@ const Section = (props) => {
       backgroundImageSx,
       children,
       backgroundColor,
-      backgroundImageClassName,
+      backgroundImageClassName = undefined,
       big,
       className,
-      sectionRef,
-      sectionId,
+      sectionRef = undefined,
+      sectionId = "",
       sx,
       // Passed to section element
       ...otherProps

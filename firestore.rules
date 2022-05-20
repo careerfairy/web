@@ -3,7 +3,7 @@ rules_version = '2';
 service cloud.firestore {
     match /databases/{database}/documents {
         function isCFAdmin() {
-            return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
+          return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
         }
         match /userInterface/{interface} {
             allow read: if true;
@@ -62,6 +62,16 @@ service cloud.firestore {
             allow update: if request.auth.token.email == userId;
             allow create: if false; // Only the admin sdk creates rewards
             allow delete: if false;
+        }
+
+        match /userData/{userId}/savedRecruiters/{recruiterId} {
+            allow read: if request.auth.token.email == userId;
+            allow write: if request.auth.token.email == userId;
+        }
+
+        match /userData/{userId}/stats/stats {
+            allow read: if request.auth.token.email == userId;
+            allow write: if request.auth.token.email == userId;
         }
 
         match /universitiesByCountry/{countryId} {
@@ -420,6 +430,17 @@ service cloud.firestore {
         }
         match /wishList/{wish} {
             allow read, write: if true;
+        }
+        match /wishes/{slug} {
+            allow read: if true;
+            allow create: if request.auth != null;
+            allow delete, update: if request.resource.data.authorUid == uid || isCFAdmin();
+            match /flags/{uid} {
+                allow read, write: if request.auth != null;
+                }
+            match /ratings/{uid} {
+                allow read, write: if request.auth.uid == uid || isCFAdmin();
+                }
         }
     }
 }

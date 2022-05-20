@@ -8,6 +8,7 @@ const initialState = {
       viewerCtaModalOpen: false,
       leftMenuOpen: true,
       focusModeEnabled: false,
+      animateProfileIcons: false,
    },
    stats: {
       numberOfViewers: 0,
@@ -74,6 +75,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
             layout: {
                ...state.layout,
                focusModeEnabled: payload,
+            },
+         }
+      case actions.ANIMATE_PROFILE_ICON:
+         return {
+            ...state,
+            layout: {
+               ...state.layout,
+               animateProfileIcons: payload,
             },
          }
       case actions.SET_AGORA_RTC_CONNECTION_STATE:

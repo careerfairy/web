@@ -13,7 +13,7 @@ const useDashboardRedirect = (group, firebase) => {
       replace,
    } = useRouter()
    const dispatch = useDispatch()
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, isLoggedIn } = useAuth()
 
    const enqueueSnackbar = (...args) =>
       dispatch(actions.enqueueSnackbar(...args))
@@ -48,7 +48,7 @@ const useDashboardRedirect = (group, firebase) => {
          if (
             pathname === basePath &&
             dashboardInviteId &&
-            isLoggedIn() &&
+            isLoggedIn &&
             unAuthorized()
          ) {
             // If you're logged in and are on the base admin page
@@ -75,10 +75,8 @@ const useDashboardRedirect = (group, firebase) => {
       authenticatedUser?.email,
       userData?.userEmail,
       pathname,
+      isLoggedIn,
    ])
-
-   const isLoggedIn = () =>
-      authenticatedUser.isLoaded && !authenticatedUser.isEmpty
 
    const unAuthorized = () => {
       return Boolean(

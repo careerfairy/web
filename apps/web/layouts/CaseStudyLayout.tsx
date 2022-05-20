@@ -3,12 +3,11 @@ import Box from "@mui/material/Box"
 import Alert from "../components/cms/Alert"
 import FooterV2 from "../components/views/footer/FooterV2"
 import GenericHeader from "../components/views/header/GenericHeader"
-import GenericDrawer from "../components/views/navbar/GenericDrawer"
+import GeneralNavDrawer from "../components/views/navbar/GeneralNavDrawer"
 
 type Props = {
    preview: boolean
 }
-const drawerWidth = 300
 const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
    return (
       <Box
@@ -26,7 +25,7 @@ const CaseStudyLayout: FC<Props> = ({ children, preview }) => {
             transparent
             hideNavOnScroll={true}
          />
-         <GenericDrawer drawerWidth={drawerWidth} />
+         <GeneralNavDrawer />
          {preview && <Alert />}
          <Box component={"main"}>{children}</Box>
          <FooterV2 sx={{ mt: "auto" }} />

@@ -54,7 +54,9 @@ const UniversitySelector = ({
 
    const getSelectedItem = () => {
       // Autocomplete will always complain because of async filtering... :( So ignore the warning
-      const item = universities.find((uni) => uni.id === values.university.code)
+      const item = universities.find(
+         (uni) => uni.id === values.university?.code
+      )
       return item || otherObj
    }
 

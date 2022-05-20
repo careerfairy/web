@@ -143,7 +143,9 @@ const EventsPreviewGrid = ({
                               scroll
                               once
                               offset={600}
-                              placeholder={<EventPreviewCard loading />}
+                              placeholder={
+                                 <EventPreviewCard event={event} loading />
+                              }
                            >
                               <EventPreviewCard
                                  interests={existingInterests}

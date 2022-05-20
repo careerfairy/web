@@ -7,7 +7,7 @@ import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import useGeneralHeader from "components/custom-hook/useGeneralHeader"
 import Link from "../../../../materialUI/NextNavLink"
-import { getUserBadges } from "@careerfairy/shared-lib/dist/badges"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
 const useStyles = makeStyles((theme) => ({
    navIconButton: {
@@ -17,8 +17,9 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const UserProfileButton = ({ userBadges = [], white = false }) => {
-   const currentBadge = getUserBadges(userBadges)?.networkerBadge()
+const UserProfileButton = ({ white = false }) => {
+   const { userPresenter } = useAuth()
+   const currentBadge = userPresenter?.badges?.networkerBadge()
    const { headerColors } = useGeneralHeader()
 
    const classes = useStyles({
@@ -36,7 +37,9 @@ const UserProfileButton = ({ userBadges = [], white = false }) => {
          sx={white ? { color: "white" } : {}}
       >
          {currentBadge && (
-            <Tooltip title={`${currentBadge.name} Badge`}>
+            <Tooltip
+               title={`${currentBadge.name} Badge Level ${currentBadge.level}`}
+            >
                <Box
                   sx={{
                      position: "absolute",

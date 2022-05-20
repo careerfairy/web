@@ -84,6 +84,7 @@ function CategoryElement({
          <Chip
             key={option.id || index}
             label={option.name}
+            stacked={"true"}
             variant="outlined"
          />
       )
