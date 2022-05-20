@@ -80,7 +80,7 @@ const GenericHeader = ({
                      <LoginButton />
                   </div>
                ) : (
-                  <UserProfileButton userBadges={userData?.badges} />
+                  <UserProfileButton />
                )}
             </Hidden>
          </Box>

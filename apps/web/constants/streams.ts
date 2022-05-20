@@ -9,3 +9,6 @@ export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
 export const RTC_CLIENT_JOIN_TIME_LIMIT = 10000
 export const RTC_CLIENT_RECONNECT_LIMIT = 12000
 export const MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS = 5
+
+// SpeakerInfoDetails profile icon animation
+export const ANIMATE_PROFILE_ICON_AFTER_MS = 10000

@@ -10,7 +10,6 @@ interface ContentCardProps {
 
 const styles: StylesProps = {
    root: {
-      borderRadius: 0.8,
       p: 2,
       transition: (theme) => theme.transitions.create(["box-shadow"]),
    },

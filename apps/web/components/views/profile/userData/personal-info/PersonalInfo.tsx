@@ -1,8 +1,7 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { Formik } from "formik"
 
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import makeStyles from "@mui/styles/makeStyles"
 import {
    Typography,
    TextField,
@@ -21,10 +20,12 @@ import { GENERAL_ERROR, URL_REGEX } from "components/util/constants"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useSnackbar } from "notistack"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
 import BadgeSimpleButton from "../../BadgeSimpleButton"
 import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 import { StylesProps } from "../../../../../types/commonTypes"
+import { useRouter } from "next/router"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
 
 const styles: StylesProps = {
    avatar: {
@@ -36,7 +37,6 @@ const styles: StylesProps = {
       marginBottom: 0,
    },
    title: {
-      color: "text.secondary",
       textTransform: "uppercase",
       fontSize: "1.8rem",
       marginBottom: 3,
@@ -49,9 +49,11 @@ const styles: StylesProps = {
    },
 }
 
-const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
+const PersonalInfo = ({ userData }) => {
+   const { userPresenter } = useAuth()
    const [open, setOpen] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
+   const router = useRouter()
    const dispatch = useDispatch()
    // @ts-ignore
    const { loading, error } = useSelector((state) => state.auth.profileEdit)
@@ -85,6 +87,14 @@ const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
    const handleUpdate = async (values) => {
       await dispatch(actions.editUserProfile(values))
    }
+
+   const navigateToReferrals = useCallback(() => {
+      void router.push({
+         pathname: "/profile/referrals",
+      })
+
+      return {} // match event handler signature
+   }, [router])
 
    return (
       <Formik
@@ -151,10 +161,10 @@ const PersonalInfo = ({ userData, redirectToReferralsTab }) => {
                         <Grid item xs={4} sx={{ textAlign: "right" }}>
                            <BadgeSimpleButton
                               badge={NetworkerBadge}
-                              isActive={userData?.badges?.includes(
-                                 NetworkerBadge.key
+                              isActive={Boolean(
+                                 userPresenter?.badges?.networkerBadge()
                               )}
-                              onClick={redirectToReferralsTab}
+                              onClick={navigateToReferrals}
                            />
                         </Grid>
                      </Grid>

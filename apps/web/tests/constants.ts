@@ -3,6 +3,7 @@ export const credentials = {
    unregisteredEmail: "unregistered@careerfairy.io",
    correctPassword: "Correct@Password420",
    wrongPassword: "wrongpassword",
+   defaultPassword: "password",
    invalidEmailAddress: "invalidemailaddress",
    correctFirstName: "John",
    correctLastName: "Smith",

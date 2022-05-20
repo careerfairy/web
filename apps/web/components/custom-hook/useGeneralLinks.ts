@@ -7,6 +7,9 @@ import { OverridableComponent } from "@mui/material/OverridableComponent"
 import { SvgIconTypeMap } from "@mui/material"
 import ReferralIcon from "@mui/icons-material/GroupAdd"
 import GroupsIcon from "@mui/icons-material/Groups"
+import ContactPageIcon from "@mui/icons-material/ContactPage"
+import AutoModeIcon from "@mui/icons-material/AutoMode"
+
 import WishListIcon from "@mui/icons-material/FavoriteRounded"
 const initialMainLinks = [
    {
@@ -59,15 +62,27 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
       icon: ProfileIcon,
    },
    {
-      href: "/referrals",
+      href: "/profile/career-skills",
+      title: "My Career Skills",
+      basePath: "/profile/career-skills",
+      icon: AutoModeIcon,
+   },
+   {
+      href: "/profile/referrals",
       title: "Referrals",
-      basePath: "/referrals",
+      basePath: "/profile/referrals",
       icon: ReferralIcon,
    },
    {
-      href: "/groups",
+      href: "/profile/saved-recruiters",
+      title: "My Recruiters",
+      basePath: "/profile/saved-recruiters",
+      icon: ContactPageIcon,
+   },
+   {
+      href: "/profile/groups",
       title: "Groups",
-      basePath: "/groups",
+      basePath: "/profile/groups",
       icon: GroupsIcon,
    },
 ]

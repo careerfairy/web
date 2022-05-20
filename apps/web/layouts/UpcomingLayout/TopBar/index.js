@@ -61,7 +61,7 @@ const TopBar = () => {
                      <LoginButton />
                   </div>
                ) : (
-                  <UserProfileButton userBadges={userData?.badges} white />
+                  <UserProfileButton white />
                )}
             </Hidden>
          </Box>

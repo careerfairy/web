@@ -20,7 +20,6 @@ test.describe("Signup Page Functionality", () => {
    test.beforeEach(async ({ page }) => {
       await UserSeed.deleteUser(credentials.correctEmail)
       await new SignupPage(page).open()
-      await new CommonPage(page).acceptCookies()
    })
 
    test.afterAll(async () => {

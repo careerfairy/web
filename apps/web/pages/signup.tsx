@@ -9,10 +9,8 @@ import {
    Step,
    StepLabel,
 } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
 import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../HOCs/AuthProvider"
-import { createStyles } from "@mui/styles"
 import SignUpPinForm from "../components/views/signup/SignUpPinForm"
 import SignUpUserForm from "../components/views/signup/SignUpUserForm"
 import MultiStepWrapper, {
@@ -21,6 +19,7 @@ import MultiStepWrapper, {
 import PersonaliseSteps from "../components/views/signup/PersonaliseSteps"
 import { MainLogo } from "./../components/logos"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
+import { sxStyles } from "../types/commonTypes"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 
@@ -100,41 +99,38 @@ export const SignupStepper = ({
    </Stepper>
 )
 
-const useStyles = makeStyles((theme) =>
-   createStyles({
-      box: {
-         width: "100%", // Fix IE 11 issue.
-         backgroundColor: "white",
-         marginTop: theme.spacing(1),
-         borderRadius: 5,
-      },
-      footer: {
-         color: "white",
-         fontWeight: 700,
-         fontSize: "1.3em",
-         margin: "40px 0 30px 0",
-         textAlign: "center",
-         textTransform: "uppercase",
-         letterSpacing: "0.4em",
-      },
-      title: {
-         color: "white",
-         fontWeight: 500,
-         fontSize: "2em",
-         textAlign: "center",
-      },
-      icon: {
-         margin: "0 10px",
-         color: "white",
-      },
-      logo: {
-         margin: "20px 20px 0 20px",
-      },
-   })
-)
+const styles = sxStyles({
+   box: {
+      width: "100%", // Fix IE 11 issue.
+      backgroundColor: "white",
+      marginTop: 1,
+      borderRadius: 5,
+   },
+   footer: {
+      color: "white",
+      fontWeight: 700,
+      fontSize: "1.3em",
+      margin: "40px 0 30px 0",
+      textAlign: "center",
+      textTransform: "uppercase",
+      letterSpacing: "0.4em",
+   },
+   title: {
+      color: "white",
+      fontWeight: 500,
+      fontSize: "2em",
+      textAlign: "center",
+   },
+   icon: {
+      margin: "0 10px",
+      color: "white",
+   },
+   logo: {
+      margin: "20px 20px 0 20px",
+   },
+})
 
 export const SignUpPageLayout = ({ children }) => {
-   const classes = useStyles()
    return (
       <Fragment>
          <Head>
@@ -142,20 +138,20 @@ export const SignUpPageLayout = ({ children }) => {
          </Head>
          <TealBackground>
             <header>
-               <MainLogo className={classes.logo} white={true} />
+               <MainLogo sx={styles.logo} white={true} />
             </header>
-            <Typography className={classes.title}>Sign Up</Typography>
+            <Typography sx={styles.title}>Sign Up</Typography>
             <Container maxWidth="sm">
                <Box
                   data-testid={"signup-page-form"}
                   boxShadow={1}
                   p={3}
-                  className={classes.box}
+                  sx={styles.box}
                >
                   {children}
                </Box>
             </Container>
-            <Typography className={classes.footer}>Meet Your Future</Typography>
+            <Typography sx={styles.footer}>Meet Your Future</Typography>
          </TealBackground>
       </Fragment>
    )

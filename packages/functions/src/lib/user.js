@@ -29,28 +29,44 @@ exports.userGetByEmail = async (email) => {
    return documentSnap.data()
 }
 
-exports.userAddPoints = (email, points) => {
-   return userIncrementField(email, "points", points)
-}
-
-exports.userIncrementReferralsCount = (email) => {
-   return userIncrementField(email, "referralsCount", 1)
-}
-
 exports.userUpdateFields = (userDataId, fields) => {
    let docRef = admin.firestore().collection("userData").doc(userDataId)
 
    return docRef.update(fields)
 }
 
-exports.userIncrementField = (userDataId, field, amount) => {
+const userIncrementField = (userDataId, field, amount) => {
    return exports.userUpdateFields(userDataId, {
       [field]: admin.firestore.FieldValue.increment(amount),
    })
 }
 
+exports.userIncrementField = userIncrementField
+
 exports.userAddEntryToArrayField = (userDataId, field, entry) => {
    return exports.userUpdateFields(userDataId, {
       [field]: admin.firestore.FieldValue.arrayUnion(entry),
    })
+}
+
+exports.userIncrementStat = async (userDataId, field, amount = 1) => {
+   const docRef = admin
+      .firestore()
+      .collection("userData")
+      .doc(userDataId)
+      .collection("stats")
+      .doc("stats")
+
+   const doc = await docRef.get()
+
+   if (doc.exists) {
+      return docRef.update({
+         [field]: admin.firestore.FieldValue.increment(amount),
+      })
+   } else {
+      return docRef.set({
+         userId: userDataId,
+         [field]: amount,
+      })
+   }
 }

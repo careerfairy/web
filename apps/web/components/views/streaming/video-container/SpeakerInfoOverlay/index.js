@@ -1,9 +1,12 @@
-import React from "react"
+import React, { useCallback } from "react"
 import { alpha } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
-import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import PropTypes from "prop-types"
+import dynamic from "next/dynamic"
 import { IconButton, Tooltip } from "@mui/material"
+import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
+import RubberBand from "@stahl.luke/react-reveal/RubberBand"
+import { useSelector } from "react-redux"
 
 const useStyles = makeStyles((theme) => ({
    speakerInformation: {
@@ -40,99 +43,83 @@ const useStyles = makeStyles((theme) => ({
       textOverflow: "ellipsis",
       margin: 0,
    },
-   speakerLinkedIn: {
-      marginLeft: 10,
+   speakerAction: {
+      marginLeft: 5,
    },
-   speakerLinkedInIconButton: {
+   speakerActionIconButton: {
       padding: 0,
    },
-   speakerLinkedInButton: {
+   speakerActionButton: {
       color: theme.palette.common.white,
-      fontSize: (props) => (props.small ? 20 : 30),
+      fontSize: (props) => (props.small ? 17 : 25),
    },
 }))
 
 const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
+   const [DialogComponent, setDialogComponent] = React.useState(null)
+   const animateProfileIcons = useSelector(
+      (state) => state.stream.layout.animateProfileIcons
+   )
+
+   const closeDialog = useCallback(async () => {
+      setDialogComponent(null)
+   }, [])
+
+   const openDialog = useCallback(async () => {
+      const SpeakerDetailsDialog = dynamic(() =>
+         import("./SpeakerDetailsDialog")
+      )
+      setDialogComponent(SpeakerDetailsDialog)
+   }, [])
+
    const classes = useStyles({ small: small, zIndex })
 
-   const handleClick = () => {
-      let url = speaker.linkedIn
-      if (!url.match(/^[a-zA-Z]+:\/\//)) {
-         url = "https://" + url
-      }
-      window.open(url, "_blank")
-   }
+   let NameHeader = "h3"
+   let PositionHeader = "h4"
 
    if (small) {
-      return (
-         <div className={classes.speakerInformation}>
-            <div className={classes.speakerData}>
-               <div>
-                  <h5
-                     className={classes.speakerName}
-                  >{`${speaker.firstName} ${speaker.lastName}`}</h5>
-               </div>
-               <div>
-                  <h5
-                     className={classes.speakerPosition}
-                  >{`${speaker.position}`}</h5>
-               </div>
-            </div>
-            {speaker.showLinkedIn && (
-               <div className={classes.speakerLinkedIn}>
-                  <Tooltip
-                     title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}
-                  >
-                     <IconButton
-                        className={classes.speakerLinkedInIconButton}
-                        onClick={handleClick}
-                        size="large"
-                     >
-                        <LinkedInIcon
-                           className={classes.speakerLinkedInButton}
-                        />
-                     </IconButton>
-                  </Tooltip>
-               </div>
-            )}
-         </div>
-      )
-   } else {
-      return (
-         <div className={classes.speakerInformation}>
-            <div>
-               <div>
-                  <h3
-                     className={classes.speakerName}
-                  >{`${speaker.firstName} ${speaker.lastName}`}</h3>
-               </div>
-               <div>
-                  <h4
-                     className={classes.speakerPosition}
-                  >{`${speaker.position}`}</h4>
-               </div>
-            </div>
-            {speaker.showLinkedIn && (
-               <div className={classes.speakerLinkedIn}>
-                  <Tooltip
-                     title={`Open ${speaker.firstName}'s LinkedIn profile in a new tab`}
-                  >
-                     <IconButton
-                        className={classes.speakerLinkedInIconButton}
-                        onClick={handleClick}
-                        size="large"
-                     >
-                        <LinkedInIcon
-                           className={classes.speakerLinkedInButton}
-                        />
-                     </IconButton>
-                  </Tooltip>
-               </div>
-            )}
-         </div>
-      )
+      NameHeader = "h5"
+      PositionHeader = "h5"
    }
+
+   return (
+      <>
+         <div className={classes.speakerInformation}>
+            <div className={small ? classes.speakerData : undefined}>
+               <div>
+                  <NameHeader
+                     className={classes.speakerName}
+                  >{`${speaker.firstName} ${speaker.lastName}`}</NameHeader>
+               </div>
+               <div>
+                  <PositionHeader
+                     className={classes.speakerPosition}
+                  >{`${speaker.position}`}</PositionHeader>
+               </div>
+            </div>
+            <div className={classes.speakerAction}>
+               <Tooltip title={`See details about this speaker`}>
+                  <IconButton
+                     className={classes.speakerActionIconButton}
+                     onClick={openDialog}
+                     size="large"
+                  >
+                     <RubberBand spy={animateProfileIcons} count={2}>
+                        <AccountCircleOutlinedIcon
+                           className={classes.speakerActionButton}
+                        />
+                     </RubberBand>
+                  </IconButton>
+               </Tooltip>
+            </div>
+         </div>
+         {DialogComponent && (
+            <DialogComponent onClose={closeDialog} speaker={speaker} />
+         )}
+      </>
+   )
 }
+
 SpeakerInfoOverlay.prototypes = {
    speaker: PropTypes.shape({
       firstName: PropTypes.string,
