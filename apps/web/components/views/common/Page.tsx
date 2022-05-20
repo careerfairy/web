@@ -41,8 +41,15 @@ const Page: FC<Props> = ({ sx, backgroundColor, ...props }) => {
    )
 }
 
-export const PageContentWrapper: FC = ({ children }) => {
-   return <Box sx={[styles.contentWrapper]} children={children} />
+export const PageContentWrapper: FC<{
+   sx?: SxProps<DefaultTheme>
+}> = ({ children, sx }) => {
+   return (
+      <Box
+         sx={[styles.contentWrapper, ...(Array.isArray(sx) ? sx : [sx])]}
+         children={children}
+      />
+   )
 }
 
 interface PageChildrenProps {

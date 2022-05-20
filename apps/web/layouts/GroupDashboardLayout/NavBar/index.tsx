@@ -8,6 +8,7 @@ import NavElement from "../../../components/views/navbar/NavElement"
 import { StylesProps } from "../../../types/commonTypes"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { PageLinkProps } from "../../../components/custom-hook/useGeneralLinks"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
 const styles: StylesProps = {
    avatar: {
@@ -44,6 +45,7 @@ const NavBar = ({
    isDesktop,
 }: Props) => {
    const dispatch = useDispatch()
+   const { isLoggedIn } = useAuth()
 
    const signOut = () => {
       dispatch(actions.signOut())
@@ -89,12 +91,14 @@ const NavBar = ({
                {drawerBottomLinks.map((item) => (
                   <NavElement {...item} key={item.title} />
                ))}
-               <NavElement
-                  href=""
-                  onClick={signOut}
-                  icon={LogoutIcon}
-                  title="LOGOUT"
-               />
+               {isLoggedIn && (
+                  <NavElement
+                     href=""
+                     onClick={signOut}
+                     icon={LogoutIcon}
+                     title="LOGOUT"
+                  />
+               )}
             </List>
          </Box>
       </Box>
