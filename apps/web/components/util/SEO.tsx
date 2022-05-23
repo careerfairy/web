@@ -30,7 +30,7 @@ const SEO = ({
       facebook: {
          appId: facebookAppId,
       },
-      canonical: getBaseUrl() + router.pathname,
+      canonical: getBaseUrl() + router.asPath,
       ...props,
       twitter: {
          cardType: props.twitter?.cardType,
