@@ -1,7 +1,4 @@
-import {
-   getBaseUrl,
-   getResizedUrl,
-} from "../components/helperFunctions/HelperFunctions"
+import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { SeoProps } from "../components/util/SEO"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import keywordExtractor from "keyword-extractor"
@@ -27,7 +24,6 @@ export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
          `${stream.title || ""} - ${stream.summary || ""}`,
          160
       ),
-      canonical: `${getBaseUrl()}/upcoming-livestream/${stream.id}`,
       twitter: {
          cardType: "summary_large_image",
          site: "@FairyCareer",
