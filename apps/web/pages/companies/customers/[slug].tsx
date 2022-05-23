@@ -13,6 +13,7 @@ import {
 } from "../../../types/cmsTypes"
 import { GetStaticPaths, GetStaticProps } from "next"
 import SeeMore from "../../../components/views/case-study/SeeMore"
+import { getBaseUrl } from "../../../components/helperFunctions/HelperFunctions"
 
 interface Props {
    companyCaseStudy: CompanyCaseStudy
@@ -29,6 +30,9 @@ export default function CaseStudy({
          <SEO
             id={companyCaseStudy?.id}
             {...companyCaseStudy?.seo}
+            canonical={`${getBaseUrl()}/companies/customers/${
+               companyCaseStudy?.slug
+            }`}
             title={`${companyCaseStudy?.company?.name} - CareerFairy Customer Story`}
          />
          <Hero
