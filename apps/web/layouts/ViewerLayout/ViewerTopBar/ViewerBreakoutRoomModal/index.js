@@ -26,7 +26,6 @@ import clsx from "clsx"
 import CloseIcon from "@mui/icons-material/Close"
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
-import useMediaQuery from "@mui/material/useMediaQuery"
 
 const useStyles = makeStyles((theme) => ({
    contentRoot: {

@@ -11,8 +11,6 @@ import {
 } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import DisplayCategoryElement from "./DisplayCategoryElement"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import { useRouter } from "next/router"
 
 const useStyles = makeStyles((theme) => ({
    root: {

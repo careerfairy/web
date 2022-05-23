@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 
-import { Box, Button, Grid, Typography } from "@mui/material"
-import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext"
+import { Box, Button, Typography } from "@mui/material"
 import GroupStreams from "../GroupStreams/GroupStreams"
 import { useRouter } from "next/router"
 import GroupJoinModal from "../../profile/GroupJoinModal"

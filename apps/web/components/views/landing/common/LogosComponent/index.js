@@ -1,5 +1,4 @@
 import React from "react"
-import makeStyles from "@mui/styles/makeStyles"
 import { Grid } from "@mui/material"
 import Fade from "@stahl.luke/react-reveal/Fade"
 

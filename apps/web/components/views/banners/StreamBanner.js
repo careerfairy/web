@@ -1,6 +1,5 @@
 import PropTypes from "prop-types"
 import Alert from "@mui/material/Alert"
-import Typography from "@mui/material/Typography"
 import makeStyles from "@mui/styles/makeStyles"
 import OverflowTip from "../../views/tooltips/OverflowTip"
 import { STREAM_ELEMENT_BORDER_RADIUS } from "constants/streams"

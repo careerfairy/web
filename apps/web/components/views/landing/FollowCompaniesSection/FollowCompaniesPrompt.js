@@ -1,6 +1,6 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
-import { Box, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 import HeroButton from "../HeroSection/HeroButton"
 
 const useStyles = makeStyles((theme) => ({
