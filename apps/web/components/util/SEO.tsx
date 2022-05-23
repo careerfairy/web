@@ -11,7 +11,6 @@ const SEO = ({
    ...props
 }: SeoProps) => {
    const router = useRouter()
-
    const SEO: NextSeoProps = {
       ...(keywords && { keywords: keywords.toString() }),
       noindex,
