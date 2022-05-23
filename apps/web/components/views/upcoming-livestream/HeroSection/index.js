@@ -159,6 +159,7 @@ const HeroSection = ({
                   <Grid sx={styles.leftGridItem} item xs={12} md={6}>
                      <Typography
                         variant={stream?.title?.length > 120 ? "h4" : "h2"}
+                        component="h1"
                         sx={styles.title}
                      >
                         {stream.title}
