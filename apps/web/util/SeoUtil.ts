@@ -2,16 +2,26 @@ import { getResizedUrl } from "../components/helperFunctions/HelperFunctions"
 import { SeoProps } from "../components/util/SEO"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import keywordExtractor from "keyword-extractor"
+import DateUtil from "./DateUtil"
 
 export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
+   const streamDate = stream.startDate
+      ? stream.startDate
+      : stream.start
+      ? stream.start.toDate?.()
+      : new Date()
+   const monthAndYear = DateUtil.monthAndDay(streamDate)
    return {
-      title: `CareerFairy | Live Stream with ${stream.company}`,
+      title: `CareerFairy | Live Stream with ${stream.company} - ${monthAndYear}`,
       image: {
          url: getResizedUrl(stream.backgroundImageUrl, "sm"),
          width: 400,
          height: 400,
       },
-      description: stream.title,
+      description: getSubstringWithEllipsis(
+         `${stream.title || ""} - ${stream.summary || ""}`,
+         160
+      ),
       twitter: {
          cardType: "summary_large_image",
          site: "@FairyCareer",
@@ -20,25 +30,32 @@ export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
       additionalMetaTags: [
          {
             name: "keywords",
-            content: keywordExtractor
-               .extract(getStreamText(stream), {
-                  language: getLanguageName(stream.language?.code),
-                  remove_digits: true,
-                  return_changed_case: true,
-                  remove_duplicates: true,
-               })
-               .join(","),
+            content:
+               keywordExtractor
+                  .extract(getStreamText(stream), {
+                     language: getLanguageName(stream.language?.code),
+                     remove_digits: true,
+                     return_changed_case: true,
+                     remove_duplicates: true,
+                  })
+                  .join(",") +
+               ",careerfairy,career,fairy,fairycareer,CareerFairy,Career Fair",
          },
       ],
    }
 }
 
+const getSubstringWithEllipsis = (text: string, maxLength: number) => {
+   const ellipsis = "..."
+   if (text.length <= maxLength) {
+      return text
+   }
+   return text.substring(0, maxLength - ellipsis.length) + ellipsis
+}
 const getStreamText = (stream: LivestreamEvent): string => {
-   return `${stream.title} ${stream.company} ${stream.summary}`
-   //    .replace(
-   //    /[^\w\d ]/g,
-   //    ""
-   // ) // replace unnesessary chars. leave only chars, numbers and space
+   return `${stream.title || ""} ${stream.company || ""} ${
+      stream.summary || ""
+   }`
 }
 export type KeywordExtractorLanguageNames =
    | "danish"
