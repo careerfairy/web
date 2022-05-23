@@ -41,8 +41,8 @@ export default class AgoraClient {
       resourceId: string,
       rtcToken: string,
       urlToRecord: string,
-      videoWidth = 1280,
-      videoHeight = 720,
+      videoWidth = 1920,
+      videoHeight = 1080,
       maxRecordingHour = 72
    ) {
       return this.authRequest(

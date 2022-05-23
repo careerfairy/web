@@ -70,18 +70,14 @@ class FirebaseService {
 
    startLivestreamRecording = async (data) => {
       const startLivestreamRecording = this.functions.httpsCallable(
-         data.isBreakout
-            ? "startRecordingBreakoutRoom"
-            : "startRecordingLivestream"
+         "startRecordingLivestream_v2"
       )
       return await startLivestreamRecording(data)
    }
 
    stopLivestreamRecording = async (data) => {
       const stopLivestreamRecording = this.functions.httpsCallable(
-         data.isBreakout
-            ? "stopRecordingBreakoutRoom"
-            : "stopRecordingLivestream"
+         "stopRecordingLivestream_v2"
       )
       return await stopLivestreamRecording(data)
    }
