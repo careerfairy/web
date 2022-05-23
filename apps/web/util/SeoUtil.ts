@@ -12,7 +12,6 @@ export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
       : new Date()
 
    const monthAndYear = DateUtil.monthAndDay(streamDate)
-
    return {
       title: `${stream.title} - ${monthAndYear} | CareerFairy`,
       image: {
