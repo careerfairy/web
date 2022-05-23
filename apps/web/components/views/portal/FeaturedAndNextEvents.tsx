@@ -1,5 +1,4 @@
 import React, { useCallback, useMemo, useState } from "react"
-import { LiveStreamEvent } from "types/event"
 import EventPreviewCard from "../common/stream-cards/EventPreviewCard"
 import Stack from "@mui/material/Stack"
 import { Box, Grid } from "@mui/material"
@@ -15,6 +14,7 @@ import { useRouter } from "next/router"
 import { alpha } from "@mui/material/styles"
 import EmptyMessageOverlay from "./events-preview/EmptyMessageOverlay"
 import ShareLivestreamModal from "../common/ShareLivestreamModal"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = {
    root: {
@@ -81,7 +81,7 @@ const FeaturedAndNextEvents = () => {
       return livestreamRepo.featuredEventQuery()
    }, [])
 
-   const { items: featuredEvents, isLoading } = usePagination<LiveStreamEvent>(
+   const { items: featuredEvents, isLoading } = usePagination<LivestreamEvent>(
       featuredEventQuery,
       {
          limit: 1,
@@ -99,7 +99,7 @@ const FeaturedAndNextEvents = () => {
    }, [authenticatedUser?.email])
 
    const { items: nextEvents, isLoading: loadingNextEvents } =
-      usePagination<LiveStreamEvent>(registeredEventsQuery, {
+      usePagination<LivestreamEvent>(registeredEventsQuery, {
          limit: 3,
       })
 

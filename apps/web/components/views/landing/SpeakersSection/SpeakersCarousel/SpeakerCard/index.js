@@ -25,6 +25,7 @@ const styles = {
       display: "flex",
       borderRadius: cardSpacing,
       flexWrap: "wrap",
+      justifyContent: "center",
    },
    companyImage: {
       height: 130,
@@ -62,40 +63,36 @@ const SpeakerCard = ({
 }) => {
    return (
       <Card elevation={0} sx={styles.cardRoot}>
-         <Grid container spacing={3}>
-            <Grid item xs={12}>
-               <Box sx={styles.speakerDetails}>
-                  <Avatar
-                     src={getResizedUrl(avatarUrl, "sm")}
-                     alt={name}
-                     sx={styles.avatar}
-                  />
-                  <Box sx={styles.aboutWrapper}>
-                     <Typography
-                        component="h4"
-                        variant="subtitle1"
-                        sx={styles.cardAuthor}
-                     >
-                        {name}
-                     </Typography>
-                     <Typography
-                        variant="body2"
-                        color="textSecondary"
-                        align="center"
-                        sx={styles.cardAuthor}
-                        component="p"
-                     >
-                        {position}
-                     </Typography>
-                  </Box>
-                  <Avatar
-                     src={getResizedUrl(companyUrl, "sm")}
-                     sx={styles.companyImage}
-                     alt={companyName}
-                  />
-               </Box>
-            </Grid>
-         </Grid>
+         <Box sx={styles.speakerDetails}>
+            <Avatar
+               src={getResizedUrl(avatarUrl, "sm")}
+               alt={name}
+               sx={styles.avatar}
+            />
+            <Box sx={styles.aboutWrapper}>
+               <Typography
+                  component="h4"
+                  variant="subtitle1"
+                  sx={styles.cardAuthor}
+               >
+                  {name}
+               </Typography>
+               <Typography
+                  variant="body2"
+                  color="textSecondary"
+                  align="center"
+                  sx={styles.cardAuthor}
+                  component="p"
+               >
+                  {position}
+               </Typography>
+            </Box>
+            <Avatar
+               src={getResizedUrl(companyUrl, "sm")}
+               sx={styles.companyImage}
+               alt={companyName}
+            />
+         </Box>
       </Card>
    )
 }
