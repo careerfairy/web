@@ -391,6 +391,16 @@ const getComponents = (theme: DefaultTheme): Components => ({
             boxShadow: theme.boxShadows.dark_8_25_10,
          },
       },
+      variants: [
+         {
+            props: {
+               elevation: 0,
+            },
+            style: {
+               boxShadow: "none",
+            },
+         },
+      ],
    },
    MuiPopover: {
       styleOverrides: {
