@@ -49,6 +49,7 @@
       "formik": "^2.1.2",
       "global": "^4.4.0",
       "jszip": "^3.6.0",
+      "keyword-extractor": "^0.0.22",
       "lodash": "^4.17.20",
       "lodash.clonedeep": "^4.5.0",
       "lodash.debounce": "^4.0.8",

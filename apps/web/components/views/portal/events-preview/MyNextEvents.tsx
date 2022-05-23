@@ -2,8 +2,8 @@ import React, { useMemo } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
 import livestreamRepo from "../../../../data/firebase/LivestreamRepository"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { LiveStreamEvent } from "../../../../types/event"
 import { usePagination } from "use-pagination-firestore"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const MyNextEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth()
@@ -12,7 +12,7 @@ const MyNextEvents = ({ limit }: Props) => {
       return livestreamRepo.registeredEventsQuery(authenticatedUser.email)
    }, [authenticatedUser?.email])
 
-   const { items: events, isLoading } = usePagination<LiveStreamEvent>(
+   const { items: events, isLoading } = usePagination<LivestreamEvent>(
       registeredEventsQuery,
       {
          limit: limit,

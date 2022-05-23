@@ -1,7 +1,6 @@
 import React from "react"
 import { Typography } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
-import { LiveStreamEvent } from "types/event"
 import Stack from "@mui/material/Stack"
 import CardMedia from "@mui/material/CardMedia"
 import Skeleton from "@mui/material/Skeleton"
@@ -13,6 +12,7 @@ import {
 import ChevronRight from "@mui/icons-material/ChevronRight"
 import Link from "next/link"
 import { alpha, Theme } from "@mui/material/styles"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const radius = 1
 const styles = {
@@ -103,7 +103,7 @@ const EventNameCard = ({ event, loading, animation }: Props) => {
    )
 }
 interface Props {
-   event?: LiveStreamEvent
+   event?: LivestreamEvent
    loading?: boolean
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
