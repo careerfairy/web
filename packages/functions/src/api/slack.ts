@@ -160,6 +160,11 @@ function generateBodyStr(fieldsObj) {
 }
 
 function generateRequest(url, body): AxiosPromise {
+   // do not send slack notifications during tests in CI
+   if (process.env.CI) {
+      return Promise.resolve() as any
+   }
+
    return axios({
       method: "post",
       data: body,
