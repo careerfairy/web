@@ -4,6 +4,7 @@ import { getUserBadges, UserBadges } from "./UserBadges"
 import { Badge } from "../badges/badges"
 import { NetworkerBadgeLevel2 } from "../badges/NetworkBadges"
 import { EngageBadgeLevel2 } from "../badges/EngageBadges"
+import { ResearchBadgeLevel2 } from "../badges/ResearchBadges"
 
 export default class UserPresenter extends BasePresenter<UserData> {
    public readonly badges: UserBadges
@@ -38,6 +39,9 @@ export default class UserPresenter extends BasePresenter<UserData> {
     */
    canSaveRecruiters(): boolean {
       return this.badges?.networkerBadge()?.level >= 2
+   }
+   canWatchAllHighlights(): boolean {
+      return this.badges.hasBadgeComplete(ResearchBadgeLevel2)
    }
 
    static saveRecruitersRequiredBadge(): Badge {

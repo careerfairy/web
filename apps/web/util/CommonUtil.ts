@@ -164,3 +164,7 @@ export function stringAvatar(firstName: string, lastName: string) {
       children: initials,
    }
 }
+
+export const getMillisecondsBetweenDates = (date1: Date, date2: Date) => {
+   return Math.abs(date1.getTime() - date2.getTime())
+}

@@ -6,6 +6,7 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { HighLight } from "../../../types/Highlight"
 import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
 
 const styles = {
    root: {
@@ -24,14 +25,31 @@ const HighlightsCarousel = ({
    const isSmall = useMediaQuery(up("sm"))
    const isMedium = useMediaQuery(up("md"))
    const isLarge = useMediaQuery(up("lg"))
-
+   const {
+      setUserTimeoutWithCookie,
+      checkIfCanWatchHighlight,
+      timoutDuration,
+   } = useCanWatchHighlights()
    const numSlides: number = useMemo(() => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
    }, [isExtraSmall, isSmall, isMedium, isLarge])
 
    const [videoUrl, setVideoUrl] = useState(null)
+
    const handleOpenVideoDialog = (videoUrl: string) => {
-      setVideoUrl(videoUrl)
+      if (checkIfCanWatchHighlight().canWatchAll) {
+         setVideoUrl(videoUrl)
+         setUserTimeoutWithCookie()
+      } else {
+         if (videoUrl) handleCloseVideoDialog()
+         alert(
+            `You can only watch highlights once per ${
+               timoutDuration / 1000
+            } seconds. You have ${Math.round(
+               checkIfCanWatchHighlight().timeLeft / 1000
+            )} seconds left.`
+         )
+      }
    }
 
    const handleCloseVideoDialog = () => {
