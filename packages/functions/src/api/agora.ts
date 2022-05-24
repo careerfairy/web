@@ -1,5 +1,6 @@
 import { RtcRole, RtcTokenBuilder } from "agora-access-token"
 import axios, { Method } from "axios"
+import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 
 export const appID = "53675bc6d3884026a72ecb1de3d19eb1"
 export const appCertificate = "286a21681469490783ab75247de35f37"
@@ -22,6 +23,16 @@ export default class AgoraClient {
       this.authorizationHeader = `Basic ${base64Credentials}`
    }
 
+   /**
+    * Acquire a Resource ID
+    * Each resource ID can only be used for one recording session
+    *
+    * The resource ID is valid for five minutes, so you need to start
+    * recording with this resource ID with it before it expires.
+    *
+    * https://docs.agora.io/en/cloud-recording/cloud_recording_api_acquire?platform=RESTful
+    * @param cname
+    */
    recordingAcquire(cname: string) {
       return this.authRequest(
          `https://api.agora.io/v1/apps/${appID}/cloud_recording/acquire`,
@@ -36,14 +47,28 @@ export default class AgoraClient {
       )
    }
 
+   /**
+    * Start a recording
+    * https://docs.agora.io/en/cloud-recording/cloud_recording_api_start?platform=RESTful
+    *
+    * @param cname
+    * @param resourceId
+    * @param rtcToken
+    * @param urlToRecord
+    * @param bucketStoragePath
+    * @param videoWidth
+    * @param videoHeight
+    * @param maxRecordingHour
+    */
    recordingStart(
       cname: string,
       resourceId: string,
       rtcToken: string,
       urlToRecord: string,
+      bucketStoragePath: string[],
       videoWidth = 1920,
       videoHeight = 1080,
-      maxRecordingHour = 72
+      maxRecordingHour = MAX_RECORDING_HOURS
    ) {
       return this.authRequest(
          `https://api.agora.io/v1/apps/${appID}/cloud_recording/resourceid/${resourceId}/mode/web/start`,
@@ -60,7 +85,8 @@ export default class AgoraClient {
                         errorHandlePolicy: "error_abort",
                         serviceParam: {
                            url: urlToRecord,
-                           audioProfile: 0,
+                           audioProfile: 1,
+                           maxVideoDuration: 240, // split files by 4 hours
                            videoWidth,
                            videoHeight,
                            maxRecordingHour,
@@ -72,12 +98,12 @@ export default class AgoraClient {
                   avFileType: ["hls", "mp4"],
                },
                storageConfig: {
-                  vendor: 1,
-                  region: 7,
+                  vendor: 1, // AWS S3
+                  region: 7, // EU_CENTRAL_1
                   bucket: "agora-cf-cloud-recordings",
                   accessKey: awsAccessKey,
                   secretKey: awsSecretKey,
-                  fileNamePrefix: ["directory1", "directory5"],
+                  fileNamePrefix: bucketStoragePath,
                },
             },
          }

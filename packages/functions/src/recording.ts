@@ -10,6 +10,10 @@ import {
 import { logAxiosError } from "./util"
 import config = require("./config")
 import { notifyLivestreamRecordingCreated } from "./api/slack"
+import {
+   downloadLink,
+   S3_ROOT_PATH,
+} from "@careerfairy/shared-lib/dist/livestreams/recordings"
 
 export const startRecordingLivestream = functions.https.onCall(async (data) => {
    const livestreamId = data.streamId
@@ -52,12 +56,20 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
 
    let start = null
    try {
+      const storagePath = [S3_ROOT_PATH, livestreamId]
       let url = `https://careerfairy.io/streaming/${livestreamId}/viewer?token=${token}&isRecordingWindow=true`
       if (isBreakout) {
          url = `https://careerfairy.io/streaming/${livestreamId}/breakout-room/${breakoutRoomId}/viewer?token=${token}&isRecordingWindow=true`
+         storagePath.push(breakoutRoomId)
       }
 
-      start = await agora.recordingStart(cname, resourceId, rtcToken, url)
+      start = await agora.recordingStart(
+         cname,
+         resourceId,
+         rtcToken,
+         url,
+         storagePath
+      )
    } catch (e) {
       logAxiosError("Failed to start recording", e)
       throw new functions.https.HttpsError(
@@ -125,11 +137,10 @@ export const stopRecordingLivestream = functions.https.onCall(async (data) => {
    }
 
    const livestreamObj = await livestreamGetById(livestreamId)
-   const id = isBreakout ? breakoutRoomId : livestreamId
-   const downloadLink = `https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${recordingToken?.sid}_${id}_0.mp4`
+   const link = downloadLink(livestreamId, recordingToken?.sid, breakoutRoomId)
    await notifyLivestreamRecordingCreated(
       config.slackWebhooks.livestreamAlerts,
       livestreamObj,
-      downloadLink
+      link
    )
 })
