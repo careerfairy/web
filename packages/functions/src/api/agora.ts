@@ -6,7 +6,7 @@ export const appCertificate = "286a21681469490783ab75247de35f37"
 export const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
 export const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
 
-const staticUID = 1234232
+const staticUID = "1234232"
 
 // AWS Storage
 export const awsSecretKey = "tenlla/MPorZigMkl+wa7OGoxe63MuVYn7lgwrhW"
@@ -102,7 +102,7 @@ export default class AgoraClient {
          data,
          headers: {
             Authorization: this.authorizationHeader,
-            "Content-Type": "application/json",
+            "Content-Type": "application/json;charset=utf-8",
          },
       })
    }
@@ -114,7 +114,7 @@ export default class AgoraClient {
          appID,
          appCertificate,
          channelName,
-         staticUID,
+         staticUID as any,
          RtcRole.SUBSCRIBER,
          privilegeExpiredTs
       )

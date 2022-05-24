@@ -1,0 +1,8 @@
+
+# Check the status of a recording, change the resourceId and sid
+# https://docs.agora.io/en/cloud-recording/cloud_recording_rest
+# /v1/apps/<appid>/cloud_recording/resourceid/<resourceid>/sid/<sid>/mode/<mode>/query
+GET https://api.agora.io/v1/apps/{{agora_appID}}/cloud_recording/resourceid/Etkl6g-zSB7EpP-Da1zN64Spvz1KYNq5ZRG69bxl4s5POxnDidCQOfB8qq0x3mZ9uTziASzxU7915LtikUMy8iQK9Jl9rS6kwBoRg2cGQOsRyInVMpPfrMaNKWsbPrqzG7YSz9nE09mMsQCsBuXlja2jBaWN_E0tip4AQSemzGW2lgEGD0PSNV32dgrc05YlQ6Gef7t_Cfdj6iSW4-l17FiUx3Ji4iAyOvCCSzCtiE5RTYr5jl2HafBWkt-2qhgvg4kOeFLgRdfihJ6QAZEzvjogUgPPTo716A54dUMS4aFeewltQGQHsW85b8v73N-gwFLgOnVdnNk1s1DpPgUgnF5CNMASEBu-hCPVy7Oo5yHHBaKJbahOXP9d3UYJ8IvE/sid/3924b376904c7084bba0c9b49c7b7350/mode/web/query
+Accept: application/json
+Authorization: Basic {{agora_authorization}}
+

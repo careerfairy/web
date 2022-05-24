@@ -1,11 +1,15 @@
 import AgoraClient from "./api/agora"
 import functions = require("firebase-functions")
 import {
+   livestreamGetById,
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
    livestreamSetIsRecording,
    livestreamUpdateRecordingToken,
 } from "./lib/livestream"
+import { logAxiosError } from "./util"
+import config = require("./config")
+import { notifyLivestreamRecordingCreated } from "./api/slack"
 
 export const startRecordingLivestream = functions.https.onCall(async (data) => {
    const livestreamId = data.streamId
@@ -20,6 +24,7 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
    try {
       acquire = await agora.recordingAcquire(cname)
    } catch (e) {
+      logAxiosError("Failed to acquire recording", e)
       throw new functions.https.HttpsError(
          "unknown",
          "Failed to acquire recording"
@@ -34,6 +39,11 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
       isBreakout ? breakoutRoomId : null
    )
    if (storedTokenDoc?.value !== token) {
+      functions.logger.error(
+         "Stored token does not match",
+         storedTokenDoc,
+         token
+      )
       throw new functions.https.HttpsError(
          "permission-denied",
          "Token mismatch"
@@ -49,6 +59,7 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
 
       start = await agora.recordingStart(cname, resourceId, rtcToken, url)
    } catch (e) {
+      logAxiosError("Failed to start recording", e)
       throw new functions.https.HttpsError(
          "unknown",
          "Failed to start recording"
@@ -106,9 +117,19 @@ export const stopRecordingLivestream = functions.https.onCall(async (data) => {
          isBreakout ? breakoutRoomId : null
       )
    } catch (e) {
+      logAxiosError("Failed to stop recording", e)
       throw new functions.https.HttpsError(
          "unknown",
          "Failed to stop recording"
       )
    }
+
+   const livestreamObj = await livestreamGetById(livestreamId)
+   const id = isBreakout ? breakoutRoomId : livestreamId
+   const downloadLink = `https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${recordingToken?.sid}_${id}_0.mp4`
+   await notifyLivestreamRecordingCreated(
+      config.slackWebhooks.livestreamAlerts,
+      livestreamObj,
+      downloadLink
+   )
 })
