@@ -1,19 +1,13 @@
 import AgoraClient from "./api/agora"
 import functions = require("firebase-functions")
 import {
-   livestreamGetById,
    livestreamGetRecordingToken,
    livestreamGetSecureToken,
    livestreamSetIsRecording,
    livestreamUpdateRecordingToken,
 } from "./lib/livestream"
 import { logAxiosError } from "./util"
-import config = require("./config")
-import { notifyLivestreamRecordingCreated } from "./api/slack"
-import {
-   downloadLink,
-   S3_ROOT_PATH,
-} from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { S3_ROOT_PATH } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 
 export const startRecordingLivestream = functions.https.onCall(async (data) => {
    const livestreamId = data.streamId
@@ -135,12 +129,4 @@ export const stopRecordingLivestream = functions.https.onCall(async (data) => {
          "Failed to stop recording"
       )
    }
-
-   const livestreamObj = await livestreamGetById(livestreamId)
-   const link = downloadLink(livestreamId, recordingToken?.sid, breakoutRoomId)
-   await notifyLivestreamRecordingCreated(
-      config.slackWebhooks.livestreamAlerts,
-      livestreamObj,
-      link
-   )
 })

@@ -10,7 +10,7 @@ export const S3_BUCKET_LINK = `https://${S3_BUCKET}.s3.eu-central-1.amazonaws.co
  * maxRecordingHour [1,720]
  *   Time recording
  */
-export const MAX_RECORDING_HOURS = 24
+export const MAX_RECORDING_HOURS = 4
 
 /**
  * Generate a download link for a recording
@@ -28,5 +28,33 @@ export const downloadLink = (
       return `${S3_BUCKET_LINK}/${S3_ROOT_PATH}/${livestreamId}/${breakoutRoomID}/${sid}_${breakoutRoomID}_0.mp4`
    } else {
       return `${S3_BUCKET_LINK}/${S3_ROOT_PATH}/${livestreamId}/${sid}_${livestreamId}_0.mp4`
+   }
+}
+
+/**
+ * Generate a download link for a recording
+ * Supports the old download link format
+ *
+ * @param livestreamStartDate
+ * @param livestreamId
+ * @param sid
+ * @param breakoutRoomID
+ */
+export const downloadLinkWithDate = (
+   livestreamStartDate: Date,
+   livestreamId: string,
+   sid: string,
+   breakoutRoomID?: string
+) => {
+   /**
+    * On 24 May 2022 we've changed the Recording functions and started using a new S3 path for the recorded files
+    * Any recording before this date, should use the old path
+    * https://github.com/careerfairy/web/pull/130
+    */
+   const newChangesDate = 1653404068480
+   if (livestreamStartDate?.getMilliseconds() < newChangesDate) {
+      return `https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${sid}_${livestreamId}_0.mp4`
+   } else {
+      return downloadLink(livestreamId, sid, breakoutRoomID)
    }
 }
