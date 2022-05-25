@@ -57,7 +57,7 @@ const UserAvatarAndDetails = () => {
             >
                {userPresenter?.badges?.hasAnyBadge() && (
                   <BadgeButton
-                     badge={userPresenter?.badges?.getOneBadge()}
+                     badge={userPresenter.badges.getOneBadge()}
                      iconButton
                      onClick={() => {
                         void router.push(`/profile/career-skills`)
