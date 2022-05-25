@@ -65,7 +65,7 @@ export class UserBadges {
 
    /**
     * Fetch one badge from the user's badges
-    * From the most important to the least importan
+    * From the most important to the least important
     */
    getOneBadge() {
       if (this.engageBadge()) {
@@ -76,7 +76,7 @@ export class UserBadges {
          return this.networkerBadge()
       }
 
-      return this.networkerBadge()
+      return this.researchBadge()
    }
 
    /**
