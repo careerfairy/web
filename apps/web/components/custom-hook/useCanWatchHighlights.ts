@@ -2,23 +2,21 @@ import { useCallback, useEffect, useState } from "react"
 import { parseCookies, setCookie } from "nookies"
 import { getMillisecondsBetweenDates } from "../../util/CommonUtil"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { usePrevious } from "react-use"
-import isEqual from "react-fast-compare"
+import { useInterval } from "react-use"
 
 const timeOut: number = 30000
 const cookieName: string = "canWatchHighlights"
 interface Props {
    // How long you want to wait before you can watch again in milliseconds
    timoutDuration?: number
-   // If these change, we will check if the user can watch again
-   deps?: any[]
 }
-const useCanWatchHighlights = ({
-   timoutDuration = timeOut,
-   deps,
-}: Props = {}) => {
+
+export interface CanWatchHighlightsProps {
+   canWatchAll: boolean
+   timeLeft: number
+}
+const useCanWatchHighlights = ({ timoutDuration = timeOut }: Props = {}) => {
    const { userPresenter, userData } = useAuth()
-   const prevDeps = usePrevious(deps)
 
    /*
     * Check if the user can watch highlights.
@@ -26,32 +24,37 @@ const useCanWatchHighlights = ({
     * - If they can't, we return {canWatchAll: false, timeLeft: timeLeft}
     * */
    const checkIfCanWatchHighlight = useCallback(() => {
-      if (userPresenter?.canWatchAllHighlights()) {
-         return { canWatchAll: true, timeLeft: 0 }
-      }
-      const cookies = parseCookies()
-      const cookieExpiry = cookies[cookieName]
-
-      if (cookieExpiry) {
-         const cookieExpiryDate = new Date(cookieExpiry)
-         const now = new Date()
-         return {
-            canWatchAll: now > cookieExpiryDate,
-            timeLeft: getMillisecondsBetweenDates(cookieExpiryDate, now),
+      let data = { canWatchAll: true, timeLeft: 0 }
+      const canWatch = userPresenter?.canWatchAllHighlights()
+      if (!canWatch) {
+         const cookies = parseCookies()
+         const cookieExpiry = cookies[cookieName]
+         if (cookieExpiry) {
+            const cookieExpiryDate = new Date(cookieExpiry)
+            const now = new Date()
+            data = {
+               canWatchAll: now > cookieExpiryDate,
+               timeLeft: getMillisecondsBetweenDates(cookieExpiryDate, now),
+            }
          }
       }
       // If we don't have a cookie, we can watch all highlights
-      return { canWatchAll: true, timeLeft: 0 }
-   }, [userData?.badges])
+      return data
+   }, [userData?.badges, userPresenter])
 
-   const [canWatchAllHighlights, setCanWatchAllHighlights] = useState<{
-      canWatchAll: boolean
-      timeLeft: number
-   }>(checkIfCanWatchHighlight())
+   const [canWatchAllHighlights, setCanWatchAllHighlights] =
+      useState<CanWatchHighlightsProps>(checkIfCanWatchHighlight())
+
+   useInterval(
+      () => {
+         setCanWatchAllHighlights(checkIfCanWatchHighlight())
+      },
+      canWatchAllHighlights.canWatchAll ? 1000 : timoutDuration
+   )
 
    useEffect(() => {
       setCanWatchAllHighlights(checkIfCanWatchHighlight())
-   }, [userData?.badges, isEqual(deps, prevDeps)])
+   }, [userData?.badges, userPresenter])
 
    /*
     * Here we set a cookie to expire in X milliseconds.

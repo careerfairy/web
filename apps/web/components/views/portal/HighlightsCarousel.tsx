@@ -29,6 +29,7 @@ const HighlightsCarousel = ({
       setUserTimeoutWithCookie,
       checkIfCanWatchHighlight,
       timoutDuration,
+      canWatchAllHighlights,
    } = useCanWatchHighlights()
    const numSlides: number = useMemo(() => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
@@ -37,7 +38,8 @@ const HighlightsCarousel = ({
    const [videoUrl, setVideoUrl] = useState(null)
 
    const handleOpenVideoDialog = (videoUrl: string) => {
-      if (checkIfCanWatchHighlight().canWatchAll) {
+      const { canWatchAll, timeLeft } = checkIfCanWatchHighlight()
+      if (canWatchAll) {
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
       } else {
@@ -45,9 +47,7 @@ const HighlightsCarousel = ({
          alert(
             `You can only watch highlights once per ${
                timoutDuration / 1000
-            } seconds. You have ${Math.round(
-               checkIfCanWatchHighlight().timeLeft / 1000
-            )} seconds left.`
+            } seconds. You have ${Math.round(timeLeft / 1000)} seconds left.`
          )
       }
    }
@@ -73,6 +73,7 @@ const HighlightsCarousel = ({
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
+                     canWatchAllHighlights={canWatchAllHighlights}
                   />
                </Box>
             ))}

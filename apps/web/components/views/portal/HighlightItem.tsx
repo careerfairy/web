@@ -5,7 +5,8 @@ import Image from "next/image"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import { HighLight } from "../../../types/Highlight"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
-
+import { CanWatchHighlightsProps } from "../../custom-hook/useCanWatchHighlights"
+import LockClockIcon from "@mui/icons-material/LockClock"
 const itemSpacingSize = 14
 const mobileFactor = 1
 const styles = {
@@ -105,7 +106,12 @@ const styles = {
 const HighlightItem = ({
    highLight: { videoUrl, thumbnail, logo },
    handleOpenVideoDialog,
+   canWatchAllHighlights,
 }: HighlightItemProps) => {
+   console.log(
+      "-> ITEM canWatchAllHighlights.canWatchAll",
+      canWatchAllHighlights.canWatchAll
+   )
    return (
       <Box sx={styles.root}>
          <Box sx={styles.circleRoot}>
@@ -122,7 +128,11 @@ const HighlightItem = ({
                      component={Image}
                   />
                   <Box className={"overlay"} sx={styles.imageOverlay} />
-                  <PlayIcon sx={styles.icon} />
+                  {canWatchAllHighlights.canWatchAll ? (
+                     <PlayIcon sx={styles.icon} />
+                  ) : (
+                     <LockClockIcon sx={styles.icon} />
+                  )}
                </Box>
             </Box>
          </Box>
@@ -145,6 +155,7 @@ const HighlightItem = ({
 interface HighlightItemProps {
    highLight: HighLight
    handleOpenVideoDialog: (videoUrl: string) => void
+   canWatchAllHighlights: CanWatchHighlightsProps
 }
 
 export default HighlightItem
