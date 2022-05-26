@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState, useRef } from "react"
 import { getServerSideStream, parseStreamDates } from "../../util/serverUtil"
-import HeadWithMeta from "../../components/page/HeadWithMeta"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"

@@ -1,6 +1,5 @@
 import React, { Fragment, useEffect, useState } from "react"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import {
    AppBar,
    Badge,

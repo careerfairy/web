@@ -8,7 +8,6 @@ import {
    CardContent,
    CardHeader,
    CardMedia,
-   Chip,
    CircularProgress,
    Dialog,
    DialogContent,

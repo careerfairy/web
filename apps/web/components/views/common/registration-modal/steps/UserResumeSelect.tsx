@@ -4,16 +4,13 @@ import UserResume from "../../../profile/userData/user-resume/UserResume"
 import { useContext, useEffect } from "react"
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
 import {
-   Box,
    Button,
-   CircularProgress,
    DialogActions,
    DialogContent,
    DialogTitle,
    Typography,
 } from "@mui/material"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-type Props = {}
 
 const styles = {
    root: {

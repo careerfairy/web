@@ -5,15 +5,7 @@ import SwipeableViews from "react-swipeable-views"
 import QueryEditView from "./QueryEditView"
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import UserTableView from "./UserTableView"
-import {
-   AppBar,
-   Backdrop,
-   CircularProgress,
-   Container,
-   Grid,
-   Tab,
-   Tabs,
-} from "@mui/material"
+import { AppBar, Backdrop, CircularProgress, Tab, Tabs } from "@mui/material"
 import { useSelector } from "react-redux"
 import { isLoaded } from "react-redux-firebase"
 
