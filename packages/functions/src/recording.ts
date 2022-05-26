@@ -171,8 +171,6 @@ const startRecording = async (
          storagePath.push(breakoutRoomId)
       }
 
-      console.log("url to record", url)
-
       start = await agora.recordingStart(
          cname,
          resourceId,
