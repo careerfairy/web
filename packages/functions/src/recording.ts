@@ -7,16 +7,130 @@ import {
    livestreamUpdateRecordingToken,
 } from "./lib/livestream"
 import { logAxiosError } from "./util"
-import { S3_ROOT_PATH } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import {
+   downloadLink,
+   S3_ROOT_PATH,
+} from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import config = require("./config")
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
+/**
+ * Automatically record a livestream
+ *
+ * Starts when the livestream starts
+ * Stops when the livestream ends
+ */
+export const automaticallyRecordLivestream = functions
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}")
+   .onUpdate(async (change, context) => {
+      const previousValue = change.before.data() as LivestreamEvent
+      const newValue = change.after.data() as LivestreamEvent
+
+      await automaticallyRecord(
+         context.params.livestreamId,
+         previousValue,
+         newValue
+      )
+   })
+
+/**
+ * Automatically record a livestream breakout room
+ *
+ * Starts when the breakout room starts/is opened
+ * Stops when the breakout room is closed
+ */
+export const automaticallyRecordLivestreamBreakoutRoom = functions
+   .region(config.region)
+   .firestore.document(
+      "livestreams/{livestreamId}/breakoutRooms/{breakoutRoomId}"
+   )
+   .onUpdate(async (change, context) => {
+      const previousValue = change.before.data() as LivestreamEvent
+      const newValue = change.after.data() as LivestreamEvent
+
+      await automaticallyRecord(
+         context.params.livestreamId,
+         previousValue,
+         newValue,
+         context.params.breakoutRoomId
+      )
+   })
+
+/**
+ * Manually start a recording
+ *
+ * Works for both livestreams and breakout rooms
+ */
 export const startRecordingLivestream = functions.https.onCall(async (data) => {
-   const livestreamId = data.streamId
-   const isBreakout = data.isBreakout
-   const breakoutRoomId = data.breakoutRoomId
-   const token = data.token
+   await startRecording(data.streamId, data.token, data.breakoutRoomId)
+})
+
+/**
+ * Manually stop a recording
+ *
+ * Works for both livestreams and breakout rooms
+ */
+export const stopRecordingLivestream = functions.https.onCall(async (data) => {
+   await stopRecording(data.streamId, data.token, data.breakoutRoomId)
+})
+
+// Business Logic
+
+const automaticallyRecord = async (
+   livestreamId: string,
+   previousValue: LivestreamEvent,
+   newValue: LivestreamEvent,
+   breakoutRoomId: string = null
+) => {
+   // Don't automatically record test events
+   // start the recording manually instead
+   if (newValue.test === true) {
+      return
+   }
+
+   if (
+      !previousValue.hasStarted &&
+      newValue.hasStarted &&
+      !newValue.isRecording
+   ) {
+      const token = (
+         await livestreamGetSecureToken(livestreamId, breakoutRoomId)
+      )?.value
+      await startRecording(livestreamId, token, breakoutRoomId)
+   }
+
+   if (!previousValue.hasEnded && newValue.hasEnded && newValue.isRecording) {
+      const token = (
+         await livestreamGetSecureToken(livestreamId, breakoutRoomId)
+      )?.value
+      await stopRecording(livestreamId, token, breakoutRoomId)
+   }
+
+   // for some reason the event has already ended, but it's still recording
+   // stop the recording
+   if (
+      previousValue.hasEnded &&
+      !newValue.hasStarted &&
+      newValue.hasEnded &&
+      newValue.isRecording
+   ) {
+      const token = (
+         await livestreamGetSecureToken(livestreamId, breakoutRoomId)
+      )?.value
+      await stopRecording(livestreamId, token, breakoutRoomId)
+   }
+}
+
+const startRecording = async (
+   livestreamId: string,
+   token: string,
+   breakoutRoomId?: string
+) => {
+   functions.logger.info("Starting recording")
    const agora = new AgoraClient()
 
-   const cname = isBreakout ? `${breakoutRoomId}` : `${livestreamId}`
+   const cname = breakoutRoomId ?? livestreamId
 
    let acquire = null
    try {
@@ -34,7 +148,7 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
 
    const storedTokenDoc = await livestreamGetSecureToken(
       livestreamId,
-      isBreakout ? breakoutRoomId : null
+      breakoutRoomId
    )
    if (storedTokenDoc?.value !== token) {
       functions.logger.error(
@@ -52,10 +166,12 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
    try {
       const storagePath = [S3_ROOT_PATH, livestreamId]
       let url = `https://careerfairy.io/streaming/${livestreamId}/viewer?token=${token}&isRecordingWindow=true`
-      if (isBreakout) {
+      if (breakoutRoomId) {
          url = `https://careerfairy.io/streaming/${livestreamId}/breakout-room/${breakoutRoomId}/viewer?token=${token}&isRecordingWindow=true`
          storagePath.push(breakoutRoomId)
       }
+
+      console.log("url to record", url)
 
       start = await agora.recordingStart(
          cname,
@@ -78,28 +194,25 @@ export const startRecordingLivestream = functions.https.onCall(async (data) => {
          sid: start.data.sid,
          resourceId: resourceId,
       },
-      isBreakout ? breakoutRoomId : null
+      breakoutRoomId
    )
 
-   await livestreamSetIsRecording(
-      livestreamId,
-      true,
-      isBreakout ? breakoutRoomId : null
-   )
-})
+   await livestreamSetIsRecording(livestreamId, true, breakoutRoomId)
+}
 
-export const stopRecordingLivestream = functions.https.onCall(async (data) => {
-   const livestreamId = data.streamId
-   const isBreakout = data.isBreakout
-   const breakoutRoomId = data.breakoutRoomId
-   const token = data.token
+const stopRecording = async (
+   livestreamId: string,
+   token: string,
+   breakoutRoomId?: string
+) => {
+   functions.logger.info("Stopping recording")
    const agora = new AgoraClient()
 
-   const cname = isBreakout ? `${breakoutRoomId}` : `${livestreamId}`
+   const cname = breakoutRoomId ?? livestreamId
 
    const storedTokenDoc = await livestreamGetSecureToken(
       livestreamId,
-      isBreakout ? breakoutRoomId : null
+      breakoutRoomId
    )
    if (storedTokenDoc?.value !== token) {
       return
@@ -107,7 +220,7 @@ export const stopRecordingLivestream = functions.https.onCall(async (data) => {
 
    const recordingToken = await livestreamGetRecordingToken(
       livestreamId,
-      isBreakout ? breakoutRoomId : null
+      breakoutRoomId
    )
 
    try {
@@ -117,11 +230,7 @@ export const stopRecordingLivestream = functions.https.onCall(async (data) => {
          recordingToken?.sid
       )
 
-      await livestreamSetIsRecording(
-         livestreamId,
-         false,
-         isBreakout ? breakoutRoomId : null
-      )
+      await livestreamSetIsRecording(livestreamId, false, breakoutRoomId)
    } catch (e) {
       logAxiosError("Failed to stop recording", e)
       throw new functions.https.HttpsError(
@@ -129,4 +238,12 @@ export const stopRecordingLivestream = functions.https.onCall(async (data) => {
          "Failed to stop recording"
       )
    }
-})
+
+   functions.logger.info(
+      `Download recorded file: ${downloadLink(
+         livestreamId,
+         recordingToken?.sid,
+         breakoutRoomId
+      )}`
+   )
+}

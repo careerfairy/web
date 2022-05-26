@@ -17,7 +17,7 @@ export const livestreamGetById = async (id) => {
    }
 }
 
-export const livestreamGetSecureToken = async (id, breakoutRoomId = null) => {
+export const livestreamGetSecureToken = async (id, breakoutRoomId?) => {
    let documentSnap: any = admin.firestore().collection("livestreams").doc(id)
 
    if (breakoutRoomId) {
@@ -65,7 +65,7 @@ export const livestreamGetRecordingToken = async (
 export const livestreamUpdateRecordingToken = async (
    id,
    data,
-   breakoutRoomId = null
+   breakoutRoomId?
 ) => {
    let ref = admin.firestore().collection("livestreams").doc(id)
 

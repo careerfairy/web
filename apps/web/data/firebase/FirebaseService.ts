@@ -1267,9 +1267,9 @@ class FirebaseService {
       const data: any = {
          hasStarted,
       }
-      if (!hasStarted) {
-         data.hasEnded = true
-      }
+
+      data.hasEnded = !hasStarted
+
       return streamRef.update(data)
    }
 
@@ -2869,6 +2869,7 @@ class FirebaseService {
          start: this.getServerTimestamp(),
          id: breakoutRoomId,
          hasStarted: false,
+         hasEnded: false,
          test,
          companyLogo,
          title,

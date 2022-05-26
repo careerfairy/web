@@ -109,6 +109,9 @@ exports.updateUserDataAnalytcicsOnWrite =
 // Recording
 exports.startRecordingLivestream_v2 = recording.startRecordingLivestream
 exports.stopRecordingLivestream_v2 = recording.stopRecordingLivestream
+exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
+exports.automaticallyRecordLivestreamBreakoutRoom =
+   recording.automaticallyRecordLivestreamBreakoutRoom
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =
