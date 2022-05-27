@@ -4,6 +4,7 @@ import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types"
 import { LiveStreamEvent } from "../../types/event"
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams"
 import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
+import { RegisteredStudent, UserData } from "@careerfairy/shared-lib/dist/users"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LiveStreamEvent[] | null>
@@ -56,6 +57,10 @@ export interface ILivestreamRepository {
       eventId: string,
       callback: (snapshot: DocumentSnapshot) => void
    )
+
+   getLivestreamRegisteredStudents(
+      eventId: string
+   ): Promise<RegisteredStudent[]>
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -240,6 +245,18 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       return livestreamRef.onSnapshot(callback)
+   }
+
+   async getLivestreamRegisteredStudents(
+      eventId: string
+   ): Promise<RegisteredStudent[]> {
+      let ref = await this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("registeredStudents")
+         .get()
+
+      return mapFirestoreDocuments<RegisteredStudent>(ref)
    }
 }
 

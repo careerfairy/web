@@ -60,3 +60,7 @@ export interface SavedRecruiter extends Identifiable {
       background?: string
    }
 }
+
+export interface RegisteredStudent extends UserData {
+   dateRegistered: firebase.firestore.Timestamp
+}
