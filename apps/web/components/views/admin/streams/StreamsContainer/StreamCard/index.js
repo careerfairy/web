@@ -203,7 +203,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                               </MenuItem>
                            </>
                         )}
-                        {!isUpcoming && stream.isRecording && (
+                        {!isUpcoming && !stream.hasEnded && stream.isRecording && (
                            <MenuItem
                               disabled={recordingRequestOngoing}
                               onClick={handleOpenConfirmRecordingDialog}
@@ -248,7 +248,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
             }
          />
          <CardContent>
-            {stream.isRecording && (
+            {(stream.isRecording || recordingSid) && (
                <Typography sx={styles.recording}>
                   {stream?.hasEnded ? "Recorded" : "Recording in progress"}
                </Typography>
