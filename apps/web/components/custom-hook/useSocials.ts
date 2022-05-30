@@ -37,12 +37,12 @@ const useSocials = (event: LivestreamEvent) => {
    }, [state.value, clicked])
    return useMemo<SocialIconProps[]>(() => {
       const eventUrl = makeLivestreamEventDetailsInviteUrl(
-         event.id,
+         event?.id,
          userData?.referralCode
       )
       const encodedEventUrl = encodeURIComponent(eventUrl)
-      const encodedCompanyName = encodeURIComponent(event.company)
-      const encodedEventTitle = encodeURIComponent(event.title)
+      const encodedCompanyName = encodeURIComponent(event?.company)
+      const encodedEventTitle = encodeURIComponent(event?.title)
       const linkedinLink = `https://www.linkedin.com/shareArticle?mini=true&url=${encodedEventUrl}&title=${encodedCompanyName}%27s%20event%20%22${encodedEventTitle}%22%20is%20open%20for%20registration%21&source=CareerFairy`
       const facebookLink = `https://www.facebook.com/dialog/share?app_id=${facebookAppId}&display=page&href=${encodedEventUrl}`
       const twitterLink = `https://twitter.com/intent/tweet?url=${encodedEventUrl}&via=CareerFairy&related=CareerFairy&text=Just%20registered%20for%20${encodedCompanyName}%27s%20latest%20event%3A%20%22${encodedEventTitle}%22`
@@ -76,7 +76,7 @@ const useSocials = (event: LivestreamEvent) => {
          {
             icon: EmailIcon,
             name: "Email",
-            href: `mailto:?subject=${event.title}&body=${encodedEventUrl}`,
+            href: `mailto:?subject=${event?.title}&body=${encodedEventUrl}`,
          },
          {
             icon: ShareIcon,
@@ -88,10 +88,10 @@ const useSocials = (event: LivestreamEvent) => {
          },
       ]
    }, [
-      event.id,
+      event?.id,
       userData?.referralCode,
-      event.company,
-      event.title,
+      event?.company,
+      event?.title,
       copyEventLinkToClipboard,
       state,
       shareLinkTooltipMessage,

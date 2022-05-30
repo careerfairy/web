@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState, useRef } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { getServerSideStream, parseStreamDates } from "../../util/serverUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
@@ -24,6 +24,7 @@ import { getRelevantHosts } from "../../util/streamUtil"
 import { useInterests } from "../../components/custom-hook/useCollection"
 import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
 import SEO from "../../components/util/SEO"
+import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -351,6 +352,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    return (
       <UpcomingLayout>
+         <EventSEOSchemaScriptTag event={stream} />
          <SEO {...getStreamMetaInfo(stream)} />
          <HeroSection
             backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}

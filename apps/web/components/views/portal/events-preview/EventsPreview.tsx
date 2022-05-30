@@ -1,7 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import { LiveStreamEvent } from "../../../../types/event"
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard"
 import Link from "next/link"
 import RegistrationModal from "components/views/common/registration-modal"
@@ -15,6 +14,7 @@ import { useInterests } from "../../../custom-hook/useCollection"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = {
    carousel: {
@@ -207,7 +207,7 @@ export enum EventsTypes {
 }
 
 export interface EventsProps {
-   events: LiveStreamEvent[]
+   events: LivestreamEvent[]
    seeMoreLink?: string
    title?: string
    loading: boolean

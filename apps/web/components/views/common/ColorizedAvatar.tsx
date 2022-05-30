@@ -27,7 +27,10 @@ const ColorizedAvatar = ({
    sx,
    ...rest
 }: ColorizedAvatarProps) => {
-   const avaProps = useMemo(() => stringAvatar(firstName, lastName), [])
+   const avaProps = useMemo(
+      () => stringAvatar(firstName, lastName),
+      [firstName, lastName]
+   )
 
    return (
       <Avatar

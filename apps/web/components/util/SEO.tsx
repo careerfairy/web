@@ -11,7 +11,6 @@ const SEO = ({
    ...props
 }: SeoProps) => {
    const router = useRouter()
-
    const SEO: NextSeoProps = {
       ...(keywords && { keywords: keywords.toString() }),
       noindex,
@@ -31,7 +30,7 @@ const SEO = ({
       facebook: {
          appId: facebookAppId,
       },
-      canonical: getBaseUrl() + router.pathname,
+      canonical: (getBaseUrl() + router.asPath).split("?")[0],
       ...props,
       twitter: {
          cardType: props.twitter?.cardType,
