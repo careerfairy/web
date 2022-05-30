@@ -5,6 +5,7 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import { useInterval } from "react-use"
 
 const timeOut: number = 30000
+
 const cookieName: string = "canWatchHighlights"
 interface Props {
    // How long you want to wait before you can watch again in milliseconds
@@ -15,15 +16,17 @@ export interface CanWatchHighlightsProps {
    canWatchAll: boolean
    timeLeft: number
 }
-const useCanWatchHighlights = ({ timoutDuration = timeOut }: Props = {}) => {
-   const { userPresenter, userData } = useAuth()
+const useCanWatchHighlights = ({
+   timoutDuration: timeoutDuration = timeOut,
+}: Props = {}) => {
+   const { userPresenter, userData, isLoggedIn } = useAuth()
 
    /*
     * Check if the user can watch highlights.
     * - If they can, we return {canWatchAll: true, timeLeft: 0}
     * - If they can't, we return {canWatchAll: false, timeLeft: timeLeft}
     * */
-   const checkIfCanWatchHighlight = useCallback(() => {
+   const checkIfCanWatchHighlight = () => {
       let data = { canWatchAll: true, timeLeft: 0 }
       const canWatch = userPresenter?.canWatchAllHighlights()
       if (!canWatch) {
@@ -40,37 +43,46 @@ const useCanWatchHighlights = ({ timoutDuration = timeOut }: Props = {}) => {
       }
       // If we don't have a cookie, we can watch all highlights
       return data
-   }, [userData?.badges, userPresenter])
+   }
 
    const [canWatchAllHighlights, setCanWatchAllHighlights] =
       useState<CanWatchHighlightsProps>(checkIfCanWatchHighlight())
 
-   useInterval(
-      () => {
-         setCanWatchAllHighlights(checkIfCanWatchHighlight())
-      },
-      canWatchAllHighlights.canWatchAll ? 1000 : timoutDuration
-   )
+   // useInterval(
+   //    () => {
+   //       setCanWatchAllHighlights(checkIfCanWatchHighlight())
+   //    },
+   //    1000
+   //    // canWatchAllHighlights.canWatchAll ? 1000 : timoutDuration
+   // )
+
+   const handleCheckIfCanWatchHighlight = useCallback(() => {
+      const data = checkIfCanWatchHighlight()
+      setCanWatchAllHighlights(data)
+      // console.log("-> setting data", data)
+      return data
+   }, [checkIfCanWatchHighlight])
 
    useEffect(() => {
-      setCanWatchAllHighlights(checkIfCanWatchHighlight())
-   }, [userData?.badges, userPresenter])
+      handleCheckIfCanWatchHighlight()
+   }, [userData?.badges, userPresenter, isLoggedIn])
 
    /*
     * Here we set a cookie to expire in X milliseconds.
     * */
    const setUserTimeoutWithCookie = useCallback(() => {
-      const timeFromNow = new Date(Date.now() + timoutDuration)
+      const timeFromNow = new Date(Date.now() + timeoutDuration)
       setCookie(null, cookieName, timeFromNow.toUTCString(), {
-         maxAge: timoutDuration,
+         maxAge: timeoutDuration,
+         expires: timeFromNow,
       })
-   }, [timoutDuration])
+   }, [timeoutDuration])
 
    return {
       canWatchAllHighlights,
       setUserTimeoutWithCookie,
-      checkIfCanWatchHighlight,
-      timoutDuration,
+      handleCheckIfCanWatchHighlight,
+      timeoutDuration,
    }
 }
 

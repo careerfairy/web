@@ -41,10 +41,15 @@ export default class UserPresenter extends BasePresenter<UserData> {
       return this.badges?.networkerBadge()?.level >= 2
    }
    canWatchAllHighlights(): boolean {
-      return this.badges.hasBadgeComplete(ResearchBadgeLevel2)
+      return this.badges.hasBadgeComplete(
+         UserPresenter.watchAllHighlightsRequiredBadge()
+      )
    }
 
    static saveRecruitersRequiredBadge(): Badge {
       return NetworkerBadgeLevel2
+   }
+   static watchAllHighlightsRequiredBadge(): Badge {
+      return ResearchBadgeLevel2
    }
 }

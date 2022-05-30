@@ -14,6 +14,7 @@ import livestreamRepo from "../data/firebase/LivestreamRepository"
 import { mapServerSideStream } from "../util/serverUtil"
 import SEO from "../components/util/SEO"
 import { useRouter } from "next/router"
+import nookies from "nookies"
 
 const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
    const { authenticatedUser, userData } = useAuth()
@@ -54,12 +55,15 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
    )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps: GetServerSideProps = async (ctx) => {
    const [showHighlights, highlights, comingUpNextEvents] = await Promise.all([
       highlightRepo.shouldShowHighlightsCarousel(),
       highlightRepo.getHighlights(5),
       livestreamRepo.getUpcomingEvents(20),
    ])
+   // Parse
+   const cookies = nookies.get(ctx)
+   console.log("-> cookies", cookies)
    return {
       props: {
          showHighlights,

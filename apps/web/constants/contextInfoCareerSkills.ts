@@ -8,12 +8,20 @@ export type ContextInfoDetail = {
 }
 
 export const My_Recruiters_NoAccess = "My_Recruiters_NoAccess"
+export const Highlights_NoAccess = "Highlights_NoAccess"
 
 export const ContextInfoMap: Record<string, ContextInfoDetail> = {
    [My_Recruiters_NoAccess]: {
       badgeRequired: UserPresenter.saveRecruitersRequiredBadge(),
       message: `To use the My Recruiters feature, you must unlock the <strong>${badgeName(
          UserPresenter.saveRecruitersRequiredBadge()
+      )}</strong> first.`,
+      showRequirements: true,
+   },
+   [Highlights_NoAccess]: {
+      badgeRequired: UserPresenter.watchAllHighlightsRequiredBadge(),
+      message: `To use the Highlights feature, you must unlock the <strong>${badgeName(
+         UserPresenter.watchAllHighlightsRequiredBadge()
       )}</strong> first.`,
       showRequirements: true,
    },

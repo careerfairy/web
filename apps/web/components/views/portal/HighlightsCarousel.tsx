@@ -7,6 +7,8 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import { HighLight } from "../../../types/Highlight"
 import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
 import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
+import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
+import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
 
 const styles = {
    root: {
@@ -21,16 +23,23 @@ const HighlightsCarousel = ({
       breakpoints: { up },
    } = useTheme()
    const [highlights] = useState<HighLight[]>(serverSideHighlights)
+   const [
+      highlightsRestrictedDialogOpen,
+      handleOpenHighlightsRestrictedDialog,
+      handleCloseHighlightsRestrictedDialog,
+   ] = useDialogStateHandler()
    const isExtraSmall = useMediaQuery(up("xs"))
    const isSmall = useMediaQuery(up("sm"))
    const isMedium = useMediaQuery(up("md"))
    const isLarge = useMediaQuery(up("lg"))
    const {
       setUserTimeoutWithCookie,
-      checkIfCanWatchHighlight,
-      timoutDuration,
+      handleCheckIfCanWatchHighlight,
+      timeoutDuration,
       canWatchAllHighlights,
    } = useCanWatchHighlights()
+   console.log("-> canWatchAllHighlights", canWatchAllHighlights)
+
    const numSlides: number = useMemo(() => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
    }, [isExtraSmall, isSmall, isMedium, isLarge])
@@ -38,17 +47,13 @@ const HighlightsCarousel = ({
    const [videoUrl, setVideoUrl] = useState(null)
 
    const handleOpenVideoDialog = (videoUrl: string) => {
-      const { canWatchAll, timeLeft } = checkIfCanWatchHighlight()
+      const { canWatchAll } = handleCheckIfCanWatchHighlight()
       if (canWatchAll) {
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
       } else {
          if (videoUrl) handleCloseVideoDialog()
-         alert(
-            `You can only watch highlights once per ${
-               timoutDuration / 1000
-            } seconds. You have ${Math.round(timeLeft / 1000)} seconds left.`
-         )
+         handleOpenHighlightsRestrictedDialog()
       }
    }
 
@@ -66,14 +71,15 @@ const HighlightsCarousel = ({
             numSlides={numSlides}
             carouselProps={{
                autoPlay: true,
+               lazyLoad: false,
             }}
          >
             {highlights.map((highlight) => (
-               <Box key={highlight.id}>
+               <Box key={highlight.id + canWatchAllHighlights.canWatchAll}>
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
-                     canWatchAllHighlights={canWatchAllHighlights}
+                     locked={Boolean(!canWatchAllHighlights.canWatchAll)}
                   />
                </Box>
             ))}
@@ -82,6 +88,14 @@ const HighlightsCarousel = ({
             <HighlightVideoDialog
                videoUrl={videoUrl}
                handleClose={handleCloseVideoDialog}
+            />
+         )}
+         {highlightsRestrictedDialogOpen && (
+            <HighlightsRestrictedDialog
+               open={highlightsRestrictedDialogOpen}
+               handleClose={handleCloseHighlightsRestrictedDialog}
+               timeLeft={canWatchAllHighlights.timeLeft}
+               timeoutDuration={timeoutDuration}
             />
          )}
       </Box>
