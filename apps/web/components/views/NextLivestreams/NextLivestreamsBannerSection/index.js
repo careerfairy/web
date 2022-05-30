@@ -2,7 +2,6 @@ import PropTypes from "prop-types"
 import React from "react"
 import Section from "../../common/Section"
 import { Container } from "@mui/material"
-import SectionHeader from "../../common/SectionHeader"
 import StreamsTab from "../StreamsTab"
 
 const styles = {
