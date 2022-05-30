@@ -2,7 +2,6 @@ import React from "react"
 import GeneralLayout from "layouts/GeneralLayout"
 import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
-// import FeaturedAndNextEvents from "../components/views/portal/FeaturedAndNextEvents";
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents"
