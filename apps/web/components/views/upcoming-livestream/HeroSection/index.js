@@ -19,7 +19,7 @@ const styles = {
       position: "relative",
       backgroundSize: "cover",
       zIndex: 2,
-      backgroundPosition: "right center",
+      backgroundPosition: "center center",
       backgroundAttachment: "fixed",
       [theme.breakpoints.up("md")]: {
          minHeight: "100vh",
