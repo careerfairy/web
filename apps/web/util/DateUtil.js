@@ -22,6 +22,9 @@ export default class DateUtil {
       return todaysYear + "-" + todaysMonth + "-" + todaysDate
    }
 
+   static monthAndDay(date) {
+      return dayjs(date).format("MMM DD")
+   }
    static eventPreviewDate(JSDate) {
       return dayjs(JSDate).format("MMMM Do, HH:mm")
    }

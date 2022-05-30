@@ -3,9 +3,9 @@ import { useRouter } from "next/router"
 import { useAuth } from "HOCs/AuthProvider"
 import { useCallback, useState } from "react"
 import { useDispatch } from "react-redux"
-import { LiveStreamEvent } from "types/event"
 import { getLinkToStream } from "util/streamUtil"
 import * as actions from "store/actions"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -28,7 +28,7 @@ const useRegistrationModal = (
    const dispatch = useDispatch()
 
    const handleOpenJoinModal = useCallback(
-      (groups: any[], targetGroupId: string, livestream: LiveStreamEvent) =>
+      (groups: any[], targetGroupId: string, livestream: LivestreamEvent) =>
          setJoinGroupModalData({
             groups: groups,
             targetGroupId,
@@ -39,7 +39,7 @@ const useRegistrationModal = (
 
    const handleClickRegister = useCallback(
       async (
-         event: LiveStreamEvent,
+         event: LivestreamEvent,
          targetGroupId: string,
          groups: any[],
          hasRegistered: boolean

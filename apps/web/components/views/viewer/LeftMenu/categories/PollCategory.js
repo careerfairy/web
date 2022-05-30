@@ -1,9 +1,6 @@
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
-import {
-   useFirebaseService,
-   withFirebase,
-} from "context/firebase/FirebaseServiceContext"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import CurrentPollGraph from "../../../streaming/sharedComponents/CurrentPollGraph"
 import { Paper } from "@mui/material"
 import {

@@ -1,6 +1,6 @@
 import React, { useMemo } from "react"
 import { useFirestoreConnect } from "react-redux-firebase"
-import { shallowEqual, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import { useRouter } from "next/router"
 import currentLivestreamSelector from "../selectors/currentLivestreamSelector"
 

@@ -81,6 +81,10 @@ export default class MyDocument extends Document {
                />
                <link rel="shortcut icon" href="/favicon.ico" />
                <meta
+                  name="google-site-verification"
+                  content="Do13x1vDwIZFd0puN68OuSW1fZGMnvJlBBfTFwpdMII"
+               />
+               <meta
                   name="theme-color"
                   content={brandedLightTheme.palette.primary.main}
                />

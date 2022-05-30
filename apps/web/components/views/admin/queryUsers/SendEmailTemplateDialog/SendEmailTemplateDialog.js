@@ -10,7 +10,6 @@ import {
    Step,
    StepLabel,
    Stepper,
-   TextField,
    useMediaQuery,
 } from "@mui/material"
 import { GlassDialog } from "materialUI/GlobalModals"
@@ -21,7 +20,6 @@ import {
    UPCOMING_LIVESTREAMS_NAME,
 } from "../../../../../data/constants/streamContants"
 import { useSelector } from "react-redux"
-import { Autocomplete } from "@mui/material"
 import EmailTemplateCard from "./EmailTemplateCard"
 import EmailTemplateForm from "./EmailTemplateForm"
 import useTemplates from "./templates"

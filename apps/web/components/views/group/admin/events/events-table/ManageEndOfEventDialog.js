@@ -4,16 +4,13 @@ import makeStyles from "@mui/styles/makeStyles"
 import {
    Box,
    Button,
-   Checkbox,
    CircularProgress,
    Collapse,
    Dialog,
    DialogActions,
    DialogContent,
    DialogTitle,
-   FormControlLabel,
    Grid,
-   Typography,
 } from "@mui/material"
 import * as actions from "store/actions"
 import EventOptionPreview from "../../../../common/EventAutoSelect/EventOptionPreview"

@@ -8,7 +8,6 @@ import React, {
 import GroupsUtil from "../../data/util/GroupsUtil"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { useRouter } from "next/router"
 import StatsUtil from "../../data/util/StatsUtil"
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
 

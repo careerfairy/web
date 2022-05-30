@@ -1,11 +1,4 @@
-import React, {
-   useState,
-   forwardRef,
-   useCallback,
-   useContext,
-   useMemo,
-   useEffect,
-} from "react"
+import React, { useState, forwardRef, useCallback, useContext } from "react"
 import clsx from "clsx"
 import { alpha } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
@@ -34,7 +27,6 @@ import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltip
 import TutorialContext from "../../../../../context/tutorials/TutorialContext"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useAuth } from "HOCs/AuthProvider"
-import { useCurrentStream } from "context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
    root: {

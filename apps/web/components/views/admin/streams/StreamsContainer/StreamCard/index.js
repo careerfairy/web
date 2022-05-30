@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
    Avatar,
    Box,
@@ -8,7 +8,6 @@ import {
    CardContent,
    CardHeader,
    CardMedia,
-   Chip,
    CircularProgress,
    Dialog,
    DialogContent,
@@ -37,6 +36,9 @@ import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-s
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog"
 import PropTypes from "prop-types"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import PercentIcon from "@mui/icons-material/Percent"
+import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
+import livestreamRepo from "../../../../../../data/firebase/LivestreamRepository"
 
 const styles = {
    root: {
@@ -91,6 +93,11 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const recordingRequestOngoing = useSelector(
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    )
+   const [csvDownloadData, setCsvDownloadData] = useState(null)
+
+   const handleCloseCsvDialog = useCallback(() => {
+      setCsvDownloadData(null)
+   }, [])
 
    useEffect(async () => {
       if (stream?.id) {
@@ -150,6 +157,23 @@ const StreamCard = ({ isUpcoming, stream }) => {
       dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }))
    }
 
+   /**
+    * Download CSV with information about the registered users
+    * Useful to check the registration dates and try to understand the no show rates
+    */
+   const handleRegisteredUsersDownload = useCallback(() => {
+      livestreamRepo
+         .getLivestreamRegisteredStudents(stream.id)
+         .then((students) => {
+            setCsvDownloadData({
+               data: formatRegisteredUsersToCSV(students, stream),
+               title: `Registered students for ${stream.title} - (${stream.start
+                  ?.toDate()
+                  ?.toISOString()})`,
+            })
+         })
+   }, [stream.id])
+
    return (
       <Card sx={styles.root}>
          <CardMedia
@@ -183,6 +207,9 @@ const StreamCard = ({ isUpcoming, stream }) => {
                            href={`https://console.firebase.google.com/u/0/project/careerfairy-e1fd9/firestore/data/~2Flivestreams~2F${stream.id}`}
                         >
                            View in Firestore
+                        </MenuItem>
+                        <MenuItem onClick={handleRegisteredUsersDownload}>
+                           Download Registered Users CSV
                         </MenuItem>
                         {isUpcoming && (
                            <>
@@ -276,27 +303,46 @@ const StreamCard = ({ isUpcoming, stream }) => {
                      secondary={stream.participatingStudents?.length || 0}
                   />
                </ListItem>
+               {stream.hasEnded && (
+                  <ListItem>
+                     <ListItemAvatar>
+                        <Avatar>
+                           <PercentIcon />
+                        </Avatar>
+                     </ListItemAvatar>
+                     <ListItemText
+                        primary="No Show"
+                        secondary={calculateNoShowPercentage(stream) + "%"}
+                     />
+                  </ListItem>
+               )}
             </List>
          </CardContent>
          <CardActions>
-            <Button
-               variant="contained"
-               sx={styles.spyButton}
-               target="_blank"
-               startIcon={<ParticipationIcon />}
-               href={`${getBaseUrl()}/streaming/${stream.id}/viewer?spy=true`}
-               color="primary"
-            >
-               Spy
-            </Button>
-            <Button
-               startIcon={<JoinIcon />}
-               variant="contained"
-               onClick={handleJoinAsStreamer}
-               color="secondary"
-            >
-               Join as streamer
-            </Button>
+            {!stream.hasEnded && (
+               <>
+                  <Button
+                     variant="contained"
+                     sx={styles.spyButton}
+                     target="_blank"
+                     startIcon={<ParticipationIcon />}
+                     href={`${getBaseUrl()}/streaming/${
+                        stream.id
+                     }/viewer?spy=true`}
+                     color="primary"
+                  >
+                     Spy
+                  </Button>
+                  <Button
+                     startIcon={<JoinIcon />}
+                     variant="contained"
+                     onClick={handleJoinAsStreamer}
+                     color="secondary"
+                  >
+                     Join as streamer
+                  </Button>
+               </>
+            )}
          </CardActions>
          <StreamerLinksDialog
             onClose={handleClose}
@@ -316,8 +362,49 @@ const StreamCard = ({ isUpcoming, stream }) => {
                </Box>
             </DialogContent>
          </Dialog>
+         <CSVDialogDownload
+            title="Export Table Entries"
+            data={csvDownloadData?.data}
+            filename={`${csvDownloadData?.title}.csv`}
+            defaultOpen={!!csvDownloadData}
+            onClose={handleCloseCsvDialog}
+         />
       </Card>
    )
+}
+
+function formatRegisteredUsersToCSV(students, stream) {
+   return students
+      .map((student) => ({
+         "First Name": student.firstName,
+         "Last Name": student.lastName,
+         "Registered Date": student.dateRegistered?.toDate(),
+         Attended: stream.participatingStudents?.includes(student.userEmail)
+            ? "Yes"
+            : "No",
+         Email: student.userEmail,
+         University: student.university?.name,
+         "University Country": student.universityCountryCode,
+      }))
+      .sort((a, b) => {
+         return b["Registered Date"] - a["Registered Date"]
+      })
+      .map((student) => ({
+         ...student,
+         "Registered Date": student["Registered Date"]?.toISOString(),
+      }))
+}
+
+function calculateNoShowPercentage(stream) {
+   try {
+      const noShowUsers =
+         stream.registeredUsers?.length - stream.participatingStudents?.length
+      const number = (noShowUsers / stream.registeredUsers?.length) * 100
+
+      return Math.round(number)
+   } catch (e) {
+      return 0
+   }
 }
 
 StreamCard.propTypes = {
