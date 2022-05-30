@@ -39,14 +39,14 @@ const initialTabs = [
    {
       label: "Groups you've joined",
       value: "joined",
-      href: "/groups?type=joined",
+      href: "/profile/groups?type=joined",
    },
 ]
 
 const adminTab = {
    label: "Groups you manage",
    value: "admin",
-   href: "/groups?type=admin",
+   href: "/profile/groups?type=admin",
 }
 const Groups = () => {
    const classes = useStyles()
