@@ -38,6 +38,7 @@ import PropTypes from "prop-types"
 import PercentIcon from "@mui/icons-material/Percent"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import livestreamRepo from "../../../../../../data/firebase/LivestreamRepository"
+import { format } from "date-fns"
 
 const styles = {
    root: {
@@ -369,11 +370,12 @@ const StreamCard = ({ isUpcoming, stream }) => {
 }
 
 function formatRegisteredUsersToCSV(students, stream) {
+   const DATE_FIELD = "Registered Date (Swiss Time)"
    return students
       .map((student) => ({
          "First Name": student.firstName,
          "Last Name": student.lastName,
-         "Registered Date": student.dateRegistered?.toDate(),
+         [DATE_FIELD]: student.dateRegistered?.toDate(),
          Attended: stream.participatingStudents?.includes(student.userEmail)
             ? "Yes"
             : "No",
@@ -382,12 +384,22 @@ function formatRegisteredUsersToCSV(students, stream) {
          "University Country": student.universityCountryCode,
       }))
       .sort((a, b) => {
-         return b["Registered Date"] - a["Registered Date"]
+         return b[DATE_FIELD] - a[DATE_FIELD]
       })
       .map((student) => ({
          ...student,
-         "Registered Date": student["Registered Date"]?.toISOString(),
+         [DATE_FIELD]: convertFromUTCToSwissTime(student[DATE_FIELD]),
       }))
+}
+
+function convertFromUTCToSwissTime(date) {
+   const zonedDate = new Date(
+      date?.toLocaleString("en-US", {
+         timeZone: "Europe/Zurich",
+      })
+   )
+
+   return format(zonedDate, "yyyy-MM-dd HH:mm")
 }
 
 function calculateNoShowPercentage(stream) {
