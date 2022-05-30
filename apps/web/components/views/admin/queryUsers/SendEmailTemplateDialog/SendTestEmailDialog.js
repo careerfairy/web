@@ -8,7 +8,6 @@ import {
 } from "@mui/material"
 import * as PropTypes from "prop-types"
 import Autocomplete from "@mui/material/Autocomplete"
-import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview"
 
 const Content = ({
    handleClose,

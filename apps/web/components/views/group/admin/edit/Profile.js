@@ -16,7 +16,6 @@ import {
 import FilePickerContainer from "../../../../ssr/FilePickerContainer"
 import PublishIcon from "@mui/icons-material/Publish"
 import { useSnackbar } from "notistack"
-import { GENERAL_ERROR } from "../../../../util/constants"
 import { uploadLogo } from "../../../../helperFunctions/HelperFunctions"
 import makeStyles from "@mui/styles/makeStyles"
 import { useDispatch } from "react-redux"

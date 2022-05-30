@@ -1,5 +1,4 @@
-import { Box, Container, useMediaQuery } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
+import { Box, Container } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import React from "react"
 import clsx from "clsx"

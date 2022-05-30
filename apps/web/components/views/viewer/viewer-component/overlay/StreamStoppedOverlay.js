@@ -1,7 +1,5 @@
-import { Button, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
-import CardGiftcardIcon from "@mui/icons-material/CardGiftcard"
-import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {

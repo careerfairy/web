@@ -2,7 +2,6 @@ import React from "react"
 import { Container, Grid, Grow } from "@mui/material"
 import GroupCategories from "../GroupCategories/GroupCategories"
 import GroupStreams from "../GroupStreams/GroupStreams"
-import { useTheme } from "@mui/material/styles"
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
 // eslint-disable-next-line react/display-name

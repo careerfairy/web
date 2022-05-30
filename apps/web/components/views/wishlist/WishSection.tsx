@@ -4,7 +4,6 @@ import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import WishCard from "./WishCard"
-import { useInterests } from "../../custom-hook/useCollection"
 import { StylesProps } from "../../../types/commonTypes"
 import { SearchResponse } from "../../../types/algolia"
 
