@@ -144,7 +144,6 @@ const HeroSection = ({
          streamLanguage ||
          eventInterests?.length
    )
-
    return (
       <Box
          sx={[
