@@ -29,7 +29,7 @@ const styles = sxStyles({
       fontStyle: "italic",
       fontWeight: 300,
       fontSize: "14px",
-      color: "#545454",
+      color: (theme) => (theme.palette.mode === "dark" ? "#fff" : "#545454"),
    },
    linkedInbutton: {
       boxShadow: "0px 3px 6px rgba(0, 70, 104, 0.5)",
@@ -37,6 +37,12 @@ const styles = sxStyles({
       marginRight: "10px",
       "&:hover": {
          backgroundColor: "#004464",
+      },
+   },
+   dialogContent: {
+      paddingBottom: 0,
+      "& .MuiPaper-root": {
+         background: "transparent",
       },
    },
 })
@@ -74,7 +80,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
          <IconButton onClick={onClose} sx={styles.dialogClose}>
             <CloseIcon />
          </IconButton>
-         <DialogContent sx={{ paddingBottom: 0 }} dividers={true}>
+         <DialogContent sx={styles.dialogContent} dividers={true}>
             <Card sx={{ boxShadow: "none" }}>
                <CardHeader
                   sx={{ padding: "16px 0", alignItems: "start" }}
