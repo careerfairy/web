@@ -4,7 +4,8 @@ import { getMillisecondsBetweenDates } from "../../util/CommonUtil"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useInterval } from "react-use"
 
-const timeOut: number = 30000
+const oneDayInMilliseconds = 24 * 60 * 60 * 1000
+const timeOut: number = oneDayInMilliseconds
 
 const cookieName: string = "canWatchHighlights"
 interface Props {
@@ -48,18 +49,16 @@ const useCanWatchHighlights = ({
    const [canWatchAllHighlights, setCanWatchAllHighlights] =
       useState<CanWatchHighlightsProps>(checkIfCanWatchHighlight())
 
-   // useInterval(
-   //    () => {
-   //       setCanWatchAllHighlights(checkIfCanWatchHighlight())
-   //    },
-   //    1000
-   //    // canWatchAllHighlights.canWatchAll ? 1000 : timoutDuration
-   // )
+   useInterval(
+      () => {
+         handleCheckIfCanWatchHighlight()
+      },
+      canWatchAllHighlights.canWatchAll ? 20000 : timeoutDuration
+   )
 
    const handleCheckIfCanWatchHighlight = useCallback(() => {
       const data = checkIfCanWatchHighlight()
       setCanWatchAllHighlights(data)
-      // console.log("-> setting data", data)
       return data
    }, [checkIfCanWatchHighlight])
 

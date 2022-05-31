@@ -168,3 +168,23 @@ export function stringAvatar(firstName: string, lastName: string) {
 export const getMillisecondsBetweenDates = (date1: Date, date2: Date) => {
    return Math.abs(date1.getTime() - date2.getTime())
 }
+
+export const convertMillisecondsToTime = (milliseconds: number) => {
+   const seconds = milliseconds / 1000
+   const minutes = seconds / 60
+   const hours = minutes / 60
+   const days = hours / 24
+   const years = days / 365
+
+   if (years > 1) {
+      return `${Math.round(years)} years`
+   } else if (days > 1) {
+      return `${Math.round(days)} days`
+   } else if (hours > 1) {
+      return `${Math.round(hours)} hours`
+   } else if (minutes > 1) {
+      return `${Math.round(minutes)} minutes`
+   } else {
+      return `${Math.round(seconds)} seconds`
+   }
+}

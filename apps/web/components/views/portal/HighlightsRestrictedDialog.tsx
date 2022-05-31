@@ -1,25 +1,22 @@
-import React, { useEffect } from "react"
+import React from "react"
 import Dialog from "@mui/material/Dialog"
-import { useVideo } from "react-use"
-import Box from "@mui/material/Box"
 import Slide from "@mui/material/Slide"
 import CloseIcon from "@mui/icons-material/Close"
-import {
-   DialogContent,
-   DialogContentText,
-   DialogTitle,
-   IconButton,
-} from "@mui/material"
+import { DialogContent, DialogContentText, IconButton } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import NoAccessView from "../common/NoAccessView"
-import { Highlights_NoAccess } from "../../../constants/contextInfoCareerSkills"
+import {
+   ContextInfoMap,
+   Highlights_NoAccess,
+} from "../../../constants/contextInfoCareerSkills"
+import { convertMillisecondsToTime } from "../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {},
    closeIconButton: {
       position: "absolute",
-      top: "11px",
-      right: "5px",
+      top: "8px",
+      right: "8px",
    },
 })
 const HighlightsRestrictedDialog = ({
@@ -31,6 +28,7 @@ const HighlightsRestrictedDialog = ({
    const onClose = () => {
       handleClose()
    }
+   const requiredBadge = ContextInfoMap[Highlights_NoAccess].badgeRequired
 
    return (
       <Dialog
@@ -40,21 +38,25 @@ const HighlightsRestrictedDialog = ({
          fullWidth
          open={open}
       >
-         <DialogTitle>
-            Oops! You don't have access to these highlights yet...
-         </DialogTitle>
          <IconButton sx={styles.closeIconButton} onClick={onClose} autoFocus>
             <CloseIcon color={"inherit"} />
          </IconButton>
          <DialogContent>
             <NoAccessView contextInfoMapKey={Highlights_NoAccess} />
-            <DialogContentText>
-               {`You can only watch highlights once per ${
-                  timeoutDuration / 1000
-               } seconds. You have ${Math.round(
-                  timeLeft / 1000
-               )} seconds left.`}
-            </DialogContentText>
+            <DialogContentText
+               dangerouslySetInnerHTML={{
+                  __html: `Since you dont have the <b>${
+                     requiredBadge.name
+                  } level ${
+                     requiredBadge.level
+                  } badge</b>, you can only watch highlights once per <b>${convertMillisecondsToTime(
+                     timeoutDuration
+                  )}</b>.You can watch another highlight in <b>${convertMillisecondsToTime(
+                     timeLeft
+                  )}</b>.`,
+               }}
+               textAlign={"center"}
+            />
          </DialogContent>
       </Dialog>
    )

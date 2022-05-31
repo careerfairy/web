@@ -38,7 +38,6 @@ const HighlightsCarousel = ({
       timeoutDuration,
       canWatchAllHighlights,
    } = useCanWatchHighlights()
-   console.log("-> canWatchAllHighlights", canWatchAllHighlights)
 
    const numSlides: number = useMemo(() => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
@@ -69,13 +68,13 @@ const HighlightsCarousel = ({
          <CustomButtonCarousel
             numChildren={highlights.length}
             numSlides={numSlides}
+            key={canWatchAllHighlights.timeLeft}
             carouselProps={{
                autoPlay: true,
-               lazyLoad: false,
             }}
          >
             {highlights.map((highlight) => (
-               <Box key={highlight.id + canWatchAllHighlights.canWatchAll}>
+               <Box key={highlight.id}>
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
