@@ -70,18 +70,14 @@ class FirebaseService {
 
    startLivestreamRecording = async (data) => {
       const startLivestreamRecording = this.functions.httpsCallable(
-         data.isBreakout
-            ? "startRecordingBreakoutRoom"
-            : "startRecordingLivestream"
+         "startRecordingLivestream_v2"
       )
       return await startLivestreamRecording(data)
    }
 
    stopLivestreamRecording = async (data) => {
       const stopLivestreamRecording = this.functions.httpsCallable(
-         data.isBreakout
-            ? "stopRecordingBreakoutRoom"
-            : "stopRecordingLivestream"
+         "stopRecordingLivestream_v2"
       )
       return await stopLivestreamRecording(data)
    }
@@ -1271,9 +1267,9 @@ class FirebaseService {
       const data: any = {
          hasStarted,
       }
-      if (!hasStarted) {
-         data.hasEnded = true
-      }
+
+      data.hasEnded = !hasStarted
+
       return streamRef.update(data)
    }
 
@@ -2873,6 +2869,7 @@ class FirebaseService {
          start: this.getServerTimestamp(),
          id: breakoutRoomId,
          hasStarted: false,
+         hasEnded: false,
          test,
          companyLogo,
          title,
@@ -3012,6 +3009,13 @@ class FirebaseService {
       return this.functions.httpsCallable("rewardLivestreamAttendance")({
          livestreamId,
          referralCode,
+      })
+   }
+
+   rewardUserAction = async (action: string, livestreamId?: string) => {
+      return this.functions.httpsCallable("rewardUserAction")({
+         action,
+         livestreamId,
       })
    }
 

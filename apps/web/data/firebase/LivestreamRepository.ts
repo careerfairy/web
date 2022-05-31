@@ -8,6 +8,7 @@ import {
    LivestreamEventParsed,
    LivestreamEventSerialized,
 } from "../../types/event"
+import { RegisteredStudent } from "@careerfairy/shared-lib/dist/users"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -76,6 +77,10 @@ export interface ILivestreamRepository {
    ): Promise<LivestreamEvent[] | null>
    serializeEvent(event: LivestreamEvent): LivestreamEventSerialized
    parseSerializedEvent(event: LivestreamEventSerialized): LivestreamEventParsed
+
+   getLivestreamRegisteredStudents(
+      eventId: string
+   ): Promise<RegisteredStudent[]>
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -345,6 +350,18 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
          livestreamRef = livestreamRef.limit(limit)
       }
       return livestreamRef.onSnapshot(callback)
+   }
+
+   async getLivestreamRegisteredStudents(
+      eventId: string
+   ): Promise<RegisteredStudent[]> {
+      let ref = await this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("registeredStudents")
+         .get()
+
+      return mapFirestoreDocuments<RegisteredStudent>(ref)
    }
 }
 

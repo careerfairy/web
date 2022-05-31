@@ -2,7 +2,6 @@ import { test, expect } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import { credentials } from "../../constants"
 import { LoginPage } from "../page-object-models/LoginPage"
-import { CommonPage } from "../page-object-models/CommonPage"
 import { PortalPage } from "../page-object-models/PortalPage"
 import { SignupPage } from "../page-object-models/SignupPage"
 import { PasswordResetPage } from "../page-object-models/PasswordResetPage"
@@ -17,8 +16,6 @@ test.describe("Login Page Functionality", () => {
          password: credentials.correctPassword,
       })
       await new LoginPage(page).open()
-      // Accept cookies
-      await new CommonPage(page).acceptCookies()
    })
 
    test("It successfully logs in", async ({ page }) => {

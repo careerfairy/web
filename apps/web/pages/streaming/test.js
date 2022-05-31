@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react"
+import { useState } from "react"
 
 import { withFirebasePage } from "context/firebase/FirebaseServiceContext"
 import { v4 as uuid } from "uuid"

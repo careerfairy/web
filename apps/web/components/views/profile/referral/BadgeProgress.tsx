@@ -1,14 +1,14 @@
 import Box from "@mui/material/Box"
 import { LinearProgress, Typography } from "@mui/material"
 import Grid from "@mui/material/Grid"
-import {
-   Badge,
-   getUserBadges,
-   NetworkerBadge,
-} from "@careerfairy/shared-lib/dist/badges"
+import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import BadgeIcon from "../../common/BadgeIcon"
+import { getUserBadges } from "@careerfairy/shared-lib/dist/users/UserBadges"
+import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
-const BadgeProgress = ({ userData }) => {
+const BadgeProgress = () => {
+   const { userData, userStats } = useAuth()
    const userBadges = getUserBadges(userData.badges)
 
    // hide the progress bar if the user already has the badge
@@ -23,7 +23,7 @@ const BadgeProgress = ({ userData }) => {
    if (!networkerBadge) {
       nextBadge = NetworkerBadge
    }
-   const progress = nextBadge.progress(userData)
+   const progress = nextBadge.progress(userData, userStats)
 
    return (
       <Grid container mt={2}>
@@ -39,7 +39,7 @@ const BadgeProgress = ({ userData }) => {
                Earn your first badge: &nbsp;
                <BadgeIcon badgeKey={nextBadge.key} /> &nbsp; {nextBadge.name}
             </Typography>
-            <p>Objective: {nextBadge.achievementDescription}</p>
+            <p>Objective: {nextBadge.requirements[0].description}</p>
             <p>
                {nextBadge.rewardsDescription.length === 1
                   ? "Reward"

@@ -1,6 +1,6 @@
 import { DeviceOption } from "../types/streaming"
-import { LiveStreamEvent } from "../types/event"
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../constants/streams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -50,7 +50,7 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
    }
 }
 
-export const checkIfPast = (event: LiveStreamEvent) => {
+export const checkIfPast = (event: LivestreamEvent) => {
    return (
       event?.hasEnded ||
       event?.start?.toDate?.() <
@@ -67,7 +67,7 @@ export const getRelevantHosts = (
    // by providing the university group ID the function will try and find the university in the group list
    // and register only through that university and not any other groups attached to the event
    targetHostGroupId: string,
-   event: LiveStreamEvent,
+   event: LivestreamEvent,
    // groups returned from fetching the group IDs array field on the livestream Document
    groupList: any[]
 ) => {
@@ -92,7 +92,7 @@ export const getRelevantHosts = (
 }
 
 export const getLinkToStream = (
-   event: LiveStreamEvent,
+   event: LivestreamEvent,
    groupId: string,
    shouldAutoRegister?: boolean,
    asPath?: string

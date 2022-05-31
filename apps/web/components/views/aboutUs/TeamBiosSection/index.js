@@ -140,6 +140,31 @@ const people = [
          "In her free-time she loves to DJ, listen to lots of music, read and spend time with her friends.\n",
       linkedinUrl: "https://www.linkedin.com/in/zarbab-aamir-601065b1/",
    },
+   {
+      id: 13,
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FHugo.jpg?alt=media&token=b0a67b4f-ec54-45d8-92a3-64c17ad216c5",
+      name: "Hugo Lammers",
+      role: "Business Development & Finance",
+      bio:
+         "After a few years in a financial consulting role at a Big4 firm, Hugo joined a Dutch scale-up as Business Development Manager.\n" +
+         "He now likes to apply both his finance and BD experience in the fast-growth environment at CareerFairy.\n" +
+         "Hugo holds a Bachelor's in Industrial Engineering from the Rijksuniversiteit Groningen and a Master's in Finance from the VU Amsterdam.\n\n" +
+         "In his free time, Hugo loves to ski, play chess and hit the gym!",
+      linkedinUrl: "https://www.linkedin.com/in/hugo-lammers-57730920/",
+   },
+   {
+      id: 14,
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FLina.jpg?alt=media&token=2ae6cfc0-3c95-4e92-a3c2-2bbe3e2edad9",
+      name: "Carolina Gentsch",
+      role: "Business Development",
+      bio:
+         "Carolina holds a M.Sc. in Human Resource Management, with a background in Applied Business Languages and International Management. While studying and working in Japan, China and the USA, she fostered her passion for working and interacting with people rather than solely with numbers. This led her to join the CareerFairy team as a Business Development Manager, where she combines her people skills with her management background. \n" +
+         "\n" +
+         "In her free time she loves to play the guitar, recently started snowboarding and has this unique hobby called LARP: google will help you to learn more about it ;)",
+      linkedinUrl: "https://www.linkedin.com/in/carolina-gentsch-hrm/",
+   },
 ]
 
 const shuffledPeople = shuffleArray(people)

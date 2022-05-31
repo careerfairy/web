@@ -2,7 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
-import { DialogContent, Grid, useMediaQuery } from "@mui/material"
+import { Grid, useMediaQuery } from "@mui/material"
 
 import Tabs from "@mui/material/Tabs"
 import CallToActionTypeButton from "./CallToActionTypeButton"

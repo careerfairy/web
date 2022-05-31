@@ -1,9 +1,6 @@
 import PropTypes from "prop-types"
 import React from "react"
 import Head from "next/head"
-import makeStyles from "@mui/styles/makeStyles"
-
-const useStyles = makeStyles((theme) => ({}))
 
 const HeadWithMetaData = ({
    title,
@@ -13,8 +10,6 @@ const HeadWithMetaData = ({
    twitterCardType,
    author,
 }) => {
-   const classes = useStyles()
-
    return (
       <Head>
          {/*Primary Meta Tags */}

@@ -141,7 +141,7 @@ const StreamerLayout = (props) => {
          let storedUuid = localStorage.getItem("streamingUuid")
          const hasStreamerInfo = currentLivestream?.liveSpeakers?.some(
             (speaker) =>
-               speaker.speakerUuid.replace(currentLivestream.id, "") ===
+               speaker.speakerUuid?.replace(currentLivestream.id, "") ===
                storedUuid
          )
          setStreamerReady(Boolean(hasStreamerInfo))

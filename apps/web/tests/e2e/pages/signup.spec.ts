@@ -1,6 +1,5 @@
 import { expect, test } from "@playwright/test"
 import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
-import { CommonPage } from "../page-object-models/CommonPage"
 import { SignupPage } from "../page-object-models/SignupPage"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
@@ -20,7 +19,6 @@ test.describe("Signup Page Functionality", () => {
    test.beforeEach(async ({ page }) => {
       await UserSeed.deleteUser(credentials.correctEmail)
       await new SignupPage(page).open()
-      await new CommonPage(page).acceptCookies()
    })
 
    test.afterAll(async () => {

@@ -1,7 +1,6 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { ButtonBase, Typography } from "@mui/material"
-import { demoVideo } from "../../components/util/constants"
 
 const useStyles = makeStyles((theme) => {
    const customTransition = theme.transitions.create("all", {

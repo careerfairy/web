@@ -7,7 +7,8 @@ import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -17,6 +18,8 @@ type DefaultContext = {
    authenticatedUser?: FirebaseReducer.AuthState
    userData?: UserData
    isLoggedOut: boolean
+   userPresenter?: UserPresenter
+   userStats?: UserStats
    isLoggedIn: boolean
 }
 const AuthContext = createContext<DefaultContext>({
@@ -24,6 +27,8 @@ const AuthContext = createContext<DefaultContext>({
    userData: undefined,
    isLoggedOut: undefined,
    isLoggedIn: undefined,
+   userPresenter: undefined,
+   userStats: undefined,
 })
 
 const securePaths = [
@@ -33,6 +38,8 @@ const securePaths = [
    "/group/[groupId]/admin/past-livestreams",
    "/group/[groupId]/admin/upcoming-livestreams",
    "/group/[groupId]/admin/drafts",
+   "/group/[groupId]/admin/events",
+   "/group/[groupId]/admin/roles",
    "/group/[groupId]/admin/edit",
    "/group/[groupId]/admin/analytics",
    "/new-livestream",
@@ -54,6 +61,12 @@ const AuthProvider = ({ children }) => {
                     doc: auth.email, // or `userData/${auth.email}`
                     storeAs: "userProfile",
                  },
+                 {
+                    collection: "userData",
+                    doc: auth.email,
+                    subcollections: [{ collection: "stats", doc: "stats" }],
+                    storeAs: "userStats",
+                 },
               ]
             : [],
       [auth?.email]
@@ -63,6 +76,10 @@ const AuthProvider = ({ children }) => {
 
    const userData = useSelector(
       ({ firestore }: RootState) => firestore.data["userProfile"]
+   )
+
+   const userStats = useSelector(
+      ({ firestore }: RootState) => firestore.data["userStats"]
    )
 
    const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
@@ -150,6 +167,8 @@ const AuthProvider = ({ children }) => {
             userData: isLoggedOut ? undefined : userData,
             isLoggedOut,
             isLoggedIn,
+            userPresenter: userData ? new UserPresenter(userData) : undefined,
+            userStats: userStats,
          }}
       >
          {children}
@@ -157,6 +176,6 @@ const AuthProvider = ({ children }) => {
    )
 }
 
-const useAuth = () => useContext(AuthContext)
+const useAuth = () => useContext<DefaultContext>(AuthContext)
 
 export { AuthProvider, useAuth }

@@ -35,11 +35,9 @@ import JoinTalentPoolButton from "./buttons/JoinTalentPoolButton"
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import BadgeButton from "../../../components/views/common/BadgeButton"
-import {
-   Badge as BadgeType,
-   getUserBadges,
-} from "@careerfairy/shared-lib/dist/badges"
 import { StylesProps } from "../../../types/commonTypes"
+import { Badge as BadgeType } from "@careerfairy/shared-lib/dist/badges/badges"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 
 const styles: StylesProps = {
    appBar: {
@@ -354,23 +352,21 @@ ViewerTopBar.propTypes = {
 }
 
 const UserBadge = () => {
-   const { userData } = useAuth()
+   const { userPresenter } = useAuth()
 
    const tooltipText = useCallback(
       (badge: BadgeType) =>
-         `You earned the ${badge.name} badge! Your questions during this event will be highlighted!`,
+         `You earned the ${badge.name} Level ${badge.level} badge! Your questions during this event will be highlighted!`,
       []
    )
 
-   if (!userData) return null
+   if (!userPresenter) return null
 
-   const networkerBadge = getUserBadges(userData.badges)?.networkerBadge()
-
-   if (!networkerBadge) return null
+   if (!userPresenter.questionsShouldBeHighlighted()) return null
 
    return (
       <BadgeButton
-         badge={networkerBadge}
+         badge={UserPresenter.questionsHighlightedRequiredBadge()}
          showBadgeSuffix={false}
          showIcon={false}
          activeTooltip={tooltipText}

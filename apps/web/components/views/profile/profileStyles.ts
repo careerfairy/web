@@ -1,4 +1,6 @@
-export const styles = {
+import { sxStyles } from "../../../types/commonTypes"
+
+export const styles = sxStyles({
    box: {
       width: "100%", // Fix IE 11 issue.
       backgroundColor: "background.paper",
@@ -13,4 +15,7 @@ export const styles = {
       fontSize: "1.8rem",
       marginBottom: "30px",
    },
-} as const
+   subtitle: {
+      fontSize: "1rem",
+   },
+})

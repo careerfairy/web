@@ -18,6 +18,7 @@ interface ColorizedAvatarProps extends AvatarProps {
    imageUrl?: string
    loading?: boolean
 }
+
 const ColorizedAvatar = ({
    firstName,
    lastName,
@@ -26,15 +27,10 @@ const ColorizedAvatar = ({
    sx,
    ...rest
 }: ColorizedAvatarProps) => {
-   let name = ""
-   if (firstName) {
-      name += firstName.charAt(0)
-   }
-
-   if (lastName) {
-      name += ` ${lastName.charAt(0)}`
-   }
-   const avaProps = useMemo(() => stringAvatar(firstName, lastName), [name])
+   const avaProps = useMemo(
+      () => stringAvatar(firstName, lastName),
+      [firstName, lastName]
+   )
 
    return (
       <Avatar

@@ -4,7 +4,6 @@ import {
    Button,
    Card,
    CardHeader,
-   Grid,
    Menu,
    MenuItem,
    Box,
@@ -12,10 +11,7 @@ import {
    Tooltip,
 } from "@mui/material"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
-import {
-   StyledTooltipWithButton,
-   TooltipHighlight,
-} from "../../../../../materialUI/GlobalTooltips"
+import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips"
 import FilterStreamsIcon from "@mui/icons-material/Tune"
 import { useSelector } from "react-redux"
 
@@ -30,6 +26,8 @@ const useStyles = makeStyles((theme) => ({
    },
    header: {
       paddingLeft: theme.spacing(3),
+      paddingTop: 0,
+      paddingBottom: 0,
    },
    titleButton: {},
    menuItem: {

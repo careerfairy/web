@@ -64,6 +64,16 @@ service cloud.firestore {
             allow delete: if false;
         }
 
+        match /userData/{userId}/savedRecruiters/{recruiterId} {
+            allow read: if request.auth.token.email == userId;
+            allow write: if request.auth.token.email == userId;
+        }
+
+        match /userData/{userId}/stats/stats {
+            allow read: if request.auth.token.email == userId;
+            allow write: if request.auth.token.email == userId;
+        }
+
         match /universitiesByCountry/{countryId} {
             allow read: if true;
             allow update: if false;

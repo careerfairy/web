@@ -20,6 +20,7 @@ import { AddToCalendar } from "../../common/AddToCalendar"
 import ShareOutlined from "@mui/icons-material/ShareOutlined"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { streamIsOld } from "../../../../util/CommonUtil"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
 const styles = {
    root: (theme) => ({
@@ -162,6 +163,9 @@ const CountDown = ({
                         sx={styles.alert}
                         variant="standard"
                         severity="info"
+                        iconMapping={{
+                           info: <InfoOutlinedIcon sx={{ color: "#626262" }} />,
+                        }}
                      >
                         PLEASE WAIT HERE! YOU WILL BE REDIRECTED WHEN THE STREAM
                         STARTS.

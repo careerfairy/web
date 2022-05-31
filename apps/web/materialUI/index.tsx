@@ -8,7 +8,6 @@ import { PaletteMode, Components } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 
 declare module "@mui/styles/defaultTheme" {
-   // eslint-disable-next-line @typescript-eslint/no-empty-interface (remove this line if you don't have the rule enabled)
    interface DefaultTheme extends Theme {
       drawerWidth?: { small: string; medium: string }
       boxShadows?: {
@@ -217,6 +216,9 @@ const getComponents = (theme: DefaultTheme): Components => ({
             boxShadow: "none",
             filter: theme.boxShadows.dark_15_60_15,
          },
+         paperFullScreen: {
+            borderRadius: 0,
+         },
       },
    },
    MuiPaper: {
@@ -379,6 +381,33 @@ const getComponents = (theme: DefaultTheme): Components => ({
       styleOverrides: {
          tooltip: {
             fontSize: "1rem",
+         },
+      },
+   },
+   MuiCard: {
+      styleOverrides: {
+         root: {
+            borderRadius: 10,
+            boxShadow: theme.boxShadows.dark_8_25_10,
+         },
+      },
+      variants: [
+         {
+            props: {
+               elevation: 0,
+            },
+            style: {
+               boxShadow: "none",
+            },
+         },
+      ],
+   },
+   MuiPopover: {
+      styleOverrides: {
+         paper: {
+            filter: theme.dropShadows.dark_6_12_12,
+            boxShadow: "none",
+            borderRadius: 8,
          },
       },
    },

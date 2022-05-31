@@ -295,6 +295,7 @@ function CategoryEditModal({
                label={el.name}
                variant="outlined"
                deleteIcon={<EditIcon />}
+               stacked={"true"}
                onDelete={(e) => {
                   setSelectedOption(el)
                   handleOpenDropDown(e)

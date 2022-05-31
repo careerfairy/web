@@ -11,7 +11,6 @@ import {
    getResizedUrl,
 } from "components/helperFunctions/HelperFunctions"
 import WhiteTagChip from "../chips/TagChip"
-import { LiveStreamEvent } from "types/event"
 import Image from "next/image"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import Avatar from "@mui/material/Avatar"
@@ -26,6 +25,7 @@ import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = {
    hideOnHoverContent: {
@@ -160,7 +160,6 @@ const styles = {
    },
    btn: {
       flex: 1,
-      borderRadius: 1,
    },
    bottomLogoWrapper: {
       display: "grid",
@@ -522,32 +521,21 @@ const EventPreviewCard = ({
                </Box>
             </Box>
          </Box>
-         {event && (
-            <EventSEOSchemaScriptTag
-               eventDate={
-                  event?.startDate ? new Date(event?.startDate) : new Date()
-               }
-               eventImageUrl={getResizedUrl(event?.companyLogoUrl, "md")}
-               eventName={event?.title}
-               eventDescription={event?.summary}
-               eventCompany={event?.company}
-               detailPageUrl={`https://www.careerfairy.io/upcoming-livestream/${event?.id}`}
-            />
-         )}
+         {event && <EventSEOSchemaScriptTag event={event} />}
       </>
    )
 }
 
 interface EventPreviewCardProps {
-   event?: LiveStreamEvent
+   event?: LivestreamEvent
    loading?: boolean
    light?: boolean
    registering?: boolean
    autoRegister?: boolean
    interests?: Interest[]
-   openShareDialog?: React.Dispatch<React.SetStateAction<LiveStreamEvent>>
+   openShareDialog?: React.Dispatch<React.SetStateAction<LivestreamEvent>>
    onRegisterClick?: (
-      event: LiveStreamEvent,
+      event: LivestreamEvent,
       targetGroupId: string,
       groups: any[],
       hasRegistered: boolean

@@ -74,7 +74,7 @@ const TopBar = ({ links, onMobileNavOpen, currentGroup }) => {
                      Login
                   </Button>
                ) : (
-                  <UserProfileButton userBadges={userData?.badges} />
+                  <UserProfileButton />
                )}
             </Hidden>
             {currentGroup?.categories && (
