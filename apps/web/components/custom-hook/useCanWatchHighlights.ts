@@ -1,16 +1,19 @@
 import { useCallback, useEffect, useState } from "react"
-import { parseCookies, setCookie, destroyCookie } from "nookies"
+import { parseCookies, setCookie } from "nookies"
 import { getMillisecondsBetweenDates } from "../../util/CommonUtil"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useInterval } from "react-use"
 
 const oneDayInMilliseconds = 24 * 60 * 60 * 1000
+
+// How long you want to wait before you can watch again in milliseconds
 export const timeoutDuration: number = oneDayInMilliseconds
 
 const cookieName: string = "canWatchHighlights"
-interface Props {
-   // How long you want to wait before you can watch again in milliseconds
-   timoutDuration?: number
+
+interface CanWatchHighlightsProps {
+   canWatchAll: boolean
+   timeLeft: number
 }
 
 const useCanWatchHighlights = () => {
