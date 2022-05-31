@@ -38,7 +38,9 @@ export default class UserPresenter extends BasePresenter<UserData> {
     * User requires to have at least level 2 Networker badge
     */
    canSaveRecruiters(): boolean {
-      return this.badges?.networkerBadge()?.level >= 2
+      return this.badges.hasBadgeComplete(
+         UserPresenter.saveRecruitersRequiredBadge()
+      )
    }
    canWatchAllHighlights(): boolean {
       return this.badges.hasBadgeComplete(
