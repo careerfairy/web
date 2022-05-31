@@ -1,0 +1,3 @@
+# Get a livestream recording
+# /directory1/directory5/[SID]_[LIVESTREAM_ID]_0.mp4
+GET https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/2c0dcc1e2b45127e71c14f9b82f0b7b1_bnruMEB6DGte14VNaZ9M_0.mp4

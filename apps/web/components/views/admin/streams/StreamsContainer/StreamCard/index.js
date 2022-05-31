@@ -35,6 +35,7 @@ import MoreVertIcon from "@mui/icons-material/MoreVert"
 import StreamerLinksDialog from "../../../../group/admin/events/enhanced-group-stream-card/StreamerLinksDialog"
 import ConfirmRecordingDialog from "./ConfirmRecordingDialog"
 import PropTypes from "prop-types"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import PercentIcon from "@mui/icons-material/Percent"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import livestreamRepo from "../../../../../../data/firebase/LivestreamRepository"
@@ -84,7 +85,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const firestore = useFirestore()
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
-   const [recordingSid, setRecordingSid] = useState(false)
+   const [recordingSid, setRecordingSid] = useState(null)
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
       useState(false)
    const [anchorEl, setAnchorEl] = React.useState(null)
@@ -230,7 +231,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                               </MenuItem>
                            </>
                         )}
-                        {!isUpcoming && stream.isRecording && (
+                        {!isUpcoming && !stream.hasEnded && stream.isRecording && (
                            <MenuItem
                               disabled={recordingRequestOngoing}
                               onClick={handleOpenConfirmRecordingDialog}
@@ -243,7 +244,11 @@ const StreamCard = ({ isUpcoming, stream }) => {
                               component="a"
                               target="_blank"
                               onClick={handleClose}
-                              href={`https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${recordingSid}_${stream.id}_0.mp4`}
+                              href={downloadLinkWithDate(
+                                 stream.start.toDate(),
+                                 stream.id,
+                                 recordingSid
+                              )}
                            >
                               Download Recording
                            </MenuItem>
@@ -271,7 +276,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
             }
          />
          <CardContent>
-            {stream.isRecording && (
+            {(stream.isRecording || recordingSid) && (
                <Typography sx={styles.recording}>
                   {stream?.hasEnded ? "Recorded" : "Recording in progress"}
                </Typography>
