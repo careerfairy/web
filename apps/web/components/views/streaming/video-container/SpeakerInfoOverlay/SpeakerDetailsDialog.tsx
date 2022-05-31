@@ -29,7 +29,7 @@ const styles = sxStyles({
       fontStyle: "italic",
       fontWeight: 300,
       fontSize: "14px",
-      color: "#545454",
+      color: "text.secondary",
    },
    linkedInbutton: {
       boxShadow: "0px 3px 6px rgba(0, 70, 104, 0.5)",
@@ -37,6 +37,12 @@ const styles = sxStyles({
       marginRight: "10px",
       "&:hover": {
          backgroundColor: "#004464",
+      },
+   },
+   dialogContent: {
+      paddingBottom: 0,
+      "& .MuiPaper-root": {
+         background: "transparent",
       },
    },
 })
@@ -64,9 +70,11 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
       subtitle = `${subtitle} (${matchedSpeaker.background.trim()} background)`
    }
 
-   // user can't save himself if logged in
+   // user can't save himself if logged in (or save a hand raised user)
    // logged out, we show the save button
-   const canSave = userData ? matchedSpeaker?.userId !== userData?.authId : true
+   const isSelf = matchedSpeaker?.userId === userData?.authId
+   const isHandRaiser = matchedSpeaker?.position?.includes("Hand Raiser")
+   const canSave = userData ? !isSelf && !isHandRaiser : true
 
    return (
       <Dialog open={true} onClose={onClose} fullWidth={true} maxWidth={"sm"}>
@@ -74,7 +82,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
          <IconButton onClick={onClose} sx={styles.dialogClose}>
             <CloseIcon />
          </IconButton>
-         <DialogContent sx={{ paddingBottom: 0 }} dividers={true}>
+         <DialogContent sx={styles.dialogContent} dividers={true}>
             <Card sx={{ boxShadow: "none" }}>
                <CardHeader
                   sx={{ padding: "16px 0", alignItems: "start" }}

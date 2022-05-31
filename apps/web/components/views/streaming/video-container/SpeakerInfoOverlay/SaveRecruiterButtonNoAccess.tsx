@@ -42,7 +42,7 @@ export const SaveRecruiterButtonNoAccess = () => {
       <Typography sx={{ p: 1 }}>
          You have to unlock the{" "}
          <Link href="#" onClick={openProfilePage}>
-            {requiredBadge.name} Badge
+            {requiredBadge.name} Badge Level {requiredBadge.level}
          </Link>{" "}
          to access this feature.
       </Typography>
@@ -65,7 +65,7 @@ export const SaveRecruiterButtonNoAccess = () => {
                   startIcon={<SaveIcon />}
                   disabled={true}
                >
-                  {isMobile ? "Save" : "Save For Later"}
+                  {isMobile ? "Save" : "Save Speaker"}
                </Button>
             </span>
          </WrapperTooltip>
