@@ -38,6 +38,7 @@ const useCanWatchHighlights = ({
             const now = new Date()
             data = {
                canWatchAll: now > cookieExpiryDate,
+               // Return the time left until the user can watch highlights again in milliseconds
                timeLeft: getMillisecondsBetweenDates(cookieExpiryDate, now),
             }
          }
@@ -53,7 +54,8 @@ const useCanWatchHighlights = ({
       () => {
          handleCheckIfCanWatchHighlight()
       },
-      canWatchAllHighlights.canWatchAll ? 20000 : timeoutDuration
+      // Check every twenty seconds if the user can watch highlights
+      20000
    )
 
    const handleCheckIfCanWatchHighlight = useCallback(() => {
