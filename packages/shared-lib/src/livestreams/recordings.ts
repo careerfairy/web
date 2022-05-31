@@ -51,8 +51,8 @@ export const downloadLinkWithDate = (
     * Any recording before this date, should use the old path
     * https://github.com/careerfairy/web/pull/130
     */
-   const newChangesDate = 1653404068480
-   if (livestreamStartDate?.getMilliseconds() < newChangesDate) {
+   const newChangesDate = 1653501600000
+   if (livestreamStartDate?.getTime() < newChangesDate) {
       return `https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/directory1/directory5/${sid}_${livestreamId}_0.mp4`
    } else {
       return downloadLink(livestreamId, sid, breakoutRoomID)
