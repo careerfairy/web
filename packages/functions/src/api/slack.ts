@@ -1,8 +1,7 @@
-const { axios } = require("./axios")
-const { DateTime } = require("luxon")
-const { isLocalEnvironment } = require("../util")
+import axios, { AxiosPromise } from "axios"
+import { DateTime } from "luxon"
 
-const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
+export const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
    const link = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
 
    const body = {
@@ -38,7 +37,7 @@ const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
    })
 }
 
-const notifyLivestreamCreated = (
+export const notifyLivestreamCreated = (
    webhookUrl,
    publisherEmailOrName,
    livestreamObj
@@ -102,6 +101,48 @@ const notifyLivestreamCreated = (
    })
 }
 
+export const notifyLivestreamRecordingCreated = (
+   webhookUrl,
+   livestreamObj,
+   downloadLink
+) => {
+   const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
+
+   return generateRequest(webhookUrl, {
+      blocks: [
+         {
+            type: "section",
+            text: {
+               type: "mrkdwn",
+               text: `Livestream Recording Complete:\n*${livestreamObj.title}*`,
+            },
+         },
+         {
+            type: "actions",
+            elements: [
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Event Details",
+                  },
+                  url: eventLink,
+               },
+               {
+                  type: "button",
+                  text: {
+                     type: "plain_text",
+                     text: "Download Recording",
+                  },
+                  url: downloadLink,
+                  style: "primary",
+               },
+            ],
+         },
+      ],
+   })
+}
+
 function formatEventStartDate(date) {
    const luxonDate = DateTime.fromJSDate(date)
    return luxonDate.toLocaleString(DateTime.DATETIME_FULL)
@@ -110,16 +151,18 @@ function formatEventStartDate(date) {
 function generateBodyStr(fieldsObj) {
    let result = ""
 
-   for (let key in fieldsObj) {
+   // eslint-disable-next-line guard-for-in
+   for (const key in fieldsObj) {
       result += `*${key}:* ${fieldsObj[key]}\n`
    }
 
    return result
 }
 
-function generateRequest(url, body) {
-   if (isLocalEnvironment()) {
-      return {}
+function generateRequest(url, body): AxiosPromise {
+   // do not send slack notifications during tests in CI
+   if (process.env.CI) {
+      return Promise.resolve() as any
    }
 
    return axios({
@@ -130,9 +173,4 @@ function generateRequest(url, body) {
          "Content-Type": "application/json",
       },
    })
-}
-
-module.exports = {
-   notifyLivestreamStarting,
-   notifyLivestreamCreated,
 }
