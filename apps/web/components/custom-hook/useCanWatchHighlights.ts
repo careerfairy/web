@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react"
-import { parseCookies, setCookie } from "nookies"
+import { parseCookies, setCookie, destroyCookie } from "nookies"
 import { getMillisecondsBetweenDates } from "../../util/CommonUtil"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useInterval } from "react-use"
@@ -30,7 +30,7 @@ const useCanWatchHighlights = ({
    const checkIfCanWatchHighlight = () => {
       let data = { canWatchAll: true, timeLeft: 0 }
       const canWatch = userPresenter?.canWatchAllHighlights()
-      if (!canWatch) {
+      if (!canWatch || !userPresenter) {
          const cookies = parseCookies()
          const cookieExpiry = cookies[cookieName]
          if (cookieExpiry) {
@@ -72,12 +72,16 @@ const useCanWatchHighlights = ({
     * Here we set a cookie to expire in X milliseconds.
     * */
    const setUserTimeoutWithCookie = useCallback(() => {
+      if (userPresenter?.canWatchAllHighlights()) {
+         // If the user can watch all highlights, we don't need to set/re-set a cookie
+         return
+      }
       const timeFromNow = new Date(Date.now() + timeoutDuration)
       setCookie(null, cookieName, timeFromNow.toUTCString(), {
          maxAge: timeoutDuration,
          expires: timeFromNow,
       })
-   }, [timeoutDuration])
+   }, [timeoutDuration, userData?.badges])
 
    return {
       canWatchAllHighlights,

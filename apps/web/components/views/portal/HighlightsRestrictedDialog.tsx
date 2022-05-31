@@ -34,7 +34,7 @@ const HighlightsRestrictedDialog = ({
       <Dialog
          onClose={onClose}
          TransitionComponent={Slide}
-         maxWidth={"lg"}
+         maxWidth={"md"}
          fullWidth
          open={open}
       >

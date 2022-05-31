@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import HighlightItem from "./HighlightItem"
 import HighlightVideoDialog from "./HighlightVideoDialog"
 import Box from "@mui/material/Box"
@@ -9,6 +9,8 @@ import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
 import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
 import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
 import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { useRouter } from "next/router"
 
 const styles = {
    root: {
@@ -19,10 +21,12 @@ const HighlightsCarousel = ({
    serverSideHighlights,
    showHighlights,
 }: Props) => {
+   const { isLoggedOut, userPresenter } = useAuth()
    const {
       breakpoints: { up },
    } = useTheme()
    const [highlights] = useState<HighLight[]>(serverSideHighlights)
+   const { push, query } = useRouter()
    const [
       highlightsRestrictedDialogOpen,
       handleOpenHighlightsRestrictedDialog,
@@ -51,10 +55,35 @@ const HighlightsCarousel = ({
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
       } else {
+         if (isLoggedOut) {
+            return push({
+               pathname: "/login",
+               query: {
+                  ...query,
+                  absolutePath: "/portal?openDialog=highlightsRestrictedDialog",
+               },
+            })
+         }
          if (videoUrl) handleCloseVideoDialog()
          handleOpenHighlightsRestrictedDialog()
       }
    }
+
+   useEffect(() => {
+      if (
+         query.openDialog === "highlightsRestrictedDialog" &&
+         !userPresenter?.canWatchAllHighlights()
+      ) {
+         handleOpenHighlightsRestrictedDialog()
+         delete query.openDialog
+         void push({
+            pathname: "/portal",
+            query: {
+               ...query,
+            },
+         })
+      }
+   }, [query.openDialog, Boolean(userPresenter)])
 
    const handleCloseVideoDialog = () => {
       setVideoUrl(null)
