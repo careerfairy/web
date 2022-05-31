@@ -29,7 +29,7 @@ const styles = sxStyles({
       fontStyle: "italic",
       fontWeight: 300,
       fontSize: "14px",
-      color: (theme) => (theme.palette.mode === "dark" ? "#fff" : "#545454"),
+      color: "text.secondary",
    },
    linkedInbutton: {
       boxShadow: "0px 3px 6px rgba(0, 70, 104, 0.5)",
