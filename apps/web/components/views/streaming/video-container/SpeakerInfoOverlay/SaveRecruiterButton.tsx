@@ -61,7 +61,7 @@ export const SaveRecruiterButton = ({ speaker }) => {
                boxShadow: "0px 3px 6px rgba(116, 49, 226, 0.5)",
             }}
          >
-            {isAlreadySaved ? "Saved" : "Save for later"}
+            {isAlreadySaved ? "Saved" : "Save Speaker"}
          </LoadingButton>
 
          <Tooltip title={tooltipMessage}>
