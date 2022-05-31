@@ -24,7 +24,9 @@ export default class UserPresenter extends BasePresenter<UserData> {
     * User requires to have at least level 2 Engage badge
     */
    questionsShouldBeHighlighted(): boolean {
-      return this.badges?.engageBadge()?.level >= 2
+      return this.badges.hasBadgeComplete(
+         UserPresenter.questionsHighlightedRequiredBadge()
+      )
    }
 
    // static because we might need to display the badge when the user is not logged in
@@ -42,15 +44,22 @@ export default class UserPresenter extends BasePresenter<UserData> {
          UserPresenter.saveRecruitersRequiredBadge()
       )
    }
+
+   static saveRecruitersRequiredBadge(): Badge {
+      return NetworkerBadgeLevel2
+   }
+
+   /**
+    * Watch Highlights functionality
+    *
+    * User requires to have at least level 2 Research badge
+    */
    canWatchAllHighlights(): boolean {
       return this.badges.hasBadgeComplete(
          UserPresenter.watchAllHighlightsRequiredBadge()
       )
    }
 
-   static saveRecruitersRequiredBadge(): Badge {
-      return NetworkerBadgeLevel2
-   }
    static watchAllHighlightsRequiredBadge(): Badge {
       return ResearchBadgeLevel2
    }
