@@ -49,7 +49,7 @@ export default class AgoraClient {
 
    /**
     * Start a recording
-    * https://docs.agora.io/en/cloud-recording/cloud_recording_api_start?platform=RESTful
+    * [link to docs](https://docs.agora.io/en/cloud-recording/cloud_recording_api_start?platform=RESTful)
     *
     * @param cname
     * @param resourceId
