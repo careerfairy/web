@@ -70,9 +70,11 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
       subtitle = `${subtitle} (${matchedSpeaker.background.trim()} background)`
    }
 
-   // user can't save himself if logged in
+   // user can't save himself if logged in (or save a hand raised user)
    // logged out, we show the save button
-   const canSave = userData ? matchedSpeaker?.userId !== userData?.authId : true
+   const isSelf = matchedSpeaker?.userId === userData?.authId
+   const isHandRaiser = matchedSpeaker?.position?.includes("Hand Raiser")
+   const canSave = userData ? !isSelf && !isHandRaiser : true
 
    return (
       <Dialog open={true} onClose={onClose} fullWidth={true} maxWidth={"sm"}>
