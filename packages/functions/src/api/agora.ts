@@ -30,7 +30,7 @@ export default class AgoraClient {
     * The resource ID is valid for five minutes, so you need to start
     * recording with this resource ID with it before it expires.
     *
-    * https://docs.agora.io/en/cloud-recording/cloud_recording_api_acquire?platform=RESTful
+    * [link to docs](https://docs.agora.io/en/cloud-recording/cloud_recording_api_acquire?platform=RESTful)
     * @param cname
     */
    recordingAcquire(cname: string) {
