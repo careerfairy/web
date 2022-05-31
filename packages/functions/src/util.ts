@@ -1,7 +1,8 @@
-const { DateTime } = require("luxon")
-const { customAlphabet } = require("nanoid")
+import { DateTime } from "luxon"
+import { customAlphabet } from "nanoid"
+import functions = require("firebase-functions")
 
-const setHeaders = (req, res) => {
+export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
    res.set("Access-Control-Allow-Credentials", "true")
 
@@ -14,34 +15,28 @@ const setHeaders = (req, res) => {
    }
 }
 
-const getStreamLink = (streamId) => {
+export const getStreamLink = (streamId) => {
    return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
-const formatHour = (LuxonTime) => {
-   return `${LuxonTime.hour}:${
-      LuxonTime.minute < 10 ? "0" + LuxonTime.minute : LuxonTime.minute
-   } ${LuxonTime.offsetNameShort}`
-}
-
-const getLivestreamTimeInterval = (
+export const getLivestreamTimeInterval = (
    livestreamStartDateTime,
    livestreamTimeZone
 ) => {
-   var startDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), {
+   const startDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), {
       zone: livestreamTimeZone,
    }).toFormat("HH:mm ZZZZ", { locale: "en-GB" })
    return `(${startDateTime})`
 }
 
-const generateEmailData = (
+export const generateEmailData = (
    livestreamId,
    livestream,
    startingNow,
    timeToDelivery
 ) => {
-   let recipientEmails = livestream.registeredUsers.join()
-   var luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), {
+   const recipientEmails = livestream.registeredUsers.join()
+   const luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), {
       zone: livestream.timezone || "Europe/Zurich",
    })
    const mailgunVariables = {
@@ -53,9 +48,9 @@ const generateEmailData = (
       streamLink: livestream.externalEventLink
          ? livestream.externalEventLink
          : getStreamLink(livestreamId),
-      german: livestream.language === "DE" ? true : false,
+      german: livestream.language === "DE",
    }
-   let recipientVariablesObj = {}
+   const recipientVariablesObj = {}
    livestream.registeredUsers.forEach((email) => {
       recipientVariablesObj[email] = mailgunVariables
    })
@@ -95,13 +90,13 @@ const generateEmailData = (
    }
 }
 
-const getArrayDifference = (array1, array2) => {
+export const getArrayDifference = (array1, array2) => {
    return array2.filter((element) => {
       return !array1.includes(element)
    })
 }
 
-const makeRequestingGroupIdFirst = (
+export const makeRequestingGroupIdFirst = (
    arrayOfGroupIds = [],
    requestingGroupId
 ) => {
@@ -116,7 +111,7 @@ const makeRequestingGroupIdFirst = (
    return newArray
 }
 
-const studentBelongsToGroup = (student, group) => {
+export const studentBelongsToGroup = (student, group) => {
    // return (
    //    student && student.groupIds && student.groupIds.includes(group.groupId)
    // );
@@ -133,21 +128,21 @@ const studentBelongsToGroup = (student, group) => {
    }
 }
 
-const convertPollOptionsObjectToArray = (pollOptionsObject) => {
+export const convertPollOptionsObjectToArray = (pollOptionsObject) => {
    return Object.keys(pollOptionsObject).map((key) => ({
       ...pollOptionsObject[key],
       index: key,
    }))
 }
 
-const getRegisteredGroupById = (student, groupId) => {
+export const getRegisteredGroupById = (student, groupId) => {
    return (
       student.registeredGroups &&
       student.registeredGroups.find((category) => category.groupId === groupId)
    )
 }
 
-const stringMatches = (basString, stringsToMatch) => {
+export const stringMatches = (basString, stringsToMatch) => {
    return stringsToMatch.some(
       (stringToMatch) =>
          stringToMatch.toLowerCase().replace(/\s/g, "") ===
@@ -155,14 +150,14 @@ const stringMatches = (basString, stringsToMatch) => {
    )
 }
 
-const getStudentInGroupDataObject = (student, group) => {
-   let studentDataObject = {
+export const getStudentInGroupDataObject = (student, group) => {
+   const studentDataObject = {
       "First Name": student.firstName,
       "Last Name": student.lastName,
       Email: student.userEmail,
       University: (student.university && student.university.name) || "N/A",
    }
-   let studentCategoriesForGroup = getRegisteredGroupById(
+   const studentCategoriesForGroup = getRegisteredGroupById(
       student,
       group.groupId
    )
@@ -173,11 +168,11 @@ const getStudentInGroupDataObject = (student, group) => {
       group.categories
    ) {
       group.categories.forEach((category) => {
-         let studentCatValue = studentCategoriesForGroup.categories.find(
+         const studentCatValue = studentCategoriesForGroup.categories.find(
             (studCat) => studCat.id === category.id
          )
          if (studentCatValue) {
-            let studentSelectedOption = category.options.find(
+            const studentSelectedOption = category.options.find(
                (option) => option.id === studentCatValue.selectedValueId
             )
             if (studentSelectedOption) {
@@ -189,12 +184,12 @@ const getStudentInGroupDataObject = (student, group) => {
    return studentDataObject
 }
 
-const groupHasSpecializedCategories = (group) => {
+export const groupHasSpecializedCategories = (group) => {
    if (group.categories) {
-      let fieldOfStudyCategory = group.categories.find((category) =>
+      const fieldOfStudyCategory = group.categories.find((category) =>
          stringMatches(category.name, ["field of study", "Domaine d'étude"])
       )
-      let levelOfStudyCategory = group.categories.find((category) =>
+      const levelOfStudyCategory = group.categories.find((category) =>
          stringMatches(category.name, ["level of study"])
       )
       return fieldOfStudyCategory && levelOfStudyCategory
@@ -202,50 +197,52 @@ const groupHasSpecializedCategories = (group) => {
    return false
 }
 
-const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
-   let fieldOfStudyCategory = group.categories.find((category) =>
+export const getSpecializedStudentStats = (
+   registeredStudentsFromGroup,
+   group
+) => {
+   const fieldOfStudyCategory = group.categories.find((category) =>
       stringMatches(category.name, ["field of study", "Domaine d'étude"])
    )
-   let levelOfStudyCategory = group.categories.find((category) =>
+   const levelOfStudyCategory = group.categories.find((category) =>
       stringMatches(category.name, ["level of study"])
    )
-   let categoryStats = {
+   const categoryStats = {
       type: "specialized",
       id: fieldOfStudyCategory.id,
       options: {},
       names: levelOfStudyCategory.options.map((option) => option.name),
    }
    fieldOfStudyCategory.options.forEach((option) => {
-      let optionObj = {
+      const optionObj = {
          name: option.name,
          id: levelOfStudyCategory.id,
          entries: 0,
          subOptions: {},
       }
       levelOfStudyCategory.options.forEach((option2) => {
-         let option2Obj = {
+         optionObj.subOptions[option2.id] = {
             name: option2.name,
             entries: 0,
          }
-         optionObj.subOptions[option2.id] = option2Obj
       })
       categoryStats.options[option.id] = optionObj
    })
    registeredStudentsFromGroup.forEach((student) => {
-      let registeredGroup = getRegisteredGroupById(student, group.groupId)
-      let targetFieldOfStudyOption =
+      const registeredGroup = getRegisteredGroupById(student, group.groupId)
+      const targetFieldOfStudyOption =
          registeredGroup &&
          registeredGroup.categories.find(
             (category) => category.id === fieldOfStudyCategory.id
          )
-      let fieldOfStudyOptionId =
+      const fieldOfStudyOptionId =
          targetFieldOfStudyOption && targetFieldOfStudyOption.selectedValueId
-      let targetLevelOfStudyOption =
+      const targetLevelOfStudyOption =
          registeredGroup &&
          registeredGroup.categories.find(
             (category) => category.id === levelOfStudyCategory.id
          )
-      let levelOfStudyOptionId =
+      const levelOfStudyOptionId =
          targetLevelOfStudyOption && targetLevelOfStudyOption.selectedValueId
       if (
          categoryStats.options[fieldOfStudyOptionId] &&
@@ -266,8 +263,8 @@ const getSpecializedStudentStats = (registeredStudentsFromGroup, group) => {
    return categoryStats
 }
 
-const getAggregateCategories = (participants, currentGroup) => {
-   let categories = []
+export const getAggregateCategories = (participants, currentGroup) => {
+   const categories = []
    if (participants) {
       participants.forEach((user) => {
          const matched =
@@ -284,7 +281,7 @@ const getAggregateCategories = (participants, currentGroup) => {
    return categories
 }
 
-const getTypeOfStudents = (participants, currentCategory, group) => {
+export const getTypeOfStudents = (participants, currentCategory, group) => {
    const aggregateCategories = getAggregateCategories(participants, group)
    const flattenedGroupOptions = [...currentCategory.options].map((option) => {
       const entries = aggregateCategories.filter((category) =>
@@ -300,7 +297,7 @@ const getTypeOfStudents = (participants, currentCategory, group) => {
       id: currentCategory.groupId,
    }
 }
-const getNonSpecializedStats = (groupCategories, students, group) => {
+export const getNonSpecializedStats = (groupCategories, students, group) => {
    return {
       type: "non-specialized",
       noneSpecializedStats: groupCategories.map((category) =>
@@ -309,7 +306,10 @@ const getNonSpecializedStats = (groupCategories, students, group) => {
    }
 }
 
-const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
+export const getRegisteredStudentsStats = (
+   registeredStudentsFromGroup,
+   group
+) => {
    if (groupHasSpecializedCategories(group)) {
       return getSpecializedStudentStats(registeredStudentsFromGroup, group)
    }
@@ -320,12 +320,12 @@ const getRegisteredStudentsStats = (registeredStudentsFromGroup, group) => {
    )
 }
 
-const getRatingsAverage = (contentRatings) =>
+export const getRatingsAverage = (contentRatings) =>
    contentRatings.reduce((a, b) => {
       return a + b.rating || 0
    }, 0) / contentRatings.length
 
-const getDateString = (streamData) => {
+export const getDateString = (streamData) => {
    const dateString =
       streamData &&
       streamData.start &&
@@ -334,7 +334,7 @@ const getDateString = (streamData) => {
    return dateString || ""
 }
 
-const markStudentStatsInUse = (totalParticipants, groupData) => {
+export const markStudentStatsInUse = (totalParticipants, groupData) => {
    return totalParticipants.map((student) => {
       // Only modify that stats in use prop when it hasn't been assigned yet
       if (!student.statsInUse) {
@@ -346,9 +346,14 @@ const markStudentStatsInUse = (totalParticipants, groupData) => {
    })
 }
 
-const createNestedArrayOfTemplates = (arrayOfTemplates, chunkSize = 500) => {
-   let nestedArrayOfTemplates = []
-   let i, j, tempArray
+export const createNestedArrayOfTemplates = (
+   arrayOfTemplates,
+   chunkSize = 500
+) => {
+   const nestedArrayOfTemplates = []
+   let i
+   let j
+   let tempArray
    for (i = 0, j = arrayOfTemplates.length; i < j; i += chunkSize) {
       tempArray = arrayOfTemplates.slice(i, i + chunkSize)
       nestedArrayOfTemplates.push(tempArray)
@@ -356,7 +361,7 @@ const createNestedArrayOfTemplates = (arrayOfTemplates, chunkSize = 500) => {
    return nestedArrayOfTemplates
 }
 
-const generateReferralCode = () => {
+export const generateReferralCode = () => {
    // 1 generation per second (3600 signups per hour) would need ~32 years to have
    // a 1% chance of at least 1 collision https://zelark.github.io/nano-id-cc/
    const nanoid = customAlphabet(
@@ -367,10 +372,10 @@ const generateReferralCode = () => {
    return nanoid()
 }
 
-//Partition function
-function partition(array, filter) {
-   let pass = [],
-      fail = []
+// Partition function
+export function partition(array, filter) {
+   const pass = []
+   const fail = []
    array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e))
    return [pass, fail]
 }
@@ -380,7 +385,7 @@ function partition(array, filter) {
  *
  * @returns {string}
  */
-const isLocalEnvironment = () => {
+export const isLocalEnvironment = () => {
    return (
       process.env.FIREBASE_AUTH_EMULATOR_HOST ||
       process.env.FIRESTORE_EMULATOR_HOST ||
@@ -390,23 +395,31 @@ const isLocalEnvironment = () => {
    )
 }
 
-module.exports = {
-   setHeaders,
-   generateEmailData,
-   formatHour,
-   getLivestreamTimeInterval,
-   getStreamLink,
-   getArrayDifference,
-   makeRequestingGroupIdFirst,
-   studentBelongsToGroup,
-   convertPollOptionsObjectToArray,
-   getStudentInGroupDataObject,
-   getRegisteredStudentsStats,
-   getRatingsAverage,
-   getDateString,
-   markStudentStatsInUse,
-   createNestedArrayOfTemplates,
-   generateReferralCode,
-   isLocalEnvironment,
-   partition,
+export const logAxiosError = (message: string, error: any) => {
+   functions.logger.error(message)
+   functions.logger.error("Request", error?.toJSON())
+   if (error.response) {
+      // The request was made and the server responded with a status code
+      // that falls out of the range of 2xx
+      functions.logger.error(
+         "Error Response",
+         error.response.data,
+         error.response.status,
+         error.response.headers
+      )
+   } else if (error.request) {
+      // The request was made but no response was received
+      // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
+      // http.ClientRequest in node.js
+      functions.logger.error(
+         "Request made but no response was received",
+         error.request
+      )
+   } else {
+      // Something happened in setting up the request that triggered an Error
+      functions.logger.error(
+         "Something happened in setting up the request that triggered an Error",
+         error
+      )
+   }
 }
