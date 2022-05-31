@@ -12,7 +12,10 @@ import List from "@mui/material/List"
 import CheckIcon from "@mui/icons-material/Check"
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
 import React, { useMemo } from "react"
-import { careerSkillsLinkWithContext } from "../../../constants/contextInfoCareerSkills"
+import {
+   badgeName,
+   careerSkillsLinkWithContext,
+} from "../../../constants/contextInfoCareerSkills"
 import { ContextInfoMap } from "../../../constants/contextInfoCareerSkills"
 import { useAuth } from "../../../HOCs/AuthProvider"
 
@@ -21,7 +24,7 @@ interface Props {
 }
 
 const NoAccessView = ({ contextInfoMapKey }: Props) => {
-   const { badgeRequired } = useMemo(
+   const { badgeRequired, noAccessViewTitle } = useMemo(
       () => ContextInfoMap[contextInfoMapKey],
       [contextInfoMapKey]
    )
@@ -36,9 +39,8 @@ const NoAccessView = ({ contextInfoMapKey }: Props) => {
                   sx={{ color: "text.secondary", textAlign: "center" }}
                   variant="h6"
                >
-                  Oops! You {"don't"} have access to this feature yet..
+                  {noAccessViewTitle}
                </Typography>
-
                <Box sx={{ textAlign: "center" }} mb={3}>
                   <Image
                      src="/illustrations/undraw_access_denied_re_awnf.svg"
@@ -57,7 +59,7 @@ const NoAccessView = ({ contextInfoMapKey }: Props) => {
                      href={careerSkillsLinkWithContext(contextInfoMapKey)}
                      color="secondary"
                   >
-                     {badgeRequired.name} Badge Level {badgeRequired.level}
+                     {badgeName(badgeRequired)} badge
                   </Link>{" "}
                   to access this feature.
                </Typography>

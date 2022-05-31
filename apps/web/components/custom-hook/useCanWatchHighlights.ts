@@ -5,7 +5,7 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import { useInterval } from "react-use"
 
 const oneDayInMilliseconds = 24 * 60 * 60 * 1000
-const timeOut: number = oneDayInMilliseconds
+export const timeoutDuration: number = oneDayInMilliseconds
 
 const cookieName: string = "canWatchHighlights"
 interface Props {
@@ -13,13 +13,7 @@ interface Props {
    timoutDuration?: number
 }
 
-export interface CanWatchHighlightsProps {
-   canWatchAll: boolean
-   timeLeft: number
-}
-const useCanWatchHighlights = ({
-   timoutDuration: timeoutDuration = timeOut,
-}: Props = {}) => {
+const useCanWatchHighlights = () => {
    const { userPresenter, userData, isLoggedIn } = useAuth()
 
    /*

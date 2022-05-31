@@ -1,10 +1,13 @@
 import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { timeoutDuration } from "../components/custom-hook/useCanWatchHighlights"
+import { convertMillisecondsToTime } from "../util/CommonUtil"
 
 export type ContextInfoDetail = {
    badgeRequired: Badge
    message: string
    showRequirements: boolean
+   noAccessViewTitle: string
 }
 
 export const My_Recruiters_NoAccess = "My_Recruiters_NoAccess"
@@ -17,6 +20,7 @@ export const ContextInfoMap: Record<string, ContextInfoDetail> = {
          UserPresenter.saveRecruitersRequiredBadge()
       )}</strong> first.`,
       showRequirements: true,
+      noAccessViewTitle: "Oops! You don't have access to this feature yet...",
    },
    [Highlights_NoAccess]: {
       badgeRequired: UserPresenter.watchAllHighlightsRequiredBadge(),
@@ -24,10 +28,13 @@ export const ContextInfoMap: Record<string, ContextInfoDetail> = {
          UserPresenter.watchAllHighlightsRequiredBadge()
       )}</strong> first.`,
       showRequirements: true,
+      noAccessViewTitle: `You can only watch highlights once every ${convertMillisecondsToTime(
+         timeoutDuration
+      )}`,
    },
 }
 
-function badgeName(badge: Badge): string {
+export function badgeName(badge: Badge): string {
    return `${badge.name} Level ${badge.level}`
 }
 
