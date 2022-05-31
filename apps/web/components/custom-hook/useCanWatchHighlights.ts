@@ -4,10 +4,8 @@ import { getMillisecondsBetweenDates } from "../../util/CommonUtil"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useInterval } from "react-use"
 
-const oneDayInMilliseconds = 24 * 60 * 60 * 1000
-
 // How long you want to wait before you can watch again in milliseconds
-export const timeoutDuration: number = oneDayInMilliseconds
+export const timeoutDuration: number = 24 * 60 * 60 * 1000 // One Day In Milliseconds
 
 const cookieName: string = "canWatchHighlights"
 
