@@ -107,12 +107,11 @@ exports.updateUserDataAnalytcicsOnWrite =
    analytics.updateUserDataAnalyticsOnWrite
 
 // Recording
-exports.startRecordingLivestream = recording.startRecordingLivestream
-exports.stopRecordingLivestream = recording.stopRecordingLivestream
-exports.startRecordingBreakoutRoom = recording.startRecordingBreakoutRoom
-exports.stopRecordingBreakoutRoom = recording.stopRecordingBreakoutRoom
-exports.startRecordingLivestreamApi = recording.startRecordingLivestreamApi
-exports.stopRecordingLivestreamApi = recording.stopRecordingLivestreamApi
+exports.startRecordingLivestream_v2 = recording.startRecordingLivestream
+exports.stopRecordingLivestream_v2 = recording.stopRecordingLivestream
+exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
+exports.automaticallyRecordLivestreamBreakoutRoom =
+   recording.automaticallyRecordLivestreamBreakoutRoom
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =
