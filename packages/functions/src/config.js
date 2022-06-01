@@ -12,7 +12,9 @@ const config = {
 
 if (process.env.NODE_ENV !== "production") {
    // avoid real slack notifications during development/testing
-   config.slackWebhooks.livestreamAlerts = "http://localhost:9"
+   // all messages are sent to #test-slack-integrations
+   config.slackWebhooks.livestreamAlerts =
+      "https://hooks.slack.com/services/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"
 }
 
 module.exports = config
