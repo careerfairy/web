@@ -2,15 +2,15 @@ import React from "react"
 import GroupBannerSection from "../GroupBannerSection"
 
 const EmbedBannerSection = ({
-   color,
-   title,
-   value,
-   groupLogo,
-   handleChange,
-   backgroundColor,
-   backgroundImage,
-   tabsColor,
-   backgroundImageOpacity,
+   color = undefined,
+   title = undefined,
+   value = undefined,
+   groupLogo = undefined,
+   handleChange = undefined,
+   backgroundColor = undefined,
+   backgroundImage = undefined,
+   tabsColor = undefined,
+   backgroundImageOpacity = undefined,
 }) => {
    return (
       <GroupBannerSection
