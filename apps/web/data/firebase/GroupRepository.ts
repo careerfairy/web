@@ -5,8 +5,12 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
    getGroupsByIds(groupIds: string[]): Promise<Group[]>
+   getGroupById(groupId: string): Promise<Group>
    getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]>
    checkIfUserHasAdminGroups(userEmail: string): Promise<boolean>
+   cleanAndSerializeGroup(
+      group: Group
+   ): Omit<Group, "adminEmails" | "adminEmail">
 }
 
 class FirebaseGroupRepository implements IGroupRepository {
@@ -34,6 +38,29 @@ class FirebaseGroupRepository implements IGroupRepository {
             ...snapshot.data(),
             id: snapshot.id,
          })) as Group[]
+   }
+
+   cleanAndSerializeGroup(
+      group: Group
+   ): Omit<Group, "adminEmails" | "adminEmail"> {
+      const serializedGroup = { ...group }
+      delete serializedGroup.adminEmails
+      delete serializedGroup.adminEmail
+      return serializedGroup
+   }
+
+   async getGroupById(groupId: string): Promise<Group> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+      const groupSnapshot = await groupRef.get()
+      if (!groupSnapshot.exists) {
+         return null
+      }
+      return {
+         ...groupSnapshot.data(),
+         id: groupSnapshot.id,
+      } as Group
    }
 
    async getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]> {
