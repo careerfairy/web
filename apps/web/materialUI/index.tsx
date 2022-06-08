@@ -7,23 +7,26 @@ import React from "react"
 import { PaletteMode, Components } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 
-declare module "@mui/styles/defaultTheme" {
-   interface DefaultTheme extends Theme {
-      drawerWidth?: { small: string; medium: string }
-      boxShadows?: {
-         // color_y_blur_opacity
-         dark_8_25_10?: string
-         dark_15_60_15?: string
-         secondary_5_15_50?: string
-         grey_5_15?: string
-         primary_5_15_50?: string
-         dark_12_13?: string
-      }
-      dropShadows?: {
-         // color_y_blur_opacity
-         dark_6_12_12?: string
-      }
+interface CustomThemeProps {
+   drawerWidth?: { small: string; medium: string }
+   boxShadows?: {
+      // color_y_blur_opacity
+      dark_8_25_10?: string
+      dark_15_60_15?: string
+      secondary_5_15_50?: string
+      grey_5_15?: string
+      primary_5_15_50?: string
+      dark_12_13?: string
    }
+   dropShadows?: {
+      // color_y_blur_opacity
+      dark_6_12_12?: string
+   }
+   darkTextShadow?: string
+   whiteShadow?: string
+}
+declare module "@mui/styles/defaultTheme" {
+   interface DefaultTheme extends Theme, CustomThemeProps {}
 }
 
 declare module "@mui/material/Button" {
@@ -44,24 +47,7 @@ declare module "@mui/material" {
 }
 
 declare module "@mui/material/styles" {
-   interface ThemeOptions {
-      whiteShadow?: string
-      boxShadows?: {
-         // color_y_blur_opacity
-         dark_8_25_10?: string
-         grey_5_15?: string
-         dark_15_60_15?: string
-         secondary_5_15_50?: string
-         primary_5_15_50?: string
-         dark_12_13?: string
-      }
-      dropShadows?: {
-         // color_y_blur_opacity
-         dark_6_12_12?: string
-      }
-      drawerWidth?: { small?: string; medium?: string }
-      darkTextShadow?: string
-   }
+   interface ThemeOptions extends CustomThemeProps {}
 
    interface PaletteColor {
       gradient?: string

@@ -1,5 +1,3 @@
-import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import {
    Grid,
    ListItem,
@@ -9,20 +7,28 @@ import {
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import Image from "next/image"
-import Link from "../../common/Link"
+import Link from "../common/Link"
 import List from "@mui/material/List"
 import CheckIcon from "@mui/icons-material/Check"
 import RadioButtonUncheckedIcon from "@mui/icons-material/RadioButtonUnchecked"
-import React from "react"
-import { useAuth } from "../../../../HOCs/AuthProvider"
+import React, { useMemo } from "react"
 import {
+   badgeName,
    careerSkillsLinkWithContext,
-   My_Recruiters_NoAccess,
-} from "../../../../constants/contextInfoCareerSkills"
+} from "../../../constants/contextInfoCareerSkills"
+import { ContextInfoMap } from "../../../constants/contextInfoCareerSkills"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
-export const NoAccessMyRecruiters = () => {
+interface Props {
+   contextInfoMapKey: keyof typeof ContextInfoMap
+}
+
+const NoAccessView = ({ contextInfoMapKey }: Props) => {
+   const { badgeRequired, noAccessViewTitle } = useMemo(
+      () => ContextInfoMap[contextInfoMapKey],
+      [contextInfoMapKey]
+   )
    const { userStats, userData } = useAuth()
-   const requiredBadge: Badge = UserPresenter.saveRecruitersRequiredBadge()
 
    return (
       <>
@@ -33,9 +39,8 @@ export const NoAccessMyRecruiters = () => {
                   sx={{ color: "text.secondary", textAlign: "center" }}
                   variant="h6"
                >
-                  Oops! You {"don't"} have access to this feature yet..
+                  {noAccessViewTitle}
                </Typography>
-
                <Box sx={{ textAlign: "center" }} mb={3}>
                   <Image
                      src="/illustrations/undraw_access_denied_re_awnf.svg"
@@ -51,10 +56,10 @@ export const NoAccessMyRecruiters = () => {
                >
                   You need to unlock the{" "}
                   <Link
-                     href={careerSkillsLinkWithContext(My_Recruiters_NoAccess)}
+                     href={careerSkillsLinkWithContext(contextInfoMapKey)}
                      color="secondary"
                   >
-                     {requiredBadge.name} Badge Level {requiredBadge.level}
+                     {badgeName(badgeRequired)} badge
                   </Link>{" "}
                   to access this feature.
                </Typography>
@@ -69,7 +74,7 @@ export const NoAccessMyRecruiters = () => {
          <Grid container alignItems="center" justifyContent="center">
             <Grid item>
                <List>
-                  {requiredBadge.requirements.map((r, i) => (
+                  {badgeRequired.requirements.map((r, i) => (
                      <ListItem key={i}>
                         <ListItemIcon sx={{ minWidth: "30px" }}>
                            {r.isComplete(userData, userStats) ? (
@@ -90,3 +95,5 @@ export const NoAccessMyRecruiters = () => {
       </>
    )
 }
+
+export default NoAccessView

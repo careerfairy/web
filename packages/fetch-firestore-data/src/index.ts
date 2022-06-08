@@ -33,6 +33,8 @@ async function run(): Promise<void> {
    const collections = ["userData", "users"]
    h1Text(`Removing collections: ${collections.join(",")}`)
    await removeExistingCollections(collections)
+   h1Text(`Deleting Auth`)
+   await deleteAuth()
 
    h1Text(`Seeding data`)
    await createUser("carlos@careerfairy.io")
@@ -90,6 +92,16 @@ async function removeExistingCollections(collections: string[]) {
          `http://localhost:8080/emulator/v1/projects/${project}/databases/(default)/documents/${collections[i]}`
       )
    }
+}
+
+async function deleteAuth() {
+   const rcFile = await readFirebaseRcFile()
+   const project = rcFile.projects.default
+
+   debug("Starting deleting auth request", project)
+   await axios.delete(
+      `http://localhost:9099/emulator/v1/projects/${project}/accounts`
+   )
 }
 
 function readFirebaseRcFile() {

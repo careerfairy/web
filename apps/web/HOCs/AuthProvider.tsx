@@ -74,16 +74,15 @@ const AuthProvider = ({ children }) => {
 
    useFirestoreConnect(query)
 
-   const userData = useSelector(
-      ({ firestore }: RootState) => firestore.data["userProfile"]
+   const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
+   const isLoggedIn = Boolean(auth.isLoaded && !auth.isEmpty)
+   const userData = useSelector(({ firestore }: RootState) =>
+      isLoggedOut ? undefined : firestore.data["userProfile"]
    )
 
    const userStats = useSelector(
       ({ firestore }: RootState) => firestore.data["userStats"]
    )
-
-   const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
-   const isLoggedIn = Boolean(auth.isLoaded && !auth.isEmpty)
 
    useEffect(() => {
       // Check that initial route is OK
@@ -164,7 +163,7 @@ const AuthProvider = ({ children }) => {
       <AuthContext.Provider
          value={{
             authenticatedUser: auth,
-            userData: isLoggedOut ? undefined : userData,
+            userData: userData,
             isLoggedOut,
             isLoggedIn,
             userPresenter: userData ? new UserPresenter(userData) : undefined,
