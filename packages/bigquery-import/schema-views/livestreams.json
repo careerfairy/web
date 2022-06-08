@@ -1,0 +1,150 @@
+{
+   "fields": [
+      {
+         "fields": [
+            {
+               "name": "email",
+               "type": "string"
+            },
+            {
+               "name": "groupId",
+               "type": "string"
+            }
+         ],
+         "name": "author",
+         "type": "map"
+      },
+      {
+         "name": "company",
+         "type": "string"
+      },
+      {
+         "name": "companyId",
+         "type": "string"
+      },
+      {
+         "name": "summary",
+         "type": "string"
+      },
+      {
+         "name": "created",
+         "type": "timestamp"
+      },
+      {
+         "name": "start",
+         "type": "timestamp"
+      },
+      {
+         "name": "duration",
+         "type": "number"
+      },
+      {
+         "name": "groupIds",
+         "type": "stringified_map"
+      },
+      {
+         "name": "handRaiseActive",
+         "type": "boolean"
+      },
+      {
+         "name": "hasEnded",
+         "type": "boolean"
+      },
+      {
+         "name": "hasStarted",
+         "type": "boolean"
+      },
+      {
+         "name": "hasSentEmails",
+         "type": "boolean"
+      },
+      {
+         "name": "hidden",
+         "type": "boolean"
+      },
+      {
+         "name": "interestsIds",
+         "type": "stringified_map"
+      },
+      {
+         "name": "isRecording",
+         "type": "boolean"
+      },
+      {
+         "fields": [
+            {
+               "name": "code",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            },
+            {
+               "name": "shortName",
+               "type": "string"
+            }
+         ],
+         "name": "language",
+         "type": "map"
+      },
+      {
+         "name": "lastUpdated",
+         "type": "timestamp"
+      },
+      {
+         "fields": [
+            {
+               "name": "email",
+               "type": "string"
+            },
+            {
+               "name": "groupId",
+               "type": "string"
+            }
+         ],
+         "name": "lastUpdatedAuthorInfo",
+         "type": "map"
+      },
+      {
+         "name": "liveSpeakers",
+         "type": "stringified_map"
+      },
+      {
+         "name": "mode",
+         "type": "string"
+      },
+      {
+         "name": "test",
+         "type": "boolean"
+      },
+      {
+         "name": "title",
+         "type": "string"
+      },
+      {
+         "name": "type",
+         "type": "string"
+      },
+      {
+         "name": "participatingStudents",
+         "type": "stringified_map"
+      },
+      {
+         "name": "registeredUsers",
+         "type": "stringified_map"
+      },
+      {
+         "name": "talentPool",
+         "type": "stringified_map"
+      },
+      {
+         "name": "speakers",
+         "type": "stringified_map"
+      },
+      {
+         "name": "universities",
+         "type": "stringified_map"
+      }
+   ]
+}
