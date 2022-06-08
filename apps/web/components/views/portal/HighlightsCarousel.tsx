@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import HighlightItem from "./HighlightItem"
 import HighlightVideoDialog from "./HighlightVideoDialog"
 import Box from "@mui/material/Box"
@@ -6,6 +6,11 @@ import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
 import { HighLight } from "../../../types/Highlight"
 import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
+import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
+import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
+import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import { useRouter } from "next/router"
 
 const styles = {
    root: {
@@ -16,23 +21,69 @@ const HighlightsCarousel = ({
    serverSideHighlights,
    showHighlights,
 }: Props) => {
+   const { isLoggedOut, userPresenter } = useAuth()
    const {
       breakpoints: { up },
    } = useTheme()
    const [highlights] = useState<HighLight[]>(serverSideHighlights)
+   const { push, query } = useRouter()
+   const [
+      highlightsRestrictedDialogOpen,
+      handleOpenHighlightsRestrictedDialog,
+      handleCloseHighlightsRestrictedDialog,
+   ] = useDialogStateHandler()
    const isExtraSmall = useMediaQuery(up("xs"))
    const isSmall = useMediaQuery(up("sm"))
    const isMedium = useMediaQuery(up("md"))
    const isLarge = useMediaQuery(up("lg"))
+   const {
+      setUserTimeoutWithCookie,
+      handleCheckIfCanWatchHighlight,
+      timeoutDuration,
+      canWatchAllHighlights,
+   } = useCanWatchHighlights()
 
    const numSlides: number = useMemo(() => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
    }, [isExtraSmall, isSmall, isMedium, isLarge])
 
    const [videoUrl, setVideoUrl] = useState(null)
+
    const handleOpenVideoDialog = (videoUrl: string) => {
-      setVideoUrl(videoUrl)
+      const { canWatchAll } = handleCheckIfCanWatchHighlight()
+      if (canWatchAll) {
+         setVideoUrl(videoUrl)
+         setUserTimeoutWithCookie()
+      } else {
+         if (isLoggedOut) {
+            return push({
+               pathname: "/login",
+               query: {
+                  ...query,
+                  absolutePath: "/portal?openDialog=highlightsRestrictedDialog",
+               },
+            })
+         }
+         if (videoUrl) handleCloseVideoDialog()
+         handleOpenHighlightsRestrictedDialog()
+      }
    }
+
+   useEffect(() => {
+      if (
+         query.openDialog === "highlightsRestrictedDialog" &&
+         !userPresenter?.canWatchAllHighlights()
+      ) {
+         handleOpenHighlightsRestrictedDialog()
+         delete query.openDialog
+         void push({
+            pathname: "/portal",
+            query: {
+               ...query,
+            },
+         })
+      }
+   }, [query.openDialog, Boolean(userPresenter)])
 
    const handleCloseVideoDialog = () => {
       setVideoUrl(null)
@@ -46,6 +97,7 @@ const HighlightsCarousel = ({
          <CustomButtonCarousel
             numChildren={highlights.length}
             numSlides={numSlides}
+            key={canWatchAllHighlights.timeLeft}
             carouselProps={{
                autoPlay: true,
             }}
@@ -55,6 +107,7 @@ const HighlightsCarousel = ({
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
+                     locked={Boolean(!canWatchAllHighlights.canWatchAll)}
                   />
                </Box>
             ))}
@@ -63,6 +116,14 @@ const HighlightsCarousel = ({
             <HighlightVideoDialog
                videoUrl={videoUrl}
                handleClose={handleCloseVideoDialog}
+            />
+         )}
+         {highlightsRestrictedDialogOpen && (
+            <HighlightsRestrictedDialog
+               open={highlightsRestrictedDialogOpen}
+               handleClose={handleCloseHighlightsRestrictedDialog}
+               timeLeft={canWatchAllHighlights.timeLeft}
+               timeoutDuration={timeoutDuration}
             />
          )}
       </Box>
