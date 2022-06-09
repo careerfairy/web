@@ -129,7 +129,7 @@ export const RecruiterCard = ({
                   <Typography sx={styles.streamDetails}>
                      {recruiter.livestreamDetails.title ? (
                         <span>
-                           Saved from {recruiter.livestreamDetails.title}
+                           Saved from {recruiter.livestreamDetails.title}{" "}
                         </span>
                      ) : (
                         <span>Saved </span>
