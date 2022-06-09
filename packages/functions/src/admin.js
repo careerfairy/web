@@ -3,8 +3,12 @@ const { client } = require("./api/postmark")
 const { createNestedArrayOfTemplates } = require("./util")
 const { emailsToRemove } = require("./misc/emailsToRemove")
 
-exports.sendBasicTemplateEmail = functions.https.onCall(
-   async (data, context) => {
+exports.sendBasicTemplateEmail = functions
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 300,
+   })
+   .https.onCall(async (data, context) => {
       const {
          title,
          summary,
@@ -94,5 +98,4 @@ exports.sendBasicTemplateEmail = functions.https.onCall(
             )
          }
       }
-   }
-)
+   })
