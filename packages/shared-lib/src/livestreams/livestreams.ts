@@ -52,3 +52,46 @@ export interface Speaker extends Identifiable {
    position?: string
    rank?: number
 }
+
+export interface LivestreamEventPublicData {
+   summary?: string
+   company?: string
+   title?: string
+   id: string
+   start?: firebase.firestore.Timestamp
+   companyLogoUrl?: string
+   test?: boolean
+}
+
+export interface BreakoutRoom extends Identifiable {
+   companyLogoUrl?: string
+   test?: boolean
+   title?: string
+   start: firebase.firestore.Timestamp
+   hasStarted?: boolean
+   hasEnded?: boolean
+   liveSpeakers?: Speaker[]
+   index?: number
+   parentLivestream?: LivestreamEventPublicData
+}
+
+/**
+ * Public information about a livestream event
+ *
+ * Useful to save on relationship documents
+ * @param livestreamData
+ */
+export const pickPublicDataFromLivestream = (
+   livestreamData: LivestreamEvent
+): LivestreamEventPublicData => {
+   return {
+      id: livestreamData.id,
+      // we prefer null instead of undefined (firestore doesn't allow storing undefined values)
+      summary: livestreamData.summary ?? null,
+      company: livestreamData.company ?? null,
+      title: livestreamData.title ?? null,
+      start: livestreamData.start ?? null,
+      companyLogoUrl: livestreamData.companyLogoUrl ?? null,
+      test: livestreamData.test ?? false,
+   }
+}

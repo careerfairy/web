@@ -3,12 +3,16 @@ import firebaseApp from "./FirebaseInstance"
 import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types"
 import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams"
 import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamEventPublicData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import {
    LivestreamEventParsed,
    LivestreamEventSerialized,
 } from "../../types/event"
 import { RegisteredStudent } from "@careerfairy/shared-lib/dist/users"
+import { UserPublicData } from "@careerfairy/shared-lib/src/users/users"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -81,6 +85,12 @@ export interface ILivestreamRepository {
    getLivestreamRegisteredStudents(
       eventId: string
    ): Promise<RegisteredStudent[]>
+
+   heartbeat(
+      livestream: LivestreamEventPublicData,
+      userData: UserPublicData,
+      elapsedMinutes: number
+   ): Promise<void>
 }
 
 class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -91,6 +101,27 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
    ): LivestreamsDataParser {
       const docs = mapFirestoreDocuments<LivestreamEvent>(documentSnapshot)
       return new LivestreamsDataParser(docs).complementaryFields()
+   }
+
+   heartbeat(
+      livestream: LivestreamEventPublicData,
+      userData: UserPublicData,
+      elapsedMinutes: number
+   ): Promise<void> {
+      const data = {
+         id: userData.id,
+         livestreamId: livestream.id,
+         totalMinutes: firebase.firestore.FieldValue.increment(1),
+         minutes: firebase.firestore.FieldValue.arrayUnion(elapsedMinutes),
+         livestream,
+         user: userData,
+      }
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestream.id)
+         .collection("participatingStats")
+         .doc(userData.id)
+         .set(data, { merge: true })
    }
 
    listenToSingleEvent(

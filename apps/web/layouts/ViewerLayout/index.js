@@ -23,6 +23,7 @@ import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/use
 import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
 import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance"
+import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -266,6 +267,7 @@ const ViewerLayout = (props) => {
    }, [Boolean(userData), Boolean(currentLivestream)])
 
    useRewardLivestreamAttendance(currentLivestream)
+   useCountLivestreamAttendanceMinutes(currentLivestream)
 
    if (notAuthorized) {
       replace({
