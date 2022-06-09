@@ -16,6 +16,7 @@ import {
    LivestreamEvent,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import SessionStorageUtil from "../../util/SessionStorageUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2245,7 +2246,11 @@ class FirebaseService {
                      },
                      // We store the referral info so that it can be used by a cloud function
                      // that applies the rewards
-                     { referral: getReferralInformation() }
+                     { referral: getReferralInformation() },
+                     {
+                        // Store the utm params if they exist
+                        utm: SessionStorageUtil.getUTMParams(),
+                     }
                   )
                )
             })
