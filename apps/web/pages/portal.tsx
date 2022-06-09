@@ -2,7 +2,6 @@ import React from "react"
 import GeneralLayout from "layouts/GeneralLayout"
 import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
-// import FeaturedAndNextEvents from "../components/views/portal/FeaturedAndNextEvents";
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents"
 import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents"
@@ -13,14 +12,12 @@ import highlightRepo from "../data/firebase/HighlightRepository"
 import livestreamRepo from "../data/firebase/LivestreamRepository"
 import { mapServerSideStream } from "../util/serverUtil"
 import SEO from "../components/util/SEO"
-import { useRouter } from "next/router"
 
 const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
    const { authenticatedUser, userData } = useAuth()
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
-   const { pathname } = useRouter()
    return (
       <>
          <SEO
@@ -29,7 +26,6 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
                "To find the greatest virtual career events, use the CareerFairy Portal. Through our events, meet potential future colleagues live and land your dream job!"
             }
             title={"CareerFairy | Portal"}
-            canonical={`https://careerfairy.com${pathname}`}
          />
          <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
             <Container disableGutters>
@@ -38,7 +34,6 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
                      showHighlights={showHighlights}
                      serverSideHighlights={highlights}
                   />
-                  {/*<FeaturedAndNextEvents />*/}
                   {hasInterests && (
                      <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
                   )}
@@ -60,6 +55,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       highlightRepo.getHighlights(5),
       livestreamRepo.getUpcomingEvents(20),
    ])
+   // Parse
    return {
       props: {
          showHighlights,

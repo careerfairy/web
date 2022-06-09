@@ -1,6 +1,5 @@
 import SessionStorageUtil from "./SessionStorageUtil"
 import { QuerySnapshot } from "@firebase/firestore-types"
-import { LiveStreamEvent } from "../types/event"
 
 /**
  * Patch console.error() function to listen for Firestore connectivity issues

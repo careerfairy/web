@@ -1,9 +1,9 @@
 import useCollection from "./useCollection"
-import { LiveStreamEvent } from "../../types/event"
 import livestreamRepo, {
    LivestreamsDataParser,
 } from "../../data/firebase/LivestreamRepository"
 import { useMemo } from "react"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useListenToUpcomingStreams = (
    filterByGroupId?: string,
@@ -19,7 +19,7 @@ const useListenToUpcomingStreams = (
       return query
    }, [filterByGroupId])
 
-   let { data, isLoading } = useCollection<LiveStreamEvent>(
+   let { data, isLoading } = useCollection<LivestreamEvent>(
       upcomingEventsQuery,
       true
    )

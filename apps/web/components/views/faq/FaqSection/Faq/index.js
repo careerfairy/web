@@ -1,7 +1,6 @@
 import React from "react"
 import FaqItem from "./FaqItem"
 import makeStyles from "@mui/styles/makeStyles"
-import FaqNav from "../../FaqNav"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -13,7 +12,6 @@ function Faq(props) {
    const classes = useStyles()
    return (
       <div className={classes.root}>
-         <FaqNav />
          <div>
             {props.items.map((item, index) => (
                <FaqItem

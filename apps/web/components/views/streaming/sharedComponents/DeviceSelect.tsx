@@ -19,11 +19,10 @@ import {
    MediaControls,
 } from "../../../../types/streaming"
 import { Theme } from "@mui/system"
-import { useDispatch, useSelector } from "react-redux"
+import { useSelector } from "react-redux"
 import RootState from "../../../../store/reducers"
 import SoundLevelDisplay from "../../common/SoundLevelDisplay"
 import MicOffIcon from "@mui/icons-material/MicOff"
-import * as actions from "store/actions"
 
 const styles = {
    gridItemContent: {

@@ -7,6 +7,7 @@ export interface Group extends Identifiable {
    description: string
    logoUrl: string
    adminEmails: string[]
+   adminEmail?: string
 
    // optional
    categories: GroupCategory[]
@@ -17,6 +18,7 @@ export interface Group extends Identifiable {
    universityCode?: string
    universityId?: string
    universityName?: string
+   hidePrivateEventsFromEmbed?: boolean
 }
 
 export interface GroupCategory extends Identifiable {

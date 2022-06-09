@@ -29,6 +29,7 @@ import "../util/FirebaseUtils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
 import GoogleTagManager from "../HOCs/GoogleTagManager"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -135,6 +136,7 @@ function MyApp(props) {
    }
 
    useStoreReferralQueryParams()
+   useStoreUTMQueryParams()
 
    return (
       <CacheProvider value={emotionCache}>

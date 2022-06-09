@@ -5,10 +5,12 @@ import Image from "next/image"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import { HighLight } from "../../../types/Highlight"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
+import LockClockIcon from "@mui/icons-material/LockClock"
+import { sxStyles } from "../../../types/commonTypes"
 
 const itemSpacingSize = 14
 const mobileFactor = 1
-const styles = {
+const styles = sxStyles({
    root: {
       display: "flex",
       flexDirection: "column",
@@ -65,12 +67,15 @@ const styles = {
       placeItems: "center",
    },
    imageOverlay: {
-      background: "black",
+      background: (theme) => theme.palette.common.black,
       borderRadius: "50%",
       opacity: 0,
       transition: (theme) => theme.transitions.create(["opacity"]),
       position: "absolute",
       inset: 0,
+   },
+   imageOverlayLocked: {
+      opacity: 0.5,
    },
    thumbnailImage: {
       borderRadius: "50%",
@@ -101,10 +106,12 @@ const styles = {
          flex: 0.4,
       },
    },
-} as const
+})
+
 const HighlightItem = ({
-   highLight: { videoUrl, thumbnail, logo },
+   highLight: { videoUrl, thumbnail, logo, title },
    handleOpenVideoDialog,
+   locked,
 }: HighlightItemProps) => {
    return (
       <Box sx={styles.root}>
@@ -121,8 +128,18 @@ const HighlightItem = ({
                      src={getResizedUrl(thumbnail, "lg")}
                      component={Image}
                   />
-                  <Box className={"overlay"} sx={styles.imageOverlay} />
-                  <PlayIcon sx={styles.icon} />
+                  <Box
+                     className={"overlay"}
+                     sx={[
+                        styles.imageOverlay,
+                        locked && styles.imageOverlayLocked,
+                     ]}
+                  />
+                  {locked ? (
+                     <LockClockIcon sx={styles.icon} />
+                  ) : (
+                     <PlayIcon sx={styles.icon} />
+                  )}
                </Box>
             </Box>
          </Box>
@@ -130,7 +147,7 @@ const HighlightItem = ({
             <Box sx={styles.logoWrapper}>
                <Box>
                   <Image
-                     alt="logo"
+                     alt={title}
                      objectFit={"contain"}
                      layout="fill"
                      src={getResizedUrl(logo, "lg")}
@@ -145,6 +162,7 @@ const HighlightItem = ({
 interface HighlightItemProps {
    highLight: HighLight
    handleOpenVideoDialog: (videoUrl: string) => void
+   locked: boolean
 }
 
 export default HighlightItem

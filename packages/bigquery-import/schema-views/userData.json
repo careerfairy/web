@@ -1,0 +1,54 @@
+{
+   "fields": [
+      {
+         "name": "firstName",
+         "type": "string"
+      },
+      {
+         "name": "lastName",
+         "type": "string"
+      },
+      {
+         "name": "badges",
+         "type": "stringified_map"
+      },
+      {
+         "name": "interestsIds",
+         "type": "stringified_map"
+      },
+      {
+         "name": "groupIds",
+         "type": "stringified_map"
+      },
+      {
+         "name": "referralsCount",
+         "type": "number"
+      },
+      {
+         "name": "totalLivestreamInvites",
+         "type": "number"
+      },
+      {
+         "name": "isAdmin",
+         "type": "boolean"
+      },
+      {
+         "name": "unsubscribed",
+         "type": "boolean"
+      },
+      {
+         "fields": [
+            {
+               "name": "code",
+               "type": "string"
+            },
+            {
+               "name": "name",
+               "type": "string"
+            }
+         ],
+         "name": "university",
+         "type": "map"
+      }
+   ]
+}

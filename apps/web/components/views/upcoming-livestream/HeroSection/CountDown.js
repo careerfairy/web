@@ -21,7 +21,6 @@ import ShareOutlined from "@mui/icons-material/ShareOutlined"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { streamIsOld } from "../../../../util/CommonUtil"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import { grey } from "@mui/material/colors"
 
 const styles = {
    root: (theme) => ({
