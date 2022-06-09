@@ -64,3 +64,25 @@ export interface SavedRecruiter extends Identifiable {
 export interface RegisteredStudent extends UserData {
    dateRegistered: firebase.firestore.Timestamp
 }
+
+export interface UserPublicData {
+   id: string
+   firstName: string
+   lastName: string
+   badges?: string[]
+}
+
+/**
+ * Public information about a user
+ *
+ * Useful to save on relationship documents
+ * @param userData
+ */
+export const pickPublicDataFromUser = (userData: UserData): UserPublicData => {
+   return {
+      id: userData.id,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
+      badges: userData.badges || [],
+   }
+}

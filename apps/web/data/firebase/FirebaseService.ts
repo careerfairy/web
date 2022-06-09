@@ -12,6 +12,10 @@ import {
    getQueryStringFromUrl,
    getReferralInformation,
 } from "../../util/CommonUtil"
+import {
+   LivestreamEvent,
+   pickPublicDataFromLivestream,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2780,21 +2784,21 @@ class FirebaseService {
          .doc(mainStreamId)
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(livestreamRef).then((livestreamSnap) => {
-            const livestreamData = livestreamSnap.data()
-            const isTestStream = livestreamData.test
-            const companyLogo = livestreamData.companyLogoUrl || ""
+            const livestreamData = {
+               ...livestreamSnap.data(),
+               id: livestreamSnap.id,
+            } as LivestreamEvent
             const breakoutRoomRef = livestreamRef
                .collection("breakoutRooms")
                .doc()
             const newBreakoutRoom = this.buildBreakoutRoom(
                breakoutRoomRef.id,
-               isTestStream,
+               livestreamData,
                title,
-               companyLogo,
                false
             )
             transaction.set(breakoutRoomRef, newBreakoutRoom)
-            if (!isTestStream) {
+            if (!livestreamData.test) {
                // If the main stream isn't a test, we will then need secure tokens for each breakout room
                const breakoutTokenRef = breakoutRoomRef
                   .collection("tokens")
@@ -2864,7 +2868,9 @@ class FirebaseService {
       return await batch.commit()
    }
 
-   buildBreakoutRoom = (breakoutRoomId, test, title, companyLogo, index) => {
+   buildBreakoutRoom = (breakoutRoomId, livestreamData, title, index) => {
+      const test = livestreamData.test
+      const companyLogo = livestreamData.companyLogoUrl || ""
       return {
          start: this.getServerTimestamp(),
          id: breakoutRoomId,
@@ -2873,6 +2879,7 @@ class FirebaseService {
          test,
          companyLogo,
          title,
+         parentLivestream: pickPublicDataFromLivestream(livestreamData),
          ...(index && { index: index }),
       }
    }
@@ -2905,22 +2912,22 @@ class FirebaseService {
          .doc(livestreamId)
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(livestreamRef).then((livestreamSnap) => {
-            const livestreamData = livestreamSnap.data()
-            const isTestStream = livestreamData.test
-            const companyLogo = livestreamData.companyLogoUrl || ""
+            const livestreamData = {
+               ...livestreamSnap.data(),
+               id: livestreamSnap.id,
+            } as LivestreamEvent
             for (let i = 1; i <= numberOfRooms; i++) {
                const breakoutRoomRef = livestreamRef
                   .collection("breakoutRooms")
                   .doc()
                const newBreakoutRoom = this.buildBreakoutRoom(
                   breakoutRoomRef.id,
-                  isTestStream,
+                  livestreamData,
                   `Breakout Room ${i}`,
-                  companyLogo,
                   i
                )
                transaction.set(breakoutRoomRef, newBreakoutRoom)
-               if (!isTestStream) {
+               if (!livestreamData.test) {
                   // If the main stream isn't a test, we will then need secure tokens for each breakout room
                   const breakoutTokenRef = breakoutRoomRef
                      .collection("tokens")
