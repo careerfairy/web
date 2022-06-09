@@ -6,9 +6,7 @@ import { Divider, Tooltip, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import ResumeIcon from "@mui/icons-material/PictureAsPdf"
-import BadgeIcon from "./BadgeIcon"
 import BadgeButton from "./BadgeButton"
-import Link from "./Link"
 import { useRouter } from "next/router"
 const styles: StylesProps = {
    root: {

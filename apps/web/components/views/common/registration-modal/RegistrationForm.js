@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import { RegistrationContext } from "context/registration/RegistrationContext"
 import CategorySelect from "./steps/CategorySelect"
 import QuestionUpvote from "./steps/QuestionUpvote"
@@ -7,7 +7,6 @@ import TalentPoolJoin from "./steps/TalentPoolJoin"
 import RegistrationComplete from "./steps/RegistrationComplete"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import UserResumeSelect from "./steps/UserResumeSelect"
 

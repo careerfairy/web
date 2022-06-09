@@ -15,7 +15,6 @@ import StepConnector, {
    stepConnectorClasses,
 } from "@mui/material/StepConnector"
 import IconButton from "@mui/material/IconButton"
-import InfoIcon from "@mui/icons-material/Info"
 import { createStyles } from "@mui/styles"
 import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
 import Box from "@mui/material/Box"

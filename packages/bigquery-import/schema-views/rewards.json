@@ -1,0 +1,16 @@
+{
+   "fields": [
+      {
+         "name": "action",
+         "type": "string"
+      },
+      {
+         "name": "createdAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "seenByUser",
+         "type": "boolean"
+      }
+   ]
+}

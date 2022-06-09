@@ -13,7 +13,6 @@ import {
    Select,
    Tab,
    Tabs,
-   Typography,
 } from "@mui/material"
 import { colorsArray } from "../../../../util/colors"
 import { getRandomColor } from "../../../../helperFunctions/HelperFunctions"

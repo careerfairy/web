@@ -202,6 +202,12 @@ service cloud.firestore {
                 allow read: if true;
                 allow write: if true;
             }
+
+            match /participatingStats/{userId} {
+                allow read: if isCFAdmin();
+                allow write: if request.auth.token.email == userId;
+            }
+
             match /breakoutRoomsSettings/{breakoutRoomsSetting} {
                 allow read: if true;
                 allow write: if true;

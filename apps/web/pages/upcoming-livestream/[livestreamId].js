@@ -216,8 +216,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [stream.hasStarted])
 
    const registerButtonLabel = useMemo(() => {
-      if (authenticatedUser && registered) return "You're booked"
       if (isPastEvent) return "The event is over"
+      if (authenticatedUser && registered) return "You're booked"
 
       if (
          stream.maxRegistrants &&

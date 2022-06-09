@@ -5,7 +5,6 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import Link from "../../common/Link"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import Button from "@mui/material/Button"
-import { NoAccessMyRecruiters } from "./NoAccessMyRecruiters"
 import { RecruiterCard } from "./RecruiterCard"
 import Skeleton from "@mui/material/Skeleton"
 import Card from "@mui/material/Card"
@@ -14,6 +13,8 @@ import userRepo from "../../../../data/firebase/UserRepository"
 import { styles } from "../profileStyles"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { DefaultTheme } from "@mui/styles"
+import NoAccessView from "../../common/NoAccessView"
+import { Highlights_NoAccess } from "../../../../constants/contextInfoCareerSkills"
 
 const MyRecruitersTab = () => {
    const { userPresenter } = useAuth()
@@ -39,7 +40,9 @@ const MyRecruitersTab = () => {
             <RecruiterList userEmail={userPresenter.model.userEmail} />
          )}
 
-         {!userPresenter.canSaveRecruiters() && <NoAccessMyRecruiters />}
+         {!userPresenter.canSaveRecruiters() && (
+            <NoAccessView contextInfoMapKey={Highlights_NoAccess} />
+         )}
       </ContentCard>
    )
 }

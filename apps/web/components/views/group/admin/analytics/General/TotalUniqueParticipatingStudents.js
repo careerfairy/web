@@ -13,7 +13,6 @@ import VisibilityIcon from "@mui/icons-material/Visibility"
 import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext"
 import PercentageDisplay from "./common/PercentageDisplay"
 import makeStyles from "@mui/styles/makeStyles"
-import { green } from "@mui/material/colors"
 
 const useStyles = makeStyles((theme) => ({
    root: {

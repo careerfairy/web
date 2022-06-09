@@ -1,5 +1,3 @@
-import { v4 as uuidv4 } from "uuid"
-
 /**
  * Convert Poll Options Object To An Array of options
  * @param {object} pollOptionsObject - Takes in an options dictionary

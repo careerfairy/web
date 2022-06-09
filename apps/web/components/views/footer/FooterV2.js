@@ -105,7 +105,8 @@ const FooterV2 = ({
             </Box>
             <div>
                <Typography align="center">
-                  2021 - CareerFairy AG - Made in Zurich, Switzerland - Contact:
+                  {new Date().getFullYear()} - CareerFairy AG - Made in Zurich,
+                  Switzerland - Contact:
                   <Box
                      component="a"
                      sx={{

@@ -1,8 +1,6 @@
 import * as yup from "yup"
 import { URL_REGEX } from "../../../../util/constants"
 import { basicEmailTemplate } from "constants/images"
-import { getBaseUrl } from "../../../../helperFunctions/HelperFunctions"
-import DataAccessUtil from "../../../../../util/DataAccessUtil"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useMemo } from "react"
 

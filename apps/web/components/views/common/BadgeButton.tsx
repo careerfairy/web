@@ -15,9 +15,9 @@ const styles = {
 }
 
 const defaultActiveTooltip = (badge: Badge) =>
-   `You've been granted the ${badge.name} Level ${badge.level} Badge! (${badge.requirements[0].description}) Congrats!`
+   `You've been granted the ${badge?.name} Level ${badge?.level} Badge! (${badge?.requirements[0].description}) Congrats!`
 const defaultInactiveTooltip = (badge: Badge) =>
-   `You need to ${badge.requirements[0].description} to activate this badge.`
+   `You need to ${badge?.requirements[0].description} to activate this badge.`
 
 const BadgeButton = ({
    badge,
@@ -53,19 +53,19 @@ const BadgeButton = ({
          onClick={onClick}
          {...buttonProps}
       >
-         <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
+         <BadgeIcon badgeKey={badge?.key} {...badgeIconProps} />
       </Button>
    ) : (
       <Button
          startIcon={
-            showIcon && <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
+            showIcon && <BadgeIcon badgeKey={badge?.key} {...badgeIconProps} />
          }
          sx={buttonStyles}
          disableRipple={!onClick}
          onClick={onClick}
          {...buttonProps}
       >
-         {badge.name}
+         {badge?.name}
          {showBadgeSuffix && " Badge"}
       </Button>
    )
@@ -78,7 +78,7 @@ const BadgeButton = ({
             onClick={onClick}
             {...buttonProps}
          >
-            <BadgeIcon badgeKey={badge.key} {...badgeIconProps} />
+            <BadgeIcon badgeKey={badge?.key} {...badgeIconProps} />
          </IconButton>
       )
    }
