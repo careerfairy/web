@@ -11,6 +11,8 @@ import usePersistentInterval from "./usePersistentInterval"
 import livestreamRepo from "../../data/firebase/LivestreamRepository"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { useRouter } from "next/router"
+import { useSelector } from "react-redux"
+import RootState from "../../store/reducers"
 
 // Send a heartbeat event to the server every minute
 const HEARTBEAT_INTERVAL_SECONDS = 60
@@ -31,6 +33,11 @@ const useCountLivestreamAttendanceMinutes = (
       query: { livestreamId },
    } = useRouter()
 
+   const agoraRtcConnectionStatus = useSelector((state: RootState) => {
+      return state.stream.agoraState.rtcConnectionState
+   })
+   const { curState, reason } = agoraRtcConnectionStatus
+
    const intervalCallback = useCallback(() => {
       // Don't record the minutes if the user is not logged in
       if (!isLoggedIn) {
@@ -38,6 +45,14 @@ const useCountLivestreamAttendanceMinutes = (
       }
 
       try {
+         // This session should be a duplicated tab, we don't want to count the minutes twice
+         if (curState === "DISCONNECTED" && reason === "UID_BANNED") {
+            // another approach could be to proceed if the curState === "CONNECTED" or !== "DISCONNECTED"
+            // but might be useful to track the attendance time for such scenarios so that we can check their
+            // frequency with a histogram view
+            return
+         }
+
          const livestreamPresenter = new LivestreamPresenter(
             livestreamData as LivestreamEvent
          )
@@ -77,6 +92,8 @@ const useCountLivestreamAttendanceMinutes = (
       userData?.id,
       isLoggedIn,
       livestreamId,
+      curState,
+      reason,
    ])
 
    // runs the intervalCallback periodically
