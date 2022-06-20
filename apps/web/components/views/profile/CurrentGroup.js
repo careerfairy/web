@@ -228,7 +228,7 @@ const CurrentGroup = ({
                   </IconButton>
                   <CardActions>
                      {!isAdmin && (
-                        <Link href={`next-livestreams/${localGroup.groupId}`}>
+                        <Link href={`/next-livestreams/${localGroup.groupId}`}>
                            <Button
                               component="a"
                               fullWidth
