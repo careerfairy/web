@@ -6,7 +6,7 @@ export default {
     * Should be updated from time to time
     */
    BUCKET_FOLDER:
-      "Fri May 27 2022-23:18:05 GMT+0000 (Coordinated Universal Time)",
+      "Tue Jun 21 2022-07:18:04 GMT+0000 (Coordinated Universal Time)",
 
    BUCKET: "careerfairy-backup",
 
