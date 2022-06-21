@@ -12,7 +12,7 @@ import livestreamRepo from "../../data/firebase/LivestreamRepository"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { useRouter } from "next/router"
 import { useSelector } from "react-redux"
-import RootState from "../../store/reducers"
+import { rtcConnectionStateSelector } from "../../store/selectors/streamSelectors"
 
 // Send a heartbeat event to the server every minute
 const HEARTBEAT_INTERVAL_SECONDS = 60
@@ -33,9 +33,7 @@ const useCountLivestreamAttendanceMinutes = (
       query: { livestreamId },
    } = useRouter()
 
-   const agoraRtcConnectionStatus = useSelector((state: RootState) => {
-      return state.stream.agoraState.rtcConnectionState
-   })
+   const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
    const { curState, reason } = agoraRtcConnectionStatus
 
    const intervalCallback = useCallback(() => {
