@@ -19,6 +19,7 @@ import InternetIcon from "@mui/icons-material/Wifi"
 import ServerIcon from "@mui/icons-material/CheckCircleOutline"
 import RootState from "../../../../store/reducers"
 import { ConnectionState, NetworkQuality } from "agora-rtc-sdk-ng"
+import { rtcConnectionStateSelector } from "../../../../store/selectors/streamSelectors"
 
 const gradient = [
    "rgba(0,0,0,0.5)",
@@ -74,9 +75,7 @@ interface WifiIndicatorProps {
 }
 
 const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
-   const agoraRtcConnectionStatus = useSelector((state: RootState) => {
-      return state.stream.agoraState.rtcConnectionState
-   })
+   const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
    const proxyActive = useSelector((state: RootState) => {
       return state.stream.agoraState.sessionIsUsingCloudProxy
    })
