@@ -13,6 +13,7 @@ import { useRouter } from "next/router"
 import ScreenShareDeniedModal from "./ModalViews/ScreenShareDeniedModal"
 import { animateProfileIcon } from "../../../../../store/actions/streamActions"
 import { ANIMATE_PROFILE_ICON_AFTER_MS } from "../../../../../constants/streams"
+import { rtcConnectionStateSelector } from "../../../../../store/selectors/streamSelectors"
 
 interface Props {}
 
@@ -21,9 +22,7 @@ const AgoraStateHandler: FC<Props> = () => {
    const router = useRouter()
 
    const [view, setView] = useState(null)
-   const agoraRtcConnectionStatus = useSelector((state: RootState) => {
-      return state.stream.agoraState.rtcConnectionState
-   })
+   const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
    const agoraRtcError = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcError
    })

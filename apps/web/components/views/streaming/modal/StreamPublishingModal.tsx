@@ -30,6 +30,7 @@ import {
 } from "types/streaming"
 import RootState from "store/reducers"
 import DeviceSelect from "../sharedComponents/DeviceSelect"
+import { rtcConnectionStateSelector } from "../../../../store/selectors/streamSelectors"
 
 const styles = {
    dialogTitle: {
@@ -88,9 +89,7 @@ const StreamPublishingModal = memo(
       const { storeNewMediaSources } = useLocalStorageMediaSources()
       const dispatch = useDispatch()
 
-      const agoraRtcConnectionState = useSelector((state: RootState) => {
-         return state.stream.agoraState.rtcConnectionState
-      })
+      const agoraRtcConnectionState = useSelector(rtcConnectionStateSelector)
       const cameraDenied = useSelector((state: RootState) => {
          return state.stream.agoraState.deviceErrors.cameraDenied
       })
