@@ -15,6 +15,7 @@ import { rtcMessages } from "types/streaming"
 import OptionCard, { OptionCardProps } from "../common/OptionCard"
 // @ts-ignore
 import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams"
+import { rtcConnectionStateSelector } from "../../../../../../store/selectors/streamSelectors"
 
 interface Props {
    steps: OptionCardProps[]
@@ -24,9 +25,7 @@ const loadingTimeLimit = RTC_CLIENT_RECONNECT_LIMIT
 const ConnectionStateModal: FC<Props> = (props) => {
    const [showDebugPrompt, setShowDebugPrompt] = useState(false)
 
-   const agoraRtcConnectionStatus = useSelector(
-      (state: RootState) => state.stream.agoraState.rtcConnectionState
-   )
+   const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
 
    useEffect(() => {
       ;(function handlePromptUseDebug() {
