@@ -6,11 +6,9 @@ const {
 } = require("agora-access-token")
 
 const { admin } = require("./api/firestoreAdmin")
+const { agoraCredentials } = require("./api/agora")
 
-const appID = "53675bc6d3884026a72ecb1de3d19eb1"
-const appCertificate = "286a21681469490783ab75247de35f37"
-
-exports.fetchAgoraRtcToken = functions.https.onCall(async (data, context) => {
+exports.fetchAgoraRtcToken = functions.https.onCall(async (data) => {
    const { isStreamer, uid, sentToken, channelName, streamDocumentPath } = data
    const rtcRole = isStreamer ? RtcRole.PUBLISHER : RtcRole.SUBSCRIBER
    const expirationTimeInSeconds = 21600
@@ -37,8 +35,8 @@ exports.fetchAgoraRtcToken = functions.https.onCall(async (data, context) => {
          }
       }
       const rtcToken = RtcTokenBuilder.buildTokenWithUid(
-         appID,
-         appCertificate,
+         agoraCredentials.appID,
+         agoraCredentials.appCertificate,
          channelName,
          uid,
          rtcRole,
@@ -50,8 +48,8 @@ exports.fetchAgoraRtcToken = functions.https.onCall(async (data, context) => {
       }
    } else {
       const rtcToken = RtcTokenBuilder.buildTokenWithUid(
-         appID,
-         appCertificate,
+         agoraCredentials.appID,
+         agoraCredentials.appCertificate,
          channelName,
          uid,
          rtcRole,
@@ -64,7 +62,7 @@ exports.fetchAgoraRtcToken = functions.https.onCall(async (data, context) => {
    }
 })
 
-exports.fetchAgoraRtmToken = functions.https.onCall(async (data, context) => {
+exports.fetchAgoraRtmToken = functions.https.onCall(async (data) => {
    const { uid } = data
    const rtmRole = 0
    const expirationTimeInSeconds = 21600
@@ -76,8 +74,8 @@ exports.fetchAgoraRtmToken = functions.https.onCall(async (data, context) => {
     * https://docs.agora.io/en/Real-time-Messaging/API%20Reference/RTM_cpp/classagora_1_1rtm_1_1_i_rtm_service.html#a2433a0babbed76ab87084d131227346b
     */
    const rtmToken = RtmTokenBuilder.buildToken(
-      appID,
-      appCertificate,
+      agoraCredentials.appID,
+      agoraCredentials.appCertificate,
       uid,
       rtmRole,
       privilegeExpiredTs

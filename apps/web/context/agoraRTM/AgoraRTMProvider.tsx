@@ -9,8 +9,7 @@ import AgoraRTMContext, {
    EmoteType,
 } from "./AgoraRTMContext"
 import * as actions from "store/actions"
-
-const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1"
+import { agoraCredentials } from "../../data/AgoraInstance"
 
 interface Props {
    children: JSX.Element
@@ -33,7 +32,7 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
    }, [])
 
    const init = () => {
-      rtmClient.current = AgoraRTM.createInstance(AGORA_APP_ID, {
+      rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
          logFilter: AgoraRTM.LOG_FILTER_ERROR,
       })
    }
