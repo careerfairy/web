@@ -40,6 +40,7 @@ async function run(): Promise<void> {
    await createUser("carlos@careerfairy.io")
    await createUser("habib@careerfairy.io")
    await createUser("maximilian@careerfairy.io")
+   await createUser("goncalo@careerfairy.io")
 
    await emulatorExport()
 
