@@ -264,6 +264,10 @@ class FirebaseService {
       })
    }
 
+   deleteUserAccount = () => {
+      return this.functions.httpsCallable("deleteUserAccount")()
+   }
+
    // *** Auth API ***
 
    createUserWithEmailAndPassword = (email, password) => {
