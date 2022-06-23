@@ -65,7 +65,9 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
          await channel.join()
          channel.on("MemberCountUpdated", onMemberCountUpdated)
          rtmChannel.current = channel
-      } catch (error) {}
+      } catch (error) {
+         console.error(error)
+      }
    }
 
    const onChannelMessage = (message: RtmMessage, memberId: string) => {
@@ -86,7 +88,9 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
          try {
             const messageToSend = dispatch(actions.createEmote(emoteType))
             await rtmChannel.current.sendMessage(messageToSend as any)
-         } catch (e) {}
+         } catch (e) {
+            console.error(e)
+         }
       },
       [dispatch, rtmChannel.current]
    )
