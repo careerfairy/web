@@ -504,32 +504,34 @@ exports.onUserStatsUpdate = functions
       }
    })
 
-exports.deleteUserAccount = functions.https.onCall(async (data, context) => {
-   const { auth } = context
-   const {
-      token: { email: userEmail, uid: userId },
-   } = auth
+exports.deleteLoggedInUserAccount = functions.https.onCall(
+   async (data, context) => {
+      const { auth } = context
+      const {
+         token: { email: userEmail, uid: userId },
+      } = auth
 
-   if (!auth || !userEmail || !userId) {
-      // Throwing an HttpsError so that the client gets the error details.
-      throw new functions.https.HttpsError(
-         "failed-precondition",
-         "The function must be called while logged in."
-      )
+      if (!auth || !userEmail || !userId) {
+         // Throwing an HttpsError so that the client gets the error details.
+         throw new functions.https.HttpsError(
+            "failed-precondition",
+            "The function must be called while logged in."
+         )
+      }
+
+      try {
+         await admin.auth().deleteUser(userId)
+         await admin.firestore().collection("userData").doc(userEmail).delete()
+
+         functions.logger.info(
+            `User ${userEmail} with the id ${userId} was deleted successfully`
+         )
+      } catch (error) {
+         console.error(
+            `Error deleting user ${userEmail} with the id ${userId} in firestore`,
+            error
+         )
+         throw new functions.https.HttpsError(error.code, error.message)
+      }
    }
-
-   try {
-      await admin.auth().deleteUser(userId)
-      await admin.firestore().collection("userData").doc(userEmail).delete()
-
-      functions.logger.info(
-         `User ${userEmail} with the id ${userId} was deleted successfully`
-      )
-   } catch (error) {
-      console.error(
-         `Error deleting user ${userEmail} with the id ${userId} in firestore`,
-         error
-      )
-      throw new functions.https.HttpsError(error.code, error.message)
-   }
-})
+)
