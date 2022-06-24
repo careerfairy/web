@@ -9,6 +9,7 @@ import DangerZone from "./danger-zone/DangerZone"
 
 const UserData = () => {
    const { userData } = useAuth()
+   const { userEmail } = userData
 
    return (
       <Grid container spacing={2}>
@@ -21,7 +22,7 @@ const UserData = () => {
                </Grid>
                <Grid item xs={12} display={{ xs: "none", lg: "block" }}>
                   <ContentCard>
-                     <DangerZone userData={userData} />
+                     <DangerZone userEmail={userEmail} />
                   </ContentCard>
                </Grid>
             </Grid>
@@ -42,7 +43,7 @@ const UserData = () => {
          </Grid>
          <Grid item xs={12} display={{ xs: "block", lg: "none" }}>
             <ContentCard>
-               <DangerZone userData={userData} />
+               <DangerZone userEmail={userEmail} />
             </ContentCard>
          </Grid>
       </Grid>

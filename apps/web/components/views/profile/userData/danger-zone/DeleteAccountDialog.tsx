@@ -18,6 +18,14 @@ const styles: StylesProps = {
    },
 }
 
+const formValidator = ({ confirmationTxt }) => {
+   const errors: any = {}
+   if (confirmationTxt !== "delete my account") {
+      errors.confirmationTxt = "invalid"
+   }
+   return errors
+}
+
 type Props = {
    userEmail: string
    onAccountDeletion: () => Promise<void>
@@ -29,14 +37,6 @@ const DeleteAccountDialog = ({
    onClose,
    userEmail,
 }: Props): JSX.Element => {
-   const formValidator = ({ confirmationTxt }) => {
-      const errors: any = {}
-      if (confirmationTxt !== "delete my account") {
-         errors.confirmationTxt = "invalid"
-      }
-      return errors
-   }
-
    return (
       <GenericDialog
          title={"Delete Account"}
@@ -112,6 +112,9 @@ const DeleteAccountDialog = ({
                                  fullWidth
                                  variant="contained"
                                  color="primary"
+                                 data-testid={
+                                    "delete-account-confirmation-button"
+                                 }
                                  disabled={
                                     !!errors.confirmationTxt ||
                                     !dirty ||

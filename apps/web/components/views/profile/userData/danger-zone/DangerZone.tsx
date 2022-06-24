@@ -1,14 +1,13 @@
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import { useRouter } from "next/router"
 import { useDispatch } from "react-redux"
 
 import * as actions from "store/actions"
 import { Button, Grid, Typography } from "@mui/material"
-import { StylesProps } from "../../../../../types/commonTypes"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { StylesProps, sxStyles } from "../../../../../types/commonTypes"
 import DeleteAccountDialog from "./DeleteAccountDialog"
 
-const styles: StylesProps = {
+const styles: StylesProps = sxStyles({
    submitBtn: {
       margin: "unset",
    },
@@ -21,18 +20,18 @@ const styles: StylesProps = {
       fontWeight: "bold",
       marginBottom: 1,
    },
-}
+})
 
 type Props = {
-   userData: UserData
+   userEmail: string
 }
 
-const DangerZone = ({ userData: { userEmail } }: Props) => {
+const DangerZone = ({ userEmail }: Props) => {
    const [isDeleteOverlayOpen, setIsDeleteOverlayOpen] = useState(false)
    const router = useRouter()
    const dispatch = useDispatch()
 
-   const handleAccountDeletion = async () => {
+   const handleAccountDeletion = useCallback(async () => {
       try {
          await dispatch(actions.deleteUser())
 
@@ -42,7 +41,7 @@ const DangerZone = ({ userData: { userEmail } }: Props) => {
       } catch (e) {
          console.error(e)
       }
-   }
+   }, [dispatch, router])
 
    return (
       <Grid container spacing={2} sx={styles.section}>
@@ -64,6 +63,7 @@ const DangerZone = ({ userData: { userEmail } }: Props) => {
                color="error"
                sx={styles.submitBtn}
                onClick={() => setIsDeleteOverlayOpen(true)}
+               data-testid={"delete-account-button"}
             >
                {"Delete Account"}
             </Button>
@@ -72,6 +72,7 @@ const DangerZone = ({ userData: { userEmail } }: Props) => {
                   userEmail={userEmail}
                   onAccountDeletion={handleAccountDeletion}
                   onClose={setIsDeleteOverlayOpen}
+                  data-testid={"delete-account-dialog"}
                />
             )}
          </Grid>

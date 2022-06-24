@@ -265,7 +265,7 @@ class FirebaseService {
    }
 
    deleteUserAccount = () => {
-      return this.functions.httpsCallable("deleteUserAccount")()
+      return this.functions.httpsCallable("deleteLoggedInUserAccount")()
    }
 
    // *** Auth API ***

@@ -8,8 +8,9 @@ import {
    Typography,
 } from "@mui/material"
 import React from "react"
+import { StylesProps, sxStyles } from "../../../types/commonTypes"
 
-const styles = {
+const styles: StylesProps = sxStyles({
    title: {
       textTransform: "uppercase",
       fontWeight: "800",
@@ -18,7 +19,7 @@ const styles = {
       fontSize: "1rem",
       mb: 3,
    },
-} as const
+})
 
 type Props = {
    onClose: () => void
