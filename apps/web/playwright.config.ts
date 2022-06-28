@@ -15,18 +15,40 @@ const chromium = {
    name: "chromium",
    use: {
       ...devices["Desktop Chrome"],
+      permissions: ["camera", "microphone"],
+      launchOptions: {
+         // https://webrtc.org/getting-started/testing
+         args: [
+            "--use-fake-ui-for-media-stream", // avoids the need to grant camera/microphone permissions
+            "--use-fake-device-for-media-stream", // feeds a test pattern to getUserMedia() instead of live camera input
+            "--mute-audio",
+         ],
+      },
    },
 }
 const firefox = {
    name: "firefox",
    use: {
       ...devices["Desktop Firefox"],
+      launchOptions: {
+         args: ["--use-test-media-devices"],
+         firefoxUserPrefs: {
+            "media.navigator.streams.fake": true,
+            "media.navigator.permission.disabled": true,
+         },
+      },
    },
 }
 const webkit = {
    name: "webkit",
    use: {
       ...devices["Desktop Safari"],
+      launchOptions: {
+         args: [
+            "--enable-mock-capture-devices=true",
+            "--enable-media-stream=true",
+         ],
+      },
    },
 }
 const getBrowserProjects = (type: string): PlaywrightTestConfig["projects"] => {

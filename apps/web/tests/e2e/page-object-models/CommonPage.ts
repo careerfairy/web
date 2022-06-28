@@ -1,8 +1,9 @@
-import { Locator, Page } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 export class CommonPage {
-   constructor(protected readonly page: Page) {}
+   constructor(public readonly page: Page) {}
 
    exactText(str: string) {
       return this.page.locator(`text="${str}"`)
@@ -10,6 +11,11 @@ export class CommonPage {
 
    text(str: string) {
       return this.page.locator(`text=${str}`)
+   }
+
+   assertTextIsVisible(text: string, exact: boolean = true) {
+      const locatorFn = exact ? "exactText" : "text"
+      return expect(this[locatorFn](text)).toBeVisible()
    }
 
    async resilientClick(
@@ -86,6 +92,23 @@ export class CommonPage {
       } catch {
          // @ts-ignore
          await locator.evaluate((node) => (node.checked = check))
+      }
+   }
+
+   // Multiple pages might need to fill the group questions
+   // when joining a livestream event
+   async selectRandomCategoriesFromGroup(group: Group) {
+      for (let category of group.categories) {
+         await this.page
+            .locator(`text=New!​${category.name} >> div[role="button"]`)
+            .click()
+
+         const randomOption =
+            category.options[
+               Math.floor(Math.random() * category.options.length)
+            ]
+
+         await this.page.locator(`[data-value="${randomOption.id}"]`).click()
       }
    }
 }

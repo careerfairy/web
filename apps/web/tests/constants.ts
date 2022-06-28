@@ -11,3 +11,12 @@ export const credentials = {
    wrongLastName: "123Smith",
    correctUniversityCountry: "Switzerland",
 }
+
+export const streaming = {
+   streamer: {
+      firstName: "John",
+      lastName: "Smith",
+      occupation: "Software Engineer",
+      linkedin: "https://linkedin.com/in/your-profile",
+   },
+}

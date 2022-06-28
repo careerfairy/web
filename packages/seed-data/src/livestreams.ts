@@ -22,6 +22,8 @@ interface LivestreamSeed {
       livestreamId: string,
       subCollections?: string[]
    ): Promise<LivestreamEventWithSubcollections>
+
+   generateSecureToken(livestreamId: string): Promise<string>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
@@ -154,6 +156,19 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       await firestore.collection("livestreams").doc(data.id).set(data)
 
       return data
+   }
+
+   async generateSecureToken(livestreamId: string): Promise<string> {
+      const token = uuidv4()
+      await firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("tokens")
+         .doc("secureToken")
+         .set({
+            value: token,
+         })
+      return token
    }
 }
 
