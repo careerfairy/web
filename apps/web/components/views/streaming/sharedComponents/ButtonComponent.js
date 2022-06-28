@@ -286,6 +286,7 @@ const ButtonComponent = ({
                                     theme.palette.mode === "dark",
                               }),
                            },
+                           "data-testid": `streaming-${action.name}`,
                            disabled: action.disabled,
                         }}
                      />

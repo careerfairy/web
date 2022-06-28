@@ -401,7 +401,9 @@ const QuestionContainer = memo(
                      </div>
                   )}
                   <div className={classes.upVotes}>
-                     <span>{question.votes}</span>
+                     <span data-testid={"streaming-question-votes"}>
+                        {question.votes}
+                     </span>
                      <ThumbUpRoundedIcon
                         color="inherit"
                         style={{ verticalAlign: "text-top" }}

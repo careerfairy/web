@@ -35,7 +35,14 @@ const test = base.extend<{
       await use(streamerPage)
    },
    viewerPage: async ({ context, page, user }, use) => {
-      const viewerPage = new ViewerPage(await context.newPage())
+      const viewerTabPage = await context.newPage()
+
+      // increase timeout to find out elements because the streaming synchronization on
+      // github ci is slow
+      page.setDefaultTimeout(10000)
+      viewerTabPage.setDefaultTimeout(10000)
+
+      const viewerPage = new ViewerPage(viewerTabPage)
 
       await use(viewerPage)
    },
@@ -100,47 +107,28 @@ test.describe("Streaming Journey", () => {
 
       await viewerPage.open(livestream.id)
 
-      const question = "My viewer question"
       // Viewer asks a question
-      await viewerPage.page.locator("text=Add a Question").click()
-      await viewerPage.page
-         .locator('[placeholder="Your question goes here"]')
-         .click()
-      await viewerPage.page
-         .locator('[placeholder="Your question goes here"]')
-         .fill(question)
-      await viewerPage.page.locator("text=Submit").click()
+      const question = "My viewer question"
+      await viewerPage.askQuestion(question)
 
+      await viewerPage.page.pause()
       // Streamer should see the question
-      await streamerPage.page
-         .locator("text=Hand RaisePollsQ&A >> #interaction-selector-action-3")
-         .click()
-      await expect(streamerPage.page.locator("text=" + question)).toBeVisible()
-      await expect(
-         await streamerPage.page.locator(
-            '#scrollable-container span:has-text("0")'
-         )
-      ).toBeVisible()
+      await streamerPage.clickQuestions()
+      await expect(streamerPage.exactText(question)).toBeVisible()
+      await expect(streamerPage.questionVotesLocator).toBeVisible()
 
+      // Streamer answers with a reaction
       const reaction = "Streamer reaction to question"
-      await streamerPage.page
-         .locator('[placeholder="Send a reaction\\.\\.\\."]')
-         .fill(reaction)
-      await streamerPage.page
-         .locator('[placeholder="Send a reaction\\.\\.\\."]')
-         .press("Enter")
+      await streamerPage.sendAQuestionReaction(reaction)
 
+      // Viewer should see the reaction
       await expect(viewerPage.exactText("1 reaction")).toBeVisible()
       await expect(viewerPage.exactText(reaction)).toBeVisible()
 
-      // viewer upvotes the question
-      await expect(
-         streamerPage.page.locator("#scrollable-container >> text=0")
-      ).toBeVisible()
-      await viewerPage.page.locator('button:has-text("UPVOTE")').click()
-      await expect(
-         streamerPage.page.locator('#scrollable-container span:has-text("1")')
-      ).toBeVisible()
+      // viewer up votes the question
+      await expect(viewerPage.questionVotesLocator).toBeVisible()
+      await viewerPage.upvoteQuestion()
+      await expect(viewerPage.questionVotesLocator).toContainText("1")
    })
 
    test("chat messages between streamer and viewer", async ({
@@ -154,38 +142,20 @@ test.describe("Streaming Journey", () => {
 
       // streamer posts a chat message
       const message = "First chat entry"
-      await streamerPage.page
-         .locator('div[role="button"]:has-text("0Chat")')
-         .click()
-      await streamerPage.page
-         .locator('[placeholder="Post in the chat\\.\\.\\."]')
-         .click()
-      await streamerPage.page
-         .locator('[placeholder="Post in the chat\\.\\.\\."]')
-         .fill(message)
-      await streamerPage.page
-         .locator('[placeholder="Post in the chat\\.\\.\\."]')
-         .press("Enter")
+      await streamerPage.openChat()
+      await streamerPage.sendChatMessage(message)
 
       // viewer receives the message
-      await viewerPage.page
-         .locator('div[role="button"]:has-text("1Chat")')
-         .click()
-      await expect(
-         viewerPage.page.locator(`text=${message}Streamer`)
-      ).toBeVisible()
+      await viewerPage.openChat(1)
+      await expect(viewerPage.text(`${message}Streamer`)).toBeVisible()
 
       // viewer answers
       const response = "Viewer Response"
-      await viewerPage.page
-         .locator('[placeholder="Post in the chat\\.\\.\\."]')
-         .fill(response)
-      await viewerPage.page
-         .locator('[placeholder="Post in the chat\\.\\.\\."]')
-         .press("Enter")
+      await viewerPage.sendChatMessage(response)
 
+      // streamer receives the response
       await expect(
-         streamerPage.page.locator(`text=${response}${user.firstName}`)
+         streamerPage.text(`${response}${user.firstName}`)
       ).toBeVisible()
    })
 
@@ -194,56 +164,39 @@ test.describe("Streaming Journey", () => {
 
       await viewerPage.open(livestream.id)
 
-      await streamerPage.page
-         .locator('text=Hand RaisePollsQ&A >> button[role="menuitem"]')
-         .nth(2)
-         .click()
-      await streamerPage.page.locator("text=Create Poll").click()
-      await streamerPage.page
-         .locator(
-            '[placeholder="Write down your question or poll to your audience"]'
-         )
-         .fill("My first poll")
-      await streamerPage.page
-         .locator(
-            'text=Option 1Option 1 >> [placeholder="Write down your option"]'
-         )
-         .fill("First answer")
-      await streamerPage.page
-         .locator(
-            'text=Option 2Option 2 >> [placeholder="Write down your option"]'
-         )
-         .fill("Second answer")
-      await streamerPage.page
-         .locator('div[role="dialog"] >> text=Create Poll')
-         .click()
-      await streamerPage.page.locator("text=Ask the Audience Now").click()
+      const poll = {
+         question: "My first poll",
+         option1: "First answer",
+         option2: "Second answer",
+      }
+
+      // Streamer creates the poll
+      await streamerPage.clickPolls()
+      await streamerPage.clickCreatePoll()
+      await streamerPage.fillPollDialog(
+         poll.question,
+         poll.option1,
+         poll.option2
+      )
+      await streamerPage.askQuestionToTheAudience()
 
       // viewer sees the poll and answers
-      await expect(viewerPage.page.locator("text=My first poll")).toBeVisible()
-      await viewerPage.page.locator('button:has-text("First answer")').click()
+      await expect(viewerPage.exactText(poll.question)).toBeVisible()
+      await viewerPage.votePollAnswer(poll.option1)
 
       // streamer sees the answer
       await expect(
          streamerPage.page.locator(
-            'div[role="button"]:has-text("First answer [1 Vote]")'
+            `div[role="button"]:has-text("${poll.option1} [1 Vote]")`
          )
       ).toBeVisible()
 
       // end poll
       // navigate away and back to polls
-      await streamerPage.page
-         .locator('text=Hand RaisePollsQ&A >> button[role="menuitem"]')
-         .nth(3)
-         .click()
-      await streamerPage.page
-         .locator('text=Hand RaisePollsQ&A >> button[role="menuitem"]')
-         .nth(2)
-         .click()
-      await streamerPage.page.locator("text=Close Poll").click()
-      await expect(
-         viewerPage.page.locator("text=No current poll")
-      ).toBeVisible()
+      await streamerPage.clickHandRaise()
+      await streamerPage.clickPolls()
+      await streamerPage.closePoll()
+      await expect(viewerPage.exactText("No current poll")).toBeVisible()
    })
 
    test("browser becomes offline, reconnect dialog shows up", async ({
@@ -258,31 +211,21 @@ test.describe("Streaming Journey", () => {
       await streamerPage.page.context().setOffline(true)
 
       // dialog with a loading spinner should show up
-      await expect(
-         viewerPage.page.locator(
-            "text=It seems like the connection got interrupted. Attempting to reconnect..."
-         )
-      ).toBeVisible()
-      await expect(
-         streamerPage.page.locator(
-            "text=It seems like the connection got interrupted. Attempting to reconnect..."
-         )
-      ).toBeVisible()
+      await viewerPage.assertConnectionInterruptedDialogOpens()
+      await streamerPage.assertConnectionInterruptedDialogOpens()
 
       // after some time we have the button to refresh the page
       await expect(
-         streamerPage.page.locator(
-            "text=We're having trouble connecting you with CareerFairy:"
-         )
+         streamerPage.connectionInterruptedTroubleMessageLocator
       ).toBeVisible({ timeout: 15000 })
       await expect(
-         streamerPage.page.locator("text=Click here to refresh once done")
+         streamerPage.connectionInterruptedTroubleRefreshMessageLocator
       ).toBeVisible()
 
       // re-connect the browser, the dialog should disappear
       await streamerPage.page.context().setOffline(false)
       await expect(
-         streamerPage.page.locator("text=Click here to refresh once done")
+         streamerPage.connectionInterruptedTroubleRefreshMessageLocator
       ).not.toBeVisible()
    })
 
@@ -322,7 +265,7 @@ test.describe("Streaming Journey", () => {
       await viewerPage.open(livestream.id)
       await viewerPage.selectRandomCategoriesFromGroup(group)
 
-      await viewerPage.page.locator("text=Enter event").click()
+      await viewerPage.enterEvent()
       await viewerPage.assertStreamerDetailsExist()
    })
 })

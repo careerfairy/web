@@ -8,6 +8,25 @@ import { expect } from "@playwright/test"
  * /streaming/:id/viewer
  */
 class StreamingPage extends CommonPage {
+   public questionVotesLocator = this.page.locator(
+      '[data-testid="streaming-question-votes"]'
+   )
+
+   public connectionInterruptedTroubleMessageLocator = this.page.locator(
+      "text=We're having trouble connecting you with CareerFairy:"
+   )
+   public connectionInterruptedTroubleRefreshMessageLocator = this.page.locator(
+      "text=Click here to refresh once done"
+   )
+
+   public assertConnectionInterruptedDialogOpens() {
+      return expect(
+         this.page.locator(
+            "text=It seems like the connection got interrupted. Attempting to reconnect..."
+         )
+      ).toBeVisible()
+   }
+
    public assertWaitingForStreamerText() {
       return this.assertTextIsVisible("Waiting for streamer")
    }
@@ -16,6 +35,42 @@ class StreamingPage extends CommonPage {
       const streamerName = `${streaming.streamer.firstName} ${streaming.streamer.lastName}`
       await expect(this.exactText(streamerName)).toBeVisible()
       return expect(this.exactText(streaming.streamer.occupation)).toBeVisible()
+   }
+
+   public clickHandRaise() {
+      return this.page.locator('[data-testid="streaming-Hand Raise"]').click()
+   }
+
+   public clickQuestions() {
+      return this.page.locator('[data-testid="streaming-Q\\&A"]').click()
+   }
+
+   public clickPolls() {
+      return this.page.locator('[data-testid="streaming-Polls"]').click()
+   }
+
+   public async sendAQuestionReaction(reactionMessage: string) {
+      await this.page
+         .locator('[placeholder="Send a reaction\\.\\.\\."]')
+         .fill(reactionMessage)
+      return this.page
+         .locator('[placeholder="Send a reaction\\.\\.\\."]')
+         .press("Enter")
+   }
+
+   public openChat(expectedNotifications: number = 0) {
+      return this.page
+         .locator(`div[role="button"]:has-text("${expectedNotifications}Chat")`)
+         .click()
+   }
+
+   public async sendChatMessage(message: string) {
+      const locator = this.page.locator(
+         '[placeholder="Post in the chat\\.\\.\\."]'
+      )
+      await locator.click()
+      await locator.fill(message)
+      return locator.press("Enter")
    }
 }
 
@@ -34,6 +89,41 @@ export class StreamerPage extends StreamingPage {
             token ? queryString : ""
          }`
       )
+   }
+
+   public clickCreatePoll() {
+      return this.page.locator("text=Create Poll").click()
+   }
+
+   public async fillPollDialog(
+      question: string,
+      option1: string,
+      option2: string
+   ) {
+      await this.page
+         .locator(
+            '[placeholder="Write down your question or poll to your audience"]'
+         )
+         .fill(question)
+      await this.page
+         .locator(
+            'text=Option 1Option 1 >> [placeholder="Write down your option"]'
+         )
+         .fill(option1)
+      await this.page
+         .locator(
+            'text=Option 2Option 2 >> [placeholder="Write down your option"]'
+         )
+         .fill(option2)
+      return this.page.locator('div[role="dialog"] >> text=Create Poll').click()
+   }
+
+   public askQuestionToTheAudience() {
+      return this.page.locator("text=Ask the Audience Now").click()
+   }
+
+   public closePoll() {
+      return this.page.locator("text=Close Poll").click()
    }
 
    public async sharePDF() {
@@ -118,5 +208,22 @@ export class ViewerPage extends StreamingPage {
 
    public open(livestreamId: string) {
       return this.page.goto(`/streaming/${livestreamId}/viewer`)
+   }
+
+   public async askQuestion(question: string) {
+      await this.page.locator("text=Add a Question").click()
+      await this.page.locator('[placeholder="Your question goes here"]').click()
+      await this.page
+         .locator('[placeholder="Your question goes here"]')
+         .fill(question)
+      return this.page.locator("text=Submit").click()
+   }
+
+   public upvoteQuestion() {
+      return this.page.locator('button:has-text("UPVOTE")').click()
+   }
+
+   public votePollAnswer(answer: string) {
+      return this.page.locator(`button:has-text("${answer}")`).click()
    }
 }
