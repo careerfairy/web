@@ -42,11 +42,12 @@ const test = base.extend<{
 })
 
 test.describe("Streaming Journey", () => {
-   // todo: enable firefox and test
-   // skip safari browser for all tests
+   // Only run those tests on chromium
+   // Firefox headless (macos) doesn't seem to load the camera/mic
+   // webkit (safari) has an open issue: https://github.com/microsoft/playwright/issues/2973
    test.skip(
       ({ browserName }) => browserName !== "chromium",
-      "Safari browser support for webrtc tests is not great atm, skipping."
+      "Safari/Firefox browser support for webrtc tests is not great atm, skipping."
    )
 
    test("streamer is able to join and viewer sees him", async ({
@@ -326,7 +327,8 @@ test.describe("Streaming Journey", () => {
    })
 })
 
-// assert agora logs for publish / subscribe events
+// test hand raise
+// test breakout room
 
 async function setupStreamer(
    streamerPage: StreamerPage,

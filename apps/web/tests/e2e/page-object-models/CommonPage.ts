@@ -111,6 +111,10 @@ export class CommonPage {
          await this.page.locator(`[data-value="${randomOption.id}"]`).click()
       }
    }
+
+   public enterEvent() {
+      return this.exactText("Enter event").click()
+   }
 }
 
 const promiseTimeout = (promise, timeoutInMilliseconds) => {

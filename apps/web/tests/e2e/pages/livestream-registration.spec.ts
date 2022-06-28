@@ -150,12 +150,14 @@ test("livestream has already started, confirm the redirection without any regist
    browserName,
 }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { livestream } = await setupData({}, {}, "createLive")
+   const { livestream, group } = await setupData({}, {}, "createLive")
 
    await login(page)
 
    // open page
    await livestreamPage.open(livestream.id)
+   await livestreamPage.selectRandomCategoriesFromGroup(group)
+   await livestreamPage.enterEvent()
 
    // https://github.com/microsoft/playwright/issues/13640
    await sleep(500)

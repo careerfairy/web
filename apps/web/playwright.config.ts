@@ -31,7 +31,7 @@ const firefox = {
    use: {
       ...devices["Desktop Firefox"],
       launchOptions: {
-         args: ["--use-test-media-devices"],
+         args: ["--use-test-media-devices", "--quiet"],
          firefoxUserPrefs: {
             "media.navigator.streams.fake": true,
             "media.navigator.permission.disabled": true,
