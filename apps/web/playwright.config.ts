@@ -43,12 +43,6 @@ const webkit = {
    name: "webkit",
    use: {
       ...devices["Desktop Safari"],
-      launchOptions: {
-         args: [
-            "--enable-mock-capture-devices=true",
-            "--enable-media-stream=true",
-         ],
-      },
    },
 }
 const getBrowserProjects = (type: string): PlaywrightTestConfig["projects"] => {
