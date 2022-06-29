@@ -93,6 +93,17 @@ export class StreamerPage extends StreamingPage {
       )
    }
 
+   public async activateHandRaise() {
+      await this.page.locator("text=Activate Hand Raise").click()
+      return expect(
+         this.page.locator("text=Waiting for viewers to raise their hands...")
+      ).toBeVisible()
+   }
+
+   public acceptUserRequestToJoinHandRaise() {
+      return this.page.locator("text=Invite to speak").click()
+   }
+
    public clickCreatePoll() {
       return this.page.locator("text=Create Poll").click()
    }
@@ -227,5 +238,17 @@ export class ViewerPage extends StreamingPage {
 
    public votePollAnswer(answer: string) {
       return this.page.locator(`button:has-text("${answer}")`).click()
+   }
+
+   public async requestToJoinHandRaise() {
+      await this.page
+         .locator("text=Request to Join with video and audio")
+         .click()
+      await this.page.locator("text=Confirm Hand Raise").click()
+      return expect(
+         this.page.locator(
+            "text=Your hand raise request has been sent, please wait to be invited."
+         )
+      ).toBeVisible()
    }
 }

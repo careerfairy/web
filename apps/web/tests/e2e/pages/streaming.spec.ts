@@ -267,34 +267,23 @@ test.describe("Streaming Journey", () => {
    test("Streamer hand raise functionality", async ({
       streamerPage,
       viewerPage,
+      user,
    }) => {
       const { livestream } = await setupStreamer(streamerPage)
       await viewerPage.open(livestream.id)
 
       // Streamer activates hand raise
-      await streamerPage.page.locator("text=Activate Hand Raise").click()
-      await expect(
-         streamerPage.page.locator(
-            "text=Waiting for viewers to raise their hands..."
-         )
-      ).toBeVisible()
+      await streamerPage.activateHandRaise()
 
       // Viewer requests to join
-      await viewerPage.page
-         .locator("text=Request to Join with video and audio")
-         .click()
-      await viewerPage.page.locator("text=Confirm Hand Raise").click()
-      await expect(
-         viewerPage.page.locator(
-            "text=Your hand raise request has been sent, please wait to be invited."
-         )
-      ).toBeVisible()
+      await viewerPage.requestToJoinHandRaise()
 
       // Streamer accepts the request
-      await streamerPage.page.locator("text=Invite to speak").click()
-      // hand raiser is being shown
+      await streamerPage.acceptUserRequestToJoinHandRaise()
+      // hand raiser details are being shown
+      const userName = `${user.firstName} ${user.lastName.charAt(0)}`
       await expect(
-         streamerPage.page.locator('h3:has-text("John D")')
+         streamerPage.page.locator(`h3:has-text("${userName}")`)
       ).toBeVisible()
       await expect(
          streamerPage.page.locator("text=✋ Hand Raiser")
@@ -307,10 +296,18 @@ test.describe("Streaming Journey", () => {
       // central video element is visible
       await expect(viewerPage.page.locator("video").nth(1)).toBeVisible()
    })
-})
 
-// test hand raise
-// test breakout room
+   // test.only("Streamer Creates a breakout room, viewer joins", async ({
+   //    streamerPage,
+   //    viewerPage,
+   //    user,
+   // }) => {
+   //    const { livestream } = await setupStreamer(streamerPage)
+   //    await viewerPage.open(livestream.id)
+   //
+   //    await viewerPage.page.pause()
+   // })
+})
 
 async function setupStreamer(
    streamerPage: StreamerPage,
