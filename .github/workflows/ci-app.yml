@@ -103,7 +103,29 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            machine: [1, 2, 3, 4, 5]
+            browser:
+               [
+                  1,
+                  2,
+                  3,
+                  4,
+                  5,
+                  6,
+                  7,
+                  8,
+                  9,
+                  10,
+                  11,
+                  12,
+                  13,
+                  14,
+                  15,
+                  16,
+                  17,
+                  18,
+                  19,
+                  20,
+               ]
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
@@ -140,7 +162,7 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.machine}}/5
+           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.machine}}/20
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
