@@ -53,6 +53,7 @@ const DangerZone = ({ userEmail }: Props) => {
          <Link
             href="#"
             underline="always"
+            data-testid="delete-account-button"
             color="error"
             onClick={() => setIsDeleteOverlayOpen(true)}
          >

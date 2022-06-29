@@ -122,7 +122,7 @@ test.describe("Career Skills", () => {
 })
 
 test.describe("Personal Information", () => {
-   test.only("it should be able to delete account", async ({ page }) => {
+   test("it should be able to delete account", async ({ page }) => {
       const profilePage = new ProfilePage(page)
 
       await LoginPage.login(page)
@@ -136,7 +136,7 @@ test.describe("Personal Information", () => {
       // click on delete account button
       await profilePage.clickDeleteAccountButton()
 
-      await profilePage.fillDeleteAccountConfirmationText("delete my account")
+      await profilePage.fillDeleteAccountConfirmationText("delete")
 
       // click on delete account confirmation button
       await Promise.all([
