@@ -81,6 +81,10 @@ class StreamingPage extends CommonPage {
 export class StreamerPage extends StreamingPage {
    public readonly shareButton = this.page.locator('[data-testid="Share"]')
 
+   public manageBreakoutRooms() {
+      return this.page.locator('[aria-label="Manage breakout rooms"]').click()
+   }
+
    public open(livestreamId: string, token?: string) {
       const queryString = "?token=" + token
 

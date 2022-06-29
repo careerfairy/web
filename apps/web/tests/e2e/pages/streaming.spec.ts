@@ -297,16 +297,22 @@ test.describe("Streaming Journey", () => {
       await expect(viewerPage.page.locator("video").nth(1)).toBeVisible()
    })
 
-   // test.only("Streamer Creates a breakout room, viewer joins", async ({
-   //    streamerPage,
-   //    viewerPage,
-   //    user,
-   // }) => {
-   //    const { livestream } = await setupStreamer(streamerPage)
-   //    await viewerPage.open(livestream.id)
-   //
-   //    await viewerPage.page.pause()
-   // })
+   test("Streamer cannot create breakout rooms because he is not a main streamer", async ({
+      streamerPage,
+      viewerPage,
+      user,
+   }) => {
+      await setupStreamer(streamerPage)
+
+      await streamerPage.manageBreakoutRooms()
+      await expect(
+         streamerPage.exactText(
+            "Please wait for the main streamer/host to create breakout rooms"
+         )
+      ).toBeVisible()
+
+      await viewerPage.page.pause()
+   })
 })
 
 async function setupStreamer(
