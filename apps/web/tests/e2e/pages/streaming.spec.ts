@@ -255,7 +255,9 @@ test.describe("Streaming Journey", () => {
       streamerPage,
       viewerPage,
    }) => {
-      const { livestream, group } = await setupStreamer(streamerPage, true)
+      const { livestream, group } = await setupStreamer(streamerPage, {
+         setupGroup: true,
+      })
 
       await viewerPage.open(livestream.id)
       await viewerPage.selectRandomCategoriesFromGroup(group)
@@ -300,7 +302,6 @@ test.describe("Streaming Journey", () => {
    test("Streamer cannot create breakout rooms because he is not a main streamer", async ({
       streamerPage,
       viewerPage,
-      user,
    }) => {
       await setupStreamer(streamerPage)
 
@@ -313,14 +314,43 @@ test.describe("Streaming Journey", () => {
 
       await viewerPage.page.pause()
    })
+
+   // test("Main Streamer creates breakout room and viewer joins", async ({
+   //    streamerPage,
+   //    viewerPage,
+   // }) => {
+   //    await setupStreamer(streamerPage)
+   //
+   //    await streamerPage.manageBreakoutRooms()
+   //    await expect(
+   //       streamerPage.exactText(
+   //          "Please wait for the main streamer/host to create breakout rooms"
+   //       )
+   //    ).toBeVisible()
+   //
+   //    await viewerPage.page.pause()
+   // })
 })
+
+type SetupStreamerOptions = {
+   setupGroup?: boolean
+   isMainStreamer?: boolean
+}
 
 async function setupStreamer(
    streamerPage: StreamerPage,
-   setupGroup: boolean = false
+   options: SetupStreamerOptions = {
+      setupGroup: false,
+      isMainStreamer: false,
+   }
 ) {
-   const { livestream, secureToken, group } = await setupData(setupGroup)
-   await streamerPage.openAndFillStreamerDetails(livestream.id, secureToken)
+   const { livestream, secureToken, group } = await setupData(
+      options.setupGroup
+   )
+   await streamerPage.openAndFillStreamerDetails(livestream.id, {
+      secureToken,
+      isMainStreamer: options.isMainStreamer,
+   })
    await streamerPage.joinWithCameraAndMicrophone()
 
    return { livestream, secureToken, group }

@@ -85,12 +85,22 @@ export class StreamerPage extends StreamingPage {
       return this.page.locator('[aria-label="Manage breakout rooms"]').click()
    }
 
-   public open(livestreamId: string, token?: string) {
-      const queryString = "?token=" + token
+   public open(
+      livestreamId: string,
+      options?: {
+         secureToken?: string
+         isMainStreamer?: boolean
+      }
+   ) {
+      const queryString = "?token=" + options?.secureToken
+
+      const path = options?.isMainStreamer
+         ? "main-streamer"
+         : "joining-streamer"
 
       return this.page.goto(
-         `/streaming/${livestreamId}/joining-streamer${
-            token ? queryString : ""
+         `/streaming/${livestreamId}/${path}${
+            options?.secureToken ? queryString : ""
          }`
       )
    }
@@ -159,9 +169,12 @@ export class StreamerPage extends StreamingPage {
 
    public async openAndFillStreamerDetails(
       livestreamId: string,
-      token?: string
+      options?: {
+         secureToken?: string
+         isMainStreamer?: boolean
+      }
    ) {
-      await this.open(livestreamId, token)
+      await this.open(livestreamId, options)
       return this.fillStreamerDetails(
          streaming.streamer.firstName,
          streaming.streamer.lastName,
