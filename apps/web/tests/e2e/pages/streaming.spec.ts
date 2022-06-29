@@ -29,18 +29,17 @@ const test = base.extend<{
 
       await use(user)
    },
-   streamerPage: async ({ page, user }, use) => {
+   streamerPage: async ({ page, user, context }, use) => {
+      // increase timeout to find out elements because the streaming synchronization on
+      // github ci is slow
+      context.setDefaultTimeout(15000)
+
       const streamerPage = new StreamerPage(page)
 
       await use(streamerPage)
    },
    viewerPage: async ({ context, page, user }, use) => {
       const viewerTabPage = await context.newPage()
-
-      // increase timeout to find out elements because the streaming synchronization on
-      // github ci is slow
-      page.setDefaultTimeout(10000)
-      viewerTabPage.setDefaultTimeout(10000)
 
       const viewerPage = new ViewerPage(viewerTabPage)
 
