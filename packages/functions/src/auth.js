@@ -523,6 +523,18 @@ exports.deleteLoggedInUserAccount = functions.https.onCall(
          await admin.auth().deleteUser(userId)
          await admin.firestore().collection("userData").doc(userEmail).delete()
 
+         // add userId and timestamp on analytics collection
+         await admin
+            .firestore()
+            .collection("analytics")
+            .doc("deletedUsers")
+            .collection(userId)
+            .doc(userId)
+            .set({
+               userId: userId,
+               timeStamp: new Date().toISOString(),
+            })
+
          functions.logger.info(
             `User ${userEmail} with the id ${userId} was deleted successfully`
          )
