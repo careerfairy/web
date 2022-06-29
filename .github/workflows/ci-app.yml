@@ -140,7 +140,7 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp
+           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.machine}}/6
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
