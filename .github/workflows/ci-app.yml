@@ -103,7 +103,7 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            browser:
+            machine:
                [
                   1,
                   2,
