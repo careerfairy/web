@@ -10,7 +10,7 @@ export default class ProfilePage extends CommonPage {
       super(page)
 
       this.deleteAccountButton = page.locator(
-         "data-testid=delete-account-button"
+         "a[data-testid=delete-account-button]"
       )
       this.deleteAccountConfirmationButton = page.locator(
          "data-testid=delete-account-confirmation-button"
