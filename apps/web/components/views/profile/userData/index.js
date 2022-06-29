@@ -14,19 +14,11 @@ const UserData = () => {
    return (
       <Grid container spacing={2}>
          <Grid item xs={12} lg={8}>
-            <Grid container spacing={2}>
-               <Grid item xs={12}>
-                  <ContentCard>
-                     <PersonalInfo userData={userData} />
-                  </ContentCard>
-               </Grid>
-               <Grid item xs={12} display={{ xs: "none", lg: "block" }}>
-                  <ContentCard>
-                     <DangerZone userEmail={userEmail} />
-                  </ContentCard>
-               </Grid>
-            </Grid>
+            <ContentCard>
+               <PersonalInfo userData={userData} />
+            </ContentCard>
          </Grid>
+
          <Grid item xs={12} lg={4}>
             <Grid container spacing={2}>
                <Grid item xs={12}>
@@ -41,8 +33,9 @@ const UserData = () => {
                </Grid>
             </Grid>
          </Grid>
-         <Grid item xs={12} display={{ xs: "block", lg: "none" }}>
-            <ContentCard>
+
+         <Grid item xs={12}>
+            <ContentCard sx={{ border: "none" }}>
                <DangerZone userEmail={userEmail} />
             </ContentCard>
          </Grid>

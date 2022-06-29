@@ -99,7 +99,7 @@ const DeleteAccountDialog = ({
                                  variant="outlined"
                                  required
                                  fullWidth
-                                 id="confirmationTxt"
+                                 id="deleteAccountConfirmationText"
                                  autoFocus
                                  onBlur={handleBlur}
                                  value={values.confirmationTxt}
