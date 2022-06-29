@@ -69,6 +69,8 @@ const config: PlaywrightTestConfig = {
       /**
        * Maximum time expect() should wait for the condition to be met.
        * For example in `await expect(locator).toHaveText();`
+       *
+       * Increased from 5s to 10s because runners in Gihub CI are slow
        */
       timeout: 10000,
    },
