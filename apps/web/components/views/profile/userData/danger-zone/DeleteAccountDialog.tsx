@@ -20,7 +20,7 @@ const styles: StylesProps = {
 
 const formValidator = ({ confirmationTxt }) => {
    const errors: any = {}
-   if (confirmationTxt !== "delete my account") {
+   if (confirmationTxt !== "delete") {
       errors.confirmationTxt = "invalid"
    }
    return errors
@@ -86,18 +86,19 @@ const DeleteAccountDialog = ({
                               display={"inline"}
                               fontWeight={"bold"}
                            >
-                              delete my account{" "}
+                              delete{" "}
                            </Box>{" "}
                            below:
                         </Typography>
                      </Grid>
                      <Grid item xs={12}>
                         <Grid container spacing={2}>
-                           <Grid item sm={8} xs={12}>
+                           <Grid item lg={5} sm={6} xs={12}>
                               <TextField
                                  name="confirmationTxt"
                                  variant="outlined"
                                  required
+                                 color="secondary"
                                  fullWidth
                                  id="deleteAccountConfirmationText"
                                  autoFocus
@@ -106,12 +107,12 @@ const DeleteAccountDialog = ({
                                  onChange={handleChange}
                               />
                            </Grid>
-                           <Grid item sm={4} xs={12}>
+                           <Grid item lg={3} sm={4} xs={12}>
                               <Button
                                  type="submit"
                                  fullWidth
                                  variant="contained"
-                                 color="primary"
+                                 color="secondary"
                                  data-testid={
                                     "delete-account-confirmation-button"
                                  }
@@ -129,7 +130,7 @@ const DeleteAccountDialog = ({
                                     )
                                  }
                               >
-                                 {isSubmitting ? "Deleting" : "Delete"}
+                                 {isSubmitting ? "Confirming" : "Confirm"}
                               </Button>
                            </Grid>
                         </Grid>
