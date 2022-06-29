@@ -33,7 +33,9 @@ class StreamingPage extends CommonPage {
 
    public async assertStreamerDetailsExist() {
       const streamerName = `${streaming.streamer.firstName} ${streaming.streamer.lastName}`
-      await expect(this.exactText(streamerName)).toBeVisible()
+      // increase timeout to find out elements because the streaming synchronization on
+      // github ci is slow
+      await expect(this.exactText(streamerName)).toBeVisible({ timeout: 30000 })
       return expect(this.exactText(streaming.streamer.occupation)).toBeVisible()
    }
 

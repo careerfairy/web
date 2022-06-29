@@ -30,10 +30,6 @@ const test = base.extend<{
       await use(user)
    },
    streamerPage: async ({ page, user, context }, use) => {
-      // increase timeout to find out elements because the streaming synchronization on
-      // github ci is slow
-      context.setDefaultTimeout(15000)
-
       const streamerPage = new StreamerPage(page)
 
       await use(streamerPage)
@@ -266,6 +262,50 @@ test.describe("Streaming Journey", () => {
 
       await viewerPage.enterEvent()
       await viewerPage.assertStreamerDetailsExist()
+   })
+
+   test("Streamer hand raise functionality", async ({
+      streamerPage,
+      viewerPage,
+   }) => {
+      const { livestream } = await setupStreamer(streamerPage)
+      await viewerPage.open(livestream.id)
+
+      // Streamer activates hand raise
+      await streamerPage.page.locator("text=Activate Hand Raise").click()
+      await expect(
+         streamerPage.page.locator(
+            "text=Waiting for viewers to raise their hands..."
+         )
+      ).toBeVisible()
+
+      // Viewer requests to join
+      await viewerPage.page
+         .locator("text=Request to Join with video and audio")
+         .click()
+      await viewerPage.page.locator("text=Confirm Hand Raise").click()
+      await expect(
+         viewerPage.page.locator(
+            "text=Your hand raise request has been sent, please wait to be invited."
+         )
+      ).toBeVisible()
+
+      // Streamer accepts the request
+      await streamerPage.page.locator("text=Invite to speak").click()
+      // hand raiser is being shown
+      await expect(
+         streamerPage.page.locator('h3:has-text("John D")')
+      ).toBeVisible()
+      await expect(
+         streamerPage.page.locator("text=✋ Hand Raiser")
+      ).toBeVisible()
+
+      // viewer is connected
+      await expect(
+         viewerPage.page.locator("text=You are connected")
+      ).toBeVisible()
+      // central video element is visible
+      await expect(viewerPage.page.locator("video").nth(1)).toBeVisible()
    })
 })
 
