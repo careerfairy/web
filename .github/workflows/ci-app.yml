@@ -99,11 +99,17 @@ jobs:
 
    # Run E2E Tests
    e2e_tests:
-      name: "E2E Tests - Machine ${{ matrix.machine }}"
+      name: "E2E Tests - ${{ matrix.browser }} ${{ matrix.shards }}/${{ matrix.total }}"
       strategy:
          fail-fast: false
          matrix:
-            machine: [1, 2, 3, 4]
+            browser: [chromium, firefox, webkit]
+            shards: [1]
+            total: 1
+            include:
+               - browser: chromium
+                 shards: [1, 2, 3]
+                 total: 3
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
@@ -135,12 +141,13 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
          - name: Install Playwright deps
-           run: npx playwright install --with-deps
+           run: npx playwright install --with-deps ${{ matrix.browser }}
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.machine}}/4
+              BROWSER: ${{ matrix.browser }}
+           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shards}}/${{ matrix.total }}
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
