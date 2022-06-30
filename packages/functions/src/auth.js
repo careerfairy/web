@@ -528,11 +528,11 @@ exports.deleteLoggedInUserAccount = functions.https.onCall(
             .firestore()
             .collection("analytics")
             .doc("deletedUsers")
-            .collection(userId)
+            .collection("deletedUsers")
             .doc(userId)
             .set({
                userId: userId,
-               timeStamp: new Date().toISOString(),
+               timeStamp: admin.firestore.FieldValue.serverTimestamp(),
             })
 
          functions.logger.info(
