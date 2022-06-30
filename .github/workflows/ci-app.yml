@@ -107,9 +107,11 @@ jobs:
             shards: [1]
             include:
                # Since chrome runs the streaming tests, we should parallelize them
-
                - browser: chromium
-                 shards: [2, 3]
+                 shards: 2
+                 total: 2
+               - browser: chromium
+                 shards: 3
                  total: 3
                - browser: firefox
                  total: 1
@@ -151,8 +153,7 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-              BROWSER: ${{ matrix.browser }}
-           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shards}}/${{ matrix.total }}
+           run: npm run test:e2e-webapp -- -- -- --project=${{browser}} --shard=${{matrix.shards}}/${{ matrix.total }}
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
