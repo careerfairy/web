@@ -135,5 +135,6 @@ export const deleteUser =
          dispatch({ type: actions.DELETE_USER_SUCCESS })
       } catch (err) {
          dispatch({ type: actions.DELETE_USER_FAIL, payload: err.message })
+         throw new Error(err)
       }
    }
