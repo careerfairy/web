@@ -111,9 +111,6 @@ jobs:
                - browser: chromium
                  shards: 2
                  total: 2
-               - browser: chromium
-                 shards: 3
-                 total: 3
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest

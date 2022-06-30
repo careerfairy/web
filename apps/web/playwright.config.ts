@@ -21,7 +21,7 @@ const config: PlaywrightTestConfig = {
    testDir: "./tests/e2e",
    testIgnore: "**/streaming/test**",
    /* Maximum time one test can run for. */
-   timeout: 30 * 1000,
+   timeout: process.env.CI ? 45 * 1000 : 30 * 1000,
    // Increase the number of workers on CI (GitHub runners have 2 cores), use default locally (cpus/2)
    workers: 1,
    expect: {
