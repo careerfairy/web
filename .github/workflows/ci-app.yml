@@ -99,15 +99,18 @@ jobs:
 
    # Run E2E Tests
    e2e_tests:
-      name: "E2E Tests - ${{ matrix.browser }} ${{ matrix.shards }}/${{ matrix.total }}"
+      name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
       strategy:
          fail-fast: false
          matrix:
-            browser: [chromium, firefox, webkit]
-            shards: [1]
-            total: [1]
-            #include:
-      # Since chrome runs the streaming tests, we should parallelize them in the future
+            shard: [1, 2, 3]
+            total: [3]
+      # Another way to split the runners by browser and custom shards by browser
+      #            browser: [chromium, firefox, webkit]
+      #            shards: [1]
+      #            total: [1]
+      #            include:
+      #               # Since chrome runs the streaming tests, we should parallelize them in the future
       #               - browser: chromium
       #                 shards: 2
       #                 total: 2
@@ -142,23 +145,23 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
          - name: Install Playwright deps
-           run: npx playwright install --with-deps ${{ matrix.browser }}
+           run: npx playwright install --with-deps
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- -- --project=${{matrix.browser}} --shard=${{matrix.shards}}/${{ matrix.total }}
+           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.browser }}-${{ matrix.shard }}-playwright-report
+              name: ${{ matrix.shard }}-playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.browser }}-${{ matrix.shard }}-debug-logs
+              name: ${{ matrix.shard }}-debug-logs
               path: firebase-debug.log
    # Deploy
    deploy:

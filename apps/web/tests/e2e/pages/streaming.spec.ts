@@ -48,7 +48,7 @@ test.describe("Streaming Journey", () => {
    // Firefox headless (macos) doesn't seem to load the camera/mic
    // webkit (safari) has an open issue: https://github.com/microsoft/playwright/issues/2973
    test.skip(
-      ({ browserName }) => browserName !== "chromium",
+      ({ browserName }) => browserName === "webkit",
       "Safari/Firefox browser support for webrtc tests is not great atm, skipping."
    )
 
