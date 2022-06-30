@@ -107,6 +107,7 @@ jobs:
             shards: [1]
             include:
                # Since chrome runs the streaming tests, we should parallelize them
+
                - browser: chromium
                  shards: [2, 3]
                  total: 3
