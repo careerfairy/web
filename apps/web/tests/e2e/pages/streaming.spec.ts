@@ -301,7 +301,6 @@ test.describe("Streaming Journey", () => {
 
    test("Streamer cannot create breakout rooms because he is not a main streamer", async ({
       streamerPage,
-      viewerPage,
    }) => {
       await setupStreamer(streamerPage)
 
@@ -311,25 +310,49 @@ test.describe("Streaming Journey", () => {
             "Please wait for the main streamer/host to create breakout rooms"
          )
       ).toBeVisible()
-
-      await viewerPage.page.pause()
    })
 
-   // test("Main Streamer creates breakout room and viewer joins", async ({
-   //    streamerPage,
-   //    viewerPage,
-   // }) => {
-   //    await setupStreamer(streamerPage)
-   //
-   //    await streamerPage.manageBreakoutRooms()
-   //    await expect(
-   //       streamerPage.exactText(
-   //          "Please wait for the main streamer/host to create breakout rooms"
-   //       )
-   //    ).toBeVisible()
-   //
-   //    await viewerPage.page.pause()
-   // })
+   test("Main Streamer creates breakout room and viewer joins", async ({
+      streamerPage,
+      viewerPage,
+   }) => {
+      const { livestream } = await setupStreamer(streamerPage, {
+         isMainStreamer: true,
+      })
+
+      // Hide hint to focus
+      await viewerPage.page.addInitScript(() => {
+         // it fails to import from the constants file at this time
+         window.localStorage.setItem("hasSeenFocusModeActivateKey", "true")
+      })
+      await viewerPage.open(livestream.id)
+
+      // Streamer creates a breakout room
+      await streamerPage.manageBreakoutRooms()
+      await streamerPage.createSingleBreakoutRoom()
+
+      // Viewer enters the new breakout room through bottom notification
+      await viewerPage.exactText("Chec2kout").click()
+      await viewerPage.clickFirstBreakoutRoomBannerLink()
+      // streamer is not connected yet
+      await viewerPage.assertWaitingForStreamerText()
+      expect(viewerPage.page.url()).toContain(
+         `/streaming/${livestream.id}/breakout-room/`
+      )
+
+      // streamer joins breakout room
+      await streamerPage.joinBreakoutRoom()
+      await expect(streamerPage.text("ROOM: Breakout Room 1")).toBeVisible()
+
+      // viewer sees the streamer on the breakout room
+      await viewerPage.assertStreamerDetailsExist()
+
+      // viewer goes back to main stream
+      await viewerPage.backToMainRoom()
+      expect(viewerPage.page.url()).toContain(
+         `/streaming/${livestream.id}/viewer`
+      )
+   })
 })
 
 type SetupStreamerOptions = {

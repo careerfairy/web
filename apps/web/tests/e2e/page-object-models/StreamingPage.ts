@@ -19,6 +19,13 @@ class StreamingPage extends CommonPage {
       "text=Click here to refresh once done"
    )
 
+   public backToMainRoom() {
+      return Promise.all([
+         this.page.waitForNavigation(),
+         this.page.locator('[aria-label="Back to main room"]').click(),
+      ])
+   }
+
    public assertConnectionInterruptedDialogOpens() {
       return expect(
          this.page.locator(
@@ -215,13 +222,27 @@ export class StreamerPage extends StreamingPage {
    }
 
    public async joinWithCameraAndMicrophone() {
-      await this.page.locator("text=Activate Camera").click()
-      await this.page.locator("#mui-31").click()
+      await this.exactText("Activate Camera").click()
+      await this.exactText("Activate Microphone").click()
       await this.page.locator('button:has-text("Join as streamer")').click()
    }
 
    public assertIsLive() {
       return expect(this.exactText("YOU ARE LIVE")).toBeVisible()
+   }
+
+   public async joinBreakoutRoom() {
+      await Promise.all([
+         this.page.waitForNavigation(),
+         this.exactText("Join Room").click(),
+      ])
+      await this.exactText("Join now").click()
+      return this.page.locator('button:has-text("Join as streamer")').click()
+   }
+
+   public async createSingleBreakoutRoom() {
+      await this.exactText("Create Rooms").click()
+      return this.page.locator('[aria-label="Expand"] >> text=Open').click()
    }
 }
 
@@ -265,5 +286,12 @@ export class ViewerPage extends StreamingPage {
             "text=Your hand raise request has been sent, please wait to be invited."
          )
       ).toBeVisible()
+   }
+
+   public async clickFirstBreakoutRoomBannerLink() {
+      return Promise.all([
+         this.page.locator('[data-testid="breakout-room-banner-item"]').click(),
+         this.page.waitForNavigation(),
+      ])
    }
 }
