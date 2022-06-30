@@ -152,13 +152,13 @@ jobs:
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.machine }}-playwright-report
+              name: ${{ matrix.browser }}-${{ matrix.shard }}-playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.machine }}-debug-logs
+              name: ${{ matrix.browser }}-${{ matrix.shard }}-debug-logs
               path: firebase-debug.log
    # Deploy
    deploy:

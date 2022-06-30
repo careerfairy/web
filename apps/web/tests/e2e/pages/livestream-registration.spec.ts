@@ -23,6 +23,7 @@ test.beforeEach(async () => {
 })
 
 test("successful registration on a livestream event", async ({ page }) => {
+   test.slow()
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { group, livestream } = await setupData()
 
