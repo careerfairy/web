@@ -332,7 +332,7 @@ test.describe("Streaming Journey", () => {
       await streamerPage.createSingleBreakoutRoom()
 
       // Viewer enters the new breakout room through bottom notification
-      await viewerPage.exactText("Chec2kout").click()
+      await viewerPage.exactText("Checkout").click()
       await viewerPage.clickFirstBreakoutRoomBannerLink()
       // streamer is not connected yet
       await viewerPage.assertWaitingForStreamerText()
