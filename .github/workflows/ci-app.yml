@@ -105,6 +105,7 @@ jobs:
          matrix:
             browser: [chromium, firefox, webkit]
             shards: [1]
+            total: [1]
             include:
                # Since chrome runs the streaming tests, we should parallelize them
                - browser: chromium
@@ -113,10 +114,6 @@ jobs:
                - browser: chromium
                  shards: 3
                  total: 3
-               - browser: firefox
-                 total: 1
-               - browser: webkit
-                 total: 1
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
