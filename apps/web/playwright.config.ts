@@ -21,7 +21,7 @@ const config: PlaywrightTestConfig = {
    testDir: "./tests/e2e",
    testIgnore: "**/streaming/test**",
    /* Maximum time one test can run for. */
-   timeout: process.env.CI ? 45 * 1000 : 30 * 1000,
+   timeout: process.env.CI ? 60 * 1000 : 30 * 1000,
    // Increase the number of workers on CI (GitHub runners have 2 cores), use default locally (cpus/2)
    workers: 1,
    expect: {
@@ -29,12 +29,12 @@ const config: PlaywrightTestConfig = {
        * Maximum time expect() should wait for the condition to be met.
        * For example in `await expect(locator).toHaveText();`
        */
-      timeout: process.env.CI ? 10 * 1000 : 5 * 1000,
+      timeout: process.env.CI ? 25 * 1000 : 5 * 1000,
    },
    /* Fail the build on CI if you accidentally left test.only in the source code. */
    forbidOnly: !!process.env.CI,
    /* Retry on CI only */
-   retries: process.env.CI ? 2 : 0,
+   retries: process.env.CI ? 1 : 0,
    /* Opt out of parallel tests on CI. */
    // workers: process.env.CI ? 1 : undefined,
    /* Reporter to use. See https://playwright.dev/docs/test-reporters */
