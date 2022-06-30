@@ -150,6 +150,7 @@ test("livestream has already started, confirm the redirection without any regist
    page,
    browserName,
 }) => {
+   test.slow()
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { livestream, group } = await setupData({}, {}, "createLive")
 

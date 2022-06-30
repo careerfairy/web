@@ -11,5 +11,6 @@ RUN apt-get update && \
 
 WORKDIR /app
 RUN npm install
+RUN npx playwright install
 
 ENTRYPOINT ["npm", "run", "test:e2e-webapp"]

@@ -286,7 +286,7 @@ test.describe("Streaming Journey", () => {
       const userName = `${user.firstName} ${user.lastName.charAt(0)}`
       await expect(
          streamerPage.page.locator(`h3:has-text("${userName}")`)
-      ).toBeVisible({ timeout: 20000 })
+      ).toBeVisible({ timeout: 30000 })
       await expect(
          streamerPage.page.locator("text=✋ Hand Raiser")
       ).toBeVisible()
