@@ -39,7 +39,7 @@ const DeleteAccountDialog = ({
 }: Props): JSX.Element => {
    return (
       <GenericDialog
-         title={"Delete Account"}
+         title={`You're about to delete your account`}
          onClose={() => onClose(false)}
          showCloseBtn={false}
       >
