@@ -23,7 +23,6 @@ test.beforeEach(async () => {
 })
 
 test("successful registration on a livestream event", async ({ page }) => {
-   test.slow()
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { group, livestream } = await setupData()
 
@@ -43,7 +42,6 @@ test("successful registration on a livestream event", async ({ page }) => {
    await expectText(page, "ASK YOUR QUESTION")
 
    await livestreamPage.skip()
-   await sleep(1000)
    await expectExactText(page, `Join the ${livestream.company} Talent Pool`)
 
    await livestreamPage.skip()
@@ -150,7 +148,6 @@ test("livestream has already started, confirm the redirection without any regist
    page,
    browserName,
 }) => {
-   test.slow()
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { livestream, group } = await setupData({}, {}, "createLive")
 

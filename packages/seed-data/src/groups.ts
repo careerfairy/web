@@ -24,7 +24,7 @@ class GroupFirebaseSeed implements GroupSeed {
          ],
 
          test: false,
-         universityName: faker.company.companyName(),
+         universityName: faker.company.companyName() ?? "My university",
       }
 
       data = Object.assign(data, overrideFields)

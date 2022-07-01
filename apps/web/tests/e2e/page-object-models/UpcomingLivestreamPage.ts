@@ -40,7 +40,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    skip() {
-      return this.resilientClick("text=Skip", 1, 1000, false)
+      return this.text("Skip").click()
    }
 
    finish() {
