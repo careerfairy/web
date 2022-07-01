@@ -10,13 +10,6 @@ import {
    Typography,
 } from "@mui/material"
 import React from "react"
-import { StylesProps } from "../../../../../types/commonTypes"
-
-const styles: StylesProps = {
-   confirmationInputWrapper: {
-      marginTop: (theme) => theme.spacing(3),
-   },
-}
 
 const formValidator = ({ confirmationTxt }) => {
    const errors: any = {}
@@ -60,7 +53,7 @@ const DeleteAccountDialog = ({
             }) => (
                <form onSubmit={handleSubmit}>
                   <Grid item sm={12}>
-                     <Typography sx={styles.body2} variant="body2" my={1}>
+                     <Typography variant="body2" my={1}>
                         This action{" "}
                         <Box fontWeight={"bold"} display={"inline"}>
                            CANNOT{" "}
@@ -68,7 +61,7 @@ const DeleteAccountDialog = ({
                         be undone. This will permanently delete the {userEmail}{" "}
                         account.
                      </Typography>
-                     <Typography sx={styles.body2} variant="body2" my={1}>
+                     <Typography variant="body2" my={1}>
                         Are you sure you want to delete your account? If you do,
                         all your data will be removed within the period defined
                         in our{" "}
@@ -77,9 +70,9 @@ const DeleteAccountDialog = ({
                         </Link>
                      </Typography>
                   </Grid>
-                  <Grid item sm={12} sx={styles.confirmationInputWrapper}>
+                  <Grid item sm={12} mt={3}>
                      <Grid item xs={12}>
-                        <Typography sx={styles.body2} variant="body2" my={1}>
+                        <Typography variant="body2" my={1}>
                            To verify, type{" "}
                            <Box
                               fontStyle={"italic"}
