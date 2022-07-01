@@ -111,7 +111,10 @@ const profileEditSuccess = (state) => {
 }
 
 const deleteUserStart = (state) => {
-   return { ...state, deleteUser: { ...state.deleteUser, loading: true } }
+   return {
+      ...state,
+      deleteUser: { ...state.deleteUser, loading: true, error: false },
+   }
 }
 
 const deleteUserFail = (state, payload) => {
