@@ -1,5 +1,6 @@
 import React from "react"
 import { Box } from "@mui/material"
+import { alternateStudentBackground } from "../../constants/images"
 
 const styles = {
    globalBackgroundStyles: {
@@ -57,6 +58,13 @@ const styles = {
       backgroundColor: "background.paper",
       height: "100%",
    },
+   registrationBackground: {
+      height: "100%",
+      minHeight: "100vh",
+      background: (theme) =>
+         `url(${alternateStudentBackground}) top left no-repeat, ${theme.palette.common.white}`,
+      backgroundSize: "auto 120vh, auto 100vh !important",
+   },
 }
 
 export const GlobalBackground = ({ ...props }) => {
@@ -84,4 +92,8 @@ export const DarkThemedBackground = ({ ...props }) => {
 
 export const PaperBackground = ({ ...props }) => {
    return <Box sx={styles.paperBackground} {...props} />
+}
+
+export const RegistrationBackground = ({ ...props }) => {
+   return <Box sx={styles.registrationBackground} {...props} />
 }

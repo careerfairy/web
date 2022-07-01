@@ -1,4 +1,4 @@
-import React, { Fragment, useState, useEffect } from "react"
+import React, { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import Head from "next/head"
 import {
@@ -9,7 +9,7 @@ import {
    Step,
    StepLabel,
 } from "@mui/material"
-import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../HOCs/AuthProvider"
 import SignUpPinForm from "../components/views/signup/SignUpPinForm"
 import SignUpUserForm from "../components/views/signup/SignUpUserForm"
@@ -100,12 +100,6 @@ export const SignupStepper = ({
 )
 
 const styles = sxStyles({
-   box: {
-      width: "100%", // Fix IE 11 issue.
-      backgroundColor: "white",
-      marginTop: 1,
-      borderRadius: 5,
-   },
    footer: {
       color: "white",
       fontWeight: 700,
@@ -116,10 +110,13 @@ const styles = sxStyles({
       letterSpacing: "0.4em",
    },
    title: {
-      color: "white",
-      fontWeight: 500,
-      fontSize: "2em",
+      fontFamily: "Poppins",
+      fontWeight: 400,
+      fontSize: "46px",
+      lineHeight: "63px",
       textAlign: "center",
+      letterSpacing: "-0.02em",
+      marginTop: 12,
    },
    icon: {
       margin: "0 10px",
@@ -132,28 +129,25 @@ const styles = sxStyles({
 
 export const SignUpPageLayout = ({ children }) => {
    return (
-      <Fragment>
+      <>
          <Head>
             <title key="title">CareerFairy | Sign Up</title>
          </Head>
-         <TealBackground>
+         <RegistrationBackground>
             <header>
-               <MainLogo sx={styles.logo} white={true} />
+               <MainLogo sx={styles.logo} />
             </header>
-            <Typography sx={styles.title}>Sign Up</Typography>
-            <Container maxWidth="sm">
-               <Box
-                  data-testid={"signup-page-form"}
-                  boxShadow={1}
-                  p={3}
-                  sx={styles.box}
-               >
+            <Typography sx={styles.title}>
+               Create your profile to start
+            </Typography>
+            <Container maxWidth="md">
+               <Box data-testid={"signup-page-form"} p={3} mt={5}>
                   {children}
                </Box>
             </Container>
             <Typography sx={styles.footer}>Meet Your Future</Typography>
-         </TealBackground>
-      </Fragment>
+         </RegistrationBackground>
+      </>
    )
 }
 
