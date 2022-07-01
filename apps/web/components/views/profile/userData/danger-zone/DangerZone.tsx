@@ -1,11 +1,13 @@
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useRouter } from "next/router"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 
 import * as actions from "store/actions"
 import { Grid, Link, Typography } from "@mui/material"
 import { StylesProps, sxStyles } from "../../../../../types/commonTypes"
 import DeleteAccountDialog from "./DeleteAccountDialog"
+import { deleteUserFailSelector } from "../../../../../store/selectors/authSelectors"
+import { useSnackbar } from "notistack"
 
 const styles: StylesProps = sxStyles({
    section: {
@@ -24,6 +26,8 @@ type Props = {
 
 const DangerZone = ({ userEmail }: Props) => {
    const [isDeleteOverlayOpen, setIsDeleteOverlayOpen] = useState(false)
+   const deletionError = useSelector(deleteUserFailSelector)
+   const { enqueueSnackbar } = useSnackbar()
    const router = useRouter()
    const dispatch = useDispatch()
 
@@ -38,6 +42,15 @@ const DangerZone = ({ userEmail }: Props) => {
          console.error(e)
       }
    }, [dispatch, router])
+
+   useEffect(() => {
+      if (deletionError) {
+         enqueueSnackbar("Something went wrong, please try again", {
+            variant: "error",
+            preventDuplicate: true,
+         })
+      }
+   }, [deletionError, enqueueSnackbar])
 
    return (
       <>
