@@ -8,6 +8,7 @@ import { StylesProps, sxStyles } from "../../../../../types/commonTypes"
 import DeleteAccountDialog from "./DeleteAccountDialog"
 import { deleteUserFailSelector } from "../../../../../store/selectors/authSelectors"
 import { useSnackbar } from "notistack"
+import { GENERAL_ERROR } from "components/util/constants"
 
 const styles: StylesProps = sxStyles({
    section: {
@@ -40,17 +41,12 @@ const DangerZone = ({ userEmail }: Props) => {
          })
       } catch (e) {
          console.error(e)
-      }
-   }, [dispatch, router])
-
-   useEffect(() => {
-      if (deletionError) {
-         enqueueSnackbar("Something went wrong, please try again", {
+         enqueueSnackbar(GENERAL_ERROR, {
             variant: "error",
             preventDuplicate: true,
          })
       }
-   }, [deletionError, enqueueSnackbar])
+   }, [dispatch, enqueueSnackbar, router])
 
    return (
       <>
