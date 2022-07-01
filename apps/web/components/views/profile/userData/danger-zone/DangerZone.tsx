@@ -43,7 +43,7 @@ const DangerZone = ({ userEmail }: Props) => {
       <>
          <Grid sx={styles.section}>
             <Typography sx={styles.subtitle} variant="h5">
-               Wish no longer join the events?
+               Wish to no longer join the events?
             </Typography>
             <Typography variant="body2" component="p">
                Once you delete your Account, there is no going back. Please be
