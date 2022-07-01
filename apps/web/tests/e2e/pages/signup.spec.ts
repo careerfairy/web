@@ -199,7 +199,6 @@ test.describe("Signup Page Functionality", () => {
       await signup.enterPinCode(differentPin)
       await signup.clickValidateEmail()
       await expect(signup.incorrectPinCodeWarning).toBeVisible()
-      await page.pause()
       await signup.clickResendVerificationEmail()
       await expect(signup.incorrectPinCodeWarning).toBeHidden()
       const userDataWithResetPin = await UserSeed.getUserData(

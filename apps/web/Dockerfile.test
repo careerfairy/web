@@ -2,6 +2,8 @@ FROM mcr.microsoft.com/playwright:v1.20.0-focal
 
 COPY ../../. /app
 
+ENV CI=true
+
 # install java for the emulators
 RUN apt-get update && \
     DEBIAN_FRONTEND=noninteractive \
@@ -11,5 +13,6 @@ RUN apt-get update && \
 
 WORKDIR /app
 RUN npm install
+RUN npx playwright install
 
 ENTRYPOINT ["npm", "run", "test:e2e-webapp"]
