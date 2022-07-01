@@ -14,7 +14,7 @@
       "test:watch": "jest --watch",
       "test:coverage": "jest --coverage",
       "test:e2e-webapp": "playwright test",
-      "test:e2e-webapp-debug": "playwright test --debug"
+      "test:e2e-webapp-debug": "cross-env PWDEBUG=console DEBUG=pw:webserver playwright test --debug"
    },
    "dependencies": {
       "@careerfairy/seed-data": "*",
@@ -107,7 +107,7 @@
    ],
    "devDependencies": {
       "@careerfairy/seed-data": "*",
-      "@playwright/test": "^1.20.0",
+      "@playwright/test": "^1.22.2",
       "@svgr/webpack": "^5.5.0",
       "@testing-library/jest-dom": "^5.16.1",
       "@testing-library/react": "^12.1.2",

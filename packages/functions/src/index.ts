@@ -36,8 +36,6 @@ exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
    auth.resendPostmarkEmailVerificationEmailWithPin_v2
 
 // Agora
-exports.generateAgoraToken = agora.generateAgoraToken
-exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall
 exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 

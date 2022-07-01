@@ -543,6 +543,8 @@ const VideoControlsContainer = ({
                                           cursor: "pointer",
                                        },
                                     ],
+                                    // @ts-ignore
+                                    "data-testid": action.name,
                                     disabled: action.disabled,
                                  }}
                                  onClick={action.onClick}

@@ -22,6 +22,8 @@ interface LivestreamSeed {
       livestreamId: string,
       subCollections?: string[]
    ): Promise<LivestreamEventWithSubcollections>
+
+   generateSecureToken(livestreamId: string): Promise<string>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
@@ -72,23 +74,33 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
    createPast(
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
-      return this.create({
-         start: admin.firestore.Timestamp.fromDate(
-            faker.date.recent(faker.datatype.number({ min: 1, max: 60 }))
-         ),
-         hasEnded: true,
-      })
+      return this.create(
+         Object.assign(
+            {
+               start: admin.firestore.Timestamp.fromDate(
+                  faker.date.recent(faker.datatype.number({ min: 1, max: 60 }))
+               ),
+               hasEnded: true,
+            },
+            overrideFields
+         )
+      )
    }
 
    createLive(
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
-      return this.create({
-         start: admin.firestore.Timestamp.fromDate(
-            faker.date.recent(faker.datatype.number({ min: 0, max: 1 }))
-         ),
-         hasStarted: true,
-      })
+      return this.create(
+         Object.assign(
+            {
+               start: admin.firestore.Timestamp.fromDate(
+                  faker.date.recent(faker.datatype.number({ min: 0, max: 1 }))
+               ),
+               hasStarted: true,
+            },
+            overrideFields
+         )
+      )
    }
 
    async create(
@@ -114,7 +126,7 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          duration: faker.random.arrayElement([30, 60, 90, 120]),
          groupIds: [uuidv4()],
          hidden: false,
-         id: uuidv4(),
+         id: uuidv4().replace(/-/g, ""),
          language: {
             code: faker.address.countryCode(),
             name: faker.address.country(),
@@ -144,6 +156,19 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       await firestore.collection("livestreams").doc(data.id).set(data)
 
       return data
+   }
+
+   async generateSecureToken(livestreamId: string): Promise<string> {
+      const token = uuidv4()
+      await firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("tokens")
+         .doc("secureToken")
+         .set({
+            value: token,
+         })
+      return token
    }
 }
 

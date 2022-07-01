@@ -66,13 +66,6 @@ class FirebaseService {
       return await fetchAgoraRtmToken(data)
    }
 
-   getSecureAgoraToken = async (data) => {
-      const getSecureAgoraToken = this.functions.httpsCallable(
-         "generateAgoraTokenSecureOnCall"
-      )
-      return await getSecureAgoraToken(data)
-   }
-
    startLivestreamRecording = async (data) => {
       const startLivestreamRecording = this.functions.httpsCallable(
          "startRecordingLivestream_v2"
