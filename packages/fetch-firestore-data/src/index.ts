@@ -144,7 +144,6 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             }
          })
       }
-
       execute(
          "npx",
          [
@@ -160,7 +159,7 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             env: {
                ...process.env,
                // emulators need a big heap to load the data
-               JAVA_TOOL_OPTIONS: "-Xmx20g",
+               JAVA_TOOL_OPTIONS: "-Xmx25g",
             },
          },
          handleProcess

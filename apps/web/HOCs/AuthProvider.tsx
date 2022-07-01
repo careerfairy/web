@@ -8,6 +8,7 @@ import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import FieldOfStudyPresenter from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyPresenter"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
@@ -135,6 +136,20 @@ const AuthProvider = ({ children }) => {
                console.error(e)
             })
       }
+   }, [userData])
+
+   useEffect(() => {
+      ;(async function () {
+         const pres = new FieldOfStudyPresenter()
+         console.log("-> finding best fit")
+         await pres.getEmbeddings("Computer Science", [
+            "Electrical Engineering",
+            "Aerospace Engineering",
+            "Process Engineering",
+            "Education",
+         ])
+         console.log("-> Done finding best fit")
+      })()
    }, [userData])
 
    useEffect(() => {
