@@ -20,6 +20,7 @@ const UniversitySelector = ({
    handleBlur,
    submitting,
    values,
+   className = "",
 }) => {
    const [open, setOpen] = useState(false)
    const [universities, setUniversities] = useState([otherObj])
@@ -99,6 +100,7 @@ const UniversitySelector = ({
             <FormControl error={Boolean(error)} fullWidth>
                <TextField
                   {...params}
+                  className={className}
                   error={Boolean(error)}
                   id="university"
                   name="university"
