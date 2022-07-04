@@ -503,3 +503,47 @@ exports.onUserStatsUpdate = functions
          functions.logger.error("Failed to update user badges", e)
       }
    })
+
+exports.deleteLoggedInUserAccount = functions.https.onCall(
+   async (data, context) => {
+      const { auth } = context
+      const {
+         token: { email: userEmail, uid: userId },
+      } = auth
+
+      if (!auth || !userEmail || !userId) {
+         // Throwing an HttpsError so that the client gets the error details.
+         throw new functions.https.HttpsError(
+            "failed-precondition",
+            "The function must be called while logged in."
+         )
+      }
+
+      try {
+         await admin.auth().deleteUser(userId)
+         await admin.firestore().collection("userData").doc(userEmail).delete()
+
+         // add userId and timestamp on analytics collection
+         await admin
+            .firestore()
+            .collection("analytics")
+            .doc("deletedUsers")
+            .collection("deletedUsers")
+            .doc(userId)
+            .set({
+               userId: userId,
+               timeStamp: admin.firestore.FieldValue.serverTimestamp(),
+            })
+
+         functions.logger.info(
+            `User ${userEmail} with the id ${userId} was deleted successfully`
+         )
+      } catch (error) {
+         console.error(
+            `Error deleting user ${userEmail} with the id ${userId} in firestore`,
+            error
+         )
+         throw new functions.https.HttpsError(error.code, error.message)
+      }
+   }
+)

@@ -34,6 +34,7 @@ exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName
 exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
    auth.resendPostmarkEmailVerificationEmailWithPin_v2
+exports.deleteLoggedInUserAccount = auth.deleteLoggedInUserAccount
 
 // Agora
 exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
