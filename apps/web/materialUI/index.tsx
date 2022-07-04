@@ -221,6 +221,32 @@ const getComponents = (theme: DefaultTheme): Components => ({
          },
       },
    },
+   MuiTextField: {
+      styleOverrides: {
+         root: {
+            "&.registrationInput": {
+               backgroundColor: white,
+               boxShadow: theme.boxShadows.grey_5_15,
+               borderRadius: "8px",
+
+               "& fieldset": {
+                  borderRadius: "8px",
+               },
+            },
+         },
+      },
+   },
+   MuiFormControl: {
+      styleOverrides: {
+         root: {
+            ".registrationDropdown": {
+               backgroundColor: white,
+               boxShadow: theme.boxShadows.grey_5_15,
+               borderRadius: "8px",
+            },
+         },
+      },
+   },
    MuiButtonGroup: {
       styleOverrides: {
          // Name of the slot

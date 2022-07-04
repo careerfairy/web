@@ -16,6 +16,7 @@ const UniversityCountrySelector = ({
    submitting,
    handleBlur,
    error,
+   className = "",
 }) => {
    const getSelectedItem = () => {
       // Autocomplete will always complain because of async filtering... :( So ignore the warning
@@ -51,6 +52,7 @@ const UniversityCountrySelector = ({
                <FormControl error={Boolean(error)} fullWidth>
                   <TextField
                      {...params}
+                     className={className}
                      inputProps={inputProps}
                      error={Boolean(error)}
                      autoComplete="none"
