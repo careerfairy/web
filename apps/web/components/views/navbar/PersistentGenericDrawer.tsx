@@ -24,10 +24,7 @@ const styles: StylesProps = {
    drawerClosed: {
       width: 0,
    },
-   persistentDrawer: {
-      width: (theme) => theme.drawerWidth.small,
-      flexShrink: 0,
-      zIndex: (theme) => theme.zIndex.drawer + 1,
+   drawerAnimation: {
       transition: (theme) => theme.transitions.create("width"),
       "& > .MuiDrawer-paper": {
          transition: (theme) =>
@@ -36,6 +33,13 @@ const styles: StylesProps = {
                "top",
                "height",
             ])} !important`,
+      },
+   },
+   persistentDrawer: {
+      width: (theme) => theme.drawerWidth.small,
+      flexShrink: 0,
+      zIndex: (theme) => theme.zIndex.drawer + 1,
+      "& > .MuiDrawer-paper": {
          boxSizing: "border-box",
          top: 64,
          height: "calc(100% - 64px)",
@@ -74,6 +78,12 @@ interface PersistentDrawerProps {
    sx?: SxProps<DefaultTheme>
 }
 
+/**
+ * Some pages have tabs that don't look great with the animation
+ * Disable the slide animation for these paths
+ */
+const disableAnimationForPaths = [/^\/profile/]
+
 const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
    isPersistent,
    children,
@@ -108,15 +118,21 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
       dispatch(actions.openNavDrawer())
    }
 
+   const sxProps = [
+      styles.drawer,
+      styles.persistentDrawer,
+      drawerOpen ? styles.drawerOpen : styles.drawerClosed,
+      ...(Array.isArray(sx) ? sx : [sx]),
+   ]
+
+   if (canShowAnimationForPath(pathname)) {
+      sxProps.push(styles.drawerAnimation)
+   }
+
    return isPersistent ? (
       <Drawer
          anchor="left"
-         sx={[
-            styles.drawer,
-            styles.persistentDrawer,
-            drawerOpen ? styles.drawerOpen : styles.drawerClosed,
-            ...(Array.isArray(sx) ? sx : [sx]),
-         ]}
+         sx={sxProps}
          open
          PaperProps={{
             sx: [drawerOpen ? styles.drawerOpen : styles.drawerClosed],
@@ -148,6 +164,10 @@ const PersistentGenericDrawer: FC<PersistentDrawerProps> = ({
          {children}
       </Drawer>
    )
+}
+
+const canShowAnimationForPath = (pathName: string) => {
+   return !disableAnimationForPaths.some((path) => path.test(pathName))
 }
 
 export default PersistentGenericDrawer
