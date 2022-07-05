@@ -1,8 +1,6 @@
-import { firebaseServiceInstance } from "./FirebaseService"
 import firebase from "firebase/app"
-import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
-import BaseFirebaseRepository from "./BaseFirebaseRepository"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import BaseFirebaseRepository from "../BaseFirebaseRepository"
+import { SavedRecruiter, UserData } from "./users"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -20,7 +18,7 @@ export interface IUserRepository {
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
 }
 
-class FirebaseUserRepository
+export class FirebaseUserRepository
    extends BaseFirebaseRepository
    implements IUserRepository
 {
@@ -114,10 +112,3 @@ class FirebaseUserRepository
       return users.filter((user) => user !== null)
    }
 }
-
-// Singleton
-const userRepo: IUserRepository = new FirebaseUserRepository(
-   firebaseServiceInstance.firestore
-)
-
-export default userRepo

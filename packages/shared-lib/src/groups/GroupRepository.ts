@@ -1,6 +1,5 @@
-import { firebaseServiceInstance } from "./FirebaseService"
 import firebase from "firebase/app"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { Group } from "./groups"
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -13,7 +12,7 @@ export interface IGroupRepository {
    ): Omit<Group, "adminEmails" | "adminEmail">
 }
 
-class FirebaseGroupRepository implements IGroupRepository {
+export class FirebaseGroupRepository implements IGroupRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
@@ -85,10 +84,3 @@ class FirebaseGroupRepository implements IGroupRepository {
       return adminGroups.docs.length > 0
    }
 }
-
-// Singleton
-const groupRepo: IGroupRepository = new FirebaseGroupRepository(
-   firebaseServiceInstance.firestore
-)
-
-export default groupRepo

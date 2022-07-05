@@ -8,10 +8,9 @@ import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
 import { GetServerSideProps } from "next"
-import highlightRepo from "../data/firebase/HighlightRepository"
-import livestreamRepo from "../data/firebase/LivestreamRepository"
 import { mapServerSideStream } from "../util/serverUtil"
 import SEO from "../components/util/SEO"
+import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
 
 const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
    const { authenticatedUser, userData } = useAuth()

@@ -36,28 +36,3 @@ export interface LiveStreamEvent extends Identifiable {
    hasEnded?: boolean
    targetCategories?: string[]
 }
-
-export interface LivestreamEventSerialized
-   extends Omit<
-      LivestreamEvent,
-      | "registeredUsers"
-      | "registrants"
-      | "talentPool"
-      | "participatingStudents"
-      | "participants"
-      | "created"
-      | "start"
-      | "startDate"
-      | "lastUpdated"
-      | "lastUpdatedAuthorInfo"
-   > {
-   createdDateString: string
-   startDateString: string
-   lastUpdatedDateString: string
-}
-
-export interface LivestreamEventParsed extends LivestreamEventSerialized {
-   startDate: Date
-   createdDate: Date
-   lastUpdatedDate: Date
-}

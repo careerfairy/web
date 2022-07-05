@@ -38,8 +38,8 @@ import PropTypes from "prop-types"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import PercentIcon from "@mui/icons-material/Percent"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
-import livestreamRepo from "../../../../../../data/firebase/LivestreamRepository"
 import { format } from "date-fns"
+import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
 
 const styles = {
    root: {

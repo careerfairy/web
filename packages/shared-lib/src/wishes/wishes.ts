@@ -93,3 +93,10 @@ export interface Comment extends Identifiable {
    wishId: string
    parentCommentId: string | null
 }
+
+// TODO: this should be moved to the web-app since its a UI detail
+export interface CreateWishFormValues {
+   description: Wish["description"]
+   interests: Interest[]
+   companyNames: Wish["companyNames"]
+}

@@ -15,11 +15,11 @@ import { Highlights } from "../../groups/Groups"
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import groupRepo from "../../../../data/firebase/GroupRepository"
 import Link from "../../common/Link"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../../store/actions"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import { groupRepo } from "../../../../data/RepositoryInstances"
 
 const useStyles = makeStyles((theme) => ({
    header: {
