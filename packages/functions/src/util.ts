@@ -386,6 +386,10 @@ export function partition(array, filter) {
  * @returns {string}
  */
 export const isLocalEnvironment = () => {
+   console.log(
+      "-> process.env.FIRESTORE_EMULATOR_HOST",
+      process.env.FIRESTORE_EMULATOR_HOST
+   )
    return (
       process.env.FIREBASE_AUTH_EMULATOR_HOST ||
       process.env.FIRESTORE_EMULATOR_HOST ||

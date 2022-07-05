@@ -10,6 +10,7 @@ import * as fieldOfStudyMapping from "@careerfairy/firebase-scripts/data/fieldOf
 import { BigBatch } from "@qualdesk/firestore-big-batch"
 
 export default async function main() {
+   console.log("-> STARTING BACKFILL FIELD OF STUDY")
    const counter = new ReadAndWriteCounter([
       "numTotalUsers",
       "numUsersWithFieldOfStudy",
@@ -32,7 +33,10 @@ export default async function main() {
       (doc) => ({ id: doc.id, ...doc.data() } as Group)
    )
    // console.log("-> total users", userSnaps.docs.length)
+   let i = 0
    for (const userSnap of userSnaps.docs) {
+      consoleLogProgressEveryPercent(counter.getCustomCount("numTotalUsers"), i)
+      i++
       const userData = {
          ...userSnap.data(),
          id: userSnap.id,
@@ -140,4 +144,16 @@ const getRegisteredGroupFieldOfStudyCategories = (
    return registeredGroupCategories.filter((category) =>
       possibleFieldsOfStudy.includes(category.name.trim())
    )
+}
+
+const consoleLogProgressEveryPercent = (
+   totalUsers: number,
+   userIndex: number,
+   percent = 10
+) => {
+   if (userIndex % Math.floor(totalUsers / Math.floor(100 / percent)) === 0) {
+      console.log(
+         `Backfilled ${Math.round((userIndex / totalUsers) * 100)}% of users`
+      )
+   }
 }
