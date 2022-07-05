@@ -5,6 +5,8 @@ import {
    Box,
    Button,
    CircularProgress,
+   Collapse,
+   FormHelperText,
    Link as MuiLink,
    Paper,
    TextField,
@@ -128,6 +130,7 @@ const SignUpPinForm = () => {
                   </Paper>
                   <Box style={{ margin: "1rem 0" }}>
                      <TextField
+                        className="registrationInput"
                         label="PIN Code"
                         placeholder="Enter the pin code"
                         variant="outlined"
@@ -142,10 +145,14 @@ const SignUpPinForm = () => {
                         error={Boolean(
                            errors.pinCode && touched.pinCode && errors.pinCode
                         )}
-                        helperText={
-                           errors.pinCode && touched.pinCode && errors.pinCode
-                        }
                      />
+                     <Collapse
+                        in={Boolean(
+                           errors.pinCode && touched.pinCode && errors.pinCode
+                        )}
+                     >
+                        <FormHelperText error>{errors.pinCode}</FormHelperText>
+                     </Collapse>
                   </Box>
                   <Button
                      size="large"

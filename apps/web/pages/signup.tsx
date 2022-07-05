@@ -102,7 +102,6 @@ export const SignupStepper = ({
 
 const styles = sxStyles({
    footer: {
-      color: "white",
       fontWeight: 700,
       fontSize: "1.3em",
       margin: "40px 0 30px 0",
