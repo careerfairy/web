@@ -29,15 +29,11 @@ const confirmScriptSafetyWrapper = async (
    callback: () => any,
    useProd: boolean
 ) => {
-   try {
-      if (useProd) {
-         await prompt.run()
-         return callback()
-      } else {
-         return callback()
-      }
-   } catch (e) {
-      console.error(e)
+   if (useProd) {
+      await prompt.run()
+      return callback()
+   } else {
+      return callback()
    }
 }
 export default confirmScriptSafetyWrapper

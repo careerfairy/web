@@ -11,6 +11,7 @@ export interface UserData extends Identifiable {
    }
    badges?: string[]
    groupIds: string[]
+   registeredGroups?: RegisteredGroup[]
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
@@ -29,6 +30,16 @@ export interface UserData extends Identifiable {
    // need data migrations to be moved to the user stats doc
    referralsCount?: number
    totalLivestreamInvites?: number
+}
+
+export interface RegisteredGroup {
+   groupId: string
+   categories: RegisteredGroupCategory[]
+}
+
+export interface RegisteredGroupCategory {
+   id: string
+   selectedValueId: string
 }
 
 export interface UserStats {

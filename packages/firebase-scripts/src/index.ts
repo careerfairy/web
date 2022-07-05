@@ -2,7 +2,6 @@ import confirmScriptSafetyWrapper from "./util/confirmScriptSafetyWrapper"
 
 type ScriptArgs = "useProd" | "scriptPath"
 
-console.log("-> process.argv", process.argv)
 const getArgValue = (targetArg: ScriptArgs) => {
    const argValue = process.argv.find((arg) => arg.startsWith(`${targetArg}=`))
    if (!argValue) {
@@ -20,10 +19,13 @@ async function run(): Promise<void> {
    try {
       const script = require(scriptPath).default
       console.log("-> Script Execution Started")
+      console.time(`${scriptPath}`)
       await confirmScriptSafetyWrapper(script, useProd)
       console.log("-> Script Execution Finished Successfully")
    } catch (e) {
+      console.log("-> Script Execution Failed or was Cancelled")
       console.error(e)
    }
+   console.timeEnd(`${scriptPath}`)
 }
 run().catch(console.error)

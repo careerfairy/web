@@ -30,7 +30,7 @@ async function run(): Promise<void> {
    emulatorsProcess = await runEmulatorsInBackground()
    h1Text(`Emulators ready to receive commands`)
 
-   const collections = ["userData", "users"]
+   const collections = ["users"]
    h1Text(`Removing collections: ${collections.join(",")}`)
    await removeExistingCollections(collections)
    h1Text(`Deleting Auth`)
