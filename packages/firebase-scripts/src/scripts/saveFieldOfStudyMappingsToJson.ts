@@ -19,17 +19,16 @@ export const saveFieldOfStudyMappingsToJson = async (): Promise<void> => {
       legacyHeaderValue
    )
 
+   const fieldOfStudyMapping = {
+      legacyMappings: legacyFieldOfStudiesDict,
+      newFieldOfStudies: currentFieldOfStudiesDict,
+   }
+
    fs.writeFile(
-      config.currentFieldOfStudiesMappingJsonPath,
-      JSON.stringify(currentFieldOfStudiesDict),
+      config.fieldOfStudyMappingJsonPath,
+      JSON.stringify(fieldOfStudyMapping),
       "utf8",
-      () => console.log("currentFieldOfStudiesDict.json saved")
-   )
-   fs.writeFile(
-      config.legacyFieldOfStudiesMappingJsonPath,
-      JSON.stringify(legacyFieldOfStudiesDict),
-      "utf8",
-      () => console.log("legacyFieldOfStudiesDict.json saved")
+      () => console.log("fieldOfStudyMappingJsonPath.json saved")
    )
 }
 
@@ -40,7 +39,6 @@ const getDictionary = (data: any[], headerKey: string, headerValue) => {
          dict[row[headerKey]] = row[headerValue]
       }
    }
-
    return dict
 }
 

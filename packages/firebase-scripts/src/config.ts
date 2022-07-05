@@ -8,4 +8,5 @@ export default {
    currentFieldOfStudiesMappingJsonPath:
       "./data/currentFieldOfStudiesMapping.json",
    exportedFieldOfStudyMappingCsv: "./data/exportedFieldOfStudyMapping.csv",
+   fieldOfStudyMappingJsonPath: "./data/fieldOfStudyMapping.json",
 }

@@ -1,19 +1,24 @@
-import * as currentFieldOfStudiesMapping from "@careerfairy/firebase-scripts/data/currentFieldOfStudiesMapping.json"
+import * as fieldOfStudyMapping from "@careerfairy/firebase-scripts/data/fieldOfStudyMapping.json"
 import { firestore } from "../lib/firebase"
 
 export default async function createNewFieldsOfStudyInFirestore() {
-   const newFieldsOfStudy = Object.keys(currentFieldOfStudiesMapping).map(
-      (mappingId) => ({
-         mappingId,
-         label: currentFieldOfStudiesMapping[mappingId],
-      })
-   )
+   const batch = firestore.batch()
+   const newMappings = fieldOfStudyMapping.newFieldOfStudies
+   const newFieldsOfStudy = Object.keys(newMappings).map((mappingId) => ({
+      mappingId,
+      label: newMappings[mappingId],
+   }))
    // write new fields of study to db
-   const fieldOfStudyRef = firestore.collection("fieldOfStudy")
 
-   for (const fieldOfStudy of newFieldsOfStudy) {
-      await fieldOfStudyRef
+   newFieldsOfStudy.forEach((fieldOfStudy) => {
+      const fieldOfStudyRef = firestore
+         .collection("fieldOfStudy")
          .doc(fieldOfStudy.mappingId)
-         .set({ label: fieldOfStudy.label })
-   }
+
+      batch.set(fieldOfStudyRef, { label: fieldOfStudy.label })
+   })
+   await batch.commit()
+
+   console.log("New fields of study created:")
+   console.table(newFieldsOfStudy)
 }

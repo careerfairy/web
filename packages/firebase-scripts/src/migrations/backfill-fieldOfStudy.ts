@@ -5,14 +5,11 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { possibleFieldsOfStudy, possibleOthers } from "../constants"
 import { RegisteredGroup } from "@careerfairy/shared-lib/dist/users/users"
 import { removeDuplicates } from "../util/misc"
-import * as currentFieldOfStudiesMapping from "@careerfairy/firebase-scripts/data/currentFieldOfStudiesMapping.json"
-import * as legacyFieldOfStudiesMapping from "@careerfairy/firebase-scripts/data/legacyFieldOfStudiesMapping.json"
+import * as fieldOfStudyMapping from "@careerfairy/firebase-scripts/data/fieldOfStudyMapping.json"
+
 import { BigBatch } from "@qualdesk/firestore-big-batch"
 
 export default async function main() {
-   console.log("-> getMappingsFromCSV")
-
-   // get all users
    const counter = new ReadAndWriteCounter([
       "numTotalUsers",
       "numUsersWithFieldOfStudy",
@@ -21,6 +18,7 @@ export default async function main() {
    const batch = new BigBatch({ firestore: firestore }) //
 
    const fieldsOfStudySnaps = await firestore.collection("fieldOfStudy").get()
+   // get all users
    const userSnaps = await firestore.collection("userData").get()
    counter.addToCustomCount("numTotalUsers", userSnaps.docs.length)
    const groupSnaps = await firestore.collection("careerCenterData").get()
@@ -80,8 +78,10 @@ export default async function main() {
 }
 
 const getAssignedFieldOfStudyId = (userFirstFieldOfStudy: string) => {
-   const fieldOfStudyId = legacyFieldOfStudiesMapping[userFirstFieldOfStudy]
-   return currentFieldOfStudiesMapping[fieldOfStudyId]
+   const legacyFieldOfStudiesDict = fieldOfStudyMapping.legacyMappings
+   const newFieldOfStudiesDict = fieldOfStudyMapping.newFieldOfStudies
+   const fieldOfStudyId = legacyFieldOfStudiesDict[userFirstFieldOfStudy]
+   return newFieldOfStudiesDict[fieldOfStudyId]
 }
 
 const getUserFieldsOfStudy = (userData: UserData, groups: Group[]) => {
