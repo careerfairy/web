@@ -20,6 +20,7 @@ import PersonaliseSteps from "../components/views/signup/PersonaliseSteps"
 import { MainLogo } from "./../components/logos"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
+import { HeaderLogoWrapper } from "../materialUI"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 
@@ -116,7 +117,7 @@ const styles = sxStyles({
       lineHeight: "63px",
       textAlign: "center",
       letterSpacing: "-0.02em",
-      marginTop: 12,
+      marginTop: 6,
    },
    icon: {
       margin: "0 10px",
@@ -134,9 +135,9 @@ export const SignUpPageLayout = ({ children }) => {
             <title key="title">CareerFairy | Sign Up</title>
          </Head>
          <RegistrationBackground>
-            <header>
+            <HeaderLogoWrapper>
                <MainLogo sx={styles.logo} />
-            </header>
+            </HeaderLogoWrapper>
             <Typography sx={styles.title}>
                Create your profile to start
             </Typography>

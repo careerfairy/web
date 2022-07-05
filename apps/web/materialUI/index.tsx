@@ -1,10 +1,16 @@
 // import { deepmerge } from "@mui/utils";
 // it could be your App.tsx file or theme file that is included in your tsconfig.json
-import { alpha, createTheme, PaletteOptions, Theme } from "@mui/material/styles"
+import {
+   alpha,
+   createTheme,
+   PaletteOptions,
+   styled,
+   Theme,
+} from "@mui/material/styles"
 import { grey } from "@mui/material/colors"
 
 import React from "react"
-import { PaletteMode, Components } from "@mui/material"
+import { PaletteMode } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 
 interface CustomThemeProps {
@@ -185,7 +191,7 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          "0px 18px 23px rgba(0,0,0,0.1);",
    })
 
-const getComponents = (theme: DefaultTheme): Components => ({
+const getComponents = (theme: DefaultTheme): any => ({
    // Name of the component
    MuiBackdrop: {
       styleOverrides: {
@@ -283,6 +289,13 @@ const getComponents = (theme: DefaultTheme): Components => ({
             },
          },
       ],
+   },
+   MuiHeaderLogoWrapper: {
+      styleOverrides: {
+         root: {
+            padding: "0 24px 0 24px",
+         },
+      },
    },
    MuiButton: {
       styleOverrides: {
@@ -463,3 +476,10 @@ export const brandedLightTheme = createTheme(
 )
 
 export const brandedDarkTheme = createTheme({}, getTheme(rootThemeObj("dark")))
+
+export const HeaderLogoWrapper = styled("div", {
+   name: "MuiHeaderLogoWrapper",
+   overridesResolver: (props, styles) => {
+      return [styles.root]
+   },
+})()

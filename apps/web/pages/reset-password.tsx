@@ -24,18 +24,19 @@ import { MainLogo } from "../components/logos"
 import Collapse from "@mui/material/Collapse"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../types/commonTypes"
+import { HeaderLogoWrapper } from "../materialUI"
 
 const styles = sxStyles({
    formWrapper: {
       p: { xs: 2, sm: 3 },
-      marginTop: 12,
+      marginTop: 3,
    },
    formTitle: {
       color: "primary.main",
       fontWeight: "500",
       fontSize: "2em",
       mx: 0,
-      my: 5,
+      my: 3,
       textAlign: "center",
    },
    logo: {
@@ -75,9 +76,9 @@ function ResetPasswordPage() {
 
    return (
       <RegistrationBackground>
-         <header>
+         <HeaderLogoWrapper>
             <MainLogo sx={styles.logo} />
-         </header>
+         </HeaderLogoWrapper>
          <ResetPasswordBase />
       </RegistrationBackground>
    )
@@ -144,17 +145,17 @@ export function ResetPasswordBase() {
                            <MicIcon
                               fontSize="large"
                               style={styles.icon}
-                              color="primary"
+                              color="disabled"
                            />
                            <ArrowForwardIosIcon
                               fontSize="large"
                               style={styles.icon}
-                              color="primary"
+                              color="disabled"
                            />
                            <BusinessCenterIcon
                               fontSize="large"
                               style={styles.icon}
-                              color="primary"
+                              color="disabled"
                            />
                         </Box>
                         <Box sx={styles.formTitle}>CareerFairy</Box>

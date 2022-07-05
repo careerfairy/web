@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect } from "react"
+import React, { useEffect } from "react"
 import { useRouter } from "next/router"
 import Link from "next/link"
 import { Formik, FormikValues } from "formik"
@@ -18,21 +18,21 @@ import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import { useAuth } from "../HOCs/AuthProvider"
 import { FormikHelpers } from "formik/dist/types"
 import { MainLogo } from "../components/logos"
+import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { HeaderLogoWrapper } from "../materialUI"
+import { FormHelperText } from "@mui/material"
+import * as yup from "yup"
 
 const styles = {
    box: {
       width: "100%", // Fix IE 11 issue.
-      backgroundColor: "background.paper",
       marginTop: 3,
-      borderRadius: "5px",
-      boxShadow: 1,
       p: 3,
    },
    submit: {
       margin: (theme) => theme.spacing(3, 0, 2),
    },
    footer: {
-      color: "white",
       fontWeight: "700",
       fontSize: "1.3em",
       margin: "40px 0 30px 0",
@@ -44,25 +44,27 @@ const styles = {
       color: "primary.main",
       fontWeight: "500",
       fontSize: "2em",
-      margin: "20px",
+      margin: 3,
       textAlign: "center",
    },
    form: {
       width: "100%", // Fix IE 11 issue.
-      marginTop: 1,
    },
    iconWrapper: {
       display: "flex",
       justifyContent: "center",
-      "& .MuiSvgIcon-root": {
-         margin: "0 10px",
-      },
    },
    message: {
       color: "success.main",
       padding: "1rem",
       backgroundColor: "white",
       margin: "1rem 0",
+   },
+   logo: {
+      margin: "20px 20px 0 20px",
+   },
+   icon: {
+      margin: "0 10px",
    },
 }
 
@@ -102,27 +104,25 @@ function LogInPage() {
    ])
 
    return (
-      <Box
-         sx={{
-            height: "100vh",
-            bgcolor: "primary.main",
-         }}
-      >
-         <Box component={"header"} sx={{ px: 3, pb: 5, pt: 2 }}>
-            <MainLogo white />
-         </Box>
+      <RegistrationBackground>
+         <HeaderLogoWrapper>
+            <MainLogo sx={styles.logo} />
+         </HeaderLogoWrapper>
          <LogInFormBase />
-      </Box>
+      </RegistrationBackground>
    )
 }
 
 export default LogInPage
 
-interface LoginFormErrors {
-   email?: string
-   password?: string
-   submitError?: string
-}
+const schema = yup.object().shape({
+   email: yup
+      .string()
+      .required("Your email is required")
+      .email("Please enter a valid email address"),
+   password: yup.string().required("A password is required"),
+})
+
 export function LogInFormBase() {
    const firebase = useFirebaseService()
    const {
@@ -161,28 +161,13 @@ export function LogInFormBase() {
    }
 
    return (
-      <Fragment>
+      <>
          <Head>
             <title key="title">CareerFairy | Log in</title>
          </Head>
          <Formik
             initialValues={{ email: "", password: "" }}
-            validate={(values) => {
-               let errors: LoginFormErrors = {}
-               if (!values.email) {
-                  errors.email = "Your email is required"
-               } else if (
-                  !/^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/i.test(
-                     values.email
-                  )
-               ) {
-                  errors.email = "Please enter a valid email address"
-               }
-               if (!values.password) {
-                  errors.password = "A password is required"
-               }
-               return errors
-            }}
+            validationSchema={schema}
             onSubmit={handleSubmit}
          >
             {({
@@ -203,18 +188,25 @@ export function LogInFormBase() {
                         onSubmit={handleSubmit}
                      >
                         <Box sx={styles.iconWrapper}>
-                           <MicOutlinedIcon color="disabled" fontSize="large" />
+                           <MicOutlinedIcon
+                              color="disabled"
+                              fontSize="large"
+                              style={styles.icon}
+                           />
                            <BusinessCenterRoundedIcon
                               color="disabled"
                               fontSize="large"
+                              style={styles.icon}
                            />
                            <TheatersRoundedIcon
                               color="disabled"
                               fontSize="large"
+                              style={styles.icon}
                            />
                         </Box>
                         <Typography sx={styles.title}>CareerFairy</Typography>
                         <TextField
+                           className="registrationInput"
                            label="Email"
                            id="email"
                            name="email"
@@ -226,13 +218,14 @@ export function LogInFormBase() {
                            onChange={handleChange}
                            onBlur={handleBlur}
                            value={values.email}
-                           helperText={
-                              errors.email && touched.email && errors.email
-                           }
                            error={Boolean(errors.email && touched.email)}
                            disabled={isSubmitting}
                         />
+                        <Collapse in={Boolean(errors.email && touched.email)}>
+                           <FormHelperText error>{errors.email}</FormHelperText>
+                        </Collapse>
                         <TextField
+                           className="registrationInput"
                            id="password"
                            type="password"
                            fullWidth
@@ -246,17 +239,15 @@ export function LogInFormBase() {
                            onBlur={handleBlur}
                            value={values.password}
                            disabled={isSubmitting}
-                           helperText={
-                              errors.password &&
-                              touched.password &&
-                              errors.password
-                           }
-                           error={Boolean(
-                              errors.password &&
-                                 touched.password &&
-                                 errors.password
-                           )}
+                           error={Boolean(errors.password && touched.password)}
                         />
+                        <Collapse
+                           in={Boolean(errors.password && touched.password)}
+                        >
+                           <FormHelperText error>
+                              {errors.password}
+                           </FormHelperText>
+                        </Collapse>
                         <Button
                            id="submitButton"
                            data-testid={"login-button"}
@@ -315,6 +306,6 @@ export function LogInFormBase() {
             )}
          </Formik>
          <Typography sx={styles.footer}>Meet Your Future</Typography>
-      </Fragment>
+      </>
    )
 }
