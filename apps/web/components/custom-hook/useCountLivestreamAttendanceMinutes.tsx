@@ -8,11 +8,11 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import LivestreamPresenter from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import usePersistentInterval from "./usePersistentInterval"
-import livestreamRepo from "../../data/firebase/LivestreamRepository"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { useRouter } from "next/router"
 import { useSelector } from "react-redux"
 import { rtcConnectionStateSelector } from "../../store/selectors/streamSelectors"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 
 // Send a heartbeat event to the server every minute
 const HEARTBEAT_INTERVAL_SECONDS = 60

@@ -14,7 +14,7 @@ import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ScrollToTop from "components/views/common/ScrollToTop"
 import { placeholderBanner } from "../../../constants/images"
 import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
-import livestreamRepo from "../../../data/firebase/LivestreamRepository"
+import { livestreamRepo } from "../../../data/RepositoryInstances"
 
 const GroupPage = ({ serverSideGroup, initialTabValue }) => {
    const {

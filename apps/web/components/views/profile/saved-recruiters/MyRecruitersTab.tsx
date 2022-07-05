@@ -9,12 +9,12 @@ import { RecruiterCard } from "./RecruiterCard"
 import Skeleton from "@mui/material/Skeleton"
 import Card from "@mui/material/Card"
 import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
-import userRepo from "../../../../data/firebase/UserRepository"
 import { styles } from "../profileStyles"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { DefaultTheme } from "@mui/styles"
 import NoAccessView from "../../common/NoAccessView"
 import { Highlights_NoAccess } from "../../../../constants/contextInfoCareerSkills"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const MyRecruitersTab = () => {
    const { userPresenter } = useAuth()

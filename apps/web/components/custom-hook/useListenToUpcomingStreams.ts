@@ -1,9 +1,8 @@
 import useCollection from "./useCollection"
-import livestreamRepo, {
-   LivestreamsDataParser,
-} from "../../data/firebase/LivestreamRepository"
 import { useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { livestreamRepo } from "../../data/RepositoryInstances"
+import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 
 const useListenToUpcomingStreams = (
    filterByGroupId?: string,

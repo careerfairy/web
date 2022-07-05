@@ -1,18 +1,13 @@
 import firebase from "firebase/app"
-import firebaseApp from "./FirebaseInstance"
-import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types"
-import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../constants/streams"
-import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
+import { RegisteredStudent, UserPublicData } from "../users"
+import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
 import {
    LivestreamEvent,
-   LivestreamEventPublicData,
-} from "@careerfairy/shared-lib/dist/livestreams"
-import {
    LivestreamEventParsed,
+   LivestreamEventPublicData,
    LivestreamEventSerialized,
-} from "../../types/event"
-import { RegisteredStudent } from "@careerfairy/shared-lib/dist/users"
-import { UserPublicData } from "@careerfairy/shared-lib/src/users/users"
+   NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
+} from "./livestreams"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -32,13 +27,13 @@ export interface ILivestreamRepository {
       userEmail: string,
       userInterestsIds: string[],
       limit: number,
-      callback: (snapshot: QuerySnapshot) => void
+      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    )
 
    listenToRegisteredEvents(
       userEmail: string,
       limit: number,
-      callback: (snapshot: QuerySnapshot) => void
+      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    )
 
    getPastEventsFrom(
@@ -63,7 +58,7 @@ export interface ILivestreamRepository {
 
    listenToSingleEvent(
       eventId: string,
-      callback: (snapshot: DocumentSnapshot) => void
+      callback: (snapshot: firebase.firestore.DocumentSnapshot) => void
    )
    eventsOfGroupQuery(
       groupId: string,
@@ -93,11 +88,11 @@ export interface ILivestreamRepository {
    ): Promise<void>
 }
 
-class FirebaseLivestreamRepository implements ILivestreamRepository {
+export class FirebaseLivestreamRepository implements ILivestreamRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
    private mapLivestreamCollections(
-      documentSnapshot: QuerySnapshot
+      documentSnapshot: firebase.firestore.QuerySnapshot
    ): LivestreamsDataParser {
       const docs = mapFirestoreDocuments<LivestreamEvent>(documentSnapshot)
       return new LivestreamsDataParser(docs).complementaryFields()
@@ -126,7 +121,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
 
    listenToSingleEvent(
       eventId: string,
-      callback: (snapshot: DocumentSnapshot) => void
+      callback: (snapshot: firebase.firestore.DocumentSnapshot) => void
    ) {
       return (
          this.firestore
@@ -253,7 +248,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
    listenToRegisteredEvents(
       userEmail: string,
       limit: number,
-      callback: (snapshot: QuerySnapshot) => void
+      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    ) {
       if (!userEmail) return null
       let livestreamRef = this.firestore
@@ -369,7 +364,7 @@ class FirebaseLivestreamRepository implements ILivestreamRepository {
       userEmail: string,
       userInterestsIds: string[],
       limit: number,
-      callback: (snapshot: QuerySnapshot) => void
+      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    ) {
       let livestreamRef = this.firestore
          .collection("livestreams")
@@ -472,10 +467,3 @@ export class LivestreamsDataParser {
       return this.livestreams
    }
 }
-
-// Singleton
-const livestreamRepo: ILivestreamRepository = new FirebaseLivestreamRepository(
-   firebaseApp.firestore()
-)
-
-export default livestreamRepo

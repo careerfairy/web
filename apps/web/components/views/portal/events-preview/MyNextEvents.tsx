@@ -1,9 +1,9 @@
 import React, { useMemo } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
-import livestreamRepo from "../../../../data/firebase/LivestreamRepository"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { usePagination } from "use-pagination-firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
 
 const MyNextEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth()

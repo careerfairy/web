@@ -1,5 +1,6 @@
 import firebase from "firebase/app"
-import { Identifiable } from "@careerfairy/shared-lib/dist/commonTypes"
+import { Identifiable } from "./commonTypes"
+import { QuerySnapshot } from "@firebase/firestore-types"
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 /**
@@ -31,4 +32,22 @@ export default class BaseFirebaseRepository {
          id: doc.id,
       } as T
    }
+}
+
+/**
+ * Add the document id to the document itself
+ *
+ * @param documentSnapshot
+ */
+export function mapFirestoreDocuments<T>(
+   documentSnapshot: QuerySnapshot
+): T[] | null {
+   let docs = null
+   if (!documentSnapshot.empty) {
+      docs = documentSnapshot.docs.map((doc) => ({
+         ...doc.data(),
+         id: doc.id,
+      }))
+   }
+   return docs
 }
