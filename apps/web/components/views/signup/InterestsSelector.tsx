@@ -1,13 +1,13 @@
 import { useAuth } from "../../../HOCs/AuthProvider"
 import React, { useCallback, useEffect, useState } from "react"
 import { useDispatch } from "react-redux"
-import userRepo from "../../../data/firebase/UserRepository"
 import { Box, Chip, Typography } from "@mui/material"
 import { useInterests } from "../../custom-hook/useCollection"
 import { Interest } from "../../../types/interests"
 import CircularLoader from "../loader/CircularLoader"
 import * as actions from "../../../store/actions/snackbarActions"
 import _ from "lodash"
+import { userRepo } from "../../../data/RepositoryInstances"
 
 const InterestsSelector = () => {
    const { authenticatedUser: user, userData } = useAuth()

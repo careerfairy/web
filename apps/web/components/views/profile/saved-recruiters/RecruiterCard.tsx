@@ -18,9 +18,9 @@ import Link from "../../common/Link"
 import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Image from "next/image"
-import userRepo from "../../../../data/firebase/UserRepository"
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { sxStyles } from "../../../../types/commonTypes"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    name: {

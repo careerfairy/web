@@ -9,7 +9,6 @@ import {
    CircularProgress,
    Typography,
 } from "@mui/material"
-import userRepo from "../../../data/firebase/UserRepository"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import Stack from "@mui/material/Stack"
 import { wishListBorderRadius } from "../../../constants/pages"
@@ -17,7 +16,6 @@ import UserAvatar from "../common/UserAvatar"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import UpvoteIcon from "@mui/icons-material/ArrowUpward"
 import DownvoteIcon from "@mui/icons-material/ArrowDownward"
-import wishRepo from "../../../data/firebase/WishRepository"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
@@ -26,6 +24,7 @@ import { useRouter } from "next/router"
 import { Hit } from "../../../types/algolia"
 import WishCardMenuButton from "./WishCardMenuButton"
 import WishSEOSchemaScriptTag from "../common/WishSEOSchemaScriptTag"
+import { userRepo, wishlistRepo } from "../../../data/RepositoryInstances"
 
 interface WishCardProps {
    wish: Hit<Wish>
@@ -157,7 +156,7 @@ const WishCard = ({ wish }: WishCardProps) => {
    useEffect(() => {
       ;(async function getUserRating() {
          if (isLoggedIn) {
-            const userRating = await wishRepo.getUserRating(
+            const userRating = await wishlistRepo.getUserRating(
                wish.id,
                authenticatedUser.uid
             )
@@ -170,7 +169,7 @@ const WishCard = ({ wish }: WishCardProps) => {
       try {
          if (!isLoggedIn) return goToLogin()
          setVoting(true)
-         const newRating = await wishRepo.toggleRateWish(
+         const newRating = await wishlistRepo.toggleRateWish(
             authenticatedUser.uid,
             wish.id,
             type
@@ -226,7 +225,7 @@ const WishCard = ({ wish }: WishCardProps) => {
    }
 
    const handleDelete = async () => {
-      await wishRepo.deleteWish(wish.id)
+      await wishlistRepo.deleteWish(wish.id)
       setDeleted(true)
    }
 

@@ -1,6 +1,9 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
 
+export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
+   1000 * 60 * 60 * 12
+
 export interface LivestreamEvent extends Identifiable {
    author?: {
       email: string
@@ -94,4 +97,29 @@ export const pickPublicDataFromLivestream = (
       companyLogoUrl: livestreamData.companyLogoUrl ?? null,
       test: livestreamData.test ?? false,
    }
+}
+
+export interface LivestreamEventSerialized
+   extends Omit<
+      LivestreamEvent,
+      | "registeredUsers"
+      | "registrants"
+      | "talentPool"
+      | "participatingStudents"
+      | "participants"
+      | "created"
+      | "start"
+      | "startDate"
+      | "lastUpdated"
+      | "lastUpdatedAuthorInfo"
+   > {
+   createdDateString: string
+   startDateString: string
+   lastUpdatedDateString: string
+}
+
+export interface LivestreamEventParsed extends LivestreamEventSerialized {
+   startDate: Date
+   createdDate: Date
+   lastUpdatedDate: Date
 }

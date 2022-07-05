@@ -1,8 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
-import livestreamRepo, {
-   LivestreamsDataParser,
-} from "../../../../data/firebase/LivestreamRepository"
 import { usePagination } from "use-pagination-firestore"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import EventsPreviewGrid from "./EventsPreviewGrid"
@@ -10,6 +7,8 @@ import { useRouter } from "next/router"
 import { parseStreamDates } from "../../../../util/serverUtil"
 import { useMountedState } from "react-use"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedIn } = useAuth()

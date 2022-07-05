@@ -1,14 +1,13 @@
 import firebase from "firebase/app"
-import firebaseApp from "./FirebaseInstance"
-import { HighLight } from "types/Highlight"
-import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
+import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
+import { HighLight } from "./Highlight"
 
 export interface IHighlightRepository {
    getHighlights(limit?: number): Promise<HighLight[]>
    shouldShowHighlightsCarousel(): Promise<Boolean>
 }
 
-class FirebaseHighlightRepository implements IHighlightRepository {
+export class FirebaseHighlightRepository implements IHighlightRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
    async getHighlights(limit?: number): Promise<HighLight[]> {
@@ -29,10 +28,3 @@ class FirebaseHighlightRepository implements IHighlightRepository {
       return Boolean(snap?.data?.()?.showHighlights)
    }
 }
-
-// Singleton
-const highlightRepo: IHighlightRepository = new FirebaseHighlightRepository(
-   firebaseApp.firestore()
-)
-
-export default highlightRepo

@@ -1,13 +1,12 @@
-import { firebaseServiceInstance } from "./FirebaseService"
 import firebase from "firebase/app"
-import { FlagReason, Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
-import { CreateWishFormValues } from "../../components/views/wishlist/CreateOrEditWishDialog"
+import { CreateWishFormValues, Wish, Rating, FlagReason } from "./wishes"
 
 export interface IWishRepository {
    getWishesQuery(
       options?: GetWishesOptions
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
    getWishes(options?: GetWishesOptions): Promise<Wish[]>
+   // todo: This repository shouldn't need to know about UI Forms, refactor this
    createWish(userUid: string, data: CreateWishFormValues): Promise<Wish>
    updateWish(
       wishData: CreateWishFormValues,
@@ -53,7 +52,8 @@ interface GetWishesOptions {
    // use the hook's limit property instead
    limit?: number
 }
-class FirebaseWishRepository implements IWishRepository {
+
+export class FirebaseWishRepository implements IWishRepository {
    constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
    getWishesQuery(
@@ -286,10 +286,3 @@ class FirebaseWishRepository implements IWishRepository {
       })
    }
 }
-
-// Singleton
-const wishRepo: IWishRepository = new FirebaseWishRepository(
-   firebaseServiceInstance.firestore
-)
-
-export default wishRepo
