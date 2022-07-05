@@ -6,6 +6,7 @@ import {
    Film as StreamIcon,
    User as ProfileIcon,
    Users as RolesIcon,
+   Share2,
 } from "react-feather"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
@@ -94,6 +95,12 @@ const useDashboardLinks = (group) => {
                icon: RolesIcon,
                title: "Roles",
                basePath: `/${baseHrefPath}/${baseParam}/admin/roles`,
+            },
+            {
+               href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
+               icon: Share2,
+               title: "ATS Integration",
+               basePath: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             },
          ])
       } else {
