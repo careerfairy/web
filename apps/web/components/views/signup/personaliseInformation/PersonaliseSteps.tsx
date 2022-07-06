@@ -1,12 +1,19 @@
-import MultiStepWrapper, { MultiStepComponentType } from "./MultiStepWrapper"
+import MultiStepWrapper, {
+   MultiStepComponentType,
+} from "../../common/MultiStepWrapper"
 import React, { useState } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
-import { SIGNUP_REDIRECT_PATH, SignupStepper } from "../../../pages/signup"
+import { SIGNUP_REDIRECT_PATH, SignupStepper } from "../../../../pages/signup"
 import InterestsSelector from "./InterestsSelector"
 import { useRouter } from "next/router"
 import LoadingButton from "@mui/lab/LoadingButton"
+import AdditionalInformation from "./AdditionalInformation"
 
 const steps: MultiStepComponentType[] = [
+   {
+      component: () => AdditionalInformation,
+      description: "Additional information",
+   },
    {
       component: () => InterestsSelector,
       description: "Interests",
