@@ -39,7 +39,6 @@ import DeleteForeverOutlinedIcon from "@mui/icons-material/DeleteForeverOutlined
 import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import RotateLeftIcon from "@mui/icons-material/RotateLeft"
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf"
-import Linkify from "react-linkify"
 import { getCSVDelimiterBasedOnOS } from "../../../../../../util/CommonUtil"
 
 export const tableIcons = {
@@ -120,16 +119,6 @@ export const tableIcons = {
    PictureAsPdfIcon: forwardRef((props, ref) => (
       <PictureAsPdfIcon {...props} ref={ref} />
    )),
-}
-
-const componentDecorator = (href, text, key) => (
-   <a href={href} key={key} target="_blank">
-      {text}
-   </a>
-)
-
-export const LinkifyText = (text) => {
-   return <Linkify componentDecorator={componentDecorator}>{text}</Linkify>
 }
 
 export const customDonutConfig = [
