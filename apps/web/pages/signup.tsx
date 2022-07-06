@@ -15,8 +15,8 @@ import SignUpPinForm from "../components/views/signup/SignUpPinForm"
 import SignUpUserForm from "../components/views/signup/SignUpUserForm"
 import MultiStepWrapper, {
    MultiStepComponentType,
-} from "../components/views/signup/MultiStepWrapper"
-import PersonaliseSteps from "../components/views/signup/PersonaliseSteps"
+} from "../components/views/common/MultiStepWrapper"
+import PersonaliseSteps from "../components/views/signup/personaliseInformation/PersonaliseSteps"
 import { MainLogo } from "./../components/logos"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
@@ -68,7 +68,7 @@ const SignUp = () => {
    }, [user, firebase.auth?.currentUser?.emailVerified])
 
    return (
-      <SignUpPageLayout>
+      <SignUpPageLayout showTitle={currentStep < 2}>
          {currentStep < 2 ? (
             <Box mb={2}>
                <SignupStepper steps={steps} currentStep={currentStep} />
@@ -127,7 +127,7 @@ const styles = sxStyles({
    },
 })
 
-export const SignUpPageLayout = ({ children }) => {
+export const SignUpPageLayout = ({ children, showTitle }) => {
    return (
       <>
          <Head>
@@ -137,9 +137,11 @@ export const SignUpPageLayout = ({ children }) => {
             <HeaderLogoWrapper>
                <MainLogo sx={styles.logo} />
             </HeaderLogoWrapper>
-            <Typography sx={styles.title}>
-               Create your profile to start
-            </Typography>
+            {showTitle && (
+               <Typography sx={styles.title}>
+                  Create your profile to start
+               </Typography>
+            )}
             <Container maxWidth="md">
                <Box data-testid={"signup-page-form"} p={3} mt={5}>
                   {children}

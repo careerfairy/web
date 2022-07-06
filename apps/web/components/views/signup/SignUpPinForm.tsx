@@ -15,7 +15,7 @@ import {
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper"
+import { IMultiStepContext, MultiStepContext } from "../common/MultiStepWrapper"
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -97,7 +97,6 @@ const SignUpPinForm = () => {
                handleChange,
                handleBlur,
                handleSubmit,
-               setFieldValue,
                isSubmitting,
                /* and other goodies */
             }) => (

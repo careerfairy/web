@@ -11,14 +11,14 @@ const MultiListSelect = ({
    inputName,
    allValues,
    selectedItems = [],
-   onSelectItems,
+   onSelectItems = () => {},
    disabled = false,
    getLabelFn = (option) => option.name, // displayed name
    inputProps = {},
    isCheckbox = false, // Select items are checkboxes
    chipProps = {},
    extraOptions = {}, // props to pass to autocomplete
-   setFieldValue = null, // formik field
+   setFieldValue = () => {}, // formik field
    getValueFn = (option) => option.id, // field value
    disabledValues = [],
    limit = false,
@@ -89,7 +89,7 @@ const MultiListSelect = ({
 type Props = {
    inputName: string
    setFieldValue?: (name, value) => void
-   onSelectItems: Dispatch<any>
+   onSelectItems?: Dispatch<any>
    selectedItems: any[]
    disabled?: boolean
    getLabelFn?: (obj: any) => string
