@@ -1,6 +1,5 @@
 import PropTypes from "prop-types"
 import React, { memo, useEffect, useState } from "react"
-import Linkify from "react-linkify"
 import makeStyles from "@mui/styles/makeStyles"
 import { Box, Card, IconButton, Popover, Typography } from "@mui/material"
 import { getTimeFromNow } from "../../../../../../helperFunctions/HelperFunctions"
@@ -13,6 +12,7 @@ import Fade from "@stahl.luke/react-reveal/Fade"
 import isEqual from "react-fast-compare"
 
 import clsx from "clsx"
+import LinkifyText from "../../../../../../util/LinkifyText"
 
 const dayjs = require("dayjs")
 const relativeTime = require("dayjs/plugin/relativeTime")
@@ -134,12 +134,6 @@ const ChatEntryContainer = ({
 
    const handleClickPreview = () => handleSetCurrentEntry(chatEntry)
 
-   const componentDecorator = (href, text, key) => (
-      <a href={href} key={key} target="_blank">
-         {text}
-      </a>
-   )
-
    const open = Boolean(anchorEl)
    return (
       <Fade left={!isMe && isNew} right={isMe && isNew} duration={250}>
@@ -175,9 +169,7 @@ const ChatEntryContainer = ({
                   [classes.broadcast]: chatEntry.type === "broadcast",
                })}
             >
-               <Linkify componentDecorator={componentDecorator}>
-                  {chatEntry.message}
-               </Linkify>
+               <LinkifyText>{chatEntry.message}</LinkifyText>
                <Typography className={classes.author}>
                   {chatEntry.authorName}
                </Typography>

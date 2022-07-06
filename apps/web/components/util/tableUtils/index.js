@@ -41,7 +41,6 @@ import SupervisorAccountIcon from "@mui/icons-material/SupervisorAccount"
 import AllInboxIcon from "@mui/icons-material/AllInbox"
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
-import Linkify from "react-linkify"
 import { getCSVDelimiterBasedOnOS } from "../../../util/CommonUtil"
 
 export const tableIcons = {
@@ -176,16 +175,6 @@ export const exportSelectionAction = (
          })
       },
    }
-}
-
-const componentDecorator = (href, text, key) => (
-   <a href={href} key={key} target="_blank">
-      {text}
-   </a>
-)
-
-export const LinkifyText = (text) => {
-   return <Linkify componentDecorator={componentDecorator}>{text}</Linkify>
 }
 
 export const customDonutConfig = [

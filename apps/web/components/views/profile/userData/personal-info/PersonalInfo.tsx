@@ -190,7 +190,6 @@ const PersonalInfo = ({ userData }) => {
                                  fullWidth
                                  id="firstName"
                                  label="First Name"
-                                 autoFocus
                                  disabled={isSubmitting}
                                  onBlur={handleBlur}
                                  value={values.firstName}
