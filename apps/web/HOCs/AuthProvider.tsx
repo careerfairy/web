@@ -80,6 +80,8 @@ const AuthProvider = ({ children }) => {
       isLoggedOut ? undefined : firestore.data["userProfile"]
    )
 
+   console.log("-> userData", userData)
+
    const userStats = useSelector(
       ({ firestore }: RootState) => firestore.data["userStats"]
    )

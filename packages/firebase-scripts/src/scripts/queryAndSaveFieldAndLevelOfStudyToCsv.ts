@@ -29,7 +29,11 @@ export default async function run() {
             ): GroupOption[] => {
                return (
                   categories?.reduce((acc, currCategory) => {
-                     if (possiblePropertyNames.includes(currCategory.name)) {
+                     if (
+                        possiblePropertyNames.includes(
+                           lowerCaseAndTrim(currCategory.name)
+                        )
+                     ) {
                         return [...acc, ...currCategory.options]
                      }
                      return acc
@@ -44,9 +48,10 @@ export default async function run() {
                const newOptionsArray = [...optionsArray]
                if (categoryOptions) {
                   categoryOptions.forEach((option) => {
-                     const optionName = option.name.toLowerCase()
+                     const optionName = lowerCaseAndTrim(option.name)
                      const optionIndex = newOptionsArray.findIndex(
-                        (optionObj) => optionObj.name === optionName
+                        (optionObj) =>
+                           lowerCaseAndTrim(optionObj.name) === optionName
                      )
                      if (optionIndex > -1) {
                         newOptionsArray[optionIndex].count += 1
@@ -58,8 +63,12 @@ export default async function run() {
                return newOptionsArray.sort((a, b) => b.count - a.count)
             }
 
-            const fieldOfStudiesCat = findCategoryOptions(possibleFieldsOfStudy)
-            const levelOfStudiesCat = findCategoryOptions(possibleLevelsOfStudy)
+            const fieldOfStudiesCat = findCategoryOptions(
+               possibleFieldsOfStudy.map(lowerCaseAndTrim)
+            )
+            const levelOfStudiesCat = findCategoryOptions(
+               possibleLevelsOfStudy.map(lowerCaseAndTrim)
+            )
 
             const sortedAndCountedFieldsOfStudy = getAndSortOptionNames(
                fieldOfStudiesCat,
@@ -81,17 +90,18 @@ export default async function run() {
       const fieldsOfStudyCsv = new ObjectsToCsv(data.fieldOfStudies)
       const levelsOfStudyCsv = new ObjectsToCsv(data.levelOfStudies)
 
-      const dateTime = `${new Date().toDateString()} ${new Date()
-         .toTimeString()
-         .split(" ")[0]
-         .replace(":", "-")}`
-
       await Promise.all([
-         fieldsOfStudyCsv.toDisk(`./Fields of Study - ${dateTime}.csv`),
-         levelsOfStudyCsv.toDisk(`./Levels of Study - ${dateTime}.csv`),
+         fieldsOfStudyCsv.toDisk(
+            `./Fields of Study - ${new Date().getMilliseconds()}.csv`
+         ),
+         levelsOfStudyCsv.toDisk(
+            `./Levels of Study - ${new Date().getMilliseconds()}.csv`
+         ),
       ])
       console.log(`-> Done! CVSs saved at packages\\firebase-scripts`)
    } catch (e) {
       console.error(e)
    }
 }
+
+const lowerCaseAndTrim = (str: string) => str.toLowerCase().trim()

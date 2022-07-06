@@ -6,11 +6,11 @@ import { possibleFieldsOfStudy, possibleOthers } from "../constants"
 import { RegisteredGroup } from "@careerfairy/shared-lib/dist/users/users"
 import { removeDuplicates } from "../util/misc"
 import * as fieldOfStudyMapping from "@careerfairy/firebase-scripts/data/fieldOfStudyMapping.json"
+import { FieldValue } from "firebase-admin/firestore"
 
 import { BigBatch } from "@qualdesk/firestore-big-batch"
 
 export default async function main() {
-   console.log("-> STARTING BACKFILL FIELD OF STUDY")
    const counter = new ReadAndWriteCounter([
       "numTotalUsers",
       "numUsersWithFieldOfStudy",
@@ -32,10 +32,9 @@ export default async function main() {
    const groups = groupSnaps.docs.map(
       (doc) => ({ id: doc.id, ...doc.data() } as Group)
    )
-   // console.log("-> total users", userSnaps.docs.length)
    let i = 0
    for (const userSnap of userSnaps.docs) {
-      consoleLogProgressEveryPercent(counter.getCustomCount("numTotalUsers"), i)
+      consoleLogProgressEveryPercent(userSnaps.docs.length, i)
       i++
       const userData = {
          ...userSnap.data(),
@@ -50,9 +49,8 @@ export default async function main() {
       if (fieldsOfStudy.length) {
          counter.customCountIncrement("numUsersWithFieldOfStudy")
 
-         const bestMatchingFieldOfStudyId = getAssignedFieldOfStudyId(
-            fieldsOfStudy[0]
-         )
+         const bestMatchingFieldOfStudyId =
+            getAssignedFieldOfStudyId(fieldsOfStudy)
          if (bestMatchingFieldOfStudyId) {
             counter.customCountIncrement("numUsersWithAssignedFieldOfStudy")
             counter.writeIncrement()
@@ -60,7 +58,7 @@ export default async function main() {
                userRef,
                {
                   fieldOfStudyId: bestMatchingFieldOfStudyId,
-                  fieldOfStudyIsBackfilled: true,
+                  backfills: FieldValue.arrayUnion("fieldOfStudy"),
                },
                { merge: true }
             )
@@ -81,11 +79,17 @@ export default async function main() {
    )
 }
 
-const getAssignedFieldOfStudyId = (userFirstFieldOfStudy: string) => {
+const getAssignedFieldOfStudyId = (userFieldsOfStudy: string[]) => {
    const legacyFieldOfStudiesDict = fieldOfStudyMapping.legacyMappings
    const newFieldOfStudiesDict = fieldOfStudyMapping.newFieldOfStudies
-   const fieldOfStudyId = legacyFieldOfStudiesDict[userFirstFieldOfStudy]
-   return newFieldOfStudiesDict[fieldOfStudyId]
+   const studyFieldWithMapping = userFieldsOfStudy.find(
+      (studyField) => legacyFieldOfStudiesDict[studyField]
+   )
+   const fieldOfStudyId = legacyFieldOfStudiesDict[studyFieldWithMapping]
+   if (newFieldOfStudiesDict[fieldOfStudyId]) {
+      return fieldOfStudyId
+   }
+   return null
 }
 
 const getUserFieldsOfStudy = (userData: UserData, groups: Group[]) => {
@@ -130,7 +134,7 @@ const getChosenFieldsOfStudy = (
          (option) => option.id === categorySelections.selectedValueId
       )
       if (!categoryOption?.name) return acc
-      return [...acc, categoryOption.name.toLowerCase()]
+      return [...acc, categoryOption.name.toLowerCase().trim()]
    }, [])
 }
 

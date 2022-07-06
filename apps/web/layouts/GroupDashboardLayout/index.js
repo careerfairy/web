@@ -16,6 +16,7 @@ import Page, {
    PageContentWrapper,
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
+import { AnalyticsProvider } from "../../HOCs/AnalyticsProvider"
 
 const styles = {
    childrenWrapperResponsive: {
@@ -54,41 +55,43 @@ const GroupDashboardLayout = (props) => {
    )
 
    return (
-      <Page>
-         <TopBar notifications={notifications} />
-         <PageContentWrapper>
-            {isLoaded(group) && !isEmpty(group) && (
-               <NavBar
-                  drawerTopLinks={drawerTopLinks}
-                  drawerBottomLinks={drawerBottomLinks}
-                  headerLinks={headerLinks}
-                  group={group}
-                  isDesktop={isDesktop}
-               />
-            )}
-            <PageChildrenWrapper
-               sx={[isDesktop && styles.childrenWrapperResponsive]}
-            >
-               {!isLoaded(group) || !isLoggedIn ? (
-                  <CircularProgress sx={{ margin: "auto" }} />
-               ) : isEmpty(group) || !isCorrectGroup ? (
-                  <Typography variant={"h6"} sx={{ margin: "auto" }}>
-                     Group not found
-                  </Typography>
-               ) : (
-                  React.Children.map(children, (child) =>
-                     React.cloneElement(child, {
-                        notifications,
-                        isAdmin,
-                        scrollRef,
-                        group,
-                        ...props,
-                     })
-                  )
+      <AnalyticsProvider>
+         <Page>
+            <TopBar notifications={notifications} />
+            <PageContentWrapper>
+               {isLoaded(group) && !isEmpty(group) && (
+                  <NavBar
+                     drawerTopLinks={drawerTopLinks}
+                     drawerBottomLinks={drawerBottomLinks}
+                     headerLinks={headerLinks}
+                     group={group}
+                     isDesktop={isDesktop}
+                  />
                )}
-            </PageChildrenWrapper>
-         </PageContentWrapper>
-      </Page>
+               <PageChildrenWrapper
+                  sx={[isDesktop && styles.childrenWrapperResponsive]}
+               >
+                  {!isLoaded(group) || !isLoggedIn ? (
+                     <CircularProgress sx={{ margin: "auto" }} />
+                  ) : isEmpty(group) || !isCorrectGroup ? (
+                     <Typography variant={"h6"} sx={{ margin: "auto" }}>
+                        Group not found
+                     </Typography>
+                  ) : (
+                     React.Children.map(children, (child) =>
+                        React.cloneElement(child, {
+                           notifications,
+                           isAdmin,
+                           scrollRef,
+                           group,
+                           ...props,
+                        })
+                     )
+                  )}
+               </PageChildrenWrapper>
+            </PageContentWrapper>
+         </Page>
+      </AnalyticsProvider>
    )
 }
 

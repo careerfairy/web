@@ -1,5 +1,4 @@
 import React, { useEffect, useRef, useState } from "react"
-import clsx from "clsx"
 import PropTypes from "prop-types"
 import { Doughnut } from "react-chartjs-2"
 import {
@@ -29,11 +28,12 @@ import Chart from "chart.js"
 import "chartjs-plugin-labels"
 import { customDonutConfig } from "../common/TableUtils"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import { useSelector } from "react-redux"
 import { createSelector } from "reselect"
 import StatsUtil from "../../../../../../data/util/StatsUtil"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import { useAnalytics } from "../../../../../../HOCs/AnalyticsProvider"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
 const audienceSelector = createSelector(
    (state) => state,
@@ -75,24 +75,24 @@ const audienceSelector = createSelector(
 )
 Chart.defaults.global.plugins.labels = false
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       height: "100%",
    },
    accordionRoot: {
-      boxShadow: theme.shadows[2],
+      boxShadow: 2,
       "&:before": {
          backgroundColor: "transparent !important",
       },
    },
    heading: {
-      fontSize: theme.typography.pxToRem(15),
-      fontWeight: theme.typography.fontWeightMedium,
+      fontSize: (theme) => theme.typography.pxToRem(15),
+      fontWeight: (theme) => theme.typography.fontWeightMedium,
    },
    expanded: {
       marginTop: "0 !important",
    },
-}))
+})
 
 function randomColor() {
    var max = 0xffffff
@@ -118,7 +118,7 @@ const CategoryBreakdown = ({
    className,
    ...rest
 }) => {
-   const classes = useStyles()
+   const { fieldsOfStudy, fieldsOfStudyById } = useAnalytics()
    const theme = useTheme()
    const chartRef = useRef()
    const [localColors, setLocalColors] = useState(colorsArray)
@@ -176,9 +176,9 @@ const CategoryBreakdown = ({
    }, [group.categories, typesOfOptions.length])
 
    useEffect(() => {
-      const newTypeOfOptions = getTypeOfStudents()
+      const newTypeOfOptions = getStudentFrequencyByProperty()
       setTypesOfOptions(newTypeOfOptions)
-   }, [audience, currentCategory, currentGroup?.categories])
+   }, [audience])
 
    useEffect(() => {
       if (typesOfOptions.length) {
@@ -208,32 +208,26 @@ const CategoryBreakdown = ({
       })
    }, [typesOfOptions, localColors, currentGroup])
 
-   const getTypeOfStudents = () => {
-      const aggregateCategories = getAggregateCategories(audience)
-      const flattenedGroupOptions = [...currentCategory.options].map(
-         (option) => {
-            const count = aggregateCategories.filter((category) =>
-               category?.categories?.some(
-                  (userOption) => userOption.selectedValueId === option.id
-               )
-            )?.length
-            return { ...option, count }
-         }
-      )
-      return flattenedGroupOptions.sort((a, b) => b.count - a.count)
-   }
+   const getStudentFrequencyByProperty = () => {
+      const initialData = [
+         {
+            name: "Other",
+            count: audience?.filter((user) => !user["fieldOfStudyId"])?.length,
+            id: "other",
+         },
+      ]
 
-   const getAggregateCategories = (participants) => {
-      let categories = []
-      participants?.forEach((user) => {
-         const matched = user.registeredGroups?.find(
-            (groupData) => groupData.groupId === currentGroup.id
-         )
-         if (matched) {
-            categories.push(matched)
+      const data = fieldsOfStudy.map((field) => {
+         const count = audience?.filter(
+            (user) => user["fieldOfStudyId"] === field.id
+         )?.length
+         return {
+            name: field.label,
+            count,
+            id: field.id,
          }
       })
-      return categories
+      return [...initialData, ...data].sort((a, b) => b.count - a.count)
    }
 
    const options = {
@@ -288,15 +282,10 @@ const CategoryBreakdown = ({
    const togglePercentage = () => {
       setShowPercentage(!showPercentage)
    }
-
    const hasPartnerGroups = Boolean(groups.length > 1)
 
    return (
-      <Card
-         raised={Boolean(currentStream)}
-         className={clsx(classes.root, className)}
-         {...rest}
-      >
+      <Card raised={Boolean(currentStream)} sx={styles.root} {...rest}>
          <CardHeader
             title={`${localUserType.displayName}`}
             ref={breakdownRef}
@@ -381,11 +370,7 @@ const CategoryBreakdown = ({
                            color="primary"
                         />
                      }
-                     label={
-                        <Typography className={classes.toggleLabel}>
-                           Show Percentage
-                        </Typography>
-                     }
+                     label={<Typography>Show Percentage</Typography>}
                   />
                </>
             )}
@@ -418,17 +403,14 @@ const CategoryBreakdown = ({
             {!hasNoData() && (
                <Accordion
                   expanded={showLabels}
-                  classes={{
-                     expanded: classes.expanded,
-                     root: classes.accordionRoot,
-                  }}
+                  sx={[showLabels && styles.expanded, styles.accordionRoot]}
                >
                   <AccordionSummary
                      onClick={() => setShowLabels(!showLabels)}
                      expandIcon={<ExpandMoreIcon />}
                      style={{ minHeight: 45 }}
                   >
-                     <Typography className={classes.heading}>
+                     <Typography sx={styles.heading}>
                         {showLabels ? "Hide Breakdown" : "Show Breakdown"}
                      </Typography>
                   </AccordionSummary>

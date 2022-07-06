@@ -5,6 +5,10 @@ service cloud.firestore {
         function isCFAdmin() {
           return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
         }
+        match /fieldsOfStudy/{fieldOfStudy} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
         match /userInterface/{interface} {
             allow read: if true;
             allow write: if isCFAdmin();

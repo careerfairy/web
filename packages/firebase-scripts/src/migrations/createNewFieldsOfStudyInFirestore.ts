@@ -12,7 +12,7 @@ export default async function createNewFieldsOfStudyInFirestore() {
 
    newFieldsOfStudy.forEach((fieldOfStudy) => {
       const fieldOfStudyRef = firestore
-         .collection("fieldOfStudy")
+         .collection("fieldsOfStudy")
          .doc(fieldOfStudy.mappingId)
 
       batch.set(fieldOfStudyRef, { label: fieldOfStudy.label })
