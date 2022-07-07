@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import firebase from "firebase"
 
 // CareerCenterData collection
 export interface Group extends Identifiable {
@@ -28,4 +29,13 @@ export interface GroupCategory extends Identifiable {
 
 export interface GroupOption extends Identifiable {
    name: string
+}
+
+export interface GroupATSInformation {
+   groupId: string
+   merge?: {
+      end_user_origin_id?: string
+      integration_name?: string
+   }
+   updatedAt: firebase.firestore.Timestamp
 }
