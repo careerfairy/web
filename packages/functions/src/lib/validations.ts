@@ -45,7 +45,7 @@ export async function validateUserIsGroupAdmin(groupId: string, email: string) {
    return response
 }
 
-function logAndThrow(message: string, ...context: any[]) {
+export function logAndThrow(message: string, ...context: any[]) {
    functions.logger.error(message, context)
    throw new functions.https.HttpsError("failed-precondition", message)
 }

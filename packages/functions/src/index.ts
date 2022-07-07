@@ -131,4 +131,5 @@ exports.rewardUserAction = rewards.rewardUserAction
 exports.onUserRateWish = wishes.onUserRateWish
 
 // ATS
-exports.linkCompanyWithATS = ats.linkCompanyWithATS
+exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
+exports.mergeGetAccountToken = ats.mergeGetAccountToken

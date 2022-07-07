@@ -36,6 +36,7 @@ export interface GroupATSInformation {
    merge?: {
       end_user_origin_id?: string
       integration_name?: string
+      account_token?: string
    }
    updatedAt: firebase.firestore.Timestamp
 }
