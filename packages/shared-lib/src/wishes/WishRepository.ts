@@ -54,7 +54,10 @@ interface GetWishesOptions {
 }
 
 export class FirebaseWishRepository implements IWishRepository {
-   constructor(private readonly firestore: firebase.firestore.Firestore) {}
+   constructor(
+      private readonly firestore: firebase.firestore.Firestore,
+      private readonly fieldValue: typeof firebase.firestore.FieldValue
+   ) {}
 
    getWishesQuery(
       getWishesOptions: GetWishesOptions = {}
@@ -102,7 +105,7 @@ export class FirebaseWishRepository implements IWishRepository {
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
          interests: wishFormValues.interests,
-         createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+         createdAt: this.fieldValue.serverTimestamp(),
          authorUid: userUid,
          updatedAt: null,
          deletedAt: null,
@@ -128,7 +131,7 @@ export class FirebaseWishRepository implements IWishRepository {
       const wishRef = this.firestore.collection("wishes").doc(wishId)
       // update wish ref
       const updatedWish: Partial<Wish> = {
-         updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+         updatedAt: this.fieldValue.serverTimestamp(),
          description: wishFormValues.description.trim(),
          companyNames: wishFormValues.companyNames,
          interestIds: wishFormValues.interests.map((interest) => interest.id),
@@ -142,7 +145,7 @@ export class FirebaseWishRepository implements IWishRepository {
       const wishRef = this.firestore.collection("wishes").doc(wishId)
       // update wish ref
       const updatedWish: Partial<Wish> = {
-         deletedAt: firebase.firestore.FieldValue.serverTimestamp(),
+         deletedAt: this.fieldValue.serverTimestamp(),
          isDeleted: true,
       }
       await wishRef.update(updatedWish)
@@ -213,7 +216,7 @@ export class FirebaseWishRepository implements IWishRepository {
             if (!ratingDoc.exists) {
                newRating = {
                   type,
-                  createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                  createdAt: this.fieldValue.serverTimestamp(),
                }
             } else {
                newRating = ratingDoc.data() as Rating
@@ -271,13 +274,13 @@ export class FirebaseWishRepository implements IWishRepository {
             }
             const isAdmin = userDoc.data()?.isAdmin
             const updatedWish: Partial<Wish> = {
-               updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+               updatedAt: this.fieldValue.serverTimestamp(),
                isFlaggedByAdmin: Boolean(isAdmin),
-               numberOfFlags: firebase.firestore.FieldValue.increment(1),
+               numberOfFlags: this.fieldValue.increment(1),
             }
             transaction.update(wishRef, updatedWish)
             transaction.set(flagRef, {
-               createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+               createdAt: this.fieldValue.serverTimestamp(),
                reasons,
                message: message || null,
             })

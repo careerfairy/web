@@ -10,7 +10,7 @@ import {
    IUserRepository,
    FirebaseUserRepository,
 } from "@careerfairy/shared-lib/dist/users/UserRepository"
-import firebaseApp from "./firebase/FirebaseInstance"
+import firebaseApp, { FieldValue } from "./firebase/FirebaseInstance"
 import {
    IGroupRepository,
    FirebaseGroupRepository,
@@ -29,11 +29,13 @@ export const highlightRepo: IHighlightRepository =
    new FirebaseHighlightRepository(firestoreInstance)
 
 export const wishlistRepo: IWishRepository = new FirebaseWishRepository(
-   firestoreInstance
+   firestoreInstance,
+   FieldValue
 )
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
-   firestoreInstance
+   firestoreInstance,
+   FieldValue
 )
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
@@ -41,4 +43,4 @@ export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
 )
 
 export const livestreamRepo: ILivestreamRepository =
-   new FirebaseLivestreamRepository(firestoreInstance)
+   new FirebaseLivestreamRepository(firestoreInstance, FieldValue)

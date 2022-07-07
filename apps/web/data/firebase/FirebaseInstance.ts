@@ -66,4 +66,6 @@ const getFirestoreSettings = (
 // [DEFAULT] app name is required for redux-firestore 🤦
 const firebaseApp: firebase.app.App = createFirebaseInstance("[DEFAULT]")
 
+export const FieldValue = firebase.firestore.FieldValue
+
 export default firebaseApp
