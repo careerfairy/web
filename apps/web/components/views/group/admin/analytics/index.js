@@ -11,10 +11,10 @@ import Feedback from "./Feedback"
 import {
    isEmpty,
    isLoaded,
+   useFirestore,
    useFirestoreConnect,
-   withFirestore,
 } from "react-redux-firebase"
-import { useDispatch, useSelector } from "react-redux"
+import { shallowEqual, useDispatch, useSelector } from "react-redux"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import * as actions from "../../../../../store/actions"
 import { AppBar, Box, Tab, Tabs } from "@mui/material"
@@ -32,6 +32,7 @@ import useUserDataSetDictionary from "../../../../custom-hook/useUserDataSetDict
 import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
 import StreamFilterModal from "./StreamFilterModal"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -141,7 +142,9 @@ const streamsSelector = createSelector(
       return streams
    }
 )
-const AnalyticsOverview = ({ group, firestore }) => {
+const AnalyticsOverview = () => {
+   const { group } = useGroup()
+
    const userDataSets = [
       {
          id: uuid(),
@@ -160,7 +163,7 @@ const AnalyticsOverview = ({ group, firestore }) => {
    if (!group.universityCode) {
       userDataSets.shift()
    }
-
+   const firestore = useFirestore()
    const firebase = useFirebaseService()
    const { globalTimeFrames } = useTimeFrames()
 
@@ -176,7 +179,6 @@ const AnalyticsOverview = ({ group, firestore }) => {
    const [showBar, setShowBar] = useState(true)
    const [userType, setUserType] = useState(userTypes[0])
    const [streamDataType, setStreamDataType] = useState(streamDataTypes[0])
-   const [groupOptions, setGroupOptions] = useState([])
    const [currentStream, setCurrentStream] = useState(null)
    const [fetchingQuestions, setFetchingQuestions] = useState(false)
    const [streamFilterModalOpen, setStreamFilterModalOpen] = useState(false)
@@ -337,11 +339,6 @@ const AnalyticsOverview = ({ group, firestore }) => {
          setLimitedUserTypes(userTypes)
       }
    }, [currentUserDataSet.dataSet, userData, group?.privacyPolicyActive])
-
-   useEffect(() => {
-      const flattenedGroupOptions = GroupsUtil.handleFlattenOptions(group)
-      setGroupOptions(flattenedGroupOptions)
-   }, [group])
 
    useEffect(() => {
       if (currentStream?.id) {
@@ -591,7 +588,6 @@ const AnalyticsOverview = ({ group, firestore }) => {
       userType,
       userTypes,
       setUserType,
-      groupOptions,
       ...(tabName !== "feedback" && {
          streamsFromTimeFrameAndFuture,
          handleReset,
@@ -677,4 +673,4 @@ const AnalyticsOverview = ({ group, firestore }) => {
    )
 }
 
-export default withFirestore(AnalyticsOverview)
+export default AnalyticsOverview

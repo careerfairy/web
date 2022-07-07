@@ -28,7 +28,6 @@ const Audience = ({
    currentUserDataSet,
    handleReset,
    streamsFromTimeFrameAndFuture,
-   groupOptions,
    handleToggleBar,
    breakdownRef,
    setCurrentStream,
@@ -92,7 +91,6 @@ const Audience = ({
                   handleReset={handleReset}
                   currentUserDataSet={currentUserDataSet}
                   setUserType={setUserType}
-                  groupOptions={groupOptions}
                   isFollowers={isFollowers}
                   breakdownRef={breakdownRef}
                   futureStreams={futureStreams}

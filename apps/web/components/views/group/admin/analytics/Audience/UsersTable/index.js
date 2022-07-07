@@ -15,8 +15,6 @@ import { LinkifyText, tableIcons } from "../../common/TableUtils"
 import makeStyles from "@mui/styles/makeStyles"
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
 import { useDispatch, useSelector } from "react-redux"
-import StatsUtil from "../../../../../../../data/util/StatsUtil"
-import GroupsUtil from "../../../../../../../data/util/GroupsUtil"
 import { universityCountriesMap } from "../../../../../../util/constants/universityCountries"
 import PDFIcon from "@mui/icons-material/PictureAsPdf"
 import Link from "materialUI/NextNavLink"
@@ -25,6 +23,7 @@ import * as actions from "store/actions"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
+import { useGroupAnalytics } from "../../../../../../../HOCs/GroupAnalyticsProvider"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -46,7 +45,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const UsersTable = ({
-   groupOptions,
    fetchingStreams,
    userType,
    currentStream,
@@ -64,12 +62,12 @@ const UsersTable = ({
    className,
    ...rest
 }) => {
+   const { fieldsOfStudyById, levelsOfStudyById } = useGroupAnalytics()
    const dataTableRef = useRef(null)
    const classes = useStyles()
    const [selection, setSelection] = useState([])
    const { enqueueSnackbar } = useSnackbar()
    const [users, setUsers] = useState([])
-   const [targetGroups, setTargetGroups] = useState([])
    const [processingCVs, setProcessingCVs] = useState(false)
    const hiddenStreamIds = useSelector(
       (state) => state.analyticsReducer.hiddenStreamIds
@@ -80,24 +78,23 @@ const UsersTable = ({
    const dispatch = useDispatch()
 
    const categoryFields = useMemo(() => {
-      const arrayOfGroups = targetGroups.length ? targetGroups : [group]
-      const tableFieldsMap = arrayOfGroups.reduce((acc, { categories }) => {
-         if (categories?.length) {
-            categories.forEach(({ name, options }) => {
-               const categoryKey = name.toLowerCase()
-               const newOptions = options.map(({ name }) => name.toLowerCase())
-               const uniqueOptions = acc[categoryKey]
-                  ? [...new Set(acc[categoryKey].concat(newOptions))]
-                  : newOptions
-               acc[categoryKey] = uniqueOptions.map((name) => toTitleCase(name))
-            })
-         }
-         return acc
-      }, {})
-      return Object.keys(tableFieldsMap)
+      const data = {}
+      const categories = group.categories
+
+      if (categories?.length) {
+         categories.forEach(({ name, options }) => {
+            const categoryKey = name.toLowerCase()
+            const newOptions = options.map(({ name }) => name.toLowerCase())
+            const uniqueOptions = data[categoryKey]
+               ? [...new Set(data[categoryKey].concat(newOptions))]
+               : newOptions
+            data[categoryKey] = uniqueOptions.map((name) => toTitleCase(name))
+         })
+      }
+      return Object.keys(data)
          .map((key) => {
             const titledLabel = toTitleCase(key)
-            const lookup = tableFieldsMap[key].reduce(
+            const lookup = data[key].reduce(
                (acc, curr) => {
                   acc[curr] = curr
                   return acc
@@ -111,57 +108,22 @@ const UsersTable = ({
             }
          })
          .map((e) => e)
-   }, [targetGroups, group])
-
-   const allGroupsMap = useSelector(
-      (state) => state.firestore.data?.allGroups || {}
-   )
-
-   useEffect(() => {
-      let newTargetGroups = []
-      if (
-         currentUserDataSet.dataSet === "followers" &&
-         currentStream?.groupIds?.length > 1
-      ) {
-         newTargetGroups = currentStream.groupIds.map((groupId) => ({
-            ...allGroupsMap[groupId],
-            options: GroupsUtil.handleFlattenOptions(allGroupsMap[groupId]),
-         }))
-      }
-      setTargetGroups(newTargetGroups)
-   }, [currentUserDataSet, currentStream?.groupIds])
+   }, [group])
 
    useEffect(() => {
       let newUsers
-      if (targetGroups.length) {
-         newUsers =
-            totalUniqueUsers?.map((user) => {
-               const relevantGroup = StatsUtil.getFirstGroupThatUserBelongsTo(
-                  user,
-                  targetGroups,
-                  group,
-                  true
-               )
-               return AnalyticsUtil.mapUserEngagement(
-                  user,
-                  streamsFromTimeFrameAndFuture,
-                  relevantGroup || group,
-                  group
-               )
-            }) || []
-      } else {
-         newUsers =
-            totalUniqueUsers?.map((user) =>
-               AnalyticsUtil.mapUserEngagement(
-                  user,
-                  streamsFromTimeFrameAndFuture,
-                  group
-               )
-            ) || []
-      }
+      newUsers =
+         totalUniqueUsers?.map((user) =>
+            AnalyticsUtil.mapUserEngagement(
+               user,
+               streamsFromTimeFrameAndFuture,
+               group
+            )
+         ) || []
       setUsers(newUsers)
       setSelection([])
-   }, [totalUniqueUsers, targetGroups])
+   }, [totalUniqueUsers, group])
+
    useEffect(() => {
       if (dataTableRef.current) {
          dataTableRef.current.onAllSelected(false)
@@ -342,7 +304,17 @@ const UsersTable = ({
                         title: "University Country",
                         lookup: universityCountriesMap,
                      },
-                     ...categoryFields,
+                     {
+                        field: "fieldOfStudyId",
+                        title: "Field of Study",
+                        lookup: fieldsOfStudyById,
+                     },
+                     {
+                        field: "levelOfStudyId",
+                        title: "Level of Study",
+                        lookup: levelsOfStudyById,
+                     },
+                     // ...categoryFields,
                      {
                         field: "numberOfStreamsWatched",
                         title: "Events Attended",

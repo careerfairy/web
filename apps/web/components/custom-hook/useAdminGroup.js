@@ -1,13 +1,12 @@
 import React, { useEffect, useMemo } from "react"
-import { populate, useFirestoreConnect } from "react-redux-firebase"
+import { useFirestoreConnect } from "react-redux-firebase"
 import { CAREER_CENTER_COLLECTION } from "../util/constants"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { shallowEqual, useDispatch, useSelector } from "react-redux"
-import GroupsUtil from "../../data/util/GroupsUtil"
 import * as actions from "store/actions"
 import { useRouter } from "next/router"
 
-const populates = [
+export const groupAdminPopulates = [
    { child: "adminEmails", root: "userData", childAlias: "admins" }, // replace owner with user object
 ]
 
@@ -39,7 +38,7 @@ const useAdminGroup = (groupId) => {
                   collection: targetCollection,
                   doc: targetId,
                   storeAs: "group",
-                  populates: isValidating ? [] : populates,
+                  populates: isValidating ? [] : groupAdminPopulates,
                },
                {
                   collection: targetCollection,
@@ -82,9 +81,8 @@ const useAdminGroup = (groupId) => {
    return useSelector(
       ({ firestore }) =>
          firestore.data.group && {
-            ...populate(firestore, "group", populates),
+            ...firestore.data.group,
             id: groupId,
-            options: GroupsUtil.handleFlattenOptions(firestore.data.group),
          },
       shallowEqual
    )

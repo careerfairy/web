@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { useMemo, useRef } from "react"
+import React, { createContext, useContext, useMemo, useRef } from "react"
 import NavBar from "./NavBar"
 import { useRouter } from "next/router"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
@@ -16,13 +16,24 @@ import Page, {
    PageContentWrapper,
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
-import { AnalyticsProvider } from "../../HOCs/AnalyticsProvider"
+import { Group, GroupOption } from "@careerfairy/shared-lib/dist/groups"
+import RootState from "../../store/reducers"
+import GroupsUtil from "../../data/util/GroupsUtil"
 
 const styles = {
    childrenWrapperResponsive: {
       width: (theme) => `calc(100% - ${theme.drawerWidth.small})`,
    },
 }
+
+type DefaultContext = {
+   group: Group
+   flattenedGroupOptions: GroupOption[]
+}
+const GroupContext = createContext<DefaultContext>({
+   group: null,
+   flattenedGroupOptions: [],
+})
 const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
@@ -34,12 +45,15 @@ const GroupDashboardLayout = (props) => {
    } = useRouter()
    const { userData, authenticatedUser, isLoggedIn } = useAuth()
    const notifications = useSelector(
-      ({ firestore }) => firestore.ordered.notifications || []
+      ({ firestore }: RootState) => firestore.ordered.notifications || []
    )
 
    const group = useAdminGroup(groupId)
    useDashboardRedirect(group, firebase)
 
+   const flattenedGroupOptions = useMemo<GroupOption[]>(() => {
+      return group ? GroupsUtil.handleFlattenOptions(group) : []
+   }, [group])
    const { headerLinks, drawerTopLinks, drawerBottomLinks } =
       useDashboardLinks(group)
 
@@ -55,7 +69,12 @@ const GroupDashboardLayout = (props) => {
    )
 
    return (
-      <AnalyticsProvider>
+      <GroupContext.Provider
+         value={{
+            group,
+            flattenedGroupOptions,
+         }}
+      >
          <Page>
             <TopBar notifications={notifications} />
             <PageContentWrapper>
@@ -91,9 +110,10 @@ const GroupDashboardLayout = (props) => {
                </PageChildrenWrapper>
             </PageContentWrapper>
          </Page>
-      </AnalyticsProvider>
+      </GroupContext.Provider>
    )
 }
+export const useGroup = () => useContext<DefaultContext>(GroupContext)
 
 GroupDashboardLayout.propTypes = {
    children: PropTypes.node.isRequired,

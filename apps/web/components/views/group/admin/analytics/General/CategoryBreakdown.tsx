@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import PropTypes from "prop-types"
 import { Doughnut } from "react-chartjs-2"
 import {
@@ -29,50 +29,14 @@ import "chartjs-plugin-labels"
 import { customDonutConfig } from "../common/TableUtils"
 import { useTheme } from "@mui/material/styles"
 import { useSelector } from "react-redux"
-import { createSelector } from "reselect"
 import StatsUtil from "../../../../../../data/util/StatsUtil"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import { useAnalytics } from "../../../../../../HOCs/AnalyticsProvider"
+import { useGroupAnalytics } from "../../../../../../HOCs/GroupAnalyticsProvider"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import RootState from "../../../../../../store/reducers"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { GroupCategory } from "@careerfairy/shared-lib/dist/groups"
 
-const audienceSelector = createSelector(
-   (state) => state,
-   (_, { currentUserDataSet }) => currentUserDataSet,
-   (_, { currentGroup }) => currentGroup,
-   (_, { currentStream }) => currentStream,
-   (_, { localUserType }) => localUserType,
-   (_, { streamsFromTimeFrameAndFuture }) => streamsFromTimeFrameAndFuture,
-   (
-      state,
-      currentUserDataSet,
-      currentGroup,
-      currentStream,
-      localUserType,
-      streamsFromTimeFrameAndFuture
-   ) => {
-      const totalUsers =
-         currentUserDataSet.dataSet === "groupUniversityStudents"
-            ? state.firestore.ordered[currentUserDataSet.dataSet]
-            : state.userDataSet.filtered.ordered
-      if (currentStream) {
-         return totalUsers?.filter(
-            (user) =>
-               currentStream[localUserType.propertyName]?.includes(
-                  user.userEmail
-               ) && StatsUtil.studentFollowsGroup(user, currentGroup)
-         )
-      } else {
-         return totalUsers?.filter((user) =>
-            streamsFromTimeFrameAndFuture?.some(
-               (stream) =>
-                  stream?.[localUserType.propertyName]?.includes(
-                     user.userEmail
-                  ) && StatsUtil.studentFollowsGroup(user, currentGroup)
-            )
-         )
-      }
-   }
-)
 Chart.defaults.global.plugins.labels = false
 
 const styles = sxStyles({
@@ -99,7 +63,7 @@ function randomColor() {
    return "#" + Math.round(Math.random() * max).toString(16)
 }
 
-const initialCurrentCategory = { options: [] }
+const initialCurrentCategory = { options: [], name: "initial", id: "initial" }
 
 const CategoryBreakdown = ({
    group,
@@ -118,7 +82,10 @@ const CategoryBreakdown = ({
    className,
    ...rest
 }) => {
-   const { fieldsOfStudy, fieldsOfStudyById } = useAnalytics()
+   const { fieldsOfStudy, levelsOfStudy } = useGroupAnalytics()
+   const [userInfoType, setUserInfoType] = useState<
+      "fieldOfStudy" | "levelOfStudy"
+   >("fieldOfStudy")
    const theme = useTheme()
    const chartRef = useRef()
    const [localColors, setLocalColors] = useState(colorsArray)
@@ -129,29 +96,52 @@ const CategoryBreakdown = ({
    const [currentGroup, setCurrentGroup] = useState(groups?.[0] || {})
    const [typesOfOptions, setTypesOfOptions] = useState([])
    const hiddenStreamIds = useSelector(
-      (state) => state.analyticsReducer.hiddenStreamIds
+      (state: RootState) => state.analyticsReducer.hiddenStreamIds
    )
    const noOfVisibleStreamIds = useSelector(
-      (state) => state.analyticsReducer.visibleStreamIds?.length || 0
+      (state: RootState) => state.analyticsReducer.visibleStreamIds?.length || 0
    )
-   const [currentCategory, setCurrentCategory] = useState(
+   const [currentCategory, setCurrentCategory] = useState<GroupCategory>(
       initialCurrentCategory
    )
-   const audience = useSelector((state) =>
-      audienceSelector(state, {
-         currentGroup,
-         currentStream,
-         localUserType,
-         streamsFromTimeFrameAndFuture,
-         currentUserDataSet,
-      })
-   )
+   const state = useSelector((state: RootState) => state)
+
+   const audience = useMemo<UserData[]>(() => {
+      const totalUsers =
+         currentUserDataSet.dataSet === "groupUniversityStudents"
+            ? state.firestore.ordered[currentUserDataSet.dataSet]
+            : state.userDataSet.filtered.ordered
+      if (currentStream) {
+         return totalUsers?.filter(
+            (user) =>
+               currentStream[localUserType.propertyName]?.includes(
+                  user.userEmail
+               ) && StatsUtil.studentFollowsGroup(user, currentGroup)
+         )
+      } else {
+         return totalUsers?.filter((user) =>
+            streamsFromTimeFrameAndFuture?.some(
+               (stream) =>
+                  stream?.[localUserType.propertyName]?.includes(
+                     user.userEmail
+                  ) && StatsUtil.studentFollowsGroup(user, currentGroup)
+            )
+         )
+      }
+   }, [
+      currentGroup,
+      currentStream,
+      localUserType,
+      streamsFromTimeFrameAndFuture,
+      currentUserDataSet,
+   ])
+
    const [data, setData] = useState({
       datasets: [],
       labels: [],
       ids: [],
+      dataId: "",
    })
-   // console.log("-> data", data);
 
    useEffect(() => {
       if (groups?.length || !currentGroup?.id) {
@@ -178,7 +168,7 @@ const CategoryBreakdown = ({
    useEffect(() => {
       const newTypeOfOptions = getStudentFrequencyByProperty()
       setTypesOfOptions(newTypeOfOptions)
-   }, [audience])
+   }, [audience, userInfoType, currentUserDataSet])
 
    useEffect(() => {
       if (typesOfOptions.length) {
@@ -209,17 +199,21 @@ const CategoryBreakdown = ({
    }, [typesOfOptions, localColors, currentGroup])
 
    const getStudentFrequencyByProperty = () => {
+      const propertyName =
+         userInfoType === "fieldOfStudy" ? "fieldOfStudyId" : "levelOfStudyId"
+      const infoData =
+         userInfoType === "fieldOfStudy" ? fieldsOfStudy : levelsOfStudy
       const initialData = [
          {
             name: "Other",
-            count: audience?.filter((user) => !user["fieldOfStudyId"])?.length,
+            count: audience?.filter((user) => !user[propertyName])?.length,
             id: "other",
          },
       ]
 
-      const data = fieldsOfStudy.map((field) => {
+      const data = infoData.map((field) => {
          const count = audience?.filter(
-            (user) => user["fieldOfStudyId"] === field.id
+            (user) => user[propertyName] === field.id
          )?.length
          return {
             name: field.label,
@@ -270,13 +264,8 @@ const CategoryBreakdown = ({
       setLocalUserType(userTypes[index])
    }
 
-   const handleGroupCategorySelect = ({ target: { value } }) => {
-      const targetCategory = currentGroup.categories.find(
-         (category) => category.id === value
-      )
-      if (targetCategory) {
-         setCurrentCategory(targetCategory)
-      }
+   const handleUserInfoSelect = ({ target: { value } }) => {
+      setUserInfoType(value)
    }
 
    const togglePercentage = () => {
@@ -347,33 +336,28 @@ const CategoryBreakdown = ({
             </React.Fragment>
          )}
          <CardContent>
-            {currentCategory.id && (
-               <>
-                  <Select
-                     value={currentCategory.id}
-                     variant="outlined"
-                     fullWidth
-                     onChange={handleGroupCategorySelect}
-                  >
-                     {currentGroup.categories.map(({ id, name }) => (
-                        <MenuItem key={id} value={id}>
-                           {name}
-                        </MenuItem>
-                     ))}
-                  </Select>
-                  <FormControlLabel
-                     control={
-                        <Switch
-                           checked={showPercentage}
-                           onChange={togglePercentage}
-                           name="percentageToggle"
-                           color="primary"
-                        />
-                     }
-                     label={<Typography>Show Percentage</Typography>}
+            <Select
+               value={userInfoType}
+               variant="outlined"
+               fullWidth
+               onChange={handleUserInfoSelect}
+            >
+               {/*{currentGroup.categories.map(({ id, name }) => (*/}
+               {/*))}*/}
+               <MenuItem value={"fieldOfStudy"}>Field of Study</MenuItem>
+               <MenuItem value={"levelOfStudy"}>Level of Study</MenuItem>
+            </Select>
+            <FormControlLabel
+               control={
+                  <Switch
+                     checked={showPercentage}
+                     onChange={togglePercentage}
+                     name="percentageToggle"
+                     color="primary"
                   />
-               </>
-            )}
+               }
+               label={<Typography>Show Percentage</Typography>}
+            />
             <Box
                height={300}
                position="relative"

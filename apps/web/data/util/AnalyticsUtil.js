@@ -1,6 +1,8 @@
 import { toTitleCase } from "../../components/helperFunctions/HelperFunctions"
+import GroupsUtil from "./GroupsUtil"
 
 const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
+   const groupOptions = GroupsUtil.handleFlattenOptions(groupContext)
    if (user.registeredGroups) {
       const targetGroup = user.registeredGroups.find(
          (groupObj) => groupObj.groupId === groupContext.groupId
@@ -10,7 +12,7 @@ const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
             (categoryObj) => categoryObj.id === targetCategoryId
          )
          if (targetCategory?.selectedValueId) {
-            const targetOption = groupContext.options.find(
+            const targetOption = groupOptions.find(
                (option) => option.id === targetCategory.selectedValueId
             )
             if (targetOption?.name) {
@@ -36,13 +38,9 @@ const mapUserCategories = (user, group) => {
    return user
 }
 
-const mapUserEngagement = (user, streams, group, requestingCompanyGroup) => {
+const mapUserEngagement = (user, streams, group) => {
    let categoryUser = user
    categoryUser = mapUserCategories(user, group)
-   if (requestingCompanyGroup) {
-      // Try and map the requesting company's categories to the user
-      categoryUser = mapUserCategories(user, requestingCompanyGroup)
-   }
    categoryUser.watchedEvent = false
    const registeredStreams = []
    const watchedStreams = []

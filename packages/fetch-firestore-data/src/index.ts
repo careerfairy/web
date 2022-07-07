@@ -38,7 +38,7 @@ async function run(): Promise<void> {
 
    h1Text(`Seeding data`)
    await createUser("carlos@careerfairy.io")
-   await createUser("habib@careerfairy.io")
+   await createUser("habib@careerfairy.io", true)
    await createUser("maximilian@careerfairy.io")
    await createUser("goncalo@careerfairy.io")
 
@@ -62,10 +62,11 @@ run().catch(console.error)
 /**
  * Create a user, skip if already exists
  * @param email
+ * @param superAdmin - if true, create a CF super admin user
  */
-async function createUser(email: string) {
+async function createUser(email: string, superAdmin: boolean = false) {
    try {
-      return await UserSeed.createUser(email)
+      return await UserSeed.createUser(email, { isAdmin: superAdmin })
    } catch (e) {
       if (e.errorInfo?.code === "auth/email-already-exists") {
          return null

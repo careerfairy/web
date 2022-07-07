@@ -14,6 +14,8 @@ import { convertCamelToSentence } from "../../../../helperFunctions/HelperFuncti
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
 import ExportTable from "../../../common/Tables/ExportTable"
 import { CSVDialogDownload } from "../../../../custom-hook/useMetaDataActions"
+import { populate } from "react-redux-firebase"
+import { groupAdminPopulates } from "../../../../custom-hook/useAdminGroup"
 
 const customOptions = { ...defaultTableOptions }
 customOptions.selection = false
@@ -73,7 +75,6 @@ const AdminBadge = ({ badgeContent, ...props }) => (
 )
 
 const MembersTable = ({
-   group,
    openAddMemberModal,
    handleCloseAreYouSureModal,
    loading,
@@ -89,7 +90,9 @@ const MembersTable = ({
    const [selection, setSelection] = useState([])
    const [data, setData] = useState([])
    const { authenticatedUser } = useAuth()
-
+   const group = useSelector(({ firestore }) =>
+      populate(firestore, "group", groupAdminPopulates)
+   )
    const adminRoles = useSelector(({ firestore }) => firestore.data.adminRoles)
    const userRole = useSelector(
       ({ firestore }) => firestore.data.userRole || {}

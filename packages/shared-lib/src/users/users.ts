@@ -5,6 +5,8 @@ export interface UserData extends Identifiable {
    authId: string
    firstName: string
    lastName: string
+   fieldOfStudyId: string
+   levelOfStudyId: string
    university: {
       code: string
       name: string
@@ -15,6 +17,7 @@ export interface UserData extends Identifiable {
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
+   backFills: BackFillType[]
    universityCountryCode: string
    unsubscribed?: boolean
    userEmail: string
@@ -31,7 +34,7 @@ export interface UserData extends Identifiable {
    referralsCount?: number
    totalLivestreamInvites?: number
 }
-
+export type BackFillType = "levelOfStudy" | "fieldOfStudy"
 export interface RegisteredGroup {
    groupId: string
    categories: RegisteredGroupCategory[]

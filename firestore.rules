@@ -9,6 +9,10 @@ service cloud.firestore {
             allow read: if true;
             allow write: if isCFAdmin();
         }
+        match /levelsOfStudy/{levelOfStudy} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
         match /userInterface/{interface} {
             allow read: if true;
             allow write: if isCFAdmin();

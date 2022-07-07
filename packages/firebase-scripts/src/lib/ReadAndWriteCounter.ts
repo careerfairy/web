@@ -1,14 +1,14 @@
 export default class ReadAndWriteCounter {
-   constructor(customCountKeys: string[]) {
-      this.customCounts = customCountKeys.reduce((acc, curr) => {
-         acc[curr] = 0
-         return acc
-      }, {})
-   }
+   // constructor(customCountKeys: string[]) {
+   //    this.customCounts = customCountKeys.reduce((acc, curr) => {
+   //       acc[curr] = 0
+   //       return acc
+   //    }, {})
+   // }
 
    private readCount: number = 0
    private writeCount: number = 0
-   private readonly customCounts: { [key: string]: number } = {}
+   private customCounts: { [key: string]: number } = {}
 
    public read(): number {
       return this.readCount
