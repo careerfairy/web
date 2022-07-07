@@ -29,6 +29,10 @@ export interface UserData extends Identifiable {
    // need data migrations to be moved to the user stats doc
    referralsCount?: number
    totalLivestreamInvites?: number
+   gender?: string
+   spokenLanguages?: string[]
+   countriesOfInterest?: string[]
+   isLookingForJob?: boolean
 }
 
 export interface UserStats {

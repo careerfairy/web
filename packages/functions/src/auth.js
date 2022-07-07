@@ -40,7 +40,7 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
       const {
          email,
          password,
-         referralCode,
+         // referralCode,
          firstName,
          lastName,
          university,
@@ -61,25 +61,25 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
             )
 
             // Check if the user was referred by someone
-            const referralData = {}
-            let referralUser = null
-            if (referralCode) {
-               referralUser = await userGetByReferralCode(referralCode)
-
-               if (referralUser) {
-                  referralData.referredBy = {
-                     uid: referralUser.id,
-                     name: `${referralUser.firstName} ${referralUser.lastName}`,
-                  }
-                  functions.logger.info(
-                     "Adding referral information to the new user."
-                  )
-               } else {
-                  functions.logger.warn(
-                     `Invalid referral code: ${referralCode}, no corresponding user.`
-                  )
-               }
-            }
+            // const referralData = {}
+            // let referralUser = null
+            // if (referralCode) {
+            //    referralUser = await userGetByReferralCode(referralCode)
+            //
+            //    if (referralUser) {
+            //       referralData.referredBy = {
+            //          uid: referralUser.id,
+            //          name: `${referralUser.firstName} ${referralUser.lastName}`,
+            //       }
+            //       functions.logger.info(
+            //          "Adding referral information to the new user."
+            //       )
+            //    } else {
+            //       functions.logger.warn(
+            //          `Invalid referral code: ${referralCode}, no corresponding user.`
+            //       )
+            //    }
+            // }
 
             await admin
                .firestore()
@@ -99,8 +99,8 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                         unsubscribed: !subscribed,
                         referralCode: generateReferralCode(),
                         gender: gender,
-                     },
-                     referralData
+                     }
+                     // referralData
                   )
                )
                .then(async () => {
@@ -119,20 +119,20 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                      )
 
                      // Create the referral follower reward if the user was referred by someone
-                     if (referralData.referredBy) {
-                        try {
-                           await rewardCreateReferralSignUpFollower(
-                              recipientEmail,
-                              referralUser
-                           )
-                           functions.logger.info(
-                              "Created referral follower reward for this user."
-                           )
-                        } catch (e) {
-                           // We don't want to fail the registration just because the reward failed
-                           functions.logger.error(e)
-                        }
-                     }
+                     // if (referralData.referredBy) {
+                     //    try {
+                     //       await rewardCreateReferralSignUpFollower(
+                     //          recipientEmail,
+                     //          referralUser
+                     //       )
+                     //       functions.logger.info(
+                     //          "Created referral follower reward for this user."
+                     //       )
+                     //    } catch (e) {
+                     //       // We don't want to fail the registration just because the reward failed
+                     //       functions.logger.error(e)
+                     //    }
+                     // }
 
                      return response
                   } catch (error) {
