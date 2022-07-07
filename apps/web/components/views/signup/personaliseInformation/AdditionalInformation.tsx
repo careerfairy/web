@@ -1,42 +1,59 @@
-import { FormControl, Grid, TextField, Typography } from "@mui/material"
+import { FormControl, Grid, Switch, Typography } from "@mui/material"
 import React, { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import MultiListSelect from "../../common/MultiListSelect"
 import { languageCodes } from "../../../helperFunctions/streamFormFunctions"
-import { useLocalStorage } from "react-use"
-import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import userRepo from "../../../../data/firebase/UserRepository"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import { useInterests } from "../../../custom-hook/useCollection"
 
 const styles = sxStyles({
-   subtitle: {
+   inputLabel: {
       textTransform: "uppercase",
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
+   headerWrapper: {
+      marginTop: 6,
+      marginBottom: 6,
+      textAlign: "center",
+   },
+   title: {
+      fontWeight: 400,
+      fontSize: "2.5rem",
+      lineHeight: "63px",
+      letterSpacing: "-0.02em",
+   },
+   subtitle: {
+      fontSize: "1.1rem",
+      fontWeight: 400,
+      lineHeight: "29px",
+      letterSpacing: "-0.02em",
+   },
+   toggleInputWrapper: {
+      my: 1,
+      display: "flex",
+      alignItems: "center",
+   },
 })
 
 type Option = {
-   code: string
+   id: string
    name: string
-   shortName: string
 }
 
 const countriesCodes = [
    {
-      code: "en",
+      id: "en",
       name: "England",
-      shortName: "eng",
    },
    {
-      code: "de",
+      id: "de",
       name: "Germany",
-      shortName: "ger",
    },
    {
-      code: "pt",
+      id: "pt",
       name: "Portugal",
-      shortName: "por",
    },
 ]
 
@@ -44,162 +61,203 @@ const formatToOptionArray = (
    selectedIds: string[],
    allOptions: Option[]
 ): Option[] => {
-   return allOptions.filter(({ code }) => selectedIds.includes(code))
+   return allOptions.filter(({ id }) => selectedIds?.includes(id))
 }
 
+const mapLanguageCodeToOptionArray = (): Option[] => {
+   return languageCodes.map(({ code, name }) => ({ id: code, name }))
+}
+
+const mappedLanguageCodes = mapLanguageCodeToOptionArray()
+
 const mapOptions = (options: Option[]) => {
-   return options.map((option) => option.code)
+   return options.map((option) => option.id)
 }
 
 const AdditionalInformation = () => {
+   const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
-   //  const [existingReferralCode] = useLocalStorage(
-   //     localStorageReferralCode,
-   //     "",
-   //     { raw: true }
-   // )
 
    const [selectedCountries, setSelectedCountries] = useState([] as Option[])
    const [selectedLanguages, setSelectedLanguages] = useState([] as Option[])
-   // const [referralCode, setReferralCode] = useState(existingReferralCode)
+   const [selectedInterests, setSelectedInterests] = useState([] as Option[])
+   const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
 
-   const [hasSelectedCountriesChanged, setSelectedCountriesChanged] =
-      useState(false)
-   const [hasSelectedLanguagesChanged, setSelectedLanguagesChanged] =
-      useState(false)
-
-   useEffect(() => {
-      if (hasSelectedCountriesChanged && selectedCountries) {
-         const fieldToUpdate = {
-            countriesOfInterest: mapOptions(selectedCountries),
-         }
-         handleChange(fieldToUpdate).catch(console.error)
-         setSelectedCountriesChanged(false)
+   const handleSelectedLanguageChange = (selectedLanguages: Option[]) => {
+      const fieldToUpdate = {
+         spokenLanguages: mapOptions(selectedLanguages),
       }
-   }, [selectedCountries, hasSelectedCountriesChanged])
+      updateFields(fieldToUpdate).catch(console.error)
+   }
 
-   useEffect(() => {
-      if (hasSelectedLanguagesChanged && selectedLanguages) {
-         const fieldToUpdate = {
-            spokenLanguages: mapOptions(selectedLanguages),
-         }
-         handleChange(fieldToUpdate).catch(console.error)
-         setSelectedLanguagesChanged(false)
+   const handleSelectedCountriesChange = (selectedCountries: Option[]) => {
+      const fieldToUpdate = {
+         countriesOfInterest: mapOptions(selectedCountries),
       }
-   }, [selectedLanguages, hasSelectedLanguagesChanged])
+      updateFields(fieldToUpdate).catch(console.error)
+   }
+
+   const handleSelectedInterestsChange = (selectedInterests: Option[]) => {
+      const fieldToUpdate = {
+         interestsIds: mapOptions(selectedInterests),
+      }
+      updateFields(fieldToUpdate).catch(console.error)
+   }
+
+   const handleIsLookingForJobChange = (isLookingForJob: boolean) => {
+      const fieldToUpdate = {
+         isLookingForJob: isLookingForJob,
+      }
+      updateFields(fieldToUpdate).catch(console.error)
+   }
 
    useEffect(() => {
       if (userData) {
-         const { countriesOfInterest, spokenLanguages } = userData
+         const {
+            countriesOfInterest,
+            spokenLanguages,
+            interestsIds,
+            isLookingForJob,
+         } = userData
 
-         if (countriesOfInterest?.length) {
-            setSelectedCountries(
-               formatToOptionArray(countriesOfInterest, countriesCodes)
-            )
-         }
-
-         if (spokenLanguages?.length) {
-            setSelectedLanguages(
-               formatToOptionArray(spokenLanguages, languageCodes)
-            )
-         }
+         setSelectedCountries(
+            formatToOptionArray(countriesOfInterest, countriesCodes)
+         )
+         setSelectedLanguages(
+            formatToOptionArray(spokenLanguages, mappedLanguageCodes)
+         )
+         setSelectedInterests(formatToOptionArray(interestsIds, allInterests))
+         setIsLookingForJobToggle(Boolean(isLookingForJob))
       }
-   }, [userData])
+   }, [userData, allInterests])
 
-   const handleChange = useCallback(async (fieldToUpdate) => {
-      try {
-         await userRepo.updateAdditionalInformation({
-            userEmail: user.email,
-            ...fieldToUpdate,
-         })
-      } catch (error) {
-         console.log(error)
-      }
-   }, [])
+   const updateFields = useCallback(
+      async (fieldToUpdate) => {
+         try {
+            await userRepo.updateAdditionalInformation({
+               userEmail: user.email,
+               ...fieldToUpdate,
+            })
+         } catch (error) {
+            console.log(error)
+         }
+      },
+      [user]
+   )
 
    return (
-      <Grid container spacing={2}>
-         <Grid item xs={12}>
-            <Typography sx={styles.subtitle} variant="h5">
-               What languages do you speak?
+      <>
+         <Grid sx={styles.headerWrapper}>
+            <Typography sx={styles.title}>
+               A few more things before we kick off...
+            </Typography>
+            <Typography sx={styles.subtitle}>
+               To help us pick the best events for you, tell us more about your
+               interests
             </Typography>
          </Grid>
-         <Grid item xs={12}>
-            <FormControl fullWidth>
-               <MultiListSelect
-                  inputName="languages"
-                  isCheckbox
-                  selectedItems={selectedLanguages}
-                  allValues={languageCodes}
-                  setFieldValue={(name, value) => setSelectedLanguages(value)}
-                  onSelectItems={() => setSelectedLanguagesChanged(true)}
-                  inputProps={{
-                     label: "Languages you speak",
-                     placeholder: "Select language",
-                     className: "registrationInput",
-                  }}
-                  getValueFn={(item) => item}
-                  getLabelFn={(item) => item.name}
-                  getKeyFn={(item) => item.code}
-                  chipProps={{
-                     color: "primary",
-                  }}
+
+         <Grid container spacing={2}>
+            <Grid item xs={12}>
+               <Typography sx={styles.inputLabel} variant="h5">
+                  What languages do you speak?
+               </Typography>
+            </Grid>
+            <Grid item xs={12}>
+               <FormControl fullWidth>
+                  <MultiListSelect
+                     inputName="languages"
+                     isCheckbox
+                     selectedItems={selectedLanguages}
+                     allValues={mappedLanguageCodes}
+                     setFieldValue={(name, value) =>
+                        handleSelectedLanguageChange(value)
+                     }
+                     inputProps={{
+                        label: "Languages you speak",
+                        placeholder: "Select language",
+                        className: "registrationInput",
+                     }}
+                     getValueFn={(item) => item}
+                     chipProps={{
+                        color: "primary",
+                     }}
+                  />
+               </FormControl>
+            </Grid>
+
+            <Grid item xs={12}>
+               <Typography sx={styles.inputLabel} variant="h5">
+                  In what country or area are you looking for opportunities?
+               </Typography>
+            </Grid>
+            <Grid item xs={12}>
+               <FormControl fullWidth>
+                  <MultiListSelect
+                     inputName="countries"
+                     isCheckbox
+                     selectedItems={selectedCountries}
+                     allValues={countriesCodes}
+                     setFieldValue={(name, value) =>
+                        handleSelectedCountriesChange(value)
+                     }
+                     inputProps={{
+                        label: "Countries of interest",
+                        placeholder: "Select one or more country",
+                        className: "registrationInput",
+                     }}
+                     getValueFn={(item) => item}
+                     chipProps={{
+                        color: "primary",
+                     }}
+                  />
+               </FormControl>
+            </Grid>
+
+            <Grid item xs={12} sx={styles.toggleInputWrapper}>
+               <Typography sx={styles.inputLabel} mr={2} variant="h5">
+                  Are you currently looking for a job?
+               </Typography>
+               <Switch
+                  checked={isLookingForJobToggle}
+                  onChange={(event, checked) =>
+                     handleIsLookingForJobChange(checked)
+                  }
+                  name="isLookingForJobToggle"
+                  color="primary"
                />
-            </FormControl>
-         </Grid>
+            </Grid>
 
-         <Grid item xs={12}>
-            <Typography sx={styles.subtitle} variant="h5">
-               In what country or area are you looking for opportunities?
-            </Typography>
+            <Grid item xs={12}>
+               <Typography sx={styles.inputLabel} variant="h5">
+                  Lastly, select your interests
+               </Typography>
+            </Grid>
+            <Grid item xs={12}>
+               <FormControl fullWidth>
+                  <MultiListSelect
+                     inputName="interests"
+                     isCheckbox
+                     limit={5}
+                     selectedItems={selectedInterests}
+                     allValues={allInterests}
+                     setFieldValue={(name, value) =>
+                        handleSelectedInterestsChange(value)
+                     }
+                     inputProps={{
+                        label: "Select 5 to improve your site experience",
+                        placeholder: "Select from the following list",
+                        className: "registrationInput",
+                     }}
+                     getValueFn={(item) => item}
+                     chipProps={{
+                        color: "primary",
+                     }}
+                  />
+               </FormControl>
+            </Grid>
          </Grid>
-         <Grid item xs={12}>
-            <FormControl fullWidth>
-               <MultiListSelect
-                  inputName="countries"
-                  isCheckbox
-                  selectedItems={selectedCountries}
-                  onSelectItems={() => setSelectedCountriesChanged(true)}
-                  allValues={countriesCodes}
-                  setFieldValue={(name, value) => setSelectedCountries(value)}
-                  inputProps={{
-                     label: "Countries of interest",
-                     placeholder: "Select one or more country",
-                     className: "registrationInput",
-                  }}
-                  getValueFn={(item) => item}
-                  getLabelFn={(item) => item.name}
-                  getKeyFn={(item) => item.code}
-                  chipProps={{
-                     color: "primary",
-                  }}
-               />
-            </FormControl>
-         </Grid>
-
-         <Grid item xs={12}>
-            <Typography sx={styles.subtitle} variant="h5">
-               Referral code
-            </Typography>
-         </Grid>
-         {/*<Grid item xs={12}>*/}
-         {/*   <FormControl fullWidth>*/}
-         {/*      <TextField*/}
-         {/*         className="registrationInput"*/}
-         {/*         variant="outlined"*/}
-         {/*         fullWidth*/}
-         {/*         id="referralCode"*/}
-         {/*         name="referralCode"*/}
-         {/*         placeholder="Enter a Referral Code"*/}
-         {/*         InputLabelProps={{ shrink: true }}*/}
-         {/*         onChange={({target: { value}}) =>{ setReferralCode(value)}}*/}
-         {/*         value={referralCode}*/}
-         {/*         label="Referral Code (Optional)"*/}
-         {/*      />*/}
-         {/*   </FormControl>*/}
-
-         {/*</Grid>*/}
-      </Grid>
+      </>
    )
 }
 

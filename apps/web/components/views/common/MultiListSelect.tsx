@@ -25,8 +25,6 @@ const MultiListSelect = ({
    limit = false,
 }: Props) => {
    const handleMultiSelect = (event, selectedOptions) => {
-      if (limit && selectedOptions.length > limit) return
-
       onSelectItems(selectedOptions)
       if (setFieldValue)
          setFieldValue(inputName, selectedOptions.map(getValueFn))
@@ -36,8 +34,16 @@ const MultiListSelect = ({
       return getValueFn(option) === getValueFn(value)
    }
 
-   const getOptionDisabled = (option) =>
-      disabledValues.includes(getValueFn(option))
+   const getOptionDisabled = (option) => {
+      let limitWasReached = false
+
+      if (limit) {
+         limitWasReached =
+            selectedItems.length >= 5 && !selectedItems.includes(option)
+      }
+
+      return limitWasReached || disabledValues.includes(getValueFn(option))
+   }
 
    return allValues.length === 0 ? null : (
       <Autocomplete
