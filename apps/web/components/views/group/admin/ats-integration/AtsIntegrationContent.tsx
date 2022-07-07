@@ -5,6 +5,7 @@ import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import { useSelector } from "react-redux"
 import { groupSelector } from "../../../../../store/selectors/groupSelectors"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { groupRepo } from "../../../../../data/RepositoryInstances"
 
 const AtsIntegrationContent = () => {
    return (
@@ -24,7 +25,11 @@ const ConnectWithATSSystem = () => {
    const group: Group = useSelector(groupSelector)
 
    const startLink = async () => {
-      console.log(await atsServiceInstance.linkCompanyWithATS(group.groupId))
+      // console.log(await atsServiceInstance.linkCompanyWithATS(group.groupId))
+
+      await groupRepo.upsertATSMetadata(group.groupId, {
+         groupId: "test",
+      })
    }
 
    return (
