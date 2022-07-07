@@ -89,7 +89,10 @@ export interface ILivestreamRepository {
 }
 
 export class FirebaseLivestreamRepository implements ILivestreamRepository {
-   constructor(private readonly firestore: firebase.firestore.Firestore) {}
+   constructor(
+      private readonly firestore: firebase.firestore.Firestore,
+      private readonly fieldValue: typeof firebase.firestore.FieldValue
+   ) {}
 
    private mapLivestreamCollections(
       documentSnapshot: firebase.firestore.QuerySnapshot
@@ -106,8 +109,8 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       const data = {
          id: userData.id,
          livestreamId: livestream.id,
-         totalMinutes: firebase.firestore.FieldValue.increment(1),
-         minutes: firebase.firestore.FieldValue.arrayUnion(elapsedMinutes),
+         totalMinutes: this.fieldValue.increment(1),
+         minutes: this.fieldValue.arrayUnion(elapsedMinutes),
          livestream,
          user: userData,
       }

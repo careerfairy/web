@@ -22,7 +22,10 @@ export class FirebaseUserRepository
    extends BaseFirebaseRepository
    implements IUserRepository
 {
-   constructor(private readonly firestore: firebase.firestore.Firestore) {
+   constructor(
+      private readonly firestore: firebase.firestore.Firestore,
+      private readonly fieldValue: typeof firebase.firestore.FieldValue
+   ) {
       super()
    }
 
@@ -74,7 +77,7 @@ export class FirebaseUserRepository
       recruiter: SavedRecruiter
    ): Promise<void> {
       // @ts-ignore
-      recruiter.savedAt = firebase.firestore.FieldValue.serverTimestamp()
+      recruiter.savedAt = this.fieldValue.serverTimestamp()
 
       return this.firestore
          .collection("userData")
