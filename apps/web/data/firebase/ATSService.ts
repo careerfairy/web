@@ -1,14 +1,29 @@
 import firebaseInstance from "./FirebaseInstance"
 import firebase from "firebase"
+import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 
 export class ATSService {
    constructor(
       private readonly firebaseFunctions: firebase.functions.Functions
    ) {}
 
-   linkCompanyWithATS(groupId: string) {
-      return this.firebaseFunctions.httpsCallable("linkCompanyWithATS")({
+   async linkCompanyWithATS(groupId: string): Promise<MergeLinkTokenResponse> {
+      const data = await this.firebaseFunctions.httpsCallable(
+         "mergeGenerateLinkToken"
+      )({
          groupId,
+      })
+
+      return data.data as MergeLinkTokenResponse
+   }
+
+   async exchangeAccountToken(
+      groupId: string,
+      publicToken: string
+   ): Promise<void> {
+      await this.firebaseFunctions.httpsCallable("mergeGetAccountToken")({
+         groupId,
+         publicToken,
       })
    }
 }
