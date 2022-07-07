@@ -9,7 +9,8 @@
       "copy-files": "cpx \"src/**/*.{json}\" dist/",
       "clean": "rimraf dist/"
    },
-   "dependencies": {
+   "peerDependencies": {
+      "axios": "^0.27.2",
       "firebase": "^8.10.1"
    },
    "devDependencies": {
