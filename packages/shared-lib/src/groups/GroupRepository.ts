@@ -36,7 +36,7 @@ export class FirebaseGroupRepository
 {
    constructor(
       private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: firebase.firestore.FieldValue
+      private readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
    }
@@ -152,7 +152,7 @@ export class FirebaseGroupRepository
    }
 
    upsertATSMetadata(groupId: string, data: Partial<GroupATSInformation>) {
-      data.updatedAt = firebase.firestore.FieldValue.serverTimestamp()
+      data.updatedAt = this.fieldValue.serverTimestamp() as any
 
       return this.firestore
          .collection("careerCenterData")
