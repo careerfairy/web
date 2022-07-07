@@ -5,5 +5,6 @@ import {
 import { admin } from "./firestoreAdmin"
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
-   admin.firestore() as any
+   admin.firestore() as any,
+   admin.firestore.FieldValue
 )
