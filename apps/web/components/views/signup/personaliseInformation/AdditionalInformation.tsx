@@ -83,33 +83,59 @@ const AdditionalInformation = () => {
    const [selectedInterests, setSelectedInterests] = useState([] as Option[])
    const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
 
-   const handleSelectedLanguageChange = (selectedLanguages: Option[]) => {
-      const fieldToUpdate = {
-         spokenLanguages: mapOptions(selectedLanguages),
-      }
-      updateFields(fieldToUpdate).catch(console.error)
-   }
+   const updateFields = useCallback(
+      async (fieldToUpdate) => {
+         try {
+            await userRepo.updateAdditionalInformation({
+               userEmail: user.email,
+               ...fieldToUpdate,
+            })
+         } catch (error) {
+            console.log(error)
+         }
+      },
+      [user]
+   )
 
-   const handleSelectedCountriesChange = (selectedCountries: Option[]) => {
-      const fieldToUpdate = {
-         countriesOfInterest: mapOptions(selectedCountries),
-      }
-      updateFields(fieldToUpdate).catch(console.error)
-   }
+   const handleSelectedLanguageChange = useCallback(
+      (selectedLanguages: Option[]) => {
+         const fieldToUpdate = {
+            spokenLanguages: mapOptions(selectedLanguages),
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
 
-   const handleSelectedInterestsChange = (selectedInterests: Option[]) => {
-      const fieldToUpdate = {
-         interestsIds: mapOptions(selectedInterests),
-      }
-      updateFields(fieldToUpdate).catch(console.error)
-   }
+   const handleSelectedCountriesChange = useCallback(
+      (selectedCountries: Option[]) => {
+         const fieldToUpdate = {
+            countriesOfInterest: mapOptions(selectedCountries),
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
 
-   const handleIsLookingForJobChange = (isLookingForJob: boolean) => {
-      const fieldToUpdate = {
-         isLookingForJob: isLookingForJob,
-      }
-      updateFields(fieldToUpdate).catch(console.error)
-   }
+   const handleSelectedInterestsChange = useCallback(
+      (selectedInterests: Option[]) => {
+         const fieldToUpdate = {
+            interestsIds: mapOptions(selectedInterests),
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
+
+   const handleIsLookingForJobChange = useCallback(
+      (isLookingForJob: boolean) => {
+         const fieldToUpdate = {
+            isLookingForJob: isLookingForJob,
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
 
    useEffect(() => {
       if (userData) {
@@ -131,20 +157,6 @@ const AdditionalInformation = () => {
       }
    }, [userData, allInterests])
 
-   const updateFields = useCallback(
-      async (fieldToUpdate) => {
-         try {
-            await userRepo.updateAdditionalInformation({
-               userEmail: user.email,
-               ...fieldToUpdate,
-            })
-         } catch (error) {
-            console.log(error)
-         }
-      },
-      [user]
-   )
-
    return (
       <>
          <Grid sx={styles.headerWrapper}>
@@ -157,7 +169,7 @@ const AdditionalInformation = () => {
             </Typography>
          </Grid>
 
-         <Grid container spacing={2}>
+         <Grid container maxWidth="sm" mx={"auto"} spacing={2}>
             <Grid item xs={12}>
                <Typography sx={styles.inputLabel} variant="h5">
                   What languages do you speak?
