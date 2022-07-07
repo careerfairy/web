@@ -7,6 +7,7 @@ type AdditionalInformationProps = {
    gender?: string
    spokenLanguages?: string[]
    countriesOfInterest?: string[]
+   interestsIds?: string[]
    isLookingForJob?: boolean
 }
 
@@ -31,6 +32,7 @@ export interface IUserRepository {
       spokenLanguages,
       countriesOfInterest,
       isLookingForJob,
+      interestsIds,
    }: AdditionalInformationProps): Promise<void>
 
    setRegistrationStepStatus({
@@ -54,7 +56,7 @@ export class FirebaseUserRepository
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
       let userRef = this.firestore.collection("userData").doc(userEmail)
-      debugger
+
       return userRef.update({
          interestsIds: Array.from(new Set(interestIds)),
       })
@@ -144,24 +146,26 @@ export class FirebaseUserRepository
       spokenLanguages,
       countriesOfInterest,
       isLookingForJob,
+      interestsIds,
    }): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
 
       const genderToUpdate = gender ? { gender } : {}
+      const interestsToUpdate = interestsIds ? { interestsIds } : {}
       const spokenLanguagesToUpdate = spokenLanguages ? { spokenLanguages } : {}
       const countriesOfInterestToUpdate = countriesOfInterest
          ? { countriesOfInterest }
          : {}
-      const isLookingForJobToUpdate = isLookingForJob ? { isLookingForJob } : {}
+      const isLookingForJobToUpdate =
+         isLookingForJob !== undefined ? { isLookingForJob } : {}
 
       const toUpdate = {
          ...genderToUpdate,
          ...spokenLanguagesToUpdate,
          ...countriesOfInterestToUpdate,
          ...isLookingForJobToUpdate,
+         ...interestsToUpdate,
       }
-
-      debugger
 
       return userRef.update(toUpdate)
    }
