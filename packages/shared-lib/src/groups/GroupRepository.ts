@@ -1,5 +1,6 @@
+import { Group, GroupATSInformation } from "./groups"
+import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
-import { Group } from "./groups"
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -10,10 +11,35 @@ export interface IGroupRepository {
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
+
+   /**
+    * Confirm if user is admin of the group
+    *
+    * Returns true if user is admin of the group and the group itself to save a
+    * network request in case you need to fetch the full group afterwards
+    * @param groupId
+    * @param userEmail
+    */
+   checkIfUserIsGroupAdmin(
+      groupId: string,
+      userEmail: string
+   ): Promise<{ isAdmin: boolean; group: Group }>
+
+   // ATS actions
+   getATSMetadata(groupId: string): Promise<GroupATSInformation>
+   upsertATSMetadata(groupId: string, data: Partial<GroupATSInformation>)
 }
 
-export class FirebaseGroupRepository implements IGroupRepository {
-   constructor(private readonly firestore: firebase.firestore.Firestore) {}
+export class FirebaseGroupRepository
+   extends BaseFirebaseRepository
+   implements IGroupRepository
+{
+   constructor(
+      private readonly firestore: firebase.firestore.Firestore,
+      private readonly fieldValue: firebase.firestore.FieldValue
+   ) {
+      super()
+   }
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
       let userRef = this.firestore.collection("userData").doc(userEmail)
@@ -82,5 +108,57 @@ export class FirebaseGroupRepository implements IGroupRepository {
          .limit(1)
          .get()
       return adminGroups.docs.length > 0
+   }
+
+   async checkIfUserIsGroupAdmin(
+      groupId: string,
+      userEmail: string
+   ): Promise<{ isAdmin: boolean; group: Group }> {
+      const groupDoc = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .get()
+
+      if (!groupDoc.exists) {
+         return { isAdmin: false, group: null }
+      }
+
+      const group = this.addIdToDoc<Group>(groupDoc)
+
+      return {
+         isAdmin: group.adminEmails.includes(userEmail),
+         group,
+      }
+   }
+
+   /*
+   |--------------------------------------------------------------------------
+   | ATS Actions
+   |--------------------------------------------------------------------------
+   */
+   async getATSMetadata(groupId: string): Promise<GroupATSInformation> {
+      const doc = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc("ats")
+         .get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data() as GroupATSInformation
+   }
+
+   upsertATSMetadata(groupId: string, data: Partial<GroupATSInformation>) {
+      data.updatedAt = firebase.firestore.FieldValue.serverTimestamp()
+
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc("ats")
+         .set(data, { merge: true })
    }
 }
