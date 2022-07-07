@@ -20,6 +20,7 @@ const MultiListSelect = ({
    extraOptions = {}, // props to pass to autocomplete
    setFieldValue = () => {}, // formik field
    getValueFn = (option) => option.id, // field value
+   getKeyFn = (option) => option.id, // field id
    disabledValues = [],
    limit = false,
 }: Props) => {
@@ -51,17 +52,20 @@ const MultiListSelect = ({
          getOptionLabel={getLabelFn}
          renderOption={(props, option, { selected }) =>
             isCheckbox ? (
-               <li {...props} key={option.id}>
+               <li
+                  {...props}
+                  key={getKeyFn(option)}
+                  style={{ justifyContent: "space-between" }}
+               >
+                  {getLabelFn(option)}
                   <Checkbox
                      icon={icon}
                      checkedIcon={checkedIcon}
-                     style={{ marginRight: 8 }}
                      checked={selected}
                   />
-                  {getLabelFn(option)}
                </li>
             ) : (
-               <li {...props} key={option.id}>
+               <li {...props} key={getKeyFn(option)}>
                   {getLabelFn(option)}
                </li>
             )
@@ -73,7 +77,7 @@ const MultiListSelect = ({
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
                <Chip
-                  key={index}
+                  key={getKeyFn(option)}
                   label={getLabelFn(option)}
                   {...getTagProps({ index })}
                   {...chipProps}
@@ -94,6 +98,7 @@ type Props = {
    disabled?: boolean
    getLabelFn?: (obj: any) => string
    getValueFn?: (obj: any) => string
+   getKeyFn?: (obj: any) => string
    inputProps?: object
    chipProps?: object
    isCheckbox?: boolean

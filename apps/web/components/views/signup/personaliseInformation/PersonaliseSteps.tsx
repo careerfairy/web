@@ -46,7 +46,7 @@ const PersonaliseSteps = () => {
    return (
       <>
          {steps.length > 1 && (
-            <Box mb={2}>
+            <Box mb={2} mt={10}>
                <SignupStepper steps={steps} currentStep={currentStep} />
             </Box>
          )}
@@ -57,7 +57,7 @@ const PersonaliseSteps = () => {
             setCurrentStep={setCurrentStep}
          />
 
-         <Grid container alignItems="center">
+         <Grid container alignItems="center" mt={10}>
             <Grid item xs={6}>
                <Typography variant="body2" color="textSecondary">
                   Step {currentStep + 1} of {steps.length}

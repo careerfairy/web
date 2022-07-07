@@ -2,6 +2,14 @@ import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import { SavedRecruiter, UserData } from "./users"
 import firebase from "firebase/compat/app"
 
+type AdditionalInformationProps = {
+   userEmail: string
+   gender?: string
+   spokenLanguages?: string[]
+   countriesOfInterest?: string[]
+   isLookingForJob?: boolean
+}
+
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
 
@@ -16,6 +24,21 @@ export interface IUserRepository {
    getUserDataByUid(uid: string): Promise<UserData>
 
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
+
+   updateAdditionalInformation({
+      userEmail,
+      gender,
+      spokenLanguages,
+      countriesOfInterest,
+      isLookingForJob,
+   }: AdditionalInformationProps): Promise<void>
+
+   setRegistrationStepStatus({
+      userEmail,
+      userId,
+      stepId,
+      isFilled,
+   }): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -31,7 +54,7 @@ export class FirebaseUserRepository
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
       let userRef = this.firestore.collection("userData").doc(userEmail)
-
+      debugger
       return userRef.update({
          interestsIds: Array.from(new Set(interestIds)),
       })
@@ -113,5 +136,56 @@ export class FirebaseUserRepository
          uids.map((uid) => this.getUserDataByUid(uid))
       )
       return users.filter((user) => user !== null)
+   }
+
+   updateAdditionalInformation({
+      userEmail,
+      gender,
+      spokenLanguages,
+      countriesOfInterest,
+      isLookingForJob,
+   }): Promise<void> {
+      const userRef = this.firestore.collection("userData").doc(userEmail)
+
+      const genderToUpdate = gender ? { gender } : {}
+      const spokenLanguagesToUpdate = spokenLanguages ? { spokenLanguages } : {}
+      const countriesOfInterestToUpdate = countriesOfInterest
+         ? { countriesOfInterest }
+         : {}
+      const isLookingForJobToUpdate = isLookingForJob ? { isLookingForJob } : {}
+
+      const toUpdate = {
+         ...genderToUpdate,
+         ...spokenLanguagesToUpdate,
+         ...countriesOfInterestToUpdate,
+         ...isLookingForJobToUpdate,
+      }
+
+      debugger
+
+      return userRef.update(toUpdate)
+   }
+
+   setRegistrationStepStatus({
+      userEmail,
+      userId,
+      stepId,
+      isFilled,
+   }): Promise<void> {
+      if (isFilled == null) {
+         return
+      }
+
+      const userRef = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("analytics")
+         .doc("analytics")
+
+      const toUpdate = isFilled
+         ? { registrationFilledSteps: [{ userId, stepId }] }
+         : { registrationSkippedSteps: [{ userId, stepId }] }
+
+      return userRef.set(toUpdate, { merge: true })
    }
 }

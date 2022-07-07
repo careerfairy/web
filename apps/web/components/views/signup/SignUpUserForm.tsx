@@ -20,8 +20,6 @@ import Link from "next/link"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
 import { IMultiStepContext, MultiStepContext } from "../common/MultiStepWrapper"
-import { useLocalStorage } from "react-use"
-import { localStorageReferralCode } from "../../../constants/localStorageKeys"
 import { sxStyles } from "../../../types/commonTypes"
 import GenericDropdown, { DropdownItem } from "../common/GenericDropdown"
 
@@ -91,12 +89,6 @@ function SignUpUserForm() {
    const [generalLoading, setGeneralLoading] = useState(false)
    const [open, setOpen] = React.useState(false)
 
-   const [existingReferralCode] = useLocalStorage(
-      localStorageReferralCode,
-      "",
-      { raw: true }
-   )
-
    const POSSIBLE_GENDERS = [
       {
          id: "male-gender-selector",
@@ -131,10 +123,9 @@ function SignUpUserForm() {
          subscribed: false,
          university: { code: "other", name: "Other" },
          universityCountryCode: "",
-         referralCode: `${existingReferralCode}`,
          gender: "",
       }),
-      [existingReferralCode]
+      []
    )
 
    const submitting = (isSubmitting) => {
@@ -422,43 +413,6 @@ function SignUpUserForm() {
                            submitting={submitting(isSubmitting)}
                            setFieldValue={setFieldValue}
                         />
-                     </Grid>
-                     <Grid item xs={12}>
-                        <Typography sx={styles.subtitle} variant="h5">
-                           Referral code
-                        </Typography>
-                     </Grid>
-                     <Grid item xs={12}>
-                        <FormControl fullWidth>
-                           <TextField
-                              className="registrationInput"
-                              variant="outlined"
-                              fullWidth
-                              error={Boolean(
-                                 errors.referralCode && touched.referralCode
-                              )}
-                              id="referralCode"
-                              name="referralCode"
-                              placeholder="Enter a Referral Code"
-                              InputLabelProps={{ shrink: true }}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              value={values.referralCode}
-                              disabled={submitting(isSubmitting)}
-                              label="Referral Code (Optional)"
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.referralCode &&
-                                    touched.referralCode &&
-                                    errors.referralCode
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.referralCode}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
                      </Grid>
                      <Grid item xs={12}>
                         <FormControlLabel
