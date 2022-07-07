@@ -21,8 +21,6 @@ export const linkCompanyWithATS = functions
          groupId: string().required(),
       })
 
-      console.log("merge secret", process.env.MERGE_ACCESS_KEY)
-
       // validations that throw exceptions
       const { email } = await validateUserAuthExists(context)
 
@@ -43,9 +41,10 @@ export const linkCompanyWithATS = functions
                // also we don't leak the group id
                end_user_origin_id: uuidv4(),
             },
+            updatedAt: null, // will be filled by the repo bellow
          }
 
-         await groupRepo.upsertATSMetadata(groupId, atsMetadata)
+         // await groupRepo.upsertATSMetadata(groupId, atsMetadata)
       }
 
       try {
@@ -62,12 +61,7 @@ export const linkCompanyWithATS = functions
          return mergeResponse.link_token
       } catch (e) {
          logAxiosError("Failed to create a link token from merge", e)
-      }
 
-      // validate user is group admin
-      // confirm group has or not a link token
-      // if so, return it
-      // create a link token from merge
-      // save details in the group document
-      // child document with creation date
+         return null
+      }
    })
