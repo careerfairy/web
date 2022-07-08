@@ -54,6 +54,7 @@ type Props = {
 export type MultiStepComponentType = {
    component: (condition?: boolean) => ComponentType
    description: string
+   title?: JSX.Element
 }
 
 export default MultiStepWrapper

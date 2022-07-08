@@ -45,7 +45,7 @@ const MultiListSelect = ({
       return limitWasReached || disabledValues.includes(getValueFn(option))
    }
 
-   return allValues.length === 0 ? null : (
+   return (
       <Autocomplete
          id={inputName}
          multiple
@@ -65,6 +65,7 @@ const MultiListSelect = ({
                >
                   {getLabelFn(option)}
                   <Checkbox
+                     key={getKeyFn(option)}
                      icon={icon}
                      checkedIcon={checkedIcon}
                      checked={selected}
