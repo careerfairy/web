@@ -1,16 +1,14 @@
 import functions = require("firebase-functions")
 import {
-   logAndThrow,
    validateData,
    validateUserAuthExists,
    validateUserIsGroupAdmin,
 } from "./lib/validations"
 import { object, string } from "yup"
 import { groupRepo } from "./api/repositories"
-import { GroupATSInformation } from "@careerfairy/shared-lib/dist/groups"
-import { v4 as uuidv4 } from "uuid"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 import { logAxiosError } from "./util"
+import { GroupATSIntegration } from "@careerfairy/shared-lib/dist/groups"
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -21,31 +19,13 @@ export const mergeGenerateLinkToken = functions
    .https.onCall(async (data, context) => {
       const inputSchema = object({
          groupId: string().required(),
+         integrationId: string().required(),
       })
 
       // validations that throw exceptions
       const { email } = await validateUserAuthExists(context)
-      const { groupId } = await validateData(data, inputSchema)
+      const { groupId, integrationId } = await validateData(data, inputSchema)
       const { group } = await validateUserIsGroupAdmin(groupId, email)
-
-      let atsMetadata: GroupATSInformation = await groupRepo.getATSMetadata(
-         groupId
-      )
-
-      // No ATS metadata yet, lets create it
-      if (!atsMetadata) {
-         atsMetadata = {
-            groupId: groupId,
-            merge: {
-               // not the group id to allow in the future a group to have multiple ats systems integrations
-               // also we don't leak the group id
-               end_user_origin_id: uuidv4(),
-            },
-            updatedAt: null, // will be filled by the repo bellow
-         }
-
-         await groupRepo.upsertATSMetadata(groupId, atsMetadata)
-      }
 
       try {
          const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
@@ -53,7 +33,7 @@ export const mergeGenerateLinkToken = functions
          // Temporary token initializing the user’s integration authorization session
          // We'll be able to open the Merge Link dialog to choose the integration
          return mergeATS.createLinkToken(
-            atsMetadata.merge.end_user_origin_id,
+            integrationId,
             group.universityName,
             group.adminEmail
          )
@@ -62,10 +42,6 @@ export const mergeGenerateLinkToken = functions
 
          return null
       }
-
-      // mudar o account token para um documento diferente
-      // nao deixar criar nova integração se ja existir uma
-      // pensar em deixar a empresar connectar varios sistemas?
    })
 
 /**
@@ -77,46 +53,50 @@ export const mergeGetAccountToken = functions
    .https.onCall(async (data, context) => {
       const inputSchema = object({
          groupId: string().required(),
+         integrationId: string().required(),
          publicToken: string().required(),
       })
 
       // validations that throw exceptions
       const { email } = await validateUserAuthExists(context)
-      const { groupId, publicToken } = await validateData(data, inputSchema)
-      await validateUserIsGroupAdmin(groupId, email)
-
-      const atsMetadata: GroupATSInformation = await groupRepo.getATSMetadata(
-         groupId
+      const { groupId, integrationId, publicToken } = await validateData(
+         data,
+         inputSchema
       )
 
-      if (!atsMetadata?.merge?.end_user_origin_id) {
-         return logAndThrow(
-            "The first step merge integration was skipped",
-            atsMetadata,
-            publicToken
-         )
-      }
-
-      if (!atsMetadata?.merge?.account_token) {
-         return logAndThrow(
-            "The group already has an account token",
-            atsMetadata,
-            publicToken
-         )
-      }
+      await validateUserIsGroupAdmin(groupId, email)
 
       try {
          const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
 
          const mergeResponse = await mergeATS.exchangeAccountToken(publicToken)
 
-         // Save the account token in the group ats doc
-         await groupRepo.upsertATSMetadata(groupId, {
+         console.log("account token resp", mergeResponse)
+
+         const atsMetadata: Partial<GroupATSIntegration> = {
+            groupId: groupId,
+            merge: {
+               end_user_origin_id: integrationId,
+               integration_name: mergeResponse?.integration?.name,
+               image: mergeResponse?.integration?.image,
+               square_image: mergeResponse?.integration?.square_image,
+               slug: mergeResponse?.integration?.slug,
+            },
+         }
+
+         await groupRepo.createATSIntegration(
+            groupId,
+            integrationId,
+            atsMetadata
+         )
+
+         await groupRepo.saveATSIntegrationTokens(groupId, integrationId, {
+            groupId,
+            integrationId,
             merge: {
                account_token: mergeResponse.account_token,
             },
          })
-
          return true
       } catch (e) {
          logAxiosError(
@@ -124,6 +104,6 @@ export const mergeGetAccountToken = functions
             e
          )
 
-         return null
+         throw e
       }
    })

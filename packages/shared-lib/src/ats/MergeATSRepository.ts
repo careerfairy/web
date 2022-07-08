@@ -62,7 +62,7 @@ export class MergeATSRepository implements IATSRepository {
 
    async exchangeAccountToken(public_token: string) {
       const { data } = await this.axios.get<MergeAccountTokenResponse>(
-         `https://api.merge.dev/api/integrations/account-token/${public_token}"`
+         `https://api.merge.dev/api/integrations/account-token/${public_token}`
       )
 
       return data
@@ -76,4 +76,11 @@ export type MergeLinkTokenResponse = {
 
 export type MergeAccountTokenResponse = {
    account_token: string
+   integration?: {
+      name?: string
+      image?: string
+      square_image?: string
+      color?: string
+      slug?: string
+   }
 }
