@@ -28,10 +28,11 @@ const initialState = {
    isLoading: false,
    linkToken: null,
    mergeLinkIsReady: false,
+   integrationId: null,
 }
 
 type Action =
-   | { type: "START" }
+   | { type: "START"; payload: string }
    | { type: "LINK_TOKEN_GRABBED"; payload: string }
    | { type: "MERGE_LINK_READY"; payload: boolean }
    | { type: "COMPLETE" }
@@ -44,10 +45,13 @@ function reducer(state: State, action: Action): State {
          return {
             ...state,
             isLoading: true,
+            integrationId: action.payload,
          }
       case "LINK_TOKEN_GRABBED":
          return {
             ...state,
+            // the user can close the Merge dialog so we stop the loading state here
+            isLoading: false,
             linkToken: action.payload,
          }
       case "MERGE_LINK_READY": {
@@ -73,11 +77,18 @@ const ConnectWithATSSystem = () => {
    const [state, dispatch] = useReducer(reducer, initialState)
 
    const startLink = async () => {
-      dispatch({ type: "START" })
+      const integrationId = atsServiceInstance.generateIntegrationId()
+
+      console.log("generated integration id", integrationId)
+      dispatch({
+         type: "START",
+         payload: integrationId,
+      })
 
       try {
          const response = await atsServiceInstance.linkCompanyWithATS(
-            group.groupId
+            group.groupId,
+            integrationId
          )
 
          console.log(response)
@@ -110,49 +121,70 @@ const ConnectWithATSSystem = () => {
          <MergeDialogConnector
             groupId={group.groupId}
             linkToken={state.linkToken}
+            integrationId={state.integrationId}
             dispatch={dispatch}
          />
       </>
    )
 }
 
-const MergeDialogConnector = ({ linkToken, groupId, dispatch }) => {
-   console.log("MergeDialogConnector render", linkToken, groupId)
+const MergeDialogConnector = ({
+   linkToken,
+   groupId,
+   integrationId,
+   dispatch,
+}) => {
+   console.log("MergeDialogConnector render", linkToken, groupId, integrationId)
 
    const { enqueueSnackbar } = useSnackbar()
-   const onSuccess = useCallback((public_token) => {
-      console.log("success!!", public_token)
-      try {
-         atsServiceInstance
-            .exchangeAccountToken(groupId, public_token)
-            .then((_) => {
-               console.log("Account Token saved")
 
-               dispatch({ type: "COMPLETE" })
-            })
-      } catch (e) {
-         Sentry.captureException(e)
-         enqueueSnackbar(
-            "We could not finalize the ATS setup, try again later",
-            {
-               variant: "error",
-               preventDuplicate: true,
-            }
-         )
-      }
-   }, [])
+   // Finalize the integration
+   const onSuccess = useCallback(
+      (public_token) => {
+         console.log("success!!", public_token)
+         try {
+            atsServiceInstance
+               .exchangeAccountToken(groupId, integrationId, public_token)
+               .then((_) => {
+                  console.log("Account Token saved")
 
-   const { open, isReady } = useMergeLink({
+                  dispatch({ type: "COMPLETE" })
+               })
+         } catch (e) {
+            Sentry.captureException(e)
+            enqueueSnackbar(
+               "We could not finalize the ATS setup, try again later",
+               {
+                  variant: "error",
+                  preventDuplicate: true,
+               }
+            )
+         }
+      },
+      [groupId, integrationId]
+   )
+
+   const { open, isReady, error } = useMergeLink({
       linkToken: linkToken,
       onSuccess,
    })
 
+   // capture MergeLink errors
    useEffect(() => {
-      if (isReady && linkToken && groupId) {
+      if (error) {
+         console.error("Merge Link has an error", error)
+         Sentry.captureException(error)
+      }
+   }, [error])
+
+   // Open the dialog if requirements are met
+   useEffect(() => {
+      if (isReady && linkToken && groupId && integrationId) {
          open()
       }
-   }, [linkToken, groupId, isReady])
+   }, [linkToken, groupId, isReady, integrationId])
 
+   // Propagate to parent the readiness of MergeLink
    useEffect(() => {
       dispatch({ type: "MERGE_LINK_READY", payload: isReady })
    }, [isReady])

@@ -1,4 +1,4 @@
-import { Group, GroupATSInformation } from "./groups"
+import { Group, GroupATSIntegration, GroupATSIntegrationTokens } from "./groups"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
 
@@ -26,8 +26,27 @@ export interface IGroupRepository {
    ): Promise<{ isAdmin: boolean; group: Group }>
 
    // ATS actions
-   getATSMetadata(groupId: string): Promise<GroupATSInformation>
-   upsertATSMetadata(groupId: string, data: Partial<GroupATSInformation>)
+   getATSIntegrations(groupId: string): Promise<GroupATSIntegration[]>
+   createATSIntegration(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSIntegration>
+   ): Promise<void>
+   saveATSIntegrationTokens(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSIntegrationTokens>
+   ): Promise<void>
+
+   /**
+    * Should only be called from backends
+    * @param groupId
+    * @param integrationId
+    */
+   getATSIntegrationTokens(
+      groupId: string,
+      integrationId: string
+   ): Promise<GroupATSIntegrationTokens>
 }
 
 export class FirebaseGroupRepository
@@ -136,29 +155,65 @@ export class FirebaseGroupRepository
    | ATS Actions
    |--------------------------------------------------------------------------
    */
-   async getATSMetadata(groupId: string): Promise<GroupATSInformation> {
+   async getATSIntegrations(groupId: string): Promise<GroupATSIntegration[]> {
+      const docs = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .get()
+
+      if (docs.empty) {
+         return []
+      }
+
+      return this.addIdToDocs<GroupATSIntegration>(docs.docs)
+   }
+
+   createATSIntegration(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSIntegration>
+   ) {
+      data.updatedAt = this.fieldValue.serverTimestamp() as any
+      data.createdAt = this.fieldValue.serverTimestamp() as any
+
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+         .set(data)
+   }
+
+   saveATSIntegrationTokens(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSIntegrationTokens>
+   ) {
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+         .collection("tokens")
+         .doc("tokens")
+         .set(data)
+   }
+
+   async getATSIntegrationTokens(groupId: string, integrationId: string) {
       const doc = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .collection("ats")
-         .doc("ats")
+         .doc(integrationId)
+         .collection("tokens")
+         .doc("tokens")
          .get()
 
       if (!doc.exists) {
          return null
       }
 
-      return doc.data() as GroupATSInformation
-   }
-
-   upsertATSMetadata(groupId: string, data: Partial<GroupATSInformation>) {
-      data.updatedAt = this.fieldValue.serverTimestamp() as any
-
-      return this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("ats")
-         .doc("ats")
-         .set(data, { merge: true })
+      return this.addIdToDoc<GroupATSIntegrationTokens>(doc)
    }
 }
