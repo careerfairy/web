@@ -92,7 +92,7 @@ const SocialInformation = () => {
          const { referralCode, linkedinUrl } = userData
 
          if (linkedinUrl !== linkedInLinkInput) {
-            setLinkedInLinkInput(linkedinUrl)
+            setLinkedInLinkInput(linkedinUrl || "")
          }
 
          if (referralCode !== referralCodeInput)
