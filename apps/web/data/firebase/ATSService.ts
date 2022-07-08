@@ -1,17 +1,29 @@
 import firebaseInstance from "./FirebaseInstance"
 import firebase from "firebase"
 import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
+import { v4 as uuidv4 } from "uuid"
 
 export class ATSService {
    constructor(
       private readonly firebaseFunctions: firebase.functions.Functions
    ) {}
 
-   async linkCompanyWithATS(groupId: string): Promise<MergeLinkTokenResponse> {
+   // not the group id to allow a group to have multiple integrations
+   // also we don't leak the group id to the ATS provider
+   generateIntegrationId() {
+      const uuid = uuidv4()
+      return uuid.replace(/-/g, "")
+   }
+
+   async linkCompanyWithATS(
+      groupId: string,
+      integrationId: string
+   ): Promise<MergeLinkTokenResponse> {
       const data = await this.firebaseFunctions.httpsCallable(
          "mergeGenerateLinkToken"
       )({
          groupId,
+         integrationId,
       })
 
       return data.data as MergeLinkTokenResponse
@@ -19,10 +31,12 @@ export class ATSService {
 
    async exchangeAccountToken(
       groupId: string,
+      integrationId: string,
       publicToken: string
    ): Promise<void> {
       await this.firebaseFunctions.httpsCallable("mergeGetAccountToken")({
          groupId,
+         integrationId,
          publicToken,
       })
    }
