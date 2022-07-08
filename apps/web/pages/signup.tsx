@@ -1,14 +1,7 @@
 import React, { useState, useEffect } from "react"
 import { useRouter } from "next/router"
 import Head from "next/head"
-import {
-   Box,
-   Container,
-   Typography,
-   Stepper,
-   Step,
-   StepLabel,
-} from "@mui/material"
+import { Box, Container, Typography } from "@mui/material"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../HOCs/AuthProvider"
 import SignUpPinForm from "../components/views/signup/SignUpPinForm"
@@ -21,6 +14,7 @@ import { MainLogo } from "./../components/logos"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
+import GenericStepper from "../components/views/common/GenericStepper"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 
@@ -71,7 +65,7 @@ const SignUp = () => {
       <SignUpPageLayout showTitle={currentStep < 2}>
          {currentStep < 2 ? (
             <Box mb={2}>
-               <SignupStepper steps={steps} currentStep={currentStep} />
+               <GenericStepper steps={steps} currentStep={currentStep} />
             </Box>
          ) : null}
 
@@ -83,22 +77,6 @@ const SignUp = () => {
       </SignUpPageLayout>
    )
 }
-
-export const SignupStepper = ({
-   currentStep,
-   steps,
-}: {
-   currentStep: number
-   steps: MultiStepComponentType[]
-}) => (
-   <Stepper activeStep={currentStep} alternativeLabel>
-      {steps.map((step, i) => (
-         <Step key={i}>
-            <StepLabel>{step.description}</StepLabel>
-         </Step>
-      ))}
-   </Stepper>
-)
 
 const styles = sxStyles({
    footer: {
@@ -143,7 +121,7 @@ export const SignUpPageLayout = ({ children, showTitle }) => {
                </Typography>
             )}
             <Container maxWidth="md">
-               <Box data-testid={"signup-page-form"} p={3} mt={5}>
+               <Box data-testid={"signup-page-form"} p={3} mt={3}>
                   {children}
                </Box>
             </Container>

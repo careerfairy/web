@@ -13,7 +13,6 @@ const styles = sxStyles({
       fontWeight: "bold",
    },
    headerWrapper: {
-      marginTop: 6,
       marginBottom: 6,
       textAlign: "center",
    },
@@ -24,6 +23,12 @@ const styles = sxStyles({
       letterSpacing: "-0.02em",
    },
 })
+
+export const renderSocialInformationStepTitle = () => (
+   <Grid sx={styles.headerWrapper}>
+      <Typography sx={styles.title}>Before we kick off...</Typography>
+   </Grid>
+)
 
 function useDebounceInput(value, delay) {
    const [debouncedValue, setDebouncedValue] = useState(value)
@@ -112,10 +117,6 @@ const SocialInformation = () => {
 
    return (
       <>
-         <Grid sx={styles.headerWrapper}>
-            <Typography sx={styles.title}>Before we kick off...</Typography>
-         </Grid>
-
          <Grid container maxWidth="sm" mx={"auto"} spacing={2}>
             <Grid item xs={12}>
                <Typography sx={styles.inputLabel} variant="h5">

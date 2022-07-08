@@ -3,20 +3,27 @@ import MultiStepWrapper, {
 } from "../../common/MultiStepWrapper"
 import React, { useState } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
-import { SIGNUP_REDIRECT_PATH, SignupStepper } from "../../../../pages/signup"
+import { SIGNUP_REDIRECT_PATH } from "../../../../pages/signup"
 import { useRouter } from "next/router"
 import LoadingButton from "@mui/lab/LoadingButton"
-import AdditionalInformation from "./AdditionalInformation"
-import SocialInformation from "./SocialInformation"
+import AdditionalInformation, {
+   renderAdditionalInformationStepTitle,
+} from "./AdditionalInformation"
+import SocialInformation, {
+   renderSocialInformationStepTitle,
+} from "./SocialInformation"
+import GenericStepper from "../../common/GenericStepper"
 
 const steps: MultiStepComponentType[] = [
    {
       component: () => SocialInformation,
       description: "Social Information",
+      title: renderSocialInformationStepTitle(),
    },
    {
       component: () => AdditionalInformation,
       description: "Additional information",
+      title: renderAdditionalInformationStepTitle(),
    },
 ]
 
@@ -45,9 +52,11 @@ const PersonaliseSteps = () => {
 
    return (
       <>
+         {steps[currentStep].title || null}
+
          {steps.length > 1 && (
-            <Box mb={2} mt={10}>
-               <SignupStepper steps={steps} currentStep={currentStep} />
+            <Box mb={5}>
+               <GenericStepper steps={steps} currentStep={currentStep} />
             </Box>
          )}
 

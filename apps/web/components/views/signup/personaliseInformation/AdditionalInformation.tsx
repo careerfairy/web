@@ -14,7 +14,6 @@ const styles = sxStyles({
       fontWeight: "bold",
    },
    headerWrapper: {
-      marginTop: 6,
       marginBottom: 6,
       textAlign: "center",
    },
@@ -56,6 +55,18 @@ const countriesCodes = [
       name: "Portugal",
    },
 ]
+
+export const renderAdditionalInformationStepTitle = () => (
+   <Grid sx={styles.headerWrapper}>
+      <Typography sx={styles.title}>
+         A few more things before we kick off...
+      </Typography>
+      <Typography sx={styles.subtitle}>
+         To help us pick the best events for you, tell us more about your
+         interests
+      </Typography>
+   </Grid>
+)
 
 const formatToOptionArray = (
    selectedIds: string[],
@@ -159,16 +170,6 @@ const AdditionalInformation = () => {
 
    return (
       <>
-         <Grid sx={styles.headerWrapper}>
-            <Typography sx={styles.title}>
-               A few more things before we kick off...
-            </Typography>
-            <Typography sx={styles.subtitle}>
-               To help us pick the best events for you, tell us more about your
-               interests
-            </Typography>
-         </Grid>
-
          <Grid container maxWidth="sm" mx={"auto"} spacing={2}>
             <Grid item xs={12}>
                <Typography sx={styles.inputLabel} variant="h5">
