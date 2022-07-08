@@ -25,6 +25,19 @@ const styles = sxStyles({
    },
 })
 
+function useDebounceInput(value, delay) {
+   const [debouncedValue, setDebouncedValue] = useState(value)
+   useEffect(() => {
+      const handler = setTimeout(() => {
+         setDebouncedValue(value)
+      }, delay)
+      return () => {
+         clearTimeout(handler)
+      }
+   }, [value, delay])
+   return debouncedValue
+}
+
 const SocialInformation = () => {
    const { authenticatedUser: user, userData } = useAuth()
    const [existingReferralCode] = useLocalStorage(
@@ -33,8 +46,32 @@ const SocialInformation = () => {
       { raw: true }
    )
 
-   const [referralCode, setReferralCode] = useState(existingReferralCode)
-   const [linkedInLink, setLinkedInLink] = useState("")
+   const [referralCodeInput, setReferralCodeInput] =
+      useState(existingReferralCode)
+   const [linkedInLinkInput, setLinkedInLinkInput] = useState("")
+   const [hasChanged, setHasChanged] = useState(false)
+   const debouncedLinkedInLink = useDebounceInput(linkedInLinkInput, 1000)
+   const debouncedReferralCode = useDebounceInput(referralCodeInput, 1000)
+
+   useEffect(() => {
+      if (hasChanged) {
+         const fieldToUpdate = {
+            linkedinUrl: debouncedLinkedInLink,
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+         setHasChanged(false)
+      }
+   }, [debouncedLinkedInLink])
+
+   useEffect(() => {
+      if (hasChanged) {
+         const fieldToUpdate = {
+            referralCode: debouncedReferralCode,
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+         setHasChanged(false)
+      }
+   }, [debouncedReferralCode])
 
    const updateFields = useCallback(
       async (fieldToUpdate) => {
@@ -53,30 +90,25 @@ const SocialInformation = () => {
    useEffect(() => {
       if (userData) {
          const { referralCode, linkedinUrl } = userData
-         setLinkedInLink(linkedinUrl)
-         setReferralCode(referralCode)
+
+         if (linkedinUrl !== linkedInLinkInput) {
+            setLinkedInLinkInput(linkedinUrl)
+         }
+
+         if (referralCode !== referralCodeInput)
+            setReferralCodeInput(referralCode || "")
       }
    }, [userData])
 
-   const handleLinkedInLinkChange = useCallback(
-      (link: string) => {
-         const fieldToUpdate = {
-            linkedInLink: link,
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
-   )
+   const handleLinkedInLinkInputChange = useCallback((value) => {
+      setLinkedInLinkInput(value)
+      setHasChanged(true)
+   }, [])
 
-   const handleReferralCodeChange = useCallback(
-      (code: string) => {
-         const fieldToUpdate = {
-            referralCode: code,
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
-   )
+   const handleReferralCodeInputChange = useCallback((value) => {
+      setReferralCodeInput(value)
+      setHasChanged(true)
+   }, [])
 
    return (
       <>
@@ -91,22 +123,20 @@ const SocialInformation = () => {
                </Typography>
             </Grid>
             <Grid item xs={12}>
-               <FormControl fullWidth>
-                  <TextField
-                     className="registrationInput"
-                     variant="outlined"
-                     fullWidth
-                     id="linkedInLink"
-                     name="linkedInLink"
-                     placeholder="Enter your LinkedIn link"
-                     InputLabelProps={{ shrink: true }}
-                     onChange={({ target: { value } }) => {
-                        handleLinkedInLinkChange(value)
-                     }}
-                     value={linkedInLink}
-                     label="Add your LinkedIn link here"
-                  />
-               </FormControl>
+               <TextField
+                  className="registrationInput"
+                  variant="outlined"
+                  fullWidth
+                  id="linkedInLink"
+                  name="linkedInLink"
+                  placeholder="Enter your LinkedIn link"
+                  InputLabelProps={{ shrink: true }}
+                  onChange={({ target: { value } }) => {
+                     handleLinkedInLinkInputChange(value)
+                  }}
+                  value={linkedInLinkInput}
+                  label="Add your LinkedIn link here"
+               />
             </Grid>
 
             <Grid item xs={12}>
@@ -125,9 +155,9 @@ const SocialInformation = () => {
                      placeholder="Enter a Referral Code"
                      InputLabelProps={{ shrink: true }}
                      onChange={({ target: { value } }) => {
-                        handleReferralCodeChange(value)
+                        handleReferralCodeInputChange(value)
                      }}
-                     value={referralCode}
+                     value={referralCodeInput}
                      label="Copy-paste here your referral code"
                   />
                </FormControl>
