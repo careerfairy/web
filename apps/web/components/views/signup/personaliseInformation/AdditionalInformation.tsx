@@ -1,4 +1,4 @@
-import { FormControl, Grid, Switch, Typography } from "@mui/material"
+import { Grid, Switch, Typography } from "@mui/material"
 import React, { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import MultiListSelect from "../../common/MultiListSelect"
@@ -81,7 +81,7 @@ const mapLanguageCodeToOptionArray = (): Option[] => {
 
 const mappedLanguageCodes = mapLanguageCodeToOptionArray()
 
-const mapOptions = (options: Option[]) => {
+const mapOptions = (options: Option[]): string[] => {
    return options.map((option) => option.id)
 }
 
@@ -170,64 +170,60 @@ const AdditionalInformation = () => {
 
    return (
       <>
-         <Grid container maxWidth="sm" mx={"auto"} spacing={2}>
-            <Grid item xs={12}>
+         <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   What languages do you speak?
                </Typography>
             </Grid>
-            <Grid item xs={12}>
-               <FormControl fullWidth>
-                  <MultiListSelect
-                     inputName="languages"
-                     isCheckbox
-                     selectedItems={selectedLanguages}
-                     allValues={mappedLanguageCodes}
-                     setFieldValue={(name, value) =>
-                        handleSelectedLanguageChange(value)
-                     }
-                     inputProps={{
-                        label: "Languages you speak",
-                        placeholder: "Select language",
-                        className: "registrationInput",
-                     }}
-                     getValueFn={(item) => item}
-                     chipProps={{
-                        color: "primary",
-                     }}
-                  />
-               </FormControl>
+            <Grid item xs={12} sm={8}>
+               <MultiListSelect
+                  inputName="languages"
+                  isCheckbox
+                  selectedItems={selectedLanguages}
+                  allValues={mappedLanguageCodes}
+                  setFieldValue={(name, value) =>
+                     handleSelectedLanguageChange(value)
+                  }
+                  inputProps={{
+                     label: "Languages you speak",
+                     placeholder: "Select language",
+                     className: "registrationInput",
+                  }}
+                  getValueFn={(item) => item}
+                  chipProps={{
+                     color: "primary",
+                  }}
+               />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   In what country or area are you looking for opportunities?
                </Typography>
             </Grid>
-            <Grid item xs={12}>
-               <FormControl fullWidth>
-                  <MultiListSelect
-                     inputName="countries"
-                     isCheckbox
-                     selectedItems={selectedCountries}
-                     allValues={countriesCodes}
-                     setFieldValue={(name, value) =>
-                        handleSelectedCountriesChange(value)
-                     }
-                     inputProps={{
-                        label: "Countries of interest",
-                        placeholder: "Select one or more country",
-                        className: "registrationInput",
-                     }}
-                     getValueFn={(item) => item}
-                     chipProps={{
-                        color: "primary",
-                     }}
-                  />
-               </FormControl>
+            <Grid item xs={12} sm={8}>
+               <MultiListSelect
+                  inputName="countries"
+                  isCheckbox
+                  selectedItems={selectedCountries}
+                  allValues={countriesCodes}
+                  setFieldValue={(name, value) =>
+                     handleSelectedCountriesChange(value)
+                  }
+                  inputProps={{
+                     label: "Countries of interest",
+                     placeholder: "Select one or more country",
+                     className: "registrationInput",
+                  }}
+                  getValueFn={(item) => item}
+                  chipProps={{
+                     color: "primary",
+                  }}
+               />
             </Grid>
 
-            <Grid item xs={12} sx={styles.toggleInputWrapper}>
+            <Grid item xs={12} sm={8} sx={styles.toggleInputWrapper}>
                <Typography sx={styles.inputLabel} mr={2} variant="h5">
                   Are you currently looking for a job?
                </Typography>
@@ -241,33 +237,31 @@ const AdditionalInformation = () => {
                />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   Lastly, select your interests
                </Typography>
             </Grid>
-            <Grid item xs={12}>
-               <FormControl fullWidth>
-                  <MultiListSelect
-                     inputName="interests"
-                     isCheckbox
-                     limit={5}
-                     selectedItems={selectedInterests}
-                     allValues={allInterests}
-                     setFieldValue={(name, value) =>
-                        handleSelectedInterestsChange(value)
-                     }
-                     inputProps={{
-                        label: "Select 5 to improve your site experience",
-                        placeholder: "Select from the following list",
-                        className: "registrationInput",
-                     }}
-                     getValueFn={(item) => item}
-                     chipProps={{
-                        color: "primary",
-                     }}
-                  />
-               </FormControl>
+            <Grid item xs={12} sm={8}>
+               <MultiListSelect
+                  inputName="interests"
+                  isCheckbox
+                  limit={5}
+                  selectedItems={selectedInterests}
+                  allValues={allInterests}
+                  setFieldValue={(name, value) =>
+                     handleSelectedInterestsChange(value)
+                  }
+                  inputProps={{
+                     label: "Select 5 to improve your site experience",
+                     placeholder: "Select from the following list",
+                     className: "registrationInput",
+                  }}
+                  getValueFn={(item) => item}
+                  chipProps={{
+                     color: "primary",
+                  }}
+               />
             </Grid>
          </Grid>
       </>
