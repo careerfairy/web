@@ -33,6 +33,7 @@ export interface UserData extends Identifiable {
    spokenLanguages?: string[]
    countriesOfInterest?: string[]
    isLookingForJob?: boolean
+   fieldOfStudy?: string
 }
 
 export interface UserStats {

@@ -117,13 +117,13 @@ const SocialInformation = () => {
 
    return (
       <>
-         <Grid container maxWidth="sm" mx={"auto"} spacing={2}>
-            <Grid item xs={12}>
+         <Grid container spacing={2} justifyContent="center">
+            <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   Do you have a linkedin account?
                </Typography>
             </Grid>
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={8}>
                <TextField
                   className="registrationInput"
                   variant="outlined"
@@ -140,28 +140,26 @@ const SocialInformation = () => {
                />
             </Grid>
 
-            <Grid item xs={12}>
+            <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   Do you have a referral code?
                </Typography>
             </Grid>
-            <Grid item xs={12}>
-               <FormControl fullWidth>
-                  <TextField
-                     className="registrationInput"
-                     variant="outlined"
-                     fullWidth
-                     id="referralCode"
-                     name="referralCode"
-                     placeholder="Enter a Referral Code"
-                     InputLabelProps={{ shrink: true }}
-                     onChange={({ target: { value } }) => {
-                        handleReferralCodeInputChange(value)
-                     }}
-                     value={referralCodeInput}
-                     label="Copy-paste here your referral code"
-                  />
-               </FormControl>
+            <Grid item xs={12} sm={8}>
+               <TextField
+                  className="registrationInput"
+                  variant="outlined"
+                  fullWidth
+                  id="referralCode"
+                  name="referralCode"
+                  placeholder="Enter a Referral Code"
+                  InputLabelProps={{ shrink: true }}
+                  onChange={({ target: { value } }) => {
+                     handleReferralCodeInputChange(value)
+                  }}
+                  value={referralCodeInput}
+                  label="Copy-paste here your referral code"
+               />
             </Grid>
          </Grid>
       </>

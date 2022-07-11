@@ -11,6 +11,7 @@ type AdditionalInformationProps = {
    isLookingForJob?: boolean
    linkedinUrl?: string
    referralCode?: string
+   fieldOfStudy?: string
 }
 
 export interface IUserRepository {
@@ -37,6 +38,7 @@ export interface IUserRepository {
       interestsIds,
       referralCode,
       linkedinUrl,
+      fieldOfStudy,
    }: AdditionalInformationProps): Promise<void>
 
    setRegistrationStepStatus({
@@ -153,6 +155,7 @@ export class FirebaseUserRepository
       interestsIds,
       linkedinUrl,
       referralCode,
+      fieldOfStudy,
    }): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
 
@@ -168,6 +171,8 @@ export class FirebaseUserRepository
          linkedinUrl !== undefined ? { linkedinUrl } : {}
       const referralCodeToUpdate =
          referralCode !== undefined ? { referralCode } : {}
+      const fieldOfStudyToUpdate =
+         fieldOfStudy !== undefined ? { fieldOfStudy } : {}
 
       const toUpdate = {
          ...genderToUpdate,
@@ -177,6 +182,7 @@ export class FirebaseUserRepository
          ...interestsToUpdate,
          ...linkedInLinkToUpdate,
          ...referralCodeToUpdate,
+         ...fieldOfStudyToUpdate,
       }
 
       return userRef.update(toUpdate)

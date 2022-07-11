@@ -33,7 +33,7 @@ const GenericDropdown = ({
 }: Props) => {
    return (
       <FormControl fullWidth>
-         <InputLabel id="demo-simple-select-label">{label}</InputLabel>
+         <InputLabel id="generic-dropdown-label">{label}</InputLabel>
          <Select
             id={id}
             value={value}

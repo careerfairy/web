@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react"
-import { useRouter } from "next/router"
 import Head from "next/head"
 import { Box, Container, Typography } from "@mui/material"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
@@ -18,7 +17,7 @@ import GenericStepper from "../components/views/common/GenericStepper"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 
-const initialStates: MultiStepComponentType[] = [
+const steps: MultiStepComponentType[] = [
    {
       component: () => SignUpUserForm,
       description: "Credentials",
@@ -38,17 +37,6 @@ const SignUp = () => {
    const firebase = useFirebaseService()
 
    const [currentStep, setCurrentStep] = useState(0)
-   const [steps, setSteps] = useState(initialStates)
-   const {
-      query: { absolutePath },
-   } = useRouter()
-
-   useEffect(() => {
-      // When redirecting, we want to skip the Personalise step
-      if (absolutePath && steps.length === 3) {
-         setSteps((prevSteps) => prevSteps.slice(0, 2))
-      }
-   }, [steps, absolutePath])
 
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return

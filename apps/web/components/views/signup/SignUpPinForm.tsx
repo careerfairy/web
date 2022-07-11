@@ -1,4 +1,3 @@
-import { useRouter } from "next/router"
 import React, { Fragment, useContext, useState } from "react"
 import { Formik } from "formik"
 import {
@@ -28,10 +27,6 @@ const schema = yup.object().shape({
 })
 
 const SignUpPinForm = () => {
-   const {
-      push,
-      query: { absolutePath },
-   } = useRouter()
    const firebase = useFirebaseService()
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
@@ -68,11 +63,7 @@ const SignUpPinForm = () => {
       }
       try {
          await firebase.validateUserEmailWithPin(userInfo)
-         if (absolutePath) {
-            void (await push(absolutePath as any))
-         } else {
-            updateActiveStep()
-         }
+         updateActiveStep()
          await firebase.auth.currentUser.reload()
       } catch (error) {
          console.log("error", error)

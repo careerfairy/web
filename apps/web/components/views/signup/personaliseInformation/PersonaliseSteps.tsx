@@ -17,19 +17,22 @@ import GenericStepper from "../../common/GenericStepper"
 const steps: MultiStepComponentType[] = [
    {
       component: () => SocialInformation,
-      description: "Social Information",
+      description: "Social",
       title: renderSocialInformationStepTitle(),
    },
    {
       component: () => AdditionalInformation,
-      description: "Additional information",
+      description: "Interests",
       title: renderAdditionalInformationStepTitle(),
    },
 ]
 
 const PersonaliseSteps = () => {
    const [currentStep, setCurrentStep] = useState(0)
-   const { push } = useRouter()
+   const {
+      push,
+      query: { absolutePath },
+   } = useRouter()
    const isLastStep = currentStep === steps.length - 1
    const isFirstStep = currentStep === 0
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
@@ -38,7 +41,12 @@ const PersonaliseSteps = () => {
       if (isLastStep) {
          // set a loading state in the Finalise button, the next page may take some seconds to render
          setIsLoadingRedirectPage(true)
-         void push(SIGNUP_REDIRECT_PATH)
+
+         if (absolutePath) {
+            void push(absolutePath as any)
+         } else {
+            void push(SIGNUP_REDIRECT_PATH)
+         }
       } else {
          setCurrentStep((prev) => prev + 1)
       }
