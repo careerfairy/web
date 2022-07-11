@@ -1,19 +1,20 @@
 import React from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import clsx from "clsx"
 import PropTypes from "prop-types"
-import Button from "@mui/material/Button"
+import Button, { ButtonProps } from "@mui/material/Button"
 import HintIcon from "components/views/common/HintIcon"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
-const useButtonStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       whiteSpace: "nowrap",
-   },
-   btnLabel: {
       justifyContent: "space-between",
    },
-}))
+})
 
+interface Props extends ButtonProps {
+   hintTitle?: string
+   hintDescription?: string
+}
 const ButtonWithHint = ({
    fullWidth = true,
    variant = "outlined",
@@ -23,22 +24,18 @@ const ButtonWithHint = ({
    hintDescription,
    color = "grey",
    ...props
-}) => {
-   const classes = useButtonStyles()
+}: Props) => {
    return (
       <Button
          fullWidth={fullWidth}
          color={color}
-         classes={{
-            label: classes.btnLabel,
-         }}
+         sx={styles.root}
          variant={variant}
          endIcon={
             (hintTitle || hintDescription) && (
                <HintIcon title={hintTitle} description={hintDescription} />
             )
          }
-         className={clsx(className, classes.root)}
          {...props}
       />
    )

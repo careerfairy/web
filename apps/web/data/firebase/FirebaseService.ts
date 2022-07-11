@@ -7,7 +7,6 @@ import DateUtil from "util/DateUtil"
 import firebaseApp from "./FirebaseInstance"
 import firebase from "firebase/app"
 import { HandRaiseState } from "types/handraise"
-import DocumentReference = firebase.firestore.DocumentReference
 import {
    getQueryStringFromUrl,
    getReferralInformation,
@@ -17,6 +16,7 @@ import {
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App

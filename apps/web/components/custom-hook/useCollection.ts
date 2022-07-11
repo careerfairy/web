@@ -3,7 +3,7 @@ import { Identifiable } from "../../types/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { Interest } from "types/interests"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { Query, FirebaseFirestore } from "@firebase/firestore-types"
+import { FirebaseFirestore, Query } from "@firebase/firestore-types"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
 

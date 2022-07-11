@@ -46,14 +46,14 @@ const createCollection = (
 ) => {
    const mappingArray = Object.keys(mappings).map((mappingId) => ({
       mappingId,
-      label: mappings[mappingId],
+      name: mappings[mappingId],
    }))
 
    mappingArray.forEach((mapping) => {
       const mappingRef = firestore
          .collection(collectionName)
          .doc(mapping.mappingId)
-      batch.set(mappingRef, { label: mapping.label })
+      batch.set(mappingRef, { name: mapping.name })
    })
    return mappingArray
 }

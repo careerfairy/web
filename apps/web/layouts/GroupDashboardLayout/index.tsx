@@ -1,5 +1,12 @@
 import PropTypes from "prop-types"
-import React, { createContext, useContext, useMemo, useRef } from "react"
+import React, {
+   createContext,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import NavBar from "./NavBar"
 import { useRouter } from "next/router"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
@@ -16,9 +23,15 @@ import Page, {
    PageContentWrapper,
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
-import { Group, GroupOption } from "@careerfairy/shared-lib/dist/groups"
+import {
+   CustomCategory,
+   Group,
+   GroupOption,
+} from "@careerfairy/shared-lib/dist/groups"
 import RootState from "../../store/reducers"
 import GroupsUtil from "../../data/util/GroupsUtil"
+import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import groupRepo from "../../data/firebase/GroupRepository"
 
 const styles = {
    childrenWrapperResponsive: {
@@ -29,15 +42,20 @@ const styles = {
 type DefaultContext = {
    group: Group
    flattenedGroupOptions: GroupOption[]
+   customCategories: CustomCategory[]
+   groupPresenter?: GroupPresenter
 }
 const GroupContext = createContext<DefaultContext>({
    group: null,
    flattenedGroupOptions: [],
+   customCategories: [],
+   groupPresenter: undefined,
 })
 const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
    const scrollRef = useRef(null)
+   const [customCategories, setCustomCategories] = useState([])
 
    const isDesktop = useIsDesktop()
    const {
@@ -68,11 +86,30 @@ const GroupDashboardLayout = (props) => {
       [groupId, group?.groupId]
    )
 
+   useEffect(() => {
+      if (isCorrectGroup && group?.id) {
+         ;(async () => {
+            const customCategories = await groupRepo.getCustomCategories(
+               group.id
+            )
+            setCustomCategories(customCategories)
+         })()
+      }
+   }, [isCorrectGroup, groupId])
+   const groupPresenter = useMemo(
+      () => group && new GroupPresenter(group),
+      [group]
+   )
+
+   useEffect(() => {}, [])
+
    return (
       <GroupContext.Provider
          value={{
             group,
             flattenedGroupOptions,
+            customCategories,
+            groupPresenter,
          }}
       >
          <Page>

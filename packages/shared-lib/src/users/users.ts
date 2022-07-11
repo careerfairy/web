@@ -1,15 +1,23 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
+import { CustomCategory, CustomCategoryOption } from "../groups"
 
 export interface UserData extends Identifiable {
    authId: string
    firstName: string
    lastName: string
-   fieldOfStudyId: string
-   levelOfStudyId: string
+   fieldOfStudy?: {
+      name: string
+      id: string
+   }
+   levelOfStudy?: {
+      name: string
+      id: string
+   }
    university: {
       code: string
       name: string
+      categories: UniversityCategoriesMap
    }
    badges?: string[]
    groupIds: string[]
@@ -17,7 +25,7 @@ export interface UserData extends Identifiable {
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
-   backFills: BackFillType[]
+   backFills: BackFillType[] | firebase.firestore.FieldValue
    universityCountryCode: string
    unsubscribed?: boolean
    userEmail: string
@@ -33,6 +41,14 @@ export interface UserData extends Identifiable {
    // need data migrations to be moved to the user stats doc
    referralsCount?: number
    totalLivestreamInvites?: number
+}
+
+export interface UniversityCategoriesMap {
+   [categoryId: CustomCategory["id"]]: {
+      categoryName?: string
+      selectedOptionName?: string
+      selectedOptionId: CustomCategoryOption["id"]
+   }
 }
 export type BackFillType = "levelOfStudy" | "fieldOfStudy"
 export interface RegisteredGroup {

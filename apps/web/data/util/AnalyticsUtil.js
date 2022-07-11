@@ -1,7 +1,7 @@
 import { toTitleCase } from "../../components/helperFunctions/HelperFunctions"
 import GroupsUtil from "./GroupsUtil"
 
-const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
+export const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
    const groupOptions = GroupsUtil.handleFlattenOptions(groupContext)
    if (user.registeredGroups) {
       const targetGroup = user.registeredGroups.find(
@@ -23,7 +23,7 @@ const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
    }
 }
 
-const mapUserCategories = (user, group) => {
+export const mapUserCategories = (user, group) => {
    group.categories.forEach((category) => {
       const targetCategoryId = category.id
       if (targetCategoryId) {
@@ -38,7 +38,7 @@ const mapUserCategories = (user, group) => {
    return user
 }
 
-const mapUserEngagement = (user, streams, group) => {
+export const mapUserEngagement = (user, streams, group) => {
    let categoryUser = user
    categoryUser = mapUserCategories(user, group)
    categoryUser.watchedEvent = false
@@ -73,7 +73,7 @@ const mapUserEngagement = (user, streams, group) => {
    return categoryUser
 }
 
-const mergeArrayOfUsers = (arr1, arr2) => {
+export const mergeArrayOfUsers = (arr1, arr2) => {
    const hash = new Map()
    arr1.concat(arr2).forEach(function (obj) {
       hash.set(obj.userEmail, Object.assign(hash.get(obj.userEmail) || {}, obj))
@@ -81,7 +81,7 @@ const mergeArrayOfUsers = (arr1, arr2) => {
    return Array.from(hash.values())
 }
 
-const getTotalUniqueIds = (streams = [], hiddenStreamIds = {}) => {
+export const getTotalUniqueIds = (streams = [], hiddenStreamIds = {}) => {
    const totalIds = streams.reduce((mainAcc, stream) => {
       if (hiddenStreamIds?.[stream.id]) return mainAcc
       const filteredStreamUserSets = [
@@ -98,21 +98,24 @@ const getTotalUniqueIds = (streams = [], hiddenStreamIds = {}) => {
    return [...new Set(totalIds)]
 }
 
-const convertArrayOfUserObjectsToDictionary = (arrayOfUsers) => {
+export const convertArrayOfUserObjectsToDictionary = (arrayOfUsers) => {
    return Object.assign(
       {},
       ...arrayOfUsers.map((user) => ({ [user.userEmail]: user }))
    )
 }
 
-const convertArrayOfObjectsToDictionaryByProp = (arrayOfObjects, prop) => {
+export const convertArrayOfObjectsToDictionaryByProp = (
+   arrayOfObjects,
+   prop
+) => {
    return Object.assign(
       {},
       ...arrayOfObjects.map((obj) => ({ [obj[prop]]: obj }))
    )
 }
 
-const getTotalEmailsFromStreamsByProperty = (streamsArray, prop) => {
+export const getTotalEmailsFromStreamsByProperty = (streamsArray, prop) => {
    return streamsArray.reduce(
       (accumulator, livestream) =>
          livestream?.[prop]?.length
@@ -122,11 +125,11 @@ const getTotalEmailsFromStreamsByProperty = (streamsArray, prop) => {
    )
 }
 
-const getUniqueIds = (arrayOfIds) => {
+export const getUniqueIds = (arrayOfIds) => {
    return [...new Set(arrayOfIds)]
 }
 
-const getUniqueUsers = (streamsArray, prop) => {
+export const getUniqueUsers = (streamsArray, prop) => {
    const totalViewers = getTotalEmailsFromStreamsByProperty(streamsArray, prop)
    // new Set method removes all duplicates from array
    return totalViewers.filter(function (el) {
@@ -138,7 +141,7 @@ const getUniqueUsers = (streamsArray, prop) => {
    }, Object.create(null))
 }
 
-const getUniqueUsersByEmailWithArrayOfUsers = (ArrayOfUsers = []) => {
+export const getUniqueUsersByEmailWithArrayOfUsers = (ArrayOfUsers = []) => {
    return ArrayOfUsers.filter(function (el) {
       if (!this[el.userEmail]) {
          this[el.userEmail] = true
@@ -148,7 +151,7 @@ const getUniqueUsersByEmailWithArrayOfUsers = (ArrayOfUsers = []) => {
    }, Object.create(null))
 }
 
-const getAggregateCategories = (participants, group) => {
+export const getAggregateCategories = (participants, group) => {
    let categories = []
    participants.forEach((user) => {
       const matched = user.registeredGroups?.find(
@@ -161,7 +164,7 @@ const getAggregateCategories = (participants, group) => {
    return categories
 }
 
-const getTypeOfStudents = (
+export const getTypeOfStudents = (
    prop,
    { currentStream, streamsFromTimeFrameAndFuture, group, currentCategory }
 ) => {
@@ -184,7 +187,9 @@ const getTypeOfStudents = (
    return flattenedGroupOptions.sort((a, b) => b.count - a.count)
 }
 
-const getTotalUniqueStreamGroupIdsFromStreams = (arrayOfStreams = []) => {
+export const getTotalUniqueStreamGroupIdsFromStreams = (
+   arrayOfStreams = []
+) => {
    const totalIds = arrayOfStreams.reduce(
       (acc, curr) => (curr.groupIds ? acc.concat(curr.groupIds) : acc),
       []
@@ -192,7 +197,7 @@ const getTotalUniqueStreamGroupIdsFromStreams = (arrayOfStreams = []) => {
    return [...new Set(totalIds)]
 }
 
-const arraysOfIdsEqual = (array1, array2) => {
+export const arraysOfIdsEqual = (array1, array2) => {
    if (array1 === array2) return true
    if (array1 == null || array2 == null) return false
    if (array1.length !== array2.length) return false
@@ -218,14 +223,14 @@ const getUsersFromDictionaryWithIds = (arrayOfIds = [], dictionary = {}) => {
    }, [])
 }
 
-const checkIfInTalentPool = (livestream, userId) => {
+export const checkIfInTalentPool = (livestream, userId) => {
    return Boolean(livestream?.talentPool?.includes(userId))
 }
 
-const insertIf = (condition, ...elements) => {
+export const insertIf = (condition, ...elements) => {
    return condition ? elements : []
 }
-module.exports = {
+export default {
    mapUserEngagement,
    getUniqueIds,
    getTotalEmailsFromStreamsByProperty,

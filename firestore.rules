@@ -139,6 +139,10 @@ service cloud.firestore {
                 return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
             }
 
+            function isCareerCenterAdmin() {
+                return request.auth.token.email in careerCenterData().adminEmails;
+            }
+
             match /bookingSlots/{slot} {
                 allow read: if true;
                 allow write: if careerCenterData().adminEmail == request.auth.token.email;
@@ -147,6 +151,10 @@ service cloud.firestore {
             match /categories/{category} {
                 allow read: if true;
                 allow write: if true;
+            }
+            match /customCategories/{customCategory} {
+                allow read: if true;
+                allow write: if isCFAdmin() || isCareerCenterAdmin();
             }
 
             match /categories/{category}/elements/{element} {

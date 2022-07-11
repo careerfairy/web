@@ -1,114 +1,88 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import clsx from "clsx"
-import PropTypes from "prop-types"
 import { Button, Card, Slide, Tab, Tabs } from "@mui/material"
-import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext"
 import {
    copyStringToClipboard,
    prettyDate,
    prettyLocalizedDate,
-   toTitleCase,
 } from "../../../../../../helperFunctions/HelperFunctions"
 import { useSnackbar } from "notistack"
 
 import { LinkifyText, tableIcons } from "../../common/TableUtils"
-import makeStyles from "@mui/styles/makeStyles"
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
 import { useDispatch, useSelector } from "react-redux"
 import { universityCountriesMap } from "../../../../../../util/constants/universityCountries"
 import PDFIcon from "@mui/icons-material/PictureAsPdf"
-import Link from "materialUI/NextNavLink"
+import Link from "../../../../../common/Link"
 import JSZip from "jszip"
 import * as actions from "store/actions"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
 import { useGroupAnalytics } from "../../../../../../../HOCs/GroupAnalyticsProvider"
+import RootState from "../../../../../../../store/reducers"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { UserDataSet, UserType } from "../../index"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
-   actions: {
-      justifyContent: "flex-end",
-   },
-   avatar: {
-      height: 70,
-      width: "80%",
-      "& img": {
-         objectFit: "contain",
-      },
-      boxShadow: theme.shadows[1],
-   },
-   streamManage: {
-      background: theme.palette.navyBlue.main,
-      color: theme.palette.common.white,
-   },
-}))
-
+interface Props {
+   currentUserDataSet: UserDataSet
+   fetchingStreams: boolean
+   userType: UserType
+   currentStream: LivestreamEvent
+   setUserType: (userType: UserType) => void
+   handleReset: () => void
+   totalUniqueUsers: UserData[]
+   streamsFromTimeFrameAndFuture: LivestreamEvent[]
+   breakdownRef: React.RefObject<HTMLDivElement>
+   userTypes: UserType[]
+}
 const UsersTable = ({
    fetchingStreams,
    userType,
    currentStream,
-   group,
-   firebase,
    setUserType,
-   futureStreams,
-   isFollowers,
    handleReset,
-   currentUserDataSet,
    totalUniqueUsers,
    streamsFromTimeFrameAndFuture,
    breakdownRef,
    userTypes,
-   className,
-   ...rest
-}) => {
+   currentUserDataSet,
+}: Props) => {
+   const showUniversityBreakdown =
+      currentUserDataSet.dataSet === "groupUniversityStudents"
    const { fieldsOfStudyById, levelsOfStudyById } = useGroupAnalytics()
+   const { customCategories, groupPresenter, group } = useGroup()
    const dataTableRef = useRef(null)
-   const classes = useStyles()
    const [selection, setSelection] = useState([])
    const { enqueueSnackbar } = useSnackbar()
    const [users, setUsers] = useState([])
    const [processingCVs, setProcessingCVs] = useState(false)
    const hiddenStreamIds = useSelector(
-      (state) => state.analyticsReducer.hiddenStreamIds
+      (state: RootState) => state.analyticsReducer.hiddenStreamIds
    )
    const noOfVisibleStreamIds = useSelector(
-      (state) => state.analyticsReducer.visibleStreamIds?.length || 0
+      (state: RootState) => state.analyticsReducer.visibleStreamIds?.length || 0
    )
    const dispatch = useDispatch()
-
    const categoryFields = useMemo(() => {
-      const data = {}
-      const categories = group.categories
-
-      if (categories?.length) {
-         categories.forEach(({ name, options }) => {
-            const categoryKey = name.toLowerCase()
-            const newOptions = options.map(({ name }) => name.toLowerCase())
-            const uniqueOptions = data[categoryKey]
-               ? [...new Set(data[categoryKey].concat(newOptions))]
-               : newOptions
-            data[categoryKey] = uniqueOptions.map((name) => toTitleCase(name))
-         })
+      if (showUniversityBreakdown) {
+         return groupPresenter.getCustomCategoriesForTable(customCategories)
+      } else {
+         return [
+            {
+               field: "fieldOfStudy.id",
+               title: "Field of Study",
+               lookup: fieldsOfStudyById,
+            },
+            {
+               field: "levelOfStudy.id",
+               title: "Level of Study",
+               lookup: levelsOfStudyById,
+            },
+         ]
       }
-      return Object.keys(data)
-         .map((key) => {
-            const titledLabel = toTitleCase(key)
-            const lookup = data[key].reduce(
-               (acc, curr) => {
-                  acc[curr] = curr
-                  return acc
-               },
-               { "": "none" }
-            )
-            return {
-               field: titledLabel,
-               title: titledLabel,
-               lookup,
-            }
-         })
-         .map((e) => e)
-   }, [group])
+   }, [showUniversityBreakdown, customCategories])
 
    useEffect(() => {
       let newUsers
@@ -194,8 +168,8 @@ const UsersTable = ({
          const zip = new JSZip()
          const linkElement = document.createElement("a")
 
-         function request({ url, fileName }) {
-            return fetch(url)
+         const request = ({ url, fileName }) =>
+            fetch(url)
                .then((resp) => resp.arrayBuffer())
                .then((resp) => {
                   // set the blog type to final pdf
@@ -204,7 +178,6 @@ const UsersTable = ({
                   // const fileURL = URL.createObjectURL(file);
                   zip.file(`${makefileNameWindowsFriendly(fileName)}.pdf`, file)
                })
-         }
 
          await Promise.all(
             arrayOfDownloadData.map((data) => {
@@ -258,12 +231,7 @@ const UsersTable = ({
    return (
       <>
          <Slide direction="up" unmountOnExit mountOnEnter in={true}>
-            <Card
-               raised={Boolean(currentStream)}
-               className={clsx(classes.root, className)}
-               ref={breakdownRef}
-               {...rest}
-            >
+            <Card raised={Boolean(currentStream)} ref={breakdownRef}>
                <Tabs
                   value={userType.propertyName}
                   indicatorColor="primary"
@@ -304,17 +272,8 @@ const UsersTable = ({
                         title: "University Country",
                         lookup: universityCountriesMap,
                      },
-                     {
-                        field: "fieldOfStudyId",
-                        title: "Field of Study",
-                        lookup: fieldsOfStudyById,
-                     },
-                     {
-                        field: "levelOfStudyId",
-                        title: "Level of Study",
-                        lookup: levelsOfStudyById,
-                     },
-                     // ...categoryFields,
+
+                     ...categoryFields,
                      {
                         field: "numberOfStreamsWatched",
                         title: "Events Attended",
@@ -440,8 +399,5 @@ const UsersTable = ({
       </>
    )
 }
-UsersTable.propTypes = {
-   className: PropTypes.string,
-}
 
-export default withFirebase(UsersTable)
+export default UsersTable

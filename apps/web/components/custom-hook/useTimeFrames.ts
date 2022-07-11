@@ -22,7 +22,33 @@ const threeYears = new Date().setFullYear(new Date().getFullYear() - 3)
 const fourYears = new Date().setFullYear(new Date().getFullYear() - 4)
 const sixYears = new Date().setFullYear(new Date().getFullYear() - 6)
 
-const timeFrames = [
+export interface TimeFrame {
+   name: string
+   /*
+    * The date time frame in past tense format
+    * */
+   pastName: string
+   /*
+    * The date in milliseconds since epoch
+    * */
+   date: number
+   id: string
+}
+
+export interface GlobalTimeFrame {
+   name: string
+   /*
+    * The date in milliseconds since epoch
+    * */
+   globalDate: number
+   timeFrames: TimeFrame[]
+   id: string
+   /*
+    * The date in milliseconds since epoch
+    * */
+   double: number
+}
+const timeFrames: TimeFrame[] = [
    {
       name: "3 Years",
       pastName: "3 years",
@@ -67,7 +93,7 @@ const timeFrames = [
    },
 ]
 
-const globalTimeFrames = [
+const globalTimeFrames: GlobalTimeFrame[] = [
    {
       globalDate: threeYears,
       timeFrames: timeFrames.filter((timeOb) => timeOb.date >= threeYears),

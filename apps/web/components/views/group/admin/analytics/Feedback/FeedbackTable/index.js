@@ -38,7 +38,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const FeedbackTable = ({
-   groupOptions,
    fetchingStreams,
    userType,
    currentStream,

@@ -1,5 +1,5 @@
 import StatsUtil from "data/util/StatsUtil"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import TalentPoolIcon from "@mui/icons-material/HowToRegRounded"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import {
@@ -21,8 +21,21 @@ import { useDispatch } from "react-redux"
 import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint"
 import { useTheme } from "@mui/material/styles"
 import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
-export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
+interface MetaDataActionsProps {
+   allGroups: Group[]
+   group: Group
+   isPast: boolean
+   isDraft: boolean
+}
+
+export function useMetaDataActions({
+   allGroups,
+   group,
+   isPast,
+   isDraft,
+}: MetaDataActionsProps) {
    const firebase = useFirebaseService()
    const { userData } = useAuth()
    const theme = useTheme()
@@ -281,6 +294,8 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
                         "Download a CSV with the details of the students who opted to put themselves in the talent pool"
                      }
                      startIcon={<TalentPoolIcon color="action" />}
+                     className={undefined}
+                     endIcon={undefined}
                   >
                      Download Talent Pool
                   </ButtonWithHint>
@@ -408,7 +423,15 @@ export function useMetaDataActions({ allGroups, group, isPast, isDraft }) {
    }
 }
 
-export const CSVDialogDownload = ({
+interface CSVDialogDownloadProps {
+   title: string
+   data: any
+   filename: string
+   defaultOpen?: boolean
+   onClose?: () => void
+}
+
+export const CSVDialogDownload: FC<CSVDialogDownloadProps> = ({
    title,
    children,
    data,
@@ -446,7 +469,9 @@ export const CSVDialogDownload = ({
 
    return (
       <>
-         {!!children && React.cloneElement(children, { onClick: handleOpen })}
+         {!!children &&
+            // @ts-ignore
+            React.cloneElement(children, { onClick: handleOpen })}
          {open && (
             <Dialog open={open} onBackdropClick={handleClose}>
                <DialogTitle onClickCapture={stopClickPropagation}>

@@ -16,6 +16,10 @@ export interface IUserRepository {
    getUserDataByUid(uid: string): Promise<UserData>
 
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
+   getUsersByEmailInBatches(
+      emails: string[],
+      options?: { withEmpty: boolean }
+   ): Promise<UserData[]>
 }
 
 export class FirebaseUserRepository
@@ -113,5 +117,41 @@ export class FirebaseUserRepository
          uids.map((uid) => this.getUserDataByUid(uid))
       )
       return users.filter((user) => user !== null)
+   }
+
+   async getUsersByEmailInBatches(
+      emails: string[],
+      options = { withEmpty: false }
+   ): Promise<UserData[]> {
+      let totalUsers = []
+      const promises = []
+      let i,
+         j,
+         emailBatch,
+         chunk = 10
+      for (i = 0, j = emails.length; i < j; i += chunk) {
+         emailBatch = emails.slice(i, i + chunk)
+         console.log("-> emailBatch", emailBatch)
+         promises.push(
+            this.firestore
+               .collection("userData")
+               .where("email", "in", emailBatch)
+               .get()
+         )
+      }
+      console.log("-> promises", promises)
+      const userSnaps = await Promise.all(promises)
+      userSnaps.forEach((snap) => {
+         snap.docs.forEach((doc) => {
+            if (options.withEmpty) {
+               totalUsers.push({ id: doc.id, ...doc.data() } as UserData)
+            } else {
+               if (doc.exists) {
+                  totalUsers.push({ id: doc.id, ...doc.data() })
+               }
+            }
+         })
+      })
+      return totalUsers
    }
 }

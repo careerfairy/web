@@ -1,11 +1,4 @@
-export default class ReadAndWriteCounter {
-   // constructor(customCountKeys: string[]) {
-   //    this.customCounts = customCountKeys.reduce((acc, curr) => {
-   //       acc[curr] = 0
-   //       return acc
-   //    }, {})
-   // }
-
+export default class Counter {
    private readCount: number = 0
    private writeCount: number = 0
    private customCounts: { [key: string]: number } = {}
@@ -65,12 +58,12 @@ export default class ReadAndWriteCounter {
    }
 
    public print(): void {
-      ReadAndWriteCounter.log(`Read: ${this.readCount}`)
-      ReadAndWriteCounter.log(`Write: ${this.writeCount}`)
-      ReadAndWriteCounter.log(`Total Reads and Writes: ${this.readAndWrite()}`)
+      Counter.log(`Read: ${this.readCount}`)
+      Counter.log(`Write: ${this.writeCount}`)
+      Counter.log(`Total Reads and Writes: ${this.readAndWrite()}`)
       // print custom counts
       for (const key in this.customCounts) {
-         ReadAndWriteCounter.log(`${key}: ${this.customCounts[key]}`)
+         Counter.log(`${key}: ${this.customCounts[key]}`)
       }
    }
 

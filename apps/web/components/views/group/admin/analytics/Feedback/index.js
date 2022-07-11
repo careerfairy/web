@@ -30,7 +30,6 @@ const Feedback = ({
    fetchingRatings,
    handleScrollToBreakdown,
    breakdownRef,
-   groupOptions,
    streamDataType,
    setStreamDataType,
    handleToggleBar,
@@ -91,7 +90,6 @@ const Feedback = ({
                   setUserType={setUserType}
                   currentStream={currentStream}
                   fetchingStreams={isFetching()}
-                  groupOptions={groupOptions}
                   streamDataType={streamDataType}
                   setStreamDataType={setStreamDataType}
                   setCurrentRating={setCurrentRating}

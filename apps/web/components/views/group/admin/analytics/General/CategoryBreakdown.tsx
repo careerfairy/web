@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useRef, useState } from "react"
-import PropTypes from "prop-types"
 import { Doughnut } from "react-chartjs-2"
 import {
    Accordion,
@@ -20,7 +19,6 @@ import {
    Typography,
 } from "@mui/material"
 import { colorsArray } from "../../../../../util/colors"
-import { withFirebase } from "../../../../../../context/firebase/FirebaseServiceContext"
 import RotateLeftIcon from "@mui/icons-material/RotateLeft"
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
 import CustomLegend from "../../../../../../materialUI/Legends"
@@ -31,11 +29,13 @@ import { useTheme } from "@mui/material/styles"
 import { useSelector } from "react-redux"
 import StatsUtil from "../../../../../../data/util/StatsUtil"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
-import { useGroupAnalytics } from "../../../../../../HOCs/GroupAnalyticsProvider"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import RootState from "../../../../../../store/reducers"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { GroupCategory } from "@careerfairy/shared-lib/dist/groups"
+import { Group, GroupUserStat } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserDataSet, UserType } from "../index"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 
 Chart.defaults.global.plugins.labels = false
 
@@ -44,7 +44,7 @@ const styles = sxStyles({
       height: "100%",
    },
    accordionRoot: {
-      boxShadow: 2,
+      boxShadow: (theme) => theme.boxShadows.dark_8_25_10,
       "&:before": {
          backgroundColor: "transparent !important",
       },
@@ -63,60 +63,48 @@ function randomColor() {
    return "#" + Math.round(Math.random() * max).toString(16)
 }
 
-const initialCurrentCategory = { options: [], name: "initial", id: "initial" }
-
 const CategoryBreakdown = ({
-   group,
-   setCurrentStream,
    currentStream,
    userTypes,
    breakdownRef,
-   setUserType,
    currentUserDataSet,
    handleReset,
    streamsFromTimeFrameAndFuture,
-   isUni,
-   groups,
    localUserType,
    setLocalUserType,
-   className,
-   ...rest
-}) => {
-   const { fieldsOfStudy, levelsOfStudy } = useGroupAnalytics()
-   const [userInfoType, setUserInfoType] = useState<
-      "fieldOfStudy" | "levelOfStudy"
-   >("fieldOfStudy")
+}: Props) => {
+   const showUniversityBreakdown =
+      currentUserDataSet.dataSet === "groupUniversityStudents"
+   const useGroupProps = useGroup()
+   const [groupUserStat, setGroupUserStat] = useState<GroupUserStat>(null)
    const theme = useTheme()
    const chartRef = useRef()
    const [localColors, setLocalColors] = useState(colorsArray)
-   const [total, setTotal] = useState(0)
    const [showPercentage, setShowPercentage] = useState(true)
    const [showLabels, setShowLabels] = useState(true)
-   const [value, setValue] = useState(0)
-   const [currentGroup, setCurrentGroup] = useState(groups?.[0] || {})
-   const [typesOfOptions, setTypesOfOptions] = useState([])
    const hiddenStreamIds = useSelector(
       (state: RootState) => state.analyticsReducer.hiddenStreamIds
    )
    const noOfVisibleStreamIds = useSelector(
       (state: RootState) => state.analyticsReducer.visibleStreamIds?.length || 0
    )
-   const [currentCategory, setCurrentCategory] = useState<GroupCategory>(
-      initialCurrentCategory
+   const totalUsers = useSelector((state: RootState) =>
+      showUniversityBreakdown
+         ? state.firestore.ordered[currentUserDataSet.dataSet]
+         : state.userDataSet.filtered.ordered
    )
-   const state = useSelector((state: RootState) => state)
 
    const audience = useMemo<UserData[]>(() => {
-      const totalUsers =
-         currentUserDataSet.dataSet === "groupUniversityStudents"
-            ? state.firestore.ordered[currentUserDataSet.dataSet]
-            : state.userDataSet.filtered.ordered
       if (currentStream) {
          return totalUsers?.filter(
             (user) =>
                currentStream[localUserType.propertyName]?.includes(
                   user.userEmail
-               ) && StatsUtil.studentFollowsGroup(user, currentGroup)
+               ) &&
+               StatsUtil.studentFollowsGroup(
+                  user,
+                  useGroupProps.groupPresenter.model
+               )
          )
       } else {
          return totalUsers?.filter((user) =>
@@ -124,18 +112,40 @@ const CategoryBreakdown = ({
                (stream) =>
                   stream?.[localUserType.propertyName]?.includes(
                      user.userEmail
-                  ) && StatsUtil.studentFollowsGroup(user, currentGroup)
+                  ) &&
+                  StatsUtil.studentFollowsGroup(
+                     user,
+                     useGroupProps.groupPresenter.model
+                  )
             )
          )
       }
    }, [
-      currentGroup,
       currentStream,
       localUserType,
       streamsFromTimeFrameAndFuture,
-      currentUserDataSet,
+      currentUserDataSet.dataSet,
+      totalUsers,
    ])
 
+   const userStats = useMemo<GroupUserStat[]>(() => {
+      if (audience) {
+         if (showUniversityBreakdown) {
+            return useGroupProps.groupPresenter.getCustomUserCategoryStats(
+               audience,
+               useGroupProps.customCategories
+            )
+         }
+         return useGroupProps.groupPresenter.getGeneralUserCategoryStats(
+            audience
+         )
+      }
+      return []
+   }, [
+      audience?.length,
+      showUniversityBreakdown,
+      useGroupProps.customCategories,
+   ])
    const [data, setData] = useState({
       datasets: [],
       labels: [],
@@ -144,85 +154,51 @@ const CategoryBreakdown = ({
    })
 
    useEffect(() => {
-      if (groups?.length || !currentGroup?.id) {
-         setCurrentGroup(groups[0])
-         setCurrentCategory(
-            groups?.[0]?.categories?.[0] || initialCurrentCategory
-         )
-         setValue(0)
-      }
-   }, [groups])
-
-   useEffect(() => {
-      if (group.categories?.length) {
-         if (localColors.length < typesOfOptions.length) {
+      if (groupUserStat?.dataArray?.length > 0) {
+         const numOptions = groupUserStat.dataArray.length || 0
+         if (localColors.length < numOptions) {
             // only add more colors if there arent enough colors
             setLocalColors([
                ...colorsArray,
-               ...typesOfOptions.map(() => randomColor()),
+               ...groupUserStat.dataArray.map(() => randomColor()),
             ])
          }
       }
-   }, [group.categories, typesOfOptions.length])
+   }, [groupUserStat?.dataArray])
 
    useEffect(() => {
-      const newTypeOfOptions = getStudentFrequencyByProperty()
-      setTypesOfOptions(newTypeOfOptions)
-   }, [audience, userInfoType, currentUserDataSet])
-
-   useEffect(() => {
-      if (typesOfOptions.length) {
-         const totalCount = typesOfOptions.reduce((acc, curr) => {
-            return acc + curr.count
-         }, 0)
-         setTotal(totalCount)
-      }
-   }, [typesOfOptions])
-
-   useEffect(() => {
-      setData({
-         datasets: [
-            {
-               data: typesOfOptions.map((option) => option.count),
-               ids: typesOfOptions.map((option) => option.id),
-               id: typesOfOptions.map((option) => option.id),
-               backgroundColor: localColors,
-               borderWidth: 8,
-               borderColor: theme.palette.common.white,
-               hoverBorderColor: theme.palette.common.white,
+      if (groupUserStat?.dataArray) {
+         const dataPoints = groupUserStat.dataArray.reduce(
+            (acc, option) => {
+               acc.data.push(option.count)
+               acc.labels.push(option.optionName)
+               acc.ids.push(option.optionId)
+               return acc
             },
-         ],
-         labels: typesOfOptions.map((option) => option.name),
-         ids: typesOfOptions.map((option) => option.id),
-         dataId: currentCategory.id,
-      })
-   }, [typesOfOptions, localColors, currentGroup])
-
-   const getStudentFrequencyByProperty = () => {
-      const propertyName =
-         userInfoType === "fieldOfStudy" ? "fieldOfStudyId" : "levelOfStudyId"
-      const infoData =
-         userInfoType === "fieldOfStudy" ? fieldsOfStudy : levelsOfStudy
-      const initialData = [
-         {
-            name: "Other",
-            count: audience?.filter((user) => !user[propertyName])?.length,
-            id: "other",
-         },
-      ]
-
-      const data = infoData.map((field) => {
-         const count = audience?.filter(
-            (user) => user[propertyName] === field.id
-         )?.length
-         return {
-            name: field.label,
-            count,
-            id: field.id,
-         }
-      })
-      return [...initialData, ...data].sort((a, b) => b.count - a.count)
-   }
+            {
+               data: [],
+               ids: [],
+               labels: [],
+            }
+         )
+         setData({
+            datasets: [
+               {
+                  data: dataPoints.data,
+                  ids: dataPoints.ids,
+                  id: dataPoints.ids,
+                  backgroundColor: localColors,
+                  borderWidth: 8,
+                  borderColor: theme.palette.common.white,
+                  hoverBorderColor: theme.palette.common.white,
+               },
+            ],
+            labels: dataPoints.labels,
+            ids: dataPoints.ids,
+            dataId: groupUserStat.id + localUserType.propertyName,
+         })
+      }
+   }, [groupUserStat?.dataArray, localColors, localUserType.propertyName])
 
    const options = {
       cutoutPercentage: 70,
@@ -248,33 +224,31 @@ const CategoryBreakdown = ({
       },
    }
 
-   const handleChange = (event, newValue) => {
-      setCurrentGroup(groups[newValue])
-      setCurrentCategory(
-         groups[newValue].categories?.[0] || initialCurrentCategory
-      )
-      setValue(newValue)
-   }
-
    const hasNoData = () => {
-      return Boolean(typesOfOptions.length && total === 0)
+      return Boolean(groupUserStat?.dataArray?.length === 0)
    }
 
    const handleMenuItemClick = (event, index) => {
       setLocalUserType(userTypes[index])
    }
 
-   const handleUserInfoSelect = ({ target: { value } }) => {
-      setUserInfoType(value)
-   }
-
    const togglePercentage = () => {
       setShowPercentage(!showPercentage)
    }
-   const hasPartnerGroups = Boolean(groups.length > 1)
 
+   useEffect(() => {
+      handleCategoryChange(groupUserStat?.id)
+   }, [Boolean(userStats.length), localUserType, audience])
+
+   const handleCategoryChange = (categoryId?: string) => {
+      const newUserStat =
+         userStats.find((category) => category.id === categoryId) ||
+         userStats?.[0] ||
+         null
+      setGroupUserStat(newUserStat)
+   }
    return (
-      <Card raised={Boolean(currentStream)} sx={styles.root} {...rest}>
+      <Card raised={Boolean(currentStream)} sx={styles.root}>
          <CardHeader
             title={`${localUserType.displayName}`}
             ref={breakdownRef}
@@ -319,33 +293,18 @@ const CategoryBreakdown = ({
             ))}
          </Tabs>
          <Divider />
-         {hasPartnerGroups && (
-            <React.Fragment>
-               <Tabs
-                  value={value}
-                  onChange={handleChange}
-                  indicatorColor="secondary"
-                  textColor="secondary"
-                  variant="scrollable"
-               >
-                  {groups?.map((cc) => (
-                     <Tab key={cc.id} wrapped label={cc.universityName} />
-                  ))}
-               </Tabs>
-               <Divider />
-            </React.Fragment>
-         )}
          <CardContent>
             <Select
-               value={userInfoType}
+               value={groupUserStat?.id || ""}
                variant="outlined"
                fullWidth
-               onChange={handleUserInfoSelect}
+               onChange={({ target: { value } }) => handleCategoryChange(value)}
             >
-               {/*{currentGroup.categories.map(({ id, name }) => (*/}
-               {/*))}*/}
-               <MenuItem value={"fieldOfStudy"}>Field of Study</MenuItem>
-               <MenuItem value={"levelOfStudy"}>Level of Study</MenuItem>
+               {userStats.map(({ label, id }) => (
+                  <MenuItem key={id} value={id}>
+                     {label}
+                  </MenuItem>
+               ))}
             </Select>
             <FormControlLabel
                control={
@@ -401,7 +360,7 @@ const CategoryBreakdown = ({
                   <AccordionDetails>
                      <Box display="flex" justifyContent="center">
                         <CustomLegend
-                           options={currentCategory.options}
+                           options={groupUserStat?.dataArray}
                            colors={localColors}
                            chartRef={chartRef}
                            fullWidth
@@ -419,21 +378,17 @@ const CategoryBreakdown = ({
    )
 }
 
-CategoryBreakdown.propTypes = {
-   breakdownRef: PropTypes.object.isRequired,
-   className: PropTypes.string,
-   currentStream: PropTypes.object,
-   currentUserDataSet: PropTypes.object,
-   group: PropTypes.object,
-   groups: PropTypes.array,
-   handleReset: PropTypes.func,
-   isUni: PropTypes.bool,
-   localUserType: PropTypes.object,
-   setCurrentStream: PropTypes.func,
-   setLocalUserType: PropTypes.func,
-   setUserType: PropTypes.func,
-   streamsFromTimeFrameAndFuture: PropTypes.array,
-   userTypes: PropTypes.array,
+interface Props {
+   breakdownRef: React.RefObject<HTMLDivElement>
+   currentStream: LivestreamEvent | null
+   currentUserDataSet: UserDataSet
+   group: Group
+   groups: Group[]
+   userTypes: UserType[]
+   handleReset: () => void
+   localUserType: UserType
+   setLocalUserType: (userType: UserType) => void
+   streamsFromTimeFrameAndFuture: LivestreamEvent[]
 }
 
-export default withFirebase(CategoryBreakdown)
+export default CategoryBreakdown

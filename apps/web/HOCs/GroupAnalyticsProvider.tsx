@@ -10,8 +10,8 @@ import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
 type DefaultContext = {
    fieldsOfStudy: FieldOfStudy[]
    levelsOfStudy: LevelOfStudy[]
-   fieldsOfStudyById: Record<string, FieldOfStudy["label"]>
-   levelsOfStudyById: Record<string, LevelOfStudy["label"]>
+   fieldsOfStudyById: Record<string, FieldOfStudy["name"]>
+   levelsOfStudyById: Record<string, LevelOfStudy["name"]>
 }
 const AnalyticsContext = createContext<DefaultContext>({
    fieldsOfStudy: [],
@@ -46,8 +46,8 @@ const GroupAnalyticsProvider = ({ children }) => {
    const { data: levelsOfStudy } = useLevelsOfStudy(true)
 
    useEffect(() => {
-      setFieldsOfStudyById(createDictionary(fieldsOfStudy, "label"))
-      setLevelsOfStudyById(createDictionary(levelsOfStudy, "label"))
+      setFieldsOfStudyById(createDictionary(fieldsOfStudy, "name"))
+      setLevelsOfStudyById(createDictionary(levelsOfStudy, "name"))
    }, [fieldsOfStudy, levelsOfStudy])
 
    return (

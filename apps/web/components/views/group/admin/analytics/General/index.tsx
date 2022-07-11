@@ -6,7 +6,6 @@ import CategoryBreakdown from "./CategoryBreakdown"
 import AverageRegistrations from "./AverageRegistrations"
 import { mustBeNumber } from "../../../../../helperFunctions/HelperFunctions"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import LatestEvents from "../common/LatestEvents"
 import UserCount from "./UserCount"
 import TotalUniqueParticipatingStudents from "./TotalUniqueParticipatingStudents"
@@ -17,16 +16,45 @@ import {
 } from "../../../../../../data/util/AnalyticsUtil"
 import useUserDataSet from "../../../../../custom-hook/useUserDataSet"
 import { useSelector } from "react-redux"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { GlobalTimeFrame } from "../../../../../custom-hook/useTimeFrames"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserDataSet, UserType } from "../index"
+import RootState from "../../../../../../store/reducers"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
-      backgroundColor: theme.palette.background.dark,
+      backgroundColor: "background.dark",
       minHeight: "100%",
-      paddingBottom: theme.spacing(3),
-      paddingTop: theme.spacing(3),
+      paddingBottom: 3,
+      paddingTop: 3,
       width: "100%",
    },
-}))
+})
+
+interface Props {
+   group: Group
+   loading: boolean
+   globalTimeFrame: GlobalTimeFrame
+   futureStreams: LivestreamEvent[]
+   streamsFromBeforeTimeFrame: LivestreamEvent[]
+   streamsFromTimeFrame: LivestreamEvent[]
+   streamsFromTimeFrameAndFuture: LivestreamEvent[]
+   handleScrollToBreakdown: () => void
+   handleReset: () => void
+   groups: Group[]
+   userTypes: UserType[]
+   userType: UserType
+   setUserType: (userType: UserType) => void
+   breakdownRef: React.RefObject<HTMLDivElement>
+   handleToggleBar: () => void
+   setCurrentStream: (stream: LivestreamEvent) => void
+   currentUserDataSet: UserDataSet
+   currentStream: LivestreamEvent
+   showBar: boolean
+}
+
 const General = ({
    group,
    loading,
@@ -47,11 +75,10 @@ const General = ({
    currentUserDataSet,
    currentStream,
    showBar,
-}) => {
+}: Props) => {
    const hiddenStreamIds = useSelector(
-      (state) => state.analyticsReducer.hiddenStreamIds
+      (state: RootState) => state.analyticsReducer.hiddenStreamIds
    )
-   const classes = useStyles()
    const [localUserType, setLocalUserType] = useState(userTypes[0])
    const theme = useTheme()
    const mediumScreen = useMediaQuery(theme.breakpoints.down("lg"))
@@ -209,7 +236,7 @@ const General = ({
       xl: 6,
    })
    return (
-      <Container className={classes.root} maxWidth={false}>
+      <Container sx={styles.root} maxWidth={false}>
          <Grid container spacing={3}>
             <Grid xs={12} sm={12} md={7} lg={8} item>
                <Grid container spacing={3}>
@@ -350,10 +377,7 @@ const General = ({
                            streamsFromTimeFrameAndFuture
                         }
                         groups={groups}
-                        isUni={isUni}
                         handleReset={handleReset}
-                        setUserType={setUserType}
-                        setCurrentStream={setCurrentStream}
                         group={group}
                      />
                   </Grid>

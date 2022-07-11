@@ -1,5 +1,6 @@
 import firebase from "firebase/app"
-import { Group } from "./groups"
+import { CustomCategory, Group } from "./groups"
+import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -10,6 +11,7 @@ export interface IGroupRepository {
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
+   getCustomCategories(groupId: string): Promise<CustomCategory[]>
 }
 
 export class FirebaseGroupRepository implements IGroupRepository {
@@ -82,5 +84,14 @@ export class FirebaseGroupRepository implements IGroupRepository {
          .limit(1)
          .get()
       return adminGroups.docs.length > 0
+   }
+
+   async getCustomCategories(groupId: string): Promise<CustomCategory[]> {
+      const groupCustomCategoriesRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customCategories")
+      const snapshots = await groupCustomCategoriesRef.get()
+      return mapFirestoreDocuments<CustomCategory>(snapshots)
    }
 }

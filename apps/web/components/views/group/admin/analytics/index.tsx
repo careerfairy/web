@@ -1,4 +1,11 @@
-import React, { Fragment, useEffect, useMemo, useRef, useState } from "react"
+import React, {
+   Fragment,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import { v4 as uuid } from "uuid"
 import SwipeableViews from "react-swipeable-views"
 import General from "./General"
@@ -11,16 +18,17 @@ import Feedback from "./Feedback"
 import {
    isEmpty,
    isLoaded,
+   ReduxFirestoreQuerySetting,
    useFirestore,
    useFirestoreConnect,
 } from "react-redux-firebase"
-import { shallowEqual, useDispatch, useSelector } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import * as actions from "../../../../../store/actions"
 import { AppBar, Box, Tab, Tabs } from "@mui/material"
 import {
-   checkIfInTalentPool,
    arraysOfIdsEqual,
+   checkIfInTalentPool,
    getTotalUniqueStreamGroupIdsFromStreams,
 } from "../../../../../data/util/AnalyticsUtil"
 import GroupsUtil from "../../../../../data/util/GroupsUtil"
@@ -33,6 +41,7 @@ import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
 import StreamFilterModal from "./StreamFilterModal"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import RootState from "../../../../../store/reducers"
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -58,24 +67,42 @@ const useStyles = makeStyles((theme) => ({
 
 const now = new Date()
 
-const userTypes = [
+export interface UserType {
+   /*
+    *The array field that has all the user Emails
+    */
+   propertyName: "talentPool" | "registeredUsers" | "participatingStudents"
+   /*
+    * The UI name of the property for the dashboard
+    */
+   displayName: string
+   /*
+    * Once the users are fetched,
+    * they will be stored as an array
+    * of user objects on the livestream
+    * document.
+    * */
+   propertyDataName:
+      | "talentPoolData"
+      | "registeredUsersData"
+      | "participatingStudentsData"
+}
+
+const userTypes: UserType[] = [
    {
       propertyName: "talentPool",
       displayName: "Talent Pool",
       propertyDataName: "talentPoolData",
-      universityPropertyDataName: "universityTalentPoolData",
    },
    {
       propertyName: "registeredUsers",
       displayName: "Registered Users",
       propertyDataName: "registeredUsersData",
-      universityPropertyDataName: "universityRegisteredUsersData",
    },
    {
       propertyName: "participatingStudents",
       displayName: "Participating Users",
       propertyDataName: "participatingStudentsData",
-      universityPropertyDataName: "universityParticipatingStudentsData",
    },
 ]
 
@@ -142,10 +169,17 @@ const streamsSelector = createSelector(
       return streams
    }
 )
+
+export interface UserDataSet {
+   id: string
+   dataSet: "groupUniversityStudents" | "followers"
+   displayName: string
+   miscName: string
+}
+
 const AnalyticsOverview = () => {
    const { group } = useGroup()
-
-   const userDataSets = [
+   const userDataSets: UserDataSet[] = [
       {
          id: uuid(),
          dataSet: "groupUniversityStudents",
@@ -189,34 +223,35 @@ const AnalyticsOverview = () => {
    const [streamsMounted, setStreamsMounted] = useState(false)
    const [groups, setGroups] = useState([])
 
-   const query = useMemo(
-      () => [
-         {
-            collection: `livestreams`,
-            where: [
-               ["start", ">", new Date(globalTimeFrame.double)],
-               ["groupIds", "array-contains", group.id],
-               ["test", "==", false],
-            ],
-            orderBy: ["start", "asc"],
-            storeAs: `livestreams of ${group.groupId}`,
-         },
-      ],
+   const query = useMemo<ReduxFirestoreQuerySetting>(
+      () => ({
+         collection: `livestreams`,
+         where: [
+            ["start", ">", new Date(globalTimeFrame.double)],
+            ["groupIds", "array-contains", group.id],
+            ["test", "==", false],
+         ],
+         orderBy: ["start", "asc"],
+         storeAs: `livestreams of ${group.groupId}`,
+      }),
       [globalTimeFrame, group.groupId]
    )
 
    useFirestoreConnect(query)
 
    const nonFilteredStreamsFromTimeFrameAndFuture = useSelector(
-      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture
+      (state: RootState) =>
+         state.analyticsReducer.streams.fromTimeframeAndFuture
    )
 
    const hiddenStreamIds = useSelector(
-      (state) => state.analyticsReducer.hiddenStreamIds
+      (state: RootState) => state.analyticsReducer.hiddenStreamIds
    )
-   const allGroups = useSelector((state) => state.firestore.ordered?.allGroups)
+   const allGroups = useSelector(
+      (state: RootState) => state.firestore.ordered?.allGroups
+   )
    const allGroupsDictionary = useSelector(
-      (state) => state.firestore.data?.allGroups
+      (state: RootState) => state.firestore.data?.allGroups
    )
    const uniStudents = useMemo(
       () => Boolean(currentUserDataSet.dataSet === "groupUniversityStudents"),
@@ -225,7 +260,7 @@ const AnalyticsOverview = () => {
    const userDataSetDictionary = useUserDataSetDictionary(currentUserDataSet)
    const userDataSet = useUserDataSet(currentUserDataSet)
 
-   const livestreams = useSelector(({ firestore: { ordered } }) =>
+   const livestreams = useSelector(({ firestore: { ordered } }: RootState) =>
       streamsSelector(ordered[`livestreams of ${group.groupId}`], {
          userDataSetDictionary,
          streamsMounted,
@@ -318,8 +353,8 @@ const AnalyticsOverview = () => {
       dispatch(actions.setUserDataSet(firebase.getUsersByEmail))
    }
 
-   const handleFilterUserdataSet = async (hiddenStreamIds) => {
-      dispatch(actions.setFilteredUserDataSet(hiddenStreamIds))
+   const handleFilterUserdataSet = async () => {
+      dispatch(actions.setFilteredUserDataSet())
    }
 
    useEffect(() => {
@@ -437,14 +472,14 @@ const AnalyticsOverview = () => {
       })
    }
 
-   const handleScrollToBreakdown = () => {
+   const handleScrollToBreakdown = useCallback(() => {
       if (breakdownRef.current) {
          breakdownRef.current.scrollIntoView({
             behavior: "smooth",
             block: "start",
          })
       }
-   }
+   }, [breakdownRef.current])
 
    const getAverageRating = (voters) => {
       const ratingVotes = voters.filter((voter) => voter?.rating > 0)
@@ -482,14 +517,14 @@ const AnalyticsOverview = () => {
       })
    }
 
-   const handleToggleBar = () => {
-      setShowBar(!showBar)
-   }
+   const handleToggleBar = useCallback(() => {
+      setShowBar((prev) => !prev)
+   }, [])
 
-   const handleReset = () => {
+   const handleReset = useCallback(() => {
       setCurrentStream(null)
       setUserType(userTypes[0])
-   }
+   }, [])
 
    useEffect(() => {
       return () => {
@@ -498,12 +533,12 @@ const AnalyticsOverview = () => {
    }, [])
 
    const streamsFromBeforeTimeFrame = useMemo(
-      () => getStreamsFromBeforeTimeFrame(globalTimeFrame.globalDate),
+      () => getStreamsFromBeforeTimeFrame(),
       [livestreams, hiddenStreamIds]
    )
 
    const futureStreams = useMemo(
-      () => getFutureEvents(globalTimeFrame.globalDate),
+      () => getFutureEvents(),
       [livestreams, hiddenStreamIds]
    )
 
@@ -514,7 +549,7 @@ const AnalyticsOverview = () => {
 
    const streamsFromTimeFrameAndFuture = useMemo(
       () => [...streamsFromTimeFrame, ...futureStreams],
-      [futureStreams, streamsFromTimeFrame]
+      [streamsFromTimeFrame, futureStreams]
    )
    const isFollowers = useMemo(
       () => currentUserDataSet.dataSet === "followers",
@@ -544,9 +579,7 @@ const AnalyticsOverview = () => {
       ) {
          ;(async function getTotalEngagedUsers() {
             try {
-               await handleSetUserdataSet(
-                  nonFilteredStreamsFromTimeFrameAndFuture
-               )
+               await handleSetUserdataSet()
             } catch (e) {
                console.log("-> e in getting followers", e)
             }
@@ -558,7 +591,7 @@ const AnalyticsOverview = () => {
       if (currentUserDataSet.dataSet === "groupUniversityStudents") return
       ;(async function getTotalFilteredEngagedUsers() {
          try {
-            await handleFilterUserdataSet(hiddenStreamIds)
+            await handleFilterUserdataSet()
          } catch (e) {
             console.log("-> e in setting filtered followers", e)
          }

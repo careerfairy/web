@@ -1,7 +1,7 @@
 import { firestore } from "../lib/firebase"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import ReadAndWriteCounter from "../lib/ReadAndWriteCounter"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import Counter from "../lib/Counter"
+import { CustomCategory, Group } from "@careerfairy/shared-lib/dist/groups"
 import {
    possibleFieldsOfStudy,
    possibleOthers,
@@ -14,16 +14,33 @@ import * as mappings from "@careerfairy/firebase-scripts/data/fieldAndLevelOfStu
 import { FieldValue } from "firebase-admin/firestore"
 
 import { BigBatch } from "@qualdesk/firestore-big-batch"
+import { UniversityCategoriesMap } from "@careerfairy/shared-lib/dist/users"
+import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 
+const customCountKeys = {
+   numTotalUsers: "Total Users",
+   numUsersWithFieldOfStudy: "Users with Field of Study",
+   numUsersWithLevelOfStudy: "Users with Level of Study",
+   numUsersWithRegisteredGroups: "Users with Registered Groups",
+   numCustomCategories: "Custom Categories",
+   numUsersWithAssignedFieldOfStudy: "Users with Assigned Field of Study",
+   numUsersWithAssignedLevelOfStudy: "Users with Assigned Level of Study",
+}
+
+const levelOfStudyMapping = mappings.levelOfStudyMapping
+const fieldOfStudyMapping = mappings.fieldOfStudyMapping
 export default async function main() {
-   const counter = new ReadAndWriteCounter()
+   const counter = new Counter()
    const batch = new BigBatch({ firestore: firestore }) //
 
    const fieldsOfStudySnaps = await firestore.collection("fieldsOfStudy").get()
    const levelsOfStudySnaps = await firestore.collection("levelsOfStudy").get()
    // get all users
    const userSnaps = await firestore.collection("userData").get()
-   counter.addToCustomCount("numTotalUsers", userSnaps.docs.length)
+   counter.addToCustomCount(
+      customCountKeys.numTotalUsers,
+      userSnaps.docs.length
+   )
    const groupSnaps = await firestore.collection("careerCenterData").get()
    counter.addToReadCount(
       userSnaps.docs.length +
@@ -35,91 +52,38 @@ export default async function main() {
    const groups = groupSnaps.docs.map(
       (doc) => ({ id: doc.id, ...doc.data() } as Group)
    )
-   let i = 0
-   for (const userSnap of userSnaps.docs) {
-      consoleLogProgressEveryPercent(userSnaps.docs.length, i)
-      i++
-      const userData = {
-         ...userSnap.data(),
-         id: userSnap.id,
-      } as UserData
+   const users = userSnaps.docs.map(
+      (doc) =>
+         ({
+            id: doc.id,
+            ...doc.data(),
+         } as UserData)
+   )
 
-      if (userData.registeredGroups) {
-         counter.customCountIncrement("numUsersWithRegisteredGroups")
-      }
+   createCustomGroupCategorySubCollections(groups, batch, counter)
 
-      const userRef = firestore.collection("userData").doc(userSnap.id)
-
-      const fieldsOfStudy = getUserCategorySelectionByPossibleNames(
-         possibleFieldsOfStudy,
-         userData,
-         groups
-      )
-
-      const levelsOfStudy = getUserCategorySelectionByPossibleNames(
-         possibleLevelsOfStudy,
-         userData,
-         groups
-      )
-
-      if (fieldsOfStudy.length) {
-         counter.customCountIncrement("numUsersWithFieldOfStudy")
-      }
-      if (levelsOfStudy.length) {
-         counter.customCountIncrement("numUsersWithLevelOfStudy")
-      }
-
-      const bestMatchingFieldOfStudyId = getAssignedFieldOfStudyId(
-         fieldsOfStudy,
-         mappings.fieldOfStudyMapping
-      )
-      const bestMatchingLevelOfStudyId = getAssignedFieldOfStudyId(
-         levelsOfStudy,
-         mappings.levelOfStudyMapping
-      )
-
-      const updateData = {
-         fieldOfStudyId: null,
-         levelOfStudyId: null,
-      }
-      const backFills = []
-      if (bestMatchingFieldOfStudyId) {
-         counter.customCountIncrement("numUsersWithAssignedFieldOfStudy")
-         updateData["fieldOfStudyId"] = bestMatchingFieldOfStudyId
-         backFills.push("fieldOfStudy")
-      }
-      if (bestMatchingLevelOfStudyId) {
-         counter.customCountIncrement("numUsersWithAssignedLevelOfStudy")
-         updateData["levelOfStudyId"] = bestMatchingLevelOfStudyId
-         backFills.push("levelOfStudy")
-      }
-      counter.writeIncrement()
-      batch.set(
-         userRef,
-         {
-            ...updateData,
-            ...(backFills.length && {
-               backFills: FieldValue.arrayUnion(...backFills),
-            }),
-         },
-         { merge: true }
-      )
-   }
+   assignUsersFieldsOfStudy(users, groups, batch, counter)
 
    await batch.commit()
 
    counter.print()
-   printPercentOfUsersAssignedData("numUsersWithAssignedFieldOfStudy", counter)
-   printPercentOfUsersAssignedData("numUsersWithAssignedLevelOfStudy", counter)
+   printPercentOfUsersAssignedData(
+      customCountKeys.numUsersWithAssignedFieldOfStudy,
+      counter
+   )
+   printPercentOfUsersAssignedData(
+      customCountKeys.numUsersWithAssignedLevelOfStudy,
+      counter
+   )
 }
 
 const printPercentOfUsersAssignedData = (
    customCount: string,
-   counter: ReadAndWriteCounter
+   counter: Counter
 ) => {
    const percentOfUsersAssignedFieldOfStudy =
       (counter.getCustomCount(customCount) /
-         counter.getCustomCount("numTotalUsers")) *
+         counter.getCustomCount(customCountKeys.numTotalUsers)) *
       100
    console.log(
       `-> ${customCount} from Backfill`,
@@ -129,7 +93,7 @@ const printPercentOfUsersAssignedData = (
 
 type Mapping = {
    current: {
-      [docId: string]: string // docLabel
+      [docId: string]: string // docName
    }
    legacy: {
       [legacyName: string]: string // docId
@@ -139,7 +103,7 @@ type Mapping = {
 //    fieldOfStudyMapping: Mapping
 //    levelOfStudyMapping: Mapping
 // }
-const getAssignedFieldOfStudyId = (
+const getAssignedUserInfoIdAndName = (
    userFieldsOfStudy: string[],
    mapping: Mapping
 ) => {
@@ -150,7 +114,7 @@ const getAssignedFieldOfStudyId = (
    )
    const docId = legacyDict[studyFieldWithMapping]
    if (newDict[docId]) {
-      return docId
+      return { id: docId, name: newDict[docId] }
    }
    return null
 }
@@ -232,4 +196,180 @@ const consoleLogProgressEveryPercent = (
          `Backfilled ${Math.round((userIndex / totalUsers) * 100)}% of users`
       )
    }
+}
+
+const getUserUniversityCategoryMap = (
+   user: UserData,
+   groups: Group[]
+): UniversityCategoriesMap => {
+   const universityCategoriesMap: UniversityCategoriesMap = null
+   if (!user.university?.code) return universityCategoriesMap
+   const university = getUniversity(user.university?.code, groups)
+   if (!university?.categories) return universityCategoriesMap
+   return university.categories.reduce<UniversityCategoriesMap>(
+      (acc, category) => {
+         if (!category.options) return acc
+         return {
+            ...acc,
+            [category.id]: {
+               categoryName: category.name,
+               ...getCategorySelectedOptionId(user, university, category.id),
+            },
+         }
+      },
+      {}
+   )
+}
+
+const getUniversity = (universityCode, groups): Group => {
+   return groups.find((group) => group?.universityCode === universityCode)
+}
+
+const getCategorySelectedOptionId = (
+   user: UserData,
+   university: Group,
+   groupCategoryId: string
+) => {
+   const registeredGroup = user.registeredGroups?.find(
+      (registeredGroup) => registeredGroup.groupId === university.id
+   )
+   if (!registeredGroup?.categories) return null
+   const category = registeredGroup.categories.find(
+      (registeredGroupCategory) =>
+         registeredGroupCategory.id === groupCategoryId
+   )
+   if (!category?.selectedValueId) return null
+
+   const selectValueName = university.categories
+      .find((category) => category.id === groupCategoryId)
+      ?.options.find((option) => option.id === category?.selectedValueId)?.name
+
+   return {
+      selectedOptionId: category?.selectedValueId || null,
+      selectedOptionName: selectValueName || null,
+   }
+}
+
+// Goes through every group and creates a document for each category
+// then stores each document in the group's customCategories sub-collection
+const createCustomGroupCategorySubCollections = (
+   groups: Group[],
+   batch: BigBatch,
+   counter: Counter
+) => {
+   groups.forEach((group) => {
+      if (!group.categories || !group.universityCode) return
+      group.categories?.forEach((category) => {
+         const categoryRef = firestore
+            .collection(`careerCenterData/${group.id}/customCategories`)
+            .doc(category.id)
+         const categoryData: CustomCategory = {
+            id: category.id,
+            name: category.name,
+            options: convertFirebaseDocsToDictionary(category.options),
+         }
+         batch.set(categoryRef, categoryData)
+         counter.customCountIncrement(customCountKeys.numCustomCategories)
+         counter.write()
+      })
+   })
+}
+
+/*
+ * Goes through every user and does 2 things:
+ *
+ * 1. If the user has registered groups, it tries to find their field of study and level of study
+ *    based on their registered groups data
+ * 2. If the user has a university, it gets the universities group category data and maps all the selected
+ *    categories of the university to the user and stores them as a dictionary in the
+ *    user's user.university.categories field
+ * */
+const assignUsersFieldsOfStudy = (
+   users: UserData[],
+   groups: Group[],
+   batch: BigBatch,
+   counter: Counter
+) => {
+   let i = 0
+   for (const userData of users) {
+      consoleLogProgressEveryPercent(users.length, i)
+      i++
+
+      if (userData.registeredGroups) {
+         counter.customCountIncrement(
+            customCountKeys.numUsersWithRegisteredGroups
+         )
+      }
+
+      const userRef = firestore.collection("userData").doc(userData.id)
+
+      const fieldsOfStudy = getUserCategorySelectionByPossibleNames(
+         possibleFieldsOfStudy,
+         userData,
+         groups
+      )
+
+      const levelsOfStudy = getUserCategorySelectionByPossibleNames(
+         possibleLevelsOfStudy,
+         userData,
+         groups
+      )
+
+      if (fieldsOfStudy.length) {
+         counter.customCountIncrement(customCountKeys.numUsersWithFieldOfStudy)
+      }
+      if (levelsOfStudy.length) {
+         counter.customCountIncrement(customCountKeys.numUsersWithLevelOfStudy)
+      }
+
+      const assignedFieldOfStudy = getAssignedUserInfoIdAndName(
+         fieldsOfStudy,
+         fieldOfStudyMapping
+      )
+      const assignedLevelOfStudy = getAssignedUserInfoIdAndName(
+         levelsOfStudy,
+         levelOfStudyMapping
+      )
+
+      let updateData: Partial<UserData> = {
+         fieldOfStudy: null,
+         levelOfStudy: null,
+      }
+      const backFills = []
+      if (assignedFieldOfStudy) {
+         counter.customCountIncrement(
+            customCountKeys.numUsersWithAssignedFieldOfStudy
+         )
+         updateData["fieldOfStudy"] = assignedFieldOfStudy
+         backFills.push("fieldOfStudy")
+      }
+      if (assignedLevelOfStudy) {
+         counter.customCountIncrement(
+            customCountKeys.numUsersWithAssignedLevelOfStudy
+         )
+         updateData["levelOfStudy"] = assignedLevelOfStudy
+         backFills.push("levelOfStudy")
+      }
+      counter.writeIncrement()
+      updateData = {
+         ...updateData,
+         university: {
+            ...userData.university,
+            categories: getUserUniversityCategoryMap(userData, groups),
+         },
+         ...(backFills.length && {
+            backFills: FieldValue.arrayUnion(...backFills),
+         }),
+      }
+      batch.set(userRef, updateData, { merge: true })
+   }
+}
+
+const convertFirebaseDocsToDictionary = <T extends Identifiable>(
+   array: T[]
+): Record<string, T> => {
+   return array.reduce<Record<string, T>>((acc, curr) => {
+      acc[curr.id] = curr
+      return acc
+   }, {})
 }
