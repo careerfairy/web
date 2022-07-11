@@ -7,8 +7,9 @@ import { useSnackbar } from "notistack"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import * as Sentry from "@sentry/nextjs"
 import { useMergeLink } from "@mergeapi/react-merge-link"
-import { useCallback, useEffect, useReducer, useState } from "react"
+import { useCallback, useEffect, useReducer } from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
 const AtsIntegrationContent = () => {
    return (
@@ -29,61 +30,41 @@ const initialState = {
    linkToken: null,
    mergeLinkIsReady: false,
    integrationId: null,
+   complete: false,
 }
 
-type Action =
-   | { type: "START"; payload: string }
-   | { type: "LINK_TOKEN_GRABBED"; payload: string }
-   | { type: "MERGE_LINK_READY"; payload: boolean }
-   | { type: "COMPLETE" }
+const atsState = createSlice({
+   name: "ats",
+   reducers: {
+      start: (state, action: PayloadAction<string>) => {
+         state.isLoading = true
+         state.integrationId = action.payload
+      },
+      linkTokenGrabbed: (state, action: PayloadAction<string>) => {
+         state.isLoading = false
+         state.linkToken = action.payload
+      },
+      mergeLinkReady: (state, action: PayloadAction<boolean>) => {
+         state.mergeLinkIsReady = action.payload
+      },
+      complete: (state) => {
+         state.complete = true
+         state.isLoading = false
+      },
+   },
+   initialState,
+})
 
-type State = typeof initialState
-
-function reducer(state: State, action: Action): State {
-   switch (action.type) {
-      case "START":
-         return {
-            ...state,
-            isLoading: true,
-            integrationId: action.payload,
-         }
-      case "LINK_TOKEN_GRABBED":
-         return {
-            ...state,
-            // the user can close the Merge dialog so we stop the loading state here
-            isLoading: false,
-            linkToken: action.payload,
-         }
-      case "MERGE_LINK_READY": {
-         return {
-            ...state,
-            mergeLinkIsReady: action.payload,
-         }
-      }
-      case "COMPLETE": {
-         return {
-            ...state,
-            isLoading: false,
-         }
-      }
-      default:
-         throw new Error(`Unknown action: ${action}`)
-   }
-}
+const { start, linkTokenGrabbed, mergeLinkReady, complete } = atsState.actions
 
 const ConnectWithATSSystem = () => {
    const group: Group = useSelector(groupSelector)
    const { enqueueSnackbar } = useSnackbar()
-   const [state, dispatch] = useReducer(reducer, initialState)
+   const [state, dispatch] = useReducer(atsState.reducer, initialState)
 
    const startLink = async () => {
       const integrationId = atsServiceInstance.generateIntegrationId()
-
-      console.log("generated integration id", integrationId)
-      dispatch({
-         type: "START",
-         payload: integrationId,
-      })
+      dispatch(start(integrationId))
 
       try {
          const response = await atsServiceInstance.linkCompanyWithATS(
@@ -91,9 +72,7 @@ const ConnectWithATSSystem = () => {
             integrationId
          )
 
-         console.log(response)
-
-         dispatch({ type: "LINK_TOKEN_GRABBED", payload: response.link_token })
+         dispatch(linkTokenGrabbed(response.link_token))
       } catch (e) {
          Sentry.captureException(e)
          enqueueSnackbar(
@@ -105,8 +84,6 @@ const ConnectWithATSSystem = () => {
          )
       }
    }
-
-   console.log("ConnectWithATSSystem render", state)
 
    return (
       <>
@@ -134,21 +111,16 @@ const MergeDialogConnector = ({
    integrationId,
    dispatch,
 }) => {
-   console.log("MergeDialogConnector render", linkToken, groupId, integrationId)
-
    const { enqueueSnackbar } = useSnackbar()
 
    // Finalize the integration
    const onSuccess = useCallback(
       (public_token) => {
-         console.log("success!!", public_token)
          try {
             atsServiceInstance
                .exchangeAccountToken(groupId, integrationId, public_token)
                .then((_) => {
-                  console.log("Account Token saved")
-
-                  dispatch({ type: "COMPLETE" })
+                  dispatch(complete())
                })
          } catch (e) {
             Sentry.captureException(e)
@@ -186,7 +158,7 @@ const MergeDialogConnector = ({
 
    // Propagate to parent the readiness of MergeLink
    useEffect(() => {
-      dispatch({ type: "MERGE_LINK_READY", payload: isReady })
+      dispatch(mergeLinkReady(isReady))
    }, [isReady])
 
    return null
