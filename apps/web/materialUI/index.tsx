@@ -237,6 +237,15 @@ const getComponents = (theme: DefaultTheme): any => ({
 
                "& fieldset": {
                   borderRadius: "8px",
+                  border: 0,
+               },
+               "& .Mui-focused fieldset": {
+                  border: "2px solid",
+                  borderColor: theme.palette.primary.main,
+               },
+               "& .Mui-error fieldset": {
+                  border: "2px solid",
+                  borderColor: theme.palette.error.main,
                },
             },
          },
@@ -249,6 +258,19 @@ const getComponents = (theme: DefaultTheme): any => ({
                backgroundColor: white,
                boxShadow: theme.boxShadows.grey_5_15,
                borderRadius: "8px",
+
+               "& fieldset": {
+                  border: 0,
+               },
+            },
+
+            "& .Mui-focused fieldset": {
+               border: "2px solid",
+               borderColor: theme.palette.primary.main,
+            },
+            "& .Mui-error fieldset": {
+               border: "2px solid",
+               borderColor: theme.palette.error.main,
             },
          },
       },

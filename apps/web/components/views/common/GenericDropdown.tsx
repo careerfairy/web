@@ -5,6 +5,7 @@ import {
    Select,
    SelectChangeEvent,
 } from "@mui/material"
+import { useState } from "react"
 
 export type DropdownItem = {
    id: string
@@ -31,16 +32,30 @@ const GenericDropdown = ({
    label,
    list,
 }: Props) => {
+   const [isOpen, setIsOpen] = useState(false)
+
+   const handleChange = (event) => {
+      event.preventDefault()
+      setIsOpen(false)
+      onChange(event)
+   }
    return (
       <FormControl fullWidth>
          <InputLabel id="generic-dropdown-label">{label}</InputLabel>
          <Select
+            open={isOpen}
+            onOpen={() => setIsOpen(true)}
+            onClose={() => setIsOpen(false)}
+            onClick={() => setIsOpen(false)}
             id={id}
             value={value}
             name={name}
             className={className}
             label={label}
-            onChange={onChange}
+            onChange={handleChange}
+            MenuProps={{
+               hideBackdrop: true,
+            }}
          >
             {list.map(({ id, value, label }) => (
                <MenuItem key={id} id={id} value={value}>
