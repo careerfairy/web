@@ -31,6 +31,7 @@
       "@mui/material": "^5.3.0",
       "@mui/styles": "^5.3.0",
       "@react-pdf/renderer": "^2.1.0",
+      "@reduxjs/toolkit": "^1.8.3",
       "@sentry/nextjs": "^6.17.9",
       "@stahl.luke/react-reveal": "^1.2.3",
       "agora-rtc-sdk": "^3.4.0",
