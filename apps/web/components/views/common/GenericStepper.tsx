@@ -34,13 +34,13 @@ const StepperConnector = styled(StepConnector)(({ theme }) => ({
    },
 }))
 
-const StepperIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
-   ({ theme, ownerstate }) => ({
+const StepperIconRoot = ({ active, children, className }) => {
+   const StyledIcons = styled("div")(({ theme }) => ({
       color: theme.palette.grey.main,
       display: "flex",
       height: 22,
       alignItems: "center",
-      ...(ownerstate.active && {
+      ...(active && {
          color: theme.palette.primary.main,
       }),
       "& .stepper-completedIcon": {
@@ -54,14 +54,16 @@ const StepperIconRoot = styled("div")<{ ownerState: { active?: boolean } }>(
          borderRadius: "50%",
          backgroundColor: "currentColor",
       },
-   })
-)
+   }))
+
+   return <StyledIcons className={className}>{children}</StyledIcons>
+}
 
 const StepperIcon = (props: StepIconProps) => {
    const { active, completed, className } = props
 
    return (
-      <StepperIconRoot ownerstate={{ active }} className={className}>
+      <StepperIconRoot active={active} className={className}>
          {completed ? (
             <Check className="stepper-completedIcon" />
          ) : (
