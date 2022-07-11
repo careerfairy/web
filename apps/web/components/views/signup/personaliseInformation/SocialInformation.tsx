@@ -1,4 +1,4 @@
-import { FormControl, Grid, TextField, Typography } from "@mui/material"
+import { Grid, TextField, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
