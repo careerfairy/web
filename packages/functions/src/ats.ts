@@ -8,7 +8,7 @@ import { object, string } from "yup"
 import { groupRepo } from "./api/repositories"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 import { logAxiosError } from "./util"
-import { GroupATSIntegration } from "@careerfairy/shared-lib/dist/groups"
+import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups"
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -73,7 +73,7 @@ export const mergeGetAccountToken = functions
 
          console.log("account token resp", mergeResponse)
 
-         const atsMetadata: Partial<GroupATSIntegration> = {
+         const atsMetadata: Partial<GroupATSAccount> = {
             groupId: groupId,
             merge: {
                end_user_origin_id: integrationId,
