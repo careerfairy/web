@@ -28,7 +28,7 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test.only("It successfully signs up without additional information", async ({
+   test("It successfully signs up without additional information", async ({
       page,
    }) => {
       const signup = new SignupPage(page)
