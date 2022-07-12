@@ -7,21 +7,48 @@ import { useSnackbar } from "notistack"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import * as Sentry from "@sentry/nextjs"
 import { useMergeLink } from "@mergeapi/react-merge-link"
-import { useCallback, useEffect, useReducer } from "react"
+import { useCallback, useEffect, useReducer, useState } from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import useGroupATSAccounts from "../../../../custom-hook/useGroupATSAccounts"
 
 const AtsIntegrationContent = () => {
+   const group: Group = useSelector(groupSelector)
+   const { data, isLoading, error } = useGroupATSAccounts(group?.groupId)
+   console.log("Render AtsIntegrationContent Group", group)
+   console.log("Render AtsIntegrationContent ATS", isLoading, data, error)
+
+   const [show, setShow] = useState(false)
+
+   useEffect(() => {
+      const timer = setTimeout(() => {
+         setShow(true)
+      }, 5000)
+
+      return () => clearTimeout(timer)
+   }, [])
+
    return (
       <>
          <Header
             title={"Applicants Tracking System"}
             subtitle={"Manage your ATS integrations"}
          />
-         <Box p={3}>
-            <ConnectWithATSSystem />
-         </Box>
+         {show && <Test />}
+         <Box p={3}>{/*<ConnectWithATSSystem />*/}</Box>
       </>
+   )
+}
+
+const Test = () => {
+   const group: Group = useSelector(groupSelector)
+   const { data, isLoading, error } = useGroupATSAccounts(group?.groupId, false)
+
+   console.log("render from Test!")
+   return (
+      <div>
+         Test component, loading = {isLoading + ""}, data = {data.length}
+      </div>
    )
 }
 
