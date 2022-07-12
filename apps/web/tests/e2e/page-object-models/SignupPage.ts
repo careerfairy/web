@@ -36,6 +36,13 @@ export class SignupPage extends CommonPage {
    readonly incorrectLastNameWarning: Locator
    readonly incorrectPasswordWarning: Locator
    readonly incorrectEmailWarning: Locator
+   readonly socialInformationStep: Locator
+   readonly linkedInLinkInput: Locator
+   readonly additionalInformationStep: Locator
+   readonly spokenLanguagesInput: Locator
+   readonly countriesOfInterestInput: Locator
+   readonly interestsInput: Locator
+   readonly isLookingForJobToggle: Locator
 
    constructor(page: Page) {
       super(page)
@@ -68,7 +75,7 @@ export class SignupPage extends CommonPage {
          'input[name="confirmPassword"]'
       )
       this.interestsTitle = page.locator("text=What are your interests?")
-      this.referralCodeTextField = page.locator('input[name="referralCode"]')
+      this.referralCodeTextField = page.locator("id=referralCode")
       this.termsOfConditionsCheckBox = page.locator('input[name="agreeTerm"]')
       this.subscribeEmailsCheckBox = page.locator('input[name="subscribed"]')
       this.signupButton = page.locator("data-testid=signup-button")
@@ -110,6 +117,19 @@ export class SignupPage extends CommonPage {
       this.accountAlreadyExistsWarning = page.locator(
          "text=Error: The email address is already in use by another account."
       )
+      this.socialInformationStep = page.locator(
+         "data-testid=registration-social-information-step"
+      )
+      this.linkedInLinkInput = page.locator("id=linkedInLink")
+      this.additionalInformationStep = page.locator(
+         "data-testid=registration-additional-information-step"
+      )
+      this.spokenLanguagesInput = page.locator("id=spokenLanguagesInput")
+      this.countriesOfInterestInput = page.locator(
+         "id=countriesOfInterestInput"
+      )
+      this.interestsInput = page.locator("id=interestsInput")
+      this.isLookingForJobToggle = page.locator("id=isLookingForJobToggle")
    }
 
    async selectUniversityCountry(country: string) {
@@ -146,6 +166,12 @@ export class SignupPage extends CommonPage {
    async enterConfirmPassword(password?: string) {
       return password && this.passwordConfirmTextField?.fill(password)
    }
+   async enterLinkedInLinkInput(link: string) {
+      await this.linkedInLinkInput.fill(link)
+      // to let debounce run
+      await this.referralCodeTextField.fill("")
+      await sleep(1200)
+   }
 
    async enterPinCode(pinCode?: string) {
       return pinCode && this.pinCodeTextField.fill(pinCode)
@@ -169,6 +195,30 @@ export class SignupPage extends CommonPage {
    }
    async clickContinueButton() {
       return this.userPersonaliseContinueButton?.click()
+   }
+   async selectSpokenLanguageOption(optionId: string) {
+      await this.spokenLanguagesInput.click()
+      await this.page
+         .locator(`data-testid=spokenLanguagesInput_${optionId}_option`)
+         ?.click()
+      await this.spokenLanguagesInput.click()
+   }
+   async selectCountriesOfInterestOption(optionId: string) {
+      await this.countriesOfInterestInput.click()
+      await this.page
+         .locator(`data-testid=countriesOfInterestInput_${optionId}_option`)
+         ?.click()
+      await this.countriesOfInterestInput.click()
+   }
+   async selectInterestsInputOption(optionId: string) {
+      await this.interestsInput.click()
+      await this.page
+         .locator(`data-testid=interestsInput_${optionId}_option`)
+         ?.click()
+      await this.interestsInput.click()
+   }
+   async selectIsLookingForJobToggleOption() {
+      return this.isLookingForJobToggle.click()
    }
 
    async open() {

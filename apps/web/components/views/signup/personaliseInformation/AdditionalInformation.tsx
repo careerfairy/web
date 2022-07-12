@@ -170,7 +170,12 @@ const AdditionalInformation = () => {
 
    return (
       <>
-         <Grid container spacing={2} justifyContent="center">
+         <Grid
+            container
+            spacing={2}
+            justifyContent="center"
+            data-testid="registration-additional-information-step"
+         >
             <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   What languages do you speak?
@@ -178,7 +183,7 @@ const AdditionalInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <MultiListSelect
-                  inputName="languages"
+                  inputName="spokenLanguagesInput"
                   isCheckbox
                   selectedItems={selectedLanguages}
                   allValues={mappedLanguageCodes}
@@ -204,7 +209,7 @@ const AdditionalInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <MultiListSelect
-                  inputName="countries"
+                  inputName="countriesOfInterestInput"
                   isCheckbox
                   selectedItems={selectedCountries}
                   allValues={countriesCodes}
@@ -228,6 +233,7 @@ const AdditionalInformation = () => {
                   Are you currently looking for a job?
                </Typography>
                <Switch
+                  id="isLookingForJobToggle"
                   checked={isLookingForJobToggle}
                   onChange={(event, checked) =>
                      handleIsLookingForJobChange(checked)
@@ -244,7 +250,7 @@ const AdditionalInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <MultiListSelect
-                  inputName="interests"
+                  inputName="interestsInput"
                   isCheckbox
                   limit={5}
                   selectedItems={selectedInterests}

@@ -60,6 +60,7 @@ const MultiListSelect = ({
             isCheckbox ? (
                <li
                   {...props}
+                  data-testid={`${inputName}_${getKeyFn(option)}_option`}
                   key={getKeyFn(option)}
                   style={{ justifyContent: "space-between" }}
                >
@@ -72,7 +73,11 @@ const MultiListSelect = ({
                   />
                </li>
             ) : (
-               <li {...props} key={getKeyFn(option)}>
+               <li
+                  {...props}
+                  data-testid={`${inputName}_${getKeyFn(option)}_option`}
+                  key={getKeyFn(option)}
+               >
                   {getLabelFn(option)}
                </li>
             )

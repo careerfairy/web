@@ -10,6 +10,10 @@ export const credentials = {
    wrongFirstName: "123John",
    wrongLastName: "123Smith",
    correctUniversityCountry: "Switzerland",
+   linkedinUrl: "this should be a link",
+   spokenLanguagesIds: ["en", "pt", "de"],
+   countriesOfInterestIds: ["en", "pt", "de"],
+   interestsIds: ["Le9yVcgRtkReAdwyh6tq"],
 }
 
 export const streaming = {
