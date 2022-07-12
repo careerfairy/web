@@ -1,4 +1,4 @@
-import { Group, GroupATSIntegration, GroupATSIntegrationTokens } from "./groups"
+import { Group, GroupATSAccount, GroupATSIntegrationTokens } from "./groups"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
 
@@ -26,11 +26,11 @@ export interface IGroupRepository {
    ): Promise<{ isAdmin: boolean; group: Group }>
 
    // ATS actions
-   getATSIntegrations(groupId: string): Promise<GroupATSIntegration[]>
+   getATSIntegrations(groupId: string): Promise<GroupATSAccount[]>
    createATSIntegration(
       groupId: string,
       integrationId: string,
-      data: Partial<GroupATSIntegration>
+      data: Partial<GroupATSAccount>
    ): Promise<void>
    saveATSIntegrationTokens(
       groupId: string,
@@ -155,7 +155,7 @@ export class FirebaseGroupRepository
    | ATS Actions
    |--------------------------------------------------------------------------
    */
-   async getATSIntegrations(groupId: string): Promise<GroupATSIntegration[]> {
+   async getATSIntegrations(groupId: string): Promise<GroupATSAccount[]> {
       const docs = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
@@ -166,13 +166,13 @@ export class FirebaseGroupRepository
          return []
       }
 
-      return this.addIdToDocs<GroupATSIntegration>(docs.docs)
+      return this.addIdToDocs<GroupATSAccount>(docs.docs)
    }
 
    createATSIntegration(
       groupId: string,
       integrationId: string,
-      data: Partial<GroupATSIntegration>
+      data: Partial<GroupATSAccount>
    ) {
       data.updatedAt = this.fieldValue.serverTimestamp() as any
       data.createdAt = this.fieldValue.serverTimestamp() as any
