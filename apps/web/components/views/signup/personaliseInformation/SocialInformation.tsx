@@ -117,7 +117,12 @@ const SocialInformation = () => {
 
    return (
       <>
-         <Grid container spacing={2} justifyContent="center">
+         <Grid
+            container
+            spacing={2}
+            justifyContent="center"
+            data-testid="registration-social-information-step"
+         >
             <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
                   Do you have a linkedin account?
