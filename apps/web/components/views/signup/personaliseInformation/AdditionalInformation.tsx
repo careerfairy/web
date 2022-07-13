@@ -2,10 +2,14 @@ import { Grid, Switch, Typography } from "@mui/material"
 import React, { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import MultiListSelect from "../../common/MultiListSelect"
-import { languageCodes } from "../../../helperFunctions/streamFormFunctions"
 import userRepo from "../../../../data/firebase/UserRepository"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useInterests } from "../../../custom-hook/useCollection"
+import {
+   countriesAndRegionsOptionCodes,
+   languageOptionCodes,
+   Option,
+} from "../../../../constants/forms"
 
 const styles = sxStyles({
    inputLabel: {
@@ -36,26 +40,6 @@ const styles = sxStyles({
    },
 })
 
-type Option = {
-   id: string
-   name: string
-}
-
-const countriesCodes = [
-   {
-      id: "en",
-      name: "England",
-   },
-   {
-      id: "de",
-      name: "Germany",
-   },
-   {
-      id: "pt",
-      name: "Portugal",
-   },
-]
-
 export const renderAdditionalInformationStepTitle = () => (
    <Grid sx={styles.headerWrapper}>
       <Typography sx={styles.title}>
@@ -74,12 +58,6 @@ const formatToOptionArray = (
 ): Option[] => {
    return allOptions.filter(({ id }) => selectedIds?.includes(id))
 }
-
-const mapLanguageCodeToOptionArray = (): Option[] => {
-   return languageCodes.map(({ code, name }) => ({ id: code, name }))
-}
-
-const mappedLanguageCodes = mapLanguageCodeToOptionArray()
 
 const mapOptions = (options: Option[]): string[] => {
    return options.map((option) => option.id)
@@ -158,10 +136,13 @@ const AdditionalInformation = () => {
          } = userData
 
          setSelectedCountries(
-            formatToOptionArray(countriesOfInterest, countriesCodes)
+            formatToOptionArray(
+               countriesOfInterest,
+               countriesAndRegionsOptionCodes
+            )
          )
          setSelectedLanguages(
-            formatToOptionArray(spokenLanguages, mappedLanguageCodes)
+            formatToOptionArray(spokenLanguages, languageOptionCodes)
          )
          setSelectedInterests(formatToOptionArray(interestsIds, allInterests))
          setIsLookingForJobToggle(Boolean(isLookingForJob))
@@ -186,7 +167,7 @@ const AdditionalInformation = () => {
                   inputName="spokenLanguagesInput"
                   isCheckbox
                   selectedItems={selectedLanguages}
-                  allValues={mappedLanguageCodes}
+                  allValues={languageOptionCodes}
                   setFieldValue={(name, value) =>
                      handleSelectedLanguageChange(value)
                   }
@@ -212,7 +193,8 @@ const AdditionalInformation = () => {
                   inputName="countriesOfInterestInput"
                   isCheckbox
                   selectedItems={selectedCountries}
-                  allValues={countriesCodes}
+                  allValues={countriesAndRegionsOptionCodes}
+                  getGroupByFn={(item) => item.groupId}
                   setFieldValue={(name, value) =>
                      handleSelectedCountriesChange(value)
                   }
