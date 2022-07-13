@@ -1,4 +1,4 @@
-import firebase from "firebase"
+import firebase from "firebase/compat/app"
 
 /**
  * When changing shared files, be sure to deploy both the webapp and the functions using this code

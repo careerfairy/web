@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import firebase from "firebase"
+import firebase from "firebase/compat"
 import firestore = firebase.firestore
 
 const useInfiniteScrollGet = <T>(query: firestore.Query, limit: number) => {
