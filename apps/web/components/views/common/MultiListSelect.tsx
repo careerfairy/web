@@ -21,6 +21,7 @@ const MultiListSelect = ({
    setFieldValue = () => {}, // formik field
    getValueFn = (option) => option.id, // field value
    getKeyFn = (option) => option.id, // field id
+   getGroupByFn = () => "",
    disabledValues = [],
    limit = false,
 }: Props) => {
@@ -97,6 +98,7 @@ const MultiListSelect = ({
                />
             ))
          }
+         groupBy={getGroupByFn}
          {...extraOptions}
       />
    )
@@ -111,6 +113,7 @@ type Props = {
    getLabelFn?: (obj: any) => string
    getValueFn?: (obj: any) => string
    getKeyFn?: (obj: any) => string
+   getGroupByFn?: (obj: any) => string
    inputProps?: object
    chipProps?: object
    isCheckbox?: boolean

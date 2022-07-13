@@ -2,9 +2,10 @@ import { Grid, TextField, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import userRepo from "../../../../data/firebase/UserRepository"
+import { linkedInRegex } from "../../../../constants/forms"
 
 const styles = sxStyles({
    inputLabel: {
@@ -30,17 +31,8 @@ export const renderSocialInformationStepTitle = () => (
    </Grid>
 )
 
-function useDebounceInput(value, delay) {
-   const [debouncedValue, setDebouncedValue] = useState(value)
-   useEffect(() => {
-      const handler = setTimeout(() => {
-         setDebouncedValue(value)
-      }, delay)
-      return () => {
-         clearTimeout(handler)
-      }
-   }, [value, delay])
-   return debouncedValue
+const isValidLinkedInLink = (link: string): boolean => {
+   return linkedInRegex.test(link)
 }
 
 const SocialInformation = () => {
@@ -54,29 +46,32 @@ const SocialInformation = () => {
    const [referralCodeInput, setReferralCodeInput] =
       useState(existingReferralCode)
    const [linkedInLinkInput, setLinkedInLinkInput] = useState("")
-   const [hasChanged, setHasChanged] = useState(false)
-   const debouncedLinkedInLink = useDebounceInput(linkedInLinkInput, 1000)
-   const debouncedReferralCode = useDebounceInput(referralCodeInput, 1000)
+   const linkedInRef = useRef()
+   const referralCodeRef = useRef()
 
    useEffect(() => {
-      if (hasChanged) {
-         const fieldToUpdate = {
-            linkedinUrl: debouncedLinkedInLink,
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-         setHasChanged(false)
-      }
-   }, [debouncedLinkedInLink])
+      return () => {
+         const lastLinkedInInput = linkedInRef.current
+         const lastReferralCodeInput = referralCodeRef.current
 
-   useEffect(() => {
-      if (hasChanged) {
-         const fieldToUpdate = {
-            referralCode: debouncedReferralCode,
+         if (
+            lastLinkedInInput !== undefined &&
+            isValidLinkedInLink(lastLinkedInInput)
+         ) {
+            const fieldToUpdate = {
+               linkedinUrl: lastLinkedInInput,
+            }
+            updateFields(fieldToUpdate).catch(console.error)
          }
-         updateFields(fieldToUpdate).catch(console.error)
-         setHasChanged(false)
+
+         if (lastReferralCodeInput !== undefined) {
+            const fieldToUpdate = {
+               referralCode: lastReferralCodeInput,
+            }
+            updateFields(fieldToUpdate).catch(console.error)
+         }
       }
-   }, [debouncedReferralCode])
+   }, [])
 
    const updateFields = useCallback(
       async (fieldToUpdate) => {
@@ -100,19 +95,20 @@ const SocialInformation = () => {
             setLinkedInLinkInput(linkedinUrl || "")
          }
 
-         if (referralCode !== referralCodeInput)
+         if (referralCode !== referralCodeInput) {
             setReferralCodeInput(referralCode || "")
+         }
       }
    }, [userData])
 
    const handleLinkedInLinkInputChange = useCallback((value) => {
       setLinkedInLinkInput(value)
-      setHasChanged(true)
+      linkedInRef.current = value
    }, [])
 
    const handleReferralCodeInputChange = useCallback((value) => {
       setReferralCodeInput(value)
-      setHasChanged(true)
+      referralCodeRef.current = value
    }, [])
 
    return (
@@ -142,6 +138,10 @@ const SocialInformation = () => {
                   }}
                   value={linkedInLinkInput}
                   label="Add your LinkedIn link here"
+                  error={
+                     linkedInLinkInput.length > 0 &&
+                     !isValidLinkedInLink(linkedInLinkInput)
+                  }
                />
             </Grid>
 
