@@ -98,6 +98,34 @@ test.describe("Signup Page Functionality", () => {
       expect(userDataInterestsIds).toBeFalsy()
    })
 
+   test("It successfully go to validate email step without gender selected", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+   })
+
    test("It successfully signs up with additional information", async ({
       page,
    }) => {
@@ -177,6 +205,68 @@ test.describe("Signup Page Functionality", () => {
       expect(firstSpokenLanguageId).toEqual(userDataSpokenLanguages[0])
       expect(firstCountriesOfInterestId).toEqual(userDataCountriesOfInterest[0])
       expect(firstInterestsId).toEqual(userDataInterestsIds[0])
+   })
+
+   test("It successfully signs up with linkedin as empty since we fill an invalid linkedinUrl one", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+      const portal = new PortalPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+         wrongLinkedinUrl,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(correctEmail)
+      await expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.enterLinkedInLinkInput(wrongLinkedinUrl)
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataFromDb = await UserSeed.getUserData(correctEmail)
+
+      const { linkedinUrl: userDataLinkedinUrl } = userDataFromDb
+
+      expect(userDataLinkedinUrl).toBeFalsy()
    })
 
    test("It fails to sign up with missing fields", async ({

@@ -11,6 +11,7 @@ export const credentials = {
    wrongLastName: "123Smith",
    correctUniversityCountry: "Switzerland",
    linkedinUrl: "http://www.linkedin.com/in/user",
+   wrongLinkedinUrl: "http://www.linkAdin.com/in/user",
    spokenLanguagesIds: ["en", "pt", "de"],
    countriesOfInterestIds: ["GB", "PT", "DE"],
    interestsIds: ["Le9yVcgRtkReAdwyh6tq"],
