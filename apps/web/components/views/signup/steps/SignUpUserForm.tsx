@@ -14,16 +14,29 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import UniversityCountrySelector from "../universitySelect/UniversityCountrySelector"
-import UniversitySelector from "../universitySelect/UniversitySelector"
+import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
+import UniversitySelector from "../../universitySelect/UniversitySelector"
 import Link from "next/link"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
-import { IMultiStepContext, MultiStepContext } from "../common/MultiStepWrapper"
-import { sxStyles } from "../../../types/commonTypes"
-import GenericDropdown, { DropdownItem } from "../common/GenericDropdown"
+import {
+   IMultiStepContext,
+   MultiStepContext,
+} from "../../common/MultiStepWrapper"
+import { sxStyles } from "../../../../types/commonTypes"
+import GenericDropdown from "../../common/GenericDropdown"
+import { possibleGenders } from "../../../../constants/forms"
 
 const styles = sxStyles({
+   title: {
+      fontFamily: "Poppins",
+      fontWeight: 400,
+      fontSize: "46px",
+      lineHeight: "63px",
+      textAlign: "center",
+      letterSpacing: "-0.02em",
+      marginTop: 6,
+   },
    submit: {
       margin: (theme) => theme.spacing(3, 0, 2),
    },
@@ -76,6 +89,10 @@ const schema = yup.object().shape({
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
 })
 
+export const renderSignUpUserForm = () => (
+   <Typography sx={styles.title}>Create your profile to start</Typography>
+)
+
 function SignUpUserForm() {
    const firebase = useFirebaseService()
    const {
@@ -88,29 +105,6 @@ function SignUpUserForm() {
    const [errorMessage, setErrorMessage] = useState(null)
    const [generalLoading, setGeneralLoading] = useState(false)
    const [open, setOpen] = React.useState(false)
-
-   const POSSIBLE_GENDERS = [
-      {
-         id: "male-gender-selector",
-         value: "male",
-         label: "Male",
-      },
-      {
-         id: "female-gender-selector",
-         value: "female",
-         label: "Female",
-      },
-      {
-         id: "other-gender-selector",
-         value: "other",
-         label: "Other",
-      },
-      {
-         id: "no-reveal-gender-selector",
-         value: "noReveal",
-         label: "Would rather not say",
-      },
-   ] as DropdownItem[]
 
    const initValues = useMemo(
       () => ({
@@ -275,7 +269,7 @@ function SignUpUserForm() {
                            onChange={handleChange}
                            value={values.gender}
                            label="Gender"
-                           list={POSSIBLE_GENDERS}
+                           list={possibleGenders}
                            className="registrationDropdown"
                         />
                      </Grid>

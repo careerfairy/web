@@ -39,6 +39,7 @@ export class SignupPage extends CommonPage {
    readonly socialInformationStep: Locator
    readonly linkedInLinkInput: Locator
    readonly additionalInformationStep: Locator
+   readonly interestsInformationStep: Locator
    readonly spokenLanguagesInput: Locator
    readonly countriesOfInterestInput: Locator
    readonly interestsInput: Locator
@@ -123,6 +124,9 @@ export class SignupPage extends CommonPage {
       this.linkedInLinkInput = page.locator("id=linkedInLink")
       this.additionalInformationStep = page.locator(
          "data-testid=registration-additional-information-step"
+      )
+      this.interestsInformationStep = page.locator(
+         "data-testid=registration-interests-information-step"
       )
       this.spokenLanguagesInput = page.locator("id=spokenLanguagesInput")
       this.countriesOfInterestInput = page.locator(

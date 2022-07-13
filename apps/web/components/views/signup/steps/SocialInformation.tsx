@@ -18,10 +18,13 @@ const styles = sxStyles({
       textAlign: "center",
    },
    title: {
+      fontFamily: "Poppins",
       fontWeight: 400,
-      fontSize: "2.5rem",
+      fontSize: "46px",
       lineHeight: "63px",
+      textAlign: "center",
       letterSpacing: "-0.02em",
+      marginTop: 6,
    },
 })
 

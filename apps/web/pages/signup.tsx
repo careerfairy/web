@@ -1,19 +1,33 @@
 import React, { useState, useEffect } from "react"
 import Head from "next/head"
-import { Box, Container, Typography } from "@mui/material"
+import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../HOCs/AuthProvider"
-import SignUpPinForm from "../components/views/signup/SignUpPinForm"
-import SignUpUserForm from "../components/views/signup/SignUpUserForm"
+import SignUpPinForm, {
+   renderSingUpPinTitle,
+} from "../components/views/signup/steps/SignUpPinForm"
+import SignUpUserForm, {
+   renderSignUpUserForm,
+} from "../components/views/signup/steps/SignUpUserForm"
 import MultiStepWrapper, {
    MultiStepComponentType,
 } from "../components/views/common/MultiStepWrapper"
-import PersonaliseSteps from "../components/views/signup/personaliseInformation/PersonaliseSteps"
 import { MainLogo } from "./../components/logos"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
 import GenericStepper from "../components/views/common/GenericStepper"
+import SocialInformation, {
+   renderSocialInformationStepTitle,
+} from "../components/views/signup/steps/SocialInformation"
+import AdditionalInformation, {
+   renderAdditionalInformationStepTitle,
+} from "../components/views/signup/steps/AdditionalInformation"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { useRouter } from "next/router"
+import InterestsInformation, {
+   renderInterestsInformationStepTitle,
+} from "../components/views/signup/steps/InterestsInformation"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 
@@ -21,22 +35,43 @@ const steps: MultiStepComponentType[] = [
    {
       component: () => SignUpUserForm,
       description: "Credentials",
+      title: renderSignUpUserForm(),
    },
    {
       component: () => SignUpPinForm,
       description: "Email Verification",
+      title: renderSingUpPinTitle(),
    },
    {
-      component: () => PersonaliseSteps, // contains multiple steps
-      description: "Personalise",
+      component: () => SocialInformation,
+      description: "Social",
+      title: renderSocialInformationStepTitle(),
+   },
+   {
+      component: () => AdditionalInformation,
+      description: "Additional Information",
+      title: renderAdditionalInformationStepTitle(),
+   },
+   {
+      component: () => InterestsInformation,
+      description: "Interests",
+      title: renderInterestsInformationStepTitle(),
    },
 ]
 
 const SignUp = () => {
    const { authenticatedUser: user } = useAuth()
+   const {
+      push,
+      query: { absolutePath },
+   } = useRouter()
    const firebase = useFirebaseService()
 
+   const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
    const [currentStep, setCurrentStep] = useState(0)
+   const isLastStep = currentStep === steps.length - 1
+   const isFirstStep = currentStep === 0
+   const showBackButton = currentStep > 2
 
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
@@ -49,19 +84,62 @@ const SignUp = () => {
       }
    }, [user, firebase.auth?.currentUser?.emailVerified])
 
+   const handlePrevious = () => {
+      if (!isFirstStep) {
+         setCurrentStep((prev) => prev - 1)
+      }
+   }
+
+   const handleContinue = () => {
+      if (isLastStep) {
+         // set a loading state in the Finalise button, the next page may take some seconds to render
+         setIsLoadingRedirectPage(true)
+
+         if (absolutePath) {
+            void push(absolutePath as any)
+         } else {
+            void push(SIGNUP_REDIRECT_PATH)
+         }
+      } else {
+         setCurrentStep((prev) => prev + 1)
+      }
+   }
+
+   const renderContinueAndBackButtons = () => (
+      <Grid container alignItems="center" mt={10}>
+         <Grid item xs={6}>
+            <Typography variant="body2" color="textSecondary">
+               Step {currentStep + 1} of {steps.length}
+            </Typography>
+         </Grid>
+         <Grid item style={{ textAlign: "right" }} xs={6}>
+            {showBackButton && <Button onClick={handlePrevious}>Back</Button>}
+
+            <LoadingButton
+               variant="contained"
+               onClick={handleContinue}
+               data-testid={"user-personalise-continue-button"}
+               loading={isLoadingRedirectPage}
+            >
+               {isLastStep ? "Finalise" : "Continue"}
+            </LoadingButton>
+         </Grid>
+      </Grid>
+   )
+
    return (
-      <SignUpPageLayout showTitle={currentStep < 2}>
-         {currentStep < 2 ? (
-            <Box mb={2}>
-               <GenericStepper steps={steps} currentStep={currentStep} />
-            </Box>
-         ) : null}
+      <SignUpPageLayout currentStep={currentStep}>
+         <Box mb={4}>
+            <GenericStepper steps={steps} currentStep={currentStep} />
+         </Box>
 
          <MultiStepWrapper
             steps={steps}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
          />
+
+         {currentStep > 1 && renderContinueAndBackButtons()}
       </SignUpPageLayout>
    )
 }
@@ -75,15 +153,6 @@ const styles = sxStyles({
       textTransform: "uppercase",
       letterSpacing: "0.4em",
    },
-   title: {
-      fontFamily: "Poppins",
-      fontWeight: 400,
-      fontSize: "46px",
-      lineHeight: "63px",
-      textAlign: "center",
-      letterSpacing: "-0.02em",
-      marginTop: 6,
-   },
    icon: {
       margin: "0 10px",
       color: "white",
@@ -93,7 +162,7 @@ const styles = sxStyles({
    },
 })
 
-export const SignUpPageLayout = ({ children, showTitle }) => {
+export const SignUpPageLayout = ({ children, currentStep }) => {
    return (
       <>
          <Head>
@@ -103,11 +172,9 @@ export const SignUpPageLayout = ({ children, showTitle }) => {
             <HeaderLogoWrapper>
                <MainLogo sx={styles.logo} />
             </HeaderLogoWrapper>
-            {showTitle && (
-               <Typography sx={styles.title}>
-                  Create your profile to start
-               </Typography>
-            )}
+
+            {steps[currentStep].title || null}
+
             <Container maxWidth="md">
                <Box data-testid={"signup-page-form"} p={3} mt={3}>
                   {children}
