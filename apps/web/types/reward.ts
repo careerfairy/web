@@ -1,5 +1,5 @@
 import { Identifiable } from "./commonTypes"
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 
 export interface Reward extends Identifiable {
    action: string
