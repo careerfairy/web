@@ -1,14 +1,34 @@
+import { DropdownItem } from "../components/views/common/GenericDropdown"
+import { Option } from "../components/views/signup/utils"
+
 export const maxQuestionLength = 170
 export const minQuestionLength = 10
 export const linkedInRegex = new RegExp(
    "^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/(pub|in|profile)\\/[\\w]"
 )
 
-export type Option = {
-   id: string
-   name: string
-   groupId?: string
-}
+export const possibleGenders = [
+   {
+      id: "male-gender-selector",
+      value: "male",
+      label: "Male",
+   },
+   {
+      id: "female-gender-selector",
+      value: "female",
+      label: "Female",
+   },
+   {
+      id: "other-gender-selector",
+      value: "other",
+      label: "Other",
+   },
+   {
+      id: "no-reveal-gender-selector",
+      value: "noReveal",
+      label: "Would rather not say",
+   },
+] as DropdownItem[]
 
 export const countriesAndRegionsOptionCodes = [
    {
