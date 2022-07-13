@@ -1,4 +1,3 @@
-import { Timestamp } from "@firebase/firestore-types"
 import {
    ConnectionDisconnectedReason,
    ConnectionState,
@@ -7,6 +6,8 @@ import {
    IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng"
 import { MediaDeviceInfo } from "agora-rtc-sdk"
+import firebase from "firebase/compat"
+import Timestamp = firebase.firestore.Timestamp
 
 export interface StreamData {
    author: {
