@@ -15,7 +15,7 @@ import { useRouter } from "next/router"
 import { ResponsiveOption, ResponsiveSelect } from "../common/ResponsiveSelect"
 import { useInterests } from "../../custom-hook/useCollection"
 import { StylesProps } from "../../../types/commonTypes"
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import DownIcon from "@mui/icons-material/ArrowDropDown"
 

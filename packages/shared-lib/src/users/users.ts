@@ -1,5 +1,5 @@
 import { Identifiable } from "../commonTypes"
-import firebase from "firebase"
+import firebase from "firebase/compat/app"
 
 export interface UserData extends Identifiable {
    authId: string
