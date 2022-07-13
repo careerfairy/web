@@ -8,8 +8,8 @@ import { useInterests } from "../../../custom-hook/useCollection"
 import {
    countriesAndRegionsOptionCodes,
    languageOptionCodes,
-   Option,
 } from "../../../../constants/forms"
+import { formatToOptionArray, mapOptions, Option } from "../utils"
 
 const styles = sxStyles({
    inputLabel: {
@@ -22,10 +22,13 @@ const styles = sxStyles({
       textAlign: "center",
    },
    title: {
+      fontFamily: "Poppins",
       fontWeight: 400,
-      fontSize: "2.5rem",
+      fontSize: "46px",
       lineHeight: "63px",
+      textAlign: "center",
       letterSpacing: "-0.02em",
+      marginTop: 6,
    },
    subtitle: {
       fontSize: "1.1rem",
@@ -52,24 +55,12 @@ export const renderAdditionalInformationStepTitle = () => (
    </Grid>
 )
 
-const formatToOptionArray = (
-   selectedIds: string[],
-   allOptions: Option[]
-): Option[] => {
-   return allOptions.filter(({ id }) => selectedIds?.includes(id))
-}
-
-const mapOptions = (options: Option[]): string[] => {
-   return options.map((option) => option.id)
-}
-
 const AdditionalInformation = () => {
    const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
 
    const [selectedCountries, setSelectedCountries] = useState([] as Option[])
    const [selectedLanguages, setSelectedLanguages] = useState([] as Option[])
-   const [selectedInterests, setSelectedInterests] = useState([] as Option[])
    const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
 
    const updateFields = useCallback(
@@ -106,16 +97,6 @@ const AdditionalInformation = () => {
       [updateFields]
    )
 
-   const handleSelectedInterestsChange = useCallback(
-      (selectedInterests: Option[]) => {
-         const fieldToUpdate = {
-            interestsIds: mapOptions(selectedInterests),
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
-   )
-
    const handleIsLookingForJobChange = useCallback(
       (isLookingForJob: boolean) => {
          const fieldToUpdate = {
@@ -128,12 +109,8 @@ const AdditionalInformation = () => {
 
    useEffect(() => {
       if (userData) {
-         const {
-            countriesOfInterest,
-            spokenLanguages,
-            interestsIds,
-            isLookingForJob,
-         } = userData
+         const { countriesOfInterest, spokenLanguages, isLookingForJob } =
+            userData
 
          setSelectedCountries(
             formatToOptionArray(
@@ -144,7 +121,6 @@ const AdditionalInformation = () => {
          setSelectedLanguages(
             formatToOptionArray(spokenLanguages, languageOptionCodes)
          )
-         setSelectedInterests(formatToOptionArray(interestsIds, allInterests))
          setIsLookingForJobToggle(Boolean(isLookingForJob))
       }
    }, [userData, allInterests])
@@ -222,33 +198,6 @@ const AdditionalInformation = () => {
                   }
                   name="isLookingForJobToggle"
                   color="primary"
-               />
-            </Grid>
-
-            <Grid item xs={12} sm={8}>
-               <Typography sx={styles.inputLabel} variant="h5">
-                  Lastly, select your interests
-               </Typography>
-            </Grid>
-            <Grid item xs={12} sm={8}>
-               <MultiListSelect
-                  inputName="interestsInput"
-                  isCheckbox
-                  limit={5}
-                  selectedItems={selectedInterests}
-                  allValues={allInterests}
-                  setFieldValue={(name, value) =>
-                     handleSelectedInterestsChange(value)
-                  }
-                  inputProps={{
-                     label: "Select 5 to improve your site experience",
-                     placeholder: "Select from the following list",
-                     className: "registrationInput",
-                  }}
-                  getValueFn={(item) => item}
-                  chipProps={{
-                     color: "primary",
-                  }}
                />
             </Grid>
          </Grid>

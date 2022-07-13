@@ -13,8 +13,24 @@ import {
 } from "@mui/material"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { IMultiStepContext, MultiStepContext } from "../common/MultiStepWrapper"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import {
+   IMultiStepContext,
+   MultiStepContext,
+} from "../../common/MultiStepWrapper"
+import { sxStyles } from "../../../../types/commonTypes"
+
+const styles = sxStyles({
+   title: {
+      fontFamily: "Poppins",
+      fontWeight: 400,
+      fontSize: "46px",
+      lineHeight: "63px",
+      textAlign: "center",
+      letterSpacing: "-0.02em",
+      marginTop: 6,
+   },
+})
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -25,6 +41,10 @@ const schema = yup.object().shape({
          "The PIN code must be a number between 0 and 9999"
       ),
 })
+
+export const renderSingUpPinTitle = () => (
+   <Typography sx={styles.title}>Create your profile to start</Typography>
+)
 
 const SignUpPinForm = () => {
    const firebase = useFirebaseService()

@@ -72,6 +72,11 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.clickContinueButton()
 
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
       await expect(portal.UpcomingEventsHeader).toBeVisible({
          timeout: 15000,
       })
@@ -142,8 +147,14 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.selectSpokenLanguageOption(firstSpokenLanguageId)
       await signup.selectCountriesOfInterestOption(firstCountriesOfInterestId)
-      await signup.selectInterestsInputOption(firstInterestsId)
       await signup.selectIsLookingForJobToggleOption()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.selectInterestsInputOption(firstInterestsId)
 
       await signup.clickContinueButton()
 
