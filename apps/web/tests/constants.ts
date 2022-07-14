@@ -26,8 +26,10 @@ export const streaming = {
    },
 }
 
-export const correctRegistrationAnalyticsSteps = [
-   { stepId: "Social", userId: "john@careerfairy.io" },
-   { stepId: "Additional Information", userId: "john@careerfairy.io" },
-   { stepId: "Interests", userId: "john@careerfairy.io" },
-]
+export const correctRegistrationAnalyticsSteps = {
+   steps: ["Social", "Location", "Interests"],
+   totalSteps: 3,
+   updatedAt:
+      "Thu Jul 14 2022 22:47:56 GMT+0100 (Western European Summer Time)\n",
+   userId: "john@careerfairy.io",
+}

@@ -176,6 +176,9 @@ export class SignupPage extends CommonPage {
    }
    async enterLinkedInLinkInput(link: string) {
       await this.linkedInLinkInput.fill(link)
+      // to let debounce run
+      await this.referralCodeTextField.fill("")
+      await sleep(1200)
    }
 
    async enterPinCode(pinCode?: string) {
