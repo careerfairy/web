@@ -25,3 +25,9 @@ export const streaming = {
       linkedin: "https://linkedin.com/in/your-profile",
    },
 }
+
+export const correctRegistrationAnalyticsSteps = [
+   { stepId: "Social", userId: "john@careerfairy.io" },
+   { stepId: "Additional Information", userId: "john@careerfairy.io" },
+   { stepId: "Interests", userId: "john@careerfairy.io" },
+]

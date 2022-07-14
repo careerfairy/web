@@ -94,6 +94,10 @@ export type RegistrationStep = {
    stepId: string
 }
 
+export type UserDataAnalytics = {
+   registrationSteps: RegistrationStep[]
+} & Identifiable
+
 export type RegistrationStepAnalyticsProps = {
    userEmail: string
    steps: RegistrationStep[]
