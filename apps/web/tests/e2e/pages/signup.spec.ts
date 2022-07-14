@@ -281,7 +281,6 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
-         wrongLinkedinUrl,
       } = credentials
 
       await signup.fillSignupForm({
@@ -326,9 +325,14 @@ test.describe("Signup Page Functionality", () => {
       const userDataAnalyticsFromDb = await UserSeed.getUserDataAnalytics(
          correctEmail
       )
-      const { registrationSteps } = userDataAnalyticsFromDb
+      const {
+         registrationSteps: { steps, userId },
+      } = userDataAnalyticsFromDb
+      const { steps: correctSteps, userId: correctUserId } =
+         correctRegistrationAnalyticsSteps
 
-      expect(registrationSteps).toEqual(correctRegistrationAnalyticsSteps)
+      expect(steps).toEqual(correctSteps)
+      expect(userId).toEqual(correctUserId)
    })
 
    test("It should save only once the steps on analytics even if the user goes back and forward", async ({
@@ -397,9 +401,15 @@ test.describe("Signup Page Functionality", () => {
       const userDataAnalyticsFromDb = await UserSeed.getUserDataAnalytics(
          correctEmail
       )
-      const { registrationSteps } = userDataAnalyticsFromDb
 
-      expect(registrationSteps).toEqual(correctRegistrationAnalyticsSteps)
+      const {
+         registrationSteps: { steps, userId },
+      } = userDataAnalyticsFromDb
+      const { steps: correctSteps, userId: correctUserId } =
+         correctRegistrationAnalyticsSteps
+
+      expect(steps).toEqual(correctSteps)
+      expect(userId).toEqual(correctUserId)
    })
 
    test("It fails to sign up with missing fields", async ({

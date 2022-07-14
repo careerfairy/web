@@ -144,7 +144,7 @@ class UserFirebaseSeed implements UserSeed {
       return recruiter
    }
 
-   async getUserDataAnalytics(email: string) {
+   async getUserDataAnalytics(email: string): Promise<UserDataAnalytics> {
       const userAnalyticsSnap = await firestore
          .doc(`userData/${email}/analytics/analytics`)
          .get()
