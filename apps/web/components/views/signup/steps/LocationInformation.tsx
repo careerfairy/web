@@ -17,25 +17,6 @@ const styles = sxStyles({
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
-   headerWrapper: {
-      marginBottom: 6,
-      textAlign: "center",
-   },
-   title: {
-      fontFamily: "Poppins",
-      fontWeight: 400,
-      fontSize: "46px",
-      lineHeight: "63px",
-      textAlign: "center",
-      letterSpacing: "-0.02em",
-      marginTop: 6,
-   },
-   subtitle: {
-      fontSize: "1.1rem",
-      fontWeight: 400,
-      lineHeight: "29px",
-      letterSpacing: "-0.02em",
-   },
    toggleInputWrapper: {
       my: 1,
       display: "flex",
@@ -43,19 +24,7 @@ const styles = sxStyles({
    },
 })
 
-export const renderAdditionalInformationStepTitle = () => (
-   <Grid sx={styles.headerWrapper}>
-      <Typography sx={styles.title}>
-         A few more things before we kick off...
-      </Typography>
-      <Typography sx={styles.subtitle}>
-         To help us pick the best events for you, tell us more about your
-         interests
-      </Typography>
-   </Grid>
-)
-
-const AdditionalInformation = () => {
+const LocationInformation = () => {
    const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
 
@@ -135,7 +104,7 @@ const AdditionalInformation = () => {
          >
             <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
-                  What languages do you speak?
+                  Which languages do you speak?
                </Typography>
             </Grid>
             <Grid item xs={12} sm={8}>
@@ -149,7 +118,7 @@ const AdditionalInformation = () => {
                   }
                   inputProps={{
                      label: "Languages you speak",
-                     placeholder: "Select language",
+                     placeholder: "Select languages",
                      className: "registrationInput",
                   }}
                   getValueFn={(item) => item}
@@ -161,7 +130,7 @@ const AdditionalInformation = () => {
 
             <Grid item xs={12} sm={8}>
                <Typography sx={styles.inputLabel} variant="h5">
-                  In what country or area are you looking for opportunities?
+                  In what country or region are you looking for opportunities?
                </Typography>
             </Grid>
             <Grid item xs={12} sm={8}>
@@ -205,4 +174,4 @@ const AdditionalInformation = () => {
    )
 }
 
-export default AdditionalInformation
+export default LocationInformation

@@ -28,15 +28,6 @@ import GenericDropdown from "../../common/GenericDropdown"
 import { possibleGenders } from "../../../../constants/forms"
 
 const styles = sxStyles({
-   title: {
-      fontFamily: "Poppins",
-      fontWeight: 400,
-      fontSize: "46px",
-      lineHeight: "63px",
-      textAlign: "center",
-      letterSpacing: "-0.02em",
-      marginTop: 6,
-   },
    submit: {
       margin: (theme) => theme.spacing(3, 0, 2),
    },
@@ -88,10 +79,6 @@ const schema = yup.object().shape({
       .boolean()
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
 })
-
-export const renderSignUpUserForm = () => (
-   <Typography sx={styles.title}>Create your profile to start</Typography>
-)
 
 function SignUpUserForm() {
    const firebase = useFirebaseService()

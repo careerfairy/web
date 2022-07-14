@@ -29,7 +29,7 @@ export interface IUserRepository {
       countriesOfInterest,
       isLookingForJob,
       interestsIds,
-      referralCode,
+      referredBy,
       linkedinUrl,
       fieldOfStudy,
    }: AdditionalInformationProps): Promise<void>
@@ -38,6 +38,8 @@ export interface IUserRepository {
       userEmail,
       steps,
    }: RegistrationStepAnalyticsProps): Promise<void>
+
+   getUserByReferralCode(referralCode): Promise<UserData>
 }
 
 export class FirebaseUserRepository
@@ -145,7 +147,7 @@ export class FirebaseUserRepository
       isLookingForJob,
       interestsIds,
       linkedinUrl,
-      referralCode,
+      referredBy,
       fieldOfStudy,
    }): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
@@ -160,8 +162,7 @@ export class FirebaseUserRepository
          isLookingForJob !== undefined ? { isLookingForJob } : {}
       const linkedInLinkToUpdate =
          linkedinUrl !== undefined ? { linkedinUrl } : {}
-      const referralCodeToUpdate =
-         referralCode !== undefined ? { referralCode } : {}
+      const referredByToUpdate = referredBy !== undefined ? { referredBy } : {}
       const fieldOfStudyToUpdate =
          fieldOfStudy !== undefined ? { fieldOfStudy } : {}
 
@@ -172,7 +173,7 @@ export class FirebaseUserRepository
          ...isLookingForJobToUpdate,
          ...interestsToUpdate,
          ...linkedInLinkToUpdate,
-         ...referralCodeToUpdate,
+         ...referredByToUpdate,
          ...fieldOfStudyToUpdate,
       }
 
@@ -186,7 +187,22 @@ export class FirebaseUserRepository
          .collection("analytics")
          .doc("analytics")
 
+      debugger
       const toUpdate = { registrationSteps: steps }
       return userRef.set(toUpdate, { merge: true })
+   }
+
+   async getUserByReferralCode(referralCode): Promise<UserData> {
+      const snap = await this.firestore
+         .collection("userData")
+         .where("referralCode", "==", referralCode)
+         .limit(1)
+         .get()
+
+      if (snap.empty) {
+         return null
+      }
+
+      return snap.docs[0].data() as UserData
    }
 }

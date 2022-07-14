@@ -3,12 +3,8 @@ import Head from "next/head"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../HOCs/AuthProvider"
-import SignUpPinForm, {
-   renderSingUpPinTitle,
-} from "../components/views/signup/steps/SignUpPinForm"
-import SignUpUserForm, {
-   renderSignUpUserForm,
-} from "../components/views/signup/steps/SignUpUserForm"
+import SignUpPinForm from "../components/views/signup/steps/SignUpPinForm"
+import SignUpUserForm from "../components/views/signup/steps/SignUpUserForm"
 import MultiStepWrapper, {
    MultiStepComponentType,
 } from "../components/views/common/MultiStepWrapper"
@@ -17,17 +13,11 @@ import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
 import GenericStepper from "../components/views/common/GenericStepper"
-import SocialInformation, {
-   renderSocialInformationStepTitle,
-} from "../components/views/signup/steps/SocialInformation"
-import AdditionalInformation, {
-   renderAdditionalInformationStepTitle,
-} from "../components/views/signup/steps/AdditionalInformation"
+import SocialInformation from "../components/views/signup/steps/SocialInformation"
+import LocationInformation from "../components/views/signup/steps/LocationInformation"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { useRouter } from "next/router"
-import InterestsInformation, {
-   renderInterestsInformationStepTitle,
-} from "../components/views/signup/steps/InterestsInformation"
+import InterestsInformation from "../components/views/signup/steps/InterestsInformation"
 import userRepo from "../data/firebase/UserRepository"
 import { RegistrationStep } from "@careerfairy/shared-lib/dist/users"
 
@@ -37,27 +27,29 @@ const steps: MultiStepComponentType[] = [
    {
       component: () => SignUpUserForm,
       description: "Credentials",
-      title: renderSignUpUserForm(),
+      title: "Create your profile to start",
    },
    {
       component: () => SignUpPinForm,
       description: "Email Verification",
-      title: renderSingUpPinTitle(),
+      title: "Create your profile to start",
    },
    {
       component: () => SocialInformation,
       description: "Social",
-      title: renderSocialInformationStepTitle(),
+      title: "Before we kick off...",
    },
    {
-      component: () => AdditionalInformation,
-      description: "Additional Information",
-      title: renderAdditionalInformationStepTitle(),
+      component: () => LocationInformation,
+      description: "Location",
+      title: "Before we kick off...",
    },
    {
       component: () => InterestsInformation,
       description: "Interests",
-      title: renderInterestsInformationStepTitle(),
+      title: "Additional Information",
+      subTitle:
+         "To help us pick the best events for you, tell us more about your interests",
    },
 ]
 
@@ -71,11 +63,18 @@ const SignUp = () => {
 
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
    const [currentStep, setCurrentStep] = useState(0)
-   const [stepAnalytics, setStepAnalytics] = useState([] as RegistrationStep[])
+   const [stepAnalytics, setStepAnalytics] = useState([])
    const isLastStep = currentStep === steps.length - 1
+   const totalSteps = steps.length - 2
    const isFirstStep = currentStep === 0
    const showBackButton = currentStep > 2
    const shouldUpdateStepAnalytics = currentStep > 1
+
+   useEffect(() => {
+      if (userData && currentStep === 0) {
+         setCurrentStep(2)
+      }
+   }, [userData])
 
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
@@ -94,43 +93,49 @@ const SignUp = () => {
       }
    }
 
-   useEffect(() => {
-      const updateAnalytics = async () => {
+   const updateAnalytics = useCallback(
+      async (stepsToUpdate: RegistrationStep) => {
          const { userEmail } = userData
          try {
             await userRepo.setRegistrationStepStatus({
                userEmail,
-               steps: stepAnalytics,
+               steps: stepsToUpdate,
             })
          } catch (error) {
             console.log(error)
          }
-      }
+      },
+      [userData]
+   )
 
-      if (stepAnalytics.length) {
-         updateAnalytics().catch(console.error)
-      }
-   }, [stepAnalytics])
-
-   const updateStepStatus = useCallback(() => {
+   useEffect(() => {
       if (shouldUpdateStepAnalytics) {
-         const { id } = userData
+         const { userEmail } = userData
          const { description: stepId } = steps[currentStep]
-         const isCurrentStepAlreadyOnStepAnalytics = stepAnalytics.find(
-            (step) => step.stepId === stepId
+         let stepsToUpdate = stepAnalytics
+
+         const isCurrentStepAlreadyOnStepAnalytics = stepAnalytics.some(
+            (step) => step === stepId
          )
 
          if (!isCurrentStepAlreadyOnStepAnalytics) {
-            const newStepAnalytics = [...stepAnalytics, { userId: id, stepId }]
-
-            setStepAnalytics(newStepAnalytics)
+            const newSteps = [...stepAnalytics, stepId]
+            setStepAnalytics(newSteps)
+            stepsToUpdate = newSteps
          }
+
+         const fieldToUpdate = {
+            userId: userEmail,
+            steps: stepsToUpdate,
+            totalSteps,
+            updatedAt: new Date().toString(),
+         } as RegistrationStep
+
+         updateAnalytics(fieldToUpdate).catch(console.error)
       }
-   }, [userData, currentStep])
+   }, [currentStep])
 
    const handleContinue = () => {
-      updateStepStatus()
-
       if (isLastStep) {
          // set a loading state in the Finalise button, the next page may take some seconds to render
          setIsLoadingRedirectPage(true)
@@ -207,7 +212,38 @@ const styles = sxStyles({
    logo: {
       margin: "20px 20px 0 20px",
    },
+   headerWrapper: {
+      marginBottom: 4,
+      textAlign: "center",
+   },
+   title: {
+      fontFamily: "Poppins",
+      fontWeight: 400,
+      fontSize: "46px",
+      lineHeight: "63px",
+      textAlign: "center",
+      letterSpacing: "-0.02em",
+      marginTop: 6,
+   },
+   subtitle: {
+      fontSize: "1.1rem",
+      fontWeight: 400,
+      lineHeight: "29px",
+      letterSpacing: "-0.02em",
+   },
 })
+
+const renderTitle = (step: MultiStepComponentType) => {
+   const { title, subTitle } = step
+   return (
+      <Grid sx={styles.headerWrapper}>
+         <Typography sx={styles.title}>{title}</Typography>
+         {subTitle ? (
+            <Typography sx={styles.subtitle}>{subTitle}</Typography>
+         ) : null}
+      </Grid>
+   )
+}
 
 export const SignUpPageLayout = ({ children, currentStep }) => {
    return (
@@ -220,7 +256,7 @@ export const SignUpPageLayout = ({ children, currentStep }) => {
                <MainLogo sx={styles.logo} />
             </HeaderLogoWrapper>
 
-            {steps[currentStep].title || null}
+            {renderTitle(steps[currentStep])}
 
             <Container maxWidth="md">
                <Box data-testid={"signup-page-form"} p={3} mt={3}>
