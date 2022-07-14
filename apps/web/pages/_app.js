@@ -53,16 +53,7 @@ const rrfProps = {
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
-   console.log("props", props)
-
    const [disableCookies, isRecordingWindow] = useRouterInformation()
-
-   console.log(
-      "disableCookies",
-      disableCookies,
-      "isRecordingWindow",
-      isRecordingWindow
-   )
 
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
