@@ -6,6 +6,8 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import userRepo from "../../../../data/firebase/UserRepository"
 import { linkedInRegex } from "../../../../constants/forms"
+import { useDebounceInput } from "../../../custom-hook/useDebouce"
+import { ReferralData } from "@careerfairy/shared-lib/dist/users"
 
 const styles = sxStyles({
    inputLabel: {
@@ -13,33 +15,14 @@ const styles = sxStyles({
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
-   headerWrapper: {
-      marginBottom: 6,
-      textAlign: "center",
-   },
-   title: {
-      fontFamily: "Poppins",
-      fontWeight: 400,
-      fontSize: "46px",
-      lineHeight: "63px",
-      textAlign: "center",
-      letterSpacing: "-0.02em",
-      marginTop: 6,
-   },
 })
-
-export const renderSocialInformationStepTitle = () => (
-   <Grid sx={styles.headerWrapper}>
-      <Typography sx={styles.title}>Before we kick off...</Typography>
-   </Grid>
-)
 
 const isValidLinkedInLink = (link: string): boolean => {
    return linkedInRegex.test(link)
 }
 
 const SocialInformation = () => {
-   const { authenticatedUser: user, userData } = useAuth()
+   const { authenticatedUser: currentUser, userData } = useAuth()
    const [existingReferralCode] = useLocalStorage(
       localStorageReferralCode,
       "",
@@ -49,69 +32,89 @@ const SocialInformation = () => {
    const [referralCodeInput, setReferralCodeInput] =
       useState(existingReferralCode)
    const [linkedInLinkInput, setLinkedInLinkInput] = useState("")
-   const linkedInRef = useRef()
-   const referralCodeRef = useRef()
+   const [isValidReferralCode, setIsValidReferralCode] = useState(false)
 
-   useEffect(() => {
-      return () => {
-         const lastLinkedInInput = linkedInRef.current
-         const lastReferralCodeInput = referralCodeRef.current
-
-         if (
-            lastLinkedInInput !== undefined &&
-            isValidLinkedInLink(lastLinkedInInput)
-         ) {
-            const fieldToUpdate = {
-               linkedinUrl: lastLinkedInInput,
-            }
-            updateFields(fieldToUpdate).catch(console.error)
-         }
-
-         if (lastReferralCodeInput !== undefined) {
-            const fieldToUpdate = {
-               referralCode: lastReferralCodeInput,
-            }
-            updateFields(fieldToUpdate).catch(console.error)
-         }
-      }
-   }, [])
+   const debouncedLinkedIn = useDebounceInput(linkedInLinkInput)
+   const debouncedReferralCode = useDebounceInput(referralCodeInput)
 
    const updateFields = useCallback(
       async (fieldToUpdate) => {
          try {
             await userRepo.updateAdditionalInformation({
-               userEmail: user.email,
+               userEmail: currentUser.email,
                ...fieldToUpdate,
             })
          } catch (error) {
             console.log(error)
          }
       },
-      [user]
+      [currentUser]
    )
 
    useEffect(() => {
-      if (userData) {
-         const { referralCode, linkedinUrl } = userData
-
-         if (linkedinUrl !== linkedInLinkInput) {
-            setLinkedInLinkInput(linkedinUrl || "")
+      if (debouncedLinkedIn) {
+         const fieldToUpdate = {
+            linkedinUrl: isValidLinkedInLink(debouncedLinkedIn)
+               ? debouncedLinkedIn
+               : "",
          }
+         updateFields(fieldToUpdate).catch(console.error)
+      }
+   }, [debouncedLinkedIn])
 
-         if (referralCode !== referralCodeInput) {
-            setReferralCodeInput(referralCode || "")
+   useEffect(() => {
+      if (debouncedReferralCode) {
+         userRepo
+            .getUserByReferralCode(debouncedReferralCode)
+            .then((referralUser) => {
+               const { id, firstName, lastName } = referralUser
+
+               if (referralUser && id !== currentUser.email) {
+                  const fieldToUpdate = {
+                     referredBy: {
+                        uid: id,
+                        name: `${firstName} ${lastName}`,
+                     } as ReferralData,
+                  }
+
+                  setIsValidReferralCode(true)
+                  updateFields(fieldToUpdate).catch(console.error)
+               }
+            })
+            .catch(() => {
+               // to reset the referredBy field on db
+               if (isValidReferralCode) {
+                  const fieldToUpdate = {
+                     referredBy: {},
+                  }
+                  updateFields(fieldToUpdate).catch(console.error)
+               }
+
+               console.warn(
+                  `Invalid referral code: ${debouncedReferralCode}, no corresponding user.`
+               )
+            })
+
+         setIsValidReferralCode(false)
+      }
+   }, [debouncedReferralCode])
+
+   useEffect(() => {
+      if (userData) {
+         const { linkedinUrl } = userData
+
+         if (linkedinUrl && linkedInLinkInput === "") {
+            setLinkedInLinkInput(linkedinUrl || "")
          }
       }
    }, [userData])
 
    const handleLinkedInLinkInputChange = useCallback((value) => {
       setLinkedInLinkInput(value)
-      linkedInRef.current = value
    }, [])
 
    const handleReferralCodeInputChange = useCallback((value) => {
       setReferralCodeInput(value)
-      referralCodeRef.current = value
    }, [])
 
    return (
@@ -142,7 +145,7 @@ const SocialInformation = () => {
                   value={linkedInLinkInput}
                   label="Add your LinkedIn link here"
                   error={
-                     linkedInLinkInput.length > 0 &&
+                     linkedInLinkInput.length &&
                      !isValidLinkedInLink(linkedInLinkInput)
                   }
                />
@@ -167,6 +170,7 @@ const SocialInformation = () => {
                   }}
                   value={referralCodeInput}
                   label="Copy-paste here your referral code"
+                  error={referralCodeInput.length && !isValidReferralCode}
                />
             </Grid>
          </Grid>

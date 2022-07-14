@@ -13,32 +13,7 @@ const styles = sxStyles({
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
-   headerWrapper: {
-      marginBottom: 6,
-      textAlign: "center",
-   },
-   title: {
-      fontFamily: "Poppins",
-      fontWeight: 400,
-      fontSize: "46px",
-      lineHeight: "63px",
-      textAlign: "center",
-      letterSpacing: "-0.02em",
-      marginTop: 6,
-   },
-   subtitle: {
-      fontSize: "1.1rem",
-      fontWeight: 400,
-      lineHeight: "29px",
-      letterSpacing: "-0.02em",
-   },
 })
-
-export const renderInterestsInformationStepTitle = () => (
-   <Grid sx={styles.headerWrapper}>
-      <Typography sx={styles.title}>Before we kick off...</Typography>
-   </Grid>
-)
 
 const InterestsInformation = () => {
    const { data: allInterests } = useInterests()
