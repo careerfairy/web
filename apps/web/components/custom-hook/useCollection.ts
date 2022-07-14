@@ -4,7 +4,6 @@ import { useFirebaseService } from "../../context/firebase/FirebaseServiceContex
 import { Interest } from "types/interests"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import firebase from "firebase/compat/app"
-import Query = firebase.firestore.Query
 
 /**
  * Fetch a Firestore collection
@@ -15,7 +14,7 @@ import Query = firebase.firestore.Query
  * @param realtime Listens for updates on the documents
  */
 function useCollection<T extends Identifiable>(
-   collection: string | GetReferenceFn | Query,
+   collection: string | GetReferenceFn | firebase.firestore.Query,
    realtime: boolean = false
 ): CollectionResponse<T> {
    const { firestore } = useFirebaseService()
@@ -62,7 +61,9 @@ function useCollection<T extends Identifiable>(
    return { isLoading: isLoading, data: documents, error: error }
 }
 
-type GetReferenceFn = (firestore: firebase.firestore.Firestore) => Query
+type GetReferenceFn = (
+   firestore: firebase.firestore.Firestore
+) => firebase.firestore.Query
 
 interface CollectionResponse<T> {
    isLoading: boolean
