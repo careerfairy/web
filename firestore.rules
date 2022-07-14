@@ -5,6 +5,9 @@ service cloud.firestore {
         function isCFAdmin() {
           return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
         }
+        function isUnchanged(field) {
+          return request.resource.data[field] == resource.data[field];
+        }
         match /fieldsOfStudy/{fieldOfStudy} {
             allow read: if true;
             allow write: if isCFAdmin();
@@ -153,8 +156,17 @@ service cloud.firestore {
                 allow write: if true;
             }
             match /customCategories/{customCategory} {
-                allow read: if true;
-                allow write: if isCFAdmin() || isCareerCenterAdmin();
+            function isCustomCategory() {
+                return resource.data.categoryType == 'custom';
+            }
+
+            function hasOptions() {
+                return request.resource.data.options != null && request.resource.data.options.keys().size() > 0;
+            }
+                allow read: if isCFAdmin() || isCareerCenterAdmin();
+                allow delete: if isCustomCategory();
+                allow create: if isCFAdmin() || isCareerCenterAdmin();
+                allow update: if isUnchanged('categoryType') && hasOptions();
             }
 
             match /categories/{category}/elements/{element} {

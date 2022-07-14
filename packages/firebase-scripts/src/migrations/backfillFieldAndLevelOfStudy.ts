@@ -257,24 +257,68 @@ const createCustomGroupCategorySubCollections = (
    batch: BigBatch,
    counter: Counter
 ) => {
+   let numUniversities = 0
    groups.forEach((group) => {
       if (!group.categories || !group.universityCode) return
+      let groupHasFieldOfStudy, groupHasLevelOfStudy
+      numUniversities += 1
       group.categories?.forEach((category) => {
          const categoryRef = firestore
             .collection(`careerCenterData/${group.id}/customCategories`)
             .doc(category.id)
+
+         const categoryIsFieldOfStudy = checkIfHasMatch(
+            category.name,
+            possibleFieldsOfStudy
+         )
+         const categoryIsLevelOfStudy = checkIfHasMatch(
+            category.name,
+            possibleLevelsOfStudy
+         )
+         if (!groupHasFieldOfStudy) {
+            groupHasFieldOfStudy = categoryIsFieldOfStudy
+         }
+         if (!groupHasLevelOfStudy) {
+            groupHasLevelOfStudy = categoryIsLevelOfStudy
+         }
+
          const categoryData: CustomCategory = {
             id: category.id,
             name: category.name,
             options: convertFirebaseDocsToDictionary(category.options),
+            categoryType: categoryIsFieldOfStudy
+               ? "fieldOfStudy"
+               : categoryIsLevelOfStudy
+               ? "levelOfStudy"
+               : "custom",
          }
          batch.set(categoryRef, categoryData)
          counter.customCountIncrement(customCountKeys.numCustomCategories)
          counter.write()
       })
+
+      if (!groupHasFieldOfStudy && !groupHasLevelOfStudy) {
+         // throw an error if the group has no field of study or level of study
+         throwMigrationError(
+            `University Group ${
+               group.universityName
+            } has no field of study or level of study, please fix that first, Group Data: ${JSON.stringify(
+               group
+            )}`
+         )
+      }
    })
+   console.log("-> numUniversities", numUniversities)
 }
 
+const checkIfHasMatch = (categoryName: string, possibleNames: string[]) => {
+   return possibleNames
+      .map((name) => trimAndLowerCase(name))
+      .includes(trimAndLowerCase(categoryName))
+}
+const trimAndLowerCase = (str: string) => {
+   return str.trim().toLowerCase()
+}
 /*
  * Goes through every user and does 2 things:
  *
@@ -372,4 +416,10 @@ const convertFirebaseDocsToDictionary = <T extends Identifiable>(
       acc[curr.id] = curr
       return acc
    }, {})
+}
+
+const throwMigrationError = (message: string) => {
+   throw new Error(
+      `Migration canceled, dont worry no mutations have been made, Error Message: ${message}`
+   )
 }

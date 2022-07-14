@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import Head from "next/head"
 import { useRouter } from "next/router"
-import { withFirebase } from "../../context/firebase/FirebaseServiceContext"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import Header from "../../components/views/header/Header"
 import Footer from "../../components/views/footer/Footer"
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup"
@@ -10,11 +10,22 @@ import CompleteGroup from "../../components/views/group/create/CompleteGroup"
 import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
 import Loader from "../../components/views/loader/Loader"
 import { useAuth } from "../../HOCs/AuthProvider"
+import { v4 as uuidv4 } from "uuid"
 
-import { Stepper, Step, StepLabel, Container } from "@mui/material"
+import { Container, Step, StepLabel, Stepper } from "@mui/material"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "../../components/util/constants"
-import defaultCategories from "../../components/views/group/create/defaultCategories"
+import {
+   CustomCategory,
+   sortCustomCategoryOptionsByName,
+} from "@careerfairy/shared-lib/dist/groups"
+import levelOfStudyRepo from "../../data/firebase/LevelOfStudyRepository"
+import fieldOfStudyRepo from "../../data/firebase/FieldOfStudyRepository"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
+import { useDispatch } from "react-redux"
+import * as actions from "../../store/actions"
+import groupRepo from "../../data/firebase/GroupRepository"
 
 function getSteps() {
    return [
@@ -24,13 +35,25 @@ function getSteps() {
    ]
 }
 
-const CreateGroup = ({ firebase }) => {
+export type BaseGroupInfo = {
+   adminEmails?: string[]
+   logoUrl?: string
+   logoFileObj?: File
+   description?: string
+   test?: boolean
+   universityName?: string
+}
+const CreateGroup = () => {
+   const firebase = useFirebaseService()
+   const dispatch = useDispatch()
    const router = useRouter()
    const { enqueueSnackbar } = useSnackbar()
    const [activeStep, setActiveStep] = useState(0)
-   const [baseGroupInfo, setBaseGroupInfo] = useState({})
-   const [arrayOfCategories, setArrayOfCategories] = useState(defaultCategories)
-   const { userData, authenticatedUser: user, loading } = useAuth()
+   const [baseGroupInfo, setBaseGroupInfo] = useState<BaseGroupInfo>({})
+   const [customCategories, setCustomCategories] = useState<CustomCategory[]>(
+      []
+   )
+   const { userData, authenticatedUser: user, isLoggedIn } = useAuth()
 
    useEffect(() => {
       if (user === null) {
@@ -38,8 +61,64 @@ const CreateGroup = ({ firebase }) => {
       }
    }, [user])
 
+   useEffect(() => {
+      void setDefaultCategories()
+   }, [])
+
    const steps = getSteps()
 
+   const setDefaultCategories = async () => {
+      try {
+         // get all level and fields of study
+         const [levelsOfStudy, fieldsOfStudy] = await Promise.all([
+            levelOfStudyRepo.getAllLevelsOfStudy(),
+            fieldOfStudyRepo.getAllFieldsOfStudy(),
+         ])
+         const initialCategories = [
+            createCustomCategoryFromUserInfoCollection(
+               levelsOfStudy,
+               "levelOfStudy"
+            ),
+            createCustomCategoryFromUserInfoCollection(
+               fieldsOfStudy,
+               "fieldOfStudy"
+            ),
+         ]
+         setCustomCategories(initialCategories)
+      } catch (e) {
+         sendError(e)
+      }
+   }
+
+   const sendError = (error: any) => {
+      dispatch(actions.sendGeneralError(error))
+   }
+
+   const createCustomCategoryFromUserInfoCollection = (
+      userInfoCollectionDocsInfo: FieldOfStudy[] | LevelOfStudy[],
+      type: Exclude<CustomCategory["categoryType"], "custom">
+   ): CustomCategory => {
+      if (type !== "fieldOfStudy" && type !== "levelOfStudy")
+         throw new Error("Invalid category type")
+      return {
+         id: uuidv4(),
+         name: type === "fieldOfStudy" ? "Field of Study" : "Level of Study",
+         hidden: false,
+         categoryType: type,
+         options: userInfoCollectionDocsInfo.reduce<CustomCategory["options"]>(
+            (acc, curr) => {
+               return {
+                  ...acc,
+                  [curr.id]: {
+                     name: curr.name,
+                     id: curr.id,
+                  },
+               }
+            },
+            {}
+         ),
+      }
+   }
    const dynamicSort = (property) => {
       let sortOrder = 1
       if (property[0] === "-") {
@@ -61,29 +140,30 @@ const CreateGroup = ({ firebase }) => {
       if (categoryObj && categoryObj.options && categoryObj.options.length) {
          categoryObj.options.sort(dynamicSort("name"))
       }
-      setArrayOfCategories([...arrayOfCategories, categoryObj])
+      setCustomCategories([...customCategories, categoryObj])
    }
 
-   const handleUpdateCategory = (categoryObj) => {
+   const handleUpdateCategory = (categoryObj: CustomCategory) => {
       // updates the temporary categories locally
-      if (categoryObj && categoryObj.options && categoryObj.options.length) {
-         categoryObj.options.sort(dynamicSort("name"))
+      const updatedCategory = {
+         ...categoryObj,
+         options: sortCustomCategoryOptionsByName(categoryObj.options),
       }
-      const newCategories = [...arrayOfCategories]
-      const indexOfOldObj = newCategories.findIndex(
-         (el) => categoryObj.id === el.id
+      setCustomCategories((prevCategories) =>
+         prevCategories.map((category) => {
+            if (category.id === updatedCategory.id) {
+               return updatedCategory
+            }
+            return category
+         })
       )
-      newCategories[indexOfOldObj] = categoryObj
-      setArrayOfCategories(newCategories)
    }
 
    const handleDeleteLocalCategory = (categoryObjId) => {
       // deletes the temporary categories locally
-      const newCategories = [...arrayOfCategories]
-      const newerCategories = newCategories.filter(
-         (el) => el.id !== categoryObjId
+      setCustomCategories((prevCategories) =>
+         prevCategories.filter((el) => el.id !== categoryObjId)
       )
-      setArrayOfCategories(newerCategories)
    }
 
    const handleNext = () => {
@@ -94,21 +174,12 @@ const CreateGroup = ({ firebase }) => {
       setActiveStep((prevActiveStep) => prevActiveStep - 1)
    }
 
-   const handleReset = () => {
-      setBaseGroupInfo({})
-      setActiveStep(0)
-   }
-
-   const setServerLogoUrl = (serverUrl) => {
-      setBaseGroupInfo({ ...baseGroupInfo, logoUrl: serverUrl })
-   }
-
    const uploadLogo = async (fileObject) => {
       try {
-         var storageRef = firebase.getStorageRef()
+         const storageRef = firebase.getStorageRef()
          let fullPath = "group-logos" + "/" + fileObject.name
          let companyLogoRef = storageRef.child(fullPath)
-         var uploadTask = companyLogoRef.put(fileObject)
+         const uploadTask = companyLogoRef.put(fileObject)
          await uploadTask.then()
          return uploadTask.snapshot.ref.getDownloadURL()
       } catch (e) {
@@ -125,9 +196,12 @@ const CreateGroup = ({ firebase }) => {
             logoUrl: downloadURL,
             description: baseGroupInfo.description,
             test: false,
-            categories: arrayOfCategories,
          }
-         let ref = await firebase.createCareerCenter(careerCenter, user.email)
+         const ref = await groupRepo.createGroup(
+            careerCenter,
+            customCategories,
+            user.email
+         )
          await router.push(`/group/${ref.id}/admin`)
          enqueueSnackbar(
             `Congrats! Your group ${baseGroupInfo.universityName} has now been created`,
@@ -153,7 +227,6 @@ const CreateGroup = ({ firebase }) => {
                   setBaseGroupInfo={setBaseGroupInfo}
                   baseGroupInfo={baseGroupInfo}
                   handleNext={handleNext}
-                  handleBack={handleBack}
                />
             )
          case 1:
@@ -162,11 +235,9 @@ const CreateGroup = ({ firebase }) => {
                   handleDeleteLocalCategory={handleDeleteLocalCategory}
                   handleUpdateCategory={handleUpdateCategory}
                   handleAddTempCategory={handleAddTempCategory}
-                  arrayOfCategories={arrayOfCategories}
+                  arrayOfCategories={customCategories}
                   handleNext={handleNext}
                   handleBack={handleBack}
-                  handleReset={handleReset}
-                  activeStep={activeStep}
                />
             )
          case 2:
@@ -174,9 +245,8 @@ const CreateGroup = ({ firebase }) => {
                <CompleteGroup
                   createCareerCenter={createCareerCenter}
                   baseGroupInfo={baseGroupInfo}
-                  setActiveStep={setActiveStep}
                   handleBack={handleBack}
-                  arrayOfCategories={arrayOfCategories}
+                  arrayOfCategories={customCategories}
                />
             )
          default:
@@ -184,7 +254,7 @@ const CreateGroup = ({ firebase }) => {
       }
    }
 
-   if (user === null || userData === null || loading === true) {
+   if (user === null || userData === null || isLoggedIn !== true) {
       return <Loader />
    }
 
@@ -213,4 +283,4 @@ const CreateGroup = ({ firebase }) => {
    )
 }
 
-export default withFirebase(CreateGroup)
+export default CreateGroup

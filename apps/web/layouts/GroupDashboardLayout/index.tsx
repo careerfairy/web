@@ -32,6 +32,7 @@ import RootState from "../../store/reducers"
 import GroupsUtil from "../../data/util/GroupsUtil"
 import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 import groupRepo from "../../data/firebase/GroupRepository"
+import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
 
 const styles = {
    childrenWrapperResponsive: {
@@ -55,7 +56,9 @@ const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
    const scrollRef = useRef(null)
-   const [customCategories, setCustomCategories] = useState([])
+   const [customCategories, setCustomCategories] = useState<CustomCategory[]>(
+      []
+   )
 
    const isDesktop = useIsDesktop()
    const {
@@ -88,12 +91,17 @@ const GroupDashboardLayout = (props) => {
 
    useEffect(() => {
       if (isCorrectGroup && group?.id) {
-         ;(async () => {
-            const customCategories = await groupRepo.getCustomCategories(
-               group.id
-            )
-            setCustomCategories(customCategories)
-         })()
+         const unsubscribe = groupRepo.listenToCustomCategories(
+            group.id,
+            (categories) => {
+               setCustomCategories(mapFirestoreDocuments(categories))
+            }
+         )
+
+         return () => {
+            unsubscribe()
+            setCustomCategories([])
+         }
       }
    }, [isCorrectGroup, groupId])
    const groupPresenter = useMemo(

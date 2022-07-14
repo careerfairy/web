@@ -164,8 +164,9 @@ const ViewerLayout = (props) => {
    }, [mobile])
 
    useEffect(() => {
-      if (userData?.isAdmin) return
+      // if (userData?.isAdmin) return
       if (userData?.userEmail) {
+         console.log("-> SETTING PARTICIPATION")
          if (livestreamId && hasCheckedForCategoryData) {
             firebase.setUserIsParticipating(livestreamId, userData)
          }

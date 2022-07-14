@@ -12,14 +12,34 @@ import {
 } from "@mui/material"
 import { v4 as uuidv4 } from "uuid"
 import Warning from "@mui/icons-material/Warning"
+import { UpdateMode } from "../CategoryEdit"
+import {
+   CustomCategory,
+   CustomCategoryOption,
+} from "@careerfairy/shared-lib/dist/groups"
 
 const requiredTxt = "Please fill this field"
 const duplicateTxt = "Cannot be a duplicate"
 
-export const AddCategory = ({ handleAdd, updateMode, setUpdateMode, open }) => {
+interface AddCategoryProps {
+   updateMode: UpdateMode
+   handleAdd: (optionData: { name: string; id: string }) => void
+   resetUpdateMode: () => void
+   open: boolean
+}
+const maxOptionLength = 40
+export const AddCategory = ({
+   handleAdd,
+   updateMode,
+   resetUpdateMode,
+   open,
+}: AddCategoryProps) => {
    const [newOptionName, setNewOptionName] = useState("")
+   const [optionNames, setOptionNames] = useState(
+      getOptionNames(updateMode.options)
+   )
    const [touched, setTouched] = useState(false)
-   const [error, setError] = useState(false)
+   const [error, setError] = useState(null)
 
    useEffect(() => {
       if (!newOptionName.length) {
@@ -28,10 +48,11 @@ export const AddCategory = ({ handleAdd, updateMode, setUpdateMode, open }) => {
    }, [touched, newOptionName.length])
 
    useEffect(() => {
-      if (
-         newOptionName.length &&
-         updateMode.options.some((el) => el.name === newOptionName)
-      ) {
+      setOptionNames(getOptionNames(updateMode.options))
+   }, [updateMode.options])
+
+   useEffect(() => {
+      if (newOptionName.length && optionNames.includes(newOptionName.trim())) {
          setError(duplicateTxt)
          setTouched(true)
       } else {
@@ -49,22 +70,19 @@ export const AddCategory = ({ handleAdd, updateMode, setUpdateMode, open }) => {
       const tempId = uuidv4()
       handleAdd({ name: newOptionName, id: tempId })
       setNewOptionName("")
-      setUpdateMode({})
+      resetUpdateMode()
    }
 
    return (
-      <Dialog
-         onClose={() => setUpdateMode({})}
-         fullWidth
-         maxWidth="xs"
-         open={open}
-      >
+      <Dialog onClose={resetUpdateMode} fullWidth maxWidth="xs" open={open}>
          <form onSubmit={handleAddModal}>
             <DialogContent>
                <TextField
                   autoFocus
                   label="Add an option"
-                  maxLength="20"
+                  inputProps={{
+                     maxLength: maxOptionLength,
+                  }}
                   fullWidth
                   value={newOptionName}
                   onChange={(e) => setNewOptionName(e.target.value)}
@@ -75,7 +93,7 @@ export const AddCategory = ({ handleAdd, updateMode, setUpdateMode, open }) => {
                />
             </DialogContent>
             <DialogActions>
-               <Button color="grey" onClick={() => setUpdateMode({})}>
+               <Button color="grey" onClick={resetUpdateMode}>
                   Cancel
                </Button>
                <Button variant="contained" type="submit" color="primary">
@@ -86,21 +104,22 @@ export const AddCategory = ({ handleAdd, updateMode, setUpdateMode, open }) => {
       </Dialog>
    )
 }
-
+interface DeleteCategoryProps {
+   updateMode: UpdateMode
+   resetUpdateMode: () => void
+   categoryName: string
+   handleDeleteCategory: () => void
+   open: boolean
+}
 export const DeleteCategory = ({
-   setUpdateMode,
    updateMode,
+   resetUpdateMode,
    categoryName,
    handleDeleteCategory,
    open,
-}) => {
+}: DeleteCategoryProps) => {
    return (
-      <Dialog
-         onClose={() => setUpdateMode({})}
-         fullWidth
-         maxWidth="md"
-         open={open}
-      >
+      <Dialog onClose={resetUpdateMode} fullWidth maxWidth="md" open={open}>
          <DialogTitle>
             Delete the category <span>{categoryName}</span>
          </DialogTitle>
@@ -119,7 +138,7 @@ export const DeleteCategory = ({
             </Box>
          </DialogContent>
          <DialogActions>
-            <Button color="grey" onClick={() => setUpdateMode({})}>
+            <Button color="grey" onClick={resetUpdateMode}>
                Cancel
             </Button>
             <Button
@@ -134,23 +153,37 @@ export const DeleteCategory = ({
    )
 }
 
+interface RenameOptionProps {
+   updateMode: UpdateMode
+   handleRename: (option: CustomCategoryOption) => void
+   resetUpdateMode: () => void
+   open: boolean
+}
+
+const getOptionNames = (options?: CustomCategory["options"]) => {
+   if (!options) return []
+   return Object.keys(options).map((el) => {
+      return options[el].name.trim()
+   })
+}
 export const RenameOption = ({
    updateMode,
    handleRename,
-   setUpdateMode,
    open,
-}) => {
+   resetUpdateMode,
+}: RenameOptionProps) => {
    const [newOptionName, setNewOptionName] = useState("")
    const [names, setNames] = useState([])
    const [touched, setTouched] = useState(false)
-   const [error, setError] = useState(false)
+   const [error, setError] = useState(null)
 
    useEffect(() => {
-      const filteredNames = updateMode.options.filter(
-         (el) => el.name !== updateMode.option.name
+      const allOptionNames = getOptionNames(updateMode.options)
+      const otherNames = allOptionNames.filter(
+         (name) => name !== updateMode.option.name
       )
-      setNames(filteredNames)
-   }, [])
+      setNames(otherNames)
+   }, [updateMode.options])
 
    useEffect(() => {
       if (!newOptionName.length) {
@@ -159,10 +192,7 @@ export const RenameOption = ({
    }, [touched, newOptionName.length])
 
    useEffect(() => {
-      if (
-         newOptionName.length &&
-         names.some((el) => el.name === newOptionName)
-      ) {
+      if (newOptionName.trim().length && names.includes(newOptionName)) {
          setError(duplicateTxt)
          setTouched(true)
       } else {
@@ -178,23 +208,20 @@ export const RenameOption = ({
       }
       if (error) return
       handleRename({ id: updateMode.option.id, name: newOptionName })
-      setUpdateMode({})
+      resetUpdateMode()
    }
 
    return (
-      <Dialog
-         open={open}
-         onClose={() => setUpdateMode({})}
-         fullWidth
-         maxWidth="md"
-      >
+      <Dialog open={open} onClose={resetUpdateMode} fullWidth maxWidth="md">
          <form onSubmit={handleRenameModal}>
             <DialogContent>
                <TextField
                   label={`Rename the option ${updateMode.option.name} to:`}
                   autoFocus
                   fullWidth
-                  maxLength="20"
+                  inputProps={{
+                     maxLength: maxOptionLength,
+                  }}
                   value={newOptionName}
                   onChange={(e) => setNewOptionName(e.target.value)}
                   error={touched && error.length > 0}
@@ -209,7 +236,7 @@ export const RenameOption = ({
                </Typography>
             </DialogContent>
             <DialogActions>
-               <Button color="grey" onClick={() => setUpdateMode({})}>
+               <Button color="grey" onClick={resetUpdateMode}>
                   Cancel
                </Button>
                <Button type="submit" color="primary" variant="contained">
@@ -221,19 +248,20 @@ export const RenameOption = ({
    )
 }
 
+interface DeleteOptionProps {
+   updateMode: UpdateMode
+   handleDelete: (option: CustomCategoryOption) => void
+   resetUpdateMode: () => void
+   open: boolean
+}
 export const DeleteOption = ({
    updateMode,
    handleDelete,
-   setUpdateMode,
+   resetUpdateMode,
    open,
-}) => {
+}: DeleteOptionProps) => {
    return (
-      <Dialog
-         open={open}
-         onClose={() => setUpdateMode({})}
-         fullWidth
-         maxWidth="md"
-      >
+      <Dialog open={open} onClose={resetUpdateMode} fullWidth maxWidth="md">
          <DialogTitle className="action">
             Delete option <strong>{updateMode.option?.name}</strong>
          </DialogTitle>
@@ -253,7 +281,7 @@ export const DeleteOption = ({
             </Box>
          </DialogContent>
          <DialogActions>
-            <Button color="grey" onClick={() => setUpdateMode({})}>
+            <Button color="grey" onClick={resetUpdateMode}>
                Cancel
             </Button>
             <Button

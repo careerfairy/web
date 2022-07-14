@@ -1,6 +1,5 @@
 import firebase from "firebase/app"
 import firebaseApp from "./FirebaseInstance"
-import { HighLight } from "types/Highlight"
 import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 

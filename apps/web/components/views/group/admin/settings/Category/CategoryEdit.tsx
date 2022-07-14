@@ -1,7 +1,5 @@
-import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import AddIcon from "@mui/icons-material/Add"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import {
    AddCategory,
    DeleteCategory,
@@ -27,77 +25,72 @@ import {
    Tooltip,
    Zoom,
 } from "@mui/material"
-import { v4 as uuidv4 } from "uuid"
-import makeStyles from "@mui/styles/makeStyles"
 import EditIcon from "@mui/icons-material/Edit"
-import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import {
+   CustomCategory,
+   CustomCategoryOption,
+   Group,
+} from "@careerfairy/shared-lib/dist/groups"
+import groupRepo from "../../../../../../data/firebase/GroupRepository"
+import { v4 as uuidv4 } from "uuid"
 
-const useStyles = makeStyles((theme) => ({
-   root: {
-      backgroundColor: "white",
-      borderRadius: "5px",
-      padding: "20px",
-      margin: "10px 0",
-      display: "flex",
-      flexDirection: "column",
-   },
-   label: {
-      fontSize: "0.8em",
-      fontWeight: "700",
-      color: "rgb(160,160,160)",
-      margin: "0 0 5px 0",
-   },
-   title: {
-      fontSize: "1.2em",
-      fontWeight: "700",
-      color: "rgb(80,80,80)",
-   },
-   chip: {
-      margin: theme.spacing(0.5),
-   },
-   error: {
-      position: "absolute",
-      fontSize: "1rem",
-      fontWeight: "lighter",
-      marginTop: "5px",
-      color: "red",
-   },
-   separate: {
-      width: "100%",
-      height: "1px",
-      backgroundColor: "rgb(230,230,230)",
-      margin: "20px 0",
-   },
+const styles = sxStyles({
    errorButton: {
-      color: theme.palette.error.main,
+      color: "error.main",
    },
    nameError: {
-      height: theme.spacing(2),
-      margin: theme.spacing(1),
+      height: (theme) => theme.spacing(2),
+      margin: (theme) => theme.spacing(1),
    },
-}))
+})
 
-function CategoryEditModal({
+interface Props {
+   category?: CustomCategory
+   handleDeleteLocalCategory?: (categoryId: string) => void
+   handleUpdateCategory?: (category: CustomCategory) => void
+   newCategory?: boolean
+   setEditMode: (editMode: boolean) => void
+   handleAddTempCategory?: (category: CustomCategory) => void
+   isLocal?: boolean
+   group?: Group
+}
+
+export interface UpdateMode {
+   mode?: "add" | "rename" | "deleteCategory" | "delete"
+   option?: Partial<CustomCategoryOption>
+   options?: CustomCategory["options"]
+}
+
+const getInitialCategory = (category?: CustomCategory): CustomCategory => {
+   if (category) {
+      return {
+         ...category,
+      }
+   }
+   return {
+      id: uuidv4(),
+      name: "",
+      options: {},
+      hidden: false,
+      categoryType: "custom",
+   }
+}
+const CategoryEditModal = ({
    category,
    handleDeleteLocalCategory,
    handleUpdateCategory,
    newCategory,
    setEditMode,
    handleAddTempCategory,
-   group,
-   groupId,
    isLocal,
-}) {
-   const classes = useStyles()
-   const firebase = useFirebaseService()
-   const dispatch = useDispatch()
-   const [categoryName, setCategoryName] = useState("")
-
-   const [editableOptions, setEditableOptions] = useState([])
+   group,
+}: Props) => {
+   const [localCategory, setLocalCategory] =
+      useState<CustomCategory>(getInitialCategory)
 
    const [selectedOption, setSelectedOption] = useState(null)
-   const [updateMode, setUpdateMode] = useState({})
+   const [updateMode, setUpdateMode] = useState<UpdateMode>({})
 
    const [touched, setTouched] = useState(false)
    const [anchorEl, setAnchorEl] = useState(null)
@@ -107,126 +100,89 @@ function CategoryEditModal({
    })
 
    useEffect(() => {
-      if (editableOptions && editableOptions.length >= 2) {
+      if (
+         localCategory.options &&
+         Object.keys(localCategory.options).length >= 2
+      ) {
          setErrorObj({ ...errorObj, optionError: false })
       }
-   }, [editableOptions.length])
+   }, [Object.keys(localCategory.options).length])
 
    useEffect(() => {
-      if (category && category.name) {
-         setCategoryName(category.name)
+      if (category) {
+         setLocalCategory({ ...category })
       }
-   }, [category.name])
+   }, [category])
 
-   useEffect(() => {
-      if (category.options && category.options.length > 0) {
-         let sortedOptions = [...category.options]
-         sortedOptions.sort(dynamicSort("name"))
-         setEditableOptions(sortedOptions)
-      }
-   }, [category.options])
-
-   function handleDelete(removedOption) {
-      let newList = []
-      if (removedOption.id) {
-         newList = editableOptions.filter(
-            (optionEl) => optionEl.id !== removedOption.id
-         )
-      } else {
-         newList = editableOptions.filter(
-            (optionEl) => optionEl.id || optionEl.name !== removedOption.name
-         )
-      }
-      setEditableOptions(newList)
-      setUpdateMode({})
+   function handleDelete(removedOption: CustomCategoryOption) {
+      setLocalCategory((prevCategory) => {
+         const newOptions = { ...prevCategory.options }
+         delete newOptions[removedOption.id]
+         return { ...prevCategory, options: newOptions }
+      })
+      resetUpdateMode()
    }
 
-   function handleDeleteCategory() {
+   async function handleDeleteCategory() {
       if (isLocal) {
          handleDeleteLocalCategory(category.id)
          return setEditMode(false)
       }
-      const existingCategories = [...group.categories]
-      const newCategories = existingCategories.filter(
-         (el) => el.id !== category.id
-      )
-      firebase.updateGroupCategoryElements(group.id, newCategories).then(() => {
-         setEditMode(false)
-      })
+      await groupRepo.deleteCustomCategory(group.id, category.id)
+      setEditMode(false)
    }
 
-   function handleAdd(newOption) {
-      const newList = [...editableOptions, newOption]
-      setEditableOptions(newList)
+   function handleAdd(newOption: CustomCategoryOption) {
+      setLocalCategory((prevCategory) => {
+         const newOptions = { ...prevCategory.options }
+         newOptions[newOption.id] = newOption
+         return { ...prevCategory, options: newOptions }
+      })
    }
 
    function handleBlur() {
       setTouched(true)
    }
 
-   function handleRename(newOption) {
-      const newList = editableOptions.map((optionEl) => {
-         if (optionEl.id === newOption.id) {
-            return newOption
-         } else {
-            return optionEl
+   function handleRename(newOption: CustomCategoryOption) {
+      setLocalCategory((prevCategory) => {
+         const newOptions = { ...prevCategory.options }
+         newOptions[newOption.id] = {
+            ...newOptions[newOption.id],
+            name: newOption.name,
          }
+         return { ...prevCategory, options: newOptions }
       })
-      setEditableOptions(newList)
-   }
-
-   function buildCategory() {
-      const newId = uuidv4()
-      return {
-         name: categoryName,
-         options: editableOptions,
-         id: newId,
-      }
    }
 
    function handleErrors() {
       const errors = {
-         inputError: categoryName.length < 1,
-         optionError: editableOptions.length < 2,
+         inputError: localCategory.name.length < 1,
+         optionError: Object.keys(localCategory.options).length < 2,
       }
       setErrorObj(errors)
-      setTouched(!categoryName.length > 0)
+      setTouched(localCategory.name.trim().length <= 0)
       return errors.inputError || errors.optionError
    }
 
-   function saveChanges() {
+   const saveChanges = async () => {
       if (handleErrors()) return
       if (isLocal) {
          if (newCategory) {
             //Add a newly created temp category Obj
-            handleAddTempCategory(buildCategory())
+            handleAddTempCategory({ ...localCategory })
          } else {
             //update an already created temp category obj
-            category.name = categoryName
-            category.options = editableOptions
-            handleUpdateCategory(category)
+            handleUpdateCategory({ ...localCategory })
          }
          return setEditMode(false)
       }
       if (newCategory && !isLocal) {
-         firebase
-            .addGroupCategoryWithElements(group.id, buildCategory())
-            .then(() => {
-               setEditMode(false)
-            })
+         await groupRepo.addNewCustomCategory(group.id, { ...localCategory })
       } else {
-         const newCategories = group.categories.map((category) => ({
-            ...category,
-         }))
-         const index = newCategories.findIndex((el) => el.id === category.id)
-         newCategories[index].name = categoryName
-         newCategories[index].options = editableOptions
-         firebase
-            .updateGroupCategoryElements(group.id, newCategories)
-            .then(() => {
-               setEditMode(false)
-            })
+         await groupRepo.updateCustomCategory(group.id, localCategory)
       }
+      setEditMode(false)
    }
 
    const handleDropDownDel = () => {
@@ -238,7 +194,7 @@ function CategoryEditModal({
       setUpdateMode({
          mode: "rename",
          option: selectedOption,
-         options: editableOptions,
+         options: localCategory.options,
       })
    }
 
@@ -267,43 +223,38 @@ function CategoryEditModal({
    }
 
    const toggleCategoryHidden = async (event) => {
-      try {
-         const isHidden = event.currentTarget.checked
-         const updatedGroupCategories = group.categories.map((prevCategory) =>
-            prevCategory.id === category.id
-               ? {
-                    ...prevCategory,
-                    hidden: isHidden,
-                 }
-               : prevCategory
-         )
-         if (updatedGroupCategories.length) {
-            await firebase.updateGroupCategoryElements(
-               group.id,
-               updatedGroupCategories
-            )
-         }
-      } catch (e) {
-         dispatch(actions.sendGeneralError(e))
-      }
+      const isHidden = event.currentTarget.checked
+      setLocalCategory((prevCategory) => {
+         return { ...prevCategory, hidden: isHidden }
+      })
    }
 
-   const optionElements = editableOptions.map((el) => {
+   const resetUpdateMode = () => setUpdateMode({})
+
+   const optionElements = Object.keys(localCategory?.options).map((key) => {
+      const option = localCategory.options[key]
       return (
-         <Zoom key={el.id} in={Boolean(el.id)}>
+         <Zoom key={option.id} in={Boolean(option.id)}>
             <Chip
-               label={el.name}
+               label={option.name}
                variant="outlined"
                deleteIcon={<EditIcon />}
-               stacked={"true"}
+               className={"stacked"}
                onDelete={(e) => {
-                  setSelectedOption(el)
+                  setSelectedOption(option)
                   handleOpenDropDown(e)
                }}
             />
          </Zoom>
       )
    })
+
+   const handleChange = (event) => {
+      setLocalCategory((prevCategory) => ({
+         ...prevCategory,
+         name: event.target.value,
+      }))
+   }
 
    return (
       <Card elevation={3}>
@@ -314,20 +265,20 @@ function CategoryEditModal({
                fullWidth
                label={"Category Name"}
                inputProps={{ maxLength: 40 }}
-               error={Boolean(touched && !categoryName.length)}
+               error={Boolean(touched && !localCategory.name?.trim().length)}
                onBlur={handleBlur}
-               value={categoryName}
-               onChange={(e) => setCategoryName(e.currentTarget.value)}
+               value={localCategory.name}
+               onChange={handleChange}
             />
-            <FormHelperText className={classes.nameError} error>
-               {touched && !categoryName.length && "Required"}
+            <FormHelperText sx={styles.nameError} error>
+               {touched && !localCategory.name?.length && "Required"}
             </FormHelperText>
             <Card>
                <CardHeader
                   action={
                      <Tooltip
                         title={
-                           category.hidden
+                           localCategory.hidden
                               ? "Re-enable this category so that users will be prompted to fill it in when registering for your events."
                               : "Don’t ask this category when users register to your events."
                         }
@@ -335,13 +286,15 @@ function CategoryEditModal({
                         <FormControlLabel
                            control={
                               <Switch
-                                 checked={Boolean(category.hidden)}
+                                 checked={Boolean(localCategory.hidden)}
                                  onChange={toggleCategoryHidden}
                                  name="category-visibility-toggle"
                                  color="primary"
                               />
                            }
-                           label={category.hidden ? "Hidden" : "Hide Category"}
+                           label={
+                              localCategory.hidden ? "Hidden" : "Hide Category"
+                           }
                         />
                      </Tooltip>
                   }
@@ -356,7 +309,7 @@ function CategoryEditModal({
                         onClick={() =>
                            setUpdateMode({
                               mode: "add",
-                              options: editableOptions,
+                              options: localCategory.options,
                            })
                         }
                      >
@@ -379,10 +332,10 @@ function CategoryEditModal({
                      onClick={() =>
                         setUpdateMode({
                            mode: "deleteCategory",
-                           option: { name: categoryName },
+                           option: { name: localCategory.name },
                         })
                      }
-                     className={classes.errorButton}
+                     color={"error"}
                      size="small"
                   >
                      Delete
@@ -420,14 +373,14 @@ function CategoryEditModal({
                   open={updateMode.mode === "add"}
                   handleAdd={handleAdd}
                   updateMode={updateMode}
-                  setUpdateMode={setUpdateMode}
+                  resetUpdateMode={resetUpdateMode}
                />
             }
             {updateMode.mode === "delete" && (
                <DeleteOption
                   open={updateMode.mode === "delete"}
                   handleDelete={handleDelete}
-                  setUpdateMode={setUpdateMode}
+                  resetUpdateMode={resetUpdateMode}
                   updateMode={updateMode}
                />
             )}
@@ -436,16 +389,16 @@ function CategoryEditModal({
                   open={updateMode.mode === "rename"}
                   handleRename={handleRename}
                   updateMode={updateMode}
-                  setUpdateMode={setUpdateMode}
+                  resetUpdateMode={resetUpdateMode}
                />
             )}
             {updateMode.mode === "deleteCategory" && (
                <DeleteCategory
                   open={updateMode.mode === "deleteCategory"}
                   handleDeleteCategory={handleDeleteCategory}
-                  categoryName={categoryName}
+                  categoryName={localCategory.name}
                   updateMode={updateMode}
-                  setUpdateMode={setUpdateMode}
+                  resetUpdateMode={resetUpdateMode}
                />
             )}
          </CardContent>
@@ -453,16 +406,4 @@ function CategoryEditModal({
    )
 }
 
-CategoryEditModal.propTypes = {
-   category: PropTypes.any,
-   firebase: PropTypes.object,
-   group: PropTypes.object,
-   groupId: PropTypes.string,
-   handleAddTempCategory: PropTypes.func,
-   handleDeleteLocalCategory: PropTypes.func,
-   handleUpdateCategory: PropTypes.func,
-   isLocal: PropTypes.bool,
-   newCategory: PropTypes.any,
-   setEditMode: PropTypes.func,
-}
 export default CategoryEditModal

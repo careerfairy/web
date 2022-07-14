@@ -1,6 +1,10 @@
 import firebase from "firebase/app"
 import { CustomCategory, Group } from "./groups"
-import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
+import {
+   mapFirestoreDocuments,
+   OnSnapshotCallback,
+   Unsubscribe,
+} from "../../util/FirebaseUtils"
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -12,6 +16,24 @@ export interface IGroupRepository {
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
    getCustomCategories(groupId: string): Promise<CustomCategory[]>
+   addNewCustomCategory(
+      groupId: string,
+      category: Omit<CustomCategory, "id">
+   ): Promise<void>
+   updateCustomCategory(
+      groupId: string,
+      category: CustomCategory
+   ): Promise<void>
+   createGroup(
+      group: Partial<Group>,
+      customCategories: CustomCategory[],
+      userEmail: string
+   ): Promise<firebase.firestore.DocumentReference>
+   deleteCustomCategory(groupId: string, categoryId: string): Promise<void>
+   listenToCustomCategories(
+      groupId: string,
+      callback: OnSnapshotCallback<CustomCategory>
+   ): Unsubscribe
 }
 
 export class FirebaseGroupRepository implements IGroupRepository {
@@ -93,5 +115,95 @@ export class FirebaseGroupRepository implements IGroupRepository {
          .collection("customCategories")
       const snapshots = await groupCustomCategoriesRef.get()
       return mapFirestoreDocuments<CustomCategory>(snapshots)
+   }
+
+   listenToCustomCategories(
+      groupId: string,
+      callback: OnSnapshotCallback<CustomCategory>
+   ): Unsubscribe {
+      const groupCustomCategoriesRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customCategories")
+      return groupCustomCategoriesRef.onSnapshot(callback)
+   }
+
+   async addNewCustomCategory(
+      groupId: string,
+      category: Omit<CustomCategory, "id">
+   ): Promise<void> {
+      const groupCustomCategoriesRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customCategories")
+      await groupCustomCategoriesRef.add(category)
+   }
+
+   async updateCustomCategory(
+      groupId: string,
+      category: CustomCategory
+   ): Promise<void> {
+      const groupCustomCategoriesRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customCategories")
+      await groupCustomCategoriesRef.doc(category.id).update(category)
+   }
+
+   async deleteCustomCategory(
+      groupId: string,
+      categoryId: string
+   ): Promise<void> {
+      const groupCustomCategoriesRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customCategories")
+      await groupCustomCategoriesRef.doc(categoryId).delete()
+   }
+
+   async createGroup(
+      group: Partial<Group>,
+      customCategories: CustomCategory[],
+      userEmail: string
+   ): Promise<firebase.firestore.DocumentReference> {
+      const removeTempCategoryIds = (customCategories: CustomCategory[]) => {
+         return customCategories.map((category) => {
+            delete category.id
+            return category
+         })
+      }
+      const newGroup = { ...group }
+      const batch = this.firestore.batch()
+
+      // Create group ref
+      const groupRef = this.firestore.collection("careerCenterData").doc()
+      // Create user's reference in th group admins sub-collection
+      const groupAdminRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupRef.id)
+         .collection("admins")
+         .doc(userEmail)
+
+      // Add the groupId property to the group object for legacy purposes
+      // TODO: Remove this property in the future
+      newGroup.groupId = groupRef.id
+
+      // add the custom categories to the the the customCategories sub-collection
+      removeTempCategoryIds(customCategories).forEach((category) => {
+         const categoryRef = this.firestore
+            .collection("careerCenterData")
+            .doc(groupRef.id)
+            .collection("customCategories")
+            .doc()
+         batch.set(categoryRef, category)
+      })
+
+      batch.set(groupRef, newGroup)
+      // Set the creating user with the mainAdmin role
+      batch.set(groupAdminRef, { role: "mainAdmin" })
+
+      await batch.commit()
+
+      return groupRef
    }
 }

@@ -373,11 +373,14 @@ export const generateReferralCode = () => {
 }
 
 // Partition function
-export function partition(array, filter) {
-   const pass = []
-   const fail = []
+export function partition<T>(
+   array: T[],
+   filter: (e: T, idx: number, arr: T[]) => boolean
+): T[][] {
+   const pass: T[] = []
+   const fail: T[] = []
    array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e))
-   return [pass, fail]
+   return [pass, fail] as T[][]
 }
 
 /**

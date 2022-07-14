@@ -208,4 +208,4 @@ const CreateBaseGroup = ({ handleNext, setBaseGroupInfo, baseGroupInfo }) => {
    )
 }
 
-export default withFirebase(CreateBaseGroup)
+export default CreateBaseGroup

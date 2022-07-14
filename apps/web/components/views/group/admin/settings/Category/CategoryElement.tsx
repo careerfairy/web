@@ -1,5 +1,4 @@
-import PropTypes from "prop-types"
-import React, { Fragment, useState } from "react"
+import React, { Fragment, useMemo, useState } from "react"
 import EditIcon from "@mui/icons-material/Edit"
 import CategoryEdit from "./CategoryEdit"
 import {
@@ -12,79 +11,47 @@ import {
    IconButton,
    Tooltip,
 } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import {
+   convertCategoryOptionsToSortedArray,
+   CustomCategory,
+   CustomCategoryOption,
+   Group,
+} from "@careerfairy/shared-lib/dist/groups"
 
-const useStyles = makeStyles((theme) => ({
-   whiteBox: {
-      backgroundColor: "white",
-      borderRadius: "5px",
-      padding: "20px",
-      margin: "10px 0",
-      textAlign: "left",
-      display: "flex",
-      flexWrap: "wrap",
-      position: "relative",
-   },
-   icon: {
-      position: "absolute",
-      top: 10,
-      right: 10,
-   },
-   label: {
-      fontSize: "0.8em",
-      fontWeight: "700",
-      color: "rgb(160,160,160)",
-      margin: "0 0 5px 0",
-   },
-   title: {
-      fontSize: "1.2em",
-      fontWeight: "700",
-      color: "rgb(80,80,80)",
-   },
-   headerTitle: {},
+const styles = sxStyles({
    hiddenChip: {
-      marginLeft: theme.spacing(1),
+      marginLeft: 1,
    },
-}))
+})
 
-function CategoryElement({
+interface Props {
+   handleUpdateCategory?: (category: CustomCategory) => void
+   category: CustomCategory
+   handleDeleteLocalCategory?: (categoryId: string) => void
+   group?: Group
+   isLocal?: boolean
+}
+
+const CategoryElement = ({
    handleUpdateCategory,
    category,
-   handleAddTempCategory,
    handleDeleteLocalCategory,
    group,
-   hidden,
    isLocal,
-}) {
-   const classes = useStyles()
+}: Props) => {
    const [editMode, setEditMode] = useState(false)
+   const hidden = Boolean(category.hidden)
+   const options = useMemo<CustomCategoryOption[]>(() => {
+      return convertCategoryOptionsToSortedArray(category.options)
+   }, [category])
 
-   const dynamicSort = (property) => {
-      let sortOrder = 1
-      if (property[0] === "-") {
-         sortOrder = -1
-         property = property.substr(1)
-      }
-      return function (a, b) {
-         /* next line works with strings and numbers,
-          * and you may want to customize it to your needs
-          */
-         const result =
-            a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
-         return result * sortOrder
-      }
-   }
-
-   let sortedOptions = []
-
-   sortedOptions = [...category.options]?.sort(dynamicSort("name"))
-
-   const optionElements = sortedOptions.map((option, index) => {
+   const optionElements = options.map((option, index) => {
       return (
          <Chip
             key={option.id || index}
             label={option.name}
-            stacked={"true"}
+            className={"stacked"}
             variant="outlined"
          />
       )
@@ -96,7 +63,6 @@ function CategoryElement({
             <Card elevation={1}>
                <CardHeader
                   titleTypographyProps={{
-                     className: classes.headerTitle,
                      gutterBottom: true,
                      color: hidden ? "textSecondary" : "textPrimary",
                   }}
@@ -106,7 +72,7 @@ function CategoryElement({
                         {hidden && (
                            <Tooltip title="This information will not be collected from viewers who register to your events.">
                               <Chip
-                                 className={classes.hiddenChip}
+                                 sx={styles.hiddenChip}
                                  variant="outlined"
                                  color="secondary"
                                  label="Hidden From Registration"
@@ -139,7 +105,6 @@ function CategoryElement({
             group={group}
             isLocal={isLocal}
             handleUpdateCategory={handleUpdateCategory}
-            handleAddTempCategory={handleAddTempCategory}
             handleDeleteLocalCategory={handleDeleteLocalCategory}
             category={category}
             setEditMode={setEditMode}
@@ -148,12 +113,4 @@ function CategoryElement({
    )
 }
 
-CategoryElement.propTypes = {
-   category: PropTypes.any,
-   group: PropTypes.object,
-   handleAddTempCategory: PropTypes.func,
-   handleDeleteLocalCategory: PropTypes.func,
-   handleUpdateCategory: PropTypes.func,
-   isLocal: PropTypes.bool,
-}
 export default CategoryElement

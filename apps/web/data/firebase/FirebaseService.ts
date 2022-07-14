@@ -176,7 +176,7 @@ class FirebaseService {
     */
    getLivestreamReportData = async (data) => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData_v2"
+         "getLivestreamReportData_v4"
       )
       return handleGetLivestreamReportData(data)
    }
@@ -1520,53 +1520,6 @@ class FirebaseService {
          .collection("careerCenterData")
          .where("groupId", "in", groupIds)
       return ref.onSnapshot(callback)
-   }
-
-   listenToGroupCategoryElements = (groupId, categoryId, callback) => {
-      let ref = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-         .collection("elements")
-      return ref.onSnapshot(callback)
-   }
-
-   updateGroupCategoryElements = (groupId, newCategories) => {
-      let groupRef = this.firestore.collection("careerCenterData").doc(groupId)
-      return groupRef.update({ categories: newCategories })
-   }
-
-   addGroupCategoryWithElements = (groupId, newCategoryObj) => {
-      let groupRef = this.firestore.collection("careerCenterData").doc(groupId)
-
-      return groupRef.update({
-         categories: firebase.firestore.FieldValue.arrayUnion(newCategoryObj),
-      })
-   }
-
-   addMultipleGroupCategoryWithElements = (groupId, arrayOfCategories) => {
-      let batch = this.firestore.batch()
-
-      arrayOfCategories.forEach((category) => {
-         let categoryRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-         const newCategoryRef = categoryRef.doc()
-         batch.set(newCategoryRef, { name: category.name })
-
-         let elementsRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("categories")
-            .doc(newCategoryRef.id)
-            .collection("elements")
-         category.options.forEach((option) => {
-            batch.set(elementsRef.doc(), { name: option.name })
-         })
-      })
-      return batch.commit()
    }
 
    /*

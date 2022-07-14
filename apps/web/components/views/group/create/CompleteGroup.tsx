@@ -5,21 +5,23 @@ import {
    Card,
    CardContent,
    CardMedia,
+   CircularProgress,
    Container,
    Typography,
-   CircularProgress,
 } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
 import DisplayCategoryElement from "./DisplayCategoryElement"
+import { sxStyles } from "../../../../types/commonTypes"
+import { BaseGroupInfo } from "../../../../pages/group/create"
+import { CustomCategory } from "@careerfairy/shared-lib/dist/groups"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       paddingTop: "50px",
       paddingBottom: "50px",
    },
    title: {
       fontWeight: "300",
-      color: "rgb(0, 210, 170)",
+      color: "primary.main",
       fontSize: "calc(1.2em + 1.5vw)",
    },
    actions: {
@@ -43,36 +45,35 @@ const useStyles = makeStyles((theme) => ({
       objectFit: "contain",
       maxWidth: "80%",
    },
-}))
+})
+
+interface Props {
+   handleBack: () => void
+   baseGroupInfo: BaseGroupInfo
+   createCareerCenter: () => Promise<void>
+   arrayOfCategories: CustomCategory[]
+}
 
 const CompleteGroup = ({
    handleBack,
    baseGroupInfo,
    createCareerCenter,
    arrayOfCategories,
-   setActiveStep,
-}) => {
+}: Props) => {
    const [submitting, setSubmitting] = useState(false)
-   const classes = useStyles()
 
    const handleFinalize = async () => {
       setSubmitting(true)
-      createCareerCenter()
+      await createCareerCenter()
    }
 
-   const categories = arrayOfCategories.map((category, index) => {
-      return (
-         <DisplayCategoryElement
-            setActiveStep={setActiveStep}
-            key={index}
-            category={category}
-         />
-      )
+   const categories = arrayOfCategories.map((category) => {
+      return <DisplayCategoryElement key={category.id} category={category} />
    })
 
    return (
-      <Container className={classes.root}>
-         <Typography align="center" className={classes.title}>
+      <Container sx={styles.root}>
+         <Typography align="center" sx={styles.title}>
             Last Check
          </Typography>
          <div>
@@ -80,9 +81,10 @@ const CompleteGroup = ({
                Details:
             </Typography>
             <Card>
-               <CardMedia className={classes.media}>
-                  <img
-                     className={classes.image}
+               <CardMedia sx={styles.media}>
+                  <Box
+                     component="img"
+                     sx={styles.image}
                      alt={`${baseGroupInfo.universityName} logo`}
                      src={baseGroupInfo.logoUrl}
                   />
@@ -105,11 +107,11 @@ const CompleteGroup = ({
             </Typography>
             <div className="category-wrapper">{categories}</div>
             {categories.length === 0 && <Typography>No categories</Typography>}
-            <div className={classes.actions}>
+            <Box sx={styles.actions}>
                <Typography gutterBottom align="center">
                   Are you satisfied?
                </Typography>
-               <Box className={classes.buttons}>
+               <Box sx={styles.buttons}>
                   <Button
                      variant="contained"
                      size="large"
@@ -134,7 +136,7 @@ const CompleteGroup = ({
                      Finish
                   </Button>
                </Box>
-            </div>
+            </Box>
          </div>
       </Container>
    )

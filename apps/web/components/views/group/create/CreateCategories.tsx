@@ -3,21 +3,16 @@ import { Box, Button, Grid, Typography } from "@mui/material"
 import CategoryEdit from "../admin/settings/Category/CategoryEdit"
 import CategoryElement from "../admin/settings/Category/CategoryElement"
 import AddIcon from "@mui/icons-material/Add"
-import makeStyles from "@mui/styles/makeStyles"
+import { sxStyles } from "../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
-      padding: theme.spacing(2, 0),
+      padding: (theme) => theme.spacing(2, 0),
    },
    title: {
       fontWeight: "300",
-      color: "rgb(0, 210, 170)",
+      color: "primary.main",
       fontSize: "calc(1.2em + 1.5vw)",
-   },
-   error: {
-      color: "red",
-      fontWeight: "lighter",
-      fontSize: "1rem",
    },
    header: {
       width: "100%",
@@ -30,7 +25,7 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       justifyContent: "space-between",
    },
-}))
+})
 
 const CreateCategories = ({
    handleBack,
@@ -40,7 +35,6 @@ const CreateCategories = ({
    handleNext,
    arrayOfCategories,
 }) => {
-   const classes = useStyles()
    const [createMode, setCreateMode] = useState(false)
 
    useEffect(() => {
@@ -55,29 +49,14 @@ const CreateCategories = ({
       }
    })
 
-   const groupId = "temp"
-
-   const categoryElements = arrayOfCategories.map((category, index) => (
-      <Grid key={category.id} item xs={12}>
-         <CategoryElement
-            handleDeleteLocalCategory={handleDeleteLocalCategory}
-            isLocal={true}
-            handleUpdateCategory={handleUpdateCategory}
-            category={category}
-         />
-      </Grid>
-   ))
-
    const verifyNext = () => {
       handleNext()
    }
 
    return (
-      <Grid className={classes.root} container spacing={2}>
-         <Grid item xs={12} className={classes.header}>
-            <Typography className={classes.title}>
-               Add some Categories
-            </Typography>
+      <Grid sx={styles.root} container spacing={2}>
+         <Grid item xs={12} sx={styles.header}>
+            <Typography sx={styles.title}>Add some Categories</Typography>
             <Box>
                <Button
                   variant="contained"
@@ -97,19 +76,26 @@ const CreateCategories = ({
                   <Grid item xs={12}>
                      <CategoryEdit
                         handleAddTempCategory={handleAddTempCategory}
-                        groupId={groupId}
                         isLocal={true}
-                        category={{}}
-                        options={[]}
+                        category={null}
                         newCategory={true}
                         setEditMode={setCreateMode}
                      />
                   </Grid>
                )}
-               {categoryElements}
+               {arrayOfCategories.map((category) => (
+                  <Grid key={category.id} item xs={12}>
+                     <CategoryElement
+                        handleDeleteLocalCategory={handleDeleteLocalCategory}
+                        isLocal={true}
+                        handleUpdateCategory={handleUpdateCategory}
+                        category={category}
+                     />
+                  </Grid>
+               ))}
             </Grid>
          </Grid>
-         <Grid item xs={12} className={classes.buttons}>
+         <Grid item xs={12} sx={styles.buttons}>
             <Button
                variant="contained"
                size="large"

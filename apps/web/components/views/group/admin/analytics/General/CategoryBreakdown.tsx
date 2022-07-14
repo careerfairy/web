@@ -18,7 +18,6 @@ import {
    Tabs,
    Typography,
 } from "@mui/material"
-import { colorsArray } from "../../../../../util/colors"
 import RotateLeftIcon from "@mui/icons-material/RotateLeft"
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
 import CustomLegend from "../../../../../../materialUI/Legends"
@@ -32,10 +31,11 @@ import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import RootState from "../../../../../../store/reducers"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { Group, GroupUserStat } from "@careerfairy/shared-lib/dist/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserDataSet, UserType } from "../index"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import useUserBreakdownStats from "../../../../../custom-hook/useUserBreakdownStats"
 
 Chart.defaults.global.plugins.labels = false
 
@@ -58,11 +58,6 @@ const styles = sxStyles({
    },
 })
 
-function randomColor() {
-   var max = 0xffffff
-   return "#" + Math.round(Math.random() * max).toString(16)
-}
-
 const CategoryBreakdown = ({
    currentStream,
    userTypes,
@@ -75,11 +70,9 @@ const CategoryBreakdown = ({
 }: Props) => {
    const showUniversityBreakdown =
       currentUserDataSet.dataSet === "groupUniversityStudents"
-   const useGroupProps = useGroup()
-   const [groupUserStat, setGroupUserStat] = useState<GroupUserStat>(null)
+   const { customCategories, group } = useGroup()
    const theme = useTheme()
    const chartRef = useRef()
-   const [localColors, setLocalColors] = useState(colorsArray)
    const [showPercentage, setShowPercentage] = useState(true)
    const [showLabels, setShowLabels] = useState(true)
    const hiddenStreamIds = useSelector(
@@ -100,11 +93,7 @@ const CategoryBreakdown = ({
             (user) =>
                currentStream[localUserType.propertyName]?.includes(
                   user.userEmail
-               ) &&
-               StatsUtil.studentFollowsGroup(
-                  user,
-                  useGroupProps.groupPresenter.model
-               )
+               ) && StatsUtil.studentFollowsGroup(user, group)
          )
       } else {
          return totalUsers?.filter((user) =>
@@ -112,11 +101,7 @@ const CategoryBreakdown = ({
                (stream) =>
                   stream?.[localUserType.propertyName]?.includes(
                      user.userEmail
-                  ) &&
-                  StatsUtil.studentFollowsGroup(
-                     user,
-                     useGroupProps.groupPresenter.model
-                  )
+                  ) && StatsUtil.studentFollowsGroup(user, group)
             )
          )
       }
@@ -128,77 +113,17 @@ const CategoryBreakdown = ({
       totalUsers,
    ])
 
-   const userStats = useMemo<GroupUserStat[]>(() => {
-      if (audience) {
-         if (showUniversityBreakdown) {
-            return useGroupProps.groupPresenter.getCustomUserCategoryStats(
-               audience,
-               useGroupProps.customCategories
-            )
-         }
-         return useGroupProps.groupPresenter.getGeneralUserCategoryStats(
-            audience
-         )
-      }
-      return []
-   }, [
-      audience?.length,
-      showUniversityBreakdown,
-      useGroupProps.customCategories,
-   ])
-   const [data, setData] = useState({
-      datasets: [],
-      labels: [],
-      ids: [],
-      dataId: "",
-   })
-
-   useEffect(() => {
-      if (groupUserStat?.dataArray?.length > 0) {
-         const numOptions = groupUserStat.dataArray.length || 0
-         if (localColors.length < numOptions) {
-            // only add more colors if there arent enough colors
-            setLocalColors([
-               ...colorsArray,
-               ...groupUserStat.dataArray.map(() => randomColor()),
-            ])
-         }
-      }
-   }, [groupUserStat?.dataArray])
-
-   useEffect(() => {
-      if (groupUserStat?.dataArray) {
-         const dataPoints = groupUserStat.dataArray.reduce(
-            (acc, option) => {
-               acc.data.push(option.count)
-               acc.labels.push(option.optionName)
-               acc.ids.push(option.optionId)
-               return acc
-            },
-            {
-               data: [],
-               ids: [],
-               labels: [],
-            }
-         )
-         setData({
-            datasets: [
-               {
-                  data: dataPoints.data,
-                  ids: dataPoints.ids,
-                  id: dataPoints.ids,
-                  backgroundColor: localColors,
-                  borderWidth: 8,
-                  borderColor: theme.palette.common.white,
-                  hoverBorderColor: theme.palette.common.white,
-               },
-            ],
-            labels: dataPoints.labels,
-            ids: dataPoints.ids,
-            dataId: groupUserStat.id + localUserType.propertyName,
-         })
-      }
-   }, [groupUserStat?.dataArray, localColors, localUserType.propertyName])
+   const {
+      currentStats,
+      totalStats,
+      handleStatChange,
+      hasNoData,
+      chartData,
+      colors,
+   } = useUserBreakdownStats(
+      audience,
+      showUniversityBreakdown ? customCategories : null
+   )
 
    const options = {
       cutoutPercentage: 70,
@@ -224,10 +149,6 @@ const CategoryBreakdown = ({
       },
    }
 
-   const hasNoData = () => {
-      return Boolean(groupUserStat?.dataArray?.length === 0)
-   }
-
    const handleMenuItemClick = (event, index) => {
       setLocalUserType(userTypes[index])
    }
@@ -236,17 +157,6 @@ const CategoryBreakdown = ({
       setShowPercentage(!showPercentage)
    }
 
-   useEffect(() => {
-      handleCategoryChange(groupUserStat?.id)
-   }, [Boolean(userStats.length), localUserType, audience])
-
-   const handleCategoryChange = (categoryId?: string) => {
-      const newUserStat =
-         userStats.find((category) => category.id === categoryId) ||
-         userStats?.[0] ||
-         null
-      setGroupUserStat(newUserStat)
-   }
    return (
       <Card raised={Boolean(currentStream)} sx={styles.root}>
          <CardHeader
@@ -295,12 +205,12 @@ const CategoryBreakdown = ({
          <Divider />
          <CardContent>
             <Select
-               value={groupUserStat?.id || ""}
+               value={currentStats?.id || ""}
                variant="outlined"
                fullWidth
-               onChange={({ target: { value } }) => handleCategoryChange(value)}
+               onChange={({ target: { value } }) => handleStatChange(value)}
             >
-               {userStats.map(({ label, id }) => (
+               {totalStats.map(({ label, id }) => (
                   <MenuItem key={id} value={id}>
                      {label}
                   </MenuItem>
@@ -325,7 +235,7 @@ const CategoryBreakdown = ({
                justifyContent="center"
                alignItems="center"
             >
-               {hasNoData() ? (
+               {hasNoData ? (
                   <>
                      <Typography>
                         Not enough {localUserType.displayName} data
@@ -340,10 +250,10 @@ const CategoryBreakdown = ({
                      </Button>
                   </>
                ) : (
-                  <Doughnut data={data} ref={chartRef} options={options} />
+                  <Doughnut data={chartData} ref={chartRef} options={options} />
                )}
             </Box>
-            {!hasNoData() && (
+            {!hasNoData && (
                <Accordion
                   expanded={showLabels}
                   sx={[showLabels && styles.expanded, styles.accordionRoot]}
@@ -360,12 +270,12 @@ const CategoryBreakdown = ({
                   <AccordionDetails>
                      <Box display="flex" justifyContent="center">
                         <CustomLegend
-                           options={groupUserStat?.dataArray}
-                           colors={localColors}
+                           options={currentStats?.dataArray}
+                           colors={colors}
                            chartRef={chartRef}
                            fullWidth
                            hideEmpty
-                           chartData={data}
+                           chartData={chartData}
                            optionDataType="User"
                            optionValueProp="count"
                         />
