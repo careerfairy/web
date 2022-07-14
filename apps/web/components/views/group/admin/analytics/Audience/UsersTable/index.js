@@ -11,7 +11,7 @@ import {
 } from "../../../../../../helperFunctions/HelperFunctions"
 import { useSnackbar } from "notistack"
 
-import { LinkifyText, tableIcons } from "../../common/TableUtils"
+import { tableIcons } from "../../common/TableUtils"
 import makeStyles from "@mui/styles/makeStyles"
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
 import { useDispatch, useSelector } from "react-redux"
@@ -25,6 +25,7 @@ import * as actions from "store/actions"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
+import LinkifyText from "../../../../../../util/LinkifyText"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
