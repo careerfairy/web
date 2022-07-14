@@ -20,7 +20,12 @@ import { useRouter } from "next/router"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
 import { useEffect, useState } from "react"
-import firebaseApp from "../data/firebase/FirebaseInstance"
+import firebaseApp, {
+   AuthInstance,
+   firebaseConfig,
+   FirestoreInstance,
+   FunctionsInstance,
+} from "../data/firebase/FirebaseInstance"
 
 import "../util/FirebaseUtils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
@@ -29,6 +34,12 @@ import GoogleTagManager from "../HOCs/GoogleTagManager"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
 import TutorialProvider from "../HOCs/TutorialProvider"
 import ErrorProvider from "../HOCs/ErrorProvider"
+import {
+   FirebaseAppProvider,
+   FirestoreProvider,
+   AuthProvider as ReactFireAuthProvider,
+   FunctionsProvider,
+} from "reactfire"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -73,35 +84,51 @@ function MyApp(props) {
          />
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
-               <TutorialProvider>
-                  <AuthProvider>
-                     <GoogleTagManager disableCookies={disableCookies}>
-                        <ThemeProviderWrapper>
-                           <FirebaseServiceContext.Provider
-                              value={firebaseServiceInstance}
-                           >
-                              <LocalizationProvider
-                                 dateAdapter={AdapterDateFns}
+               <ReactFireProviders>
+                  <TutorialProvider>
+                     <AuthProvider>
+                        <GoogleTagManager disableCookies={disableCookies}>
+                           <ThemeProviderWrapper>
+                              <FirebaseServiceContext.Provider
+                                 value={firebaseServiceInstance}
                               >
-                                 <ErrorProvider>
-                                    {disableCookies ||
-                                    isRecordingWindow ? null : (
-                                       <CFCookieConsent />
-                                    )}
-                                    <UserRewardsNotifications>
-                                       <Component {...pageProps} />
-                                    </UserRewardsNotifications>
-                                    <Notifier />
-                                 </ErrorProvider>
-                              </LocalizationProvider>
-                           </FirebaseServiceContext.Provider>
-                        </ThemeProviderWrapper>
-                     </GoogleTagManager>
-                  </AuthProvider>
-               </TutorialProvider>
+                                 <LocalizationProvider
+                                    dateAdapter={AdapterDateFns}
+                                 >
+                                    <ErrorProvider>
+                                       {disableCookies ||
+                                       isRecordingWindow ? null : (
+                                          <CFCookieConsent />
+                                       )}
+                                       <UserRewardsNotifications>
+                                          <Component {...pageProps} />
+                                       </UserRewardsNotifications>
+                                       <Notifier />
+                                    </ErrorProvider>
+                                 </LocalizationProvider>
+                              </FirebaseServiceContext.Provider>
+                           </ThemeProviderWrapper>
+                        </GoogleTagManager>
+                     </AuthProvider>
+                  </TutorialProvider>
+               </ReactFireProviders>
             </ReactReduxFirebaseProvider>
          </Provider>
       </CacheProvider>
+   )
+}
+
+const ReactFireProviders = ({ children }) => {
+   return (
+      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+         <FirestoreProvider sdk={FirestoreInstance}>
+            <ReactFireAuthProvider sdk={AuthInstance}>
+               <FunctionsProvider sdk={FunctionsInstance}>
+                  {children}
+               </FunctionsProvider>
+            </ReactFireAuthProvider>
+         </FirestoreProvider>
+      </FirebaseAppProvider>
    )
 }
 
