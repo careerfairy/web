@@ -171,7 +171,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
          - uses: actions/checkout@v2
-         - uses: amondnet/vercel-action@v20.0.1 #deploy
+         - uses: amondnet/vercel-action@v25.1.0 #deploy
            id: vercel-action
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
