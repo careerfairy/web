@@ -13,7 +13,8 @@ export class SignupPage extends CommonPage {
    readonly termsOfConditionsCheckBox: Locator
    readonly subscribeEmailsCheckBox: Locator
    readonly signupButton: Locator
-   readonly userPersonaliseContinueButton: Locator
+   readonly userRegistrationContinueButton: Locator
+   readonly userRegistrationBackButton: Locator
    readonly validateEmailButton: Locator
    readonly emailVerificationStepMessage: Locator
    readonly interestsTitle: Locator
@@ -80,8 +81,11 @@ export class SignupPage extends CommonPage {
       this.termsOfConditionsCheckBox = page.locator('input[name="agreeTerm"]')
       this.subscribeEmailsCheckBox = page.locator('input[name="subscribed"]')
       this.signupButton = page.locator("data-testid=signup-button")
-      this.userPersonaliseContinueButton = page.locator(
-         "data-testid=user-personalise-continue-button"
+      this.userRegistrationContinueButton = page.locator(
+         "data-testid=user-registration-continue-button"
+      )
+      this.userRegistrationBackButton = page.locator(
+         "data-testid=user-registration-back-button"
       )
       this.emailVerificationStepMessage = page.locator(
          "text=We have just sent you an email containing a 4-digit PIN code. Please enter this "
@@ -195,7 +199,10 @@ export class SignupPage extends CommonPage {
       return this.signupButton?.click()
    }
    async clickContinueButton() {
-      return this.userPersonaliseContinueButton?.click()
+      return this.userRegistrationContinueButton?.click()
+   }
+   async clickBackButton() {
+      return this.userRegistrationBackButton?.click()
    }
    async selectSpokenLanguageOption(optionId: string) {
       await this.spokenLanguagesInput.click()

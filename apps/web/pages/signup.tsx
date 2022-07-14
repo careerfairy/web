@@ -153,12 +153,19 @@ const SignUp = () => {
             </Typography>
          </Grid>
          <Grid item style={{ textAlign: "right" }} xs={6}>
-            {showBackButton && <Button onClick={handlePrevious}>Back</Button>}
+            {showBackButton && (
+               <Button
+                  data-testid={"user-registration-back-button"}
+                  onClick={handlePrevious}
+               >
+                  Back
+               </Button>
+            )}
 
             <LoadingButton
                variant="contained"
                onClick={handleContinue}
-               data-testid={"user-personalise-continue-button"}
+               data-testid={"user-registration-continue-button"}
                loading={isLoadingRedirectPage}
             >
                {isLastStep ? "Finalise" : "Continue"}
