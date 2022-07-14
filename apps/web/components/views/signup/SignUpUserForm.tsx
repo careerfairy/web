@@ -78,7 +78,7 @@ function SignUpUserForm() {
       query: { absolutePath },
       push,
    } = useRouter()
-   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
+   const { setCurrentStep } = useContext<IMultiStepContext>(MultiStepContext)
 
    const [emailSent, setEmailSent] = useState(false)
    const [errorMessage, setErrorMessage] = useState(null)
@@ -116,7 +116,12 @@ function SignUpUserForm() {
                .then(() => {
                   setSubmitting(false)
                   setGeneralLoading(false)
-                  nextStep()
+
+                  // we need to force the next step to be 1 (pin validation) instead of nextStep()
+                  // because there is a race condition with a useEffect in signup.txt:58
+                  // the useEffect moves to the step 1 because the user is logged in but not confirmed
+                  // if we would do nextStep() here, it would move to step 2 instead of 1
+                  setCurrentStep(1)
                })
                .catch((e) => {
                   console.error(e)
