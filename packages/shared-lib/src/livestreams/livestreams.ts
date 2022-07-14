@@ -78,6 +78,38 @@ export interface BreakoutRoom extends Identifiable {
    parentLivestream?: LivestreamEventPublicData
 }
 
+export interface LivestreamQuestion extends Identifiable {
+   author: string
+   timestamp: firebase.firestore.Timestamp
+   title: string
+   type: "new" | "current"
+   votes: number
+}
+
+export interface LivestreamPoll extends Identifiable {
+   voters: string[]
+   timestamp: firebase.firestore.Timestamp
+   state: "current" | "closed"
+   question: string
+   options: {
+      id: string
+      text: string
+   }[]
+}
+
+export interface LivestreamChatEntry extends Identifiable {
+   authorEmail: string
+   authorName: string
+   message: string
+   timestamp: firebase.firestore.Timestamp
+}
+
+export interface LivestreamIcon extends Identifiable {
+   authorEmail: string
+   timestamp: firebase.firestore.Timestamp
+   name: "heart" | "clapping" | "like"
+}
+
 /**
  * Public information about a livestream event
  *

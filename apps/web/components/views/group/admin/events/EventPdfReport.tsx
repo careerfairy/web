@@ -1,16 +1,17 @@
 import {
    Document,
-   StyleSheet,
    Font,
+   Image,
+   Page,
+   StyleSheet,
    Text,
    View,
-   Page,
-   Image,
 } from "@react-pdf/renderer"
 import { Fragment } from "react"
 import DateUtil from "util/DateUtil"
 import * as PropTypes from "prop-types"
 import { dynamicSort } from "../../../../helperFunctions/HelperFunctions"
+import { PdfReportData } from "@careerfairy/shared-lib/dist/groups"
 
 Font.register({
    family: "Poppins",
@@ -390,32 +391,32 @@ const RatingView = ({ rating }) => {
       </RatingChild>
    )
 }
+//
+// const PollOptionView = ({ option }) => {
+//    return (
+//       <View>
+//          <View />
+//          <AnswerText>{option.name}</AnswerText>
+//          <QuestionVotes>{option.votes} Votes</QuestionVotes>
+//       </View>
+//    )
+// }
 
-const PollOptionView = ({ option }) => {
-   return (
-      <View>
-         <View />
-         <AnswerText>{option.name}</AnswerText>
-         <QuestionVotes>{option.votes} Votes</QuestionVotes>
-      </View>
-   )
-}
-
-const PollView = ({ poll, index }) => {
-   let totalVotes = 0
-   poll.options.forEach((option) => (totalVotes += option.votes))
-   let pollOptionElements = poll.options.map((option) => {
-      return <PollOptionView option={option} totalVotes={totalVotes} />
-   })
-
-   return (
-      <Poll>
-         <SmallLabel>Poll {index + 1}</SmallLabel>
-         <QuestionText>{poll.question}</QuestionText>
-         {pollOptionElements}
-      </Poll>
-   )
-}
+// const PollView = ({ poll, index }) => {
+//    let totalVotes = 0
+//    poll.options.forEach((option) => (totalVotes += option.votes))
+//    let pollOptionElements = poll.options.map((option) => {
+//       return <PollOptionView option={option} totalVotes={totalVotes} />
+//    })
+//
+//    return (
+//       <Poll>
+//          <SmallLabel>Poll {index + 1}</SmallLabel>
+//          <QuestionText>{poll.question}</QuestionText>
+//          {pollOptionElements}
+//       </Poll>
+//    )
+// }
 
 const SpeakerView = ({ speaker }) => {
    let avatarUrl =
@@ -460,7 +461,7 @@ const ReportPage = ({
    categoryElements,
    followersWithMissingData,
    report,
-   onlyCompany,
+   onlyCompany = undefined,
 }) => {
    return (
       <Fragment>
@@ -531,7 +532,7 @@ const PartnerBreakdown = ({ name, numberOfStudents }) => {
       </PartnerBreakdownItem>
    )
 }
-const EventPdfReport = ({ universityReports, companyReport, summary }) => {
+const EventPdfReport = (props: PdfReportData) => {
    let questionElements = []
    let ratingsElements = []
 
@@ -556,7 +557,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
       return nameElements
    }
    const getCategoryElements = (studentStats, report) => {
-      let categoryElements = []
+      let categoryElements: JSX.Element = []
       if (studentStats && studentStats.type === "specialized") {
          categoryElements = (
             <>
@@ -576,7 +577,6 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      return (
                         <SpecializedCategoryElement
                            option={studentStats.options[option]}
-                           index={index}
                            key={index}
                         />
                      )
@@ -639,21 +639,23 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
       return totalFollowers - totalEntries
    }
 
-   questionElements = summary.questions.slice(0, 3).map((question) => {
+   questionElements = props.summary.questions.slice(0, 3).map((question) => {
       return <QuestionView key={question.id} question={question} />
    })
 
-   ratingsElements = summary.ratings.map((rating) => {
+   ratingsElements = props.summary.ratings.map((rating) => {
       return <RatingView key={rating.id} rating={rating} />
    })
 
    let numberOfVotes = 0
-   summary.questions.forEach((question) => (numberOfVotes += question.votes))
+   props.summary.questions.forEach(
+      (question) => (numberOfVotes += question.votes)
+   )
 
-   const isUniversity = Boolean(summary?.requestingGroup?.universityCode)
+   const isUniversity = Boolean(props.summary?.requestingGroup?.universityCode)
    return (
       <Document
-         title={`General Report ${summary.livestream.company} ${summary.livestream.id}.pdf`}
+         title={`General Report ${props.summary.livestream.company} ${props.summary.livestream.id}.pdf`}
       >
          <CFPage>
             <PageNumber
@@ -665,7 +667,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
             <TopView>
                <CompanyLogoView>
                   <CompanyLogo
-                     src={resolveImage(summary.requestingGroup.logoUrl)}
+                     src={resolveImage(props.summary.requestingGroup.logoUrl)}
                   />
                </CompanyLogoView>
                <View>
@@ -673,38 +675,43 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                </View>
             </TopView>
             <View style={styles.topMargin}>
-               {summary.requestingGroup.universityCode ? (
+               {props.summary.requestingGroup.universityCode ? (
                   <TopView>
                      <CompanyLogoView>
                         <CompanyLogo
-                           src={resolveImage(summary.livestream.companyLogoUrl)}
+                           src={resolveImage(
+                              props.summary.livestream.companyLogoUrl
+                           )}
                         />
                      </CompanyLogoView>
                   </TopView>
                ) : null}
                <View>
                   <Label>Live Stream Report </Label>
-                  <Title>{summary.livestream.title}</Title>
+                  <Title>{props.summary.livestream.title}</Title>
                   <DateText>
                      {DateUtil.getPrettyDate(
-                        new Date(Date.parse(summary.livestream.startDateString))
+                        // @ts-ignore
+                        new Date(
+                           Date.parse(props.summary.livestream.startDateString)
+                        )
                      )}
                   </DateText>
                   <SubTitle>Speakers</SubTitle>
-                  <SpeakersViewElement speakers={summary.speakers} />
-                  {!!universityReports.length && (
+                  <SpeakersViewElement speakers={props.summary.speakers} />
+                  {!!props.universityReports.length && (
                      <View wrap={false}>
                         <SubTitle>Hosts</SubTitle>
                         <PartnersWrapper>
-                           {universityReports.map((report) => (
+                           {props.universityReports.map((report) => (
                               <PartnerItem key={report.group.id}>
                                  <PartnerLogo src={report.group.logoUrl} />
                               </PartnerItem>
                            ))}
-                           {companyReport && (
+                           {props.companyReport && (
                               <PartnerItem>
                                  <PartnerLogo
-                                    src={companyReport.group.logoUrl}
+                                    src={props.companyReport.group.logoUrl}
                                  />
                               </PartnerItem>
                            )}
@@ -718,7 +725,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                            <SubHeader>Total Participating Students: </SubHeader>
                         </View>
                         <ColorText>
-                           <Text>{summary.totalParticipating}</Text>
+                           <Text>{props.summary.totalParticipating}</Text>
                         </ColorText>
                      </View>
                      <View>
@@ -728,7 +735,9 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                            </SubHeader>
                         </View>
                         <ColorText>
-                           <Text>{summary.totalStudentsInTalentPool}</Text>
+                           <Text>
+                              {props.summary.totalStudentsInTalentPool}
+                           </Text>
                         </ColorText>
                      </View>
                   </View>
@@ -736,7 +745,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      <View wrap={false}>
                         <SubTitle>Where They Came From</SubTitle>
                         <PartnersWrapper>
-                           {[...universityReports]
+                           {[...props.universityReports]
                               .sort(dynamicSort("totalParticipantsFromGroup"))
                               .map((report) => (
                                  <PartnerBreakdown
@@ -747,11 +756,12 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                                     }
                                  />
                               ))}
-                           {companyReport && (
+                           {props.companyReport && (
                               <PartnerBreakdown
-                                 name={companyReport.group.universityName}
+                                 name={props.companyReport.group.universityName}
                                  numberOfStudents={
-                                    companyReport.numberOfStudentsFollowingCompany
+                                    props.companyReport
+                                       .numberOfStudentsFollowingCompany
                                  }
                               />
                            )}
@@ -761,7 +771,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      <View wrap={false}>
                         <SubTitle>Most Popular Schools</SubTitle>
                         <PartnersWrapper>
-                           {summary.mostCommonUniversities.map((uni) => (
+                           {props.summary.mostCommonUniversities.map((uni) => (
                               <PartnerBreakdown
                                  key={uni.code}
                                  name={uni.name}
@@ -783,7 +793,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                               <Text># Questions</Text>
                            </View>
                            <ColorText>
-                              <Text>{summary.questions.length}</Text>
+                              <Text>{props.summary.questions.length}</Text>
                            </ColorText>
                         </EngagementChild>
                         <EngagementChild>
@@ -791,7 +801,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                               <Text># Reactions</Text>
                            </View>
                            <ColorText>
-                              <Text>{summary.numberOfIcons}</Text>
+                              <Text>{props.summary.numberOfIcons}</Text>
                            </ColorText>
                         </EngagementChild>
                         <EngagementChild>
@@ -808,7 +818,7 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                      <SubTitle>Most upvoted questions</SubTitle>
                      {questionElements}
                   </View>
-                  {universityReports.map((report) => (
+                  {props.universityReports.map((report) => (
                      <ReportPage
                         key={report.group.groupId}
                         report={report}
@@ -821,29 +831,31 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
                         )}
                      />
                   ))}
-                  {companyReport && (
+                  {props.companyReport && (
                      <ReportPage
                         followersWithMissingData={getNumberOfFollowersWithNoCategories(
-                           companyReport
+                           props.companyReport
                         )}
                         categoryElements={getCategoryElements(
-                           companyReport.studentStats,
-                           companyReport
+                           props.companyReport.studentStats,
+                           props.companyReport
                         )}
-                        onlyCompany={Boolean(!universityReports?.length)}
-                        report={companyReport}
+                        onlyCompany={Boolean(!props.universityReports?.length)}
+                        report={props.companyReport}
                      />
                   )}
-                  {summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
+                  {props.summary
+                     .numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
                      0 && (
                      <View break>
                         <DisclaimerTitle>Disclaimer</DisclaimerTitle>
                         <GroupDisclaimerText>
                            *{" "}
                            {
-                              summary.numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
+                              props.summary
+                                 .numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
                            }{" "}
-                           of the total {summary.totalParticipating}{" "}
+                           of the total {props.summary.totalParticipating}{" "}
                            participants for the event came from other sources
                         </GroupDisclaimerText>
                      </View>
@@ -853,45 +865,6 @@ const EventPdfReport = ({ universityReports, companyReport, summary }) => {
          </CFPage>
       </Document>
    )
-}
-
-EventPdfReport.propTypes = {
-   summary: PropTypes.shape({
-      requestingGroup: PropTypes.object,
-      totalParticipating: PropTypes.number,
-      totalSumOfUniversityStudents: PropTypes.number,
-      totalSumOfParticipatingStudentsWithStats: PropTypes.number,
-      requestingGroupId: PropTypes.string,
-      speakers: PropTypes.array,
-      totalStudentsInTalentPool: PropTypes.number,
-      overallRating: PropTypes.string,
-      contentRating: PropTypes.string,
-      livestream: PropTypes.object,
-      questions: PropTypes.array,
-      polls: PropTypes.array,
-      numberOfIcons: PropTypes.number,
-      numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent: PropTypes.number,
-   }),
-   universityReports: PropTypes.arrayOf(
-      PropTypes.shape({
-         numberOfStudentsFromUniversity: PropTypes.number,
-         numberOfUniversityStudentsThatFollowingUniversity: PropTypes.number,
-         numberOfUniversityStudentsWithNoStats: PropTypes.number,
-         group: PropTypes.object,
-         groupName: PropTypes.string,
-         groupId: PropTypes.string,
-         studentStats: PropTypes.object,
-         isUniversity: PropTypes.bool,
-      })
-   ),
-   companyReport: PropTypes.shape({
-      numberOfStudentsFollowingCompany: PropTypes.number,
-      group: PropTypes.object,
-      groupName: PropTypes.string,
-      groupId: PropTypes.string,
-      studentStats: PropTypes.object,
-      isUniversity: PropTypes.bool,
-   }),
 }
 
 /**
@@ -910,7 +883,7 @@ const resolveImage = (url) => {
 }
 
 //https://github.com/diegomura/react-pdf/issues/676#issuecomment-821109460
-const convertImgToBase64URL = (url, outputFormat) =>
+const convertImgToBase64URL = (url, outputFormat?: any) =>
    new Promise((resolve, reject) => {
       const img = document.createElement("img")
       img.crossOrigin = "Anonymous"
@@ -918,7 +891,7 @@ const convertImgToBase64URL = (url, outputFormat) =>
          reject(e)
       }
       img.onload = function () {
-         let canvas = document.createElement("CANVAS")
+         let canvas: HTMLCanvasElement = document.createElement("canvas")
          const ctx = canvas.getContext("2d")
          let dataURL
          canvas.height = img.height

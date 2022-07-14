@@ -31,8 +31,8 @@ import {
 import RootState from "../../store/reducers"
 import GroupsUtil from "../../data/util/GroupsUtil"
 import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
-import groupRepo from "../../data/firebase/GroupRepository"
-import { mapFirestoreDocuments } from "../../util/FirebaseUtils"
+import { groupRepo } from "../../data/RepositoryInstances"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 const styles = {
    childrenWrapperResponsive: {

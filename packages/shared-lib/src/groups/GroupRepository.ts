@@ -4,7 +4,7 @@ import {
    mapFirestoreDocuments,
    OnSnapshotCallback,
    Unsubscribe,
-} from "../../util/FirebaseUtils"
+} from "../BaseFirebaseRepository"
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -34,6 +34,10 @@ export interface IGroupRepository {
       groupId: string,
       callback: OnSnapshotCallback<CustomCategory>
    ): Unsubscribe
+   getBreakdownCategory(
+      groupId: string,
+      categoryType: Exclude<CustomCategory["categoryType"], "custom">
+   ): Promise<CustomCategory>
 }
 
 export class FirebaseGroupRepository implements IGroupRepository {
@@ -205,5 +209,19 @@ export class FirebaseGroupRepository implements IGroupRepository {
       await batch.commit()
 
       return groupRef
+   }
+
+   async getBreakdownCategory(
+      groupId: string,
+      categoryType: Exclude<CustomCategory["categoryType"], "custom">
+   ): Promise<CustomCategory> {
+      const groupFieldsOfStudySnaps = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("customCategories")
+         .where("categoryType", "==", categoryType)
+         .limit(1)
+         .get()
+      return mapFirestoreDocuments<CustomCategory>(groupFieldsOfStudySnaps)[0]
    }
 }

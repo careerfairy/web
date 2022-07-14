@@ -19,13 +19,15 @@ import {
    CustomCategory,
    sortCustomCategoryOptionsByName,
 } from "@careerfairy/shared-lib/dist/groups"
-import levelOfStudyRepo from "../../data/firebase/LevelOfStudyRepository"
-import fieldOfStudyRepo from "../../data/firebase/FieldOfStudyRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
 import { useDispatch } from "react-redux"
 import * as actions from "../../store/actions"
-import groupRepo from "../../data/firebase/GroupRepository"
+import {
+   groupRepo,
+   fieldOfStudyRepo,
+   levelOfStudyRepo,
+} from "../../data/RepositoryInstances"
 
 function getSteps() {
    return [

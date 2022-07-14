@@ -17,6 +17,7 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import { Group, PdfReportData } from "@careerfairy/shared-lib/dist/groups"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -174,7 +175,9 @@ class FirebaseService {
     * })} data
     * @return {Promise<firebase.functions.HttpsCallableResult>}
     */
-   getLivestreamReportData = async (data) => {
+   getLivestreamReportData = async (
+      data
+   ): Promise<firebase.functions.HttpsCallableResult> => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
          "getLivestreamReportData_v4"
       )
@@ -627,7 +630,7 @@ class FirebaseService {
    }
 
    getGroupsInfo = async (arrayOfGroupIds) => {
-      const groupsDictionary = {}
+      const groupsDictionary: Record<string, Group> = {}
       let i,
          j,
          tempArray,

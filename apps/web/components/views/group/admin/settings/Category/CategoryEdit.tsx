@@ -31,8 +31,8 @@ import {
    CustomCategory,
    CustomCategoryOption,
    Group,
+   groupRepo,
 } from "@careerfairy/shared-lib/dist/groups"
-import groupRepo from "../../../../../../data/firebase/GroupRepository"
 import { v4 as uuidv4 } from "uuid"
 
 const styles = sxStyles({

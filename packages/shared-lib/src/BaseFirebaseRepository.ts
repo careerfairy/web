@@ -1,6 +1,7 @@
 import firebase from "firebase/app"
 import { Identifiable } from "./commonTypes"
 import { QuerySnapshot } from "@firebase/firestore-types"
+
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 /**
@@ -35,6 +36,29 @@ export default class BaseFirebaseRepository {
 }
 
 /**
+ * Map array of Firestore documents to a dictionary of documents
+ * @param array
+ */
+export function convertDocArrayToDict<T extends Identifiable>(
+   array: T[]
+): Record<T["id"], T> {
+   return array.reduce((dict, doc) => {
+      dict[doc.id] = doc
+      return dict
+   }, {} as Record<T["id"], T>)
+}
+
+/**
+ * Map dictionary of Firestore documents to an array of documents
+ * @param dict
+ */
+export function convertDictToDocArray<T extends Identifiable>(
+   dict: Record<T["id"], T>
+): T[] {
+   return Object.values(dict)
+}
+
+/**
  * Add the document id to the document itself
  *
  * @param documentSnapshot
@@ -51,3 +75,9 @@ export function mapFirestoreDocuments<T>(
    }
    return docs
 }
+
+export type OnSnapshotCallback<T> = (
+   snapshot: firebase.firestore.QuerySnapshot<T>
+) => void
+
+export type Unsubscribe = () => void

@@ -17,8 +17,16 @@ import { useTheme } from "@mui/material/styles"
 import CloseIcon from "@mui/icons-material/Close"
 import { isMobile } from "react-device-detect"
 import { Alert, AlertTitle } from "@mui/material"
+import { PdfReportData } from "@careerfairy/shared-lib/dist/groups"
 
-const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
+interface DialogContentProps {
+   handleClose: () => void
+   reportPdfData: PdfReportData
+}
+const PdfReportDownloadDialogContent = ({
+   handleClose,
+   reportPdfData,
+}: DialogContentProps) => {
    const theme = useTheme()
 
    if (isMobile) {
@@ -83,7 +91,7 @@ const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
                height: "80vh",
                border: "none",
                borderRadius: theme.spacing(0.4),
-               boxShadow: theme.shadows[5],
+               // boxShadow: theme.shadows[5],
             }}
          >
             <EventPdfReport {...reportPdfData} />
@@ -92,11 +100,16 @@ const PdfReportDownloadDialogContent = ({ handleClose, reportPdfData }) => {
    )
 }
 
-PdfReportDownloadDialogContent.propTypes = {
-   handleClose: PropTypes.func,
+interface DownloadDialogProps {
+   openDialog: boolean
+   onClose: () => void
+   reportPdfData: PdfReportData
 }
-
-const PdfReportDownloadDialog = ({ openDialog, onClose, reportPdfData }) => {
+const PdfReportDownloadDialog = ({
+   openDialog,
+   onClose,
+   reportPdfData,
+}: DownloadDialogProps) => {
    const handleClose = () => {
       onClose?.()
    }
@@ -125,15 +138,6 @@ const PdfReportDownloadDialog = ({ openDialog, onClose, reportPdfData }) => {
          )}
       </Dialog>
    )
-}
-
-PdfReportDownloadDialog.propTypes = {
-   onClose: PropTypes.func,
-   openDialog: PropTypes.bool,
-   reportPdfData: PropTypes.shape({
-      summary: PropTypes.object,
-      groupReports: PropTypes.array,
-   }),
 }
 
 export default memo(PdfReportDownloadDialog)

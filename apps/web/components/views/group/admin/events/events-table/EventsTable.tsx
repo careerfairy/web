@@ -1,13 +1,17 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
-import MaterialTable, { MTableAction } from "@material-table/core"
+import MaterialTable, {
+   MTableAction,
+   Column,
+   Options,
+   Action,
+} from "@material-table/core"
 import {
    copyStringToClipboard,
    getBaseUrl,
    getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
-import PropTypes from "prop-types"
 import EditIcon from "@mui/icons-material/Edit"
 import DeleteIcon from "@mui/icons-material/Delete"
 import Speakers from "./Speakers"
@@ -33,6 +37,24 @@ import { useRouter } from "next/router"
 import MoreOptionsMenu from "./MoreOptionsMenu"
 import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+
+interface Props {
+   streams: LivestreamEvent[]
+   isDraft: boolean
+   handleEditStream: (stream: LivestreamEvent) => void
+   group: Group
+   publishingDraft: boolean
+   handlePublishStream: (stream: LivestreamEvent) => void
+   isPast: boolean
+   setGroupsDictionary: React.Dispatch<
+      React.SetStateAction<Record<string, Group>>
+   >
+   handleOpenNewStreamModal: () => void
+   groupsDictionary: Record<string, Group>
+   eventId: string
+}
 
 const EventsTable = ({
    streams,
@@ -46,7 +68,7 @@ const EventsTable = ({
    handleOpenNewStreamModal,
    groupsDictionary,
    eventId,
-}) => {
+}: Props) => {
    const [clickedRows, setClickedRows] = useState({})
    const firebase = useFirebaseService()
    const theme = useTheme()
@@ -81,7 +103,7 @@ const EventsTable = ({
 
    useEffect(() => {
       if (eventId) {
-         handleRowClick(_, { id: eventId })
+         handleRowClick(undefined, { id: eventId })
       }
    }, [eventId])
 
@@ -299,7 +321,7 @@ const EventsTable = ({
       ]
    )
 
-   const actions = useMemo(
+   const actions = useMemo<Action<LivestreamEvent>[]>(
       () => [
          {
             position: "toolbar",
@@ -311,7 +333,7 @@ const EventsTable = ({
       [streams]
    )
 
-   const columns = useMemo(
+   const columns = useMemo<Column<LivestreamEvent>[]>(
       () => [
          {
             field: "backgroundImageUrl",
@@ -410,7 +432,7 @@ const EventsTable = ({
       ]
    )
 
-   const customOptions = useMemo(
+   const customOptions = useMemo<Options<LivestreamEvent>>(
       () => ({
          ...defaultTableOptions,
          actionsColumnIndex: -1,
@@ -509,16 +531,3 @@ const EventsTable = ({
 }
 
 export default EventsTable
-
-Speakers.propTypes = {
-   speakers: PropTypes.arrayOf(
-      PropTypes.shape({
-         avatar: PropTypes.string,
-         background: PropTypes.string,
-         firstName: PropTypes.string,
-         id: PropTypes.string,
-         lastName: PropTypes.string,
-         position: PropTypes.string,
-      })
-   ),
-}

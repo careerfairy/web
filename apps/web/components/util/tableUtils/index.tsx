@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { forwardRef, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { getMinutes, prettyDate } from "../../helperFunctions/HelperFunctions"
@@ -42,6 +43,7 @@ import AllInboxIcon from "@mui/icons-material/AllInbox"
 import AlternateEmailIcon from "@mui/icons-material/AlternateEmail"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import { getCSVDelimiterBasedOnOS } from "../../../util/CommonUtil"
+import { Options } from "@material-table/core"
 
 export const tableIcons = {
    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -194,7 +196,7 @@ export const customDonutConfig = [
    },
 ]
 
-export const defaultTableOptions = {
+export const defaultTableOptions: Options<any> = {
    filtering: true,
    selection: true,
    pageSize: 5,
@@ -202,8 +204,8 @@ export const defaultTableOptions = {
    pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
    minBodyHeight: 200,
    exportAllData: true,
-   exportDelimiter: getCSVDelimiterBasedOnOS(),
-   exportButton: { csv: true, pdf: true }, // PDF is false because its buggy and throws errors
+   // exportDelimiter: getCSVDelimiterBasedOnOS(),
+   // exportButton: { csv: true, pdf: true }, // PDF is false because its buggy and throws errors
    searchFieldVariant: "standard",
 }
 

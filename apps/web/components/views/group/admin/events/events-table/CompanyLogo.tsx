@@ -1,35 +1,36 @@
 import React from "react"
 import { Avatar, Box, Button } from "@mui/material"
 import { alpha } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 import ImageIcon from "@mui/icons-material/Image"
 import EditIcon from "@mui/icons-material/Edit"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       width: "70%",
       height: "70%",
       maxHeight: 85,
       cursor: "pointer",
-      boxShadow: theme.shadows[5],
-      background: theme.palette.common.white,
+      boxShadow: 5,
+      background: "common.white",
       "& img": {
          objectFit: "contain",
          maxWidth: "90%",
          maxHeight: "90%",
       },
       display: "flex",
-      borderRadius: theme.spacing(0.5),
-      borderBottomRightRadius: [theme.spacing(2.5), "!important"],
-      borderTopLeftRadius: [theme.spacing(2.5), "!important"],
+      borderRadius: (theme) => theme.spacing(0.5),
+      borderBottomRightRadius: (theme) => [theme.spacing(2.5), "!important"],
+      borderTopLeftRadius: (theme) => [theme.spacing(2.5), "!important"],
    },
    hoverOverLay: {
       position: "absolute",
       width: "100%",
       height: "100%",
-      color: theme.palette.common.white,
-      backgroundColor: alpha(theme.palette.common.black, 0.4),
+      color: "common.white",
+      backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
       opacity: 0,
       display: "flex",
       justifyContent: "center",
@@ -39,22 +40,27 @@ const useStyles = makeStyles((theme) => ({
       },
       alignItems: "center",
       zIndex: 1,
-      transition: theme.transitions.create(["opacity"], {
-         easing: theme.transitions.easing.sharp,
-         duration: theme.transitions.duration.short,
-      }),
+      transition: (theme) =>
+         theme.transitions.create(["opacity"], {
+            easing: theme.transitions.easing.sharp,
+            duration: theme.transitions.duration.short,
+         }),
       "&:hover": {
          cursor: "pointer",
          opacity: 1,
       },
    },
-}))
+})
+
+interface Props {
+   onClick: (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => void
+   livestream: LivestreamEvent
+}
 
 const CompanyLogo = ({
    onClick,
    livestream: { companyLogoUrl, backgroundImageUrl },
-}) => {
-   const classes = useStyles({ backgroundImageUrl })
+}: Props) => {
    return (
       <Box
          display="flex"
@@ -65,11 +71,11 @@ const CompanyLogo = ({
          width="100%"
          minWidth={160}
       >
-         <div onClick={onClick} className={classes.hoverOverLay}>
+         <Box onClick={onClick} sx={styles.hoverOverLay}>
             <EditIcon fontSize="large" color="inherit" />
-         </div>
+         </Box>
          <Avatar
-            className={classes.root}
+            sx={styles.root}
             variant="rounded"
             src={getResizedUrl(companyLogoUrl, "xs")}
          >

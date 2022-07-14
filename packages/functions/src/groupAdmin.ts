@@ -2,16 +2,25 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import {
    getPdfCategoryChartData,
    Group,
+   PdfCategoryChartData,
    PdfReportData,
 } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamPoll,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { FirebaseGroupRepository } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { FirebaseLevelOfStudyRepository } from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
+import { FirebaseFieldOfStudyRepository } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 const functions = require("firebase-functions")
 const {
    setHeaders,
    getArrayDifference,
    makeRequestingGroupIdFirst,
-   convertPollOptionsObjectToArray,
    studentBelongsToGroup,
    getRegisteredStudentsStats,
    getRatingsAverage,
@@ -140,8 +149,8 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
       const { targetStreamId, targetGroupId, userEmail } = data
       const universityReports = []
       let companyReport = null
-      const universityReport: PdfReportData = null
-      const nonUniversityReport: PdfReportData = null
+      let universityChartData: PdfCategoryChartData = null
+      let nonUniversityChartData: PdfCategoryChartData = null
 
       const authEmail = context.auth.token.email || null
 
@@ -193,23 +202,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          return totalUsers
       }
 
-      const groupFieldOfStudySnap = await admin
-         .firestore()
-         .collection("careerCenterData")
-         .doc(targetGroupId)
-         .collection("customCategories")
-         .where("categoryType", "==", "fieldOfStudy")
-         .limit(1)
-         .get()
-      const groupLevelOfStudySnap = await admin
-         .firestore()
-         .collection("careerCenterData")
-         .doc(targetGroupId)
-         .collection("customCategories")
-         .where("categoryType", "==", "levelOfStudy")
-         .limit(1)
-         .get()
-
       const groupSnap = await admin
          .firestore()
          .collection("careerCenterData")
@@ -247,6 +239,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             id: streamSnap.id,
             startDateString: getDateString(streamSnap.data()),
          } as LivestreamEvent
+
          const requestingGroupData = {
             id: groupSnap.id,
             ...groupSnap.data(),
@@ -363,44 +356,70 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          let participatingStudents = await getUsersByEmail(
             livestreamData.participatingStudents || []
          )
+
+         const groupRepo = new FirebaseGroupRepository(admin.firestore())
+         const levelOfStudyRepo = new FirebaseLevelOfStudyRepository(
+            admin.firestore()
+         )
+         const fieldOfStudyRepo = new FirebaseFieldOfStudyRepository(
+            admin.firestore()
+         )
+         // console.log("-> requestingGroupData AGAIN V2", requestingGroupData)
+         const groupPresenter = new GroupPresenter(requestingGroupData)
+
+         const rootLevelOfStudyCategory =
+            await levelOfStudyRepo.getLevelsOfStudyAsCategory()
+         const rootFieldOfStudyCategory =
+            await fieldOfStudyRepo.getFieldsOfStudyAsCategory()
+
+         const [uniStudents, nonUniStudents]: UserData[][] = partition(
+            participatingStudents,
+            (student) => groupPresenter.isUniversityStudent(student)
+         )
+         const canHaveCustomCategories =
+            groupPresenter.canHaveCustomCategories()
+
+         // nonUniversityChartData = getPdfCategoryChartData(
+         //    rootFieldOfStudyCategory,
+         //    rootLevelOfStudyCategory,
+         //    canHaveCustomCategories ? nonUniStudents : participatingStudents
+         // )
+
+         if (groupPresenter.canHaveCustomCategories()) {
+            const customFieldsOfStudyCategory =
+               await groupRepo.getBreakdownCategory(
+                  requestingGroupData.id,
+                  "fieldOfStudy"
+               )
+
+            const customLevelsOfStudyCategory =
+               await groupRepo.getBreakdownCategory(
+                  requestingGroupData.id,
+                  "levelOfStudy"
+               )
+
+            // console.log(
+            //    "-> uniStudents categories",
+            //    uniStudents.map((s) => s.university.categories)
+            // )
+
+            universityChartData = getPdfCategoryChartData(
+               customFieldsOfStudyCategory,
+               customLevelsOfStudyCategory,
+               participatingStudents
+            )
+         }
+
          functions.logger.info(
             "Number of participating students: " + participatingStudents.length
          )
-         // const [uniStudents, nonUniStudents]: UserData[][] = partition(
-         //    participatingStudents,
-         //    (student) => {
-         //       return (
-         //          student.university?.code ===
-         //          requestingGroupData.universityCode
-         //       )
-         //    }
-         // )
-         // functions.logger.log("-> uniStudents", uniStudents.length)
-         // functions.logger.log("-> nonUniStudents", nonUniStudents.length)
-
-         const talentPoolForReport = talentPoolSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }))
 
          const speakers = livestreamData.speakers || []
 
-         const questions = questionsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-         }))
+         const questions =
+            mapFirestoreDocuments<LivestreamQuestion>(questionsSnap)
 
-         const polls = pollsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            options: convertPollOptionsObjectToArray(doc.data().options),
-         }))
-
-         const icons = iconsSnap.docs.map((doc) => ({
-            id: doc.id,
-            ...doc.data(),
-            options: convertPollOptionsObjectToArray(doc.data().options || {}),
-         }))
+         const polls = mapFirestoreDocuments<LivestreamPoll>(pollsSnap)
 
          let totalSumOfParticipatingStudentsWithStats = 0
          let totalSumOfUniversityStudents = 0
@@ -454,7 +473,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
                   groupId: groupData.id,
                   isUniversity: Boolean(groupData.universityCode),
                }
-               functions.logger.info("-> studentStats", studentStats)
 
                totalSumOfUniversityStudents += numberOfStudentsFromUniversity
                universityReports.push(universityReport)
@@ -486,10 +504,10 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             }
          }
 
-         const chartData = getPdfCategoryChartData(participatingStudents)
-
          return {
             universityReports,
+            universityChartData,
+            nonUniversityChartData,
             companyReport,
             summary: {
                totalParticipating: participatingStudents.length,
@@ -497,12 +515,12 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
                requestingGroupId: targetGroupId,
                requestingGroup: requestingGroupData,
                speakers,
-               totalStudentsInTalentPool: talentPoolForReport.length,
+               totalStudentsInTalentPool: talentPoolSnap.size,
                ratings: ratings,
                livestream: livestreamData,
                questions,
                polls,
-               numberOfIcons: icons.length,
+               numberOfIcons: iconsSnap.size,
                totalSumOfUniversityStudents,
                numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent:
                   participatingStudents.length -
@@ -513,7 +531,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
                   5
                ),
             },
-         }
+         } as PdfReportData
       } catch (e) {
          functions.logger.error(e)
          throw new functions.https.HttpsError(

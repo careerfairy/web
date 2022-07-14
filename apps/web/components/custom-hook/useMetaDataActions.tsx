@@ -21,7 +21,10 @@ import { useDispatch } from "react-redux"
 import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint"
 import { useTheme } from "@mui/material/styles"
 import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { Group, PdfReportData } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 interface MetaDataActionsProps {
    allGroups: Group[]
@@ -41,20 +44,22 @@ export function useMetaDataActions({
    const theme = useTheme()
    const dispatch = useDispatch()
    const [talentPoolDictionary, setTalentPoolDictionary] = useState({})
-   const [targetStream, setTargetStream] = useState(null)
+   const [targetStream, setTargetStream] = useState<LivestreamEvent>(null)
    const [loadingReportData, setLoadingReportData] = useState({})
    const [
       loadingRegisteredUsersFromGroupData,
       setLoadingRegisteredUsersFromGroupData,
-   ] = useState({})
+   ] = useState<Record<string, boolean>>({})
    const [loadingTalentPool, setLoadingTalentPool] = useState({})
 
    const [
       registeredStudentsFromGroupDictionary,
       setRegisteredStudentsFromGroupDictionary,
    ] = useState({})
-   const [reportDataDictionary, setReportDataDictionary] = useState({})
-   const [reportPdfData, setReportPdfData] = useState(null)
+   const [reportDataDictionary, setReportDataDictionary] = useState<
+      Record<string, PdfReportData>
+   >({})
+   const [reportPdfData, setReportPdfData] = useState<PdfReportData>(null)
 
    const [registeredStudentsDictionary, setRegisteredStudentsDictionary] =
       useState({})
@@ -132,10 +137,8 @@ export function useMetaDataActions({
          ;(async function () {
             const querySnapshot =
                await firebase.getLivestreamRegisteredStudents(targetStream.id)
-            const newRegisteredStudents = querySnapshot.docs.map((doc) => ({
-               id: doc.id,
-               ...doc.data(),
-            }))
+            const newRegisteredStudents =
+               mapFirestoreDocuments<UserData>(querySnapshot)
 
             setRegisteredStudentsDictionary({
                ...registeredStudentsDictionary,
@@ -212,7 +215,7 @@ export function useMetaDataActions({
    }, [targetStream, registeredStudentsFromGroupDictionary])
 
    const handleGetLivestreamReportData = useCallback(
-      async (rowData) => {
+      async (rowData: LivestreamEvent) => {
          try {
             if (!userData.userEmail)
                return dispatch(
@@ -226,11 +229,13 @@ export function useMetaDataActions({
                ...prevState,
                [rowData.id]: true,
             }))
-            const { data } = await firebase.getLivestreamReportData({
-               targetStreamId: rowData.id,
-               userEmail: userData.userEmail,
-               targetGroupId: group.id,
-            })
+            const { data }: { data: PdfReportData } =
+               await firebase.getLivestreamReportData({
+                  targetStreamId: rowData.id,
+                  userEmail: userData.userEmail,
+                  targetGroupId: group.id,
+               })
+            console.log("-> data", data)
             setReportDataDictionary((prevState) => ({
                ...prevState,
                [rowData.id]: data,
