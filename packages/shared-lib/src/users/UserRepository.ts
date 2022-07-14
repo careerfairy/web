@@ -1,18 +1,11 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
-import { SavedRecruiter, UserData } from "./users"
+import {
+   AdditionalInformationProps,
+   RegistrationStepAnalyticsProps,
+   SavedRecruiter,
+   UserData,
+} from "./users"
 import firebase from "firebase/compat/app"
-
-type AdditionalInformationProps = {
-   userEmail: string
-   gender?: string
-   spokenLanguages?: string[]
-   countriesOfInterest?: string[]
-   interestsIds?: string[]
-   isLookingForJob?: boolean
-   linkedinUrl?: string
-   referralCode?: string
-   fieldOfStudy?: string
-}
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -43,10 +36,8 @@ export interface IUserRepository {
 
    setRegistrationStepStatus({
       userEmail,
-      userId,
-      stepId,
-      isFilled,
-   }): Promise<void>
+      steps,
+   }: RegistrationStepAnalyticsProps): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -188,26 +179,14 @@ export class FirebaseUserRepository
       return userRef.update(toUpdate)
    }
 
-   setRegistrationStepStatus({
-      userEmail,
-      userId,
-      stepId,
-      isFilled,
-   }): Promise<void> {
-      if (isFilled == null) {
-         return
-      }
-
+   async setRegistrationStepStatus({ userEmail, steps }): Promise<void> {
       const userRef = this.firestore
          .collection("userData")
          .doc(userEmail)
          .collection("analytics")
          .doc("analytics")
 
-      const toUpdate = isFilled
-         ? { registrationFilledSteps: [{ userId, stepId }] }
-         : { registrationSkippedSteps: [{ userId, stepId }] }
-
+      const toUpdate = { registrationSteps: steps }
       return userRef.set(toUpdate, { merge: true })
    }
 }

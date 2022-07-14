@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react"
+import React, { useState, useEffect, useCallback } from "react"
 import Head from "next/head"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
@@ -28,6 +28,8 @@ import { useRouter } from "next/router"
 import InterestsInformation, {
    renderInterestsInformationStepTitle,
 } from "../components/views/signup/steps/InterestsInformation"
+import userRepo from "../data/firebase/UserRepository"
+import { RegistrationStep } from "@careerfairy/shared-lib/dist/users"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 
@@ -60,7 +62,7 @@ const steps: MultiStepComponentType[] = [
 ]
 
 const SignUp = () => {
-   const { authenticatedUser: user } = useAuth()
+   const { authenticatedUser: user, userData } = useAuth()
    const {
       push,
       query: { absolutePath },
@@ -69,9 +71,11 @@ const SignUp = () => {
 
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
    const [currentStep, setCurrentStep] = useState(0)
+   const [stepAnalytics, setStepAnalytics] = useState([] as RegistrationStep[])
    const isLastStep = currentStep === steps.length - 1
    const isFirstStep = currentStep === 0
    const showBackButton = currentStep > 2
+   const shouldUpdateStepAnalytics = currentStep > 1
 
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
@@ -90,7 +94,43 @@ const SignUp = () => {
       }
    }
 
+   useEffect(() => {
+      const updateAnalytics = async () => {
+         const { userEmail } = userData
+         try {
+            await userRepo.setRegistrationStepStatus({
+               userEmail,
+               steps: stepAnalytics,
+            })
+         } catch (error) {
+            console.log(error)
+         }
+      }
+
+      if (stepAnalytics.length) {
+         updateAnalytics().catch(console.error)
+      }
+   }, [stepAnalytics])
+
+   const updateStepStatus = useCallback(() => {
+      if (shouldUpdateStepAnalytics) {
+         const { id } = userData
+         const { description: stepId } = steps[currentStep]
+         const isCurrentStepAlreadyOnStepAnalytics = stepAnalytics.find(
+            (step) => step.stepId === stepId
+         )
+
+         if (!isCurrentStepAlreadyOnStepAnalytics) {
+            const newStepAnalytics = [...stepAnalytics, { userId: id, stepId }]
+
+            setStepAnalytics(newStepAnalytics)
+         }
+      }
+   }, [userData, currentStep])
+
    const handleContinue = () => {
+      updateStepStatus()
+
       if (isLastStep) {
          // set a loading state in the Finalise button, the next page may take some seconds to render
          setIsLoadingRedirectPage(true)

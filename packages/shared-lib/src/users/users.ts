@@ -77,6 +77,28 @@ export interface UserPublicData {
    badges?: string[]
 }
 
+export type AdditionalInformationProps = {
+   userEmail: string
+   gender?: string
+   spokenLanguages?: string[]
+   countriesOfInterest?: string[]
+   interestsIds?: string[]
+   isLookingForJob?: boolean
+   linkedinUrl?: string
+   referralCode?: string
+   fieldOfStudy?: string
+}
+
+export type RegistrationStep = {
+   userId: string
+   stepId: string
+}
+
+export type RegistrationStepAnalyticsProps = {
+   userEmail: string
+   steps: RegistrationStep[]
+}
+
 /**
  * Public information about a user
  *
