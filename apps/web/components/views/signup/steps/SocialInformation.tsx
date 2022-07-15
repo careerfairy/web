@@ -4,11 +4,11 @@ import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import React, { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import userRepo from "../../../../data/firebase/UserRepository"
 import { linkedInRegex } from "../../../../constants/forms"
 import { useDebounceInput } from "../../../custom-hook/useDebouce"
 import { ReferralData } from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    inputLabel: {

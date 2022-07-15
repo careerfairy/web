@@ -2,7 +2,6 @@ import { Grid, Switch, Typography } from "@mui/material"
 import React, { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import MultiListSelect from "../../common/MultiListSelect"
-import userRepo from "../../../../data/firebase/UserRepository"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useInterests } from "../../../custom-hook/useCollection"
 import {
@@ -12,6 +11,7 @@ import {
    regionGroupId,
 } from "../../../../constants/forms"
 import { formatToOptionArray, mapOptions, Option } from "../utils"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    inputLabel: {
