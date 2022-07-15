@@ -1,4 +1,10 @@
-import { Grid, TextField, Typography } from "@mui/material"
+import {
+   FormControl,
+   FormHelperText,
+   Grid,
+   TextField,
+   Typography,
+} from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
@@ -13,6 +19,11 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 const styles = sxStyles({
    inputLabel: {
       textTransform: "uppercase",
+      fontSize: "0.8rem !important",
+      fontWeight: "bold",
+   },
+   helperText: {
+      marginTop: 1,
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
@@ -171,22 +182,32 @@ const SocialInformation = () => {
                </Typography>
             </Grid>
             <Grid item xs={12} sm={8}>
-               <TextField
-                  className="registrationInput"
-                  variant="outlined"
-                  fullWidth
-                  id="referralCode"
-                  name="referralCode"
-                  placeholder="Enter a Referral Code"
-                  InputLabelProps={{ shrink: true }}
-                  onChange={({ target: { value } }) => {
-                     handleReferralCodeInputChange(value)
-                  }}
-                  disabled={isValidReferralCode}
-                  value={referralCodeInput}
-                  label="Copy-paste here your referral code"
-                  error={!!referralCodeInput.length && !isValidReferralCode}
-               />
+               <FormControl fullWidth>
+                  <TextField
+                     className="registrationInput"
+                     variant="outlined"
+                     fullWidth
+                     id="referralCode"
+                     name="referralCode"
+                     placeholder="Enter a Referral Code"
+                     InputLabelProps={{ shrink: true }}
+                     onChange={({ target: { value } }) => {
+                        handleReferralCodeInputChange(value)
+                     }}
+                     disabled={isValidReferralCode}
+                     value={referralCodeInput}
+                     label="Copy-paste here your referral code"
+                     error={!!referralCodeInput.length && !isValidReferralCode}
+                  />
+                  {isValidReferralCode && (
+                     <FormHelperText
+                        sx={styles.helperText}
+                        id="referralCode-helper-text"
+                     >
+                        The referral code was successfully validated
+                     </FormHelperText>
+                  )}
+               </FormControl>
             </Grid>
          </Grid>
       </>

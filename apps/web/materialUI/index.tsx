@@ -223,7 +223,7 @@ const getComponents = (theme: DefaultTheme): any => ({
    MuiOutlinedInput: {
       styleOverrides: {
          root: {
-            borderRadius: 15,
+            borderRadius: 8,
          },
       },
    },
@@ -260,6 +260,7 @@ const getComponents = (theme: DefaultTheme): any => ({
                borderRadius: "8px",
 
                "& fieldset": {
+                  borderRadius: "8px",
                   border: 0,
                },
             },
