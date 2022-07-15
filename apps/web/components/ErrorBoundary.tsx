@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode, Suspense } from "react"
 import * as Sentry from "@sentry/nextjs"
 import ErrorContext from "../context/error/ErrorContext"
 
@@ -73,4 +73,25 @@ export default class ErrorBoundary extends React.Component<Props, State> {
       // Return children components in case of no error
       return this.props.children
    }
+}
+
+interface SuspenseWithBoundaryProps extends Props {
+   fallback?: ReactNode
+   children: ReactNode
+}
+
+/**
+ * ErrorBoundary + Suspense
+ *
+ * @param props
+ * @constructor
+ */
+export const SuspenseWithBoundary = (props: SuspenseWithBoundaryProps) => {
+   return (
+      <ErrorBoundary {...props}>
+         <Suspense fallback={props.fallback ?? "Loading.."}>
+            {props.children}
+         </Suspense>
+      </ErrorBoundary>
+   )
 }

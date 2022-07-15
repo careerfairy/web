@@ -30,7 +30,7 @@ import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { styles } from "../profileStyles"
 import useUserRewards from "../../../custom-hook/useUserRewards"
-import ErrorBoundary from "../../../../components/ErrorBoundary"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 
 const ReferralProfileTab = () => {
    const { userData, userPresenter } = useAuth()
@@ -112,9 +112,9 @@ const ReferralProfileTab = () => {
             </Grid>
 
             <Grid item xs={12}>
-               <ErrorBoundary message={"Failed to load Rewards"}>
+               <SuspenseWithBoundary fallback={<LoadingRewardsTable />}>
                   <RewardsTable userDataId={userData.id} />
-               </ErrorBoundary>
+               </SuspenseWithBoundary>
             </Grid>
          </Grid>
       </ContentCard>
@@ -128,17 +128,7 @@ const localStyles = {
 }
 
 const RewardsTable = ({ userDataId }) => {
-   let { isLoading, data } = useUserRewards(userDataId)
-
-   if (isLoading) {
-      return (
-         <Box>
-            <Skeleton />
-            <Skeleton animation="wave" />
-            <Skeleton animation="wave" />
-         </Box>
-      )
-   }
+   const { data } = useUserRewards(userDataId)
 
    return (
       <TableContainer>
@@ -196,6 +186,16 @@ const RewardsTable = ({ userDataId }) => {
             </TableBody>
          </Table>
       </TableContainer>
+   )
+}
+
+const LoadingRewardsTable = () => {
+   return (
+      <Box>
+         <Skeleton />
+         <Skeleton animation="wave" />
+         <Skeleton animation="wave" />
+      </Box>
    )
 }
 
