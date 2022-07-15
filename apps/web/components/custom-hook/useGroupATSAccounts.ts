@@ -1,19 +1,26 @@
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups"
-import useCollection from "./useCollection"
-import { useCallback } from "react"
+import { collection } from "firebase/firestore"
+import { useFirestore, useFirestoreCollectionData } from "reactfire"
 
-const useGroupATSAccounts = (groupId: string, realtime: boolean = true) => {
-   // cache query function
-   const query = useCallback(
-      (firestore) =>
-         firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("ats"),
-      [groupId]
+const useGroupATSAccounts = (groupId: string) => {
+   const collectionRef = collection(
+      useFirestore(),
+      "careerCenterData",
+      groupId,
+      "ats"
    )
 
-   return useCollection<GroupATSAccount>(query, realtime)
+   let { status, data } = useFirestoreCollectionData<GroupATSAccount>(
+      collectionRef as any,
+      {
+         idField: "id", // this field will be added to the firestore object
+      }
+   )
+
+   return {
+      isLoading: status === "loading",
+      data: data,
+   }
 }
 
 export default useGroupATSAccounts
