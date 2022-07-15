@@ -14,9 +14,9 @@ import useGroupATSAccounts from "../../../../custom-hook/useGroupATSAccounts"
 
 const AtsIntegrationContent = () => {
    const group: Group = useSelector(groupSelector)
-   const { data, isLoading, error } = useGroupATSAccounts(group?.groupId)
+   const { data, isLoading } = useGroupATSAccounts(group?.groupId)
    console.log("Render AtsIntegrationContent Group", group)
-   console.log("Render AtsIntegrationContent ATS", isLoading, data, error)
+   console.log("Render AtsIntegrationContent ATS", isLoading, data)
 
    const [show, setShow] = useState(false)
 
@@ -42,7 +42,7 @@ const AtsIntegrationContent = () => {
 
 const Test = () => {
    const group: Group = useSelector(groupSelector)
-   const { data, isLoading, error } = useGroupATSAccounts(group?.groupId, false)
+   const { data, isLoading } = useGroupATSAccounts(group?.groupId)
 
    console.log("render from Test!")
    return (
