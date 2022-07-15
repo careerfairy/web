@@ -4,11 +4,14 @@ import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHea
 import AtsIntegrationContent from "../../../../components/views/group/admin/ats-integration/AtsIntegrationContent"
 import { useRouter } from "next/router"
 import { useFirestoreConnect } from "react-redux-firebase"
+import ErrorBoundary from "../../../../components/ErrorBoundary"
 
 const AtsIntegration = () => (
    <GroupDashboardLayout>
       <DashboardHead title="CareerFairy | ATS Integration" />
-      <AtsIntegrationContent />
+      <ErrorBoundary>
+         <AtsIntegrationContent />
+      </ErrorBoundary>
    </GroupDashboardLayout>
 )
 
