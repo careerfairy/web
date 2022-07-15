@@ -11,10 +11,16 @@ import { useCallback, useEffect, useReducer, useState } from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import useGroupATSAccounts from "../../../../custom-hook/useGroupATSAccounts"
+import useGroup from "../../../../custom-hook/useGroup"
 
 const AtsIntegrationContent = () => {
-   const group: Group = useSelector(groupSelector)
-   const { data, isLoading } = useGroupATSAccounts(group?.groupId)
+   // const group: Group = useSelector(groupSelector)
+   const { data: group, isLoading: groupIsLoading } = useGroup(
+      "rTUGXDAG2XAtpVcgvAcc"
+   )
+
+   console.log("group", groupIsLoading, group)
+   const { data, isLoading } = useGroupATSAccounts(group.groupId)
    console.log("Render AtsIntegrationContent Group", group)
    console.log("Render AtsIntegrationContent ATS", isLoading, data)
 
