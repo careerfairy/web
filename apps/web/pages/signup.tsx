@@ -18,8 +18,8 @@ import LocationInformation from "../components/views/signup/steps/LocationInform
 import LoadingButton from "@mui/lab/LoadingButton"
 import { useRouter } from "next/router"
 import InterestsInformation from "../components/views/signup/steps/InterestsInformation"
-import userRepo from "../data/firebase/UserRepository"
 import { RegistrationStep } from "@careerfairy/shared-lib/dist/users"
+import { userRepo } from "../data/RepositoryInstances"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
 

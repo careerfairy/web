@@ -4,8 +4,8 @@ import React, { useCallback, useEffect, useState } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import { useInterests } from "../../../custom-hook/useCollection"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import userRepo from "../../../../data/firebase/UserRepository"
 import { formatToOptionArray, mapOptions, Option } from "../utils"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    inputLabel: {
