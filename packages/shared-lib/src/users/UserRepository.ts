@@ -27,6 +27,7 @@ export interface IUserRepository {
       gender,
       spokenLanguages,
       countriesOfInterest,
+      regionsOfInterest,
       isLookingForJob,
       interestsIds,
       referredBy,
@@ -144,6 +145,7 @@ export class FirebaseUserRepository
       gender,
       spokenLanguages,
       countriesOfInterest,
+      regionsOfInterest,
       isLookingForJob,
       interestsIds,
       linkedinUrl,
@@ -158,6 +160,9 @@ export class FirebaseUserRepository
       const countriesOfInterestToUpdate = countriesOfInterest
          ? { countriesOfInterest }
          : {}
+      const regionsOfInterestToUpdate = regionsOfInterest
+         ? { regionsOfInterest }
+         : {}
       const isLookingForJobToUpdate =
          isLookingForJob !== undefined ? { isLookingForJob } : {}
       const linkedInLinkToUpdate =
@@ -170,6 +175,7 @@ export class FirebaseUserRepository
          ...genderToUpdate,
          ...spokenLanguagesToUpdate,
          ...countriesOfInterestToUpdate,
+         ...regionsOfInterestToUpdate,
          ...isLookingForJobToUpdate,
          ...interestsToUpdate,
          ...linkedInLinkToUpdate,
@@ -187,7 +193,6 @@ export class FirebaseUserRepository
          .collection("analytics")
          .doc("analytics")
 
-      debugger
       const toUpdate = { registrationSteps: steps }
       return userRef.set(toUpdate, { merge: true })
    }

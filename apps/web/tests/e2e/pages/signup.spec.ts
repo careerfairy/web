@@ -141,6 +141,7 @@ test.describe("Signup Page Functionality", () => {
          linkedinUrl,
          spokenLanguagesIds: [firstSpokenLanguageId],
          countriesOfInterestIds: [firstCountriesOfInterestId],
+         regionsOfInterestIds: [firstRegionOfInterestId],
          interestsIds: [firstInterestsId],
       } = credentials
 
@@ -175,6 +176,7 @@ test.describe("Signup Page Functionality", () => {
 
       await signup.selectSpokenLanguageOption(firstSpokenLanguageId)
       await signup.selectCountriesOfInterestOption(firstCountriesOfInterestId)
+      await signup.selectCountriesOfInterestOption(firstRegionOfInterestId)
       await signup.selectIsLookingForJobToggleOption()
 
       await signup.clickContinueButton()
@@ -196,6 +198,7 @@ test.describe("Signup Page Functionality", () => {
          linkedinUrl: userDataLinkedinUrl,
          spokenLanguages: userDataSpokenLanguages,
          countriesOfInterest: userDataCountriesOfInterest,
+         regionsOfInterest: userDataRegionsOfInterest,
          interestsIds: userDataInterestsIds,
          isLookingForJob: userDataIsLookingForJob,
       } = userDataFromDb
@@ -204,6 +207,7 @@ test.describe("Signup Page Functionality", () => {
       expect(userDataIsLookingForJob).toBeTruthy()
       expect(firstSpokenLanguageId).toEqual(userDataSpokenLanguages[0])
       expect(firstCountriesOfInterestId).toEqual(userDataCountriesOfInterest[0])
+      expect(firstRegionOfInterestId).toEqual(userDataRegionsOfInterest[0])
       expect(firstInterestsId).toEqual(userDataInterestsIds[0])
    })
 
