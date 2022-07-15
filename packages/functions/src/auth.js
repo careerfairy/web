@@ -54,48 +54,24 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                `Starting firestore account creation process for ${recipientEmail}`
             )
 
-            // Check if the user was referred by someone
-            // const referralData = {}
-            // let referralUser = null
-            // if (referralCode) {
-            //    referralUser = await userGetByReferralCode(referralCode)
-            //
-            //    if (referralUser) {
-            //       referralData.referredBy = {
-            //          uid: referralUser.id,
-            //          name: `${referralUser.firstName} ${referralUser.lastName}`,
-            //       }
-            //       functions.logger.info(
-            //          "Adding referral information to the new user."
-            //       )
-            //    } else {
-            //       functions.logger.warn(
-            //          `Invalid referral code: ${referralCode}, no corresponding user.`
-            //       )
-            //    }
-            // }
-
             await admin
                .firestore()
                .collection("userData")
                .doc(recipientEmail)
                .set(
-                  Object.assign(
-                     {
-                        authId: user.uid,
-                        id: recipientEmail,
-                        validationPin: pinCode,
-                        firstName: firstName,
-                        lastName: lastName,
-                        userEmail: recipientEmail,
-                        university: university,
-                        universityCountryCode: universityCountryCode,
-                        unsubscribed: !subscribed,
-                        referralCode: generateReferralCode(),
-                        gender: gender,
-                     }
-                     // referralData
-                  )
+                  Object.assign({
+                     authId: user.uid,
+                     id: recipientEmail,
+                     validationPin: pinCode,
+                     firstName: firstName,
+                     lastName: lastName,
+                     userEmail: recipientEmail,
+                     university: university,
+                     universityCountryCode: universityCountryCode,
+                     unsubscribed: !subscribed,
+                     referralCode: generateReferralCode(),
+                     gender: gender,
+                  })
                )
                .then(async () => {
                   console.log(`Starting sending email for ${recipientEmail}`)
@@ -111,22 +87,6 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                      console.log(
                         `Sent email successfully for ${recipientEmail}`
                      )
-
-                     // Create the referral follower reward if the user was referred by someone
-                     // if (referralData.referredBy) {
-                     //    try {
-                     //       await rewardCreateReferralSignUpFollower(
-                     //          recipientEmail,
-                     //          referralUser
-                     //       )
-                     //       functions.logger.info(
-                     //          "Created referral follower reward for this user."
-                     //       )
-                     //    } catch (e) {
-                     //       // We don't want to fail the registration just because the reward failed
-                     //       functions.logger.error(e)
-                     //    }
-                     // }
 
                      return response
                   } catch (error) {

@@ -2,12 +2,13 @@ import { Grid, TextField, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import userRepo from "../../../../data/firebase/UserRepository"
 import { linkedInRegex } from "../../../../constants/forms"
 import { useDebounceInput } from "../../../custom-hook/useDebouce"
 import { ReferralData } from "@careerfairy/shared-lib/dist/users"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 
 const styles = sxStyles({
    inputLabel: {
@@ -22,6 +23,8 @@ const isValidLinkedInLink = (link: string): boolean => {
 }
 
 const SocialInformation = () => {
+   const { rewardSignUpFollower } = useFirebaseService()
+
    const { authenticatedUser: currentUser, userData } = useAuth()
    const [existingReferralCode] = useLocalStorage(
       localStorageReferralCode,
@@ -63,22 +66,30 @@ const SocialInformation = () => {
    }, [debouncedLinkedIn])
 
    useEffect(() => {
-      if (debouncedReferralCode) {
+      if (debouncedReferralCode && !isValidReferralCode) {
+         setIsValidReferralCode(false)
+
          userRepo
             .getUserByReferralCode(debouncedReferralCode)
             .then((referralUser) => {
                const { id, firstName, lastName } = referralUser
+               const { email: currentUserId } = currentUser
 
-               if (referralUser && id !== currentUser.email) {
+               if (referralUser && id !== currentUserId) {
                   const fieldToUpdate = {
                      referredBy: {
                         uid: id,
                         name: `${firstName} ${lastName}`,
+                        referralCode: debouncedReferralCode,
                      } as ReferralData,
                   }
 
                   setIsValidReferralCode(true)
                   updateFields(fieldToUpdate).catch(console.error)
+
+                  rewardSignUpFollower(currentUserId, referralUser).catch(
+                     console.error
+                  )
                }
             })
             .catch(() => {
@@ -94,17 +105,20 @@ const SocialInformation = () => {
                   `Invalid referral code: ${debouncedReferralCode}, no corresponding user.`
                )
             })
-
-         setIsValidReferralCode(false)
       }
    }, [debouncedReferralCode])
 
    useEffect(() => {
       if (userData) {
-         const { linkedinUrl } = userData
+         const { linkedinUrl, referredBy } = userData
 
          if (linkedinUrl && linkedInLinkInput === "") {
             setLinkedInLinkInput(linkedinUrl || "")
+         }
+
+         if (referredBy) {
+            setIsValidReferralCode(true)
+            setReferralCodeInput(referredBy.referralCode)
          }
       }
    }, [userData])
@@ -145,7 +159,7 @@ const SocialInformation = () => {
                   value={linkedInLinkInput}
                   label="Add your LinkedIn link here"
                   error={
-                     linkedInLinkInput.length &&
+                     !!linkedInLinkInput.length &&
                      !isValidLinkedInLink(linkedInLinkInput)
                   }
                />
@@ -168,9 +182,10 @@ const SocialInformation = () => {
                   onChange={({ target: { value } }) => {
                      handleReferralCodeInputChange(value)
                   }}
+                  disabled={isValidReferralCode}
                   value={referralCodeInput}
                   label="Copy-paste here your referral code"
-                  error={referralCodeInput.length && !isValidReferralCode}
+                  error={!!referralCodeInput.length && !isValidReferralCode}
                />
             </Grid>
          </Grid>

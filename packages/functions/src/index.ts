@@ -124,6 +124,7 @@ exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
 exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
 exports.rewardUserAction = rewards.rewardUserAction
+exports.rewardSignUpFollower = rewards.rewardSignUpFollower
 
 // Ratings
 
