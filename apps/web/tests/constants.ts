@@ -14,6 +14,7 @@ export const credentials = {
    wrongLinkedinUrl: "http://www.linkAdin.com/in/user",
    spokenLanguagesIds: ["en", "pt", "de"],
    countriesOfInterestIds: ["GB", "PT", "DE"],
+   regionsOfInterestIds: ["asia", "africa"],
    interestsIds: ["Le9yVcgRtkReAdwyh6tq"],
 }
 

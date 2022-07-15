@@ -3,12 +3,7 @@ const { client } = require("./api/postmark")
 const { admin } = require("./api/firestoreAdmin")
 
 const { setHeaders, generateReferralCode } = require("./util")
-const {
-   userGetByReferralCode,
-   userGetByEmail,
-   userUpdateFields,
-} = require("./lib/user")
-const { rewardCreateReferralSignUpFollower } = require("./lib/reward")
+const { userGetByEmail, userUpdateFields } = require("./lib/user")
 const config = require("./config")
 const {
    handleUserNetworkerBadges,
@@ -40,7 +35,6 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
       const {
          email,
          password,
-         // referralCode,
          firstName,
          lastName,
          university,

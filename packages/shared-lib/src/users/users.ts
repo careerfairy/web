@@ -32,6 +32,7 @@ export interface UserData extends Identifiable {
    gender?: string
    spokenLanguages?: string[]
    countriesOfInterest?: string[]
+   regionsOfInterest?: string[]
    isLookingForJob?: boolean
    fieldOfStudy?: string
 }
@@ -86,6 +87,7 @@ export type AdditionalInformationProps = {
    gender?: string
    spokenLanguages?: string[]
    countriesOfInterest?: string[]
+   regionsOfInterest?: string[]
    interestsIds?: string[]
    isLookingForJob?: boolean
    linkedinUrl?: string

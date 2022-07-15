@@ -7,7 +7,9 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useInterests } from "../../../custom-hook/useCollection"
 import {
    countriesAndRegionsOptionCodes,
+   countryGroupId,
    languageOptionCodes,
+   regionGroupId,
 } from "../../../../constants/forms"
 import { formatToOptionArray, mapOptions, Option } from "../utils"
 
@@ -24,11 +26,31 @@ const styles = sxStyles({
    },
 })
 
+const mapCountriesAndRegionsToFieldToUpdate = (selectedCountriesAndRegions) => {
+   const selectedCountries = selectedCountriesAndRegions.filter(
+      (item) => item.groupId === countryGroupId
+   )
+   const selectedRegions = selectedCountriesAndRegions.filter(
+      (item) => item.groupId === regionGroupId
+   )
+
+   const mappedCountries = mapOptions(selectedCountries)
+   const mappedRegions = mapOptions(selectedRegions)
+
+   const toUpdate = {
+      countriesOfInterest: mappedCountries,
+      regionsOfInterest: mappedRegions,
+   }
+
+   return toUpdate
+}
+
 const LocationInformation = () => {
    const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
 
-   const [selectedCountries, setSelectedCountries] = useState([] as Option[])
+   const [selectedCountriesAndRegions, setSelectedCountriesAndRegions] =
+      useState([] as Option[])
    const [selectedLanguages, setSelectedLanguages] = useState([] as Option[])
    const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
 
@@ -57,10 +79,11 @@ const LocationInformation = () => {
    )
 
    const handleSelectedCountriesChange = useCallback(
-      (selectedCountries: Option[]) => {
-         const fieldToUpdate = {
-            countriesOfInterest: mapOptions(selectedCountries),
-         }
+      (selectedCountriesAndRegions: Option[]) => {
+         const fieldToUpdate = mapCountriesAndRegionsToFieldToUpdate(
+            selectedCountriesAndRegions
+         )
+
          updateFields(fieldToUpdate).catch(console.error)
       },
       [updateFields]
@@ -78,12 +101,16 @@ const LocationInformation = () => {
 
    useEffect(() => {
       if (userData) {
-         const { countriesOfInterest, spokenLanguages, isLookingForJob } =
-            userData
+         const {
+            countriesOfInterest = [],
+            regionsOfInterest = [],
+            spokenLanguages,
+            isLookingForJob,
+         } = userData
 
-         setSelectedCountries(
+         setSelectedCountriesAndRegions(
             formatToOptionArray(
-               countriesOfInterest,
+               [...regionsOfInterest, ...countriesOfInterest],
                countriesAndRegionsOptionCodes
             )
          )
@@ -137,7 +164,7 @@ const LocationInformation = () => {
                <MultiListSelect
                   inputName="countriesOfInterestInput"
                   isCheckbox
-                  selectedItems={selectedCountries}
+                  selectedItems={selectedCountriesAndRegions}
                   allValues={countriesAndRegionsOptionCodes}
                   getGroupByFn={(item) => item.groupId}
                   setFieldValue={(name, value) =>
