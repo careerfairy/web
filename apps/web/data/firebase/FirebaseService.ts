@@ -3050,6 +3050,13 @@ class FirebaseService {
       return batch.commit()
    }
 
+   rewardSignUpFollower = (recipientEmail, referralUser) => {
+      return this.functions.httpsCallable("rewardSignUpFollower")({
+         recipientEmail,
+         referralUser,
+      })
+   }
+
    // Backfill user data
    backfillUserData = async () => {
       return this.functions.httpsCallable("backfillUserData")()

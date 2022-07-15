@@ -24,6 +24,7 @@ export interface UserData extends Identifiable {
    referredBy?: {
       uid: string
       name: string
+      referralCode: string
    }
 
    // need data migrations to be moved to the user stats doc
@@ -81,6 +82,7 @@ export interface UserPublicData {
 export type ReferralData = {
    uid: string
    name: string
+   referralCode: string
 }
 export type AdditionalInformationProps = {
    userEmail: string

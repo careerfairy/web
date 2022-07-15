@@ -12,6 +12,7 @@ import {
    rewardCreateLivestream,
    rewardGetRelatedToLivestream,
    rewardCreateUserAction,
+   rewardCreateReferralSignUpFollower,
 } from "./lib/reward"
 import { livestreamGetById } from "./lib/livestream"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
@@ -294,6 +295,20 @@ export const rewardUserAction = functions.https.onCall(
       // all validations have passed, create the reward for the user
       await rewardCreateUserAction(userEmail, action, livestreamDoc)
       functions.logger.info("Created a new reward for the user action")
+   }
+)
+
+export const rewardSignUpFollower = functions.https.onCall(
+   async ({ recipientEmail, referralUser }) => {
+      try {
+         await rewardCreateReferralSignUpFollower(recipientEmail, referralUser)
+         functions.logger.info(
+            "Created referral follower reward for this user."
+         )
+      } catch (e) {
+         // We don't want to fail the registration just because the reward failed
+         functions.logger.error(e)
+      }
    }
 )
 

@@ -172,7 +172,7 @@ const LocationInformation = () => {
                   }
                   inputProps={{
                      label: "Countries of interest",
-                     placeholder: "Select one or more country",
+                     placeholder: "Select one or more countries or regions.",
                      className: "registrationInput",
                   }}
                   getValueFn={(item) => item}
