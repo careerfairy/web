@@ -120,7 +120,7 @@ function MyApp(props) {
 
 const ReactFireProviders = ({ children }) => {
    return (
-      <FirebaseAppProvider firebaseConfig={firebaseConfig}>
+      <FirebaseAppProvider firebaseConfig={firebaseConfig} suspense={true}>
          <FirestoreProvider sdk={FirestoreInstance}>
             <ReactFireAuthProvider sdk={AuthInstance}>
                <FunctionsProvider sdk={FunctionsInstance}>
