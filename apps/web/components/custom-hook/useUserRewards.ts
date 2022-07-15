@@ -1,11 +1,10 @@
 import { collection, query, orderBy } from "firebase/firestore"
-import { FirestoreInstance } from "../../data/firebase/FirebaseInstance"
-import { useFirestoreCollectionData } from "reactfire"
+import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import { Reward } from "../../types/reward"
 
 const useUserRewards = (userId: string) => {
    const collectionRef = query(
-      collection(FirestoreInstance, "userData", userId, "rewards"),
+      collection(useFirestore(), "userData", userId, "rewards"),
       orderBy("createdAt", "desc")
    )
 
