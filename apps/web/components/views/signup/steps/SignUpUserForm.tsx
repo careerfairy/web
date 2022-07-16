@@ -126,7 +126,6 @@ function SignUpUserForm() {
       setEmailSent(false)
       setGeneralLoading(true)
 
-      // useRepo and then there do this logic of creating an account
       firebase
          .createUserInAuthAndFirebase(values)
          .then(() => {
