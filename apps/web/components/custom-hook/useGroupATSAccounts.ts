@@ -10,17 +10,9 @@ const useGroupATSAccounts = (groupId: string) => {
       "ats"
    )
 
-   let { status, data } = useFirestoreCollectionData<GroupATSAccount>(
-      collectionRef as any,
-      {
-         idField: "id", // this field will be added to the firestore object
-      }
-   )
-
-   return {
-      isLoading: status === "loading",
-      data: data,
-   }
+   return useFirestoreCollectionData<GroupATSAccount>(collectionRef as any, {
+      idField: "id", // this field will be added to the firestore object
+   })
 }
 
 export default useGroupATSAccounts
