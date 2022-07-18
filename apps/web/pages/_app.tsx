@@ -121,9 +121,9 @@ function MyApp(props) {
 const ReactFireProviders = ({ children }) => {
    return (
       <FirebaseAppProvider firebaseConfig={firebaseConfig} suspense={true}>
-         <FirestoreProvider sdk={FirestoreInstance}>
-            <ReactFireAuthProvider sdk={AuthInstance}>
-               <FunctionsProvider sdk={FunctionsInstance}>
+         <FirestoreProvider sdk={FirestoreInstance as any}>
+            <ReactFireAuthProvider sdk={AuthInstance as any}>
+               <FunctionsProvider sdk={FunctionsInstance as any}>
                   {children}
                </FunctionsProvider>
             </ReactFireAuthProvider>
