@@ -6,12 +6,11 @@ import {
    Typography,
 } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
-import { useLocalStorage } from "react-use"
+import { useDebounce, useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import React, { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { linkedInRegex } from "../../../../constants/forms"
-import { useDebounceInput } from "../../../custom-hook/useDebouce"
 import { ReferralData } from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { userRepo } from "../../../../data/RepositoryInstances"
@@ -48,40 +47,30 @@ const SocialInformation = () => {
    const [linkedInLinkInput, setLinkedInLinkInput] = useState("")
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
 
-   const debouncedLinkedIn = useDebounceInput(linkedInLinkInput)
-   const debouncedReferralCode = useDebounceInput(referralCodeInput)
-
-   const updateFields = useCallback(
-      async (fieldToUpdate) => {
-         try {
-            await userRepo.updateAdditionalInformation({
-               userEmail: currentUser.email,
-               ...fieldToUpdate,
-            })
-         } catch (error) {
-            console.log(error)
-         }
-      },
-      [currentUser]
+   const [, cancelLinkedInDebounce] = useDebounce(
+      () => handleLinkedInDebounced(linkedInLinkInput),
+      1000,
+      [linkedInLinkInput]
+   )
+   const [, cancelReferralCodeDebounce] = useDebounce(
+      () => handleReferralCodeDebounced(referralCodeInput),
+      1000,
+      [referralCodeInput]
    )
 
    useEffect(() => {
-      if (debouncedLinkedIn) {
-         const fieldToUpdate = {
-            linkedinUrl: isValidLinkedInLink(debouncedLinkedIn)
-               ? debouncedLinkedIn
-               : "",
-         }
-         updateFields(fieldToUpdate).catch(console.error)
+      return () => {
+         cancelLinkedInDebounce()
+         cancelReferralCodeDebounce()
       }
-   }, [debouncedLinkedIn])
+   }, [])
 
-   useEffect(() => {
-      if (debouncedReferralCode && !isValidReferralCode) {
+   const handleReferralCodeDebounced = useCallback((referralCode) => {
+      if (referralCode && !isValidReferralCode) {
          setIsValidReferralCode(false)
 
          userRepo
-            .getUserByReferralCode(debouncedReferralCode)
+            .getUserByReferralCode(referralCode)
             .then((referralUser) => {
                const { id, firstName, lastName } = referralUser
                const { email: currentUserId } = currentUser
@@ -91,7 +80,7 @@ const SocialInformation = () => {
                      referredBy: {
                         uid: id,
                         name: `${firstName} ${lastName}`,
-                        referralCode: debouncedReferralCode,
+                        referralCode: referralCode,
                      } as ReferralData,
                   }
 
@@ -113,11 +102,34 @@ const SocialInformation = () => {
                }
 
                console.warn(
-                  `Invalid referral code: ${debouncedReferralCode}, no corresponding user.`
+                  `Invalid referral code: ${referralCode}, no corresponding user.`
                )
             })
       }
-   }, [debouncedReferralCode])
+   }, [])
+
+   const handleLinkedInDebounced = useCallback((linkedInLink) => {
+      if (linkedInLink) {
+         const fieldToUpdate = {
+            linkedinUrl: isValidLinkedInLink(linkedInLink) ? linkedInLink : "",
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      }
+   }, [])
+
+   const updateFields = useCallback(
+      async (fieldToUpdate) => {
+         try {
+            await userRepo.updateAdditionalInformation({
+               userEmail: currentUser.email,
+               ...fieldToUpdate,
+            })
+         } catch (error) {
+            console.log(error)
+         }
+      },
+      [currentUser]
+   )
 
    useEffect(() => {
       if (userData) {
