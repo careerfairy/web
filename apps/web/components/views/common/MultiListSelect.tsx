@@ -40,7 +40,7 @@ const MultiListSelect = ({
 
       if (limit) {
          limitWasReached =
-            selectedItems.length >= 5 && !selectedItems.includes(option)
+            selectedItems.length >= limit && !selectedItems.includes(option)
       }
 
       return limitWasReached || disabledValues.includes(getValueFn(option))

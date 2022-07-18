@@ -19,7 +19,7 @@ const InterestsInformation = () => {
    const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
 
-   const [selectedInterests, setSelectedInterests] = useState([] as Option[])
+   const [selectedInterests, setSelectedInterests] = useState<Option[]>([])
 
    useEffect(() => {
       if (userData) {
