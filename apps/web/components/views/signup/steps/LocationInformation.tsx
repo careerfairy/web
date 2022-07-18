@@ -3,7 +3,6 @@ import React, { useCallback, useEffect, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import MultiListSelect from "../../common/MultiListSelect"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { useInterests } from "../../../custom-hook/useCollection"
 import {
    countriesAndRegionsOptionCodes,
    countryGroupId,
@@ -26,32 +25,12 @@ const styles = sxStyles({
    },
 })
 
-const mapCountriesAndRegionsToFieldToUpdate = (selectedCountriesAndRegions) => {
-   const selectedCountries = selectedCountriesAndRegions.filter(
-      (item) => item.groupId === countryGroupId
-   )
-   const selectedRegions = selectedCountriesAndRegions.filter(
-      (item) => item.groupId === regionGroupId
-   )
-
-   const mappedCountries = mapOptions(selectedCountries)
-   const mappedRegions = mapOptions(selectedRegions)
-
-   const toUpdate = {
-      countriesOfInterest: mappedCountries,
-      regionsOfInterest: mappedRegions,
-   }
-
-   return toUpdate
-}
-
 const LocationInformation = () => {
-   const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
 
    const [selectedCountriesAndRegions, setSelectedCountriesAndRegions] =
-      useState([] as Option[])
-   const [selectedLanguages, setSelectedLanguages] = useState([] as Option[])
+      useState<Option[]>([])
+   const [selectedLanguages, setSelectedLanguages] = useState<Option[]>([])
    const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
 
    const updateFields = useCallback(
@@ -119,7 +98,7 @@ const LocationInformation = () => {
          )
          setIsLookingForJobToggle(Boolean(isLookingForJob))
       }
-   }, [userData, allInterests])
+   }, [userData])
 
    return (
       <>
@@ -199,6 +178,25 @@ const LocationInformation = () => {
          </Grid>
       </>
    )
+}
+
+const mapCountriesAndRegionsToFieldToUpdate = (selectedCountriesAndRegions) => {
+   const selectedCountries = selectedCountriesAndRegions.filter(
+      (item) => item.groupId === countryGroupId
+   )
+   const selectedRegions = selectedCountriesAndRegions.filter(
+      (item) => item.groupId === regionGroupId
+   )
+
+   const mappedCountries = mapOptions(selectedCountries)
+   const mappedRegions = mapOptions(selectedRegions)
+
+   const toUpdate = {
+      countriesOfInterest: mappedCountries,
+      regionsOfInterest: mappedRegions,
+   }
+
+   return toUpdate
 }
 
 export default LocationInformation
