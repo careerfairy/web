@@ -26,7 +26,7 @@ function TabPanel(props) {
          aria-labelledby={`full-width-tab-${path}`}
          {...other}
       >
-         {value === path && <Box sx={{ pb: 3 }}>{children}</Box>}
+         {value === path && <Box sx={{ pb: 3 }}>{children()}</Box>}
       </div>
    )
 }
@@ -92,7 +92,7 @@ const UserView = ({ currentPath }: Props) => {
          path={key}
          dir={theme.direction}
       >
-         {value.component()}
+         {value.component}
       </TabPanel>
    ))
 
