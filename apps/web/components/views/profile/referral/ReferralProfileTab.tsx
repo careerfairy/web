@@ -12,7 +12,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React, { useCallback } from "react"
+import React from "react"
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import { makeReferralUrl } from "../../../../util/makeUrls"
 import { useSnackbar } from "notistack"
@@ -22,8 +22,6 @@ import {
 } from "../../../helperFunctions/HelperFunctions"
 import * as Sentry from "@sentry/nextjs"
 import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/dist/rewards"
-import useCollection from "../../../custom-hook/useCollection"
-import { Reward } from "../../../../types/reward"
 import BadgeSimpleButton from "../BadgeSimpleButton"
 import BadgeProgress from "./BadgeProgress"
 import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
@@ -31,6 +29,8 @@ import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { styles } from "../profileStyles"
+import useUserRewards from "../../../custom-hook/useUserRewards"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 
 const ReferralProfileTab = () => {
    const { userData, userPresenter } = useAuth()
@@ -112,7 +112,9 @@ const ReferralProfileTab = () => {
             </Grid>
 
             <Grid item xs={12}>
-               <RewardsTable userDataId={userData.id} />
+               <SuspenseWithBoundary fallback={<LoadingRewardsTable />}>
+                  <RewardsTable userDataId={userData.id} />
+               </SuspenseWithBoundary>
             </Grid>
          </Grid>
       </ContentCard>
@@ -126,26 +128,7 @@ const localStyles = {
 }
 
 const RewardsTable = ({ userDataId }) => {
-   const query = useCallback(
-      (firestore) =>
-         firestore.collection("userData").doc(userDataId).collection("rewards"),
-      [userDataId]
-   )
-   let { isLoading, data } = useCollection<Reward>(query, true)
-
-   if (isLoading) {
-      return (
-         <Box>
-            <Skeleton />
-            <Skeleton animation="wave" />
-            <Skeleton animation="wave" />
-         </Box>
-      )
-   }
-
-   data = data.sort((a, b) => {
-      return b.createdAt.toMillis() - a.createdAt.toMillis()
-   })
+   const { data } = useUserRewards(userDataId)
 
    return (
       <TableContainer>
@@ -203,6 +186,16 @@ const RewardsTable = ({ userDataId }) => {
             </TableBody>
          </Table>
       </TableContainer>
+   )
+}
+
+const LoadingRewardsTable = () => {
+   return (
+      <Box>
+         <Skeleton />
+         <Skeleton animation="wave" />
+         <Skeleton animation="wave" />
+      </Box>
    )
 }
 
