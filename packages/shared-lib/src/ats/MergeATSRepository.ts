@@ -1,5 +1,7 @@
 import { IATSRepository } from "./IATSRepository"
 import axios from "axios"
+import { Job } from "./Job"
+import { Office } from "./Office"
 
 /**
  * Merge.dev HTTP API
@@ -25,9 +27,19 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    async getJobs() {
-      const { data } = await this.axios.get(`/jobs`)
+      const { data } = await this.axios.get<MergePaginatedResponse<Job>>(
+         `/jobs`
+      )
 
-      return data
+      return data.results
+   }
+
+   async getOffices() {
+      const { data } = await this.axios.get<MergePaginatedResponse<Office>>(
+         `/offices`
+      )
+
+      return data.results
    }
 
    /**
@@ -67,6 +79,12 @@ export class MergeATSRepository implements IATSRepository {
 
       return data
    }
+}
+
+export type MergePaginatedResponse<T> = {
+   next: string
+   previous: string
+   results: T[]
 }
 
 export type MergeLinkTokenResponse = {
