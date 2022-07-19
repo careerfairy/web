@@ -13,3 +13,5 @@ export const formatToOptionArray = (
 export const mapOptions = (options: Option[]): string[] => {
    return options.map((option) => option.id)
 }
+
+export const multiListSelectMapValueFn = (item) => item
