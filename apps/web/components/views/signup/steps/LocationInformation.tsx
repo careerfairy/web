@@ -9,7 +9,12 @@ import {
    languageOptionCodes,
    regionGroupId,
 } from "../../../../constants/forms"
-import { formatToOptionArray, mapOptions, Option } from "../utils"
+import {
+   formatToOptionArray,
+   mapOptions,
+   multiListSelectMapValueFn,
+   Option,
+} from "../utils"
 import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
@@ -33,51 +38,6 @@ const LocationInformation = () => {
    const [selectedLanguages, setSelectedLanguages] = useState<Option[]>([])
    const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
 
-   const updateFields = useCallback(
-      async (fieldToUpdate) => {
-         try {
-            await userRepo.updateAdditionalInformation({
-               userEmail: user.email,
-               ...fieldToUpdate,
-            })
-         } catch (error) {
-            console.log(error)
-         }
-      },
-      [user]
-   )
-
-   const handleSelectedLanguageChange = useCallback(
-      (selectedLanguages: Option[]) => {
-         const fieldToUpdate = {
-            spokenLanguages: mapOptions(selectedLanguages),
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
-   )
-
-   const handleSelectedCountriesChange = useCallback(
-      (selectedCountriesAndRegions: Option[]) => {
-         const fieldToUpdate = mapCountriesAndRegionsToFieldToUpdate(
-            selectedCountriesAndRegions
-         )
-
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
-   )
-
-   const handleIsLookingForJobChange = useCallback(
-      (isLookingForJob: boolean) => {
-         const fieldToUpdate = {
-            isLookingForJob: isLookingForJob,
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
-   )
-
    useEffect(() => {
       if (userData) {
          const {
@@ -100,6 +60,51 @@ const LocationInformation = () => {
       }
    }, [userData])
 
+   const updateFields = useCallback(
+      async (fieldToUpdate) => {
+         try {
+            await userRepo.updateAdditionalInformation({
+               userEmail: user.email,
+               ...fieldToUpdate,
+            })
+         } catch (error) {
+            console.log(error)
+         }
+      },
+      [user]
+   )
+
+   const handleSelectedLanguageChange = useCallback(
+      (name: string, selectedLanguages: Option[]) => {
+         const fieldToUpdate = {
+            spokenLanguages: mapOptions(selectedLanguages),
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
+
+   const handleSelectedCountriesChange = useCallback(
+      (name: string, selectedCountriesAndRegions: Option[]) => {
+         const fieldToUpdate = mapCountriesAndRegionsToFieldToUpdate(
+            selectedCountriesAndRegions
+         )
+
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
+
+   const handleIsLookingForJobChange = useCallback(
+      (event, isLookingForJob: boolean) => {
+         const fieldToUpdate = {
+            isLookingForJob: isLookingForJob,
+         }
+         updateFields(fieldToUpdate).catch(console.error)
+      },
+      [updateFields]
+   )
+
    return (
       <>
          <Grid
@@ -119,15 +124,13 @@ const LocationInformation = () => {
                   isCheckbox
                   selectedItems={selectedLanguages}
                   allValues={languageOptionCodes}
-                  setFieldValue={(name, value) =>
-                     handleSelectedLanguageChange(value)
-                  }
+                  setFieldValue={handleSelectedLanguageChange}
                   inputProps={{
                      label: "Languages you speak",
                      placeholder: "Select languages",
                      className: "registrationInput",
                   }}
-                  getValueFn={(item) => item}
+                  getValueFn={multiListSelectMapValueFn}
                   chipProps={{
                      color: "primary",
                   }}
@@ -145,16 +148,14 @@ const LocationInformation = () => {
                   isCheckbox
                   selectedItems={selectedCountriesAndRegions}
                   allValues={countriesAndRegionsOptionCodes}
-                  getGroupByFn={(item) => item.groupId}
-                  setFieldValue={(name, value) =>
-                     handleSelectedCountriesChange(value)
-                  }
+                  getGroupByFn={mapGroupBy}
+                  setFieldValue={handleSelectedCountriesChange}
                   inputProps={{
                      label: "Countries of interest",
                      placeholder: "Select one or more countries or regions.",
                      className: "registrationInput",
                   }}
-                  getValueFn={(item) => item}
+                  getValueFn={multiListSelectMapValueFn}
                   chipProps={{
                      color: "primary",
                   }}
@@ -168,9 +169,7 @@ const LocationInformation = () => {
                <Switch
                   id="isLookingForJobToggle"
                   checked={isLookingForJobToggle}
-                  onChange={(event, checked) =>
-                     handleIsLookingForJobChange(checked)
-                  }
+                  onChange={handleIsLookingForJobChange}
                   name="isLookingForJobToggle"
                   color="primary"
                />
@@ -198,5 +197,7 @@ const mapCountriesAndRegionsToFieldToUpdate = (selectedCountriesAndRegions) => {
 
    return toUpdate
 }
+
+const mapGroupBy = (item) => item.groupId
 
 export default LocationInformation

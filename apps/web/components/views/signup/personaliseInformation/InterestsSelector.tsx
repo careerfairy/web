@@ -5,7 +5,7 @@ import { Box, Chip, Typography } from "@mui/material"
 import { useInterests } from "../../../custom-hook/useCollection"
 import { Interest } from "../../../../types/interests"
 import CircularLoader from "../../loader/CircularLoader"
-import * as actions from "../../../../store/actions/snackbarActions"
+import * as actions from "../../../../store/actions"
 import _ from "lodash"
 import { userRepo } from "../../../../data/RepositoryInstances"
 

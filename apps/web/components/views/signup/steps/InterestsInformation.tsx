@@ -4,7 +4,12 @@ import React, { useCallback, useEffect, useState } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import { useInterests } from "../../../custom-hook/useCollection"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { formatToOptionArray, mapOptions, Option } from "../utils"
+import {
+   formatToOptionArray,
+   mapOptions,
+   multiListSelectMapValueFn,
+   Option,
+} from "../utils"
 import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
@@ -44,7 +49,7 @@ const InterestsInformation = () => {
    )
 
    const handleSelectedInterestsChange = useCallback(
-      (selectedInterests: Option[]) => {
+      (name: string, selectedInterests: Option[]) => {
          const fieldToUpdate = {
             interestsIds: mapOptions(selectedInterests),
          }
@@ -73,15 +78,13 @@ const InterestsInformation = () => {
                   limit={5}
                   selectedItems={selectedInterests}
                   allValues={allInterests}
-                  setFieldValue={(name, value) =>
-                     handleSelectedInterestsChange(value)
-                  }
+                  setFieldValue={handleSelectedInterestsChange}
                   inputProps={{
                      label: "Select 5 to improve your site experience",
                      placeholder: "Select from the following list",
                      className: "registrationInput",
                   }}
-                  getValueFn={(item) => item}
+                  getValueFn={multiListSelectMapValueFn}
                   chipProps={{
                      color: "primary",
                   }}

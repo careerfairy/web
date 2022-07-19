@@ -146,13 +146,19 @@ const SocialInformation = () => {
       }
    }, [userData])
 
-   const handleLinkedInLinkInputChange = useCallback((value) => {
-      setLinkedInLinkInput(value)
-   }, [])
+   const handleLinkedInLinkInputChange = useCallback(
+      ({ target: { value } }) => {
+         setLinkedInLinkInput(value)
+      },
+      []
+   )
 
-   const handleReferralCodeInputChange = useCallback((value) => {
-      setReferralCodeInput(value)
-   }, [])
+   const handleReferralCodeInputChange = useCallback(
+      ({ target: { value } }) => {
+         setReferralCodeInput(value)
+      },
+      []
+   )
 
    return (
       <>
@@ -176,9 +182,7 @@ const SocialInformation = () => {
                   name="linkedInLink"
                   placeholder="Enter your LinkedIn link"
                   InputLabelProps={{ shrink: true }}
-                  onChange={({ target: { value } }) => {
-                     handleLinkedInLinkInputChange(value)
-                  }}
+                  onChange={handleLinkedInLinkInputChange}
                   value={linkedInLinkInput}
                   label="Add your LinkedIn link here"
                   error={
@@ -203,9 +207,7 @@ const SocialInformation = () => {
                      name="referralCode"
                      placeholder="Enter a Referral Code"
                      InputLabelProps={{ shrink: true }}
-                     onChange={({ target: { value } }) => {
-                        handleReferralCodeInputChange(value)
-                     }}
+                     onChange={handleReferralCodeInputChange}
                      disabled={isValidReferralCode}
                      value={referralCodeInput}
                      label="Copy-paste here your referral code"
