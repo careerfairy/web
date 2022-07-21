@@ -6,7 +6,7 @@ import {
    livestreamSetIsRecording,
    livestreamUpdateRecordingToken,
 } from "./lib/livestream"
-import { logAxiosError } from "./util"
+import { logAxiosErrorAndThrow } from "./util"
 import {
    downloadLink,
    S3_ROOT_PATH,
@@ -136,10 +136,12 @@ const startRecording = async (
    try {
       acquire = await agora.recordingAcquire(cname)
    } catch (e) {
-      logAxiosError("Failed to acquire recording", e)
-      throw new functions.https.HttpsError(
-         "unknown",
-         "Failed to acquire recording"
+      logAxiosErrorAndThrow(
+         "Failed to acquire recording",
+         e,
+         livestreamId,
+         token,
+         breakoutRoomId
       )
    }
 
@@ -179,11 +181,7 @@ const startRecording = async (
          storagePath
       )
    } catch (e) {
-      logAxiosError("Failed to start recording", e)
-      throw new functions.https.HttpsError(
-         "unknown",
-         "Failed to start recording"
-      )
+      logAxiosErrorAndThrow("Failed to start recording", e, livestreamId)
    }
 
    await livestreamUpdateRecordingToken(
@@ -230,10 +228,11 @@ const stopRecording = async (
 
       await livestreamSetIsRecording(livestreamId, false, breakoutRoomId)
    } catch (e) {
-      logAxiosError("Failed to stop recording", e)
-      throw new functions.https.HttpsError(
-         "unknown",
-         "Failed to stop recording"
+      logAxiosErrorAndThrow(
+         "Failed to stop recording",
+         e,
+         livestreamId,
+         breakoutRoomId
       )
    }
 
