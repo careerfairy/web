@@ -1,13 +1,14 @@
 import React from "react"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
-import AtsIntegrationContent from "../../../../components/views/group/admin/ats-integration/AtsIntegrationContent"
 import { SuspenseWithBoundary } from "../../../../components/ErrorBoundary"
+import { SkeletonAdminPage } from "../../../../components/util/Skeletons"
+import AtsIntegrationContent from "../../../../components/views/group/admin/ats-integration"
 
 const AtsIntegration = () => (
    <GroupDashboardLayout>
       <DashboardHead title="CareerFairy | ATS Integration" />
-      <SuspenseWithBoundary>
+      <SuspenseWithBoundary fallback={<SkeletonAdminPage />}>
          <AtsIntegrationContent />
       </SuspenseWithBoundary>
    </GroupDashboardLayout>
