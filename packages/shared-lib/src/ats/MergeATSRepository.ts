@@ -1,7 +1,16 @@
-import { IATSRepository } from "./IATSRepository"
 import axios from "axios"
+import {
+   MergeAccountTokenResponse,
+   MergeJob,
+   MergeLinkTokenResponse,
+   MergeOffice,
+   MergePaginatedResponse,
+   MergeSyncStatus,
+} from "./MergeResponseTypes"
+import { IATSRepository } from "./IATSRepository"
 import { Job } from "./Job"
 import { Office } from "./Office"
+import { SyncStatus } from "./SyncStatus"
 
 /**
  * Merge.dev HTTP API
@@ -26,20 +35,28 @@ export class MergeATSRepository implements IATSRepository {
       }
    }
 
-   async getJobs() {
-      const { data } = await this.axios.get<MergePaginatedResponse<Job>>(
-         `/jobs`
+   async getJobs(): Promise<Job[]> {
+      const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
+         `/jobs?expand=offices,recruiters,hiring_managers,departments`
       )
 
-      return data.results
+      return data.results.map((res) => Job.createFromMerge(res))
    }
 
-   async getOffices() {
-      const { data } = await this.axios.get<MergePaginatedResponse<Office>>(
-         `/offices`
-      )
+   async getOffices(): Promise<Office[]> {
+      const { data } = await this.axios.get<
+         MergePaginatedResponse<MergeOffice>
+      >(`/offices`)
 
-      return data.results
+      return data.results.map((res) => Office.createFromMerge(res))
+   }
+
+   async getSyncStatus(): Promise<SyncStatus[]> {
+      const { data } = await this.axios.get<
+         MergePaginatedResponse<MergeSyncStatus>
+      >(`/sync-status`)
+
+      return data.results.map((res) => SyncStatus.createFromMerge(res))
    }
 
    /**
@@ -78,27 +95,5 @@ export class MergeATSRepository implements IATSRepository {
       )
 
       return data
-   }
-}
-
-export type MergePaginatedResponse<T> = {
-   next: string
-   previous: string
-   results: T[]
-}
-
-export type MergeLinkTokenResponse = {
-   link_token: string
-   integration_name: string
-}
-
-export type MergeAccountTokenResponse = {
-   account_token: string
-   integration?: {
-      name?: string
-      image?: string
-      square_image?: string
-      color?: string
-      slug?: string
    }
 }
