@@ -1,11 +1,34 @@
-import BasePresenter from "../BasePresenter"
-import { Group, GroupATSAccount } from "./groups"
+import { Group } from "./groups"
+import { GroupATSAccount } from "./GroupATSAccount"
 
-// TODO: delete if not used
-export default class GroupPresenter extends BasePresenter<Group> {
+export const ATS_MAX_LINKED_ACCOUNTS = 2
+
+export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
 
-   setATSAccounts(accounts: GroupATSAccount[]) {
+   constructor(
+      public readonly id: string,
+      public readonly description: string,
+      public readonly logoImage: string,
+      public readonly adminEmails: string[],
+      public readonly universityName?: string
+   ) {}
+
+   setAtsAccounts(accounts: GroupATSAccount[]) {
       this.atsAccounts = accounts
+   }
+
+   atsAllowLinkNewAccounts() {
+      return this.atsAccounts.length < ATS_MAX_LINKED_ACCOUNTS
+   }
+
+   static createFromDocument(group: Group) {
+      return new GroupPresenter(
+         group.groupId,
+         group.description,
+         group.logoUrl,
+         group.adminEmails,
+         group.universityName
+      )
    }
 }
