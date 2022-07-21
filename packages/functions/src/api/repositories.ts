@@ -3,8 +3,8 @@ import {
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { admin } from "./firestoreAdmin"
-import { IATSRepository } from "@careerfairy/shared-lib/dist/ats/IATSRepository"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
+import { IATSRepository } from "@careerfairy/shared-lib/src/ats/IATSRepository"
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
    admin.firestore() as any,
