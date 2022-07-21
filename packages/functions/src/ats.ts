@@ -1,14 +1,22 @@
 import functions = require("firebase-functions")
 import {
+   logAndThrow,
    validateData,
    validateUserAuthExists,
    validateUserIsGroupAdmin,
 } from "./lib/validations"
 import { object, string } from "yup"
-import { groupRepo } from "./api/repositories"
+import { atsRepo, groupRepo } from "./api/repositories"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { logAxiosError } from "./util"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups"
+import { logAxiosErrorAndThrow } from "./util"
+import {
+   Group,
+   GroupATSAccountDocument,
+   GroupATSIntegrationTokensDocument,
+} from "@careerfairy/shared-lib/dist/groups"
+import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import { auth } from "firebase-admin"
+import DecodedIdToken = auth.DecodedIdToken
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -17,30 +25,27 @@ import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups"
 export const mergeGenerateLinkToken = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const inputSchema = object({
-         groupId: string().required(),
-         integrationId: string().required(),
+      const requestData = await atsRequestValidation({
+         data,
+         context,
       })
-
-      // validations that throw exceptions
-      const { email } = await validateUserAuthExists(context)
-      const { groupId, integrationId } = await validateData(data, inputSchema)
-      const { group } = await validateUserIsGroupAdmin(groupId, email)
 
       try {
          const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
 
          // Temporary token initializing the user’s integration authorization session
          // We'll be able to open the Merge Link dialog to choose the integration
-         return mergeATS.createLinkToken(
-            integrationId,
-            group.universityName,
-            group.adminEmail
+         return await mergeATS.createLinkToken(
+            requestData.integrationId,
+            requestData.group.universityName,
+            requestData.group.adminEmail
          )
       } catch (e) {
-         logAxiosError("Failed to create a link token from merge", e)
-
-         return null
+         return logAxiosErrorAndThrow(
+            "Failed to create a link token from merge",
+            e,
+            requestData
+         )
       }
    })
 
@@ -51,32 +56,25 @@ export const mergeGenerateLinkToken = functions
 export const mergeGetAccountToken = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const inputSchema = object({
-         groupId: string().required(),
-         integrationId: string().required(),
-         publicToken: string().required(),
-      })
-
-      // validations that throw exceptions
-      const { email } = await validateUserAuthExists(context)
-      const { groupId, integrationId, publicToken } = await validateData(
+      const requestData = await atsRequestValidation<{ publicToken: string }>({
          data,
-         inputSchema
-      )
-
-      await validateUserIsGroupAdmin(groupId, email)
+         context,
+         requiredData: {
+            publicToken: string().required(),
+         },
+      })
 
       try {
          const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
 
-         const mergeResponse = await mergeATS.exchangeAccountToken(publicToken)
+         const mergeResponse = await mergeATS.exchangeAccountToken(
+            requestData.publicToken
+         )
 
-         console.log("account token resp", mergeResponse)
-
-         const atsMetadata: Partial<GroupATSAccount> = {
-            groupId: groupId,
+         const atsMetadata: Partial<GroupATSAccountDocument> = {
+            groupId: requestData.groupId,
             merge: {
-               end_user_origin_id: integrationId,
+               end_user_origin_id: requestData.integrationId,
                integration_name: mergeResponse?.integration?.name,
                image: mergeResponse?.integration?.image,
                square_image: mergeResponse?.integration?.square_image,
@@ -85,25 +83,177 @@ export const mergeGetAccountToken = functions
          }
 
          await groupRepo.createATSIntegration(
-            groupId,
-            integrationId,
+            requestData.groupId,
+            requestData.integrationId,
             atsMetadata
          )
 
-         await groupRepo.saveATSIntegrationTokens(groupId, integrationId, {
-            groupId,
-            integrationId,
-            merge: {
-               account_token: mergeResponse.account_token,
-            },
-         })
-         return true
-      } catch (e) {
-         logAxiosError(
-            "Failed to exchange the public token with the account token",
-            e
+         await groupRepo.saveATSIntegrationTokens(
+            requestData.groupId,
+            requestData.integrationId,
+            {
+               groupId: requestData.groupId,
+               integrationId: requestData.integrationId,
+               merge: {
+                  account_token: mergeResponse.account_token,
+               },
+            }
          )
 
-         throw e
+         return true
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to exchange the public token with the account token",
+            e,
+            requestData
+         )
       }
    })
+
+/**
+ * Fetch Jobs
+ */
+export const fetchATSJobs = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken({
+         data,
+         context,
+         requiredData: {},
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         return await atsRepository
+            .getJobs()
+            .then((jobs) => jobs.map((job) => job.serializeToPlainObject()))
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the account jobs",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
+ * Sync Status for the multiple entities
+ */
+export const fetchATSSyncStatus = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken({
+         data,
+         context,
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         return await atsRepository
+            .getSyncStatus()
+            .then((res) => res.map((s) => s.serializeToPlainObject()))
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the merge sync status",
+            e,
+            requestData
+         )
+      }
+   })
+
+/*
+|--------------------------------------------------------------------------
+| Utilities & Validations
+|--------------------------------------------------------------------------
+*/
+
+type AlwaysPresentData = {
+   groupId: string
+   integrationId: string
+}
+
+type AlwaysPresentArgs = AlwaysPresentData & {
+   idToken: DecodedIdToken
+   group: Group
+}
+
+type Options<T extends object> = {
+   data: T & AlwaysPresentData
+   context: CallableContext
+   requiredData?: object
+}
+
+/**
+ * Common Logic to validate ATS Requests
+ *
+ * Returns the data fetched from the validations
+ * @param options
+ */
+async function atsRequestValidation<T extends object>(
+   options: Options<T>
+): Promise<T & AlwaysPresentArgs> {
+   const inputSchema = object(
+      Object.assign(
+         {
+            groupId: string().required(),
+            integrationId: string().required(),
+         },
+         options.requiredData ?? {}
+      )
+   )
+
+   // validations that throw exceptions
+   const idToken = await validateUserAuthExists(options.context)
+   const inputValidationResult = (await validateData(
+      options.data,
+      inputSchema
+   )) as T & AlwaysPresentData
+
+   const { group } = await validateUserIsGroupAdmin(
+      inputValidationResult.groupId,
+      idToken.email
+   )
+
+   return {
+      ...inputValidationResult,
+      idToken,
+      group,
+   }
+}
+
+/**
+ * Extends the validation above and also fetches the account tokens
+ * @param options
+ */
+async function atsRequestValidationWithAccountToken<T extends object>(
+   options: Options<T>
+): Promise<
+   T & AlwaysPresentArgs & { tokens: GroupATSIntegrationTokensDocument }
+> {
+   const data = await atsRequestValidation(options)
+
+   // fetch account tokens (required to request information on behalf of the company)
+   const accountTokens = await groupRepo.getATSIntegrationTokens(
+      data.groupId,
+      data.integrationId
+   )
+   if (!accountTokens) {
+      logAndThrow("The requested integration is missing the account tokens", {
+         groupId: data.groupId,
+         integrationId: data.integrationId,
+      })
+   }
+
+   return {
+      ...data,
+      tokens: accountTokens,
+   }
+}
