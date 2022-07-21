@@ -1,4 +1,4 @@
-import React from "react"
+import React, { ReactNode } from "react"
 import {
    AppBar,
    Box,
@@ -21,7 +21,8 @@ const styles = sxStyles({
       marginRight: (theme) => theme.spacing(1.5),
    },
    header: {
-      paddingLeft: (theme) => theme.spacing(3),
+      paddingX: (theme) => theme.spacing(3),
+      paddingY: (theme) => theme.spacing(1),
    },
    titleButton: {},
    menuItem: {
@@ -41,7 +42,15 @@ const styles = sxStyles({
    },
 })
 
-const Header = ({ title, subtitle }) => {
+type Props = {
+   title: string
+   subtitle: string
+   actionNode?: ReactNode
+   children?: ReactNode
+}
+
+const Header = ({ title, subtitle, actionNode, children }: Props) => {
+   // is this needed?
    const isScrolling = useScrollTrigger()
 
    return (
@@ -58,9 +67,11 @@ const Header = ({ title, subtitle }) => {
                      </Box>
                   }
                   subheader={subtitle}
+                  action={actionNode}
                />
             </Card>
          </Collapse>
+         {children}
       </AppBar>
    )
 }
