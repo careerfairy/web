@@ -395,8 +395,7 @@ export const isLocalEnvironment = () => {
    )
 }
 
-export const logAxiosError = (message: string, error: any) => {
-   functions.logger.error(message)
+export const logAxiosError = (error: any) => {
    functions.logger.error("Request", error?.toJSON())
    if (error.response) {
       // The request was made and the server responded with a status code
@@ -422,4 +421,20 @@ export const logAxiosError = (message: string, error: any) => {
          error
       )
    }
+}
+
+/**
+ * Logs the error and throws to force the function to stop and return an error
+ * @param message
+ * @param error
+ * @param extraData
+ */
+export const logAxiosErrorAndThrow = (
+   message: string,
+   error: any,
+   ...extraData
+) => {
+   functions.logger.error(message, extraData)
+   logAxiosError(error)
+   throw new functions.https.HttpsError("unknown", message)
 }
