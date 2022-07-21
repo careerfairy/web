@@ -1,62 +1,13 @@
-import Header from "../Header"
-import Box from "@mui/material/Box"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { useSelector } from "react-redux"
 import { groupSelector } from "../../../../../store/selectors/groupSelectors"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { useSnackbar } from "notistack"
+import { useCallback, useEffect, useReducer } from "react"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import * as Sentry from "@sentry/nextjs"
-import { useMergeLink } from "@mergeapi/react-merge-link"
-import { useCallback, useEffect, useReducer, useState } from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
-import useGroupATSAccounts from "../../../../custom-hook/useGroupATSAccounts"
-import useGroup from "../../../../custom-hook/useGroup"
-
-const AtsIntegrationContent = () => {
-   // const group: Group = useSelector(groupSelector)
-   const { data: group, isLoading: groupIsLoading } = useGroup(
-      "rTUGXDAG2XAtpVcgvAcc"
-   )
-
-   console.log("group", groupIsLoading, group)
-   const { data, isLoading } = useGroupATSAccounts(group.groupId)
-   console.log("Render AtsIntegrationContent Group", group)
-   console.log("Render AtsIntegrationContent ATS", isLoading, data)
-
-   const [show, setShow] = useState(false)
-
-   useEffect(() => {
-      const timer = setTimeout(() => {
-         setShow(true)
-      }, 5000)
-
-      return () => clearTimeout(timer)
-   }, [])
-
-   return (
-      <>
-         <Header
-            title={"Applicants Tracking System"}
-            subtitle={"Manage your ATS integrations"}
-         />
-         {show && <Test />}
-         <Box p={3}>{/*<ConnectWithATSSystem />*/}</Box>
-      </>
-   )
-}
-
-const Test = () => {
-   const group: Group = useSelector(groupSelector)
-   const { data, isLoading } = useGroupATSAccounts(group?.groupId)
-
-   console.log("render from Test!")
-   return (
-      <div>
-         Test component, loading = {isLoading + ""}, data = {data.length}
-      </div>
-   )
-}
+import { useMergeLink } from "@mergeapi/react-merge-link"
 
 const initialState = {
    isLoading: false,
@@ -90,7 +41,7 @@ const atsState = createSlice({
 
 const { start, linkTokenGrabbed, mergeLinkReady, complete } = atsState.actions
 
-const ConnectWithATSSystem = () => {
+const LinkAccountButton = ({ title }: { title: string }) => {
    const group: Group = useSelector(groupSelector)
    const { enqueueSnackbar } = useSnackbar()
    const [state, dispatch] = useReducer(atsState.reducer, initialState)
@@ -115,6 +66,7 @@ const ConnectWithATSSystem = () => {
                preventDuplicate: true,
             }
          )
+         dispatch(complete())
       }
    }
 
@@ -125,7 +77,7 @@ const ConnectWithATSSystem = () => {
             onClick={startLink}
             loading={state.isLoading}
          >
-            Associate new integrations with Merge
+            {title}
          </LoadingButton>
 
          <MergeDialogConnector
@@ -197,4 +149,4 @@ const MergeDialogConnector = ({
    return null
 }
 
-export default AtsIntegrationContent
+export default LinkAccountButton
