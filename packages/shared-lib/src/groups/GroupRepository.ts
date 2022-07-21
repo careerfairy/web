@@ -1,4 +1,8 @@
-import { Group, GroupATSAccount, GroupATSIntegrationTokens } from "./groups"
+import {
+   Group,
+   GroupATSAccountDocument,
+   GroupATSIntegrationTokensDocument,
+} from "./groups"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
 
@@ -26,16 +30,16 @@ export interface IGroupRepository {
    ): Promise<{ isAdmin: boolean; group: Group }>
 
    // ATS actions
-   getATSIntegrations(groupId: string): Promise<GroupATSAccount[]>
+   getATSIntegrations(groupId: string): Promise<GroupATSAccountDocument[]>
    createATSIntegration(
       groupId: string,
       integrationId: string,
-      data: Partial<GroupATSAccount>
+      data: Partial<GroupATSAccountDocument>
    ): Promise<void>
    saveATSIntegrationTokens(
       groupId: string,
       integrationId: string,
-      data: Partial<GroupATSIntegrationTokens>
+      data: Partial<GroupATSIntegrationTokensDocument>
    ): Promise<void>
 
    /**
@@ -46,7 +50,7 @@ export interface IGroupRepository {
    getATSIntegrationTokens(
       groupId: string,
       integrationId: string
-   ): Promise<GroupATSIntegrationTokens>
+   ): Promise<GroupATSIntegrationTokensDocument>
 }
 
 export class FirebaseGroupRepository
@@ -155,7 +159,9 @@ export class FirebaseGroupRepository
    | ATS Actions
    |--------------------------------------------------------------------------
    */
-   async getATSIntegrations(groupId: string): Promise<GroupATSAccount[]> {
+   async getATSIntegrations(
+      groupId: string
+   ): Promise<GroupATSAccountDocument[]> {
       const docs = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
@@ -166,13 +172,13 @@ export class FirebaseGroupRepository
          return []
       }
 
-      return this.addIdToDocs<GroupATSAccount>(docs.docs)
+      return this.addIdToDocs<GroupATSAccountDocument>(docs.docs)
    }
 
    createATSIntegration(
       groupId: string,
       integrationId: string,
-      data: Partial<GroupATSAccount>
+      data: Partial<GroupATSAccountDocument>
    ) {
       data.updatedAt = this.fieldValue.serverTimestamp() as any
       data.createdAt = this.fieldValue.serverTimestamp() as any
@@ -188,7 +194,7 @@ export class FirebaseGroupRepository
    saveATSIntegrationTokens(
       groupId: string,
       integrationId: string,
-      data: Partial<GroupATSIntegrationTokens>
+      data: Partial<GroupATSIntegrationTokensDocument>
    ) {
       return this.firestore
          .collection("careerCenterData")
@@ -214,6 +220,6 @@ export class FirebaseGroupRepository
          return null
       }
 
-      return this.addIdToDoc<GroupATSIntegrationTokens>(doc)
+      return this.addIdToDoc<GroupATSIntegrationTokensDocument>(doc)
    }
 }
