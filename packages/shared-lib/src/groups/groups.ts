@@ -37,7 +37,7 @@ export interface GroupOption extends Identifiable {
  *
  * When supporting multiple providers (others than merge) just add a new map key
  */
-export interface GroupATSAccount extends Identifiable {
+export interface GroupATSAccountDocument extends Identifiable {
    groupId: string
    merge?: {
       end_user_origin_id?: string
@@ -59,7 +59,7 @@ export interface GroupATSAccount extends Identifiable {
  *
  * This data shouldn't be fetched via apps (webapp), only via backends (cloud functions)
  */
-export interface GroupATSIntegrationTokens extends Identifiable {
+export interface GroupATSIntegrationTokensDocument extends Identifiable {
    groupId: string
    integrationId: string
    merge?: {
