@@ -5,7 +5,7 @@ import { useFirebaseService } from "../../context/firebase/FirebaseServiceContex
 import Header from "../../components/views/header/Header"
 import Footer from "../../components/views/footer/Footer"
 import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup"
-import CreateCategories from "../../components/views/group/create/CreateCategories"
+import CreateGroupQuestions from "../../components/views/group/create/CreateGroupQuestions"
 import CompleteGroup from "../../components/views/group/create/CompleteGroup"
 import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
 import Loader from "../../components/views/loader/Loader"
@@ -16,8 +16,8 @@ import { Container, Step, StepLabel, Stepper } from "@mui/material"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "../../components/util/constants"
 import {
-   CustomCategory,
-   sortCustomCategoryOptionsByName,
+   GroupQuestion,
+   sortGroupQuestionOptionsByName,
 } from "@careerfairy/shared-lib/dist/groups"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
@@ -52,9 +52,7 @@ const CreateGroup = () => {
    const { enqueueSnackbar } = useSnackbar()
    const [activeStep, setActiveStep] = useState(0)
    const [baseGroupInfo, setBaseGroupInfo] = useState<BaseGroupInfo>({})
-   const [customCategories, setCustomCategories] = useState<CustomCategory[]>(
-      []
-   )
+   const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
    const { userData, authenticatedUser: user, isLoggedIn } = useAuth()
 
    useEffect(() => {
@@ -77,16 +75,16 @@ const CreateGroup = () => {
             fieldOfStudyRepo.getAllFieldsOfStudy(),
          ])
          const initialCategories = [
-            createCustomCategoryFromUserInfoCollection(
+            createGroupQuestionFromUserInfoCollection(
                levelsOfStudy,
                "levelOfStudy"
             ),
-            createCustomCategoryFromUserInfoCollection(
+            createGroupQuestionFromUserInfoCollection(
                fieldsOfStudy,
                "fieldOfStudy"
             ),
          ]
-         setCustomCategories(initialCategories)
+         setGroupQuestions(initialCategories)
       } catch (e) {
          sendError(e)
       }
@@ -96,18 +94,18 @@ const CreateGroup = () => {
       dispatch(actions.sendGeneralError(error))
    }
 
-   const createCustomCategoryFromUserInfoCollection = (
+   const createGroupQuestionFromUserInfoCollection = (
       userInfoCollectionDocsInfo: FieldOfStudy[] | LevelOfStudy[],
-      type: Exclude<CustomCategory["categoryType"], "custom">
-   ): CustomCategory => {
+      type: Exclude<GroupQuestion["questionType"], "custom">
+   ): GroupQuestion => {
       if (type !== "fieldOfStudy" && type !== "levelOfStudy")
          throw new Error("Invalid category type")
       return {
          id: uuidv4(),
          name: type === "fieldOfStudy" ? "Field of Study" : "Level of Study",
          hidden: false,
-         categoryType: type,
-         options: userInfoCollectionDocsInfo.reduce<CustomCategory["options"]>(
+         questionType: type,
+         options: userInfoCollectionDocsInfo.reduce<GroupQuestion["options"]>(
             (acc, curr) => {
                return {
                   ...acc,
@@ -137,21 +135,21 @@ const CreateGroup = () => {
       }
    }
 
-   const handleAddTempCategory = (categoryObj) => {
+   const handleAddTempGroupQuestion = (categoryObj) => {
       // adds temporary categories locally
       if (categoryObj && categoryObj.options && categoryObj.options.length) {
          categoryObj.options.sort(dynamicSort("name"))
       }
-      setCustomCategories([...customCategories, categoryObj])
+      setGroupQuestions([...groupQuestions, categoryObj])
    }
 
-   const handleUpdateCategory = (categoryObj: CustomCategory) => {
+   const handleUpdateGroupQuestion = (categoryObj: GroupQuestion) => {
       // updates the temporary categories locally
       const updatedCategory = {
          ...categoryObj,
-         options: sortCustomCategoryOptionsByName(categoryObj.options),
+         options: sortGroupQuestionOptionsByName(categoryObj.options),
       }
-      setCustomCategories((prevCategories) =>
+      setGroupQuestions((prevCategories) =>
          prevCategories.map((category) => {
             if (category.id === updatedCategory.id) {
                return updatedCategory
@@ -161,9 +159,9 @@ const CreateGroup = () => {
       )
    }
 
-   const handleDeleteLocalCategory = (categoryObjId) => {
+   const handleDeleteLocalGroupQuestion = (categoryObjId) => {
       // deletes the temporary categories locally
-      setCustomCategories((prevCategories) =>
+      setGroupQuestions((prevCategories) =>
          prevCategories.filter((el) => el.id !== categoryObjId)
       )
    }
@@ -201,7 +199,7 @@ const CreateGroup = () => {
          }
          const ref = await groupRepo.createGroup(
             careerCenter,
-            customCategories,
+            groupQuestions,
             user.email
          )
          await router.push(`/group/${ref.id}/admin`)
@@ -233,11 +231,13 @@ const CreateGroup = () => {
             )
          case 1:
             return (
-               <CreateCategories
-                  handleDeleteLocalCategory={handleDeleteLocalCategory}
-                  handleUpdateCategory={handleUpdateCategory}
-                  handleAddTempCategory={handleAddTempCategory}
-                  arrayOfCategories={customCategories}
+               <CreateGroupQuestions
+                  handleDeleteLocalGroupQuestion={
+                     handleDeleteLocalGroupQuestion
+                  }
+                  handleUpdateGroupQuestion={handleUpdateGroupQuestion}
+                  handleAddTempGroupQuestion={handleAddTempGroupQuestion}
+                  groupQuestions={groupQuestions}
                   handleNext={handleNext}
                   handleBack={handleBack}
                />
@@ -248,7 +248,7 @@ const CreateGroup = () => {
                   createCareerCenter={createCareerCenter}
                   baseGroupInfo={baseGroupInfo}
                   handleBack={handleBack}
-                  arrayOfCategories={customCategories}
+                  groupQuestions={groupQuestions}
                />
             )
          default:

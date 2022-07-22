@@ -1,10 +1,7 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
-import {
-   CustomCategory,
-   CustomCategoryOption,
-   GroupUserStatData,
-} from "../groups"
+import { Group, GroupQuestion } from "../groups"
+import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -21,7 +18,7 @@ export interface UserData extends Identifiable {
    university: {
       code: string
       name: string
-      categories: UniversityCategoriesMap
+      questions: UserGroupQuestionsWithAnswerMap
    }
    badges?: string[]
    groupIds: string[]
@@ -41,18 +38,36 @@ export interface UserData extends Identifiable {
       uid: string
       name: string
    }
-
    // need data migrations to be moved to the user stats doc
    referralsCount?: number
    totalLivestreamInvites?: number
 }
 
-export interface UniversityCategoriesMap {
-   [categoryId: CustomCategory["id"]]: {
-      categoryName?: string
-      selectedOptionName?: string
-      selectedOptionId: CustomCategoryOption["id"]
-   }
+/*
+ * Key is the questionId and value is the answerId
+ * */
+export type UserGroupQuestionsWithAnswerMap = Record<
+   GroupQuestion["id"],
+   string
+>
+export interface UserGroupData extends Identifiable {
+   userUid?: UserData["authId"]
+   groupId: Group["id"]
+   groupName: Group["universityName"]
+   groupLogo: Group["logoUrl"]
+   groupUniversityCode?: Group["universityCode"]
+   questions?: UserGroupQuestionsWithAnswerMap
+}
+
+export interface RegisteredGroup {}
+
+export interface CSVDownloadUserData extends Record<string, string> {
+   Email: string
+   "Field of study": string
+   "First Name": string
+   "Last Name": string
+   "Level of study": string
+   University: string
 }
 export type BackFillType = "levelOfStudy" | "fieldOfStudy"
 export interface RegisteredGroup {
@@ -97,6 +112,27 @@ export interface SavedRecruiter extends Identifiable {
 
 export interface RegisteredStudent extends UserData {
    dateRegistered: firebase.firestore.Timestamp
+   livestreamId: LivestreamEvent["id"]
+   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
+}
+
+/*
+ * Key is the groupId and value is a dictionary of keys questionId and values answerId
+ * */
+export type UserLivestreamGroupQuestionAnswers = Record<
+   Group["id"],
+   UserGroupQuestionsWithAnswerMap
+>
+export interface ParticipatingStudent extends UserData {
+   joined: firebase.firestore.Timestamp
+   livestreamId: LivestreamEvent["id"]
+   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
+}
+
+export interface TalentPoolStudent extends UserData {
+   dateJoinedTalentPool: firebase.firestore.Timestamp
+   livestreamId: LivestreamEvent["id"]
+   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
 }
 
 export interface UserPublicData {
@@ -104,14 +140,6 @@ export interface UserPublicData {
    firstName: string
    lastName: string
    badges?: string[]
-}
-
-export interface UserBreakdownStats {
-   totalCount: number
-   id: string
-   label: string
-   dataDict: Record<GroupUserStatData["optionId"], GroupUserStatData>
-   dataArray: GroupUserStatData[]
 }
 
 /**
@@ -129,95 +157,21 @@ export const pickPublicDataFromUser = (userData: UserData): UserPublicData => {
    }
 }
 
-export const getGeneralUserBreakdownStats = function (
-   users: UserData[]
-): UserBreakdownStats[] {
-   const fieldOfStudyStats: UserBreakdownStats = {
-      totalCount: users.length,
-      label: "Field of Study",
-      id: "fieldOfStudy",
-      dataDict: {},
-      dataArray: [],
-   }
-   const levelOfStudyStats: UserBreakdownStats = {
-      totalCount: users.length,
-      label: "Level of Study",
-      id: "levelOfStudy",
-      dataDict: {},
-      dataArray: [],
-   }
-   mapUserStats(fieldOfStudyStats, users, {
-      pathToDataId: "fieldOfStudy.id",
-      pathToDataName: "fieldOfStudy.name",
-   })
-   mapUserStats(levelOfStudyStats, users, {
-      pathToDataId: "levelOfStudy.id",
-      pathToDataName: "levelOfStudy.name",
-   })
-   return [fieldOfStudyStats, levelOfStudyStats]
-}
-interface BreakdownDataPaths {
-   pathToDataName: string
-   pathToDataId: string
-}
-
-function resolve(obj, path, separator = ".") {
-   const properties = Array.isArray(path) ? path : path.split(separator)
-   return properties.reduce((prev, curr) => prev && prev[curr], obj)
-}
-/*
- * Takes a list of users and maps them to a userBreakdownStats object
- * @param userBreakdownStats - the userBreakdownStats object to map to
- * @param users - list of users
- * @param pathsToData - paths to the data to map to the userBreakdownStats
- * @returns userBreakdownStats - the userBreakdownStats object with the mapped data
- * */
-export const mapUserStats = (
-   stats: UserBreakdownStats,
-   users: UserData[],
-   dataPaths: BreakdownDataPaths
-) => {
-   for (const user of users) {
-      const dataId = resolve(user, dataPaths.pathToDataId)
-      const dataName = resolve(user, dataPaths.pathToDataName)
-
-      if (!dataId) continue
-      if (!stats.dataDict[dataId]) {
-         stats.dataDict[dataId] = {
-            count: 0,
-            optionName: dataName,
-            optionId: dataId,
-         }
-      }
-      stats.dataDict[dataId].count++
-   }
-   stats.dataArray = getDataArray(stats.dataDict)
-}
-
-export function getUserBreakdownStatsBasedOnCustomCategories(
-   users: UserData[],
-   customCategories: CustomCategory[]
-): UserBreakdownStats[] {
-   return customCategories.map((customCategory) => {
-      const customCategoryStat: UserBreakdownStats = {
-         id: customCategory.id,
-         totalCount: users.length,
-         label: customCategory.name,
-         dataDict: {},
-         dataArray: [],
-      }
-      mapUserStats(customCategoryStat, users, {
-         pathToDataId: `university.categories.${customCategory.id}.selectedOptionId`,
-         pathToDataName: `university.categories.${customCategory.id}.selectedOptionName`,
-      })
-      return customCategoryStat
-   }, [])
-}
-
-const getDataArray = (
-   dataDict: UserBreakdownStats["dataDict"]
-): UserBreakdownStats["dataArray"] => {
-   return Object.keys(dataDict)
-      .map((key) => dataDict[key])
-      .sort((a, b) => b.count - a.count)
+export const getLivestreamGroupQuestionAnswers = (
+   livestreamGroupQuestionsWithUserAnswers: LivestreamGroupQuestionsMap
+): UserLivestreamGroupQuestionAnswers => {
+   return Object.values(
+      livestreamGroupQuestionsWithUserAnswers
+   ).reduce<UserLivestreamGroupQuestionAnswers>(
+      (acc, groupDataWithQuestions) => {
+         acc[groupDataWithQuestions.groupId] = Object.values(
+            groupDataWithQuestions.questions
+         ).reduce((acc, question) => {
+            acc[question.id] = question.selectedOptionId
+            return acc
+         }, {})
+         return acc
+      },
+      {}
+   )
 }

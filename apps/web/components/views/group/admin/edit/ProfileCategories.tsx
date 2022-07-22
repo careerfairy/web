@@ -10,12 +10,12 @@ import {
    Grow,
 } from "@mui/material"
 import AddIcon from "@mui/icons-material/Add"
-import CategoryElement from "../settings/Category/CategoryElement"
-import CategoryEdit from "../settings/Category/CategoryEdit"
+import GroupQuestionElement from "../settings/GroupQuestion/GroupQuestionElement"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import GroupQuestionEdit from "../settings/GroupQuestion/GroupQuestionEdit"
 
 const ProfileCategories = () => {
-   const { group, customCategories } = useGroup()
+   const { group, groupQuestions } = useGroup()
    const [createMode, setCreateMode] = useState(false)
 
    return (
@@ -43,17 +43,19 @@ const ProfileCategories = () => {
             <Grid container spacing={3}>
                <Grow unmountOnExit in={createMode}>
                   <Grid item md={12} xs={12}>
-                     <CategoryEdit
+                     <GroupQuestionEdit
                         group={group}
-                        newCategory={true}
                         setEditMode={setCreateMode}
                      />
                   </Grid>
                </Grow>
 
-               {customCategories.map((category) => (
+               {groupQuestions.map((category) => (
                   <Grid item md={12} xs={12} key={category.id}>
-                     <CategoryElement group={group} category={category} />
+                     <GroupQuestionElement
+                        group={group}
+                        GroupQuestion={category}
+                     />
                   </Grid>
                ))}
             </Grid>

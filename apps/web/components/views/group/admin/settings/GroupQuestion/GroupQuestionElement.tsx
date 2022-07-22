@@ -1,6 +1,6 @@
 import React, { Fragment, useMemo, useState } from "react"
 import EditIcon from "@mui/icons-material/Edit"
-import CategoryEdit from "./CategoryEdit"
+import GroupQuestionEdit from "./GroupQuestionEdit"
 import {
    Card,
    CardContent,
@@ -13,9 +13,9 @@ import {
 } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import {
-   convertCategoryOptionsToSortedArray,
-   CustomCategory,
-   CustomCategoryOption,
+   convertGroupQuestionOptionsToSortedArray,
+   GroupQuestion,
+   GroupQuestionOption,
    Group,
 } from "@careerfairy/shared-lib/dist/groups"
 
@@ -26,25 +26,25 @@ const styles = sxStyles({
 })
 
 interface Props {
-   handleUpdateCategory?: (category: CustomCategory) => void
-   category: CustomCategory
-   handleDeleteLocalCategory?: (categoryId: string) => void
+   handleUpdateGroupQuestion?: (category: GroupQuestion) => void
+   GroupQuestion: GroupQuestion
+   handleDeleteLocalGroupQuestion?: (categoryId: string) => void
    group?: Group
    isLocal?: boolean
 }
 
-const CategoryElement = ({
-   handleUpdateCategory,
-   category,
-   handleDeleteLocalCategory,
+const GroupQuestionElement = ({
+   handleUpdateGroupQuestion,
+   GroupQuestion,
+   handleDeleteLocalGroupQuestion,
    group,
    isLocal,
 }: Props) => {
    const [editMode, setEditMode] = useState(false)
-   const hidden = Boolean(category.hidden)
-   const options = useMemo<CustomCategoryOption[]>(() => {
-      return convertCategoryOptionsToSortedArray(category.options)
-   }, [category])
+   const hidden = Boolean(GroupQuestion.hidden)
+   const options = useMemo<GroupQuestionOption[]>(() => {
+      return convertGroupQuestionOptionsToSortedArray(GroupQuestion.options)
+   }, [GroupQuestion])
 
    const optionElements = options.map((option, index) => {
       return (
@@ -68,7 +68,7 @@ const CategoryElement = ({
                   }}
                   title={
                      <>
-                        {category.name}
+                        {GroupQuestion.name}
                         {hidden && (
                            <Tooltip title="This information will not be collected from viewers who register to your events.">
                               <Chip
@@ -101,16 +101,16 @@ const CategoryElement = ({
 
    return (
       <Fragment>
-         <CategoryEdit
+         <GroupQuestionEdit
             group={group}
             isLocal={isLocal}
-            handleUpdateCategory={handleUpdateCategory}
-            handleDeleteLocalCategory={handleDeleteLocalCategory}
-            category={category}
+            handleUpdateGroupQuestion={handleUpdateGroupQuestion}
+            handleDeleteLocalGroupQuestion={handleDeleteLocalGroupQuestion}
+            groupQuestion={GroupQuestion}
             setEditMode={setEditMode}
          />
       </Fragment>
    )
 }
 
-export default CategoryElement
+export default GroupQuestionElement

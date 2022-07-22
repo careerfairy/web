@@ -1,10 +1,5 @@
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import {
-   getPdfCategoryChartData,
-   Group,
-   PdfCategoryChartData,
-   PdfReportData,
-} from "@careerfairy/shared-lib/dist/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import {
    LivestreamEvent,
    LivestreamPoll,
@@ -15,17 +10,20 @@ import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 import { FirebaseLevelOfStudyRepository } from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
 import { FirebaseFieldOfStudyRepository } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import {
+   getPdfCategoryChartData,
+   PdfCategoryChartData,
+   PdfReportData,
+} from "@careerfairy/shared-lib/dist/groups/pdf-report"
+import { FirebaseUserRepository } from "@careerfairy/shared-lib/dist/users/UserRepository"
 
 const functions = require("firebase-functions")
 const {
    setHeaders,
    getArrayDifference,
    makeRequestingGroupIdFirst,
-   studentBelongsToGroup,
-   getRegisteredStudentsStats,
    getRatingsAverage,
    getDateString,
-   markStudentStatsInUse,
    partition,
 } = require("./util")
 const { client } = require("./api/postmark")
@@ -147,8 +145,7 @@ export const sendNewlyPublishedEventEmail = functions.https.onCall(
 export const getLivestreamReportData_v4 = functions.https.onCall(
    async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data
-      const universityReports = []
-      let companyReport = null
+      const hostsData: PdfReportData["hostsData"] = []
       let universityChartData: PdfCategoryChartData = null
       let nonUniversityChartData: PdfCategoryChartData = null
 
@@ -168,39 +165,17 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          )
       }
 
-      const getUsersByEmail = async (
-         arrayOfEmails = [],
-         options = { withEmpty: false }
-      ): Promise<UserData[]> => {
-         let totalUsers = []
-         let i,
-            j,
-            tempArray,
-            chunk = 800
-         for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
-            tempArray = arrayOfEmails.slice(i, i + chunk)
-            const userSnaps = await Promise.all(
-               tempArray
-                  .filter((email) => email)
-                  .map((email) =>
-                     admin.firestore().collection("userData").doc(email).get()
-                  )
-            )
-            let newUsers
-            if (options.withEmpty) {
-               newUsers = userSnaps.map((doc) => ({
-                  id: doc.id,
-                  ...doc.data(),
-               }))
-            } else {
-               newUsers = userSnaps
-                  .filter((doc) => doc.exists)
-                  .map((doc) => ({ id: doc.id, ...doc.data() }))
-            }
-            totalUsers = [...totalUsers, ...newUsers]
-         }
-         return totalUsers
-      }
+      const groupRepo = new FirebaseGroupRepository(admin.firestore())
+      const userRepo = new FirebaseUserRepository(
+         admin.firestore(),
+         admin.firestore.FieldValue
+      )
+      const levelOfStudyRepo = new FirebaseLevelOfStudyRepository(
+         admin.firestore()
+      )
+      const fieldOfStudyRepo = new FirebaseFieldOfStudyRepository(
+         admin.firestore()
+      )
 
       const groupSnap = await admin
          .firestore()
@@ -249,26 +224,30 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             livestreamData.groupIds,
             requestingGroupData.id
          )
-
-         // Declaration of Snaps promises, todo turn into Promise.all()
-         const talentPoolSnap = await admin
-            .firestore()
-            .collection("userData")
-            .where("talentPools", "array-contains", livestreamData.companyId)
-            .get()
-         const pollsSnap = await streamSnap.ref
-            .collection("polls")
-            .orderBy("timestamp", "asc")
-            .get()
-
-         const iconsSnap = await streamSnap.ref
-            .collection("icons")
-            .orderBy("timestamp", "desc")
-            .get()
-         const questionsSnap = await streamSnap.ref
-            .collection("questions")
-            .orderBy("votes", "desc")
-            .get()
+         const [talentPoolSnap, pollsSnap, iconsSnap, questionsSnap] =
+            await Promise.all([
+               admin
+                  .firestore()
+                  .collection("userData")
+                  .where(
+                     "talentPools",
+                     "array-contains",
+                     livestreamData.companyId
+                  )
+                  .get(),
+               streamSnap.ref
+                  .collection("polls")
+                  .orderBy("timestamp", "asc")
+                  .get(),
+               streamSnap.ref
+                  .collection("icons")
+                  .orderBy("timestamp", "desc")
+                  .get(),
+               streamSnap.ref
+                  .collection("questions")
+                  .orderBy("votes", "desc")
+                  .get(),
+            ])
 
          const ratingsSnap = await streamSnap.ref.collection("rating").get()
 
@@ -304,7 +283,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          }
 
          // Extraction of snap Data
-         const getMostCommonUniversities = (students = [], max = 5) => {
+         const getMostCommonUniversities = (students: UserData[], max = 5) => {
             const universitiesCount = students.reduce(
                (acc, currentStudent) => {
                   if (!currentStudent?.university?.code) {
@@ -324,16 +303,15 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             )
 
             const universitiesArray = Object.keys(universitiesCount)
-               .map((key) => ({
-                  code: key,
-                  name: universitiesCount[key].name,
-                  count: universitiesCount[key].count,
-               }))
+               .map((key) => universitiesCount[key])
                .filter((university) => university.count > 0)
                .sort((a, b) => b.count - a.count)
             const otherCodes = ["other", "othe"]
             // remove others from the list
-            const [topNamedUniversities, otherUniversities] = partition(
+            const {
+               matches: topNamedUniversities,
+               noMatches: otherUniversities,
+            } = partition(
                universitiesArray,
                (university, index) =>
                   !otherCodes.includes(university.code) && index < max + 1
@@ -353,18 +331,10 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          }
 
          // Its let since this array will be modified
-         let participatingStudents = await getUsersByEmail(
+         const participatingStudents = await userRepo.getUsersByEmail(
             livestreamData.participatingStudents || []
          )
 
-         const groupRepo = new FirebaseGroupRepository(admin.firestore())
-         const levelOfStudyRepo = new FirebaseLevelOfStudyRepository(
-            admin.firestore()
-         )
-         const fieldOfStudyRepo = new FirebaseFieldOfStudyRepository(
-            admin.firestore()
-         )
-         // console.log("-> requestingGroupData AGAIN V2", requestingGroupData)
          const groupPresenter = new GroupPresenter(requestingGroupData)
 
          const rootLevelOfStudyCategory =
@@ -372,48 +342,45 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          const rootFieldOfStudyCategory =
             await fieldOfStudyRepo.getFieldsOfStudyAsCategory()
 
-         const [uniStudents, nonUniStudents]: UserData[][] = partition(
-            participatingStudents,
-            (student) => groupPresenter.isUniversityStudent(student)
+         const {
+            matches: uniStudents,
+            noMatches: nonUniStudents,
+         }: {
+            matches: UserData[]
+            noMatches: UserData[]
+         } = partition(participatingStudents, (student) =>
+            groupPresenter.isUniversityStudent(student)
          )
-         const canHaveCustomCategories =
-            groupPresenter.canHaveCustomCategories()
 
-         // nonUniversityChartData = getPdfCategoryChartData(
-         //    rootFieldOfStudyCategory,
-         //    rootLevelOfStudyCategory,
-         //    canHaveCustomCategories ? nonUniStudents : participatingStudents
-         // )
+         const isUniversity = groupPresenter.isUniversity()
 
-         if (groupPresenter.canHaveCustomCategories()) {
+         nonUniversityChartData = getPdfCategoryChartData(
+            rootFieldOfStudyCategory,
+            rootLevelOfStudyCategory,
+            isUniversity ? nonUniStudents : participatingStudents,
+            false
+         )
+
+         if (groupPresenter.isUniversity()) {
             const customFieldsOfStudyCategory =
-               await groupRepo.getBreakdownCategory(
+               await groupRepo.getFieldOrLevelOfStudyGroupQuestion(
                   requestingGroupData.id,
                   "fieldOfStudy"
                )
 
             const customLevelsOfStudyCategory =
-               await groupRepo.getBreakdownCategory(
+               await groupRepo.getFieldOrLevelOfStudyGroupQuestion(
                   requestingGroupData.id,
                   "levelOfStudy"
                )
 
-            // console.log(
-            //    "-> uniStudents categories",
-            //    uniStudents.map((s) => s.university.categories)
-            // )
-
             universityChartData = getPdfCategoryChartData(
                customFieldsOfStudyCategory,
                customLevelsOfStudyCategory,
-               participatingStudents
+               uniStudents,
+               true
             )
          }
-
-         functions.logger.info(
-            "Number of participating students: " + participatingStudents.length
-         )
-
          const speakers = livestreamData.speakers || []
 
          const questions =
@@ -421,97 +388,40 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
 
          const polls = mapFirestoreDocuments<LivestreamPoll>(pollsSnap)
 
-         let totalSumOfParticipatingStudentsWithStats = 0
-         let totalSumOfUniversityStudents = 0
-         let numberOfStudentsFollowingCompany = 0
-         for (const groupId of livestreamGroupIds) {
-            let groupData
-            if (groupId === requestingGroupData.id) {
-               groupData = requestingGroupData
-            } else {
-               const otherGroupSnap = await admin
-                  .firestore()
-                  .collection("careerCenterData")
-                  .doc(groupId)
-                  .get()
-               if (!otherGroupSnap.exists) continue
-               groupData = { id: otherGroupSnap.id, ...otherGroupSnap.data() }
+         const groups = await groupRepo.getGroupsByIds(livestreamGroupIds)
+
+         for (const groupData of groups) {
+            const presenter = new GroupPresenter(groupData)
+            const isUniversity = presenter.isUniversity()
+            const numberOfStudentsFromUniversity = isUniversity
+               ? participatingStudents.filter((user) =>
+                    presenter.isUniversityStudent(user)
+                 ).length
+               : 0
+
+            const hostData = {
+               id: presenter.model.id,
+               hostName: presenter.model.universityName,
+               groupId: presenter.model.id,
+               hostLogoUrl: presenter.model.logoUrl,
+               isUniversity,
+               numberOfStudentsFromUniversity: numberOfStudentsFromUniversity,
             }
-            if (groupData.universityCode) {
-               // Generate university Report Data
-               const studentsFromUniversity = participatingStudents.filter(
-                  (student) =>
-                     student.university &&
-                     student.university.code === groupData.universityCode
-               )
-               const numberOfStudentsFromUniversity =
-                  studentsFromUniversity.length
-               const universityStudentsThatFollowingUniversity =
-                  studentsFromUniversity.filter((student) =>
-                     studentBelongsToGroup(student, groupData)
-                  )
 
-               participatingStudents = markStudentStatsInUse(
-                  participatingStudents,
-                  groupData
-               )
-               const studentStats = getRegisteredStudentsStats(
-                  universityStudentsThatFollowingUniversity,
-                  groupData
-               )
-
-               const universityReport = {
-                  numberOfStudentsFromUniversity,
-                  studentStats,
-                  numberOfUniversityStudentsWithNoStats:
-                     numberOfStudentsFromUniversity -
-                     universityStudentsThatFollowingUniversity.length,
-                  numberOfUniversityStudentsThatFollowingUniversity:
-                     universityStudentsThatFollowingUniversity.length,
-                  group: groupData,
-                  groupName: groupData.universityName,
-                  groupId: groupData.id,
-                  isUniversity: Boolean(groupData.universityCode),
-               }
-
-               totalSumOfUniversityStudents += numberOfStudentsFromUniversity
-               universityReports.push(universityReport)
-            } else if (groupData.id === requestingGroupData.id) {
-               // Generate company Data
-               const studentsThatFollowCompany = participatingStudents.filter(
-                  (student) => studentBelongsToGroup(student, groupData)
-               )
-               participatingStudents = markStudentStatsInUse(
-                  participatingStudents,
-                  groupData
-               )
-
-               numberOfStudentsFollowingCompany =
-                  studentsThatFollowCompany.length
-
-               const studentStats = getRegisteredStudentsStats(
-                  studentsThatFollowCompany,
-                  groupData
-               )
-               companyReport = {
-                  numberOfStudentsFollowingCompany,
-                  studentStats,
-                  group: groupData,
-                  groupName: groupData.universityName,
-                  groupId: groupData.id,
-                  isUniversity: Boolean(groupData.universityCode),
-               }
-            }
+            hostsData.push(hostData)
          }
+         const totalParticipatingWithoutData = universityChartData
+            ? universityChartData.totalWithoutStats +
+              nonUniversityChartData.totalWithoutStats
+            : nonUniversityChartData.totalWithoutStats
 
          return {
-            universityReports,
+            hostsData,
             universityChartData,
             nonUniversityChartData,
-            companyReport,
             summary: {
+               totalParticipatingWithoutData: totalParticipatingWithoutData,
                totalParticipating: participatingStudents.length,
-               totalSumOfParticipatingStudentsWithStats,
                requestingGroupId: targetGroupId,
                requestingGroup: requestingGroupData,
                speakers,
@@ -521,11 +431,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
                questions,
                polls,
                numberOfIcons: iconsSnap.size,
-               totalSumOfUniversityStudents,
-               numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent:
-                  participatingStudents.length -
-                  (totalSumOfUniversityStudents +
-                     numberOfStudentsFollowingCompany),
                mostCommonUniversities: getMostCommonUniversities(
                   participatingStudents,
                   5

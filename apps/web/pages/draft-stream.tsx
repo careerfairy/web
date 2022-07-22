@@ -22,7 +22,10 @@ const DraftStream = () => {
    const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false)
    const [submitted, setSubmitted] = useState(false)
    const { authenticatedUser, userData } = useAuth()
-   const [userInfo, setUserInfo] = useState({})
+   const [userInfo, setUserInfo] = useState({
+      name: "",
+      email: "",
+   })
    const { enqueueSnackbar } = useSnackbar()
    const router = useRouter()
    const formRef = useRef()
@@ -36,7 +39,7 @@ const DraftStream = () => {
          setUserInfo({
             ...userData,
             name: `${userData.firstName} ${userData.lastName}`,
-            email: userData.email || userData.userEmail,
+            email: userData.userEmail,
          })
       }
    }, [userData])
@@ -51,6 +54,7 @@ const DraftStream = () => {
    const handleSubmit = () => {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
       if (formRef.current) {
+         // @ts-ignore
          formRef.current.handleSubmit()
       }
    }
@@ -80,7 +84,6 @@ const DraftStream = () => {
    const onSubmit = async (
       values,
       { setSubmitting },
-      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -91,7 +94,6 @@ const DraftStream = () => {
          setSubmitting(true)
          const livestream = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             draftStreamId,
             firebaseService
@@ -105,6 +107,7 @@ const DraftStream = () => {
                pendingApproval: true,
                seen: false,
             }
+            // @ts-ignore
             livestream.status = newStatus
             setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
@@ -156,7 +159,7 @@ const DraftStream = () => {
 
          if (absolutePath) {
             return push({
-               pathname: absolutePath,
+               pathname: absolutePath as string,
             })
          }
          setDraftId(id)

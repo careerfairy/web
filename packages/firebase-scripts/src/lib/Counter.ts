@@ -67,7 +67,7 @@ export default class Counter {
       }
    }
 
-   private static log(message: string): void {
-      console.log(`\x1b[32m%s\x1b[0m`, `--> ${message}`)
+   static log(...message: string[]): void {
+      console.log(`\x1b[32m%s\x1b[0m`, `--> ${message.join(" ")}`)
    }
 }

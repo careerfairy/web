@@ -24,6 +24,9 @@ import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
 import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance"
 import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
+import { userRepo } from "../../data/RepositoryInstances"
+import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -103,8 +106,10 @@ const ViewerLayout = (props) => {
    const [selectedState, setSelectedState] = useState("questions")
    const [notAuthorized, setNotAuthorized] = useState(false)
    const [checkingForCategoryData, setCheckingForCategoryData] = useState(false)
-   const [hasCheckedForCategoryData, setHasCheckedForCategoryData] =
-      useState(false)
+   const [
+      hasAnsweredLivestreamGroupQuestions,
+      setHasAnsweredLivestreamGroupQuestions,
+   ] = useState(false)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const handleOpenJoinModal = ({ groups, livestream }) =>
       setJoinGroupModalData({ groups, livestream })
@@ -166,17 +171,17 @@ const ViewerLayout = (props) => {
    useEffect(() => {
       // if (userData?.isAdmin) return
       if (userData?.userEmail) {
-         console.log("-> SETTING PARTICIPATION")
-         if (livestreamId && hasCheckedForCategoryData) {
-            firebase.setUserIsParticipating(livestreamId, userData)
-         }
-         if (breakoutRoomId) {
-            firebase.setUserIsParticipatingWithRef(streamRef, userData)
+         if (
+            (livestreamId && hasAnsweredLivestreamGroupQuestions) ||
+            breakoutRoomId
+         ) {
+            console.log("-> SETTING PARTICIPATION")
+            void firebase.setUserIsParticipatingWithRef(streamRef, userData)
          }
       }
    }, [
       livestreamId,
-      userData?.email,
+      userData?.userEmail,
       userData?.isAdmin,
       userData?.linkedinUrl,
       userData?.firstName,
@@ -184,7 +189,7 @@ const ViewerLayout = (props) => {
       userData?.registeredGroups,
       breakoutRoomId,
       streamRef,
-      hasCheckedForCategoryData,
+      hasAnsweredLivestreamGroupQuestions,
    ])
 
    useEffect(() => {
@@ -220,52 +225,42 @@ const ViewerLayout = (props) => {
          try {
             if (
                !currentLivestream?.test &&
-               currentLivestream?.groupIds?.length &&
+               currentLivestream?.groupQuestionsMap &&
                !breakoutRoomId
             ) {
                setCheckingForCategoryData(true)
                const livestreamGroups = await firebase.getGroupsWithIds(
                   currentLivestream.groupIds
                )
-               const groupThatUserFollows =
-                  StatsUtil.getGroupThatStudentBelongsTo(
-                     userData,
-                     livestreamGroups
+               const answeredLivestreamGroupQuestions =
+                  await userRepo.mapUserAnswersToLivestreamGroupQuestionWithAnswers(
+                     userData?.userEmail,
+                     currentLivestream.groupQuestionsMap
                   )
-
-               if (!groupThatUserFollows) {
-                  // If user is not following any of the groups bring up group following Dialog
-                  // Open the follow group dialog...
-                  if (livestreamGroups?.length) {
-                     // Only open dialog when there are groups
-                     handleOpenJoinModal({
-                        groups: livestreamGroups,
-                        livestream: currentLivestream,
-                     })
-                  }
-               } else {
-                  // If user is following one of the groups, please check if the user has all the categories of the group
-                  const userHasAllCategoriesOfGroup =
-                     StatsUtil.studentHasAllCategoriesOfGroup(
-                        userData,
-                        groupThatUserFollows
-                     )
-                  if (!userHasAllCategoriesOfGroup) {
-                     // Open the category select dialog...
-                     handleOpenJoinModal({
-                        groups: [groupThatUserFollows],
-                        livestream: currentLivestream,
-                     })
-                  }
-               }
+               const hasAnsweredAllQuestions =
+                  checkIfUserHasAnsweredAllLivestreamGroupQuestions(
+                     answeredLivestreamGroupQuestions
+                  )
+               if (!hasAnsweredAllQuestions) {
+                  handleOpenJoinModal({
+                     groups: livestreamGroups,
+                     livestream: currentLivestream,
+                  })
+               } else setHasAnsweredLivestreamGroupQuestions(true)
             }
-         } catch (e) {}
+         } catch (e) {
+            console.log("-> error in checkForCategoryData", e)
+         }
          setCheckingForCategoryData(false)
-         setHasCheckedForCategoryData(true)
       }
 
-      checkForCategoryData()
+      void checkForCategoryData()
    }, [Boolean(userData), Boolean(currentLivestream)])
+
+   const onRegistrationQuestionsAnswered = useCallback(async () => {
+      setHasAnsweredLivestreamGroupQuestions(true)
+      handleCloseJoinModal()
+   }, [])
 
    useRewardLivestreamAttendance(currentLivestream)
    useCountLivestreamAttendanceMinutes(currentLivestream)
@@ -305,8 +300,7 @@ const ViewerLayout = (props) => {
    if (
       !isLoaded(currentLivestream) ||
       notAuthorized ||
-      checkingForCategoryData ||
-      !hasCheckedForCategoryData
+      checkingForCategoryData
    ) {
       return <Loader />
    }
@@ -315,7 +309,7 @@ const ViewerLayout = (props) => {
       return (
          <ViewerGroupCategorySelectMenu
             joinGroupModalData={joinGroupModalData}
-            onGroupJoin={handleCloseJoinModal}
+            onQuestionsAnswered={onRegistrationQuestionsAnswered}
          />
       )
    }

@@ -1,13 +1,13 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
-import {
-   getGeneralUserBreakdownStats,
-   getUserBreakdownStatsBasedOnCustomCategories,
-   UserBreakdownStats,
-   UserData,
-} from "@careerfairy/shared-lib/dist/users"
-import { CustomCategory } from "@careerfairy/shared-lib/dist/groups"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
 import { colorsArray } from "../util/colors"
 import { useTheme } from "@mui/material/styles"
+import {
+   getGeneralUserBreakdownStats,
+   getUserBreakdownStatsBasedOnGroupQuestions,
+   UserBreakdownStats,
+} from "@careerfairy/shared-lib/dist/groups/analytics"
 
 interface ChartData {
    datasets: {
@@ -31,7 +31,7 @@ function randomColor() {
 
 const useUserBreakdownStats = (
    users: UserData[],
-   customCategories?: CustomCategory[]
+   groupQuestions?: GroupQuestion[]
 ) => {
    const theme = useTheme()
 
@@ -90,20 +90,20 @@ const useUserBreakdownStats = (
 
    const totalStats = useMemo<UserBreakdownStats[]>(() => {
       if (users) {
-         if (customCategories) {
-            return getUserBreakdownStatsBasedOnCustomCategories(
+         if (groupQuestions) {
+            return getUserBreakdownStatsBasedOnGroupQuestions(
                users,
-               customCategories
+               groupQuestions
             )
          }
          return getGeneralUserBreakdownStats(users)
       }
       return []
-   }, [users, customCategories])
+   }, [users, groupQuestions])
 
    useEffect(() => {
       handleStatChange(currentStats?.id)
-   }, [Boolean(totalStats.length), Boolean(customCategories), users])
+   }, [Boolean(totalStats.length), Boolean(groupQuestions), users])
 
    const handleStatChange = useCallback(
       (categoryId?: string) => {

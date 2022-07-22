@@ -1,13 +1,11 @@
 import confirmScriptSafetyWrapper from "./util/confirmScriptSafetyWrapper"
 
-type ScriptArgs = "useProd" | "scriptPath"
-
-const getArgValue = (targetArg: ScriptArgs) => {
+export const getArgValue = <T extends string>(targetArg: string): T => {
    const argValue = process.argv.find((arg) => arg.startsWith(`${targetArg}=`))
    if (!argValue) {
       return null
    }
-   return argValue.split("=")[1]
+   return argValue.split("=")[1] as T
 }
 
 export const useProd = getArgValue("useProd") === "true"

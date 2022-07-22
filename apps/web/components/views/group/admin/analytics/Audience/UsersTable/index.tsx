@@ -7,7 +7,7 @@ import {
 } from "../../../../../../helperFunctions/HelperFunctions"
 import { useSnackbar } from "notistack"
 
-import { LinkifyText, tableIcons } from "../../common/TableUtils"
+import { tableIcons } from "../../common/TableUtils"
 import AnalyticsUtil from "../../../../../../../data/util/AnalyticsUtil"
 import { useDispatch, useSelector } from "react-redux"
 import { universityCountriesMap } from "../../../../../../util/constants/universityCountries"
@@ -24,6 +24,7 @@ import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { UserDataSet, UserType } from "../../index"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import LinkifyText from "../../../../../../util/LinkifyText"
 
 interface Props {
    currentUserDataSet: UserDataSet
@@ -52,7 +53,7 @@ const UsersTable = ({
    const showUniversityBreakdown =
       currentUserDataSet.dataSet === "groupUniversityStudents"
    const { fieldsOfStudyById, levelsOfStudyById } = useGroupAnalytics()
-   const { customCategories, groupPresenter, group } = useGroup()
+   const { groupQuestions, groupPresenter, group } = useGroup()
    const dataTableRef = useRef(null)
    const [selection, setSelection] = useState([])
    const { enqueueSnackbar } = useSnackbar()
@@ -67,7 +68,7 @@ const UsersTable = ({
    const dispatch = useDispatch()
    const categoryFields = useMemo(() => {
       if (showUniversityBreakdown) {
-         return groupPresenter.getCustomCategoriesForTable(customCategories)
+         return groupPresenter.getUniversityQuestionsForTable(groupQuestions)
       } else {
          return [
             {
@@ -82,7 +83,7 @@ const UsersTable = ({
             },
          ]
       }
-   }, [showUniversityBreakdown, customCategories])
+   }, [showUniversityBreakdown, groupQuestions])
 
    useEffect(() => {
       let newUsers

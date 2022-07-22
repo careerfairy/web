@@ -1,4 +1,9 @@
 import { v4 as uuidv4 } from "uuid"
+import {
+   LivestreamEvent,
+   Speaker,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 
 export const speakerObj = {
    avatar: "",
@@ -8,10 +13,13 @@ export const speakerObj = {
    background: "",
 }
 
-export const getStreamSubCollectionSpeakers = (livestream, speakerQuery) => {
+export const getStreamSubCollectionSpeakers = (
+   livestream,
+   speakerQuery
+): Record<string, Speaker> => {
    if (!speakerQuery.empty && !livestream.speakers) {
       // if this stream doc has no speakers array and but has a sub-collection
-      let speakersObj = {}
+      let speakersObj: Record<string, Speaker> = {}
       speakerQuery.forEach((query) => {
          let speaker = query.data()
          speaker.id = query.id
@@ -20,7 +28,7 @@ export const getStreamSubCollectionSpeakers = (livestream, speakerQuery) => {
       return speakersObj
    } else if (livestream.speakers?.length) {
       let speakersObj = {}
-      livestream.speakers.forEach((speaker) => {
+      livestream.speakers.forEach((speaker: Speaker) => {
          if (!speaker.background) {
             speaker.background = ""
          }
@@ -28,7 +36,8 @@ export const getStreamSubCollectionSpeakers = (livestream, speakerQuery) => {
       })
       return speakersObj
    } else {
-      return { [uuidv4()]: speakerObj }
+      const newId = uuidv4()
+      return { [newId]: { ...speakerObj, id: newId } }
    }
 }
 
@@ -51,12 +60,11 @@ export const handleError = (key, fieldName, errors, touched) => {
 }
 
 export const buildLivestreamObject = (
-   values,
-   targetCategories,
+   values: DraftFormValues,
    updateMode,
-   streamId,
+   streamId: string,
    firebase
-) => {
+): LivestreamEvent => {
    return {
       ...(updateMode && { id: streamId }), // only adds id: livestreamId field if there's actually a valid id, which is when updateMode is true
       backgroundImageUrl: values.backgroundImageUrl,
@@ -66,8 +74,8 @@ export const buildLivestreamObject = (
       companyLogoUrl: values.companyLogoUrl,
       start: firebase.getFirebaseTimestamp(values.start),
       duration: values.duration,
-      targetCategories: targetCategories,
       interestsIds: [...new Set(values.interestsIds)],
+      groupQuestionsMap: values.groupQuestionsMap,
       type: "upcoming",
       test: false,
       groupIds: [...new Set(values.groupIds)],
@@ -139,7 +147,9 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
 }
 
 export const validateStreamForm = (values, isDraft, noValidation = false) => {
-   let errors = { speakers: {} }
+   let errors: Partial<DraftFormValues> = {
+      speakers: {},
+   }
    if (!values.companyLogoUrl) {
       errors.companyLogoUrl = "Required"
    }

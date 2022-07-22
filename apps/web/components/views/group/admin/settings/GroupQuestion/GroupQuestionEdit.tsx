@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from "react"
 import AddIcon from "@mui/icons-material/Add"
 import {
-   AddCategory,
-   DeleteCategory,
+   AddGroupQuestion,
+   DeleteGroupQuestion,
    DeleteOption,
    RenameOption,
-} from "./Option/CategoryEditOption"
+} from "./Option/GroupQuestionEditDialogs"
 import {
    Box,
    Button,
@@ -28,12 +28,12 @@ import {
 import EditIcon from "@mui/icons-material/Edit"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import {
-   CustomCategory,
-   CustomCategoryOption,
+   GroupQuestion,
+   GroupQuestionOption,
    Group,
-   groupRepo,
 } from "@careerfairy/shared-lib/dist/groups"
 import { v4 as uuidv4 } from "uuid"
+import { groupRepo } from "../../../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    errorButton: {
@@ -46,26 +46,28 @@ const styles = sxStyles({
 })
 
 interface Props {
-   category?: CustomCategory
-   handleDeleteLocalCategory?: (categoryId: string) => void
-   handleUpdateCategory?: (category: CustomCategory) => void
-   newCategory?: boolean
+   groupQuestion?: GroupQuestion
+   handleDeleteLocalGroupQuestion?: (groupQuestionId: string) => void
+   handleUpdateGroupQuestion?: (groupQuestion: GroupQuestion) => void
+   newGroupQuestion?: boolean
    setEditMode: (editMode: boolean) => void
-   handleAddTempCategory?: (category: CustomCategory) => void
+   handleAddTempGroupQuestion?: (groupQuestion: GroupQuestion) => void
    isLocal?: boolean
    group?: Group
 }
 
 export interface UpdateMode {
-   mode?: "add" | "rename" | "deleteCategory" | "delete"
-   option?: Partial<CustomCategoryOption>
-   options?: CustomCategory["options"]
+   mode?: "add" | "rename" | "deleteGroupQuestion" | "delete"
+   option?: Partial<GroupQuestionOption>
+   options?: GroupQuestion["options"]
 }
 
-const getInitialCategory = (category?: CustomCategory): CustomCategory => {
-   if (category) {
+const getInitialGroupQuestion = (
+   groupQuestion?: GroupQuestion
+): GroupQuestion => {
+   if (groupQuestion) {
       return {
-         ...category,
+         ...groupQuestion,
       }
    }
    return {
@@ -73,21 +75,22 @@ const getInitialCategory = (category?: CustomCategory): CustomCategory => {
       name: "",
       options: {},
       hidden: false,
-      categoryType: "custom",
+      questionType: "custom",
    }
 }
-const CategoryEditModal = ({
-   category,
-   handleDeleteLocalCategory,
-   handleUpdateCategory,
-   newCategory,
+const GroupQuestionEdit = ({
+   groupQuestion,
+   handleDeleteLocalGroupQuestion,
+   handleUpdateGroupQuestion,
+   newGroupQuestion,
    setEditMode,
-   handleAddTempCategory,
+   handleAddTempGroupQuestion,
    isLocal,
    group,
 }: Props) => {
-   const [localCategory, setLocalCategory] =
-      useState<CustomCategory>(getInitialCategory)
+   const [localGroupQuestion, setLocalGroupQuestion] = useState<GroupQuestion>(
+      getInitialGroupQuestion
+   )
 
    const [selectedOption, setSelectedOption] = useState(null)
    const [updateMode, setUpdateMode] = useState<UpdateMode>({})
@@ -101,42 +104,42 @@ const CategoryEditModal = ({
 
    useEffect(() => {
       if (
-         localCategory.options &&
-         Object.keys(localCategory.options).length >= 2
+         localGroupQuestion.options &&
+         Object.keys(localGroupQuestion.options).length >= 2
       ) {
          setErrorObj({ ...errorObj, optionError: false })
       }
-   }, [Object.keys(localCategory.options).length])
+   }, [Object.keys(localGroupQuestion.options).length])
 
    useEffect(() => {
-      if (category) {
-         setLocalCategory({ ...category })
+      if (groupQuestion) {
+         setLocalGroupQuestion({ ...groupQuestion })
       }
-   }, [category])
+   }, [groupQuestion])
 
-   function handleDelete(removedOption: CustomCategoryOption) {
-      setLocalCategory((prevCategory) => {
-         const newOptions = { ...prevCategory.options }
+   function handleDelete(removedOption: GroupQuestionOption) {
+      setLocalGroupQuestion((prevGroupQuestion) => {
+         const newOptions = { ...prevGroupQuestion.options }
          delete newOptions[removedOption.id]
-         return { ...prevCategory, options: newOptions }
+         return { ...prevGroupQuestion, options: newOptions }
       })
       resetUpdateMode()
    }
 
-   async function handleDeleteCategory() {
+   async function handleDeleteGroupQuestion() {
       if (isLocal) {
-         handleDeleteLocalCategory(category.id)
+         handleDeleteLocalGroupQuestion(groupQuestion.id)
          return setEditMode(false)
       }
-      await groupRepo.deleteCustomCategory(group.id, category.id)
+      await groupRepo.deleteGroupQuestion(group.id, groupQuestion.id)
       setEditMode(false)
    }
 
-   function handleAdd(newOption: CustomCategoryOption) {
-      setLocalCategory((prevCategory) => {
-         const newOptions = { ...prevCategory.options }
+   function handleAdd(newOption: GroupQuestionOption) {
+      setLocalGroupQuestion((prevGroupQuestion) => {
+         const newOptions = { ...prevGroupQuestion.options }
          newOptions[newOption.id] = newOption
-         return { ...prevCategory, options: newOptions }
+         return { ...prevGroupQuestion, options: newOptions }
       })
    }
 
@@ -144,43 +147,45 @@ const CategoryEditModal = ({
       setTouched(true)
    }
 
-   function handleRename(newOption: CustomCategoryOption) {
-      setLocalCategory((prevCategory) => {
-         const newOptions = { ...prevCategory.options }
+   function handleRename(newOption: GroupQuestionOption) {
+      setLocalGroupQuestion((prevGroupQuestion) => {
+         const newOptions = { ...prevGroupQuestion.options }
          newOptions[newOption.id] = {
             ...newOptions[newOption.id],
             name: newOption.name,
          }
-         return { ...prevCategory, options: newOptions }
+         return { ...prevGroupQuestion, options: newOptions }
       })
    }
 
    function handleErrors() {
       const errors = {
-         inputError: localCategory.name.length < 1,
-         optionError: Object.keys(localCategory.options).length < 2,
+         inputError: localGroupQuestion.name.length < 1,
+         optionError: Object.keys(localGroupQuestion.options).length < 2,
       }
       setErrorObj(errors)
-      setTouched(localCategory.name.trim().length <= 0)
+      setTouched(localGroupQuestion.name.trim().length <= 0)
       return errors.inputError || errors.optionError
    }
 
    const saveChanges = async () => {
       if (handleErrors()) return
       if (isLocal) {
-         if (newCategory) {
-            //Add a newly created temp category Obj
-            handleAddTempCategory({ ...localCategory })
+         if (newGroupQuestion) {
+            //Add a newly created temp group question Obj
+            handleAddTempGroupQuestion({ ...localGroupQuestion })
          } else {
-            //update an already created temp category obj
-            handleUpdateCategory({ ...localCategory })
+            //update an already created temp group question obj
+            handleUpdateGroupQuestion({ ...localGroupQuestion })
          }
          return setEditMode(false)
       }
-      if (newCategory && !isLocal) {
-         await groupRepo.addNewCustomCategory(group.id, { ...localCategory })
+      if (newGroupQuestion && !isLocal) {
+         await groupRepo.addNewGroupQuestion(group.id, {
+            ...localGroupQuestion,
+         })
       } else {
-         await groupRepo.updateCustomCategory(group.id, localCategory)
+         await groupRepo.updateGroupQuestion(group.id, localGroupQuestion)
       }
       setEditMode(false)
    }
@@ -194,7 +199,7 @@ const CategoryEditModal = ({
       setUpdateMode({
          mode: "rename",
          option: selectedOption,
-         options: localCategory.options,
+         options: localGroupQuestion.options,
       })
    }
 
@@ -206,52 +211,38 @@ const CategoryEditModal = ({
       setAnchorEl(null)
    }
 
-   const dynamicSort = (property) => {
-      let sortOrder = 1
-      if (property[0] === "-") {
-         sortOrder = -1
-         property = property.substr(1)
-      }
-      return function (a, b) {
-         /* next line works with strings and numbers,
-          * and you may want to customize it to your needs
-          */
-         const result =
-            a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
-         return result * sortOrder
-      }
-   }
-
-   const toggleCategoryHidden = async (event) => {
+   const toggleGroupQuestionHidden = async (event) => {
       const isHidden = event.currentTarget.checked
-      setLocalCategory((prevCategory) => {
-         return { ...prevCategory, hidden: isHidden }
+      setLocalGroupQuestion((prevGroupQuestion) => {
+         return { ...prevGroupQuestion, hidden: isHidden }
       })
    }
 
    const resetUpdateMode = () => setUpdateMode({})
 
-   const optionElements = Object.keys(localCategory?.options).map((key) => {
-      const option = localCategory.options[key]
-      return (
-         <Zoom key={option.id} in={Boolean(option.id)}>
-            <Chip
-               label={option.name}
-               variant="outlined"
-               deleteIcon={<EditIcon />}
-               className={"stacked"}
-               onDelete={(e) => {
-                  setSelectedOption(option)
-                  handleOpenDropDown(e)
-               }}
-            />
-         </Zoom>
-      )
-   })
+   const optionElements = Object.keys(localGroupQuestion?.options).map(
+      (key) => {
+         const option = localGroupQuestion.options[key]
+         return (
+            <Zoom key={option.id} in={Boolean(option.id)}>
+               <Chip
+                  label={option.name}
+                  variant="outlined"
+                  deleteIcon={<EditIcon />}
+                  className={"stacked"}
+                  onDelete={(e) => {
+                     setSelectedOption(option)
+                     handleOpenDropDown(e)
+                  }}
+               />
+            </Zoom>
+         )
+      }
+   )
 
    const handleChange = (event) => {
-      setLocalCategory((prevCategory) => ({
-         ...prevCategory,
+      setLocalGroupQuestion((prevGroupQuestion) => ({
+         ...prevGroupQuestion,
          name: event.target.value,
       }))
    }
@@ -263,42 +254,46 @@ const CategoryEditModal = ({
                autoFocus
                variant="outlined"
                fullWidth
-               label={"Category Name"}
+               label={"Question Name"}
                inputProps={{ maxLength: 40 }}
-               error={Boolean(touched && !localCategory.name?.trim().length)}
+               error={Boolean(
+                  touched && !localGroupQuestion.name?.trim().length
+               )}
                onBlur={handleBlur}
-               value={localCategory.name}
+               value={localGroupQuestion.name}
                onChange={handleChange}
             />
             <FormHelperText sx={styles.nameError} error>
-               {touched && !localCategory.name?.length && "Required"}
+               {touched && !localGroupQuestion.name?.length && "Required"}
             </FormHelperText>
             <Card>
                <CardHeader
                   action={
                      <Tooltip
                         title={
-                           localCategory.hidden
-                              ? "Re-enable this category so that users will be prompted to fill it in when registering for your events."
-                              : "Don’t ask this category when users register to your events."
+                           localGroupQuestion.hidden
+                              ? "Re-enable this question so that users will be prompted to fill it in when registering for your events."
+                              : "Don’t ask this question when users register to your events."
                         }
                      >
                         <FormControlLabel
                            control={
                               <Switch
-                                 checked={Boolean(localCategory.hidden)}
-                                 onChange={toggleCategoryHidden}
-                                 name="category-visibility-toggle"
+                                 checked={Boolean(localGroupQuestion.hidden)}
+                                 onChange={toggleGroupQuestionHidden}
+                                 name="question-visibility-toggle"
                                  color="primary"
                               />
                            }
                            label={
-                              localCategory.hidden ? "Hidden" : "Hide Category"
+                              localGroupQuestion.hidden
+                                 ? "Hidden"
+                                 : "Hide Question"
                            }
                         />
                      </Tooltip>
                   }
-                  subheader="Category Options"
+                  subheader="Question Options"
                />
                <Divider />
                <CardActions>
@@ -309,7 +304,7 @@ const CategoryEditModal = ({
                         onClick={() =>
                            setUpdateMode({
                               mode: "add",
-                              options: localCategory.options,
+                              options: localGroupQuestion.options,
                            })
                         }
                      >
@@ -325,14 +320,14 @@ const CategoryEditModal = ({
             <Box
                display="flex"
                paddingTop={2}
-               justifyContent={newCategory ? "flex-end" : "space-between"}
+               justifyContent={newGroupQuestion ? "flex-end" : "space-between"}
             >
-               {!newCategory && (
+               {!newGroupQuestion && (
                   <Button
                      onClick={() =>
                         setUpdateMode({
-                           mode: "deleteCategory",
-                           option: { name: localCategory.name },
+                           mode: "deleteGroupQuestion",
+                           option: { name: localGroupQuestion.name },
                         })
                      }
                      color={"error"}
@@ -356,7 +351,7 @@ const CategoryEditModal = ({
                      size="small"
                      variant="contained"
                   >
-                     {newCategory ? "Create" : "Update"}
+                     {newGroupQuestion ? "Create" : "Update"}
                   </Button>
                </div>
             </Box>
@@ -369,7 +364,7 @@ const CategoryEditModal = ({
                <MenuItem onClick={handleDropDownRename}>Rename</MenuItem>
             </Menu>
             {
-               <AddCategory
+               <AddGroupQuestion
                   open={updateMode.mode === "add"}
                   handleAdd={handleAdd}
                   updateMode={updateMode}
@@ -392,12 +387,11 @@ const CategoryEditModal = ({
                   resetUpdateMode={resetUpdateMode}
                />
             )}
-            {updateMode.mode === "deleteCategory" && (
-               <DeleteCategory
-                  open={updateMode.mode === "deleteCategory"}
-                  handleDeleteCategory={handleDeleteCategory}
-                  categoryName={localCategory.name}
-                  updateMode={updateMode}
+            {updateMode.mode === "deleteGroupQuestion" && (
+               <DeleteGroupQuestion
+                  open={updateMode.mode === "deleteGroupQuestion"}
+                  handleDeleteGroupQuestion={handleDeleteGroupQuestion}
+                  groupQuestionName={localGroupQuestion.name}
                   resetUpdateMode={resetUpdateMode}
                />
             )}
@@ -406,4 +400,4 @@ const CategoryEditModal = ({
    )
 }
 
-export default CategoryEditModal
+export default GroupQuestionEdit

@@ -2,8 +2,8 @@ import React, { useMemo } from "react"
 import { Box, Chip, Paper } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import {
-   convertCategoryOptionsToSortedArray,
-   CustomCategory,
+   convertGroupQuestionOptionsToSortedArray,
+   GroupQuestion,
 } from "@careerfairy/shared-lib/dist/groups"
 
 const styles = sxStyles({
@@ -25,11 +25,11 @@ const styles = sxStyles({
 })
 
 interface Props {
-   category: CustomCategory
+   category: GroupQuestion
 }
 const DisplayCategoryElement = ({ category }: Props) => {
    const optionsArray = useMemo(
-      () => convertCategoryOptionsToSortedArray(category.options),
+      () => convertGroupQuestionOptionsToSortedArray(category.options),
       [category.options]
    )
 

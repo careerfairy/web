@@ -20,6 +20,7 @@ export const mapServerSideStream = (livestream) => {
 export const getServerSideStream = async (livestreamId) => {
    let serverSideStream = null
    if (livestreamId) {
+      // @ts-ignore
       const livestreamSnap = await store.firestore.get({
          collection: "livestreams",
          doc: livestreamId,
@@ -37,6 +38,7 @@ export const getServerSideStream = async (livestreamId) => {
 export const getServerSideStreamAdminPreferences = async (livestreamId) => {
    let streamAdminPreferences = null
    if (livestreamId) {
+      // @ts-ignore
       const preferenceSnap = await store.firestore.get({
          collection: "livestreams",
          doc: livestreamId,
@@ -126,6 +128,7 @@ export const convertStreamJsDatesToTimestamps = (
 }
 export const getServerSideGroup = async (groupId) => {
    let serverSideGroup = {}
+   // @ts-ignore
    const snap = await store.firestore.get({
       collection: "careerCenterData",
       doc: groupId,
@@ -133,7 +136,9 @@ export const getServerSideGroup = async (groupId) => {
    })
    if (snap.exists) {
       serverSideGroup = snap.data()
+      // @ts-ignore
       delete serverSideGroup.adminEmails
+      // @ts-ignore
       serverSideGroup.id = snap.id
    }
    return serverSideGroup

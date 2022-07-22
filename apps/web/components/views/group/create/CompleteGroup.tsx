@@ -12,7 +12,7 @@ import {
 import DisplayCategoryElement from "./DisplayCategoryElement"
 import { sxStyles } from "../../../../types/commonTypes"
 import { BaseGroupInfo } from "../../../../pages/group/create"
-import { CustomCategory } from "@careerfairy/shared-lib/dist/groups"
+import { GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
 
 const styles = sxStyles({
    root: {
@@ -51,14 +51,14 @@ interface Props {
    handleBack: () => void
    baseGroupInfo: BaseGroupInfo
    createCareerCenter: () => Promise<void>
-   arrayOfCategories: CustomCategory[]
+   groupQuestions: GroupQuestion[]
 }
 
 const CompleteGroup = ({
    handleBack,
    baseGroupInfo,
    createCareerCenter,
-   arrayOfCategories,
+   groupQuestions,
 }: Props) => {
    const [submitting, setSubmitting] = useState(false)
 
@@ -67,7 +67,7 @@ const CompleteGroup = ({
       await createCareerCenter()
    }
 
-   const categories = arrayOfCategories.map((category) => {
+   const categories = groupQuestions.map((category) => {
       return <DisplayCategoryElement key={category.id} category={category} />
    })
 

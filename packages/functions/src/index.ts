@@ -87,6 +87,10 @@ exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
+exports.getRegistrationDataForTalentPoolStuent =
+   livestreams.getRegistrationDataForTalentPoolStuent
+exports.getRegistrationDataForParticpatingStudent =
+   livestreams.getRegistrationDataForParticpatingStudent
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =

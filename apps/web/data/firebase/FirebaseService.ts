@@ -17,7 +17,16 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import DocumentReference = firebase.firestore.DocumentReference
-import { Group, PdfReportData } from "@careerfairy/shared-lib/dist/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   getLivestreamGroupQuestionAnswers,
+   ParticipatingStudent,
+   UserData,
+   UserGroupData,
+   UserLivestreamGroupQuestionAnswers,
+} from "@careerfairy/shared-lib/dist/users"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -28,7 +37,6 @@ class FirebaseService {
 
    constructor(firebaseInstance: firebase.app.App) {
       this.app = firebaseInstance
-
       this.auth = firebaseInstance.auth()
       this.firestore = firebaseInstance.firestore()
       this.storage = firebaseInstance.storage()
@@ -2123,12 +2131,18 @@ class FirebaseService {
     * @param {string} livestreamId
     * @param authenticatedUser
     * @param {*[]} groupsWithPolicies
+    * @param userAnsweredLivestreamQuestions
     */
    registerToLivestream = async (
-      livestreamId,
-      authenticatedUser,
-      groupsWithPolicies = []
-   ) => {
+      livestreamId: string,
+      authenticatedUser: { uid: string; email: string },
+      groupsWithPolicies: GroupWithPolicy[],
+      userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap
+   ): Promise<void> => {
+      const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
+         userAnsweredLivestreamQuestions
+      )
+
       const { uid, email } = authenticatedUser
       const idsOfGroupsWithPolicies = groupsWithPolicies.map(
          (group) => group.id
@@ -2147,69 +2161,103 @@ class FirebaseService {
          .doc(livestreamId)
          .collection("registrants")
          .doc(uid)
-      const transactionPromise = this.firestore.runTransaction(
-         (transaction) => {
-            return transaction.get(userRef).then((userDoc) => {
-               const user = userDoc.data()
-               transaction.update(livestreamRef, {
-                  // To be depreciated
-                  registeredUsers:
-                     firebase.firestore.FieldValue.arrayUnion(email),
-               })
-
-               for (const groupId of idsOfGroupsWithPolicies) {
-                  // to be depreciated
-                  let userInPolicyRef = this.firestore
-                     .collection("careerCenterData")
-                     .doc(groupId)
-                     .collection("usersInPolicy")
-                     .doc(email)
-                  // to be used from now on
-                  let authUserInPolicyRef = this.firestore
-                     .collection("careerCenterData")
-                     .doc(groupId)
-                     .collection("authUsersInPolicy")
-                     .doc(uid)
-                  transaction.set(userInPolicyRef, {
-                     ...user,
-                     dateAgreed: this.getServerTimestamp(),
-                  })
-                  transaction.set(authUserInPolicyRef, {
-                     ...user,
-                     dateAgreed: this.getServerTimestamp(),
-                  })
-               }
+      return this.firestore.runTransaction((transaction) => {
+         return transaction.get(userRef).then((userDoc) => {
+            const user = userDoc.data()
+            transaction.update(livestreamRef, {
                // To be depreciated
-               transaction.set(registeredUsersRef, {
-                  ...user,
-                  livestreamId,
-                  dateRegistered: this.getServerTimestamp(),
-                  authId: uid,
-               })
-
-               // To be used from now on
-               transaction.set(
-                  registrantSubCollectionRef,
-                  Object.assign(
-                     {
-                        ...user,
-                        livestreamId,
-                        dateRegistered: this.getServerTimestamp(),
-                        authId: uid,
-                     },
-                     // We store the referral info so that it can be used by a cloud function
-                     // that applies the rewards
-                     { referral: getReferralInformation() },
-                     {
-                        // Store the utm params if they exist
-                        utm: SessionStorageUtil.getUTMParams(),
-                     }
-                  )
-               )
+               registeredUsers: firebase.firestore.FieldValue.arrayUnion(email),
             })
-         }
-      )
-      return await Promise.all([transactionPromise])
+
+            for (const groupId of idsOfGroupsWithPolicies) {
+               // to be depreciated
+               let userInPolicyRef = this.firestore
+                  .collection("careerCenterData")
+                  .doc(groupId)
+                  .collection("usersInPolicy")
+                  .doc(email)
+               // to be used from now on
+               let authUserInPolicyRef = this.firestore
+                  .collection("careerCenterData")
+                  .doc(groupId)
+                  .collection("authUsersInPolicy")
+                  .doc(uid)
+               transaction.set(userInPolicyRef, {
+                  ...user,
+                  dateAgreed: this.getServerTimestamp(),
+               })
+               transaction.set(authUserInPolicyRef, {
+                  ...user,
+                  dateAgreed: this.getServerTimestamp(),
+               })
+            }
+
+            // Updates the user's questions and answers in the userData/userGroups subcollection
+            this.updateUserGroupQuestionAnswers(
+               email,
+               userQuestionsAndAnswersDict,
+               transaction
+            )
+
+            // To be depreciated
+            transaction.set(registeredUsersRef, {
+               ...user,
+               livestreamId,
+               dateRegistered: this.getServerTimestamp(),
+               authId: uid,
+               livestreamGroupQuestionAnswers: userQuestionsAndAnswersDict,
+            })
+
+            // To be used from now on
+            transaction.set(
+               registrantSubCollectionRef,
+               Object.assign(
+                  {
+                     ...user,
+                     livestreamId,
+                     livestreamGroupQuestionAnswers:
+                        userQuestionsAndAnswersDict,
+                     dateRegistered: this.getServerTimestamp(),
+                     authId: uid,
+                  },
+                  // We store the referral info so that it can be used by a cloud function
+                  // that applies the rewards
+                  { referral: getReferralInformation() },
+                  {
+                     // Store the utm params if they exist
+                     utm: SessionStorageUtil.getUTMParams(),
+                  }
+               )
+            )
+         })
+      })
+   }
+
+   updateUserGroupQuestionAnswers = (
+      userEmail: string,
+      userQuestionsAndAnswersDict: UserLivestreamGroupQuestionAnswers,
+      transaction: firebase.firestore.Transaction
+   ) => {
+      const userRef = this.firestore.collection("userData").doc(userEmail)
+      Object.keys(userQuestionsAndAnswersDict).forEach((groupId) => {
+         const userGroupDataRef = userRef.collection("userGroups").doc(groupId)
+         Object.keys(userQuestionsAndAnswersDict[groupId]).forEach(
+            (questionId) => {
+               const answerId = userQuestionsAndAnswersDict[groupId][questionId]
+
+               transaction.set(
+                  userGroupDataRef,
+                  {
+                     groupId: groupId,
+                     questions: {
+                        [questionId]: answerId,
+                     },
+                  } as Partial<UserGroupData>,
+                  { merge: true }
+               )
+            }
+         )
+      })
    }
 
    deregisterFromLivestream = (livestreamId, authenticatedUser) => {
@@ -2317,32 +2365,7 @@ class FirebaseService {
       return userTalentPoolRef.onSnapshot(callback)
    }
 
-   setUserIsParticipating = async (livestreamId, userData) => {
-      let batch = this.firestore.batch()
-      let livestreamRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-      let participantsRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("participatingStudents")
-         .doc(userData.userEmail)
-
-      batch.set(participantsRef, {
-         ...userData,
-         joined: this.getServerTimestamp(),
-      })
-      batch.update(livestreamRef, {
-         participatingStudents: firebase.firestore.FieldValue.arrayUnion(
-            userData.userEmail
-         ),
-      })
-      const participationPromise = batch.commit()
-      let promises = [participationPromise]
-      return await Promise.all(promises)
-   }
-
-   setUserIsParticipatingWithRef = (streamRef, userData) => {
+   setUserIsParticipatingWithRef = (streamRef, userData: UserData) => {
       let batch = this.firestore.batch()
       let participantsRef = streamRef
          .collection("participatingStudents")
@@ -2351,7 +2374,7 @@ class FirebaseService {
       batch.set(participantsRef, {
          ...userData,
          joined: this.getServerTimestamp(),
-      })
+      } as ParticipatingStudent)
       batch.update(streamRef, {
          participatingStudents: firebase.firestore.FieldValue.arrayUnion(
             userData.userEmail

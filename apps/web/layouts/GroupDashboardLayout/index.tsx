@@ -24,7 +24,7 @@ import Page, {
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 import {
-   CustomCategory,
+   GroupQuestion,
    Group,
    GroupOption,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -43,22 +43,20 @@ const styles = {
 type DefaultContext = {
    group: Group
    flattenedGroupOptions: GroupOption[]
-   customCategories: CustomCategory[]
+   groupQuestions: GroupQuestion[]
    groupPresenter?: GroupPresenter
 }
 const GroupContext = createContext<DefaultContext>({
    group: null,
    flattenedGroupOptions: [],
-   customCategories: [],
+   groupQuestions: [],
    groupPresenter: undefined,
 })
 const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
    const scrollRef = useRef(null)
-   const [customCategories, setCustomCategories] = useState<CustomCategory[]>(
-      []
-   )
+   const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
    const isDesktop = useIsDesktop()
    const {
@@ -91,16 +89,16 @@ const GroupDashboardLayout = (props) => {
 
    useEffect(() => {
       if (isCorrectGroup && group?.id) {
-         const unsubscribe = groupRepo.listenToCustomCategories(
+         const unsubscribe = groupRepo.listenToGroupQuestions(
             group.id,
             (categories) => {
-               setCustomCategories(mapFirestoreDocuments(categories))
+               setGroupQuestions(mapFirestoreDocuments(categories) || [])
             }
          )
 
          return () => {
             unsubscribe()
-            setCustomCategories([])
+            setGroupQuestions([])
          }
       }
    }, [isCorrectGroup, groupId])
@@ -116,7 +114,7 @@ const GroupDashboardLayout = (props) => {
          value={{
             group,
             flattenedGroupOptions,
-            customCategories,
+            groupQuestions,
             groupPresenter,
          }}
       >
@@ -160,9 +158,4 @@ const GroupDashboardLayout = (props) => {
 }
 export const useGroup = () => useContext<DefaultContext>(GroupContext)
 
-GroupDashboardLayout.propTypes = {
-   children: PropTypes.node.isRequired,
-}
-
-GroupDashboardLayout.defaultProps = {}
 export default GroupDashboardLayout

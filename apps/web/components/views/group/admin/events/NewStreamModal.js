@@ -149,7 +149,6 @@ const NewStreamModal = ({
    const onSubmit = async (
       values,
       { setSubmitting },
-      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -161,7 +160,6 @@ const NewStreamModal = ({
          setSubmitting(true)
          const livestream = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             draftStreamId,
             firebase

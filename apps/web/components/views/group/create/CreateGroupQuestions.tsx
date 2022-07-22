@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"
 import { Box, Button, Grid, Typography } from "@mui/material"
-import CategoryEdit from "../admin/settings/Category/CategoryEdit"
-import CategoryElement from "../admin/settings/Category/CategoryElement"
+import GroupQuestionEdit from "../admin/settings/GroupQuestion/GroupQuestionEdit"
+import GroupQuestionElement from "../admin/settings/GroupQuestion/GroupQuestionElement"
 import AddIcon from "@mui/icons-material/Add"
 import { sxStyles } from "../../../../types/commonTypes"
 
@@ -27,24 +27,24 @@ const styles = sxStyles({
    },
 })
 
-const CreateCategories = ({
+const CreateGroupQuestions = ({
    handleBack,
-   handleDeleteLocalCategory,
-   handleUpdateCategory,
-   handleAddTempCategory,
+   handleDeleteLocalGroupQuestion,
+   handleUpdateGroupQuestion,
+   handleAddTempGroupQuestion,
    handleNext,
-   arrayOfCategories,
+   groupQuestions,
 }) => {
    const [createMode, setCreateMode] = useState(false)
 
    useEffect(() => {
-      if (!arrayOfCategories.length) {
+      if (!groupQuestions.length) {
          setCreateMode(true)
       }
    }, [])
 
    useEffect(() => {
-      if (!createMode && !arrayOfCategories.length) {
+      if (!createMode && !groupQuestions.length) {
          setCreateMode(true)
       }
    })
@@ -74,22 +74,24 @@ const CreateCategories = ({
             <Grid container spacing={2}>
                {createMode && (
                   <Grid item xs={12}>
-                     <CategoryEdit
-                        handleAddTempCategory={handleAddTempCategory}
+                     <GroupQuestionEdit
+                        handleAddTempGroupQuestion={handleAddTempGroupQuestion}
                         isLocal={true}
-                        category={null}
-                        newCategory={true}
+                        groupQuestion={null}
+                        newGroupQuestion={true}
                         setEditMode={setCreateMode}
                      />
                   </Grid>
                )}
-               {arrayOfCategories.map((category) => (
+               {groupQuestions.map((category) => (
                   <Grid key={category.id} item xs={12}>
-                     <CategoryElement
-                        handleDeleteLocalCategory={handleDeleteLocalCategory}
+                     <GroupQuestionElement
+                        handleDeleteLocalGroupQuestion={
+                           handleDeleteLocalGroupQuestion
+                        }
                         isLocal={true}
-                        handleUpdateCategory={handleUpdateCategory}
-                        category={category}
+                        handleUpdateGroupQuestion={handleUpdateGroupQuestion}
+                        GroupQuestion={category}
                      />
                   </Grid>
                ))}
@@ -119,4 +121,4 @@ const CreateCategories = ({
    )
 }
 
-export default CreateCategories
+export default CreateGroupQuestions

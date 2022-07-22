@@ -12,28 +12,28 @@ import {
 } from "@mui/material"
 import { v4 as uuidv4 } from "uuid"
 import Warning from "@mui/icons-material/Warning"
-import { UpdateMode } from "../CategoryEdit"
+import { UpdateMode } from "../GroupQuestionEdit"
 import {
-   CustomCategory,
-   CustomCategoryOption,
+   GroupQuestion,
+   GroupQuestionOption,
 } from "@careerfairy/shared-lib/dist/groups"
 
 const requiredTxt = "Please fill this field"
 const duplicateTxt = "Cannot be a duplicate"
 
-interface AddCategoryProps {
+interface AddGroupQuestionProps {
    updateMode: UpdateMode
    handleAdd: (optionData: { name: string; id: string }) => void
    resetUpdateMode: () => void
    open: boolean
 }
 const maxOptionLength = 40
-export const AddCategory = ({
+export const AddGroupQuestion = ({
    handleAdd,
    updateMode,
    resetUpdateMode,
    open,
-}: AddCategoryProps) => {
+}: AddGroupQuestionProps) => {
    const [newOptionName, setNewOptionName] = useState("")
    const [optionNames, setOptionNames] = useState(
       getOptionNames(updateMode.options)
@@ -104,30 +104,27 @@ export const AddCategory = ({
       </Dialog>
    )
 }
-interface DeleteCategoryProps {
-   updateMode: UpdateMode
+interface DeleteGroupQuestionProps {
    resetUpdateMode: () => void
-   categoryName: string
-   handleDeleteCategory: () => void
+   groupQuestionName: string
+   handleDeleteGroupQuestion: () => void
    open: boolean
 }
-export const DeleteCategory = ({
-   updateMode,
+export const DeleteGroupQuestion = ({
    resetUpdateMode,
-   categoryName,
-   handleDeleteCategory,
+   groupQuestionName,
+   handleDeleteGroupQuestion,
    open,
-}: DeleteCategoryProps) => {
+}: DeleteGroupQuestionProps) => {
    return (
       <Dialog onClose={resetUpdateMode} fullWidth maxWidth="md" open={open}>
          <DialogTitle>
-            Delete the category <span>{categoryName}</span>
+            Delete the question <span>{groupQuestionName}</span>
          </DialogTitle>
          <DialogContent>
             <Typography>
-               All your members who are currently classified under{" "}
-               <span>{updateMode.option.name}</span> will not anymore belong to
-               any category until they manually update their categorisation.
+               By deleting this question, all the user answers to this question
+               will be deleted.
             </Typography>
             <Box display="flex" alignItems="center">
                <Warning color="error" />
@@ -142,11 +139,11 @@ export const DeleteCategory = ({
                Cancel
             </Button>
             <Button
-               onClick={handleDeleteCategory}
+               onClick={handleDeleteGroupQuestion}
                color="primary"
                variant="contained"
             >
-               Permanently Delete the Category {categoryName}
+               Permanently Delete the Question {groupQuestionName}
             </Button>
          </DialogActions>
       </Dialog>
@@ -155,12 +152,12 @@ export const DeleteCategory = ({
 
 interface RenameOptionProps {
    updateMode: UpdateMode
-   handleRename: (option: CustomCategoryOption) => void
+   handleRename: (option: GroupQuestionOption) => void
    resetUpdateMode: () => void
    open: boolean
 }
 
-const getOptionNames = (options?: CustomCategory["options"]) => {
+const getOptionNames = (options?: GroupQuestion["options"]) => {
    if (!options) return []
    return Object.keys(options).map((el) => {
       return options[el].name.trim()
@@ -250,7 +247,7 @@ export const RenameOption = ({
 
 interface DeleteOptionProps {
    updateMode: UpdateMode
-   handleDelete: (option: CustomCategoryOption) => void
+   handleDelete: (option: UpdateMode["option"]) => void
    resetUpdateMode: () => void
    open: boolean
 }
@@ -267,10 +264,10 @@ export const DeleteOption = ({
          </DialogTitle>
          <DialogContent>
             <Typography className="explanation">
-               All your members who are currently classified under{" "}
-               <strong>{updateMode.option?.name}</strong> will not anymore
-               belong to any classification until they manually update their
-               categorisation.
+               All your members who are currently classified under the{" "}
+               <strong>{updateMode.option?.name}</strong> question option will
+               not anymore belong to any classification until they manually
+               update their question answer.
             </Typography>
             <Box display="flex" alignItems="center">
                <Warning color="error" />
@@ -289,7 +286,7 @@ export const DeleteOption = ({
                onClick={() => handleDelete(updateMode.option)}
                variant="contained"
             >
-               Permanently Delete the Category {updateMode.option.name}
+               Permanently Delete the Question option {updateMode.option.name}
             </Button>
          </DialogActions>
       </Dialog>

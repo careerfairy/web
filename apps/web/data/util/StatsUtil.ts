@@ -1,3 +1,18 @@
+import {
+   Group,
+   GroupQuestion,
+   GroupQuestionOption,
+} from "@careerfairy/shared-lib/dist/groups"
+import {
+   CSVDownloadUserData,
+   RegisteredStudent,
+   UserData,
+   TalentPoolStudent,
+} from "@careerfairy/shared-lib/dist/users"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { getUserAnswerNameFromLivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
+
 export default class StatsUtil {
    static getStudentInGroupDataObject(student, group) {
       let studentDataObject = {
@@ -31,6 +46,76 @@ export default class StatsUtil {
          })
       }
       return studentDataObject
+   }
+
+   static getCsvData(
+      requestingGroup: Group,
+      targetStream: LivestreamEvent,
+      users: TalentPoolStudent[] | RegisteredStudent[],
+      groupQuestions: GroupQuestion[]
+   ): CSVDownloadUserData[] {
+      try {
+         return users
+            .map((user) => {
+               const otherCustomUniversityCategories = Object.keys(
+                  targetStream.groupQuestionsMap || {}
+               ).reduce((acc, groupId) => {
+                  const groupData = targetStream.groupQuestionsMap[groupId]
+                  Object.values(groupData.questions).forEach((question) => {
+                     acc[question.name] =
+                        getUserAnswerNameFromLivestreamGroupQuestion(
+                           user,
+                           groupData.groupId,
+                           question
+                        )
+                  })
+                  return acc
+               }, {})
+               return {
+                  "First Name": user.firstName,
+                  "Last Name": user.lastName,
+                  Email: user.userEmail,
+                  University: user.university?.name || "N/A",
+                  "Level of study":
+                     StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
+                        "levelOfStudy",
+                        groupQuestions,
+                        user
+                     ),
+                  "Field of study":
+                     StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
+                        "fieldOfStudy",
+                        groupQuestions,
+                        user
+                     ),
+                  ...otherCustomUniversityCategories,
+               }
+            })
+            .sort(dynamicSort("First Name"))
+      } catch (error) {
+         console.log(error)
+      }
+   }
+
+   static getUserUniLevelOrFieldOfStudyCategoryByType(
+      type: Omit<GroupQuestion["questionType"], "custom">,
+      groupQuestions: GroupQuestion[],
+      user: TalentPoolStudent | RegisteredStudent
+   ): GroupQuestionOption["name"] | "N/A" {
+      const groupQuestion = groupQuestions.find(
+         (question) => question.questionType === type
+      )
+      const userSelectedAnswerId =
+         user.university?.questions?.[groupQuestion?.id]
+      const name = groupQuestion?.options?.[userSelectedAnswerId]?.name
+      if (!name) {
+         return type === "levelOfStudy"
+            ? user.levelOfStudy?.name
+            : type === "fieldOfStudy"
+            ? user.fieldOfStudy?.name
+            : "N/A"
+      }
+      return name || "N/A"
    }
 
    static getStudentOutsideGroupDataObject(student, allGroups) {
@@ -242,7 +327,7 @@ export default class StatsUtil {
       )
    }
 
-   static studentBelongsToGroup(student = {}, group = {}) {
+   static studentBelongsToGroup(student: UserData, group: Group) {
       if (group.universityCode) {
          if (student.university?.code === group.universityCode) {
             return student.groupIds && student.groupIds.includes(group.groupId)
@@ -265,7 +350,7 @@ export default class StatsUtil {
       )
    }
 
-   static studentFollowsGroup(student = {}, group = {}) {
+   static studentFollowsGroup(student: UserData, group: Group) {
       return student.groupIds && student.groupIds.includes(group.groupId)
    }
 
@@ -312,10 +397,10 @@ export default class StatsUtil {
    }
 
    static getFirstGroupThatUserBelongsTo(
-      student = {},
+      student: UserData,
       arrayOfGroups = [],
       requestingGroup,
-      forCategoryData
+      forCategoryData?: boolean
    ) {
       let groupThatUserBelongsTo
       const userFollowsRequestingGroup = StatsUtil.studentFollowsGroup(
@@ -335,6 +420,7 @@ export default class StatsUtil {
       }
       return groupThatUserBelongsTo
    }
+
    static mapUserCategorySelection({ userData, group, alreadyJoined }) {
       let mappedGroupCategories = []
       const userCategories = userData?.registeredGroups?.find(

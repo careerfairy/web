@@ -1,8 +1,12 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { Box } from "@mui/material"
-import PropTypes from "prop-types"
 import RegistrationModal from "../common/registration-modal"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -22,26 +26,29 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const ViewerGroupCategorySelectMenu = ({ joinGroupModalData, onGroupJoin }) => {
+interface Props {
+   joinGroupModalData?: {
+      groups: Group[]
+      livestream: LivestreamEvent
+   }
+   onQuestionsAnswered: (...any) => void
+}
+const ViewerGroupCategorySelectMenu = ({
+   joinGroupModalData,
+   onQuestionsAnswered,
+}: Props) => {
    const classes = useStyles()
 
    return (
       <Box className={classes.root}>
          <RegistrationModal
             open={Boolean(joinGroupModalData)}
-            onGroupJoin={onGroupJoin}
+            onQuestionsAnswered={onQuestionsAnswered}
             livestream={joinGroupModalData?.livestream}
             groups={joinGroupModalData?.groups}
          />
       </Box>
    )
-}
-
-ViewerGroupCategorySelectMenu.propTypes = {
-   onGroupJoin: PropTypes.func.isRequired,
-   joinGroupModalData: PropTypes.shape({
-      groups: PropTypes.array,
-   }),
 }
 
 export default ViewerGroupCategorySelectMenu

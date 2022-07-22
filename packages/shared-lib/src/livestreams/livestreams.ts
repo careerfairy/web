@@ -1,5 +1,11 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
+import { Group, GroupQuestion } from "../groups"
+import {
+   ParticipatingStudent,
+   RegisteredStudent,
+   TalentPoolStudent,
+} from "../users"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -7,7 +13,7 @@ export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
 export interface LivestreamEvent extends Identifiable {
    author?: {
       email: string
-      groupId: string
+      groupId?: string
    }
    summary?: string
    backgroundImageUrl?: string
@@ -18,9 +24,12 @@ export interface LivestreamEvent extends Identifiable {
    companyLogoUrl?: string
    created?: firebase.firestore.Timestamp
    currentSpeakerId?: string
+   withResume?: boolean
    duration?: number
    groupIds?: string[]
    interestsIds?: string[]
+   levelOfStudyIds?: string[]
+   fieldOfStudyIds?: string[]
    isRecording?: boolean
    language?: {
       code?: string
@@ -34,6 +43,7 @@ export interface LivestreamEvent extends Identifiable {
    start: firebase.firestore.Timestamp
    startDate?: Date
    registeredUsers?: string[]
+   groupQuestionsMap?: LivestreamGroupQuestionsMap
    registrants?: string[]
    hasStarted?: boolean
    hasEnded?: boolean
@@ -45,6 +55,26 @@ export interface LivestreamEvent extends Identifiable {
       groupId: string
    }
    universities: any[]
+}
+
+export type LivestreamGroupQuestionsMap = Record<
+   Group["id"],
+   LivestreamGroupQuestions
+>
+
+export interface LivestreamGroupQuestion extends GroupQuestion {
+   /*
+    * The property selectedOptionId and isNew is never saved on the livestream document.
+    * It is only used to track the user selected option client-side.
+    * */
+   selectedOptionId?: string
+   isNew?: boolean
+}
+
+export interface LivestreamGroupQuestions {
+   groupName: string
+   groupId: string
+   questions: Record<LivestreamGroupQuestion["id"], LivestreamGroupQuestion>
 }
 
 export interface Speaker extends Identifiable {
@@ -129,6 +159,16 @@ export const pickPublicDataFromLivestream = (
       companyLogoUrl: livestreamData.companyLogoUrl ?? null,
       test: livestreamData.test ?? false,
    }
+}
+
+export const getUserAnswerNameFromLivestreamGroupQuestion = (
+   user: RegisteredStudent | TalentPoolStudent | ParticipatingStudent,
+   groupId: string,
+   question: LivestreamGroupQuestion
+): string => {
+   const userAnswerId =
+      user.livestreamGroupQuestionAnswers[groupId][question.id]
+   return question.options[userAnswerId].name
 }
 
 export interface LivestreamEventSerialized

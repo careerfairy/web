@@ -41,7 +41,9 @@ service cloud.firestore {
             allow read, write: if true;
         }
         match /userData/{userId} {
-
+            match /userGroups/{userGroup} {
+                allow read, write: if request.auth.token.email == userId || isCFAdmin();
+            }
 //            function authUserAccessesOwnUserData() {
 //                return request.auth.token.email == userId;
 //            }
@@ -155,18 +157,18 @@ service cloud.firestore {
                 allow read: if true;
                 allow write: if true;
             }
-            match /customCategories/{customCategory} {
-            function isCustomCategory() {
-                return resource.data.categoryType == 'custom';
+            match /groupQuestions/{groupQuestion} {
+            function isCustomQuestionType() {
+                return resource.data.questionType == 'custom';
             }
 
             function hasOptions() {
                 return request.resource.data.options != null && request.resource.data.options.keys().size() > 0;
             }
                 allow read: if isCFAdmin() || isCareerCenterAdmin();
-                allow delete: if isCustomCategory();
+                allow delete: if isCustomQuestionType();
                 allow create: if isCFAdmin() || isCareerCenterAdmin();
-                allow update: if isUnchanged('categoryType') && hasOptions();
+                allow update: if isUnchanged('questionType') && hasOptions();
             }
 
             match /categories/{category}/elements/{element} {

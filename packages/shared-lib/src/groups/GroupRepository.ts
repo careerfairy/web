@@ -1,5 +1,5 @@
 import firebase from "firebase/app"
-import { CustomCategory, Group } from "./groups"
+import { GroupQuestion, Group } from "./groups"
 import {
    mapFirestoreDocuments,
    OnSnapshotCallback,
@@ -15,29 +15,33 @@ export interface IGroupRepository {
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
-   getCustomCategories(groupId: string): Promise<CustomCategory[]>
-   addNewCustomCategory(
+   getGroupQuestions(groupId: string): Promise<GroupQuestion[]>
+   addNewGroupQuestion(
       groupId: string,
-      category: Omit<CustomCategory, "id">
+      groupQuestion: Omit<GroupQuestion, "id">
    ): Promise<void>
-   updateCustomCategory(
+   updateGroupQuestion(
       groupId: string,
-      category: CustomCategory
+      groupQuestion: GroupQuestion
    ): Promise<void>
    createGroup(
       group: Partial<Group>,
-      customCategories: CustomCategory[],
+      groupQuestions: GroupQuestion[],
       userEmail: string
    ): Promise<firebase.firestore.DocumentReference>
-   deleteCustomCategory(groupId: string, categoryId: string): Promise<void>
-   listenToCustomCategories(
+   deleteGroupQuestion(groupId: string, groupQuestionId: string): Promise<void>
+   listenToGroupQuestions(
       groupId: string,
-      callback: OnSnapshotCallback<CustomCategory>
+      callback: OnSnapshotCallback<GroupQuestion>
    ): Unsubscribe
-   getBreakdownCategory(
+   getFieldOrLevelOfStudyGroupQuestion(
       groupId: string,
-      categoryType: Exclude<CustomCategory["categoryType"], "custom">
-   ): Promise<CustomCategory>
+      questionType: Exclude<GroupQuestion["questionType"], "custom">
+   ): Promise<GroupQuestion>
+   getAllGroups(): Promise<Group[]>
+   getGroupCustomQuestionsQuery(
+      groupId: string
+   ): firebase.firestore.Query<firebase.firestore.DocumentData>
 }
 
 export class FirebaseGroupRepository implements IGroupRepository {
@@ -112,68 +116,78 @@ export class FirebaseGroupRepository implements IGroupRepository {
       return adminGroups.docs.length > 0
    }
 
-   async getCustomCategories(groupId: string): Promise<CustomCategory[]> {
-      const groupCustomCategoriesRef = this.firestore
+   async getGroupQuestions(groupId: string): Promise<GroupQuestion[]> {
+      const groupQuestionRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("customCategories")
-      const snapshots = await groupCustomCategoriesRef.get()
-      return mapFirestoreDocuments<CustomCategory>(snapshots)
+         .collection("groupQuestions")
+      const snapshots = await groupQuestionRef.get()
+      return mapFirestoreDocuments<GroupQuestion>(snapshots)
    }
 
-   listenToCustomCategories(
+   getGroupCustomQuestionsQuery(
+      groupId: string
+   ): firebase.firestore.Query<firebase.firestore.DocumentData> {
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("groupQuestions")
+         .where("questionType", "==", "custom")
+   }
+
+   listenToGroupQuestions(
       groupId: string,
-      callback: OnSnapshotCallback<CustomCategory>
+      callback: OnSnapshotCallback<GroupQuestion>
    ): Unsubscribe {
-      const groupCustomCategoriesRef = this.firestore
+      const groupQuestionsRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("customCategories")
-      return groupCustomCategoriesRef.onSnapshot(callback)
+         .collection("groupQuestions")
+      return groupQuestionsRef.onSnapshot(callback)
    }
 
-   async addNewCustomCategory(
+   async addNewGroupQuestion(
       groupId: string,
-      category: Omit<CustomCategory, "id">
+      groupQuestion: Omit<GroupQuestion, "id">
    ): Promise<void> {
-      const groupCustomCategoriesRef = this.firestore
+      const groupQuestionsRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("customCategories")
-      await groupCustomCategoriesRef.add(category)
+         .collection("groupQuestions")
+      await groupQuestionsRef.add(groupQuestion)
    }
 
-   async updateCustomCategory(
+   async updateGroupQuestion(
       groupId: string,
-      category: CustomCategory
+      groupQuestion: GroupQuestion
    ): Promise<void> {
-      const groupCustomCategoriesRef = this.firestore
+      const groupQuestionsRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("customCategories")
-      await groupCustomCategoriesRef.doc(category.id).update(category)
+         .collection("groupQuestions")
+      await groupQuestionsRef.doc(groupQuestion.id).update(groupQuestion)
    }
 
-   async deleteCustomCategory(
+   async deleteGroupQuestion(
       groupId: string,
-      categoryId: string
+      groupQuestionId: string
    ): Promise<void> {
-      const groupCustomCategoriesRef = this.firestore
+      const groupQuestionsRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("customCategories")
-      await groupCustomCategoriesRef.doc(categoryId).delete()
+         .collection("groupQuestions")
+      await groupQuestionsRef.doc(groupQuestionId).delete()
    }
 
    async createGroup(
       group: Partial<Group>,
-      customCategories: CustomCategory[],
+      groupQuestions: GroupQuestion[],
       userEmail: string
    ): Promise<firebase.firestore.DocumentReference> {
-      const removeTempCategoryIds = (customCategories: CustomCategory[]) => {
-         return customCategories.map((category) => {
-            delete category.id
-            return category
+      const removeTempGroupQuestionIds = (groupQuestions: GroupQuestion[]) => {
+         return groupQuestions.map((groupQuestion) => {
+            delete groupQuestion.id
+            return groupQuestion
          })
       }
       const newGroup = { ...group }
@@ -192,14 +206,14 @@ export class FirebaseGroupRepository implements IGroupRepository {
       // TODO: Remove this property in the future
       newGroup.groupId = groupRef.id
 
-      // add the custom categories to the the the customCategories sub-collection
-      removeTempCategoryIds(customCategories).forEach((category) => {
-         const categoryRef = this.firestore
+      // add the group questions to the the the groupQuestions sub-collection
+      removeTempGroupQuestionIds(groupQuestions).forEach((groupQuestion) => {
+         const groupQuestionRef = this.firestore
             .collection("careerCenterData")
             .doc(groupRef.id)
-            .collection("customCategories")
+            .collection("groupQuestions")
             .doc()
-         batch.set(categoryRef, category)
+         batch.set(groupQuestionRef, groupQuestion)
       })
 
       batch.set(groupRef, newGroup)
@@ -211,17 +225,24 @@ export class FirebaseGroupRepository implements IGroupRepository {
       return groupRef
    }
 
-   async getBreakdownCategory(
+   async getFieldOrLevelOfStudyGroupQuestion(
       groupId: string,
-      categoryType: Exclude<CustomCategory["categoryType"], "custom">
-   ): Promise<CustomCategory> {
+      questionType: Exclude<GroupQuestion["questionType"], "custom">
+   ): Promise<GroupQuestion> {
       const groupFieldsOfStudySnaps = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("customCategories")
-         .where("categoryType", "==", categoryType)
+         .collection("groupQuestions")
+         .where("questionType", "==", questionType)
          .limit(1)
          .get()
-      return mapFirestoreDocuments<CustomCategory>(groupFieldsOfStudySnaps)[0]
+      return mapFirestoreDocuments<GroupQuestion>(groupFieldsOfStudySnaps)[0]
+   }
+
+   async getAllGroups(): Promise<Group[]> {
+      const groupSnapshots = await this.firestore
+         .collection("careerCenterData")
+         .get()
+      return mapFirestoreDocuments<Group>(groupSnapshots)
    }
 }

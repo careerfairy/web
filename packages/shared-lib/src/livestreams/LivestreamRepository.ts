@@ -1,5 +1,10 @@
 import firebase from "firebase/app"
-import { RegisteredStudent, UserPublicData } from "../users"
+import {
+   ParticipatingStudent,
+   RegisteredStudent,
+   TalentPoolStudent,
+   UserPublicData,
+} from "../users"
 import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
 import {
    LivestreamEvent,
@@ -80,12 +85,18 @@ export interface ILivestreamRepository {
    getLivestreamRegisteredStudents(
       eventId: string
    ): Promise<RegisteredStudent[]>
+   getLivestreamTalentPoolMembers(
+      companyId: LivestreamEvent["companyId"]
+   ): Promise<TalentPoolStudent[]>
 
    heartbeat(
       livestream: LivestreamEventPublicData,
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void>
+   getAllRegisteredStudents(): Promise<RegisteredStudent[]>
+   getAllParticipatingStudents(): Promise<ParticipatingStudent[]>
+   getAllTalentPoolStudents(): Promise<TalentPoolStudent[]>
 }
 
 export class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -303,6 +314,7 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
          lastUpdatedDateString:
             event.lastUpdated?.toDate?.().toString() || null,
          startDateString: event.start?.toDate?.().toString() || null,
+         groupQuestionsMap: event.groupQuestionsMap || null,
          duration: event.duration || null,
          hasEnded: event.hasEnded || false,
          targetCategories: event.targetCategories || null,
@@ -392,6 +404,36 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
 
       return mapFirestoreDocuments<RegisteredStudent>(ref)
    }
+
+   async getLivestreamTalentPoolMembers(
+      companyId: LivestreamEvent["companyId"]
+   ): Promise<TalentPoolStudent[]> {
+      let snaps = await this.firestore
+         .collection("userData")
+         .where("talentPools", "array-contains", companyId)
+         .get()
+      return mapFirestoreDocuments<TalentPoolStudent>(snaps)
+   }
+
+   async getAllRegisteredStudents(): Promise<RegisteredStudent[]> {
+      const snaps = await this.firestore
+         .collectionGroup("registeredStudents")
+         .get()
+      return mapFirestoreDocuments<RegisteredStudent>(snaps, true)
+   }
+
+   async getAllParticipatingStudents(): Promise<ParticipatingStudent[]> {
+      const snaps = await this.firestore
+         .collectionGroup("participatingStudents")
+         .get()
+
+      return mapFirestoreDocuments<ParticipatingStudent>(snaps, true)
+   }
+
+   async getAllTalentPoolStudents(): Promise<TalentPoolStudent[]> {
+      const snaps = await this.firestore.collectionGroup("talentPool").get()
+      return mapFirestoreDocuments<TalentPoolStudent>(snaps, true)
+   }
 }
 
 function getEarliestEventBufferTime() {
@@ -428,32 +470,6 @@ export class LivestreamsDataParser {
 
          return true
       })
-      return this
-   }
-
-   filterByTargetCategories(groupId: string, categories: string[]) {
-      this.livestreams = this.livestreams.reduce(
-         (accumulator, currentLivestream) => {
-            if (currentLivestream.targetCategories) {
-               const livestreamCategories =
-                  currentLivestream.targetCategories[groupId]
-               if (categories.length && livestreamCategories) {
-                  if (
-                     categories.some((v) => livestreamCategories.includes(v))
-                  ) {
-                     return accumulator.concat(currentLivestream)
-                  }
-               } else if (!categories.length) {
-                  return accumulator.concat(currentLivestream)
-               }
-            } else {
-               return accumulator.concat(currentLivestream)
-            }
-            return accumulator
-         },
-         []
-      )
-
       return this
    }
 

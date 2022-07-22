@@ -26,7 +26,7 @@ const MultiListSelect = ({
    const handleMultiSelect = (event, selectedOptions) => {
       if (limit && selectedOptions.length > limit) return
 
-      onSelectItems(selectedOptions)
+      onSelectItems?.(selectedOptions)
       if (setFieldValue)
          setFieldValue(inputName, selectedOptions.map(getValueFn))
    }

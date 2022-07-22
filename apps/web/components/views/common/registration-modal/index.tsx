@@ -2,7 +2,10 @@ import React, { memo } from "react"
 import { Dialog, Grow } from "@mui/material"
 import { RegistrationContextProvider } from "context/registration/RegistrationContext"
 import RegistrationForm from "./RegistrationForm"
-import { LiveStreamEvent } from "../../../../types/event"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const RegistrationModal = memo(
    ({
@@ -11,7 +14,7 @@ const RegistrationModal = memo(
       livestream,
       groups,
       promptOtherEventsOnFinal,
-      onGroupJoin,
+      onQuestionsAnswered,
       onFinish,
       targetGroupId,
    }: Props) => {
@@ -19,7 +22,6 @@ const RegistrationModal = memo(
       const onClose = () => {
          handleClose?.()
       }
-
       return (
          <Dialog
             maxWidth="md"
@@ -33,7 +35,7 @@ const RegistrationModal = memo(
                closeModal={onClose}
                livestream={livestream}
                onFinish={onFinish}
-               onGroupJoin={onGroupJoin}
+               onQuestionsAnswered={onQuestionsAnswered}
                targetGroupId={targetGroupId}
                cancelable={cancelable}
                groups={groups}
@@ -48,10 +50,10 @@ const RegistrationModal = memo(
 
 interface Props {
    open?: boolean
-   onGroupJoin?: () => any
-   handleClose: () => any
-   onFinish: () => any
-   livestream: LiveStreamEvent
+   onQuestionsAnswered?: (...any) => void
+   handleClose?: () => any
+   onFinish?: () => any
+   livestream: LivestreamEvent
    groups: any[]
    promptOtherEventsOnFinal?: boolean
    targetGroupId?: string

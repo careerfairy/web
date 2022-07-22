@@ -372,15 +372,20 @@ export const generateReferralCode = () => {
    return nanoid()
 }
 
-// Partition function
-export function partition<T>(
+export const partition = <T>(
    array: T[],
-   filter: (e: T, idx: number, arr: T[]) => boolean
-): T[][] {
-   const pass: T[] = []
-   const fail: T[] = []
-   array.forEach((e, idx, arr) => (filter(e, idx, arr) ? pass : fail).push(e))
-   return [pass, fail] as T[][]
+   compareFn: (el: T, index?: number) => boolean
+): {
+   matches: T[]
+   noMatches: T[]
+} => {
+   return array.reduce(
+      (acc, curr, currentIndex) => {
+         acc[compareFn(curr, currentIndex) ? "matches" : "noMatches"].push(curr)
+         return acc
+      },
+      { matches: [], noMatches: [] }
+   ) as { matches: T[]; noMatches: T[] }
 }
 
 /**

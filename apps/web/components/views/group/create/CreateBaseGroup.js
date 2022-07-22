@@ -1,5 +1,4 @@
 import React, { useState } from "react"
-import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext"
 import PublishIcon from "@mui/icons-material/Publish"
 import { Form as UiForm, Formik } from "formik"
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer"

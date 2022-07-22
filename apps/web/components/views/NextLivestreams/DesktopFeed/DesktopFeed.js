@@ -1,6 +1,5 @@
 import React from "react"
 import { Container, Grid, Grow } from "@mui/material"
-import GroupCategories from "../GroupCategories/GroupCategories"
 import GroupStreams from "../GroupStreams/GroupStreams"
 
 // FIXME checkout https://mui.com/components/use-media-query/#migrating-from-withwidth
@@ -10,14 +9,10 @@ const withWidth = () => (WrappedComponent) => (props) =>
 
 const DesktopFeed = ({
    groupData,
-   hasCategories,
-   handleToggleActive,
-   mobile,
    livestreams,
    searching,
    careerCenterId,
    listenToUpcoming,
-   selectedOptions,
    isPastLivestreams,
 }) => {
    return (
@@ -32,18 +27,11 @@ const DesktopFeed = ({
                spacing={4}
                sx={{ margin: (theme) => theme.spacing(1) }}
             >
-               <GroupCategories
-                  mobile={mobile}
-                  hasCategories={hasCategories}
-                  handleToggleActive={handleToggleActive}
-                  groupData={groupData}
-               />
                <GroupStreams
                   mobile={false}
                   isPastLivestreams={isPastLivestreams}
                   listenToUpcoming={listenToUpcoming}
                   careerCenterId={careerCenterId}
-                  selectedOptions={selectedOptions}
                   searching={searching}
                   livestreams={livestreams}
                   groupData={groupData}

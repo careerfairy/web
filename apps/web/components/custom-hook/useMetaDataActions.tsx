@@ -21,10 +21,13 @@ import { useDispatch } from "react-redux"
 import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint"
 import { useTheme } from "@mui/material/styles"
 import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
-import { Group, PdfReportData } from "@careerfairy/shared-lib/dist/groups"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { RegisteredStudent, UserData } from "@careerfairy/shared-lib/dist/users"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
+import { livestreamRepo } from "../../data/RepositoryInstances"
+import { useGroup } from "../../layouts/GroupDashboardLayout"
 
 interface MetaDataActionsProps {
    allGroups: Group[]
@@ -33,12 +36,16 @@ interface MetaDataActionsProps {
    isDraft: boolean
 }
 
+const isLegacyStream = (stream: LivestreamEvent) => false // TODO: legacy stream
+// stream.start.toDate() < new Date(2022, 7, 18)
+
 export function useMetaDataActions({
    allGroups,
    group,
    isPast,
    isDraft,
 }: MetaDataActionsProps) {
+   const { groupPresenter, groupQuestions } = useGroup()
    const firebase = useFirebaseService()
    const { userData } = useAuth()
    const theme = useTheme()
@@ -83,39 +90,23 @@ export function useMetaDataActions({
                targetRegisteredStudents.length &&
                !registeredStudentsFromGroupDictionary?.[targetStream.id]
             ) {
-               let newRegisteredStudentsFromGroup
+               let users = targetRegisteredStudents
                if (group.universityCode) {
-                  newRegisteredStudentsFromGroup = targetRegisteredStudents
-                     .filter((student) => studentBelongsToGroup(student))
-                     .map((filteredStudent) =>
-                        StatsUtil.getStudentInGroupDataObject(
-                           filteredStudent,
-                           group
-                        )
-                     )
-               } else {
-                  const livestreamGroups = allGroups.filter((group) =>
-                     targetStream.groupIds.includes(group.id)
-                  )
-                  newRegisteredStudentsFromGroup = targetRegisteredStudents.map(
-                     (student) => {
-                        const livestreamGroupUserBelongsTo =
-                           StatsUtil.getFirstGroupThatUserBelongsTo(
-                              student,
-                              livestreamGroups,
-                              group
-                           )
-                        return StatsUtil.getStudentInGroupDataObject(
-                           student,
-                           livestreamGroupUserBelongsTo || {}
-                        )
-                     }
+                  users = targetRegisteredStudents.filter((user) =>
+                     groupPresenter.isUniversityStudent(user)
                   )
                }
 
+               const csvData = StatsUtil.getCsvData(
+                  group,
+                  targetStream,
+                  users,
+                  groupQuestions
+               )
+
                setRegisteredStudentsFromGroupDictionary({
                   ...registeredStudentsFromGroupDictionary,
-                  [targetStream.id]: newRegisteredStudentsFromGroup,
+                  [targetStream.id]: csvData,
                })
             }
          } catch (e) {
@@ -126,7 +117,7 @@ export function useMetaDataActions({
             [targetStream.id]: false,
          }))
       })()
-   }, [registeredStudentsDictionary, targetStream, group])
+   }, [registeredStudentsDictionary, targetStream, group, groupQuestions])
 
    useEffect(() => {
       if (
@@ -138,7 +129,7 @@ export function useMetaDataActions({
             const querySnapshot =
                await firebase.getLivestreamRegisteredStudents(targetStream.id)
             const newRegisteredStudents =
-               mapFirestoreDocuments<UserData>(querySnapshot)
+               mapFirestoreDocuments<RegisteredStudent>(querySnapshot)
 
             setRegisteredStudentsDictionary({
                ...registeredStudentsDictionary,
@@ -157,52 +148,19 @@ export function useMetaDataActions({
             }))
             try {
                if (!talentPoolDictionary[targetStream.id]) {
-                  const querySnapshot =
-                     await firebase.getLivestreamTalentPoolMembers(
+                  const users =
+                     await livestreamRepo.getLivestreamTalentPoolMembers(
                         targetStream.companyId
                      )
-                  const registeredStudents = querySnapshot.docs.map((doc) => {
-                     let element = doc.data()
-                     if (
-                        registeredStudentsFromGroupDictionary[
-                           targetStream.id
-                        ]?.some((student) => student.Email === doc.id)
-                     ) {
-                        let publishedStudent
-                        if (group.universityCode) {
-                           publishedStudent =
-                              StatsUtil.getStudentInGroupDataObject(
-                                 element,
-                                 group
-                              )
-                        } else {
-                           const livestreamGroups = allGroups.filter((group) =>
-                              targetStream.groupIds.includes(group.id)
-                           )
-                           const livestreamGroupUserBelongsTo =
-                              StatsUtil.getFirstGroupThatUserBelongsTo(
-                                 element,
-                                 livestreamGroups,
-                                 group
-                              )
-                           publishedStudent =
-                              StatsUtil.getStudentInGroupDataObject(
-                                 element,
-                                 livestreamGroupUserBelongsTo || {}
-                              )
-                        }
-                        return publishedStudent
-                     } else {
-                        return StatsUtil.getStudentOutsideGroupDataObject(
-                           element,
-                           allGroups
-                        )
-                     }
-                  })
-
+                  const csvData = StatsUtil.getCsvData(
+                     group,
+                     targetStream,
+                     users,
+                     groupQuestions
+                  )
                   setTalentPoolDictionary({
                      ...talentPoolDictionary,
-                     [targetStream.id]: registeredStudents,
+                     [targetStream.id]: csvData,
                   })
                }
             } catch (e) {}
@@ -212,7 +170,79 @@ export function useMetaDataActions({
             }))
          })()
       }
-   }, [targetStream, registeredStudentsFromGroupDictionary])
+   }, [targetStream, registeredStudentsFromGroupDictionary, groupQuestions])
+   const getLegacyRegisteredStudentsCsvData = useCallback(
+      (targetRegisteredStudents: RegisteredStudent[]) => {
+         let newRegisteredStudentsFromGroup
+         if (group.universityCode) {
+            newRegisteredStudentsFromGroup = targetRegisteredStudents
+               .filter((student) => studentBelongsToGroup(student))
+               .map((filteredStudent) =>
+                  StatsUtil.getStudentInGroupDataObject(filteredStudent, group)
+               )
+         } else {
+            const livestreamGroups = allGroups.filter((group) =>
+               targetStream.groupIds.includes(group.id)
+            )
+            newRegisteredStudentsFromGroup = targetRegisteredStudents.map(
+               (student) => {
+                  const livestreamGroupUserBelongsTo =
+                     StatsUtil.getFirstGroupThatUserBelongsTo(
+                        student,
+                        livestreamGroups,
+                        group
+                     )
+                  return StatsUtil.getStudentInGroupDataObject(
+                     student,
+                     livestreamGroupUserBelongsTo || {}
+                  )
+               }
+            )
+         }
+         return newRegisteredStudentsFromGroup
+      },
+      [allGroups, group, targetStream]
+   )
+   const getLegacyTalentPoolStudentsCsvData = useCallback(
+      (targetUsers: UserData[]) => {
+         return targetUsers.map((element) => {
+            if (
+               registeredStudentsFromGroupDictionary[targetStream.id]?.some(
+                  (student) => student.Email === element.id
+               )
+            ) {
+               let publishedStudent
+               if (group.universityCode) {
+                  publishedStudent = StatsUtil.getStudentInGroupDataObject(
+                     element,
+                     group
+                  )
+               } else {
+                  const livestreamGroups = allGroups.filter((group) =>
+                     targetStream.groupIds.includes(group.id)
+                  )
+                  const livestreamGroupUserBelongsTo =
+                     StatsUtil.getFirstGroupThatUserBelongsTo(
+                        element,
+                        livestreamGroups,
+                        group
+                     )
+                  publishedStudent = StatsUtil.getStudentInGroupDataObject(
+                     element,
+                     livestreamGroupUserBelongsTo || {}
+                  )
+               }
+               return publishedStudent
+            } else {
+               return StatsUtil.getStudentOutsideGroupDataObject(
+                  element,
+                  allGroups
+               )
+            }
+         })
+      },
+      [allGroups, group, targetStream]
+   )
 
    const handleGetLivestreamReportData = useCallback(
       async (rowData: LivestreamEvent) => {
@@ -235,7 +265,6 @@ export function useMetaDataActions({
                   userEmail: userData.userEmail,
                   targetGroupId: group.id,
                })
-            console.log("-> data", data)
             setReportDataDictionary((prevState) => ({
                ...prevState,
                [rowData.id]: data,

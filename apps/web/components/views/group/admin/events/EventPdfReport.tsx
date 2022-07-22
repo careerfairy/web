@@ -11,7 +11,11 @@ import { Fragment } from "react"
 import DateUtil from "util/DateUtil"
 import * as PropTypes from "prop-types"
 import { dynamicSort } from "../../../../helperFunctions/HelperFunctions"
-import { PdfReportData } from "@careerfairy/shared-lib/dist/groups"
+import {
+   PdfCategoryChartData,
+   PdfCategoryChartOption,
+   PdfReportData,
+} from "@careerfairy/shared-lib/dist/groups/pdf-report"
 
 Font.register({
    family: "Poppins",
@@ -334,38 +338,24 @@ const QuestionVotes = (props) => (
 const Border = (props) => <View {...props} style={styles.border} />
 
 const SmallView = (props) => <View {...props} style={styles.smallView} />
-const SpecializedSubCategoryElement = ({ subOption }) => {
-   return (
-      <SmallView>
-         <SmallNumber>{subOption.entries}</SmallNumber>
-      </SmallView>
-   )
-}
 
-const SpecializedCategoryElement = ({ option }) => {
-   let subCategoryElements = Object.keys(option.subOptions).map((entry) => {
-      return (
-         <SpecializedSubCategoryElement
-            key={entry}
-            subOption={option.subOptions[entry]}
-         />
-      )
-   })
+interface CategoryElementProps {
+   mainCategoryOption: PdfCategoryChartOption
+}
+const CategoryElement = ({ mainCategoryOption }: CategoryElementProps) => {
    return (
       <Border wrap={false}>
-         <LargeText>{option.name}</LargeText>
-         <LargeNumber>{option.entries}</LargeNumber>
-         <SubCategoryParent>{subCategoryElements}</SubCategoryParent>
+         <LargeText>{mainCategoryOption.name}</LargeText>
+         <LargeNumber>{mainCategoryOption.count}</LargeNumber>
+         <SubCategoryParent>
+            {mainCategoryOption.subCategoryOptions.map((subOption) => (
+               <SmallView key={subOption.id}>
+                  <SmallNumber>{subOption.count}</SmallNumber>
+               </SmallView>
+            ))}
+         </SubCategoryParent>
       </Border>
    )
-}
-const NonSpecializedCategoryElement = ({ options }) => {
-   return options.map((option) => (
-      <Border key={option.id} wrap={false}>
-         <LargeText>{option.name}</LargeText>
-         <LargeNumber>{option.entries}</LargeNumber>
-      </Border>
-   ))
 }
 
 const QuestionView = ({ question }) => {
@@ -457,54 +447,57 @@ const getPercentage = (num1, num2) => {
    return `${((num1 / num2) * 100).toFixed(0)}%`
 }
 
+interface ReportPageProps {
+   chartData: PdfCategoryChartData
+   groupLogo?: string
+   title: string
+   subtitle: string
+}
 const ReportPage = ({
-   categoryElements,
-   followersWithMissingData,
-   report,
-   onlyCompany = undefined,
-}) => {
+   chartData,
+   groupLogo,
+   title,
+   subtitle,
+}: ReportPageProps) => {
    return (
       <Fragment>
-         {report.isUniversity && (
+         {groupLogo && (
             <GroupLogoView break>
-               <GroupLogoImage src={report.group.logoUrl} />
+               <GroupLogoImage src={groupLogo} />
             </GroupLogoView>
          )}
-         <Title break={!report.isUniversity}>
-            {report.isUniversity
-               ? `Your Audience from ${report.group.universityName}`
-               : onlyCompany
-               ? "Your participants breakdown"
-               : "Participants from other universities"}
-         </Title>
+
+         <Title>{title}</Title>
          <Fragment>
             <InlineView>
-               {report.isUniversity ? (
-                  <GroupSubTitle>
-                     Number Of Participating Students from{" "}
-                     {report.group.universityName}:{" "}
-                     {report.isUniversity
-                        ? report.numberOfStudentsFromUniversity
-                        : report.numberOfStudentsFollowingCompany}
-                  </GroupSubTitle>
-               ) : (
-                  <GroupSubTitle>
-                     Number Of Participating Students:{" "}
-                     {report.numberOfStudentsFollowingCompany}
-                  </GroupSubTitle>
-               )}
+               <GroupSubTitle>{subtitle}</GroupSubTitle>
             </InlineView>
          </Fragment>
 
          <CategoriesParent>
-            {categoryElements}
-            {followersWithMissingData > 0 && (
+            <Border>
+               <LargeText style={{ color: "grey" }}>
+                  {chartData.mainCategoryName}
+               </LargeText>
+               <LargeNumber style={{ color: "grey" }}>#</LargeNumber>
+               <SubCategoryParent>
+                  {chartData.subCategoryOptionNames.map((name) => (
+                     <SmallView key={name}>
+                        <SmallText>{name}</SmallText>
+                     </SmallView>
+                  ))}
+               </SubCategoryParent>
+            </Border>
+            {chartData.mainCategoryOptions.map((option) => (
+               <CategoryElement key={option.id} mainCategoryOption={option} />
+            ))}
+            {chartData.totalWithoutStats > 0 && (
                <Border wrap={false}>
                   <LargeText style={{ color: "grey" }}>
                      Other Study Backgrounds
                   </LargeText>
                   <LargeNumber style={{ color: "grey" }}>
-                     {followersWithMissingData}
+                     {chartData.totalWithoutStats}
                   </LargeNumber>
                </Border>
             )}
@@ -536,109 +529,6 @@ const EventPdfReport = (props: PdfReportData) => {
    let questionElements = []
    let ratingsElements = []
 
-   function compareOptions(optionA, optionB, studentStats) {
-      return (
-         studentStats.options[optionB].entries -
-         studentStats.options[optionA].entries
-      )
-   }
-
-   const getNameElements = (studentStats) => {
-      let nameElements = []
-      if (studentStats && studentStats.type === "specialized") {
-         nameElements = studentStats.names.map((name) => {
-            return (
-               <SmallView key={name}>
-                  <SmallText>{name}</SmallText>
-               </SmallView>
-            )
-         })
-      }
-      return nameElements
-   }
-   const getCategoryElements = (studentStats, report) => {
-      let categoryElements: JSX.Element = []
-      if (studentStats && studentStats.type === "specialized") {
-         categoryElements = (
-            <>
-               <Border>
-                  <LargeText style={{ color: "grey" }}>Faculty</LargeText>
-                  <LargeNumber style={{ color: "grey" }}>#</LargeNumber>
-                  <SubCategoryParent>
-                     {getNameElements(studentStats)}
-                  </SubCategoryParent>
-               </Border>
-               {Object.keys(studentStats.options)
-                  .sort((optionA, optionB) =>
-                     compareOptions(optionA, optionB, studentStats)
-                  )
-                  .filter((option) => studentStats.options[option].entries > 0)
-                  .map((option, index) => {
-                     return (
-                        <SpecializedCategoryElement
-                           option={studentStats.options[option]}
-                           key={index}
-                        />
-                     )
-                  })}
-            </>
-         )
-      } else if (studentStats && studentStats.type === "non-specialized") {
-         const totalFollowers = report.isUniversity
-            ? report.numberOfUniversityStudentsThatFollowingUniversity
-            : report.numberOfStudentsFollowingCompany
-         categoryElements = studentStats.noneSpecializedStats.map((stats) => {
-            const totalEntries = stats.options.reduce((acc, curr) => {
-               acc += curr.entries || 0
-               return acc
-            }, 0)
-            const followersWithMissingData = totalFollowers - totalEntries
-            return (
-               <>
-                  <Border>
-                     <LargeText style={{ color: "grey" }}>
-                        {stats.categoryName}
-                     </LargeText>
-                  </Border>
-                  <NonSpecializedCategoryElement
-                     key={stats.id}
-                     options={stats.options}
-                  />
-                  {followersWithMissingData > 0 && (
-                     <Border wrap={false}>
-                        <LargeText style={{ color: "grey" }}>
-                           Other Study Backgrounds
-                        </LargeText>
-                        <LargeNumber style={{ color: "grey" }}>
-                           {followersWithMissingData}
-                        </LargeNumber>
-                     </Border>
-                  )}
-               </>
-            )
-         })
-      }
-      return categoryElements
-   }
-
-   const getNumberOfFollowersWithNoCategories = (report) => {
-      const totalFollowers = report.isUniversity
-         ? report.numberOfUniversityStudentsThatFollowingUniversity
-         : report.numberOfStudentsFollowingCompany
-      let totalEntries
-      if (report.studentStats && report.studentStats.type === "specialized") {
-         totalEntries = Object.keys(report.studentStats.options).reduce(
-            (acc, curr) => {
-               acc += report.studentStats.options[curr].entries || 0
-               return acc
-            },
-            0
-         )
-      } else {
-      }
-      return totalFollowers - totalEntries
-   }
-
    questionElements = props.summary.questions.slice(0, 3).map((question) => {
       return <QuestionView key={question.id} question={question} />
    })
@@ -652,7 +542,9 @@ const EventPdfReport = (props: PdfReportData) => {
       (question) => (numberOfVotes += question.votes)
    )
 
-   const isUniversity = Boolean(props.summary?.requestingGroup?.universityCode)
+   const isForUniversity = Boolean(
+      props.summary?.requestingGroup?.universityCode
+   )
    return (
       <Document
          title={`General Report ${props.summary.livestream.company} ${props.summary.livestream.id}.pdf`}
@@ -691,33 +583,24 @@ const EventPdfReport = (props: PdfReportData) => {
                   <Title>{props.summary.livestream.title}</Title>
                   <DateText>
                      {DateUtil.getPrettyDate(
-                        // @ts-ignore
                         new Date(
+                           // @ts-ignore
                            Date.parse(props.summary.livestream.startDateString)
                         )
                      )}
                   </DateText>
                   <SubTitle>Speakers</SubTitle>
                   <SpeakersViewElement speakers={props.summary.speakers} />
-                  {!!props.universityReports.length && (
-                     <View wrap={false}>
-                        <SubTitle>Hosts</SubTitle>
-                        <PartnersWrapper>
-                           {props.universityReports.map((report) => (
-                              <PartnerItem key={report.group.id}>
-                                 <PartnerLogo src={report.group.logoUrl} />
-                              </PartnerItem>
-                           ))}
-                           {props.companyReport && (
-                              <PartnerItem>
-                                 <PartnerLogo
-                                    src={props.companyReport.group.logoUrl}
-                                 />
-                              </PartnerItem>
-                           )}
-                        </PartnersWrapper>
-                     </View>
-                  )}
+                  <View wrap={false}>
+                     <SubTitle>Hosts</SubTitle>
+                     <PartnersWrapper>
+                        {props.hostsData.map((host) => (
+                           <PartnerItem key={host.id}>
+                              <PartnerLogo src={host.hostLogoUrl} />
+                           </PartnerItem>
+                        ))}
+                     </PartnersWrapper>
+                  </View>
                   <View break wrap={false}>
                      <SubTitle>Your Audience</SubTitle>
                      <View>
@@ -741,30 +624,26 @@ const EventPdfReport = (props: PdfReportData) => {
                         </ColorText>
                      </View>
                   </View>
-                  {isUniversity ? (
+                  {isForUniversity ? (
                      <View wrap={false}>
                         <SubTitle>Where They Came From</SubTitle>
                         <PartnersWrapper>
-                           {[...props.universityReports]
+                           {[...props.hostsData]
                               .sort(dynamicSort("totalParticipantsFromGroup"))
-                              .map((report) => (
+                              .filter(
+                                 (host) =>
+                                    host.numberOfStudentsFromUniversity > 0 &&
+                                    host.isUniversity
+                              )
+                              .map((host) => (
                                  <PartnerBreakdown
-                                    key={report.group.id}
-                                    name={report.group.universityName}
+                                    key={host.id}
+                                    name={host.hostName}
                                     numberOfStudents={
-                                       report.numberOfStudentsFromUniversity
+                                       host.numberOfStudentsFromUniversity
                                     }
                                  />
                               ))}
-                           {props.companyReport && (
-                              <PartnerBreakdown
-                                 name={props.companyReport.group.universityName}
-                                 numberOfStudents={
-                                    props.companyReport
-                                       .numberOfStudentsFollowingCompany
-                                 }
-                              />
-                           )}
                         </PartnersWrapper>
                      </View>
                   ) : (
@@ -818,44 +697,40 @@ const EventPdfReport = (props: PdfReportData) => {
                      <SubTitle>Most upvoted questions</SubTitle>
                      {questionElements}
                   </View>
-                  {props.universityReports.map((report) => (
-                     <ReportPage
-                        key={report.group.groupId}
-                        report={report}
-                        categoryElements={getCategoryElements(
-                           report.studentStats,
-                           report
-                        )}
-                        followersWithMissingData={getNumberOfFollowersWithNoCategories(
-                           report
-                        )}
-                     />
-                  ))}
-                  {props.companyReport && (
-                     <ReportPage
-                        followersWithMissingData={getNumberOfFollowersWithNoCategories(
-                           props.companyReport
-                        )}
-                        categoryElements={getCategoryElements(
-                           props.companyReport.studentStats,
-                           props.companyReport
-                        )}
-                        onlyCompany={Boolean(!props.universityReports?.length)}
-                        report={props.companyReport}
-                     />
+                  {props.universityChartData && (
+                     <View break>
+                        <ReportPage
+                           groupLogo={props.summary.requestingGroup.logoUrl}
+                           title={`Your Audience from ${props.summary.requestingGroup.universityName}`}
+                           subtitle={`Number Of Participating Students from
+                        ${props.summary.requestingGroup.universityName}: ${props.universityChartData.totalWithStats}`}
+                           chartData={props.universityChartData}
+                        />
+                     </View>
                   )}
-                  {props.summary
-                     .numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent >
-                     0 && (
+                  {props.nonUniversityChartData && (
+                     <View break>
+                        <ReportPage
+                           title={
+                              isForUniversity
+                                 ? "Participants from other universities"
+                                 : "Your participants breakdown"
+                           }
+                           subtitle={`${
+                              isForUniversity
+                                 ? "Number Of Participants from other universities"
+                                 : "Number Of Participants from your most popular schools"
+                           }: ${props.nonUniversityChartData.totalWithStats}`}
+                           chartData={props.nonUniversityChartData}
+                        />
+                     </View>
+                  )}
+                  {props.summary.totalParticipatingWithoutData > 0 && (
                      <View break>
                         <DisclaimerTitle>Disclaimer</DisclaimerTitle>
                         <GroupDisclaimerText>
-                           *{" "}
-                           {
-                              props.summary
-                                 .numberOfStudentsThatDontFollowCompanyOrIsNotAUniStudent
-                           }{" "}
-                           of the total {props.summary.totalParticipating}{" "}
+                           * {props.summary.totalParticipatingWithoutData} of
+                           the total {props.summary.totalParticipating}{" "}
                            participants for the event came from other sources
                         </GroupDisclaimerText>
                      </View>

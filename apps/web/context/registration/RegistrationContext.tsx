@@ -10,14 +10,58 @@ import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
 import StatsUtil from "../../data/util/StatsUtil"
 import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 
 // Applied to all fields
 const variant = "standard"
 const margin = "normal"
 
-export const RegistrationContext = createContext({
+interface DefaultContext {
+   activeStep: number
+   handleNext: () => void
+   handleBack: () => void
+   handleClose: () => void
+   handleGoToLast: () => void
+   handleSkipNext: () => void
+   variant: "standard"
+   margin: "normal"
+   livestream: LivestreamEvent
+   group?: Group
+   getMore: () => Promise<void>
+   groups?: Group[]
+   hasMore: boolean
+   setGroup: (group: Group) => void
+   setSliding: (sliding: boolean) => void
+   sliding: boolean
+   questions: LivestreamQuestion[]
+   handleClientSideQuestionUpdate: <T>(docId: string, updateData: T) => void
+   groupsWithPolicies: GroupWithPolicy[]
+   hasAgreedToAll: boolean
+   verifyResumeRequirement: () => void
+   completeRegistrationProcess: (
+      userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
+   ) => Promise<void>
+   promptOtherEventsOnFinal: boolean
+   totalSteps: number
+   setTotalSteps: (totalSteps: number) => void
+   questionSortType: "timestamp" | string
+   handleChangeQuestionSortType: (
+      event: Event,
+      questionSortType: "timestamp"
+   ) => void
+   onQuestionsAnswered: (...any) => void
+   onFinish: () => void
+   loadingInitialQuestions: boolean
+   gettingPolicyStatus: boolean
+   cancelable: boolean
+}
+export const RegistrationContext = createContext<DefaultContext>({
    activeStep: 0,
-   handleChange() {},
    handleNext() {},
    handleBack() {},
    handleClose() {},
@@ -25,9 +69,12 @@ export const RegistrationContext = createContext({
    handleSkipNext() {},
    variant,
    margin,
+   questions: [],
    livestream: null,
-   group: {},
+   group: null,
    groups: [],
+   hasMore: true,
+   getMore: async () => {},
    setGroup() {},
    setSliding() {},
    sliding: false,
@@ -35,15 +82,17 @@ export const RegistrationContext = createContext({
    groupsWithPolicies: [],
    hasAgreedToAll: false,
    verifyResumeRequirement() {},
-   completeRegistrationProcess() {},
-   labels: [],
+   async completeRegistrationProcess() {},
    promptOtherEventsOnFinal: false,
    totalSteps: 0,
+   setTotalSteps() {},
    questionSortType: "timestamp",
    handleChangeQuestionSortType() {},
-   onGroupJoin() {},
+   onQuestionsAnswered() {},
    onFinish() {},
    loadingInitialQuestions: false,
+   gettingPolicyStatus: false,
+   cancelable: false,
 })
 
 function reducer(state, action) {
@@ -99,15 +148,15 @@ export function RegistrationContextProvider({
    livestream,
    closeModal,
    promptOtherEventsOnFinal,
-   onGroupJoin,
+   onQuestionsAnswered,
    onFinish,
    cancelable,
    targetGroupId,
 }) {
    const {
       checkIfUserAgreedToGroupPolicy,
-      registerToLivestream,
       sendRegistrationConfirmationEmail,
+      registerToLivestream,
       livestreamQuestionsQuery,
    } = useFirebaseService()
    const { authenticatedUser, userData } = useAuth()
@@ -161,17 +210,8 @@ export function RegistrationContextProvider({
          setQuestionSortType(newSortType)
       }
    }
-   const setGroup = (group) => {
-      let newGroup = { ...group }
-      if (group?.categories?.length) {
-         // filter out hidden categories if any
-         newGroup = {
-            ...group,
-            categories: group.categories.filter((cat) => !cat.hidden),
-         }
-      }
-      return dispatch({ type: "set-group", payload: newGroup || {} })
-   }
+   const setGroup = (group) =>
+      dispatch({ type: "set-group", payload: { ...group } || {} })
    const setTotalSteps = (totalAmountOfSteps) =>
       dispatch({ type: "set-total-steps", payload: totalAmountOfSteps || 0 })
    const setPolicyGroups = (policyGroups) =>
@@ -234,22 +274,27 @@ export function RegistrationContextProvider({
       }
    }
 
-   const completeRegistrationProcess = async () => {
+   const completeRegistrationProcess = async (
+      userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
+   ) => {
       try {
          if (livestream) {
             await registerToLivestream(
                livestream.id,
                authenticatedUser,
-               groupsWithPolicies
+               groupsWithPolicies,
+               userAnsweredLivestreamGroupQuestions
             )
          }
          handleSendConfirmEmail()
-      } catch (e) {}
+      } catch (e) {
+         console.error(e)
+      }
       if (livestream) {
          // Go to booking step...
-         handleNext()
+         return handleNext()
       } else {
-         handleClose()
+         return handleClose()
       }
    }
 
@@ -261,6 +306,7 @@ export function RegistrationContextProvider({
          value={{
             activeStep,
             handleNext,
+            totalSteps,
             handleBack,
             variant,
             margin,
@@ -283,13 +329,12 @@ export function RegistrationContextProvider({
             setSliding,
             handleGoToLast,
             promptOtherEventsOnFinal,
-            alreadyJoined: Boolean(userData?.groupIds?.includes(group?.id)),
             gettingPolicyStatus,
             handleChangeQuestionSortType,
             questionSortType,
             loadingInitialQuestions,
             onFinish,
-            onGroupJoin,
+            onQuestionsAnswered,
             cancelable,
          }}
       >

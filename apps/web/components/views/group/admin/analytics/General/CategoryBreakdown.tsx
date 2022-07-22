@@ -70,7 +70,7 @@ const CategoryBreakdown = ({
 }: Props) => {
    const showUniversityBreakdown =
       currentUserDataSet.dataSet === "groupUniversityStudents"
-   const { customCategories, group } = useGroup()
+   const { groupQuestions, group } = useGroup()
    const theme = useTheme()
    const chartRef = useRef()
    const [showPercentage, setShowPercentage] = useState(true)
@@ -122,7 +122,7 @@ const CategoryBreakdown = ({
       colors,
    } = useUserBreakdownStats(
       audience,
-      showUniversityBreakdown ? customCategories : null
+      showUniversityBreakdown ? groupQuestions : null
    )
 
    const options = {

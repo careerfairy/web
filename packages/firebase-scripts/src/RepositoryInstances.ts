@@ -10,7 +10,6 @@ import {
    IUserRepository,
    FirebaseUserRepository,
 } from "@careerfairy/shared-lib/dist/users/UserRepository"
-import firebaseApp, { FieldValue } from "./firebase/FirebaseInstance"
 import {
    IGroupRepository,
    FirebaseGroupRepository,
@@ -19,18 +18,19 @@ import {
    ILivestreamRepository,
    FirebaseLivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
-
+import { firestore } from "./lib/firebase"
+import firebase from "firebase"
+import FieldValue = firebase.firestore.FieldValue
 import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
-
 import {
-   ILevelOfStudyRepository,
    FirebaseLevelOfStudyRepository,
+   ILevelOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
 
-const firestoreInstance = firebaseApp.firestore()
+const firestoreInstance = firestore as unknown as firebase.firestore.Firestore
 
 /**
  * Singleton instances of the repositories
