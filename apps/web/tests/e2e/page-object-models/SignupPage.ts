@@ -132,12 +132,10 @@ export class SignupPage extends CommonPage {
       this.interestsInformationStep = page.locator(
          "data-testid=registration-interests-information-step"
       )
-      this.spokenLanguagesInput = page.locator("id=spokenLanguagesInput")
-      this.countriesOfInterestInput = page.locator(
-         "id=countriesOfInterestInput"
-      )
-      this.interestsInput = page.locator("id=interestsInput")
-      this.isLookingForJobToggle = page.locator("id=isLookingForJobToggle")
+      this.spokenLanguagesInput = page.locator("id=spokenLanguages")
+      this.countriesOfInterestInput = page.locator("id=countriesOfInterest")
+      this.interestsInput = page.locator("id=interestsIds")
+      this.isLookingForJobToggle = page.locator("id=isLookingForJob")
    }
 
    async selectUniversityCountry(country: string) {
@@ -210,21 +208,21 @@ export class SignupPage extends CommonPage {
    async selectSpokenLanguageOption(optionId: string) {
       await this.spokenLanguagesInput.click()
       await this.page
-         .locator(`data-testid=spokenLanguagesInput_${optionId}_option`)
+         .locator(`data-testid=spokenLanguages_${optionId}_option`)
          ?.click()
       await this.spokenLanguagesInput.click()
    }
    async selectCountriesOfInterestOption(optionId: string) {
       await this.countriesOfInterestInput.click()
       await this.page
-         .locator(`data-testid=countriesOfInterestInput_${optionId}_option`)
+         .locator(`data-testid=countriesOfInterest_${optionId}_option`)
          ?.click()
       await this.countriesOfInterestInput.click()
    }
    async selectInterestsInputOption(optionId: string) {
       await this.interestsInput.click()
       await this.page
-         .locator(`data-testid=interestsInput_${optionId}_option`)
+         .locator(`data-testid=interestsIds_${optionId}_option`)
          ?.click()
       await this.interestsInput.click()
    }
