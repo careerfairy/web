@@ -16,6 +16,9 @@ const styles = sxStyles({
    },
 })
 
+const LINKEDIN_FIELD_NAME = "linkedInLink"
+const REFERRAL_CODE_FIELD_NAME = "referralCode"
+
 const SocialInformation = () => {
    const { authenticatedUser: currentUser, userData } = useAuth()
    const [existingReferralCode] = useLocalStorage(
@@ -24,9 +27,10 @@ const SocialInformation = () => {
       { raw: true }
    )
 
-   const [referralCodeInput, setReferralCodeInput] =
-      useState(existingReferralCode)
-   const [linkedInLinkInput, setLinkedInLinkInput] = useState("")
+   const [inputValues, setInputValues] = useState({
+      [LINKEDIN_FIELD_NAME]: "",
+      [REFERRAL_CODE_FIELD_NAME]: existingReferralCode,
+   })
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
 
    const updateFields = useCallback(
@@ -47,30 +51,26 @@ const SocialInformation = () => {
       if (userData) {
          const { linkedinUrl, referredBy } = userData
 
-         if (linkedinUrl && linkedInLinkInput === "") {
-            setLinkedInLinkInput(linkedinUrl || "")
+         if (linkedinUrl && inputValues[LINKEDIN_FIELD_NAME] === "") {
+            setInputValues((prev) => ({
+               ...prev,
+               [LINKEDIN_FIELD_NAME]: linkedinUrl || "",
+            }))
          }
 
          if (referredBy) {
             setIsValidReferralCode(true)
-            setReferralCodeInput(referredBy.referralCode)
+            setInputValues((prev) => ({
+               ...prev,
+               [REFERRAL_CODE_FIELD_NAME]: referredBy.referralCode,
+            }))
          }
       }
    }, [userData])
 
-   const handleLinkedInLinkInputChange = useCallback(
-      ({ target: { value } }) => {
-         setLinkedInLinkInput(value)
-      },
-      []
-   )
-
-   const handleReferralCodeInputChange = useCallback(
-      ({ target: { value } }) => {
-         setReferralCodeInput(value)
-      },
-      []
-   )
+   const handleInputChange = useCallback(({ target: { value, name } }) => {
+      setInputValues((prev) => ({ ...prev, [name]: value }))
+   }, [])
 
    return (
       <>
@@ -87,9 +87,10 @@ const SocialInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <LinkedInInput
-                  linkedInValue={linkedInLinkInput}
+                  name={LINKEDIN_FIELD_NAME}
+                  linkedInValue={inputValues[LINKEDIN_FIELD_NAME]}
                   onUpdateField={updateFields}
-                  onChange={handleLinkedInLinkInputChange}
+                  onChange={handleInputChange}
                />
             </Grid>
 
@@ -100,10 +101,11 @@ const SocialInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <ReferralCodeInput
-                  referralCodeValue={referralCodeInput}
+                  name={REFERRAL_CODE_FIELD_NAME}
+                  referralCodeValue={inputValues[REFERRAL_CODE_FIELD_NAME]}
                   currentUser={currentUser}
                   onUpdateField={updateFields}
-                  onChange={handleReferralCodeInputChange}
+                  onChange={handleInputChange}
                   isValid={isValidReferralCode}
                   onSetIsValid={setIsValidReferralCode}
                />
