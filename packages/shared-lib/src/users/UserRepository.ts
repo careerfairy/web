@@ -15,6 +15,8 @@ export interface IUserRepository {
 
    getUserDataByUid(uid: string): Promise<UserData>
 
+   getUserDataById(id: string): Promise<UserData>
+
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
 }
 
@@ -106,6 +108,14 @@ export class FirebaseUserRepository
 
       if (snap.empty) return null
       return { ...snap.docs[0].data(), id: snap.docs[0].id } as UserData
+   }
+
+   async getUserDataById(id: string): Promise<UserData> {
+      const snap = await this.firestore.collection("userData").doc(id).get()
+
+      if (!snap.exists) return null
+
+      return this.addIdToDoc<UserData>(snap)
    }
 
    async getUsersDataByUids(uids: string[]): Promise<UserData[]> {
