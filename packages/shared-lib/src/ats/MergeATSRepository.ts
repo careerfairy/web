@@ -96,4 +96,10 @@ export class MergeATSRepository implements IATSRepository {
 
       return data
    }
+
+   async removeAccount() {
+      const { data } = await this.axios.post<any>(`/delete-account`)
+
+      return data
+   }
 }
