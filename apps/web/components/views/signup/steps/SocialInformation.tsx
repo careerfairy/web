@@ -1,19 +1,12 @@
-import {
-   FormControl,
-   FormHelperText,
-   Grid,
-   TextField,
-   Typography,
-} from "@mui/material"
+import { Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
-import { useDebounce, useLocalStorage } from "react-use"
+import { useLocalStorage } from "react-use"
 import { localStorageReferralCode } from "../../../../constants/localStorageKeys"
 import React, { useCallback, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { linkedInRegex } from "../../../../constants/forms"
-import { ReferralData } from "@careerfairy/shared-lib/dist/users"
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
+import LinkedInInput from "../../common/inputs/LinkedInInput"
 
 const styles = sxStyles({
    inputLabel: {
@@ -21,20 +14,9 @@ const styles = sxStyles({
       fontSize: "0.8rem !important",
       fontWeight: "bold",
    },
-   helperText: {
-      marginTop: 1,
-      fontSize: "0.8rem !important",
-      fontWeight: "bold",
-   },
 })
 
-const isValidLinkedInLink = (link: string): boolean => {
-   return linkedInRegex.test(link)
-}
-
 const SocialInformation = () => {
-   const { rewardSignUpFollower } = useFirebaseService()
-
    const { authenticatedUser: currentUser, userData } = useAuth()
    const [existingReferralCode] = useLocalStorage(
       localStorageReferralCode,
@@ -46,76 +28,6 @@ const SocialInformation = () => {
       useState(existingReferralCode)
    const [linkedInLinkInput, setLinkedInLinkInput] = useState("")
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
-
-   const [, cancelLinkedInDebounce] = useDebounce(
-      () => handleLinkedInDebounced(linkedInLinkInput),
-      1000,
-      [linkedInLinkInput]
-   )
-   const [, cancelReferralCodeDebounce] = useDebounce(
-      () => handleReferralCodeDebounced(referralCodeInput),
-      1000,
-      [referralCodeInput]
-   )
-
-   useEffect(() => {
-      return () => {
-         cancelLinkedInDebounce()
-         cancelReferralCodeDebounce()
-      }
-   }, [])
-
-   const handleReferralCodeDebounced = useCallback((referralCode) => {
-      if (referralCode && !isValidReferralCode) {
-         setIsValidReferralCode(false)
-
-         userRepo
-            .getUserByReferralCode(referralCode)
-            .then((referralUser) => {
-               const { id, firstName, lastName } = referralUser
-               const { email: currentUserId } = currentUser
-
-               if (referralUser && id !== currentUserId) {
-                  const fieldToUpdate = {
-                     referredBy: {
-                        uid: id,
-                        name: `${firstName} ${lastName}`,
-                        referralCode: referralCode,
-                     } as ReferralData,
-                  }
-
-                  setIsValidReferralCode(true)
-                  updateFields(fieldToUpdate).catch(console.error)
-
-                  rewardSignUpFollower(currentUserId, referralUser).catch(
-                     console.error
-                  )
-               }
-            })
-            .catch(() => {
-               // to reset the referredBy field on db
-               if (isValidReferralCode) {
-                  const fieldToUpdate = {
-                     referredBy: {},
-                  }
-                  updateFields(fieldToUpdate).catch(console.error)
-               }
-
-               console.warn(
-                  `Invalid referral code: ${referralCode}, no corresponding user.`
-               )
-            })
-      }
-   }, [])
-
-   const handleLinkedInDebounced = useCallback((linkedInLink) => {
-      if (linkedInLink) {
-         const fieldToUpdate = {
-            linkedinUrl: isValidLinkedInLink(linkedInLink) ? linkedInLink : "",
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      }
-   }, [])
 
    const updateFields = useCallback(
       async (fieldToUpdate) => {
@@ -174,21 +86,10 @@ const SocialInformation = () => {
                </Typography>
             </Grid>
             <Grid item xs={12} sm={8}>
-               <TextField
-                  className="registrationInput"
-                  variant="outlined"
-                  fullWidth
-                  id="linkedInLink"
-                  name="linkedInLink"
-                  placeholder="Enter your LinkedIn link"
-                  InputLabelProps={{ shrink: true }}
+               <LinkedInInput
+                  linkedInValue={linkedInLinkInput}
+                  onUpdateField={updateFields}
                   onChange={handleLinkedInLinkInputChange}
-                  value={linkedInLinkInput}
-                  label="Add your LinkedIn link here"
-                  error={
-                     !!linkedInLinkInput.length &&
-                     !isValidLinkedInLink(linkedInLinkInput)
-                  }
                />
             </Grid>
 
@@ -198,30 +99,14 @@ const SocialInformation = () => {
                </Typography>
             </Grid>
             <Grid item xs={12} sm={8}>
-               <FormControl fullWidth>
-                  <TextField
-                     className="registrationInput"
-                     variant="outlined"
-                     fullWidth
-                     id="referralCode"
-                     name="referralCode"
-                     placeholder="Enter a Referral Code"
-                     InputLabelProps={{ shrink: true }}
-                     onChange={handleReferralCodeInputChange}
-                     disabled={isValidReferralCode}
-                     value={referralCodeInput}
-                     label="Copy-paste here your referral code"
-                     error={!!referralCodeInput.length && !isValidReferralCode}
-                  />
-                  {isValidReferralCode && (
-                     <FormHelperText
-                        sx={styles.helperText}
-                        id="referralCode-helper-text"
-                     >
-                        The referral code was successfully validated
-                     </FormHelperText>
-                  )}
-               </FormControl>
+               <ReferralCodeInput
+                  referralCodeValue={referralCodeInput}
+                  currentUser={currentUser}
+                  onUpdateField={updateFields}
+                  onChange={handleReferralCodeInputChange}
+                  isValid={isValidReferralCode}
+                  onSetIsValid={setIsValidReferralCode}
+               />
             </Grid>
          </Grid>
       </>
