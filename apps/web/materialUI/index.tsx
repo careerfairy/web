@@ -10,7 +10,7 @@ import {
 import { grey } from "@mui/material/colors"
 
 import React from "react"
-import { PaletteMode } from "@mui/material"
+import { PaletteMode, Components } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 
 interface CustomThemeProps {
@@ -191,7 +191,7 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          "0px 18px 23px rgba(0,0,0,0.1);",
    })
 
-const getComponents = (theme: DefaultTheme): any => ({
+const getComponents = (theme: DefaultTheme): Components => ({
    // Name of the component
    MuiBackdrop: {
       styleOverrides: {
@@ -312,13 +312,6 @@ const getComponents = (theme: DefaultTheme): any => ({
             },
          },
       ],
-   },
-   MuiHeaderLogoWrapper: {
-      styleOverrides: {
-         root: {
-            padding: "0 24px 0 24px",
-         },
-      },
    },
    MuiButton: {
       styleOverrides: {
@@ -500,9 +493,6 @@ export const brandedLightTheme = createTheme(
 
 export const brandedDarkTheme = createTheme({}, getTheme(rootThemeObj("dark")))
 
-export const HeaderLogoWrapper = styled("div", {
-   name: "MuiHeaderLogoWrapper",
-   overridesResolver: (props, styles) => {
-      return [styles.root]
-   },
-})()
+export const HeaderLogoWrapper = styled("div")({
+   padding: "0 24px 0 24px",
+})
