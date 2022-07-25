@@ -3,6 +3,8 @@ import { useCallback, useState } from "react"
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import { useMountedState } from "react-use"
 
 type Props = {
    atsAccount: GroupATSAccount
@@ -11,6 +13,8 @@ type Props = {
 const RemoveLinkedAccountButton = ({ atsAccount }: Props) => {
    const [isOpen, setOpen] = useState(false)
    const [isLoading, setIsLoading] = useState(false)
+   const isMounted = useMountedState()
+   const { errorNotification, successNotification } = useSnackbarNotifications()
 
    const onClose = useCallback(() => {
       setOpen(false)
@@ -21,9 +25,35 @@ const RemoveLinkedAccountButton = ({ atsAccount }: Props) => {
    }, [])
 
    const handleConfirm = useCallback(() => {
-      console.log("confirm!")
-      // atsServiceInstance.removeAccount(atsAccount.groupId, atsAccount.id).then()
-   }, [atsAccount.id, atsAccount.groupId])
+      setIsLoading(true)
+      atsServiceInstance
+         .removeAccount(atsAccount.groupId, atsAccount.id)
+         .then((_) => {
+            successNotification("Account removed with success")
+         })
+         .catch((e) => {
+            errorNotification(
+               e,
+               "Failed to remove linked account, try again later"
+            )
+         })
+         .finally(() => {
+            // avoid updating state when the parent component already un-mounted this component
+            // the parent component has a realtime listener and will unmount this component after
+            // deleting the docs
+            if (isMounted) {
+               setIsLoading(false)
+               onClose()
+            }
+         })
+   }, [
+      atsAccount.id,
+      atsAccount.groupId,
+      successNotification,
+      errorNotification,
+      onClose,
+      isMounted,
+   ])
 
    return (
       <>
@@ -35,14 +65,18 @@ const RemoveLinkedAccountButton = ({ atsAccount }: Props) => {
          >
             Unlink
          </Button>
-         <AreYouSureModal
-            open={isOpen}
-            handleClose={onClose}
-            loading={isLoading}
-            title="Are you sure?"
-            handleConfirm={handleConfirm}
-            message={"My Message"}
-         />
+         {isOpen && (
+            <AreYouSureModal
+               open={isOpen}
+               handleClose={onClose}
+               loading={isLoading}
+               title={`Are you sure you want to remove ${atsAccount.name} account?`}
+               handleConfirm={handleConfirm}
+               message={
+                  "The data will be deleted from our systems, you can add this integration later in the future again."
+               }
+            />
+         )}
       </>
    )
 }
