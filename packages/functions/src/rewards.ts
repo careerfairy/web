@@ -16,6 +16,8 @@ import {
 } from "./lib/reward"
 import { livestreamGetById } from "./lib/livestream"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { admin } from "./api/firestoreAdmin"
 
 /**
  * Everytime there is a new reward document, apply the reward depending on the action
@@ -298,19 +300,88 @@ export const rewardUserAction = functions.https.onCall(
    }
 )
 
+/**
+ * Check if the referral code is valid and if the user has any, if yes, rewards the followed user
+ * and adds the referral code on the current user
+ */
 export const rewardSignUpFollower = functions.https.onCall(
-   async ({ recipientEmail, referralUser }) => {
+   async (referralCode, context) => {
+      const userEmail = context.auth?.token?.email
+
       try {
-         await rewardCreateReferralSignUpFollower(recipientEmail, referralUser)
-         functions.logger.info(
-            "Created referral follower reward for this user."
-         )
+         // Extrapolate the user from the idToken that is the context
+         const currentUser = await getUserById(userEmail)
+         const { referredBy } = currentUser
+
+         if (referredBy) {
+            throw new functions.https.HttpsError(
+               "failed-precondition",
+               "User already is referral by someone"
+            )
+         }
+
+         // get Follower User and reward him
+         const followedUser = await getUserByReferralCode(referralCode)
+
+         if (followedUser) {
+            const { id, firstName, lastName } = followedUser
+
+            // confirm that the followed user exists and is not the current user
+            if (followedUser && id !== userEmail) {
+               const fieldToUpdate = {
+                  uid: id,
+                  name: `${firstName} ${lastName}`,
+                  referralCode: referralCode,
+               } as ReferralData
+
+               await rewardCreateReferralSignUpFollower(userEmail, followedUser)
+               functions.logger.info(
+                  "Created referral follower reward for this user."
+               )
+
+               return fieldToUpdate
+            }
+         }
+
+         return null
       } catch (e) {
-         // We don't want to fail the registration just because the reward failed
          functions.logger.error(e)
+         throw new Error(e)
       }
    }
 )
+// get user by id
+const getUserById = async (userId) => {
+   const snap = await admin.firestore().collection("userData").doc(userId).get()
+
+   if (!snap.exists) {
+      return null
+   }
+
+   return snap.data() as UserData
+}
+
+type ReferralData = {
+   uid: string
+   name: string
+   referralCode: string
+}
+
+// Get User by referral code
+const getUserByReferralCode = async (referralCode): Promise<UserData> => {
+   const snap = await admin
+      .firestore()
+      .collection("userData")
+      .where("referralCode", "==", referralCode)
+      .limit(1)
+      .get()
+
+   if (snap.empty) {
+      return null
+   }
+
+   return snap.docs[0].data() as UserData
+}
 
 // Validation functions, should throw exceptions
 

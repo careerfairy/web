@@ -27,8 +27,6 @@ export interface IUserRepository {
       stepId: string,
       totalSteps: number
    ): Promise<void>
-
-   getUserByReferralCode(referralCode): Promise<UserData>
 }
 
 export class FirebaseUserRepository
@@ -201,19 +199,5 @@ export class FirebaseUserRepository
          },
       }
       return userRef.set(toUpdate, { merge: true })
-   }
-
-   async getUserByReferralCode(referralCode): Promise<UserData> {
-      const snap = await this.firestore
-         .collection("userData")
-         .where("referralCode", "==", referralCode)
-         .limit(1)
-         .get()
-
-      if (snap.empty) {
-         return null
-      }
-
-      return snap.docs[0].data() as UserData
    }
 }

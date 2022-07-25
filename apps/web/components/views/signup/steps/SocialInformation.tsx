@@ -66,7 +66,7 @@ const SocialInformation = () => {
             }))
          }
       }
-   }, [userData])
+   }, [inputValues, userData])
 
    const handleInputChange = useCallback(({ target: { value, name } }) => {
       setInputValues((prev) => ({ ...prev, [name]: value }))
@@ -103,7 +103,6 @@ const SocialInformation = () => {
                <ReferralCodeInput
                   name={REFERRAL_CODE_FIELD_NAME}
                   referralCodeValue={inputValues[REFERRAL_CODE_FIELD_NAME]}
-                  currentUser={currentUser}
                   onUpdateField={updateFields}
                   onChange={handleInputChange}
                   isValid={isValidReferralCode}

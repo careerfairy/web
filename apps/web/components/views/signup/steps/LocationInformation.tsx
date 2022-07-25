@@ -52,7 +52,6 @@ const LocationInformation = () => {
             isLookingForJob,
          } = userData
 
-         debugger
          setInputValues({
             [COUNTRIES_OF_INTEREST_FIELD_NAME]: formatToOptionArray(
                [...regionsOfInterest, ...countriesOfInterest],
