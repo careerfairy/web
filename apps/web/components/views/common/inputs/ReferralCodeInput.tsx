@@ -5,7 +5,6 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../../../../types/commonTypes"
 import { FirebaseReducer } from "react-redux-firebase"
-import { ReferralData } from "@careerfairy/shared-lib/dist/users"
 
 const styles = sxStyles({
    inputLabel: {
@@ -110,6 +109,12 @@ const ReferralCodeInput = ({
          )}
       </FormControl>
    )
+}
+
+type ReferralData = {
+   uid: string
+   name: string
+   referralCode: string
 }
 
 type Props = {

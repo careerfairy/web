@@ -37,10 +37,10 @@ const InterestsInformation = () => {
    const updateFields = useCallback(
       async (fieldToUpdate) => {
          try {
-            await userRepo.updateAdditionalInformation({
-               userEmail: user.email,
-               ...fieldToUpdate,
-            })
+            await userRepo.updateAdditionalInformation(
+               user.email,
+               fieldToUpdate
+            )
          } catch (error) {
             console.log(error)
          }

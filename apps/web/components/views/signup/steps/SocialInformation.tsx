@@ -36,10 +36,10 @@ const SocialInformation = () => {
    const updateFields = useCallback(
       async (fieldToUpdate) => {
          try {
-            await userRepo.updateAdditionalInformation({
-               userEmail: currentUser.email,
-               ...fieldToUpdate,
-            })
+            await userRepo.updateAdditionalInformation(
+               currentUser.email,
+               fieldToUpdate
+            )
          } catch (error) {
             console.log(error)
          }
