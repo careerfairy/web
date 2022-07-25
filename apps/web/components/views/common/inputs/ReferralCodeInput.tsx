@@ -36,52 +36,55 @@ const ReferralCodeInput = ({
       [referralCodeValue]
    )
 
-   const handleReferralCodeDebounced = useCallback((referralCode) => {
-      // if referral code input still not valid, we want to check if the new one is valid
-      // after 1st validation of the referral code we do not want the user to insert a new onex
-      if (referralCode && !isValid) {
-         onSetIsValid(false)
+   const handleReferralCodeDebounced = useCallback(
+      (referralCode) => {
+         // if referral code input still not valid, we want to check if the new one is valid
+         // after 1st validation of the referral code we do not want the user to insert a new onex
+         if (referralCode && !isValid) {
+            onSetIsValid(false)
 
-         userRepo
-            .getUserByReferralCode(referralCode)
-            .then((referralUser) => {
-               const { id, firstName, lastName } = referralUser
-               const { email: currentUserId } = currentUser
+            userRepo
+               .getUserByReferralCode(referralCode)
+               .then((referralUser) => {
+                  const { id, firstName, lastName } = referralUser
+                  const { email: currentUserId } = currentUser
 
-               // check if the added referral code is not the current user referral code
-               if (referralUser && id !== currentUserId) {
-                  const fieldToUpdate = {
-                     referredBy: {
-                        uid: id,
-                        name: `${firstName} ${lastName}`,
-                        referralCode: referralCode,
-                     } as ReferralData,
+                  // check if the added referral code is not the current user referral code
+                  if (referralUser && id !== currentUserId) {
+                     const fieldToUpdate = {
+                        referredBy: {
+                           uid: id,
+                           name: `${firstName} ${lastName}`,
+                           referralCode: referralCode,
+                        } as ReferralData,
+                     }
+
+                     onSetIsValid(true)
+                     onUpdateField(fieldToUpdate)
+
+                     // add current user information to the referral code user
+                     rewardSignUpFollower(currentUserId, referralUser).catch(
+                        console.error
+                     )
+                  }
+               })
+               .catch(() => {
+                  // to reset the referredBy field on db
+                  if (isValid) {
+                     const fieldToUpdate = {
+                        referredBy: {},
+                     }
+                     onUpdateField(fieldToUpdate)
                   }
 
-                  onSetIsValid(true)
-                  onUpdateField(fieldToUpdate)
-
-                  // add current user information to the referral code user
-                  rewardSignUpFollower(currentUserId, referralUser).catch(
-                     console.error
+                  console.warn(
+                     `Invalid referral code: ${referralCode}, no corresponding user.`
                   )
-               }
-            })
-            .catch(() => {
-               // to reset the referredBy field on db
-               if (isValid) {
-                  const fieldToUpdate = {
-                     referredBy: {},
-                  }
-                  onUpdateField(fieldToUpdate)
-               }
-
-               console.warn(
-                  `Invalid referral code: ${referralCode}, no corresponding user.`
-               )
-            })
-      }
-   }, [])
+               })
+         }
+      },
+      [currentUser, isValid, onSetIsValid, onUpdateField, rewardSignUpFollower]
+   )
 
    return (
       <FormControl fullWidth>
