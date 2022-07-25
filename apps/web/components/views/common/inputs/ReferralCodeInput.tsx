@@ -1,10 +1,8 @@
 import { FormControl, FormHelperText, TextField } from "@mui/material"
 import React, { useCallback } from "react"
 import { useDebounce } from "react-use"
-import { userRepo } from "../../../../data/RepositoryInstances"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../../../../types/commonTypes"
-import { FirebaseReducer } from "react-redux-firebase"
 
 const styles = sxStyles({
    inputLabel: {
@@ -22,7 +20,6 @@ const styles = sxStyles({
 const ReferralCodeInput = ({
    name,
    referralCodeValue,
-   currentUser,
    onUpdateField,
    onChange,
    isValid,
@@ -37,53 +34,29 @@ const ReferralCodeInput = ({
    )
 
    const handleReferralCodeDebounced = useCallback(
-      (referralCode) => {
+      async (referralCode) => {
          // if referral code input still not valid, we want to check if the new one is valid
          // after 1st validation of the referral code we do not want the user to insert a new onex
          if (referralCode && !isValid) {
             onSetIsValid(false)
 
-            userRepo
-               .getUserByReferralCode(referralCode)
-               .then((referralUser) => {
-                  const { id, firstName, lastName } = referralUser
-                  const { email: currentUserId } = currentUser
+            try {
+               const { data: fieldToUpdate } = await rewardSignUpFollower(
+                  referralCode
+               )
 
-                  // check if the added referral code is not the current user referral code
-                  if (referralUser && id !== currentUserId) {
-                     const fieldToUpdate = {
-                        referredBy: {
-                           uid: id,
-                           name: `${firstName} ${lastName}`,
-                           referralCode: referralCode,
-                        } as ReferralData,
-                     }
-
-                     onSetIsValid(true)
-                     onUpdateField(fieldToUpdate)
-
-                     // add current user information to the referral code user
-                     rewardSignUpFollower(currentUserId, referralUser).catch(
-                        console.error
-                     )
-                  }
-               })
-               .catch(() => {
-                  // to reset the referredBy field on db
-                  if (isValid) {
-                     const fieldToUpdate = {
-                        referredBy: {},
-                     }
-                     onUpdateField(fieldToUpdate)
-                  }
-
-                  console.warn(
-                     `Invalid referral code: ${referralCode}, no corresponding user.`
-                  )
-               })
+               if (fieldToUpdate) {
+                  onSetIsValid(true)
+                  onUpdateField({ referredBy: fieldToUpdate })
+               }
+            } catch {
+               console.error(
+                  `Invalid referral code: ${referralCode}, no corresponding user.`
+               )
+            }
          }
       },
-      [currentUser, isValid, onSetIsValid, onUpdateField, rewardSignUpFollower]
+      [isValid, onSetIsValid, onUpdateField, rewardSignUpFollower]
    )
 
    return (
@@ -114,16 +87,9 @@ const ReferralCodeInput = ({
    )
 }
 
-type ReferralData = {
-   uid: string
-   name: string
-   referralCode: string
-}
-
 type Props = {
    name: string
    referralCodeValue: string
-   currentUser: FirebaseReducer.AuthState
    onUpdateField: (field) => void
    onChange: (event) => void
    isValid: boolean
