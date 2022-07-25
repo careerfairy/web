@@ -69,6 +69,7 @@ exports.sendReminderEmailsWhenLivestreamStarts =
    reminders.sendReminderEmailsWhenLivestreamStarts
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
+exports.reminderTest = reminders.reminderTest
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =

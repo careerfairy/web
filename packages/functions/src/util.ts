@@ -91,6 +91,114 @@ export const generateEmailData = (
    }
 }
 
+export const generateReminderEmailData = ({
+   stream,
+   emailTemplateId,
+   minutesToRemindBefore,
+}) => {
+   const {
+      company,
+      title,
+      externalEventLink,
+      speakers: [firstSpeaker],
+      start,
+      // registeredStudents,
+      // registeredUsers,
+      timezone,
+      id: streamId,
+      // language
+   } = stream
+
+   const luxonStartDate = DateTime.fromJSDate(start.toDate(), {
+      zone: timezone || "Europe/Zurich",
+   })
+
+   const formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+
+   console.log("formattedDate -> ", formattedDate)
+
+   const dateToDelivery = minutesToRemindBefore
+      ? luxonStartDate.minus({ minutes: minutesToRemindBefore }).toRFC2822()
+      : 0
+
+   console.log("dateToDelivery -> ", dateToDelivery)
+
+   const {
+      firstName: speakerFirstName,
+      lastName: speakerLastName,
+      position: speakerPosition,
+   } = firstSpeaker
+
+   // const templateData = registeredStudents.reduce((acc, registeredStudent) => {
+   //    const {id: studentEmail, firstName, lastName} = registeredStudent
+   //
+   //    const emailData = {
+   //       companyName: company,
+   //       userFirstName: `${firstName} ${lastName}`,
+   //       streamTitle: title,
+   //       formattedDateTime: formattedDate,
+   //       speaker1Name: `${speakerFirstName} ${speakerLastName}`,
+   //       speaker1JobTitle: speakerPosition,
+   //       upcomingStreamLink: externalEventLink ? externalEventLink : getStreamLink(streamId),
+   //       german: language === "DE",
+   //    }
+   //
+   //    return {
+   //       ...acc,
+   //       [studentEmail] : emailData
+   //    }
+   // }, {})
+   //
+   // const mailData = {
+   //    from: "CareerFairy <noreply@careerfairy.io>",
+   //    to: registeredUsers,
+   //    subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
+   //    template: emailTemplateId,
+   //    "recipient-variables": JSON.stringify(templateData),
+   //    "o:deliverytime": dateToDelivery,
+   // }
+
+   const templateData = {
+      "yojiwod814@logodez.com": {
+         companyName: company,
+         userFirstName: "Ze Bone",
+         streamTitle: title,
+         formattedDateTime: formattedDate,
+         speaker1Name: `${speakerFirstName} ${speakerLastName}`,
+         speaker1JobTitle: speakerPosition,
+         upcomingStreamLink: externalEventLink
+            ? externalEventLink
+            : getStreamLink(streamId),
+      },
+      "tonoli8027@altpano.com": {
+         companyName: company,
+         userFirstName: "Gonçalo Santos",
+         streamTitle: title,
+         formattedDateTime: formattedDate,
+         speaker1Name: `${speakerFirstName} ${speakerLastName}`,
+         speaker1JobTitle: speakerPosition,
+         upcomingStreamLink: externalEventLink
+            ? externalEventLink
+            : getStreamLink(streamId),
+      },
+   }
+
+   const mailData = {
+      from: "CareerFairy <noreply@careerfairy.io>",
+      to: ["tonoli8027@altpano.com", "yojiwod814@logodez.com"],
+      subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
+      template: emailTemplateId,
+      "recipient-variables": JSON.stringify(templateData),
+      "o:deliverytime": dateToDelivery,
+   }
+
+   return mailData
+}
+
+export const addMinutesDate = (date, minutes) => {
+   return new Date(date.getTime() + minutes * 60000)
+}
+
 export const getArrayDifference = (array1, array2) => {
    return array2.filter((element) => {
       return !array1.includes(element)
