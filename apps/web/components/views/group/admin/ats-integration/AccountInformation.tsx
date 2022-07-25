@@ -5,6 +5,7 @@ import { useMemo } from "react"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import SyncStatusButtonDialog from "./SyncStatusButtonDialog"
+import RemoveLinkedAccountButton from "./RemoveLinkedAccountButton"
 
 type Props = {
    atsAccount: GroupATSAccount
@@ -49,10 +50,13 @@ const AccountInformation = ({ atsAccount }: Props) => {
             mt={1}
             pr={3}
          >
-            <SyncStatusButtonDialog
-               groupId={atsAccount.groupId}
-               integrationId={atsAccount.id}
-            />
+            <Box mr={1}>
+               <SyncStatusButtonDialog
+                  groupId={atsAccount.groupId}
+                  integrationId={atsAccount.id}
+               />
+            </Box>
+            <RemoveLinkedAccountButton atsAccount={atsAccount} />
          </Box>
          <Box p={2}>
             <Table data={jobsToRows} columns={columns} title={"Jobs"} />
