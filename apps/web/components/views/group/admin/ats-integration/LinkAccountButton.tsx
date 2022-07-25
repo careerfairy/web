@@ -2,12 +2,12 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { useSelector } from "react-redux"
 import { groupSelector } from "../../../../../store/selectors/groupSelectors"
-import { useSnackbar } from "notistack"
 import { useCallback, useEffect, useReducer } from "react"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import * as Sentry from "@sentry/nextjs"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { useMergeLink } from "@mergeapi/react-merge-link"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 
 const initialState = {
    isLoading: false,
@@ -43,7 +43,7 @@ const { start, linkTokenGrabbed, mergeLinkReady, complete } = atsState.actions
 
 const LinkAccountButton = ({ title }: { title: string }) => {
    const group: Group = useSelector(groupSelector)
-   const { enqueueSnackbar } = useSnackbar()
+   const { errorNotification } = useSnackbarNotifications()
    const [state, dispatch] = useReducer(atsState.reducer, initialState)
 
    const startLink = async () => {
@@ -58,13 +58,9 @@ const LinkAccountButton = ({ title }: { title: string }) => {
 
          dispatch(linkTokenGrabbed(response.link_token))
       } catch (e) {
-         Sentry.captureException(e)
-         enqueueSnackbar(
-            "The integration call with the ATS system failed, try again later",
-            {
-               variant: "error",
-               preventDuplicate: true,
-            }
+         errorNotification(
+            e,
+            "The integration call with the ATS system failed, try again later"
          )
          dispatch(complete())
       }
@@ -96,7 +92,7 @@ const MergeDialogConnector = ({
    integrationId,
    dispatch,
 }) => {
-   const { enqueueSnackbar } = useSnackbar()
+   const { errorNotification } = useSnackbarNotifications()
 
    // Finalize the integration
    const onSuccess = useCallback(
@@ -108,13 +104,9 @@ const MergeDialogConnector = ({
                   dispatch(complete())
                })
          } catch (e) {
-            Sentry.captureException(e)
-            enqueueSnackbar(
-               "We could not finalize the ATS setup, try again later",
-               {
-                  variant: "error",
-                  preventDuplicate: true,
-               }
+            errorNotification(
+               e,
+               "We could not finalize the ATS setup, try again later"
             )
          }
       },
