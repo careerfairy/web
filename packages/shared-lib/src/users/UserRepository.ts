@@ -1,11 +1,5 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
-import {
-   AdditionalInformationProps,
-   RegistrationStep,
-   RegistrationStepAnalyticsProps,
-   SavedRecruiter,
-   UserData,
-} from "./users"
+import { RegistrationStep, SavedRecruiter, UserData } from "./users"
 import firebase from "firebase/compat/app"
 
 export interface IUserRepository {
@@ -23,24 +17,16 @@ export interface IUserRepository {
 
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
 
-   updateAdditionalInformation({
-      userEmail,
-      gender,
-      spokenLanguages,
-      countriesOfInterest,
-      regionsOfInterest,
-      isLookingForJob,
-      interestsIds,
-      referredBy,
-      linkedinUrl,
-      fieldOfStudy,
-   }: AdditionalInformationProps): Promise<void>
+   updateAdditionalInformation(
+      userEmail: string,
+      fields: Partial<UserData>
+   ): Promise<void>
 
-   setRegistrationStepStatus({
-      userEmail,
-      stepId,
-      totalSteps,
-   }: RegistrationStepAnalyticsProps): Promise<void>
+   setRegistrationStepStatus(
+      userEmail: string,
+      stepId: string,
+      totalSteps: number
+   ): Promise<void>
 
    getUserByReferralCode(referralCode): Promise<UserData>
 }
@@ -142,19 +128,20 @@ export class FirebaseUserRepository
       return users.filter((user) => user !== null)
    }
 
-   updateAdditionalInformation({
-      userEmail,
-      gender,
-      spokenLanguages,
-      countriesOfInterest,
-      regionsOfInterest,
-      isLookingForJob,
-      interestsIds,
-      linkedinUrl,
-      referredBy,
-      fieldOfStudy,
-   }): Promise<void> {
+   updateAdditionalInformation(userEmail, fields): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
+
+      const {
+         gender,
+         spokenLanguages,
+         countriesOfInterest,
+         regionsOfInterest,
+         isLookingForJob,
+         interestsIds,
+         linkedinUrl,
+         referredBy,
+         fieldOfStudy,
+      } = fields
 
       const genderToUpdate = gender ? { gender } : {}
       const interestsToUpdate = interestsIds ? { interestsIds } : {}
@@ -188,11 +175,11 @@ export class FirebaseUserRepository
       return userRef.update(toUpdate)
    }
 
-   async setRegistrationStepStatus({
+   async setRegistrationStepStatus(
       userEmail,
       stepId,
-      totalSteps,
-   }): Promise<void> {
+      totalSteps
+   ): Promise<void> {
       const userRef = this.firestore
          .collection("userData")
          .doc(userEmail)

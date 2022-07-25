@@ -62,7 +62,6 @@ const SignUp = () => {
 
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
    const [currentStep, setCurrentStep] = useState(0)
-   const [stepAnalytics, setStepAnalytics] = useState([])
    const isLastStep = currentStep === steps.length - 1
    const totalSteps = steps.length - 2
    const isFirstStep = currentStep === 0
@@ -96,11 +95,11 @@ const SignUp = () => {
       async (stepId: string, totalSteps: number) => {
          const { userEmail } = userData
          try {
-            await userRepo.setRegistrationStepStatus({
+            await userRepo.setRegistrationStepStatus(
                userEmail,
                stepId,
-               totalSteps,
-            })
+               totalSteps
+            )
          } catch (error) {
             console.log(error)
          }

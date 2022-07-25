@@ -80,24 +80,6 @@ export interface UserPublicData {
    badges?: string[]
 }
 
-export type ReferralData = {
-   uid: string
-   name: string
-   referralCode: string
-}
-export type AdditionalInformationProps = {
-   userEmail: string
-   gender?: string
-   spokenLanguages?: string[]
-   countriesOfInterest?: string[]
-   regionsOfInterest?: string[]
-   interestsIds?: string[]
-   isLookingForJob?: boolean
-   linkedinUrl?: string
-   referredBy?: ReferralData
-   fieldOfStudy?: string
-}
-
 export type RegistrationStep = {
    userId: string
    steps: string[]
@@ -108,12 +90,6 @@ export type RegistrationStep = {
 export type UserDataAnalytics = {
    registrationSteps: RegistrationStep
 } & Identifiable
-
-export type RegistrationStepAnalyticsProps = {
-   userEmail: string
-   stepId: string
-   totalSteps: number
-}
 
 /**
  * Public information about a user
