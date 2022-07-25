@@ -78,7 +78,14 @@ export interface MergeSyncStatus {
 |--------------------------------------------------------------------------
 */
 export type MergePaginatedResponse<T> = {
+   /**
+    * Next cursor id
+    */
    next: string
+
+   /**
+    * Previous cursor id
+    */
    previous: string
    results: T[]
 }
