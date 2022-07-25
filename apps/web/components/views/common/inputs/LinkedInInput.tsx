@@ -13,14 +13,19 @@ const LinkedInInput = ({
       linkedInValue,
    ])
 
-   const handleLinkedInDebounced = useCallback((linkedInLink) => {
-      if (linkedInLink) {
-         const fieldToUpdate = {
-            linkedinUrl: isValidLinkedInLink(linkedInLink) ? linkedInLink : "",
+   const handleLinkedInDebounced = useCallback(
+      (linkedInLink) => {
+         if (linkedInLink) {
+            const fieldToUpdate = {
+               linkedinUrl: isValidLinkedInLink(linkedInLink)
+                  ? linkedInLink
+                  : "",
+            }
+            onUpdateField(fieldToUpdate)
          }
-         onUpdateField(fieldToUpdate)
-      }
-   }, [])
+      },
+      [onUpdateField]
+   )
 
    return (
       <TextField
