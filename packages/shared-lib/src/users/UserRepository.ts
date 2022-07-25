@@ -1,11 +1,8 @@
 import firebase from "firebase/app"
 import BaseFirebaseRepository, {
    mapFirestoreDocuments,
-   Unsubscribe,
 } from "../BaseFirebaseRepository"
-import { SavedRecruiter, UserData, UserGroupData } from "./users"
-import { LivestreamGroupQuestionsMap } from "../livestreams"
-const cloneDeep = require("lodash.clonedeep")
+import { SavedRecruiter, UserData } from "./users"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -26,18 +23,6 @@ export interface IUserRepository {
       options?: { withEmpty: boolean }
    ): Promise<UserData[]>
    getAllUsers(): Promise<UserData[]>
-   listenToUserGroupQuestions(
-      userEmail: string,
-      groupId: string,
-      callback: firebase.firestore.DocumentSnapshot<UserGroupData>
-   ): Unsubscribe
-   getUserGroupDataByGroupId(userEmail: string, groupId): Promise<UserGroupData>
-   mapUserAnswersToLivestreamGroupQuestionWithAnswers(
-      userEmail: string,
-      livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap
-   ): Promise<LivestreamGroupQuestionsMap>
-   getAllUserGroupDataIds(userEmail: string): Promise<string[]>
-   deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -171,104 +156,8 @@ export class FirebaseUserRepository
       return totalUsers
    }
 
-   async getAllUserGroupData(userEmail: string): Promise<UserGroupData[]> {
-      const userGroupDataRef = await this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("userGroups")
-         .get()
-      return mapFirestoreDocuments<UserGroupData>(userGroupDataRef)
-   }
-
-   async deleteUserGroupData(
-      userEmail: string,
-      groupId: string
-   ): Promise<void> {
-      return await this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("userGroups")
-         .doc(groupId)
-         .delete()
-   }
-   async getUserGroupDataByGroupId(
-      userEmail: string,
-      groupId
-   ): Promise<UserGroupData> {
-      const userGroupSnap = await this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("userGroups")
-         .doc(groupId)
-         .get()
-      return userGroupSnap.exists
-         ? ({ id: userGroupSnap.id, ...userGroupSnap.data() } as UserGroupData)
-         : null
-   }
-
-   async getAllUserGroupDataIds(userEmail: string): Promise<string[]> {
-      const userGroupDataSnap = await this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("userGroups")
-         .get()
-      return userGroupDataSnap.docs.map((doc) => doc.id)
-   }
-
    async getAllUsers(): Promise<UserData[]> {
       const users = await this.firestore.collection("userData").get()
       return mapFirestoreDocuments<UserData>(users, true)
-   }
-   listenToUserGroupQuestions(
-      userEmail: string,
-      groupId: string,
-      callback: firebase.firestore.DocumentSnapshot<UserGroupData>
-   ): Unsubscribe {
-      const ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("userGroups")
-         .doc(groupId)
-      // @ts-ignore
-      return ref.onSnapshot(callback)
-   }
-
-   /*
-    *
-    * */
-   async mapUserAnswersToLivestreamGroupQuestionWithAnswers(
-      userEmail: string,
-      livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap
-   ): Promise<LivestreamGroupQuestionsMap> {
-      let livestreamGroupQuestionsMapWithUserAnswers: LivestreamGroupQuestionsMap =
-         cloneDeep(livestreamGroupQuestionsMap)
-      for (const groupDataWithQuestions of Object.values(
-         livestreamGroupQuestionsMap || {}
-      )) {
-         const userGroupQuestionAnswers = await this.getUserGroupDataByGroupId(
-            userEmail,
-            groupDataWithQuestions.groupId
-         )
-         Object.values(groupDataWithQuestions.questions).forEach(
-            (groupQuestion) => {
-               const userSelectedAnswerId =
-                  userGroupQuestionAnswers?.questions?.[groupQuestion.id]
-               const validAnswerId =
-                  groupQuestion?.options?.[userSelectedAnswerId]
-               const question =
-                  livestreamGroupQuestionsMapWithUserAnswers[
-                     groupDataWithQuestions.groupId
-                  ]?.questions?.[groupQuestion.id]
-
-               if (validAnswerId) {
-                  question.selectedOptionId = userSelectedAnswerId
-               } else {
-                  question.selectedOptionId = null
-                  question.isNew = true
-               }
-            }
-         )
-      }
-      return livestreamGroupQuestionsMapWithUserAnswers
    }
 }

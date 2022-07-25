@@ -16,7 +16,6 @@ import PropTypes from "prop-types"
 import useStreamRef from "../../components/custom-hook/useStreamRef"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import StatsUtil from "../../data/util/StatsUtil"
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu"
 import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
@@ -24,9 +23,8 @@ import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
 import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance"
 import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
-import { userRepo } from "../../data/RepositoryInstances"
+import { groupRepo } from "../../data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
-import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -233,9 +231,9 @@ const ViewerLayout = (props) => {
                   currentLivestream.groupIds
                )
                const answeredLivestreamGroupQuestions =
-                  await userRepo.mapUserAnswersToLivestreamGroupQuestionWithAnswers(
-                     userData?.userEmail,
-                     currentLivestream.groupQuestionsMap
+                  await groupRepo.mapUserAnswersToLivestreamGroupQuestion(
+                     userData,
+                     currentLivestream
                   )
                const hasAnsweredAllQuestions =
                   checkIfUserHasAnsweredAllLivestreamGroupQuestions(

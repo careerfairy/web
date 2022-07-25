@@ -20,7 +20,7 @@ import Link from "../../common/Link"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../../store/actions"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
-import { groupRepo, userRepo } from "../../../../data/RepositoryInstances"
+import { groupRepo } from "../../../../data/RepositoryInstances"
 import Autocomplete from "@mui/material/Autocomplete"
 import match from "autosuggest-highlight/match"
 import parse from "autosuggest-highlight/parse"
@@ -122,7 +122,7 @@ const Groups = () => {
                )
                setGroups(adminGroups)
             } else if (value === "joined") {
-               const groupDataIds = await userRepo.getAllUserGroupDataIds(
+               const groupDataIds = await groupRepo.getAllUserGroupDataIds(
                   authenticatedUser.email
                )
                const joinedGroups = await groupRepo.getGroupsByIds(groupDataIds)

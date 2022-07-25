@@ -459,6 +459,7 @@ const backfillUsers = (
          ...updateData,
          university: {
             ...userData.university,
+            groupId: university?.id || null,
             questions: convertUserGroupCategoriesToQuestionWithAnswerMap(
                userData,
                university?.id,

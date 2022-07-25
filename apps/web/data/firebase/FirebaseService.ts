@@ -23,6 +23,7 @@ import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livest
 import {
    getLivestreamGroupQuestionAnswers,
    ParticipatingStudent,
+   RegisteredStudent,
    UserData,
    UserGroupData,
    UserLivestreamGroupQuestionAnswers,
@@ -2206,7 +2207,7 @@ class FirebaseService {
                dateRegistered: this.getServerTimestamp(),
                authId: uid,
                livestreamGroupQuestionAnswers: userQuestionsAndAnswersDict,
-            })
+            } as RegisteredStudent)
 
             // To be used from now on
             transaction.set(

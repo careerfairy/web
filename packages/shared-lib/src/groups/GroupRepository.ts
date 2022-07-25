@@ -5,6 +5,9 @@ import {
    OnSnapshotCallback,
    Unsubscribe,
 } from "../BaseFirebaseRepository"
+import { UserData, UserGroupData } from "../users"
+import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+const cloneDeep = require("lodash.clonedeep")
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -42,6 +45,14 @@ export interface IGroupRepository {
    getGroupCustomQuestionsQuery(
       groupId: string
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
+   mapUserAnswersToLivestreamGroupQuestions(
+      userData: UserData,
+      livestream: LivestreamEvent
+   ): Promise<LivestreamGroupQuestionsMap>
+   getUserGroupDataByGroupId(userEmail: string, groupId): Promise<UserGroupData>
+
+   getAllUserGroupDataIds(userEmail: string): Promise<string[]>
+   deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository implements IGroupRepository {
@@ -244,5 +255,159 @@ export class FirebaseGroupRepository implements IGroupRepository {
          .collection("careerCenterData")
          .get()
       return mapFirestoreDocuments<Group>(groupSnapshots)
+   }
+
+   /*
+    * Goes and fetches a user's university group level and field of study questions
+    * and add them to the event group questions
+    * */
+   private async addUniversityLevelAndFieldOfStudyQuestionsToEventQuestions(
+      userUniversityGroupId: string,
+      eventGroupQuestions: LivestreamGroupQuestionsMap
+   ): Promise<LivestreamGroupQuestionsMap> {
+      let eventQuestions = { ...eventGroupQuestions }
+      // fetch the group's field and level of study questions and add them
+      const [fieldOfStudyQuestion, levelOfStudyQuestion] = await Promise.all([
+         this.getFieldOrLevelOfStudyGroupQuestion(
+            userUniversityGroupId,
+            "fieldOfStudy"
+         ),
+         this.getFieldOrLevelOfStudyGroupQuestion(
+            userUniversityGroupId,
+            "levelOfStudy"
+         ),
+      ])
+
+      if (fieldOfStudyQuestion) {
+         eventQuestions = FirebaseGroupRepository.addQuestionToMap(
+            eventGroupQuestions,
+            userUniversityGroupId,
+            fieldOfStudyQuestion
+         )
+      }
+      if (levelOfStudyQuestion) {
+         eventQuestions = FirebaseGroupRepository.addQuestionToMap(
+            eventGroupQuestions,
+            userUniversityGroupId,
+            levelOfStudyQuestion
+         )
+      }
+
+      return eventQuestions
+   }
+
+   private static addQuestionToMap(
+      groupQuestionsMap: LivestreamGroupQuestionsMap,
+      groupId: string,
+      question: GroupQuestion
+   ): LivestreamGroupQuestionsMap {
+      return {
+         ...groupQuestionsMap,
+         [groupId]: {
+            groupId: groupId,
+            ...groupQuestionsMap[groupId],
+            questions: {
+               ...groupQuestionsMap[groupId]?.questions,
+               [question.id]: question,
+            },
+         },
+      }
+   }
+   /*
+    * Takes the groups questions from an event and then fetches and maps the user's
+    * answers to each of the questions
+    * */
+   async mapUserAnswersToLivestreamGroupQuestions(
+      userData: UserData,
+      livestream: LivestreamEvent
+   ): Promise<LivestreamGroupQuestionsMap> {
+      let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap = cloneDeep(
+         livestream.groupQuestionsMap
+      )
+      const userUniversityGroupId = userData.university.groupId
+      const usersUniversityIsInEvent = livestream.groupIds.includes(
+         userUniversityGroupId
+      )
+      if (usersUniversityIsInEvent) {
+         livestreamGroupQuestionsMap =
+            await this.addUniversityLevelAndFieldOfStudyQuestionsToEventQuestions(
+               userUniversityGroupId,
+               livestreamGroupQuestionsMap
+            )
+      }
+      const arrayOfGroups = Object.values(livestreamGroupQuestionsMap || {})
+
+      for (const groupDataWithQuestions of arrayOfGroups) {
+         const userGroupQuestionAnswers = await this.getUserGroupDataByGroupId(
+            userData.userEmail,
+            groupDataWithQuestions.groupId
+         )
+         Object.values(groupDataWithQuestions.questions).forEach(
+            (groupQuestion) => {
+               const userSelectedAnswerId =
+                  userGroupQuestionAnswers?.questions?.[groupQuestion.id]
+               const validAnswerId =
+                  groupQuestion?.options?.[userSelectedAnswerId]
+               const question =
+                  livestreamGroupQuestionsMap[groupDataWithQuestions.groupId]
+                     ?.questions?.[groupQuestion.id]
+
+               if (validAnswerId) {
+                  question.selectedOptionId = userSelectedAnswerId
+               } else {
+                  question.selectedOptionId = null
+                  question.isNew = true
+               }
+            }
+         )
+      }
+      return livestreamGroupQuestionsMap
+   }
+   /*
+    * User group data methods
+    * */
+
+   async getAllUserGroupData(userEmail: string): Promise<UserGroupData[]> {
+      const userGroupDataRef = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userGroups")
+         .get()
+      return mapFirestoreDocuments<UserGroupData>(userGroupDataRef)
+   }
+
+   async deleteUserGroupData(
+      userEmail: string,
+      groupId: string
+   ): Promise<void> {
+      return await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userGroups")
+         .doc(groupId)
+         .delete()
+   }
+   async getUserGroupDataByGroupId(
+      userEmail: string,
+      groupId
+   ): Promise<UserGroupData> {
+      const userGroupSnap = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userGroups")
+         .doc(groupId)
+         .get()
+      return userGroupSnap.exists
+         ? ({ id: userGroupSnap.id, ...userGroupSnap.data() } as UserGroupData)
+         : null
+   }
+
+   async getAllUserGroupDataIds(userEmail: string): Promise<string[]> {
+      const userGroupDataSnap = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userGroups")
+         .get()
+      return userGroupDataSnap.docs.map((doc) => doc.id)
    }
 }

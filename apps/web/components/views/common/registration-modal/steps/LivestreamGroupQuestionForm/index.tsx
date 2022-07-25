@@ -15,7 +15,7 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import GroupLogo from "../../common/GroupLogo"
 import LivestreamGroupQuestionsSelector from "../../../../profile/LivestreamGroupQuestionsSelector"
 import Stack from "@mui/material/Stack"
-import { userRepo } from "../../../../../../data/RepositoryInstances"
+import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
 import { Formik } from "formik"
 import {
@@ -59,9 +59,9 @@ const LivestreamGroupQuestionForm = () => {
          try {
             setCheckingQuestions(true)
             const answeredLivestreamGroupQuestions =
-               await userRepo.mapUserAnswersToLivestreamGroupQuestionWithAnswers(
-                  userData?.userEmail,
-                  livestream.groupQuestionsMap
+               await groupRepo.mapUserAnswersToLivestreamGroupQuestion(
+                  userData,
+                  livestream
                )
             const hasAnsweredAllQuestions =
                checkIfUserHasAnsweredAllLivestreamGroupQuestions(
@@ -74,10 +74,17 @@ const LivestreamGroupQuestionForm = () => {
                   Object.assign({}, prevState, answeredLivestreamGroupQuestions)
                )
             }
-         } catch (e) {}
+         } catch (e) {
+            console.error(e)
+         }
          setCheckingQuestions(false)
       })()
    }, [livestream.groupQuestionsMap, userData?.userEmail, hasAgreedToAll])
+
+   const handleSubmit = async (values: LivestreamGroupQuestionsMap) => {
+      await completeRegistrationProcess(values)
+      onQuestionsAnswered?.(values)
+   }
 
    if (checkingQuestions || gettingPolicyStatus) {
       return (
@@ -85,11 +92,6 @@ const LivestreamGroupQuestionForm = () => {
             <CircularProgress />
          </div>
       )
-   }
-
-   const handleSubmit = async (values: LivestreamGroupQuestionsMap) => {
-      await completeRegistrationProcess(values)
-      onQuestionsAnswered?.(values)
    }
 
    return (
@@ -112,9 +114,7 @@ const LivestreamGroupQuestionForm = () => {
             return (
                <>
                   <DialogTitle>
-                     {livestream?.hasStarted && group?.universityName
-                        ? `${group.universityName} Would Like To Know More About You`
-                        : "Join live streams from"}
+                     {`${livestream.company} Would Like To Know More About You`}
                   </DialogTitle>
                   <GroupLogo
                      logoUrl={livestream?.companyLogoUrl}

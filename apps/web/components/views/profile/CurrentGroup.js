@@ -20,7 +20,7 @@ import Skeleton from "@mui/material/Skeleton"
 import Link from "next/link"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
-import { userRepo } from "../../../data/RepositoryInstances"
+import { groupRepo } from "../../../data/RepositoryInstances"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -107,7 +107,7 @@ const CurrentGroup = ({
    const handleLeaveGroup = async () => {
       try {
          setLeaving(true)
-         await userRepo.deleteUserGroupData(userData.userEmail, group.id)
+         await groupRepo.deleteUserGroupData(userData.userEmail, group.id)
          setDeleted(true)
          setLeaving(false)
          setOpen(false)

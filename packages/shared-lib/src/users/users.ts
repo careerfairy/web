@@ -16,6 +16,7 @@ export interface UserData extends Identifiable {
       id: string
    }
    university: {
+      groupId: string
       code: string
       name: string
       questions: UserGroupQuestionsWithAnswerMap
