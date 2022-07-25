@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import React, { Fragment, useContext, useMemo, useState } from "react"
+import React, { Fragment, useContext, useState } from "react"
 import { Formik } from "formik"
 import {
    Box,
@@ -80,6 +80,19 @@ const schema = yup.object().shape({
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
 })
 
+const initValues = {
+   firstName: "",
+   lastName: "",
+   email: "",
+   password: "",
+   confirmPassword: "",
+   agreeTerm: false,
+   subscribed: false,
+   university: { code: "other", name: "Other" },
+   universityCountryCode: "",
+   gender: "",
+}
+
 function SignUpUserForm() {
    const firebase = useFirebaseService()
    const {
@@ -92,22 +105,6 @@ function SignUpUserForm() {
    const [errorMessage, setErrorMessage] = useState(null)
    const [generalLoading, setGeneralLoading] = useState(false)
    const [open, setOpen] = React.useState(false)
-
-   const initValues = useMemo(
-      () => ({
-         firstName: "",
-         lastName: "",
-         email: "",
-         password: "",
-         confirmPassword: "",
-         agreeTerm: false,
-         subscribed: false,
-         university: { code: "other", name: "Other" },
-         universityCountryCode: "",
-         gender: "",
-      }),
-      []
-   )
 
    const submitting = (isSubmitting) => {
       return isSubmitting || emailSent || generalLoading

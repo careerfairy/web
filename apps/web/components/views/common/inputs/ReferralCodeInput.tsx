@@ -1,0 +1,122 @@
+import { FormControl, FormHelperText, TextField } from "@mui/material"
+import React, { useCallback } from "react"
+import { useDebounce } from "react-use"
+import { userRepo } from "../../../../data/RepositoryInstances"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
+import { sxStyles } from "../../../../types/commonTypes"
+import { FirebaseReducer } from "react-redux-firebase"
+import { ReferralData } from "@careerfairy/shared-lib/dist/users"
+
+const styles = sxStyles({
+   inputLabel: {
+      textTransform: "uppercase",
+      fontSize: "0.8rem !important",
+      fontWeight: "bold",
+   },
+   helperText: {
+      marginTop: 1,
+      fontSize: "0.8rem !important",
+      fontWeight: "bold",
+   },
+})
+
+const ReferralCodeInput = ({
+   referralCodeValue,
+   currentUser,
+   onUpdateField,
+   onChange,
+   isValid,
+   onSetIsValid,
+}: Props) => {
+   const { rewardSignUpFollower } = useFirebaseService()
+
+   const [] = useDebounce(
+      () => handleReferralCodeDebounced(referralCodeValue),
+      1000,
+      [referralCodeValue]
+   )
+
+   const handleReferralCodeDebounced = useCallback((referralCode) => {
+      // if referral code input still not valid, we want to check if the new one is valid
+      // after 1st validation of the referral code we do not want the user to insert a new onex
+      if (referralCode && !isValid) {
+         onSetIsValid(false)
+
+         userRepo
+            .getUserByReferralCode(referralCode)
+            .then((referralUser) => {
+               const { id, firstName, lastName } = referralUser
+               const { email: currentUserId } = currentUser
+
+               // check if the added referral code is not the current user referral code
+               if (referralUser && id !== currentUserId) {
+                  const fieldToUpdate = {
+                     referredBy: {
+                        uid: id,
+                        name: `${firstName} ${lastName}`,
+                        referralCode: referralCode,
+                     } as ReferralData,
+                  }
+
+                  onSetIsValid(true)
+                  onUpdateField(fieldToUpdate)
+
+                  // add current user information to the referral code user
+                  rewardSignUpFollower(currentUserId, referralUser).catch(
+                     console.error
+                  )
+               }
+            })
+            .catch(() => {
+               // to reset the referredBy field on db
+               if (isValid) {
+                  const fieldToUpdate = {
+                     referredBy: {},
+                  }
+                  onUpdateField(fieldToUpdate)
+               }
+
+               console.warn(
+                  `Invalid referral code: ${referralCode}, no corresponding user.`
+               )
+            })
+      }
+   }, [])
+
+   return (
+      <FormControl fullWidth>
+         <TextField
+            className="registrationInput"
+            variant="outlined"
+            fullWidth
+            id="referralCode"
+            name="referralCode"
+            placeholder="Enter a Referral Code"
+            InputLabelProps={{ shrink: true }}
+            onChange={onChange}
+            disabled={isValid}
+            value={referralCodeValue}
+            label="Copy-paste here your referral code"
+            error={!!referralCodeValue.length && !isValid}
+         />
+         {isValid && (
+            <FormHelperText
+               sx={styles.helperText}
+               id="referralCode-helper-text"
+            >
+               The referral code was successfully validated
+            </FormHelperText>
+         )}
+      </FormControl>
+   )
+}
+
+type Props = {
+   referralCodeValue: string
+   currentUser: FirebaseReducer.AuthState
+   onUpdateField: (field) => void
+   onChange: (event) => void
+   isValid: boolean
+   onSetIsValid: (isValid: boolean) => void
+}
+export default ReferralCodeInput
