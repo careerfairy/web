@@ -169,6 +169,41 @@ export const fetchATSSyncStatus = functions
       }
    })
 
+/**
+ * Remove a linked account from merge
+ */
+export const mergeRemoveAccount = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken({
+         data,
+         context,
+      })
+
+      try {
+         const mergeATS = new MergeATSRepository(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         await mergeATS.removeAccount()
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to remove ATS account",
+            e,
+            requestData
+         )
+      }
+
+      // delete ats docs
+      await groupRepo.removeATSIntegration(
+         requestData.groupId,
+         requestData.integrationId
+      )
+
+      return true
+   })
+
 /*
 |--------------------------------------------------------------------------
 | Utilities & Validations
