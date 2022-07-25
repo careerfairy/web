@@ -18,7 +18,6 @@ import LocationInformation from "../components/views/signup/steps/LocationInform
 import LoadingButton from "@mui/lab/LoadingButton"
 import { useRouter } from "next/router"
 import InterestsInformation from "../components/views/signup/steps/InterestsInformation"
-import { RegistrationStep } from "@careerfairy/shared-lib/dist/users"
 import { userRepo } from "../data/RepositoryInstances"
 
 export const SIGNUP_REDIRECT_PATH = "/portal"
@@ -94,12 +93,13 @@ const SignUp = () => {
    }
 
    const updateAnalytics = useCallback(
-      async (stepsToUpdate: RegistrationStep) => {
+      async (stepId: string, totalSteps: number) => {
          const { userEmail } = userData
          try {
             await userRepo.setRegistrationStepStatus({
                userEmail,
-               steps: stepsToUpdate,
+               stepId,
+               totalSteps,
             })
          } catch (error) {
             console.log(error)
@@ -110,28 +110,9 @@ const SignUp = () => {
 
    useEffect(() => {
       if (shouldUpdateStepAnalytics) {
-         const { userEmail } = userData
          const { description: stepId } = steps[currentStep]
-         let stepsToUpdate = stepAnalytics
 
-         const isCurrentStepAlreadyOnStepAnalytics = stepAnalytics.some(
-            (step) => step === stepId
-         )
-
-         if (!isCurrentStepAlreadyOnStepAnalytics) {
-            const newSteps = [...stepAnalytics, stepId]
-            setStepAnalytics(newSteps)
-            stepsToUpdate = newSteps
-         }
-
-         const fieldToUpdate = {
-            userId: userEmail,
-            steps: stepsToUpdate,
-            totalSteps,
-            updatedAt: new Date().toString(),
-         } as RegistrationStep
-
-         updateAnalytics(fieldToUpdate).catch(console.error)
+         updateAnalytics(stepId, totalSteps).catch(console.error)
       }
    }, [currentStep])
 
