@@ -1,6 +1,7 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import {
    AdditionalInformationProps,
+   RegistrationStep,
    RegistrationStepAnalyticsProps,
    SavedRecruiter,
    UserData,
@@ -37,7 +38,8 @@ export interface IUserRepository {
 
    setRegistrationStepStatus({
       userEmail,
-      steps,
+      stepId,
+      totalSteps,
    }: RegistrationStepAnalyticsProps): Promise<void>
 
    getUserByReferralCode(referralCode): Promise<UserData>
@@ -186,14 +188,31 @@ export class FirebaseUserRepository
       return userRef.update(toUpdate)
    }
 
-   async setRegistrationStepStatus({ userEmail, steps }): Promise<void> {
+   async setRegistrationStepStatus({
+      userEmail,
+      stepId,
+      totalSteps,
+   }): Promise<void> {
       const userRef = this.firestore
          .collection("userData")
          .doc(userEmail)
          .collection("analytics")
          .doc("analytics")
 
-      const toUpdate = { registrationSteps: steps }
+      // create base step analytics structure
+      const stepAnalytics = {
+         userId: userEmail,
+         totalSteps,
+         updatedAt: this.fieldValue.serverTimestamp(),
+      } as RegistrationStep
+
+      const toUpdate = {
+         registrationSteps: {
+            ...stepAnalytics,
+            // adding stepIds with arrayUnion in order to not repeat them
+            steps: this.fieldValue.arrayUnion(stepId),
+         },
+      }
       return userRef.set(toUpdate, { merge: true })
    }
 
