@@ -30,13 +30,18 @@ const styles = sxStyles({
    },
 })
 
+const COUNTRIES_OF_INTEREST_FIELD_NAME = "countriesOfInterest"
+const SPOKEN_LANGUAGES_FIELD_NAME = "spokenLanguages"
+const IS_LOOKING_FOR_JOB_FIELD_NAME = "isLookingForJob"
+
 const LocationInformation = () => {
    const { authenticatedUser: user, userData } = useAuth()
 
-   const [selectedCountriesAndRegions, setSelectedCountriesAndRegions] =
-      useState<Option[]>([])
-   const [selectedLanguages, setSelectedLanguages] = useState<Option[]>([])
-   const [isLookingForJobToggle, setIsLookingForJobToggle] = useState(false)
+   const [inputValues, setInputValues] = useState({
+      [COUNTRIES_OF_INTEREST_FIELD_NAME]: [] as Option[],
+      [SPOKEN_LANGUAGES_FIELD_NAME]: [] as Option[],
+      [IS_LOOKING_FOR_JOB_FIELD_NAME]: false,
+   })
 
    useEffect(() => {
       if (userData) {
@@ -47,16 +52,18 @@ const LocationInformation = () => {
             isLookingForJob,
          } = userData
 
-         setSelectedCountriesAndRegions(
-            formatToOptionArray(
+         debugger
+         setInputValues({
+            [COUNTRIES_OF_INTEREST_FIELD_NAME]: formatToOptionArray(
                [...regionsOfInterest, ...countriesOfInterest],
                countriesAndRegionsOptionCodes
-            )
-         )
-         setSelectedLanguages(
-            formatToOptionArray(spokenLanguages, languageOptionCodes)
-         )
-         setIsLookingForJobToggle(Boolean(isLookingForJob))
+            ),
+            [SPOKEN_LANGUAGES_FIELD_NAME]: formatToOptionArray(
+               spokenLanguages,
+               languageOptionCodes
+            ),
+            [IS_LOOKING_FOR_JOB_FIELD_NAME]: Boolean(isLookingForJob),
+         })
       }
    }, [userData])
 
@@ -120,9 +127,9 @@ const LocationInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <MultiListSelect
-                  inputName="spokenLanguagesInput"
+                  inputName={SPOKEN_LANGUAGES_FIELD_NAME}
                   isCheckbox
-                  selectedItems={selectedLanguages}
+                  selectedItems={inputValues[SPOKEN_LANGUAGES_FIELD_NAME]}
                   allValues={languageOptionCodes}
                   setFieldValue={handleSelectedLanguageChange}
                   inputProps={{
@@ -144,9 +151,9 @@ const LocationInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <MultiListSelect
-                  inputName="countriesOfInterestInput"
+                  inputName={COUNTRIES_OF_INTEREST_FIELD_NAME}
                   isCheckbox
-                  selectedItems={selectedCountriesAndRegions}
+                  selectedItems={inputValues[COUNTRIES_OF_INTEREST_FIELD_NAME]}
                   allValues={countriesAndRegionsOptionCodes}
                   getGroupByFn={mapGroupBy}
                   setFieldValue={handleSelectedCountriesChange}
@@ -167,8 +174,8 @@ const LocationInformation = () => {
                   Are you currently looking for a job?
                </Typography>
                <Switch
-                  id="isLookingForJobToggle"
-                  checked={isLookingForJobToggle}
+                  id={IS_LOOKING_FOR_JOB_FIELD_NAME}
+                  checked={inputValues[IS_LOOKING_FOR_JOB_FIELD_NAME]}
                   onChange={handleIsLookingForJobChange}
                   name="isLookingForJobToggle"
                   color="primary"
