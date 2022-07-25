@@ -21,6 +21,7 @@ const styles = sxStyles({
 })
 
 const ReferralCodeInput = ({
+   name,
    referralCodeValue,
    currentUser,
    onUpdateField,
@@ -89,8 +90,8 @@ const ReferralCodeInput = ({
             className="registrationInput"
             variant="outlined"
             fullWidth
-            id="referralCode"
-            name="referralCode"
+            id={name}
+            name={name}
             placeholder="Enter a Referral Code"
             InputLabelProps={{ shrink: true }}
             onChange={onChange}
@@ -112,6 +113,7 @@ const ReferralCodeInput = ({
 }
 
 type Props = {
+   name: string
    referralCodeValue: string
    currentUser: FirebaseReducer.AuthState
    onUpdateField: (field) => void

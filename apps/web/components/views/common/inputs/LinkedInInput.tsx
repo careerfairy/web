@@ -3,7 +3,12 @@ import React, { useCallback } from "react"
 import { useDebounce } from "react-use"
 import { linkedInRegex } from "../../../../constants/forms"
 
-const LinkedInInput = ({ linkedInValue, onUpdateField, onChange }: Props) => {
+const LinkedInInput = ({
+   name,
+   linkedInValue,
+   onUpdateField,
+   onChange,
+}: Props) => {
    const [] = useDebounce(() => handleLinkedInDebounced(linkedInValue), 1000, [
       linkedInValue,
    ])
@@ -22,8 +27,8 @@ const LinkedInInput = ({ linkedInValue, onUpdateField, onChange }: Props) => {
          className="registrationInput"
          variant="outlined"
          fullWidth
-         id="linkedInLink"
-         name="linkedInLink"
+         id={name}
+         name={name}
          placeholder="Enter your LinkedIn link"
          InputLabelProps={{ shrink: true }}
          onChange={onChange}
@@ -39,6 +44,7 @@ const isValidLinkedInLink = (link: string): boolean => {
 }
 
 type Props = {
+   name: string
    linkedInValue: string
    onUpdateField: (field) => void
    onChange: (event) => void
