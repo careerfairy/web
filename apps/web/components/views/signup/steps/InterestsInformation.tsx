@@ -20,42 +20,40 @@ const styles = sxStyles({
    },
 })
 
+const SELECTED_INTERESTS_FIELD_NAME = "interestsIds"
+
 const InterestsInformation = () => {
    const { data: allInterests } = useInterests()
    const { authenticatedUser: user, userData } = useAuth()
 
-   const [selectedInterests, setSelectedInterests] = useState<Option[]>([])
+   const [inputValues, setInputValues] = useState({
+      [SELECTED_INTERESTS_FIELD_NAME]: [] as Option[],
+   })
 
    useEffect(() => {
       if (userData) {
          const { interestsIds } = userData
 
-         setSelectedInterests(formatToOptionArray(interestsIds, allInterests))
+         setInputValues({
+            [SELECTED_INTERESTS_FIELD_NAME]: formatToOptionArray(
+               interestsIds,
+               allInterests
+            ),
+         })
       }
    }, [userData, allInterests])
 
-   const updateFields = useCallback(
-      async (fieldToUpdate) => {
+   const handleSelectedInterestsChange = useCallback(
+      async (name: string, selectedInterests: Option[]) => {
          try {
-            await userRepo.updateAdditionalInformation(
-               user.email,
-               fieldToUpdate
-            )
+            await userRepo.updateAdditionalInformation(user.email, {
+               [name]: mapOptions(selectedInterests),
+            })
          } catch (error) {
             console.log(error)
          }
       },
-      [user]
-   )
-
-   const handleSelectedInterestsChange = useCallback(
-      (name: string, selectedInterests: Option[]) => {
-         const fieldToUpdate = {
-            interestsIds: mapOptions(selectedInterests),
-         }
-         updateFields(fieldToUpdate).catch(console.error)
-      },
-      [updateFields]
+      [user.email]
    )
 
    return (
@@ -73,10 +71,10 @@ const InterestsInformation = () => {
             </Grid>
             <Grid item xs={12} sm={8}>
                <MultiListSelect
-                  inputName="interestsInput"
+                  inputName={SELECTED_INTERESTS_FIELD_NAME}
                   isCheckbox
                   limit={5}
-                  selectedItems={selectedInterests}
+                  selectedItems={inputValues[SELECTED_INTERESTS_FIELD_NAME]}
                   allValues={allInterests}
                   setFieldValue={handleSelectedInterestsChange}
                   inputProps={{
