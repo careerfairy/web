@@ -9,7 +9,7 @@ export class GroupPresenter {
    constructor(
       public readonly id: string,
       public readonly description: string,
-      public readonly logoImage: string,
+      public readonly logoUrl: string,
       public readonly adminEmails: string[],
       public readonly universityName?: string
    ) {}
