@@ -33,8 +33,6 @@ export const mergeGenerateLinkToken = functions
       try {
          const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
 
-         console.log("requestData", requestData)
-
          // Temporary token initializing the user’s integration authorization session
          // We'll be able to open the Merge Link dialog to choose the integration
          return await mergeATS.createLinkToken(
