@@ -62,8 +62,6 @@ exports.sendReminderEmailToRegistrants =
 exports.scheduleReminderEmails = reminders.scheduleReminderEmails
 exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity
-exports.sendReminderEmailsWhenLivestreamStarts =
-   reminders.sendReminderEmailsWhenLivestreamStarts
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
 

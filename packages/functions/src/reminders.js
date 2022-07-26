@@ -175,43 +175,6 @@ exports.scheduleReminderEmails = functions.pubsub
       await handle1DayReminder(dateStart)
    })
 
-exports.sendReminderEmailsWhenLivestreamStarts = functions.firestore
-   .document("livestreams/{livestreamId}")
-   .onUpdate((change, context) => {
-      console.log("onUpdate")
-      const previousValue = change.before.data()
-      const newValue = change.after.data()
-      if (newValue.test === false) {
-         if (
-            !previousValue.hasStarted &&
-            !previousValue.hasSentEmails &&
-            newValue.hasStarted === true
-         ) {
-            functions.logger.log("sendEmail")
-            admin
-               .firestore()
-               .collection("livestreams")
-               .doc(context.params.livestreamId)
-               .update({ hasSentEmails: true })
-               .then(() => {
-                  const data = generateReminderEmailData(
-                     newValue,
-                     "registration-reminder",
-                     0
-                  )
-                  console.log(data)
-                  sendMessage(data)
-                     .then((body) => {
-                        functions.logger.log("body:" + JSON.stringify(body))
-                     })
-                     .catch((error) => {
-                        functions.logger.error(error)
-                     })
-               })
-         }
-      }
-   })
-
 /**
  * Search for a stream that will start in the next {reminderSchedulerTimer} minutes and schedule a reminder for 5 minutes before it starts.
  *

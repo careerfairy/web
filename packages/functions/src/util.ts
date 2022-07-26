@@ -40,7 +40,6 @@ export const generateReminderEmailData = (
 
    const templateData = createRecipientVariables(stream, formattedDate)
 
-   // if it's a reminder when livestream starts
    if (dateToDelivery === 0) {
       return {
          from: "CareerFairy <noreply@careerfairy.io>",
@@ -50,8 +49,7 @@ export const generateReminderEmailData = (
          "recipient-variables": JSON.stringify(templateData),
       }
    }
-
-   return {
+   const emailData = {
       from: "CareerFairy <noreply@careerfairy.io>",
       to: registeredUsers,
       subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
@@ -59,6 +57,8 @@ export const generateReminderEmailData = (
       "recipient-variables": JSON.stringify(templateData),
       "o:deliverytime": dateToDelivery,
    }
+
+   return emailData
 }
 
 /**
