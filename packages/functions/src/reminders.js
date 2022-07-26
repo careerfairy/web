@@ -170,6 +170,8 @@ exports.scheduleReminderEmails = functions.pubsub
    .onRun(async (context) => {
       const dateStart = addMinutesDate(new Date(Date.now()), reminderDateDelay)
 
+      functions.logger.log(`Check live streams started at ${dateStart}`)
+
       await handle5MinutesReminder(dateStart)
       await handle1HourReminder(dateStart)
       await handle1DayReminder(dateStart)
