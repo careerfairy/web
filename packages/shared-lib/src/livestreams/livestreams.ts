@@ -1,6 +1,7 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat"
 import Timestamp = firebase.firestore.Timestamp
+import { RegisteredStudent } from "../users"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -46,6 +47,9 @@ export interface LivestreamEvent extends Identifiable {
       groupId: string
    }
    universities: any[]
+   externalEventLink?: string
+   registeredStudents?: RegisteredStudent[]
+   timezone?: string
 }
 
 export interface Speaker extends Identifiable {
