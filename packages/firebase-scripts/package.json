@@ -15,6 +15,7 @@
    "dependencies": {
       "@careerfairy/shared-lib": "*",
       "@qualdesk/firestore-big-batch": "^0.0.2",
+      "cli-progress": "^3.11.2",
       "csv-parse": "^5.2.2",
       "csvtojson": "^2.0.10",
       "d3-request": "^1.0.6",

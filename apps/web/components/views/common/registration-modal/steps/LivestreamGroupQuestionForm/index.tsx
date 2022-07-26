@@ -59,7 +59,7 @@ const LivestreamGroupQuestionForm = () => {
          try {
             setCheckingQuestions(true)
             const answeredLivestreamGroupQuestions =
-               await groupRepo.mapUserAnswersToLivestreamGroupQuestion(
+               await groupRepo.mapUserAnswersToLivestreamGroupQuestions(
                   userData,
                   livestream
                )

@@ -212,6 +212,10 @@ service cloud.firestore {
                 allow read: if true;
                 allow write: if true;
             }
+            match /userLivestreamData/{studentEmail} {
+                allow read: if request.auth.token != null;
+                allow write: if request.auth.token.email == studentEmail;
+            }
 
             match /registrants/{registrant} {
                 allow read: if true;

@@ -7,56 +7,78 @@ import {
 } from "../BaseFirebaseRepository"
 import { UserData, UserGroupData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+
 const cloneDeep = require("lodash.clonedeep")
 
 export interface IGroupRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
+
    getGroupsByIds(groupIds: string[]): Promise<Group[]>
+
    getGroupById(groupId: string): Promise<Group>
+
    getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]>
+
    checkIfUserHasAdminGroups(userEmail: string): Promise<boolean>
+
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
+
    getGroupQuestions(groupId: string): Promise<GroupQuestion[]>
+
    addNewGroupQuestion(
       groupId: string,
       groupQuestion: Omit<GroupQuestion, "id">
    ): Promise<void>
+
    updateGroupQuestion(
       groupId: string,
       groupQuestion: GroupQuestion
    ): Promise<void>
+
    createGroup(
       group: Partial<Group>,
       groupQuestions: GroupQuestion[],
       userEmail: string
    ): Promise<firebase.firestore.DocumentReference>
+
    deleteGroupQuestion(groupId: string, groupQuestionId: string): Promise<void>
+
    listenToGroupQuestions(
       groupId: string,
       callback: OnSnapshotCallback<GroupQuestion>
    ): Unsubscribe
+
    getFieldOrLevelOfStudyGroupQuestion(
       groupId: string,
       questionType: Exclude<GroupQuestion["questionType"], "custom">
    ): Promise<GroupQuestion>
+
    getAllGroups(): Promise<Group[]>
+
    getGroupCustomQuestionsQuery(
       groupId: string
    ): firebase.firestore.Query<firebase.firestore.DocumentData>
+
    mapUserAnswersToLivestreamGroupQuestions(
       userData: UserData,
       livestream: LivestreamEvent
    ): Promise<LivestreamGroupQuestionsMap>
+
    getUserGroupDataByGroupId(userEmail: string, groupId): Promise<UserGroupData>
 
    getAllUserGroupDataIds(userEmail: string): Promise<string[]>
+
    deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository implements IGroupRepository {
-   constructor(private readonly firestore: firebase.firestore.Firestore) {}
+   constructor(
+      private readonly firestore: firebase.firestore.Firestore,
+      // @ts-ignore
+      private readonly fieldValue: typeof firebase.firestore.FieldValue
+   ) {}
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
       let userRef = this.firestore.collection("userData").doc(userEmail)
@@ -313,6 +335,7 @@ export class FirebaseGroupRepository implements IGroupRepository {
          },
       }
    }
+
    /*
     * Takes the groups questions from an event and then fetches and maps the user's
     * answers to each of the questions
@@ -363,6 +386,7 @@ export class FirebaseGroupRepository implements IGroupRepository {
       }
       return livestreamGroupQuestionsMap
    }
+
    /*
     * User group data methods
     * */
@@ -387,6 +411,7 @@ export class FirebaseGroupRepository implements IGroupRepository {
          .doc(groupId)
          .delete()
    }
+
    async getUserGroupDataByGroupId(
       userEmail: string,
       groupId

@@ -5,17 +5,19 @@ import {
    LivestreamPoll,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import { FirebaseGroupRepository } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
-import { FirebaseLevelOfStudyRepository } from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
-import { FirebaseFieldOfStudyRepository } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    getPdfCategoryChartData,
    PdfCategoryChartData,
    PdfReportData,
 } from "@careerfairy/shared-lib/dist/groups/pdf-report"
-import { FirebaseUserRepository } from "@careerfairy/shared-lib/dist/users/UserRepository"
+import {
+   fieldOfStudyRepo,
+   groupRepo,
+   levelOfStudyRepo,
+   livestreamRepo,
+} from "./api/repositories"
 
 const functions = require("firebase-functions")
 const {
@@ -164,18 +166,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             "You do not have permission to access this data"
          )
       }
-
-      const groupRepo = new FirebaseGroupRepository(admin.firestore())
-      const userRepo = new FirebaseUserRepository(
-         admin.firestore(),
-         admin.firestore.FieldValue
-      )
-      const levelOfStudyRepo = new FirebaseLevelOfStudyRepository(
-         admin.firestore()
-      )
-      const fieldOfStudyRepo = new FirebaseFieldOfStudyRepository(
-         admin.firestore()
-      )
 
       const groupSnap = await admin
          .firestore()
@@ -330,9 +320,17 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             return topNamedUniversities
          }
 
-         // Its let since this array will be modified
-         const participatingStudents = await userRepo.getUsersByEmail(
-            livestreamData.participatingStudents || []
+         const participatingStudents = await livestreamRepo.getLivestreamUsers(
+            livestreamData.id,
+            "participatedInLivestream"
+         )
+         console.log(
+            "-> num participatingStudents in collection",
+            livestreamData.participatingStudents.length
+         )
+         console.log(
+            "-> num participatingStudents",
+            participatingStudents.length
          )
 
          const groupPresenter = new GroupPresenter(requestingGroupData)
@@ -353,6 +351,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          )
 
          const isUniversity = groupPresenter.isUniversity()
+         console.log("-> isUniversity", isUniversity)
 
          nonUniversityChartData = getPdfCategoryChartData(
             rootFieldOfStudyCategory,
@@ -362,21 +361,20 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          )
 
          if (groupPresenter.isUniversity()) {
-            const customFieldsOfStudyCategory =
+            const groupFieldOfStudyQuestion =
                await groupRepo.getFieldOrLevelOfStudyGroupQuestion(
                   requestingGroupData.id,
                   "fieldOfStudy"
                )
 
-            const customLevelsOfStudyCategory =
+            const groupLevelOfStudyQuestion =
                await groupRepo.getFieldOrLevelOfStudyGroupQuestion(
                   requestingGroupData.id,
                   "levelOfStudy"
                )
-
             universityChartData = getPdfCategoryChartData(
-               customFieldsOfStudyCategory,
-               customLevelsOfStudyCategory,
+               groupFieldOfStudyQuestion,
+               groupLevelOfStudyQuestion,
                uniStudents,
                true
             )

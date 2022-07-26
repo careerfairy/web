@@ -49,7 +49,8 @@ export const userRepo: IUserRepository = new FirebaseUserRepository(
 )
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
-   firestoreInstance
+   firestoreInstance,
+   FieldValue
 )
 
 export const livestreamRepo: ILivestreamRepository =

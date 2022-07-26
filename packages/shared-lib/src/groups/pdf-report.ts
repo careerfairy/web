@@ -34,9 +34,7 @@ const uniFilterFn = (
    category: GroupQuestion | RootCFCategory,
    option: GroupQuestionOption
 ) => {
-   return (
-      user.university?.questions?.[category.id]?.selectedOptionId === option.id
-   )
+   return user.university?.questions?.[category.id]?.answerId === option.id
 }
 
 const generalFilterFn = (
@@ -48,32 +46,32 @@ const generalFilterFn = (
 }
 
 export const getPdfCategoryChartData = (
-   mainCategory: GroupQuestion | RootCFCategory,
-   subCategory: GroupQuestion | RootCFCategory,
+   mainQuestion: GroupQuestion | RootCFCategory,
+   subQuestion: GroupQuestion | RootCFCategory,
    users: UserData[],
    forUniversity: boolean
 ): PdfCategoryChartData => {
    const subCategorySortingOrder = "asc"
-   const mainCategoryOptions: PdfCategoryChartOption[] =
-      convertGroupQuestionOptionsToSortedArray(mainCategory.options)
-         .map((mainCategoryOption) => {
-            const mainCategoryOptionUsers = users.filter((user) =>
+   const mainQuestionOptions: PdfCategoryChartOption[] =
+      convertGroupQuestionOptionsToSortedArray(mainQuestion.options)
+         .map((mainQuestionOption) => {
+            const mainQuestionOptionUsers = users.filter((user) =>
                forUniversity
-                  ? uniFilterFn(user, mainCategory, mainCategoryOption)
-                  : generalFilterFn(user, mainCategory, mainCategoryOption)
+                  ? uniFilterFn(user, mainQuestion, mainQuestionOption)
+                  : generalFilterFn(user, mainQuestion, mainQuestionOption)
             )
             return {
-               id: mainCategoryOption.id,
+               id: mainQuestionOption.id,
                subCategoryOptions: convertGroupQuestionOptionsToSortedArray(
-                  subCategory.options
+                  subQuestion.options
                )
                   .map((subCategoryOption) => {
-                     const count = mainCategoryOptionUsers.filter((user) =>
+                     const count = mainQuestionOptionUsers.filter((user) =>
                         forUniversity
-                           ? uniFilterFn(user, subCategory, subCategoryOption)
+                           ? uniFilterFn(user, subQuestion, subCategoryOption)
                            : generalFilterFn(
                                 user,
-                                subCategory,
+                                subQuestion,
                                 subCategoryOption
                              )
                      ).length
@@ -84,26 +82,26 @@ export const getPdfCategoryChartData = (
                      }
                   })
                   .sort(dynamicSort("name", subCategorySortingOrder)),
-               name: mainCategoryOption.name,
-               count: mainCategoryOptionUsers.length,
+               name: mainQuestionOption.name,
+               count: mainQuestionOptionUsers.length,
             }
          })
          .sort(dynamicSort("count", "desc"))
          .filter((el) => el.count > 0)
-   const totalWithStats = mainCategoryOptions.reduce(
+   const totalWithStats = mainQuestionOptions.reduce(
       (accumulator, option) => accumulator + option.count,
       0
    )
    return {
       totalWithoutStats: users.length - totalWithStats,
       totalWithStats,
-      name: mainCategory.name,
-      mainCategoryName: mainCategory.name,
-      mainCategoryId: mainCategory.id,
-      subCategoryName: subCategory.name,
-      subCategoryId: subCategory.id,
-      mainCategoryOptions: mainCategoryOptions,
-      subCategoryOptionNames: convertDictToDocArray(subCategory.options)
+      name: mainQuestion.name,
+      mainCategoryName: mainQuestion.name,
+      mainCategoryId: mainQuestion.id,
+      subCategoryName: subQuestion.name,
+      subCategoryId: subQuestion.id,
+      mainCategoryOptions: mainQuestionOptions,
+      subCategoryOptionNames: convertDictToDocArray(subQuestion.options)
          .sort(dynamicSort("name", subCategorySortingOrder))
          .map((option) => option.name),
    }

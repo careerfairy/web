@@ -30,44 +30,6 @@ exports.assertLivestreamRegistrationWasCompleted = functions.firestore
             })
       }
    })
-const getUserLivestreamGroupQuestionAnswersForCollection = async (
-   change,
-   context
-) => {
-   if (change.after.exists) {
-      const docRef = change.after.ref
-      functions.logger.log(
-         `Getting latest livestream Group Question Answers ${context.params.livestreamId}`
-      )
-      const registrationSnap = await admin
-         .firestore()
-         .collection("livestreams")
-         .doc(context.params.livestreamId)
-         .collection("registeredStudents")
-         .doc(context.params.studentId)
-         .get()
-      if (registrationSnap.exists) {
-         const livestreamGroupQuestionAnswers =
-            registrationSnap.data().livestreamGroupQuestionAnswers
-         if (livestreamGroupQuestionAnswers) {
-            functions.logger.log(
-               `Updating Document in path ${docRef.path} Pool with ${livestreamGroupQuestionAnswers}`
-            )
-            await docRef.update({
-               livestreamGroupQuestionAnswers,
-            })
-         }
-      }
-   }
-}
-
-exports.getRegistrationDataForTalentPoolStuent = functions.firestore
-   .document("livestreams/{livestreamId}/talentPool/{studentId}")
-   .onWrite(getUserLivestreamGroupQuestionAnswersForCollection)
-
-exports.getRegistrationDataForParticpatingStudent = functions.firestore
-   .document("livestreams/{livestreamId}/participatingStudents/{studentId}")
-   .onWrite(getUserLivestreamGroupQuestionAnswersForCollection)
 
 exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
    .document("livestreams/{livestreamId}/registeredStudents/{studentId}")

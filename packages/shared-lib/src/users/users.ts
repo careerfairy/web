@@ -1,6 +1,6 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
-import { Group, GroupQuestion } from "../groups"
+import { Group, GroupQuestion, GroupQuestionOption } from "../groups"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 
 export interface UserData extends Identifiable {
@@ -19,7 +19,7 @@ export interface UserData extends Identifiable {
       groupId: string
       code: string
       name: string
-      questions: UserGroupQuestionsWithAnswerMap
+      questions: UserReadableGroupQuestionsWithAnswerMap
    }
    badges?: string[]
    groupIds: string[]
@@ -51,6 +51,19 @@ export type UserGroupQuestionsWithAnswerMap = Record<
    GroupQuestion["id"],
    string
 >
+/*
+ * Key is the questionId and value is the answerId
+ * */
+export type UserReadableGroupQuestionsWithAnswerMap = Record<
+   GroupQuestion["id"],
+   ReadableQuestionAndAnswer
+>
+export interface ReadableQuestionAndAnswer {
+   questionName: GroupQuestion["name"]
+   questionId: GroupQuestion["id"]
+   answerId: GroupQuestionOption["id"]
+   answerName: GroupQuestionOption["name"]
+}
 export interface UserGroupData extends Identifiable {
    userUid?: UserData["authId"]
    groupId: Group["id"]
@@ -59,8 +72,6 @@ export interface UserGroupData extends Identifiable {
    groupUniversityCode?: Group["universityCode"]
    questions?: UserGroupQuestionsWithAnswerMap
 }
-
-export interface RegisteredGroup {}
 
 export interface CSVDownloadUserData extends Record<string, string> {
    Email: string
@@ -111,12 +122,6 @@ export interface SavedRecruiter extends Identifiable {
    }
 }
 
-export interface RegisteredStudent extends UserData {
-   dateRegistered: firebase.firestore.Timestamp
-   livestreamId: LivestreamEvent["id"]
-   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
-}
-
 /*
  * Key is the groupId and value is a dictionary of keys questionId and values answerId
  * */
@@ -124,16 +129,20 @@ export type UserLivestreamGroupQuestionAnswers = Record<
    Group["id"],
    UserGroupQuestionsWithAnswerMap
 >
+
+export interface RegisteredStudent extends UserData {
+   dateRegistered: firebase.firestore.Timestamp
+   livestreamId: LivestreamEvent["id"]
+}
+
 export interface ParticipatingStudent extends UserData {
    joined: firebase.firestore.Timestamp
    livestreamId: LivestreamEvent["id"]
-   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
 }
 
 export interface TalentPoolStudent extends UserData {
    dateJoinedTalentPool: firebase.firestore.Timestamp
    livestreamId: LivestreamEvent["id"]
-   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
 }
 
 export interface UserPublicData {

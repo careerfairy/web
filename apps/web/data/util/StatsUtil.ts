@@ -5,13 +5,14 @@ import {
 } from "@careerfairy/shared-lib/dist/groups"
 import {
    CSVDownloadUserData,
-   RegisteredStudent,
    UserData,
-   TalentPoolStudent,
 } from "@careerfairy/shared-lib/dist/users"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { getUserAnswerNameFromLivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamGroupQuestion,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 export default class StatsUtil {
    static getStudentInGroupDataObject(student, group) {
@@ -48,66 +49,77 @@ export default class StatsUtil {
       return studentDataObject
    }
 
+   static getUserAnswerNameFromLivestreamGroupQuestion(
+      userLivestreamData: UserLivestreamData,
+      groupId: string,
+      question: LivestreamGroupQuestion
+   ): string {
+      const userAnswerId =
+         userLivestreamData?.livestreamGroupQuestionAnswers[groupId]?.[
+            question?.id
+         ]
+      return question?.options?.[userAnswerId]?.name
+   }
+
    static getCsvData(
       requestingGroup: Group,
       targetStream: LivestreamEvent,
-      users: TalentPoolStudent[] | RegisteredStudent[],
+      users: UserLivestreamData[],
       groupQuestions: GroupQuestion[]
    ): CSVDownloadUserData[] {
-      try {
-         return users
-            .map((user) => {
-               const otherCustomUniversityCategories = Object.keys(
-                  targetStream.groupQuestionsMap || {}
-               ).reduce((acc, groupId) => {
-                  const groupData = targetStream.groupQuestionsMap[groupId]
-                  Object.values(groupData.questions).forEach((question) => {
-                     acc[question.name] =
-                        getUserAnswerNameFromLivestreamGroupQuestion(
-                           user,
-                           groupData.groupId,
-                           question
-                        )
-                  })
-                  return acc
-               }, {})
-               return {
-                  "First Name": user.firstName,
-                  "Last Name": user.lastName,
-                  Email: user.userEmail,
-                  University: user.university?.name || "N/A",
-                  "Level of study":
-                     StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
-                        "levelOfStudy",
-                        groupQuestions,
-                        user
-                     ),
-                  "Field of study":
-                     StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
-                        "fieldOfStudy",
-                        groupQuestions,
-                        user
-                     ),
-                  ...otherCustomUniversityCategories,
-               }
-            })
-            .sort(dynamicSort("First Name"))
-      } catch (error) {
-         console.log(error)
-      }
+      return users
+         .map((user) => {
+            const otherCustomUniversityCategories = Object.keys(
+               targetStream.groupQuestionsMap || {}
+            ).reduce((acc, groupId) => {
+               const groupData = targetStream.groupQuestionsMap[groupId]
+               Object.values(groupData.questions).forEach((question) => {
+                  acc[question.name] =
+                     this.getUserAnswerNameFromLivestreamGroupQuestion(
+                        user,
+                        groupData.groupId,
+                        question
+                     )
+               })
+               return acc
+            }, {})
+            return {
+               "First Name": user.firstName,
+               "Last Name": user.lastName,
+               Email: user.userEmail,
+               University: user.university?.name || "N/A",
+               "Level of study":
+                  StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
+                     "levelOfStudy",
+                     groupQuestions,
+                     user
+                  ),
+               "Field of study":
+                  StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
+                     "fieldOfStudy",
+                     groupQuestions,
+                     user
+                  ),
+               ...otherCustomUniversityCategories,
+            }
+         })
+         .sort(dynamicSort("First Name"))
    }
 
    static getUserUniLevelOrFieldOfStudyCategoryByType(
       type: Omit<GroupQuestion["questionType"], "custom">,
       groupQuestions: GroupQuestion[],
-      user: TalentPoolStudent | RegisteredStudent
+      user: UserLivestreamData
    ): GroupQuestionOption["name"] | "N/A" {
       const groupQuestion = groupQuestions.find(
          (question) => question.questionType === type
       )
       const userSelectedAnswerId =
-         user.university?.questions?.[groupQuestion?.id]
-      const name = groupQuestion?.options?.[userSelectedAnswerId]?.name
+         user.university?.questions?.[groupQuestion?.id]?.answerId
+      let name = user.university?.questions?.[groupQuestion?.id]?.answerName
+      if (!name) {
+         name = groupQuestion?.options?.[userSelectedAnswerId]?.name
+      }
       if (!name) {
          return type === "levelOfStudy"
             ? user.levelOfStudy?.name

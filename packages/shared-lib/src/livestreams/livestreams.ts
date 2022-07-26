@@ -1,11 +1,7 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase"
 import { Group, GroupQuestion } from "../groups"
-import {
-   ParticipatingStudent,
-   RegisteredStudent,
-   TalentPoolStudent,
-} from "../users"
+import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -55,6 +51,23 @@ export interface LivestreamEvent extends Identifiable {
       groupId: string
    }
    universities: any[]
+}
+
+export type LivestreamUserAction =
+   | "joinedTalentPool"
+   | "participatedInLivestream"
+   | "registeredToLivestream"
+
+/*
+ * Sub-collection found on the livestream doc called userLivestreamData
+ * */
+export interface UserLivestreamData extends UserData {
+   userHas: LivestreamUserAction[] | firebase.firestore.FieldValue
+   livestreamId: LivestreamEvent["id"]
+   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
+   dateJoinedTalentPool?: firebase.firestore.Timestamp
+   dateParticipatedInLivestream?: firebase.firestore.Timestamp
+   dateRegisteredToLivestream?: firebase.firestore.Timestamp
 }
 
 export type LivestreamGroupQuestionsMap = Record<
@@ -159,16 +172,6 @@ export const pickPublicDataFromLivestream = (
       companyLogoUrl: livestreamData.companyLogoUrl ?? null,
       test: livestreamData.test ?? false,
    }
-}
-
-export const getUserAnswerNameFromLivestreamGroupQuestion = (
-   user: RegisteredStudent | TalentPoolStudent | ParticipatingStudent,
-   groupId: string,
-   question: LivestreamGroupQuestion
-): string => {
-   const userAnswerId =
-      user.livestreamGroupQuestionAnswers[groupId][question.id]
-   return question.options[userAnswerId].name
 }
 
 export interface LivestreamEventSerialized

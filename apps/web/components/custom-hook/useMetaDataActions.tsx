@@ -24,7 +24,6 @@ import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { RegisteredStudent, UserData } from "@careerfairy/shared-lib/dist/users"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useGroup } from "../../layouts/GroupDashboardLayout"
@@ -35,9 +34,6 @@ interface MetaDataActionsProps {
    isPast: boolean
    isDraft: boolean
 }
-
-const isLegacyStream = (stream: LivestreamEvent) => false // TODO: legacy stream
-// stream.start.toDate() < new Date(2022, 7, 18)
 
 export function useMetaDataActions({
    allGroups,
@@ -96,7 +92,7 @@ export function useMetaDataActions({
                      groupPresenter.isUniversityStudent(user)
                   )
                }
-
+               console.count("handleGetRegisteredUsersFromGroup getCsvData")
                const csvData = StatsUtil.getCsvData(
                   group,
                   targetStream,
@@ -126,10 +122,11 @@ export function useMetaDataActions({
          !registeredStudentsDictionary?.[targetStream?.id]
       ) {
          ;(async function () {
-            const querySnapshot =
-               await firebase.getLivestreamRegisteredStudents(targetStream.id)
             const newRegisteredStudents =
-               mapFirestoreDocuments<RegisteredStudent>(querySnapshot)
+               await livestreamRepo.getLivestreamUsers(
+                  targetStream.id,
+                  "registeredToLivestream"
+               )
 
             setRegisteredStudentsDictionary({
                ...registeredStudentsDictionary,
@@ -148,10 +145,10 @@ export function useMetaDataActions({
             }))
             try {
                if (!talentPoolDictionary[targetStream.id]) {
-                  const users =
-                     await livestreamRepo.getLivestreamTalentPoolMembers(
-                        targetStream.companyId
-                     )
+                  const users = await livestreamRepo.getLivestreamUsers(
+                     targetStream.id,
+                     "joinedTalentPool"
+                  )
                   const csvData = StatsUtil.getCsvData(
                      group,
                      targetStream,
@@ -171,78 +168,6 @@ export function useMetaDataActions({
          })()
       }
    }, [targetStream, registeredStudentsFromGroupDictionary, groupQuestions])
-   const getLegacyRegisteredStudentsCsvData = useCallback(
-      (targetRegisteredStudents: RegisteredStudent[]) => {
-         let newRegisteredStudentsFromGroup
-         if (group.universityCode) {
-            newRegisteredStudentsFromGroup = targetRegisteredStudents
-               .filter((student) => studentBelongsToGroup(student))
-               .map((filteredStudent) =>
-                  StatsUtil.getStudentInGroupDataObject(filteredStudent, group)
-               )
-         } else {
-            const livestreamGroups = allGroups.filter((group) =>
-               targetStream.groupIds.includes(group.id)
-            )
-            newRegisteredStudentsFromGroup = targetRegisteredStudents.map(
-               (student) => {
-                  const livestreamGroupUserBelongsTo =
-                     StatsUtil.getFirstGroupThatUserBelongsTo(
-                        student,
-                        livestreamGroups,
-                        group
-                     )
-                  return StatsUtil.getStudentInGroupDataObject(
-                     student,
-                     livestreamGroupUserBelongsTo || {}
-                  )
-               }
-            )
-         }
-         return newRegisteredStudentsFromGroup
-      },
-      [allGroups, group, targetStream]
-   )
-   const getLegacyTalentPoolStudentsCsvData = useCallback(
-      (targetUsers: UserData[]) => {
-         return targetUsers.map((element) => {
-            if (
-               registeredStudentsFromGroupDictionary[targetStream.id]?.some(
-                  (student) => student.Email === element.id
-               )
-            ) {
-               let publishedStudent
-               if (group.universityCode) {
-                  publishedStudent = StatsUtil.getStudentInGroupDataObject(
-                     element,
-                     group
-                  )
-               } else {
-                  const livestreamGroups = allGroups.filter((group) =>
-                     targetStream.groupIds.includes(group.id)
-                  )
-                  const livestreamGroupUserBelongsTo =
-                     StatsUtil.getFirstGroupThatUserBelongsTo(
-                        element,
-                        livestreamGroups,
-                        group
-                     )
-                  publishedStudent = StatsUtil.getStudentInGroupDataObject(
-                     element,
-                     livestreamGroupUserBelongsTo || {}
-                  )
-               }
-               return publishedStudent
-            } else {
-               return StatsUtil.getStudentOutsideGroupDataObject(
-                  element,
-                  allGroups
-               )
-            }
-         })
-      },
-      [allGroups, group, targetStream]
-   )
 
    const handleGetLivestreamReportData = useCallback(
       async (rowData: LivestreamEvent) => {

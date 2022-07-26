@@ -30,6 +30,7 @@ export interface GroupWithPolicy extends Group {
 }
 export interface GroupCategory extends Identifiable {
    name: string
+   hidden?: boolean
    options: GroupOption[]
 }
 

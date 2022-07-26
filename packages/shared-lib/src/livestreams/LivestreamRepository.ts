@@ -11,7 +11,9 @@ import {
    LivestreamEventParsed,
    LivestreamEventPublicData,
    LivestreamEventSerialized,
+   LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
+   UserLivestreamData,
 } from "./livestreams"
 
 export interface ILivestreamRepository {
@@ -97,6 +99,11 @@ export interface ILivestreamRepository {
    getAllRegisteredStudents(): Promise<RegisteredStudent[]>
    getAllParticipatingStudents(): Promise<ParticipatingStudent[]>
    getAllTalentPoolStudents(): Promise<TalentPoolStudent[]>
+   getLivestreamUsers(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): Promise<UserLivestreamData[]>
+   getAllLivestreams(withTest?: boolean): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -433,6 +440,34 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
    async getAllTalentPoolStudents(): Promise<TalentPoolStudent[]> {
       const snaps = await this.firestore.collectionGroup("talentPool").get()
       return mapFirestoreDocuments<TalentPoolStudent>(snaps, true)
+   }
+
+   async getLivestreamUsers(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): Promise<UserLivestreamData[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("userLivestreamData")
+         .where("userHas", "array-contains", userType)
+         .get()
+      return mapFirestoreDocuments<UserLivestreamData>(snaps)
+   }
+
+   async getAllLivestreams(
+      withTest: boolean = false
+   ): Promise<LivestreamEvent[]> {
+      let snaps
+      if (withTest) {
+         snaps = await this.firestore.collection("livestreams").get()
+      } else {
+         snaps = await this.firestore
+            .collection("livestreams")
+            .where("test", "==", false)
+            .get()
+      }
+      return mapFirestoreDocuments<LivestreamEvent>(snaps)
    }
 }
 

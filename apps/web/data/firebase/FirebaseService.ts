@@ -13,13 +13,13 @@ import {
 } from "../../util/CommonUtil"
 import {
    LivestreamEvent,
+   LivestreamGroupQuestionsMap,
+   LivestreamUserAction,
    pickPublicDataFromLivestream,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
-import DocumentReference = firebase.firestore.DocumentReference
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import {
    getLivestreamGroupQuestionAnswers,
    ParticipatingStudent,
@@ -28,6 +28,7 @@ import {
    UserGroupData,
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2162,9 +2163,15 @@ class FirebaseService {
          .doc(livestreamId)
          .collection("registrants")
          .doc(uid)
+
+      const userLivestreamDataRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("userLivestreamData")
+         .doc(email)
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userDoc) => {
-            const user = userDoc.data()
+            const user = { ...userDoc.data(), id: userDoc.id } as UserData
             transaction.update(livestreamRef, {
                // To be depreciated
                registeredUsers: firebase.firestore.FieldValue.arrayUnion(email),
@@ -2206,8 +2213,21 @@ class FirebaseService {
                livestreamId,
                dateRegistered: this.getServerTimestamp(),
                authId: uid,
-               livestreamGroupQuestionAnswers: userQuestionsAndAnswersDict,
             } as RegisteredStudent)
+
+            const userAction: LivestreamUserAction = "registeredToLivestream"
+            const newUserData: UserLivestreamData = {
+               ...user,
+               livestreamId,
+               userHas: firebase.firestore.FieldValue.arrayUnion(userAction),
+               dateRegisteredToLivestream: this.getServerTimestamp(),
+               livestreamGroupQuestionAnswers: userQuestionsAndAnswersDict,
+            }
+            transaction.set(
+               userLivestreamDataRef,
+               newUserData as UserLivestreamData,
+               { merge: true }
+            )
 
             // To be used from now on
             transaction.set(
@@ -2216,8 +2236,6 @@ class FirebaseService {
                   {
                      ...user,
                      livestreamId,
-                     livestreamGroupQuestionAnswers:
-                        userQuestionsAndAnswersDict,
                      dateRegistered: this.getServerTimestamp(),
                      authId: uid,
                   },

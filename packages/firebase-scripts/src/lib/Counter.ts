@@ -49,6 +49,10 @@ export default class Counter {
       return this.customCounts[key]
    }
 
+   public setCustomCount(key: string, count: number): void {
+      this.customCounts[key] = count
+   }
+
    public addToCustomCount(key: string, count: number): void {
       if (this.customCounts[key]) {
          this.customCounts[key] += count
@@ -57,13 +61,17 @@ export default class Counter {
       }
    }
 
-   public print(): void {
-      Counter.log(`Read: ${this.readCount}`)
-      Counter.log(`Write: ${this.writeCount}`)
-      Counter.log(`Total Reads and Writes: ${this.readAndWrite()}`)
-      // print custom counts
-      for (const key in this.customCounts) {
+   public print(key?: string): void {
+      if (key) {
          Counter.log(`${key}: ${this.customCounts[key]}`)
+      } else {
+         Counter.log(`Read: ${this.readCount}`)
+         Counter.log(`Write: ${this.writeCount}`)
+         Counter.log(`Total Reads and Writes: ${this.readAndWrite()}`)
+         // print custom counts
+         for (const key in this.customCounts) {
+            Counter.log(`${key}: ${this.customCounts[key]}`)
+         }
       }
    }
 
