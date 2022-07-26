@@ -307,7 +307,7 @@ exports.reminderTest = functions.https.onCall(async (context) => {
 })
 
 const handle5MinutesReminder = async (dateStart) => {
-   const dateEnd5Minutes = addMinutesDate(dateStart, 5)
+   const dateEnd5Minutes = addMinutesDate(dateStart, reminderSchedulerTimer)
 
    try {
       const streamsToReminderIn5Minutes =
@@ -415,9 +415,7 @@ const getStreamsByDateWithRegisteredStudents = (dateStart, dateEnd) => {
             ...doc.data(),
          }))
 
-         if (streams.length) {
-            return await addRegisteredStudentsFieldOnStreams(streams)
-         }
+         return await addRegisteredStudentsFieldOnStreams(streams)
       })
       .catch((error) => console.log(error))
 }
