@@ -21,6 +21,13 @@ export const getStreamLink = (streamId) => {
    return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
+/**
+ * Generate a dynamic reminder email using a stream and user registered data
+ *
+ * @param {Partial<LivestreamEvent>} stream
+ * @param {string} emailTemplateId
+ * @param {number} minutesToRemindBefore
+ */
 export const generateReminderEmailData = (
    stream: Partial<LivestreamEvent>,
    emailTemplateId: string,
@@ -40,15 +47,6 @@ export const generateReminderEmailData = (
 
    const templateData = createRecipientVariables(stream, formattedDate)
 
-   if (dateToDelivery === 0) {
-      return {
-         from: "CareerFairy <noreply@careerfairy.io>",
-         to: registeredUsers,
-         subject: `NOW: Live Stream with ${company} at ${formattedDate}`,
-         template: emailTemplateId,
-         "recipient-variables": JSON.stringify(templateData),
-      }
-   }
    const emailData = {
       from: "CareerFairy <noreply@careerfairy.io>",
       to: registeredUsers,
@@ -84,6 +82,7 @@ const createRecipientVariables = (
       position: speakerPosition,
    } = firstSpeaker
 
+   // Reduce over registered students to be possible to get registered information and add it to the stream data
    return registeredStudents.reduce((acc, registeredStudent) => {
       const { id: studentEmail, firstName, lastName } = registeredStudent
 
