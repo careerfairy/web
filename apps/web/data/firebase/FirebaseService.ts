@@ -626,10 +626,6 @@ class FirebaseService {
       }
    }
 
-   test = async () => {
-      return this.functions.httpsCallable("reminderTest")()
-   }
-
    getGroupsInfo = async (arrayOfGroupIds) => {
       const groupsDictionary = {}
       let i,

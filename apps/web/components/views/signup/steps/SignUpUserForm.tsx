@@ -149,12 +149,9 @@ function SignUpUserForm() {
             setSubmitting(false)
          })
    }
-   const handleClickTest = () => {
-      firebase.test().catch()
-   }
+
    return (
       <Fragment>
-         <Button onClick={() => handleClickTest()}>Click</Button>
          <Formik
             enableReinitialize={true}
             initialValues={initValues}
