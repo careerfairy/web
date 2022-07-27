@@ -1,6 +1,7 @@
 import axios from "axios"
 import {
    MergeAccountTokenResponse,
+   MergeApplication,
    MergeJob,
    MergeLinkTokenResponse,
    MergeOffice,
@@ -11,6 +12,7 @@ import { IATSRepository } from "./IATSRepository"
 import { Job } from "./Job"
 import { Office } from "./Office"
 import { SyncStatus } from "./SyncStatus"
+import { Application } from "./Application"
 
 /**
  * Merge.dev HTTP API
@@ -40,7 +42,7 @@ export class MergeATSRepository implements IATSRepository {
          `/jobs?expand=offices,recruiters,hiring_managers,departments`
       )
 
-      return data.results.map((res) => Job.createFromMerge(res))
+      return data.results.map(Job.createFromMerge)
    }
 
    async getOffices(): Promise<Office[]> {
@@ -48,7 +50,23 @@ export class MergeATSRepository implements IATSRepository {
          MergePaginatedResponse<MergeOffice>
       >(`/offices`)
 
-      return data.results.map((res) => Office.createFromMerge(res))
+      return data.results.map(Office.createFromMerge)
+   }
+
+   async getApplications(jobId?: string): Promise<Application[]> {
+      const qs = new URLSearchParams({
+         expand: "candidate,job",
+      })
+
+      if (jobId) {
+         qs.append("job_id", jobId)
+      }
+
+      const { data } = await this.axios.get<
+         MergePaginatedResponse<MergeApplication>
+      >(`/applications?${qs.toString()}`)
+
+      return data.results.map(Application.createFromMerge)
    }
 
    async getSyncStatus(): Promise<SyncStatus[]> {

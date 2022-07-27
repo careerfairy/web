@@ -17,6 +17,10 @@ export class Candidate extends BaseModel {
       super()
    }
 
+   getName() {
+      return `${this.firstName} ${this.lastName}`
+   }
+
    static createFromMerge(candidate: MergeCandidate) {
       return new Candidate(
          candidate.id,
