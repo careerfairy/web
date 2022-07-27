@@ -72,7 +72,7 @@ const SignUp = () => {
       if (userData && currentStep === 0) {
          setCurrentStep(2)
       }
-   }, [userData])
+   }, [userData, currentStep])
 
    useEffect(() => {
       if (!user.isLoaded || user.isEmpty) return
