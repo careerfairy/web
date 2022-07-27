@@ -155,6 +155,12 @@ const HOUR_TO_MINUTES = 60
 // range to how many minutes we will search
 const reminderScheduleRange = 15
 
+const REMINDERS = {
+   reminder5Minutes: "reminder-5-minutes",
+   reminder1Hour: "reminder-1-hour",
+   reminder24Hours: "reminder-24-hours",
+}
+
 /**
  * Runs every {reminderScheduleRange} minutes to handle all the 5 minutes, 1 hour and 1 day livestream email reminders
  * The {reminderDateDelay} is the number of minutes we want to delay in the future, to be sure that our logic runs before being required to send the reminders
@@ -175,14 +181,14 @@ export const scheduleReminderEmails = functions.pubsub
       retryReminders(handle1HourReminder).catch((error) => {
          throw new functions.https.HttpsError(
             "unknown",
-            "error on 5 minutes reminder: " + error
+            "error on 1 hour reminder: " + error
          )
       })
 
       retryReminders(handle1DayReminder).catch((error) => {
          throw new functions.https.HttpsError(
             "unknown",
-            "error on 5 minutes reminder: " + error
+            "error on 1 day reminder: " + error
          )
       })
    })
@@ -201,6 +207,8 @@ const retryReminders = async (fn) => {
       try {
          return await fn(dateStart)
       } catch {
+         // It waits 500 ms to try again the failed send reminder
+         await wait(500)
          functions.logger.error("failed to send reminder")
       }
    }
@@ -210,6 +218,15 @@ const retryReminders = async (fn) => {
       `Failed retrying ${timesToRetrySendReminder} times`
    )
 }
+
+/**
+ * Simple wait
+ *
+ */
+const wait = (ms) =>
+   new Promise<void>((resolve) => {
+      setTimeout(() => resolve(), ms)
+   })
 
 /**
  * Search for a stream that will start between {reminderDateDelay} and {reminderDateDelay} + {reminderScheduleRange} minutes and schedule a reminder for 5 minutes before it starts.
@@ -228,15 +245,16 @@ const handle5MinutesReminder = async (filterStartDate: Date) => {
             filterEndDateFor5MinutesReminder
          )
 
-      functions.logger.log(
-         `${streamsToReminderIn5Minutes.length} streams with 5 minutes reminder`
+      const filteredStreams = filterAlreadySentEmail(
+         streamsToReminderIn5Minutes,
+         REMINDERS.reminder5Minutes
       )
 
-      await handleSendEmail(
-         streamsToReminderIn5Minutes,
-         "reminder-5-minutes",
-         5
+      functions.logger.log(
+         `${filteredStreams.length} streams with 5 minutes reminder`
       )
+
+      await handleSendEmail(filteredStreams, REMINDERS.reminder5Minutes, 5)
    } catch (error) {
       throw new functions.https.HttpsError(
          "unknown",
@@ -266,13 +284,18 @@ const handle1HourReminder = async (filterStartDate: Date): Promise<void> => {
             filterEndDateFor1HourReminder
          )
 
+      const filteredStreams = filterAlreadySentEmail(
+         streamsToReminderIn1Hour,
+         REMINDERS.reminder1Hour
+      )
+
       functions.logger.log(
-         `${streamsToReminderIn1Hour.length} streams with 1 hour reminder`
+         `${filteredStreams.length} streams with 1 hour reminder`
       )
 
       await handleSendEmail(
-         streamsToReminderIn1Hour,
-         "reminder-1-hour",
+         filteredStreams,
+         REMINDERS.reminder1Hour,
          HOUR_TO_MINUTES
       )
    } catch (error) {
@@ -304,13 +327,18 @@ const handle1DayReminder = async (filterStartDate: Date): Promise<void> => {
             filterEndDateFor1DayReminder
          )
 
+      const filteredStreams = filterAlreadySentEmail(
+         streamsToReminderIn1Day,
+         REMINDERS.reminder24Hours
+      )
+
       functions.logger.log(
-         `${streamsToReminderIn1Day.length} streams with 1 day reminder`
+         `${filteredStreams.length} streams with 1 day reminder`
       )
 
       await handleSendEmail(
-         streamsToReminderIn1Day,
-         "reminder-24-hours",
+         filteredStreams,
+         REMINDERS.reminder24Hours,
          DAY_TO_MINUTES
       )
    } catch (error) {
@@ -378,23 +406,6 @@ const createSendEmailPromise = (
    })
 }
 
-const updateLiveStreamWithEmailSent = (stream, templateId) => {
-   const { id, emailsSent } = stream
-
-   const fieldToUpdate = {
-      ...emailsSent,
-      [templateId]: true,
-   }
-
-   admin
-      .firestore()
-      .collection("livestreams")
-      .doc(id)
-      .update({ emailSent: fieldToUpdate })
-      .then(() => {
-         functions.logger.log(`Reminders ${templateId} sent on stream ${id}`)
-      })
-}
 /**
  * Get all the streams filtered by starting date and with all the registered students for each stream.
  *
@@ -449,4 +460,54 @@ const addRegisteredStudentsFieldOnStreams = async (
    }
 
    return formattedStreams
+}
+
+/**
+ * Update {reminderEmailsSent} value on livestream DB with the specific reminder email that was sent
+ *
+ */
+const updateLiveStreamWithEmailSent = (
+   stream: LiveStreamEventWithRegisteredStudents,
+   templateId: string
+) => {
+   const { id, reminderEmailsSent } = stream
+
+   const reminderKey = getReminderKey(templateId)
+
+   const fieldToUpdate = {
+      ...reminderEmailsSent,
+      [reminderKey]: true,
+   }
+
+   admin
+      .firestore()
+      .collection("livestreams")
+      .doc(id)
+      .update({ reminderEmailsSent: fieldToUpdate })
+      .then(() => {
+         functions.logger.log(
+            `Reminders ${templateId} updated on stream ${id} data`
+         )
+      })
+}
+
+/**
+ * To filter all the streams to the ones
+ *
+ */
+const filterAlreadySentEmail = (
+   streams: LiveStreamEventWithRegisteredStudents[],
+   templateId: string
+): LiveStreamEventWithRegisteredStudents[] => {
+   return streams.filter((stream) => {
+      const { reminderEmailsSent } = stream
+
+      const reminderKey = getReminderKey(templateId)
+
+      return reminderEmailsSent ? !reminderEmailsSent[reminderKey] : true
+   })
+}
+
+const getReminderKey = (templateId: string) => {
+   return Object.keys(REMINDERS).find((key) => REMINDERS[key] === templateId)
 }

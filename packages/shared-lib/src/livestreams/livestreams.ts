@@ -50,6 +50,13 @@ export interface LivestreamEvent extends Identifiable {
    externalEventLink?: string
    timezone?: string
    isFaceToFace?: boolean
+   reminderEmailsSent?: IEmailSent
+}
+
+export interface IEmailSent {
+   reminder5Minutes: boolean
+   reminder1Hour: boolean
+   reminder24Hours: boolean
 }
 
 export interface LiveStreamEventWithRegisteredStudents extends LivestreamEvent {
