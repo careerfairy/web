@@ -94,7 +94,7 @@ const createRecipientVariables = (
          upcomingStreamLink: externalEventLink
             ? externalEventLink
             : getStreamLink(streamId),
-         german: language.code === "DE",
+         german: language?.code === "DE",
       }
 
       return {
