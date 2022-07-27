@@ -2,7 +2,8 @@ import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
 import functions = require("firebase-functions")
 import { https } from "firebase-functions"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent, LiveStreamEventWithRegisteredStudents } from "@careerfairy/shared-lib/dist/livestreams"
+import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -24,15 +25,12 @@ export const getStreamLink = (streamId) => {
 /**
  * Generate a dynamic reminder email using a stream and user registered data
  *
- * @param {Partial<LivestreamEvent>} stream
- * @param {string} emailTemplateId
- * @param {number} minutesToRemindBefore
  */
 export const generateReminderEmailData = (
-   stream: Partial<LivestreamEvent>,
+   stream: LiveStreamEventWithRegisteredStudents,
    emailTemplateId: string,
    minutesToRemindBefore: number
-) => {
+): MailgunMessageData => {
    const { company, start, registeredUsers, timezone } = stream
 
    const luxonStartDate = DateTime.fromJSDate(start.toDate(), {
@@ -63,7 +61,7 @@ export const generateReminderEmailData = (
  * Create all the email template variables needed for the email data
  */
 const createRecipientVariables = (
-   stream: Partial<LivestreamEvent>,
+   stream: LiveStreamEventWithRegisteredStudents,
    formattedDate: Date
 ) => {
    const {
@@ -84,11 +82,11 @@ const createRecipientVariables = (
 
    // Reduce over registered students to be possible to get registered information and add it to the stream data
    return registeredStudents.reduce((acc, registeredStudent) => {
-      const { id: studentEmail, firstName, lastName } = registeredStudent
+      const { id: studentEmail, firstName } = registeredStudent
 
       const emailData = {
          companyName: company,
-         userFirstName: `${firstName} ${lastName}`,
+         userFirstName: firstName,
          streamTitle: title,
          formattedDateTime: formattedDate,
          speaker1Name: `${speakerFirstName} ${speakerLastName}`,
@@ -106,7 +104,7 @@ const createRecipientVariables = (
    }, {})
 }
 
-export const addMinutesDate = (date, minutes) => {
+export const addMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() + minutes * 60000)
 }
 

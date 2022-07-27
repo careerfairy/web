@@ -48,8 +48,12 @@ export interface LivestreamEvent extends Identifiable {
    }
    universities: any[]
    externalEventLink?: string
-   registeredStudents?: RegisteredStudent[]
    timezone?: string
+   isFaceToFace?: boolean
+}
+
+export interface LiveStreamEventWithRegisteredStudents extends LivestreamEvent {
+   registeredStudents: RegisteredStudent[]
 }
 
 export interface Speaker extends Identifiable {
