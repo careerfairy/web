@@ -208,18 +208,9 @@ service cloud.firestore {
             allow update: if true;
             allow delete: if true;
 
-            match /registeredStudents/{student} {
-                allow read: if true;
-                allow write: if true;
-            }
             match /userLivestreamData/{studentEmail} {
                 allow read: if request.auth.token != null;
                 allow write: if request.auth.token.email == studentEmail;
-            }
-
-            match /registrants/{registrant} {
-                allow read: if true;
-                allow write: if true;
             }
 
             match /preferences/{adminPreference} {
@@ -227,15 +218,6 @@ service cloud.firestore {
                 allow write: if isCFAdmin();
             }
 
-            match /talentPool/{student} {
-                allow read: if true;
-                allow write: if true;
-            }
-
-            match /participatingStudents/{student} {
-                allow read: if true;
-                allow write: if true;
-            }
 
             match /participatingStats/{userId} {
                 allow read: if isCFAdmin();
@@ -350,9 +332,9 @@ service cloud.firestore {
             allow update: if true;
             allow delete: if true;
 
-            match /participatingStudents/{student} {
-                allow read: if true;
-                allow write: if true;
+            match /userLivestreamData/{studentEmail} {
+                allow read: if request.auth.token != null;
+                allow write: if request.auth.token.email == studentEmail;
             }
 
             match /chatEntries/{chatEntry} {

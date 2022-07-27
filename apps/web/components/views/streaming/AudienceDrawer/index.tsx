@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { useEffect } from "react"
+import React, { useEffect, useMemo } from "react"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import Drawer from "@mui/material/Drawer"
@@ -12,6 +12,9 @@ import { withFirebase } from "../../../../context/firebase/FirebaseServiceContex
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import PeopleWhoJoinedTab from "./PeopleWhoJoinedTab"
 import useStreamRef from "../../../custom-hook/useStreamRef"
+import useCollection from "../../../custom-hook/useCollection"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { UserLivestreamData } from "@careerfairy/shared-lib/src/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    drawerContent: {
@@ -40,38 +43,31 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const DrawerContent = ({ isStreamer, hideAudience, firebase }) => {
+interface ContentProps {
+   isStreamer: boolean
+   hideAudience: () => void
+}
+const DrawerContent = ({ isStreamer, hideAudience }: ContentProps) => {
    const theme = useTheme()
    const classes = useStyles()
    const streamRef = useStreamRef()
    const [value, setValue] = React.useState(isStreamer ? 1 : 0)
-   const [participatingStudents, setParticipatingStudents] =
-      React.useState(undefined)
 
    const {
-      currentLivestream: { talentPool, id: streamId },
+      currentLivestream: { id: streamId },
    } = useCurrentStream()
-
-   useEffect(() => {
-      if (streamId) {
-         const unsubscribe =
-            firebase.listenToAllLivestreamParticipatingStudents(
-               streamRef,
-               (querySnapshot) => {
-                  const participatingStudents = querySnapshot.docs.map(
-                     (doc) => ({
-                        id: doc.id,
-                        ...doc.data(),
-                        inTalentPool: talentPool?.includes(doc.id),
-                     })
-                  )
-                  setParticipatingStudents(participatingStudents)
-               }
-            )
-
-         return () => unsubscribe()
-      }
-   }, [streamId, talentPool])
+   const query = useMemo(
+      () =>
+         livestreamRepo.livestreamUsersQueryWithRef(
+            streamRef,
+            "participatedInLivestream"
+         ),
+      [streamId]
+   )
+   const { data: participatingStudents } = useCollection<UserLivestreamData>(
+      query,
+      true
+   )
 
    const handleChange = (event, newValue) => {
       setValue(newValue)
@@ -150,18 +146,16 @@ const DrawerContent = ({ isStreamer, hideAudience, firebase }) => {
    )
 }
 
-DrawerContent.propTypes = {
-   firebase: PropTypes.object,
-   hideAudience: PropTypes.func,
-   isStreamer: PropTypes.bool,
+interface AudienceDrawerProps {
+   audienceDrawerOpen: boolean
+   hideAudience: () => void
+   isStreamer: boolean
 }
-
 const AudienceDrawer = ({
    audienceDrawerOpen,
    hideAudience,
    isStreamer,
-   firebase,
-}) => {
+}: AudienceDrawerProps) => {
    const classes = useStyles()
 
    return (
@@ -173,19 +167,9 @@ const AudienceDrawer = ({
          open={audienceDrawerOpen}
          onClose={hideAudience}
       >
-         <DrawerContent
-            firebase={firebase}
-            hideAudience={hideAudience}
-            isStreamer={isStreamer}
-         />
+         <DrawerContent hideAudience={hideAudience} isStreamer={isStreamer} />
       </Drawer>
    )
 }
 
-AudienceDrawer.propTypes = {
-   audienceDrawerOpen: PropTypes.bool.isRequired,
-   hideAudience: PropTypes.func.isRequired,
-   isStreamer: PropTypes.bool.isRequired,
-}
-
-export default withFirebase(AudienceDrawer)
+export default AudienceDrawer

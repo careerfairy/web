@@ -7,6 +7,10 @@ import AudienceCategoryChart from "./AudienceCategoryChart"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import LoadingDisplay from "../displays/LoadingDisplay"
 import EmptyDisplay from "../displays/EmptyDisplay"
+import {
+   LivestreamUserAction,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -14,7 +18,11 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const BreakdownTab = ({ audience }) => {
+interface Props {
+   audience: UserLivestreamData[]
+}
+
+const BreakdownTab = ({ audience }: Props) => {
    const classes = useStyles()
    const {
       currentLivestream: { talentPool },
@@ -22,8 +30,9 @@ const BreakdownTab = ({ audience }) => {
 
    const talentPoolPercentage = useMemo(() => {
       const totalCount = audience.length
-      const inTalentPoolCount = audience.filter(
-         (user) => user.inTalentPool
+      const inTalentPoolCount = audience.filter((user) =>
+         // @ts-ignore
+         user.userHas?.includes("joinedTalentPool" as LivestreamUserAction)
       ).length
       const percentage = (inTalentPoolCount / totalCount) * 100
       return isNaN(percentage) ? 0 : Math.round(percentage)

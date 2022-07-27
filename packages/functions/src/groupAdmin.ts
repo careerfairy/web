@@ -324,14 +324,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             livestreamData.id,
             "participatedInLivestream"
          )
-         console.log(
-            "-> num participatingStudents in collection",
-            livestreamData.participatingStudents.length
-         )
-         console.log(
-            "-> num participatingStudents",
-            participatingStudents.length
-         )
 
          const groupPresenter = new GroupPresenter(requestingGroupData)
 

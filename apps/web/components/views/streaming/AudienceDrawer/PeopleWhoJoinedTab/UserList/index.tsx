@@ -3,8 +3,16 @@ import React, { memo } from "react"
 import AutoSizer from "react-virtualized-auto-sizer"
 import { FixedSizeList } from "react-window"
 import User from "./User"
+import {
+   LivestreamUserAction,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
-const UserList = ({ audience, isStreamer }) => {
+interface Props {
+   audience: UserLivestreamData[]
+   isStreamer: boolean
+}
+const UserList = ({ audience, isStreamer }: Props) => {
    return (
       <div style={{ flex: "1 1 auto" }}>
          <AutoSizer>
@@ -19,9 +27,12 @@ const UserList = ({ audience, isStreamer }) => {
                      <User
                         style={style}
                         key={audience[index].id}
-                        isStreamer={isStreamer}
                         inTalentPool={Boolean(
-                           isStreamer && audience[index]?.inTalentPool
+                           isStreamer &&
+                              // @ts-ignore
+                              audience[index]?.userHas?.includes(
+                                 "joinedTalentPool" as LivestreamUserAction
+                              )
                         )}
                         user={audience[index]}
                      />

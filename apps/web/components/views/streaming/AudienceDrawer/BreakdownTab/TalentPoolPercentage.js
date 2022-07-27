@@ -5,8 +5,6 @@ import withStyles from "@mui/styles/withStyles"
 import { Card, CardContent, CardHeader, Grid, Typography } from "@mui/material"
 import LinearProgress from "@mui/material/LinearProgress"
 
-import clsx from "clsx"
-
 const BorderLinearProgress = withStyles((theme) => ({
    root: {
       height: 10,
@@ -34,10 +32,10 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const TalentPoolPercentage = ({ percentage, className, ...rest }) => {
+const TalentPoolPercentage = ({ percentage, ...rest }) => {
    const classes = useStyles()
    return (
-      <Card className={clsx(classes.root, className)} {...rest}>
+      <Card className={classes.root} {...rest}>
          <CardHeader
             className={classes.header}
             title="Percent in talent pool"

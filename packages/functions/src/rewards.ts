@@ -110,7 +110,9 @@ export const rewardApply = functions
 
 export const rewardLivestreamRegistrant = functions
    .region(config.region)
-   .firestore.document("livestreams/{livestreamId}/registrants/{userId}")
+   .firestore.document(
+      "livestreams/{livestreamId}/userLivestreamData/{userEmail}"
+   )
    .onCreate(async (snap, context) => {
       const documentData = snap.data()
 
@@ -136,7 +138,7 @@ export const rewardLivestreamRegistrant = functions
 
       if (
          !userInviteOwner ||
-         userInviteOwner.authId === context.params.userId
+         userInviteOwner.userEmail === context.params.userEmail
       ) {
          functions.logger.info(
             "The user owner of the invite is the same attending or does not exist."

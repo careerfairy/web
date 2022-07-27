@@ -87,10 +87,6 @@ export interface ILivestreamRepository {
    getLivestreamRegisteredStudents(
       eventId: string
    ): Promise<RegisteredStudent[]>
-   getLivestreamTalentPoolMembers(
-      companyId: LivestreamEvent["companyId"]
-   ): Promise<TalentPoolStudent[]>
-
    heartbeat(
       livestream: LivestreamEventPublicData,
       userData: UserPublicData,
@@ -104,6 +100,14 @@ export interface ILivestreamRepository {
       userType: LivestreamUserAction
    ): Promise<UserLivestreamData[]>
    getAllLivestreams(withTest?: boolean): Promise<LivestreamEvent[]>
+   livestreamUsersQuery(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): firebase.firestore.Query
+   livestreamUsersQueryWithRef(
+      streamRef: firebase.firestore.DocumentReference,
+      userType: LivestreamUserAction
+   ): firebase.firestore.Query
 }
 
 export class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -412,16 +416,6 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return mapFirestoreDocuments<RegisteredStudent>(ref)
    }
 
-   async getLivestreamTalentPoolMembers(
-      companyId: LivestreamEvent["companyId"]
-   ): Promise<TalentPoolStudent[]> {
-      let snaps = await this.firestore
-         .collection("userData")
-         .where("talentPools", "array-contains", companyId)
-         .get()
-      return mapFirestoreDocuments<TalentPoolStudent>(snaps)
-   }
-
    async getAllRegisteredStudents(): Promise<RegisteredStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("registeredStudents")
@@ -446,13 +440,28 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       eventId: string,
       userType: LivestreamUserAction
    ): Promise<UserLivestreamData[]> {
-      const snaps = await this.firestore
+      const snaps = await this.livestreamUsersQuery(eventId, userType).get()
+      return mapFirestoreDocuments<UserLivestreamData>(snaps)
+   }
+
+   livestreamUsersQuery(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): firebase.firestore.Query {
+      return this.firestore
          .collection("livestreams")
          .doc(eventId)
          .collection("userLivestreamData")
          .where("userHas", "array-contains", userType)
-         .get()
-      return mapFirestoreDocuments<UserLivestreamData>(snaps)
+   }
+
+   livestreamUsersQueryWithRef(
+      streamRef: firebase.firestore.DocumentReference,
+      userType: LivestreamUserAction
+   ): firebase.firestore.Query {
+      return streamRef
+         .collection("userLivestreamData")
+         .where("userHas", "==", userType)
    }
 
    async getAllLivestreams(

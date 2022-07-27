@@ -15,7 +15,6 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import clsx from "clsx"
 import HowToRegRoundedIcon from "@mui/icons-material/HowToRegRounded"
 import MoreVertIcon from "@mui/icons-material/MoreVert"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
@@ -114,9 +113,7 @@ const User = ({ user, style, inTalentPool }) => {
 
    return (
       <ListItem
-         className={clsx(classes.root, {
-            // [classes.highlighted]: inTalentPool
-         })}
+         className={classes.root}
          style={style}
          button={inTalentPool}
          alignItems="flex-start"

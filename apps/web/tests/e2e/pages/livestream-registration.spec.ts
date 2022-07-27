@@ -13,7 +13,10 @@ import {
    expectText,
 } from "../utils/assertions"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamUserAction,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { sleep } from "../utils"
 
@@ -63,11 +66,13 @@ test("successful registration on a livestream event", async ({ page }) => {
    // assert firestore data is right
    const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
       livestream.id,
-      ["registrants", "registeredStudents"]
+      ["userLivestreamData"]
    )
-   expect(finalLivestreamData.registrants[0].userEmail).toBe(user.userEmail)
-   expect(finalLivestreamData.registeredStudents[0].userEmail).toBe(
+   expect(finalLivestreamData.userLivestreamData[0].userEmail).toBe(
       user.userEmail
+   )
+   expect(finalLivestreamData.userLivestreamData[0].userHas).toContain(
+      "joinedTalentPool" as LivestreamUserAction
    )
    expect(finalLivestreamData.livestream.registeredUsers).toContain(
       user.userEmail
@@ -112,10 +117,15 @@ test("register to an event and fill out a question and join talent pool", async 
    // assert firestore data is right
    const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
       livestream.id,
-      ["questions", "talentPool"]
+      ["questions", "userLivestreamData"]
    )
    expect(finalLivestreamData.questions[0].title).toBe(question)
-   expect(finalLivestreamData.talentPool[0].userEmail).toBe(user.userEmail)
+   expect(finalLivestreamData.userLivestreamData[0].userEmail).toBe(
+      user.userEmail
+   )
+   expect(finalLivestreamData.userLivestreamData[0].userHas).toContain(
+      "joinedTalentPool" as LivestreamUserAction
+   )
 })
 
 test("register to an event without login, login and proceed with registration", async ({

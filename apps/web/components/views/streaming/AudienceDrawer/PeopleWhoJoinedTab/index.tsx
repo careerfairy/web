@@ -11,9 +11,12 @@ import {
 } from "@mui/material"
 import UserList from "./UserList"
 import { isEmpty, isLoaded } from "react-redux-firebase"
-import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import EmptyDisplay from "../displays/EmptyDisplay"
 import LoadingDisplay from "../displays/LoadingDisplay"
+import {
+   LivestreamUserAction,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    searchGridWrapper: {
@@ -24,27 +27,32 @@ const TALENT_POOL_OPTION = "Talent pool"
 const ALL_OPTION = "All"
 const options = [ALL_OPTION, TALENT_POOL_OPTION]
 
-const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }) => {
+interface Props {
+   participatingStudents: UserLivestreamData[]
+   isStreamer: boolean
+}
+const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }: Props) => {
    const classes = useStyles()
-   const {
-      currentLivestream: { talentPool },
-   } = useCurrentStream()
 
    const [searchParams, setSearchParams] = useState("")
    const [currentOption, setCurrentOption] = useState(options[0])
 
    const [filteredAudience, setFilteredAudience] = useState(undefined)
 
-   const handleFilter = (arrayOfUserObjects) => {
+   const handleFilter = (arrayOfUserObjects: UserLivestreamData[]) => {
       if (!arrayOfUserObjects) return arrayOfUserObjects
       let filtered = arrayOfUserObjects.filter(
          (user) =>
             user.firstName?.toLowerCase().includes(searchParams) ||
             user.lastName?.toLowerCase().includes(searchParams) ||
-            user.universityName?.toLowerCase().includes(searchParams)
+            user.university.name?.toLowerCase().includes(searchParams)
+         // user.universityName?.toLowerCase().includes(searchParams)
       )
       if (currentOption === TALENT_POOL_OPTION) {
-         filtered = filtered.filter((user) => talentPool?.includes(user.id))
+         filtered = filtered.filter((user) =>
+            // @ts-ignore
+            user.userHas?.includes("joinedTalentPool" as LivestreamUserAction)
+         )
       }
       return filtered
    }

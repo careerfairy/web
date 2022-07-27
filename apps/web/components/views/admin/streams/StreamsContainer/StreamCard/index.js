@@ -40,6 +40,7 @@ import PercentIcon from "@mui/icons-material/Percent"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import { format } from "date-fns"
 import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 const styles = {
    root: {
@@ -164,10 +165,10 @@ const StreamCard = ({ isUpcoming, stream }) => {
     */
    const handleRegisteredUsersDownload = useCallback(() => {
       livestreamRepo
-         .getLivestreamRegisteredStudents(stream.id)
+         .getLivestreamUsers(stream.id, "registeredToLivestream")
          .then((students) => {
             setCsvDownloadData({
-               data: formatRegisteredUsersToCSV(students, stream),
+               data: formatRegisteredUsersToCSV(students),
                title: `Registered students for ${stream.title} - (${stream.start
                   ?.toDate()
                   ?.toISOString()})`,
@@ -374,23 +375,21 @@ const StreamCard = ({ isUpcoming, stream }) => {
    )
 }
 
-function formatRegisteredUsersToCSV(students, stream) {
+function formatRegisteredUsersToCSV(students) {
    const DATE_FIELD = "Registered Date (Swiss Time)"
    return students
       .map((student) => ({
          "First Name": student.firstName,
          "Last Name": student.lastName,
-         [DATE_FIELD]: student.dateRegistered?.toDate(),
-         Attended: stream.participatingStudents?.includes(student.userEmail)
+         [DATE_FIELD]: student.dateRegisteredToLivestream?.toDate(),
+         Attended: student.userHas?.includes("participatedInLivestream")
             ? "Yes"
             : "No",
          Email: student.userEmail,
          University: student.university?.name,
          "University Country": student.universityCountryCode,
       }))
-      .sort((a, b) => {
-         return b[DATE_FIELD] - a[DATE_FIELD]
-      })
+      .sort(dynamicSort(DATE_FIELD))
       .map((student) => ({
          ...student,
          [DATE_FIELD]: convertFromUTCToSwissTime(student[DATE_FIELD]),

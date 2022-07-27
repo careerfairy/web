@@ -295,11 +295,11 @@ class FirebaseService {
 
    // *** Firestore API ***
 
-   getStreamRef = (router) => {
+   getStreamRef = (router): firebase.firestore.DocumentReference => {
       const {
          query: { breakoutRoomId, livestreamId },
       } = router
-      if (!livestreamId) return {}
+      if (!livestreamId) return null
       let ref = this.firestore.collection("livestreams").doc(livestreamId)
       if (breakoutRoomId) {
          ref = ref.collection("breakoutRooms").doc(breakoutRoomId)
@@ -1328,45 +1328,6 @@ class FirebaseService {
       })
    }
 
-   getLivestreamRegisteredStudents = (livestreamId) => {
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("registeredStudents")
-      return ref.get()
-   }
-
-   getLivestreamParticipatingStudents = (livestreamId) => {
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("participatingStudents")
-      return ref.get()
-   }
-   listenToLivestreamParticipatingStudents = (livestreamId, callback) => {
-      const now = new Date()
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("participatingStudents")
-         .where("joined", ">", now)
-         .orderBy("joined", "asc")
-         .limit(1)
-      return ref.onSnapshot(callback)
-   }
-
-   listenToAllLivestreamParticipatingStudents = (streamRef, callback) => {
-      let ref = streamRef.collection("participatingStudents")
-      return ref.onSnapshot(callback)
-   }
-
-   getLivestreamTalentPoolMembers = (companyId) => {
-      let ref = this.firestore
-         .collection("userData")
-         .where("talentPools", "array-contains", companyId)
-      return ref.get()
-   }
-
    deleteCareerCenter = (careerCenterId) => {
       let careerCenterRef = this.firestore
          .collection("careerCenterData")
@@ -2153,16 +2114,6 @@ class FirebaseService {
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-      let registeredUsersRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("registeredStudents")
-         .doc(email)
-      let registrantSubCollectionRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("registrants")
-         .doc(uid)
 
       const userLivestreamDataRef = this.firestore
          .collection("livestreams")
@@ -2207,35 +2158,16 @@ class FirebaseService {
                transaction
             )
 
-            // To be depreciated
-            transaction.set(registeredUsersRef, {
-               ...user,
-               livestreamId,
-               dateRegistered: this.getServerTimestamp(),
-               authId: uid,
-            } as RegisteredStudent)
-
-            const userAction: LivestreamUserAction = "registeredToLivestream"
-            const newUserData: UserLivestreamData = {
-               ...user,
-               livestreamId,
-               userHas: firebase.firestore.FieldValue.arrayUnion(userAction),
-               dateRegisteredToLivestream: this.getServerTimestamp(),
-               livestreamGroupQuestionAnswers: userQuestionsAndAnswersDict,
-            }
             transaction.set(
                userLivestreamDataRef,
-               newUserData as UserLivestreamData,
-               { merge: true }
-            )
-
-            // To be used from now on
-            transaction.set(
-               registrantSubCollectionRef,
                Object.assign(
                   {
                      ...user,
                      livestreamId,
+                     userHas: firebase.firestore.FieldValue.arrayUnion(
+                        "registeredToLivestream" as LivestreamUserAction
+                     ),
+                     dateRegisteredToLivestream: this.getServerTimestamp(),
                      dateRegistered: this.getServerTimestamp(),
                      authId: uid,
                   },
@@ -2246,7 +2178,8 @@ class FirebaseService {
                      // Store the utm params if they exist
                      utm: SessionStorageUtil.getUTMParams(),
                   }
-               )
+               ) as UserLivestreamData,
+               { merge: true }
             )
          })
       })
@@ -2280,29 +2213,33 @@ class FirebaseService {
    }
 
    deregisterFromLivestream = (livestreamId, authenticatedUser) => {
-      const { uid, email } = authenticatedUser
+      const { email } = authenticatedUser
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-      let registeredUsersRef = this.firestore
+      const userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-         .collection("registeredStudents")
+         .collection("userLivestreamData")
          .doc(email)
-      let registrantSubCollectionRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("registrants")
-         .doc(uid)
-      let batch = this.firestore.batch()
-      batch.update(livestreamRef, {
-         registeredUsers: firebase.firestore.FieldValue.arrayRemove(email),
+
+      return this.firestore.runTransaction((transaction) => {
+         return transaction
+            .get(userLivestreamDataRef)
+            .then((userLivestreamDataDoc) => {
+               if (userLivestreamDataDoc.exists) {
+                  transaction.update(userLivestreamDataRef, {
+                     userHas: firebase.firestore.FieldValue.arrayRemove(
+                        "registeredToLivestream" as LivestreamUserAction
+                     ),
+                  } as UserLivestreamData)
+               }
+               transaction.update(livestreamRef, {
+                  registeredUsers:
+                     firebase.firestore.FieldValue.arrayRemove(email),
+               })
+            })
       })
-      // To be depreciated
-      batch.delete(registeredUsersRef)
-      // To be used from now on
-      batch.delete(registrantSubCollectionRef)
-      return batch.commit()
    }
 
    joinCompanyTalentPool = (companyId, userData, mainStreamId) => {
@@ -2310,10 +2247,10 @@ class FirebaseService {
          .collection("userData")
          .doc(userData.userEmail)
       let streamRef = this.firestore.collection("livestreams").doc(mainStreamId)
-      let userInTalentPoolCollectionRef = this.firestore
+      const userLivestreamData = this.firestore
          .collection("livestreams")
          .doc(mainStreamId)
-         .collection("talentPool")
+         .collection("userLivestreamData")
          .doc(userData.userEmail)
 
       return this.firestore.runTransaction((transaction) => {
@@ -2329,10 +2266,17 @@ class FirebaseService {
                      userData.userEmail
                   ),
                })
-               transaction.set(userInTalentPoolCollectionRef, {
-                  ...userData,
-                  dateJoinedTalentPool: this.getServerTimestamp(),
-               })
+               transaction.set(
+                  userLivestreamData,
+                  {
+                     ...userData,
+                     userHas: firebase.firestore.FieldValue.arrayUnion(
+                        "joinedTalentPool" as LivestreamUserAction
+                     ),
+                     dateJoinedTalentPool: this.getServerTimestamp(),
+                  } as UserLivestreamData,
+                  { merge: true }
+               )
             }
          })
       })
@@ -2351,35 +2295,45 @@ class FirebaseService {
    }
 
    leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
-      let batch = this.firestore.batch()
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
       let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
-      let userInTalentPoolCollectionRef = this.firestore
+      let userLivestreamDataRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-         .collection("talentPool")
+         .collection("userLivestreamData")
          .doc(userData.userEmail)
-      batch.update(userRef, {
-         talentPools: firebase.firestore.FieldValue.arrayRemove(companyId),
-      })
-      batch.update(streamRef, {
-         talentPool: firebase.firestore.FieldValue.arrayRemove(
-            userData.userEmail
-         ),
-      })
 
-      batch.delete(userInTalentPoolCollectionRef)
-
-      return batch.commit()
+      return this.firestore.runTransaction((transaction) => {
+         return transaction
+            .get(userLivestreamDataRef)
+            .then((userLivestreamDataDoc) => {
+               if (userLivestreamDataDoc.exists) {
+                  transaction.update(userLivestreamDataRef, {
+                     userHas: firebase.firestore.FieldValue.arrayRemove(
+                        "joinedTalentPool" as LivestreamUserAction
+                     ),
+                  } as UserLivestreamData)
+               }
+               transaction.update(userRef, {
+                  talentPools:
+                     firebase.firestore.FieldValue.arrayRemove(companyId),
+               })
+               transaction.update(streamRef, {
+                  talentPool: firebase.firestore.FieldValue.arrayRemove(
+                     userData.userEmail
+                  ),
+               })
+            })
+      })
    }
 
    listenToUserInTalentPool = (livestreamId, userId, callback) => {
       const userTalentPoolRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-         .collection("talentPool")
+         .collection("userLivestreamData")
          .doc(userId)
       return userTalentPoolRef.onSnapshot(callback)
    }
@@ -2387,13 +2341,20 @@ class FirebaseService {
    setUserIsParticipatingWithRef = (streamRef, userData: UserData) => {
       let batch = this.firestore.batch()
       let participantsRef = streamRef
-         .collection("participatingStudents")
+         .collection("userLivestreamData")
          .doc(userData.userEmail)
 
-      batch.set(participantsRef, {
-         ...userData,
-         joined: this.getServerTimestamp(),
-      } as ParticipatingStudent)
+      batch.set(
+         participantsRef,
+         {
+            ...userData,
+            dateParticipatedInLivestream: this.getServerTimestamp(),
+            userHas: firebase.firestore.FieldValue.arrayUnion(
+               "participatedInLivestream" as LivestreamUserAction
+            ),
+         } as UserLivestreamData,
+         { merge: true }
+      )
       batch.update(streamRef, {
          participatingStudents: firebase.firestore.FieldValue.arrayUnion(
             userData.userEmail

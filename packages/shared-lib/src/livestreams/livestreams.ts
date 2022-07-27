@@ -17,6 +17,7 @@ export interface LivestreamEvent extends Identifiable {
    companyId?: string
    participants?: string[]
    participatingStudents?: string[]
+   maxRegistrants?: number
    companyLogoUrl?: string
    created?: firebase.firestore.Timestamp
    currentSpeakerId?: string
@@ -33,6 +34,7 @@ export interface LivestreamEvent extends Identifiable {
    }
    hidden?: boolean
    talentPool?: string[]
+   hasNoTalentPool?: boolean
    test?: boolean
    title?: string
    type?: string
@@ -40,7 +42,6 @@ export interface LivestreamEvent extends Identifiable {
    startDate?: Date
    registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
-   registrants?: string[]
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
@@ -65,9 +66,15 @@ export interface UserLivestreamData extends UserData {
    userHas: LivestreamUserAction[] | firebase.firestore.FieldValue
    livestreamId: LivestreamEvent["id"]
    livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
-   dateJoinedTalentPool?: firebase.firestore.Timestamp
-   dateParticipatedInLivestream?: firebase.firestore.Timestamp
-   dateRegisteredToLivestream?: firebase.firestore.Timestamp
+   dateJoinedTalentPool?:
+      | firebase.firestore.Timestamp
+      | firebase.firestore.FieldValue
+   dateParticipatedInLivestream?:
+      | firebase.firestore.Timestamp
+      | firebase.firestore.FieldValue
+   dateRegisteredToLivestream?:
+      | firebase.firestore.Timestamp
+      | firebase.firestore.FieldValue
 }
 
 export type LivestreamGroupQuestionsMap = Record<
@@ -178,7 +185,6 @@ export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
       | "registeredUsers"
-      | "registrants"
       | "talentPool"
       | "participatingStudents"
       | "participants"

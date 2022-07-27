@@ -1,6 +1,8 @@
 import {
    LivestreamEvent,
+   LivestreamQuestion,
    Speaker,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { faker } from "@faker-js/faker"
 import { v4 as uuidv4 } from "uuid"
@@ -29,12 +31,7 @@ interface LivestreamSeed {
 class LivestreamFirebaseSeed implements LivestreamSeed {
    async getWithSubcollections(
       livestreamId: string,
-      subCollections = [
-         "registeredStudents",
-         "registrants",
-         "talentPool",
-         "questions",
-      ]
+      subCollections = ["userLivestreamData", "questions"]
    ): Promise<LivestreamEventWithSubcollections> {
       let res = {}
 
@@ -137,7 +134,6 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             groupId: uuidv4(),
          },
          registeredUsers,
-         registrants: registeredUsers.map((_) => uuidv4()),
          speakers: Array.from(
             {
                length: faker.datatype.number({ min: 1, max: 5 }),
@@ -183,10 +179,8 @@ const generateSpeaker = (): Speaker => ({
 
 type LivestreamEventWithSubcollections = {
    livestream: LivestreamEvent
-   registeredStudents: any
-   registrants: any
-   talentPool: any
-   questions: any
+   userLivestreamData: UserLivestreamData[]
+   questions: LivestreamQuestion[]
 }
 
 const instance: LivestreamSeed = new LivestreamFirebaseSeed()

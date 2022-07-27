@@ -31,6 +31,7 @@ export interface UserData extends Identifiable {
    universityCountryCode: string
    unsubscribed?: boolean
    userEmail: string
+   talentPools?: string[]
    validationPin: number
    interestsIds?: string[]
    points?: number
