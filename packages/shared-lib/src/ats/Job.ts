@@ -1,5 +1,5 @@
 import { JobStatus, MergeJob } from "./MergeResponseTypes"
-import { BaseModel } from "../BaseModel"
+import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
 import { Office } from "./Office"
 import { Recruiter } from "./Recruiter"
 import { Department } from "./Department"
@@ -26,20 +26,6 @@ export class Job extends BaseModel {
       super()
    }
 
-   /**
-    * Convert from a class object to plain object with primitive types
-    * Useful to return as JSON responses from the backend
-    *
-    * Don't forget to convert it again to a class type (createFromPlainObject)
-    * otherwise functions won't be accessible
-    */
-   serializeToPlainObject() {
-      return {
-         ...this,
-         createdAt: this.createdAt.toISOString(),
-      }
-   }
-
    static createFromMerge(job: MergeJob) {
       return new Job(
          job.id,
@@ -47,12 +33,12 @@ export class Job extends BaseModel {
          // strip html tags (teamtailor)
          job.description.replace(/<[^>]*>?/gm, ""),
          job.status,
-         job.offices.map((o) => Office.createFromMerge(o)),
-         job.hiring_managers.map((h) => Recruiter.createFromMerge(h)),
-         job.recruiters.map((r) => Recruiter.createFromMerge(r)),
-         job.departments.map((d) => Department.createFromMerge(d)),
-         new Date(job.remote_created_at),
-         new Date(job.remote_updated_at)
+         job.offices.map(Office.createFromMerge),
+         job.hiring_managers.map(Recruiter.createFromMerge),
+         job.recruiters.map(Recruiter.createFromMerge),
+         job.departments.map(Department.createFromMerge),
+         fromMergeDate(job.remote_created_at),
+         fromMergeDate(job.remote_updated_at)
       )
    }
 
@@ -62,12 +48,12 @@ export class Job extends BaseModel {
          job.name,
          job.description,
          job.status,
-         job.offices.map((o) => Office.createFromPlainObject(o)),
-         job.hiringManagers.map((h) => Recruiter.createFromPlainObject(h)),
-         job.recruiters.map((r) => Recruiter.createFromPlainObject(r)),
-         job.departments.map((d) => Department.createFromPlainObject(d)),
-         new Date(job.createdAt),
-         new Date(job.updatedAt)
+         job.offices.map(Office.createFromPlainObject),
+         job.hiringManagers.map(Recruiter.createFromPlainObject),
+         job.recruiters.map(Recruiter.createFromPlainObject),
+         job.departments.map(Department.createFromPlainObject),
+         fromSerializedDate(job.createdAt),
+         fromSerializedDate(job.updatedAt)
       )
    }
 }
