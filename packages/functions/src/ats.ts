@@ -17,6 +17,7 @@ import {
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import { auth } from "firebase-admin"
 import DecodedIdToken = auth.DecodedIdToken
+import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -128,12 +129,43 @@ export const fetchATSJobs = functions
             requestData.tokens.merge.account_token
          )
 
-         return await atsRepository
-            .getJobs()
-            .then((jobs) => jobs.map((job) => job.serializeToPlainObject()))
+         return await atsRepository.getJobs().then(serializeModels)
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to fetch the account jobs",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
+ * Fetch Job Applications
+ * Possibility to filter by job id
+ */
+export const fetchATSApplications = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken({
+         data,
+         context,
+         requiredData: {
+            jobId: string().optional().nullable(),
+         },
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         return await atsRepository
+            .getApplications(requestData.jobId)
+            .then(serializeModels)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the account applications",
             e,
             requestData
          )
@@ -157,9 +189,7 @@ export const fetchATSSyncStatus = functions
             requestData.tokens.merge.account_token
          )
 
-         return await atsRepository
-            .getSyncStatus()
-            .then((res) => res.map((s) => s.serializeToPlainObject()))
+         return await atsRepository.getSyncStatus().then(serializeModels)
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to fetch the merge sync status",
@@ -291,4 +321,12 @@ async function atsRequestValidationWithAccountToken<T extends object>(
       ...data,
       tokens: accountTokens,
    }
+}
+
+/**
+ * Convert business models into plain objects (arrays)
+ * @param result
+ */
+function serializeModels<T extends BaseModel>(result: T[]) {
+   return result.map((entry) => entry.serializeToPlainObject())
 }

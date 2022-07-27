@@ -136,3 +136,4 @@ exports.mergeGetAccountToken = ats.mergeGetAccountToken
 exports.mergeRemoveAccount = ats.mergeRemoveAccount
 exports.fetchATSJobs = ats.fetchATSJobs
 exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
+exports.fetchATSApplications = ats.fetchATSApplications
