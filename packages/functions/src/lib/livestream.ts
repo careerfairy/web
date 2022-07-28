@@ -155,8 +155,6 @@ export const updateLiveStreamWithEmailSent = (
    stream: LiveStreamEventWithRegisteredStudents,
    reminder: ReminderData
 ): Promise<admin.firestore.WriteResult> => {
-   throw new Error("error")
-
    const { id, reminderEmailsSent } = stream
    const { livestreamKey } = reminder
 

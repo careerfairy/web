@@ -238,10 +238,14 @@ export const scheduleReminderEmails = functions.pubsub
          const rejectedPromises = results.filter(
             ({ status }) => status === "rejected"
          )
-         rejectedPromises.length &&
-            functions.logger.error(
-               `${rejectedPromises.length} reminders were not sent`
-            )
+
+         if (rejectedPromises.length > 0) {
+            const errorMessage = `${rejectedPromises.length} reminders were not sent`
+            functions.logger.error(errorMessage)
+
+            // Google Cloud monitoring should create an incident
+            throw new Error(errorMessage)
+         }
       })
    })
 
@@ -271,7 +275,8 @@ const handleReminder = async (
       await handleSendEmail(filteredStreams, reminder)
    } catch (error) {
       functions.logger.error(
-         `Error handling reminder with template ${reminder.template}`
+         `Error handling reminder with template ${reminder.template}`,
+         error
       )
       throw new functions.https.HttpsError("unknown", error)
    }
@@ -318,7 +323,7 @@ const handleSendEmail = (
             )
          } else {
             functions.logger.error(reason)
-            throw Error(reason)
+            throw new Error(reason)
          }
       })
    })
@@ -343,8 +348,8 @@ const createSendEmailPromise = (
          })
       })
       .catch((error) => {
-         throw Error(
-            `Email ${template} was not sent for stream ${id} with the error ${error}`
+         throw new Error(
+            `Email ${template} was not sent for stream ${id} with the error ${error?.message}`
          )
       })
 }
