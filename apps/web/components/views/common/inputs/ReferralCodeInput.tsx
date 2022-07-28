@@ -25,7 +25,7 @@ const ReferralCodeInput = ({
    isValid,
    onSetIsValid,
 }: Props) => {
-   const { rewardSignUpFollower } = useFirebaseService()
+   const { applyReferralCode } = useFirebaseService()
 
    const [] = useDebounce(
       () => handleReferralCodeDebounced(referralCodeValue),
@@ -41,7 +41,7 @@ const ReferralCodeInput = ({
             onSetIsValid(false)
 
             try {
-               const { data: fieldToUpdate } = await rewardSignUpFollower(
+               const { data: fieldToUpdate } = await applyReferralCode(
                   referralCode
                )
 
@@ -56,7 +56,7 @@ const ReferralCodeInput = ({
             }
          }
       },
-      [isValid, onSetIsValid, onUpdateField, rewardSignUpFollower]
+      [isValid, onSetIsValid, onUpdateField, applyReferralCode]
    )
 
    return (
