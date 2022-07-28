@@ -254,20 +254,27 @@ const handleReminder = async (
    filterEndDate: Date,
    reminder: ReminderData
 ) => {
-   const streams = await getStreamsByDateWithRegisteredStudents(
-      filterStartDate,
-      filterEndDate
-   )
+   try {
+      const streams = await getStreamsByDateWithRegisteredStudents(
+         filterStartDate,
+         filterEndDate
+      )
 
-   const { livestreamKey } = reminder
+      const { livestreamKey } = reminder
 
-   const filteredStreams = filterAlreadySentEmail(streams, livestreamKey)
+      const filteredStreams = filterAlreadySentEmail(streams, livestreamKey)
 
-   functions.logger.log(
-      `${filteredStreams.length} streams with ${livestreamKey} reminder`
-   )
+      functions.logger.log(
+         `${filteredStreams.length} streams with ${livestreamKey} reminder`
+      )
 
-   await handleSendEmail(filteredStreams, reminder)
+      await handleSendEmail(filteredStreams, reminder)
+   } catch (error) {
+      functions.logger.error(
+         `Error handling reminder with template ${reminder.template}`
+      )
+      throw new functions.https.HttpsError("unknown", error)
+   }
 }
 
 /**
