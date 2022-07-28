@@ -5,6 +5,7 @@ import {
    userGetByEmail,
    userIncrementStat,
    userIncrementField,
+   userUpdateFields,
 } from "./lib/user"
 import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 import {
@@ -332,16 +333,22 @@ export const applyReferralCode = functions.https.onCall(
                   referralCode: referralCode,
                } as ReferralData
 
+               // update user data with referredBy information
+               await userUpdateFields(userEmail, {
+                  referredBy: fieldToUpdate,
+               })
+
+               // apply reward to followed user
                await rewardCreateReferralSignUpFollower(userEmail, followedUser)
                functions.logger.info(
                   "Created referral follower reward for this user."
                )
 
-               return fieldToUpdate
+               return true
             }
          }
 
-         return null
+         return false
       } catch (e) {
          functions.logger.error(e)
          throw new Error(e)
