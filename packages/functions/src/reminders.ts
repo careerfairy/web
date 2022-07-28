@@ -4,8 +4,10 @@ import { admin } from "./api/firestoreAdmin"
 import { addMinutesDate, generateReminderEmailData, setHeaders } from "./util"
 import { sendMessage } from "./api/mailgun"
 import { TemplatedMessage } from "postmark"
-import { LivestreamEvent } from "../.packages/shared-lib/dist/livestreams"
-import { LiveStreamEventWithRegisteredStudents } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LiveStreamEventWithRegisteredStudents,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 
 export const sendReminderEmailToUserFromUniversity = functions.https.onRequest(
