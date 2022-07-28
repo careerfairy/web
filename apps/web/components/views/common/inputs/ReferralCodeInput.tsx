@@ -20,7 +20,6 @@ const styles = sxStyles({
 const ReferralCodeInput = ({
    name,
    referralCodeValue,
-   onUpdateField,
    onChange,
    isValid,
    onSetIsValid,
@@ -41,13 +40,11 @@ const ReferralCodeInput = ({
             onSetIsValid(false)
 
             try {
-               const { data: fieldToUpdate } = await applyReferralCode(
+               const { data: isValidReferralCode } = await applyReferralCode(
                   referralCode
                )
-
-               if (fieldToUpdate) {
+               if (isValidReferralCode) {
                   onSetIsValid(true)
-                  onUpdateField({ referredBy: fieldToUpdate })
                }
             } catch {
                console.error(
@@ -56,7 +53,7 @@ const ReferralCodeInput = ({
             }
          }
       },
-      [isValid, onSetIsValid, onUpdateField, applyReferralCode]
+      [isValid, onSetIsValid, applyReferralCode]
    )
 
    return (
@@ -90,7 +87,6 @@ const ReferralCodeInput = ({
 type Props = {
    name: string
    referralCodeValue: string
-   onUpdateField: (field) => void
    onChange: (event) => void
    isValid: boolean
    onSetIsValid: (isValid: boolean) => void

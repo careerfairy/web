@@ -103,7 +103,6 @@ const SocialInformation = () => {
                <ReferralCodeInput
                   name={REFERRAL_CODE_FIELD_NAME}
                   referralCodeValue={inputValues[REFERRAL_CODE_FIELD_NAME]}
-                  onUpdateField={updateFields}
                   onChange={handleInputChange}
                   isValid={isValidReferralCode}
                   onSetIsValid={setIsValidReferralCode}
