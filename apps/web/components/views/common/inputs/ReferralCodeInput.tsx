@@ -3,6 +3,7 @@ import React, { useCallback } from "react"
 import { useDebounce } from "react-use"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../../../../types/commonTypes"
+import { useSnackbar } from "notistack"
 
 const styles = sxStyles({
    inputLabel: {
@@ -25,6 +26,7 @@ const ReferralCodeInput = ({
    onSetIsValid,
 }: Props) => {
    const { applyReferralCode } = useFirebaseService()
+   const { enqueueSnackbar } = useSnackbar()
 
    const [] = useDebounce(
       () => handleReferralCodeDebounced(referralCodeValue),
@@ -45,6 +47,12 @@ const ReferralCodeInput = ({
                )
                if (isValidReferralCode) {
                   onSetIsValid(true)
+               } else {
+                  const notification = `The chosen referral code is not valid!`
+                  enqueueSnackbar(notification, {
+                     variant: "error",
+                     preventDuplicate: false,
+                  })
                }
             } catch {
                console.error(
@@ -53,7 +61,7 @@ const ReferralCodeInput = ({
             }
          }
       },
-      [isValid, onSetIsValid, applyReferralCode]
+      [isValid, onSetIsValid, applyReferralCode, enqueueSnackbar]
    )
 
    return (

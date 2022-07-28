@@ -66,7 +66,7 @@ const SocialInformation = () => {
             }))
          }
       }
-   }, [inputValues, userData])
+   }, [userData])
 
    const handleInputChange = useCallback(({ target: { value, name } }) => {
       setInputValues((prev) => ({ ...prev, [name]: value }))
