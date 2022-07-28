@@ -356,7 +356,3 @@ const filterAlreadySentEmail = (
       return reminderEmailsSent ? !reminderEmailsSent[reminderKey] : true
    })
 }
-
-const getReminderKey = (templateId: string) => {
-   return Object.keys(REMINDERS).find((key) => REMINDERS[key] === templateId)
-}
