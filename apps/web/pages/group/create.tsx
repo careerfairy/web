@@ -4,7 +4,9 @@ import { useRouter } from "next/router"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import Header from "../../components/views/header/Header"
 import Footer from "../../components/views/footer/Footer"
-import CreateBaseGroup from "../../components/views/group/create/CreateBaseGroup"
+import CreateBaseGroup, {
+   GroupedUniversity,
+} from "../../components/views/group/create/CreateBaseGroup"
 import CreateGroupQuestions from "../../components/views/group/create/CreateGroupQuestions"
 import CompleteGroup from "../../components/views/group/create/CompleteGroup"
 import { GlobalBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
@@ -16,6 +18,7 @@ import { Container, Step, StepLabel, Stepper } from "@mui/material"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "../../components/util/constants"
 import {
+   Group,
    GroupQuestion,
    sortGroupQuestionOptionsByName,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -28,6 +31,7 @@ import {
    fieldOfStudyRepo,
    levelOfStudyRepo,
 } from "../../data/RepositoryInstances"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 function getSteps() {
    return [
@@ -44,6 +48,8 @@ export type BaseGroupInfo = {
    description?: string
    test?: boolean
    universityName?: string
+   university?: GroupedUniversity
+   isUniversity?: boolean
 }
 const CreateGroup = () => {
    const firebase = useFirebaseService()
@@ -53,6 +59,7 @@ const CreateGroup = () => {
    const [activeStep, setActiveStep] = useState(0)
    const [baseGroupInfo, setBaseGroupInfo] = useState<BaseGroupInfo>({})
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
+   const [loadingDefaultQuestions, setLoadingDefaultQuestions] = useState(false)
    const { userData, authenticatedUser: user, isLoggedIn } = useAuth()
 
    useEffect(() => {
@@ -62,14 +69,23 @@ const CreateGroup = () => {
    }, [user])
 
    useEffect(() => {
-      void setDefaultCategories()
-   }, [])
+      if (baseGroupInfo.university?.id) {
+         if (!groupQuestions.length) {
+            void setFieldAndLevelOfStudyQuestions()
+         }
+      } else {
+         clearFieldAndLevelOfStudyQuestions()
+      }
+   }, [Boolean(baseGroupInfo.university?.id)])
 
    const steps = getSteps()
 
-   const setDefaultCategories = async () => {
+   const clearFieldAndLevelOfStudyQuestions = () => setGroupQuestions([])
+
+   const setFieldAndLevelOfStudyQuestions = async () => {
       try {
          // get all level and fields of study
+         setLoadingDefaultQuestions(true)
          const [levelsOfStudy, fieldsOfStudy] = await Promise.all([
             levelOfStudyRepo.getAllLevelsOfStudy(),
             fieldOfStudyRepo.getAllFieldsOfStudy(),
@@ -88,6 +104,7 @@ const CreateGroup = () => {
       } catch (e) {
          sendError(e)
       }
+      setLoadingDefaultQuestions(false)
    }
 
    const sendError = (error: any) => {
@@ -117,21 +134,6 @@ const CreateGroup = () => {
             },
             {}
          ),
-      }
-   }
-   const dynamicSort = (property) => {
-      let sortOrder = 1
-      if (property[0] === "-") {
-         sortOrder = -1
-         property = property.substr(1)
-      }
-      return function (a, b) {
-         /* next line works with strings and numbers,
-          * and you may want to customize it to your needs
-          */
-         const result =
-            a[property] < b[property] ? -1 : a[property] > b[property] ? 1 : 0
-         return result * sortOrder
       }
    }
 
@@ -190,12 +192,15 @@ const CreateGroup = () => {
    const createCareerCenter = async () => {
       try {
          const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
-         const careerCenter = {
+         const careerCenter: Omit<Group, "id" | "groupId"> = {
             universityName: baseGroupInfo.universityName,
             adminEmails: baseGroupInfo.adminEmails,
             logoUrl: downloadURL,
             description: baseGroupInfo.description,
             test: false,
+            ...(baseGroupInfo.university?.id && {
+               universityCode: baseGroupInfo.university.id,
+            }),
          }
          const ref = await groupRepo.createGroup(
             careerCenter,
@@ -219,6 +224,10 @@ const CreateGroup = () => {
       }
    }
 
+   const handleSkipNext = () =>
+      setActiveStep((prevActiveStep) => prevActiveStep + 2)
+   const handleSkipBack = () =>
+      setActiveStep((prevActiveStep) => prevActiveStep - 2)
    function getStepContent(stepIndex) {
       switch (stepIndex) {
          case 0:
@@ -226,6 +235,7 @@ const CreateGroup = () => {
                <CreateBaseGroup
                   setBaseGroupInfo={setBaseGroupInfo}
                   baseGroupInfo={baseGroupInfo}
+                  handleSkipNext={handleSkipNext}
                   handleNext={handleNext}
                />
             )
@@ -235,6 +245,7 @@ const CreateGroup = () => {
                   handleDeleteLocalGroupQuestion={
                      handleDeleteLocalGroupQuestion
                   }
+                  loadingDefaultQuestions={loadingDefaultQuestions}
                   handleUpdateGroupQuestion={handleUpdateGroupQuestion}
                   handleAddTempGroupQuestion={handleAddTempGroupQuestion}
                   groupQuestions={groupQuestions}
@@ -248,6 +259,7 @@ const CreateGroup = () => {
                   createCareerCenter={createCareerCenter}
                   baseGroupInfo={baseGroupInfo}
                   handleBack={handleBack}
+                  handleSkipBack={handleSkipBack}
                   groupQuestions={groupQuestions}
                />
             )

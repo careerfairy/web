@@ -29,6 +29,7 @@ const styles = sxStyles({
       flexDirection: "column",
       alignItems: "center",
       justifyContent: "space-between",
+      mt: 2,
    },
    buttons: {
       display: "flex",
@@ -52,6 +53,7 @@ interface Props {
    baseGroupInfo: BaseGroupInfo
    createCareerCenter: () => Promise<void>
    groupQuestions: GroupQuestion[]
+   handleSkipBack: () => void
 }
 
 const CompleteGroup = ({
@@ -59,6 +61,7 @@ const CompleteGroup = ({
    baseGroupInfo,
    createCareerCenter,
    groupQuestions,
+   handleSkipBack,
 }: Props) => {
    const [submitting, setSubmitting] = useState(false)
 
@@ -66,10 +69,6 @@ const CompleteGroup = ({
       setSubmitting(true)
       await createCareerCenter()
    }
-
-   const categories = groupQuestions.map((category) => {
-      return <DisplayCategoryElement key={category.id} category={category} />
-   })
 
    return (
       <Container sx={styles.root}>
@@ -102,11 +101,25 @@ const CompleteGroup = ({
                   </Typography>
                </CardContent>
             </Card>
-            <Typography style={{ marginTop: 10 }} variant="h5" gutterBottom>
-               Categories:
-            </Typography>
-            <div className="category-wrapper">{categories}</div>
-            {categories.length === 0 && <Typography>No categories</Typography>}
+            {!!groupQuestions.length && (
+               <>
+                  <Typography
+                     style={{ marginTop: 10 }}
+                     variant="h5"
+                     gutterBottom
+                  >
+                     Event registration questions:
+                  </Typography>
+                  <div className="category-wrapper">
+                     {groupQuestions.map((category) => (
+                        <DisplayCategoryElement
+                           key={category.id}
+                           category={category}
+                        />
+                     ))}
+                  </div>
+               </>
+            )}
             <Box sx={styles.actions}>
                <Typography gutterBottom align="center">
                   Are you satisfied?
@@ -116,7 +129,14 @@ const CompleteGroup = ({
                      variant="contained"
                      size="large"
                      style={{ marginRight: 5 }}
-                     onClick={handleBack}
+                     onClick={() => {
+                        const isUni = Boolean(baseGroupInfo.university?.id)
+                        if (isUni) {
+                           handleBack()
+                        } else {
+                           handleSkipBack() // skip the field and level of study questions step
+                        }
+                     }}
                   >
                      Back
                   </Button>

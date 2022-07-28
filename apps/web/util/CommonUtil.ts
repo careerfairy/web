@@ -1,4 +1,5 @@
 import LocalStorageUtil from "./LocalStorageUtil"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -187,4 +188,29 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
    } else {
       return `${Math.round(seconds)} seconds`
    }
+}
+
+export const findDuplicatePropertiesInArrayOfElements = <T>(
+   elements: T[],
+   properties: Array<keyof T>,
+   sortBy: keyof T
+) => {
+   const getPropertyString = (element: T) =>
+      properties.map((p) => element[p]).join("")
+   const duplicateProperties = elements
+      .map((v) => `${getPropertyString(v)}`)
+      .filter(
+         (propertyValue, i, arrayOfPropertyValues) =>
+            propertyValue && arrayOfPropertyValues.indexOf(propertyValue) !== i
+      )
+   const duplicateElements = elements
+      .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
+      .sort(dynamicSort(sortBy))
+   if (duplicateElements) {
+      console.log(`-> elements that have the same ${properties.join(" and ")}:`)
+      console.table(duplicateElements)
+   } else {
+      console.log(`-> no duplicate elements found`)
+   }
+   return duplicateElements
 }

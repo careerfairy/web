@@ -1,5 +1,5 @@
 import React, { useMemo } from "react"
-import { Box, Chip, Paper } from "@mui/material"
+import { Box, Card, Chip } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import {
    convertGroupQuestionOptionsToSortedArray,
@@ -34,24 +34,25 @@ const DisplayCategoryElement = ({ category }: Props) => {
    )
 
    return (
-      <Paper sx={styles.whiteBox}>
+      <Card sx={styles.whiteBox}>
          <Box style={{ minWidth: "120px" }}>
-            <Box sx={styles.label}>Category Name</Box>
+            <Box sx={styles.label}>Question Name</Box>
             <Box>{category.name}</Box>
          </Box>
          <Box style={{ minWidth: "240px" }}>
-            <Box sx={styles.label}>Category Options</Box>
+            <Box sx={styles.label}>Question Options</Box>
             {optionsArray.map((option) => {
                return (
                   <Chip
                      key={option.id}
                      label={option.name}
                      variant="outlined"
+                     className="stacked"
                   />
                )
             })}
          </Box>
-      </Paper>
+      </Card>
    )
 }
 

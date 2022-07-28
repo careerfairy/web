@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Box, Button, Grid, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Grid, Typography } from "@mui/material"
 import GroupQuestionEdit from "../admin/settings/GroupQuestion/GroupQuestionEdit"
 import GroupQuestionElement from "../admin/settings/GroupQuestion/GroupQuestionElement"
 import AddIcon from "@mui/icons-material/Add"
@@ -25,6 +25,9 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "space-between",
    },
+   loader: {
+      m: 5,
+   },
 })
 
 const CreateGroupQuestions = ({
@@ -34,23 +37,22 @@ const CreateGroupQuestions = ({
    handleAddTempGroupQuestion,
    handleNext,
    groupQuestions,
+   loadingDefaultQuestions,
 }) => {
    const [createMode, setCreateMode] = useState(false)
 
    useEffect(() => {
-      if (!groupQuestions.length) {
+      if (!createMode && !groupQuestions.length && !loadingDefaultQuestions) {
          setCreateMode(true)
       }
-   }, [])
-
-   useEffect(() => {
-      if (!createMode && !groupQuestions.length) {
-         setCreateMode(true)
-      }
-   })
+   }, [loadingDefaultQuestions])
 
    const verifyNext = () => {
       handleNext()
+   }
+
+   if (loadingDefaultQuestions) {
+      return <CircularProgress sx={styles.loader} />
    }
 
    return (

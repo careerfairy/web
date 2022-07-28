@@ -416,6 +416,9 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return mapFirestoreDocuments<RegisteredStudent>(ref)
    }
 
+   /*
+    * Legacy Query for migration script only
+    * */
    async getAllRegisteredStudents(): Promise<RegisteredStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("registeredStudents")
@@ -423,6 +426,9 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return mapFirestoreDocuments<RegisteredStudent>(snaps, true)
    }
 
+   /*
+    * Legacy Query for migration script only
+    * */
    async getAllParticipatingStudents(): Promise<ParticipatingStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("participatingStudents")
@@ -431,6 +437,9 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return mapFirestoreDocuments<ParticipatingStudent>(snaps, true)
    }
 
+   /*
+    * Legacy Query for migration script only
+    * */
    async getAllTalentPoolStudents(): Promise<TalentPoolStudent[]> {
       const snaps = await this.firestore.collectionGroup("talentPool").get()
       return mapFirestoreDocuments<TalentPoolStudent>(snaps, true)

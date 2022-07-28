@@ -29,6 +29,10 @@ import {
    ILevelOfStudyRepository,
    FirebaseLevelOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
+import {
+   FirebaseUniversityRepository,
+   IUniversityRepository,
+} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
 
 const firestoreInstance = firebaseApp.firestore()
 
@@ -49,7 +53,8 @@ export const userRepo: IUserRepository = new FirebaseUserRepository(
 )
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
-   firestoreInstance
+   firestoreInstance,
+   FieldValue
 )
 
 export const livestreamRepo: ILivestreamRepository =
@@ -60,3 +65,5 @@ export const fieldOfStudyRepo: IFieldOfStudyRepository =
 
 export const levelOfStudyRepo: ILevelOfStudyRepository =
    new FirebaseLevelOfStudyRepository(firestoreInstance)
+export const universityRepo: IUniversityRepository =
+   new FirebaseUniversityRepository(firestoreInstance)

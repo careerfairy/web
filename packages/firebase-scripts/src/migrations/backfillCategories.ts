@@ -373,10 +373,20 @@ const getReadableQuestionAndAnswer = (
    }
 }
 
-const getUniversity = (universityCode, groupsDict: GroupsDict): Group => {
-   return Object.values(groupsDict).find(
-      (group) => group?.universityCode === universityCode
+const getUniversity = (user: UserData, groupsDict: GroupsDict): Group => {
+   const groups = Object.values(groupsDict)
+
+   // get university User is following
+   const registeredUniGroup = groups.find(
+      (group) =>
+         group.universityCode === user.university.code &&
+         user.groupIds.includes(group.id)
    )
+   if (registeredUniGroup) {
+      return registeredUniGroup
+   }
+   // Otherwise get first university group User is registered to
+   return groups.find((group) => group?.universityCode === user.university.code)
 }
 
 const getCategorySelectedOptionId = (
@@ -553,7 +563,7 @@ const backfillUsers = (
          updateData["levelOfStudy"] = assignedLevelOfStudy
          backFills.push("levelOfStudy")
       }
-      const university = getUniversity(userData.university?.code, groupsDict)
+      const university = getUniversity(userData, groupsDict)
 
       const additionalUserDataToUpdate =
          storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection(

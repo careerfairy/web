@@ -12,7 +12,6 @@ export interface Group extends Identifiable {
    adminEmail?: string
 
    // optional
-   categories: GroupCategory[]
    extraInfo?: string
    partnerGroupIds?: string[]
    rank?: number
@@ -23,6 +22,11 @@ export interface Group extends Identifiable {
    hidePrivateEventsFromEmbed?: boolean
    privacyPolicyActive?: boolean
    privacyPolicyUrl?: string
+
+   /*
+    * Deprecated
+    * */
+   categories?: GroupCategory[]
 }
 
 export interface GroupWithPolicy extends Group {
