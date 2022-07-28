@@ -88,6 +88,9 @@ const GroupQuestionEdit = ({
    isLocal,
    group,
 }: Props) => {
+   const isFieldOrLevelOfStudyQuestion =
+      groupQuestion?.questionType === "fieldOfStudy" ||
+      groupQuestion?.questionType === "levelOfStudy"
    const [localGroupQuestion, setLocalGroupQuestion] = useState<GroupQuestion>(
       getInitialGroupQuestion
    )
@@ -254,6 +257,7 @@ const GroupQuestionEdit = ({
                autoFocus
                variant="outlined"
                fullWidth
+               disabled={isFieldOrLevelOfStudyQuestion}
                label={"Question Name"}
                inputProps={{ maxLength: 40 }}
                error={Boolean(
@@ -267,34 +271,31 @@ const GroupQuestionEdit = ({
                {touched && !localGroupQuestion.name?.length && "Required"}
             </FormHelperText>
             <Card>
-               <CardHeader
-                  action={
-                     <Tooltip
-                        title={
-                           localGroupQuestion.hidden
-                              ? "Re-enable this question so that users will be prompted to fill it in when registering for your events."
-                              : "Don’t ask this question when users register to your events."
-                        }
-                     >
-                        <FormControlLabel
-                           control={
-                              <Switch
-                                 checked={Boolean(localGroupQuestion.hidden)}
-                                 onChange={toggleGroupQuestionHidden}
-                                 name="question-visibility-toggle"
-                                 color="primary"
-                              />
-                           }
-                           label={
-                              localGroupQuestion.hidden
-                                 ? "Hidden"
-                                 : "Hide Question"
-                           }
-                        />
-                     </Tooltip>
-                  }
-                  subheader="Question Options"
-               />
+               {/*TODO we might not need this anymore as questions are opt in per event*/}
+               {/*   <Tooltip*/}
+               {/*      title={*/}
+               {/*         localGroupQuestion.hidden*/}
+               {/*            ? "Re-enable this question so that users will be prompted to fill it in when registering for your events."*/}
+               {/*            : "Don’t ask this question when users register to your events."*/}
+               {/*      }*/}
+               {/*   >*/}
+               {/*      <FormControlLabel*/}
+               {/*         control={*/}
+               {/*            <Switch*/}
+               {/*               checked={Boolean(localGroupQuestion.hidden)}*/}
+               {/*               onChange={toggleGroupQuestionHidden}*/}
+               {/*               name="question-visibility-toggle"*/}
+               {/*               color="primary"*/}
+               {/*            />*/}
+               {/*         }*/}
+               {/*         label={*/}
+               {/*            localGroupQuestion.hidden*/}
+               {/*               ? "Hidden"*/}
+               {/*               : "Hide Question"*/}
+               {/*         }*/}
+               {/*      />*/}
+               {/*   </Tooltip>*/}
+               <CardHeader subheader="Question Options" />
                <Divider />
                <CardActions>
                   <div style={{ display: "flex", flexWrap: "wrap" }}>
@@ -323,18 +324,29 @@ const GroupQuestionEdit = ({
                justifyContent={newGroupQuestion ? "flex-end" : "space-between"}
             >
                {!newGroupQuestion && (
-                  <Button
-                     onClick={() =>
-                        setUpdateMode({
-                           mode: "deleteGroupQuestion",
-                           option: { name: localGroupQuestion.name },
-                        })
+                  <Tooltip
+                     title={
+                        isFieldOrLevelOfStudyQuestion
+                           ? "Cannot delete a field or level of study question"
+                           : ""
                      }
-                     color={"error"}
-                     size="small"
                   >
-                     Delete
-                  </Button>
+                     <span>
+                        <Button
+                           onClick={() =>
+                              setUpdateMode({
+                                 mode: "deleteGroupQuestion",
+                                 option: { name: localGroupQuestion.name },
+                              })
+                           }
+                           disabled={isFieldOrLevelOfStudyQuestion}
+                           color={"error"}
+                           size="small"
+                        >
+                           Delete
+                        </Button>
+                     </span>
+                  </Tooltip>
                )}
                <div>
                   <Button

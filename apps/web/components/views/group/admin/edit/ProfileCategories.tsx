@@ -22,7 +22,7 @@ const ProfileCategories = () => {
       <Card>
          <Box display="flex" justifyContent="space-between">
             <CardHeader
-               title="Categories"
+               title="Event Registration Questions"
                subheader="The information can be edited"
             />
             <Box p={2} display="flex" alignItems="flex-end">
@@ -34,7 +34,7 @@ const ProfileCategories = () => {
                   disabled={createMode}
                   endIcon={<AddIcon />}
                >
-                  Add Category
+                  Add a question
                </Button>
             </Box>
          </Box>

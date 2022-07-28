@@ -69,16 +69,17 @@ const GroupQuestionElement = ({
                   title={
                      <>
                         {GroupQuestion.name}
-                        {hidden && (
-                           <Tooltip title="This information will not be collected from viewers who register to your events.">
-                              <Chip
-                                 sx={styles.hiddenChip}
-                                 variant="outlined"
-                                 color="secondary"
-                                 label="Hidden From Registration"
-                              />
-                           </Tooltip>
-                        )}
+                        {/*TODO we might not need this anymore as questions are opt in per event*/}
+                        {/*{hidden && (*/}
+                        {/*   <Tooltip title="This information will not be collected from viewers who register to your events.">*/}
+                        {/*      <Chip*/}
+                        {/*         sx={styles.hiddenChip}*/}
+                        {/*         variant="outlined"*/}
+                        {/*         color="secondary"*/}
+                        {/*         label="Hidden From Registration"*/}
+                        {/*      />*/}
+                        {/*   </Tooltip>*/}
+                        {/*)}*/}
                      </>
                   }
                   action={

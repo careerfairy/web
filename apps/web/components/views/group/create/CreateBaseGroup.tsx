@@ -256,7 +256,7 @@ const CreateBaseGroup = ({
                         control={
                            <Checkbox
                               value={values.isUniversity}
-                              defaultChecked={values.isUniversity}
+                              checked={values.isUniversity}
                               onChange={(event) => {
                                  const checked = event.target.checked
                                  if (!checked) {
