@@ -4,11 +4,12 @@ import { admin } from "./api/firestoreAdmin"
 import { addMinutesDate, generateReminderEmailData, setHeaders } from "./util"
 import { sendMessage } from "./api/mailgun"
 import { TemplatedMessage } from "postmark"
-import {
-   LiveStreamEventWithRegisteredStudents,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { LiveStreamEventWithRegisteredStudents } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
+import {
+   getStreamsByDateWithRegisteredStudents,
+   updateLiveStreamWithEmailSent,
+} from "./lib/livestream"
 
 export const sendReminderEmailToUserFromUniversity = functions.https.onRequest(
    async (req, res) => {
@@ -152,15 +153,32 @@ export const sendReminderEmailAboutApplicationLink = functions
 
 // delay to be sure that the reminder is sent at the time
 const reminderDateDelay = 20
-const DAY_TO_MINUTES = 1440
-const HOUR_TO_MINUTES = 60
-// range to how many minutes we will search
-const reminderScheduleRange = 15
 
-const REMINDERS = {
-   reminder5Minutes: "reminder-5-minutes",
-   reminder1Hour: "reminder-1-hour",
-   reminder24Hours: "reminder-24-hours",
+// range to how many minutes we will search
+const reminderScheduleRange = 20
+
+export type ReminderData = {
+   template: string
+   minutesBefore: number
+   livestreamKey: string
+}
+
+const Reminder5Min: ReminderData = {
+   template: "reminder-5-minutes",
+   minutesBefore: 5,
+   livestreamKey: "reminder5Minutes",
+}
+
+const Reminder1Hour: ReminderData = {
+   template: "reminder-1-hour",
+   minutesBefore: 60,
+   livestreamKey: "reminder1Hour",
+}
+
+const Reminder24Hours: ReminderData = {
+   template: "reminder-24-hours",
+   minutesBefore: 1440,
+   livestreamKey: "reminder24Hours",
 }
 
 /**
@@ -170,197 +188,99 @@ const REMINDERS = {
  * So we will be looking for streams that start on current date + {reminderDateDelay}
  */
 export const scheduleReminderEmails = functions.pubsub
-   .schedule(`every ${reminderScheduleRange} minutes`)
+   .schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
    .onRun((context) => {
-      retryReminders(handle5MinutesReminder).catch((error) => {
-         throw new functions.https.HttpsError(
-            "unknown",
-            "error on 5 minutes reminder: " + error
-         )
-      })
-
-      retryReminders(handle1HourReminder).catch((error) => {
-         throw new functions.https.HttpsError(
-            "unknown",
-            "error on 1 hour reminder: " + error
-         )
-      })
-
-      retryReminders(handle1DayReminder).catch((error) => {
-         throw new functions.https.HttpsError(
-            "unknown",
-            "error on 1 day reminder: " + error
-         )
-      })
-   })
-
-/**
- * To retry 3 times send reminder emails in case of failure
- */
-const retryReminders = async (fn) => {
-   const timesToRetrySendReminder = 3
-
-   for (let i = 0; i < timesToRetrySendReminder; i++) {
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
+      const dateEndFor5Minutes = addMinutesDate(
+         dateStart,
+         reminderScheduleRange
+      )
 
-      functions.logger.log(`Check live streams started at ${dateStart}`)
+      const dateStartFor1Hour = addMinutesDate(
+         dateStart,
+         Reminder1Hour.minutesBefore
+      )
+      const dateEndFor1Hour = addMinutesDate(
+         dateStartFor1Hour,
+         reminderScheduleRange
+      )
 
-      try {
-         return await fn(dateStart)
-      } catch {
-         // It waits 500 ms to try again the failed send reminder
-         await wait(500)
-         functions.logger.error("failed to send reminder")
-      }
-   }
+      const dateStartFor24Hours = addMinutesDate(
+         dateStart,
+         Reminder24Hours.minutesBefore
+      )
+      const dateEndFor24Hours = addMinutesDate(
+         dateStartFor24Hours,
+         reminderScheduleRange
+      )
 
-   throw new functions.https.HttpsError(
-      "unknown",
-      `Failed retrying ${timesToRetrySendReminder} times`
-   )
-}
+      const reminder5MinutesPromise = handleReminder(
+         dateStart,
+         dateEndFor5Minutes,
+         Reminder5Min
+      )
+      const reminder1HourPromise = handleReminder(
+         dateStartFor1Hour,
+         dateEndFor1Hour,
+         Reminder1Hour
+      )
+      const reminder24HoursPromise = handleReminder(
+         dateStartFor24Hours,
+         dateEndFor24Hours,
+         Reminder24Hours
+      )
 
-/**
- * Simple wait
- *
- */
-const wait = (ms) =>
-   new Promise<void>((resolve) => {
-      setTimeout(() => resolve(), ms)
+      Promise.allSettled([
+         reminder5MinutesPromise,
+         reminder1HourPromise,
+         reminder24HoursPromise,
+      ]).then((results) => {
+         const rejectedPromises = results.filter(
+            ({ status }) => status === "rejected"
+         )
+         rejectedPromises.length &&
+            functions.logger.error(
+               `${rejectedPromises.length} reminders were not sent`
+            )
+      })
    })
 
 /**
- * Search for a stream that will start between {reminderDateDelay} and {reminderDateDelay} + {reminderScheduleRange} minutes and schedule a reminder for 5 minutes before it starts.
+ * Search for a stream that will start between {filterStartDate} and {filterEndDate} + {reminderScheduleRange} minutes and schedule the reminder.
  *
  */
-const handle5MinutesReminder = async (filterStartDate: Date) => {
-   const filterEndDateFor5MinutesReminder = addMinutesDate(
+const handleReminder = async (
+   filterStartDate: Date,
+   filterEndDate: Date,
+   reminder: ReminderData
+) => {
+   const streams = await getStreamsByDateWithRegisteredStudents(
       filterStartDate,
-      reminderScheduleRange
+      filterEndDate
    )
 
-   try {
-      const streamsToReminderIn5Minutes =
-         await getStreamsByDateWithRegisteredStudents(
-            filterStartDate,
-            filterEndDateFor5MinutesReminder
-         )
+   const { livestreamKey } = reminder
 
-      const filteredStreams = filterAlreadySentEmail(
-         streamsToReminderIn5Minutes,
-         REMINDERS.reminder5Minutes
-      )
+   const filteredStreams = filterAlreadySentEmail(streams, livestreamKey)
 
-      functions.logger.log(
-         `${filteredStreams.length} streams with 5 minutes reminder`
-      )
+   functions.logger.log(
+      `${filteredStreams.length} streams with ${livestreamKey} reminder`
+   )
 
-      await handleSendEmail(filteredStreams, REMINDERS.reminder5Minutes, 5)
-   } catch (error) {
-      throw new functions.https.HttpsError(
-         "unknown",
-         "error on 5 minutes reminder: " + error
-      )
-   }
+   await handleSendEmail(filteredStreams, reminder)
 }
 
 /**
- * Search for a stream that will start between {reminderDateDelay} + 1 hour and {reminderDateDelay} + 1 hour + {reminderScheduleRange} minutes and schedule a reminder for 1 hour before it starts.
- *
- */
-const handle1HourReminder = async (filterStartDate: Date): Promise<void> => {
-   const filterStartDateFor1HourReminder = addMinutesDate(
-      filterStartDate,
-      HOUR_TO_MINUTES
-   )
-   const filterEndDateFor1HourReminder = addMinutesDate(
-      filterStartDateFor1HourReminder,
-      reminderScheduleRange
-   )
-
-   try {
-      const streamsToReminderIn1Hour =
-         await getStreamsByDateWithRegisteredStudents(
-            filterStartDateFor1HourReminder,
-            filterEndDateFor1HourReminder
-         )
-
-      const filteredStreams = filterAlreadySentEmail(
-         streamsToReminderIn1Hour,
-         REMINDERS.reminder1Hour
-      )
-
-      functions.logger.log(
-         `${filteredStreams.length} streams with 1 hour reminder`
-      )
-
-      await handleSendEmail(
-         filteredStreams,
-         REMINDERS.reminder1Hour,
-         HOUR_TO_MINUTES
-      )
-   } catch (error) {
-      throw new functions.https.HttpsError(
-         "unknown",
-         "error on 1 hour reminder: " + error
-      )
-   }
-}
-
-/**
- * Search for a stream that will start between {reminderDateDelay} + 1 day and {reminderDateDelay} + 1 day + {reminderScheduleRange} minutes and schedule a reminder for 1 day before it starts.
- *
- */
-const handle1DayReminder = async (filterStartDate: Date): Promise<void> => {
-   const filterStartDateFor1DayReminder = addMinutesDate(
-      filterStartDate,
-      DAY_TO_MINUTES
-   )
-   const filterEndDateFor1DayReminder = addMinutesDate(
-      filterStartDateFor1DayReminder,
-      reminderScheduleRange
-   )
-
-   try {
-      const streamsToReminderIn1Day =
-         await getStreamsByDateWithRegisteredStudents(
-            filterStartDateFor1DayReminder,
-            filterEndDateFor1DayReminder
-         )
-
-      const filteredStreams = filterAlreadySentEmail(
-         streamsToReminderIn1Day,
-         REMINDERS.reminder24Hours
-      )
-
-      functions.logger.log(
-         `${filteredStreams.length} streams with 1 day reminder`
-      )
-
-      await handleSendEmail(
-         filteredStreams,
-         REMINDERS.reminder24Hours,
-         DAY_TO_MINUTES
-      )
-   } catch (error) {
-      throw new functions.https.HttpsError(
-         "unknown",
-         "error on 1 day reminder: " + error
-      )
-   }
-}
-
-/**
- * It creates email data and sends the email to all the streams that are not FaceToFace.
+ * It creates emailData based on the stream and the reminder information and sends the email to all the streams that are not FaceToFace.
  *
  */
 const handleSendEmail = (
    streams: LiveStreamEventWithRegisteredStudents[],
-   emailTemplateId: string,
-   minutesToRemindBefore: number
+   reminder: ReminderData
 ) => {
    const promiseArrayToSendMessages = []
+   const { template, minutesBefore } = reminder
 
    streams.forEach((stream) => {
       const { isFaceToFace, company } = stream
@@ -372,123 +292,53 @@ const handleSendEmail = (
       } else {
          const emailData = generateReminderEmailData(
             stream,
-            emailTemplateId,
-            minutesToRemindBefore
+            template,
+            minutesBefore
          )
          promiseArrayToSendMessages.push(
-            createSendEmailPromise(emailData, emailTemplateId, stream)
+            createSendEmailPromise(emailData, reminder, stream)
          )
       }
    })
 
-   return Promise.all(promiseArrayToSendMessages)
-}
+   return Promise.allSettled(promiseArrayToSendMessages).then((results) => {
+      results.forEach((result: any) => {
+         const { status, value, reason } = result
 
-const createSendEmailPromise = (
-   emailData: MailgunMessageData,
-   emailTemplateId: string,
-   stream: LiveStreamEventWithRegisteredStudents
-) => {
-   const { company } = stream
-
-   return new Promise(() => {
-      return sendMessage(emailData)
-         .then(() => {
+         if (status === "fulfilled") {
+            const { template, streamId } = value
             functions.logger.log(
-               `Reminders ${emailTemplateId} to company ${company} were sent successfully`
+               `Email ${template} sent successfully for the stream ${streamId}`
             )
-
-            updateLiveStreamWithEmailSent(stream, emailTemplateId)
-         })
-         .catch(() => {
-            functions.logger.error(
-               `Reminders ${emailTemplateId} to company ${company} were not sent`
-            )
-         })
+         } else {
+            functions.logger.error(reason)
+            throw Error(reason)
+         }
+      })
    })
 }
 
 /**
- * Get all the streams filtered by starting date and with all the registered students for each stream.
+ * To create sendEmail promise and handling the possible error
  *
  */
-const getStreamsByDateWithRegisteredStudents = (
-   filterStartDate: Date,
-   filterEndDate: Date
-): Promise<LiveStreamEventWithRegisteredStudents[]> => {
-   return admin
-      .firestore()
-      .collection("livestreams")
-      .where("start", ">=", filterStartDate)
-      .where("start", "<=", filterEndDate)
-      .get()
-      .then((querySnapshot) => {
-         const streams = querySnapshot.docs?.map(
-            (doc) =>
-               ({
-                  id: doc.id,
-                  ...doc.data(),
-               } as LivestreamEvent)
-         )
+const createSendEmailPromise = (
+   emailData: MailgunMessageData,
+   reminder: ReminderData,
+   stream: LiveStreamEventWithRegisteredStudents
+) => {
+   const { id } = stream
+   const { template } = reminder
 
-         return addRegisteredStudentsFieldOnStreams(streams)
+   return sendMessage(emailData)
+      .then(() => {
+         return updateLiveStreamWithEmailSent(stream, reminder).then(() => {
+            return { template, streamId: id }
+         })
       })
       .catch((error) => {
-         throw new functions.https.HttpsError(
-            "unknown",
-            "error fetching streams : " + error
-         )
-      })
-}
-
-/**
- * Add all registered students to the correspondent streams
- *
- */
-const addRegisteredStudentsFieldOnStreams = async (
-   streams: LivestreamEvent[] = []
-): Promise<LiveStreamEventWithRegisteredStudents[]> => {
-   const formattedStreams = []
-   for (const stream of streams) {
-      const collection = await admin
-         .firestore()
-         .collection("livestreams")
-         .doc(stream.id)
-         .collection("registeredStudents")
-         .get()
-
-      const registeredStudents = collection.docs?.map((doc) => doc.data())
-      formattedStreams.push({ ...stream, registeredStudents })
-   }
-
-   return formattedStreams
-}
-
-/**
- * Update {reminderEmailsSent} value on livestream DB with the specific reminder email that was sent
- *
- */
-const updateLiveStreamWithEmailSent = (
-   stream: LiveStreamEventWithRegisteredStudents,
-   templateId: string
-) => {
-   const { id, reminderEmailsSent } = stream
-
-   const reminderKey = getReminderKey(templateId)
-
-   const fieldToUpdate = {
-      ...reminderEmailsSent,
-      [reminderKey]: true,
-   }
-
-   admin
-      .firestore()
-      .collection("livestreams")
-      .doc(id)
-      .update({ reminderEmailsSent: fieldToUpdate })
-      .then(() => {
-         functions.logger.log(
-            `Reminders ${templateId} updated on stream ${id} data`
+         throw Error(
+            `Email ${template} was not sent for stream ${id} with the error ${error}`
          )
       })
 }
@@ -499,12 +349,10 @@ const updateLiveStreamWithEmailSent = (
  */
 const filterAlreadySentEmail = (
    streams: LiveStreamEventWithRegisteredStudents[],
-   templateId: string
+   reminderKey: string
 ): LiveStreamEventWithRegisteredStudents[] => {
    return streams.filter((stream) => {
       const { reminderEmailsSent } = stream
-
-      const reminderKey = getReminderKey(templateId)
 
       return reminderEmailsSent ? !reminderEmailsSent[reminderKey] : true
    })

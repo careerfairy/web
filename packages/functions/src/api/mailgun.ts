@@ -9,8 +9,8 @@ let domain = "mail.careerfairy.io"
 
 // on local emulators use the sandbox environment (emails whitelisted in mailgun)
 if (isLocalEnvironment()) {
-   domain =
-      "https://api.mailgun.net/v3/sandbox6105d057d95146d6ac6d5389bd1b44eb.mailgun.org"
+   // domain =
+   //    "https://api.mailgun.net/v3/sandbox6105d057d95146d6ac6d5389bd1b44eb.mailgun.org"
    console.log("Using mailgun v2 sandbox environment")
 }
 
