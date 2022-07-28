@@ -43,14 +43,14 @@ jobs:
            with:
               # caching node_modules
               path: node_modules
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
               restore-keys: |
                  ${{ runner.os }}-build-${{ env.cache-name }}-
                  ${{ runner.os }}-build-
                  ${{ runner.os }}-
 
          - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
 
          - name: Build
@@ -84,13 +84,13 @@ jobs:
            with:
               # caching node_modules
               path: node_modules
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
               restore-keys: |
                  ${{ runner.os }}-build-${{ env.cache-name }}-
                  ${{ runner.os }}-build-
                  ${{ runner.os }}-
          - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
          - name: Build
            run: npm run build
@@ -136,13 +136,13 @@ jobs:
            with:
               # caching node_modules
               path: node_modules
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('package-lock.json') }}
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
               restore-keys: |
                  ${{ runner.os }}-build-${{ env.cache-name }}-
                  ${{ runner.os }}-build-
                  ${{ runner.os }}-
          - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
          - name: Install Playwright deps
            run: npx playwright install --with-deps
