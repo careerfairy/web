@@ -16,8 +16,6 @@ import {
 } from "./lib/reward"
 import { livestreamGetById } from "./lib/livestream"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { admin } from "./api/firestoreAdmin"
 
 /**
  * Everytime there is a new reward document, apply the reward depending on the action
@@ -304,13 +302,13 @@ export const rewardUserAction = functions.https.onCall(
  * Check if the referral code is valid and if the user has any, if yes, rewards the followed user
  * and adds the referral code on the current user
  */
-export const rewardSignUpFollower = functions.https.onCall(
+export const applyReferralCode = functions.https.onCall(
    async (referralCode, context) => {
       const userEmail = context.auth?.token?.email
 
       try {
          // Extrapolate the user from the idToken that is the context
-         const currentUser = await getUserById(userEmail)
+         const currentUser = await userGetByEmail(userEmail)
          const { referredBy } = currentUser
 
          if (referredBy) {
@@ -321,13 +319,13 @@ export const rewardSignUpFollower = functions.https.onCall(
          }
 
          // get Follower User and reward him
-         const followedUser = await getUserByReferralCode(referralCode)
+         const followedUser = await userGetByReferralCode(referralCode)
 
          if (followedUser) {
             const { id, firstName, lastName } = followedUser
 
             // confirm that the followed user exists and is not the current user
-            if (followedUser && id !== userEmail) {
+            if (id !== userEmail) {
                const fieldToUpdate = {
                   uid: id,
                   name: `${firstName} ${lastName}`,
@@ -350,37 +348,11 @@ export const rewardSignUpFollower = functions.https.onCall(
       }
    }
 )
-// get user by id
-const getUserById = async (userId) => {
-   const snap = await admin.firestore().collection("userData").doc(userId).get()
-
-   if (!snap.exists) {
-      return null
-   }
-
-   return snap.data() as UserData
-}
 
 type ReferralData = {
    uid: string
    name: string
    referralCode: string
-}
-
-// Get User by referral code
-const getUserByReferralCode = async (referralCode): Promise<UserData> => {
-   const snap = await admin
-      .firestore()
-      .collection("userData")
-      .where("referralCode", "==", referralCode)
-      .limit(1)
-      .get()
-
-   if (snap.empty) {
-      return null
-   }
-
-   return snap.docs[0].data() as UserData
 }
 
 // Validation functions, should throw exceptions

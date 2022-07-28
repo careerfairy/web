@@ -57,10 +57,7 @@ service cloud.firestore {
             allow delete: if true;
         }
         match /userData/{userId}/analytics/analytics {
-            allow read: if true;
-            allow update: if request.auth.token.email == userId;
-            allow create: if request.auth.token.email == userId;
-            allow delete: if request.auth.token.email == userId;
+            allow read, write: if request.auth.token.email == userId;
         }
 
         match /userData/{userId}/rewards/{rewardId} {

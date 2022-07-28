@@ -1,6 +1,5 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat/app"
-import FieldValue = firebase.firestore.FieldValue
 
 export interface UserData extends Identifiable {
    authId: string
@@ -84,7 +83,7 @@ export type RegistrationStep = {
    userId: string
    steps: string[]
    totalSteps: number
-   updatedAt: FieldValue
+   updatedAt: firebase.firestore.Timestamp
 }
 
 export type UserDataAnalytics = {

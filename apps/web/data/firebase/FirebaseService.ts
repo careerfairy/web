@@ -3050,8 +3050,8 @@ class FirebaseService {
       return batch.commit()
    }
 
-   rewardSignUpFollower = async (referralCode: string) => {
-      return await this.functions.httpsCallable("rewardSignUpFollower")(
+   applyReferralCode = async (referralCode: string) => {
+      return await this.functions.httpsCallable("applyReferralCode")(
          referralCode
       )
    }
