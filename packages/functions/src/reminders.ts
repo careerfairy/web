@@ -196,6 +196,11 @@ export const scheduleReminderEmails = functions.pubsub
          dateStart,
          reminderScheduleRange
       )
+      const reminder5MinutesPromise = handleReminder(
+         dateStart,
+         dateEndFor5Minutes,
+         Reminder5Min
+      )
 
       const dateStartFor1Hour = addMinutesDate(
          dateStart,
@@ -205,6 +210,11 @@ export const scheduleReminderEmails = functions.pubsub
          dateStartFor1Hour,
          reminderScheduleRange
       )
+      const reminder1HourPromise = handleReminder(
+         dateStartFor1Hour,
+         dateEndFor1Hour,
+         Reminder1Hour
+      )
 
       const dateStartFor24Hours = addMinutesDate(
          dateStart,
@@ -213,17 +223,6 @@ export const scheduleReminderEmails = functions.pubsub
       const dateEndFor24Hours = addMinutesDate(
          dateStartFor24Hours,
          reminderScheduleRange
-      )
-
-      const reminder5MinutesPromise = handleReminder(
-         dateStart,
-         dateEndFor5Minutes,
-         Reminder5Min
-      )
-      const reminder1HourPromise = handleReminder(
-         dateStartFor1Hour,
-         dateEndFor1Hour,
-         Reminder1Hour
       )
       const reminder24HoursPromise = handleReminder(
          dateStartFor24Hours,
