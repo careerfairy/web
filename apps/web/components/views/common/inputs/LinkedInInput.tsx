@@ -14,14 +14,11 @@ const LinkedInInput = ({
    ])
 
    const handleLinkedInDebounced = useCallback(
-      (linkedInLink) => {
-         if (linkedInLink) {
-            const fieldToUpdate = {
-               linkedinUrl: isValidLinkedInLink(linkedInLink)
-                  ? linkedInLink
-                  : "",
-            }
-            onUpdateField(fieldToUpdate)
+      (linkedInLink: string) => {
+         if (linkedInLink.length === 0) {
+            onUpdateField({ linkedinUrl: "" })
+         } else if (isValidLinkedInLink(linkedInLink)) {
+            onUpdateField({ linkedinUrl: linkedInLink })
          }
       },
       [onUpdateField]
