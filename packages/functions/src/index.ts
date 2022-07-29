@@ -21,7 +21,7 @@ import rewards = require("./rewards")
 import wishes = require("./wishes")
 
 // Auth
-exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
+exports.createNewUserAccount_v3 = auth.createNewUserAccount_v3
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
