@@ -19,7 +19,7 @@ const getRandomInt = (max) => {
    }
 }
 
-exports.createNewUserAccount_v2 = functions.https.onCall(
+exports.createNewUserAccount_v3 = functions.https.onCall(
    async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
