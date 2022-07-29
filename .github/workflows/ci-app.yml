@@ -31,25 +31,27 @@ jobs:
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       steps:
          - uses: actions/checkout@v2
-         - name: Setup Node.js
-           uses: actions/setup-node@v2
+         - uses: actions/setup-node@v2
            with:
               node-version: "16"
+              cache: "npm"
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v2
+           env:
+              cache-name: cache-node-modules
            with:
               # caching node_modules
-              path: ~/.npm
-              key: npm-${{ hashFiles('package-lock.json') }}
-              restore-keys: npm-
-         - name: Install Dependencies
-           run: npm ci --ignore-scripts
+              path: node_modules
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
 
-         - name: Build
-           run: npm run build
-         - name: Run Jest Unit Tests
-           run: npm run test
+         - name: Install Dependencies
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm install
 
          - name: Build
            run: npm run build
@@ -70,21 +72,26 @@ jobs:
          NODE_ENV: test
       steps:
          - uses: actions/checkout@v2
-         - name: Setup Node.js
-           uses: actions/setup-node@v2
+         - uses: actions/setup-node@v2
            with:
               node-version: "16"
+              cache: "npm"
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v2
+           env:
+              cache-name: cache-node-modules
            with:
               # caching node_modules
-              path: ~/.npm
-              key: npm-${{ hashFiles('package-lock.json') }}
-              restore-keys: npm-
+              path: node_modules
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
          - name: Install Dependencies
-           run: npm ci --ignore-scripts
-
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm install
          - name: Build
            run: npm run build
          - name: Run Jest Unit Tests
@@ -116,26 +123,27 @@ jobs:
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       steps:
          - uses: actions/checkout@v2
-         - name: Setup Node.js
-           uses: actions/setup-node@v2
+
+         - uses: actions/setup-node@v2
            with:
               node-version: "16"
+              cache: "npm"
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v2
+           env:
+              cache-name: cache-node-modules
            with:
               # caching node_modules
-              path: ~/.npm
-              key: npm-${{ hashFiles('package-lock.json') }}
-              restore-keys: npm-
+              path: node_modules
+              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+              restore-keys: |
+                 ${{ runner.os }}-build-${{ env.cache-name }}-
+                 ${{ runner.os }}-build-
+                 ${{ runner.os }}-
          - name: Install Dependencies
-           run: npm ci --ignore-scripts
-
-         - name: Build
-           run: npm run build
-         - name: Run Jest Unit Tests
-           run: npm run test
-
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm install
          - name: Install Playwright deps
            run: npx playwright install --with-deps
          - name: Run Playwright End to End tests
