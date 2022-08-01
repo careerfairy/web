@@ -10,8 +10,8 @@ import { BaseModel } from "../BaseModel"
 export class Office extends BaseModel {
    constructor(
       public readonly id: string,
-      public readonly name: string,
-      public readonly location: string
+      public readonly name?: string,
+      public readonly location?: string
    ) {
       super()
    }
