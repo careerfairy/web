@@ -61,6 +61,30 @@ export interface SavedRecruiter extends Identifiable {
    }
 }
 
+/**
+ * Document /userData/{id}/ats/ats
+ *
+ * Will store the user ATS existent relationships
+ */
+export interface UserATSDocument {
+   userId: string
+
+   // Map of AccountIds -> ATS Object IDs
+   // Stores the relation between each group linked account (Greenhouse, Teamtailor, etc)
+   // and Merge objects (Candidate id, Attachment ids, etc)
+   // We'll be able to answer the questions:
+   // - The user already has a Candidate ATS Model on the group TeamTailor account?
+   // - The user has already applied for a certain job?
+   atsRelations?: { [index: string]: UserATSRelations }
+}
+
+export interface UserATSRelations {
+   candidateId?: string
+   cvAttachmentId?: string
+   // map job id -> application id
+   jobApplications?: { [jobId: string]: string }
+}
+
 export interface RegisteredStudent extends UserData {
    dateRegistered: firebase.firestore.Timestamp
 }
