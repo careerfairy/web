@@ -15,12 +15,10 @@ import {
    CardHeader,
    Chip,
    Divider,
-   FormControlLabel,
    FormHelperText,
    IconButton,
    Menu,
    MenuItem,
-   Switch,
    TextField,
    Tooltip,
    Zoom,
@@ -28,9 +26,9 @@ import {
 import EditIcon from "@mui/icons-material/Edit"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import {
+   Group,
    GroupQuestion,
    GroupQuestionOption,
-   Group,
 } from "@careerfairy/shared-lib/dist/groups"
 import { v4 as uuidv4 } from "uuid"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"

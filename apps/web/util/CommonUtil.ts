@@ -190,7 +190,7 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
    }
 }
 
-export const findDuplicatePropertiesInArrayOfElements = <T>(
+export const findElementsWithDuplicatePropertiesInArray = <T>(
    elements: T[],
    properties: Array<keyof T>,
    sortBy: keyof T
@@ -198,7 +198,7 @@ export const findDuplicatePropertiesInArrayOfElements = <T>(
    const getPropertyString = (element: T) =>
       properties.map((p) => element[p]).join("")
    const duplicateProperties = elements
-      .map((v) => `${getPropertyString(v)}`)
+      .map((v) => `${getPropertyString(v)}`) // convert element to a string of properties
       .filter(
          (propertyValue, i, arrayOfPropertyValues) =>
             propertyValue && arrayOfPropertyValues.indexOf(propertyValue) !== i
@@ -207,7 +207,9 @@ export const findDuplicatePropertiesInArrayOfElements = <T>(
       .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
       .sort(dynamicSort(sortBy))
    if (duplicateElements) {
-      console.log(`-> elements that have the same ${properties.join(" and ")}:`)
+      console.log(
+         `-> elements that have the duplicate ${properties.join(" and ")}:`
+      )
       console.table(duplicateElements)
    } else {
       console.log(`-> no duplicate elements found`)
