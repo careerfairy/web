@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import {
    Box,
@@ -16,7 +16,13 @@ import { v4 as uuid } from "uuid"
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { useLocalStorage } from "react-use"
 
-const DemoIntroModal = ({ open, handleClose }) => {
+type Props = {
+   open: boolean
+   handleClose: (wantsDemo: boolean) => void
+   smallScreen: boolean
+}
+
+const DemoIntroModal = ({ open, handleClose, smallScreen }: Props) => {
    const firebase = useFirebaseService()
    const [loading, setLoading] = useState(false)
    const streamRef = useStreamRef()
@@ -26,6 +32,13 @@ const DemoIntroModal = ({ open, handleClose }) => {
    )
 
    const [dismissTutorial, setDismissTutorial] = useState(false)
+
+   useEffect(() => {
+      if (smallScreen) {
+         setHasDismissedStreamTutorial(true)
+         handleClose(false)
+      }
+   }, [smallScreen])
 
    const createTestLivestream = async () => {
       const testChatEntries = [

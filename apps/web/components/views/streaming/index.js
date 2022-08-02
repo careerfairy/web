@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { createContext, useCallback, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import VideoContainer from "./video-container/VideoContainer"
 import NotificationsContainer from "./notifications-container/NotificationsContainer"
@@ -67,6 +67,7 @@ const StreamerOverview = ({
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
+   const [showMobileActionButtons, setShowMobileActionButtons] = useState(true)
    const classes = useStyles()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
@@ -77,11 +78,40 @@ const StreamerOverview = ({
       setMounted(true)
    }, [])
 
+   /**
+    * On mobile the visibility of the buttons will be handle based on stream frame click
+    */
+   const handleClick = useCallback(
+      ({ target }) => {
+         if (smallScreen) {
+            const streamElement = document.getElementById("videoBlackFrame")
+            const actionButtons = document.getElementById("streamActionButtons")
+            const controllerButtons = document.getElementById(
+               "streamControllerButtons"
+            )
+
+            const clickedOnVideoFrame = streamElement.contains(target)
+            const clickedOnButtons = [actionButtons, controllerButtons].some(
+               (selector) => selector.contains(target)
+            )
+
+            if (clickedOnVideoFrame && !clickedOnButtons) {
+               setShowMobileActionButtons((prev) => !prev)
+            }
+         }
+      },
+      [smallScreen]
+   )
+
    if (!mounted) return null
 
    return (
-      <Fragment>
-         <div id="videoBlackFrame" className={classes.blackFrame}>
+      <MobileContext.Provider value={{ showMobileActionButtons }}>
+         <div
+            id="videoBlackFrame"
+            className={classes.blackFrame}
+            onClick={handleClick}
+         >
             <VideoContainer
                currentLivestream={currentLivestream}
                streamerId={streamerId}
@@ -143,8 +173,10 @@ const StreamerOverview = ({
                <div>Click to play</div>
             </div>
          </Backdrop>
-      </Fragment>
+      </MobileContext.Provider>
    )
 }
+
+export const MobileContext = createContext({ showMobileActionButtons: true })
 
 export default StreamerOverview

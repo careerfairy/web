@@ -55,27 +55,16 @@ function ButtonWithConfirm({
       <Fragment>
          <Tooltip title={tooltipTitle}>
             <span>
-               {extraSmallScreen ? (
-                  <IconButton
-                     className={classes.iconInButton}
-                     disabled={disabled}
-                     onClick={() => setModalOpen(true)}
-                     size="large"
-                  >
-                     {rest.startIcon}
-                  </IconButton>
-               ) : (
-                  <Button
-                     style={{ background: color, boxShadow: "none" }}
-                     color="primary"
-                     variant="contained"
-                     startIcon={rest.startIcon}
-                     onClick={() => setModalOpen(true)}
-                     disabled={disabled}
-                  >
-                     {buttonLabel}
-                  </Button>
-               )}
+               <Button
+                  style={{ background: color, boxShadow: "none" }}
+                  color="primary"
+                  variant="contained"
+                  startIcon={rest.startIcon}
+                  onClick={() => setModalOpen(true)}
+                  disabled={disabled}
+               >
+                  {buttonLabel}
+               </Button>
             </span>
          </Tooltip>
          <GlassDialog open={modalOpen} onClose={() => setModalOpen(false)}>
