@@ -1,4 +1,4 @@
-import React, { createContext, useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import VideoContainer from "./video-container/VideoContainer"
 import NotificationsContainer from "./notifications-container/NotificationsContainer"
@@ -106,7 +106,7 @@ const StreamerOverview = ({
    if (!mounted) return null
 
    return (
-      <MobileContext.Provider value={{ showMobileActionButtons }}>
+      <>
          <div
             id="videoBlackFrame"
             className={classes.blackFrame}
@@ -121,6 +121,7 @@ const StreamerOverview = ({
                isBreakout={isBreakout}
                showMenu={showMenu}
                viewer={false}
+               showMobileActionButtons={showMobileActionButtons}
             />
             <ButtonComponent
                streamer={true}
@@ -128,6 +129,7 @@ const StreamerOverview = ({
                selectedState={selectedState}
                showMenu={showMenu}
                handleStateChange={handleStateChange}
+               showMobileActionButtons={showMobileActionButtons}
             />
          </div>
          <AudienceDrawer
@@ -173,10 +175,8 @@ const StreamerOverview = ({
                <div>Click to play</div>
             </div>
          </Backdrop>
-      </MobileContext.Provider>
+      </>
    )
 }
-
-export const MobileContext = createContext({ showMobileActionButtons: true })
 
 export default StreamerOverview

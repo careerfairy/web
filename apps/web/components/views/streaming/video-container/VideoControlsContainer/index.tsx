@@ -52,7 +52,6 @@ import { StreamData } from "types/streaming"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import { HandRaiseState } from "types/handraise"
 import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
-import { MobileContext } from "../../index"
 
 const styles = {
    root: {
@@ -126,6 +125,7 @@ interface Props {
       setLocalVideoEnabled: (enabled: boolean) => Promise<void>
    }
    openPublishingModal: () => void
+   showMobileActionButtons: boolean
 }
 type Action = {
    icon: JSX.Element
@@ -149,6 +149,7 @@ const VideoControlsContainer = ({
    openPublishingModal,
    joinAsViewer,
    localMediaControls,
+   showMobileActionButtons,
 }: Props) => {
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
@@ -170,7 +171,6 @@ const VideoControlsContainer = ({
    const [shareActions, setShareActions] = useState<Action[]>([])
    const [handRaiseState] = useHandRaiseState()
 
-   const { showMobileActionButtons } = useContext(MobileContext)
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened()
    const presentMode = mode === "presentation"
    const desktopMode = mode === "desktop"

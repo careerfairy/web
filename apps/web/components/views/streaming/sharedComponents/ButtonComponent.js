@@ -14,7 +14,6 @@ import TutorialContext from "../../../../context/tutorials/TutorialContext"
 import clsx from "clsx"
 import { useDispatch, useSelector } from "react-redux"
 import * as storeActions from "store/actions"
-import { MobileContext } from "../index"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -120,6 +119,7 @@ const ButtonComponent = ({
    isMobile,
    selectedState,
    streamer,
+   showMobileActionButtons,
 }) => {
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
@@ -131,8 +131,6 @@ const ButtonComponent = ({
    const [open, setOpen] = useState(true)
    const [delayHandler, setDelayHandler] = useState(null)
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
-
-   const { showMobileActionButtons } = useContext(MobileContext)
 
    useEffect(() => {
       setHasMounted(true)
