@@ -52,6 +52,7 @@ import { StreamData } from "types/streaming"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import { HandRaiseState } from "types/handraise"
 import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
+import { MobileContext } from "../../index"
 
 const styles = {
    root: {
@@ -169,6 +170,7 @@ const VideoControlsContainer = ({
    const [shareActions, setShareActions] = useState<Action[]>([])
    const [handRaiseState] = useHandRaiseState()
 
+   const { showMobileActionButtons } = useContext(MobileContext)
    const [fullyOpened, onEntered, onExited] = useSliderFullyOpened()
    const presentMode = mode === "presentation"
    const desktopMode = mode === "desktop"
@@ -453,7 +455,7 @@ const VideoControlsContainer = ({
    ])
 
    return (
-      <>
+      <div id={"streamControllerButtons"}>
          <ClickAwayListener onClickAway={handleClose}>
             <Box
                onMouseEnter={handleMouseEnter}
@@ -511,7 +513,7 @@ const VideoControlsContainer = ({
                         }}
                         icon={<SpeedDialIcon />}
                         onFocus={handleOpen}
-                        open
+                        open={showMobileActionButtons}
                      >
                         {actions.map((action) => {
                            return (
@@ -605,7 +607,7 @@ const VideoControlsContainer = ({
                onClose={handleCloseShareVideoModal}
             />
          )}
-      </>
+      </div>
    )
 }
 
