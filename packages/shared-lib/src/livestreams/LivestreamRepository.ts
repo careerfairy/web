@@ -92,9 +92,11 @@ export interface ILivestreamRepository {
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void>
-   getAllRegisteredStudents(): Promise<RegisteredStudent[]>
-   getAllParticipatingStudents(): Promise<ParticipatingStudent[]>
-   getAllTalentPoolStudents(): Promise<TalentPoolStudent[]>
+   getAllRegisteredStudents(withRef?: boolean): Promise<RegisteredStudent[]>
+   getAllParticipatingStudents(
+      withRef?: boolean
+   ): Promise<ParticipatingStudent[]>
+   getAllTalentPoolStudents(withRef?: boolean): Promise<TalentPoolStudent[]>
    getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
@@ -419,30 +421,36 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
    /*
     * Legacy Query for migration script only
     * */
-   async getAllRegisteredStudents(): Promise<RegisteredStudent[]> {
+   async getAllRegisteredStudents(
+      withRef?: boolean
+   ): Promise<RegisteredStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("registeredStudents")
          .get()
-      return mapFirestoreDocuments<RegisteredStudent>(snaps, true)
+      return mapFirestoreDocuments<RegisteredStudent>(snaps, withRef)
    }
 
    /*
     * Legacy Query for migration script only
     * */
-   async getAllParticipatingStudents(): Promise<ParticipatingStudent[]> {
+   async getAllParticipatingStudents(
+      withRef?: boolean
+   ): Promise<ParticipatingStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("participatingStudents")
          .get()
 
-      return mapFirestoreDocuments<ParticipatingStudent>(snaps, true)
+      return mapFirestoreDocuments<ParticipatingStudent>(snaps, withRef)
    }
 
    /*
     * Legacy Query for migration script only
     * */
-   async getAllTalentPoolStudents(): Promise<TalentPoolStudent[]> {
+   async getAllTalentPoolStudents(
+      withRef?: boolean
+   ): Promise<TalentPoolStudent[]> {
       const snaps = await this.firestore.collectionGroup("talentPool").get()
-      return mapFirestoreDocuments<TalentPoolStudent>(snaps, true)
+      return mapFirestoreDocuments<TalentPoolStudent>(snaps, withRef)
    }
 
    async getLivestreamUsers(

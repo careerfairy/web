@@ -1,6 +1,4 @@
 import SessionStorageUtil from "./SessionStorageUtil"
-import { DocumentSnapshot, QuerySnapshot } from "@firebase/firestore-types"
-import firebase from "firebase"
 
 /**
  * Patch console.error() function to listen for Firestore connectivity issues

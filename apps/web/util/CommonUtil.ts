@@ -190,11 +190,12 @@ export const convertMillisecondsToTime = (milliseconds: number) => {
    }
 }
 
+// returns an array of elements with duplicate properties
 export const findElementsWithDuplicatePropertiesInArray = <T>(
    elements: T[],
    properties: Array<keyof T>,
    sortBy: keyof T
-) => {
+): T[] => {
    const getPropertyString = (element: T) =>
       properties.map((p) => element[p]).join("")
    const duplicateProperties = elements

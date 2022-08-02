@@ -22,7 +22,7 @@ export interface IUserRepository {
       arrayOfEmails: string[],
       options?: { withEmpty: boolean }
    ): Promise<UserData[]>
-   getAllUsers(): Promise<UserData[]>
+   getAllUsers(withRef?: boolean): Promise<UserData[]>
 }
 
 export class FirebaseUserRepository
@@ -156,8 +156,8 @@ export class FirebaseUserRepository
       return totalUsers
    }
 
-   async getAllUsers(): Promise<UserData[]> {
+   async getAllUsers(withRef?: boolean): Promise<UserData[]> {
       const users = await this.firestore.collection("userData").get()
-      return mapFirestoreDocuments<UserData>(users, true)
+      return mapFirestoreDocuments<UserData>(users, withRef)
    }
 }

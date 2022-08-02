@@ -94,7 +94,7 @@ export default async function main() {
       switch (targetBackfill) {
          case "userData":
             backfillUsers(
-               await userRepo.getAllUsers(),
+               await userRepo.getAllUsers(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -103,7 +103,7 @@ export default async function main() {
             break
          case "registeredStudent":
             backfillUsers(
-               await livestreamRepo.getAllRegisteredStudents(),
+               await livestreamRepo.getAllRegisteredStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -112,7 +112,7 @@ export default async function main() {
             break
          case "participatingStudent":
             backfillUsers(
-               await livestreamRepo.getAllParticipatingStudents(),
+               await livestreamRepo.getAllParticipatingStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -121,7 +121,7 @@ export default async function main() {
             break
          case "talentPoolStudent":
             backfillUsers(
-               await livestreamRepo.getAllTalentPoolStudents(),
+               await livestreamRepo.getAllTalentPoolStudents(true),
                groupsDict,
                bulkWriter,
                counter,
