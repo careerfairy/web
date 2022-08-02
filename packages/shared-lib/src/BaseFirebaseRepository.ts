@@ -1,7 +1,6 @@
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import { Identifiable } from "./commonTypes"
-import { QuerySnapshot } from "@firebase/firestore-types"
-
+import QuerySnapshot = firebase.firestore.QuerySnapshot
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 /**

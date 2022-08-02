@@ -11,7 +11,9 @@ if (typeof window !== "undefined") {
    console["error"] = function (...args) {
       if (args.length === 2) {
          if (
+            typeof arguments[0] === "string" &&
             arguments[0].indexOf("@firebase/firestore") !== -1 &&
+            typeof arguments[1] === "string" &&
             arguments[1].indexOf(
                "Could not reach Cloud Firestore backend. Backend didn't respond within "
             ) !== -1

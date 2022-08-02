@@ -1,11 +1,11 @@
-import firebase from "firebase/app"
-import "firebase/firestore"
-import "firebase/auth"
-import "firebase/storage"
-import "firebase/functions"
+import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
+import "firebase/compat/auth"
+import "firebase/compat/storage"
+import "firebase/compat/functions"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 
-const config = {
+export const firebaseConfig = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
    authDomain: process.env.REACT_APP_FIREBASE_AUTH_DOMAIN,
    databaseURL: process.env.REACT_APP_FIREBASE_DATABASE_URL,
@@ -29,7 +29,7 @@ export const createFirebaseInstance = (
       return existingApp
    }
 
-   const app = firebase.initializeApp(config, name)
+   const app = firebase.initializeApp(firebaseConfig, name)
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
@@ -65,6 +65,10 @@ const getFirestoreSettings = (
 // Default instance that we can re-use, default settings for firestore, auth, etc
 // [DEFAULT] app name is required for redux-firestore 🤦
 const firebaseApp: firebase.app.App = createFirebaseInstance("[DEFAULT]")
+
+export const FirestoreInstance = firebaseApp.firestore()
+export const AuthInstance = firebaseApp.auth()
+export const FunctionsInstance = firebaseApp.functions()
 
 export const FieldValue = firebase.firestore.FieldValue
 

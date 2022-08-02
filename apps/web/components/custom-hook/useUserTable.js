@@ -2,8 +2,9 @@ import React, { useMemo, useState } from "react"
 import { copyStringToClipboard } from "../helperFunctions/HelperFunctions"
 import { useDispatch } from "react-redux"
 import * as actions from "../../store/actions"
-import { LinkifyText, tableIcons } from "../util/tableUtils"
+import { tableIcons } from "../util/tableUtils"
 import { universityCountriesMap } from "../util/constants/universityCountries"
+import LinkifyText from "../util/LinkifyText"
 
 const columns = () => [
    {

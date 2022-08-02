@@ -5,7 +5,7 @@ import {
 } from "../constants/streamContants"
 import DateUtil from "util/DateUtil"
 import firebaseApp from "./FirebaseInstance"
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import { HandRaiseState } from "types/handraise"
 import {
    getQueryStringFromUrl,

@@ -1,5 +1,5 @@
 import { Identifiable } from "./commonTypes"
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export interface LiveStreamEvent extends Identifiable {

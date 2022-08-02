@@ -1,8 +1,8 @@
-import firebase from "firebase/app"
 import BaseFirebaseRepository, {
    mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
 import { SavedRecruiter, UserData } from "./users"
+import firebase from "firebase/compat/app"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>

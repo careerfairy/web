@@ -1,5 +1,5 @@
 import { Identifiable } from "../commonTypes"
-import firebase from "firebase"
+import firebase from "firebase/compat/app"
 import { Group, GroupQuestion, GroupQuestionOption } from "../groups"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 
