@@ -38,7 +38,7 @@ const useAdminGroup = (groupId) => {
                   collection: targetCollection,
                   doc: targetId,
                   storeAs: "group",
-                  // populates: isValidating ? [] : groupAdminPopulates,
+                  populates: isValidating ? [] : groupAdminPopulates,
                },
                {
                   collection: targetCollection,

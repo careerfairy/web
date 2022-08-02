@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useMemo, useRef, useState } from "react"
 import { Doughnut } from "react-chartjs-2"
 import {
    Accordion,

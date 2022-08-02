@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React, {
    createContext,
    useContext,
@@ -24,9 +23,9 @@ import Page, {
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 import {
-   GroupQuestion,
    Group,
    GroupOption,
+   GroupQuestion,
 } from "@careerfairy/shared-lib/dist/groups"
 import RootState from "../../store/reducers"
 import GroupsUtil from "../../data/util/GroupsUtil"

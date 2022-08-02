@@ -9,7 +9,6 @@ import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
-import useCollection from "../components/custom-hook/useCollection"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -50,12 +49,6 @@ const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
-   const { data: userGroups } = useCollection(
-      `userData/${auth.email}/userGroups`,
-      true
-   )
-   console.log("-> userGroups", userGroups)
-
    const { pathname, replace, asPath } = useRouter()
 
    const query = useMemo(
@@ -85,8 +78,6 @@ const AuthProvider = ({ children }) => {
    const userData = useSelector(({ firestore }: RootState) =>
       isLoggedOut ? undefined : firestore.data["userProfile"]
    )
-
-   console.log("-> userData", userData)
 
    const userStats = useSelector(
       ({ firestore }: RootState) => firestore.data["userStats"]

@@ -1,9 +1,7 @@
 // @ts-nocheck
-import React, { forwardRef, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
+import React, { forwardRef } from "react"
 import { getMinutes, prettyDate } from "../../helperFunctions/HelperFunctions"
-import { Rating } from "@mui/material"
-import { Box, Tooltip, Typography } from "@mui/material"
+import { Tooltip, Typography } from "@mui/material"
 import { CsvBuilder } from "filefy"
 
 import AddBox from "@mui/icons-material/AddBox"
@@ -179,23 +177,6 @@ export const exportSelectionAction = (
    }
 }
 
-export const customDonutConfig = [
-   {
-      display: false,
-      fontStyle: "bold",
-      textShadow: true,
-      overlap: true,
-      fontColor: "white",
-      render: ({ percentage }) => {
-         // args will be something like:
-         // { label: 'Label', value: 123, percentage: 50, index: 0, dataset: {...} }
-         return percentage > 2 ? percentage + "%" : ""
-         // return object if it is image
-         // return { src: 'image.png', width: 16, height: 16 };
-      },
-   },
-]
-
 export const defaultTableOptions: Options<any> = {
    filtering: true,
    selection: true,
@@ -204,8 +185,6 @@ export const defaultTableOptions: Options<any> = {
    pageSizeOptions: [3, 5, 10, 25, 50, 100, 200],
    minBodyHeight: 200,
    exportAllData: true,
-   // exportDelimiter: getCSVDelimiterBasedOnOS(),
-   // exportButton: { csv: true, pdf: true }, // PDF is false because its buggy and throws errors
    searchFieldVariant: "standard",
 }
 
@@ -219,29 +198,8 @@ export const getPageSize = (pageSizeOptions = [], totalData = []) => {
    )
 }
 
-const useStyles = makeStyles((theme) => ({
-   ratingInput: {
-      display: "inline-flex",
-      flexDirection: "row",
-      alignItems: "center",
-      height: 48,
-      paddingLeft: 20,
-   },
-   ratingText: {
-      marginLeft: theme.spacing(1),
-      color: theme.palette.text.secondary,
-      fontWeight: 500,
-   },
-   tableTooltipQuestion: {
-      fontSize: theme.spacing(2),
-   },
-}))
-
 export const getDate = (rowData, prop) => {
    return prettyDate(rowData[prop])
-}
-export const getCount = ({ value }) => {
-   return value ? value.length : 0
 }
 export const renderLongText = ({ value }) => {
    return (
@@ -261,85 +219,4 @@ export const renderAppearAfter = ({ appearAfter }) => {
          {getMinutes(appearAfter)}
       </Typography>
    )
-}
-
-export const RatingInputValue = ({ item, applyValue }) => {
-   const classes = useStyles()
-
-   const handleFilterChange = (event) => {
-      applyValue({ ...item, value: event.target.value })
-   }
-
-   return (
-      <div className={classes.ratingInput}>
-         <Rating
-            name="custom-rating-filter-operator"
-            placeholder="Filter value"
-            value={Number(item.value)}
-            onChange={handleFilterChange}
-            precision={0.5}
-         />
-      </div>
-   )
-}
-export const StarRatingInputValue = ({ columnDef, onFilterChanged }) => {
-   const [rating, setRating] = useState(0)
-   return (
-      <Box>
-         <Typography component="legend">Up to:</Typography>
-         <Rating
-            name={`ratings-${columnDef.tableData.id}`}
-            placeholder="Ratings lower than"
-            value={rating}
-            onChange={(event, value) => {
-               setRating(value)
-               onFilterChanged(columnDef.tableData.id, `${value}`)
-            }}
-            precision={0.5}
-         />
-      </Box>
-   )
-}
-
-export const renderRating = ({ value, id }) => {
-   return (
-      <Box display="flex" alignItems="center">
-         <Rating readOnly name={id} value={Number(value)} precision={0.5} />
-         {value ? (
-            <Typography
-               style={{
-                  marginLeft: 8,
-                  color: "grey",
-                  fontWeight: 500,
-               }}
-            >
-               {value}
-            </Typography>
-         ) : null}
-      </Box>
-   )
-}
-export const renderRatingStars = ({ rating, id }) => {
-   return (
-      <Box display="flex" alignItems="center">
-         <Rating readOnly name={id} value={Number(rating)} precision={0.5} />
-         {Number(rating) > 0 && (
-            <Typography
-               style={{
-                  marginLeft: 8,
-                  color: "grey",
-                  fontWeight: 500,
-               }}
-            >
-               {rating}
-            </Typography>
-         )}
-      </Box>
-   )
-}
-
-export const filterModel = {
-   items: [
-      // {columnField: 'rating', value: '3.5', operatorValue: '>='}
-   ],
 }

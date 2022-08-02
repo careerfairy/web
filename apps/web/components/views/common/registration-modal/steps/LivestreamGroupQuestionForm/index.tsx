@@ -79,7 +79,7 @@ const LivestreamGroupQuestionForm = () => {
          }
          setCheckingQuestions(false)
       })()
-   }, [livestream.groupQuestionsMap, userData?.userEmail, hasAgreedToAll])
+   }, [livestream?.groupQuestionsMap, userData?.userEmail, hasAgreedToAll])
 
    const handleSubmit = async (values: LivestreamGroupQuestionsMap) => {
       await completeRegistrationProcess(values)

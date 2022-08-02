@@ -25,6 +25,7 @@ import { UserDataSet, UserType } from "../../index"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import LinkifyText from "../../../../../../util/LinkifyText"
+import { Identifiable } from "../../../../../../../types/commonTypes"
 
 interface Props {
    currentUserDataSet: UserDataSet
@@ -37,6 +38,16 @@ interface Props {
    streamsFromTimeFrameAndFuture: LivestreamEvent[]
    breakdownRef: React.RefObject<HTMLDivElement>
    userTypes: UserType[]
+}
+
+const createLookup = <T extends Identifiable>(
+   array: T[],
+   propertyName: keyof T
+): Record<string, T[keyof T]> => {
+   return array.reduce((acc, curr) => {
+      acc[curr.id] = curr[propertyName]
+      return acc
+   }, {})
 }
 const UsersTable = ({
    fetchingStreams,
@@ -52,7 +63,7 @@ const UsersTable = ({
 }: Props) => {
    const showUniversityBreakdown =
       currentUserDataSet.dataSet === "groupUniversityStudents"
-   const { fieldsOfStudyById, levelsOfStudyById } = useGroupAnalytics()
+   const { fieldsOfStudy, levelsOfStudy } = useGroupAnalytics()
    const { groupQuestions, groupPresenter, group } = useGroup()
    const dataTableRef = useRef(null)
    const [selection, setSelection] = useState([])
@@ -74,12 +85,12 @@ const UsersTable = ({
             {
                field: "fieldOfStudy.id",
                title: "Field of Study",
-               lookup: fieldsOfStudyById,
+               lookup: createLookup(fieldsOfStudy, "name"),
             },
             {
                field: "levelOfStudy.id",
                title: "Level of Study",
-               lookup: levelsOfStudyById,
+               lookup: createLookup(levelsOfStudy, "name"),
             },
          ]
       }
@@ -331,7 +342,9 @@ const UsersTable = ({
                      {
                         field: "linkedinUrl",
                         title: "LinkedIn",
-                        render: (rowData) => LinkifyText(rowData.linkedinUrl),
+                        render: (rowData) => (
+                           <LinkifyText>{rowData.linkedinUrl}</LinkifyText>
+                        ),
                         cellStyle: {
                            width: 300,
                         },

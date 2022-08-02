@@ -381,7 +381,7 @@ function formatRegisteredUsersToCSV(students) {
       .map((student) => ({
          "First Name": student.firstName,
          "Last Name": student.lastName,
-         [DATE_FIELD]: student.dateRegisteredToLivestream?.toDate(),
+         [DATE_FIELD]: student.dateRegistered?.toDate(),
          Attended: student.userHas?.includes("participatedInLivestream")
             ? "Yes"
             : "No",

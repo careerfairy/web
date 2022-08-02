@@ -1,5 +1,4 @@
 import React from "react"
-import PropTypes from "prop-types"
 import Button, { ButtonProps } from "@mui/material/Button"
 import HintIcon from "components/views/common/HintIcon"
 import { sxStyles } from "../../../../../../types/commonTypes"
@@ -18,8 +17,6 @@ interface Props extends ButtonProps {
 const ButtonWithHint = ({
    fullWidth = true,
    variant = "outlined",
-   className,
-   endIcon,
    hintTitle,
    hintDescription,
    color = "grey",
@@ -39,10 +36,6 @@ const ButtonWithHint = ({
          {...props}
       />
    )
-}
-
-ButtonWithHint.propTypes = {
-   className: PropTypes.any,
 }
 
 export default ButtonWithHint

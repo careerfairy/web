@@ -420,6 +420,20 @@ const DraftStreamForm = ({
       [group?.id]
    )
 
+   const handleGroupSelect = useCallback(
+      (values: DraftFormValues, selectedGroups: Group[]) => {
+         const selectedGroupIds = selectedGroups.map((group) => group.id)
+         Object.keys(values.groupQuestionsMap).forEach((groupId) => {
+            if (!selectedGroupIds.includes(groupId)) {
+               delete values.groupQuestionsMap[groupId]
+            }
+         })
+
+         setSelectedGroups(selectedGroups)
+      },
+      []
+   )
+
    const SuccessMessage = () => {
       const directLink = getDirectLink()
       const targetPath = buildFullUrl(directLink)
@@ -864,28 +878,12 @@ const DraftStreamForm = ({
                                     >
                                        <MultiListSelect
                                           inputName="groupIds"
-                                          onSelectItems={(selectedGroups) => {
-                                             const selectedGroupIds =
-                                                selectedGroups.map(
-                                                   (group) => group.id
-                                                )
-                                             Object.keys(
-                                                values.groupQuestionsMap
-                                             ).forEach((groupId) => {
-                                                if (
-                                                   !selectedGroupIds.includes(
-                                                      groupId
-                                                   )
-                                                ) {
-                                                   delete values
-                                                      .groupQuestionsMap[
-                                                      groupId
-                                                   ]
-                                                }
-                                             })
-
-                                             setSelectedGroups(selectedGroups)
-                                          }}
+                                          onSelectItems={(selectedGroups) =>
+                                             handleGroupSelect(
+                                                values,
+                                                selectedGroups
+                                             )
+                                          }
                                           selectedItems={selectedGroups}
                                           allValues={existingGroups}
                                           disabled={isSubmitting || isNotAdmin}

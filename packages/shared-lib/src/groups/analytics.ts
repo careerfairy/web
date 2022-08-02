@@ -88,8 +88,8 @@ export function getUserBreakdownStatsBasedOnGroupQuestions(
          dataArray: [],
       }
       mapUserStats(groupQuestionStat, users, {
-         pathToDataId: `university.questions.${groupQuestion.id}.selectedOptionId`,
-         pathToDataName: `university.questions.${groupQuestion.id}.selectedOptionName`,
+         pathToDataId: `university.questions.${groupQuestion.id}.answerId`,
+         pathToDataName: `university.questions.${groupQuestion.id}.answerName`,
       })
       return groupQuestionStat
    }, [])

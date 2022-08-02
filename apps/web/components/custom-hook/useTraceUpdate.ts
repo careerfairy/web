@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react"
 
+// A DEV only hook to track what props are causing a component to re-render
 export default function useTraceUpdate(props) {
    const prev = useRef(props)
    useEffect(() => {

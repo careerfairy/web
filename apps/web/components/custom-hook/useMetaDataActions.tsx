@@ -91,7 +91,6 @@ export function useMetaDataActions({
                      groupPresenter.isUniversityStudent(user)
                   )
                }
-               console.count("handleGetRegisteredUsersFromGroup getCsvData")
                const csvData = StatsUtil.getCsvData(
                   group,
                   targetStream,
@@ -252,8 +251,6 @@ export function useMetaDataActions({
                         "Download a CSV with the details of the students who opted to put themselves in the talent pool"
                      }
                      startIcon={<TalentPoolIcon color="action" />}
-                     className={undefined}
-                     endIcon={undefined}
                   >
                      Download Talent Pool
                   </ButtonWithHint>

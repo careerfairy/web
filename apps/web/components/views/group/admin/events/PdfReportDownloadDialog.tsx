@@ -91,7 +91,6 @@ const PdfReportDownloadDialogContent = ({
                height: "80vh",
                border: "none",
                borderRadius: theme.spacing(0.4),
-               // boxShadow: theme.shadows[5],
             }}
          >
             <EventPdfReport {...reportPdfData} />

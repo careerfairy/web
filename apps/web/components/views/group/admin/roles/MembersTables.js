@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import clsx from "clsx"
 import PropTypes from "prop-types"
 import { Avatar, Badge, Box, Card, Typography } from "@mui/material"
@@ -88,7 +88,6 @@ const MembersTable = ({
 }) => {
    const classes = useStyles()
    const [selection, setSelection] = useState([])
-   const [data, setData] = useState([])
    const { authenticatedUser } = useAuth()
    const group = useSelector(({ firestore }) =>
       populate(firestore, "group", groupAdminPopulates)
@@ -97,9 +96,10 @@ const MembersTable = ({
    const userRole = useSelector(
       ({ firestore }) => firestore.data.userRole || {}
    )
-   useEffect(() => {
+
+   const data = useMemo(() => {
       if (group.admins?.length) {
-         const newData = group?.admins?.map((userData) => {
+         return group.admins.map((userData) => {
             let newUserData = {
                ...userData,
                displayName: userData.firstName
@@ -110,8 +110,8 @@ const MembersTable = ({
             newUserData = { ...newUserData, ...userRole }
             return newUserData
          })
-         setData(newData)
       }
+      return []
    }, [group.admins])
 
    const getRoleLookup = () => {
