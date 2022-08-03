@@ -1,7 +1,7 @@
-import React, { useMemo } from "react"
+import { useMemo } from "react"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
-import firebase from "firebase"
+import firebase from "firebase/compat"
 
 /**
  * Gets the firestore document reference either for a normal livestream.

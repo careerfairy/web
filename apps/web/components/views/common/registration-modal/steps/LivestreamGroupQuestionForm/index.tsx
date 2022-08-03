@@ -58,6 +58,7 @@ const LivestreamGroupQuestionForm = () => {
       ;(async () => {
          try {
             setCheckingQuestions(true)
+            if (!livestream) return
             const answeredLivestreamGroupQuestions =
                await groupRepo.mapUserAnswersToLivestreamGroupQuestions(
                   userData,
@@ -71,7 +72,11 @@ const LivestreamGroupQuestionForm = () => {
                await handleSubmit(answeredLivestreamGroupQuestions)
             } else {
                setRegistrationFormValues((prevState) =>
-                  Object.assign({}, prevState, answeredLivestreamGroupQuestions)
+                  Object.assign(
+                     {},
+                     prevState,
+                     answeredLivestreamGroupQuestions || {}
+                  )
                )
             }
          } catch (e) {

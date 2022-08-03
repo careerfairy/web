@@ -231,7 +231,7 @@ const ViewerLayout = (props) => {
                   currentLivestream.groupIds
                )
                const answeredLivestreamGroupQuestions =
-                  await groupRepo.mapUserAnswersToLivestreamGroupQuestion(
+                  await groupRepo.mapUserAnswersToLivestreamGroupQuestions(
                      userData,
                      currentLivestream
                   )

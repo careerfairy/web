@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export class CommonPage {
    constructor(public readonly page: Page) {}
@@ -95,20 +95,21 @@ export class CommonPage {
       }
    }
 
-   // Multiple pages might need to fill the group questions
+   // Multiple pages might need to fill the event group questions
    // when joining a livestream event
-   async selectRandomCategoriesFromGroup(group: Group) {
-      for (let category of group.categories) {
-         await this.page
-            .locator(`text=New!​${category.name} >> div[role="button"]`)
-            .click()
+   async selectRandomCategoriesFromEvent(livestream: LivestreamEvent) {
+      for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
+         for (let question of Object.values(groupQuestions.questions)) {
+            await this.page
+               .locator(`text=New!​${question.name} >> div[role="button"]`)
+               .click()
 
-         const randomOption =
-            category.options[
-               Math.floor(Math.random() * category.options.length)
-            ]
+            const options = Object.values(question.options)
+            const randomOption =
+               options[Math.floor(Math.random() * options.length)]
 
-         await this.page.locator(`[data-value="${randomOption.id}"]`).click()
+            await this.page.locator(`[data-value="${randomOption.id}"]`).click()
+         }
       }
    }
 

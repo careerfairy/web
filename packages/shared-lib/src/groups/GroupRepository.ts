@@ -347,6 +347,10 @@ export class FirebaseGroupRepository implements IGroupRepository {
       let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap = cloneDeep(
          livestream.groupQuestionsMap
       )
+      if (!livestreamGroupQuestionsMap) {
+         return null
+      }
+
       const userUniversityGroupId = userData.university.groupId
       const usersUniversityIsInEvent = livestream.groupIds.includes(
          userUniversityGroupId

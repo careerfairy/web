@@ -70,6 +70,7 @@ const RegistrationForm = () => {
          index={activeStep}
          onChangeIndex={() => setSliding(true)}
          onTransitionEnd={() => setSliding(false)}
+         disableLazyLoading
          disabled
       >
          {steps.map((stepData) => (

@@ -1,12 +1,9 @@
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import {
    convertDocArrayToDict,
    mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
-import {
-   FieldOfStudy,
-   RootFieldOfStudyCategory,
-} from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { FieldOfStudy, RootFieldOfStudyCategory } from "./fieldOfStudy"
 
 export interface IFieldOfStudyRepository {
    getAllFieldsOfStudy(): Promise<FieldOfStudy[]>

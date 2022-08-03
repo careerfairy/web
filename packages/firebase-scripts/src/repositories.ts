@@ -30,7 +30,7 @@ import {
    ILevelOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
 
-const firestoreInstance = firestore as unknown as firebase.firestore.Firestore
+const firestoreInstance = firestore as any
 
 /**
  * Singleton instances of the repositories

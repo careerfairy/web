@@ -4,6 +4,7 @@ import { FormikErrors } from "formik"
 export const checkIfUserHasAnsweredAllLivestreamGroupQuestions = (
    livestreamGroupQuestionsWithUserAnswers: LivestreamGroupQuestionsMap
 ): boolean => {
+   if (!livestreamGroupQuestionsWithUserAnswers) return true
    return Object.values(livestreamGroupQuestionsWithUserAnswers).reduce(
       (acc, groupDataWithQuestions) => {
          return (

@@ -1,5 +1,5 @@
-import firebase from "firebase/app"
-import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
+import firebase from "firebase/compat/app"
+import { LevelOfStudy } from "./levelOfStudy"
 import {
    convertDocArrayToDict,
    mapFirestoreDocuments,
