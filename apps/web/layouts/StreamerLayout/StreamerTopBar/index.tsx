@@ -161,7 +161,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                                  : theme.palette.primary.main
                            }
                            hasStarted={currentLivestream.hasStarted}
-                           mobile={mobile}
+                           noLabel={mobile}
                            disabled={!streamStartTimeIsNow}
                            startIcon={
                               currentLivestream.hasStarted ? (
@@ -179,11 +179,9 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                                  : "Are you sure that you want to start your livestream now?"
                            }
                            buttonLabel={
-                              mobile
-                                 ? ""
-                                 : currentLivestream.hasStarted
-                                 ? `Stop Streaming`
-                                 : `Start Streaming`
+                              currentLivestream.hasStarted
+                                 ? `Stop ${mobile ? "" : "Streaming"}`
+                                 : `Start ${mobile ? "" : "Streaming"}`
                            }
                            tooltipTitle={
                               currentLivestream.hasStarted
