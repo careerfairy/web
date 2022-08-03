@@ -36,6 +36,7 @@ const AccountInformation = ({ atsAccount }: Props) => {
    // Tabs behaviour
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const switchTabHandler = useCallback((...args) => {
+      // clicking tabs handler
       setActiveTabIndex(args[1])
    }, [])
 
@@ -48,7 +49,7 @@ const AccountInformation = ({ atsAccount }: Props) => {
                aria-label="ats content tabs"
             >
                {tabs.map((tab, i) => (
-                  <Tab key={`content-tab-${i}`} label={tab.label} />
+                  <Tab key={tab.label} label={tab.label} />
                ))}
             </Tabs>
          </Grid>
@@ -77,7 +78,7 @@ const AccountInformation = ({ atsAccount }: Props) => {
                >
                   {tabs.map((tab, i) => (
                      <SwipeablePanel
-                        key={`panel-content-${i}`}
+                        key={tab.label}
                         value={activeTabIndex}
                         index={i}
                      >
