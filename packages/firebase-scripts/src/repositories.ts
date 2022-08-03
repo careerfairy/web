@@ -19,8 +19,7 @@ import {
    FirebaseLivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { firestore } from "./lib/firebase"
-import firebase from "firebase"
-import FieldValue = firebase.firestore.FieldValue
+import { FieldValue } from "firebase-admin/firestore"
 import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
