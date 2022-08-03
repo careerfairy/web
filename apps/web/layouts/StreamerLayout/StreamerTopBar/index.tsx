@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import {
    AppBar,
@@ -120,7 +120,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    }
 
    return (
-      <Fragment>
+      <>
          <AppBar elevation={1} color="transparent">
             <Toolbar sx={styles.toolbar}>
                <Hidden mdDown>
@@ -130,7 +130,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                   <MiniLogo />
                </Hidden>
                {(isMainStreamer || (isStreamer && isBreakout)) && (
-                  <Fragment>
+                  <>
                      <StandartTooltip
                         arrow
                         open={
@@ -140,18 +140,18 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                         }
                         placement="bottom"
                         title={
-                           <React.Fragment>
+                           <>
                               <TooltipTitle>Start Streaming</TooltipTitle>
                               <TooltipText>
-                                 The Start Streaming button will become active 2
+                                 {`The Start Streaming button will become active 2
                                  minutes before the stream's official start
-                                 time.
+                                 time.`}
                               </TooltipText>
                               <TooltipButtonComponent
                                  onConfirm={() => setHideTooltip(true)}
                                  buttonText="Ok"
                               />
-                           </React.Fragment>
+                           </>
                         }
                      >
                         <ButtonWithConfirm
@@ -179,9 +179,11 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                                  : "Are you sure that you want to start your livestream now?"
                            }
                            buttonLabel={
-                              currentLivestream.hasStarted
-                                 ? `Stop ${mobile ? "" : "Streaming"}`
-                                 : `Start ${mobile ? "" : "Streaming"}`
+                              mobile
+                                 ? ""
+                                 : currentLivestream.hasStarted
+                                 ? `Stop Streaming`
+                                 : `Start Streaming`
                            }
                            tooltipTitle={
                               currentLivestream.hasStarted
@@ -190,7 +192,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                            }
                         />
                      </StandartTooltip>
-                  </Fragment>
+                  </>
                )}
                {mobile ? (
                   <Tooltip
@@ -258,7 +260,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                         <BreakoutRoomIcon />
                      </IconButton>
                   </Tooltip>
-                  {
+                  {mobile ? null : (
                      <Tooltip title="Open Student View">
                         <IconButton
                            target="_blank"
@@ -268,22 +270,24 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
                            <StudentViewIcon color="inherit" />
                         </IconButton>
                      </Tooltip>
-                  }
-                  <Tooltip
-                     title={
-                        themeMode === "dark"
-                           ? "Switch to light theme"
-                           : "Switch to dark mode"
-                     }
-                  >
-                     <Checkbox
-                        checked={themeMode === "dark"}
-                        onChange={toggleTheme}
-                        icon={<Brightness4Icon />}
-                        checkedIcon={<Brightness7Icon />}
-                        color="default"
-                     />
-                  </Tooltip>
+                  )}
+                  {mobile ? null : (
+                     <Tooltip
+                        title={
+                           themeMode === "dark"
+                              ? "Switch to light theme"
+                              : "Switch to dark mode"
+                        }
+                     >
+                        <Checkbox
+                           checked={themeMode === "dark"}
+                           onChange={toggleTheme}
+                           icon={<Brightness4Icon />}
+                           checkedIcon={<Brightness7Icon />}
+                           color="default"
+                        />
+                     </Tooltip>
+                  )}
                   <NewFeatureHint
                      // onClick={showAudience}
                      hide={!streamerIsPublished}
@@ -348,7 +352,7 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
             joiningStreamerLink={joiningStreamerLink}
             setOpen={setSpeakerManagementOpen}
          />
-      </Fragment>
+      </>
    )
 }
 

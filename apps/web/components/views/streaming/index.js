@@ -14,6 +14,7 @@ import { Backdrop } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier"
+import { alpha } from "@mui/material/styles"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -49,11 +50,26 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
       color: theme.palette.common.white,
    },
+   infoText: {
+      position: "absolute",
+      bottom: 150,
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      padding: 15,
+      borderRadius: 30,
+      fontWeight: "bold",
+      fontSize: "1rem",
+      color: theme.palette.common.white,
+      boxShadow: theme.shadows[2],
+      backgroundColor: alpha(theme.palette.common.black, 0.3),
+      backdropFilter: "blur(5px)",
+      maxWidth: "100%",
+      zIndex: 99,
+   },
 }))
 
 const StreamerOverview = ({
    isStreamer,
-   showAudience,
    setSliding,
    selectedState,
    handleStateChange,
@@ -68,6 +84,7 @@ const StreamerOverview = ({
    const { currentLivestream, isBreakout } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
    const [showMobileActionButtons, setShowMobileActionButtons] = useState(true)
+   const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
@@ -76,7 +93,16 @@ const StreamerOverview = ({
 
    useEffect(() => {
       setMounted(true)
+      setTimeout(() => {
+         setShowTapHint(false)
+      }, 20000)
    }, [])
+
+   useEffect(() => {
+      if (showTapHint && !showMobileActionButtons) {
+         setShowTapHint(false)
+      }
+   }, [showMobileActionButtons])
 
    /**
     * On mobile the visibility of the buttons will be handle based on stream frame click
@@ -95,12 +121,14 @@ const StreamerOverview = ({
                (selector) => selector.contains(target)
             )
 
-            if (clickedOnVideoFrame && !clickedOnButtons) {
+            if (!showMobileActionButtons && clickedOnVideoFrame) {
+               setShowMobileActionButtons(true)
+            } else if (clickedOnVideoFrame && !clickedOnButtons) {
                setShowMobileActionButtons((prev) => !prev)
             }
          }
       },
-      [smallScreen]
+      [smallScreen, showMobileActionButtons]
    )
 
    if (!mounted) return null
@@ -131,6 +159,9 @@ const StreamerOverview = ({
                handleStateChange={handleStateChange}
                showMobileActionButtons={showMobileActionButtons}
             />
+            {showTapHint && (
+               <div className={classes.infoText}>Tap to hide controllers</div>
+            )}
          </div>
          <AudienceDrawer
             hideAudience={hideAudience}

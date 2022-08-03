@@ -5,22 +5,10 @@ import {
    DialogContent,
    DialogContentText,
    DialogTitle,
-   IconButton,
    Tooltip,
-   useMediaQuery,
 } from "@mui/material"
 import CheckIcon from "@mui/icons-material/Check"
 import { GlassDialog } from "materialUI/GlobalModals"
-import { useTheme } from "@mui/material/styles"
-
-import makeStyles from "@mui/styles/makeStyles"
-
-const useStyles = makeStyles((theme) => ({
-   iconInButton: {
-      color: ({ hasStarted }) =>
-         hasStarted ? theme.palette.error.main : theme.palette.primary.main,
-   },
-}))
 
 function ButtonWithConfirm({
    color,
@@ -32,9 +20,6 @@ function ButtonWithConfirm({
    tooltipTitle,
    ...rest
 }) {
-   const theme = useTheme()
-   const extraSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
-   const classes = useStyles({ hasStarted })
    const [modalOpen, setModalOpen] = useState(false)
 
    const memorisedState = useMemo(
@@ -51,6 +36,8 @@ function ButtonWithConfirm({
       [modalOpen]
    )
 
+   const { mobile, startIcon } = rest
+
    return (
       <Fragment>
          <Tooltip title={tooltipTitle}>
@@ -59,11 +46,11 @@ function ButtonWithConfirm({
                   style={{ background: color, boxShadow: "none" }}
                   color="primary"
                   variant="contained"
-                  startIcon={rest.startIcon}
+                  startIcon={mobile ? null : startIcon}
                   onClick={() => setModalOpen(true)}
                   disabled={disabled}
                >
-                  {buttonLabel}
+                  {mobile ? startIcon : buttonLabel}
                </Button>
             </span>
          </Tooltip>
