@@ -17,7 +17,6 @@ const styles = sxStyles({
       background: "none",
    },
    title: {
-      // fontWeight: 400
       marginRight: (theme) => theme.spacing(1.5),
    },
    header: {
@@ -50,7 +49,6 @@ type Props = {
 }
 
 const Header = ({ title, subtitle, actionNode, children }: Props) => {
-   // is this needed?
    const isScrolling = useScrollTrigger()
 
    return (
