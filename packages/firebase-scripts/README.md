@@ -1,3 +1,21 @@
+# Firebase scripts
+
+script syntax:
+
+###Target Dev:
+Emulators must be running before running this script is executed.
+
+```sh
+npm run script -w @careerfairy/firebase-scripts -- scriptPath=<path-to-script>
+```
+
+###Target Prod:
+For prod a manual confirmation prompt will appear in the terminal before running the script.
+
+```sh
+npm run script -w @careerfairy/firebase-scripts -- scriptPath=<path-to-script> useProd="true"
+```
+
 ## Migrations
 
 ### createNewFieldsOfStudyInFirestore
@@ -184,8 +202,7 @@ Example Output of `livestream/{livestreamId}` document:
 
 Steps for this script:
 
-1. Make a
-   copy [this Google sheet](https://docs.google.com/spreadsheets/d/1MeLhVaEq-ev02JjGdLg6Yx7-mAAgGDOPvSgBaAChBO0/edit?usp=sharing)
+1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/1MeLhVaEq-ev02JjGdLg6Yx7-mAAgGDOPvSgBaAChBO0/edit?usp=sharing)
 
 2. On the left of the Google sheet document are all the legacy field of study names that are being used by all the
    groups on CF, and on the right are the new pre-defined fields of studies that you will have to create. Each legacy
@@ -198,6 +215,9 @@ Steps for this script:
 npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/saveFieldOfStudyMappingsToJson
 ```
 
+#### What it does:
+
 The script will then create a JSON file in the `packages/firebase-scripts/data` folder with the
 name `fieldOfStudyMapping.json`
-containing the mapping between the legacy field of study names and the new field of study IDs.
+containing the mapping between the legacy field of study names and the new field of study IDs. That will be
+used by the migration scripts

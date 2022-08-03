@@ -307,7 +307,6 @@ const convertUserGroupCategoriesToQuestionWithAnswerMap = (
 } => {
    let userGroupQuestionWithAnswerMap: UserGroupQuestionsWithAnswerMap = null
    const targetGroup = groupsDict[targetGroupId]
-   if (!targetGroup) return { targetGroup, userGroupQuestionWithAnswerMap }
    if (!targetGroup?.categories)
       return { userGroupQuestionWithAnswerMap, targetGroup }
    userGroupQuestionWithAnswerMap =
@@ -565,7 +564,7 @@ const backfillUsers = (
       }
       const university = getUniversity(userData, groupsDict)
 
-      const additionalUserDataToUpdate =
+      const dataForUserLivestreamData =
          storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection(
             userData,
             userRef,
@@ -587,7 +586,7 @@ const backfillUsers = (
          ...(backFills.length && {
             backFills: FieldValue.arrayUnion(...backFills),
          }),
-         ...(additionalUserDataToUpdate && additionalUserDataToUpdate),
+         ...(dataForUserLivestreamData && dataForUserLivestreamData),
       }
 
       setUserLivestreamData(
@@ -603,7 +602,11 @@ const backfillUsers = (
 }
 
 const storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection = (
-   userData: UserData,
+   userData:
+      | UserData
+      | RegisteredStudent
+      | ParticipatingStudent
+      | TalentPoolStudent,
    userRef: DocumentReference,
    groupsDict: GroupsDict,
    bulkWriter: BulkWriter,
@@ -632,18 +635,18 @@ const storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection = (
                groupsDict
             )
          if (!targetGroup) return
-         const data: UserGroupData = {
-            id: targetGroup.id,
-            userUid: userData.authId || "",
-            groupId: targetGroup.id,
-            groupName: targetGroup.universityName,
-            groupLogo: targetGroup.logoUrl || "",
-            groupUniversityCode: targetGroup.universityCode || "",
-            questions: userGroupQuestionWithAnswerMap,
-         }
          if (!isInUserDataCollection) {
             dataDict[registeredGroup.groupId] = userGroupQuestionWithAnswerMap
          } else {
+            const data: UserGroupData = {
+               id: targetGroup.id,
+               userUid: userData.authId || "",
+               groupId: targetGroup.id,
+               groupName: targetGroup.universityName,
+               groupLogo: targetGroup.logoUrl || "",
+               groupUniversityCode: targetGroup.universityCode || "",
+               questions: userGroupQuestionWithAnswerMap,
+            }
             const userGroupDataRef = userRef
                .collection("userGroups")
                .doc(registeredGroup.groupId)
