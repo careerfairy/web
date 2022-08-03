@@ -1,6 +1,6 @@
 import { sxStyles } from "../../../../types/commonTypes"
 import { Grid, Typography } from "@mui/material"
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import { useInterests } from "../../../custom-hook/useCollection"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -77,26 +77,24 @@ const InterestsInformation = () => {
                   selectedItems={inputValues[SELECTED_INTERESTS_FIELD_NAME]}
                   allValues={allInterests}
                   setFieldValue={handleSelectedInterestsChange}
-                  inputProps={useMemo(
-                     () => ({
-                        label: "Select 5 to improve your site experience",
-                        placeholder: "Select from the following list",
-                        className: "registrationInput",
-                     }),
-                     []
-                  )}
+                  inputProps={multiSelectInputProps}
                   getValueFn={multiListSelectMapValueFn}
-                  chipProps={useMemo(
-                     () => ({
-                        color: "primary",
-                     }),
-                     []
-                  )}
+                  chipProps={multiSelectChipProps}
                />
             </Grid>
          </Grid>
       </>
    )
+}
+
+const multiSelectInputProps = {
+   label: "Select 5 to improve your site experience",
+   placeholder: "Select from the following list",
+   className: "registrationInput",
+}
+
+const multiSelectChipProps = {
+   color: "primary",
 }
 
 export default InterestsInformation
