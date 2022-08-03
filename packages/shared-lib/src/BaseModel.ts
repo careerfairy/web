@@ -67,7 +67,7 @@ export function fromMergeDate(dateString?: string): Date {
  * @param date
  */
 export function fromSerializedDate(date?: number | Date): Date {
-   if (date && date instanceof Date) {
+   if (date instanceof Date) {
       return date
    }
 
