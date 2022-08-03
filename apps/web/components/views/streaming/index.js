@@ -58,7 +58,6 @@ const useStyles = makeStyles((theme) => ({
       padding: 15,
       borderRadius: 30,
       fontWeight: "bold",
-      fontSize: "1rem",
       color: theme.palette.common.white,
       boxShadow: theme.shadows[2],
       backgroundColor: alpha(theme.palette.common.black, 0.3),
