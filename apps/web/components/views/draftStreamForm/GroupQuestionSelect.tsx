@@ -3,7 +3,7 @@ import MultiListSelect from "../common/MultiListSelect"
 import { Group, GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
 import useCollection from "../../custom-hook/useCollection"
 import { Grid } from "@mui/material"
-import { FormikHelpers } from "Formik"
+import { FormikHelpers } from "formik"
 import { DraftFormValues } from "./DraftStreamForm"
 import {
    LivestreamGroupQuestion,
