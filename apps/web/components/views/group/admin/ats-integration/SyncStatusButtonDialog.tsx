@@ -13,7 +13,12 @@ import {
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import Paper from "@mui/material/Paper"
 
-const SyncStatusButtonDialog = ({ groupId, integrationId }) => {
+type Props = {
+   groupId: string
+   integrationId: string
+}
+
+const SyncStatusButtonDialog = ({ groupId, integrationId }: Props) => {
    const [isOpen, setOpen] = useState(false)
 
    const onClose = useCallback(() => {
@@ -40,7 +45,7 @@ const SyncStatusButtonDialog = ({ groupId, integrationId }) => {
    )
 }
 
-const DialogBody = ({ groupId, integrationId }) => {
+const DialogBody = ({ groupId, integrationId }: Props) => {
    const { data: syncStatus } = useGroupATSSyncStatus(groupId, integrationId)
 
    return (
