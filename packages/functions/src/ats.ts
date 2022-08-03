@@ -184,44 +184,42 @@ export const atsUserApplyToJob = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(
       onCallWrapper(async (data, context) => {
-         const requestData = await atsRequestValidationWithAccountToken<{
-            jobId?: string
-         }>({
-            data,
-            context,
-            requiredData: {
-               jobId: string().required(),
-            },
-         })
+         const { tokens, idToken, integrationId, jobId } =
+            await atsRequestValidationWithAccountToken<{
+               jobId?: string
+            }>({
+               data,
+               context,
+               requiredData: {
+                  jobId: string().required(),
+               },
+            })
 
          const atsRepository = atsRepo(
             process.env.MERGE_ACCESS_KEY,
-            requestData.tokens.merge.account_token
+            tokens.merge.account_token
          )
 
          // Confirm if the user has already applied to this job
 
          const userATSData: UserATSDocument = await userRepo.getUserATSData(
-            requestData.idToken.email
+            idToken.email
          )
-         const atsRelations =
-            userATSData?.atsRelations?.[requestData.integrationId]
+         const atsRelations = userATSData?.atsRelations?.[integrationId]
 
-         if (atsRelations?.jobApplications?.[requestData.jobId]) {
+         if (atsRelations?.jobApplications?.[jobId]) {
             return "User has already applied for that job"
          }
 
          // Create the necessary ATS models to apply the user to the job
 
-         const job: Job = await atsRepository.getJob(requestData.jobId)
+         const job: Job = await atsRepository.getJob(jobId)
 
          if (!job) {
-            return logAndThrow("That job does not exit", requestData.jobId)
+            return logAndThrow("That job does not exit", jobId)
          }
 
-         const userData = await userRepo.getUserDataById(
-            requestData.idToken.email
-         )
+         const userData = await userRepo.getUserDataById(idToken.email)
 
          // Fetch or create a Candidate object
          let candidate: Candidate
@@ -234,13 +232,9 @@ export const atsUserApplyToJob = functions
             candidate = await atsRepository.createCandidate(userData)
 
             // associate the candidate with the user
-            await userRepo.associateATSData(
-               requestData.idToken.email,
-               requestData.integrationId,
-               {
-                  candidateId: candidate.id,
-               }
-            )
+            await userRepo.associateATSData(idToken.email, integrationId, {
+               candidateId: candidate.id,
+            })
          }
 
          // Associate CV resume if existent (and not associated already)
@@ -250,30 +244,22 @@ export const atsUserApplyToJob = functions
                userData.userResume
             )
 
-            await userRepo.associateATSData(
-               requestData.idToken.email,
-               requestData.integrationId,
-               {
-                  cvAttachmentId: attachmentId,
-               }
-            )
+            await userRepo.associateATSData(idToken.email, integrationId, {
+               cvAttachmentId: attachmentId,
+            })
          }
 
          // Create the application
          const applicationId = await atsRepository.createApplication(
             candidate.id,
-            requestData.jobId
+            jobId
          )
 
-         await userRepo.associateATSData(
-            requestData.idToken.email,
-            requestData.integrationId,
-            {
-               jobApplications: {
-                  [requestData.jobId]: applicationId,
-               },
-            }
-         )
+         await userRepo.associateATSData(idToken.email, integrationId, {
+            jobApplications: {
+               [jobId]: applicationId,
+            },
+         })
 
          return applicationId
       })

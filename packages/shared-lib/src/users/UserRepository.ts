@@ -161,12 +161,12 @@ export class FirebaseUserRepository
     * @param accountId
     * @param data
     */
-   async associateATSData(
+   associateATSData(
       id: string,
       accountId: string,
       data: Partial<UserATSRelations>
    ): Promise<void> {
-      let userRef = this.firestore
+      const userRef = this.firestore
          .collection("userData")
          .doc(id)
          .collection("atsRelations")

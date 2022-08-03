@@ -69,10 +69,14 @@ export function saveIfObject<T>(
    targetField: object | string,
    creationFunction: (field: any) => T
 ) {
-   if (typeof targetField === "string" || !targetField) {
-      return null
-   } else {
+   if (
+      targetField &&
+      typeof targetField === "object" &&
+      Object.keys(targetField).length
+   ) {
       return creationFunction(targetField)
+   } else {
+      return null
    }
 }
 
@@ -89,7 +93,9 @@ export function mapIfObject<T extends BaseModel>(
    creationFunction: (field: any) => any
 ) {
    if (!targetField) return []
-   return targetField.map((o) => saveIfObject<T>(o, creationFunction)) as T[]
+   return targetField
+      .map((o) => saveIfObject<T>(o, creationFunction))
+      .filter((o) => o) as T[]
 }
 
 /**
