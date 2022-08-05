@@ -9,6 +9,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 const styles = sxStyles({
    wrapper: {
       marginTop: 6,
+      marginBottom: 6,
    },
 })
 
