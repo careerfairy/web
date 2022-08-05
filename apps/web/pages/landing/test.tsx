@@ -10,7 +10,10 @@ import GeneralLayout from "../../layouts/GeneralLayout"
 const test = () => {
    return (
       <GeneralLayout>
-         <Header />
+         <Header
+            title={"This is the title"}
+            subTitle={"this is the subtitle"}
+         />
          <UpcomingLivestreams />
          <MarketingSignUp />
       </GeneralLayout>
