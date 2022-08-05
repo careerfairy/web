@@ -29,8 +29,6 @@ export class FirebaseMarketingUsersRepository
          createdAt: this.fieldValue.serverTimestamp(),
       }
 
-      console.log("Creating", toInsert)
-
       return (
          this.firestore
             .collection("marketingUsers")
