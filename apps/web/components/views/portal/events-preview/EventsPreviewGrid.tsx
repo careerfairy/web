@@ -117,21 +117,26 @@ const EventsPreviewGrid = ({
                            ? "You’re not registered for any event yet."
                            : "There currently aren't any scheduled events"}
                      </Typography>
-                     <Link
-                        href={
-                           type === EventsTypes.myNext
-                              ? "/next-livestreams"
-                              : "/next-livestreams?type=pastEvents"
-                        }
-                     >
-                        <a>
-                           <Button variant="contained" endIcon={<SearchIcon />}>
-                              {type === EventsTypes.myNext
-                                 ? "Find an event"
-                                 : "See Past Events"}
-                           </Button>
-                        </a>
-                     </Link>
+                     {isOnLandingPage ? null : (
+                        <Link
+                           href={
+                              type === EventsTypes.myNext
+                                 ? "/next-livestreams"
+                                 : "/next-livestreams?type=pastEvents"
+                           }
+                        >
+                           <a>
+                              <Button
+                                 variant="contained"
+                                 endIcon={<SearchIcon />}
+                              >
+                                 {type === EventsTypes.myNext
+                                    ? "Find an event"
+                                    : "See Past Events"}
+                              </Button>
+                           </a>
+                        </Link>
+                     )}
                   </Stack>
                ) : (
                   <Grid container spacing={2}>
