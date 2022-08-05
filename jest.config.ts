@@ -26,6 +26,7 @@ const config: Config.InitialOptions = {
       // Jest should ignore e2e tests,
       // that job is for playwright ;)
       "<rootDir>/tests/e2e/",
+      "<rootDir>/pages/landing",
    ],
    moduleDirectories: ["node_modules", "<rootDir>"],
    testEnvironment: "jsdom",
