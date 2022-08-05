@@ -296,7 +296,7 @@ const EventPreviewCard = ({
    }
 
    const getHref = useCallback(() => {
-      if (isOnLandingPage && !onRegisterClick) {
+      if (isOnLandingPage && !authenticatedUser.email) {
          return `#${marketingSignUpFormId}`
       }
       return {
@@ -307,14 +307,7 @@ const EventPreviewCard = ({
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
          },
       }
-   }, [
-      event?.groupIds,
-      event?.id,
-      groupId,
-      isOnLandingPage,
-      isPast,
-      onRegisterClick,
-   ])
+   }, [authenticatedUser, event, groupId, isOnLandingPage, isPast])
 
    return (
       <>
@@ -497,7 +490,7 @@ const EventPreviewCard = ({
                               {event?.summary}
                            </Typography>
                            <Stack spacing={1} direction="row">
-                              {onRegisterClick && !isPast && (
+                              {onRegisterClick && !isPast && !isOnLandingPage && (
                                  <Button
                                     sx={styles.btn}
                                     onClick={onClickRegister}
