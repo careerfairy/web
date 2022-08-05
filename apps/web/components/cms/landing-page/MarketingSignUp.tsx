@@ -4,12 +4,13 @@ import { sxStyles } from "../../../types/commonTypes"
 import {
    Button,
    CircularProgress,
+   FormHelperText,
    Grid,
    MenuItem,
    TextField,
    Typography,
 } from "@mui/material"
-import React from "react"
+import React, { useState } from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import { Formik } from "formik"
 import * as yup from "yup"
@@ -24,6 +25,7 @@ const styles = sxStyles({
 })
 
 const MarketingSignUp = () => {
+   const [isComplete, setComplete] = useState(false)
    return (
       <Box id={marketingSignUpFormId} sx={styles.container}>
          <Container>
@@ -34,10 +36,21 @@ const MarketingSignUp = () => {
                </Typography>
 
                <Box mt={3}>
-                  <MarketingForm />
+                  {!isComplete && <MarketingForm setComplete={setComplete} />}
+                  {isComplete && <Complete />}
                </Box>
             </Box>
          </Container>
+      </Box>
+   )
+}
+
+const Complete = () => {
+   return (
+      <Box>
+         <Typography variant={"h3"}>
+            Expect to receive news from us soon!
+         </Typography>
       </Box>
    )
 }
@@ -56,7 +69,8 @@ const schema = yup.object().shape({
    fieldOfStudyId: yup.string().label("Field of Study").required(),
 })
 
-const MarketingForm = () => {
+const MarketingForm = ({ setComplete }) => {
+   const [backendError, setBackendError] = useState<Error>(null)
    return (
       <Formik
          initialValues={initialValues}
@@ -73,9 +87,12 @@ const MarketingForm = () => {
                .then((_) => {
                   console.log("Created with success")
                   resetForm()
+                  setComplete(true)
+                  setBackendError(null)
                })
                .catch((e) => {
                   console.log("failed", e)
+                  setBackendError(e)
                })
                .finally(() => {
                   setSubmitting(false)
@@ -201,6 +218,7 @@ const MarketingForm = () => {
                      Sign up
                   </Button>
                </Box>
+               {backendError && <BackendError error={backendError} />}
             </form>
          )}
       </Formik>
@@ -247,6 +265,10 @@ const FieldOfStudySelector = ({
          </TextField>
       </>
    )
+}
+
+const BackendError = ({ error }) => {
+   return <FormHelperText error>{error.message}</FormHelperText>
 }
 
 export default MarketingSignUp
