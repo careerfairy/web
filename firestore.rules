@@ -24,6 +24,12 @@ service cloud.firestore {
             allow read: if true;
             allow write: if isCFAdmin();
         }
+
+        match /fieldsOfStudy/{fieldOfStudy} {
+            allow read: if true;
+            allow write: if false;
+        }
+
         match /interests/{interest} {
             allow read: if true;
             allow write: if isCFAdmin();
