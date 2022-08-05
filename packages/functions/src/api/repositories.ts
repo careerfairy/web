@@ -17,6 +17,10 @@ import {
    FirebaseLivestreamRepository,
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+import {
+   FirebaseMarketingUsersRepository,
+   IMarketingUsersRepository,
+} from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
 
 const firestoreInstance = admin.firestore() as any
 
@@ -45,3 +49,9 @@ export const atsRepo = (
 ): IATSRepository => {
    return new MergeATSRepository(apiKey, accountToken)
 }
+
+export const marketingUsersRepo: IMarketingUsersRepository =
+   new FirebaseMarketingUsersRepository(
+      firestoreInstance,
+      admin.firestore.FieldValue
+   )
