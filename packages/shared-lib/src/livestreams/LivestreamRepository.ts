@@ -12,6 +12,11 @@ import {
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
 
+   getUpcomingEventsByFieldsOfStudy(
+      fieldsOfStudy: string[],
+      limit?: number
+   ): Promise<LivestreamEvent[] | null>
+
    getRegisteredEvents(
       userEmail: string,
       limit?: number
@@ -194,6 +199,27 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return this.mapLivestreamCollections(snapshots)
          .filterByNotEndedEvents()
          .get()
+   }
+
+   async getUpcomingEventsByFieldsOfStudy(
+      fieldsOfStudy: string[],
+      limit?: number
+   ) {
+      // add filter by fields of study
+      let livestreamRef = this.firestore
+         .collection("livestreams")
+         .where("start", ">", getEarliestEventBufferTime())
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .where("hasEnded", "==", false)
+         .orderBy("start", "asc")
+
+      if (limit) {
+         livestreamRef = livestreamRef.limit(limit)
+      }
+      const snapshots = await livestreamRef.get()
+
+      return this.mapLivestreamCollections(snapshots).get()
    }
 
    async getPastEventsFrom(

@@ -1,7 +1,6 @@
 import React, { useCallback, useState } from "react"
 import Box from "@mui/material/Box"
 import Typography from "@mui/material/Typography"
-import { LiveStreamEvent } from "../../../../types/event"
 import EventPreviewCard from "../../common/stream-cards/EventPreviewCard"
 import Link from "next/link"
 import RegistrationModal from "components/views/common/registration-modal"
@@ -15,6 +14,7 @@ import { Button, Grid } from "@mui/material"
 import LazyLoad from "react-lazyload"
 import useInfiniteScrollClientWithHandlers from "components/custom-hook/useInfiniteScrollClientWithHandlers"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const arrowFontSize = 30
 
@@ -73,6 +73,7 @@ const EventsPreviewGrid = ({
    events,
    type,
    id,
+   isOnLandingPage = false,
 }: EventsProps) => {
    const {
       query: { groupId },
@@ -92,13 +93,15 @@ const EventsPreviewGrid = ({
          <Box sx={{ px: 2 }} id={id}>
             <Box sx={styles.eventsHeader}>
                <Heading>{title}</Heading>
-               <Link href={seeMoreLink}>
-                  <a>
-                     <Typography sx={styles.seeMoreText} color="grey">
-                        See more
-                     </Typography>
-                  </a>
-               </Link>
+               {isOnLandingPage ? null : (
+                  <Link href={seeMoreLink}>
+                     <a>
+                        <Typography sx={styles.seeMoreText} color="grey">
+                           See more
+                        </Typography>
+                     </a>
+                  </Link>
+               )}
             </Box>
             <Stack>
                {!loading && !events.length ? (
@@ -114,21 +117,26 @@ const EventsPreviewGrid = ({
                            ? "You’re not registered for any event yet."
                            : "There currently aren't any scheduled events"}
                      </Typography>
-                     <Link
-                        href={
-                           type === EventsTypes.myNext
-                              ? "/next-livestreams"
-                              : "/next-livestreams?type=pastEvents"
-                        }
-                     >
-                        <a>
-                           <Button variant="contained" endIcon={<SearchIcon />}>
-                              {type === EventsTypes.myNext
-                                 ? "Find an event"
-                                 : "See Past Events"}
-                           </Button>
-                        </a>
-                     </Link>
+                     {isOnLandingPage ? null : (
+                        <Link
+                           href={
+                              type === EventsTypes.myNext
+                                 ? "/next-livestreams"
+                                 : "/next-livestreams?type=pastEvents"
+                           }
+                        >
+                           <a>
+                              <Button
+                                 variant="contained"
+                                 endIcon={<SearchIcon />}
+                              >
+                                 {type === EventsTypes.myNext
+                                    ? "Find an event"
+                                    : "See Past Events"}
+                              </Button>
+                           </a>
+                        </Link>
+                     )}
                   </Stack>
                ) : (
                   <Grid container spacing={2}>
@@ -153,6 +161,7 @@ const EventsPreviewGrid = ({
                                  onRegisterClick={handleClickRegister}
                                  key={event.id}
                                  event={event}
+                                 isOnLandingPage={isOnLandingPage}
                               />
                            </LazyLoad>
                         </Grid>
@@ -203,12 +212,13 @@ export enum EventsTypes {
 }
 
 export interface EventsProps {
-   events: LiveStreamEvent[]
+   events: LivestreamEvent[]
    seeMoreLink?: string
    title?: string
    loading: boolean
    type: EventsTypes
    id?: string
+   isOnLandingPage?: boolean
    // Not all portal widget should
    // have automatic event registrations
    // to avoid duplicate events clashing

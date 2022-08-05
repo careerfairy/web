@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
@@ -26,6 +26,7 @@ import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { marketingSignUpFormId } from "../../../cms/constants"
 
 const styles = {
    hideOnHoverContent: {
@@ -197,6 +198,7 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
+   isOnLandingPage = false,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
@@ -244,7 +246,7 @@ const EventPreviewCard = ({
             )
          })()
       }
-   }, [event?.groupIds, groupId, loading])
+   }, [event, firebase, groupId, light, loading])
 
    useEffect(() => {
       if (!loading) {
@@ -292,6 +294,27 @@ const EventPreviewCard = ({
    const onClickRegister = () => {
       onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
    }
+
+   const getHref = useCallback(() => {
+      if (isOnLandingPage && !onRegisterClick) {
+         return `#${marketingSignUpFormId}`
+      }
+      return {
+         pathname: `/upcoming-livestream/[livestreamId]`,
+         hash: isPast && "#about",
+         query: {
+            livestreamId: event?.id,
+            ...(event?.groupIds?.includes(groupId as string) && { groupId }),
+         },
+      }
+   }, [
+      event?.groupIds,
+      event?.id,
+      groupId,
+      isOnLandingPage,
+      isPast,
+      onRegisterClick,
+   ])
 
    return (
       <>
@@ -498,16 +521,7 @@ const EventPreviewCard = ({
                                  component={Link}
                                  /*
                                             // @ts-ignore */
-                                 href={{
-                                    pathname: `/upcoming-livestream/[livestreamId]`,
-                                    hash: isPast && "#about",
-                                    query: {
-                                       livestreamId: event?.id,
-                                       ...(event?.groupIds?.includes(
-                                          groupId as string
-                                       ) && { groupId }),
-                                    },
-                                 }}
+                                 href={getHref()}
                                  variant={"contained"}
                                  color={"secondary"}
                                  size={"small"}
@@ -542,6 +556,7 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
+   isOnLandingPage?: boolean
 }
 
 export default EventPreviewCard

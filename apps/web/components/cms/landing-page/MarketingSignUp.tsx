@@ -9,12 +9,13 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React, { useCallback } from "react"
+import React from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import { Formik } from "formik"
 import * as yup from "yup"
 import { useFieldsOfStudy } from "../../custom-hook/useCollection"
 import SessionStorageUtil from "util/SessionStorageUtil"
+import { marketingSignUpFormId } from "../constants"
 
 const styles = sxStyles({
    container: {
@@ -24,7 +25,7 @@ const styles = sxStyles({
 
 const MarketingSignUp = () => {
    return (
-      <Box sx={styles.container}>
+      <Box id={marketingSignUpFormId} sx={styles.container}>
          <Container>
             <Box p={3}>
                <Typography variant="h4">Stay connected</Typography>
@@ -88,7 +89,6 @@ const MarketingForm = () => {
             handleChange,
             handleBlur,
             handleSubmit,
-            setFieldValue,
             isSubmitting,
          }) => (
             <form onSubmit={handleSubmit}>
@@ -239,7 +239,7 @@ const FieldOfStudySelector = ({
                </MenuItem>
             )}
             {!isLoading &&
-               data.map((entry, i) => (
+               data.map((entry) => (
                   <MenuItem key={entry.name} value={JSON.stringify(entry)}>
                      {entry.name}
                   </MenuItem>

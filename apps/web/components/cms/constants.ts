@@ -6,3 +6,5 @@ export const caseStudyCompanyCoverImageDimensions = {
    width: 600,
    height: 340,
 }
+
+export const marketingSignUpFormId = "marketingSignUpFormId"
