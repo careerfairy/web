@@ -26,15 +26,13 @@ export default async function handler(
       return res.status(401).json({ message: "Invalid token" })
    }
 
+   // const isLandingPage = req.query.slug === "landing"
+
    // Fetch the headless CMS to check if the provided `slug` exists
-   const { companyCaseStudy } =
-      await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
-         req.query.slug as string,
-         true
-      )
+   const { location, hasData } = await getPreviewData(req.query)
 
    // If the content doesn't exist prevent preview mode from being enabled
-   if (!companyCaseStudy) {
+   if (!hasData) {
       return res
          .status(401)
          .json({ message: "Slug not found - cannot enter preview mode" })
@@ -45,8 +43,46 @@ export default async function handler(
    // Redirect to the path from the fetched case study
    // We don't redirect to req.query.slug as that might lead to open redirect vulnerabilities
    res.writeHead(307, {
-      Location: `/companies/customers/${companyCaseStudy.slug}`,
+      Location: location,
    })
 
    res.end()
+}
+
+type PageTypes = "COMPANY_CASE_STUDY" | "MARKETING_LANDING_PAGE"
+const getPreviewData = async (
+   query: NextApiRequest["query"]
+): Promise<{
+   hasData: boolean
+   location: string
+}> => {
+   const pageType: string | PageTypes = query.pageType as string
+
+   switch (pageType) {
+      case "COMPANY_CASE_STUDY":
+         const { companyCaseStudy } =
+            await caseStudyRepo.getCaseStudyAndMoreCaseStudies(
+               query.slug as string,
+               true
+            )
+         return {
+            hasData: Boolean(companyCaseStudy),
+            location: `/companies/customers/${companyCaseStudy.slug}`,
+         }
+
+      case "MARKETING_LANDING_PAGE":
+         // TODO add marketingLandingPage query
+         const data = null
+
+         return {
+            hasData: false,
+            location: `/landing/${data?.slug}`,
+         }
+
+      default:
+         return {
+            hasData: false,
+            location: "/",
+         }
+   }
 }
