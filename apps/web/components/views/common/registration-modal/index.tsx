@@ -2,7 +2,7 @@ import React, { memo } from "react"
 import { Dialog, Grow } from "@mui/material"
 import { RegistrationContextProvider } from "context/registration/RegistrationContext"
 import RegistrationForm from "./RegistrationForm"
-import { LiveStreamEvent } from "../../../../types/event"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const RegistrationModal = memo(
    ({
@@ -51,7 +51,7 @@ interface Props {
    onGroupJoin?: () => any
    handleClose: () => any
    onFinish: () => any
-   livestream: LiveStreamEvent
+   livestream: LivestreamEvent
    groups: any[]
    promptOtherEventsOnFinal?: boolean
    targetGroupId?: string

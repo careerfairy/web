@@ -4,6 +4,7 @@ import { sxStyles } from "../../../types/commonTypes"
 import { Button, Grid, Typography } from "@mui/material"
 import { useCallback } from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
+import { marketingSignUpFormId } from "../constants"
 
 const styles = sxStyles({
    container: {
@@ -35,7 +36,7 @@ const MarketingSignUp = () => {
    }, [])
 
    return (
-      <Box sx={styles.container}>
+      <Box id={marketingSignUpFormId} sx={styles.container}>
          <Container>
             <Box p={3}>
                <Typography variant="h4">Stay connected</Typography>

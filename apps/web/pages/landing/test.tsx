@@ -14,7 +14,7 @@ const test = () => {
             title={"This is the title"}
             subTitle={"this is the subtitle"}
          />
-         <UpcomingLivestreams />
+         <UpcomingLivestreams fieldsOfStudy={[""]} />
          <MarketingSignUp />
       </GeneralLayout>
    )
