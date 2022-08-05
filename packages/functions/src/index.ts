@@ -19,6 +19,8 @@ import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
 import wishes = require("./wishes")
+import cms = require("./cms")
+import marketing = require("./marketing")
 import ats = require("./ats")
 
 // Auth
@@ -123,8 +125,13 @@ exports.rewardUserAction = rewards.rewardUserAction
 exports.applyReferralCode = rewards.applyReferralCode
 
 // Ratings
-
 exports.onUserRateWish = wishes.onUserRateWish
+
+// CMS
+exports.fieldsOfStudy = cms.fieldsOfStudy
+
+// Marketing
+exports.createMarketingUser = marketing.createMarketingUser
 
 // ATS
 exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
