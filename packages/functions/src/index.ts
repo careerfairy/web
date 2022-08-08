@@ -19,6 +19,8 @@ import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
 import wishes = require("./wishes")
+import cms = require("./cms")
+import marketing = require("./marketing")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
@@ -126,5 +128,10 @@ exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
 exports.rewardUserAction = rewards.rewardUserAction
 
 // Ratings
-
 exports.onUserRateWish = wishes.onUserRateWish
+
+// CMS
+exports.fieldsOfStudy = cms.fieldsOfStudy
+
+// Marketing
+exports.createMarketingUser = marketing.createMarketingUser
