@@ -1,6 +1,13 @@
 import { RichTextContent, EmbedReferences } from "@graphcms/rich-text-types"
 
 export type Slug = string
+
+export type Variables = {
+   [p: string]: any
+   slug: string
+   preview?: boolean
+   locale?: string
+}
 export interface CmsImage {
    height?: number
    width?: number
