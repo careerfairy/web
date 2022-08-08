@@ -5,18 +5,22 @@ import SEO from "../../components/util/SEO"
 import React from "react"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
-import { parseCaseStudy } from "../../components/cms/util"
+import Header from "../../components/cms/landing-page/Header"
 
 /**
  * Just for us to develop the UI while we don't have the hygraph cms setup
  */
 
-const landingPage = () => {
+const landingPage = ({ marketingLandingPage }) => {
    return (
       <GeneralLayout>
          <SEO
             title="CareerFairy | Marketing Landing"
             canonical={`https://www.careerfairy.io/landing`}
+         />
+         <Header
+            title={marketingLandingPage.title}
+            subTitle={marketingLandingPage.subtitle}
          />
          <UpcomingLivestreams fieldsOfStudy={[""]} />
          <MarketingSignUp />
@@ -29,27 +33,22 @@ export const getStaticProps: GetStaticProps = async ({
    preview = false,
    locale,
 }) => {
-   const { companyCaseStudy } = await marketingPageRepo.getMarketingPage({
+   const { marketingLandingPage } = await marketingPageRepo.getMarketingPage({
       slug: params.slug as string,
       preview,
       locale,
    })
 
-   if (!companyCaseStudy) {
+   if (!marketingLandingPage) {
       return {
          notFound: true,
       }
    }
 
-   let parsedMoreCompanyCaseStudies = []
-
-   const parsedCaseStudyData = await parseCaseStudy(companyCaseStudy)
-
    return {
       props: {
          preview,
-         companyCaseStudy: parsedCaseStudyData,
-         moreCompanyCaseStudies: parsedMoreCompanyCaseStudies || [],
+         marketingLandingPage,
       },
       revalidate: 60,
    }

@@ -1,5 +1,6 @@
 import caseStudyRepo from "../../data/graphcms/CaseStudyRepository"
 import { NextApiRequest, NextApiResponse } from "next"
+import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 /*
  * You can read more about preview mode on [nextjs](https://nextjs.org/docs/advanced-features/preview-mode)
  *
@@ -72,11 +73,15 @@ const getPreviewData = async (
 
       case "MARKETING_LANDING_PAGE":
          // TODO add marketingLandingPage query
-         const data = null
+         const { marketingLandingPage } =
+            await marketingPageRepo.getMarketingPage({
+               slug: query.slug as string,
+               preview: true,
+            })
 
          return {
-            hasData: false,
-            location: `/landing/${data?.slug}`,
+            hasData: Boolean(marketingLandingPage),
+            location: `/landing/${marketingLandingPage?.slug}`,
          }
 
       default:
