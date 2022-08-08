@@ -1,4 +1,3 @@
-import Header from "../../components/cms/landing-page/Header"
 import UpcomingLivestreams from "../../components/cms/landing-page/UpcomingLivestreams"
 import MarketingSignUp from "../../components/cms/landing-page/MarketingSignUp"
 import GeneralLayout from "../../layouts/GeneralLayout"
@@ -12,18 +11,14 @@ import { parseCaseStudy } from "../../components/cms/util"
  * Just for us to develop the UI while we don't have the hygraph cms setup
  */
 
-const test = () => {
+const landingPage = () => {
    return (
       <GeneralLayout>
          <SEO
             title="CareerFairy | Marketing Landing"
             canonical={`https://www.careerfairy.io/landing`}
          />
-         <Header
-            title={"This is the title"}
-            subTitle={"this is the subtitle"}
-         />
-         <UpcomingLivestreams />
+         <UpcomingLivestreams fieldsOfStudy={[""]} />
          <MarketingSignUp />
       </GeneralLayout>
    )
@@ -89,4 +84,4 @@ export async function getStaticPaths({ locales }) {
    }
 }
 
-export default test
+export default landingPage
