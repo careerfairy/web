@@ -31,6 +31,9 @@ const AuthContext = createContext<DefaultContext>({
    userStats: undefined,
 })
 
+/**
+ * Paths that require sign in
+ */
 const securePaths = [
    "/profile",
    "/groups",
@@ -42,9 +45,11 @@ const securePaths = [
    "/group/[groupId]/admin/roles",
    "/group/[groupId]/admin/edit",
    "/group/[groupId]/admin/analytics",
+   "/group/[groupId]/admin/ats-integration",
    "/new-livestream",
    "/group/create",
 ]
+
 const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
