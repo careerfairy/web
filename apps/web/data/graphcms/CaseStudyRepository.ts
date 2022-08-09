@@ -8,6 +8,7 @@ import {
    CompanyCaseStudyPreview,
    Slug,
 } from "../../types/cmsTypes"
+import gql from "graphql-tag"
 
 export interface ICaseStudyRepository {
    getAllCaseStudiesWithSlug(): Promise<{ slug: Slug }[]>
@@ -25,7 +26,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
    constructor() {}
 
    async getAllCaseStudiesWithSlug(): Promise<{ slug: Slug }[]> {
-      const data = await fetchAPI(`
+      const data = await fetchAPI(gql`
          {
             companyCaseStudies {
                slug
@@ -43,7 +44,7 @@ class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
       moreCompanyCaseStudies: CompanyCaseStudyPreview[]
    }> {
       return await fetchAPI(
-         `
+         gql`
              query CompanyCaseStudyBySlug($slug: String!, $stage: Stage!) {
                  companyCaseStudy(stage: $stage, where: { slug: $slug }) {
                      title
