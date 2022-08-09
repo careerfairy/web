@@ -207,6 +207,7 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
    const [isPast, setIsPast] = useState(checkIfPast(event))
+   const isPlaceholderEvent = event?.id === "placeholderEvent"
 
    const {
       query: { groupId },
@@ -300,6 +301,7 @@ const EventPreviewCard = ({
                startDate={getStartDate()}
                loading={loading}
                onShareClick={handleShareClick}
+               showPlaceholderDate={isPlaceholderEvent}
             />
             <Box
                sx={[
@@ -474,46 +476,54 @@ const EventPreviewCard = ({
                               {event?.summary}
                            </Typography>
                            <Stack spacing={1} direction="row">
-                              {onRegisterClick && !isPast && (
+                              {onRegisterClick &&
+                                 !isPast &&
+                                 !isPlaceholderEvent && (
+                                    <Button
+                                       sx={styles.btn}
+                                       onClick={onClickRegister}
+                                       variant={
+                                          hasRegistered
+                                             ? "outlined"
+                                             : "contained"
+                                       }
+                                       color={
+                                          hasRegistered ? "info" : "primary"
+                                       }
+                                       disabled={registering}
+                                       size={"medium"}
+                                    >
+                                       {hasRegistered
+                                          ? "cancel"
+                                          : mobile
+                                          ? "attend"
+                                          : "I'll attend"}
+                                    </Button>
+                                 )}
+
+                              {!isPlaceholderEvent && (
                                  <Button
                                     sx={styles.btn}
-                                    onClick={onClickRegister}
-                                    variant={
-                                       hasRegistered ? "outlined" : "contained"
-                                    }
-                                    color={hasRegistered ? "info" : "primary"}
-                                    disabled={registering}
-                                    size={"medium"}
+                                    component={Link}
+                                    /*
+                                             // @ts-ignore */
+                                    href={{
+                                       pathname: `/upcoming-livestream/[livestreamId]`,
+                                       hash: isPast && "#about",
+                                       query: {
+                                          livestreamId: event?.id,
+                                          ...(event?.groupIds?.includes(
+                                             groupId as string
+                                          ) && { groupId }),
+                                       },
+                                    }}
+                                    variant={"contained"}
+                                    color={"secondary"}
+                                    size={"small"}
                                  >
-                                    {hasRegistered
-                                       ? "cancel"
-                                       : mobile
-                                       ? "attend"
-                                       : "I'll attend"}
+                                    {mobile ? "details" : "see details"}
                                  </Button>
                               )}
-
-                              <Button
-                                 sx={styles.btn}
-                                 component={Link}
-                                 /*
-                                            // @ts-ignore */
-                                 href={{
-                                    pathname: `/upcoming-livestream/[livestreamId]`,
-                                    hash: isPast && "#about",
-                                    query: {
-                                       livestreamId: event?.id,
-                                       ...(event?.groupIds?.includes(
-                                          groupId as string
-                                       ) && { groupId }),
-                                    },
-                                 }}
-                                 variant={"contained"}
-                                 color={"secondary"}
-                                 size={"small"}
-                              >
-                                 {mobile ? "details" : "see details"}
-                              </Button>
                            </Stack>
                         </>
                      )}
