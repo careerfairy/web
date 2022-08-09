@@ -158,10 +158,7 @@ const BrowseButton = () => {
       <Box mt={4} mb={4}>
          <Button
             component={Link}
-            // @ts-ignore
-            href={{
-               pathname: `/next-livestreams`,
-            }}
+            href={"/next-livestreams"}
             style={{ textDecoration: "none" }}
             color="secondary"
             variant="contained"

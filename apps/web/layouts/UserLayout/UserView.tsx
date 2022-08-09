@@ -16,7 +16,15 @@ import { Container } from "@mui/material"
 import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
 
-function TabPanel(props) {
+type TabPanelProps = {
+   children: () => JSX.Element
+   value: string
+   path: string
+   // All other props
+   [x: string]: any
+}
+
+function TabPanel(props: TabPanelProps) {
    const { children, value, path, ...other } = props
    return (
       <div
@@ -26,7 +34,7 @@ function TabPanel(props) {
          aria-labelledby={`full-width-tab-${path}`}
          {...other}
       >
-         {value === path && <Box sx={{ pb: 3 }}>{children}</Box>}
+         {value === path && <Box sx={{ pb: 3 }}>{children()}</Box>}
       </div>
    )
 }
@@ -92,7 +100,7 @@ const UserView = ({ currentPath }: Props) => {
          path={key}
          dir={theme.direction}
       >
-         {value.component()}
+         {value.component}
       </TabPanel>
    ))
 
