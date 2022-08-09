@@ -2,16 +2,28 @@ import UpcomingLivestreams from "../../components/cms/landing-page/UpcomingLives
 import MarketingSignUp from "../../components/cms/landing-page/MarketingSignUp"
 import GeneralLayout from "../../layouts/GeneralLayout"
 import SEO from "../../components/util/SEO"
-import React from "react"
+import React, { useEffect } from "react"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
 import Header from "../../components/cms/landing-page/Header"
+import { useDispatch } from "react-redux"
+import * as actions from "store/actions"
 
 /**
  * Just for us to develop the UI while we don't have the hygraph cms setup
  */
 
-const landingPage = ({ marketingLandingPage }) => {
+const LandingPage = ({ marketingLandingPage }) => {
+   const dispatch = useDispatch()
+
+   useEffect(() => {
+      dispatch(actions.inLandingPage())
+
+      return () => {
+         dispatch(actions.outOfLandingPage())
+      }
+   }, [])
+
    return (
       <GeneralLayout>
          <SEO
@@ -83,4 +95,4 @@ export async function getStaticPaths({ locales }) {
    }
 }
 
-export default landingPage
+export default LandingPage
