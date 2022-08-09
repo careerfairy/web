@@ -72,6 +72,131 @@ export interface MergeSyncStatus {
    is_initial_sync: boolean
 }
 
+/**
+ * Candidate response
+ */
+export interface MergeCandidate {
+   id: string
+   remote_id: string
+   first_name: string
+   last_name: string
+   company?: string
+   title?: string
+   remote_created_at?: string
+   remote_updated_at?: string
+   last_interaction_at?: string
+   is_private?: boolean
+   can_email?: boolean
+   locations?: string[]
+   phone_numbers?: MergePhoneNumber[]
+   email_addresses?: MergeEmailAddress[]
+   urls?: MergeUrl[]
+   applications?: MergeApplication[]
+   attachments?: MergeAttachment[]
+}
+
+/**
+ * Application (expanded)
+ */
+export interface MergeApplication {
+   id: string
+   remote_id: string
+   candidate?: MergeCandidate
+   job?: MergeJob
+   applied_at?: string
+   rejected_at?: string
+   source?: string
+   credited_to?: string
+   current_stage?: MergeJobInterviewStage
+   reject_reason?: string
+}
+
+// creation model
+export interface MergeApplicationModel {
+   id?: string // will only exist after creating (response)
+   candidate: string
+   job: string
+   applied_at?: string
+   rejected_at?: string
+   source?: string
+   credited_to?: string
+   current_stage?: string
+   reject_reason?: string
+}
+
+export interface MergeJobInterviewStage {
+   id: string
+   remote_id: string
+   name: string
+   job: string
+}
+
+/**
+ * Attachment
+ */
+export interface MergeAttachment {
+   id: string
+   remote_id: string
+   file_name?: string
+   file_url?: string
+   candidate?: MergeCandidate
+   attachment_type?: attachmentType
+}
+
+export type attachmentType =
+   | "RESUME"
+   | "COVER_LETTER"
+   | "OFFER_LETTER"
+   | "OTHER"
+
+// model to create / update
+export interface MergeAttachmentModel {
+   file_name?: string
+   file_url?: string
+   candidate?: string
+   attachment_type: attachmentType
+}
+
+export interface MergePhoneNumber {
+   value: string
+   phone_number_type: "HOME" | "WORK" | "MOBILE" | "SKYPE" | "OTHER"
+}
+
+export interface MergeEmailAddress {
+   value: string
+   email_address_type: "PERSONAL" | "WORK" | "OTHER"
+}
+
+export interface MergeUrl {
+   value: string
+   url_type:
+      | "PERSONAL"
+      | "COMPANY"
+      | "PORTFOLIO"
+      | "BLOG"
+      | "SOCIAL_MEDIA"
+      | "OTHER"
+}
+
+/**
+ * Model used to create a Candidate
+ * Request body model object
+ */
+export interface MergeCandidateModel {
+   remote_id?: string
+   first_name?: string
+   last_name?: string
+   company?: string
+   title?: string
+   attachments: string[]
+   applications: string[]
+   tags: string[]
+   urls: MergeUrl[]
+   email_addresses: MergeEmailAddress[]
+   phone_numbers: MergePhoneNumber[]
+   locations?: string[]
+}
+
 /*
 |--------------------------------------------------------------------------
 | API Response Wrappers

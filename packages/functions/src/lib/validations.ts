@@ -12,7 +12,11 @@ export async function validateData(data: any, schema: BaseSchema) {
    try {
       return await schema.validate(data)
    } catch (e) {
-      logAndThrow("Invalid Arguments Provided (schema validation failed)", data)
+      logAndThrow(
+         "Invalid Arguments Provided (schema validation failed)",
+         data,
+         e
+      )
    }
 }
 
@@ -68,6 +72,6 @@ export async function validateUserIsCFAdmin(email: string) {
 }
 
 export function logAndThrow(message: string, ...context: any[]) {
-   functions.logger.error(message, context)
+   functions.logger.error(message, { ...context })
    throw new functions.https.HttpsError("failed-precondition", message)
 }
