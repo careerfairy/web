@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback } from "react"
 import Typography from "@mui/material/Typography"
 import Skeleton from "@mui/material/Skeleton"
 import DateUtil from "../../../../../util/DateUtil"
@@ -20,7 +20,18 @@ const DateAndShareDisplay = ({
    loading,
    onShareClick,
    animation,
+   showPlaceholderDate = false,
 }: Props) => {
+   const renderDate = useCallback(
+      (date) => {
+         if (showPlaceholderDate) {
+            return "Coming soon"
+         }
+         return DateUtil.eventPreviewDate(date)
+      },
+      [showPlaceholderDate]
+   )
+
    return (
       <Stack
          spacing={2}
@@ -33,7 +44,7 @@ const DateAndShareDisplay = ({
             {loading ? (
                <Skeleton animation={animation} width={120} />
             ) : (
-               DateUtil.eventPreviewDate(startDate)
+               renderDate(startDate)
             )}
          </Typography>
          {loading ? (
@@ -60,6 +71,7 @@ interface Props {
    startDate?: Date
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
+   showPlaceholderDate?: boolean
 }
 
 export default DateAndShareDisplay

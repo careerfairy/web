@@ -40,6 +40,7 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
                      serverSideEvents={comingUpNextEvents}
                      limit={20}
                   />
+                  {/*TODO: add past events*/}
                   <MyNextEvents limit={20} />
                </WidgetsWrapper>
             </Container>
