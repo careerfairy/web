@@ -133,5 +133,8 @@ exports.onUserRateWish = wishes.onUserRateWish
 // ATS
 exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
 exports.mergeGetAccountToken = ats.mergeGetAccountToken
+exports.mergeRemoveAccount = ats.mergeRemoveAccount
 exports.fetchATSJobs = ats.fetchATSJobs
 exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
+exports.fetchATSApplications = ats.fetchATSApplications
+exports.atsUserApplyToJob = ats.atsUserApplyToJob

@@ -31,11 +31,15 @@ export interface IGroupRepository {
 
    // ATS actions
    getATSIntegrations(groupId: string): Promise<GroupATSAccountDocument[]>
+
+   removeATSIntegration(groupId: string, integrationId: string): Promise<void>
+
    createATSIntegration(
       groupId: string,
       integrationId: string,
       data: Partial<GroupATSAccountDocument>
    ): Promise<void>
+
    saveATSIntegrationTokens(
       groupId: string,
       integrationId: string,
@@ -221,5 +225,39 @@ export class FirebaseGroupRepository
       }
 
       return this.addIdToDoc<GroupATSIntegrationTokensDocument>(doc)
+   }
+
+   /**
+    * Removes the ATS document and child documents
+    *
+    * @param groupId
+    * @param integrationId
+    */
+   async removeATSIntegration(
+      groupId: string,
+      integrationId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      batch.delete(
+         this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("ats")
+            .doc(integrationId)
+      )
+
+      // Child documents
+      batch.delete(
+         this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("ats")
+            .doc(integrationId)
+            .collection("tokens")
+            .doc("tokens")
+      )
+
+      return await batch.commit()
    }
 }
