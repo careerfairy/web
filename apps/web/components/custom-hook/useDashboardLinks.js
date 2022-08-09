@@ -9,6 +9,7 @@ import {
    Share2,
 } from "react-feather"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import useFeatureFlags from "./useFeatureFlags"
 
 const initialHeaderLinks = [
    {
@@ -37,6 +38,7 @@ const initialDrawerBottomLinks = [
 ]
 const useDashboardLinks = (group) => {
    const firebase = useFirebaseService()
+   const featureFlags = useFeatureFlags()
 
    const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
    const [drawerBottomLinks, setDrawerBottomLinks] = useState(
@@ -71,7 +73,7 @@ const useDashboardLinks = (group) => {
       if (isLoaded(group) && !isEmpty(group)) {
          const baseHrefPath = "group"
          const baseParam = "[groupId]"
-         setDrawerTopLinks([
+         const links = [
             {
                href: `/${baseHrefPath}/${group.id}/admin/events`,
                icon: StreamIcon,
@@ -96,17 +98,21 @@ const useDashboardLinks = (group) => {
                title: "Roles",
                basePath: `/${baseHrefPath}/${baseParam}/admin/roles`,
             },
-            {
+         ]
+         if (featureFlags.atsAdminPageFlag) {
+            links.push({
                href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
                icon: Share2,
                title: "ATS Integration",
                basePath: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
-            },
-         ])
+            })
+         }
+
+         setDrawerTopLinks(links)
       } else {
          setDrawerTopLinks([])
       }
-   }, [group?.id])
+   }, [group?.id, featureFlags.atsAdminPageFlag])
 
    return { drawerBottomLinks, drawerTopLinks, headerLinks }
 }
