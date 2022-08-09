@@ -19,6 +19,7 @@ import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
 import wishes = require("./wishes")
+import ats = require("./ats")
 
 // Auth
 exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
@@ -128,3 +129,12 @@ exports.rewardUserAction = rewards.rewardUserAction
 // Ratings
 
 exports.onUserRateWish = wishes.onUserRateWish
+
+// ATS
+exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
+exports.mergeGetAccountToken = ats.mergeGetAccountToken
+exports.mergeRemoveAccount = ats.mergeRemoveAccount
+exports.fetchATSJobs = ats.fetchATSJobs
+exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
+exports.fetchATSApplications = ats.fetchATSApplications
+exports.atsUserApplyToJob = ats.atsUserApplyToJob

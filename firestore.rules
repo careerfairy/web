@@ -131,6 +131,10 @@ service cloud.firestore {
                 return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
             }
 
+            match /ats/{integrationId} {
+                allow read: if request.auth.token.email in careerCenterData().adminEmails || isCFAdmin();
+            }
+
             match /bookingSlots/{slot} {
                 allow read: if true;
                 allow write: if careerCenterData().adminEmail == request.auth.token.email;

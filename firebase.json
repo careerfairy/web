@@ -1,7 +1,12 @@
 {
    "functions": {
       "source": "packages/functions",
-      "predeploy": ["npm run lint:functions", "npm run build:functions"]
+      "predeploy": ["npm run lint:functions", "npm run build:functions"],
+      "ignore": [
+         "**/node_modules/**",
+         "**/firebase-export-*",
+         "**/emulatorData/**"
+      ]
    },
    "firestore": {
       "rules": "firestore.rules"
