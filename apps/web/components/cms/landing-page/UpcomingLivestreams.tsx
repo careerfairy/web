@@ -38,7 +38,6 @@ const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
             type={EventsTypes.comingUp}
             seeMoreLink={"/next-livestreams"}
             loading={false}
-            isOnLandingPage={true}
             events={events}
          />
       </Box>

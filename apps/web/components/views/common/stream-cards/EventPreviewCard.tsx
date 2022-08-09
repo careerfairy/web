@@ -27,6 +27,8 @@ import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
+import { useSelector } from "react-redux"
+import { isOnLandingPageSelector } from "../../../../store/selectors/generalLayoutSelectors"
 
 const styles = {
    hideOnHoverContent: {
@@ -198,7 +200,6 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
-   isOnLandingPage = false,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
@@ -209,6 +210,7 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
    const [isPast, setIsPast] = useState(checkIfPast(event))
+   const isOnLandingPage = useSelector(isOnLandingPageSelector)
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
    const {
@@ -559,7 +561,6 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
-   isOnLandingPage?: boolean
 }
 
 export default EventPreviewCard
