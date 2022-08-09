@@ -22,12 +22,13 @@
       "axios": "^0.26.0",
       "dotenv": "^8.2.0",
       "firebase-admin": "^10.0.2",
-      "firebase-functions": "^3.18.1",
+      "firebase-functions": "^3.22.0",
       "lodash": "^4.17.20",
       "luxon": "^1.22.0",
       "mailgun-js": "^0.22.0",
       "nanoid": "^3.3.1",
-      "postmark": "^2.3.5"
+      "postmark": "^2.3.5",
+      "yup": "^0.32.11"
    },
    "engines": {
       "node": "14"
