@@ -15,6 +15,8 @@ import LazyLoad from "react-lazyload"
 import useInfiniteScrollClientWithHandlers from "components/custom-hook/useInfiniteScrollClientWithHandlers"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { useSelector } from "react-redux"
+import { isOnLandingPageSelector } from "../../../../store/selectors/generalLayoutSelectors"
 
 const arrowFontSize = 30
 
@@ -73,7 +75,6 @@ const EventsPreviewGrid = ({
    events,
    type,
    id,
-   isOnLandingPage = false,
 }: EventsProps) => {
    const {
       query: { groupId },
@@ -83,6 +84,7 @@ const EventsPreviewGrid = ({
    const { data: existingInterests } = useInterests()
    const [slicedEvents] = useInfiniteScrollClientWithHandlers(events, 6, 3)
    const [shareEventDialog, setShareEventDialog] = useState(null)
+   const isOnLandingPage = useSelector(isOnLandingPageSelector)
 
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null)
@@ -161,7 +163,6 @@ const EventsPreviewGrid = ({
                                  onRegisterClick={handleClickRegister}
                                  key={event.id}
                                  event={event}
-                                 isOnLandingPage={isOnLandingPage}
                               />
                            </LazyLoad>
                         </Grid>
@@ -218,7 +219,6 @@ export interface EventsProps {
    loading: boolean
    type: EventsTypes
    id?: string
-   isOnLandingPage?: boolean
    // Not all portal widget should
    // have automatic event registrations
    // to avoid duplicate events clashing
