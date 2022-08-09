@@ -16,6 +16,9 @@ export default async function createNewFieldsAndLevelOfStudyInFirestore() {
          `Unable to find: ${config.fieldAndLevelOfStudyMappingJsonPath}`
       )
    }
+   // Delete existing fieldsOfStudy and levelsOfStudy collections
+   await deleteCollection("fieldsOfStudy", batch)
+   await deleteCollection("levelsOfStudy", batch)
 
    // write new fields of study to db
    const newFieldsOfStudy = createCollection(
@@ -56,4 +59,15 @@ const createCollection = (
       batch.set(mappingRef, { name: mapping.name })
    })
    return mappingArray
+}
+
+const deleteCollection = async (
+   collectionName: "fieldsOfStudy" | "levelsOfStudy",
+   batch: WriteBatch
+) => {
+   const snaps = await firestore.collection(collectionName).get()
+   snaps.forEach((snap) => {
+      batch.delete(snap.ref)
+   })
+   return
 }

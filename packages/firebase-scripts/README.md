@@ -27,7 +27,7 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/creat
 #### What it does:
 
 This script will create/replace the `fieldOfStudy` and `levelOfStudy`collections based on the JSON file
-in `packages/firebase-scripts/data/fieldOfStudyMapping.json`([how to generate this file](#Save Field Of Study Mappings To Json))
+in `packages/firebase-scripts/data/fieldAndLevelOfStudyMapping.json`([how to generate this file](#Save Field Of Study Mappings To Json))
 . It will look at the `newFieldOfStudies`
 property in the JSON file and create/replace the collection. The key will be the document id and the value will be the
 label field value in the document data.
@@ -46,7 +46,7 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/backf
 
 Goes through every user in the userData collection and try to figure their legacy field of study based on their group
 registration data. If a legacy field of study is found it will look at the JSON file
-in `packages/firebase-scripts/data/fieldOfStudyMapping.json`([how to generate this file](#Save Field Of Study Mappings To Json))
+in `packages/firebase-scripts/data/fieldAndLevelOfStudyMapping.json`([how to generate this file](#Save Field Of Study Mappings To Json))
 and map the legacy field of study to the new field of studies and add the corresponding ID to the fieldOfStudy field on
 the user data document.
 
@@ -202,13 +202,13 @@ Example Output of `livestream/{livestreamId}` document:
 
 Steps for this script:
 
-1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/1MeLhVaEq-ev02JjGdLg6Yx7-mAAgGDOPvSgBaAChBO0/edit?usp=sharing)
+1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/19u6uWLu39fb1t_7wipFgXNruD3yyAMT1qhxi3bIPzIo/edit?usp=sharing)
 
 2. On the left of the Google sheet document are all the legacy field of study names that are being used by all the
    groups on CF, and on the right are the new pre-defined fields of studies that you will have to create. Each legacy
    field of study on the left must be tied to one of the predefined fields of study on the right.
 3. Save the Google sheet as a csv file in the `packages/firebase-scripts/data` folder with the
-   name `exportedFieldOfStudyMapping.csv`.
+   name `exportedFieldAndLevelOfStudyMapping.csv`.
 4. Run the script:
 
 ```sh
@@ -218,6 +218,6 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=./scripts/saveFiel
 #### What it does:
 
 The script will then create a JSON file in the `packages/firebase-scripts/data` folder with the
-name `fieldOfStudyMapping.json`
+name `fieldAndLevelOfStudyMapping.json`
 containing the mapping between the legacy field of study names and the new field of study IDs. That will be
 used by the migration scripts
