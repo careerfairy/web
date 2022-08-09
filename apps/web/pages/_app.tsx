@@ -40,6 +40,7 @@ import {
    AuthProvider as ReactFireAuthProvider,
    FunctionsProvider,
 } from "reactfire"
+import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -85,32 +86,34 @@ function MyApp(props) {
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <ReactFireProviders>
-                  <TutorialProvider>
-                     <AuthProvider>
-                        <GoogleTagManager disableCookies={disableCookies}>
-                           <ThemeProviderWrapper>
-                              <FirebaseServiceContext.Provider
-                                 value={firebaseServiceInstance}
-                              >
-                                 <LocalizationProvider
-                                    dateAdapter={AdapterDateFns}
+                  <FeatureFlagsProvider>
+                     <TutorialProvider>
+                        <AuthProvider>
+                           <GoogleTagManager disableCookies={disableCookies}>
+                              <ThemeProviderWrapper>
+                                 <FirebaseServiceContext.Provider
+                                    value={firebaseServiceInstance}
                                  >
-                                    <ErrorProvider>
-                                       {disableCookies ||
-                                       isRecordingWindow ? null : (
-                                          <CFCookieConsent />
-                                       )}
-                                       <UserRewardsNotifications>
-                                          <Component {...pageProps} />
-                                       </UserRewardsNotifications>
-                                       <Notifier />
-                                    </ErrorProvider>
-                                 </LocalizationProvider>
-                              </FirebaseServiceContext.Provider>
-                           </ThemeProviderWrapper>
-                        </GoogleTagManager>
-                     </AuthProvider>
-                  </TutorialProvider>
+                                    <LocalizationProvider
+                                       dateAdapter={AdapterDateFns}
+                                    >
+                                       <ErrorProvider>
+                                          {disableCookies ||
+                                          isRecordingWindow ? null : (
+                                             <CFCookieConsent />
+                                          )}
+                                          <UserRewardsNotifications>
+                                             <Component {...pageProps} />
+                                          </UserRewardsNotifications>
+                                          <Notifier />
+                                       </ErrorProvider>
+                                    </LocalizationProvider>
+                                 </FirebaseServiceContext.Provider>
+                              </ThemeProviderWrapper>
+                           </GoogleTagManager>
+                        </AuthProvider>
+                     </TutorialProvider>
+                  </FeatureFlagsProvider>
                </ReactFireProviders>
             </ReactReduxFirebaseProvider>
          </Provider>
