@@ -1,5 +1,5 @@
 import { MergeAttachment, MergeCandidate, MergeUrl } from "./MergeResponseTypes"
-import { BaseModel } from "../BaseModel"
+import { BaseModel, mapIfObject } from "../BaseModel"
 import { Application } from "./Application"
 
 export class Candidate extends BaseModel {
@@ -30,7 +30,10 @@ export class Candidate extends BaseModel {
          candidate.title,
          candidate.locations,
          candidate.urls,
-         candidate.applications.map(Application.createFromMerge),
+         mapIfObject<Application>(
+            candidate.applications,
+            Application.createFromMerge
+         ),
          candidate.attachments
       )
    }
@@ -44,7 +47,10 @@ export class Candidate extends BaseModel {
          candidate.title,
          candidate.locations,
          candidate.urls,
-         candidate.applications.map(Application.createFromPlainObject),
+         mapIfObject<Application>(
+            candidate.applications,
+            Application.createFromPlainObject
+         ),
          candidate.attachments
       )
    }

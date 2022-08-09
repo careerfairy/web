@@ -1,5 +1,10 @@
 import { JobStatus, MergeJob } from "./MergeResponseTypes"
-import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
+import {
+   BaseModel,
+   fromMergeDate,
+   fromSerializedDate,
+   mapIfObject,
+} from "../BaseModel"
 import { Office } from "./Office"
 import { Recruiter } from "./Recruiter"
 import { Department } from "./Department"
@@ -33,10 +38,10 @@ export class Job extends BaseModel {
          // strip html tags (teamtailor)
          job.description.replace(/<[^>]*>?/gm, ""),
          job.status,
-         job.offices.map(Office.createFromMerge),
-         job.hiring_managers.map(Recruiter.createFromMerge),
-         job.recruiters.map(Recruiter.createFromMerge),
-         job.departments.map(Department.createFromMerge),
+         mapIfObject<Office>(job.offices, Office.createFromMerge),
+         mapIfObject<Recruiter>(job.hiring_managers, Recruiter.createFromMerge),
+         mapIfObject<Recruiter>(job.recruiters, Recruiter.createFromMerge),
+         mapIfObject<Department>(job.departments, Department.createFromMerge),
          fromMergeDate(job.remote_created_at),
          fromMergeDate(job.remote_updated_at)
       )
@@ -48,10 +53,19 @@ export class Job extends BaseModel {
          job.name,
          job.description,
          job.status,
-         job.offices.map(Office.createFromPlainObject),
-         job.hiringManagers.map(Recruiter.createFromPlainObject),
-         job.recruiters.map(Recruiter.createFromPlainObject),
-         job.departments.map(Department.createFromPlainObject),
+         mapIfObject<Office>(job.offices, Office.createFromPlainObject),
+         mapIfObject<Recruiter>(
+            job.hiringManagers,
+            Recruiter.createFromPlainObject
+         ),
+         mapIfObject<Recruiter>(
+            job.recruiters,
+            Recruiter.createFromPlainObject
+         ),
+         mapIfObject<Department>(
+            job.departments,
+            Department.createFromPlainObject
+         ),
          fromSerializedDate(job.createdAt),
          fromSerializedDate(job.updatedAt)
       )

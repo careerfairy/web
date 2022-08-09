@@ -51,7 +51,7 @@ function mapApplicationsToTableRows(data: Application[]) {
       id: application.id,
       jobName: application.job.name,
       candidateName: application.candidate.getName(),
-      appliedAt: application.appliedAt,
+      appliedAt: application.appliedAt.toLocaleDateString(),
       currentStage: application.currentStage,
    }))
 }
