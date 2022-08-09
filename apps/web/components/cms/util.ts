@@ -1,6 +1,4 @@
 import { CompanyCaseStudy, CompanyCaseStudyPreview } from "../../types/cmsTypes"
-import { serialize } from "next-mdx-remote/serialize"
-import he from "he"
 
 export const parseCaseStudy = ({
    published,

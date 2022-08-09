@@ -14,3 +14,13 @@ export const closeNavDrawer = () => async (dispatch) => {
 export const toggleNavDrawer = () => async (dispatch) => {
    dispatch({ type: actions.TOGGLE_NAV_DRAWER })
 }
+
+// to define that the user is on the landing page
+export const inLandingPage = () => async (dispatch) => {
+   dispatch({ type: actions.IN_LANDING_PAGE })
+}
+
+// to define the user is out of the landing page
+export const outOfLandingPage = () => async (dispatch) => {
+   dispatch({ type: actions.OUT_OF_LANDING_PAGE })
+}
