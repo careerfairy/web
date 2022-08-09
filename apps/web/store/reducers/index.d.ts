@@ -86,6 +86,7 @@ interface UserDataSetReducer {
 interface GeneralLayoutState {
    layout: {
       drawerOpen: boolean
+      isOnLandingPage: boolean
    }
 }
 
