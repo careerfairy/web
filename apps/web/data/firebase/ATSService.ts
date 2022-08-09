@@ -40,6 +40,13 @@ export class ATSService {
          publicToken,
       })
    }
+
+   async removeAccount(groupId: string, integrationId: string): Promise<void> {
+      await this.firebaseFunctions.httpsCallable("mergeRemoveAccount")({
+         groupId,
+         integrationId,
+      })
+   }
 }
 
 export const atsServiceInstance = new ATSService(firebaseInstance.functions())

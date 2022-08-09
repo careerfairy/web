@@ -1,23 +1,28 @@
 import useSWR from "swr"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
 import { useMemo } from "react"
+import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
 
 type Result = {
-   jobs: Job[]
+   applications: Application[]
 }
 
-const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
-   const fetcher = useFunctionsSWR<Job[]>()
+const useGroupATSApplications = (
+   groupId: string,
+   integrationId: string,
+   jobId?: string
+): Result => {
+   const fetcher = useFunctionsSWR<Application[]>()
 
    const { data } = useSWR(
       [
-         "fetchATSJobs",
+         "fetchATSApplications",
          {
             groupId,
             integrationId,
+            jobId,
          },
       ],
       fetcher,
@@ -26,12 +31,12 @@ const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
 
    return useMemo(() => {
       // map to business model (convert plain object to class object)
-      const jobs = data.map(Job.createFromPlainObject)
+      const applications = data.map(Application.createFromPlainObject)
 
       return {
-         jobs,
+         applications,
       }
    }, [data])
 }
 
-export default useGroupATSJobs
+export default useGroupATSApplications

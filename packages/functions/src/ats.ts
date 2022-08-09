@@ -6,9 +6,9 @@ import {
    validateUserIsGroupAdmin,
 } from "./lib/validations"
 import { object, string } from "yup"
-import { atsRepo, groupRepo } from "./api/repositories"
+import { atsRepo, groupRepo, userRepo } from "./api/repositories"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { logAxiosErrorAndThrow } from "./util"
+import { logAxiosErrorAndThrow, onCallWrapper } from "./util"
 import {
    Group,
    GroupATSAccountDocument,
@@ -17,6 +17,10 @@ import {
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import { auth } from "firebase-admin"
 import DecodedIdToken = auth.DecodedIdToken
+import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+import { UserATSDocument } from "@careerfairy/shared-lib/dist/users"
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -128,9 +132,7 @@ export const fetchATSJobs = functions
             requestData.tokens.merge.account_token
          )
 
-         return await atsRepository
-            .getJobs()
-            .then((jobs) => jobs.map((job) => job.serializeToPlainObject()))
+         return await atsRepository.getJobs().then(serializeModels)
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to fetch the account jobs",
@@ -139,6 +141,129 @@ export const fetchATSJobs = functions
          )
       }
    })
+
+/**
+ * Fetch Job Applications
+ * Possibility to filter by job id
+ */
+export const fetchATSApplications = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken<{
+         jobId?: string
+      }>({
+         data,
+         context,
+         requiredData: {
+            jobId: string().optional().nullable(),
+         },
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         return await atsRepository
+            .getApplications(requestData.jobId)
+            .then(serializeModels)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the account applications",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
+ * Apply a user to a job
+ */
+export const atsUserApplyToJob = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(
+      onCallWrapper(async (data, context) => {
+         const { tokens, idToken, integrationId, jobId } =
+            await atsRequestValidationWithAccountToken<{
+               jobId?: string
+            }>({
+               data,
+               context,
+               requiredData: {
+                  jobId: string().required(),
+               },
+            })
+
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            tokens.merge.account_token
+         )
+
+         // Confirm if the user has already applied to this job
+
+         const userATSData: UserATSDocument = await userRepo.getUserATSData(
+            idToken.email
+         )
+         const atsRelations = userATSData?.atsRelations?.[integrationId]
+
+         if (atsRelations?.jobApplications?.[jobId]) {
+            return "User has already applied for that job"
+         }
+
+         // Create the necessary ATS models to apply the user to the job
+
+         const job: Job = await atsRepository.getJob(jobId)
+
+         if (!job) {
+            return logAndThrow("That job does not exit", jobId)
+         }
+
+         const userData = await userRepo.getUserDataById(idToken.email)
+
+         // Fetch or create a Candidate object
+         let candidate: Candidate
+         if (atsRelations?.candidateId) {
+            candidate = await atsRepository.getCandidate(
+               atsRelations.candidateId
+            )
+         } else {
+            // create
+            candidate = await atsRepository.createCandidate(userData)
+
+            // associate the candidate with the user
+            await userRepo.associateATSData(idToken.email, integrationId, {
+               candidateId: candidate.id,
+            })
+         }
+
+         // Associate CV resume if existent (and not associated already)
+         if (userData.userResume && !atsRelations?.cvAttachmentId) {
+            const attachmentId = await atsRepository.candidateAddCVAttachment(
+               candidate.id,
+               userData.userResume
+            )
+
+            await userRepo.associateATSData(idToken.email, integrationId, {
+               cvAttachmentId: attachmentId,
+            })
+         }
+
+         // Create the application
+         const applicationId = await atsRepository.createApplication(
+            candidate.id,
+            jobId
+         )
+
+         await userRepo.associateATSData(idToken.email, integrationId, {
+            jobApplications: {
+               [jobId]: applicationId,
+            },
+         })
+
+         return applicationId
+      })
+   )
 
 /**
  * Sync Status for the multiple entities
@@ -157,9 +282,7 @@ export const fetchATSSyncStatus = functions
             requestData.tokens.merge.account_token
          )
 
-         return await atsRepository
-            .getSyncStatus()
-            .then((res) => res.map((s) => s.serializeToPlainObject()))
+         return await atsRepository.getSyncStatus().then(serializeModels)
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to fetch the merge sync status",
@@ -167,6 +290,41 @@ export const fetchATSSyncStatus = functions
             requestData
          )
       }
+   })
+
+/**
+ * Remove a linked account from merge
+ */
+export const mergeRemoveAccount = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken({
+         data,
+         context,
+      })
+
+      try {
+         const mergeATS = new MergeATSRepository(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         await mergeATS.removeAccount()
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to remove ATS account",
+            e,
+            requestData
+         )
+      }
+
+      // delete ats docs
+      await groupRepo.removeATSIntegration(
+         requestData.groupId,
+         requestData.integrationId
+      )
+
+      return true
    })
 
 /*
@@ -256,4 +414,12 @@ async function atsRequestValidationWithAccountToken<T extends object>(
       ...data,
       tokens: accountTokens,
    }
+}
+
+/**
+ * Convert business models into plain objects (arrays)
+ * @param result
+ */
+function serializeModels<T extends BaseModel>(result: T[]) {
+   return result.map((entry) => entry.serializeToPlainObject())
 }
