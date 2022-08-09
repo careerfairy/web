@@ -1,5 +1,10 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
-import { SavedRecruiter, UserData } from "./users"
+import {
+   SavedRecruiter,
+   UserATSDocument,
+   UserATSRelations,
+   UserData,
+} from "./users"
 import firebase from "firebase/compat/app"
 
 export interface IUserRepository {
@@ -15,7 +20,17 @@ export interface IUserRepository {
 
    getUserDataByUid(uid: string): Promise<UserData>
 
+   getUserDataById(id: string): Promise<UserData>
+
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
+
+   getUserATSData(id: string): Promise<UserATSDocument>
+
+   associateATSData(
+      id: string,
+      accountId: string,
+      data: Partial<UserATSRelations>
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -108,10 +123,62 @@ export class FirebaseUserRepository
       return { ...snap.docs[0].data(), id: snap.docs[0].id } as UserData
    }
 
+   async getUserDataById(id: string): Promise<UserData> {
+      const snap = await this.firestore.collection("userData").doc(id).get()
+
+      if (!snap.exists) return null
+
+      return this.addIdToDoc<UserData>(snap)
+   }
+
    async getUsersDataByUids(uids: string[]): Promise<UserData[]> {
       const users = await Promise.all(
          uids.map((uid) => this.getUserDataByUid(uid))
       )
       return users.filter((user) => user !== null)
+   }
+
+   async getUserATSData(id: string): Promise<UserATSDocument> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(id)
+         .collection("atsRelations")
+         .doc("atsRelations")
+
+      const doc = await ref.get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data() as UserATSDocument
+   }
+
+   /**
+    * Update ats/ats sub document
+    *
+    * @param id
+    * @param accountId
+    * @param data
+    */
+   associateATSData(
+      id: string,
+      accountId: string,
+      data: Partial<UserATSRelations>
+   ): Promise<void> {
+      const userRef = this.firestore
+         .collection("userData")
+         .doc(id)
+         .collection("atsRelations")
+         .doc("atsRelations")
+
+      const toUpdate: Partial<UserATSDocument> = {
+         userId: id,
+         atsRelations: {
+            [accountId]: data,
+         },
+      }
+
+      return userRef.set(toUpdate, { merge: true })
    }
 }

@@ -132,7 +132,7 @@ service cloud.firestore {
             }
 
             match /ats/{integrationId} {
-                allow read: if request.auth.token.email in careerCenterData().adminEmails;
+                allow read: if request.auth.token.email in careerCenterData().adminEmails || isCFAdmin();
             }
 
             match /bookingSlots/{slot} {

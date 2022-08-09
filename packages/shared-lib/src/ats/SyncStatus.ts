@@ -1,6 +1,10 @@
 import { MergeSyncStatus } from "./MergeResponseTypes"
-import { BaseModel } from "../BaseModel"
+import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
 
+/**
+ * Linked Account synchronization status
+ * Instantiated for each Entity (Job, Recruiter, Candidate, etc)
+ */
 export class SyncStatus extends BaseModel {
    constructor(
       public readonly id: string,
@@ -19,8 +23,8 @@ export class SyncStatus extends BaseModel {
          status.model_name,
          status.status,
          status.is_initial_sync,
-         status.last_sync_start ? new Date(status.last_sync_start) : null,
-         status.next_sync_start ? new Date(status.next_sync_start) : null
+         fromMergeDate(status.last_sync_start),
+         fromMergeDate(status.next_sync_start)
       )
    }
 
@@ -30,16 +34,8 @@ export class SyncStatus extends BaseModel {
          obj.model,
          obj.status,
          obj.isInitialSync,
-         obj.lastSync ? new Date(obj.lastSync) : null,
-         obj.nextSync ? new Date(obj.nextSync) : null
+         fromSerializedDate(obj.lastSync),
+         fromSerializedDate(obj.nextSync)
       )
-   }
-
-   serializeToPlainObject() {
-      return {
-         ...this,
-         lastSync: this.lastSync?.toISOString(),
-         nextSync: this.nextSync?.toISOString(),
-      }
    }
 }

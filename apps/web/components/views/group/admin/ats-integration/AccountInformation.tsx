@@ -1,91 +1,104 @@
-import useGroupATSJobs from "../../../../custom-hook/useGroupATSJobs"
-import MaterialTable from "@material-table/core"
 import Box from "@mui/material/Box"
-import { useMemo } from "react"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import SyncStatusButtonDialog from "./SyncStatusButtonDialog"
+import RemoveLinkedAccountButton from "./RemoveLinkedAccountButton"
+import { Grid } from "@mui/material"
+import { useCallback, useState } from "react"
+import Tabs from "@mui/material/Tabs"
+import Tab from "@mui/material/Tab"
+import SwipeableViews from "react-swipeable-views"
+import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
+import { SkeletonStackMultiple } from "../../../../util/Skeletons"
+import AccountJobs from "./AccountJobs"
+import AccountApplications from "./AccountApplications"
 
 type Props = {
    atsAccount: GroupATSAccount
 }
 
-const columns = [
+const tabs = [
    {
-      title: "Name",
-      field: "name",
+      label: "Jobs",
+      component: (atsAccount: GroupATSAccount) => (
+         <AccountJobs atsAccount={atsAccount} />
+      ),
    },
    {
-      title: "Description",
-      field: "description",
-   },
-   {
-      title: "Status",
-      field: "status",
-   },
-   {
-      title: "Hiring Manager",
-      field: "hiringManager",
-   },
-   {
-      title: "Created At",
-      field: "createdAt",
+      label: "Applications",
+      component: (atsAccount: GroupATSAccount) => (
+         <AccountApplications atsAccount={atsAccount} />
+      ),
    },
 ]
 
 const AccountInformation = ({ atsAccount }: Props) => {
-   const { jobs } = useGroupATSJobs(atsAccount.groupId, atsAccount.id)
-
-   const jobsToRows = useMemo(() => {
-      return mapJobsToTableRows(jobs)
-   }, [jobs])
+   // Tabs behaviour
+   const [activeTabIndex, setActiveTabIndex] = useState(0)
+   const switchTabHandler = useCallback((...args) => {
+      // clicking tabs handler
+      setActiveTabIndex(args[1])
+   }, [])
 
    return (
-      <>
-         <Box
-            display={"flex"}
-            justifyContent={"end"}
-            alignItems={"end"}
-            mt={1}
-            pr={3}
-         >
-            <SyncStatusButtonDialog
-               groupId={atsAccount.groupId}
-               integrationId={atsAccount.id}
-            />
-         </Box>
-         <Box p={2}>
-            <Table data={jobsToRows} columns={columns} title={"Jobs"} />
-         </Box>
-      </>
+      <Grid container>
+         <Grid item xs={6} pl={2}>
+            <Tabs
+               value={activeTabIndex}
+               onChange={switchTabHandler}
+               aria-label="ats content tabs"
+            >
+               {tabs.map((tab, i) => (
+                  <Tab key={tab.label} label={tab.label} />
+               ))}
+            </Tabs>
+         </Grid>
+         <Grid item xs={6}>
+            <Box
+               display={"flex"}
+               justifyContent={"end"}
+               alignItems={"end"}
+               mt={1}
+               pr={3}
+            >
+               <Box mr={1}>
+                  <SyncStatusButtonDialog
+                     groupId={atsAccount.groupId}
+                     integrationId={atsAccount.id}
+                  />
+               </Box>
+               <RemoveLinkedAccountButton atsAccount={atsAccount} />
+            </Box>
+         </Grid>
+         <Grid item xs={12}>
+            <Box p={2}>
+               <SwipeableViews
+                  index={activeTabIndex}
+                  onChangeIndex={switchTabHandler}
+               >
+                  {tabs.map((tab, i) => (
+                     <SwipeablePanel
+                        key={tab.label}
+                        value={activeTabIndex}
+                        index={i}
+                     >
+                        <SuspenseWithBoundary
+                           fallback={
+                              <SkeletonStackMultiple
+                                 quantity={1}
+                                 height={150}
+                              />
+                           }
+                        >
+                           {tab.component(atsAccount)}
+                        </SuspenseWithBoundary>
+                     </SwipeablePanel>
+                  ))}
+               </SwipeableViews>
+            </Box>
+         </Grid>
+      </Grid>
    )
-}
-
-type TableProps<T> = {
-   data: T[]
-   title?: string
-   columns?: object[]
-}
-
-const Table = <T extends object>(props: TableProps<T>) => {
-   return (
-      <MaterialTable
-         columns={props.columns}
-         data={props.data}
-         title={props.title}
-      />
-   )
-}
-
-function mapJobsToTableRows(jobs: Job[]) {
-   return jobs.map((job) => ({
-      id: job.id,
-      name: job.name,
-      description: job.description,
-      status: job.status,
-      hiringManager: job.hiringManagers[0].getName(),
-      createdAt: job.createdAt.toLocaleDateString(),
-   }))
 }
 
 export default AccountInformation

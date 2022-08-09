@@ -1,5 +1,5 @@
 import { MergeRemoteUser, MergeUserRole } from "./MergeResponseTypes"
-import { BaseModel } from "../BaseModel"
+import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
 
 export class Recruiter extends BaseModel {
    constructor(
@@ -25,7 +25,7 @@ export class Recruiter extends BaseModel {
          user.last_name,
          user.access_role,
          user.email,
-         user.remote_created_at ? new Date(user.remote_created_at) : null,
+         fromMergeDate(user.remote_created_at),
          user.disabled ?? false
       )
    }
@@ -37,15 +37,8 @@ export class Recruiter extends BaseModel {
          recruiter.lastName,
          recruiter.role,
          recruiter.email,
-         recruiter.createdAt ? new Date(recruiter.createdAt) : null,
+         fromSerializedDate(recruiter.createdAt),
          recruiter.disabled
       )
-   }
-
-   serializeToPlainObject(): this {
-      return {
-         ...this,
-         createdAt: this.createdAt ? this.createdAt.toISOString() : null,
-      }
    }
 }

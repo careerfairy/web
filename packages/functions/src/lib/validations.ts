@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
-import { groupRepo } from "../api/repositories"
+import { groupRepo, userRepo } from "../api/repositories"
 
 /**
  * Validate the data object argument in a function call
@@ -12,7 +12,11 @@ export async function validateData(data: any, schema: BaseSchema) {
    try {
       return await schema.validate(data)
    } catch (e) {
-      logAndThrow("Invalid Arguments Provided (schema validation failed)", data)
+      logAndThrow(
+         "Invalid Arguments Provided (schema validation failed)",
+         data,
+         e
+      )
    }
 }
 
@@ -39,13 +43,35 @@ export async function validateUserIsGroupAdmin(groupId: string, email: string) {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
    if (!response.isAdmin) {
-      logAndThrow("The user is not a group admin", groupId, email)
+      try {
+         // check if user is CF admin, will throw if not
+         await validateUserIsCFAdmin(email)
+
+         return response
+      } catch (e) {
+         logAndThrow("The user is not a group admin", groupId, email)
+      }
    }
 
    return response
 }
 
+/**
+ * Validates if the user a CF Admin
+ *
+ * @param email
+ */
+export async function validateUserIsCFAdmin(email: string) {
+   const userData = await userRepo.getUserDataById(email)
+
+   if (!userData.isAdmin) {
+      logAndThrow("The user is not a cf admin", email)
+   }
+
+   return userData
+}
+
 export function logAndThrow(message: string, ...context: any[]) {
-   functions.logger.error(message, context)
+   functions.logger.error(message, { ...context })
    throw new functions.https.HttpsError("failed-precondition", message)
 }
