@@ -19,6 +19,15 @@
  */
 export abstract class BaseModel {
    /**
+    * Change to false if the model only has the ID
+    * Some relationship objects are not expanded, and we only got the id
+    * If this flag is false, the user should fetch the whole object from ATS
+    * and re-hydrate this object
+    * @protected
+    */
+   public hydrated = true
+
+   /**
     * Serialize this object into a plain object
     * Objects should be serialized before being sent as an HTTP response
     *
@@ -50,6 +59,45 @@ export abstract class BaseModel {
 | Utilities
 |--------------------------------------------------------------------------
 */
+/**
+ * Map models if we receive an object
+ * otherwise it should be an id, and we should return null
+ * @param targetField
+ * @param creationFunction
+ */
+export function saveIfObject<T>(
+   targetField: object | string,
+   creationFunction: (field: any) => T
+) {
+   if (
+      targetField &&
+      typeof targetField === "object" &&
+      Object.keys(targetField).length
+   ) {
+      return creationFunction(targetField)
+   } else {
+      return null
+   }
+}
+
+/**
+ * Map list of models to a string[] or object[]
+ *
+ * Some relationships are shallow, returning the object id instead of the object
+ * with all properties
+ * @param targetField
+ * @param creationFunction
+ */
+export function mapIfObject<T extends BaseModel>(
+   targetField: any[],
+   creationFunction: (field: any) => any
+) {
+   if (!targetField) return []
+   return targetField
+      .map((o) => saveIfObject<T>(o, creationFunction))
+      .filter((o) => o) as T[]
+}
+
 /**
  * Convert a Merge date string to Date object
  *

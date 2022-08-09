@@ -95,6 +95,9 @@ export interface MergeCandidate {
    attachments?: MergeAttachment[]
 }
 
+/**
+ * Application (expanded)
+ */
 export interface MergeApplication {
    id: string
    remote_id: string
@@ -108,6 +111,19 @@ export interface MergeApplication {
    reject_reason?: string
 }
 
+// creation model
+export interface MergeApplicationModel {
+   id?: string // will only exist after creating (response)
+   candidate: string
+   job: string
+   applied_at?: string
+   rejected_at?: string
+   source?: string
+   credited_to?: string
+   current_stage?: string
+   reject_reason?: string
+}
+
 export interface MergeJobInterviewStage {
    id: string
    remote_id: string
@@ -115,13 +131,30 @@ export interface MergeJobInterviewStage {
    job: string
 }
 
+/**
+ * Attachment
+ */
 export interface MergeAttachment {
    id: string
    remote_id: string
    file_name?: string
    file_url?: string
    candidate?: MergeCandidate
-   attachment_type?: "RESUME" | "COVER_LETTER" | "OFFER_LETTER" | "OTHER"
+   attachment_type?: attachmentType
+}
+
+export type attachmentType =
+   | "RESUME"
+   | "COVER_LETTER"
+   | "OFFER_LETTER"
+   | "OTHER"
+
+// model to create / update
+export interface MergeAttachmentModel {
+   file_name?: string
+   file_url?: string
+   candidate?: string
+   attachment_type: attachmentType
 }
 
 export interface MergePhoneNumber {
@@ -143,6 +176,25 @@ export interface MergeUrl {
       | "BLOG"
       | "SOCIAL_MEDIA"
       | "OTHER"
+}
+
+/**
+ * Model used to create a Candidate
+ * Request body model object
+ */
+export interface MergeCandidateModel {
+   remote_id?: string
+   first_name?: string
+   last_name?: string
+   company?: string
+   title?: string
+   attachments: string[]
+   applications: string[]
+   tags: string[]
+   urls: MergeUrl[]
+   email_addresses: MergeEmailAddress[]
+   phone_numbers: MergePhoneNumber[]
+   locations?: string[]
 }
 
 /*

@@ -1,5 +1,10 @@
 import { MergeApplication } from "./MergeResponseTypes"
-import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
+import {
+   BaseModel,
+   fromMergeDate,
+   fromSerializedDate,
+   saveIfObject,
+} from "../BaseModel"
 import { Job } from "./Job"
 import { Candidate } from "./Candidate"
 
@@ -22,8 +27,11 @@ export class Application extends BaseModel {
    static createFromMerge(application: MergeApplication) {
       return new Application(
          application.id,
-         Job.createFromMerge(application.job),
-         Candidate.createFromMerge(application.candidate),
+         saveIfObject<Job>(application.job, Job.createFromMerge),
+         saveIfObject<Candidate>(
+            application.candidate,
+            Candidate.createFromMerge
+         ),
          fromMergeDate(application.applied_at),
          fromMergeDate(application.rejected_at),
          application.source,
@@ -34,8 +42,11 @@ export class Application extends BaseModel {
    static createFromPlainObject(application: Application) {
       return new Application(
          application.id,
-         Job.createFromPlainObject(application.job),
-         Candidate.createFromPlainObject(application.candidate),
+         saveIfObject<Job>(application.job, Job.createFromPlainObject),
+         saveIfObject<Candidate>(
+            application.job,
+            Candidate.createFromPlainObject
+         ),
          fromSerializedDate(application.appliedAt),
          fromSerializedDate(application.rejectedAt),
          application.source,

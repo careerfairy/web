@@ -1,6 +1,7 @@
 import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
 import functions = require("firebase-functions")
+import { https } from "firebase-functions"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -396,28 +397,29 @@ export const isLocalEnvironment = () => {
 }
 
 export const logAxiosError = (error: any) => {
-   functions.logger.error("Request", error?.toJSON())
+   functions.logger.error("Axios: JSON", error?.toJSON())
    if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
-      functions.logger.error(
-         "Error Response",
-         error.response.data,
-         error.response.status,
-         error.response.headers
-      )
+      functions.logger.error("Axios: Error Response", {
+         body: error.response.data,
+         status: error.response.status,
+         headers: error.response.headers,
+      })
    } else if (error.request) {
       // The request was made but no response was received
       // `error.request` is an instance of XMLHttpRequest in the browser and an instance of
       // http.ClientRequest in node.js
       functions.logger.error(
-         "Request made but no response was received",
-         error.request
+         "Axios: Request made but no response was received",
+         {
+            request: error.request,
+         }
       )
    } else {
       // Something happened in setting up the request that triggered an Error
       functions.logger.error(
-         "Something happened in setting up the request that triggered an Error",
+         "Axios: Something happened in setting up the request that triggered an Error",
          error
       )
    }
@@ -437,4 +439,38 @@ export const logAxiosErrorAndThrow = (
    functions.logger.error(message, extraData)
    logAxiosError(error)
    throw new functions.https.HttpsError("unknown", message)
+}
+
+type onCallFnHandler = (
+   data: any,
+   context: https.CallableContext
+) => any | Promise<any>
+
+/**
+ * Function wrapper
+ * Catches errors and improves logging for axios exceptions
+ *  Helps with the debug
+ *
+ * Still throws the error to be handled by the cloud function
+ * @param handler
+ */
+export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
+   return async (data, context) => {
+      try {
+         return await handler(data, context)
+      } catch (e) {
+         if (e.name === "AxiosError") {
+            logAxiosError(e)
+            const errorData = e.toJSON()
+            const requestData = `${errorData?.status} - ${errorData?.config?.method} ${errorData?.config?.baseURL}${errorData?.config.url}`
+            const error = new Error(
+               `Failed to make outbound HTTP request via Axios: ${requestData}`
+            )
+            error.stack = e.stack
+            throw error
+         }
+
+         throw e
+      }
+   }
 }
