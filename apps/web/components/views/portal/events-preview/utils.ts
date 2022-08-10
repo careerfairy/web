@@ -3,39 +3,35 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 const EVENT_PLACEHOLDERS = [
    {
       id: "placeholderEvent",
+      title: "This event will be published soon",
+      backgroundImageUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-1.jpg?alt=media",
+      companyLogoUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
+   },
+   {
+      id: "placeholderEvent",
+      title: "An awesome company is currently creating this event",
+      backgroundImageUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-2.jpg?alt=media",
+      companyLogoUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
+   },
+   {
+      id: "placeholderEvent",
+      title: "Stay tuned. Event is being created right now",
+      backgroundImageUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-3.jpg?alt=media",
+      companyLogoUrl:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
+   },
+   {
+      id: "placeholderEvent",
       title: "New live is coming soon",
-      summary: "",
       backgroundImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F3fdbec13-362e-4c8a-a9c5-62226fe7c4b5_TU_Eindhoven.png?alt=media",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-4.jpg?alt=media",
       companyLogoUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fbombardier-logo.png?alt=media",
-   },
-   {
-      id: "placeholderEvent",
-      title: "Something awesome is coming",
-      summary: "",
-      backgroundImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fbombardier-bck.JPG?alt=media",
-      companyLogoUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fbombardier-logo.png?alt=media",
-   },
-   {
-      id: "placeholderEvent",
-      title: "Stay tuned. We are launching soon.",
-      summary: "",
-      backgroundImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fbombardier-logo.png?alt=media",
-      companyLogoUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fbombardier-logo.png?alt=media",
-   },
-   {
-      id: "placeholderEvent",
-      title: "We are almost ready to launch",
-      summary: "",
-      backgroundImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2F3fdbec13-362e-4c8a-a9c5-62226fe7c4b5_TU_Eindhoven.png?alt=media",
-      companyLogoUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fbombardier-logo.png?alt=media",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
    },
 ] as LivestreamEvent[]
 
