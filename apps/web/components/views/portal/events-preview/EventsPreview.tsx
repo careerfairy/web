@@ -177,15 +177,11 @@ const EventsPreview = ({
                handleClose={handleCloseJoinModal}
             />
          )}
-         {shareEventDialog ? (
-            /*
-            // @ts-ignore */
+         {shareEventDialog && (
             <ShareLivestreamModal
                livestreamData={shareEventDialog}
                handleClose={handleShareEventDialogClose}
             />
-         ) : (
-            ""
          )}
       </>
    )

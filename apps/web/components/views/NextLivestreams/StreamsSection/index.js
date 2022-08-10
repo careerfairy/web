@@ -39,9 +39,7 @@ export function StreamsSection({
                   setSelectedOptions={setSelectedOptions}
                   selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
-                  livestreams={formatLivestreamsEvents(
-                     upcomingLivestreams || []
-                  )}
+                  livestreams={formatLivestreamsEvents(upcomingLivestreams, 6)}
                   currentGroup={currentGroup}
                />
             ) : (
