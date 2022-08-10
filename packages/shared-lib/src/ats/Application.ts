@@ -44,7 +44,7 @@ export class Application extends BaseModel {
          application.id,
          saveIfObject<Job>(application.job, Job.createFromPlainObject),
          saveIfObject<Candidate>(
-            application.job,
+            application.candidate,
             Candidate.createFromPlainObject
          ),
          fromSerializedDate(application.appliedAt),
