@@ -83,7 +83,7 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
       }
    }, [livestreamData.id, livestreamData.start, userData])
 
-   if (!referralLink) return ""
+   if (!referralLink) return null
 
    return (
       <Dialog

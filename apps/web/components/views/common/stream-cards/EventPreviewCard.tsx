@@ -301,7 +301,7 @@ const EventPreviewCard = ({
                startDate={getStartDate()}
                loading={loading}
                onShareClick={handleShareClick}
-               showPlaceholderDate={isPlaceholderEvent}
+               isPlaceholderEvent={isPlaceholderEvent}
             />
             <Box
                sx={[

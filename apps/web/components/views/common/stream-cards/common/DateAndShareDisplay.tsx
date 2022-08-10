@@ -20,16 +20,16 @@ const DateAndShareDisplay = ({
    loading,
    onShareClick,
    animation,
-   showPlaceholderDate = false,
+   isPlaceholderEvent = false,
 }: Props) => {
    const renderDate = useCallback(
       (date) => {
-         if (showPlaceholderDate) {
+         if (isPlaceholderEvent) {
             return "Coming soon"
          }
          return DateUtil.eventPreviewDate(date)
       },
-      [showPlaceholderDate]
+      [isPlaceholderEvent]
    )
 
    return (
@@ -54,7 +54,7 @@ const DateAndShareDisplay = ({
                height={20}
                width={20}
             />
-         ) : onShareClick ? (
+         ) : onShareClick && !isPlaceholderEvent ? (
             <>
                <IconButton onClick={onShareClick}>
                   <ShareIcon />
@@ -71,7 +71,7 @@ interface Props {
    startDate?: Date
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
-   showPlaceholderDate?: boolean
+   isPlaceholderEvent?: boolean
 }
 
 export default DateAndShareDisplay
