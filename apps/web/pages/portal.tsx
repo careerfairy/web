@@ -101,7 +101,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
 /**
  * To parse the events coming from server side
  */
-const mapFromServerSide = (events): LivestreamEvent[] => {
+const mapFromServerSide = (events = []): LivestreamEvent[] => {
    return events.map((event) => JSON.parse(event))
 }
 
