@@ -53,9 +53,11 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
 }
 
 export const checkIfPast = (event: LivestreamEvent) => {
+   const eventDate = event?.start?.toDate?.() || new Date(event?.startDate)
+
    return (
       event?.hasEnded ||
-      event?.start?.toDate?.() <
+      eventDate <
          new Date(
             Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
          )

@@ -56,7 +56,7 @@ const PortalPage = ({
                      id={"past-events"}
                      title={"PAST EVENTS"}
                      type={EventsTypes.pastEvents}
-                     events={pastEvents}
+                     events={mapFromServerSide(pastEvents)}
                      seeMoreLink={"/next-livestreams?type=pastEvents"}
                      // No need to show loading as these events have already been queried server side
                      loading={false}
@@ -92,17 +92,24 @@ export const getServerSideProps: GetServerSideProps = async () => {
             ),
          }),
          ...(pastEvents && {
-            pastEvents: pastEvents.map((event) => mapServerSideStream(event)),
+            pastEvents: pastEvents.map((event) => JSON.stringify(event)),
          }),
       },
    }
+}
+
+/**
+ * To parse the events coming from server side
+ */
+const mapFromServerSide = (events): LivestreamEvent[] => {
+   return events.map((event) => JSON.parse(event))
 }
 
 type Props = {
    highlights: HighLight[]
    comingUpNextEvents: LivestreamEvent[]
    showHighlights: boolean
-   pastEvents: LivestreamEvent[]
+   pastEvents: string[]
 }
 
 export default PortalPage
