@@ -62,9 +62,10 @@ interface StreamReducer {
    }
 }
 
-interface GeneralLayout {
+export interface GeneralLayoutState {
    layout: {
       drawerOpen: boolean
+      isOnLandingPage: boolean
    }
 }
 
@@ -76,7 +77,7 @@ interface Schema {
 }
 
 export default interface RootState extends DefaultRootState {
-   generalLayout: GeneralLayout
+   generalLayout: GeneralLayoutState
    auth: AuthReducer
    stream: StreamReducer
    firebase: FirebaseReducer.Reducer<{}, Schema>
