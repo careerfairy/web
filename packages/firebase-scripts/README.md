@@ -202,7 +202,7 @@ Example Output of `livestream/{livestreamId}` document:
 
 Steps for this script:
 
-1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/19u6uWLu39fb1t_7wipFgXNruD3yyAMT1qhxi3bIPzIo/edit?usp=sharing)
+1. Open [this Google sheet](https://docs.google.com/spreadsheets/d/1zjn1qZOX4H_7AJkwQs2H7TONL1CxZdjfbDqvZUPFQu8/edit?usp=sharing)
 
 2. On the left of the Google sheet document are all the legacy field of study names that are being used by all the
    groups on CF, and on the right are the new pre-defined fields of studies that you will have to create. Each legacy
