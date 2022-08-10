@@ -3,12 +3,7 @@ const { client } = require("./api/postmark")
 const { admin } = require("./api/firestoreAdmin")
 
 const { setHeaders, generateReferralCode } = require("./util")
-const {
-   userGetByReferralCode,
-   userGetByEmail,
-   userUpdateFields,
-} = require("./lib/user")
-const { rewardCreateReferralSignUpFollower } = require("./lib/reward")
+const { userGetByEmail, userUpdateFields } = require("./lib/user")
 const config = require("./config")
 const {
    handleUserNetworkerBadges,
@@ -16,7 +11,7 @@ const {
 } = require("./lib/badge")
 
 const getRandomInt = (max) => {
-   let variable = Math.floor(Math.random() * Math.floor(max))
+   const variable = Math.floor(Math.random() * Math.floor(max))
    if (variable < 1000) {
       return variable + 1000
    } else {
@@ -24,7 +19,7 @@ const getRandomInt = (max) => {
    }
 }
 
-exports.createNewUserAccount_v2 = functions.https.onCall(
+exports.createNewUserAccount_v3 = functions.https.onCall(
    async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
@@ -35,108 +30,79 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
       }
 
       const userData = data.userData
-      const recipient_email = data.userData.email.toLowerCase()
+      const recipientEmail = data.userData.email.toLowerCase()
       const pinCode = getRandomInt(9999)
+      const {
+         email,
+         password,
+         firstName,
+         lastName,
+         university,
+         universityCountryCode,
+         subscribed,
+         gender = "",
+      } = userData
 
       console.log(
-         `Starting auth account creation process for ${recipient_email}`
+         `Starting auth account creation process for ${recipientEmail}`
       )
       await admin
          .auth()
-         .createUser({ email: userData.email, password: userData.password })
+         .createUser({ email: email, password: password })
          .then(async (user) => {
             console.log(
-               `Starting firestore account creation process for ${recipient_email}`
+               `Starting firestore account creation process for ${recipientEmail}`
             )
-
-            // Check if the user was referred by someone
-            const referralData = {}
-            let referralUser = null
-            if (userData.referralCode) {
-               referralUser = await userGetByReferralCode(userData.referralCode)
-
-               if (referralUser) {
-                  referralData.referredBy = {
-                     uid: referralUser.id,
-                     name: `${referralUser.firstName} ${referralUser.lastName}`,
-                  }
-                  functions.logger.info(
-                     `Adding referral information to the new user.`
-                  )
-               } else {
-                  functions.logger.warn(
-                     `Invalid referral code: ${userData.referralCode}, no corresponding user.`
-                  )
-               }
-            }
 
             await admin
                .firestore()
                .collection("userData")
-               .doc(recipient_email)
+               .doc(recipientEmail)
                .set(
-                  Object.assign(
-                     {
-                        authId: user.uid,
-                        id: recipient_email,
-                        validationPin: pinCode,
-                        firstName: userData.firstName,
-                        lastName: userData.lastName,
-                        userEmail: recipient_email,
-                        university: userData.university,
-                        universityCountryCode: userData.universityCountryCode,
-                        unsubscribed: !userData.subscribed,
-                        referralCode: generateReferralCode(),
-                     },
-                     referralData
-                  )
+                  Object.assign({
+                     authId: user.uid,
+                     id: recipientEmail,
+                     validationPin: pinCode,
+                     firstName: firstName,
+                     lastName: lastName,
+                     userEmail: recipientEmail,
+                     university: university,
+                     universityCountryCode: universityCountryCode,
+                     unsubscribed: !subscribed,
+                     referralCode: generateReferralCode(),
+                     gender: gender,
+                  })
                )
                .then(async () => {
-                  console.log(`Starting sending email for ${recipient_email}`)
+                  console.log(`Starting sending email for ${recipientEmail}`)
                   const email = {
                      TemplateId:
                         process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
                      From: "CareerFairy <noreply@careerfairy.io>",
-                     To: recipient_email,
+                     To: recipientEmail,
                      TemplateModel: { pinCode: pinCode },
                   }
                   try {
-                     let response = await client.sendEmailWithTemplate(email)
+                     const response = await client.sendEmailWithTemplate(email)
                      console.log(
-                        `Sent email successfully for ${recipient_email}`
+                        `Sent email successfully for ${recipientEmail}`
                      )
-
-                     // Create the referral follower reward if the user was referred by someone
-                     if (referralData.referredBy) {
-                        try {
-                           await rewardCreateReferralSignUpFollower(
-                              recipient_email,
-                              referralUser
-                           )
-                           functions.logger.info(
-                              "Created referral follower reward for this user."
-                           )
-                        } catch (e) {
-                           // We don't want to fail the registration just because the reward failed
-                           functions.logger.error(e)
-                        }
-                     }
 
                      return response
                   } catch (error) {
                      console.error(
-                        `Error sending PIN email to ${recipient_email}`,
+                        `Error sending PIN email to ${recipientEmail}`,
                         error
                      )
                      console.error(
-                        `Starting auth and firestore user deletion ${recipient_email}`,
+                        `Starting auth and firestore user deletion ${recipientEmail}`,
                         error
                      )
                      await admin.auth().deleteUser(user.uid)
                      await admin
                         .firestore()
                         .collection("userData")
-                        .doc(recipient_email)
+                        .doc(recipientEmail)
                         .delete()
                      throw new functions.https.HttpsError(
                         "resource-exhausted",
@@ -147,13 +113,13 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
                .catch(async (error) => {
                   if (error.code !== "resource-exhausted") {
                      console.error(
-                        `Starting auth user deletion ${recipient_email}`,
+                        `Starting auth user deletion ${recipientEmail}`,
                         error
                      )
                      await admin.auth().deleteUser(user.uid)
                   }
                   console.error(
-                     `Error creating user ${recipient_email} in firestore`,
+                     `Error creating user ${recipientEmail} in firestore`,
                      error
                   )
                   throw new functions.https.HttpsError("internal", error)
@@ -161,7 +127,7 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
          })
          .catch(async (error) => {
             console.error(
-               `Error creating user ${recipient_email} in firebase auth`,
+               `Error creating user ${recipientEmail} in firebase auth`,
                error
             )
             throw new functions.https.HttpsError("internal", error)
@@ -171,19 +137,19 @@ exports.createNewUserAccount_v2 = functions.https.onCall(
 
 exports.resendPostmarkEmailVerificationEmailWithPin_v2 = functions.https.onCall(
    async (data) => {
-      const recipient_email = data.recipientEmail
+      const recipientEmail = data.recipientEmail
       const pinCode = getRandomInt(9999)
 
       await admin
          .firestore()
          .collection("userData")
-         .doc(recipient_email)
+         .doc(recipientEmail)
          .update({ validationPin: pinCode })
 
       const email = {
          TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
          From: "CareerFairy <noreply@careerfairy.io>",
-         To: recipient_email,
+         To: recipientEmail,
          TemplateModel: { pinCode: pinCode },
       }
       try {
@@ -199,30 +165,30 @@ exports.validateUserEmailWithPin = functions
       minInstances: 1,
    })
    .https.onCall(async (data, context) => {
-      const recipient_email = data.userInfo.recipientEmail
+      const recipientEmail = data.userInfo.recipientEmail
       const pinCode = data.userInfo.pinCode
       let error
 
       functions.logger.log(
-         `Starting user email validation for ${recipient_email}`
+         `Starting user email validation for ${recipientEmail}`
       )
 
       try {
-         let querySnapshot = await admin
+         const querySnapshot = await admin
             .firestore()
             .collection("userData")
-            .doc(recipient_email)
+            .doc(recipientEmail)
             .get()
          if (querySnapshot.exists) {
-            let user = querySnapshot.data()
-            functions.logger.log(`Acquired user data for ${recipient_email}`)
+            const user = querySnapshot.data()
+            functions.logger.log(`Acquired user data for ${recipientEmail}`)
             if (user.validationPin === pinCode) {
                functions.logger.log(
-                  `Provided Pin code for ${recipient_email} is correct`
+                  `Provided Pin code for ${recipientEmail} is correct`
                )
                const userRecord = await admin
                   .auth()
-                  .getUserByEmail(recipient_email)
+                  .getUserByEmail(recipientEmail)
 
                const updatedUserRecord = await admin
                   .auth()
@@ -231,33 +197,33 @@ exports.validateUserEmailWithPin = functions
                   })
 
                functions.logger.log(
-                  `Auth user ${recipient_email} has been validated`
+                  `Auth user ${recipientEmail} has been validated`
                )
 
-               functions.logger.log(`Updated User Record`, updatedUserRecord)
+               functions.logger.log("Updated User Record", updatedUserRecord)
 
                return updatedUserRecord
             } else {
                functions.logger.error(
-                  `The User ${recipient_email} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
+                  `The User ${recipientEmail} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
                )
                error = {
                   code: "invalid-argument",
-                  message: `Failed to provide the correct Pin code`,
+                  message: "Failed to provide the correct Pin code",
                }
             }
          } else {
             functions.logger.error(
-               `Was unable to find any userData with ${recipient_email}`
+               `Was unable to find any userData with ${recipientEmail}`
             )
             error = {
                code: "not-found",
-               message: `Was unable to find any userData with ${recipient_email}`,
+               message: `Was unable to find any userData with ${recipientEmail}`,
             }
          }
       } catch (error) {
          functions.logger.warn(
-            `An error has occurred fetching userData for ${recipient_email}`
+            `An error has occurred fetching userData for ${recipientEmail}`
          )
          throw new functions.https.HttpsError("unknown", error)
       }
@@ -279,7 +245,7 @@ exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             url: redirectLink,
          }
 
-         functions.logger.info("recipient_email", recipientEmail)
+         functions.logger.info("recipientEmail", recipientEmail)
          functions.logger.info("actionCodeSettings", actionCodeSettings)
 
          const link = await admin
@@ -314,44 +280,44 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res)
 
-      const recipient_email = req.body.recipientEmail.toLowercase()
-      const recipient_first_name = req.body.firstName
-      const recipient_last_name = req.body.lastName
-      const recipient_university = req.body.universityCode
-      const recipient_university_country_code = req.body.universityCountryCode
+      const recipientEmail = req.body.recipientEmail.toLowercase()
+      const recipientFirstName = req.body.firstName
+      const recipientLastName = req.body.lastName
+      const recipientUniversity = req.body.universityCode
+      const recipientUniversityCountryCode = req.body.universityCountryCode
       const pinCode = getRandomInt(9999)
 
       admin
          .firestore()
          .collection("userData")
-         .doc(recipient_email)
+         .doc(recipientEmail)
          .set({
-            id: recipient_email,
+            id: recipientEmail,
             validationPin: pinCode,
-            firstName: recipient_first_name,
-            lastName: recipient_last_name,
-            userEmail: recipient_email,
-            universityCode: recipient_university,
-            universityCountryCode: recipient_university_country_code,
+            firstName: recipientFirstName,
+            lastName: recipientLastName,
+            userEmail: recipientEmail,
+            universityCode: recipientUniversity,
+            universityCountryCode: recipientUniversityCountryCode,
          })
          .then(() => {
             const email = {
                TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
                From: "CareerFairy <noreply@careerfairy.io>",
-               To: recipient_email,
+               To: recipientEmail,
                TemplateModel: { pinCode: pinCode },
             }
 
             return client.sendEmailWithTemplate(email).then(
                (response) => {
                   console.log(
-                     `Successfully sent PIN email to ${recipient_email}`
+                     `Successfully sent PIN email to ${recipientEmail}`
                   )
                   res.sendStatus(200)
                },
                (error) => {
                   console.error(
-                     `Error sending PIN email to ${recipient_email}`,
+                     `Error sending PIN email to ${recipientEmail}`,
                      error
                   )
                   res.sendStatus(500)
@@ -359,7 +325,7 @@ exports.sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
             )
          })
          .catch((error) => {
-            console.error(`Error creating user ${recipient_email}`, error)
+            console.error(`Error creating user ${recipientEmail}`, error)
             res.sendStatus(500)
          })
    }
@@ -369,50 +335,50 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res)
 
-      const recipient_email = req.body.recipientEmail
-      const recipient_first_name = req.body.firstName
-      const recipient_last_name = req.body.lastName
-      const recipient_university = req.body.universityCode
-      const recipient_university_name = req.body.universityName
-      const recipient_university_country_code = req.body.universityCountryCode
+      const recipientEmail = req.body.recipientEmail
+      const recipientFirstName = req.body.firstName
+      const recipientLastName = req.body.lastName
+      const recipientUniversity = req.body.universityCode
+      const recipientUniversityName = req.body.universityName
+      const recipientUniversityCountryCode = req.body.universityCountryCode
       const pinCode = getRandomInt(9999)
 
       admin
          .firestore()
          .collection("userData")
-         .doc(recipient_email)
+         .doc(recipientEmail)
          .set({
-            id: recipient_email,
+            id: recipientEmail,
             validationPin: pinCode,
-            firstName: recipient_first_name,
-            lastName: recipient_last_name,
-            userEmail: recipient_email,
-            universityCode: recipient_university,
+            firstName: recipientFirstName,
+            lastName: recipientLastName,
+            userEmail: recipientEmail,
+            universityCode: recipientUniversity,
             university: {
-               name: recipient_university_name,
-               code: recipient_university,
+               name: recipientUniversityName,
+               code: recipientUniversity,
             },
-            universityName: recipient_university_name,
-            universityCountryCode: recipient_university_country_code,
+            universityName: recipientUniversityName,
+            universityCountryCode: recipientUniversityCountryCode,
          })
          .then(() => {
             const email = {
                TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
                From: "CareerFairy <noreply@careerfairy.io>",
-               To: recipient_email,
+               To: recipientEmail,
                TemplateModel: { pinCode: pinCode },
             }
 
             return client.sendEmailWithTemplate(email).then(
                (response) => {
                   console.log(
-                     `Successfully sent PIN email to ${recipient_email}`
+                     `Successfully sent PIN email to ${recipientEmail}`
                   )
                   res.sendStatus(200)
                },
                (error) => {
                   console.error(
-                     `Error sending PIN email to ${recipient_email}`,
+                     `Error sending PIN email to ${recipientEmail}`,
                      error
                   )
                   res.sendStatus(500)
@@ -420,7 +386,7 @@ exports.sendPostmarkEmailUserDataAndUniWithName = functions.https.onRequest(
             )
          })
          .catch((error) => {
-            console.error(`Error creating user ${recipient_email}`, error)
+            console.error(`Error creating user ${recipientEmail}`, error)
             res.sendStatus(500)
          })
    }
@@ -449,7 +415,7 @@ exports.backfillUserData = functions.https.onCall(async (data, context) => {
 
    if (!email) {
       functions.logger.error(
-         `The user calling the function is not authenticated`
+         "The user calling the function is not authenticated"
       )
       throw new functions.https.HttpsError(
          "invalid-argument",

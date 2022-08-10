@@ -22,7 +22,7 @@ import wishes = require("./wishes")
 import ats = require("./ats")
 
 // Auth
-exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
+exports.createNewUserAccount_v3 = auth.createNewUserAccount_v3
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
@@ -125,6 +125,7 @@ exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
 exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
 exports.rewardUserAction = rewards.rewardUserAction
+exports.applyReferralCode = rewards.applyReferralCode
 
 // Ratings
 
