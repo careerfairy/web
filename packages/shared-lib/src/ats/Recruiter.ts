@@ -12,6 +12,11 @@ export class Recruiter extends BaseModel {
       public readonly disabled?: boolean
    ) {
       super()
+
+      if (!firstName || !lastName)
+         throw new Error(
+            "Missing Recruiter required properties, firstName, lastName"
+         )
    }
 
    public getName() {

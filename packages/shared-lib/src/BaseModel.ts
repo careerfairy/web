@@ -74,7 +74,13 @@ export function saveIfObject<T>(
       typeof targetField === "object" &&
       Object.keys(targetField).length
    ) {
-      return creationFunction(targetField)
+      try {
+         return creationFunction(targetField)
+      } catch (e) {
+         // if for some reason the model fails creating, return null as if it doesn't exist
+         console.error(e, targetField)
+         return null
+      }
    } else {
       return null
    }
