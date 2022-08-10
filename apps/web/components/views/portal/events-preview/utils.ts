@@ -2,7 +2,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const EVENT_PLACEHOLDERS = [
    {
-      id: "placeholderEvent",
+      id: "placeholderEvent1",
       title: "This event will be published soon",
       backgroundImageUrl:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-1.jpg?alt=media",
@@ -10,7 +10,7 @@ const EVENT_PLACEHOLDERS = [
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
    },
    {
-      id: "placeholderEvent",
+      id: "placeholderEvent2",
       title: "An awesome company is currently creating this event",
       backgroundImageUrl:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-2.jpg?alt=media",
@@ -18,7 +18,7 @@ const EVENT_PLACEHOLDERS = [
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
    },
    {
-      id: "placeholderEvent",
+      id: "placeholderEvent3",
       title: "Stay tuned. Event is being created right now",
       backgroundImageUrl:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-3.jpg?alt=media",
@@ -26,7 +26,7 @@ const EVENT_PLACEHOLDERS = [
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fcoming-soon.png?alt=media",
    },
    {
-      id: "placeholderEvent",
+      id: "placeholderEvent4",
       title: "New live is coming soon",
       backgroundImageUrl:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FBackgroundPlaceholder-4.jpg?alt=media",

@@ -207,7 +207,7 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
    const [isPast, setIsPast] = useState(checkIfPast(event))
-   const isPlaceholderEvent = event?.id === "placeholderEvent"
+   const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
    const {
       query: { groupId },
