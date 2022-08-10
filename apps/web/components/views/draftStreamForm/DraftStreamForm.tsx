@@ -49,6 +49,11 @@ import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import MultiListSelect from "../common/MultiListSelect"
 import { useInterests } from "../../custom-hook/useCollection"
 import { createStyles } from "@mui/styles"
+import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
+import {
+   LivestreamEvent,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -162,6 +167,7 @@ const DraftStreamForm = ({
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
+      jobs: [],
    })
 
    const handleSetGroupIds = async (
@@ -242,7 +248,7 @@ const DraftStreamForm = ({
                targetCollection
             )
             if (livestreamQuery.exists) {
-               let livestream = livestreamQuery.data()
+               let livestream: LivestreamEvent = livestreamQuery.data()
                const newFormData: any = {
                   id: targetId,
                   companyLogoUrl: livestream.companyLogoUrl || "",
@@ -264,6 +270,7 @@ const DraftStreamForm = ({
                   ),
                   status: livestream.status || {},
                   language: livestream.language || languageCodes[0],
+                  jobs: livestream.jobs ?? [],
                }
                setFormData(newFormData)
                setAllFetched(false)
@@ -894,6 +901,8 @@ const DraftStreamForm = ({
                                  />
                               </Grid>
                            </FormGroup>
+
+                           <JobSelectorCategory currentValues={values.jobs} />
 
                            <ButtonGroup
                               className={classes.buttonGroup}
