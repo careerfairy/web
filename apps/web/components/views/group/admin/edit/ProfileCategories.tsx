@@ -46,6 +46,7 @@ const ProfileCategories = () => {
                      <GroupQuestionEdit
                         group={group}
                         setEditMode={setCreateMode}
+                        newGroupQuestion
                      />
                   </Grid>
                </Grow>

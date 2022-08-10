@@ -5,7 +5,7 @@ import {
    LivestreamPoll,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    getPdfCategoryChartData,
@@ -274,7 +274,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
 
          // Extraction of snap Data
          const getMostCommonUniversities = (students: UserData[], max = 5) => {
-            const universitiesCount = students.reduce(
+            const universitiesCount = students?.reduce(
                (acc, currentStudent) => {
                   if (!currentStudent?.university?.code) {
                      acc["other"].count += 1
@@ -320,12 +320,14 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             return topNamedUniversities
          }
 
-         const participatingStudents = await livestreamRepo.getLivestreamUsers(
-            livestreamData.id,
-            "participatedInLivestream"
-         )
+         const participatingStudents =
+            (await livestreamRepo.getLivestreamUsers(
+               livestreamData.id,
+               "participatedInLivestream"
+            )) || []
 
-         const groupPresenter = new GroupPresenter(requestingGroupData)
+         const groupPresenter =
+            GroupPresenter.createFromDocument(requestingGroupData)
 
          const rootLevelOfStudyCategory =
             await levelOfStudyRepo.getLevelsOfStudyAsCategory()
@@ -343,7 +345,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          )
 
          const isUniversity = groupPresenter.isUniversity()
-         console.log("-> isUniversity", isUniversity)
 
          nonUniversityChartData = getPdfCategoryChartData(
             rootFieldOfStudyCategory,
@@ -381,7 +382,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          const groups = await groupRepo.getGroupsByIds(livestreamGroupIds)
 
          for (const groupData of groups) {
-            const presenter = new GroupPresenter(groupData)
+            const presenter = GroupPresenter.createFromDocument(groupData)
             const isUniversity = presenter.isUniversity()
             const numberOfStudentsFromUniversity = isUniversity
                ? participatingStudents.filter((user) =>
@@ -390,10 +391,10 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
                : 0
 
             const hostData = {
-               id: presenter.model.id,
-               hostName: presenter.model.universityName,
-               groupId: presenter.model.id,
-               hostLogoUrl: presenter.model.logoUrl,
+               id: presenter.id,
+               hostName: presenter.universityName,
+               groupId: presenter.id,
+               hostLogoUrl: presenter.logoUrl,
                isUniversity,
                numberOfStudentsFromUniversity: numberOfStudentsFromUniversity,
             }
@@ -401,9 +402,9 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             hostsData.push(hostData)
          }
          const totalParticipatingWithoutData = universityChartData
-            ? universityChartData.totalWithoutStats +
-              nonUniversityChartData.totalWithoutStats
-            : nonUniversityChartData.totalWithoutStats
+            ? (universityChartData?.totalWithoutStats || 0) +
+              (nonUniversityChartData?.totalWithoutStats || 0)
+            : nonUniversityChartData?.totalWithoutStats || 0
 
          return {
             hostsData,

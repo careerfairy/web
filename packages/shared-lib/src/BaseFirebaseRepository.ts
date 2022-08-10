@@ -41,7 +41,7 @@ export default class BaseFirebaseRepository {
 export function convertDocArrayToDict<T extends Identifiable>(
    array: T[]
 ): Record<T["id"], T> {
-   return array.reduce((dict, doc) => {
+   return array?.reduce((dict, doc) => {
       dict[doc.id] = doc
       return dict
    }, {} as Record<T["id"], T>)

@@ -443,7 +443,7 @@ export class FirebaseGroupRepository
          .where("questionType", "==", questionType)
          .limit(1)
          .get()
-      return mapFirestoreDocuments<GroupQuestion>(groupFieldsOfStudySnaps)[0]
+      return mapFirestoreDocuments<GroupQuestion>(groupFieldsOfStudySnaps)?.[0]
    }
 
    async getAllGroups(): Promise<Group[]> {

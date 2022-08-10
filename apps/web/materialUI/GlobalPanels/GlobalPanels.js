@@ -31,7 +31,13 @@ export const SimplePanel = ({ panelId, children, height, ...other }) => {
    )
 }
 
-export const SwipeablePanel = ({ children, value, index, dir, ...other }) => {
+export const SwipeablePanel = ({
+   children,
+   value,
+   index,
+   dir = undefined,
+   ...other
+}) => {
    return (
       <Box
          role="tabpanel"

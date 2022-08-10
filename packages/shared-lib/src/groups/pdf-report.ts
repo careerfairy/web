@@ -53,7 +53,7 @@ export const getPdfCategoryChartData = (
 ): PdfCategoryChartData => {
    const subCategorySortingOrder = "asc"
    const mainQuestionOptions: PdfCategoryChartOption[] =
-      convertGroupQuestionOptionsToSortedArray(mainQuestion.options)
+      convertGroupQuestionOptionsToSortedArray(mainQuestion?.options)
          .map((mainQuestionOption) => {
             const mainQuestionOptionUsers = users.filter((user) =>
                forUniversity
@@ -61,9 +61,9 @@ export const getPdfCategoryChartData = (
                   : generalFilterFn(user, mainQuestion, mainQuestionOption)
             )
             return {
-               id: mainQuestionOption.id,
+               id: mainQuestionOption?.id,
                subCategoryOptions: convertGroupQuestionOptionsToSortedArray(
-                  subQuestion.options
+                  subQuestion?.options
                )
                   .map((subCategoryOption) => {
                      const count = mainQuestionOptionUsers.filter((user) =>
@@ -76,14 +76,14 @@ export const getPdfCategoryChartData = (
                              )
                      ).length
                      return {
-                        id: subCategoryOption.id,
-                        name: subCategoryOption.name,
+                        id: subCategoryOption?.id,
+                        name: subCategoryOption?.name,
                         count: count,
                      }
                   })
                   .sort(dynamicSort("name", subCategorySortingOrder)),
-               name: mainQuestionOption.name,
-               count: mainQuestionOptionUsers.length,
+               name: mainQuestionOption?.name,
+               count: mainQuestionOptionUsers?.length,
             }
          })
          .sort(dynamicSort("count", "desc"))
@@ -93,15 +93,15 @@ export const getPdfCategoryChartData = (
       0
    )
    return {
-      totalWithoutStats: users.length - totalWithStats,
+      totalWithoutStats: (users?.length || 0) - totalWithStats,
       totalWithStats,
-      name: mainQuestion.name,
-      mainCategoryName: mainQuestion.name,
-      mainCategoryId: mainQuestion.id,
-      subCategoryName: subQuestion.name,
-      subCategoryId: subQuestion.id,
+      name: mainQuestion?.name,
+      mainCategoryName: mainQuestion?.name,
+      mainCategoryId: mainQuestion?.id,
+      subCategoryName: subQuestion?.name,
+      subCategoryId: subQuestion?.id,
       mainCategoryOptions: mainQuestionOptions,
-      subCategoryOptionNames: convertDictToDocArray(subQuestion.options)
+      subCategoryOptionNames: convertDictToDocArray(subQuestion?.options)
          .sort(dynamicSort("name", subCategorySortingOrder))
          .map((option) => option.name),
    }

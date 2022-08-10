@@ -29,7 +29,7 @@ import {
 } from "@careerfairy/shared-lib/dist/groups"
 import RootState from "../../store/reducers"
 import GroupsUtil from "../../data/util/GroupsUtil"
-import GroupPresenter from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
@@ -102,11 +102,9 @@ const GroupDashboardLayout = (props) => {
       }
    }, [isCorrectGroup, groupId])
    const groupPresenter = useMemo(
-      () => group && new GroupPresenter(group),
+      () => group && GroupPresenter.createFromDocument(group),
       [group]
    )
-
-   useEffect(() => {}, [])
 
    return (
       <GroupContext.Provider
