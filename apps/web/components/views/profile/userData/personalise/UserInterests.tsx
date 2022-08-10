@@ -6,7 +6,7 @@ import {
    InterestsSelectedState,
    interestsSubmitHandler,
    userInterestsDidNotChange,
-} from "../../../signup/InterestsSelector"
+} from "../../../signup/personaliseInformation/InterestsSelector"
 import { useDispatch } from "react-redux"
 import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 

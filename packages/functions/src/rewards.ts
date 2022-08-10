@@ -5,6 +5,7 @@ import {
    userGetByEmail,
    userIncrementStat,
    userIncrementField,
+   userUpdateFields,
 } from "./lib/user"
 import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 import {
@@ -12,6 +13,7 @@ import {
    rewardCreateLivestream,
    rewardGetRelatedToLivestream,
    rewardCreateUserAction,
+   rewardCreateReferralSignUpFollower,
 } from "./lib/reward"
 import { livestreamGetById } from "./lib/livestream"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
@@ -296,6 +298,69 @@ export const rewardUserAction = functions.https.onCall(
       functions.logger.info("Created a new reward for the user action")
    }
 )
+
+/**
+ * Check if the referral code is valid and if the user has any, if yes, rewards the followed user
+ * and adds the referral code on the current user
+ */
+export const applyReferralCode = functions.https.onCall(
+   async (referralCode, context) => {
+      const userEmail = context.auth?.token?.email
+
+      try {
+         // Extrapolate the user from the idToken that is the context
+         const currentUser = await userGetByEmail(userEmail)
+         const { referredBy } = currentUser
+
+         if (referredBy) {
+            throw new functions.https.HttpsError(
+               "failed-precondition",
+               "User already is referral by someone"
+            )
+         }
+
+         // get Follower User and reward him
+         const followedUser = await userGetByReferralCode(referralCode)
+
+         if (followedUser) {
+            const { id, firstName, lastName } = followedUser
+
+            // confirm that the followed user exists and is not the current user
+            if (id !== userEmail) {
+               const fieldToUpdate = {
+                  uid: id,
+                  name: `${firstName} ${lastName}`,
+                  referralCode: referralCode,
+               } as ReferralData
+
+               // update user data with referredBy information
+               await userUpdateFields(userEmail, {
+                  referredBy: fieldToUpdate,
+               })
+
+               // apply reward to followed user
+               await rewardCreateReferralSignUpFollower(userEmail, followedUser)
+               functions.logger.info(
+                  "Created referral follower reward for this user."
+               )
+
+               return true
+            }
+         }
+
+         return false
+      } catch (e) {
+         functions.logger.error(e)
+         throw new Error(e)
+      }
+   }
+)
+
+type ReferralData = {
+   uid: string
+   name: string
+   referralCode: string
+}
 
 // Validation functions, should throw exceptions
 

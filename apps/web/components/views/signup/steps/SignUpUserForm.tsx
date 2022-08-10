@@ -14,15 +14,18 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import UniversityCountrySelector from "../universitySelect/UniversityCountrySelector"
-import UniversitySelector from "../universitySelect/UniversitySelector"
+import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
+import UniversitySelector from "../../universitySelect/UniversitySelector"
 import Link from "next/link"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
-import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper"
-import { useLocalStorage } from "react-use"
-import { localStorageReferralCode } from "../../../constants/localStorageKeys"
-import { sxStyles } from "../../../types/commonTypes"
+import {
+   IMultiStepContext,
+   MultiStepContext,
+} from "../../common/MultiStepWrapper"
+import { sxStyles } from "../../../../types/commonTypes"
+import GenericDropdown from "../../common/GenericDropdown"
+import { possibleGenders } from "../../../../constants/forms"
 
 const styles = sxStyles({
    submit: {
@@ -31,6 +34,11 @@ const styles = sxStyles({
    resetEmail: {
       margin: "20px auto 0 auto",
       textAlign: "center",
+   },
+   subtitle: {
+      textTransform: "uppercase",
+      fontSize: "0.8rem !important",
+      fontWeight: "bold",
    },
 })
 
@@ -72,6 +80,19 @@ const schema = yup.object().shape({
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
 })
 
+const initValues = {
+   firstName: "",
+   lastName: "",
+   email: "",
+   password: "",
+   confirmPassword: "",
+   agreeTerm: false,
+   subscribed: false,
+   university: { code: "other", name: "Other" },
+   universityCountryCode: "",
+   gender: "",
+}
+
 function SignUpUserForm() {
    const firebase = useFirebaseService()
    const {
@@ -84,12 +105,6 @@ function SignUpUserForm() {
    const [errorMessage, setErrorMessage] = useState(null)
    const [generalLoading, setGeneralLoading] = useState(false)
    const [open, setOpen] = React.useState(false)
-
-   const [existingReferralCode] = useLocalStorage(
-      localStorageReferralCode,
-      "",
-      { raw: true }
-   )
 
    const submitting = (isSubmitting) => {
       return isSubmitting || emailSent || generalLoading
@@ -139,18 +154,7 @@ function SignUpUserForm() {
       <Fragment>
          <Formik
             enableReinitialize={true}
-            initialValues={{
-               firstName: "",
-               lastName: "",
-               email: "",
-               password: "",
-               confirmPassword: "",
-               agreeTerm: false,
-               subscribed: false,
-               university: { code: "other", name: "Other" },
-               universityCountryCode: "",
-               referralCode: `${existingReferralCode}`,
-            }}
+            initialValues={initValues}
             validationSchema={schema}
             onSubmit={handleSubmit}
          >
@@ -167,9 +171,15 @@ function SignUpUserForm() {
             }) => (
                <form id="signUpForm" onSubmit={handleSubmit}>
                   <Grid container spacing={2}>
-                     <Grid item xs={12} sm={6}>
+                     <Grid item xs={12}>
+                        <Typography sx={styles.subtitle} variant="h5">
+                           Personal Info
+                        </Typography>
+                     </Grid>
+                     <Grid item xs={12} sm={6} md={4}>
                         <FormControl fullWidth>
                            <TextField
+                              className="registrationInput"
                               autoComplete="fname"
                               name="firstName"
                               variant="outlined"
@@ -201,9 +211,10 @@ function SignUpUserForm() {
                            </Collapse>
                         </FormControl>
                      </Grid>
-                     <Grid item xs={12} sm={6}>
+                     <Grid item xs={12} sm={6} md={4}>
                         <FormControl fullWidth>
                            <TextField
+                              className="registrationInput"
                               variant="outlined"
                               fullWidth
                               id="lastName"
@@ -234,9 +245,21 @@ function SignUpUserForm() {
                            </Collapse>
                         </FormControl>
                      </Grid>
+                     <Grid item xs={12} sm={12} md={4}>
+                        <GenericDropdown
+                           id="gender-dropdown"
+                           name="gender"
+                           onChange={handleChange}
+                           value={values.gender}
+                           label="Gender"
+                           list={possibleGenders}
+                           className="registrationDropdown"
+                        />
+                     </Grid>
                      <Grid item xs={12}>
                         <FormControl fullWidth>
                            <TextField
+                              className="registrationInput"
                               variant="outlined"
                               fullWidth
                               error={Boolean(errors.email && touched.email)}
@@ -262,38 +285,9 @@ function SignUpUserForm() {
                         </FormControl>
                      </Grid>
                      <Grid item xs={12} sm={6}>
-                        <UniversityCountrySelector
-                           value={values.universityCountryCode}
-                           handleClose={handleClose}
-                           submitting={submitting(isSubmitting)}
-                           setFieldValue={setFieldValue}
-                           error={
-                              errors.universityCountryCode &&
-                              touched.universityCountryCode &&
-                              errors.universityCountryCode
-                           }
-                           handleOpen={handleOpen}
-                           handleBlur={handleBlur}
-                           open={open}
-                        />
-                     </Grid>
-                     <Grid item xs={12} sm={6}>
-                        <UniversitySelector
-                           handleBlur={handleBlur}
-                           error={
-                              errors.university &&
-                              touched.university &&
-                              errors.university
-                           }
-                           universityCountryCode={values.universityCountryCode}
-                           values={values}
-                           submitting={submitting(isSubmitting)}
-                           setFieldValue={setFieldValue}
-                        />
-                     </Grid>
-                     <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                            <TextField
+                              className="registrationInput"
                               variant="outlined"
                               fullWidth
                               label="Password"
@@ -328,6 +322,7 @@ function SignUpUserForm() {
                      <Grid item xs={12} sm={6}>
                         <FormControl fullWidth>
                            <TextField
+                              className="registrationInput"
                               variant="outlined"
                               fullWidth
                               label="Confirm Password"
@@ -360,35 +355,41 @@ function SignUpUserForm() {
                         </FormControl>
                      </Grid>
                      <Grid item xs={12}>
-                        <FormControl fullWidth>
-                           <TextField
-                              variant="outlined"
-                              fullWidth
-                              error={Boolean(
-                                 errors.referralCode && touched.referralCode
-                              )}
-                              id="referralCode"
-                              name="referralCode"
-                              placeholder="Enter a Referral Code"
-                              InputLabelProps={{ shrink: true }}
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              value={values.referralCode}
-                              disabled={submitting(isSubmitting)}
-                              label="Referral Code (Optional)"
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.referralCode &&
-                                    touched.referralCode &&
-                                    errors.referralCode
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.referralCode}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
+                        <Typography sx={styles.subtitle} variant="h5">
+                           University
+                        </Typography>
+                     </Grid>
+                     <Grid item xs={12} sm={6}>
+                        <UniversityCountrySelector
+                           className="registrationInput"
+                           value={values.universityCountryCode}
+                           handleClose={handleClose}
+                           submitting={submitting(isSubmitting)}
+                           setFieldValue={setFieldValue}
+                           error={
+                              errors.universityCountryCode &&
+                              touched.universityCountryCode &&
+                              errors.universityCountryCode
+                           }
+                           handleOpen={handleOpen}
+                           handleBlur={handleBlur}
+                           open={open}
+                        />
+                     </Grid>
+                     <Grid item xs={12} sm={6}>
+                        <UniversitySelector
+                           className="registrationInput"
+                           handleBlur={handleBlur}
+                           error={
+                              errors.university &&
+                              touched.university &&
+                              errors.university
+                           }
+                           universityCountryCode={values.universityCountryCode}
+                           values={values}
+                           submitting={submitting(isSubmitting)}
+                           setFieldValue={setFieldValue}
+                        />
                      </Grid>
                      <Grid item xs={12}>
                         <FormControlLabel

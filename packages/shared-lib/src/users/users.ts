@@ -24,11 +24,18 @@ export interface UserData extends Identifiable {
    referredBy?: {
       uid: string
       name: string
+      referralCode: string
    }
 
    // need data migrations to be moved to the user stats doc
    referralsCount?: number
    totalLivestreamInvites?: number
+   gender?: string
+   spokenLanguages?: string[]
+   countriesOfInterest?: string[]
+   regionsOfInterest?: string[]
+   isLookingForJob?: boolean
+   fieldOfStudy?: string
 }
 
 export interface UserStats {
@@ -95,6 +102,17 @@ export interface UserPublicData {
    lastName: string
    badges?: string[]
 }
+
+export type RegistrationStep = {
+   userId: string
+   steps: string[]
+   totalSteps: number
+   updatedAt: firebase.firestore.Timestamp
+}
+
+export type UserDataAnalytics = {
+   registrationSteps: RegistrationStep
+} & Identifiable
 
 /**
  * Public information about a user
