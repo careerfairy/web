@@ -54,10 +54,10 @@ const PortalPage = ({
                   />
                   <EventsPreview
                      id={"past-events"}
-                     title={"Past Events"}
+                     title={"PAST EVENTS"}
                      type={EventsTypes.pastEvents}
                      events={pastEvents}
-                     seeMoreLink={"/next-livestreams"}
+                     seeMoreLink={"/next-livestreams?type=pastEvents"}
                      // No need to show loading as these events have already been queried server side
                      loading={false}
                   />
