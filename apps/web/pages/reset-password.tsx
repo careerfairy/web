@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 
 import MicIcon from "@mui/icons-material/Mic"
@@ -22,6 +22,42 @@ import { FormikHelpers } from "formik/dist/types"
 import Paper from "@mui/material/Paper"
 import { MainLogo } from "../components/logos"
 import Collapse from "@mui/material/Collapse"
+import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { sxStyles } from "../types/commonTypes"
+import { HeaderLogoWrapper } from "../materialUI"
+
+const styles = sxStyles({
+   formWrapper: {
+      p: { xs: 2, sm: 3 },
+      marginTop: 3,
+   },
+   formTitle: {
+      color: "primary.main",
+      fontWeight: "500",
+      fontSize: "2em",
+      mx: 0,
+      my: 3,
+      textAlign: "center",
+   },
+   logo: {
+      margin: "20px 20px 0 20px",
+   },
+   footerInfo: {
+      color: "black",
+      fontWeight: "700",
+      fontSize: "1.3em",
+      margin: "40px 0 30px 0",
+      textAlign: "center",
+      textTransform: "uppercase",
+      letterSpacing: "0.4em",
+   },
+   headerWrapper: {
+      textAlign: "center",
+   },
+   icon: {
+      margin: "0 10px",
+   },
+})
 
 function ResetPasswordPage() {
    const { authenticatedUser: user } = useAuth()
@@ -39,17 +75,12 @@ function ResetPasswordPage() {
    }, [user, firebase.auth?.currentUser?.emailVerified])
 
    return (
-      <Box
-         sx={{
-            height: "100vh",
-            bgcolor: "primary.main",
-         }}
-      >
-         <Box component={"header"} sx={{ px: 3, pb: 5, pt: 2 }}>
-            <MainLogo white />
-         </Box>
+      <RegistrationBackground>
+         <HeaderLogoWrapper>
+            <MainLogo sx={styles.logo} />
+         </HeaderLogoWrapper>
          <ResetPasswordBase />
-      </Box>
+      </RegistrationBackground>
    )
 }
 
@@ -81,12 +112,12 @@ export function ResetPasswordBase() {
    }
 
    return (
-      <Fragment>
+      <>
          <Head>
             <title key="title">CareerFairy | Reset Password</title>
          </Head>
          <Container maxWidth={"sm"}>
-            <Paper sx={{ p: { xs: 2, sm: 3 } }}>
+            <Box sx={styles.formWrapper}>
                <Formik
                   initialValues={{ email: "" }}
                   validate={(values) => {
@@ -110,37 +141,24 @@ export function ResetPasswordBase() {
                      /* and other goodies */
                   }) => (
                      <form id="resetPasswordForm" onSubmit={handleSubmit}>
-                        <Box
-                           sx={{
-                              textAlign: "center",
-                              color: "white",
-                           }}
-                        >
+                        <Box sx={styles.headerWrapper}>
                            <MicIcon
                               fontSize="large"
-                              style={{ margin: "0 10px" }}
+                              style={styles.icon}
+                              color="disabled"
                            />
                            <ArrowForwardIosIcon
                               fontSize="large"
-                              style={{ margin: "0 10px" }}
+                              style={styles.icon}
+                              color="disabled"
                            />
                            <BusinessCenterIcon
                               fontSize="large"
-                              style={{ margin: "0 10px" }}
+                              style={styles.icon}
+                              color="disabled"
                            />
                         </Box>
-                        <Box
-                           sx={{
-                              color: "primary.main",
-                              fontWeight: "500",
-                              fontSize: "2em",
-                              mx: 0,
-                              my: 5,
-                              textAlign: "center",
-                           }}
-                        >
-                           CareerFairy
-                        </Box>
+                        <Box sx={styles.formTitle}>CareerFairy</Box>
                         <TextField
                            required
                            name="email"
@@ -152,11 +170,18 @@ export function ResetPasswordBase() {
                            disabled={isSubmitting}
                            label="Email"
                            variant="outlined"
+                           className="registrationInput"
                            fullWidth
+                           error={Boolean(errors.email && touched.email)}
                         />
-                        <FormHelperText error>
-                           {errors.email && touched.email && errors.email}
-                        </FormHelperText>
+                        <Collapse
+                           in={Boolean(
+                              errors.email && touched.email && errors.email
+                           )}
+                        >
+                           <FormHelperText error>{errors.email}</FormHelperText>
+                        </Collapse>
+
                         <Button
                            type="submit"
                            data-testid={"password-reset-button"}
@@ -191,21 +216,9 @@ export function ResetPasswordBase() {
                      </form>
                   )}
                </Formik>
-            </Paper>
-            <Typography
-               sx={{
-                  color: "white",
-                  fontWeight: "700",
-                  fontSize: "1.3em",
-                  margin: "40px 0 30px 0",
-                  textAlign: "center",
-                  textTransform: "uppercase",
-                  letterSpacing: "0.4em",
-               }}
-            >
-               Meet Your Future
-            </Typography>
+            </Box>
+            <Typography sx={styles.footerInfo}>Meet Your Future</Typography>
          </Container>
-      </Fragment>
+      </>
    )
 }

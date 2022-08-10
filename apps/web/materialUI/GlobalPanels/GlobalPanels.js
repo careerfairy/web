@@ -46,6 +46,13 @@ export const SwipeablePanel = ({ children, value, index, dir, ...other }) => {
    )
 }
 
+export const swipeableTabA11yProps = (index) => {
+   return {
+      id: `full-width-tabpanel-${index}`,
+      "aria-controls": `full-width-tab-${index}`,
+   }
+}
+
 SwipeablePanel.propTypes = {
    children: PropTypes.node,
    index: PropTypes.any.isRequired,

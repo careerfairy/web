@@ -1,5 +1,11 @@
+import {
+   Group,
+   GroupATSAccountDocument,
+   GroupATSIntegrationTokensDocument,
+   GroupQuestion,
+} from "./groups"
+import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
-import { GroupQuestion, Group } from "./groups"
 import {
    mapFirestoreDocuments,
    OnSnapshotCallback,
@@ -24,6 +30,46 @@ export interface IGroupRepository {
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
+
+   /**
+    * Confirm if user is admin of the group
+    *
+    * Returns true if user is admin of the group and the group itself to save a
+    * network request in case you need to fetch the full group afterwards
+    * @param groupId
+    * @param userEmail
+    */
+   checkIfUserIsGroupAdmin(
+      groupId: string,
+      userEmail: string
+   ): Promise<{ isAdmin: boolean; group: Group }>
+
+   // ATS actions
+   getATSIntegrations(groupId: string): Promise<GroupATSAccountDocument[]>
+
+   removeATSIntegration(groupId: string, integrationId: string): Promise<void>
+
+   createATSIntegration(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSAccountDocument>
+   ): Promise<void>
+
+   saveATSIntegrationTokens(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSIntegrationTokensDocument>
+   ): Promise<void>
+
+   /**
+    * Should only be called from backends
+    * @param groupId
+    * @param integrationId
+    */
+   getATSIntegrationTokens(
+      groupId: string,
+      integrationId: string
+   ): Promise<GroupATSIntegrationTokensDocument>
 
    getGroupQuestions(groupId: string): Promise<GroupQuestion[]>
 
@@ -73,12 +119,16 @@ export interface IGroupRepository {
    deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
 }
 
-export class FirebaseGroupRepository implements IGroupRepository {
+export class FirebaseGroupRepository
+   extends BaseFirebaseRepository
+   implements IGroupRepository
+{
    constructor(
       private readonly firestore: firebase.firestore.Firestore,
-      // @ts-ignore
       private readonly fieldValue: typeof firebase.firestore.FieldValue
-   ) {}
+   ) {
+      super()
+   }
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {
       let userRef = this.firestore.collection("userData").doc(userEmail)
@@ -147,6 +197,130 @@ export class FirebaseGroupRepository implements IGroupRepository {
          .limit(1)
          .get()
       return adminGroups.docs.length > 0
+   }
+
+   async checkIfUserIsGroupAdmin(
+      groupId: string,
+      userEmail: string
+   ): Promise<{ isAdmin: boolean; group: Group }> {
+      const groupDoc = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .get()
+
+      if (!groupDoc.exists) {
+         return { isAdmin: false, group: null }
+      }
+
+      const group = this.addIdToDoc<Group>(groupDoc)
+
+      return {
+         isAdmin: group.adminEmails.includes(userEmail),
+         group,
+      }
+   }
+
+   /*
+   |--------------------------------------------------------------------------
+   | ATS Actions
+   |--------------------------------------------------------------------------
+   */
+   async getATSIntegrations(
+      groupId: string
+   ): Promise<GroupATSAccountDocument[]> {
+      const docs = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .get()
+
+      if (docs.empty) {
+         return []
+      }
+
+      return this.addIdToDocs<GroupATSAccountDocument>(docs.docs)
+   }
+
+   createATSIntegration(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSAccountDocument>
+   ) {
+      data.updatedAt = this.fieldValue.serverTimestamp() as any
+      data.createdAt = this.fieldValue.serverTimestamp() as any
+
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+         .set(data)
+   }
+
+   saveATSIntegrationTokens(
+      groupId: string,
+      integrationId: string,
+      data: Partial<GroupATSIntegrationTokensDocument>
+   ) {
+      return this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+         .collection("tokens")
+         .doc("tokens")
+         .set(data)
+   }
+
+   async getATSIntegrationTokens(groupId: string, integrationId: string) {
+      const doc = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+         .collection("tokens")
+         .doc("tokens")
+         .get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return this.addIdToDoc<GroupATSIntegrationTokensDocument>(doc)
+   }
+
+   /**
+    * Removes the ATS document and child documents
+    *
+    * @param groupId
+    * @param integrationId
+    */
+   async removeATSIntegration(
+      groupId: string,
+      integrationId: string
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+
+      batch.delete(
+         this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("ats")
+            .doc(integrationId)
+      )
+
+      // Child documents
+      batch.delete(
+         this.firestore
+            .collection("careerCenterData")
+            .doc(groupId)
+            .collection("ats")
+            .doc(integrationId)
+            .collection("tokens")
+            .doc("tokens")
+      )
+
+      return await batch.commit()
    }
 
    async getGroupQuestions(groupId: string): Promise<GroupQuestion[]> {

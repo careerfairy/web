@@ -3,9 +3,8 @@ import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
 import { SignupPage } from "../page-object-models/SignupPage"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
-import { credentials } from "../../constants"
+import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
 import { PortalPage } from "../page-object-models/PortalPage"
-import { checkIfArraysAreEqual } from "../utils"
 import { LoginPage } from "../page-object-models/LoginPage"
 
 test.describe("Signup Page Functionality", () => {
@@ -29,71 +28,407 @@ test.describe("Signup Page Functionality", () => {
       ])
    })
 
-   test("It successfully signs up", async ({ page }) => {
+   test("It successfully signs up without additional information", async ({
+      page,
+   }) => {
       const signup = new SignupPage(page)
       const portal = new PortalPage(page)
 
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+      } = credentials
+
       await signup.fillSignupForm({
-         universityName: `University of ${credentials.correctUniversityCountry}`,
+         universityName: `University of ${correctUniversityCountry}`,
          agreeToTerms: true,
          subscribeEmails: true,
-         universityCountry: credentials.correctUniversityCountry,
-         confirmPassword: credentials.correctPassword,
-         password: credentials.correctPassword,
-         email: credentials.correctEmail,
-         lastName: credentials.correctLastName,
-         firstName: credentials.correctFirstName,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
 
-      const userData = await UserSeed.getUserData(credentials.correctEmail)
+      const userData = await UserSeed.getUserData(correctEmail)
       await expect(userData).toBeTruthy()
       const validationPin = userData.validationPin
       await signup.enterPinCode(`${validationPin}`)
       await signup.clickValidateEmail()
-      await expect(signup.interestsTitle).toBeVisible()
-      const dummyInterests = InterestSeed.getDummyInterests()
-      const targetInterests = [
-         dummyInterests["Startups"],
-         dummyInterests["Research & Development"],
-         dummyInterests["Business"],
-         dummyInterests["Marketing"],
-         dummyInterests["Product Management"],
-      ]
-      const targetInterestNames = targetInterests.map(
-         (interest) => interest.name
-      )
-      const targetInterestIds = targetInterests.map((interest) => interest.id)
-      // selects the interests
-      await signup.clickOnMultipleInterests(targetInterestNames)
-      // de-selects the interests
-      await signup.clickOnMultipleInterests(targetInterestNames)
-      // re-selects the interests
-      await signup.clickOnMultipleInterests(targetInterestNames)
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
 
       await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
       await expect(portal.UpcomingEventsHeader).toBeVisible({
          timeout: 15000,
       })
-      const userDataWithInterests = await UserSeed.getUserData(
-         credentials.correctEmail
-      )
-      const userInterests = userDataWithInterests.interestsIds
-      const [areEqual, first, second] = checkIfArraysAreEqual(
-         userInterests,
-         targetInterestIds
-      )
-      expect(
-         areEqual,
-         `User's interests on userData Doc should match the selected interests: userData Doc interests -> (${first}) Selected Interests -> (${second})`
-      ).toBe(true)
+
+      const userDataFromDb = await UserSeed.getUserData(correctEmail)
+
+      const {
+         linkedinUrl: userDataLinkedinUrl,
+         spokenLanguages: userDataSpokenLanguages,
+         countriesOfInterest: userDataCountriesOfInterest,
+         interestsIds: userDataInterestsIds,
+         isLookingForJob: userDataIsLookingForJob,
+      } = userDataFromDb
+
+      expect(userDataLinkedinUrl).toBeFalsy()
+      expect(userDataIsLookingForJob).toBeFalsy()
+      expect(userDataSpokenLanguages).toBeFalsy()
+      expect(userDataCountriesOfInterest).toBeFalsy()
+      expect(userDataInterestsIds).toBeFalsy()
    })
-   test("It fails to sign up with missing fields", async ({ page }) => {
+
+   test("It successfully go to validate email step without gender selected", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+   })
+
+   test("It successfully signs up with additional information", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+      const portal = new PortalPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+         linkedinUrl,
+         spokenLanguagesIds: [firstSpokenLanguageId],
+         countriesOfInterestIds: [firstCountriesOfInterestId],
+         regionsOfInterestIds: [firstRegionOfInterestId],
+         interestsIds: [firstInterestsId],
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(correctEmail)
+      await expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.enterLinkedInLinkInput(linkedinUrl)
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.selectSpokenLanguageOption(firstSpokenLanguageId)
+      await signup.selectCountriesOfInterestOption(firstCountriesOfInterestId)
+      await signup.selectCountriesOfInterestOption(firstRegionOfInterestId)
+      await signup.selectIsLookingForJobToggleOption()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.selectInterestsInputOption(firstInterestsId)
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataFromDb = await UserSeed.getUserData(correctEmail)
+
+      const {
+         linkedinUrl: userDataLinkedinUrl,
+         spokenLanguages: userDataSpokenLanguages,
+         countriesOfInterest: userDataCountriesOfInterest,
+         regionsOfInterest: userDataRegionsOfInterest,
+         interestsIds: userDataInterestsIds,
+         isLookingForJob: userDataIsLookingForJob,
+      } = userDataFromDb
+
+      expect(userDataLinkedinUrl).toEqual(linkedinUrl)
+      expect(userDataIsLookingForJob).toBeTruthy()
+      expect(firstSpokenLanguageId).toEqual(userDataSpokenLanguages[0])
+      expect(firstCountriesOfInterestId).toEqual(userDataCountriesOfInterest[0])
+      expect(firstRegionOfInterestId).toEqual(userDataRegionsOfInterest[0])
+      expect(firstInterestsId).toEqual(userDataInterestsIds[0])
+   })
+
+   test("It successfully signs up with linkedin as empty since we fill an invalid linkedinUrl one", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+      const portal = new PortalPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+         wrongLinkedinUrl,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(correctEmail)
+      await expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.enterLinkedInLinkInput(wrongLinkedinUrl)
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataFromDb = await UserSeed.getUserData(correctEmail)
+
+      const { linkedinUrl: userDataLinkedinUrl } = userDataFromDb
+
+      expect(userDataLinkedinUrl).toBeFalsy()
+   })
+
+   test("It successfully signs up and save the steps on analytics", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+      const portal = new PortalPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(correctEmail)
+      await expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataAnalyticsFromDb = await UserSeed.getUserDataAnalytics(
+         correctEmail
+      )
+      const {
+         registrationSteps: { steps, userId },
+      } = userDataAnalyticsFromDb
+      const { steps: correctSteps, userId: correctUserId } =
+         correctRegistrationAnalyticsSteps
+
+      expect(steps).toEqual(correctSteps)
+      expect(userId).toEqual(correctUserId)
+   })
+
+   test("It should save only once the steps on analytics even if the user goes back and forward", async ({
+      page,
+   }) => {
+      const signup = new SignupPage(page)
+      const portal = new PortalPage(page)
+
+      const {
+         correctPassword,
+         correctUniversityCountry,
+         correctEmail,
+         correctLastName,
+         correctFirstName,
+      } = credentials
+
+      await signup.fillSignupForm({
+         universityName: `University of ${correctUniversityCountry}`,
+         agreeToTerms: true,
+         subscribeEmails: true,
+         universityCountry: correctUniversityCountry,
+         confirmPassword: correctPassword,
+         password: correctPassword,
+         email: correctEmail,
+         lastName: correctLastName,
+         firstName: correctFirstName,
+      })
+      await signup.clickSignup()
+      await expect(signup.emailVerificationStepMessage).toBeVisible()
+
+      const userData = await UserSeed.getUserData(correctEmail)
+      await expect(userData).toBeTruthy()
+      const validationPin = userData.validationPin
+      await signup.enterPinCode(`${validationPin}`)
+      await signup.clickValidateEmail()
+
+      // should be on the social information step
+      await expect(signup.socialInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickBackButton()
+
+      // should be again on the additional information step
+      await expect(signup.additionalInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      // should be again on the interest information step
+      await expect(signup.interestsInformationStep).toBeVisible()
+
+      await signup.clickContinueButton()
+
+      await expect(portal.UpcomingEventsHeader).toBeVisible({
+         timeout: 15000,
+      })
+
+      const userDataAnalyticsFromDb = await UserSeed.getUserDataAnalytics(
+         correctEmail
+      )
+
+      const {
+         registrationSteps: { steps, userId },
+      } = userDataAnalyticsFromDb
+      const { steps: correctSteps, userId: correctUserId } =
+         correctRegistrationAnalyticsSteps
+
+      expect(steps).toEqual(correctSteps)
+      expect(userId).toEqual(correctUserId)
+   })
+
+   test("It fails to sign up with missing fields", async ({
+      page,
+      browserName,
+   }) => {
       const signup = new SignupPage(page)
 
       await signup.fillSignupForm({})
       await signup.clickSignup()
+
+      if (browserName === "webkit") {
+         await signup.clickSignup()
+      }
+
       await Promise.all([
          expect(signup.firstNameRequiredWarning).toBeVisible(),
          expect(signup.lastNameRequiredWarning).toBeVisible(),

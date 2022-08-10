@@ -93,7 +93,7 @@ class FirebaseService {
 
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v2"
+         "createNewUserAccount_v3"
       )
       return createUserInAuthAndFirebase({ userData })
    }
@@ -3007,6 +3007,12 @@ class FirebaseService {
       }
 
       return batch.commit()
+   }
+
+   applyReferralCode = async (referralCode: string) => {
+      return await this.functions.httpsCallable("applyReferralCode")(
+         referralCode
+      )
    }
 
    // Backfill user data

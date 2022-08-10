@@ -69,6 +69,9 @@ service cloud.firestore {
             allow create: if true;
             allow delete: if true;
         }
+        match /userData/{userId}/analytics/analytics {
+            allow read, write: if request.auth.token.email == userId;
+        }
 
         match /userData/{userId}/rewards/{rewardId} {
             allow read: if request.auth.token.email == userId;
@@ -146,6 +149,10 @@ service cloud.firestore {
 
             function isCareerCenterAdmin() {
                 return request.auth.token.email in careerCenterData().adminEmails;
+            }
+
+            match /ats/{integrationId} {
+                allow read: if request.auth.token.email in careerCenterData().adminEmails || isCFAdmin();
             }
 
             match /bookingSlots/{slot} {

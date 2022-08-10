@@ -39,10 +39,16 @@ export interface UserData extends Identifiable {
    referredBy?: {
       uid: string
       name: string
+      referralCode: string
    }
    // need data migrations to be moved to the user stats doc
    referralsCount?: number
    totalLivestreamInvites?: number
+   gender?: string
+   spokenLanguages?: string[]
+   countriesOfInterest?: string[]
+   regionsOfInterest?: string[]
+   isLookingForJob?: boolean
 }
 
 /*
@@ -123,6 +129,30 @@ export interface SavedRecruiter extends Identifiable {
    }
 }
 
+/**
+ * Document /userData/{id}/ats/ats
+ *
+ * Will store the user ATS existent relationships
+ */
+export interface UserATSDocument {
+   userId: string
+
+   // Map of AccountIds -> ATS Object IDs
+   // Stores the relation between each group linked account (Greenhouse, Teamtailor, etc)
+   // and Merge objects (Candidate id, Attachment ids, etc)
+   // We'll be able to answer the questions:
+   // - The user already has a Candidate ATS Model on the group TeamTailor account?
+   // - The user has already applied for a certain job?
+   atsRelations?: { [index: string]: UserATSRelations }
+}
+
+export interface UserATSRelations {
+   candidateId?: string
+   cvAttachmentId?: string
+   // map job id -> application id
+   jobApplications?: { [jobId: string]: string }
+}
+
 /*
  * Key is the groupId and value is a dictionary of keys questionId and values answerId
  * */
@@ -152,6 +182,17 @@ export interface UserPublicData {
    lastName: string
    badges?: string[]
 }
+
+export type RegistrationStep = {
+   userId: string
+   steps: string[]
+   totalSteps: number
+   updatedAt: firebase.firestore.Timestamp
+}
+
+export type UserDataAnalytics = {
+   registrationSteps: RegistrationStep
+} & Identifiable
 
 /**
  * Public information about a user
