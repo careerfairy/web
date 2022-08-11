@@ -44,7 +44,7 @@ export const getStaticProps: GetStaticProps = async ({
          locale,
       }),
       // TODO: getFieldsOfStudy()
-      () => [{ id: "medic" }, { id: "professor" }],
+      [{ id: "medic" }, { id: "professor" }],
    ])
 
    if (!page) {
@@ -56,6 +56,7 @@ export const getStaticProps: GetStaticProps = async ({
       props: {
          preview,
          serverPage: page.serializeToPlainObject(),
+         // TODO: use serialize after proper object
          fieldsOfStudy: fieldsOfStudy,
       },
       revalidate: 60,
