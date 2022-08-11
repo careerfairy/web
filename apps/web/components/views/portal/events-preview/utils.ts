@@ -89,6 +89,6 @@ export const createPlaceHolderEvents = (
    numberOfEvents: number
 ): LivestreamEvent[] => {
    return [...Array(numberOfEvents)].map(
-      (current, index) => EVENT_PLACEHOLDERS[index]
+      (current, index) => EVENT_PLACEHOLDERS[index % EVENT_PLACEHOLDERS.length]
    )
 }
