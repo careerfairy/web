@@ -31,6 +31,7 @@ interface StreamReducer {
       viewerCtaModalOpen: boolean
       leftMenuOpen: boolean
       focusModeEnabled: boolean
+      showActionButtons: boolean
    }
    stats: {
       numberOfViewers: number
