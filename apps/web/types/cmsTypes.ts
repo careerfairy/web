@@ -1,5 +1,4 @@
-import { RichTextContent, EmbedReferences } from "@graphcms/rich-text-types"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
 
 export type Slug = string
@@ -40,7 +39,7 @@ export interface Person {
    company?: Company
 }
 
-export interface Seo {
+export interface HygraphSeo {
    title: string
    description: string
    keywords: string
@@ -82,7 +81,7 @@ export interface CompanyCaseStudy {
    coverImage: CmsImage
    authors: Person[]
    slug: Slug
-   seo: Seo
+   seo: HygraphSeo
 }
 
 export interface Carousel {
@@ -94,7 +93,7 @@ export interface Testimonial {
    content: string
    person: Person
 }
-export interface Button {
+export interface HygraphButton {
    children: string
    slug: string
    href: string
@@ -103,8 +102,21 @@ export interface Button {
    size: ButtonProps["size"]
 }
 
-export interface Hero {
-   image: CmsImage
-   buttons: Button[]
+export interface HygraphHero {
+   id: string
    slug: string
+   image: CmsImage
+   buttons: HygraphButton[]
+}
+export type PageTypes = "COMPANY_CASE_STUDY" | "MARKETING_LANDING_PAGE"
+
+export interface HygraphMarketingPage {
+   id: string
+   title: string
+   subtitle: string
+   hero: HygraphHero
+   buttons: HygraphButton[]
+   pageType: PageTypes
+   slug: string
+   seo: HygraphSeo
 }
