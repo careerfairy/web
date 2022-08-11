@@ -1,10 +1,10 @@
 import Image, { ImageProps } from "next/image"
 import { GraphCMSImageLoader } from "./util"
 import React from "react"
-import { CmsImage } from "../../types/cmsTypes"
+import { ICmsImage } from "../../types/cmsTypes"
 
 interface Props {
-   cmsImage: CmsImage
+   cmsImage: ICmsImage
    imageProps?: Omit<ImageProps, "src">
 }
 const CmsImage = ({ imageProps, cmsImage }: Props) => {

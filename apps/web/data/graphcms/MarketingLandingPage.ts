@@ -10,6 +10,7 @@ import {
 export class MarketingLandingPage extends BaseModel {
    constructor(
       public readonly id: string,
+      public readonly slug: string,
       public readonly title: string,
       public readonly subtitle: string,
       public readonly hero: HygraphResponseHero,
@@ -25,6 +26,7 @@ export class MarketingLandingPage extends BaseModel {
    static createFromHygraph(page: HygraphResponseMarketingPage) {
       return new MarketingLandingPage(
          page.id,
+         page.slug,
          page.title,
          page.subtitle,
          page.hero,
@@ -35,6 +37,7 @@ export class MarketingLandingPage extends BaseModel {
    static createFromPlainObject(page: MarketingLandingPage) {
       return new MarketingLandingPage(
          page.id,
+         page.slug,
          page.title,
          page.subtitle,
          page.hero,
