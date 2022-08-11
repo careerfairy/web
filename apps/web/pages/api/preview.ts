@@ -1,6 +1,7 @@
 import caseStudyRepo from "../../data/graphcms/CaseStudyRepository"
 import { NextApiRequest, NextApiResponse } from "next"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
+import { PageTypes } from "../../types/cmsTypes"
 /*
  * You can read more about preview mode on [nextjs](https://nextjs.org/docs/advanced-features/preview-mode)
  *
@@ -50,7 +51,6 @@ export default async function handler(
    res.end()
 }
 
-type PageTypes = "COMPANY_CASE_STUDY" | "MARKETING_LANDING_PAGE"
 const getPreviewData = async (
    query: NextApiRequest["query"]
 ): Promise<{

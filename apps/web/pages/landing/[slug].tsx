@@ -5,17 +5,26 @@ import SEO from "../../components/util/SEO"
 import React, { useEffect } from "react"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
-import Header from "../../components/cms/landing-page/Header"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
+import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
+import Hero from "../../components/cms/hero"
+import useServerModel from "../../components/custom-hook/useServerModel"
 
 /**
  * Just for us to develop the UI while we don't have the hygraph cms setup
  */
 
-const LandingPage = ({ marketingLandingPage }) => {
+interface Props {
+   serverMarketingLandingPage: MarketingLandingPage
+}
+const LandingPage = ({ serverMarketingLandingPage }: Props) => {
+   const marketingLandingPage = useServerModel<MarketingLandingPage>(
+      serverMarketingLandingPage,
+      MarketingLandingPage.createFromPlainObject
+   )
+   console.log("-> marketingLandingPage", marketingLandingPage)
    const dispatch = useDispatch()
-
    useEffect(() => {
       dispatch(actions.inLandingPage())
 
@@ -25,18 +34,22 @@ const LandingPage = ({ marketingLandingPage }) => {
    }, [])
 
    return (
-      <GeneralLayout>
+      <>
          <SEO
-            title="CareerFairy | Marketing Landing"
-            canonical={`https://www.careerfairy.io/landing`}
+            id={marketingLandingPage?.id}
+            {...marketingLandingPage?.seo}
+            title={`${marketingLandingPage?.title} - CareerFairy Marketing`}
          />
-         <Header
-            title={marketingLandingPage.title}
-            subTitle={marketingLandingPage.subtitle}
-         />
+         {marketingLandingPage.hero && (
+            <Hero
+               pageTitle={marketingLandingPage.title}
+               pageSubTitle={marketingLandingPage.subtitle}
+               {...marketingLandingPage.hero}
+            />
+         )}
          <UpcomingLivestreams fieldsOfStudy={[""]} />
          <MarketingSignUp />
-      </GeneralLayout>
+      </>
    )
 }
 
@@ -45,22 +58,21 @@ export const getStaticProps: GetStaticProps = async ({
    preview = false,
    locale,
 }) => {
-   const { marketingLandingPage } = await marketingPageRepo.getMarketingPage({
+   const marketingPage = await marketingPageRepo.getMarketingPage({
       slug: params.slug as string,
       preview,
       locale,
    })
 
-   if (!marketingLandingPage) {
+   if (!marketingPage) {
       return {
          notFound: true,
       }
    }
-
    return {
       props: {
          preview,
-         marketingLandingPage,
+         serverMarketingLandingPage: marketingPage.serializeToPlainObject(),
       },
       revalidate: 60,
    }
