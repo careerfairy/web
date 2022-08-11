@@ -1,5 +1,9 @@
 import { fetchAPI } from "./index"
-import { HygraphMarketingPage, Slug, Variables } from "../../types/cmsTypes"
+import {
+   HygraphResponseMarketingPage,
+   Slug,
+   Variables,
+} from "../../types/cmsTypes"
 import { MarketingLandingPage } from "./MarketingLandingPage"
 
 export interface IMarketingPageRepository {
@@ -33,7 +37,6 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       slug
                       title
                       subtitle
-                      fieldsOfStudy
                       hero {
                           id
                           slug
@@ -51,6 +54,29 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                               variant
                               color
                               size
+                          }
+                      }
+                      blocks(first: 500) {
+                          ... on EventsSection {
+                              __typename
+                              id
+                              fieldsOfStudy
+                              typeOfEvent
+                          }
+                          ... on MarketingSignup {
+                              id
+                              __typename
+                              title
+                              subtitle
+                              slug
+                              button {
+                                  children
+                                  slug
+                                  href
+                                  variant
+                                  color
+                                  size
+                              }
                           }
                       }
                       seo {

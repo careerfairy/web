@@ -39,7 +39,7 @@ export interface Person {
    company?: Company
 }
 
-export interface HygraphSeo {
+export interface HygraphResponseSeo {
    title: string
    description: string
    keywords: string
@@ -81,7 +81,7 @@ export interface CompanyCaseStudy {
    coverImage: CmsImage
    authors: Person[]
    slug: Slug
-   seo: HygraphSeo
+   seo: HygraphResponseSeo
 }
 
 export interface Carousel {
@@ -93,7 +93,7 @@ export interface Testimonial {
    content: string
    person: Person
 }
-export interface HygraphButton {
+export interface HygraphResponseButton {
    children: string
    slug: string
    href: string
@@ -102,21 +102,37 @@ export interface HygraphButton {
    size: ButtonProps["size"]
 }
 
-export interface HygraphHero {
+export interface HygraphResponseHero {
    id: string
    slug: string
    image: CmsImage
-   buttons: HygraphButton[]
+   buttons: HygraphResponseButton[]
 }
 export type PageTypes = "COMPANY_CASE_STUDY" | "MARKETING_LANDING_PAGE"
 
-export interface HygraphMarketingPage {
+export interface HygraphResponseMarketingPage {
    id: string
    title: string
    subtitle: string
-   hero: HygraphHero
-   buttons: HygraphButton[]
+   hero: HygraphResponseHero
+   buttons: HygraphResponseButton[]
    pageType: PageTypes
    slug: string
-   seo: HygraphSeo
+   seo: HygraphResponseSeo
+   blocks: (HygraphResponseEventsSection | HygraphResponseMarketingSignup)[]
+}
+
+export interface HygraphResponseEventsSection {
+   __typename: string
+   id: string
+   fieldsOfStudy: string[]
+   typeOfEvent: string
+}
+export interface HygraphResponseMarketingSignup {
+   __typename: string
+   id: string
+   title: string
+   subtitle: string
+   slug: string
+   button: HygraphResponseButton
 }

@@ -17,26 +17,38 @@ import * as yup from "yup"
 import { useFieldsOfStudy } from "../../custom-hook/useCollection"
 import SessionStorageUtil from "util/SessionStorageUtil"
 import { marketingSignUpFormId } from "../constants"
+import {
+   HygraphResponseButton,
+   HygraphResponseMarketingSignup,
+} from "../../../types/cmsTypes"
 
 const styles = sxStyles({
    container: {
       backgroundColor: "grey.200",
    },
 })
-
-const MarketingSignUp = () => {
+const MarketingSignUp = ({
+   subtitle,
+   title,
+   button,
+}: HygraphResponseMarketingSignup) => {
    const [isComplete, setComplete] = useState(false)
    return (
       <Box id={marketingSignUpFormId} sx={styles.container}>
          <Container>
             <Box p={3}>
-               <Typography variant="h4">Stay connected</Typography>
-               <Typography variant="subtitle1">
-                  {"You'll"} receive emails for future livestream events
-               </Typography>
+               {title && <Typography variant="h4">{title}</Typography>}
+               {subtitle && (
+                  <Typography variant="subtitle1">{subtitle}</Typography>
+               )}
 
                <Box mt={3}>
-                  {!isComplete && <MarketingForm setComplete={setComplete} />}
+                  {!isComplete && (
+                     <MarketingForm
+                        buttonProps={button}
+                        setComplete={setComplete}
+                     />
+                  )}
                   {isComplete && <Complete />}
                </Box>
             </Box>
@@ -69,7 +81,11 @@ const schema = yup.object().shape({
    fieldOfStudyId: yup.string().label("Field of Study").required(),
 })
 
-const MarketingForm = ({ setComplete }) => {
+interface Props {
+   buttonProps: HygraphResponseButton
+   setComplete: (complete: boolean) => void
+}
+const MarketingForm = ({ setComplete, buttonProps }: Props) => {
    const [backendError, setBackendError] = useState<Error>(null)
    return (
       <Formik
@@ -214,6 +230,7 @@ const MarketingForm = ({ setComplete }) => {
                            <CircularProgress size={20} color="inherit" />
                         )
                      }
+                     {...buttonProps}
                   >
                      Sign up
                   </Button>
