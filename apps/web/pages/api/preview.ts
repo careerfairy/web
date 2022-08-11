@@ -73,11 +73,10 @@ const getPreviewData = async (
 
       case "MARKETING_LANDING_PAGE":
          // TODO add marketingLandingPage query
-         const { marketingLandingPage } =
-            await marketingPageRepo.getMarketingPage({
-               slug: query.slug as string,
-               preview: true,
-            })
+         const marketingLandingPage = await marketingPageRepo.getMarketingPage({
+            slug: query.slug as string,
+            preview: true,
+         })
 
          return {
             hasData: Boolean(marketingLandingPage),
