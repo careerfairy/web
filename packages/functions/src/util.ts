@@ -2,7 +2,7 @@ import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
 import functions = require("firebase-functions")
 import { https } from "firebase-functions"
-import { LivestreamEvent, LiveStreamEventWithRegisteredStudents } from "@careerfairy/shared-lib/dist/livestreams"
+import { LiveStreamEventWithRegisteredStudents } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 
 export const setHeaders = (req, res) => {
