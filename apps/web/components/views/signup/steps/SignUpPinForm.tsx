@@ -1,10 +1,11 @@
-import { useRouter } from "next/router"
 import React, { Fragment, useContext, useState } from "react"
 import { Formik } from "formik"
 import {
    Box,
    Button,
    CircularProgress,
+   Collapse,
+   FormHelperText,
    Link as MuiLink,
    Paper,
    TextField,
@@ -12,8 +13,11 @@ import {
 } from "@mui/material"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
-import { useAuth } from "../../../HOCs/AuthProvider"
-import { IMultiStepContext, MultiStepContext } from "./MultiStepWrapper"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import {
+   IMultiStepContext,
+   MultiStepContext,
+} from "../../common/MultiStepWrapper"
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -26,10 +30,6 @@ const schema = yup.object().shape({
 })
 
 const SignUpPinForm = () => {
-   const {
-      push,
-      query: { absolutePath },
-   } = useRouter()
    const firebase = useFirebaseService()
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
@@ -66,11 +66,7 @@ const SignUpPinForm = () => {
       }
       try {
          await firebase.validateUserEmailWithPin(userInfo)
-         if (absolutePath) {
-            void (await push(absolutePath as any))
-         } else {
-            updateActiveStep()
-         }
+         updateActiveStep()
          await firebase.auth.currentUser.reload()
       } catch (error) {
          console.log("error", error)
@@ -95,7 +91,6 @@ const SignUpPinForm = () => {
                handleChange,
                handleBlur,
                handleSubmit,
-               setFieldValue,
                isSubmitting,
                /* and other goodies */
             }) => (
@@ -128,6 +123,7 @@ const SignUpPinForm = () => {
                   </Paper>
                   <Box style={{ margin: "1rem 0" }}>
                      <TextField
+                        className="registrationInput"
                         label="PIN Code"
                         placeholder="Enter the pin code"
                         variant="outlined"
@@ -142,10 +138,14 @@ const SignUpPinForm = () => {
                         error={Boolean(
                            errors.pinCode && touched.pinCode && errors.pinCode
                         )}
-                        helperText={
-                           errors.pinCode && touched.pinCode && errors.pinCode
-                        }
                      />
+                     <Collapse
+                        in={Boolean(
+                           errors.pinCode && touched.pinCode && errors.pinCode
+                        )}
+                     >
+                        <FormHelperText error>{errors.pinCode}</FormHelperText>
+                     </Collapse>
                   </Box>
                   <Button
                      size="large"

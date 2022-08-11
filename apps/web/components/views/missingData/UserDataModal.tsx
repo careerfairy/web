@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import InterestsSelector from "../signup/InterestsSelector"
+import InterestsSelector from "../signup/personaliseInformation/InterestsSelector"
 import {
    Box,
    Button,
@@ -9,7 +9,7 @@ import {
    DialogTitle,
    Tooltip,
 } from "@mui/material"
-import MultiStepWrapper from "../signup/MultiStepWrapper"
+import MultiStepWrapper from "../common/MultiStepWrapper"
 import Typography from "@mui/material/Typography"
 import { useAuth } from "../../../HOCs/AuthProvider"
 

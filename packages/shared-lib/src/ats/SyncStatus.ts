@@ -1,0 +1,41 @@
+import { MergeSyncStatus } from "./MergeResponseTypes"
+import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
+
+/**
+ * Linked Account synchronization status
+ * Instantiated for each Entity (Job, Recruiter, Candidate, etc)
+ */
+export class SyncStatus extends BaseModel {
+   constructor(
+      public readonly id: string,
+      public readonly model: string,
+      public readonly status: string,
+      public readonly isInitialSync: boolean,
+      public readonly lastSync?: Date,
+      public readonly nextSync?: Date
+   ) {
+      super()
+   }
+
+   static createFromMerge(status: MergeSyncStatus) {
+      return new SyncStatus(
+         status.model_id,
+         status.model_name,
+         status.status,
+         status.is_initial_sync,
+         fromMergeDate(status.last_sync_start),
+         fromMergeDate(status.next_sync_start)
+      )
+   }
+
+   static createFromPlainObject(obj: SyncStatus) {
+      return new SyncStatus(
+         obj.id,
+         obj.model,
+         obj.status,
+         obj.isInitialSync,
+         fromSerializedDate(obj.lastSync),
+         fromSerializedDate(obj.nextSync)
+      )
+   }
+}

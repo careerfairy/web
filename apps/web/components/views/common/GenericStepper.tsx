@@ -1,0 +1,99 @@
+import { styled } from "@mui/styles"
+import {
+   Step,
+   StepConnector,
+   StepIconProps,
+   StepLabel,
+   Stepper,
+} from "@mui/material"
+import { stepConnectorClasses } from "@mui/material/StepConnector"
+import { Check } from "@mui/icons-material"
+import React from "react"
+import { MultiStepComponentType } from "./MultiStepWrapper"
+
+const StepperConnector = styled(StepConnector)(({ theme }) => ({
+   [`&.${stepConnectorClasses.alternativeLabel}`]: {
+      top: 10,
+      left: "calc(-50% + 15px)",
+      right: "calc(50% + 15px)",
+   },
+   [`&.${stepConnectorClasses.active}`]: {
+      [`& .${stepConnectorClasses.line}`]: {
+         borderColor: theme.palette.primary.main,
+      },
+   },
+   [`&.${stepConnectorClasses.completed}`]: {
+      [`& .${stepConnectorClasses.line}`]: {
+         borderColor: theme.palette.primary.main,
+      },
+   },
+   [`& .${stepConnectorClasses.line}`]: {
+      borderColor: theme.palette.grey.main,
+      borderTopWidth: 4,
+      borderRadius: 1,
+   },
+}))
+
+const StepperIconRoot = ({ active, children, className }) => {
+   const StyledIcons = styled("div")(({ theme }) => ({
+      color: theme.palette.grey.main,
+      display: "flex",
+      height: 22,
+      alignItems: "center",
+      ...(active && {
+         color: theme.palette.primary.main,
+      }),
+      "& .stepper-completedIcon": {
+         color: theme.palette.primary.main,
+         zIndex: 1,
+         fontSize: 18,
+      },
+      "& .stepper-circle": {
+         width: 8,
+         height: 8,
+         borderRadius: "50%",
+         backgroundColor: "currentColor",
+      },
+   }))
+
+   return <StyledIcons className={className}>{children}</StyledIcons>
+}
+
+const StepperIcon = (props: StepIconProps) => {
+   const { active, completed, className } = props
+
+   return (
+      <StepperIconRoot active={active} className={className}>
+         {completed ? (
+            <Check className="stepper-completedIcon" />
+         ) : (
+            <div className="stepper-circle" />
+         )}
+      </StepperIconRoot>
+   )
+}
+
+type GenericStepperProps = {
+   currentStep: number
+   steps: MultiStepComponentType[]
+}
+
+const GenericStepper = ({ currentStep, steps }: GenericStepperProps) => {
+   return (
+      <Stepper
+         activeStep={currentStep}
+         alternativeLabel
+         connector={<StepperConnector />}
+      >
+         {steps.map((step, i) => (
+            <Step key={i}>
+               <StepLabel StepIconComponent={StepperIcon}>
+                  {step.description}
+               </StepLabel>
+            </Step>
+         ))}
+      </Stepper>
+   )
+}
+
+export default GenericStepper

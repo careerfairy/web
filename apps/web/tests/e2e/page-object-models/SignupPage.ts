@@ -13,7 +13,8 @@ export class SignupPage extends CommonPage {
    readonly termsOfConditionsCheckBox: Locator
    readonly subscribeEmailsCheckBox: Locator
    readonly signupButton: Locator
-   readonly userPersonaliseContinueButton: Locator
+   readonly userRegistrationContinueButton: Locator
+   readonly userRegistrationBackButton: Locator
    readonly validateEmailButton: Locator
    readonly emailVerificationStepMessage: Locator
    readonly interestsTitle: Locator
@@ -36,6 +37,14 @@ export class SignupPage extends CommonPage {
    readonly incorrectLastNameWarning: Locator
    readonly incorrectPasswordWarning: Locator
    readonly incorrectEmailWarning: Locator
+   readonly socialInformationStep: Locator
+   readonly linkedInLinkInput: Locator
+   readonly additionalInformationStep: Locator
+   readonly interestsInformationStep: Locator
+   readonly spokenLanguagesInput: Locator
+   readonly countriesOfInterestInput: Locator
+   readonly interestsInput: Locator
+   readonly isLookingForJobToggle: Locator
 
    constructor(page: Page) {
       super(page)
@@ -68,12 +77,15 @@ export class SignupPage extends CommonPage {
          'input[name="confirmPassword"]'
       )
       this.interestsTitle = page.locator("text=What are your interests?")
-      this.referralCodeTextField = page.locator('input[name="referralCode"]')
+      this.referralCodeTextField = page.locator("id=referralCode")
       this.termsOfConditionsCheckBox = page.locator('input[name="agreeTerm"]')
       this.subscribeEmailsCheckBox = page.locator('input[name="subscribed"]')
       this.signupButton = page.locator("data-testid=signup-button")
-      this.userPersonaliseContinueButton = page.locator(
-         "data-testid=user-personalise-continue-button"
+      this.userRegistrationContinueButton = page.locator(
+         "data-testid=user-registration-continue-button"
+      )
+      this.userRegistrationBackButton = page.locator(
+         "data-testid=user-registration-back-button"
       )
       this.emailVerificationStepMessage = page.locator(
          "text=We have just sent you an email containing a 4-digit PIN code. Please enter this "
@@ -110,6 +122,20 @@ export class SignupPage extends CommonPage {
       this.accountAlreadyExistsWarning = page.locator(
          "text=Error: The email address is already in use by another account."
       )
+      this.socialInformationStep = page.locator(
+         "data-testid=registration-social-information-step"
+      )
+      this.linkedInLinkInput = page.locator("id=linkedInLink")
+      this.additionalInformationStep = page.locator(
+         "data-testid=registration-additional-information-step"
+      )
+      this.interestsInformationStep = page.locator(
+         "data-testid=registration-interests-information-step"
+      )
+      this.spokenLanguagesInput = page.locator("id=spokenLanguages")
+      this.countriesOfInterestInput = page.locator("id=countriesOfInterest")
+      this.interestsInput = page.locator("id=interestsIds")
+      this.isLookingForJobToggle = page.locator("id=isLookingForJob")
    }
 
    async selectUniversityCountry(country: string) {
@@ -146,6 +172,12 @@ export class SignupPage extends CommonPage {
    async enterConfirmPassword(password?: string) {
       return password && this.passwordConfirmTextField?.fill(password)
    }
+   async enterLinkedInLinkInput(link: string) {
+      await this.linkedInLinkInput.fill(link)
+      // to let debounce run
+      await this.referralCodeTextField.fill("")
+      await sleep(1200)
+   }
 
    async enterPinCode(pinCode?: string) {
       return pinCode && this.pinCodeTextField.fill(pinCode)
@@ -168,7 +200,34 @@ export class SignupPage extends CommonPage {
       return this.signupButton?.click()
    }
    async clickContinueButton() {
-      return this.userPersonaliseContinueButton?.click()
+      return this.userRegistrationContinueButton?.click()
+   }
+   async clickBackButton() {
+      return this.userRegistrationBackButton?.click()
+   }
+   async selectSpokenLanguageOption(optionId: string) {
+      await this.spokenLanguagesInput.click()
+      await this.page
+         .locator(`data-testid=spokenLanguages_${optionId}_option`)
+         ?.click()
+      await this.spokenLanguagesInput.click()
+   }
+   async selectCountriesOfInterestOption(optionId: string) {
+      await this.countriesOfInterestInput.click()
+      await this.page
+         .locator(`data-testid=countriesOfInterest_${optionId}_option`)
+         ?.click()
+      await this.countriesOfInterestInput.click()
+   }
+   async selectInterestsInputOption(optionId: string) {
+      await this.interestsInput.click()
+      await this.page
+         .locator(`data-testid=interestsIds_${optionId}_option`)
+         ?.click()
+      await this.interestsInput.click()
+   }
+   async selectIsLookingForJobToggleOption() {
+      return this.isLookingForJobToggle.click()
    }
 
    async open() {

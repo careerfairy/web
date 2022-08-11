@@ -1,5 +1,11 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
-import { SavedRecruiter, UserData } from "./users"
+import {
+   SavedRecruiter,
+   UserATSDocument,
+   UserATSRelations,
+   UserData,
+   RegistrationStep,
+} from "./users"
 import firebase from "firebase/compat/app"
 
 export interface IUserRepository {
@@ -18,6 +24,25 @@ export interface IUserRepository {
    getUserDataById(id: string): Promise<UserData>
 
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
+
+   getUserATSData(id: string): Promise<UserATSDocument>
+
+   associateATSData(
+      id: string,
+      accountId: string,
+      data: Partial<UserATSRelations>
+   ): Promise<void>
+
+   updateAdditionalInformation(
+      userEmail: string,
+      fields: Partial<UserData>
+   ): Promise<void>
+
+   setRegistrationStepStatus(
+      userEmail: string,
+      stepId: string,
+      totalSteps: number
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -123,5 +148,124 @@ export class FirebaseUserRepository
          uids.map((uid) => this.getUserDataByUid(uid))
       )
       return users.filter((user) => user !== null)
+   }
+
+   async getUserATSData(id: string): Promise<UserATSDocument> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(id)
+         .collection("atsRelations")
+         .doc("atsRelations")
+
+      const doc = await ref.get()
+
+      if (!doc.exists) {
+         return null
+      }
+
+      return doc.data() as UserATSDocument
+   }
+
+   /**
+    * Update ats/ats sub document
+    *
+    * @param id
+    * @param accountId
+    * @param data
+    */
+   associateATSData(
+      id: string,
+      accountId: string,
+      data: Partial<UserATSRelations>
+   ): Promise<void> {
+      const userRef = this.firestore
+         .collection("userData")
+         .doc(id)
+         .collection("atsRelations")
+         .doc("atsRelations")
+
+      const toUpdate: Partial<UserATSDocument> = {
+         userId: id,
+         atsRelations: {
+            [accountId]: data,
+         },
+      }
+
+      return userRef.set(toUpdate, { merge: true })
+   }
+
+   updateAdditionalInformation(userEmail, fields): Promise<void> {
+      const userRef = this.firestore.collection("userData").doc(userEmail)
+
+      const {
+         gender,
+         spokenLanguages,
+         countriesOfInterest,
+         regionsOfInterest,
+         isLookingForJob,
+         interestsIds,
+         linkedinUrl,
+         referredBy,
+         fieldOfStudy,
+      } = fields
+
+      const genderToUpdate = gender ? { gender } : {}
+      const interestsToUpdate = interestsIds ? { interestsIds } : {}
+      const spokenLanguagesToUpdate = spokenLanguages ? { spokenLanguages } : {}
+      const countriesOfInterestToUpdate = countriesOfInterest
+         ? { countriesOfInterest }
+         : {}
+      const regionsOfInterestToUpdate = regionsOfInterest
+         ? { regionsOfInterest }
+         : {}
+      const isLookingForJobToUpdate =
+         isLookingForJob !== undefined ? { isLookingForJob } : {}
+      const linkedInLinkToUpdate =
+         linkedinUrl !== undefined ? { linkedinUrl } : {}
+      const referredByToUpdate = referredBy !== undefined ? { referredBy } : {}
+      const fieldOfStudyToUpdate =
+         fieldOfStudy !== undefined ? { fieldOfStudy } : {}
+
+      const toUpdate = {
+         ...genderToUpdate,
+         ...spokenLanguagesToUpdate,
+         ...countriesOfInterestToUpdate,
+         ...regionsOfInterestToUpdate,
+         ...isLookingForJobToUpdate,
+         ...interestsToUpdate,
+         ...linkedInLinkToUpdate,
+         ...referredByToUpdate,
+         ...fieldOfStudyToUpdate,
+      }
+
+      return userRef.update(toUpdate)
+   }
+
+   async setRegistrationStepStatus(
+      userEmail,
+      stepId,
+      totalSteps
+   ): Promise<void> {
+      const userRef = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("analytics")
+         .doc("analytics")
+
+      // create base step analytics structure
+      const stepAnalytics = {
+         userId: userEmail,
+         totalSteps,
+         updatedAt: this.fieldValue.serverTimestamp(),
+      } as RegistrationStep
+
+      const toUpdate = {
+         registrationSteps: {
+            ...stepAnalytics,
+            // adding stepIds with arrayUnion in order to not repeat them
+            steps: this.fieldValue.arrayUnion(stepId),
+         },
+      }
+      return userRef.set(toUpdate, { merge: true })
    }
 }
