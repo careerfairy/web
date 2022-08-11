@@ -1,12 +1,10 @@
-import UpcomingLivestreams from "../../components/cms/landing-page/UpcomingLivestreams"
-import MarketingSignUp from "../../components/cms/landing-page/MarketingSignUp"
-import GeneralLayout from "../../layouts/GeneralLayout"
 import SEO from "../../components/util/SEO"
 import React, { useEffect } from "react"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
+import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import Hero from "../../components/cms/hero"
 import useServerModel from "../../components/custom-hook/useServerModel"
@@ -23,7 +21,6 @@ const LandingPage = ({ serverMarketingLandingPage }: Props) => {
       serverMarketingLandingPage,
       MarketingLandingPage.createFromPlainObject
    )
-   console.log("-> marketingLandingPage", marketingLandingPage)
    const dispatch = useDispatch()
    useEffect(() => {
       dispatch(actions.inLandingPage())
@@ -47,8 +44,21 @@ const LandingPage = ({ serverMarketingLandingPage }: Props) => {
                {...marketingLandingPage.hero}
             />
          )}
-         <UpcomingLivestreams fieldsOfStudy={[""]} />
-         <MarketingSignUp />
+         {marketingLandingPage.blocks && (
+            <>
+               {marketingLandingPage.blocks.map((block) => {
+                  const Component = Blocks[block.__typename]
+                  if (!Component) return null
+                  return (
+                     <Component
+                        key={block.id}
+                        page={marketingLandingPage}
+                        {...block}
+                     />
+                  )
+               })}
+            </>
+         )}
       </>
    )
 }

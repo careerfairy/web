@@ -1,5 +1,5 @@
 import { Box, Button, Container, Typography } from "@mui/material"
-import { HygraphHero } from "../../types/cmsTypes"
+import { HygraphResponseHero } from "../../types/cmsTypes"
 import { sxStyles } from "../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import CmsImage from "./image"
@@ -40,15 +40,7 @@ const styles = sxStyles({
       pt: 2,
       pb: 3,
    },
-   subTitle: {
-      mt: {
-         xs: 3,
-         md: 5,
-      },
-      width: "100%",
-      mx: "auto",
-      maxWidth: "80%",
-   },
+   subTitle: {},
    stack: {
       mt: 5,
       width: {
@@ -59,24 +51,25 @@ const styles = sxStyles({
    root: {
       position: "relative",
    },
-   content: {
+   container: {
       bgColor: "grey.main",
       py: {
          lg: 24,
          xs: 10,
       },
-   },
-   main: {
-      // py: { lg: 24 },
-      // pt: 8,
-      // pb: 10,
+      pl: 0,
+      pr: 0,
    },
    title: {
       fontWeight: 900,
+      textAlign: {
+         xs: "center",
+         lg: "left",
+      },
    },
 })
 
-interface Props extends HygraphHero {
+interface Props extends HygraphResponseHero {
    pageTitle: string
    pageSubTitle: string
 }
@@ -84,13 +77,8 @@ interface Props extends HygraphHero {
 const Hero = ({ pageTitle, pageSubTitle, image, slug, buttons }: Props) => {
    return (
       <Box id={slug} sx={styles.root}>
-         <Container
-            disableGutters
-            maxWidth={"xl"}
-            sx={styles.main}
-            component="main"
-         >
-            <Box sx={styles.content}>
+         <Box component="main">
+            <Container maxWidth={"xl"} sx={styles.container}>
                <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
                   <Typography
                      variant="h1"
@@ -102,12 +90,12 @@ const Hero = ({ pageTitle, pageSubTitle, image, slug, buttons }: Props) => {
                   </Typography>
                   {pageSubTitle && (
                      <Typography
-                        variant="h1"
-                        component="h1"
+                        variant="h5"
+                        sx={styles.subTitle}
+                        color="text.secondary"
                         gutterBottom
-                        fontWeight="extrabold"
                      >
-                        {pageTitle}
+                        {pageSubTitle}
                      </Typography>
                   )}
                   {buttons && (
@@ -139,7 +127,7 @@ const Hero = ({ pageTitle, pageSubTitle, image, slug, buttons }: Props) => {
                      </Stack>
                   )}
                </Box>
-            </Box>
+            </Container>
             {image && (
                <Box sx={styles.imageWrapper}>
                   <CmsImage
@@ -152,7 +140,7 @@ const Hero = ({ pageTitle, pageSubTitle, image, slug, buttons }: Props) => {
                   />
                </Box>
             )}
-         </Container>
+         </Box>
       </Box>
    )
 }
