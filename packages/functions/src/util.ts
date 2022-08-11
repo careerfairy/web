@@ -2,6 +2,7 @@ import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
 import functions = require("firebase-functions")
 import { https } from "firebase-functions"
+import { ClientError } from "graphql-request"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -439,6 +440,29 @@ export const logAxiosErrorAndThrow = (
    functions.logger.error(message, extraData)
    logAxiosError(error)
    throw new functions.https.HttpsError("unknown", message)
+}
+/**
+ * Logs the error and throws to force the function to stop and return an error
+ * @param message
+ * @param error
+ * @param extraData
+ */
+export const logGraphqlErrorAndThrow = (
+   message: string,
+   error: any,
+   ...extraData
+) => {
+   functions.logger.error(message, extraData)
+   logAxiosError(error)
+   throw new functions.https.HttpsError("unknown", message)
+}
+
+export const logGraphqlError = (error: ClientError) => {
+   functions.logger.error("GraphQL: Error", {
+      message: error.message,
+      name: error.name,
+      stack: error.stack,
+   })
 }
 
 type onCallFnHandler = (

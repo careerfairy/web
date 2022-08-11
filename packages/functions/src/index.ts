@@ -133,7 +133,8 @@ exports.applyReferralCode = rewards.applyReferralCode
 exports.onUserRateWish = wishes.onUserRateWish
 
 // CMS
-exports.fieldsOfStudy = cms.fieldsOfStudy
+exports.fieldOfStudy = cms.fieldOfStudy
+exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
 
 // Marketing
 exports.createMarketingUser = marketing.createMarketingUser

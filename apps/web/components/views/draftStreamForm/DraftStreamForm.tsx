@@ -47,7 +47,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import StreamDurationSelect from "./StreamDurationSelect"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import MultiListSelect from "../common/MultiListSelect"
-import { useInterests } from "../../custom-hook/useCollection"
+import { useFieldsOfStudy, useInterests } from "../../custom-hook/useCollection"
 import { createStyles } from "@mui/styles"
 
 const useStyles = makeStyles((theme) =>
@@ -118,6 +118,7 @@ const DraftStreamForm = ({
    saveChangesButtonRef = useRef(),
    currentStream,
 }) => {
+   const { data: existingFieldsOfStudy } = useFieldsOfStudy()
    const router = useRouter()
    const { userData } = useAuth()
    const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 10
@@ -138,6 +139,7 @@ const DraftStreamForm = ({
    const [targetCategories, setTargetCategories] = useState({})
    const [selectedGroups, setSelectedGroups] = useState([])
    const [selectedInterests, setSelectedInterests] = useState([])
+   const [selectedFieldsOfStudy, setSelectedFieldsOfStudy] = useState([])
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
 
@@ -253,6 +255,7 @@ const DraftStreamForm = ({
                   targetCategories: {},
                   groupIds: livestream.groupIds || [],
                   interestsIds: livestream.interestsIds || [],
+                  fieldOfStudyIds: livestream.fieldOfStudyIds || [],
                   start: livestream.start.toDate() || new Date(),
                   duration:
                      livestream.duration || DEFAULT_STREAM_DURATION_MINUTES,
@@ -283,6 +286,12 @@ const DraftStreamForm = ({
                      newFormData.interestsIds.includes(i.id)
                   )
                )
+               setSelectedFieldsOfStudy(
+                  existingFieldsOfStudy.filter((i) =>
+                     newFormData.fieldOfStudyIds.includes(i.id)
+                  )
+               )
+
                setUpdateMode(true)
             } else {
                setUpdateMode(false)
@@ -886,6 +895,35 @@ const DraftStreamForm = ({
                                        label: "Add some Categories",
                                        placeholder:
                                           "Choose 5 categories that best describe this event",
+                                    }}
+                                    chipProps={{
+                                       variant: "outlined",
+                                    }}
+                                    isCheckbox={true}
+                                 />
+                              </Grid>
+                           </FormGroup>
+                           <FormGroup>
+                              <Grid
+                                 xs={12}
+                                 sm={12}
+                                 md={12}
+                                 lg={12}
+                                 xl={12}
+                                 item
+                              >
+                                 <MultiListSelect
+                                    inputName="fieldOfStudyIds"
+                                    onSelectItems={setSelectedFieldsOfStudy}
+                                    selectedItems={selectedFieldsOfStudy}
+                                    allValues={existingFieldsOfStudy}
+                                    disabled={isSubmitting}
+                                    limit={5}
+                                    setFieldValue={setFieldValue}
+                                    inputProps={{
+                                       label: "Add some Fields of study",
+                                       placeholder:
+                                          "Choose 5 fields of study that best describe this event",
                                     }}
                                     chipProps={{
                                        variant: "outlined",

@@ -51,3 +51,16 @@ export function mapFirestoreDocuments<T>(
    }
    return docs
 }
+
+/**
+ * Remove duplicate documents by id from array
+ *
+ * @param docs
+ */
+export function removeDuplicateDocuments<T extends Identifiable>(
+   docs: T[]
+): T[] {
+   return docs.filter((item, index) => {
+      return docs.findIndex((i) => i.id === item.id) === index
+   })
+}

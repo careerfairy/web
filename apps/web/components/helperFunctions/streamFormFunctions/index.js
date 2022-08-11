@@ -68,6 +68,7 @@ export const buildLivestreamObject = (
       duration: values.duration,
       targetCategories: targetCategories,
       interestsIds: [...new Set(values.interestsIds)],
+      fieldOfStudyIds: [...new Set(values.fieldOfStudyIds)],
       type: "upcoming",
       test: false,
       groupIds: [...new Set(values.groupIds)],
@@ -77,6 +78,7 @@ export const buildLivestreamObject = (
       speakers: buildSpeakersArray(values),
       language: values.language,
       lastUpdated: firebase.getServerTimestamp(),
+      hasEnded: false,
    }
 }
 

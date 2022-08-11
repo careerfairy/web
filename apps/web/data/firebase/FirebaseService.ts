@@ -17,6 +17,7 @@ import {
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -3079,7 +3080,7 @@ class FirebaseService {
    }
    getFieldsOfStudiesByIds = async (
       fieldOfStudyIds: string[]
-   ): Promise<{ id: string; name: string }[]> => {
+   ): Promise<FieldOfStudy[]> => {
       const promises = fieldOfStudyIds.map((id) =>
          this.firestore.collection("fieldsOfStudy").doc(id).get()
       )
@@ -3089,7 +3090,7 @@ class FirebaseService {
          .map((doc) => ({
             ...doc.data(),
             id: doc.id,
-         })) as { id: string; name: string }[]
+         })) as FieldOfStudy[]
    }
 }
 

@@ -70,11 +70,15 @@ const styles = sxStyles({
 })
 
 interface Props extends HygraphResponseHero {
-   pageTitle: string
-   pageSubTitle: string
+   page?: {
+      title: string
+      subtitle: string
+   }
 }
 
-const Hero = ({ pageTitle, pageSubTitle, image, slug, buttons }: Props) => {
+const Hero = ({ page, image, slug, buttons, title, subtitle }: Props) => {
+   const titleText = title || page.title
+   const subtitleText = subtitle || page.subtitle
    return (
       <Box id={slug} sx={styles.root}>
          <Box component="main">
@@ -86,16 +90,16 @@ const Hero = ({ pageTitle, pageSubTitle, image, slug, buttons }: Props) => {
                      gutterBottom
                      sx={styles.title}
                   >
-                     {pageTitle}
+                     {titleText}
                   </Typography>
-                  {pageSubTitle && (
+                  {subtitleText && (
                      <Typography
                         variant="h5"
                         sx={styles.subTitle}
                         color="text.secondary"
                         gutterBottom
                      >
-                        {pageSubTitle}
+                        {subtitleText}
                      </Typography>
                   )}
                   {buttons && (

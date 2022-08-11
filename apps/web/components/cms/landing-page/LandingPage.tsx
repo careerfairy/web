@@ -1,6 +1,9 @@
 import { Box, Container, Typography } from "@mui/material"
 import CmsImage from "../image"
-import { ICmsImage } from "../../../types/cmsTypes"
+import {
+   HygraphRemoteFieldOfStudyResponse,
+   ICmsImage,
+} from "../../../types/cmsTypes"
 import { sxStyles } from "../../../types/commonTypes"
 import React from "react"
 
@@ -9,7 +12,7 @@ type Props = {
    title: string
    subTitle: string
    image: ICmsImage
-   fieldsOfStudy: []
+   fieldsOfStudy: HygraphRemoteFieldOfStudyResponse[]
 }
 
 const styles = sxStyles({
@@ -77,6 +80,8 @@ const LandingPage = ({
    image,
    fieldsOfStudy,
 }: Props) => {
+   console.log("-> fieldsOfStudy", fieldsOfStudy)
+
    return (
       <Box id={slug} sx={styles.root}>
          <Box component="main">
