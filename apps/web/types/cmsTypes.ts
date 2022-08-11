@@ -1,4 +1,6 @@
 import { RichTextContent, EmbedReferences } from "@graphcms/rich-text-types"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import { ButtonProps } from "@mui/material"
 
 export type Slug = string
 
@@ -91,4 +93,18 @@ export interface Carousel {
 export interface Testimonial {
    content: string
    person: Person
+}
+export interface Button {
+   children: string
+   slug: string
+   href: string
+   variant: ButtonProps["variant"]
+   color: ButtonProps["color"]
+   size: ButtonProps["size"]
+}
+
+export interface Hero {
+   image: CmsImage
+   buttons: Button[]
+   slug: string
 }
