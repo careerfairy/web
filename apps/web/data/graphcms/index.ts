@@ -4,7 +4,7 @@ interface Options {
    preview: boolean
 }
 
-const fetchAPI = async (query, options?: Options) => {
+const fetchAPI = async (query: string, options?: Options) => {
    const res = await fetch(process.env.GRAPHCMS_PROJECT_API, {
       method: "POST",
       headers: {

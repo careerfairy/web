@@ -48,7 +48,6 @@
       "firebase": "^9.9.0",
       "formik": "^2.1.2",
       "global": "^4.4.0",
-      "graphql-tag": "^2.12.6",
       "jszip": "^3.6.0",
       "keyword-extractor": "^0.0.22",
       "lodash": "^4.17.20",
