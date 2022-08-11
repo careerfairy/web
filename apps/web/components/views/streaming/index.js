@@ -99,12 +99,9 @@ const StreamerOverview = ({
       }, 20000)
    }, [])
 
-   useEffect(() => {
-      if (showTapHint && !showActionButtons) {
-         setShowTapHint(false)
-      }
-   }, [showActionButtons])
-
+   /**
+    * If the screen size changes to something other than small, we always want to show the action buttons
+    */
    useEffect(() => {
       if (!smallScreen) {
          dispatch(actions.showActionButtons())
@@ -136,10 +133,15 @@ const StreamerOverview = ({
                      ? actions.hideActionButtons()
                      : actions.showActionButtons()
                )
+
+               // The click was valid and the TapHint is visible. We want to hide it
+               if (showTapHint) {
+                  setShowTapHint(false)
+               }
             }
          }
       },
-      [smallScreen, showActionButtons, dispatch]
+      [smallScreen, showActionButtons, dispatch, showTapHint]
    )
 
    if (!mounted) return null
