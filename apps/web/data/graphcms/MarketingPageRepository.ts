@@ -1,5 +1,9 @@
 import { fetchAPI } from "./index"
-import { Slug, Variables } from "../../types/cmsTypes"
+import {
+   HygraphRemoteFieldOfStudyResponse,
+   Slug,
+   Variables,
+} from "../../types/cmsTypes"
 import { MarketingLandingPage } from "./MarketingLandingPage"
 import { Page } from "./Page"
 
@@ -9,6 +13,8 @@ export interface IMarketingPageRepository {
    getMarketingPage(variables: Variables): Promise<MarketingLandingPage>
 
    getPage(variables: Variables): Promise<Page>
+
+   getFieldsOfStudyWithMarketingPages(): Promise<HygraphRemoteFieldOfStudyResponse>
 }
 
 // language=GraphQL
@@ -36,7 +42,15 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       slug
                       title
                       subtitle
-                      fieldsOfStudy
+                      fieldOfStudies {
+                          marketingLandingPage {
+                              slug
+                          }
+                          firebaseFieldOfStudy{
+                              id,
+                              name
+                          }
+                      }
                       hero {
                           id
                           slug
@@ -56,7 +70,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                               size
                           }
                       }
-                      blocks(first: 500) {
+                      blocks {
                           ... on EventsSection {
                               __typename
                               id
@@ -126,12 +140,12 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       title
                       subtitle
                       image {
-                        height
-                        width
-                        url
-                        caption
-                        alt
-                      }   
+                          height
+                          width
+                          url
+                          caption
+                          alt
+                      }
                       seo {
                           id
                           title
@@ -152,6 +166,23 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
 
       if (!response.page) return null
       return Page.createFromHygraph(response.page)
+   }
+
+   async getFieldsOfStudyWithMarketingPages(): Promise<HygraphRemoteFieldOfStudyResponse> {
+      const data = await fetchAPI(`
+          {
+              fieldOfStudies {
+                  firebaseFieldOfStudy {
+                      id
+                      name
+                  }
+                  marketingLandingPage {
+                      slug
+                  }
+              }
+          }
+      `)
+      return data.fieldOfStudies
    }
 }
 

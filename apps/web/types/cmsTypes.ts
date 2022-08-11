@@ -1,5 +1,6 @@
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
 export type Slug = string
 
@@ -107,14 +108,25 @@ export interface HygraphResponseHero {
    slug: string
    image: ICmsImage
    buttons: HygraphResponseButton[]
+   title?: string
+   subtitle?: string
 }
-export type PageTypes = "COMPANY_CASE_STUDY" | "MARKETING_LANDING_PAGE"
+export type PageTypes =
+   | "COMPANY_CASE_STUDY"
+   | "MARKETING_LANDING_PAGE"
+   | "LANDING_PAGE"
 
+export interface HygraphRemoteFieldOfStudyResponse {
+   firebaseFieldOfStudy: FieldOfStudy
+   marketingLandingPage: {
+      slug: string
+   }
+}
 export interface HygraphResponseMarketingPage {
    id: string
    title: string
    subtitle: string
-   fieldsOfStudy: string[]
+   fieldOfStudies: HygraphRemoteFieldOfStudyResponse[]
    hero: HygraphResponseHero
    buttons: HygraphResponseButton[]
    pageType: PageTypes

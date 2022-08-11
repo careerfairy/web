@@ -4,11 +4,11 @@ import { Page } from "../../data/graphcms/Page"
 import useServerModel from "../../components/custom-hook/useServerModel"
 import SEO from "../../components/util/SEO"
 import LandingPage from "../../components/cms/landing-page/LandingPage"
-import GeneralLayout from "../../layouts/GeneralLayout"
+import { HygraphRemoteFieldOfStudyResponse } from "../../types/cmsTypes"
 
 type Props = {
    serverPage: Page
-   fieldsOfStudy: []
+   fieldsOfStudy: HygraphRemoteFieldOfStudyResponse[]
 }
 
 const Landing = ({ serverPage, fieldsOfStudy }: Props) => {
@@ -19,15 +19,13 @@ const Landing = ({ serverPage, fieldsOfStudy }: Props) => {
    return (
       <>
          <SEO id={id} {...seo} title={`${title} - CareerFairy Landing Page`} />
-         <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
-            <LandingPage
-               slug={slug}
-               title={title}
-               subTitle={subtitle}
-               image={image}
-               fieldsOfStudy={fieldsOfStudy}
-            />
-         </GeneralLayout>
+         <LandingPage
+            slug={slug}
+            title={title}
+            subTitle={subtitle}
+            image={image}
+            fieldsOfStudy={fieldsOfStudy}
+         />
       </>
    )
 }
@@ -43,8 +41,7 @@ export const getStaticProps: GetStaticProps = async ({
          preview: true,
          locale,
       }),
-      // TODO: getFieldsOfStudy()
-      [{ id: "medic" }, { id: "professor" }],
+      marketingPageRepo.getFieldsOfStudyWithMarketingPages(),
    ])
 
    if (!page) {
@@ -56,7 +53,6 @@ export const getStaticProps: GetStaticProps = async ({
       props: {
          preview,
          serverPage: page.serializeToPlainObject(),
-         // TODO: use serialize after proper object
          fieldsOfStudy: fieldsOfStudy,
       },
       revalidate: 60,

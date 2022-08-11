@@ -14,24 +14,28 @@ import React, { useState } from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import { Formik } from "formik"
 import * as yup from "yup"
-import { useFieldsOfStudy } from "../../custom-hook/useCollection"
 import SessionStorageUtil from "util/SessionStorageUtil"
 import { marketingSignUpFormId } from "../constants"
 import {
    HygraphResponseButton,
    HygraphResponseMarketingSignup,
 } from "../../../types/cmsTypes"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
 const styles = sxStyles({
    container: {
       backgroundColor: "grey.200",
    },
 })
+interface MarketingSignUpProps extends HygraphResponseMarketingSignup {
+   fieldsOfStudy: FieldOfStudy[]
+}
 const MarketingSignUp = ({
    subtitle,
    title,
    button,
-}: HygraphResponseMarketingSignup) => {
+   fieldsOfStudy,
+}: MarketingSignUpProps) => {
    const [isComplete, setComplete] = useState(false)
    return (
       <Box id={marketingSignUpFormId} sx={styles.container}>
@@ -47,6 +51,7 @@ const MarketingSignUp = ({
                      <MarketingForm
                         buttonProps={button}
                         setComplete={setComplete}
+                        fieldsOfStudy={fieldsOfStudy}
                      />
                   )}
                   {isComplete && <Complete />}
@@ -84,8 +89,9 @@ const schema = yup.object().shape({
 interface Props {
    buttonProps: HygraphResponseButton
    setComplete: (complete: boolean) => void
+   fieldsOfStudy: FieldOfStudy[]
 }
-const MarketingForm = ({ setComplete, buttonProps }: Props) => {
+const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
    const [backendError, setBackendError] = useState<Error>(null)
    return (
       <Formik
@@ -204,6 +210,7 @@ const MarketingForm = ({ setComplete, buttonProps }: Props) => {
                      value={values.fieldOfStudyId}
                      disabled={isSubmitting}
                      onChange={handleChange}
+                     fieldsOfStudy={fieldsOfStudy}
                      handleBlur={handleBlur}
                      error={Boolean(
                         errors.fieldOfStudyId &&
@@ -249,9 +256,8 @@ const FieldOfStudySelector = ({
    disabled,
    error,
    helperText,
+   fieldsOfStudy,
 }) => {
-   const { data, isLoading } = useFieldsOfStudy()
-
    return (
       <>
          <TextField
@@ -268,17 +274,11 @@ const FieldOfStudySelector = ({
             variant="outlined"
             helperText={helperText}
          >
-            {isLoading && (
-               <MenuItem value="">
-                  <em>Loading..</em>
+            {fieldsOfStudy.map((entry) => (
+               <MenuItem key={entry.name} value={JSON.stringify(entry)}>
+                  {entry.name}
                </MenuItem>
-            )}
-            {!isLoading &&
-               data.map((entry) => (
-                  <MenuItem key={entry.name} value={JSON.stringify(entry)}>
-                     {entry.name}
-                  </MenuItem>
-               ))}
+            ))}
          </TextField>
       </>
    )

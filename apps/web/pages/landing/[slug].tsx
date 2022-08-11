@@ -8,7 +8,6 @@ import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import Hero from "../../components/cms/hero"
 import useServerModel from "../../components/custom-hook/useServerModel"
-import { firebaseServiceInstance } from "../../data/firebase/FirebaseService"
 
 /**
  * Just for us to develop the UI while we don't have the hygraph cms setup
@@ -39,11 +38,7 @@ const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
             title={`${marketingLandingPage?.title} - CareerFairy Marketing`}
          />
          {marketingLandingPage.hero && (
-            <Hero
-               pageTitle={marketingLandingPage.title}
-               pageSubTitle={marketingLandingPage.subtitle}
-               {...marketingLandingPage.hero}
-            />
+            <Hero {...marketingLandingPage.hero} page={marketingLandingPage} />
          )}
          {marketingLandingPage.blocks && (
             <>
@@ -54,8 +49,8 @@ const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
                      <Component
                         key={block.id}
                         page={marketingLandingPage}
-                        fieldsOfStudy={marketingLandingPage.fieldsOfStudy}
                         {...block}
+                        fieldsOfStudy={marketingLandingPage.fieldsOfStudy}
                      />
                   )
                })}
@@ -81,10 +76,7 @@ export const getStaticProps: GetStaticProps = async ({
          notFound: true,
       }
    }
-   const fieldsOfStudy = await firebaseServiceInstance.getFieldsOfStudiesByIds(
-      marketingPage.fieldsOfStudy || []
-   )
-   console.log("-> fieldsOfStudy from req", fieldsOfStudy)
+
    return {
       props: {
          preview,
