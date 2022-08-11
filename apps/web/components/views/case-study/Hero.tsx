@@ -1,7 +1,7 @@
 import React from "react"
 import Section from "./Section"
 import Typography from "@mui/material/Typography"
-import { CmsImage, Company } from "../../../types/cmsTypes"
+import { ICmsImage, Company } from "../../../types/cmsTypes"
 import Image from "next/image"
 import { GraphCMSImageLoader } from "../../cms/util"
 import Grid from "@mui/material/Grid"
@@ -87,7 +87,7 @@ const Hero = ({ company, coverVideoUrl, coverImage, title }: Props) => {
 }
 interface Props {
    title: string
-   coverImage: CmsImage
+   coverImage: ICmsImage
    coverVideoUrl: string
    company: Company
 }

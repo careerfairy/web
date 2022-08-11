@@ -9,7 +9,7 @@ export type Variables = {
    preview?: boolean
    locale?: string
 }
-export interface CmsImage {
+export interface ICmsImage {
    height?: number
    width?: number
    url: string
@@ -19,7 +19,7 @@ export interface CmsImage {
 
 export interface Company {
    name: string
-   logo: CmsImage
+   logo: ICmsImage
 }
 
 export interface CmsVideo {
@@ -34,7 +34,7 @@ export interface StatisticStat {
 
 export interface Person {
    name: string
-   photo: CmsImage
+   photo: ICmsImage
    role?: string
    company?: Company
 }
@@ -44,7 +44,7 @@ export interface HygraphResponseSeo {
    description: string
    keywords: string
    noIndex: boolean
-   image: CmsImage
+   image: ICmsImage
 }
 
 export interface CompanyCaseStudyPreview {
@@ -53,7 +53,7 @@ export interface CompanyCaseStudyPreview {
    id: string
    published: Date
    formattedPublished?: string
-   coverImage: CmsImage
+   coverImage: ICmsImage
    slug: Slug
    authors: Person[]
 }
@@ -75,17 +75,17 @@ export interface CompanyCaseStudy {
       raw: RichTextContent
       references: EmbedReferences
    }
-   storySideImage: CmsImage
+   storySideImage: ICmsImage
    statisticStats: StatisticStat[]
-   ogImage: CmsImage
-   coverImage: CmsImage
+   ogImage: ICmsImage
+   coverImage: ICmsImage
    authors: Person[]
    slug: Slug
    seo: HygraphResponseSeo
 }
 
 export interface Carousel {
-   images: CmsImage[]
+   images: ICmsImage[]
    title: string
 }
 
@@ -105,7 +105,7 @@ export interface HygraphResponseButton {
 export interface HygraphResponseHero {
    id: string
    slug: string
-   image: CmsImage
+   image: ICmsImage
    buttons: HygraphResponseButton[]
 }
 export type PageTypes = "COMPANY_CASE_STUDY" | "MARKETING_LANDING_PAGE"
@@ -120,6 +120,14 @@ export interface HygraphResponseMarketingPage {
    slug: string
    seo: HygraphResponseSeo
    blocks: (HygraphResponseEventsSection | HygraphResponseMarketingSignup)[]
+}
+export interface HygraphResponsePage {
+   id: string
+   title: string
+   subtitle: string
+   slug: string
+   seo: HygraphResponseSeo
+   image: ICmsImage
 }
 
 export interface HygraphResponseEventsSection {

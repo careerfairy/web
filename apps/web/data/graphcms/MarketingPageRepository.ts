@@ -5,11 +5,14 @@ import {
    Variables,
 } from "../../types/cmsTypes"
 import { MarketingLandingPage } from "./MarketingLandingPage"
+import { Page } from "./Page"
 
 export interface IMarketingPageRepository {
    getAllMarketingPageSlugs(): Promise<{ slug: Slug }[]>
 
    getMarketingPage(variables: Variables): Promise<MarketingLandingPage>
+
+   getPage(variables: Variables): Promise<Page>
 }
 
 // language=GraphQL
@@ -115,6 +118,44 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
       return MarketingLandingPage.createFromHygraph(
          response.marketingLandingPage
       )
+   }
+
+   async getPage(variables: Variables): Promise<Page> {
+      const response = await fetchAPI(
+         `
+              query PageQuery($slug: String!, $stage: Stage!) {
+                  page(stage: $stage, where: { slug: $slug }) {
+                      id
+                      slug
+                      title
+                      subtitle
+                      image {
+                        height
+                        width
+                        url
+                        caption
+                        alt
+                      }   
+                      seo {
+                          id
+                          title
+                          description
+                          keywords
+                      }
+                  }
+              }
+         `,
+         {
+            variables: {
+               slug: variables.slug,
+               stage: variables.preview ? "DRAFT" : "PUBLISHED",
+            },
+            preview: variables.preview,
+         }
+      )
+
+      if (!response.page) return null
+      return Page.createFromHygraph(response.page)
    }
 }
 
