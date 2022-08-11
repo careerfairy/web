@@ -1,9 +1,5 @@
 import { fetchAPI } from "./index"
-import {
-   HygraphResponseMarketingPage,
-   Slug,
-   Variables,
-} from "../../types/cmsTypes"
+import { Slug, Variables } from "../../types/cmsTypes"
 import { MarketingLandingPage } from "./MarketingLandingPage"
 import { Page } from "./Page"
 
@@ -40,6 +36,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       slug
                       title
                       subtitle
+                      fieldsOfStudy
                       hero {
                           id
                           slug
@@ -63,7 +60,6 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                           ... on EventsSection {
                               __typename
                               id
-                              fieldsOfStudy
                               typeOfEvent
                           }
                           ... on MarketingSignup {

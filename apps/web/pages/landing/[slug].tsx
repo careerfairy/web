@@ -8,17 +8,18 @@ import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import Hero from "../../components/cms/hero"
 import useServerModel from "../../components/custom-hook/useServerModel"
+import { firebaseServiceInstance } from "../../data/firebase/FirebaseService"
 
 /**
  * Just for us to develop the UI while we don't have the hygraph cms setup
  */
 
 interface Props {
-   serverMarketingLandingPage: MarketingLandingPage
+   marketingLandingPagePlainObject: MarketingLandingPage
 }
-const LandingPage = ({ serverMarketingLandingPage }: Props) => {
+const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
    const marketingLandingPage = useServerModel<MarketingLandingPage>(
-      serverMarketingLandingPage,
+      marketingLandingPagePlainObject,
       MarketingLandingPage.createFromPlainObject
    )
    const dispatch = useDispatch()
@@ -53,6 +54,7 @@ const LandingPage = ({ serverMarketingLandingPage }: Props) => {
                      <Component
                         key={block.id}
                         page={marketingLandingPage}
+                        fieldsOfStudy={marketingLandingPage.fieldsOfStudy}
                         {...block}
                      />
                   )
@@ -79,10 +81,15 @@ export const getStaticProps: GetStaticProps = async ({
          notFound: true,
       }
    }
+   const fieldsOfStudy = await firebaseServiceInstance.getFieldsOfStudiesByIds(
+      marketingPage.fieldsOfStudy || []
+   )
+   console.log("-> fieldsOfStudy from req", fieldsOfStudy)
    return {
       props: {
          preview,
-         serverMarketingLandingPage: marketingPage.serializeToPlainObject(),
+         marketingLandingPagePlainObject:
+            marketingPage.serializeToPlainObject(),
       },
       revalidate: 60,
    }

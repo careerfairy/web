@@ -13,6 +13,7 @@ export class MarketingLandingPage extends BaseModel {
       public readonly slug: string,
       public readonly title: string,
       public readonly subtitle: string,
+      public readonly fieldsOfStudy: string[],
       public readonly hero: HygraphResponseHero,
       public readonly seo: HygraphResponseSeo,
       public readonly blocks: (
@@ -29,6 +30,7 @@ export class MarketingLandingPage extends BaseModel {
          page.slug,
          page.title,
          page.subtitle,
+         page.fieldsOfStudy,
          page.hero,
          page.seo,
          page.blocks
@@ -40,6 +42,7 @@ export class MarketingLandingPage extends BaseModel {
          page.slug,
          page.title,
          page.subtitle,
+         page.fieldsOfStudy,
          page.hero,
          page.seo,
          page.blocks

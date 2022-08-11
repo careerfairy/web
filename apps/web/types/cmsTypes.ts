@@ -114,6 +114,7 @@ export interface HygraphResponseMarketingPage {
    id: string
    title: string
    subtitle: string
+   fieldsOfStudy: string[]
    hero: HygraphResponseHero
    buttons: HygraphResponseButton[]
    pageType: PageTypes
@@ -133,7 +134,6 @@ export interface HygraphResponsePage {
 export interface HygraphResponseEventsSection {
    __typename: string
    id: string
-   fieldsOfStudy: string[]
    typeOfEvent: string
 }
 export interface HygraphResponseMarketingSignup {
