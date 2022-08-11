@@ -14,6 +14,7 @@ import TutorialContext from "../../../../context/tutorials/TutorialContext"
 import clsx from "clsx"
 import { useDispatch, useSelector } from "react-redux"
 import * as storeActions from "store/actions"
+import { showActionButtonsSelector } from "../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -119,7 +120,6 @@ const ButtonComponent = ({
    isMobile,
    selectedState,
    streamer,
-   showMobileActionButtons,
 }) => {
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
@@ -131,6 +131,7 @@ const ButtonComponent = ({
    const [open, setOpen] = useState(true)
    const [delayHandler, setDelayHandler] = useState(null)
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
+   const showActionButtons = useSelector(showActionButtonsSelector)
 
    useEffect(() => {
       setHasMounted(true)
@@ -186,7 +187,7 @@ const ButtonComponent = ({
    }
 
    const getActions = () => {
-      if (!hasMounted || !showMobileActionButtons) {
+      if (!hasMounted || !showActionButtons) {
          return []
       }
       const actions = [

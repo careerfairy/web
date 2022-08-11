@@ -91,6 +91,16 @@ export const animateProfileIcon = () => async (dispatch) => {
    dispatch({ type: actions.ANIMATE_PROFILE_ICON, payload: true })
 }
 
+// Action to show the actions buttons on stream UI
+export const showActionButtons = () => async (dispatch) => {
+   dispatch({ type: actions.SHOW_ACTION_BUTTONS })
+}
+
+// Action to hide the actions buttons on stream UI
+export const hideActionButtons = () => async (dispatch) => {
+   dispatch({ type: actions.HIDE_ACTION_BUTTONS })
+}
+
 export const setFocusMode = (mode, mobile) => async (dispatch, getState) => {
    // If mode is null or undefined, the new mode will be the opposite of the current mode
    const newFocusMode = Boolean(

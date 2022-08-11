@@ -45,7 +45,6 @@ function VideoContainer({
    smallScreen,
    streamerId,
    viewer,
-   showMobileActionButtons,
 }) {
    const firebase = useFirebaseService()
    const {
@@ -332,7 +331,6 @@ function VideoContainer({
             localMediaControls={localMediaControls}
             showSettings={showSettings}
             setShowSettings={setShowSettings}
-            showMobileActionButtons={showMobileActionButtons}
          />
          <DraggableComponent
             zIndex={3}

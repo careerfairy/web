@@ -15,6 +15,10 @@ import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier"
 import { alpha } from "@mui/material/styles"
+import {
+   showActionButtonsSelector,
+   streamingSelector,
+} from "../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -82,13 +86,11 @@ const StreamerOverview = ({
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
-   const [showMobileActionButtons, setShowMobileActionButtons] = useState(true)
    const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
    const dispatch = useDispatch()
-   const { videoIsMuted, videoIsPaused } = useSelector(
-      (state) => state.stream.streaming
-   )
+   const { videoIsMuted, videoIsPaused } = useSelector(streamingSelector)
+   const showActionButtons = useSelector(showActionButtonsSelector)
 
    useEffect(() => {
       setMounted(true)
@@ -98,13 +100,19 @@ const StreamerOverview = ({
    }, [])
 
    useEffect(() => {
-      if (showTapHint && !showMobileActionButtons) {
+      if (showTapHint && !showActionButtons) {
          setShowTapHint(false)
       }
-   }, [showMobileActionButtons])
+   }, [showActionButtons])
+
+   useEffect(() => {
+      if (!smallScreen) {
+         dispatch(actions.showActionButtons())
+      }
+   }, [smallScreen])
 
    /**
-    * On mobile the visibility of the buttons will be handle based on stream frame click
+    * On mobile the visibility of the buttons will be handled based on stream frame click
     */
    const handleClick = useCallback(
       ({ target }) => {
@@ -120,14 +128,18 @@ const StreamerOverview = ({
                (selector) => selector.contains(target)
             )
 
-            if (!showMobileActionButtons && clickedOnVideoFrame) {
-               setShowMobileActionButtons(true)
+            if (!showActionButtons && clickedOnVideoFrame) {
+               dispatch(actions.showActionButtons())
             } else if (clickedOnVideoFrame && !clickedOnButtons) {
-               setShowMobileActionButtons((prev) => !prev)
+               dispatch(
+                  showActionButtons
+                     ? actions.hideActionButtons()
+                     : actions.showActionButtons()
+               )
             }
          }
       },
-      [smallScreen, showMobileActionButtons]
+      [smallScreen, showActionButtons, dispatch]
    )
 
    if (!mounted) return null
@@ -148,7 +160,6 @@ const StreamerOverview = ({
                isBreakout={isBreakout}
                showMenu={showMenu}
                viewer={false}
-               showMobileActionButtons={showMobileActionButtons}
             />
             <ButtonComponent
                streamer={true}
@@ -156,7 +167,6 @@ const StreamerOverview = ({
                selectedState={selectedState}
                showMenu={showMenu}
                handleStateChange={handleStateChange}
-               showMobileActionButtons={showMobileActionButtons}
             />
             {showTapHint && (
                <div className={classes.infoText}>Tap to hide controllers</div>
