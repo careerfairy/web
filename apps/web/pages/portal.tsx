@@ -52,6 +52,7 @@ const PortalPage = ({
                      serverSideEvents={comingUpNextEvents}
                      limit={20}
                   />
+                  <MyNextEvents limit={20} />
                   <EventsPreview
                      id={"past-events"}
                      title={"PAST EVENTS"}
@@ -61,7 +62,6 @@ const PortalPage = ({
                      // No need to show loading as these events have already been queried server side
                      loading={false}
                   />
-                  <MyNextEvents limit={20} />
                </WidgetsWrapper>
             </Container>
          </GeneralLayout>
