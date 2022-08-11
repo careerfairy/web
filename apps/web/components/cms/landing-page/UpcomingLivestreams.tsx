@@ -5,6 +5,7 @@ import EventsPreviewGrid from "../../views/portal/events-preview/EventsPreviewGr
 import React, { useEffect, useState } from "react"
 import { livestreamRepo } from "../../../data/RepositoryInstances"
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
 const styles = sxStyles({
    wrapper: {
@@ -14,7 +15,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   fieldsOfStudy: string[]
+   fieldsOfStudy: FieldOfStudy[]
 }
 
 const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
@@ -22,7 +23,10 @@ const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
 
    useEffect(() => {
       livestreamRepo
-         .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, 10)
+         .getUpcomingEventsByFieldsOfStudy(
+            fieldsOfStudy.map((el) => el.id),
+            10
+         )
          .then((events: LivestreamEvent[]) => {
             if (events) {
                setEvents(events)

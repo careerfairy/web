@@ -72,7 +72,6 @@ const getPreviewData = async (
          }
 
       case "MARKETING_LANDING_PAGE":
-         // TODO add marketingLandingPage query
          const marketingLandingPage = await marketingPageRepo.getMarketingPage({
             slug: query.slug as string,
             preview: true,
@@ -81,6 +80,17 @@ const getPreviewData = async (
          return {
             hasData: Boolean(marketingLandingPage),
             location: `/landing/${marketingLandingPage?.slug}`,
+         }
+
+      case "LANDING_PAGE":
+         const landingPage = await marketingPageRepo.getPage({
+            slug: query.slug as string,
+            preview: true,
+         })
+
+         return {
+            hasData: Boolean(landingPage),
+            location: `/landing`,
          }
 
       default:
