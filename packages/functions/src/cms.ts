@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
 import * as config from "./config"
-import { getFieldsOfStudy } from "./lib/cms"
+import { getFieldsOfStudiesByIds } from "./lib/cms"
 
 const SECRET = "bizzy"
 
@@ -14,6 +14,7 @@ const SECRET = "bizzy"
 export const fieldsOfStudy = functions
    .region(config.region)
    .https.onRequest(async (req, res) => {
+      functions.logger.log("-> REQUEST", req)
       if (req.method !== "GET") {
          res.status(401).end()
          return
@@ -24,7 +25,9 @@ export const fieldsOfStudy = functions
          return
       }
 
-      const fieldsOfStudy = await getFieldsOfStudy()
+      const fieldsOfStudy = await getFieldsOfStudiesByIds(
+         req.get("fieldsOfStudyIds").split(",")
+      )
 
       res.send(fieldsOfStudy)
    })

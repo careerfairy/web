@@ -3077,6 +3077,20 @@ class FirebaseService {
    getServerTimestamp = () => {
       return firebase.firestore.FieldValue.serverTimestamp()
    }
+   getFieldsOfStudiesByIds = async (
+      fieldOfStudyIds: string[]
+   ): Promise<{ id: string; name: string }[]> => {
+      const promises = fieldOfStudyIds.map((id) =>
+         this.firestore.collection("fieldsOfStudy").doc(id).get()
+      )
+      const snapshots = await Promise.all(promises)
+      return snapshots
+         .filter((snap) => snap.exists)
+         .map((doc) => ({
+            ...doc.data(),
+            id: doc.id,
+         })) as { id: string; name: string }[]
+   }
 }
 
 /**
