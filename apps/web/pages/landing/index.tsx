@@ -25,6 +25,11 @@ export const getStaticProps: GetStaticProps = async ({
    preview = true,
    locale,
 }) => {
+   if (process.env.APP_ENV === "test") {
+      return {
+         notFound: true,
+      }
+   }
    const [page, fieldsOfStudy] = await Promise.all([
       marketingPageRepo.getPage({
          slug: "hook-landing-page",
