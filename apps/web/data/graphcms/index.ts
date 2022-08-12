@@ -3,31 +3,20 @@ interface Options {
    variables: Variables
    preview: boolean
 }
+import { GraphQLClient } from "graphql-request"
 
 const fetchAPI = async (query: string, options?: Options) => {
-   const res = await fetch(process.env.GRAPHCMS_PROJECT_API, {
-      method: "POST",
+   return new GraphQLClient(process.env.GRAPHCMS_PROJECT_API, {
       headers: {
-         "Content-Type": "application/json",
-         Authorization: `Bearer ${
-            options?.preview
-               ? process.env.GRAPHCMS_DEV_AUTH_TOKEN
-               : process.env.GRAPHCMS_PROD_AUTH_TOKEN
-         }`,
+         ...(process.env.GRAPHCMS_PROD_AUTH_TOKEN && {
+            Authorization: `Bearer ${
+               options?.preview
+                  ? process.env.GRAPHCMS_DEV_AUTH_TOKEN
+                  : process.env.GRAPHCMS_PROD_AUTH_TOKEN
+            }`,
+         }),
       },
-      body: JSON.stringify({
-         query,
-         variables: options?.variables,
-      }),
-   })
-   const json = await res.json()
-
-   if (json.errors) {
-      console.error(json.errors)
-      throw new Error("Failed to fetch API")
-   }
-
-   return json.data
+   }).request(query, options?.variables)
 }
 
 export { fetchAPI }
