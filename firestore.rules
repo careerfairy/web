@@ -165,13 +165,13 @@ service cloud.firestore {
                 allow write: if true;
             }
             match /groupQuestions/{groupQuestion} {
-            function isCustomQuestionType() {
-                return resource.data.questionType == 'custom';
-            }
+                        function isCustomQuestionType() {
+                            return resource.data.questionType == 'custom';
+                        }
 
-            function hasOptions() {
-                return request.resource.data.options != null && request.resource.data.options.keys().size() > 0;
-            }
+                        function hasOptions() {
+                            return request.resource.data.options != null && request.resource.data.options.keys().size() > 0;
+                        }
                 allow read: if isCFAdmin() || isCareerCenterAdmin();
                 allow delete: if isCustomQuestionType();
                 allow create: if isCFAdmin() || isCareerCenterAdmin();
