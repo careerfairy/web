@@ -112,6 +112,7 @@ const Hero: FC<Props> = ({
 }) => {
    const titleText = heroTitle || page.title
    const subtitleText = heroSubtitle || page.subtitle
+
    return (
       <>
          <Box id={slug} sx={styles.root}>
@@ -165,6 +166,7 @@ const Hero: FC<Props> = ({
                                        },
                                     }}
                                     {...button}
+                                    size={button.size || "medium"}
                                  />
                               </Box>
                            ))}
