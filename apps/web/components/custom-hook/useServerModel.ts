@@ -5,7 +5,7 @@ const useServerModel = <T>(
    creationFunction: (field: any) => any
 ): T => {
    return useMemo<T>(
-      () => creationFunction(serverPlainObject),
+      () => serverPlainObject && creationFunction(serverPlainObject),
       [serverPlainObject]
    )
 }
