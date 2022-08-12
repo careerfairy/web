@@ -24,10 +24,7 @@ export const createMarketingUser = functions.https.onCall(
             email: string().email().required(),
             firstName: string().required(),
             lastName: string().required(),
-            fieldOfStudy: object({
-               id: string().required(),
-               name: string().required(),
-            }).required(),
+            fieldOfStudyId: string().required(),
             utmParams: object().optional(),
          })
       )

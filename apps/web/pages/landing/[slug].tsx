@@ -1,4 +1,3 @@
-import SEO from "../../components/util/SEO"
 import React, { useEffect } from "react"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
@@ -6,8 +5,8 @@ import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
-import Hero from "../../components/cms/hero"
 import useServerModel from "../../components/custom-hook/useServerModel"
+import CmsPageLayout from "../../layouts/CmsPageLayout"
 
 /**
  * Just for us to develop the UI while we don't have the hygraph cms setup
@@ -31,15 +30,7 @@ const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
    }, [])
 
    return (
-      <>
-         <SEO
-            id={marketingLandingPage?.id}
-            {...marketingLandingPage?.seo}
-            title={`${marketingLandingPage?.title} - CareerFairy Marketing`}
-         />
-         {marketingLandingPage.hero && (
-            <Hero {...marketingLandingPage.hero} page={marketingLandingPage} />
-         )}
+      <CmsPageLayout page={marketingLandingPage}>
          {marketingLandingPage.blocks && (
             <>
                {marketingLandingPage.blocks.map((block) => {
@@ -56,7 +47,7 @@ const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
                })}
             </>
          )}
-      </>
+      </CmsPageLayout>
    )
 }
 

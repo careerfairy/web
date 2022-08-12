@@ -1,6 +1,12 @@
 import { fetchAPI } from "./index"
 import {
+   eventsSectionQueryProps,
+   fieldOfStudyQueryProps,
+   heroQueryProps,
    HygraphRemoteFieldOfStudyResponse,
+   imageQueryProps,
+   marketingSignupQueryProps,
+   seoQueryProps,
    Slug,
    Variables,
 } from "../../types/cmsTypes"
@@ -42,76 +48,13 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       slug
                       title
                       subtitle
-                      fieldOfStudies {
-                          marketingLandingPage {
-                              slug
-                          }
-                          firebaseFieldOfStudy{
-                              id,
-                              name
-                          }
-                      }
-                      hero {
-                          id
-                          slug
-                          image {
-                              height
-                              width
-                              url
-                              caption
-                              alt
-                          }
-                          buttons {
-                              children
-                              slug
-                              href
-                              variant
-                              color
-                              size
-                          }
-                      }
+                      fieldOfStudies ${fieldOfStudyQueryProps}
                       blocks {
-                          ... on EventsSection {
-                              __typename
-                              id
-                              typeOfEvent
-                          }
-                          ... on MarketingSignup {
-                              id
-                              __typename
-                              title
-                              subtitle
-                              slug
-                              button {
-                                  children
-                                  slug
-                                  href
-                                  variant
-                                  color
-                                  size
-                              }
-                          }
+                          ... on EventsSection ${eventsSectionQueryProps}
+                          ... on MarketingSignup ${marketingSignupQueryProps}
+                          ... on Hero ${heroQueryProps}
                       }
-                      seo {
-                          id
-                          title
-                          description
-                          keywords
-                          image {
-                              id
-                              stage
-                              updatedAt
-                              alt
-                              handle
-                              fileName
-                              mimeType
-                              width
-                              height
-                              size
-                              url
-                          }
-                          noIndex
-                      }
+                      seo ${seoQueryProps}
                   }
               }
          `,
@@ -123,7 +66,6 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
             preview: variables.preview,
          }
       )
-
       if (!response.marketingLandingPage) return null
       return MarketingLandingPage.createFromHygraph(
          response.marketingLandingPage
@@ -139,19 +81,9 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       slug
                       title
                       subtitle
-                      image {
-                          height
-                          width
-                          url
-                          caption
-                          alt
-                      }
-                      seo {
-                          id
-                          title
-                          description
-                          keywords
-                      }
+                      hero ${heroQueryProps}
+                      image ${imageQueryProps}
+                      seo ${seoQueryProps}
                   }
               }
          `,
@@ -171,15 +103,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
    async getFieldsOfStudyWithMarketingPages(): Promise<HygraphRemoteFieldOfStudyResponse> {
       const data = await fetchAPI(`
           {
-              fieldOfStudies {
-                  firebaseFieldOfStudy {
-                      id
-                      name
-                  }
-                  marketingLandingPage {
-                      slug
-                  }
-              }
+              fieldOfStudies ${fieldOfStudyQueryProps}
           }
       `)
       return data.fieldOfStudies

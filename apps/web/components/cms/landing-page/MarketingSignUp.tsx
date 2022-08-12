@@ -10,7 +10,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React, { useState } from "react"
+import React, { useMemo, useState } from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import { Formik } from "formik"
 import * as yup from "yup"
@@ -21,6 +21,7 @@ import {
    HygraphResponseMarketingSignup,
 } from "../../../types/cmsTypes"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { useRouter } from "next/router"
 
 const styles = sxStyles({
    container: {
@@ -72,13 +73,6 @@ const Complete = () => {
    )
 }
 
-const initialValues = {
-   firstName: "",
-   lastName: "",
-   email: "",
-   fieldOfStudyId: "",
-}
-
 const schema = yup.object().shape({
    email: yup.string().email().required(),
    firstName: yup.string().label("First Name").min(2).required(),
@@ -92,18 +86,31 @@ interface Props {
    fieldsOfStudy: FieldOfStudy[]
 }
 const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
+   const {
+      query: { fieldOfStudyId },
+   } = useRouter()
+   const initialValues = useMemo(
+      () => ({
+         firstName: "",
+         lastName: "",
+         email: "",
+         fieldOfStudyId: fieldOfStudyId?.toString() || "",
+      }),
+      [fieldOfStudyId]
+   )
    const [backendError, setBackendError] = useState<Error>(null)
    return (
       <Formik
          initialValues={initialValues}
          validationSchema={schema}
+         enableReinitialize
          onSubmit={(values, { setSubmitting, resetForm }) => {
             marketingServiceInstance
                .create({
                   firstName: values.firstName,
                   lastName: values.lastName,
                   email: values.email,
-                  fieldOfStudy: JSON.parse(values.fieldOfStudyId),
+                  fieldOfStudyId: values.fieldOfStudyId,
                   utmParams: SessionStorageUtil.getUTMParams() ?? {},
                })
                .then((_) => {
@@ -205,30 +212,31 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                      />
                   </Grid>
                </Grid>
-               <Box mt={2}>
-                  <FieldOfStudySelector
-                     value={values.fieldOfStudyId}
-                     disabled={isSubmitting}
-                     onChange={handleChange}
-                     fieldsOfStudy={fieldsOfStudy}
-                     handleBlur={handleBlur}
-                     error={Boolean(
-                        errors.fieldOfStudyId &&
+               {!initialValues.fieldOfStudyId && (
+                  <Box mt={2}>
+                     <FieldOfStudySelector
+                        value={values.fieldOfStudyId}
+                        disabled={isSubmitting}
+                        onChange={handleChange}
+                        fieldsOfStudy={fieldsOfStudy}
+                        handleBlur={handleBlur}
+                        error={Boolean(
+                           errors.fieldOfStudyId &&
+                              touched.fieldOfStudyId &&
+                              errors.fieldOfStudyId
+                        )}
+                        helperText={
+                           errors.fieldOfStudyId &&
                            touched.fieldOfStudyId &&
                            errors.fieldOfStudyId
-                     )}
-                     helperText={
-                        errors.fieldOfStudyId &&
-                        touched.fieldOfStudyId &&
-                        errors.fieldOfStudyId
-                     }
-                  />
-               </Box>
+                        }
+                     />
+                  </Box>
+               )}
                <Box mt={2} display={"flex"} justifyContent={"center"}>
                   <Button
                      type="submit"
                      fullWidth
-                     size="large"
                      variant="contained"
                      color="primary"
                      disabled={isSubmitting}
@@ -238,6 +246,8 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                         )
                      }
                      {...buttonProps}
+                     href={undefined}
+                     size={buttonProps?.size || "large"}
                   >
                      Sign up
                   </Button>
@@ -275,7 +285,7 @@ const FieldOfStudySelector = ({
             helperText={helperText}
          >
             {fieldsOfStudy.map((entry) => (
-               <MenuItem key={entry.name} value={JSON.stringify(entry)}>
+               <MenuItem key={entry.name} value={entry.id}>
                   {entry.name}
                </MenuItem>
             ))}

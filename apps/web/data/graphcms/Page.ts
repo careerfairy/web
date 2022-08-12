@@ -1,5 +1,6 @@
 import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
 import {
+   HygraphResponseHero,
    HygraphResponsePage,
    HygraphResponseSeo,
    ICmsImage,
@@ -12,7 +13,8 @@ export class Page extends BaseModel {
       public readonly title: string,
       public readonly subtitle: string,
       public readonly seo: HygraphResponseSeo,
-      public readonly image: ICmsImage
+      public readonly image: ICmsImage,
+      public readonly hero: HygraphResponseHero
    ) {
       super()
    }
@@ -24,7 +26,8 @@ export class Page extends BaseModel {
          page.title,
          page.subtitle,
          page.seo,
-         page.image
+         page.image,
+         page.hero
       )
    }
    static createFromPlainObject(page: Page) {
@@ -34,7 +37,8 @@ export class Page extends BaseModel {
          page.title,
          page.subtitle,
          page.seo,
-         page.image
+         page.image,
+         page.hero
       )
    }
 }

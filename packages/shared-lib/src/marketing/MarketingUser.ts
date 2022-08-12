@@ -7,7 +7,8 @@ import firebase from "firebase/compat"
  */
 export interface MarketingUserDocument
    extends Identifiable,
-      MarketingUserCreationFields {
+      Omit<MarketingUserCreationFields, "fieldOfStudyId"> {
+   fieldOfStudy: FieldOfStudy
    createdAt: firebase.firestore.Timestamp
 }
 
@@ -19,7 +20,7 @@ export interface MarketingUserCreationFields {
    firstName: string
    lastName: string
    email: string
-   fieldOfStudy: FieldOfStudy
+   fieldOfStudyId: string
    utmParams?: UTMParams
 }
 
