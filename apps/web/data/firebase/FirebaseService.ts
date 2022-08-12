@@ -83,7 +83,7 @@ class FirebaseService {
 
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v3"
+         "createNewUserAccount_v4"
       )
       return createUserInAuthAndFirebase({ userData })
    }

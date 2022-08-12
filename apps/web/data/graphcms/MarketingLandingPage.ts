@@ -15,11 +15,11 @@ export class MarketingLandingPage extends BaseModel {
       public readonly title: string,
       public readonly subtitle: string,
       public readonly fieldsOfStudy: FieldOfStudy[],
-      public readonly hero: HygraphResponseHero,
       public readonly seo: HygraphResponseSeo,
       public readonly blocks: (
          | HygraphResponseEventsSection
          | HygraphResponseMarketingSignup
+         | HygraphResponseHero
       )[]
    ) {
       super()
@@ -31,10 +31,10 @@ export class MarketingLandingPage extends BaseModel {
          page.slug,
          page.title,
          page.subtitle,
-         page.fieldOfStudies
-            .map((o) => o.firebaseFieldOfStudy) // get the remote field of study from firebase
-            .filter((e) => e), // map the remote firebase field to the model
-         page.hero,
+         page.fieldOfStudies.map((o) => ({
+            id: o.fieldOfStudyId,
+            name: o.fieldOfStudyName,
+         })), // get the remote field of study from firebase
          page.seo,
          page.blocks
       )
@@ -46,7 +46,6 @@ export class MarketingLandingPage extends BaseModel {
          page.title,
          page.subtitle,
          page.fieldsOfStudy,
-         page.hero,
          page.seo,
          page.blocks
       )

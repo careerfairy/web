@@ -9,6 +9,7 @@ const {
    handleUserNetworkerBadges,
    handleUserStatsBadges,
 } = require("./lib/badge")
+const { marketingUsersRepo } = require("./api/repositories")
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -19,7 +20,7 @@ const getRandomInt = (max) => {
    }
 }
 
-exports.createNewUserAccount_v3 = functions.https.onCall(
+exports.createNewUserAccount_v4 = functions.https.onCall(
    async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
@@ -73,6 +74,16 @@ exports.createNewUserAccount_v3 = functions.https.onCall(
                      gender: gender,
                   })
                )
+               .then(async () => {
+                  try {
+                     await marketingUsersRepo.delete(recipientEmail)
+                  } catch (e) {
+                     functions.logger.warn(
+                        `Unable to deleting marketing user: ${recipientEmail}, could be because it doesn't exist`,
+                        e
+                     )
+                  }
+               })
                .then(async () => {
                   console.log(`Starting sending email for ${recipientEmail}`)
                   const email = {
