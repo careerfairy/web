@@ -27,7 +27,7 @@ export interface UserData extends Identifiable {
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
-   backFills: BackFillType[] | firebase.firestore.FieldValue
+   backFills: BackFillType[]
    universityCountryCode: string
    unsubscribed?: boolean
    userEmail: string

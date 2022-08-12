@@ -1,9 +1,9 @@
 import { useProd } from "../"
-
-require("dotenv").config({ path: "./.env.local" })
-import { App, initializeApp, applicationDefault } from "firebase-admin/app"
+import { App, initializeApp } from "firebase-admin/app"
 import { getAuth } from "firebase-admin/auth"
 import { getFirestore } from "firebase-admin/firestore"
+import { credential } from "firebase-admin"
+var serviceAccount = require("../../keys/production_credentials.json")
 
 import { AppOptions } from "firebase-admin/lib/app/core"
 
@@ -23,7 +23,7 @@ if (!useProd) {
    process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 }
 if (useProd) {
-   config["credential"] = applicationDefault()
+   config["credential"] = credential.cert(serviceAccount)
 }
 
 const app: App = initializeApp(config)

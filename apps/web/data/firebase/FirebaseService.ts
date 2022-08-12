@@ -2168,7 +2168,6 @@ class FirebaseService {
                         "registeredToLivestream" as LivestreamUserAction
                      ),
                      dateRegisteredToLivestream: this.getServerTimestamp(),
-                     dateRegistered: this.getServerTimestamp(),
                      authId: uid,
                   },
                   // We store the referral info so that it can be used by a cloud function

@@ -1,6 +1,6 @@
 import csvToData from "../util/csvToData"
-var fs = require("fs")
 import config from "../config"
+import * as fs from "fs"
 
 // Fos = Field of Study
 // Los = Level of Study

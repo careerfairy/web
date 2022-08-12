@@ -584,6 +584,7 @@ const backfillUsers = (
             ),
          },
          ...(backFills.length && {
+            // @ts-ignore
             backFills: FieldValue.arrayUnion(...backFills),
          }),
          ...(dataForUserLivestreamData && dataForUserLivestreamData),
@@ -635,9 +636,8 @@ const storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection = (
                groupsDict
             )
          if (!targetGroup) return
-         if (!isInUserDataCollection) {
-            dataDict[registeredGroup.groupId] = userGroupQuestionWithAnswerMap
-         } else {
+         if (isInUserDataCollection) {
+            // only store this as a subcollection for userData Documents
             const data: UserGroupData = {
                id: targetGroup.id,
                userUid: userData.authId || "",
@@ -657,12 +657,19 @@ const storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection = (
                })
                .then(() => handleBulkWriterSuccess(counter))
                .catch((err) => handleBulkWriterError(err, counter))
+         } else {
+            // for RegisteredStudent ParticipatingStudent TalentPoolStudent
+            // store it all in a dictionary
+            dataDict[registeredGroup.groupId] = userGroupQuestionWithAnswerMap
          }
       })
    }
-   return isInUserDataCollection
-      ? undefined
-      : { livestreamGroupQuestionAnswers: dataDict, livestreamId }
+   if (isInUserDataCollection) {
+      return undefined
+   } else {
+      // we only return data to be merged into the livestream/userLivestreamData/document
+      return { livestreamGroupQuestionAnswers: dataDict, livestreamId }
+   }
 }
 
 const throwMigrationError = (message: string) => {
