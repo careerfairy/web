@@ -1,6 +1,5 @@
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
 export type Slug = string
 
