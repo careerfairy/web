@@ -104,24 +104,40 @@ export interface HygraphResponseButton {
 }
 
 export interface HygraphResponseHero {
+   __typename: string
    id: string
    slug: string
    image: ICmsImage
    buttons: HygraphResponseButton[]
-   title?: string
-   subtitle?: string
+   heroTitle?: string
+   heroSubtitle?: string
+   fullScreenImage?: boolean
+   component?: HygraphFieldOfStudySelectResponse
 }
+
+export interface HygraphFieldOfStudySelectResponse {
+   __typename: string
+   id: string
+   placeHolderText: string
+   label: string
+   fallbackMarketingLandingPage: {
+      slug: string
+   }
+}
+
 export type PageTypes =
    | "COMPANY_CASE_STUDY"
    | "MARKETING_LANDING_PAGE"
    | "LANDING_PAGE"
 
 export interface HygraphRemoteFieldOfStudyResponse {
-   firebaseFieldOfStudy: FieldOfStudy
+   fieldOfStudyId: string
+   fieldOfStudyName: string
    marketingLandingPage: {
       slug: string
    }
 }
+
 export interface HygraphResponseMarketingPage {
    id: string
    title: string
@@ -132,7 +148,11 @@ export interface HygraphResponseMarketingPage {
    pageType: PageTypes
    slug: string
    seo: HygraphResponseSeo
-   blocks: (HygraphResponseEventsSection | HygraphResponseMarketingSignup)[]
+   blocks: (
+      | HygraphResponseEventsSection
+      | HygraphResponseMarketingSignup
+      | HygraphResponseHero
+   )[]
 }
 export interface HygraphResponsePage {
    id: string
@@ -141,6 +161,7 @@ export interface HygraphResponsePage {
    slug: string
    seo: HygraphResponseSeo
    image: ICmsImage
+   hero: HygraphResponseHero
 }
 
 export interface HygraphResponseEventsSection {
@@ -156,3 +177,97 @@ export interface HygraphResponseMarketingSignup {
    slug: string
    button: HygraphResponseButton
 }
+
+// language=GraphQL
+export const imageQueryProps = `
+    {
+        height
+        width
+        url
+        alt
+        caption
+    }
+`
+// language=GraphQL
+export const buttonQueryProps = `
+    {
+        children
+        slug
+        href
+        variant
+        color
+        size
+    }
+`
+
+// language=GraphQL
+export const seoQueryProps = `
+    {
+        id
+        title
+        description
+        keywords
+        image ${imageQueryProps}
+        noIndex
+    }
+`
+// language=GraphQL
+export const fieldOfStudySelectQueryProps = `
+    {
+        id
+        __typename
+        placeHolderText
+        label
+        id
+        fallbackMarketingLandingPage {
+            slug
+        }
+    }
+`
+
+// language=GraphQL
+export const heroQueryProps = `
+    {
+        __typename
+        id
+        slug
+        image ${imageQueryProps}
+        buttons ${buttonQueryProps}
+        heroTitle
+        heroSubtitle
+        fullScreenImage
+        component {
+            ... on FieldOfStudySelect ${fieldOfStudySelectQueryProps}
+        }
+    }
+`
+
+// language=GraphQL
+export const eventsSectionQueryProps = `
+    {
+        __typename
+        id
+        typeOfEvent
+    }
+`
+// language=GraphQL
+export const marketingSignupQueryProps = `
+    {
+        id
+        __typename
+        title
+        subtitle
+        slug
+        button ${buttonQueryProps}
+    }
+`
+// language=GraphQL
+export const fieldOfStudyQueryProps = `
+    {
+        marketingLandingPage {
+            slug
+        }
+        fieldOfStudyId
+        fieldOfStudyName
+    }
+`

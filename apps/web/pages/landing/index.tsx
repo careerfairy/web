@@ -2,9 +2,9 @@ import { GetStaticProps } from "next"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { Page } from "../../data/graphcms/Page"
 import useServerModel from "../../components/custom-hook/useServerModel"
-import SEO from "../../components/util/SEO"
-import LandingPage from "../../components/cms/landing-page/LandingPage"
 import { HygraphRemoteFieldOfStudyResponse } from "../../types/cmsTypes"
+import CmsPageLayout from "../../layouts/CmsPageLayout"
+import LandingPage from "../../components/cms/landing-page/LandingPage"
 
 type Props = {
    serverPage: Page
@@ -14,19 +14,10 @@ type Props = {
 const Landing = ({ serverPage, fieldsOfStudy }: Props) => {
    const page = useServerModel<Page>(serverPage, Page.createFromPlainObject)
 
-   const { seo, id, title, subtitle, slug, image } = page
-
    return (
-      <>
-         <SEO id={id} {...seo} title={`${title} - CareerFairy Landing Page`} />
-         <LandingPage
-            slug={slug}
-            title={title}
-            subTitle={subtitle}
-            image={image}
-            fieldsOfStudy={fieldsOfStudy}
-         />
-      </>
+      <CmsPageLayout page={page}>
+         <LandingPage fieldsOfStudy={fieldsOfStudy} hero={page.hero} />
+      </CmsPageLayout>
    )
 }
 
