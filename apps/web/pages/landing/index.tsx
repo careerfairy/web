@@ -22,14 +22,13 @@ const Landing = ({ serverPage, fieldsOfStudy }: Props) => {
 }
 
 export const getStaticProps: GetStaticProps = async ({
-   params,
    preview = true,
    locale,
 }) => {
    const [page, fieldsOfStudy] = await Promise.all([
       marketingPageRepo.getPage({
-         slug: "myPage",
-         preview: true,
+         slug: "hook-landing-page",
+         preview,
          locale,
       }),
       marketingPageRepo.getFieldsOfStudyWithMarketingPages(),
