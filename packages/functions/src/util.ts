@@ -453,7 +453,7 @@ export const logGraphqlErrorAndThrow = (
    ...extraData
 ) => {
    functions.logger.error(message, extraData)
-   logAxiosError(error)
+   logGraphqlError(error)
    throw new functions.https.HttpsError("unknown", message)
 }
 

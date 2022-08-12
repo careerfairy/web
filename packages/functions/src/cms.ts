@@ -1,44 +1,6 @@
 import functions = require("firebase-functions")
-import * as config from "./config"
-import { getFieldOfStudyById } from "./lib/cms"
 import { GraphQLClient } from "graphql-request"
-import { isLocalEnvironment, logGraphqlError } from "./util"
-
-const SECRET = "bizzy"
-
-/**
- * Return the list of field of studies
- * This endpoint is used by Hygraph cms (custom landing pages)
- *
- * A secret header is used to hide the content from internet crawlers
- * Request needs to have the header secret: $SECRET
- */
-export const fieldOfStudy = functions
-   .region(config.region)
-   .https.onRequest(async (req, res) => {
-      if (req.method !== "GET") {
-         res.status(401).end()
-         return
-      }
-      if (!req.query.id) {
-         res.status(401).end()
-         return
-      }
-
-      if (req.get("secret") !== SECRET) {
-         res.status(401).end()
-         return
-      }
-
-      const fieldOfStudy = await getFieldOfStudyById(req.query.id.toString())
-
-      if (!fieldOfStudy) {
-         res.status(404).end()
-         return
-      }
-
-      res.send(fieldOfStudy)
-   })
+import { isLocalEnvironment, logGraphqlErrorAndThrow } from "./util"
 
 export const syncFieldsOfStudyToHygraph = functions
    // Make the secret available to this function
@@ -112,13 +74,11 @@ export const syncFieldsOfStudyToHygraph = functions
             )
          }
       } catch (e) {
-         functions.logger.error(
+         logGraphqlErrorAndThrow(
             `Error ${
                isDelete ? "deleting" : isCreate ? "creating" : "updating"
             } field of study with Id ${fieldOfStudyId} to hygraph with `,
             e
          )
-         logGraphqlError(e)
-         throw new functions.https.HttpsError("unknown", e)
       }
    })
