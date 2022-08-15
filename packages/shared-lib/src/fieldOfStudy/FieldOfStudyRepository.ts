@@ -3,11 +3,17 @@ import {
    convertDocArrayToDict,
    mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
-import { FieldOfStudy, RootFieldOfStudyCategory } from "./fieldOfStudy"
+import { FieldOfStudy } from "./fieldOfStudy"
+import { GroupQuestion } from "../groups"
 
 export interface IFieldOfStudyRepository {
    getAllFieldsOfStudy(): Promise<FieldOfStudy[]>
-   getFieldsOfStudyAsCategory(): Promise<RootFieldOfStudyCategory>
+
+   getAllLevelsOfStudy(): Promise<FieldOfStudy[]>
+
+   getFieldsOfStudyAsGroupQuestion(
+      categoryType: "fieldOfStudy" | "levelOfStudy"
+   ): Promise<GroupQuestion>
 }
 
 export class FirebaseFieldOfStudyRepository implements IFieldOfStudyRepository {
@@ -17,12 +23,24 @@ export class FirebaseFieldOfStudyRepository implements IFieldOfStudyRepository {
       const snapshots = await this.firestore.collection("fieldsOfStudy").get()
       return mapFirestoreDocuments<FieldOfStudy>(snapshots)
    }
-   async getFieldsOfStudyAsCategory(): Promise<RootFieldOfStudyCategory> {
-      const levelOfStudies = await this.getAllFieldsOfStudy()
+
+   async getAllLevelsOfStudy(): Promise<FieldOfStudy[]> {
+      const snapshots = await this.firestore.collection("levelsOfStudy").get()
+      return mapFirestoreDocuments<FieldOfStudy>(snapshots)
+   }
+
+   async getFieldsOfStudyAsGroupQuestion(
+      categoryType: "fieldOfStudy" | "levelOfStudy"
+   ): Promise<GroupQuestion> {
+      const isFieldOfStudy = categoryType === "fieldOfStudy"
+      const categories = isFieldOfStudy
+         ? await this.getAllFieldsOfStudy()
+         : await this.getAllLevelsOfStudy()
       return {
-         name: "Field of Study",
-         id: "fieldOfStudy",
-         options: convertDocArrayToDict(levelOfStudies),
+         name: isFieldOfStudy ? "Field of Study" : "Level of Study",
+         id: isFieldOfStudy ? "fieldOfStudy" : "levelOfStudy",
+         questionType: isFieldOfStudy ? "fieldOfStudy" : "levelOfStudy",
+         options: convertDocArrayToDict(categories),
       }
    }
 }

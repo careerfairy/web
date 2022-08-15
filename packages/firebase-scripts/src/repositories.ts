@@ -24,10 +24,6 @@ import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
-import {
-   FirebaseLevelOfStudyRepository,
-   ILevelOfStudyRepository,
-} from "@careerfairy/shared-lib/dist/levelOfStudy/LevelOfStudyRepository"
 
 const firestoreInstance = firestore as any
 
@@ -57,6 +53,3 @@ export const livestreamRepo: ILivestreamRepository =
 
 export const fieldOfStudyRepo: IFieldOfStudyRepository =
    new FirebaseFieldOfStudyRepository(firestoreInstance)
-
-export const levelOfStudyRepo: ILevelOfStudyRepository =
-   new FirebaseLevelOfStudyRepository(firestoreInstance)

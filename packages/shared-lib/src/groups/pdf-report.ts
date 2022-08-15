@@ -1,12 +1,11 @@
 import { FieldOfStudy } from "../fieldOfStudy"
-import { LevelOfStudy } from "../levelOfStudy"
 import { UserData } from "../users"
 import { dynamicSort } from "../utils"
 import {
    convertGroupQuestionOptionsToSortedArray,
+   Group,
    GroupQuestion,
    GroupQuestionOption,
-   Group,
 } from "./groups"
 import {
    LivestreamEvent,
@@ -14,7 +13,6 @@ import {
    LivestreamQuestion,
    Speaker,
 } from "../livestreams"
-import { RootCFCategory } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 
 export interface PdfCategoryChartData {
@@ -31,7 +29,7 @@ export interface PdfCategoryChartData {
 
 const uniFilterFn = (
    user: UserData,
-   category: GroupQuestion | RootCFCategory,
+   category: GroupQuestion,
    option: GroupQuestionOption
 ) => {
    return user.university?.questions?.[category.id]?.answerId === option.id
@@ -39,15 +37,15 @@ const uniFilterFn = (
 
 const generalFilterFn = (
    user: UserData,
-   userInfo: GroupQuestion | RootCFCategory,
-   option: FieldOfStudy | LevelOfStudy
+   userInfo: GroupQuestion,
+   option: FieldOfStudy
 ) => {
    return user[userInfo.id]?.id === option.id
 }
 
 export const getPdfCategoryChartData = (
-   mainQuestion: GroupQuestion | RootCFCategory,
-   subQuestion: GroupQuestion | RootCFCategory,
+   mainQuestion: GroupQuestion,
+   subQuestion: GroupQuestion,
    users: UserData[],
    forUniversity: boolean
 ): PdfCategoryChartData => {

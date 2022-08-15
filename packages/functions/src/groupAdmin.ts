@@ -12,12 +12,7 @@ import {
    PdfCategoryChartData,
    PdfReportData,
 } from "@careerfairy/shared-lib/dist/groups/pdf-report"
-import {
-   fieldOfStudyRepo,
-   groupRepo,
-   levelOfStudyRepo,
-   livestreamRepo,
-} from "./api/repositories"
+import { fieldOfStudyRepo, groupRepo, livestreamRepo } from "./api/repositories"
 
 const functions = require("firebase-functions")
 const {
@@ -321,18 +316,24 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          }
 
          const participatingStudents =
-            (await livestreamRepo.getLivestreamUsers(
-               livestreamData.id,
-               "participatedInLivestream"
-            )) || []
+            (
+               await livestreamRepo.getLivestreamUsers(
+                  livestreamData.id,
+                  "participated"
+               )
+            ).map((data) => data.user) || []
 
          const groupPresenter =
             GroupPresenter.createFromDocument(requestingGroupData)
 
          const rootLevelOfStudyCategory =
-            await levelOfStudyRepo.getLevelsOfStudyAsCategory()
+            await fieldOfStudyRepo.getFieldsOfStudyAsGroupQuestion(
+               "levelOfStudy"
+            )
          const rootFieldOfStudyCategory =
-            await fieldOfStudyRepo.getFieldsOfStudyAsCategory()
+            await fieldOfStudyRepo.getFieldsOfStudyAsGroupQuestion(
+               "fieldOfStudy"
+            )
 
          const {
             matches: uniStudents,

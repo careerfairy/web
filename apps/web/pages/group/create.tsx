@@ -23,14 +23,9 @@ import {
    sortGroupQuestionOptionsByName,
 } from "@careerfairy/shared-lib/dist/groups"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
 import { useDispatch } from "react-redux"
 import * as actions from "../../store/actions"
-import {
-   groupRepo,
-   fieldOfStudyRepo,
-   levelOfStudyRepo,
-} from "../../data/RepositoryInstances"
+import { fieldOfStudyRepo, groupRepo } from "../../data/RepositoryInstances"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 function getSteps() {
@@ -87,7 +82,7 @@ const CreateGroup = () => {
          // get all level and fields of study
          setLoadingDefaultQuestions(true)
          const [levelsOfStudy, fieldsOfStudy] = await Promise.all([
-            levelOfStudyRepo.getAllLevelsOfStudy(),
+            fieldOfStudyRepo.getAllLevelsOfStudy(),
             fieldOfStudyRepo.getAllFieldsOfStudy(),
          ])
          const initialCategories = [
@@ -112,7 +107,7 @@ const CreateGroup = () => {
    }
 
    const createGroupQuestionFromUserInfoCollection = (
-      userInfoCollectionDocsInfo: FieldOfStudy[] | LevelOfStudy[],
+      userInfoCollectionDocsInfo: FieldOfStudy[],
       type: Exclude<GroupQuestion["questionType"], "custom">
    ): GroupQuestion => {
       if (type !== "fieldOfStudy" && type !== "levelOfStudy")

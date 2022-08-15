@@ -7,10 +7,8 @@ import AudienceCategoryChart from "./AudienceCategoryChart"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import LoadingDisplay from "../displays/LoadingDisplay"
 import EmptyDisplay from "../displays/EmptyDisplay"
-import {
-   LivestreamUserAction,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -30,13 +28,14 @@ const BreakdownTab = ({ audience }: Props) => {
 
    const talentPoolPercentage = useMemo(() => {
       const totalCount = audience.length
-      const inTalentPoolCount = audience.filter((user) =>
-         // @ts-ignore
-         user.userHas?.includes("joinedTalentPool" as LivestreamUserAction)
+      const inTalentPoolCount = audience.filter(
+         (user) => user.talentPool?.date
       ).length
       const percentage = (inTalentPoolCount / totalCount) * 100
       return isNaN(percentage) ? 0 : Math.round(percentage)
    }, [audience, talentPool])
+
+   const users = useMemo(() => audience.map((data) => data.user), [audience])
 
    if (!isLoaded(audience)) {
       return <LoadingDisplay />
@@ -51,7 +50,7 @@ const BreakdownTab = ({ audience }: Props) => {
             <TalentPoolPercentage percentage={talentPoolPercentage} />
          </Grid>
          <Grid item xs={12}>
-            <AudienceCategoryChart audience={audience} />
+            <AudienceCategoryChart audience={users} />
          </Grid>
       </Grid>
    )

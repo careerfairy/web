@@ -1,6 +1,11 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat/app"
-import { Group, GroupQuestion, GroupQuestionOption } from "../groups"
+import {
+   Group,
+   GroupQuestion,
+   GroupQuestionOption,
+   UserGroupQuestionsWithAnswerMap,
+} from "../groups"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 
 export interface UserData extends Identifiable {
@@ -31,6 +36,7 @@ export interface UserData extends Identifiable {
    universityCountryCode: string
    unsubscribed?: boolean
    userEmail: string
+   // legacy field that contains an array of livestream.companyId's
    talentPools?: string[]
    validationPin: number
    interestsIds?: string[]
@@ -54,13 +60,6 @@ export interface UserData extends Identifiable {
 /*
  * Key is the questionId and value is the answerId
  * */
-export type UserGroupQuestionsWithAnswerMap = Record<
-   GroupQuestion["id"],
-   string
->
-/*
- * Key is the questionId and value is the answerId
- * */
 export type UserReadableGroupQuestionsWithAnswerMap = Record<
    GroupQuestion["id"],
    ReadableQuestionAndAnswer
@@ -70,14 +69,6 @@ export interface ReadableQuestionAndAnswer {
    questionId: GroupQuestion["id"]
    answerId: GroupQuestionOption["id"]
    answerName: GroupQuestionOption["name"]
-}
-export interface UserGroupData extends Identifiable {
-   userUid?: UserData["authId"]
-   groupId: Group["id"]
-   groupName: Group["universityName"]
-   groupLogo: Group["logoUrl"]
-   groupUniversityCode?: Group["universityCode"]
-   questions?: UserGroupQuestionsWithAnswerMap
 }
 
 export interface CSVDownloadUserData extends Record<string, string> {

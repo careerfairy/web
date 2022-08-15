@@ -2,6 +2,7 @@ import { Identifiable } from "../commonTypes"
 import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
+import { UserData } from "../users"
 
 // CareerCenterData collection
 export interface Group extends Identifiable {
@@ -122,4 +123,21 @@ export interface GroupATSIntegrationTokensDocument extends Identifiable {
    merge?: {
       account_token?: string
    }
+}
+
+/*
+ * Key is the questionId and value is the answerId
+ * */
+export type UserGroupQuestionsWithAnswerMap = Record<
+   GroupQuestion["id"],
+   string
+>
+
+export interface UserGroupData extends Identifiable {
+   userUid?: UserData["authId"]
+   groupId: Group["id"]
+   groupName: Group["universityName"]
+   groupLogo: Group["logoUrl"]
+   groupUniversityCode?: Group["universityCode"]
+   questions?: UserGroupQuestionsWithAnswerMap
 }

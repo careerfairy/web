@@ -1,5 +1,4 @@
-import PropTypes from "prop-types"
-import React, { useEffect, useMemo } from "react"
+import React, { useMemo } from "react"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import Drawer from "@mui/material/Drawer"
@@ -8,7 +7,6 @@ import SwipeableViews from "react-swipeable-views"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import BreakdownTab from "./BreakdownTab"
-import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import PeopleWhoJoinedTab from "./PeopleWhoJoinedTab"
 import useStreamRef from "../../../custom-hook/useStreamRef"
@@ -58,11 +56,8 @@ const DrawerContent = ({ isStreamer, hideAudience }: ContentProps) => {
    } = useCurrentStream()
    const query = useMemo(
       () =>
-         livestreamRepo.livestreamUsersQueryWithRef(
-            streamRef,
-            "participatedInLivestream"
-         ),
-      [streamId]
+         livestreamRepo.livestreamUsersQueryWithRef(streamRef, "participated"),
+      [streamId, streamRef]
    )
    const { data: participatingStudents } = useCollection<UserLivestreamData>(
       query,

@@ -165,7 +165,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
     */
    const handleRegisteredUsersDownload = useCallback(() => {
       livestreamRepo
-         .getLivestreamUsers(stream.id, "registeredToLivestream")
+         .getLivestreamUsers(stream.id, "registered")
          .then((students) => {
             setCsvDownloadData({
                data: formatRegisteredUsersToCSV(students),
@@ -375,19 +375,17 @@ const StreamCard = ({ isUpcoming, stream }) => {
    )
 }
 
-function formatRegisteredUsersToCSV(students) {
+function formatRegisteredUsersToCSV(userLivestreamDatas) {
    const DATE_FIELD = "Registered Date (Swiss Time)"
-   return students
-      .map((student) => ({
-         "First Name": student.firstName,
-         "Last Name": student.lastName,
-         [DATE_FIELD]: student.dateRegistered?.toDate(),
-         Attended: student.userHas?.includes("participatedInLivestream")
-            ? "Yes"
-            : "No",
-         Email: student.userEmail,
-         University: student.university?.name,
-         "University Country": student.universityCountryCode,
+   return userLivestreamDatas
+      .map((data) => ({
+         "First Name": data.user.firstName,
+         "Last Name": data.user.lastName,
+         [DATE_FIELD]: data.registered.date?.toDate(),
+         Attended: data?.participated?.date ? "Yes" : "No",
+         Email: data.user.userEmail,
+         University: data.user.university?.name,
+         "University Country": data.user.universityCountryCode,
       }))
       .sort(dynamicSort(DATE_FIELD))
       .map((student) => ({

@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React, { Fragment, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import {
@@ -13,10 +12,7 @@ import UserList from "./UserList"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import EmptyDisplay from "../displays/EmptyDisplay"
 import LoadingDisplay from "../displays/LoadingDisplay"
-import {
-   LivestreamUserAction,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    searchGridWrapper: {
@@ -42,17 +38,13 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }: Props) => {
    const handleFilter = (arrayOfUserObjects: UserLivestreamData[]) => {
       if (!arrayOfUserObjects) return arrayOfUserObjects
       let filtered = arrayOfUserObjects.filter(
-         (user) =>
-            user.firstName?.toLowerCase().includes(searchParams) ||
-            user.lastName?.toLowerCase().includes(searchParams) ||
-            user.university.name?.toLowerCase().includes(searchParams)
-         // user.universityName?.toLowerCase().includes(searchParams)
+         (data) =>
+            data.user.firstName?.toLowerCase().includes(searchParams) ||
+            data.user.lastName?.toLowerCase().includes(searchParams) ||
+            data.user.university.name?.toLowerCase().includes(searchParams)
       )
       if (currentOption === TALENT_POOL_OPTION) {
-         filtered = filtered.filter((user) =>
-            // @ts-ignore
-            user.userHas?.includes("joinedTalentPool" as LivestreamUserAction)
-         )
+         filtered = filtered.filter((userData) => userData.talentPool?.date)
       }
       return filtered
    }
@@ -111,10 +103,6 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }: Props) => {
          )}
       </Fragment>
    )
-}
-
-PeopleWhoJoinedTab.propTypes = {
-   isStreamer: PropTypes.bool.isRequired,
 }
 
 export default PeopleWhoJoinedTab

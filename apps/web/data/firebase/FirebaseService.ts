@@ -14,18 +14,18 @@ import {
 import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
-   LivestreamUserAction,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
-import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
+import {
+   Group,
+   GroupWithPolicy,
+   UserGroupData,
+} from "@careerfairy/shared-lib/dist/groups"
 import {
    getLivestreamGroupQuestionAnswers,
-   ParticipatingStudent,
-   RegisteredStudent,
    UserData,
-   UserGroupData,
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
 import DocumentReference = firebase.firestore.DocumentReference
@@ -2158,28 +2158,25 @@ class FirebaseService {
                transaction
             )
 
-            transaction.set(
-               userLivestreamDataRef,
-               Object.assign(
-                  {
-                     ...user,
-                     livestreamId,
-                     userHas: firebase.firestore.FieldValue.arrayUnion(
-                        "registeredToLivestream" as LivestreamUserAction
-                     ),
-                     dateRegisteredToLivestream: this.getServerTimestamp(),
-                     authId: uid,
-                  },
+            const data: UserLivestreamData = {
+               livestreamId,
+               userId: uid,
+               user: {
+                  ...user,
+               },
+               answers: userQuestionsAndAnswersDict,
+               registered: {
                   // We store the referral info so that it can be used by a cloud function
                   // that applies the rewards
-                  { referral: getReferralInformation() },
-                  {
-                     // Store the utm params if they exist
-                     utm: SessionStorageUtil.getUTMParams(),
-                  }
-               ) as UserLivestreamData,
-               { merge: true }
-            )
+                  referral: getReferralInformation(),
+                  // Store the utm params if they exist
+                  utm: SessionStorageUtil.getUTMParams(),
+                  // @ts-ignore
+                  date: this.getServerTimestamp(),
+               },
+            }
+
+            transaction.set(userLivestreamDataRef, data, { merge: true })
          })
       })
    }
@@ -2228,9 +2225,7 @@ class FirebaseService {
             .then((userLivestreamDataDoc) => {
                if (userLivestreamDataDoc.exists) {
                   transaction.update(userLivestreamDataRef, {
-                     userHas: firebase.firestore.FieldValue.arrayRemove(
-                        "registeredToLivestream" as LivestreamUserAction
-                     ),
+                     registered: null,
                   } as UserLivestreamData)
                }
                transaction.update(livestreamRef, {
@@ -2241,7 +2236,11 @@ class FirebaseService {
       })
    }
 
-   joinCompanyTalentPool = (companyId, userData, mainStreamId) => {
+   joinCompanyTalentPool = (
+      companyId: string,
+      userData: UserData,
+      mainStreamId
+   ) => {
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
@@ -2255,7 +2254,10 @@ class FirebaseService {
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userSnap) => {
             if (userSnap.exists) {
-               const userData = userSnap.data()
+               const userData = {
+                  ...userSnap.data(),
+                  id: userSnap.id,
+               } as UserData
                transaction.update(userRef, {
                   talentPools:
                      firebase.firestore.FieldValue.arrayUnion(companyId),
@@ -2265,17 +2267,20 @@ class FirebaseService {
                      userData.userEmail
                   ),
                })
-               transaction.set(
-                  userLivestreamData,
-                  {
+
+               const data: UserLivestreamData = {
+                  userId: userData.authId,
+                  livestreamId: mainStreamId,
+                  user: {
                      ...userData,
-                     userHas: firebase.firestore.FieldValue.arrayUnion(
-                        "joinedTalentPool" as LivestreamUserAction
-                     ),
-                     dateJoinedTalentPool: this.getServerTimestamp(),
-                  } as UserLivestreamData,
-                  { merge: true }
-               )
+                  },
+                  talentPool: {
+                     companyId,
+                     // @ts-ignore
+                     date: this.getServerTimestamp(),
+                  },
+               }
+               transaction.set(userLivestreamData, data, { merge: true })
             }
          })
       })
@@ -2309,11 +2314,10 @@ class FirebaseService {
             .get(userLivestreamDataRef)
             .then((userLivestreamDataDoc) => {
                if (userLivestreamDataDoc.exists) {
-                  transaction.update(userLivestreamDataRef, {
-                     userHas: firebase.firestore.FieldValue.arrayRemove(
-                        "joinedTalentPool" as LivestreamUserAction
-                     ),
-                  } as UserLivestreamData)
+                  const data: Partial<UserLivestreamData> = {
+                     talentPool: null,
+                  }
+                  transaction.update(userLivestreamDataRef, data)
                }
                transaction.update(userRef, {
                   talentPools:
@@ -2343,17 +2347,18 @@ class FirebaseService {
          .collection("userLivestreamData")
          .doc(userData.userEmail)
 
-      batch.set(
-         participantsRef,
-         {
+      const data: UserLivestreamData = {
+         user: {
             ...userData,
-            dateParticipatedInLivestream: this.getServerTimestamp(),
-            userHas: firebase.firestore.FieldValue.arrayUnion(
-               "participatedInLivestream" as LivestreamUserAction
-            ),
-         } as UserLivestreamData,
-         { merge: true }
-      )
+         },
+         userId: userData?.authId,
+         participated: {
+            // @ts-ignore
+            date: this.getServerTimestamp(),
+         },
+      }
+
+      batch.set(participantsRef, data, { merge: true })
       batch.update(streamRef, {
          participatingStudents: firebase.firestore.FieldValue.arrayUnion(
             userData.userEmail

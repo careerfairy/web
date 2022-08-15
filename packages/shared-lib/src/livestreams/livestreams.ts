@@ -55,27 +55,34 @@ export interface LivestreamEvent extends Identifiable {
    universities: any[]
 }
 
-export type LivestreamUserAction =
-   | "joinedTalentPool"
-   | "participatedInLivestream"
-   | "registeredToLivestream"
+export type LivestreamUserAction = keyof Pick<
+   UserLivestreamData,
+   "talentPool" | "registered" | "participated"
+>
 
 /*
  * Sub-collection found on the livestream doc called userLivestreamData
  * */
-export interface UserLivestreamData extends UserData {
-   userHas: LivestreamUserAction[] | firebase.firestore.FieldValue
+export interface UserLivestreamData extends Identifiable {
+   userId: string
    livestreamId: LivestreamEvent["id"]
-   livestreamGroupQuestionAnswers?: UserLivestreamGroupQuestionAnswers
-   dateJoinedTalentPool?:
-      | firebase.firestore.Timestamp
-      | firebase.firestore.FieldValue
-   dateParticipatedInLivestream?:
-      | firebase.firestore.Timestamp
-      | firebase.firestore.FieldValue
-   dateRegisteredToLivestream?:
-      | firebase.firestore.Timestamp
-      | firebase.firestore.FieldValue
+   user: UserData
+   answers?: UserLivestreamGroupQuestionAnswers
+   registered?: {
+      date: firebase.firestore.Timestamp
+      referral?: {
+         referralCode: string
+         inviteLivestream: string
+      }
+      utm: any
+   }
+   talentPool?: {
+      date: firebase.firestore.Timestamp
+      companyId: string
+   }
+   participated?: {
+      date: firebase.firestore.Timestamp
+   }
 }
 
 export type LivestreamGroupQuestionsMap = Record<

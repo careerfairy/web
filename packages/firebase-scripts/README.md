@@ -18,10 +18,10 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=<path-to-script> u
 
 ## Migrations
 
-### createNewFieldsOfStudyInFirestore
+### createNewFieldsAndLevelOfStudyInFirestore
 
 ```sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/createNewFieldsOfStudyInFirestore
+npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/createNewFieldsAndLevelOfStudyInFirestore
 ```
 
 #### What it does:
@@ -106,13 +106,27 @@ Interface of the `livestreams/{livestreamId}/userLivestreamData` document:
 
 ```sh
 {
-  ...backfilledUserData,
-  userHas:["joinedTalentPool","participatedInLivestream","registeredToLivestream"],
+  user:{
+    ...userData,
+  },
+  userId: "authId",
+  talentPool:{
+    date: Timestamp
+    companyId: string,
+  },
+  participating:{
+    date: Timestamp
+  },
+  registered:{
+    date: Timestamp,
+    referral: {
+         referralCode: string,
+         inviteLivestream: string
+    },
+    utm: any
+  },
   livestreamId: "streamId",
-  dateJoinedTalentPool?: "Timestamp",
-  dateParticipatedInLivestream?: "Timestamp",
-  dateRegisteredToLivestream?: "Timestamp",
-  livestreamGroupQuestionAnswers: { // <-- Dictionary of group question answers
+  answers: { // <-- Dictionary of group question answers
     [groupId]: {
       [questionId]:[answerId]
     }
@@ -154,9 +168,9 @@ Example Output of `careerCenterData/{groupId}/groupQuestions/${questionId}` docu
 
 ### Backfill Livestreams Collection:
 
-````sh
-npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/backfillCategories targetBackfill=livestreams```
-````
+```sh
+npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/backfillCategories targetBackfill=livestreams
+```
 
 #### What it does:
 

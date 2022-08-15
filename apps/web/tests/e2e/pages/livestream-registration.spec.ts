@@ -70,12 +70,12 @@ test("successful registration on a livestream event", async ({ page }) => {
       livestream.id,
       ["userLivestreamData"]
    )
-   expect(finalLivestreamData.userLivestreamData[0].userEmail).toBe(
+   expect(finalLivestreamData.userLivestreamData[0].user.userEmail).toBe(
       user.userEmail
    )
-   expect(finalLivestreamData.userLivestreamData[0].userHas).toContain(
-      "registeredToLivestream" as LivestreamUserAction
-   )
+   expect(
+      finalLivestreamData.userLivestreamData[0].registered.date
+   ).toBeTruthy()
    expect(finalLivestreamData.livestream.registeredUsers).toContain(
       user.userEmail
    )
@@ -120,12 +120,12 @@ test("register to an event and fill out a question and join talent pool", async 
       ["questions", "userLivestreamData"]
    )
    expect(finalLivestreamData.questions[0].title).toBe(question)
-   expect(finalLivestreamData.userLivestreamData[0].userEmail).toBe(
+   expect(finalLivestreamData.userLivestreamData[0].user.userEmail).toBe(
       user.userEmail
    )
-   expect(finalLivestreamData.userLivestreamData[0].userHas).toContain(
-      "joinedTalentPool" as LivestreamUserAction
-   )
+   expect(
+      finalLivestreamData.userLivestreamData[0].talentPool.date
+   ).toBeTruthy()
 })
 
 test("register to an event without login, login and proceed with registration", async ({

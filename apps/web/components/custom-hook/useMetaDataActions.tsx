@@ -22,20 +22,22 @@ import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithH
 import { useTheme } from "@mui/material/styles"
 import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useGroup } from "../../layouts/GroupDashboardLayout"
+import { CSVDownloadUserData } from "@careerfairy/shared-lib/dist/users"
 
 interface MetaDataActionsProps {
-   allGroups: Group[]
    group: Group
    isPast: boolean
    isDraft: boolean
 }
 
 export function useMetaDataActions({
-   allGroups,
    group,
    isPast,
    isDraft,
@@ -45,26 +47,32 @@ export function useMetaDataActions({
    const { userData } = useAuth()
    const theme = useTheme()
    const dispatch = useDispatch()
-   const [talentPoolDictionary, setTalentPoolDictionary] = useState({})
+   const [talentPoolDictionary, setTalentPoolDictionary] = useState<
+      Record<string, CSVDownloadUserData[]>
+   >({})
    const [targetStream, setTargetStream] = useState<LivestreamEvent>(null)
-   const [loadingReportData, setLoadingReportData] = useState({})
+   const [loadingReportData, setLoadingReportData] = useState<
+      Record<string, boolean>
+   >({})
    const [
       loadingRegisteredUsersFromGroupData,
       setLoadingRegisteredUsersFromGroupData,
    ] = useState<Record<string, boolean>>({})
-   const [loadingTalentPool, setLoadingTalentPool] = useState({})
+   const [loadingTalentPool, setLoadingTalentPool] = useState<
+      Record<string, boolean>
+   >({})
 
    const [
       registeredStudentsFromGroupDictionary,
       setRegisteredStudentsFromGroupDictionary,
-   ] = useState({})
+   ] = useState<Record<string, CSVDownloadUserData[]>>({})
    const [reportDataDictionary, setReportDataDictionary] = useState<
       Record<string, PdfReportData>
    >({})
    const [reportPdfData, setReportPdfData] = useState<PdfReportData>(null)
 
    const [registeredStudentsDictionary, setRegisteredStudentsDictionary] =
-      useState({})
+      useState<Record<string, UserLivestreamData[]>>({})
 
    const removeReportPdfData = useCallback(() => {
       setReportPdfData(null)
@@ -87,8 +95,8 @@ export function useMetaDataActions({
             ) {
                let users = targetRegisteredStudents
                if (group.universityCode) {
-                  users = targetRegisteredStudents.filter((user) =>
-                     groupPresenter.isUniversityStudent(user)
+                  users = targetRegisteredStudents.filter((data) =>
+                     groupPresenter.isUniversityStudent(data.user)
                   )
                }
                const csvData = StatsUtil.getCsvData(
@@ -123,7 +131,7 @@ export function useMetaDataActions({
             const newRegisteredStudents =
                await livestreamRepo.getLivestreamUsers(
                   targetStream.id,
-                  "registeredToLivestream"
+                  "registered"
                )
 
             setRegisteredStudentsDictionary({
@@ -145,7 +153,7 @@ export function useMetaDataActions({
                if (!talentPoolDictionary[targetStream.id]) {
                   const users = await livestreamRepo.getLivestreamUsers(
                      targetStream.id,
-                     "joinedTalentPool"
+                     "talentPool"
                   )
                   const csvData = StatsUtil.getCsvData(
                      group,

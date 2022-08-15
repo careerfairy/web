@@ -55,9 +55,7 @@ export default class StatsUtil {
       question: LivestreamGroupQuestion
    ): string {
       const userAnswerId =
-         userLivestreamData?.livestreamGroupQuestionAnswers[groupId]?.[
-            question?.id
-         ]
+         userLivestreamData?.answers?.[groupId]?.[question?.id]
       return question?.options?.[userAnswerId]?.name
    }
 
@@ -68,15 +66,17 @@ export default class StatsUtil {
       groupQuestions: GroupQuestion[]
    ): CSVDownloadUserData[] {
       return users
-         .map((user) => {
+         .map((data) => {
             const otherCustomUniversityCategories = Object.keys(
                targetStream.groupQuestionsMap || {}
-            ).reduce((acc, groupId) => {
+            ).reduce<
+               Record<GroupQuestion["name"], GroupQuestionOption["name"]>
+            >((acc, groupId) => {
                const groupData = targetStream.groupQuestionsMap[groupId]
                Object.values(groupData.questions).forEach((question) => {
                   acc[question.name] =
                      this.getUserAnswerNameFromLivestreamGroupQuestion(
-                        user,
+                        data,
                         groupData.groupId,
                         question
                      )
@@ -84,21 +84,21 @@ export default class StatsUtil {
                return acc
             }, {})
             return {
-               "First Name": user.firstName,
-               "Last Name": user.lastName,
-               Email: user.userEmail,
-               University: user.university?.name || "N/A",
+               "First Name": data.user.firstName,
+               "Last Name": data.user.lastName,
+               Email: data.user.userEmail,
+               University: data.user.university?.name || "N/A",
                "Level of study":
                   StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
                      "levelOfStudy",
                      groupQuestions,
-                     user
+                     data.user
                   ),
                "Field of study":
                   StatsUtil.getUserUniLevelOrFieldOfStudyCategoryByType(
                      "fieldOfStudy",
                      groupQuestions,
-                     user
+                     data.user
                   ),
                ...otherCustomUniversityCategories,
             }
@@ -107,9 +107,9 @@ export default class StatsUtil {
    }
 
    static getUserUniLevelOrFieldOfStudyCategoryByType(
-      type: Omit<GroupQuestion["questionType"], "custom">,
+      type: GroupQuestion["questionType"],
       groupQuestions: GroupQuestion[],
-      user: UserLivestreamData
+      user: UserData
    ): GroupQuestionOption["name"] | "N/A" {
       const groupQuestion = groupQuestions.find(
          (question) => question.questionType === type

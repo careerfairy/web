@@ -3,6 +3,7 @@ import {
    GroupATSAccountDocument,
    GroupATSIntegrationTokensDocument,
    GroupQuestion,
+   UserGroupData,
 } from "./groups"
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
@@ -11,7 +12,7 @@ import {
    OnSnapshotCallback,
    Unsubscribe,
 } from "../BaseFirebaseRepository"
-import { UserData, UserGroupData } from "../users"
+import { UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 
 const cloneDeep = require("lodash.clonedeep")

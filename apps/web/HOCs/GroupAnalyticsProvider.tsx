@@ -4,11 +4,10 @@ import {
    useFieldsOfStudy,
    useLevelsOfStudy,
 } from "../components/custom-hook/useCollection"
-import { LevelOfStudy } from "@careerfairy/shared-lib/dist/levelOfStudy"
 
 type DefaultContext = {
    fieldsOfStudy: FieldOfStudy[]
-   levelsOfStudy: LevelOfStudy[]
+   levelsOfStudy: FieldOfStudy[]
 }
 const AnalyticsContext = createContext<DefaultContext>({
    fieldsOfStudy: [],

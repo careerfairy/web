@@ -463,22 +463,22 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
 
    livestreamUsersQuery(
       eventId: string,
-      userType: LivestreamUserAction
+      userAction: LivestreamUserAction
    ): firebase.firestore.Query {
       return this.firestore
          .collection("livestreams")
          .doc(eventId)
          .collection("userLivestreamData")
-         .where("userHas", "array-contains", userType)
+         .where(`${userAction}.date`, "!=", null)
    }
 
    livestreamUsersQueryWithRef(
       streamRef: firebase.firestore.DocumentReference,
-      userType: LivestreamUserAction
+      userAction: LivestreamUserAction
    ): firebase.firestore.Query {
       return streamRef
          .collection("userLivestreamData")
-         .where("userHas", "==", userType)
+         .where(`${userAction}.date`, "!=", null)
    }
 
    async getAllLivestreams(

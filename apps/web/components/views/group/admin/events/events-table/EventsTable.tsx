@@ -76,7 +76,6 @@ const EventsTable = ({
    const { userData } = useAuth()
    const [deletingEvent, setDeletingEvent] = useState(false)
    const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null)
-   const [allGroups, setAllGroups] = useState([])
    const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] =
       useState(false)
    const [endOfEventDialogData, setEndOfEventDialogData] = useState(null)
@@ -90,7 +89,6 @@ const EventsTable = ({
       setTargetStream,
       registeredStudentsFromGroupDictionary,
    } = useMetaDataActions({
-      allGroups,
       group,
       isPast,
       isDraft,
@@ -106,18 +104,6 @@ const EventsTable = ({
          handleRowClick(undefined, { id: eventId })
       }
    }, [eventId])
-
-   useEffect(() => {
-      firebase.getAllCareerCenters().then((querySnapshot) => {
-         let careerCenters = []
-         querySnapshot.forEach((doc) => {
-            let cc = doc.data()
-            cc.id = doc.id
-            careerCenters.push(cc)
-         })
-         setAllGroups(careerCenters)
-      })
-   }, [])
 
    useEffect(() => {
       if (streams?.length) {

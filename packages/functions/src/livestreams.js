@@ -14,10 +14,8 @@ exports.assertLivestreamRegistrationWasCompleted = functions.firestore
          `Documents created in userLivestreamData in ${context.params.livestreamId}`
       )
       if (snapshot.exists) {
-         const user = snapshot.data()
-         const userRegistered = user?.userHas?.includes(
-            "registeredToLivestream"
-         )
+         const data = snapshot.data()
+         const userRegistered = Boolean(data?.registered?.date)
          if (!userRegistered) return
          admin
             .firestore()
@@ -43,9 +41,8 @@ exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
          `Documents deleted in userLivestreamData in ${context.params.livestreamId}`
       )
       const snap = change.after
-      const user = snap && snap.data()
-      const userStillRegistered =
-         user && user.userHas && user.userHas.includes("registeredToLivestream")
+      const data = snap && snap.data()
+      const userStillRegistered = Boolean(data?.registered?.date)
 
       if (userStillRegistered) return
 

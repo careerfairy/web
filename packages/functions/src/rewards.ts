@@ -16,7 +16,10 @@ import {
    rewardCreateReferralSignUpFollower,
 } from "./lib/reward"
 import { livestreamGetById } from "./lib/livestream"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 /**
  * Everytime there is a new reward document, apply the reward depending on the action
@@ -116,26 +119,27 @@ export const rewardLivestreamRegistrant = functions
       "livestreams/{livestreamId}/userLivestreamData/{userEmail}"
    )
    .onCreate(async (snap, context) => {
-      const documentData = snap.data()
+      const documentData = { ...snap.data(), id: snap.id } as UserLivestreamData
 
       if (
-         !documentData.referral ||
-         !documentData.referral.referralCode ||
-         !documentData.referral.inviteLivestream
+         !documentData.registered.referral ||
+         !documentData.registered.referral.referralCode ||
+         !documentData.registered.referral.inviteLivestream
       ) {
          functions.logger.info("No referral information to reward.")
          return
       }
 
       if (
-         documentData.referral.inviteLivestream !== context.params.livestreamId
+         documentData.registered.referral.inviteLivestream !==
+         context.params.livestreamId
       ) {
          functions.logger.info("The invite wasn't for this event, ignoring.")
          return
       }
 
       const userInviteOwner = await userGetByReferralCode(
-         documentData.referral.referralCode
+         documentData.registered.referral.referralCode
       )
 
       if (

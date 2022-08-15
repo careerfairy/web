@@ -4,12 +4,15 @@ import {
    RegisteredStudent,
    TalentPoolStudent,
    UserData,
-   UserGroupData,
-   UserGroupQuestionsWithAnswerMap,
    UserReadableGroupQuestionsWithAnswerMap,
 } from "@careerfairy/shared-lib/dist/users"
 import Counter from "../lib/Counter"
-import { Group, GroupQuestion } from "@careerfairy/shared-lib/dist/groups"
+import {
+   Group,
+   GroupQuestion,
+   UserGroupData,
+   UserGroupQuestionsWithAnswerMap,
+} from "@careerfairy/shared-lib/dist/groups"
 import {
    possibleFieldsOfStudy,
    possibleLevelsOfStudy,
@@ -378,14 +381,16 @@ const getUniversity = (user: UserData, groupsDict: GroupsDict): Group => {
    // get university User is following
    const registeredUniGroup = groups.find(
       (group) =>
-         group.universityCode === user.university.code &&
-         user.groupIds.includes(group.id)
+         group.universityCode === user.university?.code &&
+         user.groupIds?.includes(group.id)
    )
    if (registeredUniGroup) {
       return registeredUniGroup
    }
    // Otherwise get first university group User is registered to
-   return groups.find((group) => group?.universityCode === user.university.code)
+   return groups.find(
+      (group) => group?.universityCode === user.university?.code
+   )
 }
 
 const getCategorySelectedOptionId = (
@@ -573,6 +578,7 @@ const backfillUsers = (
             counter
          )
 
+      // @ts-ignore
       updateData = {
          ...updateData,
          university: {
@@ -584,10 +590,8 @@ const backfillUsers = (
             ),
          },
          ...(backFills.length && {
-            // @ts-ignore
             backFills: FieldValue.arrayUnion(...backFills),
          }),
-         ...(dataForUserLivestreamData && dataForUserLivestreamData),
       }
 
       setUserLivestreamData(
@@ -595,7 +599,8 @@ const backfillUsers = (
          bulkWriter,
          documentType,
          counter,
-         userRef
+         userRef,
+         dataForUserLivestreamData
       )
       counter.writeIncrement()
    }
@@ -668,7 +673,7 @@ const storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection = (
       return undefined
    } else {
       // we only return data to be merged into the livestream/userLivestreamData/document
-      return { livestreamGroupQuestionAnswers: dataDict, livestreamId }
+      return { answers: dataDict, livestreamId }
    }
 }
 
@@ -680,13 +685,13 @@ const getUserAction = (documentType: DocumentType): LivestreamUserAction => {
    let userAction: LivestreamUserAction
    switch (documentType) {
       case "participatingStudent":
-         userAction = "participatedInLivestream"
+         userAction = "participated"
          break
       case "registeredStudent":
-         userAction = "registeredToLivestream"
+         userAction = "registered"
          break
       case "talentPoolStudent":
-         userAction = "joinedTalentPool"
+         userAction = "talentPool"
          break
       default:
          throwMigrationError(`Unknown document type ${documentType}`)
@@ -811,7 +816,8 @@ const setUserLivestreamData = (
    bulkWriter: BulkWriter,
    documentType: DocumentType,
    counter: Counter,
-   userRef: DocumentReference
+   userRef: DocumentReference,
+   dataForUserLivestreamData: Partial<UserLivestreamData>
 ) => {
    // if is userData document just update user
    if (documentType === "userData") {
@@ -836,10 +842,15 @@ const setUserLivestreamData = (
       .set(
          updateRef,
          {
-            ...updateData,
-            userHas: FieldValue.arrayUnion(userAction),
-            [dateField]: dateOfAction,
+            userId: updateData.authId || null,
+            user: {
+               ...updateData,
+            },
+            [userAction]: {
+               date: dateOfAction,
+            },
             livestreamId,
+            ...dataForUserLivestreamData,
          } as UserLivestreamData,
          { merge: true }
       )

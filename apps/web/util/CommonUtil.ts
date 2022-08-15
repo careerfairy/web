@@ -204,18 +204,9 @@ export const findElementsWithDuplicatePropertiesInArray = <T>(
          (propertyValue, i, arrayOfPropertyValues) =>
             propertyValue && arrayOfPropertyValues.indexOf(propertyValue) !== i
       )
-   const duplicateElements = elements
+   return elements
       .filter((obj) => duplicateProperties.includes(getPropertyString(obj)))
       .sort(dynamicSort(sortBy))
-   if (duplicateElements) {
-      console.log(
-         `-> elements that have the duplicate ${properties.join(" and ")}:`
-      )
-      console.table(duplicateElements)
-   } else {
-      console.log(`-> no duplicate elements found`)
-   }
-   return duplicateElements
 }
 
 export const capitalizeFirstLetter = (string: string) => {
