@@ -26,3 +26,7 @@ export const checkIfHasMatch = (
 export const trimAndLowerCase = (str: string) => {
    return str.trim().toLowerCase()
 }
+
+export const throwMigrationError = (message: string) => {
+   throw new Error(`Migration canceled, Error Message: ${message}`)
+}

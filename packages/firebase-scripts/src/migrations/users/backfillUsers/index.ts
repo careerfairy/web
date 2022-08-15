@@ -1,4 +1,4 @@
-import { firestore } from "../lib/firebase"
+import { firestore } from "../../../lib/firebase"
 import {
    ParticipatingStudent,
    RegisteredStudent,
@@ -6,10 +6,9 @@ import {
    UserData,
    UserReadableGroupQuestionsWithAnswerMap,
 } from "@careerfairy/shared-lib/dist/users"
-import Counter from "../lib/Counter"
+import Counter from "../../../lib/Counter"
 import {
    Group,
-   GroupQuestion,
    UserGroupData,
    UserGroupQuestionsWithAnswerMap,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -17,51 +16,44 @@ import {
    possibleFieldsOfStudy,
    possibleLevelsOfStudy,
    possibleOthers,
-} from "../constants"
+} from "../../../constants"
 import { RegisteredGroup } from "@careerfairy/shared-lib/dist/users/users"
 import {
    checkIfHasMatch,
-   getCLIBarOptions,
    removeDuplicates,
+   throwMigrationError,
    trimAndLowerCase,
-} from "../util/misc"
+} from "../../../util/misc"
 import * as mappings from "@careerfairy/firebase-scripts/data/fieldAndLevelOfStudyMapping.json"
-
-const cliProgress = require("cli-progress")
-
 import {
    BulkWriter,
    DocumentReference,
    FieldValue,
 } from "firebase-admin/firestore"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { groupRepo, livestreamRepo, userRepo } from "../repositories"
-import { getArgValue } from "../index"
+import { groupRepo, livestreamRepo, userRepo } from "../../../repositories"
+import { getArgValue } from "../../../index"
 import {
-   LivestreamEvent,
-   LivestreamGroupQuestion,
-   LivestreamGroupQuestionsMap,
    LivestreamUserAction,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { ReadableQuestionAndAnswer } from "@careerfairy/shared-lib/src/users"
 import { GroupCategory } from "@careerfairy/shared-lib/src/groups"
+import {
+   handleBulkWriterError,
+   handleBulkWriterSuccess,
+   loopProgressBar,
+   writeProgressBar,
+} from "../../../util/bulkWriter"
+import counterConstants from "../../../lib/Counter/constants"
 
 const customCountKeys = {
-   totalNumDocs: "Total Docs",
-   currentDocIndex: "Current Doc Index",
    numTotalUsers: "Total Users",
-   numTotalLiveStreams: "Total Live Streams",
    numUsersWithFieldOfStudy: "Users with Field of Study",
    numUsersWithLevelOfStudy: "Users with Level of Study",
    numUsersWithRegisteredGroups: "Users with Registered Groups",
-   numGroupQuestions: "Group Questions",
    numUsersWithAssignedFieldOfStudy: "Users with Assigned Field of Study",
    numUsersWithAssignedLevelOfStudy: "Users with Assigned Level of Study",
-   numUniversityGroups: "Total Number of University Groups",
-   numNonUniversityGroups: "Total Number of Non University Groups",
-   numFailedWrites: "Failed Writes",
-   numSuccessfulWrites: "Successful Writes",
 }
 
 const levelOfStudyMapping = mappings.levelOfStudyMapping
@@ -73,25 +65,15 @@ type DocumentType =
    | "participatingStudent"
    | "talentPoolStudent"
    | "userData"
-   | "careerCenterData"
-   | "livestreams"
 
-const writeProgressBar = new cliProgress.SingleBar(
-   getCLIBarOptions("Writes Progress", "Successful Writes"),
-   cliProgress.Presets.shades_classic
-)
-const loopProgressBar = new cliProgress.SingleBar(
-   getCLIBarOptions("Analyzing Data", "Documents Analyzed"),
-   cliProgress.Presets.shades_classic
-)
-export default async function main() {
+export async function run() {
    const counter = new Counter()
    const targetBackfill = getArgValue<DocumentType>("targetBackfill")
    try {
       const bulkWriter = firestore.bulkWriter()
       const groups = await groupRepo.getAllGroups()
       counter.addToReadCount(groups.length)
-      counter.setCustomCount(customCountKeys.numFailedWrites, 0)
+      counter.setCustomCount(counterConstants.numFailedWrites, 0)
       const groupsDict = convertDocArrayToDict(groups)
 
       switch (targetBackfill) {
@@ -131,17 +113,6 @@ export default async function main() {
                "talentPoolStudent"
             )
             break
-         case "livestreams":
-            storeGroupQuestionsOnLivestreams(
-               await livestreamRepo.getAllLivestreams(),
-               groupsDict,
-               bulkWriter,
-               counter
-            )
-            break
-         case "careerCenterData":
-            createCustomGroupCategorySubCollections(groups, bulkWriter, counter)
-            break
          default:
             throwMigrationError("Invalid targetBackfill")
       }
@@ -149,7 +120,7 @@ export default async function main() {
       Counter.log("Committing all writes...")
       writeProgressBar.start(
          counter.write(),
-         counter.getCustomCount(customCountKeys.numSuccessfulWrites)
+         counter.getCustomCount(counterConstants.numSuccessfulWrites)
       )
       /*
        * Commits all enqueued writes and marks the BulkWriter instance as closed.
@@ -164,19 +135,14 @@ export default async function main() {
    } catch (error) {
       throwMigrationError(error.message)
    } finally {
-      if (
-         targetBackfill !== "careerCenterData" &&
-         targetBackfill !== "livestreams"
-      ) {
-         printPercentOfUsersAssignedData(
-            customCountKeys.numUsersWithAssignedFieldOfStudy,
-            counter
-         )
-         printPercentOfUsersAssignedData(
-            customCountKeys.numUsersWithAssignedLevelOfStudy,
-            counter
-         )
-      }
+      printPercentOfUsersAssignedData(
+         customCountKeys.numUsersWithAssignedFieldOfStudy,
+         counter
+      )
+      printPercentOfUsersAssignedData(
+         customCountKeys.numUsersWithAssignedLevelOfStudy,
+         counter
+      )
       counter.print()
    }
 }
@@ -287,17 +253,6 @@ const getRegisteredGroupPossibleCategories = (
    return registeredGroupCategories.filter((category) =>
       checkIfHasMatch(category.name, possibleNames)
    )
-}
-
-const getQuestionType = (
-   questionName: string
-): GroupQuestion["questionType"] => {
-   const isFieldOfStudy = checkIfHasMatch(questionName, possibleFieldsOfStudy)
-   const isLevelOfStudy = checkIfHasMatch(questionName, possibleLevelsOfStudy)
-
-   if (isFieldOfStudy) return "fieldOfStudy"
-   if (isLevelOfStudy) return "levelOfStudy"
-   return "custom"
 }
 
 const convertUserGroupCategoriesToQuestionWithAnswerMap = (
@@ -411,70 +366,6 @@ const getCategorySelectedOptionId = (
    return category?.selectedValueId || null
 }
 
-// Goes through every group and creates a document for each category
-// then stores each document in the group's groupQuestions sub-collection
-const createCustomGroupCategorySubCollections = (
-   groups: Group[],
-   bulkWriter: BulkWriter,
-   counter: Counter
-) => {
-   counter.setCustomCount(customCountKeys.totalNumDocs, groups.length)
-
-   loopProgressBar.start(groups.length, 0)
-   groups.forEach((group, index) => {
-      counter.setCustomCount(customCountKeys.currentDocIndex, index)
-      loopProgressBar.update(index + 1)
-      if (!group.categories) return
-      let groupHasFieldOfStudy, groupHasLevelOfStudy
-      const isUniversityGroup = group.universityCode
-      if (isUniversityGroup) {
-         counter.customCountIncrement(customCountKeys.numUniversityGroups)
-      } else {
-         counter.customCountIncrement(customCountKeys.numNonUniversityGroups)
-      }
-      group.categories?.forEach((category) => {
-         const categoryRef = firestore
-            .collection(`careerCenterData/${group.id}/groupQuestions`)
-            .doc(category.id)
-
-         const questionType = getQuestionType(category.name)
-         if (!groupHasFieldOfStudy) {
-            groupHasFieldOfStudy = questionType === "fieldOfStudy"
-         }
-         if (!groupHasLevelOfStudy) {
-            groupHasLevelOfStudy = questionType === "levelOfStudy"
-         }
-
-         if (isUniversityGroup || questionType === "custom") {
-            const categoryData: GroupQuestion = {
-               id: category.id,
-               name: category.name,
-               options: convertDocArrayToDict(category.options),
-               questionType: questionType,
-            }
-            bulkWriter
-               .set(categoryRef, categoryData)
-               .then(() => handleBulkWriterSuccess(counter))
-               .catch((e) => handleBulkWriterError(e, counter))
-            counter.writeIncrement()
-            counter.customCountIncrement(customCountKeys.numGroupQuestions)
-         }
-      })
-
-      if (!groupHasFieldOfStudy && !groupHasLevelOfStudy && isUniversityGroup) {
-         // throw an error if the group has no field of study or level of study
-         throwMigrationError(
-            `University Group ${
-               group.universityName
-            } has no field of study or level of study, please fix that first, Group Data: ${JSON.stringify(
-               group
-            )}`
-         )
-      }
-   })
-   loopProgressBar.stop()
-}
-
 /*
  * Goes through every user and does 2 things:
  *
@@ -496,13 +387,13 @@ const backfillUsers = (
    documentType: DocumentType
 ) => {
    counter.setCustomCount(customCountKeys.numTotalUsers, users.length)
-   counter.setCustomCount(customCountKeys.totalNumDocs, users.length)
+   counter.setCustomCount(counterConstants.totalNumDocs, users.length)
    counter.addToReadCount(users.length)
    loopProgressBar.start(users.length, 0)
 
    for (let index = 0; index < users.length; index++) {
       // fastest looping method
-      counter.setCustomCount(customCountKeys.currentDocIndex, index)
+      counter.setCustomCount(counterConstants.currentDocIndex, index)
       loopProgressBar.update(index + 1)
       const userData = users[index]
 
@@ -677,10 +568,6 @@ const storeLivestreamGroupQuestionsWithAnswersInUserLivestreamDataCollection = (
    }
 }
 
-const throwMigrationError = (message: string) => {
-   throw new Error(`Migration canceled, Error Message: ${message}`)
-}
-
 const getUserAction = (documentType: DocumentType): LivestreamUserAction => {
    let userAction: LivestreamUserAction
    switch (documentType) {
@@ -717,94 +604,6 @@ const getUserSubCollectionDateField = (
          throwMigrationError(`Unknown document type ${documentType}`)
    }
    return dateField
-}
-
-const storeGroupQuestionsOnLivestreams = (
-   livestreams: LivestreamEvent[],
-   groupsDict: GroupsDict,
-   bulkWriter: BulkWriter,
-   counter: Counter
-) => {
-   counter.setCustomCount(customCountKeys.totalNumDocs, livestreams.length)
-
-   counter.addToCustomCount(
-      customCountKeys.numTotalLiveStreams,
-      livestreams.length
-   )
-   counter.addToReadCount(livestreams.length)
-   loopProgressBar.start(livestreams.length, 0)
-   for (let i = 0; i < livestreams.length; i++) {
-      const livestream = livestreams[i]
-      counter.setCustomCount(customCountKeys.currentDocIndex, i)
-      loopProgressBar.update(i + 1)
-
-      const livestreamRef = firestore
-         .collection("livestreams")
-         .doc(livestream.id)
-
-      const updateData: Partial<LivestreamEvent> = {
-         groupQuestionsMap: getLivestreamGroupQuestions(livestream, groupsDict),
-      }
-      bulkWriter
-         .update(livestreamRef, updateData)
-         .then(() => handleBulkWriterSuccess(counter))
-         .catch((err) => {
-            console.error(err)
-            handleBulkWriterError(err, counter)
-         })
-      counter.writeIncrement()
-   }
-   loopProgressBar.stop()
-}
-const getLivestreamGroupQuestions = (
-   livestream: LivestreamEvent,
-   groupsDict: GroupsDict
-): LivestreamGroupQuestionsMap => {
-   if (!livestream.groupIds?.length) return null
-   return livestream.groupIds.reduce<LivestreamGroupQuestionsMap>(
-      (acc, currGroupId) => {
-         const group = groupsDict[currGroupId]
-         if (!group) return acc
-         if (group) {
-            acc[group.id] = {
-               groupId: group.id || null,
-               groupName: group.universityName || null,
-               questions:
-                  group.categories?.reduce<
-                     Record<LivestreamGroupQuestion["id"], GroupQuestion>
-                  >((acc, currCategory) => {
-                     const questionType = getQuestionType(currCategory.name)
-                     if (
-                        questionType === "fieldOfStudy" ||
-                        questionType === "levelOfStudy"
-                     ) {
-                        return acc // skip storing fieldOfStudy and levelOfStudy questions on the livestream
-                     }
-                     acc[currCategory.id] = {
-                        id: currCategory.id || null,
-                        name: currCategory.name || null,
-                        hidden: currCategory.hidden ?? false,
-                        questionType,
-                        options:
-                           currCategory.options?.reduce(
-                              (optionAcc, currOption) => {
-                                 optionAcc[currOption.id] = {
-                                    id: currOption.id || null,
-                                    name: currOption.name || null,
-                                 }
-                                 return optionAcc
-                              },
-                              {}
-                           ) || null,
-                     }
-                     return acc
-                  }, {}) || null,
-            }
-         }
-         return acc
-      },
-      {}
-   )
 }
 
 const setUserLivestreamData = (
@@ -856,23 +655,4 @@ const setUserLivestreamData = (
       )
       .then(() => handleBulkWriterSuccess(counter))
       .catch((err) => handleBulkWriterError(err, counter))
-}
-
-const handleBulkWriterError = (err: Error, counter: Counter) => {
-   console.error(err)
-   counter.customCountIncrement(customCountKeys.numFailedWrites)
-}
-const handleBulkWriterSuccess = (counter: Counter) => {
-   counter.customCountIncrement(customCountKeys.numSuccessfulWrites)
-   const totalDocs = counter.getCustomCount(customCountKeys.totalNumDocs)
-   const currentDocIndex = counter.getCustomCount(
-      customCountKeys.currentDocIndex
-   )
-   const hasLoopedThroughAllDocs = currentDocIndex >= totalDocs - 1
-   if (hasLoopedThroughAllDocs) {
-      const currentSuccessfulWriteCount = counter.getCustomCount(
-         customCountKeys.numSuccessfulWrites
-      )
-      writeProgressBar.update(currentSuccessfulWriteCount)
-   }
 }

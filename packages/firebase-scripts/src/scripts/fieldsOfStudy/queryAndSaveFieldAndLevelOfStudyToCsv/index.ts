@@ -1,8 +1,10 @@
-import { firestore } from "../lib/firebase"
+import { firestore } from "../../../lib/firebase"
 import { Group, GroupOption } from "@careerfairy/shared-lib/dist/groups"
-import { possibleFieldsOfStudy, possibleLevelsOfStudy } from "../constants"
+import {
+   possibleFieldsOfStudy,
+   possibleLevelsOfStudy,
+} from "../../../constants"
 const ObjectsToCsv = require("objects-to-csv")
-
 type DataEntry = {
    // Name of category Option
    name: string
@@ -10,7 +12,7 @@ type DataEntry = {
    count: number
 }
 
-export default async function run() {
+export async function run() {
    try {
       const snaps = await firestore.collection("careerCenterData").get()
 

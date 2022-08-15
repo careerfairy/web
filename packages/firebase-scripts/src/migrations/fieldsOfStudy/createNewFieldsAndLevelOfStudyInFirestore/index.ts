@@ -1,9 +1,9 @@
 import * as mappings from "@careerfairy/firebase-scripts/data/fieldAndLevelOfStudyMapping.json"
-import { firestore } from "../lib/firebase"
+import { firestore } from "../../../lib/firebase"
 import { WriteBatch } from "firebase-admin/firestore"
-import config from "../config"
-
-export default async function createNewFieldsAndLevelOfStudyInFirestore() {
+import config from "../../../config"
+//
+export async function run() {
    const batch = firestore.batch()
    const newFieldsOfStudyMapping = mappings.fieldOfStudyMapping.current
    const newLevelsOfStudyMapping = mappings.levelOfStudyMapping.current

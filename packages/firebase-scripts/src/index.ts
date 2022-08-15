@@ -15,7 +15,7 @@ async function run(): Promise<void> {
       throw new Error(`scriptPath is required`)
    }
    try {
-      const script = require(scriptPath).default
+      const script = require(scriptPath).run
       console.log("-> Script Execution Started")
       console.time(`${scriptPath}`)
       await confirmScriptSafetyWrapper(script, useProd)
