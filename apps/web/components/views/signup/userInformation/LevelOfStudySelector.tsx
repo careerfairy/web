@@ -69,7 +69,9 @@ export const LevelOfStudyUpdater = () => {
                   userData.userEmail,
                   selectedOption
                )
-            } catch (e) {}
+            } catch (e) {
+               console.error(e)
+            }
             setLoading(false)
          }
       },
