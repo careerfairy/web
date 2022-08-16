@@ -474,7 +474,6 @@ const backfillUsers = (
          ...updateData,
          university: {
             ...userData.university,
-            groupId: university?.id || null,
             questions: getUserReadableGroupQuestionsWithAnswerMap(
                userData,
                university
