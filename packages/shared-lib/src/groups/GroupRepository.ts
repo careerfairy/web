@@ -526,14 +526,17 @@ export class FirebaseGroupRepository
          return null
       }
 
-      const userUniversityGroupId = userData.university.groupId
-      const usersUniversityIsInEvent = livestream.groupIds.includes(
-         userUniversityGroupId
+      const userUniversityCode = userData.university?.code
+      const usersUniversityGroup = Object.values(
+         livestream.groupQuestionsMap || {}
+      )?.find(
+         (data) =>
+            data.universityCode && data.universityCode === userUniversityCode
       )
-      if (usersUniversityIsInEvent) {
+      if (usersUniversityGroup) {
          livestreamGroupQuestionsMap =
             await this.addUniversityLevelAndFieldOfStudyQuestionsToEventQuestions(
-               userUniversityGroupId,
+               usersUniversityGroup.groupId,
                livestreamGroupQuestionsMap
             )
       }

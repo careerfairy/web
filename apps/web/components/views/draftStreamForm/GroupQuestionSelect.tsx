@@ -54,6 +54,7 @@ const GroupQuestionSelect = ({
          const groupQuestionsMap: LivestreamGroupQuestions = {
             groupId: group.id,
             groupName: group.universityName,
+            universityCode: group.universityCode || null,
             questions: selectedItems.reduce<
                Record<string, LivestreamGroupQuestion>
             >(
