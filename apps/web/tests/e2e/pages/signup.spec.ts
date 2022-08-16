@@ -3,6 +3,7 @@ import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
 import { SignupPage } from "../page-object-models/SignupPage"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
+import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
 import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
 import { PortalPage } from "../page-object-models/PortalPage"
 import { LoginPage } from "../page-object-models/LoginPage"
@@ -12,6 +13,8 @@ test.describe("Signup Page Functionality", () => {
       await Promise.all([
          InterestSeed.createBasicInterests(),
          UniversitiesSeed.createBasicUniversities(),
+         FieldsOfStudySeed.createCollection("fieldsOfStudy"),
+         FieldsOfStudySeed.createCollection("levelsOfStudy"),
       ])
    })
 
@@ -25,6 +28,8 @@ test.describe("Signup Page Functionality", () => {
          UserSeed.deleteUser(credentials.correctEmail),
          UniversitiesSeed.deleteUniversities(),
          InterestSeed.deleteInterests(),
+         FieldsOfStudySeed.deleteCollection("fieldsOfStudy"),
+         FieldsOfStudySeed.deleteCollection("levelsOfStudy"),
       ])
    })
 
@@ -40,6 +45,8 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
+         correctFieldOfStudyName,
+         correctLevelOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -52,6 +59,8 @@ test.describe("Signup Page Functionality", () => {
          email: correctEmail,
          lastName: correctLastName,
          firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
@@ -109,6 +118,8 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
+         correctFieldOfStudyName,
+         correctLevelOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -121,6 +132,8 @@ test.describe("Signup Page Functionality", () => {
          email: correctEmail,
          lastName: correctLastName,
          firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
@@ -143,6 +156,8 @@ test.describe("Signup Page Functionality", () => {
          countriesOfInterestIds: [firstCountriesOfInterestId],
          regionsOfInterestIds: [firstRegionOfInterestId],
          interestsIds: [firstInterestsId],
+         correctLevelOfStudyName,
+         correctFieldOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -155,6 +170,8 @@ test.describe("Signup Page Functionality", () => {
          email: correctEmail,
          lastName: correctLastName,
          firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
@@ -224,6 +241,8 @@ test.describe("Signup Page Functionality", () => {
          correctLastName,
          correctFirstName,
          wrongLinkedinUrl,
+         correctLevelOfStudyName,
+         correctFieldOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -236,6 +255,8 @@ test.describe("Signup Page Functionality", () => {
          email: correctEmail,
          lastName: correctLastName,
          firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
@@ -285,6 +306,8 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
+         correctLevelOfStudyName,
+         correctFieldOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -297,6 +320,8 @@ test.describe("Signup Page Functionality", () => {
          email: correctEmail,
          lastName: correctLastName,
          firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
@@ -351,6 +376,8 @@ test.describe("Signup Page Functionality", () => {
          correctEmail,
          correctLastName,
          correctFirstName,
+         correctLevelOfStudyName,
+         correctFieldOfStudyName,
       } = credentials
 
       await signup.fillSignupForm({
@@ -363,6 +390,8 @@ test.describe("Signup Page Functionality", () => {
          email: correctEmail,
          lastName: correctLastName,
          firstName: correctFirstName,
+         levelOfStudyName: correctLevelOfStudyName,
+         fieldOfStudyName: correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.emailVerificationStepMessage).toBeVisible()
@@ -454,6 +483,8 @@ test.describe("Signup Page Functionality", () => {
          email: credentials.correctEmail,
          lastName: credentials.correctLastName,
          firstName: credentials.correctFirstName,
+         levelOfStudyName: credentials.correctLevelOfStudyName,
+         fieldOfStudyName: credentials.correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.confirmPasswordMissMatchedWarning).toBeVisible()
@@ -473,6 +504,8 @@ test.describe("Signup Page Functionality", () => {
          email: credentials.correctEmail,
          lastName: credentials.correctLastName,
          firstName: credentials.correctFirstName,
+         levelOfStudyName: credentials.correctLevelOfStudyName,
+         fieldOfStudyName: credentials.correctFieldOfStudyName,
       })
       await signup.clickSignup()
       await expect(signup.accountAlreadyExistsWarning).toBeVisible()
@@ -499,6 +532,8 @@ test.describe("Signup Page Functionality", () => {
          expect(signup.incorrectLastNameWarning).toBeVisible(),
          expect(signup.incorrectPasswordWarning).toBeVisible(),
          expect(signup.incorrectEmailWarning).toBeVisible(),
+         expect(signup.missingFieldOfStudyWarning).toBeVisible(),
+         expect(signup.missingLevelOfStudyWarning).toBeVisible(),
       ])
    })
 

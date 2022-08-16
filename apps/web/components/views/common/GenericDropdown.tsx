@@ -1,11 +1,6 @@
-import {
-   FormControl,
-   InputLabel,
-   MenuItem,
-   Select,
-   SelectChangeEvent,
-} from "@mui/material"
-import { useState } from "react"
+import { MenuItem, OutlinedTextFieldProps, TextField } from "@mui/material"
+import { ChangeEvent } from "react"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 export type DropdownItem = {
    id: string
@@ -13,10 +8,9 @@ export type DropdownItem = {
    label: string
 }
 
-type Props = {
+interface Props extends Omit<OutlinedTextFieldProps, "variant"> {
    id: string
    name: string
-   onChange: (e: SelectChangeEvent) => void
    value: string
    label: string
    list: DropdownItem[]
@@ -31,39 +25,46 @@ const GenericDropdown = ({
    value,
    label,
    list,
+   ...rest
 }: Props) => {
-   const [isOpen, setIsOpen] = useState(false)
-
-   const handleChange = (event) => {
+   const isMobile = useIsMobile()
+   const handleChange = (
+      event: ChangeEvent<HTMLTextAreaElement | HTMLInputElement>
+   ) => {
       event.preventDefault()
-      setIsOpen(false)
       onChange(event)
    }
+
    return (
-      <FormControl fullWidth>
-         <InputLabel id="generic-dropdown-label">{label}</InputLabel>
-         <Select
-            open={isOpen}
-            onOpen={() => setIsOpen(true)}
-            onClose={() => setIsOpen(false)}
-            onClick={() => setIsOpen(false)}
-            id={id}
-            value={value}
-            name={name}
-            className={className}
-            label={label}
-            onChange={handleChange}
-            MenuProps={{
+      <TextField
+         select
+         id={id}
+         value={value}
+         name={name}
+         label={label}
+         onChange={handleChange}
+         fullWidth
+         SelectProps={{
+            native: isMobile,
+            MenuProps: {
                hideBackdrop: true,
-            }}
-         >
-            {list.map(({ id, value, label }) => (
+            },
+            className,
+         }}
+         {...rest}
+      >
+         {list.map(({ id, value, label }) =>
+            isMobile ? (
+               <option key={id} id={id} value={value}>
+                  {label}
+               </option>
+            ) : (
                <MenuItem key={id} id={id} value={value}>
                   {label}
                </MenuItem>
-            ))}
-         </Select>
-      </FormControl>
+            )
+         )}
+      </TextField>
    )
 }
 export default GenericDropdown

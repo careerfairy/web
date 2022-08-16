@@ -126,6 +126,7 @@ const getLivestreamGroupQuestions = (
             acc[group.id] = {
                groupId: group.id || null,
                groupName: group.universityName || null,
+               universityCode: group.universityCode || null,
                questions:
                   group.categories?.reduce<
                      Record<LivestreamGroupQuestion["id"], GroupQuestion>

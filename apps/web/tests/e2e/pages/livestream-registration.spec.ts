@@ -1,4 +1,4 @@
-import { test, expect, Page } from "@playwright/test"
+import { expect, Page, test } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import LivestreamSeed, {
@@ -15,10 +15,7 @@ import {
    expectText,
 } from "../utils/assertions"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import {
-   LivestreamEvent,
-   LivestreamUserAction,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { sleep } from "../utils"
 
