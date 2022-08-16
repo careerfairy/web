@@ -172,7 +172,7 @@ export interface HygraphResponseMarketingSignup {
    __typename: string
    id: string
    title: string
-   subtitle: string
+   shortText: string
    slug: string
    button: HygraphResponseButton
 }
@@ -255,7 +255,7 @@ export const marketingSignupQueryProps = `
         id
         __typename
         title
-        subtitle
+        shortText
         slug
         button ${buttonQueryProps}
     }
