@@ -265,6 +265,28 @@ const getComponents = (theme: DefaultTheme): Components => ({
                },
             },
 
+            "&.marketingForm": {
+               borderRadius: "8px",
+
+               "& input": {
+                  color: "white",
+               },
+               "& label": {
+                  color: "white",
+               },
+               "& fieldset": {
+                  borderRadius: "8px",
+                  border: "1px solid",
+                  borderColor: "white",
+               },
+               "& svg": {
+                  color: "white",
+               },
+               "& div": {
+                  color: "white",
+               },
+            },
+
             "& .Mui-focused fieldset": {
                border: "2px solid",
                borderColor: theme.palette.primary.main,

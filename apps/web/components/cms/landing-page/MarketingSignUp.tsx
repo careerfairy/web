@@ -25,14 +25,17 @@ import { useRouter } from "next/router"
 
 const styles = sxStyles({
    container: {
-      backgroundColor: "grey.200",
+      borderRadius: " 0px 224px 224px 0px",
+      width: "95%",
+      background: (theme) =>
+         `linear-gradient(to right, ${theme.palette.secondary.main}, 80%, ${theme.palette.secondary.light})`,
    },
 })
 interface MarketingSignUpProps extends HygraphResponseMarketingSignup {
    fieldsOfStudy: FieldOfStudy[]
 }
 const MarketingSignUp = ({
-   subtitle,
+   shortText,
    title,
    button,
    fieldsOfStudy,
@@ -41,23 +44,32 @@ const MarketingSignUp = ({
    return (
       <Box id={marketingSignUpFormId} sx={styles.container}>
          <Container>
-            <Box p={3}>
-               {title && <Typography variant="h4">{title}</Typography>}
-               {subtitle && (
-                  <Typography variant="subtitle1">{subtitle}</Typography>
-               )}
-
-               <Box mt={3}>
-                  {!isComplete && (
-                     <MarketingForm
-                        buttonProps={button}
-                        setComplete={setComplete}
-                        fieldsOfStudy={fieldsOfStudy}
-                     />
+            <Grid container spacing={2} p={10}>
+               <Grid item xs={6}>
+                  {shortText && (
+                     <Typography variant="h2" color="white">
+                        {shortText}
+                     </Typography>
                   )}
-                  {isComplete && <Complete />}
-               </Box>
-            </Box>
+               </Grid>
+               <Grid item xs={6}>
+                  {title && (
+                     <Typography variant="h6" color="white">
+                        {title}
+                     </Typography>
+                  )}
+                  <Box mt={3}>
+                     {!isComplete && (
+                        <MarketingForm
+                           buttonProps={button}
+                           setComplete={setComplete}
+                           fieldsOfStudy={fieldsOfStudy}
+                        />
+                     )}
+                     {isComplete && <Complete />}
+                  </Box>
+               </Grid>
+            </Grid>
          </Container>
       </Box>
    )
@@ -95,10 +107,12 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
          lastName: "",
          email: "",
          fieldOfStudyId: fieldOfStudyId?.toString() || "",
+         subscribed: false,
       }),
       [fieldOfStudyId]
    )
    const [backendError, setBackendError] = useState<Error>(null)
+   console.log("button props ->", { ...buttonProps })
    return (
       <Formik
          initialValues={initialValues}
@@ -138,121 +152,125 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
             isSubmitting,
          }) => (
             <form onSubmit={handleSubmit}>
-               <Grid container spacing={2}>
-                  <Grid item xs>
-                     <TextField
-                        autoComplete="fname"
-                        label="First Name"
-                        placeholder="Enter your first name"
-                        variant="outlined"
-                        id="firstName"
-                        name="firstName"
-                        fullWidth
-                        disabled={isSubmitting}
-                        value={values.firstName}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        error={Boolean(
-                           errors.firstName &&
+               <>
+                  <Grid container spacing={2}>
+                     <Grid item xs>
+                        <TextField
+                           className="marketingForm"
+                           autoComplete="fname"
+                           label="First Name"
+                           placeholder="Enter your first name"
+                           variant="outlined"
+                           id="firstName"
+                           name="firstName"
+                           fullWidth
+                           disabled={isSubmitting}
+                           value={values.firstName}
+                           onBlur={handleBlur}
+                           onChange={handleChange}
+                           error={Boolean(
+                              errors.firstName &&
+                                 touched.firstName &&
+                                 errors.firstName
+                           )}
+                           helperText={
+                              errors.firstName &&
                               touched.firstName &&
                               errors.firstName
-                        )}
-                        helperText={
-                           errors.firstName &&
-                           touched.firstName &&
-                           errors.firstName
-                        }
-                     />
-                  </Grid>
-                  <Grid item xs>
-                     <TextField
-                        autoComplete="lname"
-                        label="Last Name"
-                        placeholder="Enter your last name"
-                        variant="outlined"
-                        id="lastName"
-                        name="lastName"
-                        fullWidth
-                        disabled={isSubmitting}
-                        value={values.lastName}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        error={Boolean(
-                           errors.lastName &&
+                           }
+                        />
+                     </Grid>
+                     <Grid item xs>
+                        <TextField
+                           className="marketingForm"
+                           autoComplete="lname"
+                           label="Last Name"
+                           placeholder="Enter your last name"
+                           variant="outlined"
+                           id="lastName"
+                           name="lastName"
+                           fullWidth
+                           disabled={isSubmitting}
+                           value={values.lastName}
+                           onBlur={handleBlur}
+                           onChange={handleChange}
+                           error={Boolean(
+                              errors.lastName &&
+                                 touched.lastName &&
+                                 errors.lastName
+                           )}
+                           helperText={
+                              errors.lastName &&
                               touched.lastName &&
                               errors.lastName
-                        )}
-                        helperText={
-                           errors.lastName &&
-                           touched.lastName &&
-                           errors.lastName
-                        }
-                     />
+                           }
+                        />
+                     </Grid>
                   </Grid>
-               </Grid>
-               <Grid container mt={2}>
-                  <Grid item xs>
-                     <TextField
-                        label="Email"
-                        placeholder="Enter your email"
-                        variant="outlined"
-                        id="email"
-                        name="email"
-                        fullWidth
-                        disabled={isSubmitting}
-                        value={values.email}
-                        onBlur={handleBlur}
-                        onChange={handleChange}
-                        error={Boolean(
-                           errors.email && touched.email && errors.email
-                        )}
-                        helperText={
-                           errors.email && touched.email && errors.email
-                        }
-                     />
+                  <Grid container mt={2}>
+                     <Grid item xs>
+                        <TextField
+                           className="marketingForm"
+                           label="Email"
+                           placeholder="Enter your email"
+                           variant="outlined"
+                           id="email"
+                           name="email"
+                           fullWidth
+                           disabled={isSubmitting}
+                           value={values.email}
+                           onBlur={handleBlur}
+                           onChange={handleChange}
+                           error={Boolean(
+                              errors.email && touched.email && errors.email
+                           )}
+                           helperText={
+                              errors.email && touched.email && errors.email
+                           }
+                        />
+                     </Grid>
                   </Grid>
-               </Grid>
-               {!initialValues.fieldOfStudyId && (
-                  <Box mt={2}>
-                     <FieldOfStudySelector
-                        value={values.fieldOfStudyId}
-                        disabled={isSubmitting}
-                        onChange={handleChange}
-                        fieldsOfStudy={fieldsOfStudy}
-                        handleBlur={handleBlur}
-                        error={Boolean(
-                           errors.fieldOfStudyId &&
+                  {!initialValues.fieldOfStudyId && (
+                     <Box mt={2}>
+                        <FieldOfStudySelector
+                           value={values.fieldOfStudyId}
+                           disabled={isSubmitting}
+                           onChange={handleChange}
+                           fieldsOfStudy={fieldsOfStudy}
+                           handleBlur={handleBlur}
+                           error={Boolean(
+                              errors.fieldOfStudyId &&
+                                 touched.fieldOfStudyId &&
+                                 errors.fieldOfStudyId
+                           )}
+                           helperText={
+                              errors.fieldOfStudyId &&
                               touched.fieldOfStudyId &&
                               errors.fieldOfStudyId
-                        )}
-                        helperText={
-                           errors.fieldOfStudyId &&
-                           touched.fieldOfStudyId &&
-                           errors.fieldOfStudyId
+                           }
+                        />
+                     </Box>
+                  )}
+                  <Box mt={2} width={"30%"}>
+                     <Button
+                        type="submit"
+                        fullWidth
+                        variant="contained"
+                        disabled={isSubmitting}
+                        endIcon={
+                           isSubmitting && (
+                              <CircularProgress size={20} color="inherit" />
+                           )
                         }
-                     />
+                        {...buttonProps}
+                        href={undefined}
+                        size={buttonProps?.size || "small"}
+                     >
+                        {buttonProps?.children || "Send"}
+                     </Button>
                   </Box>
-               )}
-               <Box mt={2} display={"flex"} justifyContent={"center"}>
-                  <Button
-                     type="submit"
-                     fullWidth
-                     variant="contained"
-                     color="primary"
-                     disabled={isSubmitting}
-                     endIcon={
-                        isSubmitting && (
-                           <CircularProgress size={20} color="inherit" />
-                        )
-                     }
-                     {...buttonProps}
-                     href={undefined}
-                     size={buttonProps?.size || "large"}
-                  >
-                     Sign up
-                  </Button>
-               </Box>
-               {backendError && <BackendError error={backendError} />}
+                  {backendError && <BackendError error={backendError} />}
+               </>
             </form>
          )}
       </Formik>
@@ -272,6 +290,7 @@ const FieldOfStudySelector = ({
       <>
          <TextField
             select
+            className="marketingForm"
             id="fieldOfStudyId"
             name="fieldOfStudyId"
             label="Field of Study"
