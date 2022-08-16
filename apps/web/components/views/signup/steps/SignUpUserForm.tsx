@@ -451,6 +451,7 @@ function SignUpUserForm() {
                            value={values.fieldOfStudy}
                            className="registrationInput"
                            handleBlur={handleBlur}
+                           disabled={submitting(isSubmitting)}
                            error={
                               errors.fieldOfStudy &&
                               touched.fieldOfStudy &&
@@ -464,6 +465,7 @@ function SignUpUserForm() {
                            value={values.levelOfStudy}
                            handleBlur={handleBlur}
                            className="registrationInput"
+                           disabled={submitting(isSubmitting)}
                            error={
                               errors.levelOfStudy &&
                               touched.levelOfStudy &&
