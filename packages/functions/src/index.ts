@@ -139,3 +139,4 @@ exports.fetchATSJobs = ats.fetchATSJobs
 exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
 exports.fetchATSApplications = ats.fetchATSApplications
 exports.atsUserApplyToJob = ats.atsUserApplyToJob
+exports.fetchLivestreamJobs = ats.fetchLivestreamJobs
