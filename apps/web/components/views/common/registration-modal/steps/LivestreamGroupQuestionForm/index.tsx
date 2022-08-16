@@ -17,7 +17,7 @@ import LivestreamGroupQuestionsSelector from "../../../../profile/LivestreamGrou
 import Stack from "@mui/material/Stack"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
-import { Formik } from "formik"
+import { Form, Formik } from "formik"
 import {
    checkIfUserHasAnsweredAllLivestreamGroupQuestions,
    validate,
@@ -117,7 +117,12 @@ const LivestreamGroupQuestionForm = () => {
             touched,
          }) => {
             return (
-               <>
+               <Form
+                  onSubmit={(e) => {
+                     e.preventDefault()
+                     handleSubmit()
+                  }}
+               >
                   <DialogTitle>
                      {`${livestream.company} Would Like To Know More About You`}
                   </DialogTitle>
@@ -173,6 +178,7 @@ const LivestreamGroupQuestionForm = () => {
                      )}
                      <Button
                         disabled={isSubmitting || !isValid}
+                        type="submit"
                         variant="contained"
                         size="large"
                         endIcon={
@@ -180,14 +186,13 @@ const LivestreamGroupQuestionForm = () => {
                               <CircularProgress size={20} color="inherit" />
                            )
                         }
-                        onClick={handleSubmit as any}
                         color="primary"
                         autoFocus
                      >
                         {livestream?.hasStarted ? "Enter event" : "I'll attend"}
                      </Button>
                   </DialogActions>
-               </>
+               </Form>
             )
          }}
       </Formik>
