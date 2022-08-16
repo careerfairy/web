@@ -19,4 +19,4 @@ firebase-export-*/
 test-results/
 playwright-report/
 
-.DS_Store!/packages/firebase-scripts/keys/production_credentials.json
+.DS_Store

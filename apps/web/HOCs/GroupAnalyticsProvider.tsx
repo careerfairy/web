@@ -1,4 +1,4 @@
-import React, { createContext, useContext } from "react"
+import React, { createContext, useContext, useMemo } from "react"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import {
    useFieldsOfStudy,
@@ -18,13 +18,15 @@ const GroupAnalyticsProvider = ({ children }) => {
    const { data: fieldsOfStudy } = useFieldsOfStudy(true)
    const { data: levelsOfStudy } = useLevelsOfStudy(true)
 
+   const value = useMemo(() => {
+      return {
+         fieldsOfStudy,
+         levelsOfStudy,
+      }
+   }, [fieldsOfStudy, levelsOfStudy])
+
    return (
-      <AnalyticsContext.Provider
-         value={{
-            fieldsOfStudy,
-            levelsOfStudy,
-         }}
-      >
+      <AnalyticsContext.Provider value={value}>
          {children}
       </AnalyticsContext.Provider>
    )
