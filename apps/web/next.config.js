@@ -74,6 +74,7 @@ const moduleExports = {
          "firebasestorage.googleapis.com",
          "media.graphcms.com",
          "media.graphassets.com",
+         "localhost",
       ],
    },
    webpackDevMiddleware: (config) => {
