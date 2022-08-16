@@ -8,7 +8,7 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users
 
 Goes through every user in the userData collection and try to figure their legacy field of study based on their group
 registration data. If a legacy field of study is found it will look at the JSON file
-in `packages/firebase-scripts/data/fieldAndLevelOfStudyMapping.json`([how to generate this file](../../../scripts/fieldsOfStudy/saveFieldAndLevelOfStudyMappingsToJson/README.md#Save Field Of Study Mappings To Json))
+in `packages/firebase-scripts/data/fieldAndLevelOfStudyMapping.json`([how to generate this file](../../../scripts/fieldsOfStudy/saveFieldAndLevelOfStudyMappingsToJson/README.md))
 and map the legacy field of study to the new field of studies and add the corresponding ID to the fieldOfStudy field on
 the user data document.
 
