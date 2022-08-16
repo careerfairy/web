@@ -4,6 +4,7 @@ import { useFirebaseService } from "../../context/firebase/FirebaseServiceContex
 import { Interest } from "types/interests"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import firebase from "firebase/compat/app"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 /**
  * Fetch a Firestore collection
@@ -75,5 +76,12 @@ export const useInterests = (realtime: boolean = false) =>
    useCollection<Interest>("interests", realtime)
 export const useGroups = (realtime: boolean = false) =>
    useCollection<Group>("careerCenterData", realtime)
+
+// use fields of Study
+export const useFieldsOfStudy = (realtime: boolean = false) =>
+   useCollection<FieldOfStudy>("fieldsOfStudy", realtime)
+// use levels of Study
+export const useLevelsOfStudy = (realtime: boolean = false) =>
+   useCollection<FieldOfStudy>("levelsOfStudy", realtime)
 
 export default useCollection

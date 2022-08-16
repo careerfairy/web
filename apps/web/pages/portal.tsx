@@ -88,7 +88,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
          ...(highlights && { highlights }),
          ...(comingUpNextEvents && {
             comingUpNextEvents: comingUpNextEvents.map((event) =>
-               mapServerSideStream(event)
+               livestreamRepo.serializeEvent(event)
             ),
          }),
          ...(pastEvents && {

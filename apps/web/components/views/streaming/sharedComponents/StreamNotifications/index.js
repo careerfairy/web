@@ -4,7 +4,6 @@ import * as actions from "../../../../../store/actions/index"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useDispatch } from "react-redux"
-import { useAuth } from "../../../../../HOCs/AuthProvider"
 import {
    addMinutes,
    getMinutesPassed,
@@ -23,31 +22,12 @@ const StreamNotifications = ({ isStreamer, firebase }) => {
    const classes = useStyles()
    const dispatch = useDispatch()
    const streamRef = useStreamRef()
-   const { userData } = useAuth()
    const { currentLivestream } = useCurrentStream()
    const [feedbackQuestions, setFeedbackQuestions] = useState([])
    const [minutesPassed, setMinutesPassed] = useState(null)
    const {
       query: { isRecordingWindow },
    } = useRouter()
-
-   useEffect(() => {
-      if (currentLivestream?.id && (userData || isStreamer)) {
-         // const unsubscribe = firebase.listenToLivestreamParticipatingStudents(currentLivestream.id, querySnapshot => {
-         //     querySnapshot.docChanges().forEach((change, index) => {
-         //         if (change.type === "added") {
-         //             if (change.doc.exists) {
-         //                 const docData = change.doc.data()
-         //                 if (userData?.userEmail !== docData?.userEmail) { // make sure you dont get notified of your self joining
-         //                     sendJoinMessage(docData, change.type === "modified")
-         //                 }
-         //             }
-         //         }
-         //     })
-         // })
-         // return () => unsubscribe()
-      }
-   }, [currentLivestream?.id, userData?.userEmail])
 
    useEffect(() => {
       if (currentLivestream?.id && isStreamer) {

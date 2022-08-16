@@ -415,6 +415,9 @@ const getComponents = (theme: DefaultTheme): Components => ({
                margin: "0.5em 0.5em 0 0",
                // marginLeft: 0,
             }),
+            "&.stacked": {
+               margin: "0.5em 0.5em 0 0",
+            },
          }),
       },
    },

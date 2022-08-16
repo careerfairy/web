@@ -14,6 +14,12 @@ export default class LivestreamPresenter extends BasePresenter<LivestreamEvent> 
       return this.model.test
    }
 
+   getStartDateString(): Date {
+      const nanoseconds = this.model.start?.seconds * 1000
+      // convert nanoseconds to date string
+      return new Date(nanoseconds)
+   }
+
    /**
     * Elapsed minutes since the livestream started
     *

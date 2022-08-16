@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import Head from "next/head"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
 import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
@@ -8,7 +8,7 @@ import SignUpUserForm from "../components/views/signup/steps/SignUpUserForm"
 import MultiStepWrapper, {
    MultiStepComponentType,
 } from "../components/views/common/MultiStepWrapper"
-import { MainLogo } from "./../components/logos"
+import { MainLogo } from "../components/logos"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
@@ -164,13 +164,11 @@ const SignUp = () => {
          <Box mb={4}>
             <GenericStepper steps={steps} currentStep={currentStep} />
          </Box>
-
          <MultiStepWrapper
             steps={steps}
             currentStep={currentStep}
             setCurrentStep={setCurrentStep}
          />
-
          {currentStep > 1 && renderContinueAndBackButtons()}
       </SignUpPageLayout>
    )

@@ -25,7 +25,6 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
    } = useTheme()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
    const [switchedToPastTab, setSwitchedToPastTab] = useState(false)
-   const [selectedOptions, setSelectedOptions] = useState([])
 
    const currentGroup = useSelector(
       (state) =>
@@ -46,10 +45,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
       },
    ])
 
-   const upcomingLivestreams = useListenToUpcomingStreams(
-      currentGroup.groupId,
-      selectedOptions
-   )
+   const upcomingLivestreams = useListenToUpcomingStreams(currentGroup.groupId)
 
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
@@ -120,8 +116,6 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
                <StreamsSection
                   value={value}
                   upcomingLivestreams={upcomingLivestreams}
-                  setSelectedOptions={setSelectedOptions}
-                  selectedOptions={selectedOptions}
                   currentGroup={currentGroup}
                   pastLivestreams={pastLivestreams}
                />

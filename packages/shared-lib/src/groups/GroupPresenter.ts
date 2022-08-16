@@ -1,5 +1,6 @@
-import { Group } from "./groups"
+import { Group, GroupQuestion } from "./groups"
 import { GroupATSAccount } from "./GroupATSAccount"
+import { UserData } from "../users"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 2
 
@@ -11,7 +12,8 @@ export class GroupPresenter {
       public readonly description: string,
       public readonly logoUrl: string,
       public readonly adminEmails: string[],
-      public readonly universityName?: string
+      public readonly universityName?: string,
+      public readonly universityCode?: string
    ) {}
 
    setAtsAccounts(accounts: GroupATSAccount[]) {
@@ -28,7 +30,32 @@ export class GroupPresenter {
          group.description,
          group.logoUrl,
          group.adminEmails,
-         group.universityName
+         group.universityName,
+         group.universityCode
       )
+   }
+
+   isUniversity(): boolean {
+      return Boolean(this.universityCode)
+   }
+
+   isUniversityStudent(user: UserData): boolean {
+      return Boolean(
+         this.universityCode &&
+            user.university &&
+            user.university.code === this.universityCode
+      )
+   }
+   getUniversityQuestionsForTable(groupQuestions: GroupQuestion[]) {
+      return groupQuestions.map((groupQuestion) => {
+         return {
+            field: `university.questions.${groupQuestion.id}.selectedOptionId`,
+            title: groupQuestion.name,
+            lookup: Object.keys(groupQuestion.options).reduce((acc, key) => {
+               acc[key] = groupQuestion.options[key].name
+               return acc
+            }, {}),
+         }
+      })
    }
 }

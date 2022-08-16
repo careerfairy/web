@@ -107,6 +107,9 @@ const TalentPoolSection = memo((props) => {
             query: { absolutePath: asPath },
          })
       }
+      if (!props.registered) {
+         return props.handleOpenJoinModal()
+      }
       try {
          setJoiningTalentPool(true)
 
