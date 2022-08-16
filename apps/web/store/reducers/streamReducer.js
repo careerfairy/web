@@ -9,6 +9,7 @@ const initialState = {
       leftMenuOpen: true,
       focusModeEnabled: false,
       animateProfileIcons: false,
+      showActionButtons: true,
    },
    stats: {
       numberOfViewers: 0,
@@ -271,6 +272,16 @@ const streamReducer = (state = initialState, { type, payload }) => {
          return {
             ...state,
             stats: { ...state.stats, numberOfViewers: payload },
+         }
+      case actions.HIDE_ACTION_BUTTONS:
+         return {
+            ...state,
+            layout: { ...state.layout, showActionButtons: false },
+         }
+      case actions.SHOW_ACTION_BUTTONS:
+         return {
+            ...state,
+            layout: { ...state.layout, showActionButtons: true },
          }
       default:
          return state

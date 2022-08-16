@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import VideoContainer from "./video-container/VideoContainer"
 import NotificationsContainer from "./notifications-container/NotificationsContainer"
@@ -14,6 +14,11 @@ import { Backdrop } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier"
+import { alpha } from "@mui/material/styles"
+import {
+   showActionButtonsSelector,
+   streamingSelector,
+} from "../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -49,11 +54,25 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
       color: theme.palette.common.white,
    },
+   infoText: {
+      position: "absolute",
+      bottom: 150,
+      left: "50%",
+      transform: "translate(-50%, -50%)",
+      padding: 15,
+      borderRadius: 30,
+      fontWeight: "bold",
+      color: theme.palette.common.white,
+      boxShadow: theme.shadows[2],
+      backgroundColor: alpha(theme.palette.common.black, 0.3),
+      backdropFilter: "blur(5px)",
+      maxWidth: "100%",
+      zIndex: 99,
+   },
 }))
 
 const StreamerOverview = ({
    isStreamer,
-   showAudience,
    setSliding,
    selectedState,
    handleStateChange,
@@ -67,21 +86,73 @@ const StreamerOverview = ({
 }) => {
    const { currentLivestream, isBreakout } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
+   const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
    const dispatch = useDispatch()
-   const { videoIsMuted, videoIsPaused } = useSelector(
-      (state) => state.stream.streaming
-   )
+   const { videoIsMuted, videoIsPaused } = useSelector(streamingSelector)
+   const showActionButtons = useSelector(showActionButtonsSelector)
 
    useEffect(() => {
       setMounted(true)
+      setTimeout(() => {
+         setShowTapHint(false)
+      }, 20000)
    }, [])
+
+   /**
+    * If the screen size changes to something other than small, we always want to show the action buttons
+    */
+   useEffect(() => {
+      if (!smallScreen) {
+         dispatch(actions.showActionButtons())
+      }
+   }, [smallScreen])
+
+   /**
+    * On mobile the visibility of the buttons will be handled based on stream frame click
+    */
+   const handleClick = useCallback(
+      ({ target }) => {
+         if (smallScreen) {
+            const streamElement = document.getElementById("videoBlackFrame")
+            const actionButtons = document.getElementById("streamActionButtons")
+            const controllerButtons = document.getElementById(
+               "streamControllerButtons"
+            )
+
+            const clickedOnVideoFrame = streamElement.contains(target)
+            const clickedOnButtons = [actionButtons, controllerButtons].some(
+               (selector) => selector.contains(target)
+            )
+
+            if (!showActionButtons && clickedOnVideoFrame) {
+               dispatch(actions.showActionButtons())
+            } else if (clickedOnVideoFrame && !clickedOnButtons) {
+               dispatch(
+                  showActionButtons
+                     ? actions.hideActionButtons()
+                     : actions.showActionButtons()
+               )
+
+               // The click was valid and the TapHint is visible. We want to hide it
+               if (showTapHint) {
+                  setShowTapHint(false)
+               }
+            }
+         }
+      },
+      [smallScreen, showActionButtons, dispatch, showTapHint]
+   )
 
    if (!mounted) return null
 
    return (
-      <Fragment>
-         <div id="videoBlackFrame" className={classes.blackFrame}>
+      <>
+         <div
+            id="videoBlackFrame"
+            className={classes.blackFrame}
+            onClick={handleClick}
+         >
             <VideoContainer
                currentLivestream={currentLivestream}
                streamerId={streamerId}
@@ -99,6 +170,9 @@ const StreamerOverview = ({
                showMenu={showMenu}
                handleStateChange={handleStateChange}
             />
+            {showTapHint && (
+               <div className={classes.infoText}>Tap to hide controllers</div>
+            )}
          </div>
          <AudienceDrawer
             hideAudience={hideAudience}
@@ -143,7 +217,7 @@ const StreamerOverview = ({
                <div>Click to play</div>
             </div>
          </Backdrop>
-      </Fragment>
+      </>
    )
 }
 
