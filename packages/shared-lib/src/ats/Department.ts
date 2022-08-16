@@ -1,7 +1,7 @@
 import { MergeDepartment } from "./MergeResponseTypes"
-import { BaseModel } from "../BaseModel"
+import { ATSModel } from "./ATSModel"
 
-export class Department extends BaseModel {
+export class Department extends ATSModel {
    constructor(public readonly id: string, public readonly name: string) {
       super()
    }

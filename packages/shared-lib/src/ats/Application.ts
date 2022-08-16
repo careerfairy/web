@@ -1,17 +1,13 @@
 import { MergeApplication } from "./MergeResponseTypes"
-import {
-   BaseModel,
-   fromMergeDate,
-   fromSerializedDate,
-   saveIfObject,
-} from "../BaseModel"
+import { fromSerializedDate, saveIfObject } from "../BaseModel"
 import { Job } from "./Job"
 import { Candidate } from "./Candidate"
+import { ATSModel, fromMergeDate } from "./ATSModel"
 
 /**
  * Relationship between a Job and Candidate
  */
-export class Application extends BaseModel {
+export class Application extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly job: Job,

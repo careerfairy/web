@@ -1,11 +1,12 @@
 import { MergeSyncStatus } from "./MergeResponseTypes"
-import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
+import { fromSerializedDate } from "../BaseModel"
+import { ATSModel, fromMergeDate } from "./ATSModel"
 
 /**
  * Linked Account synchronization status
  * Instantiated for each Entity (Job, Recruiter, Candidate, etc)
  */
-export class SyncStatus extends BaseModel {
+export class SyncStatus extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly model: string,
