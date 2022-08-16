@@ -1,6 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test"
 import { sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 export class SignupPage extends CommonPage {
    readonly page: Page
@@ -19,6 +20,8 @@ export class SignupPage extends CommonPage {
    readonly emailVerificationStepMessage: Locator
    readonly interestsTitle: Locator
    readonly universityCountrySelector: Locator
+   readonly fieldOfStudySelector: Locator
+   readonly levelOfStudySelector: Locator
    readonly universitySelector: Locator
    readonly firstNameRequiredWarning: Locator
    readonly lastNameRequiredWarning: Locator
@@ -36,6 +39,8 @@ export class SignupPage extends CommonPage {
    readonly incorrectFirstNameWarning: Locator
    readonly incorrectLastNameWarning: Locator
    readonly incorrectPasswordWarning: Locator
+   readonly missingFieldOfStudyWarning: Locator
+   readonly missingLevelOfStudyWarning: Locator
    readonly incorrectEmailWarning: Locator
    readonly socialInformationStep: Locator
    readonly linkedInLinkInput: Locator
@@ -68,6 +73,12 @@ export class SignupPage extends CommonPage {
       this.incorrectPasswordWarning = page.locator(
          "text=Your password needs to be at least 6 characters long and contain at least one up"
       )
+      this.missingFieldOfStudyWarning = page.locator(
+         "text=Please select a field of study"
+      )
+      this.missingLevelOfStudyWarning = page.locator(
+         "text=Please select a level of study"
+      )
       this.page = page
       this.emailTextField = page.locator('input[name="email"]')
       this.firstNameTextField = page.locator('input[name="firstName"]')
@@ -97,6 +108,8 @@ export class SignupPage extends CommonPage {
       this.universityCountrySelector = page.locator(
          'input[name="universityCountryCode"]'
       )
+      this.fieldOfStudySelector = page.locator('input[name="fieldOfStudy"]')
+      this.levelOfStudySelector = page.locator('input[name="levelOfStudy"]')
       this.universitySelector = page.locator('input[name="university"]')
       this.firstNameRequiredWarning = page.locator(
          "text=Your first name is required"
@@ -140,6 +153,12 @@ export class SignupPage extends CommonPage {
 
    async selectUniversityCountry(country: string) {
       return this.handleMultiSelect(country, this.universityCountrySelector)
+   }
+   async selectFieldOfStudy(fieldOfStudyName: string) {
+      return this.handleMultiSelect(fieldOfStudyName, this.fieldOfStudySelector)
+   }
+   async selectLevelOfStudy(levelOfStudyName: string) {
+      return this.handleMultiSelect(levelOfStudyName, this.levelOfStudySelector)
    }
 
    async selectUniversity(university: string) {
@@ -250,6 +269,8 @@ export class SignupPage extends CommonPage {
       await this.enterLastName(formData.lastName)
       await this.enterEmail(formData.email)
       await this.selectUniversityCountry(formData.universityCountry)
+      await this.selectFieldOfStudy(formData.fieldOfStudyName)
+      await this.selectLevelOfStudy(formData.levelOfStudyName)
       await this.selectUniversity(formData.universityName)
       await this.enterPassword(formData.password)
       await this.enterConfirmPassword(formData.confirmPassword)
@@ -282,4 +303,6 @@ interface SignupFormData {
    subscribeEmails?: boolean
    universityCountry?: string
    universityName?: string
+   fieldOfStudyName?: string
+   levelOfStudyName?: string
 }

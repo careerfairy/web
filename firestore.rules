@@ -5,6 +5,17 @@ service cloud.firestore {
         function isCFAdmin() {
           return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
         }
+        function isUnchanged(field) {
+          return request.resource.data[field] == resource.data[field];
+        }
+        match /fieldsOfStudy/{fieldOfStudy} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
+        match /levelsOfStudy/{levelOfStudy} {
+            allow read: if true;
+            allow write: if isCFAdmin();
+        }
         match /userInterface/{interface} {
             allow read: if true;
             allow write: if isCFAdmin();
@@ -30,7 +41,9 @@ service cloud.firestore {
             allow read, write: if true;
         }
         match /userData/{userId} {
-
+            match /userGroups/{userGroup} {
+                allow read, write: if request.auth.token.email == userId || isCFAdmin();
+            }
 //            function authUserAccessesOwnUserData() {
 //                return request.auth.token.email == userId;
 //            }
@@ -134,6 +147,10 @@ service cloud.firestore {
                 return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
             }
 
+            function isCareerCenterAdmin() {
+                return request.auth.token.email in careerCenterData().adminEmails;
+            }
+
             match /ats/{integrationId} {
                 allow read: if request.auth.token.email in careerCenterData().adminEmails || isCFAdmin();
             }
@@ -146,6 +163,19 @@ service cloud.firestore {
             match /categories/{category} {
                 allow read: if true;
                 allow write: if true;
+            }
+            match /groupQuestions/{groupQuestion} {
+                        function isCustomQuestionType() {
+                            return resource.data.questionType == 'custom';
+                        }
+
+                        function hasOptions() {
+                            return request.resource.data.options != null && request.resource.data.options.keys().size() > 0;
+                        }
+                allow read: if isCFAdmin() || isCareerCenterAdmin();
+                allow delete: if isCustomQuestionType();
+                allow create: if isCFAdmin() || isCareerCenterAdmin();
+                allow update: if isUnchanged('questionType') && hasOptions();
             }
 
             match /categories/{category}/elements/{element} {
@@ -185,14 +215,9 @@ service cloud.firestore {
             allow update: if true;
             allow delete: if true;
 
-            match /registeredStudents/{student} {
+            match /userLivestreamData/{studentEmail} {
                 allow read: if true;
-                allow write: if true;
-            }
-
-            match /registrants/{registrant} {
-                allow read: if true;
-                allow write: if true;
+                allow write: if request.auth.token.email == studentEmail;
             }
 
             match /preferences/{adminPreference} {
@@ -200,15 +225,6 @@ service cloud.firestore {
                 allow write: if isCFAdmin();
             }
 
-            match /talentPool/{student} {
-                allow read: if true;
-                allow write: if true;
-            }
-
-            match /participatingStudents/{student} {
-                allow read: if true;
-                allow write: if true;
-            }
 
             match /participatingStats/{userId} {
                 allow read: if isCFAdmin();
@@ -323,9 +339,9 @@ service cloud.firestore {
             allow update: if true;
             allow delete: if true;
 
-            match /participatingStudents/{student} {
-                allow read: if true;
-                allow write: if true;
+            match /userLivestreamData/{studentEmail} {
+                allow read: if request.auth.token != null;
+                allow write: if request.auth.token.email == studentEmail;
             }
 
             match /chatEntries/{chatEntry} {

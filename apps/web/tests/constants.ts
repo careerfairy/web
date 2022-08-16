@@ -1,3 +1,8 @@
+import {
+   dummyLevelsOfStudy,
+   dummyFieldsOfStudy,
+} from "@careerfairy/seed-data/dist/fieldsOfStudy"
+
 export const credentials = {
    correctEmail: "john@careerfairy.io",
    unregisteredEmail: "unregistered@careerfairy.io",
@@ -16,6 +21,8 @@ export const credentials = {
    countriesOfInterestIds: ["GB", "PT", "DE"],
    regionsOfInterestIds: ["asia", "africa"],
    interestsIds: ["Le9yVcgRtkReAdwyh6tq"],
+   correctFieldOfStudyName: dummyFieldsOfStudy[0].name,
+   correctLevelOfStudyName: dummyLevelsOfStudy[0].name,
 }
 
 export const streaming = {

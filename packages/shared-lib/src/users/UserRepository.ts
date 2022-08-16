@@ -1,4 +1,6 @@
-import BaseFirebaseRepository from "../BaseFirebaseRepository"
+import BaseFirebaseRepository, {
+   mapFirestoreDocuments,
+} from "../BaseFirebaseRepository"
 import {
    SavedRecruiter,
    UserATSDocument,
@@ -7,9 +9,18 @@ import {
    RegistrationStep,
 } from "./users"
 import firebase from "firebase/compat/app"
+import { FieldOfStudy } from "../fieldOfStudy"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
+   updateFieldOfStudy(
+      userEmail: string,
+      fieldOfStudy: FieldOfStudy
+   ): Promise<void>
+   updateLevelOfStudy(
+      userEmail: string,
+      levelOfStudy: FieldOfStudy
+   ): Promise<void>
 
    getSavedRecruiters(userEmail: string): Promise<SavedRecruiter[]>
 
@@ -24,6 +35,11 @@ export interface IUserRepository {
    getUserDataById(id: string): Promise<UserData>
 
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
+   getUsersByEmail(
+      arrayOfEmails: string[],
+      options?: { withEmpty: boolean }
+   ): Promise<UserData[]>
+   getAllUsers(withRef?: boolean): Promise<UserData[]>
 
    getUserATSData(id: string): Promise<UserATSDocument>
 
@@ -62,6 +78,25 @@ export class FirebaseUserRepository
       return userRef.update({
          interestsIds: Array.from(new Set(interestIds)),
       })
+   }
+
+   updateFieldOfStudy(
+      userEmail: string,
+      fieldOfStudy: FieldOfStudy
+   ): Promise<void> {
+      return this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .update({ fieldOfStudy })
+   }
+   updateLevelOfStudy(
+      userEmail: string,
+      levelOfStudy: FieldOfStudy
+   ): Promise<void> {
+      return this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .update({ levelOfStudy })
    }
 
    /*
@@ -148,6 +183,45 @@ export class FirebaseUserRepository
          uids.map((uid) => this.getUserDataByUid(uid))
       )
       return users.filter((user) => user !== null)
+   }
+
+   async getUsersByEmail(
+      arrayOfEmails = [],
+      options = { withEmpty: false }
+   ): Promise<UserData[]> {
+      let totalUsers = []
+      let i,
+         j,
+         tempArray,
+         chunk = 800
+      for (i = 0, j = arrayOfEmails.length; i < j; i += chunk) {
+         tempArray = arrayOfEmails.slice(i, i + chunk)
+         const userSnaps = await Promise.all(
+            tempArray
+               .filter((email) => email)
+               .map((email) =>
+                  this.firestore.collection("userData").doc(email).get()
+               )
+         )
+         let newUsers
+         if (options.withEmpty) {
+            newUsers = userSnaps.map((doc) => ({
+               id: doc.id,
+               ...doc.data(),
+            }))
+         } else {
+            newUsers = userSnaps
+               .filter((doc) => doc.exists)
+               .map((doc) => ({ id: doc.id, ...doc.data() }))
+         }
+         totalUsers = [...totalUsers, ...newUsers]
+      }
+      return totalUsers
+   }
+
+   async getAllUsers(withRef?: boolean): Promise<UserData[]> {
+      const users = await this.firestore.collection("userData").get()
+      return mapFirestoreDocuments<UserData>(users, withRef)
    }
 
    async getUserATSData(id: string): Promise<UserATSDocument> {

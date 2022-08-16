@@ -292,9 +292,8 @@ const NewLivestreamForm = () => {
          setSubmitting(true)
          const livestream: any = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
-            livestreamId,
+            livestreamId as string,
             firebase
          )
          let id
