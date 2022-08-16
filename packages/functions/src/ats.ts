@@ -13,7 +13,7 @@ import {
    userRepo,
 } from "./api/repositories"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { logAxiosErrorAndThrow, onCallWrapper } from "./util"
+import { logAxiosError, logAxiosErrorAndThrow, onCallWrapper } from "./util"
 import {
    Group,
    GroupATSAccountDocument,
@@ -27,6 +27,7 @@ import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
 import { UserATSDocument } from "@careerfairy/shared-lib/dist/users"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { getATSTokensForJobAssociations } from "./lib/groups"
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -170,24 +171,28 @@ export const fetchLivestreamJobs = functions
          return []
       }
 
-      try {
-         const jobs: Job = []
+      // integrationId -> token
+      const tokens = await getATSTokensForJobAssociations(livestream.jobs)
 
-         for (let jobAssociation of livestream.jobs) {
-            const atsRepository = atsRepo(
-               process.env.MERGE_ACCESS_KEY,
-               requestData.tokens.merge.account_token
-            )
-         }
+      const jobs: Job[] = []
 
-         return await atsRepository.getJobs().then(serializeModels)
-      } catch (e) {
-         return logAxiosErrorAndThrow(
-            "Failed to fetch the account jobs",
-            e,
-            requestData
+      for (const jobAssociation of livestream.jobs) {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            tokens[jobAssociation.integrationId]
          )
+
+         try {
+            const fetched = await atsRepository.getJobs()
+            jobs.push(...fetched)
+         } catch (e) {
+            // log the error but let the function proceed
+            // we want to be optimistic and try to fetch the next jobs
+            logAxiosError(e)
+         }
       }
+
+      return serializeModels(jobs)
    })
 
 /**
