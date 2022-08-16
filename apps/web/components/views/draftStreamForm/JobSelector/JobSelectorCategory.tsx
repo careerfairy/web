@@ -17,17 +17,17 @@ const JobSelectorCategory = ({
    onSelectItems,
    selectedItems,
 }: Props) => {
-   console.log("args", groupId)
    const { data: accounts } = useGroupATSAccounts(groupId)
    const jobs = useGroupATSJobsAllIntegrations(accounts)
 
    const allValues: LivestreamJobAssociation[] = useMemo(() => {
       return jobs.map((job) => ({
-         name: job.name,
-         jobId: job.id,
+         groupId: groupId,
          integrationId: job.integrationId,
+         jobId: job.id,
+         name: job.name,
       }))
-   }, [jobs])
+   }, [jobs, groupId])
 
    // Only display the selector if the Group has ATS accounts linked
    if (accounts.length === 0) {
