@@ -61,6 +61,7 @@ export interface LivestreamStatus {
 }
 
 export interface LivestreamJobAssociation {
+   groupId: string
    integrationId: string
    jobId: string
    name: string
