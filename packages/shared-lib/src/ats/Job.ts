@@ -1,13 +1,9 @@
 import { JobStatus, MergeJob } from "./MergeResponseTypes"
-import {
-   BaseModel,
-   fromMergeDate,
-   fromSerializedDate,
-   mapIfObject,
-} from "../BaseModel"
+import { fromSerializedDate, mapIfObject } from "../BaseModel"
 import { Office } from "./Office"
 import { Recruiter } from "./Recruiter"
 import { Department } from "./Department"
+import { ATSModel, fromMergeDate } from "./ATSModel"
 
 /**
  * Job class
@@ -15,7 +11,7 @@ import { Department } from "./Department"
  * Our own type that can be created from ATS providers
  * UI/Business logic should live here
  */
-export class Job extends BaseModel {
+export class Job extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly name: string,

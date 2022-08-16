@@ -1,8 +1,9 @@
 import { MergeAttachment, MergeCandidate, MergeUrl } from "./MergeResponseTypes"
-import { BaseModel, mapIfObject } from "../BaseModel"
+import { mapIfObject } from "../BaseModel"
 import { Application } from "./Application"
+import { ATSModel } from "./ATSModel"
 
-export class Candidate extends BaseModel {
+export class Candidate extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly firstName: string,

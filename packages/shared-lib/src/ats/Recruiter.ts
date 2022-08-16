@@ -1,7 +1,8 @@
 import { MergeRemoteUser, MergeUserRole } from "./MergeResponseTypes"
-import { BaseModel, fromMergeDate, fromSerializedDate } from "../BaseModel"
+import { fromSerializedDate } from "../BaseModel"
+import { ATSModel, fromMergeDate } from "./ATSModel"
 
-export class Recruiter extends BaseModel {
+export class Recruiter extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly firstName: string,
