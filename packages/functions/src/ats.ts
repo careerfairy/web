@@ -6,7 +6,12 @@ import {
    validateUserIsGroupAdmin,
 } from "./lib/validations"
 import { object, string } from "yup"
-import { atsRepo, groupRepo, userRepo } from "./api/repositories"
+import {
+   atsRepo,
+   groupRepo,
+   livestreamsRepo,
+   userRepo,
+} from "./api/repositories"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 import { logAxiosErrorAndThrow, onCallWrapper } from "./util"
 import {
@@ -21,6 +26,7 @@ import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
 import { UserATSDocument } from "@careerfairy/shared-lib/dist/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -131,6 +137,48 @@ export const fetchATSJobs = functions
             process.env.MERGE_ACCESS_KEY,
             requestData.tokens.merge.account_token
          )
+
+         return await atsRepository.getJobs().then(serializeModels)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the account jobs",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
+ * Fetch Jobs associated with a livestream
+ * Since livestreams are public, anyone can run this function (no sign in)
+ */
+export const fetchLivestreamJobs = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      await validateData(data, object({ livestreamId: string().required() }))
+
+      const livestream: LivestreamEvent = await livestreamsRepo.getById(
+         data.livestreamId
+      )
+
+      if (!livestream) {
+         return logAndThrow("Livestream not found", data)
+      }
+
+      if (livestream.jobs?.length === 0) {
+         // no associated jobs
+         return []
+      }
+
+      try {
+         const jobs: Job = []
+
+         for (let jobAssociation of livestream.jobs) {
+            const atsRepository = atsRepo(
+               process.env.MERGE_ACCESS_KEY,
+               requestData.tokens.merge.account_token
+            )
+         }
 
          return await atsRepository.getJobs().then(serializeModels)
       } catch (e) {
@@ -332,7 +380,6 @@ export const mergeRemoveAccount = functions
 | Utilities & Validations
 |--------------------------------------------------------------------------
 */
-
 type AlwaysPresentData = {
    groupId: string
    integrationId: string
