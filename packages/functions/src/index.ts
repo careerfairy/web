@@ -22,7 +22,7 @@ import wishes = require("./wishes")
 import ats = require("./ats")
 
 // Auth
-exports.createNewUserAccount_v3 = auth.createNewUserAccount_v3
+exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData

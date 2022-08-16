@@ -21,10 +21,9 @@ export interface UserData extends Identifiable {
       id: string
    }
    university: {
-      groupId: string
       code: string
       name: string
-      questions: UserReadableGroupQuestionsWithAnswerMap
+      questions?: UserReadableGroupQuestionsWithAnswerMap
    }
    badges?: string[]
    groupIds: string[]

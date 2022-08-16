@@ -102,6 +102,7 @@ export interface LivestreamGroupQuestion extends GroupQuestion {
 export interface LivestreamGroupQuestions {
    groupName: string
    groupId: string
+   universityCode?: string
    questions: Record<LivestreamGroupQuestion["id"], LivestreamGroupQuestion>
 }
 

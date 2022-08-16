@@ -9,9 +9,18 @@ import {
    RegistrationStep,
 } from "./users"
 import firebase from "firebase/compat/app"
+import { FieldOfStudy } from "../fieldOfStudy"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
+   updateFieldOfStudy(
+      userEmail: string,
+      fieldOfStudy: FieldOfStudy
+   ): Promise<void>
+   updateLevelOfStudy(
+      userEmail: string,
+      levelOfStudy: FieldOfStudy
+   ): Promise<void>
 
    getSavedRecruiters(userEmail: string): Promise<SavedRecruiter[]>
 
@@ -69,6 +78,25 @@ export class FirebaseUserRepository
       return userRef.update({
          interestsIds: Array.from(new Set(interestIds)),
       })
+   }
+
+   updateFieldOfStudy(
+      userEmail: string,
+      fieldOfStudy: FieldOfStudy
+   ): Promise<void> {
+      return this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .update({ fieldOfStudy })
+   }
+   updateLevelOfStudy(
+      userEmail: string,
+      levelOfStudy: FieldOfStudy
+   ): Promise<void> {
+      return this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .update({ levelOfStudy })
    }
 
    /*
