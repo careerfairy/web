@@ -31,6 +31,25 @@ export class Job extends BaseModel {
       super()
    }
 
+   /**
+    * Get the job name plus additional information if existent
+    * Useful to display in Dropdown Selectors so the user can
+    * distinguish jobs
+    */
+   getExtendedName() {
+      let title = `${this.name}, ${this.status}`
+
+      if (this.departments.length > 0) {
+         title += `, ${this.departments[0].name}`
+      }
+
+      if (this.offices.length > 0) {
+         title += `, ${this.offices[0].name}`
+      }
+
+      return title
+   }
+
    static createFromMerge(job: MergeJob) {
       return new Job(
          job.id,

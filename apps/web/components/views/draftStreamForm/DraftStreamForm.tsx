@@ -54,6 +54,7 @@ import {
    LivestreamEvent,
    LivestreamJobAssociation,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import { SuspenseWithBoundary } from "../../ErrorBoundary"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -143,6 +144,9 @@ const DraftStreamForm = ({
    const [targetCategories, setTargetCategories] = useState({})
    const [selectedGroups, setSelectedGroups] = useState([])
    const [selectedInterests, setSelectedInterests] = useState([])
+   const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
+      []
+   )
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
 
@@ -167,7 +171,6 @@ const DraftStreamForm = ({
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
-      jobs: [],
    })
 
    const handleSetGroupIds = async (
@@ -270,7 +273,6 @@ const DraftStreamForm = ({
                   ),
                   status: livestream.status || {},
                   language: livestream.language || languageCodes[0],
-                  jobs: livestream.jobs ?? [],
                }
                setFormData(newFormData)
                setAllFetched(false)
@@ -285,6 +287,7 @@ const DraftStreamForm = ({
                   await handleSetGroupIds([], livestream.groupIds, newFormData)
                }
                setTargetCategories(livestream.targetCategories || {})
+               setSelectedJobs(livestream.jobs || [])
                setSelectedInterests(
                   existingInterests.filter((i) =>
                      newFormData.interestsIds.includes(i.id)
@@ -337,13 +340,18 @@ const DraftStreamForm = ({
    }
 
    const getDownloadUrl = (fileElement) => {
+      let host = "https://firebasestorage.googleapis.com"
+
+      if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+         host = " http://localhost:9199"
+      }
+
       console.log("-> fileElement", fileElement)
       if (fileElement) {
-         return (
-            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/" +
-            fileElement.replace("/", "%2F") +
-            "?alt=media"
-         )
+         return `${host}/v0/b/careerfairy-e1fd9.appspot.com/o/${fileElement.replace(
+            "/",
+            "%2F"
+         )}?alt=media`
       } else {
          console.log("-> no fileElement", fileElement)
          return ""
@@ -469,7 +477,8 @@ const DraftStreamForm = ({
                         setFormData,
                         setDraftId,
                         status,
-                        setStatus
+                        setStatus,
+                        selectedJobs
                      )
                   }}
                >
@@ -902,7 +911,15 @@ const DraftStreamForm = ({
                               </Grid>
                            </FormGroup>
 
-                           <JobSelectorCategory currentValues={values.jobs} />
+                           <SuspenseWithBoundary hide>
+                              {values.groupIds.length > 0 && (
+                                 <JobSelectorCategory
+                                    groupId={values.groupIds[0]} // we only support a single group for now
+                                    onSelectItems={setSelectedJobs}
+                                    selectedItems={selectedJobs}
+                                 />
+                              )}
+                           </SuspenseWithBoundary>
 
                            <ButtonGroup
                               className={classes.buttonGroup}

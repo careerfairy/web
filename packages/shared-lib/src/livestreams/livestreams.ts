@@ -8,7 +8,7 @@ export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
 export interface LivestreamEvent extends Identifiable {
    author?: {
       email: string
-      groupId: string
+      groupId?: string
    }
    summary?: string
    backgroundImageUrl?: string

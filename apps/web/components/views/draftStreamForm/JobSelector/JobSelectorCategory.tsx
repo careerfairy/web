@@ -1,14 +1,38 @@
 import { Grid, Typography } from "@mui/material"
-import React from "react"
+import React, { Dispatch, useMemo } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import FormGroup from "../FormGroup"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
+import useGroupATSJobsAllIntegrations from "../../../custom-hook/useGroupATSJobsAllIntegrations"
+import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 
 type Props = {
-   currentValues: LivestreamJobAssociation[]
+   groupId: string
+   onSelectItems: Dispatch<any>
+   selectedItems: LivestreamJobAssociation[]
 }
 
-const JobSelectorCategory = ({ currentValues }: Props) => {
+const JobSelectorCategory = ({
+   groupId,
+   onSelectItems,
+   selectedItems,
+}: Props) => {
+   const { data: accounts } = useGroupATSAccounts(groupId)
+   const jobs = useGroupATSJobsAllIntegrations(accounts)
+
+   const allValues: LivestreamJobAssociation[] = useMemo(() => {
+      return jobs.map((job) => ({
+         name: job.name,
+         jobId: job.id,
+         integrationId: job.integrationId,
+      }))
+   }, [jobs])
+
+   // Only display the selector if the Group has ATS accounts linked
+   if (accounts.length === 0) {
+      return null
+   }
+
    return (
       <>
          <Typography style={{ color: "white" }} variant="h4">
@@ -18,29 +42,15 @@ const JobSelectorCategory = ({ currentValues }: Props) => {
          <FormGroup>
             <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                <MultiListSelect
-                  inputName="jobId"
-                  onSelectItems={(args) => {
-                     console.log("onSelectItems", args)
-                  }}
-                  selectedItems={currentValues}
-                  allValues={[
-                     {
-                        name: "Test",
-                        id: "1",
-                     },
-                     {
-                        name: "Test 2",
-                        id: "2",
-                     },
-                  ]}
-                  disabled={false}
-                  limit={5}
-                  setFieldValue={(args) => {
-                     console.log("setFieldValue", args)
-                  }}
+                  inputName="jobIds"
+                  selectedItems={selectedItems}
+                  onSelectItems={onSelectItems}
+                  allValues={allValues}
+                  limit={1}
+                  getKeyFn={(value) => value.jobId}
                   inputProps={{
-                     label: "Select a job",
-                     placeholder: "placeholder select a job",
+                     label: "Select Job",
+                     placeholder: "Select one job",
                   }}
                   chipProps={{
                      variant: "outlined",

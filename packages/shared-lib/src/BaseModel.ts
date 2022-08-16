@@ -19,6 +19,12 @@
  */
 export abstract class BaseModel {
    /**
+    * Linked Account ID
+    * Useful when we need to relate the model with the account
+    */
+   public integrationId?: string
+
+   /**
     * Change to false if the model only has the ID
     * Some relationship objects are not expanded, and we only got the id
     * If this flag is false, the user should fetch the whole object from ATS
@@ -51,6 +57,10 @@ export abstract class BaseModel {
       }
 
       return serialized
+   }
+
+   public setIntegrationId(linkedAccountId: string) {
+      this.integrationId = linkedAccountId
    }
 }
 

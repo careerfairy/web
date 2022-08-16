@@ -22,7 +22,10 @@ export class ATSService {
          integrationId,
       })
 
-      return data.data.map(Job.createFromPlainObject)
+      return data.data.map(Job.createFromPlainObject).map((job: Job) => {
+         job.setIntegrationId(integrationId)
+         return job
+      })
    }
 
    async linkCompanyWithATS(

@@ -1,25 +1,51 @@
-import useGroupATSAccounts from "./useGroupATSAccounts"
 import { useEffect, useState } from "react"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import useGroupATSJobs from "./useGroupATSJobs"
+import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
+import { atsServiceInstance } from "../../data/firebase/ATSService"
 
 /**
  * This hook fetches all the available jobs from all the linked accounts
  *
  * Useful when creating livestreams, the group admin can choose jobs from all integrations
- * @param groupId
  */
-const useGroupATSJobsAllIntegrations = (groupId: string) => {
-   const accounts = useGroupATSAccounts(groupId)
-   const jobs = useState<Job[]>([])
+const useGroupATSJobsAllIntegrations = (accounts: GroupATSAccount[]) => {
+   const [jobs, setJobs] = useState<Job[]>([])
 
    useEffect(() => {
       let mounted = true
+
+      fetchAllJobs(accounts)
+         .then((res) => {
+            // we only care about the successful responses
+            const jobs = res
+               .filter((r) => r.status === "fulfilled")
+               .map((r) => (r as PromiseFulfilledResult<Job[]>).value)
+               .flat()
+
+            if (mounted) {
+               setJobs(jobs)
+            }
+         })
+         .catch((e) => {
+            console.error("Failed to fetch jobs", e)
+         })
 
       return () => {
          mounted = false
       }
    }, [accounts])
+
+   return jobs
+}
+
+function fetchAllJobs(accounts: GroupATSAccount[]) {
+   const promises = []
+
+   for (let account of accounts) {
+      promises.push(atsServiceInstance.getJobs(account.groupId, account.id))
+   }
+
+   return Promise.allSettled(promises)
 }
 
 export default useGroupATSJobsAllIntegrations
