@@ -9,6 +9,10 @@ import {
    FirebaseUserRepository,
    IUserRepository,
 } from "@careerfairy/shared-lib/dist/users/UserRepository"
+import {
+   FirebaseLivestreamRepository,
+   ILivestreamRepository,
+} from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
    admin.firestore() as any,
@@ -19,6 +23,12 @@ export const userRepo: IUserRepository = new FirebaseUserRepository(
    admin.firestore() as any,
    admin.firestore.FieldValue
 )
+
+export const livestreamsRepo: ILivestreamRepository =
+   new FirebaseLivestreamRepository(
+      admin.firestore() as any,
+      admin.firestore.FieldValue
+   )
 
 export const atsRepo = (
    apiKey: string,
