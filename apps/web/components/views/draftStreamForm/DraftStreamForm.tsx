@@ -28,6 +28,7 @@ import { useRouter } from "next/router"
 import FormGroup from "./FormGroup"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
+   getDownloadUrl,
    getStreamSubCollectionSpeakers,
    handleAddSpeaker,
    handleDeleteSpeaker,
@@ -337,25 +338,6 @@ const DraftStreamForm = ({
       // @ts-ignore
       const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
       await handleSetGroupIds(arrayOfUrlIds, [], formData)
-   }
-
-   const getDownloadUrl = (fileElement) => {
-      let host = "https://firebasestorage.googleapis.com"
-
-      if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
-         host = " http://localhost:9199"
-      }
-
-      console.log("-> fileElement", fileElement)
-      if (fileElement) {
-         return `${host}/v0/b/careerfairy-e1fd9.appspot.com/o/${fileElement.replace(
-            "/",
-            "%2F"
-         )}?alt=media`
-      } else {
-         console.log("-> no fileElement", fileElement)
-         return ""
-      }
    }
 
    const getDirectLink = () => `/draft-stream?draftStreamId=${draftId}`

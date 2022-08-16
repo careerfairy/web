@@ -17,6 +17,7 @@ const JobSelectorCategory = ({
    onSelectItems,
    selectedItems,
 }: Props) => {
+   console.log("args", groupId)
    const { data: accounts } = useGroupATSAccounts(groupId)
    const jobs = useGroupATSJobsAllIntegrations(accounts)
 
