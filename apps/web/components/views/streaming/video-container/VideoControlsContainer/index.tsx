@@ -45,13 +45,14 @@ import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver"
 import StudentViewIcon from "@mui/icons-material/FaceRounded"
 import Button from "@mui/material/Button"
 import CheckIcon from "@mui/icons-material/Check"
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import * as storeActions from "store/actions"
 import LoadingButton from "@mui/lab/LoadingButton"
 import { StreamData } from "types/streaming"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import { HandRaiseState } from "types/handraise"
 import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
+import { showActionButtonsSelector } from "../../../../../store/selectors/streamSelectors"
 
 const styles = {
    root: {
@@ -173,6 +174,8 @@ const VideoControlsContainer = ({
    const presentMode = mode === "presentation"
    const desktopMode = mode === "desktop"
    const videoMode = mode === "video"
+
+   const showActionButtons = useSelector(showActionButtonsSelector)
 
    useEffect(() => {
       if (isOpen(16)) {
@@ -453,7 +456,7 @@ const VideoControlsContainer = ({
    ])
 
    return (
-      <>
+      <div id={"streamControllerButtons"}>
          <ClickAwayListener onClickAway={handleClose}>
             <Box
                onMouseEnter={handleMouseEnter}
@@ -511,7 +514,7 @@ const VideoControlsContainer = ({
                         }}
                         icon={<SpeedDialIcon />}
                         onFocus={handleOpen}
-                        open
+                        open={showActionButtons}
                      >
                         {actions.map((action) => {
                            return (
@@ -605,7 +608,7 @@ const VideoControlsContainer = ({
                onClose={handleCloseShareVideoModal}
             />
          )}
-      </>
+      </div>
    )
 }
 

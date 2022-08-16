@@ -222,7 +222,6 @@ const StreamPublishingModal = memo(
                         labels.joinWithoutCameraConfirmDescription
                      }
                      hasStarted={false}
-                     mobile={undefined}
                   />
                ) : (
                   <LoadingButton
