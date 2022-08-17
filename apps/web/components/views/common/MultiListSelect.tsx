@@ -32,7 +32,11 @@ const MultiListSelect = ({
    }
 
    const isOptionEqualToValue = (option, value) => {
-      return getValueFn(option) === getValueFn(value)
+      // the option/value can be objects, we compare their string representation
+      return (
+         JSON.stringify(getValueFn(option)) ===
+         JSON.stringify(getValueFn(value))
+      )
    }
 
    const getOptionDisabled = (option) => {

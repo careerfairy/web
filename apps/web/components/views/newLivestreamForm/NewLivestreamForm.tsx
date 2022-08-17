@@ -42,6 +42,7 @@ import { useGroups, useInterests } from "../../custom-hook/useCollection"
 import StreamDurationSelect from "../draftStreamForm/StreamDurationSelect"
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
+import FieldsOfStudyMultiSelector from "../draftStreamForm/FieldsOfStudyMultiSelector"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -124,6 +125,7 @@ const NewLivestreamForm = () => {
       speakers: { [uuidv4()]: speakerObj },
       language: languageCodes[0],
       duration: DEFAULT_STREAM_DURATION_MINUTES,
+      targetFieldsOfStudy: [],
    })
 
    useEffect(() => {
@@ -176,6 +178,7 @@ const NewLivestreamForm = () => {
                      speakerQuery
                   ),
                   language: livestream.language || languageCodes[0],
+                  targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                }
                setFormData(newFormData)
                setSelectedInterests(
@@ -734,6 +737,19 @@ const NewLivestreamForm = () => {
                                  variant: "outlined",
                               }}
                               isCheckbox={true}
+                           />
+                        </Grid>
+                     </FormGroup>
+
+                     <Typography style={{ color: "white" }} variant="h4">
+                        Target Students:
+                     </Typography>
+
+                     <FormGroup>
+                        <Grid xs={12} item>
+                           <FieldsOfStudyMultiSelector
+                              selectedItems={values.targetFieldsOfStudy}
+                              setFieldValue={setFieldValue}
                            />
                         </Grid>
                      </FormGroup>
