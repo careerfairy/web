@@ -110,6 +110,15 @@ export interface ILivestreamRepository {
       streamRef: firebase.firestore.DocumentReference,
       userType: LivestreamUserAction
    ): firebase.firestore.Query
+   getAllUserLivestreamData(withRef: boolean): Promise<UserLivestreamData[]>
+   getAllLivestreamUsers(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): Promise<UserLivestreamData[]>
+   getAllLivestreamUsersByType(
+      userType: LivestreamUserAction,
+      withRef?: boolean
+   ): Promise<UserLivestreamData[]>
 }
 
 export class FirebaseLivestreamRepository implements ILivestreamRepository {
@@ -452,12 +461,46 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       const snaps = await this.firestore.collectionGroup("talentPool").get()
       return mapFirestoreDocuments<TalentPoolStudent>(snaps, withRef)
    }
+   /*
+    * Legacy Query for migration script only
+    * */
+   async getAllUserLivestreamData(
+      withRef?: boolean
+   ): Promise<UserLivestreamData[]> {
+      const snaps = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .get()
+      return mapFirestoreDocuments<UserLivestreamData>(snaps, withRef)
+   }
 
+   async getAllLivestreamUsersByType(
+      userType: LivestreamUserAction,
+      withRef?: boolean
+   ): Promise<UserLivestreamData[]> {
+      console.log("-> updated query")
+      const snaps = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .where(`${userType}.date`, "!=", null)
+         .orderBy(`${userType}.date`, "asc")
+         .get()
+      return mapFirestoreDocuments<UserLivestreamData>(snaps, withRef)
+   }
    async getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
    ): Promise<UserLivestreamData[]> {
       const snaps = await this.livestreamUsersQuery(eventId, userType).get()
+      return mapFirestoreDocuments<UserLivestreamData>(snaps)
+   }
+   async getAllLivestreamUsers(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): Promise<UserLivestreamData[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("userLivestreamData")
+         .get()
       return mapFirestoreDocuments<UserLivestreamData>(snaps)
    }
 

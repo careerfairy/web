@@ -29,6 +29,7 @@ import {
    BulkWriter,
    DocumentReference,
    FieldValue,
+   Timestamp,
 } from "firebase-admin/firestore"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { groupRepo, livestreamRepo, userRepo } from "../../../repositories"
@@ -634,7 +635,9 @@ const setUserLivestreamData = (
       .doc(updateData.id)
    const dateField = getUserSubCollectionDateField(documentType)
    const userAction = getUserAction(documentType)
-   const dateOfAction = updateData[dateField] || null
+   const dateOfAction =
+      updateData[dateField] ||
+      Timestamp.fromDate(new Date("March 17, 2020 03:24:00"))
    delete updateData[dateField]
    bulkWriter
       .set(
