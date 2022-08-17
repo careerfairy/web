@@ -58,7 +58,7 @@ const styles = {
       backgroundColor: "background.paper",
       height: "100%",
    },
-   registrationBackground: {
+   pillsBackground: {
       height: "100%",
       minHeight: "100vh",
       background: (theme) =>
@@ -94,6 +94,6 @@ export const PaperBackground = ({ ...props }) => {
    return <Box sx={styles.paperBackground} {...props} />
 }
 
-export const RegistrationBackground = ({ ...props }) => {
-   return <Box sx={styles.registrationBackground} {...props} />
+export const PillsBackground = ({ ...props }) => {
+   return <Box sx={styles.pillsBackground} {...props} />
 }

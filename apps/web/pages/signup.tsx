@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useCallback } from "react"
 import Head from "next/head"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
-import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { PillsBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../HOCs/AuthProvider"
 import SignUpPinForm from "../components/views/signup/steps/SignUpPinForm"
 import SignUpUserForm from "../components/views/signup/steps/SignUpUserForm"
@@ -231,7 +231,7 @@ export const SignUpPageLayout = ({ children, currentStep }) => {
          <Head>
             <title key="title">CareerFairy | Sign Up</title>
          </Head>
-         <RegistrationBackground>
+         <PillsBackground>
             <HeaderLogoWrapper>
                <MainLogo sx={styles.logo} />
             </HeaderLogoWrapper>
@@ -244,7 +244,7 @@ export const SignUpPageLayout = ({ children, currentStep }) => {
                </Box>
             </Container>
             <Typography sx={styles.footer}>Meet Your Future</Typography>
-         </RegistrationBackground>
+         </PillsBackground>
       </>
    )
 }
