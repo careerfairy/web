@@ -555,7 +555,6 @@ const DraftStreamForm = ({
                      validateForm,
                      /* and other goodies */
                   }) => {
-                     console.log("Values", values)
                      // @ts-ignore
                      return (
                         <form
