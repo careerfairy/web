@@ -35,8 +35,7 @@ export const LevelOfStudySelector = ({
          label: "Select your level of study",
          placeholder: "Select from the following list",
          className,
-         helperText: error,
-         error: !!error,
+         error,
       }),
       [className, error]
    )
