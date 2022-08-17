@@ -55,7 +55,7 @@ const MarketingSignUp = ({
             container
             spacing={2}
             py={{ xs: 6, md: 8, lg: 10 }}
-            px={{ xs: 3, md: 16, lg: 20 }}
+            px={{ xs: 6, md: 16, lg: 20 }}
          >
             <Grid item xs={12} lg={6}>
                {shortText && (
@@ -67,7 +67,7 @@ const MarketingSignUp = ({
                )}
             </Grid>
             <Grid item xs={12} lg={6}>
-               <Box maxWidth={isMobile ? "100%" : "70%"}>
+               <Box maxWidth={isMobile ? "100%" : "90%"}>
                   {title && (
                      <Typography variant="h6" color="white">
                         {title}
@@ -170,7 +170,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
             <form onSubmit={handleSubmit}>
                <>
                   <Grid container spacing={2}>
-                     <Grid item xs>
+                     <Grid item xs={12} md={6}>
                         <TextField
                            className="marketingForm"
                            autoComplete="fname"
@@ -196,7 +196,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                            }
                         />
                      </Grid>
-                     <Grid item xs>
+                     <Grid item xs={12} md={6}>
                         <TextField
                            className="marketingForm"
                            autoComplete="lname"
