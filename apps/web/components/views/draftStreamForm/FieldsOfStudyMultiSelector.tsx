@@ -24,6 +24,7 @@ const FieldsOfStudyMultiSelector = ({
          setFieldValue={setFieldValue}
          allValues={allFieldsOfStudy}
          limit={5}
+         isCheckbox={true}
          inputProps={{
             label: "Select Fields of Study",
             placeholder: "Select up to 5 Fields of Study",
