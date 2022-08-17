@@ -30,7 +30,7 @@ exports.createNewUserAccount_v4 = functions.https.onCall(
       }
 
       const userData = data.userData
-      const recipientEmail = data.userData.email.toLowerCase()
+      const recipientEmail = data.userData.email.toLowerCase().trim()
       const pinCode = getRandomInt(9999)
       const {
          email,
@@ -50,7 +50,7 @@ exports.createNewUserAccount_v4 = functions.https.onCall(
       )
       await admin
          .auth()
-         .createUser({ email: email, password: password })
+         .createUser({ email: email.trim(), password: password })
          .then(async (user) => {
             console.log(
                `Starting firestore account creation process for ${recipientEmail}`

@@ -70,6 +70,7 @@ interface IFormValues
 const schema: yup.SchemaOf<IFormValues> = yup.object().shape({
    email: yup
       .string()
+      .trim()
       .required("Your email is required")
       .email("Please enter a valid email address"),
    firstName: yup
