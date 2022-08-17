@@ -59,15 +59,15 @@ const MarketingSignUp = ({
          >
             <Grid item xs={12} lg={6}>
                {shortText && (
-                  <Box maxWidth={isMobile ? "100%" : "70%"}>
-                     <Typography variant="h2" color="white">
+                  <Box maxWidth={{ xs: "100%", md: "70%" }}>
+                     <Typography variant="h3" color="white">
                         {shortText}
                      </Typography>
                   </Box>
                )}
             </Grid>
-            <Grid item xs={12} lg={6}>
-               <Box maxWidth={isMobile ? "100%" : "90%"}>
+            <Grid item xs={12} lg={6} mt={{ xs: 4, lg: 0 }}>
+               <Box maxWidth={{ lg: "100%", xl: "80%" }}>
                   {title && (
                      <Typography variant="h6" color="white">
                         {title}
@@ -127,7 +127,6 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
       [fieldOfStudyId]
    )
    const [backendError, setBackendError] = useState<Error>(null)
-   const isMobile = useIsMobile()
 
    return (
       <Formik
@@ -267,7 +266,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                         />
                      </Box>
                   )}
-                  <Box mt={2} width={isMobile ? "100%" : "30%"}>
+                  <Box mt={2} width={{ xs: "100%", md: "30%" }}>
                      <Button
                         type="submit"
                         fullWidth
