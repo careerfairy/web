@@ -2,6 +2,7 @@ import PropTypes from "prop-types"
 import React from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
+import CmsImage from "../../../../cms/image"
 
 const angle = 20
 const rectLength = 130
@@ -55,8 +56,10 @@ const BenefitCard = ({
    secondaryGradientStart,
    secondaryGradientEnd,
    buttonProps,
+   image,
 }) => {
    const theme = useTheme()
+
    return (
       <Box>
          <Box sx={styles.graphicContainer}>
@@ -86,12 +89,19 @@ const BenefitCard = ({
                      "drop-shadow(21.632px 36.001px 24.5px rgba(189,243,236,0.29))",
                }}
             />
-            <Box
-               component="img"
-               sx={styles.graphic}
-               src={imageUrl}
-               alt={name}
-            />
+
+            {image ? (
+               <Box sx={styles.graphic}>
+                  <CmsImage cmsImage={image} />
+               </Box>
+            ) : (
+               <Box
+                  component="img"
+                  sx={styles.graphic}
+                  src={imageUrl}
+                  alt={name}
+               />
+            )}
          </Box>
          <div
             style={{

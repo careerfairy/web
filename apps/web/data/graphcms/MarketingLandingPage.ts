@@ -1,5 +1,6 @@
 import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
 import {
+   HygraphResponseCompanyValues,
    HygraphResponseEventsSection,
    HygraphResponseHero,
    HygraphResponseMarketingPage,
@@ -20,6 +21,7 @@ export class MarketingLandingPage extends BaseModel {
          | HygraphResponseEventsSection
          | HygraphResponseMarketingSignup
          | HygraphResponseHero
+         | HygraphResponseCompanyValues
       )[]
    ) {
       super()
