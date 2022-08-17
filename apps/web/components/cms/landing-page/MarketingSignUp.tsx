@@ -1,4 +1,3 @@
-import Container from "@mui/material/Container"
 import Box from "@mui/material/Box"
 import { sxStyles } from "../../../types/commonTypes"
 import {
@@ -22,11 +21,16 @@ import {
 } from "../../../types/cmsTypes"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 import { useRouter } from "next/router"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
-   container: {
+   largeContainer: {
       borderRadius: " 0px 224px 224px 0px",
       width: "95%",
+      background: (theme) =>
+         `linear-gradient(to right, ${theme.palette.secondary.main}, 80%, ${theme.palette.secondary.light})`,
+   },
+   smallContainer: {
       background: (theme) =>
          `linear-gradient(to right, ${theme.palette.secondary.main}, 80%, ${theme.palette.secondary.light})`,
    },
@@ -40,19 +44,30 @@ const MarketingSignUp = ({
    button,
    fieldsOfStudy,
 }: MarketingSignUpProps) => {
+   const isMobile = useIsMobile()
    const [isComplete, setComplete] = useState(false)
    return (
-      <Box id={marketingSignUpFormId} sx={styles.container}>
-         <Container>
-            <Grid container spacing={2} p={10}>
-               <Grid item xs={6}>
-                  {shortText && (
+      <Box
+         id={marketingSignUpFormId}
+         sx={isMobile ? styles.smallContainer : styles.largeContainer}
+      >
+         <Grid
+            container
+            spacing={2}
+            py={{ xs: 6, md: 8, lg: 10 }}
+            px={{ xs: 3, md: 16, lg: 20 }}
+         >
+            <Grid item xs={12} lg={6}>
+               {shortText && (
+                  <Box maxWidth={isMobile ? "100%" : "70%"}>
                      <Typography variant="h2" color="white">
                         {shortText}
                      </Typography>
-                  )}
-               </Grid>
-               <Grid item xs={6}>
+                  </Box>
+               )}
+            </Grid>
+            <Grid item xs={12} lg={6}>
+               <Box maxWidth={isMobile ? "100%" : "70%"}>
                   {title && (
                      <Typography variant="h6" color="white">
                         {title}
@@ -68,9 +83,9 @@ const MarketingSignUp = ({
                      )}
                      {isComplete && <Complete />}
                   </Box>
-               </Grid>
+               </Box>
             </Grid>
-         </Container>
+         </Grid>
       </Box>
    )
 }
@@ -78,7 +93,7 @@ const MarketingSignUp = ({
 const Complete = () => {
    return (
       <Box>
-         <Typography variant={"h3"}>
+         <Typography variant={"h3"} color={"white"}>
             Expect to receive news from us soon!
          </Typography>
       </Box>
@@ -112,7 +127,8 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
       [fieldOfStudyId]
    )
    const [backendError, setBackendError] = useState<Error>(null)
-   console.log("button props ->", { ...buttonProps })
+   const isMobile = useIsMobile()
+
    return (
       <Formik
          initialValues={initialValues}
@@ -251,7 +267,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                         />
                      </Box>
                   )}
-                  <Box mt={2} width={"30%"}>
+                  <Box mt={2} width={isMobile ? "100%" : "30%"}>
                      <Button
                         type="submit"
                         fullWidth
@@ -314,7 +330,11 @@ const FieldOfStudySelector = ({
 }
 
 const BackendError = ({ error }) => {
-   return <FormHelperText error>{error.message}</FormHelperText>
+   return (
+      <Box mt={1}>
+         <FormHelperText error>{error.message}</FormHelperText>
+      </Box>
+   )
 }
 
 export default MarketingSignUp
