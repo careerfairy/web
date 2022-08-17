@@ -56,10 +56,14 @@ const MarketingSignUp = ({
             spacing={2}
             py={{ xs: 6, md: 8, lg: 10 }}
             px={{ xs: 6, md: 16, lg: 20 }}
+            my={4}
          >
             <Grid item xs={12} lg={6}>
                {shortText && (
-                  <Box maxWidth={{ xs: "100%", md: "70%" }}>
+                  <Box
+                     maxWidth={{ xs: "100%", lg: "70%" }}
+                     textAlign={"center"}
+                  >
                      <Typography variant="h3" color="white">
                         {shortText}
                      </Typography>
