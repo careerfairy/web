@@ -22,7 +22,7 @@ import { FormikHelpers } from "formik/dist/types"
 import Paper from "@mui/material/Paper"
 import { MainLogo } from "../components/logos"
 import Collapse from "@mui/material/Collapse"
-import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { PillsBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
 
@@ -75,12 +75,12 @@ function ResetPasswordPage() {
    }, [user, firebase.auth?.currentUser?.emailVerified])
 
    return (
-      <RegistrationBackground>
+      <PillsBackground>
          <HeaderLogoWrapper>
             <MainLogo sx={styles.logo} />
          </HeaderLogoWrapper>
          <ResetPasswordBase />
-      </RegistrationBackground>
+      </PillsBackground>
    )
 }
 
