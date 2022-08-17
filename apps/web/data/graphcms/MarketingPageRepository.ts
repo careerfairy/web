@@ -1,5 +1,6 @@
 import { fetchAPI } from "./index"
 import {
+   companyValuesQueryProps,
    eventsSectionQueryProps,
    fieldOfStudyQueryProps,
    heroQueryProps,
@@ -53,6 +54,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                           ... on EventsSection ${eventsSectionQueryProps}
                           ... on MarketingSignup ${marketingSignupQueryProps}
                           ... on Hero ${heroQueryProps}
+                          ... on CompanyValues ${companyValuesQueryProps}
                       }
                       seo ${seoQueryProps}
                   }

@@ -114,6 +114,20 @@ export interface HygraphResponseHero {
    component?: HygraphFieldOfStudySelectResponse
 }
 
+export interface HygraphResponseCompanyValues {
+   __typename: string
+   id: string
+   slug: string
+   title: string
+   values: HygraphResponseCompanyValue[]
+}
+
+export interface HygraphResponseCompanyValue {
+   name: string
+   description: string
+   image: ICmsImage
+}
+
 export interface HygraphFieldOfStudySelectResponse {
    __typename: string
    id: string
@@ -268,5 +282,21 @@ export const fieldOfStudyQueryProps = `
         }
         fieldOfStudyId
         fieldOfStudyName
+    }
+`
+// language=GraphQL
+export const companyValueQueryProp = `
+    {
+        name
+        description
+        image ${imageQueryProps}
+    }
+`
+// language=GraphQL
+export const companyValuesQueryProps = `
+    {
+        __typename
+        title
+        values ${companyValueQueryProp}
     }
 `

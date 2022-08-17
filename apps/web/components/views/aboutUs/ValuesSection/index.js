@@ -57,5 +57,6 @@ ValuesSection.propTypes = {
    color: PropTypes.string,
    subtitle: PropTypes.string,
    title: PropTypes.string,
+   valuesData: PropTypes.array,
 }
 export default ValuesSection
