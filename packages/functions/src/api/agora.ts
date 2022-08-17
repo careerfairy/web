@@ -1,11 +1,31 @@
 import { RtcRole, RtcTokenBuilder } from "agora-access-token"
 import axios, { Method } from "axios"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { isLocalEnvironment } from "../util"
 
-export const appID = "53675bc6d3884026a72ecb1de3d19eb1"
-export const appCertificate = "286a21681469490783ab75247de35f37"
-export const customerKey = "fd45e86c6ffe445ebb87571344e945b1"
-export const customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
+// Project: Production
+let appID = "53675bc6d3884026a72ecb1de3d19eb1"
+let appCertificate = "286a21681469490783ab75247de35f37"
+let customerKey = "fd45e86c6ffe445ebb87571344e945b1"
+let customerSecret = "3e56ecf0a5ef4eaaa5d26cf8543952d0"
+
+if (isLocalEnvironment()) {
+   // Project: CareerFairyStreaming
+   appID = "52e732c40bf94a8c97fdd0fd443210e0"
+   appCertificate = "ffb72ee48dea40c5be4b7c93228707b6"
+
+   // Restfull api credentials for customer id: e76e7e728a5241b5803036a87c735736
+   customerKey = "e76e7e728a5241b5803036a87c735736"
+   customerSecret = "2e2577f3450a421890f9a1e09d27a707"
+   console.log("Using AgoraSDK testing environment")
+}
+
+export const agoraCredentials = {
+   appID,
+   appCertificate,
+   customerKey,
+   customerSecret,
+}
 
 const staticUID = "1234232"
 

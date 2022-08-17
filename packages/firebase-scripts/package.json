@@ -1,0 +1,33 @@
+{
+   "name": "@careerfairy/firebase-scripts",
+   "private": true,
+   "version": "0.0.0",
+   "main": "./dist/index.js",
+   "scripts": {
+      "build": "npm run clean && npm run copy-files && tsc",
+      "dev": "npm run clean && npm run copy-files && tsc --watch",
+      "copy-files": "cpx \"src/**/*.{json}\" dist/",
+      "clean": "rimraf dist/",
+      "script": "node dist/",
+      "download-CSV-fieldAndLevelOfStudy": "node ./dist/scripts/queryAndSaveFieldAndLevelOfStudyToCsv.js NEXT_PUBLIC_FIREBASE_EMULATORS=false",
+      "backfill-fieldOfStudy": "node ./dist/migrations/backfill-fieldOfStudy.js"
+   },
+   "dependencies": {
+      "@careerfairy/shared-lib": "*",
+      "@qualdesk/firestore-big-batch": "^0.0.2",
+      "cli-progress": "^3.11.2",
+      "csv-parse": "^5.2.2",
+      "csvtojson": "^2.0.10",
+      "d3-request": "^1.0.6",
+      "dotenv": "^16.0.1",
+      "enquirer": "^2.3.6",
+      "firebase-admin": "^10.3.0",
+      "objects-to-csv": "^1.3.6",
+      "string-similarity": "^4.0.4"
+   },
+   "devDependencies": {
+      "cpx": "^1.5.0",
+      "rimraf": "^3.0.2",
+      "typescript": "^4.5.4"
+   }
+}

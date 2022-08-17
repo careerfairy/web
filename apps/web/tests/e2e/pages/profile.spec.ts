@@ -120,3 +120,64 @@ test.describe("Career Skills", () => {
       expect(thereIsProgress).toBeFalsy()
    })
 })
+
+test.describe("Personal Information", () => {
+   test("it should be able to delete account", async ({ page }) => {
+      const profilePage = new ProfilePage(page)
+
+      await LoginPage.login(page)
+
+      // open page
+      await profilePage.open()
+
+      // scroll to delete button
+      await profilePage.deleteAccountButton.scrollIntoViewIfNeeded()
+
+      // click on delete account button
+      await profilePage.clickDeleteAccountButton()
+
+      await profilePage.fillDeleteAccountConfirmationText("delete")
+
+      // click on delete account confirmation button
+      await Promise.all([
+         profilePage.clickDeleteAccountConfirmationButton(),
+         page.waitForNavigation(),
+      ])
+
+      // expect being on the login page
+      const thereIsLoginButton = await page
+         .locator("data-testid=login-button")
+         .isVisible()
+      expect(thereIsLoginButton).toBeTruthy()
+   })
+
+   test("it should not be able to delete account since the confirmation text is not correct", async ({
+      page,
+   }) => {
+      const profilePage = new ProfilePage(page)
+
+      await LoginPage.login(page)
+
+      // open page
+      await profilePage.open()
+
+      // scroll to delete button
+      await profilePage.deleteAccountButton.scrollIntoViewIfNeeded()
+
+      // click on delete account button
+      await profilePage.clickDeleteAccountButton()
+
+      await profilePage.fillDeleteAccountConfirmationText("incorrect text")
+
+      // expect confirmation button to be disabled
+      const isButtonDisable =
+         await profilePage.deleteAccountConfirmationButton.isDisabled()
+      expect(isButtonDisable).toBeTruthy()
+
+      // expect not being on the login page
+      const thereIsLoginButton = await page
+         .locator("data-testid=login-button")
+         .isVisible()
+      expect(thereIsLoginButton).toBeFalsy()
+   })
+})

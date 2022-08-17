@@ -1,4 +1,5 @@
 import * as actions from "./actionTypes"
+import { firebaseServiceInstance } from "../../data/firebase/FirebaseService"
 
 // Sign up action creator
 export const signUp =
@@ -123,25 +124,17 @@ export const editUserProfile =
 // Delete user
 export const deleteUser =
    () =>
-   async (dispatch, getState, { getFirebase, getFirestore }) => {
+   async (dispatch, getState, { getFirebase }) => {
       const firebase = getFirebase()
-      const firestore = getFirestore()
-      const user = firebase.auth().currentUser
-      const {
-         // uid: userId, // dont need uid yet
-         email: userEmail,
-      } = getState().firebase.auth
-      dispatch({ type: actions.DELETE_START })
+
+      dispatch({ type: actions.DELETE_USER_START })
       try {
-         await firestore.collection("userData").doc(userEmail).delete()
+         await firebaseServiceInstance.deleteUserAccount()
+         await firebase.auth().signOut()
 
-         // await firestore   // Need to delete all user doc references in firestore
-         //     .collection('todos')
-         //     .doc(userId)
-         //     .delete();
-
-         await user.delete()
+         dispatch({ type: actions.DELETE_USER_SUCCESS })
       } catch (err) {
-         dispatch({ type: actions.DELETE_FAIL, payload: err.message })
+         dispatch({ type: actions.DELETE_USER_FAIL, payload: err.message })
+         throw new Error(err)
       }
    }

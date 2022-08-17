@@ -40,7 +40,7 @@ const EditOverview = ({ firebase, group }) => {
                      <ProfileDetails firebase={firebase} group={group} />
                   </Grid>
                   <Grid item lg={12} md={12} xs={12}>
-                     <ProfileCategories firebase={firebase} group={group} />
+                     <ProfileCategories />
                   </Grid>
                   <Grid item lg={12} md={12} xs={12}>
                      <ProfilePrivacyPolicy firebase={firebase} group={group} />

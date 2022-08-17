@@ -5,6 +5,7 @@ import { Box, CircularProgress } from "@mui/material"
 import * as PropTypes from "prop-types"
 import React, { useEffect } from "react"
 import { forceCheck } from "react-lazyload"
+import { formatLivestreamsEvents } from "../../portal/events-preview/utils"
 
 const styles = {
    loaderWrapper: {
@@ -21,8 +22,6 @@ const styles = {
 export function StreamsSection({
    currentGroup,
    pastLivestreams,
-   selectedOptions,
-   setSelectedOptions,
    upcomingLivestreams,
    listenToUpcoming,
    value,
@@ -35,10 +34,8 @@ export function StreamsSection({
          <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
                <NextLivestreams
-                  setSelectedOptions={setSelectedOptions}
-                  selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
-                  livestreams={upcomingLivestreams || []}
+                  livestreams={formatLivestreamsEvents(upcomingLivestreams, 6)}
                   currentGroup={currentGroup}
                />
             ) : (
@@ -50,8 +47,6 @@ export function StreamsSection({
          <SwipeablePanel value={value} index={"pastEvents"}>
             {isLoaded(pastLivestreams) ? (
                <NextLivestreams
-                  setSelectedOptions={setSelectedOptions}
-                  selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
                   isPastLivestreams
                   livestreams={pastLivestreams || []}

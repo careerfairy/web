@@ -127,6 +127,7 @@ const Content = ({
                         <ListItem
                            button={!activeRoom}
                            onClick={() => handleGoToRoom(room.id)}
+                           data-testid={"breakout-room-banner-item"}
                            className={clsx(classes.breakoutRoomItem, {
                               [classes.activeItem]: activeRoom,
                            })}

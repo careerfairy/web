@@ -1,6 +1,8 @@
 import { DeviceOption } from "../types/streaming"
-import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../constants/streams"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -51,9 +53,11 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
 }
 
 export const checkIfPast = (event: LivestreamEvent) => {
+   const eventDate = event?.start?.toDate?.() || new Date(event?.startDate)
+
    return (
       event?.hasEnded ||
-      event?.start?.toDate?.() <
+      eventDate <
          new Date(
             Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
          )

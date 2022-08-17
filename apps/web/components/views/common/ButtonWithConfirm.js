@@ -1,4 +1,4 @@
-import React, { Fragment, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import {
    Button,
    DialogActions,
@@ -7,12 +7,9 @@ import {
    DialogTitle,
    IconButton,
    Tooltip,
-   useMediaQuery,
 } from "@mui/material"
 import CheckIcon from "@mui/icons-material/Check"
 import { GlassDialog } from "materialUI/GlobalModals"
-import { useTheme } from "@mui/material/styles"
-
 import makeStyles from "@mui/styles/makeStyles"
 
 const useStyles = makeStyles((theme) => ({
@@ -32,8 +29,6 @@ function ButtonWithConfirm({
    tooltipTitle,
    ...rest
 }) {
-   const theme = useTheme()
-   const extraSmallScreen = useMediaQuery(theme.breakpoints.down("sm"))
    const classes = useStyles({ hasStarted })
    const [modalOpen, setModalOpen] = useState(false)
 
@@ -51,25 +46,27 @@ function ButtonWithConfirm({
       [modalOpen]
    )
 
+   const { noLabel, startIcon } = rest
+
    return (
-      <Fragment>
+      <>
          <Tooltip title={tooltipTitle}>
             <span>
-               {extraSmallScreen ? (
+               {noLabel ? (
                   <IconButton
                      className={classes.iconInButton}
                      disabled={disabled}
                      onClick={() => setModalOpen(true)}
                      size="large"
                   >
-                     {rest.startIcon}
+                     {startIcon}
                   </IconButton>
                ) : (
                   <Button
                      style={{ background: color, boxShadow: "none" }}
                      color="primary"
                      variant="contained"
-                     startIcon={rest.startIcon}
+                     startIcon={startIcon}
                      onClick={() => setModalOpen(true)}
                      disabled={disabled}
                   >
@@ -99,7 +96,7 @@ function ButtonWithConfirm({
                </Button>
             </DialogActions>
          </GlassDialog>
-      </Fragment>
+      </>
    )
 }
 

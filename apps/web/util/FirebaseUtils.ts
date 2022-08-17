@@ -1,5 +1,4 @@
 import SessionStorageUtil from "./SessionStorageUtil"
-import { QuerySnapshot } from "@firebase/firestore-types"
 
 /**
  * Patch console.error() function to listen for Firestore connectivity issues
@@ -10,7 +9,9 @@ if (typeof window !== "undefined") {
    console["error"] = function (...args) {
       if (args.length === 2) {
          if (
+            typeof arguments[0] === "string" &&
             arguments[0].indexOf("@firebase/firestore") !== -1 &&
+            typeof arguments[1] === "string" &&
             arguments[1].indexOf(
                "Could not reach Cloud Firestore backend. Backend didn't respond within "
             ) !== -1
@@ -35,22 +36,4 @@ if (typeof window !== "undefined") {
 
       return originalFn.apply(console, args)
    }
-}
-
-/**
- * Add the document id to the document itself
- *
- * @param documentSnapshot
- */
-export function mapFirestoreDocuments<T>(
-   documentSnapshot: QuerySnapshot
-): T[] | null {
-   let docs = null
-   if (!documentSnapshot.empty) {
-      docs = documentSnapshot.docs.map((doc) => ({
-         ...doc.data(),
-         id: doc.id,
-      }))
-   }
-   return docs
 }

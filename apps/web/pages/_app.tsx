@@ -1,0 +1,167 @@
+import * as React from "react"
+import "styles.css"
+import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
+import config from "@stahl.luke/react-reveal/globals"
+import { newStore, wrapper } from "../store"
+import NextNProgress from "nextjs-progressbar"
+import { brandedLightTheme } from "../materialUI"
+import Head from "next/head"
+import AdapterDateFns from "@mui/lab/AdapterDateFns"
+import LocalizationProvider from "@mui/lab/LocalizationProvider"
+import { AuthProvider } from "../HOCs/AuthProvider"
+import { ReactReduxFirebaseProvider } from "react-redux-firebase"
+import { createFirestoreInstance } from "redux-firestore"
+import { Provider } from "react-redux"
+import { CacheProvider } from "@emotion/react"
+import createEmotionCache from "../materialUI/createEmotionCache"
+import Notifier from "../components/views/notifier"
+import CFCookieConsent from "../components/views/common/cookie-consent/CFCookieConsent"
+import { useRouter } from "next/router"
+import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
+import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
+import { useEffect, useState } from "react"
+import firebaseApp, {
+   AuthInstance,
+   firebaseConfig,
+   FirestoreInstance,
+   FunctionsInstance,
+} from "../data/firebase/FirebaseInstance"
+
+import "../util/FirebaseUtils"
+import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
+import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import GoogleTagManager from "../HOCs/GoogleTagManager"
+import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
+import TutorialProvider from "../HOCs/TutorialProvider"
+import ErrorProvider from "../HOCs/ErrorProvider"
+import {
+   FirebaseAppProvider,
+   FirestoreProvider,
+   AuthProvider as ReactFireAuthProvider,
+   FunctionsProvider,
+} from "reactfire"
+import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+
+// Client-side cache, shared for the whole session of the user in the browser.
+const clientSideEmotionCache = createEmotionCache()
+
+config({ ssrFadeout: true })
+
+// react-redux-firebase config
+const rrfConfig = {
+   // userProfile: 'userData',
+   useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
+   attachAuthIsReady: true, // attaches auth is ready promise to store
+}
+
+export const store = newStore()
+const rrfProps = {
+   firebase: firebaseApp,
+   config: rrfConfig,
+   dispatch: store.dispatch,
+   createFirestoreInstance,
+}
+
+function MyApp(props) {
+   const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+
+   const [disableCookies, isRecordingWindow] = useRouterInformation()
+
+   useStoreReferralQueryParams()
+   useStoreUTMQueryParams()
+
+   return (
+      <CacheProvider value={emotionCache}>
+         <Head>
+            <meta
+               name="viewport"
+               content="initial-scale=1, width=device-width"
+            />
+            <title>CareerFairy | Watch live streams. Get hired.</title>
+         </Head>
+         <NextNProgress
+            color={brandedLightTheme.palette.primary.main}
+            options={{ showSpinner: false }}
+         />
+         <Provider store={store}>
+            <ReactReduxFirebaseProvider {...rrfProps}>
+               <ReactFireProviders>
+                  <FeatureFlagsProvider>
+                     <TutorialProvider>
+                        <AuthProvider>
+                           <GoogleTagManager disableCookies={disableCookies}>
+                              <ThemeProviderWrapper>
+                                 <FirebaseServiceContext.Provider
+                                    value={firebaseServiceInstance}
+                                 >
+                                    <LocalizationProvider
+                                       dateAdapter={AdapterDateFns}
+                                    >
+                                       <ErrorProvider>
+                                          {disableCookies ||
+                                          isRecordingWindow ? null : (
+                                             <CFCookieConsent />
+                                          )}
+                                          <UserRewardsNotifications>
+                                             <Component {...pageProps} />
+                                          </UserRewardsNotifications>
+                                          <Notifier />
+                                       </ErrorProvider>
+                                    </LocalizationProvider>
+                                 </FirebaseServiceContext.Provider>
+                              </ThemeProviderWrapper>
+                           </GoogleTagManager>
+                        </AuthProvider>
+                     </TutorialProvider>
+                  </FeatureFlagsProvider>
+               </ReactFireProviders>
+            </ReactReduxFirebaseProvider>
+         </Provider>
+      </CacheProvider>
+   )
+}
+
+const ReactFireProviders = ({ children }) => {
+   return (
+      <FirebaseAppProvider firebaseConfig={firebaseConfig} suspense={true}>
+         <FirestoreProvider sdk={FirestoreInstance as any}>
+            <ReactFireAuthProvider sdk={AuthInstance as any}>
+               <FunctionsProvider sdk={FunctionsInstance as any}>
+                  {children}
+               </FunctionsProvider>
+            </ReactFireAuthProvider>
+         </FirestoreProvider>
+      </FirebaseAppProvider>
+   )
+}
+
+const useRouterInformation = () => {
+   const {
+      pathname,
+      query: { isRecordingWindow },
+   } = useRouter()
+
+   const [disableCookies, setDisableCookies] = useState(false)
+
+   useEffect(() => {
+      setDisableCookies(
+         Boolean(pathname === "/next-livestreams/[groupId]/embed")
+      )
+   }, [pathname])
+
+   return [disableCookies, isRecordingWindow]
+}
+
+// Only uncomment this method if you have blocking data requirements for
+// every single page in your application. This disables the ability to
+// perform automatic static optimization, causing every page in your app to
+// be server-side rendered.
+//
+// MyApp.getInitialProps = async (appContext) => {
+//   // calls page's `getInitialProps` and fills `appProps.pageProps`
+//   const appProps = await App.getInitialProps(appContext);
+//
+//   return { ...appProps }
+// }
+
+export default wrapper.withRedux(MyApp)

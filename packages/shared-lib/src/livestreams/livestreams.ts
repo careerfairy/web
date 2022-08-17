@@ -1,10 +1,16 @@
 import { Identifiable } from "../commonTypes"
-import firebase from "firebase"
+import { Group, GroupQuestion } from "../groups"
+import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
+import firebase from "firebase/compat"
+import Timestamp = firebase.firestore.Timestamp
+
+export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
+   1000 * 60 * 60 * 12
 
 export interface LivestreamEvent extends Identifiable {
    author?: {
       email: string
-      groupId: string
+      groupId?: string
    }
    summary?: string
    backgroundImageUrl?: string
@@ -12,12 +18,16 @@ export interface LivestreamEvent extends Identifiable {
    companyId?: string
    participants?: string[]
    participatingStudents?: string[]
+   maxRegistrants?: number
    companyLogoUrl?: string
-   created?: firebase.firestore.Timestamp
+   created?: Timestamp
    currentSpeakerId?: string
+   withResume?: boolean
    duration?: number
    groupIds?: string[]
    interestsIds?: string[]
+   levelOfStudyIds?: string[]
+   fieldOfStudyIds?: string[]
    isRecording?: boolean
    language?: {
       code?: string
@@ -25,13 +35,14 @@ export interface LivestreamEvent extends Identifiable {
    }
    hidden?: boolean
    talentPool?: string[]
+   hasNoTalentPool?: boolean
    test?: boolean
    title?: string
    type?: string
    start: firebase.firestore.Timestamp
    startDate?: Date
    registeredUsers?: string[]
-   registrants?: string[]
+   groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
@@ -42,6 +53,57 @@ export interface LivestreamEvent extends Identifiable {
       groupId: string
    }
    universities: any[]
+}
+
+export type LivestreamUserAction = keyof Pick<
+   UserLivestreamData,
+   "talentPool" | "registered" | "participated"
+>
+
+/*
+ * Sub-collection found on the livestream doc called userLivestreamData
+ * */
+export interface UserLivestreamData extends Identifiable {
+   userId: string
+   livestreamId: LivestreamEvent["id"]
+   user: UserData
+   answers?: UserLivestreamGroupQuestionAnswers
+   registered?: {
+      date: firebase.firestore.Timestamp
+      referral?: {
+         referralCode: string
+         inviteLivestream: string
+      }
+      utm: any
+   }
+   talentPool?: {
+      date: firebase.firestore.Timestamp
+      companyId: string
+   }
+   participated?: {
+      date: firebase.firestore.Timestamp
+   }
+}
+
+export type LivestreamGroupQuestionsMap = Record<
+   Group["id"],
+   LivestreamGroupQuestions
+>
+
+export interface LivestreamGroupQuestion extends GroupQuestion {
+   /*
+    * The property selectedOptionId and isNew is never saved on the livestream document.
+    * It is only used to track the user selected option client-side.
+    * */
+   selectedOptionId?: string
+   isNew?: boolean
+}
+
+export interface LivestreamGroupQuestions {
+   groupName: string
+   groupId: string
+   universityCode?: string
+   questions: Record<LivestreamGroupQuestion["id"], LivestreamGroupQuestion>
 }
 
 export interface Speaker extends Identifiable {
@@ -75,6 +137,38 @@ export interface BreakoutRoom extends Identifiable {
    parentLivestream?: LivestreamEventPublicData
 }
 
+export interface LivestreamQuestion extends Identifiable {
+   author: string
+   timestamp: firebase.firestore.Timestamp
+   title: string
+   type: "new" | "current"
+   votes: number
+}
+
+export interface LivestreamPoll extends Identifiable {
+   voters: string[]
+   timestamp: firebase.firestore.Timestamp
+   state: "current" | "closed"
+   question: string
+   options: {
+      id: string
+      text: string
+   }[]
+}
+
+export interface LivestreamChatEntry extends Identifiable {
+   authorEmail: string
+   authorName: string
+   message: string
+   timestamp: firebase.firestore.Timestamp
+}
+
+export interface LivestreamIcon extends Identifiable {
+   authorEmail: string
+   timestamp: firebase.firestore.Timestamp
+   name: "heart" | "clapping" | "like"
+}
+
 /**
  * Public information about a livestream event
  *
@@ -94,4 +188,28 @@ export const pickPublicDataFromLivestream = (
       companyLogoUrl: livestreamData.companyLogoUrl ?? null,
       test: livestreamData.test ?? false,
    }
+}
+
+export interface LivestreamEventSerialized
+   extends Omit<
+      LivestreamEvent,
+      | "registeredUsers"
+      | "talentPool"
+      | "participatingStudents"
+      | "participants"
+      | "created"
+      | "start"
+      | "startDate"
+      | "lastUpdated"
+      | "lastUpdatedAuthorInfo"
+   > {
+   createdDateString: string
+   startDateString: string
+   lastUpdatedDateString: string
+}
+
+export interface LivestreamEventParsed extends LivestreamEventSerialized {
+   startDate: Date
+   createdDate: Date
+   lastUpdatedDate: Date
 }

@@ -2,7 +2,7 @@ import React from "react"
 import Linkify from "react-linkify"
 
 const componentDecorator = (href, text, key) => (
-   <a href={href} key={key} target="_blank">
+   <a href={href} key={key} target="_blank" style={{ wordBreak: "break-word" }}>
       {text}
    </a>
 )

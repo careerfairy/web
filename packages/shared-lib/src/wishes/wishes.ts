@@ -1,5 +1,5 @@
 import { Identifiable } from "../commonTypes"
-import firebase from "firebase"
+import firebase from "firebase/compat/app"
 import { Interest } from "../interests"
 
 export interface Wish extends Identifiable {
@@ -92,4 +92,11 @@ export interface Comment extends Identifiable {
    isFlaggedByAdmin: boolean
    wishId: string
    parentCommentId: string | null
+}
+
+// TODO: this should be moved to the web-app since its a UI detail
+export interface CreateWishFormValues {
+   description: Wish["description"]
+   interests: Interest[]
+   companyNames: Wish["companyNames"]
 }

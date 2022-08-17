@@ -1,7 +1,6 @@
 import PropTypes from "prop-types"
 import React, { memo, useContext, useEffect, useState } from "react"
 import ThumbUpRoundedIcon from "@mui/icons-material/ThumbUpRounded"
-import Linkify from "react-linkify"
 import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded"
 import ExpandMoreRoundedIcon from "@mui/icons-material/ExpandMoreRounded"
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
@@ -31,6 +30,7 @@ import { compose } from "redux"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import LinkifyText from "../../../../util/LinkifyText"
 
 const useStyles = makeStyles((theme) => ({
    chatInput: {
@@ -303,12 +303,6 @@ const QuestionContainer = memo(
          )
       }
 
-      const componentDecorator = (href, text, key) => (
-         <a href={href} key={key} target="_blank">
-            {text}
-         </a>
-      )
-
       const makeGloballyActive = () => {
          setOpenQuestionId(question.id)
          setShowAllReactions(true)
@@ -338,9 +332,9 @@ const QuestionContainer = memo(
                   component={Card}
                >
                   <div style={{ wordBreak: "break-word" }}>
-                     <Linkify componentDecorator={componentDecorator}>
+                     <LinkifyText>
                         <span>{comment.title}</span>
-                     </Linkify>
+                     </LinkifyText>
                   </div>
                   <div style={{ fontSize: "0.8em", color: "rgb(160,160,160)" }}>
                      <span>@{comment.author}</span>
@@ -401,7 +395,9 @@ const QuestionContainer = memo(
                      </div>
                   )}
                   <div className={classes.upVotes}>
-                     <span>{question.votes}</span>
+                     <span data-testid={"streaming-question-votes"}>
+                        {question.votes}
+                     </span>
                      <ThumbUpRoundedIcon
                         color="inherit"
                         style={{ verticalAlign: "text-top" }}

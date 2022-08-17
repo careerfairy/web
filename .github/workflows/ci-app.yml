@@ -99,11 +99,21 @@ jobs:
 
    # Run E2E Tests
    e2e_tests:
-      name: "E2E Tests - ${{ matrix.browser }}"
+      name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
       strategy:
          fail-fast: false
          matrix:
-            browser: [chromium, firefox, webkit]
+            shard: [1, 2, 3]
+            total: [3]
+      # Another way to split the runners by browser and custom shards by browser
+      #            browser: [chromium, firefox, webkit]
+      #            shards: [1]
+      #            total: [1]
+      #            include:
+      #               # Since chrome runs the streaming tests, we should parallelize them in the future
+      #               - browser: chromium
+      #                 shards: 2
+      #                 total: 2
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
@@ -135,24 +145,23 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm install
          - name: Install Playwright deps
-           run: npx playwright install --with-deps ${{ matrix.browser }} chromium
+           run: npx playwright install --with-deps
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-              BROWSER: ${{ matrix.browser }}
-           run: npm run test:e2e-webapp
+           run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.browser }}-playwright-report
+              name: ${{ matrix.shard }}-playwright-report
               path: apps/web/playwright-report
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.browser }}-debug-logs
+              name: ${{ matrix.shard }}-debug-logs
               path: firebase-debug.log
    # Deploy
    deploy:
@@ -162,7 +171,7 @@ jobs:
       runs-on: ubuntu-latest
       steps:
          - uses: actions/checkout@v2
-         - uses: amondnet/vercel-action@v20.0.1 #deploy
+         - uses: amondnet/vercel-action@v25.1.0 #deploy
            id: vercel-action
            with:
               vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required

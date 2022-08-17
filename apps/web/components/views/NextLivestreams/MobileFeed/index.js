@@ -1,29 +1,11 @@
 import React, { useEffect, useState } from "react"
 
-import { Box, Button, Typography } from "@mui/material"
+import { Box } from "@mui/material"
 import GroupStreams from "../GroupStreams/GroupStreams"
 import { useRouter } from "next/router"
-import GroupJoinModal from "../../profile/GroupJoinModal"
-import FiltersDrawer from "./FiltersDrawer"
-
-const styles = {
-   streamsGrid: {
-      height: "100%",
-   },
-   followButton: {
-      marginTop: "5px",
-      position: "sticky",
-      top: "165px",
-      zIndex: 20,
-   },
-}
 
 const MobileFeed = ({
-   handleToggleActive,
-   hasCategories,
    groupData,
-   userData,
-   alreadyJoined,
    livestreams,
    searching,
    scrollToTop,
@@ -32,10 +14,7 @@ const MobileFeed = ({
    selectedOptions,
    isPastLivestreams,
 }) => {
-   const router = useRouter()
-   const absolutePath = router.asPath
    const [value, setValue] = useState(0)
-   const [openJoinModal, setOpenJoinModal] = useState(false)
    const { query } = useRouter()
 
    useEffect(() => {
@@ -54,50 +33,10 @@ const MobileFeed = ({
       setValue(0)
    }
 
-   const handleCloseJoinModal = () => {
-      setOpenJoinModal(false)
-   }
-   const handleOpenJoinModal = () => {
-      setOpenJoinModal(true)
-   }
-
-   const handleJoin = () => {
-      if (userData) {
-         handleOpenJoinModal()
-      } else {
-         return router.push({ pathname: "/login", query: { absolutePath } })
-      }
-   }
-
    return (
       <Box p={1}>
-         {!userData?.groupIds?.includes(groupData.groupId) &&
-            !listenToUpcoming && (
-               <>
-                  <Button
-                     sx={styles.followButton}
-                     onClick={handleJoin}
-                     size="large"
-                     variant="contained"
-                     fullWidth
-                     color="primary"
-                     align="center"
-                  >
-                     <Typography variant="h5">
-                        Start Following {groupData.universityName}
-                     </Typography>
-                  </Button>
-                  <GroupJoinModal
-                     open={openJoinModal}
-                     group={groupData}
-                     alreadyJoined={alreadyJoined}
-                     userData={userData}
-                     closeModal={handleCloseJoinModal}
-                  />
-               </>
-            )}
          <GroupStreams
-            mobile={true}
+            mobile
             listenToUpcoming={listenToUpcoming}
             careerCenterId={careerCenterId}
             isPastLivestreams={isPastLivestreams}
@@ -105,11 +44,6 @@ const MobileFeed = ({
             searching={searching}
             livestreams={livestreams}
             groupData={groupData}
-         />
-         <FiltersDrawer
-            groupData={groupData}
-            hasCategories={hasCategories}
-            handleToggleActive={handleToggleActive}
          />
       </Box>
    )
