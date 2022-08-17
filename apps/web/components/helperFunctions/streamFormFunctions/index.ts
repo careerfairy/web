@@ -86,6 +86,7 @@ export const buildLivestreamObject = (
       language: values.language,
       lastUpdated: firebase.getServerTimestamp(),
       targetFieldsOfStudy: values.targetFieldsOfStudy,
+      targetLevelsOfStudy: values.targetLevelsOfStudy,
    }
 }
 
