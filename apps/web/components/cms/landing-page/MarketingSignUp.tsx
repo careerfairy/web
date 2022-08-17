@@ -270,7 +270,11 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                         />
                      </Box>
                   )}
-                  <Box mt={2} width={{ xs: "100%", md: "30%" }}>
+                  <Box
+                     mt={2}
+                     width={{ xs: "100%", md: "fit-content" }}
+                     minWidth={"30%"}
+                  >
                      <Button
                         type="submit"
                         fullWidth
