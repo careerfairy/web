@@ -3,6 +3,7 @@ import { Group, GroupQuestion } from "../groups"
 import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 import firebase from "firebase/compat"
 import Timestamp = firebase.firestore.Timestamp
+import { FieldOfStudy } from "../fieldOfStudy"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -46,6 +47,7 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
+   targetFieldsOfStudy?: FieldOfStudy[]
    lastUpdated?: firebase.firestore.Timestamp
    speakers?: Speaker[]
    lastUpdatedAuthorInfo?: {
