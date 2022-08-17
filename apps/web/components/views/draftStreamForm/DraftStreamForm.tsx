@@ -63,6 +63,8 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { FormikHelpers } from "formik/dist/types"
 import GroupQuestionSelect from "./GroupQuestionSelect"
+import FieldsOfStudyMultiSelector from "./FieldsOfStudyMultiSelector"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -161,6 +163,7 @@ export interface DraftFormValues {
       name: string
       shortName: string
    }
+   targetFieldsOfStudy: FieldOfStudy[]
 }
 
 const DraftStreamForm = ({
@@ -218,6 +221,7 @@ const DraftStreamForm = ({
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
+      targetFieldsOfStudy: [],
    })
 
    const handleSetGroupIds = async (
@@ -320,6 +324,7 @@ const DraftStreamForm = ({
                   ),
                   status: livestream.status || {},
                   language: livestream.language || languageCodes[0],
+                  targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                }
                setFormData(newFormData)
                setAllFetched(false)
@@ -948,6 +953,26 @@ const DraftStreamForm = ({
                                        variant: "outlined",
                                     }}
                                     isCheckbox={true}
+                                 />
+                              </Grid>
+                           </FormGroup>
+
+                           <Typography style={{ color: "white" }} variant="h4">
+                              Target Students:
+                           </Typography>
+
+                           <FormGroup>
+                              <Grid
+                                 xs={12}
+                                 sm={12}
+                                 md={12}
+                                 lg={12}
+                                 xl={12}
+                                 item
+                              >
+                                 <FieldsOfStudyMultiSelector
+                                    selectedItems={values.targetFieldsOfStudy}
+                                    setFieldValue={setFieldValue}
                                  />
                               </Grid>
                            </FormGroup>
