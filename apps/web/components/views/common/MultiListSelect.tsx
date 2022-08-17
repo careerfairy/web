@@ -37,8 +37,6 @@ const MultiListSelect = ({
    useEffect(() => {
       if (selectAllOption) {
          setAllValuesLocal([selectAllOption.value, ...allValues])
-      } else {
-         setAllValuesLocal(allValues)
       }
    }, [allValues, selectAllOption])
 
