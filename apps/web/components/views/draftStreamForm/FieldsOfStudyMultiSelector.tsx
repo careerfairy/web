@@ -32,9 +32,11 @@ const FieldsOfStudyMultiSelector = ({
          chipProps={{
             variant: "outlined",
          }}
-         getValueFn={(value) => value}
+         getValueFn={getValueFn}
       />
    )
 }
+
+const getValueFn = (value) => value
 
 export default FieldsOfStudyMultiSelector
