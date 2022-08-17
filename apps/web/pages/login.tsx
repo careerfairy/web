@@ -18,7 +18,7 @@ import MicOutlinedIcon from "@mui/icons-material/MicOutlined"
 import { useAuth } from "../HOCs/AuthProvider"
 import { FormikHelpers } from "formik/dist/types"
 import { MainLogo } from "../components/logos"
-import { RegistrationBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { PillsBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { HeaderLogoWrapper } from "../materialUI"
 import { FormHelperText } from "@mui/material"
 import * as yup from "yup"
@@ -104,12 +104,12 @@ function LogInPage() {
    ])
 
    return (
-      <RegistrationBackground>
+      <PillsBackground>
          <HeaderLogoWrapper>
             <MainLogo sx={styles.logo} />
          </HeaderLogoWrapper>
          <LogInFormBase />
-      </RegistrationBackground>
+      </PillsBackground>
    )
 }
 

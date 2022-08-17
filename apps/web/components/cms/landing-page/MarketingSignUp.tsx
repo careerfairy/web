@@ -9,7 +9,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import React, { useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import { Formik } from "formik"
 import * as yup from "yup"
@@ -132,34 +132,37 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
    )
    const [backendError, setBackendError] = useState<Error>(null)
 
+   const handleSubmitForm = useCallback(
+      (values, { setSubmitting, resetForm }) => {
+         marketingServiceInstance
+            .create({
+               firstName: values.firstName,
+               lastName: values.lastName,
+               email: values.email,
+               fieldOfStudyId: values.fieldOfStudyId,
+               utmParams: SessionStorageUtil.getUTMParams() ?? {},
+            })
+            .then((_) => {
+               resetForm()
+               setComplete(true)
+               setBackendError(null)
+            })
+            .catch((e) => {
+               setBackendError(e)
+            })
+            .finally(() => {
+               setSubmitting(false)
+            })
+      },
+      [setComplete]
+   )
+
    return (
       <Formik
          initialValues={initialValues}
          validationSchema={schema}
          enableReinitialize
-         onSubmit={(values, { setSubmitting, resetForm }) => {
-            marketingServiceInstance
-               .create({
-                  firstName: values.firstName,
-                  lastName: values.lastName,
-                  email: values.email,
-                  fieldOfStudyId: values.fieldOfStudyId,
-                  utmParams: SessionStorageUtil.getUTMParams() ?? {},
-               })
-               .then((_) => {
-                  console.log("Created with success")
-                  resetForm()
-                  setComplete(true)
-                  setBackendError(null)
-               })
-               .catch((e) => {
-                  console.log("failed", e)
-                  setBackendError(e)
-               })
-               .finally(() => {
-                  setSubmitting(false)
-               })
-         }}
+         onSubmit={handleSubmitForm}
       >
          {({
             values,
