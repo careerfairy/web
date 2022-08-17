@@ -219,9 +219,14 @@ const getUserCategorySelectionByPossibleNames = (
 }
 
 const removeOthers = (fieldOfStudyLabels: string[]) => {
-   return fieldOfStudyLabels.filter(
-      (fieldOfStudyLabel) => !possibleOthers.includes(fieldOfStudyLabel.trim())
-   )
+   const withoutOthers = fieldOfStudyLabels
+      .map(trimAndLowerCase)
+      .filter(
+         (fieldOfStudyLabel) => !possibleOthers.includes(fieldOfStudyLabel)
+      )
+   // first try and find field of study labels that arent others
+   // if no labels remain after filtering out "others", return the original labels
+   return withoutOthers.length ? withoutOthers : fieldOfStudyLabels
 }
 const getChosenSelection = (
    userRegisteredGroup: RegisteredGroup,
@@ -397,6 +402,14 @@ const backfillUsers = (
       counter.setCustomCount(counterConstants.currentDocIndex, index)
       loopProgressBar.update(index + 1)
       const userData = users[index]
+      if (
+         (userData.fieldOfStudy && userData.levelOfStudy) ||
+         !userData.registeredGroups?.length
+      ) {
+         // skip if user already has been assigned both or
+         // does not have any legacy registration data to map
+         continue
+      }
 
       if (userData.registeredGroups) {
          counter.customCountIncrement(
@@ -445,14 +458,14 @@ const backfillUsers = (
          ...userData,
       }
       const backFills = []
-      if (assignedFieldOfStudy) {
+      if (assignedFieldOfStudy && !userData.fieldOfStudy) {
          counter.customCountIncrement(
             customCountKeys.numUsersWithAssignedFieldOfStudy
          )
          updateData["fieldOfStudy"] = assignedFieldOfStudy
          backFills.push("fieldOfStudy")
       }
-      if (assignedLevelOfStudy) {
+      if (assignedLevelOfStudy && !userData.levelOfStudy) {
          counter.customCountIncrement(
             customCountKeys.numUsersWithAssignedLevelOfStudy
          )
