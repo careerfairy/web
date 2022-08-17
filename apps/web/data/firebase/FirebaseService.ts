@@ -280,8 +280,8 @@ class FirebaseService {
       return this.auth.createUserWithEmailAndPassword(email, password)
    }
 
-   signInWithEmailAndPassword = (email, password) => {
-      return this.auth.signInWithEmailAndPassword(email, password)
+   signInWithEmailAndPassword = (email: string, password: string) => {
+      return this.auth.signInWithEmailAndPassword(email.trim(), password)
    }
 
    doSignOut = () => this.auth.signOut()
