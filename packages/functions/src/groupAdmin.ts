@@ -1,12 +1,7 @@
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import {
-   LivestreamEvent,
-   LivestreamPoll,
-   LivestreamQuestion,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    getPdfCategoryChartData,
    PdfCategoryChartData,
@@ -14,18 +9,20 @@ import {
 } from "@careerfairy/shared-lib/dist/groups/pdf-report"
 import { fieldOfStudyRepo, groupRepo, livestreamRepo } from "./api/repositories"
 
-const functions = require("firebase-functions")
-const {
-   setHeaders,
+import {
    getArrayDifference,
-   makeRequestingGroupIdFirst,
-   getRatingsAverage,
    getDateString,
+   getRatingsAverage,
+   makeRequestingGroupIdFirst,
    partition,
-} = require("./util")
+   setHeaders,
+} from "./util"
+import { admin } from "./api/firestoreAdmin"
+
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
-const { admin } = require("./api/firestoreAdmin")
-const { marketingTeamEmails } = require("./misc/marketingTeamEmails")
+import { marketingTeamEmails } from "./misc/marketingTeamEmails"
+import functions = require("firebase-functions")
 
 export const sendDraftApprovalRequestEmail = functions.https.onCall(
    async (data) => {
@@ -139,6 +136,7 @@ export const sendNewlyPublishedEventEmail = functions.https.onCall(
    }
 )
 
+/* eslint-disable camelcase */
 export const getLivestreamReportData_v4 = functions.https.onCall(
    async (data, context) => {
       const { targetStreamId, targetGroupId, userEmail } = data
@@ -198,7 +196,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
             ...streamSnap.data(),
             id: streamSnap.id,
             startDateString: getDateString(streamSnap.data()),
-         } as LivestreamEvent
+         } as unknown as LivestreamEvent
 
          const requestingGroupData = {
             id: groupSnap.id,
@@ -375,10 +373,15 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          }
          const speakers = livestreamData.speakers || []
 
-         const questions =
-            mapFirestoreDocuments<LivestreamQuestion>(questionsSnap)
+         const questions = questionsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }))
 
-         const polls = mapFirestoreDocuments<LivestreamPoll>(pollsSnap)
+         const polls = pollsSnap.docs.map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+         }))
 
          const groups = await groupRepo.getGroupsByIds(livestreamGroupIds)
 
@@ -484,7 +487,7 @@ export const updateUserDocAdminStatus = functions.firestore
          )
 
          if (newAdmins.length === 0 && oldAdmins.length === 0) {
-            functions.logger.info(`No new admin has been added or removed`)
+            functions.logger.info("No new admin has been added or removed")
             return
          }
 
@@ -524,26 +527,32 @@ export const updateUserDocAdminStatus = functions.firestore
 
 export const joinGroupDashboard = functions.https.onCall(
    async (data, context) => {
-      let authEmail = context.auth.token.email || null
+      const authEmail = context.auth.token.email || null
 
       if (!authEmail || authEmail !== data.userEmail) {
-         throw new functions.https.HttpsError("permission-denied")
+         throw new functions.https.HttpsError(
+            "permission-denied",
+            "Unauthorized"
+         )
       }
 
-      let groupRef = admin
+      const groupRef = admin
          .firestore()
          .collection("careerCenterData")
          .doc(data.groupId)
 
-      let userRef = admin.firestore().collection("userData").doc(data.userEmail)
+      const userRef = admin
+         .firestore()
+         .collection("userData")
+         .doc(data.userEmail)
 
-      let notificationRef = admin
+      const notificationRef = admin
          .firestore()
          .collection("notifications")
          .doc(data.invitationId)
 
-      let notificationDoc = await notificationRef.get()
-      let notification = notificationDoc.data()
+      const notificationDoc = await notificationRef.get()
+      const notification = notificationDoc.data()
 
       if (
          notification.details.requester !== data.groupId ||
@@ -552,11 +561,14 @@ export const joinGroupDashboard = functions.https.onCall(
          functions.logger.error(
             `User ${data.userEmail} trying to connect to group ${data.groupId} did not pass the notification check ${notification.details}`
          )
-         throw new functions.https.HttpsError("permission-denied")
+         throw new functions.https.HttpsError(
+            "permission-denied",
+            "Unauthorized"
+         )
       }
 
       await admin.firestore().runTransaction((transaction) => {
-         return transaction.get(userRef).then((userDoc) => {
+         return transaction.get(userRef).then(() => {
             transaction.update(groupRef, {
                adminEmails: admin.firestore.FieldValue.arrayUnion(
                   data.userEmail
@@ -565,7 +577,7 @@ export const joinGroupDashboard = functions.https.onCall(
             transaction.update(userRef, {
                adminIds: admin.firestore.FieldValue.arrayUnion(data.groupId),
             })
-            let groupAdminRef = admin
+            const groupAdminRef = admin
                .firestore()
                .collection("careerCenterData")
                .doc(data.groupId)
