@@ -35,8 +35,7 @@ export const FieldOfStudySelector = ({
          label: "Select your field of study",
          placeholder: "Select from the following list",
          className,
-         helperText: error,
-         error: !!error,
+         error,
       }),
       [className, error]
    )
