@@ -8,12 +8,15 @@ const {
 } = require("./api/slack")
 
 exports.assertLivestreamRegistrationWasCompleted = functions.firestore
-   .document("livestreams/{livestreamId}/registeredStudents/{studentId}")
+   .document("livestreams/{livestreamId}/userLivestreamData/{studentId}")
    .onCreate((snapshot, context) => {
       console.log(
-         `Documents created in registeredStudents in ${context.params.livestreamId}`
+         `Documents created in userLivestreamData in ${context.params.livestreamId}`
       )
       if (snapshot.exists) {
+         const data = snapshot.data()
+         const userRegistered = Boolean(data?.registered?.date)
+         if (!userRegistered) return
          admin
             .firestore()
             .collection("livestreams")
@@ -32,11 +35,17 @@ exports.assertLivestreamRegistrationWasCompleted = functions.firestore
    })
 
 exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
-   .document("livestreams/{livestreamId}/registeredStudents/{studentId}")
-   .onDelete((snapshot, context) => {
+   .document("livestreams/{livestreamId}/userLivestreamData/{studentId}")
+   .onWrite((change, context) => {
       console.log(
-         `Documents deleted in registeredStudents in ${context.params.livestreamId}`
+         `Documents deleted in userLivestreamData in ${context.params.livestreamId}`
       )
+      const snap = change.after
+      const data = snap && snap.data()
+      const userStillRegistered = Boolean(data?.registered?.date)
+
+      if (userStillRegistered) return
+
       admin
          .firestore()
          .collection("livestreams")

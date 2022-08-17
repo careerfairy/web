@@ -38,7 +38,7 @@ const numColumns = 25
 const mdItem = 0.7
 const smItem = 1
 const xsItem = 1.5
-// @ts-ignore
+
 const CustomButtonCarousel: FC<Props> = ({
    children,
    numSlides,
@@ -121,5 +121,4 @@ interface Props {
    shouldCenter?: boolean
 }
 
-// @ts-ignore
 export default CustomButtonCarousel

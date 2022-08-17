@@ -12,7 +12,6 @@ import { Formik } from "formik"
 import * as yup from "yup"
 import { useInterests } from "../../custom-hook/useCollection"
 import InterestSelect from "./InterestSelect"
-import wishlistRepo from "../../../data/firebase/WishRepository"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import Stack from "@mui/material/Stack"
@@ -25,6 +24,8 @@ import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 import UserAvatar from "../common/UserAvatar"
+import { CreateWishFormValues } from "@careerfairy/shared-lib/dist/wishes/wishes"
+import { wishlistRepo } from "../../../data/RepositoryInstances"
 
 interface CreateWishDialogProps {
    open: boolean
@@ -62,12 +63,6 @@ const schema = yup.object().shape({
    //       then: yup.array().min(1, "You must add at least one company"),
    //    }),
 })
-
-export interface CreateWishFormValues {
-   description: Wish["description"]
-   interests: Interest[]
-   companyNames: Wish["companyNames"]
-}
 
 const styles: StylesProps = {
    title: {

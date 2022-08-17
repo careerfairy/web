@@ -4,13 +4,13 @@ import HighlightVideoDialog from "./HighlightVideoDialog"
 import Box from "@mui/material/Box"
 import { useTheme } from "@mui/material/styles"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { HighLight } from "../../../types/Highlight"
 import CustomButtonCarousel from "../common/carousels/CustomButtonCarousel"
 import useCanWatchHighlights from "../../custom-hook/useCanWatchHighlights"
 import useDialogStateHandler from "../../custom-hook/useDialogStateHandler"
 import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
+import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
 
 const styles = {
    root: {

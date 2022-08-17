@@ -1,25 +1,30 @@
 import React, { useEffect, useState } from "react"
 import {
    Box,
+   Button,
    CircularProgress,
    Fade,
    Grid,
    Tab,
    Tabs,
+   TextField,
    Typography,
 } from "@mui/material"
 import { useRouter } from "next/router"
 import CurrentGroup from "components/views/profile/CurrentGroup"
 import makeStyles from "@mui/styles/makeStyles"
-import { Highlights } from "../../groups/Groups"
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import groupRepo from "../../../../data/firebase/GroupRepository"
 import Link from "../../common/Link"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../../store/actions"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
+import { groupRepo } from "../../../../data/RepositoryInstances"
+import Autocomplete from "@mui/material/Autocomplete"
+import match from "autosuggest-highlight/match"
+import parse from "autosuggest-highlight/parse"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -117,9 +122,10 @@ const Groups = () => {
                )
                setGroups(adminGroups)
             } else if (value === "joined") {
-               const joinedGroups = await groupRepo.getGroupsByIds(
-                  userData?.groupIds || []
+               const groupDataIds = await groupRepo.getAllUserGroupDataIds(
+                  authenticatedUser.email
                )
+               const joinedGroups = await groupRepo.getGroupsByIds(groupDataIds)
                setGroups(joinedGroups)
             }
          } catch (e) {
@@ -216,6 +222,87 @@ const Groups = () => {
             </Fade>
          )}
       </ContentCard>
+   )
+}
+
+interface HighlightProps {
+   groups: Group[]
+   handleSelectGroup: (event: React.SyntheticEvent, value: Group) => void
+   absolutePath?: string
+   hideButton?: boolean
+}
+export const Highlights = ({
+   groups,
+   handleSelectGroup,
+   absolutePath = undefined,
+   hideButton,
+}: HighlightProps) => {
+   return (
+      <div
+         style={{
+            position: "sticky",
+            zIndex: 10,
+            marginBottom: 10,
+            display: "flex",
+         }}
+      >
+         <Autocomplete
+            options={groups}
+            selectOnFocus
+            fullWidth
+            autoHighlight
+            onChange={handleSelectGroup}
+            getOptionLabel={(option) =>
+               option.universityName ? option.universityName : ""
+            }
+            renderInput={(params) => (
+               <TextField
+                  {...params}
+                  style={{ backgroundColor: "white", margin: 0 }}
+                  placeholder="Join some groups"
+                  label="Search"
+                  fullWidth
+                  variant="outlined"
+                  margin="normal"
+               />
+            )}
+            renderOption={(props, option, { inputValue }) => {
+               const matches = match(option.universityName, inputValue)
+               const parts = parse(option.universityName, matches)
+               const key = `listItem-${option.groupId}-${option.id}`
+               return (
+                  <li {...props} key={key}>
+                     <div>
+                        {parts.map((part, index) => (
+                           <span
+                              key={index + part.text}
+                              style={{
+                                 fontWeight: part.highlight ? 700 : 400,
+                              }}
+                           >
+                              {part.text}
+                           </span>
+                        ))}
+                     </div>
+                  </li>
+               )
+            }}
+         />
+         {absolutePath || hideButton ? null : (
+            <Link href="/next-livestreams">
+               <a>
+                  <Button
+                     style={{ marginLeft: "0.5rem" }}
+                     disableElevation
+                     color="primary"
+                     variant="contained"
+                  >
+                     To next livestreams
+                  </Button>
+               </a>
+            </Link>
+         )}
+      </div>
    )
 }
 

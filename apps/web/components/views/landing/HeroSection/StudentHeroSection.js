@@ -36,12 +36,13 @@ const StudentHeroSection = (props) => {
          }
          buttons={[
             <HeroButton
-               href="/next-livestreams"
+               href="/portal"
                component={Link}
                color="secondary"
                withGradient
                variant="contained"
                iconUrl={playIcon}
+               key="upcomingLivestreamsButton"
             >
                View Upcoming Livestreams
             </HeroButton>,

@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useState } from "react"
 import { SavedRecruiter } from "@careerfairy/shared-lib/dist/users"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import userRepo from "../../../../../data/firebase/UserRepository"
 import { GENERAL_ERROR } from "components/util/constants"
 import { useSnackbar } from "notistack"
+import { userRepo } from "../../../../../data/RepositoryInstances"
 
 const useRecruiterData = (speakerId) => {
    const [recruiterData, setRecruiterData] = useState<SavedRecruiter>(null)

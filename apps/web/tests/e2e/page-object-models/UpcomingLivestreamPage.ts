@@ -22,28 +22,8 @@ export default class UpcomingLivestreamPage extends CommonPage {
       return this.exactText("I'll attend").click()
    }
 
-   async selectRandomCategoriesFromGroup(group: Group) {
-      for (let category of group.categories) {
-         await this.page
-            .locator(`text=New!​${category.name} >> div[role="button"]`)
-            .click()
-
-         const randomOption =
-            category.options[
-               Math.floor(Math.random() * category.options.length)
-            ]
-
-         await this.page.locator(`[data-value="${randomOption.id}"]`).click()
-      }
-   }
-
    async modalAttend() {
-      await Promise.all([
-         this.page.waitForNavigation(),
-         this.resilientClick('div[role="dialog"] >> text=I\'ll attend'),
-      ])
-
-      await sleep(1000)
+      return this.resilientClick('div[role="dialog"] >> text=I\'ll attend')
    }
 
    modalSubmit() {
@@ -55,7 +35,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    skip() {
-      return this.resilientClick("text=Skip", 1, 1000, false)
+      return this.text("Skip").click()
    }
 
    finish() {

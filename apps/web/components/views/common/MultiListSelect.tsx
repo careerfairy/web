@@ -11,22 +11,22 @@ const MultiListSelect = ({
    inputName,
    allValues,
    selectedItems = [],
-   onSelectItems,
+   onSelectItems = () => {},
    disabled = false,
    getLabelFn = (option) => option.name, // displayed name
    inputProps = {},
    isCheckbox = false, // Select items are checkboxes
    chipProps = {},
    extraOptions = {}, // props to pass to autocomplete
-   setFieldValue = null, // formik field
+   setFieldValue = () => {}, // formik field
    getValueFn = (option) => option.id, // field value
+   getKeyFn = (option) => option.id, // field id
+   getGroupByFn = () => "",
    disabledValues = [],
    limit = false,
 }: Props) => {
    const handleMultiSelect = (event, selectedOptions) => {
-      if (limit && selectedOptions.length > limit) return
-
-      onSelectItems(selectedOptions)
+      onSelectItems?.(selectedOptions)
       if (setFieldValue)
          setFieldValue(inputName, selectedOptions.map(getValueFn))
    }
@@ -35,10 +35,18 @@ const MultiListSelect = ({
       return getValueFn(option) === getValueFn(value)
    }
 
-   const getOptionDisabled = (option) =>
-      disabledValues.includes(getValueFn(option))
+   const getOptionDisabled = (option) => {
+      let limitWasReached = false
 
-   return allValues.length === 0 ? null : (
+      if (limit) {
+         limitWasReached =
+            selectedItems.length >= limit && !selectedItems.includes(option)
+      }
+
+      return limitWasReached || disabledValues.includes(getValueFn(option))
+   }
+
+   return (
       <Autocomplete
          id={inputName}
          multiple
@@ -51,17 +59,26 @@ const MultiListSelect = ({
          getOptionLabel={getLabelFn}
          renderOption={(props, option, { selected }) =>
             isCheckbox ? (
-               <li {...props} key={option.id}>
+               <li
+                  {...props}
+                  data-testid={`${inputName}_${getKeyFn(option)}_option`}
+                  key={getKeyFn(option)}
+                  style={{ justifyContent: "space-between" }}
+               >
+                  {getLabelFn(option)}
                   <Checkbox
+                     key={getKeyFn(option)}
                      icon={icon}
                      checkedIcon={checkedIcon}
-                     style={{ marginRight: 8 }}
                      checked={selected}
                   />
-                  {getLabelFn(option)}
                </li>
             ) : (
-               <li {...props} key={option.id}>
+               <li
+                  {...props}
+                  data-testid={`${inputName}_${getKeyFn(option)}_option`}
+                  key={getKeyFn(option)}
+               >
                   {getLabelFn(option)}
                </li>
             )
@@ -73,7 +90,7 @@ const MultiListSelect = ({
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
                <Chip
-                  key={index}
+                  key={getKeyFn(option)}
                   label={getLabelFn(option)}
                   {...getTagProps({ index })}
                   {...chipProps}
@@ -81,6 +98,7 @@ const MultiListSelect = ({
                />
             ))
          }
+         groupBy={getGroupByFn}
          {...extraOptions}
       />
    )
@@ -89,11 +107,13 @@ const MultiListSelect = ({
 type Props = {
    inputName: string
    setFieldValue?: (name, value) => void
-   onSelectItems: Dispatch<any>
+   onSelectItems?: Dispatch<any>
    selectedItems: any[]
    disabled?: boolean
    getLabelFn?: (obj: any) => string
    getValueFn?: (obj: any) => string
+   getKeyFn?: (obj: any) => string
+   getGroupByFn?: (obj: any) => string
    inputProps?: object
    chipProps?: object
    isCheckbox?: boolean

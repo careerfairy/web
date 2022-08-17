@@ -1,9 +1,23 @@
-import { Page } from "@playwright/test"
+import { Locator, Page } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
 
 export default class ProfilePage extends CommonPage {
+   readonly deleteAccountButton: Locator
+   readonly deleteAccountConfirmationButton: Locator
+   readonly deleteAccountConfirmationText: Locator
+
    constructor(page: Page) {
       super(page)
+
+      this.deleteAccountButton = page.locator(
+         "a[data-testid=delete-account-button]"
+      )
+      this.deleteAccountConfirmationButton = page.locator(
+         "data-testid=delete-account-confirmation-button"
+      )
+      this.deleteAccountConfirmationText = page.locator(
+         "input[id=deleteAccountConfirmationText]"
+      )
    }
 
    open() {
@@ -16,6 +30,18 @@ export default class ProfilePage extends CommonPage {
 
    openCareerSkills() {
       return this.resilientGoto(`/profile/career-skills`)
+   }
+
+   async clickDeleteAccountButton() {
+      return this.deleteAccountButton.click()
+   }
+
+   async clickDeleteAccountConfirmationButton() {
+      return this.deleteAccountConfirmationButton.click()
+   }
+
+   async fillDeleteAccountConfirmationText(txt: string) {
+      return this.deleteAccountConfirmationText.fill(txt)
    }
 
    clickBrowseAllEvents() {

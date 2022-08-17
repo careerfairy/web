@@ -4,7 +4,11 @@ import { v4 as uuidv4 } from "uuid"
 import * as admin from "firebase-admin"
 
 import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
-import { SavedRecruiter, UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   SavedRecruiter,
+   UserData,
+   UserDataAnalytics,
+} from "@careerfairy/shared-lib/dist/users"
 import { faker } from "@faker-js/faker"
 
 interface UserSeed {
@@ -138,6 +142,15 @@ class UserFirebaseSeed implements UserSeed {
          .set(recruiter)
 
       return recruiter
+   }
+
+   async getUserDataAnalytics(email: string): Promise<UserDataAnalytics> {
+      const userAnalyticsSnap = await firestore
+         .doc(`userData/${email}/analytics/analytics`)
+         .get()
+      return userAnalyticsSnap.exists
+         ? (userAnalyticsSnap.data() as UserDataAnalytics)
+         : null
    }
 }
 

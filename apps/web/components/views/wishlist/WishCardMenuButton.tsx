@@ -19,11 +19,11 @@ import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../store/actions"
 import FlagDialog from "./FlagDialog"
-import wishRepo from "../../../data/firebase/WishRepository"
 import { FlagReason, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import CreateOrEditWishDialog from "./CreateOrEditWishDialog"
 import { Hit } from "../../../types/algolia"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
+import { wishlistRepo } from "../../../data/RepositoryInstances"
 
 const styles: StylesProps = {
    divider: {
@@ -135,7 +135,7 @@ const WishCardMenuButton = ({
    ) => {
       try {
          setDeleting(true)
-         await wishRepo.flagWish(
+         await wishlistRepo.flagWish(
             authenticatedUser.uid,
             authenticatedUser.email,
             wish.id,

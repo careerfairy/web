@@ -3,10 +3,10 @@ import Box from "@mui/material/Box"
 import { Theme } from "@mui/material/styles"
 import Image from "next/image"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import { HighLight } from "../../../types/Highlight"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
 import LockClockIcon from "@mui/icons-material/LockClock"
 import { sxStyles } from "../../../types/commonTypes"
+import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
 
 const itemSpacingSize = 14
 const mobileFactor = 1

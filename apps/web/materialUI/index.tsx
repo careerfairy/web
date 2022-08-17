@@ -1,6 +1,12 @@
 // import { deepmerge } from "@mui/utils";
 // it could be your App.tsx file or theme file that is included in your tsconfig.json
-import { alpha, createTheme, PaletteOptions, Theme } from "@mui/material/styles"
+import {
+   alpha,
+   createTheme,
+   PaletteOptions,
+   styled,
+   Theme,
+} from "@mui/material/styles"
 import { grey } from "@mui/material/colors"
 
 import React from "react"
@@ -217,7 +223,56 @@ const getComponents = (theme: DefaultTheme): Components => ({
    MuiOutlinedInput: {
       styleOverrides: {
          root: {
-            borderRadius: 15,
+            borderRadius: 8,
+         },
+      },
+   },
+   MuiTextField: {
+      styleOverrides: {
+         root: {
+            "&.registrationInput": {
+               backgroundColor: white,
+               boxShadow: theme.boxShadows.grey_5_15,
+               borderRadius: "8px",
+
+               "& fieldset": {
+                  borderRadius: "8px",
+                  border: 0,
+               },
+               "& .Mui-focused fieldset": {
+                  border: "2px solid",
+                  borderColor: theme.palette.primary.main,
+               },
+               "& .Mui-error fieldset": {
+                  border: "2px solid",
+                  borderColor: theme.palette.error.main,
+               },
+            },
+         },
+      },
+   },
+   MuiFormControl: {
+      styleOverrides: {
+         root: {
+            ".registrationDropdown": {
+               backgroundColor: white,
+               boxShadow: theme.boxShadows.grey_5_15,
+               borderRadius: "8px",
+
+               "& fieldset": {
+                  borderRadius: "8px",
+                  border: 0,
+               },
+            },
+
+            "& .Mui-focused fieldset": {
+               border: "2px solid",
+               borderColor: theme.palette.primary.main,
+            },
+            "& .Mui-error fieldset": {
+               border: "2px solid",
+               borderColor: theme.palette.error.main,
+            },
          },
       },
    },
@@ -360,6 +415,9 @@ const getComponents = (theme: DefaultTheme): Components => ({
                margin: "0.5em 0.5em 0 0",
                // marginLeft: 0,
             }),
+            "&.stacked": {
+               margin: "0.5em 0.5em 0 0",
+            },
          }),
       },
    },
@@ -437,3 +495,7 @@ export const brandedLightTheme = createTheme(
 )
 
 export const brandedDarkTheme = createTheme({}, getTheme(rootThemeObj("dark")))
+
+export const HeaderLogoWrapper = styled("div")({
+   padding: "0 24px 0 24px",
+})

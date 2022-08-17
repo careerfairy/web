@@ -1,5 +1,5 @@
 import { Identifiable } from "./commonTypes"
-import firebase from "firebase/app"
+import firebase from "firebase/compat/app"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export interface LiveStreamEvent extends Identifiable {
@@ -35,29 +35,4 @@ export interface LiveStreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
-}
-
-export interface LivestreamEventSerialized
-   extends Omit<
-      LivestreamEvent,
-      | "registeredUsers"
-      | "registrants"
-      | "talentPool"
-      | "participatingStudents"
-      | "participants"
-      | "created"
-      | "start"
-      | "startDate"
-      | "lastUpdated"
-      | "lastUpdatedAuthorInfo"
-   > {
-   createdDateString: string
-   startDateString: string
-   lastUpdatedDateString: string
-}
-
-export interface LivestreamEventParsed extends LivestreamEventSerialized {
-   startDate: Date
-   createdDate: Date
-   lastUpdatedDate: Date
 }

@@ -8,16 +8,27 @@ import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
 import { GetServerSideProps } from "next"
-import highlightRepo from "../data/firebase/HighlightRepository"
-import livestreamRepo from "../data/firebase/LivestreamRepository"
 import { mapServerSideStream } from "../util/serverUtil"
 import SEO from "../components/util/SEO"
+import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
+import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
+import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import EventsPreview, {
+   EventsTypes,
+} from "../components/views/portal/events-preview/EventsPreview"
 
-const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
+const PortalPage = ({
+   highlights,
+   comingUpNextEvents,
+   showHighlights,
+   pastEvents,
+}: Props) => {
    const { authenticatedUser, userData } = useAuth()
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
+
    return (
       <>
          <SEO
@@ -42,6 +53,15 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
                      limit={20}
                   />
                   <MyNextEvents limit={20} />
+                  <EventsPreview
+                     id={"past-events"}
+                     title={"PAST EVENTS"}
+                     type={EventsTypes.pastEvents}
+                     events={mapFromServerSide(pastEvents)}
+                     seeMoreLink={"/next-livestreams?type=pastEvents"}
+                     // No need to show loading as these events have already been queried server side
+                     loading={false}
+                  />
                </WidgetsWrapper>
             </Container>
          </GeneralLayout>
@@ -50,11 +70,17 @@ const PortalPage = ({ highlights, comingUpNextEvents, showHighlights }) => {
 }
 
 export const getServerSideProps: GetServerSideProps = async () => {
-   const [showHighlights, highlights, comingUpNextEvents] = await Promise.all([
-      highlightRepo.shouldShowHighlightsCarousel(),
-      highlightRepo.getHighlights(5),
-      livestreamRepo.getUpcomingEvents(20),
-   ])
+   const [showHighlights, highlights, comingUpNextEvents, pastEvents] =
+      await Promise.all([
+         highlightRepo.shouldShowHighlightsCarousel(),
+         highlightRepo.getHighlights(5),
+         livestreamRepo.getUpcomingEvents(20),
+         livestreamRepo.getPastEventsFrom(
+            new Date(START_DATE_FOR_REPORTED_EVENTS),
+            undefined,
+            6
+         ),
+      ])
    // Parse
    return {
       props: {
@@ -62,11 +88,28 @@ export const getServerSideProps: GetServerSideProps = async () => {
          ...(highlights && { highlights }),
          ...(comingUpNextEvents && {
             comingUpNextEvents: comingUpNextEvents.map((event) =>
-               mapServerSideStream(event)
+               livestreamRepo.serializeEvent(event)
             ),
+         }),
+         ...(pastEvents && {
+            pastEvents: pastEvents.map((event) => JSON.stringify(event)),
          }),
       },
    }
+}
+
+/**
+ * To parse the events coming from server side
+ */
+const mapFromServerSide = (events = []): LivestreamEvent[] => {
+   return events.map((event) => JSON.parse(event))
+}
+
+type Props = {
+   highlights: HighLight[]
+   comingUpNextEvents: LivestreamEvent[]
+   showHighlights: boolean
+   pastEvents: string[]
 }
 
 export default PortalPage

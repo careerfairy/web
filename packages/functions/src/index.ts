@@ -19,9 +19,10 @@ import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
 import wishes = require("./wishes")
+import ats = require("./ats")
 
 // Auth
-exports.createNewUserAccount_v2 = auth.createNewUserAccount_v2
+exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
@@ -34,10 +35,9 @@ exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName
 exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
    auth.resendPostmarkEmailVerificationEmailWithPin_v2
+exports.deleteLoggedInUserAccount = auth.deleteLoggedInUserAccount
 
 // Agora
-exports.generateAgoraToken = agora.generateAgoraToken
-exports.generateAgoraTokenSecureOnCall = agora.generateAgoraTokenSecureOnCall
 exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 
@@ -51,8 +51,7 @@ exports.sendBasicTemplateEmail = admin.sendBasicTemplateEmail
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
-exports.getLivestreamReportData = groupAdmin.getLivestreamReportData
-exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData_v2
+exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
 
@@ -125,7 +124,17 @@ exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
 exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
 exports.rewardUserAction = rewards.rewardUserAction
+exports.applyReferralCode = rewards.applyReferralCode
 
 // Ratings
 
 exports.onUserRateWish = wishes.onUserRateWish
+
+// ATS
+exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
+exports.mergeGetAccountToken = ats.mergeGetAccountToken
+exports.mergeRemoveAccount = ats.mergeRemoveAccount
+exports.fetchATSJobs = ats.fetchATSJobs
+exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
+exports.fetchATSApplications = ats.fetchATSApplications
+exports.atsUserApplyToJob = ats.atsUserApplyToJob

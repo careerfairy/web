@@ -26,7 +26,6 @@ import {
 import SaveIcon from "@mui/icons-material/Save"
 import { useSnackbar } from "notistack"
 import PublishIcon from "@mui/icons-material/Publish"
-import { useRouter } from "next/router"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 
@@ -80,13 +79,10 @@ const NewStreamModal = ({
    const dialogRef = useRef()
    const saveChangesButtonRef = useRef()
    const { authenticatedUser } = useAuth()
-   const router = useRouter()
    const { enqueueSnackbar } = useSnackbar()
    const [submitted, setSubmitted] = useState(false)
    const [publishDraft, setPublishDraft] = useState(false)
    const classes = useStyles()
-
-   const { push } = router
 
    const isDraftsPage = () => typeOfStream === "draft"
    const isUpcomingPage = () => typeOfStream === "upcoming"
@@ -106,15 +102,6 @@ const NewStreamModal = ({
       handleResetCurrentStream()
       setSubmitted(false)
       onClose()
-   }
-
-   const getAuthor = (livestream) => {
-      return livestream?.author?.email
-         ? livestream.author
-         : {
-              email: authenticatedUser.email,
-              ...(group?.id && { groupId: group.id }),
-           }
    }
 
    const handlePublishDraft = async (streamToPublish) => {
@@ -149,7 +136,6 @@ const NewStreamModal = ({
    const onSubmit = async (
       values,
       { setSubmitting },
-      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -161,7 +147,6 @@ const NewStreamModal = ({
          setSubmitting(true)
          const livestream = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             draftStreamId,
             firebase
@@ -198,12 +183,6 @@ const NewStreamModal = ({
                }
             }
             await firebase.updateLivestream(livestream, targetCollection)
-            // console.log(
-            //    `-> ${
-            //       !isActualLivestream() && "Draft "
-            //    }livestream was updated with id`,
-            //    id
-            // );
          } else {
             const author = {
                groupId: group.id,
@@ -214,12 +193,6 @@ const NewStreamModal = ({
                targetCollection,
                author
             )
-            // console.log(
-            //    `-> ${
-            //       !isActualLivestream() && "Draft "
-            //    }livestream was created with id`,
-            //    id
-            // );
          }
          handleCloseDialog()
 

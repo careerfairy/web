@@ -1,6 +1,6 @@
 import React, { useContext, useEffect } from "react"
 import { RegistrationContext } from "context/registration/RegistrationContext"
-import CategorySelect from "./steps/CategorySelect"
+import LivestreamGroupQuestionForm from "./steps/LivestreamGroupQuestionForm"
 import QuestionUpvote from "./steps/QuestionUpvote"
 import QuestionCreateForm from "./steps/QuestionCreateForm"
 import TalentPoolJoin from "./steps/TalentPoolJoin"
@@ -26,7 +26,7 @@ const steps = [
    },
    {
       index: 1,
-      step: <CategorySelect />,
+      step: <LivestreamGroupQuestionForm />,
       label: "Select your categories",
       id: "categorySelect",
    },
@@ -70,6 +70,7 @@ const RegistrationForm = () => {
          index={activeStep}
          onChangeIndex={() => setSliding(true)}
          onTransitionEnd={() => setSliding(false)}
+         disableLazyLoading
          disabled
       >
          {steps.map((stepData) => (

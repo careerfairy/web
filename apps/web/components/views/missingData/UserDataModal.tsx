@@ -1,5 +1,5 @@
 import React, { useState } from "react"
-import InterestsSelector from "../signup/InterestsSelector"
+import InterestsSelector from "../signup/personaliseInformation/InterestsSelector"
 import {
    Box,
    Button,
@@ -9,9 +9,11 @@ import {
    DialogTitle,
    Tooltip,
 } from "@mui/material"
-import MultiStepWrapper from "../signup/MultiStepWrapper"
+import MultiStepWrapper from "../common/MultiStepWrapper"
 import Typography from "@mui/material/Typography"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import { FieldOfStudyUpdater } from "../signup/userInformation/FieldOfStudySelector"
+import { LevelOfStudyUpdater } from "../signup/userInformation/LevelOfStudySelector"
 
 export const missingDataFields = [
    {
@@ -20,6 +22,20 @@ export const missingDataFields = [
          return !userData.interestsIds || userData.interestsIds.length === 0
       },
       component: () => InterestsSelector,
+   },
+   {
+      description: "Field of study",
+      isMissing: (userData) => {
+         return !userData.fieldOfStudy?.name || !userData.fieldOfStudy?.id
+      },
+      component: () => FieldOfStudyUpdater,
+   },
+   {
+      description: "Level of study",
+      isMissing: (userData) => {
+         return !userData.levelOfStudy?.name || !userData.levelOfStudy?.id
+      },
+      component: () => LevelOfStudyUpdater,
    },
 ]
 

@@ -122,7 +122,7 @@ const FeedDrawer = memo(
                <List sx={{ display: { lg: "none" } }}>
                   {isLoggedOut && <LoginButton />}
                   {drawerTopLinks.map((link) => (
-                     <NavElement {...link} />
+                     <NavElement key={link.title} {...link} />
                   ))}
                   <Divider />
                </List>
@@ -161,7 +161,7 @@ const FeedDrawer = memo(
                <Divider />
                <List>
                   {drawerBottomLinks.map((link) => (
-                     <NavElement {...link} />
+                     <NavElement key={link.title} {...link} />
                   ))}
                   {userData && (
                      <NavElement

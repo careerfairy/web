@@ -17,6 +17,7 @@ import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams"
 import { LocalStream } from "types/streaming"
 import RootState from "../../store/reducers"
 import { sleep } from "../helperFunctions/HelperFunctions"
+import { agoraCredentials } from "../../data/AgoraInstance"
 
 const rtcClient = AgoraRTC.createClient({
    mode: "live",
@@ -28,7 +29,6 @@ const screenShareRtcClient = AgoraRTC.createClient({
    codec: "vp8",
 })
 
-const AGORA_APP_ID = "53675bc6d3884026a72ecb1de3d19eb1"
 export default function useAgoraRtc(
    streamerId: string,
    roomId: string,
@@ -170,7 +170,7 @@ export default function useAgoraRtc(
                rtcClient.startProxyServer(3)
                try {
                   await rtcClient.join(
-                     AGORA_APP_ID,
+                     agoraCredentials.appID,
                      roomId,
                      data.token.rtcToken,
                      userUid
@@ -184,7 +184,7 @@ export default function useAgoraRtc(
          logStatus("JOIN", false, sessionShouldUseCloudProxy)
 
          await rtcClient.join(
-            AGORA_APP_ID,
+            agoraCredentials.appID,
             roomId,
             data.token.rtcToken,
             userUid

@@ -19,7 +19,7 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.common.white,
    },
 }))
-const GroupLogo = ({ logoUrl, alt }) => {
+const GroupLogo = ({ logoUrl, alt = "" }) => {
    const classes = useStyles()
    return (
       <CardMedia className={classes.media}>
