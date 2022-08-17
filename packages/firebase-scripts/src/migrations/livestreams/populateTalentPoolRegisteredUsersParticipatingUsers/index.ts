@@ -75,6 +75,7 @@ export async function run() {
          switch (targetBackfill) {
             case "talentPool":
                updateData = {
+                  // @ts-ignore
                   talentPool: hasJoinedTalentPool
                      ? FieldValue.arrayUnion(userEmail)
                      : FieldValue.arrayRemove(userEmail),
@@ -82,6 +83,7 @@ export async function run() {
                break
             case "participated":
                updateData = {
+                  // @ts-ignore
                   participatedUsers: hasParticipated
                      ? FieldValue.arrayUnion(userEmail)
                      : FieldValue.arrayRemove(userEmail),
@@ -89,6 +91,7 @@ export async function run() {
                break
             case "registered":
                updateData = {
+                  // @ts-ignore
                   registeredUsers: hasRegistered
                      ? FieldValue.arrayUnion(userEmail)
                      : FieldValue.arrayRemove(userEmail),
