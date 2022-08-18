@@ -105,7 +105,7 @@ const Complete = () => {
 }
 
 const schema = yup.object().shape({
-   email: yup.string().email().required(),
+   email: yup.string().trim().email().required(),
    firstName: yup.string().label("First Name").min(2).required(),
    lastName: yup.string().label("Last Name").min(2).required(),
    fieldOfStudyId: yup.string().label("Field of Study").required(),
@@ -138,7 +138,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
             .create({
                firstName: values.firstName,
                lastName: values.lastName,
-               email: values.email,
+               email: values.email.trim(),
                fieldOfStudyId: values.fieldOfStudyId,
                utmParams: SessionStorageUtil.getUTMParams() ?? {},
             })
