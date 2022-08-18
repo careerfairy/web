@@ -94,6 +94,7 @@ const ViewerOverview = ({
                isMobile={mobile}
                handleStateChange={handleStateChange}
                streamer={false}
+               includeJobs={currentLivestream.jobs?.length > 0}
             />
             <ViewerComponent
                livestreamId={currentLivestream.id}
