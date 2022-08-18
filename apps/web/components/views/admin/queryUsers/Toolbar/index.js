@@ -17,7 +17,7 @@ import SearchIcon from "@mui/icons-material/Search"
 import AddDatasetIcon from "@mui/icons-material/PostAdd"
 import DataSetDrawer from "./DataSetDrawer"
 
-const Toolbar = ({ queryDataSet, loading }) => {
+const Toolbar = ({ loading }) => {
    const {
       palette: { primary, secondary, error, navyBlue },
    } = useTheme()
@@ -147,7 +147,6 @@ const Toolbar = ({ queryDataSet, loading }) => {
 }
 
 Toolbar.propTypes = {
-   queryDataSet: PropTypes.func.isRequired,
    loading: PropTypes.bool.isRequired,
 }
 

@@ -29,6 +29,8 @@ import {
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
 import DocumentReference = firebase.firestore.DocumentReference
+import { IFormValues } from "../../components/views/admin/queryUsers/QueryForm"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -64,6 +66,38 @@ class FirebaseService {
     * @param {{isStreamer: any; uid: any; streamDocumentPath: string; sentToken: string; channelName: string}} data
     * @return {Promise<firebase.functions.HttpsCallableResult>}
     */
+
+   queryUsers = async ({
+      targetFieldsOfStudy,
+      targetLevelsOfStudy,
+      universityCountryIds,
+   }: IFormValues) => {
+      let query = this.firestore.collection("userData")
+      if (targetFieldsOfStudy.length > 0) {
+         query = query.where(
+            "fieldOfStudy.id",
+            "in",
+            targetFieldsOfStudy.map((field) => field.id)
+         )
+      }
+      if (targetLevelsOfStudy.length > 0) {
+         query = query.where(
+            "levelOfStudy.id",
+            "in",
+            targetLevelsOfStudy.map((level) => level.id)
+         )
+      }
+      if (universityCountryIds.length > 0) {
+         query = query.where(
+            "university.code",
+            "in",
+            universityCountryIds.map((country) => country.id)
+         )
+      }
+      console.log("-> query", query)
+      const snaps = await query.limit(50).get()
+      return mapFirestoreDocuments<UserData>(snaps)
+   }
 
    fetchAgoraRtcToken = async (data) => {
       const fetchAgoraRtcToken =

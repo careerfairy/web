@@ -32,8 +32,8 @@ const DrawerContent = ({ handleClose }) => {
 
    useFirestoreConnect(() => [
       {
-         collection: "filterGroups",
-         storeAs: "filterGroups",
+         collection: "marketingFilters",
+         storeAs: "marketingFilters",
       },
    ])
 

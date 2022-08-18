@@ -26,10 +26,13 @@ const QueryEditView = ({ loading }) => {
    const filters = useSelector(
       (state) => state.currentFilterGroup.data?.filters || []
    )
+   console.log("-> filters", filters)
    const totalData = useSelector((state) =>
       Boolean(state.currentFilterGroup.data.totalStudentsData.data)
    )
+   console.log("-> totalData", totalData)
    const data = useSelector((state) => state.firestore.data)
+   console.log("-> data", data)
 
    useEffect(() => {
       ;(async function getAllGroups() {
@@ -91,10 +94,7 @@ const QueryEditView = ({ loading }) => {
       <Container className={classes.root} maxWidth={false}>
          <Grid container spacing={2}>
             <Grid item xs={12}>
-               <Toolbar
-                  loading={loading}
-                  queryDataSet={handleQueryCurrentFilterGroup}
-               />
+               <Toolbar loading={loading} />
             </Grid>
             <Grid item xs={12}>
                <FilterComponent />
