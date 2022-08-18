@@ -5,13 +5,13 @@ import {
    LivestreamScriptsRepository,
 } from "./api/LivestreamScriptsRepository"
 import {
-   GroupScriptsRepository,
-   IGroupScriptsRepository,
-} from "./api/GroupScriptsRepository"
-import {
    IUserScriptsRepository,
    UserScriptsRepository,
 } from "./api/UserScriptsRepository"
+import {
+   FirebaseGroupRepository,
+   IGroupRepository,
+} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 
 const firestoreInstance = firestore as any
 
@@ -19,11 +19,15 @@ const firestoreInstance = firestore as any
  * Singleton instances of the repositories
  */
 
-export const userScriptsRepo: IUserScriptsRepository =
-   new UserScriptsRepository(firestoreInstance, FieldValue)
+export const userRepo: IUserScriptsRepository = new UserScriptsRepository(
+   firestoreInstance,
+   FieldValue
+)
 
-export const groupScriptsRepo: IGroupScriptsRepository =
-   new GroupScriptsRepository(firestoreInstance, FieldValue)
+export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
+   firestoreInstance,
+   FieldValue
+)
 
-export const livestreamScriptsRepo: ILivestreamScriptsRepository =
+export const livestreamRepo: ILivestreamScriptsRepository =
    new LivestreamScriptsRepository(firestoreInstance, FieldValue)

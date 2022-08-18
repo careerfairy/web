@@ -32,11 +32,7 @@ import {
    Timestamp,
 } from "firebase-admin/firestore"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import {
-   groupScriptsRepo,
-   livestreamScriptsRepo,
-   userScriptsRepo,
-} from "../../../repositories"
+import { groupRepo, livestreamRepo, userRepo } from "../../../repositories"
 import { getArgValue } from "../../../index"
 import {
    FALLBACK_DATE,
@@ -77,7 +73,7 @@ export async function run() {
    const targetBackfill = getArgValue<DocumentType>("targetBackfill")
    try {
       const bulkWriter = firestore.bulkWriter()
-      const groups = await groupScriptsRepo.getAllGroups()
+      const groups = await groupRepo.getAllGroups()
       counter.addToReadCount(groups.length)
       counter.setCustomCount(counterConstants.numFailedWrites, 0)
       const groupsDict = convertDocArrayToDict(groups)
@@ -85,7 +81,7 @@ export async function run() {
       switch (targetBackfill) {
          case "userData":
             backfillUsers(
-               await userScriptsRepo.getAllUsers(true),
+               await userRepo.getAllUsers(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -94,7 +90,7 @@ export async function run() {
             break
          case "registeredStudent":
             backfillUsers(
-               await livestreamScriptsRepo.getAllRegisteredStudents(true),
+               await livestreamRepo.getAllRegisteredStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -103,7 +99,7 @@ export async function run() {
             break
          case "participatingStudent":
             backfillUsers(
-               await livestreamScriptsRepo.getAllParticipatingStudents(true),
+               await livestreamRepo.getAllParticipatingStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -112,7 +108,7 @@ export async function run() {
             break
          case "talentPoolStudent":
             backfillUsers(
-               await livestreamScriptsRepo.getAllTalentPoolStudents(true),
+               await livestreamRepo.getAllTalentPoolStudents(true),
                groupsDict,
                bulkWriter,
                counter,
