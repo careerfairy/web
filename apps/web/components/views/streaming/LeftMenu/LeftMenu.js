@@ -11,6 +11,7 @@ import { Drawer, Fab } from "@mui/material"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
+import JobsCategory from "./categories/JobsCategory"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -51,7 +52,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const states = ["questions", "polls", "hand"]
 const LeftMenu = ({
    livestream,
    streamer,
@@ -62,6 +62,7 @@ const LeftMenu = ({
    setSelectedState,
    smallScreen,
 }) => {
+   const [states, setStates] = useState(["questions", "polls", "hand"])
    const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen)
 
    const theme = useTheme()
@@ -95,8 +96,21 @@ const LeftMenu = ({
          setValue(1)
       } else if (selectedState === "hand") {
          setValue(2)
+      } else if (selectedState === "jobs") {
+         // lazy add the jobs tab only when clicked for the first time
+         // so that we avoid loading the jobs to when its strictly necessary
+         if (!states.includes("jobs")) {
+            setStates((prev) => [...prev, "jobs"])
+            setViews((prev) => [
+               ...prev,
+               <TabPanel key={3} value={value} index={3} dir={theme.direction}>
+                  <JobsCategory />
+               </TabPanel>,
+            ])
+         }
+         setValue(3)
       }
-   }, [selectedState, showMenu])
+   }, [selectedState, showMenu, states])
 
    const handleChange = (event) => {
       setSliding(true)
@@ -104,7 +118,7 @@ const LeftMenu = ({
       setSelectedState?.(states[event])
    }
 
-   const views = [
+   const [views, setViews] = useState([
       <TabPanel key={0} value={value} index={0} dir={theme.direction}>
          <QuestionCategory
             sliding={sliding}
@@ -133,7 +147,7 @@ const LeftMenu = ({
             selectedState={selectedState}
          />
       </TabPanel>,
-   ]
+   ])
 
    return (
       <Drawer

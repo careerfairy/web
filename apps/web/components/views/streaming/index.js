@@ -98,6 +98,7 @@ const StreamerOverview = ({
                selectedState={selectedState}
                showMenu={showMenu}
                handleStateChange={handleStateChange}
+               includeJobs={currentLivestream.jobs?.length > 0}
             />
          </div>
          <AudienceDrawer

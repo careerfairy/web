@@ -14,6 +14,7 @@ import clsx from "clsx"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
+import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -57,7 +58,6 @@ const useStyles = makeStyles((theme) => ({
    }),
 }))
 
-const states = ["questions", "polls", "hand", "chat"]
 const LeftMenu = ({
    handRaiseActive,
    setHandRaiseActive,
@@ -67,6 +67,8 @@ const LeftMenu = ({
    livestream,
    isMobile,
 }) => {
+   const [states, setStates] = useState(["questions", "polls", "hand", "chat"])
+
    const focusModeEnabled = useSelector(
       (state) => state.stream.layout.focusModeEnabled
    )
@@ -86,8 +88,21 @@ const LeftMenu = ({
          setValue(2)
       } else if (selectedState === "chat") {
          setValue(3)
+      } else if (selectedState === "jobs") {
+         // lazy add the jobs tab only when clicked for the first time
+         // so that we avoid loading the jobs to when its strictly necessary
+         if (!states.includes("jobs")) {
+            setStates((prev) => [...prev, "jobs"])
+            setViews((prev) => [
+               ...prev,
+               <TabPanel key={3} value={value} index={3} dir={theme.direction}>
+                  <JobsCategory />
+               </TabPanel>,
+            ])
+         }
+         setValue(3)
       }
-   }, [selectedState, showMenu, isMobile])
+   }, [selectedState, showMenu, isMobile, states])
    useEffect(() => {
       if (
          selectedState === "chat" &&
@@ -109,7 +124,7 @@ const LeftMenu = ({
       dispatch(actions.closeLeftMenu())
    }
 
-   const views = [
+   const [views, setViews] = useState([
       <TabPanel key={0} value={value} index={0} dir={theme.direction}>
          <QuestionCategory
             showMenu={showMenu}
@@ -143,7 +158,7 @@ const LeftMenu = ({
             setHandRaiseActive={setHandRaiseActive}
          />
       </TabPanel>,
-   ]
+   ])
 
    if (showMenu && (isMobile || focusModeEnabled)) {
       views.push(
