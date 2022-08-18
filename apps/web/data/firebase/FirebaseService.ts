@@ -12,7 +12,6 @@ import {
    getReferralInformation,
 } from "../../util/CommonUtil"
 import {
-   EARLIEST_LIVESTREAM_DATE,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    pickPublicDataFromLivestream,
@@ -740,7 +739,7 @@ class FirebaseService {
          test: true,
          universities: [],
          start: firebase.firestore.Timestamp.fromDate(
-            new Date(EARLIEST_LIVESTREAM_DATE)
+            new Date("March 17, 2020 03:24:00")
          ),
       })
    }

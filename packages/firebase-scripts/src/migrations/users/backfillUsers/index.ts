@@ -39,7 +39,7 @@ import {
 } from "../../../repositories"
 import { getArgValue } from "../../../index"
 import {
-   EARLIEST_LIVESTREAM_DATE,
+   FALLBACK_DATE,
    LivestreamUserAction,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -654,8 +654,7 @@ const setUserLivestreamData = (
    const dateField = getUserSubCollectionDateField(documentType)
    const userAction = getUserAction(documentType)
    const dateOfAction =
-      updateData[dateField] ||
-      Timestamp.fromDate(new Date(EARLIEST_LIVESTREAM_DATE)) // not all docs have timestamps, so in order to identify these events we'll use a static date
+      updateData[dateField] || Timestamp.fromDate(new Date(FALLBACK_DATE)) // not all docs have timestamps, so in order to identify these events we'll use a static date
    delete updateData[dateField]
    bulkWriter
       .set(

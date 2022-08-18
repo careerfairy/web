@@ -7,8 +7,6 @@ import Timestamp = firebase.firestore.Timestamp
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
 
-export const EARLIEST_LIVESTREAM_DATE = "March 17, 2020 03:24:00"
-
 export interface LivestreamEvent extends Identifiable {
    author?: {
       email: string
@@ -63,6 +61,14 @@ export type LivestreamUserAction = keyof Pick<
 >
 
 /*
+ * This date string is used for UserLivestreamData documents
+ * that were created during the migration of the talentPool/participating/registered
+ * users subcollection. Any talentPool/participating/registered document that didn't have time stamps
+ * were given this static date
+ * */
+export const FALLBACK_DATE = "March 17, 2020 03:24:00"
+
+/*
  * Sub-collection found on the livestream doc called userLivestreamData
  * */
 export interface UserLivestreamData extends Identifiable {
@@ -71,6 +77,7 @@ export interface UserLivestreamData extends Identifiable {
    user: UserData
    answers?: UserLivestreamGroupQuestionAnswers
    registered?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
       referral?: {
          referralCode: string
@@ -79,10 +86,12 @@ export interface UserLivestreamData extends Identifiable {
       utm: any
    }
    talentPool?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
       companyId: string
    }
    participated?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
    }
 }
