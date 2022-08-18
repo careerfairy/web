@@ -1,10 +1,5 @@
 import firebase from "firebase/compat/app"
-import {
-   ParticipatingStudent,
-   RegisteredStudent,
-   TalentPoolStudent,
-   UserPublicData,
-} from "../users"
+import { UserPublicData } from "../users"
 import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
 import {
    LivestreamEvent,
@@ -83,25 +78,15 @@ export interface ILivestreamRepository {
    ): Promise<LivestreamEvent[] | null>
    serializeEvent(event: LivestreamEvent): LivestreamEventSerialized
    parseSerializedEvent(event: LivestreamEventSerialized): LivestreamEventParsed
-
-   getLivestreamRegisteredStudents(
-      eventId: string
-   ): Promise<RegisteredStudent[]>
    heartbeat(
       livestream: LivestreamEventPublicData,
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void>
-   getAllRegisteredStudents(withRef?: boolean): Promise<RegisteredStudent[]>
-   getAllParticipatingStudents(
-      withRef?: boolean
-   ): Promise<ParticipatingStudent[]>
-   getAllTalentPoolStudents(withRef?: boolean): Promise<TalentPoolStudent[]>
    getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
    ): Promise<UserLivestreamData[]>
-   getAllLivestreams(withTest?: boolean): Promise<LivestreamEvent[]>
    livestreamUsersQuery(
       eventId: string,
       userType: LivestreamUserAction
@@ -114,8 +99,8 @@ export interface ILivestreamRepository {
 
 export class FirebaseLivestreamRepository implements ILivestreamRepository {
    constructor(
-      private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: typeof firebase.firestore.FieldValue
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {}
 
    private mapLivestreamCollections(
@@ -406,53 +391,6 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return livestreamRef.onSnapshot(callback)
    }
 
-   async getLivestreamRegisteredStudents(
-      eventId: string
-   ): Promise<RegisteredStudent[]> {
-      let ref = await this.firestore
-         .collection("livestreams")
-         .doc(eventId)
-         .collection("registeredStudents")
-         .get()
-
-      return mapFirestoreDocuments<RegisteredStudent>(ref)
-   }
-
-   /*
-    * Legacy Query for migration script only
-    * */
-   async getAllRegisteredStudents(
-      withRef?: boolean
-   ): Promise<RegisteredStudent[]> {
-      const snaps = await this.firestore
-         .collectionGroup("registeredStudents")
-         .get()
-      return mapFirestoreDocuments<RegisteredStudent>(snaps, withRef)
-   }
-
-   /*
-    * Legacy Query for migration script only
-    * */
-   async getAllParticipatingStudents(
-      withRef?: boolean
-   ): Promise<ParticipatingStudent[]> {
-      const snaps = await this.firestore
-         .collectionGroup("participatingStudents")
-         .get()
-
-      return mapFirestoreDocuments<ParticipatingStudent>(snaps, withRef)
-   }
-
-   /*
-    * Legacy Query for migration script only
-    * */
-   async getAllTalentPoolStudents(
-      withRef?: boolean
-   ): Promise<TalentPoolStudent[]> {
-      const snaps = await this.firestore.collectionGroup("talentPool").get()
-      return mapFirestoreDocuments<TalentPoolStudent>(snaps, withRef)
-   }
-
    async getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
@@ -479,21 +417,6 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       return streamRef
          .collection("userLivestreamData")
          .where(`${userAction}.date`, "!=", null)
-   }
-
-   async getAllLivestreams(
-      withTest: boolean = false
-   ): Promise<LivestreamEvent[]> {
-      let snaps
-      if (withTest) {
-         snaps = await this.firestore.collection("livestreams").get()
-      } else {
-         snaps = await this.firestore
-            .collection("livestreams")
-            .where("test", "==", false)
-            .get()
-      }
-      return mapFirestoreDocuments<LivestreamEvent>(snaps)
    }
 }
 

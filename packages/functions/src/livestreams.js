@@ -7,61 +7,6 @@ const {
    notifyLivestreamCreated,
 } = require("./api/slack")
 
-exports.assertLivestreamRegistrationWasCompleted = functions.firestore
-   .document("livestreams/{livestreamId}/userLivestreamData/{studentId}")
-   .onCreate((snapshot, context) => {
-      console.log(
-         `Documents created in userLivestreamData in ${context.params.livestreamId}`
-      )
-      if (snapshot.exists) {
-         const data = snapshot.data()
-         const userRegistered = Boolean(data?.registered?.date)
-         if (!userRegistered) return
-         admin
-            .firestore()
-            .collection("livestreams")
-            .doc(context.params.livestreamId)
-            .update({
-               registeredUsers: admin.firestore.FieldValue.arrayUnion(
-                  context.params.studentId
-               ),
-            })
-            .then(() => {
-               console.log(
-                  `Successfully updated registeredUsers in ${context.params.livestreamId}`
-               )
-            })
-      }
-   })
-
-exports.assertLivestreamDeregistrationWasCompleted = functions.firestore
-   .document("livestreams/{livestreamId}/userLivestreamData/{studentId}")
-   .onWrite((change, context) => {
-      console.log(
-         `Documents deleted in userLivestreamData in ${context.params.livestreamId}`
-      )
-      const snap = change.after
-      const data = snap && snap.data()
-      const userStillRegistered = Boolean(data?.registered?.date)
-
-      if (userStillRegistered) return
-
-      admin
-         .firestore()
-         .collection("livestreams")
-         .doc(context.params.livestreamId)
-         .update({
-            registeredUsers: admin.firestore.FieldValue.arrayRemove(
-               context.params.studentId
-            ),
-         })
-         .then(() => {
-            console.log(
-               `Successfully removed user from registeredUsers in ${context.params.livestreamId}`
-            )
-         })
-   })
-
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
    .timeZone("Europe/Zurich")

@@ -74,10 +74,6 @@ exports.scheduleTestLivestreamDeletion =
    livestreams.scheduleTestLivestreamDeletion
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
-exports.assertLivestreamRegistrationWasCompleted =
-   livestreams.assertLivestreamRegistrationWasCompleted
-exports.assertLivestreamDeregistrationWasCompleted =
-   livestreams.assertLivestreamDeregistrationWasCompleted
 exports.sendLivestreamRegistrationConfirmationEmail =
    livestreams.sendLivestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail =

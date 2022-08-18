@@ -5,7 +5,8 @@ export default {
     * Remote folder that we want to fetch
     * Should be updated from time to time
     */
-   BUCKET_FOLDER: "Mon Aug 15 2022-12:18:04 GMT+0000 (Coordinated Universal Time)",
+   BUCKET_FOLDER:
+      "Wed Aug 17 2022-14:18:05 GMT+0000 (Coordinated Universal Time)",
 
    BUCKET: "careerfairy-backup",
 

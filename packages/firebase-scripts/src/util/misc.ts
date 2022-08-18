@@ -18,9 +18,17 @@ export const checkIfHasMatch = (
    questionName: string,
    possibleNames: string[]
 ) => {
-   return possibleNames
-      .map((name) => trimAndLowerCase(name))
-      .includes(trimAndLowerCase(questionName))
+   const trimmedQuestionName = trimAndLowerCase(questionName)
+   const trimmedPossibleNames = possibleNames.map(trimAndLowerCase)
+   return (
+      // check to see if question name is in possible names
+      trimmedPossibleNames.includes(trimmedQuestionName) ||
+      // check to see if any of the possible
+      // names is a subset of the question name
+      trimmedPossibleNames.some((possibleName) =>
+         trimmedQuestionName.includes(possibleName)
+      )
+   )
 }
 
 export const trimAndLowerCase = (str: string) => {
