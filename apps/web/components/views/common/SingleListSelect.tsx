@@ -5,6 +5,9 @@ import {
    Chip,
    ChipProps,
    CircularProgress,
+   Collapse,
+   FormControl,
+   FormHelperText,
    TextField,
 } from "@mui/material"
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
@@ -21,7 +24,7 @@ const SingleListSelect = <T extends { [key: string]: any }>({
    onSelectItem = () => {},
    disabled = false,
    getLabelFn = (option: T) => option.name, // displayed name
-   inputProps = {},
+   inputProps,
    isCheckbox = false, // Select items are checkboxes
    chipProps = {},
    extraOptions = {}, // props to pass to autocomplete
@@ -94,22 +97,27 @@ const SingleListSelect = <T extends { [key: string]: any }>({
          }
          getOptionDisabled={getOptionDisabled}
          renderInput={(params) => (
-            <TextField
-               {...params}
-               {...inputProps}
-               name={inputName}
-               InputProps={{
-                  ...params.InputProps,
-                  endAdornment: (
-                     <React.Fragment>
-                        {loading ? (
-                           <CircularProgress color="inherit" size={20} />
-                        ) : null}
-                        {params.InputProps.endAdornment}
-                     </React.Fragment>
-                  ),
-               }}
-            />
+            <FormControl error={Boolean(inputProps?.error)} fullWidth>
+               <TextField
+                  {...params}
+                  {...inputProps}
+                  name={inputName}
+                  InputProps={{
+                     ...params.InputProps,
+                     endAdornment: (
+                        <React.Fragment>
+                           {loading ? (
+                              <CircularProgress color="inherit" size={20} />
+                           ) : null}
+                           {params.InputProps.endAdornment}
+                        </React.Fragment>
+                     ),
+                  }}
+               />
+               <Collapse in={Boolean(inputProps?.error)}>
+                  <FormHelperText>{inputProps?.error}</FormHelperText>
+               </Collapse>
+            </FormControl>
          )}
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
@@ -138,7 +146,7 @@ interface Props<T> {
    getValueFn?: (obj: T) => T
    getKeyFn?: (obj: T) => string
    getGroupByFn?: (obj: T) => string
-   inputProps?: object
+   inputProps?: any
    chipProps?: ChipProps
    isCheckbox?: boolean
    options: T[]
