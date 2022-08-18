@@ -49,7 +49,7 @@ export class GroupPresenter {
    getUniversityQuestionsForTable(groupQuestions: GroupQuestion[]) {
       return groupQuestions.map((groupQuestion) => {
          return {
-            field: `university.questions.${groupQuestion.id}.selectedOptionId`,
+            field: `university.questions.${groupQuestion.id}.answerId`,
             title: groupQuestion.name,
             lookup: Object.keys(groupQuestion.options).reduce((acc, key) => {
                acc[key] = groupQuestion.options[key].name

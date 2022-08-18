@@ -1,12 +1,10 @@
-import BaseFirebaseRepository, {
-   mapFirestoreDocuments,
-} from "../BaseFirebaseRepository"
+import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import {
+   RegistrationStep,
    SavedRecruiter,
    UserATSDocument,
    UserATSRelations,
    UserData,
-   RegistrationStep,
 } from "./users"
 import firebase from "firebase/compat/app"
 import { FieldOfStudy } from "../fieldOfStudy"
@@ -39,7 +37,6 @@ export interface IUserRepository {
       arrayOfEmails: string[],
       options?: { withEmpty: boolean }
    ): Promise<UserData[]>
-   getAllUsers(withRef?: boolean): Promise<UserData[]>
 
    getUserATSData(id: string): Promise<UserATSDocument>
 
@@ -66,8 +63,8 @@ export class FirebaseUserRepository
    implements IUserRepository
 {
    constructor(
-      private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: typeof firebase.firestore.FieldValue
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
    }
@@ -217,11 +214,6 @@ export class FirebaseUserRepository
          totalUsers = [...totalUsers, ...newUsers]
       }
       return totalUsers
-   }
-
-   async getAllUsers(withRef?: boolean): Promise<UserData[]> {
-      const users = await this.firestore.collection("userData").get()
-      return mapFirestoreDocuments<UserData>(users, withRef)
    }
 
    async getUserATSData(id: string): Promise<UserATSDocument> {

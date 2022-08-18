@@ -12,6 +12,7 @@ export const possibleFieldsOfStudy = [
    "Domain of study",
    "Field of study ",
    "Programmes",
+   "background",
 ]
 export const possibleLevelsOfStudy = [
    "Level of Study",

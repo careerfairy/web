@@ -75,6 +75,14 @@ export type LivestreamUserAction = keyof Pick<
 >
 
 /*
+ * This date string is used for UserLivestreamData documents
+ * that were created during the migration of the talentPool/participating/registered
+ * users subcollection. Any talentPool/participating/registered document that didn't have time stamps
+ * were given this static date
+ * */
+export const FALLBACK_DATE = "March 17, 2020 03:24:00"
+
+/*
  * Sub-collection found on the livestream doc called userLivestreamData
  * */
 export interface UserLivestreamData extends Identifiable {
@@ -83,6 +91,7 @@ export interface UserLivestreamData extends Identifiable {
    user: UserData
    answers?: UserLivestreamGroupQuestionAnswers
    registered?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
       referral?: {
          referralCode: string
@@ -91,10 +100,12 @@ export interface UserLivestreamData extends Identifiable {
       utm: any
    }
    talentPool?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
       companyId: string
    }
    participated?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
    }
 }
