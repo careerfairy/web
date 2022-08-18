@@ -2,8 +2,8 @@ import { Identifiable } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
 import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 import firebase from "firebase/compat"
-import Timestamp = firebase.firestore.Timestamp
 import { FieldOfStudy } from "../fieldOfStudy"
+import Timestamp = firebase.firestore.Timestamp
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -47,7 +47,19 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
+
+   /**
+    * An empty array means the livestream should target all the fields of study
+    * [] -> All fields of study
+    */
    targetFieldsOfStudy?: FieldOfStudy[]
+
+   /**
+    * An empty array means the livestream should target all the levels of study
+    * [] -> All levels of study
+    */
+   targetLevelsOfStudy?: FieldOfStudy[]
+
    lastUpdated?: firebase.firestore.Timestamp
    speakers?: Speaker[]
    lastUpdatedAuthorInfo?: {

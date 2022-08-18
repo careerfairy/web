@@ -63,8 +63,9 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { FormikHelpers } from "formik/dist/types"
 import GroupQuestionSelect from "./GroupQuestionSelect"
-import FieldsOfStudyMultiSelector from "./FieldsOfStudyMultiSelector"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import FieldsOfStudyMultiSelector from "./TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
+import LevelsOfStudyMultiSelector from "./TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -120,6 +121,7 @@ const speakerObj = {
    position: "",
    background: "",
 }
+
 interface Props {
    group?: Group
    setSubmitted: (submitted: boolean) => void
@@ -164,6 +166,7 @@ export interface DraftFormValues {
       shortName: string
    }
    targetFieldsOfStudy: FieldOfStudy[]
+   targetLevelsOfStudy: FieldOfStudy[]
 }
 
 const DraftStreamForm = ({
@@ -222,6 +225,7 @@ const DraftStreamForm = ({
       status: {},
       language: languageCodes[0],
       targetFieldsOfStudy: [],
+      targetLevelsOfStudy: [],
    })
 
    const handleSetGroupIds = async (
@@ -325,6 +329,7 @@ const DraftStreamForm = ({
                   status: livestream.status || {},
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
+                  targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
                }
                setFormData(newFormData)
                setAllFetched(false)
@@ -965,6 +970,13 @@ const DraftStreamForm = ({
                               <Grid xs={12} item>
                                  <FieldsOfStudyMultiSelector
                                     selectedItems={values.targetFieldsOfStudy}
+                                    setFieldValue={setFieldValue}
+                                 />
+                              </Grid>
+
+                              <Grid xs={12} item>
+                                 <LevelsOfStudyMultiSelector
+                                    selectedItems={values.targetLevelsOfStudy}
                                     setFieldValue={setFieldValue}
                                  />
                               </Grid>

@@ -1,16 +1,19 @@
-import { useFieldsOfStudy } from "../../custom-hook/useCollection"
+import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import MultiListSelect from "../common/MultiListSelect"
+import MultiListSelect from "../../common/MultiListSelect"
+import { memo } from "react"
 
-type Props = {
+export type FieldsOfStudyMultiSelectorProps = {
    selectedItems: FieldOfStudy[]
    setFieldValue: (name, value) => void
 }
 
+const allOption = { id: "select-all", name: "Any Field Of Study" }
+
 const FieldsOfStudyMultiSelector = ({
    selectedItems,
    setFieldValue,
-}: Props) => {
+}: FieldsOfStudyMultiSelectorProps) => {
    const { isLoading, data: allFieldsOfStudy } = useFieldsOfStudy()
 
    if (isLoading) {
@@ -20,23 +23,29 @@ const FieldsOfStudyMultiSelector = ({
    return (
       <MultiListSelect
          inputName="targetFieldsOfStudy"
-         selectedItems={selectedItems}
+         selectedItems={
+            selectedItems.length === 0 ? [allOption] : selectedItems
+         }
          setFieldValue={setFieldValue}
          allValues={allFieldsOfStudy}
-         limit={5}
          isCheckbox={true}
          inputProps={{
-            label: "Select Fields of Study",
-            placeholder: "Select up to 5 Fields of Study",
+            label: "By Fields of Study",
+            placeholder: "Select Fields of Study",
          }}
          chipProps={{
             variant: "outlined",
          }}
          getValueFn={getValueFn}
+         selectAllOption={{
+            value: allOption,
+            returnValue: [],
+            selectValueType: "ReturnValue",
+         }}
       />
    )
 }
 
 const getValueFn = (value) => value
 
-export default FieldsOfStudyMultiSelector
+export default memo(FieldsOfStudyMultiSelector)
