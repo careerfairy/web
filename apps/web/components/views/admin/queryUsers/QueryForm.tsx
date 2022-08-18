@@ -4,10 +4,10 @@ import { Button, Grid, TextField, Typography } from "@mui/material"
 import { Formik } from "formik"
 import * as yup from "yup"
 import UniversityCountriesSelector from "./UniversityCountriesSelector"
-import FieldsOfStudyMultiSelector from "../../draftStreamForm/TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import LevelsOfStudyMultiSelector from "../../draftStreamForm/TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
+import FieldsOfStudyQuerySelector from "./FieldsOfStudyQuerySelector"
+import LevelsOfStudyQuerySelector from "./LevelsOfStudyQuerySelector"
 
 export interface IFormValues {
    label: string // unique
@@ -91,13 +91,13 @@ const QueryForm = () => {
                            />
                         </Grid>
                         <Grid item xs={12}>
-                           <FieldsOfStudyMultiSelector
+                           <FieldsOfStudyQuerySelector
                               setFieldValue={setFieldValue}
                               selectedItems={values.targetFieldsOfStudy}
                            />
                         </Grid>
                         <Grid item xs={12}>
-                           <LevelsOfStudyMultiSelector
+                           <LevelsOfStudyQuerySelector
                               setFieldValue={setFieldValue}
                               selectedItems={values.targetLevelsOfStudy}
                            />
