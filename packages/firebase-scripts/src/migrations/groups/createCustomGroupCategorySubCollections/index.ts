@@ -106,7 +106,7 @@ const createCustomGroupCategorySubCollections = (
                questionType: questionType,
             }
             bulkWriter
-               .set(categoryRef, categoryData)
+               .set(categoryRef, categoryData, { merge: true })
                .then(() => handleBulkWriterSuccess(counter))
                .catch((e) => handleBulkWriterError(e, counter))
             counter.writeIncrement()
