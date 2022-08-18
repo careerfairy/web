@@ -1,12 +1,10 @@
-import BaseFirebaseRepository, {
-   mapFirestoreDocuments,
-} from "../BaseFirebaseRepository"
+import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import {
+   RegistrationStep,
    SavedRecruiter,
    UserATSDocument,
    UserATSRelations,
    UserData,
-   RegistrationStep,
 } from "./users"
 import firebase from "firebase/compat/app"
 import { FieldOfStudy } from "../fieldOfStudy"
