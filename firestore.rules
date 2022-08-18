@@ -26,7 +26,7 @@ service cloud.firestore {
         }
         match /interests/{interest} {
             allow read: if true;
-            allow write: if false;
+            allow write: if isCFAdmin();
         }
 
         match /IcBoostDayUsers/{user} {
