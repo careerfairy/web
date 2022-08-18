@@ -8,7 +8,7 @@ import {
 import { checkIfHasMatch, throwMigrationError } from "../../../util/misc"
 import { BulkWriter } from "firebase-admin/firestore"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { groupRepo, livestreamRepo } from "../../../repositories"
+import { groupScriptsRepo, livestreamScriptsRepo } from "../../../repositories"
 import {
    LivestreamEvent,
    LivestreamGroupQuestion,
@@ -35,12 +35,12 @@ export async function run() {
    const counter = new Counter()
    try {
       const bulkWriter = firestore.bulkWriter()
-      const groups = await groupRepo.getAllGroups()
+      const groups = await groupScriptsRepo.getAllGroups()
       counter.addToReadCount(groups.length)
       const groupsDict = convertDocArrayToDict(groups)
 
       storeGroupQuestionsOnLivestreams(
-         await livestreamRepo.getAllLivestreams(),
+         await livestreamScriptsRepo.getAllLivestreams(),
          groupsDict,
          bulkWriter,
          counter

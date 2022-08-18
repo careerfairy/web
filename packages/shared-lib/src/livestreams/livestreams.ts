@@ -7,6 +7,8 @@ import Timestamp = firebase.firestore.Timestamp
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
 
+export const EARLIEST_LIVESTREAM_DATE = "March 17, 2020 03:24:00"
+
 export interface LivestreamEvent extends Identifiable {
    author?: {
       email: string

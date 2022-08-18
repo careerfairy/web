@@ -32,9 +32,14 @@ import {
    Timestamp,
 } from "firebase-admin/firestore"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { groupRepo, livestreamRepo, userRepo } from "../../../repositories"
+import {
+   groupScriptsRepo,
+   livestreamScriptsRepo,
+   userScriptsRepo,
+} from "../../../repositories"
 import { getArgValue } from "../../../index"
 import {
+   EARLIEST_LIVESTREAM_DATE,
    LivestreamUserAction,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -72,7 +77,7 @@ export async function run() {
    const targetBackfill = getArgValue<DocumentType>("targetBackfill")
    try {
       const bulkWriter = firestore.bulkWriter()
-      const groups = await groupRepo.getAllGroups()
+      const groups = await groupScriptsRepo.getAllGroups()
       counter.addToReadCount(groups.length)
       counter.setCustomCount(counterConstants.numFailedWrites, 0)
       const groupsDict = convertDocArrayToDict(groups)
@@ -80,7 +85,7 @@ export async function run() {
       switch (targetBackfill) {
          case "userData":
             backfillUsers(
-               await userRepo.getAllUsers(true),
+               await userScriptsRepo.getAllUsers(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -89,7 +94,7 @@ export async function run() {
             break
          case "registeredStudent":
             backfillUsers(
-               await livestreamRepo.getAllRegisteredStudents(true),
+               await livestreamScriptsRepo.getAllRegisteredStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -98,7 +103,7 @@ export async function run() {
             break
          case "participatingStudent":
             backfillUsers(
-               await livestreamRepo.getAllParticipatingStudents(true),
+               await livestreamScriptsRepo.getAllParticipatingStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -107,7 +112,7 @@ export async function run() {
             break
          case "talentPoolStudent":
             backfillUsers(
-               await livestreamRepo.getAllTalentPoolStudents(true),
+               await livestreamScriptsRepo.getAllTalentPoolStudents(true),
                groupsDict,
                bulkWriter,
                counter,
@@ -650,7 +655,7 @@ const setUserLivestreamData = (
    const userAction = getUserAction(documentType)
    const dateOfAction =
       updateData[dateField] ||
-      Timestamp.fromDate(new Date("March 17, 2020 03:24:00"))
+      Timestamp.fromDate(new Date(EARLIEST_LIVESTREAM_DATE)) // not all docs have timestamps, so in order to identify these events we'll use a static date
    delete updateData[dateField]
    bulkWriter
       .set(

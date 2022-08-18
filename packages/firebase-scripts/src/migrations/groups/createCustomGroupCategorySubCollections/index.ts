@@ -8,7 +8,7 @@ import {
 import { checkIfHasMatch } from "../../../util/misc"
 import { BulkWriter } from "firebase-admin/firestore"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { groupRepo } from "../../../repositories"
+import { groupScriptsRepo } from "../../../repositories"
 import {
    handleBulkWriterError,
    handleBulkWriterSuccess,
@@ -27,7 +27,7 @@ export async function run() {
    const counter = new Counter()
    try {
       const bulkWriter = firestore.bulkWriter()
-      const groups = await groupRepo.getAllGroups()
+      const groups = await groupScriptsRepo.getAllGroups()
       counter.addToReadCount(groups.length)
 
       createCustomGroupCategorySubCollections(groups, bulkWriter, counter)

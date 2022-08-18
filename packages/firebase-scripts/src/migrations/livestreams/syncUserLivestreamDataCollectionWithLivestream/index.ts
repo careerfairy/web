@@ -1,7 +1,7 @@
 import { firestore } from "../../../lib/firebase"
 import Counter from "../../../lib/Counter"
 import { throwMigrationError } from "../../../util/misc"
-import { livestreamRepo } from "../../../repositories"
+import { livestreamScriptsRepo } from "../../../repositories"
 import {
    handleBulkWriterError,
    handleBulkWriterSuccess,
@@ -15,7 +15,7 @@ export async function run() {
    const counter = new Counter()
    try {
       const livestreamUserDatas =
-         (await livestreamRepo.getAllUserLivestreamData(true)) || []
+         (await livestreamScriptsRepo.getAllUserLivestreamData(true)) || []
 
       const bulkWriter = firestore.bulkWriter()
       counter.addToReadCount(livestreamUserDatas.length)
