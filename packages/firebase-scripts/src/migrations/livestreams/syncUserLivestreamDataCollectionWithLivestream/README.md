@@ -10,5 +10,3 @@ Goes through every UserLivestreamData document through a collection group query 
 out if the user has registered/participated/joined talentpool based on that, we then
 add/remove the user's email from registeredUsers/participatingStudents/talentPool array of emails fields
 on the livestream document
-
-Example Output of `livestream/{livestreamId}` document:

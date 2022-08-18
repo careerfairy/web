@@ -477,7 +477,6 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
       userType: LivestreamUserAction,
       withRef?: boolean
    ): Promise<UserLivestreamData[]> {
-      console.log("-> updated query")
       const snaps = await this.firestore
          .collectionGroup("userLivestreamData")
          .where(`${userType}.date`, "!=", null)
