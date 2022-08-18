@@ -1,7 +1,8 @@
 import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
-import functions = require("firebase-functions")
 import { https } from "firebase-functions"
+import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
+import functions = require("firebase-functions")
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -473,4 +474,12 @@ export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
          throw e
       }
    }
+}
+
+/**
+ * Convert business models into plain objects (arrays)
+ * @param result
+ */
+export function serializeModels<T extends BaseModel>(result: T[]) {
+   return result.map((entry) => entry.serializeToPlainObject())
 }
