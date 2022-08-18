@@ -9,49 +9,17 @@ import {
    writeProgressBar,
 } from "../../../util/bulkWriter"
 import counterConstants from "../../../lib/Counter/constants"
-import {
-   LivestreamEvent,
-   LivestreamUserAction,
-} from "@careerfairy/shared-lib/dist/livestreams"
 import { FieldValue } from "firebase-admin/firestore"
-import { getArgValue } from "../../../index"
 
 export async function run() {
    const counter = new Counter()
    try {
-      const targetBackfill = getArgValue<LivestreamUserAction>("userType")
-      let livestreamUserDatas
-      switch (targetBackfill) {
-         case "talentPool":
-            livestreamUserDatas =
-               (await livestreamRepo.getAllLivestreamUsersByType(
-                  "talentPool",
-                  true
-               )) || []
-            break
-         case "participated":
-            livestreamUserDatas =
-               (await livestreamRepo.getAllLivestreamUsersByType(
-                  "participated",
-                  true
-               )) || []
-            break
-         case "registered":
-            livestreamUserDatas =
-               (await livestreamRepo.getAllLivestreamUsersByType(
-                  "registered",
-                  true
-               )) || []
-            break
-         default:
-            throwMigrationError(`Invalid user type: ${targetBackfill}`)
-      }
+      const livestreamUserDatas =
+         (await livestreamRepo.getAllUserLivestreamData(true)) || []
 
       const bulkWriter = firestore.bulkWriter()
       counter.addToReadCount(livestreamUserDatas.length)
-      Counter.log(
-         `found ${livestreamUserDatas.length} userDatas for ${targetBackfill}`
-      )
+      Counter.log(`Found ${livestreamUserDatas.length} UserLivestreamDatas`)
 
       counter.setCustomCount(
          counterConstants.totalNumDocs,
@@ -70,32 +38,19 @@ export async function run() {
          const hasRegistered = Boolean(data.registered?.date)
          const hasParticipated = Boolean(data.participated?.date)
          const hasJoinedTalentPool = Boolean(data.talentPool?.date)
-         let updateData: Partial<LivestreamEvent> = {}
-
-         switch (targetBackfill) {
-            case "talentPool":
-               updateData = {
-                  // @ts-ignore
-                  talentPool: hasJoinedTalentPool
-                     ? FieldValue.arrayUnion(userEmail)
-                     : FieldValue.arrayRemove(userEmail),
-               }
-               break
-            case "participated":
-               updateData = {
-                  // @ts-ignore
-                  participatedUsers: hasParticipated
-                     ? FieldValue.arrayUnion(userEmail)
-                     : FieldValue.arrayRemove(userEmail),
-               }
-               break
-            case "registered":
-               updateData = {
-                  // @ts-ignore
-                  registeredUsers: hasRegistered
-                     ? FieldValue.arrayUnion(userEmail)
-                     : FieldValue.arrayRemove(userEmail),
-               }
+         const updateData = {
+            // @ts-ignore
+            talentPool: hasJoinedTalentPool
+               ? FieldValue.arrayUnion(userEmail)
+               : FieldValue.arrayRemove(userEmail),
+            // @ts-ignore
+            participatedUsers: hasParticipated
+               ? FieldValue.arrayUnion(userEmail)
+               : FieldValue.arrayRemove(userEmail),
+            // @ts-ignore
+            registeredUsers: hasRegistered
+               ? FieldValue.arrayUnion(userEmail)
+               : FieldValue.arrayRemove(userEmail),
          }
 
          if (livestreamId && isLivestreamChild) {
