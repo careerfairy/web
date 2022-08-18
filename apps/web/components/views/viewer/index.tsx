@@ -1,4 +1,4 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useCallback } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import ViewerComponent from "./viewer-component/ViewerComponent"
 import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer"
@@ -15,10 +15,13 @@ import StreamClosedCountdown from "../streaming/sharedComponents/StreamClosedCou
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import { useRouter } from "next/router"
+import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
+import RootState from "../../../store/reducers"
 
 const useStyles = makeStyles((theme) => ({
    iconsContainer: {
       position: "absolute",
+      // @ts-ignore
       bottom: ({ mobile }) => (mobile ? 80 : 60),
       right: 60,
       width: 80,
@@ -65,9 +68,7 @@ const ViewerOverview = ({
    hideAudience,
    audienceDrawerOpen,
 }) => {
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
 
    const {
       query: { isRecordingWindow },
@@ -75,10 +76,20 @@ const ViewerOverview = ({
    const { currentLivestream, isBreakout } = useCurrentStream()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
-      (state) => state.stream.streaming
+      (state: RootState) => state.stream.streaming
    )
 
    const classes = useStyles({ mobile })
+
+   const unmuteMutedRemoteVideosAfterFail = useCallback(
+      () => dispatch(actions.unmuteMutedRemoteVideosAfterFail()),
+      [dispatch]
+   )
+
+   const unpauseRemoteVideosAfterFail = useCallback(
+      () => dispatch(actions.unpauseRemoteVideosAfterFail()),
+      [dispatch]
+   )
 
    return (
       <Fragment>
@@ -97,7 +108,6 @@ const ViewerOverview = ({
                includeJobs={currentLivestream.jobs?.length > 0}
             />
             <ViewerComponent
-               livestreamId={currentLivestream.id}
                streamerId={streamerId}
                mobile={mobile}
                showMenu={showMenu}
@@ -115,11 +125,7 @@ const ViewerOverview = ({
             )}
          </div>
          {!focusModeEnabled && (
-            <IconsContainer
-               className={classes.iconsContainer}
-               isTest={currentLivestream.test}
-               livestreamId={currentLivestream.id}
-            />
+            <IconsContainer className={classes.iconsContainer} />
          )}
          {currentLivestream && !currentLivestream.hasNoRatings && (
             <RatingContainer
@@ -131,7 +137,7 @@ const ViewerOverview = ({
          <Backdrop
             open={videoIsMuted && !isRecordingWindow}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
+            onClick={unmuteMutedRemoteVideosAfterFail}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />
@@ -141,7 +147,7 @@ const ViewerOverview = ({
          <Backdrop
             open={videoIsPaused && !isRecordingWindow}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
+            onClick={unpauseRemoteVideosAfterFail}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />

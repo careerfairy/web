@@ -2,25 +2,21 @@ import React from "react"
 import * as PropTypes from "prop-types"
 import { Box } from "@mui/material"
 
-export const TabPanel = ({
-   hidden,
+type TabPanelProps = {
+   hidden?: boolean
+   className?: string
+   other?: any
+   index?: number
+   children: JSX.Element
+   height?: string
+   value?: number
+}
+
+export const StyledBox = ({
    children,
-   height,
-   value,
-   index,
-   className,
-   ...other
-}) => {
-   return (
-      <Box
-         hidden={hidden}
-         className={className}
-         {...other}
-         style={{ height: height || "100%", ...other.style }}
-      >
-         {children}
-      </Box>
-   )
+   className = undefined,
+}: TabPanelProps) => {
+   return <Box className={className}>{children}</Box>
 }
 
 export const SimplePanel = ({ panelId, children, height, ...other }) => {
