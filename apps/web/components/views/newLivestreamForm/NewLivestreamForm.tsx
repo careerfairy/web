@@ -5,13 +5,13 @@ import {
    CircularProgress,
    Collapse,
    Container,
+   Fab,
    FormControl,
    FormControlLabel,
    Grid,
    Switch,
    TextField,
    Typography,
-   Fab,
 } from "@mui/material"
 import { Formik } from "formik"
 import { v4 as uuidv4 } from "uuid"
@@ -42,7 +42,8 @@ import { useGroups, useInterests } from "../../custom-hook/useCollection"
 import StreamDurationSelect from "../draftStreamForm/StreamDurationSelect"
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
-import FieldsOfStudyMultiSelector from "../draftStreamForm/FieldsOfStudyMultiSelector"
+import FieldsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
+import LevelsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -126,6 +127,7 @@ const NewLivestreamForm = () => {
       language: languageCodes[0],
       duration: DEFAULT_STREAM_DURATION_MINUTES,
       targetFieldsOfStudy: [],
+      targetLevelsOfStudy: [],
    })
 
    useEffect(() => {
@@ -179,6 +181,7 @@ const NewLivestreamForm = () => {
                   ),
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
+                  targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
                }
                setFormData(newFormData)
                setSelectedInterests(
@@ -749,6 +752,13 @@ const NewLivestreamForm = () => {
                         <Grid xs={12} item>
                            <FieldsOfStudyMultiSelector
                               selectedItems={values.targetFieldsOfStudy}
+                              setFieldValue={setFieldValue}
+                           />
+                        </Grid>
+
+                        <Grid xs={12} item>
+                           <LevelsOfStudyMultiSelector
+                              selectedItems={values.targetLevelsOfStudy}
                               setFieldValue={setFieldValue}
                            />
                         </Grid>
