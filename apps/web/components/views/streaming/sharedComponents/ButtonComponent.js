@@ -15,6 +15,7 @@ import clsx from "clsx"
 import { useDispatch, useSelector } from "react-redux"
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded"
 import * as storeActions from "store/actions"
+import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -122,9 +123,7 @@ const ButtonComponent = ({
    streamer,
    includeJobs,
 }) => {
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const DELAY = 3000 //3 seconds
    const [hasMounted, setHasMounted] = useState(false)
    const dispatch = useDispatch()

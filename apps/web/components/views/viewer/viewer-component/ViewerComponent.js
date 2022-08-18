@@ -3,6 +3,7 @@ import React, {
    useCallback,
    useContext,
    useEffect,
+   useMemo,
    useState,
 } from "react"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -30,6 +31,7 @@ import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
 import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
+import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -65,9 +67,7 @@ function ViewerComponent({
    mobile,
 }) {
    const { setDesktopMode: setDesktopModeInstanceMethod } = useFirebaseService()
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
       (state) => state.stream.streaming.spyModeEnabled
    )
@@ -97,6 +97,11 @@ function ViewerComponent({
    const shouldInitializeAgora = Boolean(
       currentLivestream.hasStarted || (userData?.isAdmin && spyModeEnabled)
    )
+
+   const agoraOptions = useMemo(
+      () => ({ isAHandRaiser: handRaiseActive }),
+      [handRaiseActive]
+   )
    const {
       networkQuality,
       localStream,
@@ -112,14 +117,21 @@ function ViewerComponent({
       currentLivestream.id,
       handRaiseActive,
       shouldInitializeAgora,
-      { isAHandRaiser: handRaiseActive }
+      agoraOptions
    )
 
    const { createEmote } = useContext(AgoraRTMContext)
 
-   const { devices, deviceInitializers } = useDevices(localStream, {
-      initialize: Boolean(handRaiseActive),
-   })
+   const deviceSettings = useMemo(
+      () => ({
+         initialize: Boolean(handRaiseActive),
+      }),
+      [handRaiseActive]
+   )
+   const { devices, deviceInitializers } = useDevices(
+      localStream,
+      deviceSettings
+   )
 
    const { mediaControls, localMediaStream: displayableMediaStream } =
       useMediaSources(devices, localStream, true)

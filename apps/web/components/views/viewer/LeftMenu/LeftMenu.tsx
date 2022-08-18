@@ -1,5 +1,4 @@
-import PropTypes from "prop-types"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { alpha, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import SwipeableViews from "react-swipeable-views"
@@ -9,12 +8,16 @@ import QuestionCategory from "../../streaming/sharedComponents/QuestionCategory"
 import PollCategory from "./categories/PollCategory"
 import HandRaiseCategory from "./categories/HandRaiseCategory"
 import ChatCategory from "../../streaming/LeftMenu/categories/ChatCategory"
-import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import clsx from "clsx"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
+import {
+   focusModeEnabledSelector,
+   leftMenuOpenSelector,
+} from "../../../../store/selectors/streamSelectors"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -50,6 +53,7 @@ const useStyles = makeStyles((theme) => ({
    mobileDrawer: {
       width: "100%",
    },
+   // @ts-ignore
    desktopDrawer: ({ focusModeEnabled }) => ({
       width: 280,
       top: focusModeEnabled ? 0 : 55,
@@ -66,13 +70,11 @@ const LeftMenu = ({
    selectedState,
    livestream,
    isMobile,
-}) => {
-   const [states, setStates] = useState(["questions", "polls", "hand", "chat"])
+}: LeftMenuProps) => {
+   const [states, setStates] = useState(["questions", "polls", "hand"])
 
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
-   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen)
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
+   const showMenu = useSelector(leftMenuOpenSelector)
    const { userData, authenticatedUser: user } = useAuth()
    const theme = useTheme()
    const classes = useStyles({ showMenu, isMobile, focusModeEnabled })
@@ -87,7 +89,7 @@ const LeftMenu = ({
       } else if (selectedState === "hand") {
          setValue(2)
       } else if (selectedState === "chat") {
-         setValue(3)
+         setValue(states.indexOf("chat"))
       } else if (selectedState === "jobs") {
          // lazy add the jobs tab only when clicked for the first time
          // so that we avoid loading the jobs to when its strictly necessary
@@ -95,14 +97,13 @@ const LeftMenu = ({
             setStates((prev) => [...prev, "jobs"])
             setViews((prev) => [
                ...prev,
-               <TabPanel key={3} value={value} index={3} dir={theme.direction}>
-                  <JobsCategory />
-               </TabPanel>,
+               <JobsCategory key={"jobs-category-tab"} />,
             ])
          }
-         setValue(3)
+         setValue(states.indexOf("jobs"))
       }
    }, [selectedState, showMenu, isMobile, states])
+
    useEffect(() => {
       if (
          selectedState === "chat" &&
@@ -113,66 +114,90 @@ const LeftMenu = ({
          setSelectedState("questions")
          setValue(0)
       }
-   }, [selectedState, showMenu, isMobile])
+   }, [selectedState, showMenu, isMobile, focusModeEnabled, setSelectedState])
 
-   const handleChange = (event, newValue) => {
-      setValue(newValue)
-      setSelectedState(states[newValue])
-   }
+   const handleChange = useCallback(
+      (event, newValue) => {
+         setValue(newValue)
+         setSelectedState(states[newValue])
+      },
+      [setSelectedState, states]
+   )
 
-   const handleClose = () => {
+   const handleClose = useCallback(() => {
       dispatch(actions.closeLeftMenu())
-   }
+   }, [dispatch])
 
    const [views, setViews] = useState([
-      <TabPanel key={0} value={value} index={0} dir={theme.direction}>
-         <QuestionCategory
-            showMenu={showMenu}
-            streamer={streamer}
-            livestream={livestream}
-            isMobile={isMobile}
-            selectedState={selectedState}
-            user={user}
-            userData={userData}
-         />
-      </TabPanel>,
-      <TabPanel key={1} value={value} index={1} dir={theme.direction}>
-         <PollCategory
-            livestream={livestream}
-            selectedState={selectedState}
-            setSelectedState={setSelectedState}
-            streamer={streamer}
-            user={user}
-            userData={userData}
-         />
-      </TabPanel>,
-      <TabPanel key={2} value={value} index={2} dir={theme.direction}>
-         <HandRaiseCategory
-            streamer={streamer}
-            livestream={livestream}
-            selectedState={selectedState}
-            user={user}
-            isMobile={isMobile}
-            userData={userData}
-            handRaiseActive={handRaiseActive}
-            setHandRaiseActive={setHandRaiseActive}
-         />
-      </TabPanel>,
+      <QuestionCategory
+         key={"questions-category-tab"}
+         showMenu={showMenu}
+         streamer={streamer}
+         livestream={livestream}
+         isMobile={isMobile}
+         selectedState={selectedState}
+         user={user}
+         userData={userData}
+      />,
+      <PollCategory
+         key={"polls-category-tab"}
+         livestream={livestream}
+         //@ts-ignore
+         selectedState={selectedState}
+         setSelectedState={setSelectedState}
+         streamer={streamer}
+         user={user}
+         userData={userData}
+      />,
+      <HandRaiseCategory
+         key={"handraise-category-tab"}
+         // @ts-ignore
+         streamer={streamer}
+         // @ts-ignore
+         livestream={livestream}
+         selectedState={selectedState}
+         user={user}
+         isMobile={isMobile}
+         userData={userData}
+         handRaiseActive={handRaiseActive}
+         setHandRaiseActive={setHandRaiseActive}
+      />,
    ])
 
-   if (showMenu && (isMobile || focusModeEnabled)) {
-      views.push(
-         <TabPanel key={3} value={value} index={3} dir={theme.direction}>
-            <ChatCategory
-               livestream={livestream}
-               selectedState={selectedState}
-               user={user}
-               userData={userData}
-               isStreamer={false}
-            />
-         </TabPanel>
-      )
-   }
+   useEffect(() => {
+      if (showMenu && (isMobile || focusModeEnabled)) {
+         if (!states.includes("chat")) {
+            setStates((prev) => [...prev, "chat"])
+            setViews((prev) => [
+               ...prev,
+               <ChatCategory
+                  key={"chat-category-tab"}
+                  livestream={livestream}
+                  selectedState={selectedState}
+                  // @ts-ignore
+                  user={user}
+                  userData={userData}
+                  isStreamer={false}
+               />,
+            ])
+         }
+      }
+   }, [
+      focusModeEnabled,
+      isMobile,
+      livestream,
+      selectedState,
+      showMenu,
+      states,
+      user,
+      userData,
+   ])
+
+   const toggleLeftMenu = useCallback(
+      () => dispatch(actions.toggleLeftMenu()),
+      [dispatch]
+   )
+
    const content = (
       <>
          {isMobile && showMenu && (
@@ -180,17 +205,17 @@ const LeftMenu = ({
                className={classes.closeBtn}
                size="large"
                color="secondary"
-               onClick={() => dispatch(actions.toggleLeftMenu())}
+               onClick={toggleLeftMenu}
             >
                <ChevronLeftRoundedIcon />
             </Fab>
          )}
          <SwipeableViews
-            containerStyle={{ WebkitOverflowScrolling: "touch" }}
+            containerStyle={containerStyle}
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={value}
             animateTransitions
-            slideStyle={{ overflowX: "hidden" }}
+            slideStyle={slideStyle}
             hysteresis={0.3}
             slideClassName={classes.slides}
             className={classes.viewRoot}
@@ -201,12 +226,22 @@ const LeftMenu = ({
       </>
    )
 
+   const mobileDrawerClasses = useMemo(
+      () => ({ paper: clsx(classes.mobileDrawer, classes.blur) }),
+      [classes.blur, classes.mobileDrawer]
+   )
+
+   const desktopDrawerClasses = useMemo(
+      () => ({ paper: clsx(classes.desktopDrawer, classes.blur) }),
+      [classes.blur, classes.desktopDrawer]
+   )
+
    return (
       <>
          {isMobile ? (
             <Drawer
                anchor="left"
-               classes={{ paper: clsx(classes.mobileDrawer, classes.blur) }}
+               classes={mobileDrawerClasses}
                onClose={handleClose}
                open={showMenu}
                variant="persistent"
@@ -216,7 +251,7 @@ const LeftMenu = ({
          ) : (
             <Drawer
                anchor="left"
-               classes={{ paper: clsx(classes.desktopDrawer, classes.blur) }}
+               classes={desktopDrawerClasses}
                open={focusModeEnabled ? showMenu : true}
                variant="persistent"
             >
@@ -227,16 +262,17 @@ const LeftMenu = ({
    )
 }
 
-LeftMenu.propTypes = {
-   className: PropTypes.string,
-   handRaiseActive: PropTypes.bool,
-   handleStateChange: PropTypes.func.isRequired,
-   isMobile: PropTypes.bool,
-   livestream: PropTypes.object,
-   selectedState: PropTypes.string.isRequired,
-   setHandRaiseActive: PropTypes.func.isRequired,
-   setSelectedState: PropTypes.func.isRequired,
-   streamer: PropTypes.any,
+const slideStyle = { overflowX: "hidden" }
+const containerStyle = { WebkitOverflowScrolling: "touch" }
+
+type LeftMenuProps = {
+   handRaiseActive: boolean
+   setHandRaiseActive: (args) => any
+   streamer: any
+   setSelectedState: (args) => any
+   selectedState: string
+   livestream: LivestreamEvent
+   isMobile: boolean
 }
 
 export default LeftMenu

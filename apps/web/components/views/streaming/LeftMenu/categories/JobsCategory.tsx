@@ -5,9 +5,12 @@ import {
 } from "materialUI/GlobalContainers"
 import WorkIcon from "@mui/icons-material/Work"
 import { memo } from "react"
+import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 
 const JobsCategory = () => {
-   console.log("Rendering JobsCategory")
+   const { currentLivestream } = useCurrentStream()
+   console.log("Rendering JobsCategory", currentLivestream)
+
    return (
       <CategoryContainerTopAligned className={undefined}>
          <QuestionContainerHeader className={undefined}>
