@@ -296,6 +296,7 @@ export const companyValueQueryProp = `
 export const companyValuesQueryProps = `
     {
         __typename
+        id
         title
         values ${companyValueQueryProp}
     }
