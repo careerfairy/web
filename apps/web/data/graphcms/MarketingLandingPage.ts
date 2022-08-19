@@ -6,6 +6,7 @@ import {
    HygraphResponseMarketingPage,
    HygraphResponseMarketingSignup,
    HygraphResponseSeo,
+   HygraphResponseTestimonialValue,
 } from "../../types/cmsTypes"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
@@ -22,6 +23,7 @@ export class MarketingLandingPage extends BaseModel {
          | HygraphResponseMarketingSignup
          | HygraphResponseHero
          | HygraphResponseCompanyValues
+         | HygraphResponseTestimonialValue
       )[]
    ) {
       super()
