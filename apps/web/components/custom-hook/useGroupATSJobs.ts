@@ -34,7 +34,7 @@ const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
       return {
          jobs,
       }
-   }, [data])
+   }, [data, integrationId])
 }
 
 export default useGroupATSJobs
