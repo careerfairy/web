@@ -128,6 +128,16 @@ export interface HygraphResponseCompanyValue {
    image: ICmsImage
 }
 
+export interface HygraphResponseTestimonialValue {
+   __typename: string
+   id: string
+   slug: string
+   title: string
+   content: string
+   published: Date
+   rating: number
+}
+
 export interface HygraphFieldOfStudySelectResponse {
    __typename: string
    id: string
@@ -299,5 +309,16 @@ export const companyValuesQueryProps = `
         id
         title
         values ${companyValueQueryProp}
+    }
+`
+// language=GraphQL
+export const testimonialQueryProps = `
+    {
+        __typename
+        id
+        title
+        content
+        published
+        rating
     }
 `

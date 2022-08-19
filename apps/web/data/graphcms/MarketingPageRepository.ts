@@ -9,6 +9,7 @@ import {
    marketingSignupQueryProps,
    seoQueryProps,
    Slug,
+   testimonialQueryProps,
    Variables,
 } from "../../types/cmsTypes"
 import { MarketingLandingPage } from "./MarketingLandingPage"
@@ -55,6 +56,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                           ... on MarketingSignup ${marketingSignupQueryProps}
                           ... on Hero ${heroQueryProps}
                           ... on CompanyValues ${companyValuesQueryProps}
+                          ... on Testimonial ${testimonialQueryProps}
                       }
                       seo ${seoQueryProps}
                   }
