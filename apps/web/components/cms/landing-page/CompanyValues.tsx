@@ -6,8 +6,7 @@ import ValuesSection from "../../views/aboutUs/ValuesSection"
 
 const styles = sxStyles({
    wrapper: {
-      marginTop: 6,
-      marginBottom: 6,
+      paddingY: 6,
    },
 })
 
