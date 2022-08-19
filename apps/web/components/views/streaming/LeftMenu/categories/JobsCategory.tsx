@@ -6,6 +6,8 @@ import {
 import WorkIcon from "@mui/icons-material/Work"
 import { memo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import JobList from "./jobs/JobList"
+import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 
 type Props = {
    selectedState: string // current tab open, this one is "jobs"
@@ -14,14 +16,9 @@ type Props = {
 }
 
 const JobsCategory = ({ selectedState, livestream, showMenu }: Props) => {
-   console.log("Rendering JobsCategory", livestream, showMenu)
-
-   if (selectedState !== "jobs" || !showMenu) {
-      console.log("avoid rendering all")
+   if (selectedState !== "jobs" || !showMenu || !livestream.jobs) {
       return null
    }
-
-   console.log("here")
 
    return (
       <CategoryContainerTopAligned className={undefined}>
@@ -31,6 +28,10 @@ const JobsCategory = ({ selectedState, livestream, showMenu }: Props) => {
             </QuestionContainerTitle>
             <div>Available Jobs</div>
          </QuestionContainerHeader>
+
+         <SuspenseWithBoundary>
+            <JobList livestream={livestream} />
+         </SuspenseWithBoundary>
       </CategoryContainerTopAligned>
    )
 }

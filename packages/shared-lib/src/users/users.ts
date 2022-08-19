@@ -1,5 +1,7 @@
 import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat/app"
+import { Job } from "../ats/Job"
+import { LivestreamEventPublicData } from "../livestreams"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -115,6 +117,18 @@ export type UserDataAnalytics = {
 } & Identifiable
 
 /**
+ * userData/{id}/jobApplications/{doc}
+ */
+export interface UserJobApplicationDocument extends Identifiable {
+   groupId: string
+   integrationId: string
+   jobId: string
+   date: firebase.firestore.Timestamp
+   job: Job // will be serialized to plain object
+   livestream: LivestreamEventPublicData
+}
+
+/**
  * Public information about a user
  *
  * Useful to save on relationship documents
@@ -127,4 +141,24 @@ export const pickPublicDataFromUser = (userData: UserData): UserPublicData => {
       lastName: userData.lastName,
       badges: userData.badges || [],
    }
+}
+
+/**
+ * Confirm if the user has already applied for a id in the
+ * saved relations
+ *
+ * @param relations
+ * @param jobId
+ */
+export const userAlreadyAppliedForJob = (
+   relations: UserATSDocument,
+   jobId: string
+) => {
+   for (let relation of Object.values(relations?.atsRelations)) {
+      if (relation?.jobApplications?.[jobId]) {
+         return true
+      }
+   }
+
+   return false
 }

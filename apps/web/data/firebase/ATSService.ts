@@ -60,6 +60,13 @@ export class ATSService {
          integrationId,
       })
    }
+
+   async applyToAJob(livestreamId: string, jobId: string): Promise<any> {
+      return this.firebaseFunctions.httpsCallable("atsUserApplyToJob")({
+         livestreamId,
+         jobId,
+      })
+   }
 }
 
 export const atsServiceInstance = new ATSService(firebaseInstance.functions())
