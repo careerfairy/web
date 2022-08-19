@@ -10,9 +10,9 @@ import { Drawer, Fab } from "@mui/material"
 import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import JobsCategory from "./categories/JobsCategory"
 import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import JobsCategory from "./categories/JobsCategory"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -54,6 +54,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
+const states = ["questions", "polls", "hand", "jobs"]
+
 const LeftMenu = ({
    livestream,
    streamer,
@@ -64,7 +66,6 @@ const LeftMenu = ({
    setSelectedState,
    smallScreen,
 }: LeftMenuProps) => {
-   const [states, setStates] = useState(["questions", "polls", "hand"])
    const showMenu = useSelector(leftMenuOpenSelector)
 
    const theme = useTheme()
@@ -88,25 +89,11 @@ const LeftMenu = ({
    }, [dispatch])
 
    useEffect(() => {
-      if (selectedState === "questions") {
-         setValue(0)
-      } else if (selectedState === "polls") {
-         setValue(1)
-      } else if (selectedState === "hand") {
-         setValue(2)
-      } else if (selectedState === "jobs") {
-         // lazy add the jobs tab only when clicked for the first time
-         // so that we avoid loading the jobs to when its strictly necessary
-         if (!states.includes("jobs")) {
-            setStates((prev) => [...prev, "jobs"])
-            setViews((prev) => [
-               ...prev,
-               <JobsCategory key={"jobs-category-tab"} />,
-            ])
-         }
-         setValue(3)
+      const newSelectedIndex = states.indexOf(selectedState)
+      if (value !== newSelectedIndex) {
+         setValue(newSelectedIndex)
       }
-   }, [selectedState, showMenu, states])
+   }, [selectedState, value])
 
    const handleChange = useCallback(
       (event) => {
@@ -114,10 +101,10 @@ const LeftMenu = ({
          setValue(event)
          setSelectedState?.(states[event])
       },
-      [setSelectedState, setSliding, states]
+      [setSelectedState, setSliding]
    )
 
-   const [views, setViews] = useState([
+   const views = [
       <QuestionCategory
          key={"question-category-tab"}
          sliding={sliding}
@@ -143,7 +130,18 @@ const LeftMenu = ({
          livestream={livestream}
          selectedState={selectedState}
       />,
-   ])
+   ]
+
+   if (livestream?.jobs?.length > 0) {
+      views.push(
+         <JobsCategory
+            key={"jobs-category-tab"}
+            selectedState={selectedState}
+            livestream={livestream}
+            showMenu={showMenu}
+         />
+      )
+   }
 
    const toggleLeftMenu = useCallback(
       () => dispatch(actions.toggleLeftMenu()),

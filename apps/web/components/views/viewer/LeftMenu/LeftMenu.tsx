@@ -12,12 +12,12 @@ import clsx from "clsx"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import {
    focusModeEnabledSelector,
    leftMenuOpenSelector,
 } from "../../../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -62,6 +62,8 @@ const useStyles = makeStyles((theme) => ({
    }),
 }))
 
+const states = ["questions", "polls", "hand", "chat", "jobs"]
+
 const LeftMenu = ({
    handRaiseActive,
    setHandRaiseActive,
@@ -71,8 +73,6 @@ const LeftMenu = ({
    livestream,
    isMobile,
 }: LeftMenuProps) => {
-   const [states, setStates] = useState(["questions", "polls", "hand"])
-
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const showMenu = useSelector(leftMenuOpenSelector)
    const { userData, authenticatedUser: user } = useAuth()
@@ -80,29 +80,6 @@ const LeftMenu = ({
    const classes = useStyles({ showMenu, isMobile, focusModeEnabled })
    const [value, setValue] = useState(0)
    const dispatch = useDispatch()
-
-   useEffect(() => {
-      if (selectedState === "questions") {
-         setValue(0)
-      } else if (selectedState === "polls") {
-         setValue(1)
-      } else if (selectedState === "hand") {
-         setValue(2)
-      } else if (selectedState === "chat") {
-         setValue(states.indexOf("chat"))
-      } else if (selectedState === "jobs") {
-         // lazy add the jobs tab only when clicked for the first time
-         // so that we avoid loading the jobs to when its strictly necessary
-         if (!states.includes("jobs")) {
-            setStates((prev) => [...prev, "jobs"])
-            setViews((prev) => [
-               ...prev,
-               <JobsCategory key={"jobs-category-tab"} />,
-            ])
-         }
-         setValue(states.indexOf("jobs"))
-      }
-   }, [selectedState, showMenu, isMobile, states])
 
    useEffect(() => {
       if (
@@ -121,14 +98,14 @@ const LeftMenu = ({
          setValue(newValue)
          setSelectedState(states[newValue])
       },
-      [setSelectedState, states]
+      [setSelectedState]
    )
 
    const handleClose = useCallback(() => {
       dispatch(actions.closeLeftMenu())
    }, [dispatch])
 
-   const [views, setViews] = useState([
+   const views = [
       <QuestionCategory
          key={"questions-category-tab"}
          showMenu={showMenu}
@@ -162,36 +139,44 @@ const LeftMenu = ({
          handRaiseActive={handRaiseActive}
          setHandRaiseActive={setHandRaiseActive}
       />,
-   ])
+   ]
+
+   if (showMenu && (isMobile || focusModeEnabled)) {
+      views.push(
+         <ChatCategory
+            livestream={livestream}
+            selectedState={selectedState}
+            // @ts-ignore
+            user={user}
+            userData={userData}
+            isStreamer={false}
+         />
+      )
+   }
+
+   if (livestream?.jobs?.length > 0) {
+      views.push(
+         <JobsCategory
+            key={"jobs-category-tab"}
+            selectedState={selectedState}
+            livestream={livestream}
+            showMenu={showMenu}
+         />
+      )
+   }
 
    useEffect(() => {
-      if (showMenu && (isMobile || focusModeEnabled)) {
-         if (!states.includes("chat")) {
-            setStates((prev) => [...prev, "chat"])
-            setViews((prev) => [
-               ...prev,
-               <ChatCategory
-                  key={"chat-category-tab"}
-                  livestream={livestream}
-                  selectedState={selectedState}
-                  // @ts-ignore
-                  user={user}
-                  userData={userData}
-                  isStreamer={false}
-               />,
-            ])
-         }
+      let newSelectedIndex = states.indexOf(selectedState)
+
+      if (selectedState === "jobs" && views.length !== states.length) {
+         // chat view might be missing, we need to go to the previous tab
+         --newSelectedIndex
       }
-   }, [
-      focusModeEnabled,
-      isMobile,
-      livestream,
-      selectedState,
-      showMenu,
-      states,
-      user,
-      userData,
-   ])
+
+      if (value !== newSelectedIndex) {
+         setValue(newSelectedIndex)
+      }
+   }, [selectedState, value, views.length])
 
    const toggleLeftMenu = useCallback(
       () => dispatch(actions.toggleLeftMenu()),
