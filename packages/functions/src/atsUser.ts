@@ -1,14 +1,20 @@
 import functions = require("firebase-functions")
-import { logAndThrow, validateData } from "./lib/validations"
+import {
+   logAndThrow,
+   validateData,
+   validateUserAuthExists,
+} from "./lib/validations"
 import { object, string } from "yup"
 import { atsRepo, livestreamsRepo, userRepo } from "./api/repositories"
 import { logAxiosError, onCallWrapper, serializeModels } from "./util"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
-import { UserATSDocument } from "@careerfairy/shared-lib/dist/users"
+import {
+   userAlreadyAppliedForJob,
+   UserATSDocument,
+} from "@careerfairy/shared-lib/dist/users"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { getATSTokensForJobAssociations } from "./lib/groups"
-import { atsRequestValidationWithAccountToken } from "./lib/ats"
 
 /*
 |--------------------------------------------------------------------------
@@ -19,31 +25,43 @@ import { atsRequestValidationWithAccountToken } from "./lib/ats"
 /**
  * Fetch Jobs associated with a livestream
  * Since livestreams are public, anyone can run this function (no sign in)
+ *
+ * Possible to fetch the jobs by a livestreamId or jobs (LivestreamJobAssociation[]) array
  */
 export const fetchLivestreamJobs = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
-      await validateData(data, object({ livestreamId: string().required() }))
+   .https.onCall(async (data) => {
+      let jobAssociationList = []
 
-      const livestream: LivestreamEvent = await livestreamsRepo.getById(
-         data.livestreamId
-      )
+      if (data.livestreamId) {
+         const livestream: LivestreamEvent = await livestreamsRepo.getById(
+            data.livestreamId
+         )
 
-      if (!livestream) {
-         return logAndThrow("Livestream not found", data)
+         if (!livestream) {
+            return logAndThrow("Livestream not found", data)
+         }
+
+         if (livestream.jobs?.length === 0) {
+            // no associated jobs
+            return []
+         }
+
+         jobAssociationList = livestream.jobs
+      } else {
+         jobAssociationList = data.jobs
       }
 
-      if (livestream.jobs?.length === 0) {
-         // no associated jobs
-         return []
+      if (!data.livestreamId && !data.jobs) {
+         return logAndThrow("Invalid arguments", data)
       }
 
       // integrationId -> token
-      const tokens = await getATSTokensForJobAssociations(livestream.jobs)
+      const tokens = await getATSTokensForJobAssociations(jobAssociationList)
 
       const jobs: Job[] = []
 
-      for (const jobAssociation of livestream.jobs) {
+      for (const jobAssociation of jobAssociationList) {
          const atsRepository = atsRepo(
             process.env.MERGE_ACCESS_KEY,
             tokens[jobAssociation.integrationId]
@@ -64,36 +82,47 @@ export const fetchLivestreamJobs = functions
 
 /**
  * Apply a user to a job
+ * User needs to be signed in
+ *
+ * It will create the necessary entities on the Merge (Candidate, Application, etc)
  */
 export const atsUserApplyToJob = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(
       onCallWrapper(async (data, context) => {
-         const { tokens, idToken, integrationId, jobId } =
-            await atsRequestValidationWithAccountToken<{
-               jobId?: string
-            }>({
-               data,
-               context,
-               requiredData: {
-                  jobId: string().required(),
-               },
+         // user needs to be signed in
+         await validateUserAuthExists(context)
+
+         await validateData(
+            data,
+            object({
+               livestreamId: string().required(),
+               jobId: string().required(),
             })
+         )
+
+         const { livestreamId, jobId } = data
+         const userEmail = context.auth.token.email
+
+         const livestream = await livestreamsRepo.getById(livestreamId)
+         const jobAssociation = livestream.jobs.find((a) => a.jobId === jobId)
+         const integrationId = jobAssociation.integrationId
+         const tokens = await getATSTokensForJobAssociations([jobAssociation])
 
          const atsRepository = atsRepo(
             process.env.MERGE_ACCESS_KEY,
-            tokens.merge.account_token
+            tokens[jobAssociation.integrationId]
          )
 
          // Confirm if the user has already applied to this job
-
          const userATSData: UserATSDocument = await userRepo.getUserATSData(
-            idToken.email
+            userEmail
          )
+
          const atsRelations = userATSData?.atsRelations?.[integrationId]
 
-         if (atsRelations?.jobApplications?.[jobId]) {
-            return "User has already applied for that job"
+         if (userATSData && userAlreadyAppliedForJob(userATSData, jobId)) {
+            return { error: "User has already applied for that job" }
          }
 
          // Create the necessary ATS models to apply the user to the job
@@ -104,7 +133,7 @@ export const atsUserApplyToJob = functions
             return logAndThrow("That job does not exit", jobId)
          }
 
-         const userData = await userRepo.getUserDataById(idToken.email)
+         const userData = await userRepo.getUserDataById(userEmail)
 
          // Fetch or create a Candidate object
          let candidate: Candidate
@@ -117,19 +146,30 @@ export const atsUserApplyToJob = functions
             candidate = await atsRepository.createCandidate(userData)
 
             // associate the candidate with the user
-            await userRepo.associateATSData(idToken.email, integrationId, {
+            await userRepo.associateATSData(userEmail, integrationId, {
                candidateId: candidate.id,
             })
          }
 
          // Associate CV resume if existent (and not associated already)
          if (userData.userResume && !atsRelations?.cvAttachmentId) {
+            let resumeUrl = userData.userResume
+
+            // Merge doesn't accept localhost, replace with remote storage
+            // merge will try to fetch the file and store in their systems
+            // it might fail if the file not accessible
+            if (resumeUrl.indexOf("http://localhost:9199") !== -1) {
+               // use a remote test CV file
+               resumeUrl =
+                  "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/development%2Fsample.pdf?alt=media&token=37d5f709-29e4-44d9-8400-f35629de64b6"
+            }
+
             const attachmentId = await atsRepository.candidateAddCVAttachment(
                candidate.id,
-               userData.userResume
+               resumeUrl
             )
 
-            await userRepo.associateATSData(idToken.email, integrationId, {
+            await userRepo.associateATSData(userEmail, integrationId, {
                cvAttachmentId: attachmentId,
             })
          }
@@ -140,11 +180,19 @@ export const atsUserApplyToJob = functions
             jobId
          )
 
-         await userRepo.associateATSData(idToken.email, integrationId, {
+         await userRepo.associateATSData(userEmail, integrationId, {
             jobApplications: {
                [jobId]: applicationId,
             },
          })
+
+         // Create a job application document on user side
+         await userRepo.upsertJobApplication(
+            userEmail,
+            { jobId: job.id, integrationId, groupId: jobAssociation.groupId },
+            job,
+            livestream
+         )
 
          return applicationId
       })

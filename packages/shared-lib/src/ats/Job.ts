@@ -86,3 +86,15 @@ export class Job extends ATSModel {
       )
    }
 }
+
+/**
+ * Job Identifier type
+ *
+ * A job has the following association:
+ * Job -> Linked Account (integrationId) -> Group
+ */
+export interface JobIdentifier {
+   jobId: string
+   groupId: string
+   integrationId: string
+}

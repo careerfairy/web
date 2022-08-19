@@ -1,12 +1,15 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import {
+   RegistrationStep,
    SavedRecruiter,
    UserATSDocument,
    UserATSRelations,
    UserData,
-   RegistrationStep,
+   UserJobApplicationDocument,
 } from "./users"
 import firebase from "firebase/compat/app"
+import { Job, JobIdentifier } from "../ats/Job"
+import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -26,6 +29,21 @@ export interface IUserRepository {
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
 
    getUserATSData(id: string): Promise<UserATSDocument>
+
+   /**
+    * Save/update the job application
+    *
+    * @param userId
+    * @param jobIdentifier
+    * @param job
+    * @param livestream
+    */
+   upsertJobApplication(
+      userId: string,
+      jobIdentifier: JobIdentifier,
+      job: Job,
+      livestream: LivestreamEvent
+   ): Promise<void>
 
    associateATSData(
       id: string,
@@ -194,6 +212,33 @@ export class FirebaseUserRepository
       return userRef.set(toUpdate, { merge: true })
    }
 
+   upsertJobApplication(
+      userId: string,
+      jobIdentifier: JobIdentifier,
+      job: Job,
+      livestream: LivestreamEvent
+   ): Promise<void> {
+      const docId = documentIdJobApplication(jobIdentifier)
+
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("jobApplications")
+         .doc(docId)
+
+      const toInsert: UserJobApplicationDocument = {
+         groupId: jobIdentifier.groupId,
+         integrationId: jobIdentifier.integrationId,
+         jobId: jobIdentifier.jobId,
+         // @ts-ignore
+         date: this.fieldValue.serverTimestamp(),
+         job: job.serializeToPlainObject() as Job,
+         livestream: pickPublicDataFromLivestream(livestream),
+      }
+
+      return docRef.set(toInsert, { merge: true })
+   }
+
    updateAdditionalInformation(userEmail, fields): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
 
@@ -268,4 +313,8 @@ export class FirebaseUserRepository
       }
       return userRef.set(toUpdate, { merge: true })
    }
+}
+
+const documentIdJobApplication = (jobIdentifier: JobIdentifier) => {
+   return `${jobIdentifier.groupId}_${jobIdentifier.integrationId}_${jobIdentifier.jobId}`
 }
