@@ -1,4 +1,5 @@
 import SvgWrapper from "./SvgWrapper"
+import { IColors } from "../../types/commonTypes"
 
 export const StarIcon = (props: Props) => {
    const { filled = false } = props
@@ -31,16 +32,7 @@ export const StarIcon = (props: Props) => {
 }
 
 type Props = {
-   color?:
-      | "inherit"
-      | "action"
-      | "disabled"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning"
+   color?: IColors
    title?: string
    sx?: object
    viewBox?: string

@@ -90,8 +90,11 @@ export interface Carousel {
 }
 
 export interface Testimonial {
-   content: string
-   person: Person
+   id: string
+   content?: string
+   published?: Date
+   rating?: number
+   person?: Person
 }
 export interface HygraphResponseButton {
    children: string
@@ -136,6 +139,15 @@ export interface HygraphResponseTestimonialValue {
    content: string
    published: Date
    rating: number
+   person?: Person
+}
+
+export interface HygraphResponseTestimonialListValue {
+   __typename: string
+   id: string
+   slug: string
+   testimonials?: HygraphResponseTestimonialValue[]
+   sliderArrowColor?: string
 }
 
 export interface HygraphFieldOfStudySelectResponse {
@@ -312,6 +324,15 @@ export const companyValuesQueryProps = `
     }
 `
 // language=GraphQL
+export const personQueryProps = `
+   {
+      id
+      name
+      role
+      photo ${imageQueryProps}
+   }
+`
+// language=GraphQL
 export const testimonialQueryProps = `
     {
         __typename
@@ -320,5 +341,15 @@ export const testimonialQueryProps = `
         content
         published
         rating
+        person ${personQueryProps}
+    }
+`
+// language=GraphQL
+export const testimonialListQueryProps = `
+    {
+        __typename
+        id
+        testimonials ${testimonialQueryProps}
+        sliderArrowColor
     }
 `
