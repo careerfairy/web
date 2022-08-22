@@ -160,6 +160,13 @@ export interface HygraphFieldOfStudySelectResponse {
    }
 }
 
+export interface HygraphResponseCompanyLogosValue {
+   __typename: string
+   id: string
+   title: string
+   companies: Company[]
+}
+
 export type PageTypes =
    | "COMPANY_CASE_STUDY"
    | "MARKETING_LANDING_PAGE"
@@ -351,5 +358,22 @@ export const testimonialListQueryProps = `
         id
         testimonials ${testimonialQueryProps}
         sliderArrowColor
+    }
+`
+// language=GraphQL
+export const logoQueryProps = `
+    {
+        name
+        logo ${imageQueryProps}
+    }
+`
+// language=GraphQL
+export const companyLogosQueryProps = `
+    {
+        __typename
+        id
+        title
+        slug
+        companies ${logoQueryProps}
     }
 `
