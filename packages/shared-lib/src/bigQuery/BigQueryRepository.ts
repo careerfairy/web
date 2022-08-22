@@ -12,7 +12,7 @@ export interface IBigQueryRepository {
       universityName: string,
       fieldOfStudyIds: string[],
       levelOfStudyIds: string[]
-   ): Promise<BigQueryUserResponse>
+   ): Promise<BigQueryUserResponse[]>
 }
 
 /**
@@ -25,7 +25,7 @@ export class BigQueryRepository implements IBigQueryRepository {
    private readonly dataset = "careerfairy-e1fd9.firestore_export"
    private readonly userDataTable = `\`${this.dataset}.userData_raw_latest\``
 
-   constructor(private readonly client: typeof BigQuery) {}
+   constructor(private readonly client: BigQuery) {}
 
    /**
     * Get users
@@ -39,7 +39,7 @@ export class BigQueryRepository implements IBigQueryRepository {
       universityName: string = "",
       fieldOfStudyIds: string[] = [],
       levelOfStudyIds: string[] = []
-   ): Promise<BigQueryUserResponse> {
+   ): Promise<BigQueryUserResponse[]> {
       const universityCountryCodesString = universityCountryCodes
          ?.map((a) => `"${a}"`)
          .join(",")
@@ -103,6 +103,6 @@ export class BigQueryRepository implements IBigQueryRepository {
       }
 
       const [rows] = await this.client.query(options)
-      return rows
+      return rows as BigQueryUserResponse[]
    }
 }
