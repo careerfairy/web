@@ -1,4 +1,5 @@
 import { SvgIcon } from "@mui/material"
+import { IColors } from "../../types/commonTypes"
 
 const SvgWrapper = ({
    viewBox = "0 0 35 34",
@@ -24,16 +25,7 @@ type Props = {
    description?: string
    children?: JSX.Element
    sx?: object
-   color?:
-      | "inherit"
-      | "action"
-      | "disabled"
-      | "primary"
-      | "secondary"
-      | "error"
-      | "info"
-      | "success"
-      | "warning"
+   color?: IColors
    title?: string
 }
 

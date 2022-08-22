@@ -69,6 +69,8 @@ Section.propTypes = {
    backgroundImage: PropTypes.string,
    backgroundImageOpacity: PropTypes.number,
    backgroundImageRepeat: PropTypes.bool,
+   backgroundImageClassName: PropTypes.string,
+   backgroundColor: PropTypes.string,
    children: PropTypes.any,
    color: PropTypes.string,
    big: PropTypes.bool,
