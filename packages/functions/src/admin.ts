@@ -2,11 +2,15 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { bigQueryRepo } from "./api/repositories"
 import { bigQueryRequestValidation } from "./lib/validations"
 
-const functions = require("firebase-functions")
-const { client } = require("./api/postmark")
-const { createNestedArrayOfTemplates } = require("./util")
-const { emailsToRemove } = require("./misc/emailsToRemove")
+import functions = require("firebase-functions")
 
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { client } = require("./api/postmark")
+
+import { createNestedArrayOfTemplates } from "./util"
+import { emailsToRemove } from "./misc/emailsToRemove"
+
+/* eslint-disable camelcase */
 export const sendBasicTemplateEmail_v2 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
@@ -74,7 +78,7 @@ export const sendBasicTemplateEmail_v2 = functions
          emailsArray.length
       )
 
-      //TODO remove before deploying to prod
+      // TODO remove before deploying to prod
       // functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
 
       // Will use the server side of the templateId for more
@@ -115,7 +119,7 @@ export const sendBasicTemplateEmail_v2 = functions
             await client
                .sendEmailBatchWithTemplates(arrayOfTemplateEmails)
                .then(
-                  (response) => {
+                  () => {
                      functions.logger.log(
                         `Successfully sent email to ${arrayOfTemplateEmails.length}`
                      )
