@@ -94,6 +94,7 @@ SectionHeader.propTypes = {
    sx: PropTypes.object,
    hasSearch: PropTypes.bool,
    subTitleSx: PropTypes.object,
+   titleSx: PropTypes.object,
 }
 
 export default SectionHeader
