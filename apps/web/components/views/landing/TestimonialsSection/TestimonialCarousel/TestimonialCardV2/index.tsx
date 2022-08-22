@@ -38,7 +38,7 @@ const TestimonialCardV2 = ({ person, content, rating, published }: Props) => {
                </Typography>
             </Box>
             <Box mt={1}>
-               <Typography variant="h6">{`"${content || ""}"`}</Typography>
+               <Typography variant="h6">{content && `"${content}"`}</Typography>
             </Box>
          </Box>
       </Card>
