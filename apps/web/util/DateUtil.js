@@ -38,6 +38,9 @@ export default class DateUtil {
    static getStreamDate(JSDate) {
       return dayjs(JSDate).format("dddd, MMMM D")
    }
+   static getRatingDate(JSDate) {
+      return dayjs(JSDate).format("D MMMM YYYY")
+   }
 
    static getRelativeDate(JSDate) {
       const now = new Date()

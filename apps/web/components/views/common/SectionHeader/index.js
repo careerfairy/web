@@ -92,6 +92,8 @@ SectionHeader.propTypes = {
    titleClassName: PropTypes.string,
    color: PropTypes.string,
    sx: PropTypes.object,
+   hasSearch: PropTypes.bool,
+   subTitleSx: PropTypes.object,
 }
 
 export default SectionHeader
