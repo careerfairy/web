@@ -1,6 +1,6 @@
 import { BigQueryUserResponse } from "./types"
 
-const { BigQuery } = require("@google-cloud/bigquery")
+import { BigQuery } from "@google-cloud/bigquery"
 
 export interface IBigQueryRepository {
    getUsers(
@@ -25,9 +25,7 @@ export class BigQueryRepository implements IBigQueryRepository {
    private readonly dataset = "careerfairy-e1fd9.firestore_export"
    private readonly userDataTable = `\`${this.dataset}.userData_raw_latest\``
 
-   constructor(
-      private readonly client: typeof BigQuery // @ts-ignore
-   ) {}
+   constructor(private readonly client: typeof BigQuery) {}
 
    /**
     * Get users
