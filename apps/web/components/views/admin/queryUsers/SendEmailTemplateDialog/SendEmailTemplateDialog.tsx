@@ -25,6 +25,9 @@ import EmailTemplateForm from "./EmailTemplateForm"
 import useTemplates from "./templates"
 import EventOptionPreview from "../../../common/EventAutoSelect/EventOptionPreview"
 import EventAutoSelect from "../../../common/EventAutoSelect"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import RootState from "../../../../../store/reducers"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 
 function getSteps() {
    return [
@@ -39,9 +42,10 @@ const EventSelectView = ({
    handleNext,
    targetStream,
    setTargetStream,
-}) => {
+}: TemplateDialogStepProps) => {
    const upcomingStreams = useSelector(
-      (state) => state.firestore.ordered[UPCOMING_LIVESTREAMS_NAME] || []
+      (state: RootState) =>
+         state.firestore.ordered[UPCOMING_LIVESTREAMS_NAME] || []
    )
    const [inputValue, setInputValue] = useState("")
 
@@ -50,7 +54,11 @@ const EventSelectView = ({
          <Box p={2}>
             <Collapse in={Boolean(targetStream)} unmountOnExit>
                <Box mb={2}>
-                  <EventOptionPreview preview streamData={targetStream} />
+                  <EventOptionPreview
+                     preview
+                     streamData={targetStream}
+                     selected={undefined}
+                  />
                </Box>
             </Collapse>
             <EventAutoSelect
@@ -87,7 +95,7 @@ const TemplateSelectView = ({
    setTargetTemplate,
    targetTemplate,
    handleNext,
-}) => {
+}: TemplateDialogStepProps) => {
    const templates = useTemplates()
    return (
       <>
@@ -125,11 +133,22 @@ const TemplateSelectView = ({
    )
 }
 
-const TemplateFinalizeView = (props) => {
+const TemplateFinalizeView = (props: TemplateDialogStepProps) => {
    return <EmailTemplateForm {...props} />
 }
 
-function getStepContent(stepIndex, props) {
+export type TemplateDialogStepProps = {
+   handleClose: () => void
+   handleBack: () => void
+   handleNext: () => void
+   targetStream: LivestreamEvent
+   setTargetStream: (stream: LivestreamEvent) => void
+   setTargetTemplate: (template: any) => void
+   targetTemplate: any
+   totalUsers: number
+   queryOptions: BigQueryUserQueryOptions
+}
+function getStepContent(stepIndex, props: TemplateDialogStepProps) {
    switch (stepIndex) {
       case 0:
          return <EventSelectView {...props} />
@@ -143,7 +162,12 @@ function getStepContent(stepIndex, props) {
 }
 const targetTime = new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
 
-const Content = ({ handleClose, emails }) => {
+interface ContentProps {
+   queryOptions: BigQueryUserQueryOptions
+   totalUsers: number
+   handleClose: () => void
+}
+const Content = ({ handleClose, totalUsers, queryOptions }: ContentProps) => {
    const firestore = useFirestore()
    const [activeStep, setActiveStep] = useState(0)
    const [targetStream, setTargetStream] = useState(null)
@@ -197,12 +221,24 @@ const Content = ({ handleClose, emails }) => {
             setTargetStream,
             setTargetTemplate,
             targetTemplate,
-            emails,
+            totalUsers,
+            queryOptions,
          })}
       </DialogContent>
    )
 }
-const SendEmailTemplateDialog = ({ open, onClose, emails }) => {
+interface Props {
+   queryOptions: BigQueryUserQueryOptions
+   totalUsers: number
+   open: boolean
+   onClose: () => void
+}
+const SendEmailTemplateDialog = ({
+   open,
+   onClose,
+   totalUsers,
+   queryOptions,
+}: Props) => {
    const handleClose = () => {
       onClose()
    }
@@ -217,7 +253,11 @@ const SendEmailTemplateDialog = ({ open, onClose, emails }) => {
          TransitionComponent={Grow}
          open={open}
       >
-         <Content emails={emails} handleClose={handleClose} />
+         <Content
+            queryOptions={queryOptions}
+            totalUsers={totalUsers}
+            handleClose={handleClose}
+         />
       </GlassDialog>
    )
 }

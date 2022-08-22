@@ -1,0 +1,7 @@
+const { BigQuery } = require("@google-cloud/bigquery")
+
+export const bigQueryClient = new BigQuery({
+   projectId: "careerfairy-e1fd9",
+   keyFile: require("../keys/big_query_service_account.json"),
+   location: "EU",
+})

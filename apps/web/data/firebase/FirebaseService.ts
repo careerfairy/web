@@ -29,8 +29,7 @@ import {
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
 import DocumentReference = firebase.firestore.DocumentReference
-import { IFormValues } from "../../components/views/admin/queryUsers/QueryForm"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -60,44 +59,6 @@ class FirebaseService {
     * @reject {Error}
     * @returns fPromise
     */
-
-   /**
-    * Call an on call cloud function to generate a secure agora token.
-    * @param {{isStreamer: any; uid: any; streamDocumentPath: string; sentToken: string; channelName: string}} data
-    * @return {Promise<firebase.functions.HttpsCallableResult>}
-    */
-
-   queryUsers = async ({
-      targetFieldsOfStudy,
-      targetLevelsOfStudy,
-      universityCountryIds,
-   }: IFormValues) => {
-      let query = this.firestore.collection("userData")
-      if (targetFieldsOfStudy.length > 0) {
-         query = query.where(
-            "fieldOfStudy.id",
-            "in",
-            targetFieldsOfStudy.map((field) => field.id)
-         )
-      }
-      if (targetLevelsOfStudy.length > 0) {
-         query = query.where(
-            "levelOfStudy.id",
-            "in",
-            targetLevelsOfStudy.map((level) => level.id)
-         )
-      }
-      if (universityCountryIds.length > 0) {
-         query = query.where(
-            "university.code",
-            "in",
-            universityCountryIds.map((country) => country.id)
-         )
-      }
-      console.log("-> query", query)
-      const snaps = await query.limit(50).get()
-      return mapFirestoreDocuments<UserData>(snaps)
-   }
 
    fetchAgoraRtcToken = async (data) => {
       const fetchAgoraRtcToken =
@@ -178,12 +139,12 @@ class FirebaseService {
 
    sendBasicTemplateEmail = async ({
       values,
-      emails,
+      testEmails,
       senderEmail,
       templateId,
+      queryOptions,
+      isForRealEmails = false,
    }) => {
-      // const testingEmails = ["kadirit@hotmail.com"];
-
       const dataObj = {
          title: values.title,
          summary: values.summary,
@@ -192,13 +153,15 @@ class FirebaseService {
          eventUrl: values.eventUrl,
          subject: values.subject,
          start: values.start,
-         emails,
+         testEmails,
          senderEmail,
          templateId,
+         queryOptions: queryOptions as BigQueryUserQueryOptions,
+         isForRealEmails,
       }
 
       const sendBasicTemplateEmail = this.functions.httpsCallable(
-         "sendBasicTemplateEmail"
+         "sendBasicTemplateEmail_v2"
       )
 
       return sendBasicTemplateEmail(dataObj)

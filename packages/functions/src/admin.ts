@@ -1,9 +1,13 @@
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { bigQueryRepo } from "./api/repositories"
+import { bigQueryRequestValidation } from "./lib/validations"
+
 const functions = require("firebase-functions")
 const { client } = require("./api/postmark")
 const { createNestedArrayOfTemplates } = require("./util")
 const { emailsToRemove } = require("./misc/emailsToRemove")
 
-exports.sendBasicTemplateEmail = functions
+export const sendBasicTemplateEmail_v2 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
@@ -17,16 +21,49 @@ exports.sendBasicTemplateEmail = functions
          eventUrl,
          subject,
          start,
-         emails,
+         testEmails,
          senderEmail,
+         queryOptions,
+         isForRealEmails,
          // Stick to server side/cloud function templateId for now
          templateId,
+      }: {
+         title: string
+         summary: string
+         companyLogoUrl: string
+         illustrationImageUrl: string
+         eventUrl: string
+         subject: string
+         start: string
+         testEmails: string[]
+         senderEmail: string
+         queryOptions: BigQueryUserQueryOptions
+         templateId: string
+         isForRealEmails: boolean
       } = data
 
-      let emailsArray =
-         emails.filter((email) => !emailsToRemove.includes(email)) || []
+      let emailsArray = []
       if (senderEmail) {
          emailsArray.push(senderEmail)
+      }
+      if (isForRealEmails === true) {
+         await bigQueryRequestValidation(context)
+         const users = await bigQueryRepo.getUsers(
+            queryOptions.page,
+            false,
+            queryOptions.orderBy,
+            queryOptions.sortOrder,
+            queryOptions.universityCountryCodes,
+            queryOptions.universityName,
+            queryOptions.fieldOfStudyIds,
+            queryOptions.levelOfStudyIds
+         )
+         const userEmails = users.map((user) => user.userEmail)
+         emailsArray = emailsArray.concat(userEmails)
+      } else {
+         const testEmailsArray =
+            testEmails?.filter((email) => !emailsToRemove.includes(email)) || []
+         emailsArray = emailsArray.concat(testEmailsArray)
       }
 
       // Remove the sender email if the sender is already in the emails list

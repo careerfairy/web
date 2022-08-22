@@ -31,7 +31,11 @@ const ExportTable = (props) => {
 
    return (
       <>
-         <MaterialTable options={tableOptions} {...props} />
+         <MaterialTable
+            isLoading={props.isLoading}
+            options={tableOptions}
+            {...props}
+         />
          <CSVDialogDownload
             title="Export Table Entries"
             data={csvDownloadData?.data}
