@@ -65,7 +65,6 @@ interface StreamReducer {
 export interface GeneralLayoutState {
    layout: {
       drawerOpen: boolean
-      isOnLandingPage: boolean
    }
 }
 

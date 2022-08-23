@@ -15,7 +15,7 @@ import LazyLoad from "react-lazyload"
 import useInfiniteScrollClientWithHandlers from "components/custom-hook/useInfiniteScrollClientWithHandlers"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const arrowFontSize = 30
 
@@ -84,7 +84,9 @@ const EventsPreviewGrid = ({
    const [slicedEvents] = useInfiniteScrollClientWithHandlers(events, 6, 3)
    const [shareEventDialog, setShareEventDialog] = useState(null)
    const { pathname } = useRouter()
-   const isOnLandingPage = pathname.includes(LANDING_PAGE_PATH)
+   const isOnMarketingLandingPage = pathname.includes(
+      MARKETING_LANDING_PAGE_PATH
+   )
 
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null)
@@ -95,7 +97,7 @@ const EventsPreviewGrid = ({
          <Box sx={{ px: 2 }} id={id}>
             <Box sx={styles.eventsHeader}>
                <Heading>{title}</Heading>
-               {isOnLandingPage ? null : (
+               {isOnMarketingLandingPage ? null : (
                   <Link href={seeMoreLink}>
                      <a>
                         <Typography sx={styles.seeMoreText} color="grey">
@@ -119,7 +121,7 @@ const EventsPreviewGrid = ({
                            ? "You’re not registered for any event yet."
                            : "There currently aren't any scheduled events"}
                      </Typography>
-                     {isOnLandingPage ? null : (
+                     {isOnMarketingLandingPage ? null : (
                         <Link
                            href={
                               type === EventsTypes.myNext

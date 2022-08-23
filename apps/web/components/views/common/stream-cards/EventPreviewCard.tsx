@@ -27,7 +27,7 @@ import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
-import { LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const styles = {
    hideOnHoverContent: {
@@ -209,7 +209,9 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
    const [isPast, setIsPast] = useState(checkIfPast(event))
-   const isOnLandingPage = pathname.includes(LANDING_PAGE_PATH)
+   const isOnMarketingLandingPage = pathname.includes(
+      MARKETING_LANDING_PAGE_PATH
+   )
 
    const {
       query: { groupId },
@@ -297,7 +299,7 @@ const EventPreviewCard = ({
    }
 
    const getHref = useCallback(() => {
-      if (isOnLandingPage && !authenticatedUser.email) {
+      if (isOnMarketingLandingPage && !authenticatedUser.email) {
          return `#${marketingSignUpFormId}`
       }
       return {
@@ -308,7 +310,7 @@ const EventPreviewCard = ({
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
          },
       }
-   }, [authenticatedUser, event, groupId, isOnLandingPage, isPast])
+   }, [authenticatedUser, event, groupId, isOnMarketingLandingPage, isPast])
 
    return (
       <>
@@ -491,24 +493,30 @@ const EventPreviewCard = ({
                               {event?.summary}
                            </Typography>
                            <Stack spacing={1} direction="row">
-                              {onRegisterClick && !isPast && !isOnLandingPage && (
-                                 <Button
-                                    sx={styles.btn}
-                                    onClick={onClickRegister}
-                                    variant={
-                                       hasRegistered ? "outlined" : "contained"
-                                    }
-                                    color={hasRegistered ? "info" : "primary"}
-                                    disabled={registering}
-                                    size={"medium"}
-                                 >
-                                    {hasRegistered
-                                       ? "cancel"
-                                       : mobile
-                                       ? "attend"
-                                       : "I'll attend"}
-                                 </Button>
-                              )}
+                              {onRegisterClick &&
+                                 !isPast &&
+                                 !isOnMarketingLandingPage && (
+                                    <Button
+                                       sx={styles.btn}
+                                       onClick={onClickRegister}
+                                       variant={
+                                          hasRegistered
+                                             ? "outlined"
+                                             : "contained"
+                                       }
+                                       color={
+                                          hasRegistered ? "info" : "primary"
+                                       }
+                                       disabled={registering}
+                                       size={"medium"}
+                                    >
+                                       {hasRegistered
+                                          ? "cancel"
+                                          : mobile
+                                          ? "attend"
+                                          : "I'll attend"}
+                                    </Button>
+                                 )}
 
                               <Button
                                  sx={styles.btn}
