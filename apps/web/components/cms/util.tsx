@@ -1,5 +1,4 @@
 import { CompanyCaseStudy, CompanyCaseStudyPreview } from "../../types/cmsTypes"
-import React from "react"
 
 export const parseCaseStudy = ({
    published,
