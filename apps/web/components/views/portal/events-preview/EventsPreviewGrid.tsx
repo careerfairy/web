@@ -15,8 +15,7 @@ import LazyLoad from "react-lazyload"
 import useInfiniteScrollClientWithHandlers from "components/custom-hook/useInfiniteScrollClientWithHandlers"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { useSelector } from "react-redux"
-import { isOnLandingPageSelector } from "../../../../store/selectors/generalLayoutSelectors"
+import { LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const arrowFontSize = 30
 
@@ -84,7 +83,8 @@ const EventsPreviewGrid = ({
    const { data: existingInterests } = useInterests()
    const [slicedEvents] = useInfiniteScrollClientWithHandlers(events, 6, 3)
    const [shareEventDialog, setShareEventDialog] = useState(null)
-   const isOnLandingPage = useSelector(isOnLandingPageSelector)
+   const { pathname } = useRouter()
+   const isOnLandingPage = pathname.includes(LANDING_PAGE_PATH)
 
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null)

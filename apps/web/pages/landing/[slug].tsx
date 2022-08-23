@@ -1,8 +1,5 @@
-import React, { useEffect } from "react"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
-import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
 import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import useServerModel from "../../components/custom-hook/useServerModel"
@@ -20,14 +17,6 @@ const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
       marketingLandingPagePlainObject,
       MarketingLandingPage.createFromPlainObject
    )
-   const dispatch = useDispatch()
-   useEffect(() => {
-      dispatch(actions.inLandingPage())
-
-      return () => {
-         dispatch(actions.outOfLandingPage())
-      }
-   }, [])
 
    return (
       <CmsPageLayout page={marketingLandingPage}>
