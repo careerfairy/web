@@ -1,7 +1,6 @@
-import { Typography } from "@mui/material"
+import { Rating, Typography } from "@mui/material"
 import Box from "@mui/material/Box"
-import React, { useCallback } from "react"
-import { getStars } from "../util"
+import { sxStyles } from "../../../types/commonTypes"
 
 type Props = {
    title: string
@@ -9,14 +8,13 @@ type Props = {
    rating: number
 }
 
-const Testimonial = ({ title, content, rating }: Props): JSX.Element => {
-   /**
-    * To handle the rendering of the rating stars and determine whether they are filled
-    */
-   const renderRating = useCallback((rating) => {
-      return getStars(rating)
-   }, [])
+const styles = sxStyles({
+   stars: {
+      color: (theme) => theme.palette.primary.main,
+   },
+})
 
+const Testimonial = ({ title, content, rating }: Props): JSX.Element => {
    return (
       <Box paddingY={6} marginX={{ xs: 4, md: 10, lg: 36, xl: 62 }}>
          <Typography variant="h1">{title}</Typography>
@@ -25,7 +23,21 @@ const Testimonial = ({ title, content, rating }: Props): JSX.Element => {
                {content}
             </Typography>
          )}
-         {rating && renderRating(rating)}
+         {rating && (
+            <Box display={"flex"}>
+               <Rating
+                  readOnly
+                  name={"testimonial-rating"}
+                  value={Number(rating)}
+                  precision={0.5}
+                  size="large"
+                  sx={styles.stars}
+               />
+               <Typography variant="h5" ml={1} alignSelf="flex-end">
+                  {rating}
+               </Typography>
+            </Box>
+         )}
       </Box>
    )
 }

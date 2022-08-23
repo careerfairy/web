@@ -1,8 +1,7 @@
-import React, { memo, useCallback } from "react"
-import { Avatar, Box, Card, Typography } from "@mui/material"
+import React, { memo } from "react"
+import { Avatar, Box, Card, Rating, Typography } from "@mui/material"
 import { Person } from "../../../../../../types/cmsTypes"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { getStars } from "../../../../../cms/util"
 import DateUtil from "../../../../../../util/DateUtil"
 
 const styles = sxStyles({
@@ -14,13 +13,12 @@ const styles = sxStyles({
       padding: { xs: 2, md: 5 },
       boxShadow: "none",
    },
+   stars: {
+      color: (theme) => theme.palette.primary.main,
+   },
 })
 
 const TestimonialCardV2 = ({ person, content, rating, published }: Props) => {
-   const renderRating = useCallback((rating) => {
-      return getStars(rating, true)
-   }, [])
-
    return (
       <Card sx={styles.card}>
          <Box>
@@ -31,9 +29,18 @@ const TestimonialCardV2 = ({ person, content, rating, published }: Props) => {
                   sx={{ mb: 2 }}
                />
 
-               {renderRating(rating)}
+               {rating && (
+                  <Rating
+                     readOnly
+                     name={"testimonial-rating"}
+                     value={Number(rating)}
+                     precision={0.5}
+                     size="medium"
+                     sx={styles.stars}
+                  />
+               )}
 
-               <Typography variant="body2" sx={{ mt: 2 }}>
+               <Typography variant="body2">
                   {person?.name}, {DateUtil.getRatingDate(published)}
                </Typography>
             </Box>
