@@ -27,8 +27,7 @@ import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
-import { useSelector } from "react-redux"
-import { isOnLandingPageSelector } from "../../../../store/selectors/generalLayoutSelectors"
+import { LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const styles = {
    hideOnHoverContent: {
@@ -210,7 +209,7 @@ const EventPreviewCard = ({
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
    const [isPast, setIsPast] = useState(checkIfPast(event))
-   const isOnLandingPage = useSelector(isOnLandingPageSelector)
+   const isOnLandingPage = pathname.includes(LANDING_PAGE_PATH)
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
    const {
