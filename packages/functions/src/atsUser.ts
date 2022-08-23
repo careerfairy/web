@@ -66,10 +66,9 @@ export const fetchLivestreamJobs = functions
             process.env.MERGE_ACCESS_KEY,
             tokens[jobAssociation.integrationId]
          )
-
          try {
-            const fetched = await atsRepository.getJobs()
-            jobs.push(...fetched)
+            const fetched = await atsRepository.getJob(jobAssociation.jobId)
+            jobs.push(fetched)
          } catch (e) {
             // log the error but let the function proceed
             // we want to be optimistic and try to fetch the next jobs
