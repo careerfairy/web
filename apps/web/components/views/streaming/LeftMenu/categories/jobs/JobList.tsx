@@ -6,9 +6,8 @@ import {
    ListItemIcon,
    ListItemText,
 } from "@mui/material"
-import WorkHistoryIcon from "@mui/icons-material/WorkHistory"
-import GenericDialog from "../../../../common/GenericDialog"
-import { useCallback, useMemo, useState } from "react"
+import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
+import React, { useCallback, useMemo, useState } from "react"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import Box from "@mui/material/Box"
 import JobEntryApply from "./JobEntryApply"
@@ -16,6 +15,24 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import Link from "../../../../common/Link"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import Typography from "@mui/material/Typography"
+import GenericDialog from "../../../../common/GenericDialog"
+
+const styles = sxStyles({
+   list: {
+      width: "100%",
+   },
+   itemWrapper: {
+      boxShadow: (theme) => theme.shadows[1],
+   },
+   icon: {
+      minWidth: "unset",
+      marginRight: 2,
+      alignSelf: "start",
+      marginY: "4px",
+   },
+})
 
 const JobList = ({ livestream }) => {
    const { jobs } = useLivestreamJobs(undefined, livestream.jobs)
@@ -31,18 +48,27 @@ const JobList = ({ livestream }) => {
 
    return (
       <>
-         <List>
+         <List sx={styles.list}>
             {jobs.map((job) => (
                <ListItem
                   disablePadding
                   key={job.id}
                   onClick={() => setSelectedJob(job)}
+                  sx={styles.itemWrapper}
                >
                   <ListItemButton>
-                     <ListItemIcon>
-                        <WorkHistoryIcon />
+                     <ListItemIcon sx={styles.icon}>
+                        <WorkOutlineOutlinedIcon color="secondary" />
                      </ListItemIcon>
-                     <ListItemText primary={job.getExtendedName()} />
+                     <ListItemText>
+                        <Typography variant="body1" fontWeight="bold">
+                           {job.name}
+                        </Typography>
+
+                        <Typography variant="body2" mt={1} fontStyle="italic">
+                           {job.getExtendedName()}
+                        </Typography>
+                     </ListItemText>
                   </ListItemButton>
                </ListItem>
             ))}

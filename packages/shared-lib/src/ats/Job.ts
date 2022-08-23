@@ -28,12 +28,12 @@ export class Job extends ATSModel {
    }
 
    /**
-    * Get the job name plus additional information if existent
+    * Get the job additional information if existent
     * Useful to display in Dropdown Selectors so the user can
     * distinguish jobs
     */
    getExtendedName() {
-      let title = `${this.name}, ${this.status}`
+      let title = `${this.status}`
 
       if (this.departments.length > 0) {
          title += `, ${this.departments[0].name}`

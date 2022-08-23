@@ -26,7 +26,6 @@ const JobsCategory = ({ selectedState, livestream, showMenu }: Props) => {
             <QuestionContainerTitle>
                <WorkIcon fontSize="large" color="primary" /> Jobs
             </QuestionContainerTitle>
-            <div>Available Jobs</div>
          </QuestionContainerHeader>
 
          <SuspenseWithBoundary>
