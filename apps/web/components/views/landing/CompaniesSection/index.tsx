@@ -9,16 +9,16 @@ import SectionHeader from "../../common/SectionHeader"
 import { IColors } from "../../../../types/commonTypes"
 import { Company } from "../../../../types/cmsTypes"
 import { useCallback } from "react"
-import { useSelector } from "react-redux"
-import { isOnLandingPageSelector } from "../../../../store/selectors/generalLayoutSelectors"
 import { useTheme } from "@mui/material/styles"
+import { LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { useRouter } from "next/router"
 
 const styles = {
-   section: (theme, isLandingPage) => {
+   section: (theme, isOnLandingPage) => {
       return {
          paddingBottom: 20,
          [theme.breakpoints.down("md")]: {
-            paddingTop: isLandingPage ? "" : 40,
+            paddingTop: isOnLandingPage ? "" : 40,
          },
       }
    },
@@ -37,7 +37,8 @@ const CompaniesSection = ({
    companies,
 }: Props) => {
    const theme = useTheme()
-   const isLandingPage = useSelector(isOnLandingPageSelector)
+   const { pathname } = useRouter()
+   const isOnLandingPage = pathname.includes(LANDING_PAGE_PATH)
 
    /**
     * To render the companies logos based on the CMS or the hard codes companies
@@ -51,7 +52,7 @@ const CompaniesSection = ({
 
    return (
       <Section
-         sx={styles.section(theme, isLandingPage)}
+         sx={styles.section(theme, isOnLandingPage)}
          big={big}
          color={color}
          backgroundImageClassName={backgroundImageClassName}
@@ -59,7 +60,7 @@ const CompaniesSection = ({
          backgroundImageOpacity={backgroundImageOpacity}
          backgroundColor={backgroundColor}
       >
-         <SectionContainer maxWidth={isLandingPage ? "xl" : "md"}>
+         <SectionContainer maxWidth={isOnLandingPage ? "xl" : "md"}>
             {title && (
                <SectionHeader color={color} title={title} subtitle={subtitle} />
             )}
