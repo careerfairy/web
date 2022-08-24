@@ -40,7 +40,7 @@ export const mapUserCategories = (user, group) => {
 
 export const mapUserEngagement = (user, streams, group) => {
    let categoryUser = {
-      ...user,
+      ...mapUserCategories(user, group),
       levelOfStudy: {
          ...user.levelOfStudy,
          name: user.levelOfStudy?.name || null,
