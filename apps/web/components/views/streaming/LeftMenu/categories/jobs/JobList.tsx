@@ -15,9 +15,12 @@ import JobDialog from "./JobDialog"
 const styles = sxStyles({
    list: {
       width: "100%",
+      paddingX: 1,
    },
    itemWrapper: {
-      boxShadow: (theme) => theme.shadows[1],
+      boxShadow: (theme) => theme.shadows[3],
+      background: (theme) => theme.palette.background.default,
+      borderRadius: 2,
    },
    icon: {
       minWidth: "unset",
