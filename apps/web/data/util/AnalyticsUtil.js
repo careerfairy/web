@@ -39,8 +39,19 @@ export const mapUserCategories = (user, group) => {
 }
 
 export const mapUserEngagement = (user, streams, group) => {
-   let categoryUser = user
-   categoryUser = mapUserCategories(user, group)
+   let categoryUser = {
+      ...mapUserCategories(user, group),
+      levelOfStudy: {
+         ...user.levelOfStudy,
+         name: user.levelOfStudy?.name || null,
+         id: user.levelOfStudy?.id || null,
+      },
+      fieldOfStudy: {
+         ...user.fieldOfStudy,
+         name: user.fieldOfStudy?.name || null,
+         id: user.fieldOfStudy?.id || null,
+      },
+   }
    categoryUser.watchedEvent = false
    const registeredStreams = []
    const watchedStreams = []
