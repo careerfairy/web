@@ -67,6 +67,10 @@ export class ATSService {
          jobId,
       })
    }
+
+   async updateUserJobApplications(): Promise<void> {
+      await this.firebaseFunctions.httpsCallable("updateUserJobApplications")()
+   }
 }
 
 export const atsServiceInstance = new ATSService(firebaseInstance.functions())
