@@ -129,6 +129,7 @@ export interface UserJobApplicationDocument extends Identifiable {
    livestream: LivestreamEventPublicData
    rejectedAt?: firebase.firestore.Timestamp
    currentStage?: string
+   rejectReason?: string
 }
 
 /**

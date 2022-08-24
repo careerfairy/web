@@ -33,7 +33,6 @@ type Props = {
 
 const AccountJobs = ({ atsAccount }: Props) => {
    const { jobs } = useGroupATSJobs(atsAccount.groupId, atsAccount.id)
-   console.log("-> jobs", jobs)
 
    const jobsToRows = useMemo(() => {
       return mapJobsToTableRows(jobs)
