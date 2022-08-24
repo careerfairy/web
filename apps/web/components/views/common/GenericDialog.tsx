@@ -26,11 +26,13 @@ type Props = {
    title: string
    children: JSX.Element
    showCloseBtn?: boolean
+   titleOnCenter?: boolean
 }
 
 const GenericDialog = ({
    onClose,
    title,
+   titleOnCenter = false,
    children,
    showCloseBtn = true,
 }: Props) => {
@@ -42,7 +44,7 @@ const GenericDialog = ({
          open={true}
          onClose={onClose}
       >
-         <DialogTitle>
+         <DialogTitle sx={titleOnCenter && { alignSelf: "center" }}>
             <Typography sx={styles.title}>{title}</Typography>
          </DialogTitle>
          <DialogContent dividers>{children}</DialogContent>
