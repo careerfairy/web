@@ -8,7 +8,7 @@ import {
    UserJobApplicationDocument,
 } from "./users"
 import firebase from "firebase/compat/app"
-import { Job, JobIdentifier } from "../ats/Job"
+import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
 import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { Application } from "../ats/Application"
 
@@ -238,7 +238,6 @@ export class FirebaseUserRepository
       }[]
    ): Promise<void> {
       const batch = this.firestore.batch()
-      console.log("-> batchOperations", batchOperations)
       batchOperations.forEach((operation) => {
          const ref = this.firestore
             .collection("userData")
@@ -247,6 +246,7 @@ export class FirebaseUserRepository
             .doc(operation.jobApplicationDocId)
 
          const toUpdate: Partial<UserJobApplicationDocument> = {
+            rejectReason: operation.application.rejectReason || null,
             currentStage: operation.application.currentStage || null,
             // @ts-ignore
             updatedAt: this.fieldValue.serverTimestamp(),
@@ -255,7 +255,6 @@ export class FirebaseUserRepository
                : null,
             job: operation.application.job.serializeToPlainObject() as Job,
          }
-         console.log("-> toUpdate", toUpdate)
          batch.update(ref, toUpdate)
       })
       return batch.commit()
@@ -296,6 +295,8 @@ export class FirebaseUserRepository
          .collection("userData")
          .doc(userId)
          .collection("jobApplications")
+         .where("job.status", "in", PUBLIC_JOB_STATUSES)
+         .orderBy("date", "desc")
 
       const data = await collectionRef.get()
 

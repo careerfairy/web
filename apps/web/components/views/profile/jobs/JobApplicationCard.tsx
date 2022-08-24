@@ -3,19 +3,15 @@ import Card from "@mui/material/Card"
 import {
    CardContent,
    CardHeader,
-   ListItemIcon,
-   ListItemText,
-   Menu,
-   MenuItem,
+   Divider,
+   Tooltip,
    Typography,
 } from "@mui/material"
-import IconButton from "@mui/material/IconButton"
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz"
-import React, { useCallback, useMemo, useState } from "react"
-import DeleteOutlineOutlinedIcon from "@mui/icons-material/DeleteOutlineOutlined"
-import { useAuth } from "../../../../HOCs/AuthProvider"
+import React, { useMemo } from "react"
+import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied"
 import { sxStyles } from "../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import TaskAltRoundedIcon from "@mui/icons-material/TaskAltRounded"
 import DateUtil from "../../../../util/DateUtil"
 import Skeleton from "@mui/material/Skeleton"
@@ -36,6 +32,17 @@ const styles = sxStyles({
    icon: {
       mr: 1,
    },
+   content: {
+      px: 4,
+      pt: 0,
+   },
+   root: {},
+   header: {
+      px: 4,
+      pt: 3,
+      pb: 2,
+      alignItems: "start",
+   },
 })
 
 type JobApplicationCardProps = {
@@ -44,41 +51,49 @@ type JobApplicationCardProps = {
 export const JobApplicationCard = ({
    jobApplication,
 }: JobApplicationCardProps) => {
-   const [anchorEl, setAnchorEl] = useState(null)
-   const {
-      userData: { userEmail },
-   } = useAuth()
-   const handleCloseMenu = useCallback(() => setAnchorEl(null), [])
-
-   const handleOpenMenu = useCallback((event) => {
-      setAnchorEl(event.currentTarget)
-   }, [])
-
-   const handleDeleteApplication = useCallback(async () => {
-      try {
-      } catch (e) {
-         console.error(e)
-      }
-   }, [userEmail, jobApplication])
-
-   const detailItems = useMemo<ApplicationDetailItem[]>(
-      () => [
+   const detailItems = useMemo<ApplicationDetailItem[]>(() => {
+      const details: ApplicationDetailItem[] = [
          {
-            icon: <TaskAltRoundedIcon color={"inherit"} sx={styles.icon} />,
-            title: `Date applied ${DateUtil.getJobApplicationDate(
+            icon: <TaskAltRoundedIcon sx={styles.icon} />,
+            title: `Applied ${DateUtil.getJobApplicationDate(
                jobApplication.date.toDate()
             )}`,
          },
-      ],
-      [jobApplication.date]
-   )
+      ]
+
+      if (jobApplication.currentStage) {
+         details.push({
+            icon: <InfoOutlinedIcon sx={styles.icon} />,
+            title: `Stage ${jobApplication.currentStage}`,
+         })
+      }
+
+      if (jobApplication.rejectedAt) {
+         details.push({
+            icon: (
+               <Tooltip
+                  title={
+                     jobApplication.rejectReason
+                        ? `Reason: ${jobApplication.rejectReason}`
+                        : ""
+                  }
+               >
+                  <SentimentDissatisfiedIcon sx={styles.icon} />
+               </Tooltip>
+            ),
+            title: `Rejected ${DateUtil.getJobApplicationDate(
+               jobApplication.rejectedAt.toDate()
+            )}`,
+            color: "warning.main",
+         })
+      }
+      return details
+   }, [jobApplication.date])
 
    return (
-      <Card>
+      <Card sx={styles.root}>
          <CardHeader
-            sx={{
-               alignItems: "start",
-            }}
+            sx={styles.header}
             title={
                <Typography sx={styles.title} variant="h4" gutterBottom>
                   {jobApplication.job.name}
@@ -89,33 +104,13 @@ export const JobApplicationCard = ({
                   {`Associated to ${jobApplication.livestream.title} event`}
                </Typography>
             }
-            action={
-               <>
-                  <IconButton aria-label="settings" onClick={handleOpenMenu}>
-                     <MoreHorizIcon />
-                  </IconButton>
-                  <Menu
-                     id="card-options-menu"
-                     anchorEl={anchorEl}
-                     open={Boolean(anchorEl)}
-                     onClose={handleCloseMenu}
-                     anchorOrigin={{
-                        vertical: "bottom",
-                        horizontal: "left",
-                     }}
-                  >
-                     <MenuItem onClick={handleDeleteApplication}>
-                        <ListItemIcon>
-                           <DeleteOutlineOutlinedIcon />
-                        </ListItemIcon>
-                        <ListItemText>Delete</ListItemText>
-                     </MenuItem>
-                  </Menu>
-               </>
-            }
          />
-         <CardContent>
-            <Stack spacing={2}>
+         <CardContent sx={styles.content}>
+            <Stack
+               divider={<Divider orientation="vertical" flexItem />}
+               direction={{ xs: "column", sm: "row" }}
+               spacing={{ xs: 1, sm: 2 }}
+            >
                {detailItems.map((detailItem) => (
                   <ApplicationDetail key={detailItem.title} {...detailItem} />
                ))}
@@ -127,13 +122,14 @@ export const JobApplicationCard = ({
 
 export const JobApplicationCardSkeleton = () => {
    return (
-      <Card>
+      <Card sx={styles.root}>
          <CardHeader
             title={
                <Typography sx={styles.title} variant="h4" gutterBottom>
                   <Skeleton variant={"text"} width={"50%"} />
                </Typography>
             }
+            sx={styles.header}
             action={<Skeleton width={25} height={15} />}
             subheader={
                <Typography sx={styles.subtitle} variant="body1">
@@ -141,9 +137,10 @@ export const JobApplicationCardSkeleton = () => {
                </Typography>
             }
          />
-         <CardContent>
+         <CardContent sx={styles.content}>
             <Stack direction={"row"} spacing={2}>
-               <Skeleton variant={"text"} height={25} width={"40%"} />
+               <Skeleton variant={"text"} height={25} width={"20%"} />
+               <Skeleton variant={"text"} height={25} width={"20%"} />
             </Stack>
          </CardContent>
       </Card>
@@ -153,12 +150,17 @@ export const JobApplicationCardSkeleton = () => {
 type ApplicationDetailItem = {
    icon: React.ReactElement
    title: string
+   color?: string
 }
-const ApplicationDetail = ({ icon, title }: ApplicationDetailItem) => {
+const ApplicationDetail = ({
+   icon,
+   title,
+   color = "text.secondary",
+}: ApplicationDetailItem) => {
    return (
       <Stack
          sx={{
-            color: "text.secondary",
+            color,
          }}
          direction={"row"}
          alignItems={"center"}

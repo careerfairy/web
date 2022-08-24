@@ -1,8 +1,8 @@
-import React from "react"
+import React, { FC } from "react"
 import * as PropTypes from "prop-types"
 import { Box } from "@mui/material"
 
-type TabPanelProps = {
+type StyledBoxPanelProps = {
    hidden?: boolean
    className?: string
    other?: any
@@ -15,8 +15,31 @@ type TabPanelProps = {
 export const StyledBox = ({
    children,
    className = undefined,
-}: TabPanelProps) => {
+}: StyledBoxPanelProps) => {
    return <Box className={className}>{children}</Box>
+}
+
+interface TabPanelProps {
+   key: any
+   value: number | string
+   activeValue: number | string
+   [x: string]: any
+}
+
+export const TabPanel: FC<TabPanelProps> = (props) => {
+   const { children, activeValue, value, ...other } = props
+
+   return (
+      <div
+         role="tabpanel"
+         hidden={activeValue !== value}
+         id={`simple-tabpanel-${value}`}
+         aria-labelledby={`simple-tab-${value}`}
+         {...other}
+      >
+         {activeValue === value && <Box>{children}</Box>}
+      </div>
+   )
 }
 
 export const SimplePanel = ({ panelId, children, height, ...other }) => {

@@ -148,7 +148,6 @@ export const updateUserJobApplications = functions
                   batchOperations
                )
             } catch (e) {
-               logAndThrow("Error batch updating user job applications", e)
                functions.logger.error(
                   "Error batch updating user job applications",
                   e,
