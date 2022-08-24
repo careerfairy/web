@@ -28,12 +28,12 @@ export class Job extends ATSModel {
    }
 
    /**
-    * Get the job additional information if existent
+    * Get the job name plus additional information if existent
     * Useful to display in Dropdown Selectors so the user can
     * distinguish jobs
     */
    getExtendedName() {
-      let title = `${this.status}`
+      let title = `${this.name}, ${this.status}`
 
       if (this.departments.length > 0) {
          title += `, ${this.departments[0].name}`
@@ -44,6 +44,14 @@ export class Job extends ATSModel {
       }
 
       return title
+   }
+
+   /**
+    * Get the Hiring Manager name if exists
+    * Useful to display in the left bar of live stream
+    */
+   getHiringManager() {
+      return this.hiringManagers?.[0]?.getName() || ""
    }
 
    static createFromMerge(job: MergeJob) {
