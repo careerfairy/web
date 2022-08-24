@@ -13,6 +13,7 @@ import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNoti
 import * as Sentry from "@sentry/nextjs"
 import LoadingButton from "@mui/lab/LoadingButton"
 import dynamic from "next/dynamic"
+import { Typography } from "@mui/material"
 
 type Props = {
    job: Job
@@ -73,7 +74,13 @@ const JobEntryApply = ({ job, livestreamId }: Props) => {
    }, [livestreamId, job.id, successNotification, errorNotification])
 
    if (alreadyApplied) {
-      return <Box>Congrats! You have already applied to this job!</Box>
+      return (
+         <Box textAlign="center">
+            <Typography fontWeight="bold" color="primary" mt={6} variant="h5">
+               Congrats! You have already applied to this job!
+            </Typography>
+         </Box>
+      )
    }
 
    const missingDataComponents = []
@@ -84,33 +91,18 @@ const JobEntryApply = ({ job, livestreamId }: Props) => {
       }
    }
 
-   if (missingDataComponents.length > 0) {
-      return (
-         <Box>
-            <p>
-               <strong>
-                  You need to fill this missing data before you can apply:
-               </strong>
-            </p>
-            {missingDataComponents.map((component, i) => (
-               <Box key={i} mb={2}>
-                  {component(userData)}
-               </Box>
-            ))}
-         </Box>
-      )
-   }
-
    return (
-      <Box display={"flex"} justifyContent={"center"}>
+      <Box display={"flex"} justifyContent={"end"} mt={6}>
          <LoadingButton
             loading={isLoading}
             variant="contained"
             color="primary"
             size={"large"}
             onClick={onClickApply}
+            disabled={missingDataComponents.length > 0}
+            sx={{ width: "195px" }}
          >
-            Apply Now!
+            Apply Now
          </LoadingButton>
       </Box>
    )
