@@ -15,7 +15,8 @@ export class Application extends ATSModel {
       public readonly appliedAt?: Date,
       public readonly rejectedAt?: Date,
       public readonly source?: string,
-      public readonly currentStage?: string
+      public readonly currentStage?: string,
+      public readonly rejectReason?: string
    ) {
       super()
    }
@@ -31,7 +32,8 @@ export class Application extends ATSModel {
          fromMergeDate(application.applied_at),
          fromMergeDate(application.rejected_at),
          application.source,
-         application.current_stage?.name
+         application.current_stage?.name,
+         application.reject_reason?.name
       )
    }
 
@@ -46,7 +48,8 @@ export class Application extends ATSModel {
          fromSerializedDate(application.appliedAt),
          fromSerializedDate(application.rejectedAt),
          application.source,
-         application.currentStage
+         application.currentStage,
+         application.rejectReason
       )
    }
 }

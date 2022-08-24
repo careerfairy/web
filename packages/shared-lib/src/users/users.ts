@@ -124,8 +124,11 @@ export interface UserJobApplicationDocument extends Identifiable {
    integrationId: string
    jobId: string
    date: firebase.firestore.Timestamp
+   updatedAt: firebase.firestore.Timestamp
    job: Job // will be serialized to plain object
    livestream: LivestreamEventPublicData
+   rejectedAt?: firebase.firestore.Timestamp
+   currentStage?: string
 }
 
 /**

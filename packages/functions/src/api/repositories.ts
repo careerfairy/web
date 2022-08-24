@@ -21,7 +21,8 @@ export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
    admin.firestore() as any,
-   admin.firestore.FieldValue
+   admin.firestore.FieldValue,
+   admin.firestore.Timestamp
 )
 
 export const livestreamsRepo: ILivestreamRepository =

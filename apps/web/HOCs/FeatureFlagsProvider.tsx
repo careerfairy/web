@@ -21,7 +21,9 @@ export const flagsInitialState: Record<FlagKeys, FeatureFlag> = {
       conditionalEnable: (path: string, params: ParsedUrlQuery) => {
          // Enable ATS for the following groups
          // rTUGXDAG2XAtpVcgvAcc is a test group
-         return ["rTUGXDAG2XAtpVcgvAcc"].includes(params?.groupId?.toString())
+         return ["rTUGXDAG2XAtpVcgvAcc", "sfJI7nRHx8OqJRZLuR6Q"].includes(
+            params?.groupId?.toString()
+         )
       },
    },
 }

@@ -53,7 +53,6 @@ export class MergeATSRepository implements IATSRepository {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
          `/jobs?expand=offices,recruiters,hiring_managers,departments`
       )
-
       return data.results.map(Job.createFromMerge)
    }
 
@@ -126,7 +125,7 @@ export class MergeATSRepository implements IATSRepository {
    */
    async getApplications(jobId?: string): Promise<Application[]> {
       const qs = new URLSearchParams({
-         expand: "candidate,job",
+         expand: "candidate,job,current_stage,reject_reason",
       })
 
       if (jobId) {
@@ -155,8 +154,11 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    async getApplication(applicationId: string): Promise<Application> {
+      const qs = new URLSearchParams({
+         expand: "candidate,job,current_stage,reject_reason",
+      })
       const { data } = await this.axios.get<MergeApplication>(
-         `/applications/${applicationId}?expand=job,candidate`
+         `/applications/${applicationId}?${qs.toString()}`
       )
 
       return Application.createFromMerge(data)
