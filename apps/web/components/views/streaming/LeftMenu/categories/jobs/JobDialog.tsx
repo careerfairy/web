@@ -19,10 +19,7 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
    let { userData } = useAuth()
    const { isStreamer } = useCurrentStream()
 
-   const hiringManagers = useMemo(
-      () => job.hiringManagers?.[0]?.getName() || "Mario Sousa",
-      [job.hiringManagers]
-   )
+   const hiringManagers = useMemo(() => job.getHiringManager(), [job])
 
    return (
       <GenericDialog
