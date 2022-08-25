@@ -30,17 +30,30 @@ export abstract class BaseModel {
     */
    serializeToPlainObject() {
       const serialized: { [field: string]: any } = {}
-
       for (const key of Object.keys(this)) {
          // serialize Date
          if (this[key] instanceof Date) {
             serialized[key] = (this[key] as unknown as Date).getTime()
             continue
          }
-
+         // check if array
+         if (
+            Array.isArray(this[key]) &&
+            this[key].length > 0 &&
+            this[key][0] instanceof BaseModel
+         ) {
+            // check if array of objects
+            serialized[key] = this[key].map((item) =>
+               item.serializeToPlainObject()
+            )
+            continue
+         }
+         if (this[key] instanceof BaseModel) {
+            serialized[key] = this[key].serializeToPlainObject()
+            continue
+         }
          serialized[key] = this[key]
       }
-
       return serialized
    }
 }
