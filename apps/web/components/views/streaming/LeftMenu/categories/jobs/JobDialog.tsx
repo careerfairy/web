@@ -1,7 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import GenericDialog from "../../../../common/GenericDialog"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
@@ -18,25 +18,31 @@ import UserResume from "../../../../profile/userData/user-resume/UserResume"
 const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
    let { userData } = useAuth()
    const { isStreamer } = useCurrentStream()
+   const [alreadyApplied, setAlreadyApplied] = useState(false)
 
    const hiringManagers = useMemo(() => job.getHiringManager(), [job])
 
    const renderApplyButton = useCallback((): JSX.Element => {
       return (
-         <Box mx={4}>
+         <Box mr={4}>
             <SuspenseWithBoundary>
-               <JobEntryApply job={job} livestreamId={livestreamId} />
+               <JobEntryApply
+                  job={job}
+                  livestreamId={livestreamId}
+                  isApplied={alreadyApplied}
+                  handleAlreadyApply={setAlreadyApplied}
+               />
             </SuspenseWithBoundary>
          </Box>
       )
-   }, [job, livestreamId])
+   }, [alreadyApplied, job, livestreamId])
 
    return (
       <GenericDialog
          onClose={onCloseDialog}
          title={`Apply Job`}
          titleOnCenter={true}
-         additionalRightButton={renderApplyButton()}
+         additionalLeftButton={renderApplyButton()}
       >
          <Box padding={2}>
             <Box display="flex">
@@ -111,7 +117,7 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                            <UserResume
                               userData={userData}
                               showOnlyButton={true}
-                              disabled={isStreamer}
+                              disabled={isStreamer || alreadyApplied}
                            />
                         </Box>
                         {isStreamer && (
