@@ -92,7 +92,7 @@ const JobEntryApply = ({ job, livestreamId }: Props) => {
    }
 
    return (
-      <Box display={"flex"} justifyContent={"end"} mt={6}>
+      <Box display={"flex"}>
          <LoadingButton
             loading={isLoading}
             variant="contained"

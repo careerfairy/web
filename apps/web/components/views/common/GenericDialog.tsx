@@ -7,7 +7,7 @@ import {
    Grow,
    Typography,
 } from "@mui/material"
-import React from "react"
+import React, { useMemo } from "react"
 import { StylesProps, sxStyles } from "../../../types/commonTypes"
 
 const styles: StylesProps = sxStyles({
@@ -27,6 +27,8 @@ type Props = {
    children: JSX.Element
    showCloseBtn?: boolean
    titleOnCenter?: boolean
+   additionalLeftButton?: JSX.Element
+   additionalRightButton?: JSX.Element
 }
 
 const GenericDialog = ({
@@ -35,7 +37,15 @@ const GenericDialog = ({
    titleOnCenter = false,
    children,
    showCloseBtn = true,
+   additionalLeftButton,
+   additionalRightButton,
 }: Props) => {
+   const footerButtons = useMemo(
+      (): boolean =>
+         showCloseBtn || !!additionalLeftButton || !!additionalRightButton,
+      [additionalLeftButton, additionalRightButton, showCloseBtn]
+   )
+
    return (
       <Dialog
          maxWidth="md"
@@ -48,11 +58,15 @@ const GenericDialog = ({
             <Typography sx={styles.title}>{title}</Typography>
          </DialogTitle>
          <DialogContent dividers>{children}</DialogContent>
-         {showCloseBtn && (
+         {footerButtons && (
             <DialogActions sx={{ justifyContent: "right" }}>
-               <Button variant="outlined" onClick={onClose}>
-                  Close
-               </Button>
+               {additionalLeftButton}
+               {showCloseBtn && (
+                  <Button variant="outlined" onClick={onClose}>
+                     Close
+                  </Button>
+               )}
+               {additionalRightButton}
             </DialogActions>
          )}
       </Dialog>
