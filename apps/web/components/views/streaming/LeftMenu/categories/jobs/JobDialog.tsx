@@ -1,7 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import GenericDialog from "../../../../common/GenericDialog"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
@@ -21,12 +21,22 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
 
    const hiringManagers = useMemo(() => job.getHiringManager(), [job])
 
+   const renderApplyButton = useCallback((): JSX.Element => {
+      return (
+         <Box mx={4}>
+            <SuspenseWithBoundary>
+               <JobEntryApply job={job} livestreamId={livestreamId} />
+            </SuspenseWithBoundary>
+         </Box>
+      )
+   }, [job, livestreamId])
+
    return (
       <GenericDialog
          onClose={onCloseDialog}
          title={`Apply Job`}
          titleOnCenter={true}
-         showCloseBtn={true}
+         additionalRightButton={renderApplyButton()}
       >
          <Box padding={2}>
             <Box display="flex">
@@ -135,11 +145,6 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                         </Typography>
                      </Link>
                   </Box>
-               )}
-               {userData && !isStreamer && (
-                  <SuspenseWithBoundary>
-                     <JobEntryApply job={job} livestreamId={livestreamId} />
-                  </SuspenseWithBoundary>
                )}
             </Box>
          </Box>
