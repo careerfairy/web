@@ -127,6 +127,7 @@ export const fetchATSJobs = functions
 
          return await atsRepository.getJobs().then(serializeModels)
       } catch (e) {
+         console.log("-> NORMAL ERROR", e)
          return logAxiosErrorAndThrow(
             "Failed to fetch the account jobs",
             e,

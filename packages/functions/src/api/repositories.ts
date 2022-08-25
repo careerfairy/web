@@ -35,5 +35,5 @@ export const atsRepo = (
    apiKey: string,
    accountToken: string
 ): IATSRepository => {
-   return new MergeATSRepository(apiKey, accountToken)
+   return new MergeATSRepository(apiKey, accountToken, admin.firestore as any)
 }
