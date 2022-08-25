@@ -23,6 +23,10 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
    const hiringManagers = useMemo(() => job.getHiringManager(), [job])
 
    const renderApplyButton = useCallback((): JSX.Element => {
+      if (isStreamer) {
+         return null
+      }
+
       return (
          <Box mr={4}>
             <SuspenseWithBoundary>
@@ -35,7 +39,7 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
             </SuspenseWithBoundary>
          </Box>
       )
-   }, [alreadyApplied, job, livestreamId])
+   }, [alreadyApplied, isStreamer, job, livestreamId])
 
    return (
       <GenericDialog
