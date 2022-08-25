@@ -18,6 +18,8 @@ import { Typography } from "@mui/material"
 type Props = {
    job: Job
    livestreamId: string
+   isApplied: boolean
+   handleAlreadyApply: (available: boolean) => void
 }
 
 const UserResume = dynamic(
@@ -36,11 +38,15 @@ const requiredDataToApply: RequiredData[] = [
    },
 ]
 
-const JobEntryApply = ({ job, livestreamId }: Props) => {
+const JobEntryApply = ({
+   job,
+   livestreamId,
+   isApplied,
+   handleAlreadyApply,
+}: Props) => {
    const { userData } = useAuth()
    const atsRelations = useUserATSRelations(userData.id)
    const [isLoading, setIsLoading] = useState(false)
-   const [alreadyApplied, setAlreadyApplied] = useState(false)
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
    // Confirm if user already applied to this job
@@ -48,11 +54,11 @@ const JobEntryApply = ({ job, livestreamId }: Props) => {
       if (
          atsRelations &&
          userAlreadyAppliedForJob(atsRelations, job.id) &&
-         !alreadyApplied
+         !isApplied
       ) {
-         setAlreadyApplied(true)
+         handleAlreadyApply(true)
       }
-   }, [alreadyApplied, atsRelations, job.id])
+   }, [isApplied, atsRelations, job.id, handleAlreadyApply])
 
    // Apply to the job
    const onClickApply = useCallback(() => {
@@ -60,7 +66,7 @@ const JobEntryApply = ({ job, livestreamId }: Props) => {
       atsServiceInstance
          .applyToAJob(livestreamId, job.id)
          .then(() => {
-            setAlreadyApplied(true)
+            handleAlreadyApply(true)
             successNotification("You have successfully applied to the job!")
          })
          .catch((e) => {
@@ -71,12 +77,18 @@ const JobEntryApply = ({ job, livestreamId }: Props) => {
          .finally(() => {
             setIsLoading(false)
          })
-   }, [livestreamId, job.id, successNotification, errorNotification])
+   }, [
+      livestreamId,
+      job.id,
+      handleAlreadyApply,
+      successNotification,
+      errorNotification,
+   ])
 
-   if (alreadyApplied) {
+   if (isApplied) {
       return (
          <Box textAlign="center">
-            <Typography fontWeight="bold" color="primary" mt={6} variant="h5">
+            <Typography fontWeight="bold" color="primary" variant="h5">
                Congrats! You have already applied to this job!
             </Typography>
          </Box>
