@@ -54,7 +54,7 @@ const JobList = ({ livestream }) => {
                   <WorkOutlineOutlinedIcon color="secondary" />
                </ListItemIcon>
                <ListItemText>
-                  <Typography variant="body1" fontWeight="bold">
+                  <Typography variant="subtitle1" fontWeight="bold">
                      {name}
                   </Typography>
 
