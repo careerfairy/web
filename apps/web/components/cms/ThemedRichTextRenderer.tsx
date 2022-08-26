@@ -17,7 +17,7 @@ import Fade from "@stahl.luke/react-reveal/Fade"
 
 type Props = {
    rawContent: RichTextContent
-   references: EmbedReferences
+   references?: EmbedReferences
 }
 const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
    return (
