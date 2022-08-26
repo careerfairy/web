@@ -1,5 +1,6 @@
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
+import { IColors } from "./commonTypes"
 
 export type Slug = string
 
@@ -148,8 +149,11 @@ export interface HygraphResponseTestimonialListValue {
    __typename: string
    id: string
    slug: string
+   testimonialTitle?: {
+      raw: RichTextContent
+   }
    testimonials?: HygraphResponseTestimonialValue[]
-   sliderArrowColor?: string
+   sliderArrowColor?: IColors
 }
 
 export interface HygraphFieldOfStudySelectResponse {
@@ -236,6 +240,12 @@ export const imageQueryProps = `
 export const videoQueryProps = `
     {
         url
+    }
+`
+// language=GraphQL
+export const richTestQueryProps = `
+    {
+        raw
     }
 `
 // language=GraphQL
@@ -366,6 +376,7 @@ export const testimonialListQueryProps = `
     {
         __typename
         id
+        testimonialTitle ${richTestQueryProps}
         testimonials ${testimonialQueryProps}
         sliderArrowColor
     }
