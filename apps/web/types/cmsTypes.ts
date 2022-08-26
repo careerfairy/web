@@ -173,6 +173,17 @@ export interface HygraphResponseCompanyLogosValue {
    companies: Company[]
 }
 
+export interface HygraphResponseTextBlock {
+   __typename: string
+   slug: string
+   textBlockTitle: {
+      raw: RichTextContent
+   }
+   content?: {
+      raw: RichTextContent
+   }
+}
+
 export type PageTypes =
    | "COMPANY_CASE_STUDY"
    | "MARKETING_LANDING_PAGE"
@@ -396,5 +407,14 @@ export const companyLogosQueryProps = `
         title
         slug
         companies ${logoQueryProps}
+    }
+`
+// language=GraphQL
+export const textBlockQueryProps = `
+    {
+        __typename
+        slug
+        textBlockTitle ${richTestQueryProps}
+        content ${richTestQueryProps}
     }
 `
