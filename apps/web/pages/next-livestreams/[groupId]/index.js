@@ -118,6 +118,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
                   upcomingLivestreams={upcomingLivestreams}
                   currentGroup={currentGroup}
                   pastLivestreams={pastLivestreams}
+                  minimumUpcomingStreams={0}
                />
             </div>
          </NextLivestreamsLayout>
