@@ -51,7 +51,11 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
                   </Box>
                </Fade>
             ),
-            bold: ({ children }) => <b>{children}</b>,
+            bold: ({ children }) => (
+               <Box sx={{ color: "primary.main", display: "inline" }}>
+                  <b>{children}</b>
+               </Box>
+            ),
             italic: ({ children }) => <em>{children}</em>,
             underline: ({ children }) => <u>{children}</u>,
             h6: ({ children }) => (
