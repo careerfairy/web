@@ -25,6 +25,7 @@ export function StreamsSection({
    upcomingLivestreams,
    listenToUpcoming,
    value,
+   minimumUpcomingStreams = 6,
 }) {
    useEffect(() => {
       forceCheck()
@@ -35,7 +36,10 @@ export function StreamsSection({
             {isLoaded(upcomingLivestreams) ? (
                <NextLivestreams
                   listenToUpcoming={listenToUpcoming}
-                  livestreams={formatLivestreamsEvents(upcomingLivestreams, 6)}
+                  livestreams={formatLivestreamsEvents(
+                     upcomingLivestreams,
+                     minimumUpcomingStreams
+                  )}
                   currentGroup={currentGroup}
                />
             ) : (
@@ -64,10 +68,8 @@ export function StreamsSection({
 
 StreamsSection.propTypes = {
    value: PropTypes.string.isRequired,
-   dir: PropTypes.any,
    upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
-   setSelectedOptions: PropTypes.func,
-   selectedOptions: PropTypes.arrayOf(PropTypes.any),
    currentGroup: PropTypes.any,
    pastLivestreams: PropTypes.any,
+   minimumUpcomingStreams: PropTypes.number,
 }
