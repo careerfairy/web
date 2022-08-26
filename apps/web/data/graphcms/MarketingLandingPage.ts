@@ -16,8 +16,6 @@ export class MarketingLandingPage extends BaseModel {
    constructor(
       public readonly id: string,
       public readonly slug: string,
-      public readonly title: string,
-      public readonly subtitle: string,
       public readonly fieldsOfStudy: FieldOfStudy[],
       public readonly seo: HygraphResponseSeo,
       public readonly blocks: (
@@ -37,8 +35,6 @@ export class MarketingLandingPage extends BaseModel {
       return new MarketingLandingPage(
          page.id,
          page.slug,
-         page.title,
-         page.subtitle,
          page.fieldOfStudies.map((o) => ({
             id: o.fieldOfStudyId,
             name: o.fieldOfStudyName,
@@ -51,8 +47,6 @@ export class MarketingLandingPage extends BaseModel {
       return new MarketingLandingPage(
          page.id,
          page.slug,
-         page.title,
-         page.subtitle,
          page.fieldsOfStudy,
          page.seo,
          page.blocks

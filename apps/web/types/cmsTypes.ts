@@ -22,7 +22,7 @@ export interface Company {
    logo: ICmsImage
 }
 
-export interface CmsVideo {
+export interface ICmsVideo {
    url: string
 }
 
@@ -70,7 +70,7 @@ export interface CompanyCaseStudy {
       raw: RichTextContent
       references: EmbedReferences
    }
-   coverVideo: CmsVideo
+   coverVideo: ICmsVideo
    statisticsContentSection: {
       raw: RichTextContent
       references: EmbedReferences
@@ -110,6 +110,8 @@ export interface HygraphResponseHero {
    id: string
    slug: string
    image: ICmsImage
+   video?: ICmsVideo
+   selectorLabel?: string
    buttons: HygraphResponseButton[]
    heroTitle?: string
    heroSubtitle?: string
@@ -231,6 +233,12 @@ export const imageQueryProps = `
     }
 `
 // language=GraphQL
+export const videoQueryProps = `
+    {
+        url
+    }
+`
+// language=GraphQL
 export const buttonQueryProps = `
     {
         children
@@ -274,7 +282,9 @@ export const heroQueryProps = `
         id
         slug
         image ${imageQueryProps}
+        video ${videoQueryProps}
         buttons ${buttonQueryProps}
+        selectorLabel,
         heroTitle
         heroSubtitle
         fullScreenImage

@@ -5,8 +5,6 @@ import { Box } from "@mui/material"
 
 const styles = {
    laptopImage: {
-      // minWidth: "80%",
-      // height: "90%",
       width: "100%",
    },
    laptopUi: {
@@ -50,15 +48,13 @@ const styles = {
    },
    laptop: {
       width: "100%",
-      // maxWidth: "1200px",
       position: "relative",
-      // height: "100%",
       "& img": {},
       "& video": {},
    },
 }
 
-const LaptopVideo = ({}) => {
+const LaptopVideo = ({ videoUrl }: Prop) => {
    return (
       <Box sx={styles.laptop}>
          <Box sx={styles.laptopScreenDiv}>
@@ -70,7 +66,7 @@ const LaptopVideo = ({}) => {
                      autoPlay
                      loop
                      muted
-                     src={smilingStreamerVideoUrl}
+                     src={videoUrl || smilingStreamerVideoUrl}
                   />
                </Box>
                <div>
@@ -91,6 +87,10 @@ const LaptopVideo = ({}) => {
          />
       </Box>
    )
+}
+
+type Prop = {
+   videoUrl?: string
 }
 
 export default LaptopVideo

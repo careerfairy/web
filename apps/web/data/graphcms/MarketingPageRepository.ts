@@ -50,8 +50,6 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       id
                       pageType
                       slug
-                      title
-                      subtitle
                       fieldOfStudies ${fieldOfStudyQueryProps}
                       blocks {
                           ... on EventsSection ${eventsSectionQueryProps}
