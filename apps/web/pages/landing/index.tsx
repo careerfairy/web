@@ -1,22 +1,49 @@
 import { GetStaticProps } from "next"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
-import { Page } from "../../data/graphcms/Page"
-import useServerModel from "../../components/custom-hook/utils/useServerModel"
-import { HygraphRemoteFieldOfStudyResponse } from "../../types/cmsTypes"
+import useServerModel from "../../components/custom-hook/useServerModel"
+import {
+   HygraphRemoteFieldOfStudyResponse,
+   HygraphResponseHero,
+} from "../../types/cmsTypes"
 import CmsPageLayout from "../../layouts/CmsPageLayout"
+import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
+import * as Blocks from "../../components/cms/blocks"
+import { hookLandingPage } from "../../components/cms/constants"
 import LandingPage from "../../components/cms/landing-page/LandingPage"
 
 type Props = {
-   serverPage: Page
-   fieldsOfStudy: HygraphRemoteFieldOfStudyResponse[]
+   serverPage: MarketingLandingPage
+   allFieldsOfStudy: HygraphRemoteFieldOfStudyResponse[]
 }
 
-const Landing = ({ serverPage, fieldsOfStudy }: Props) => {
-   const page = useServerModel<Page>(serverPage, Page.createFromPlainObject)
+const Landing = ({ serverPage, allFieldsOfStudy }: Props) => {
+   const page = useServerModel<MarketingLandingPage>(
+      serverPage,
+      MarketingLandingPage.createFromPlainObject
+   )
 
    return (
       <CmsPageLayout page={page}>
-         <LandingPage fieldsOfStudy={fieldsOfStudy} hero={page.hero} />
+         {page.blocks && (
+            <>
+               {page.blocks.map((block) => {
+                  const Component = Blocks[block.__typename]
+                  if (!Component) return null
+
+                  // in case is a hero component we want to pass the fieldsOfStudy to have the input selector
+                  if (block.__typename === "Hero") {
+                     return (
+                        <LandingPage
+                           fieldsOfStudy={allFieldsOfStudy}
+                           hero={block as HygraphResponseHero}
+                        />
+                     )
+                  }
+
+                  return <Component key={block.id} page={page} {...block} />
+               })}
+            </>
+         )}
       </CmsPageLayout>
    )
 }
@@ -30,16 +57,16 @@ export const getStaticProps: GetStaticProps = async ({
          notFound: true,
       }
    }
-   const [page, fieldsOfStudy] = await Promise.all([
-      marketingPageRepo.getPage({
-         slug: "hook-landing-page",
+   const [marketingPage, allFieldsOfStudy] = await Promise.all([
+      marketingPageRepo.getMarketingPage({
+         slug: hookLandingPage,
          preview,
          locale,
       }),
       marketingPageRepo.getFieldsOfStudyWithMarketingPages(),
    ])
 
-   if (!page) {
+   if (!marketingPage) {
       return {
          notFound: true,
       }
@@ -47,8 +74,8 @@ export const getStaticProps: GetStaticProps = async ({
    return {
       props: {
          preview,
-         serverPage: page.serializeToPlainObject(),
-         fieldsOfStudy: fieldsOfStudy,
+         serverPage: marketingPage.serializeToPlainObject(),
+         allFieldsOfStudy: allFieldsOfStudy,
       },
       revalidate: 60,
    }

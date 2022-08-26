@@ -4,6 +4,7 @@ import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import useServerModel from "../../components/custom-hook/utils/useServerModel"
 import CmsPageLayout from "../../layouts/CmsPageLayout"
+import { hookLandingPage } from "../../components/cms/constants"
 
 interface Props {
    marketingLandingPagePlainObject: MarketingLandingPage
@@ -67,7 +68,9 @@ export async function getStaticPaths({ locales }) {
    let paths = []
 
    if (process.env.APP_ENV !== "test") {
-      const marketingPages = await marketingPageRepo.getAllMarketingPageSlugs()
+      const marketingPages = await marketingPageRepo
+         .getAllMarketingPageSlugs()
+         .then((slugs) => slugs.filter(({ slug }) => slug !== hookLandingPage))
 
       if (locales) {
          for (const locale of locales) {

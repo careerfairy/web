@@ -4,6 +4,7 @@ import { sxStyles } from "../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import CmsImage from "./image"
 import { FC } from "react"
+import LaptopVideo from "components/views/landing/HeroSection/LaptopVideo"
 
 const styles = sxStyles({
    imageWrapper: {
@@ -34,9 +35,31 @@ const styles = sxStyles({
    fullScreenImageWrapper: {
       width: "100% !important",
       position: "absolute !important",
-      zIndex: -1,
       inset: 0,
       height: "100% !important",
+   },
+   videoWrapper: {
+      display: {
+         xs: "none",
+         lg: "block",
+      },
+      width: "50%",
+      position: {
+         lg: "absolute",
+      },
+      top: {
+         lg: 0,
+      },
+      bottom: {
+         lg: 0,
+      },
+      right: {
+         lg: 0,
+      },
+      py: {
+         lg: 24,
+         xs: 10,
+      },
    },
    detailsWrapper: {
       mx: "auto",
@@ -65,6 +88,7 @@ const styles = sxStyles({
       position: "relative",
    },
    container: {
+      zIndex: 1,
       bgColor: "grey.main",
       py: {
          lg: 24,
@@ -90,19 +114,13 @@ const styles = sxStyles({
       alignItems: {
          md: "center",
       },
+      zIndex: 1,
    },
 })
 
-interface Props extends HygraphResponseHero {
-   page?: {
-      title: string
-      subtitle: string
-   }
-}
-
-const Hero: FC<Props> = ({
-   page,
+const Hero: FC<HygraphResponseHero> = ({
    image,
+   video,
    slug,
    buttons,
    heroTitle,
@@ -110,8 +128,8 @@ const Hero: FC<Props> = ({
    fullScreenImage,
    children,
 }) => {
-   const titleText = heroTitle || page.title
-   const subtitleText = heroSubtitle || page.subtitle
+   const titleText = heroTitle
+   const subtitleText = heroSubtitle
 
    return (
       <>
@@ -175,7 +193,7 @@ const Hero: FC<Props> = ({
                      {children}
                   </Box>
                </Container>
-               {image && (
+               {image && !video && (
                   <Box
                      sx={[
                         styles.imageWrapper,
@@ -190,6 +208,11 @@ const Hero: FC<Props> = ({
                            objectFit: "cover",
                         }}
                      />
+                  </Box>
+               )}
+               {video && video?.url && (
+                  <Box sx={styles.videoWrapper}>
+                     <LaptopVideo videoUrl={video?.url} />
                   </Box>
                )}
             </Box>
