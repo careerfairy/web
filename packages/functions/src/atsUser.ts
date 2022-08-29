@@ -88,10 +88,10 @@ export const fetchLivestreamJobs = functions
  */
 export const updateUserJobApplications = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
-      // user needs to be signed in
-      const token = await validateUserAuthExists(context)
-      try {
+   .https.onCall(
+      onCallWrapper(async (data, context) => {
+         // user needs to be signed in
+         const token = await validateUserAuthExists(context)
          const userApplications = await userRepo.getJobApplications(token.email)
          const userATSDocument = await userRepo.getUserATSData(token.email)
 
@@ -155,10 +155,8 @@ export const updateUserJobApplications = functions
                )
             }
          }
-      } catch (e) {
-         logAxiosError(e)
-      }
-   })
+      })
+   )
 
 /**
  * Apply a user to a job
