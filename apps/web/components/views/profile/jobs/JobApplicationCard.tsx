@@ -1,14 +1,7 @@
 import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
 import Card from "@mui/material/Card"
-import {
-   CardContent,
-   CardHeader,
-   Divider,
-   Tooltip,
-   Typography,
-} from "@mui/material"
+import { CardContent, CardHeader, Divider, Typography } from "@mui/material"
 import React, { useMemo } from "react"
-import SentimentDissatisfiedIcon from "@mui/icons-material/SentimentDissatisfied"
 import { sxStyles } from "../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
@@ -36,7 +29,6 @@ const styles = sxStyles({
       px: 4,
       pt: 0,
    },
-   root: {},
    header: {
       px: 4,
       pt: 3,
@@ -68,30 +60,11 @@ export const JobApplicationCard = ({
          })
       }
 
-      if (jobApplication.rejectedAt) {
-         details.push({
-            icon: (
-               <Tooltip
-                  title={
-                     jobApplication.rejectReason
-                        ? `Reason: ${jobApplication.rejectReason}`
-                        : ""
-                  }
-               >
-                  <SentimentDissatisfiedIcon sx={styles.icon} />
-               </Tooltip>
-            ),
-            title: `Rejected ${DateUtil.getJobApplicationDate(
-               jobApplication.rejectedAt.toDate()
-            )}`,
-            color: "warning.main",
-         })
-      }
       return details
-   }, [jobApplication.date])
+   }, [jobApplication])
 
    return (
-      <Card sx={styles.root}>
+      <Card>
          <CardHeader
             sx={styles.header}
             title={
@@ -122,7 +95,7 @@ export const JobApplicationCard = ({
 
 export const JobApplicationCardSkeleton = () => {
    return (
-      <Card sx={styles.root}>
+      <Card>
          <CardHeader
             title={
                <Typography sx={styles.title} variant="h4" gutterBottom>

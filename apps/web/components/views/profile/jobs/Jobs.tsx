@@ -22,6 +22,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { JobStatus } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
 import Box from "@mui/material/Box"
 import Image from "next/image"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    tabs: {
@@ -35,16 +36,15 @@ const styles = sxStyles({
    tabLabel: {
       fontWeight: 600,
    },
-   subtitle: {},
 })
 type ApplicationsProps = {
    types?: JobStatus[]
 }
 const Applications = ({ types }: ApplicationsProps) => {
    const { userData } = useAuth()
-   const { data, status } = useUserJobApplications(userData.id, types)
+   const { data } = useUserJobApplications(userData.id, types)
 
-   if (status === "success" && data.length === 0) {
+   if (data.length === 0) {
       return (
          <Stack sx={{ mt: 3 }} spacing={3}>
             <Box sx={{ textAlign: "center" }}>
@@ -78,18 +78,25 @@ const Applications = ({ types }: ApplicationsProps) => {
 const viewData = {
    "/profile/jobs?type=open": {
       component: <Applications types={["OPEN", "PENDING"]} />,
-      title: "Open Applications",
+      title: {
+         compact: "Open",
+         full: "Open Applications",
+      },
       value: 0,
    },
    "/profile/jobs?type=closed": {
       component: <Applications types={["CLOSED"]} />,
-      title: "Closed Applications",
+      title: {
+         compact: "Closed",
+         full: "Closed Applications",
+      },
       value: 1,
    },
 }
 type Value = keyof typeof viewData
 const Jobs = () => {
    const { errorNotification } = useSnackbarNotifications()
+   const mobile = useIsMobile()
    const theme = useTheme()
    const { asPath } = useRouter()
    const value: Value = viewData[asPath]
@@ -102,7 +109,7 @@ const Jobs = () => {
          .catch((e) =>
             errorNotification(e, "Failed to update your job applications")
          )
-   }, [])
+   }, [errorNotification])
 
    const views = Object.keys(viewData).map((path) => (
       <TabPanel
@@ -135,7 +142,9 @@ const Jobs = () => {
          value={path}
          label={
             <Typography sx={styles.tabLabel} variant="h6">
-               {viewData[path].title}
+               {mobile
+                  ? viewData[path].title.compact
+                  : viewData[path].title.full}
             </Typography>
          }
       />
@@ -148,7 +157,7 @@ const Jobs = () => {
             </Grid>
 
             <Grid item xs={12}>
-               <Typography sx={styles.subtitle}>
+               <Typography>
                   During a Livestream event you can apply to job openings and
                   they will appear here.
                </Typography>

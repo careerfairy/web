@@ -4,7 +4,7 @@ import SEO from "../../components/util/SEO"
 import UserView from "../../layouts/UserLayout/UserView"
 import { useRouter } from "next/router"
 
-const MyGroupsPage = () => {
+const MyJobsPage = () => {
    const { pathname } = useRouter()
    return (
       <UserLayout>
@@ -16,4 +16,4 @@ const MyGroupsPage = () => {
       </UserLayout>
    )
 }
-export default MyGroupsPage
+export default MyJobsPage
