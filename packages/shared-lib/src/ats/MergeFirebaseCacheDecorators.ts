@@ -18,7 +18,7 @@ interface CacheEntry<T = firebase.firestore.DocumentData> {
    constructorName: string
    /** Time data was cached, as a Cloud Firestore Timestamp object */
    cachedAt: firebase.firestore.Timestamp
-   /** Time data was cached, as a Cloud Firestore Timestamp object */
+   /** Time data should no longer be considered fresh, as a Cloud Firestore Timestamp object */
    expiresAt: firebase.firestore.Timestamp
    /** The ETag signature of the cached resource */
    eTag: string
