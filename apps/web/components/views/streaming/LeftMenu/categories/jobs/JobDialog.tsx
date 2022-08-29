@@ -1,7 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useMemo, useState } from "react"
 import GenericDialog from "../../../../common/GenericDialog"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
@@ -20,9 +20,9 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
    const { isStreamer } = useCurrentStream()
    const [alreadyApplied, setAlreadyApplied] = useState(false)
 
-   const hiringManagers = useMemo(() => job.getHiringManager(), [job])
+   const hiringManagers = job.getHiringManager()
 
-   const renderApplyButton = useCallback((): JSX.Element => {
+   const renderApplyButton = useMemo((): JSX.Element => {
       if (isStreamer) {
          return null
       }
@@ -46,7 +46,7 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
          onClose={onCloseDialog}
          title={`Apply Job`}
          titleOnCenter={true}
-         additionalLeftButton={renderApplyButton()}
+         additionalLeftButton={renderApplyButton}
       >
          <Box padding={2}>
             <Box display="flex">
