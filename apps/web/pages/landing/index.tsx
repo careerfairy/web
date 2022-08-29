@@ -36,11 +36,14 @@ const Landing = ({ serverPage, allFieldsOfStudy }: Props) => {
                         <LandingPage
                            fieldsOfStudy={allFieldsOfStudy}
                            hero={block as HygraphResponseHero}
+                           key={block.__typename}
                         />
                      )
                   }
 
-                  return <Component key={block.id} page={page} {...block} />
+                  return (
+                     <Component key={block.__typename} page={page} {...block} />
+                  )
                })}
             </>
          )}
