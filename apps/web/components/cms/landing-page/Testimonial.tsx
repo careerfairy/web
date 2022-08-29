@@ -12,12 +12,21 @@ const styles = sxStyles({
    stars: {
       color: (theme) => theme.palette.primary.main,
    },
+   wrapper: {
+      paddingY: 6,
+      marginX: {
+         xs: 4,
+         md: 32,
+         lg: 52,
+         xl: 83,
+      },
+   },
 })
 
 const Testimonial = ({ title, content, rating }: Props): JSX.Element => {
    return (
-      <Box paddingY={6} marginX={{ xs: 4, md: 10, lg: 36, xl: 62 }}>
-         <Typography variant="h3">{title}</Typography>
+      <Box sx={styles.wrapper}>
+         <Typography variant="h2">{title}</Typography>
          {content && (
             <Typography variant="body1" marginY={3}>
                {content}

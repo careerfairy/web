@@ -86,6 +86,7 @@ const styles = sxStyles({
    },
    root: {
       position: "relative",
+      paddingBottom: { xl: 8 },
    },
    container: {
       zIndex: 1,
@@ -132,92 +133,87 @@ const Hero: FC<HygraphResponseHero> = ({
    const subtitleText = heroSubtitle
 
    return (
-      <>
-         <Box id={slug} sx={styles.root}>
-            <Box
-               sx={[fullScreenImage && styles.fullScreenMain]}
-               component="main"
-            >
-               <Container maxWidth={"xl"} sx={styles.container}>
-                  <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
-                     <Typography
-                        variant="h1"
-                        component="h1"
-                        gutterBottom
-                        sx={[styles.title, fullScreenImage && styles.whiteText]}
-                     >
-                        {titleText}
-                     </Typography>
-                     {subtitleText && (
-                        <Typography
-                           variant="h5"
-                           sx={[
-                              styles.subTitle,
-                              fullScreenImage && styles.whiteText,
-                           ]}
-                           color="text.secondary"
-                           gutterBottom
-                        >
-                           {subtitleText}
-                        </Typography>
-                     )}
-                     {buttons && (
-                        <Stack
-                           sx={styles.stack}
-                           direction={{ xs: "column", md: "row" }}
-                           justifyContent={{ sm: "center", lg: "flex-start" }}
-                           spacing={{
-                              lg: 3,
-                              xs: 1,
-                           }}
-                        >
-                           {buttons.map((button) => (
-                              <Box key={button.slug}>
-                                 <Button
-                                    fullWidth
-                                    sx={{
-                                       ":nth-of-type(even)": {
-                                          mx: {
-                                             xs: 0,
-                                             md: 3,
-                                          },
-                                       },
-                                    }}
-                                    {...button}
-                                    size={button.size || "medium"}
-                                 />
-                              </Box>
-                           ))}
-                        </Stack>
-                     )}
-                     {children}
-                  </Box>
-               </Container>
-               {image && !video && (
-                  <Box
-                     sx={[
-                        styles.imageWrapper,
-                        fullScreenImage && styles.fullScreenImageWrapper,
-                     ]}
+      <Box id={slug} sx={styles.root}>
+         <Box sx={[fullScreenImage && styles.fullScreenMain]} component="main">
+            <Container maxWidth={"xl"} sx={styles.container}>
+               <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
+                  <Typography
+                     variant="h1"
+                     component="h1"
+                     gutterBottom
+                     sx={[styles.title, fullScreenImage && styles.whiteText]}
                   >
-                     <CmsImage
-                        cmsImage={image}
-                        imageProps={{
-                           layout: "fill",
-                           priority: true,
-                           objectFit: "cover",
+                     {titleText}
+                  </Typography>
+                  {subtitleText && (
+                     <Typography
+                        variant="h5"
+                        sx={[
+                           styles.subTitle,
+                           fullScreenImage && styles.whiteText,
+                        ]}
+                        color="text.secondary"
+                        gutterBottom
+                     >
+                        {subtitleText}
+                     </Typography>
+                  )}
+                  {buttons && (
+                     <Stack
+                        sx={styles.stack}
+                        direction={{ xs: "column", md: "row" }}
+                        justifyContent={{ sm: "center", lg: "flex-start" }}
+                        spacing={{
+                           lg: 3,
+                           xs: 1,
                         }}
-                     />
-                  </Box>
-               )}
-               {video && video?.url && (
-                  <Box sx={styles.videoWrapper}>
-                     <LaptopVideo videoUrl={video?.url} />
-                  </Box>
-               )}
-            </Box>
+                     >
+                        {buttons.map((button) => (
+                           <Box key={button.slug}>
+                              <Button
+                                 fullWidth
+                                 sx={{
+                                    ":nth-of-type(even)": {
+                                       mx: {
+                                          xs: 0,
+                                          md: 3,
+                                       },
+                                    },
+                                 }}
+                                 {...button}
+                                 size={button.size || "medium"}
+                              />
+                           </Box>
+                        ))}
+                     </Stack>
+                  )}
+                  {children}
+               </Box>
+            </Container>
+            {image && !video && (
+               <Box
+                  sx={[
+                     styles.imageWrapper,
+                     fullScreenImage && styles.fullScreenImageWrapper,
+                  ]}
+               >
+                  <CmsImage
+                     cmsImage={image}
+                     imageProps={{
+                        layout: "fill",
+                        priority: true,
+                        objectFit: "cover",
+                     }}
+                  />
+               </Box>
+            )}
+            {video && video?.url && (
+               <Box sx={styles.videoWrapper}>
+                  <LaptopVideo videoUrl={video?.url} />
+               </Box>
+            )}
          </Box>
-      </>
+      </Box>
    )
 }
 
