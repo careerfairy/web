@@ -7,7 +7,6 @@ import {
    Grow,
    Typography,
 } from "@mui/material"
-import React, { useMemo } from "react"
 import { StylesProps, sxStyles } from "../../../types/commonTypes"
 
 const styles: StylesProps = sxStyles({
@@ -40,11 +39,8 @@ const GenericDialog = ({
    additionalLeftButton,
    additionalRightButton,
 }: Props) => {
-   const footerButtons = useMemo(
-      (): boolean =>
-         showCloseBtn || !!additionalLeftButton || !!additionalRightButton,
-      [additionalLeftButton, additionalRightButton, showCloseBtn]
-   )
+   const footerButtons =
+      showCloseBtn || !!additionalLeftButton || !!additionalRightButton
 
    return (
       <Dialog

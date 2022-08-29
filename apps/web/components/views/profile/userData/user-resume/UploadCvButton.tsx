@@ -14,6 +14,7 @@ import DeleteForever from "@mui/icons-material/DeleteForever"
 import ArrowDropDown from "@mui/icons-material/ArrowDropDown"
 import FilePickerContainer from "../../../../ssr/FilePickerContainer"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { useCallback } from "react"
 
 const UploadCvButton = ({
    userData,
@@ -29,6 +30,13 @@ const UploadCvButton = ({
    openDropdown,
    disabled = false,
 }: Props) => {
+   const handleClick = useCallback(
+      (event, index) => {
+         handleMenuItemClick(event, index)
+      },
+      [handleMenuItemClick]
+   )
+
    return userData && userData.userResume && !disabled ? (
       <>
          <ButtonGroup
@@ -49,7 +57,7 @@ const UploadCvButton = ({
                   extensions={["pdf"]}
                   onChange={uploadLogo}
                   maxSize={20}
-                  onError={(errMsg) => console.log(errMsg)}
+                  onError={handleError}
                >
                   <Button
                      startIcon={
@@ -105,9 +113,7 @@ const UploadCvButton = ({
                               <MenuItem
                                  key={option}
                                  selected={index === selectedIndex}
-                                 onClick={(event) =>
-                                    handleMenuItemClick(event, index)
-                                 }
+                                 onClick={(event) => handleClick(event, index)}
                               >
                                  {option}
                               </MenuItem>
@@ -124,7 +130,7 @@ const UploadCvButton = ({
          extensions={["pdf"]}
          onChange={uploadLogo}
          maxSize={20}
-         onError={(errMsg) => console.log(errMsg)}
+         onError={handleError}
       >
          <Button
             color="primary"
@@ -139,6 +145,10 @@ const UploadCvButton = ({
          </Button>
       </FilePickerContainer>
    )
+}
+
+const handleError = (errorMessage: string) => {
+   console.log(errorMessage)
 }
 
 type Props = {
