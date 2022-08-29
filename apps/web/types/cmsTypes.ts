@@ -96,6 +96,7 @@ export interface Testimonial {
    published?: Date
    rating?: number
    person?: Person
+   title?: string
 }
 export interface HygraphResponseButton {
    children: string
@@ -227,10 +228,12 @@ export interface HygraphResponseEventsSection {
    __typename: string
    id: string
    typeOfEvent: string
+   eventsTitle: string
 }
 export interface HygraphResponseMarketingSignup {
    __typename: string
    id: string
+   formTitle: string
    title: string
    shortText: string
    slug: string
@@ -321,6 +324,7 @@ export const eventsSectionQueryProps = `
         __typename
         id
         typeOfEvent
+        eventsTitle
     }
 `
 // language=GraphQL
@@ -330,6 +334,7 @@ export const marketingSignupQueryProps = `
         __typename
         title
         shortText
+        formTitle
         slug
         button ${buttonQueryProps}
     }
@@ -362,13 +367,23 @@ export const companyValuesQueryProps = `
     }
 `
 // language=GraphQL
+export const companyQueryProp = `
+{
+   id
+   name
+   logo ${imageQueryProps}
+}
+`
+// language=GraphQL
 export const personQueryProps = `
    {
       id
       name
       role
       photo ${imageQueryProps}
+      company ${companyQueryProp}
    }
+
 `
 // language=GraphQL
 export const testimonialQueryProps = `
