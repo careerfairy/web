@@ -7,9 +7,14 @@ import { sxStyles } from "../../../types/commonTypes"
 
 const styles = sxStyles({
    title: {
-      marginX: { xs: 2, lg: 12, xl: 42 },
+      marginX: { xs: 2, lg: 24, xl: 52 },
       textAlign: "center",
       marginBottom: -4,
+   },
+   wrapper: {
+      paddingLeft: 2,
+      paddingRight: 4,
+      paddingTop: 12,
    },
 })
 
@@ -19,7 +24,7 @@ const TestimonialList = ({
    testimonialTitle,
 }: HygraphResponseTestimonialListValue): JSX.Element => {
    return (
-      <Box paddingX={2} paddingTop={12}>
+      <Box sx={styles.wrapper}>
          {testimonialTitle && (
             <Box sx={styles.title}>
                <ThemedRichTextRenderer rawContent={testimonialTitle.raw} />
