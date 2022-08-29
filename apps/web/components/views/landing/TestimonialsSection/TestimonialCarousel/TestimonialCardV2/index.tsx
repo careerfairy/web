@@ -1,6 +1,6 @@
 import React, { memo } from "react"
 import { Avatar, Box, Card, Rating, Typography } from "@mui/material"
-import { Person } from "../../../../../../types/cmsTypes"
+import { Testimonial } from "../../../../../../types/cmsTypes"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import DateUtil from "../../../../../../util/DateUtil"
 
@@ -18,14 +18,21 @@ const styles = sxStyles({
    },
 })
 
-const TestimonialCardV2 = ({ person, content, rating, published }: Props) => {
+const TestimonialCardV2 = ({
+   person,
+   content,
+   rating,
+   published,
+}: Testimonial) => {
+   const { company } = person
+
    return (
       <Card sx={styles.card}>
          <Box>
             <Box>
                <Avatar
-                  src={person?.photo?.url}
-                  alt={`${person?.name} avatar`}
+                  src={company?.logo?.url}
+                  alt={`${company?.name} avatar`}
                   sx={{ mb: 2 }}
                />
 
@@ -41,7 +48,7 @@ const TestimonialCardV2 = ({ person, content, rating, published }: Props) => {
                )}
 
                <Typography variant="body2">
-                  {person?.name}, {DateUtil.getRatingDate(published)}
+                  {company?.name}, {DateUtil.getRatingDate(published)}
                </Typography>
             </Box>
             <Box mt={1}>
@@ -52,11 +59,4 @@ const TestimonialCardV2 = ({ person, content, rating, published }: Props) => {
    )
 }
 
-type Props = {
-   content?: string
-   person?: Person
-   rating?: number
-   published?: Date
-   key: string
-}
 export default memo(TestimonialCardV2)

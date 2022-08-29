@@ -6,6 +6,7 @@ import EventsPreview, {
 import React from "react"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 import useUpcomingStreamsByFieldOfStudy from "../../custom-hook/useUpcomingStreamsByFieldOfStudy"
+import { HygraphResponseEventsSection } from "../../../types/cmsTypes"
 
 const styles = sxStyles({
    wrapper: {
@@ -16,9 +17,9 @@ const styles = sxStyles({
 
 type Props = {
    fieldsOfStudy: FieldOfStudy[]
-}
+} & HygraphResponseEventsSection
 
-const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
+const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
    const { events, loading } = useUpcomingStreamsByFieldOfStudy(fieldsOfStudy)
 
    return (
@@ -26,7 +27,7 @@ const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
          <EventsPreview
             id={"upcoming-events"}
             limit={0}
-            title={"COMING UP NEXT"}
+            title={eventsTitle?.toUpperCase() || "COMING UP NEXT"}
             type={EventsTypes.comingUp}
             events={events}
             loading={loading}

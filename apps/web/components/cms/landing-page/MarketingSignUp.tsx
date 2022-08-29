@@ -35,55 +35,63 @@ const styles = sxStyles({
          `linear-gradient(to right, ${theme.palette.secondary.main}, 80%, ${theme.palette.secondary.light})`,
    },
 })
+
 interface MarketingSignUpProps extends HygraphResponseMarketingSignup {
    fieldsOfStudy: FieldOfStudy[]
 }
+
 const MarketingSignUp = ({
    shortText,
    title,
+   formTitle,
    button,
    fieldsOfStudy,
 }: MarketingSignUpProps) => {
    const isMobile = useIsMobile()
    const [isComplete, setComplete] = useState(false)
    return (
-      <Box
-         id={marketingSignUpFormId}
-         sx={isMobile ? styles.smallContainer : styles.largeContainer}
-      >
-         <Grid container spacing={2} p={{ xs: 6, md: 8, lg: 10 }} my={4}>
-            <Grid item xs={12} lg={6}>
-               {shortText && (
-                  <Box
-                     maxWidth={{ xs: "100%", lg: "70%" }}
-                     textAlign={"center"}
-                  >
-                     <Typography variant="h4" color="white">
-                        {shortText}
-                     </Typography>
-                  </Box>
-               )}
-            </Grid>
-            <Grid item xs={12} lg={6} mt={{ xs: 4, lg: 0 }}>
-               <Box maxWidth={{ lg: "100%", xl: "80%" }}>
-                  {title && (
-                     <Typography variant="h6" color="white">
-                        {title}
-                     </Typography>
+      <Box my={4}>
+         <Box mb={4} ml={2}>
+            <Typography variant="h4">{formTitle}</Typography>
+         </Box>
+         <Box
+            id={marketingSignUpFormId}
+            sx={isMobile ? styles.smallContainer : styles.largeContainer}
+         >
+            <Grid container spacing={2} p={{ xs: 6, md: 8, lg: 10 }}>
+               <Grid item xs={12} lg={6}>
+                  {shortText && (
+                     <Box
+                        maxWidth={{ xs: "100%", lg: "70%" }}
+                        textAlign={"center"}
+                     >
+                        <Typography variant="h4" color="white">
+                           {shortText}
+                        </Typography>
+                     </Box>
                   )}
-                  <Box mt={3}>
-                     {!isComplete && (
-                        <MarketingForm
-                           buttonProps={button}
-                           setComplete={setComplete}
-                           fieldsOfStudy={fieldsOfStudy}
-                        />
+               </Grid>
+               <Grid item xs={12} lg={6} mt={{ xs: 4, lg: 0 }}>
+                  <Box maxWidth={{ lg: "100%", xl: "80%" }}>
+                     {title && (
+                        <Typography variant="h6" color="white">
+                           {title}
+                        </Typography>
                      )}
-                     {isComplete && <Complete />}
+                     <Box mt={3}>
+                        {!isComplete && (
+                           <MarketingForm
+                              buttonProps={button}
+                              setComplete={setComplete}
+                              fieldsOfStudy={fieldsOfStudy}
+                           />
+                        )}
+                        {isComplete && <Complete />}
+                     </Box>
                   </Box>
-               </Box>
+               </Grid>
             </Grid>
-         </Grid>
+         </Box>
       </Box>
    )
 }
