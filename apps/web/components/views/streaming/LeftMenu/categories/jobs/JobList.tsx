@@ -1,32 +1,14 @@
 import useLivestreamJobs from "../../../../../custom-hook/useLivestreamJobs"
-import {
-   List,
-   ListItem,
-   ListItemButton,
-   ListItemIcon,
-   ListItemText,
-} from "@mui/material"
-import WorkOutlineOutlinedIcon from "@mui/icons-material/WorkOutlineOutlined"
+import { List } from "@mui/material"
 import React, { useCallback, useState } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import Typography from "@mui/material/Typography"
 import JobDialog from "./JobDialog"
+import JobItem from "./JobItem"
 
 const styles = sxStyles({
    list: {
       width: "100%",
       paddingX: 1,
-   },
-   itemWrapper: {
-      boxShadow: (theme) => theme.shadows[3],
-      background: (theme) => theme.palette.background.default,
-      borderRadius: 2,
-   },
-   icon: {
-      minWidth: "unset",
-      marginRight: 2,
-      alignSelf: "start",
-      marginY: "5px",
    },
 })
 
@@ -38,42 +20,21 @@ const JobList = ({ livestream }) => {
       setSelectedJob(null)
    }, [])
 
-   const renderJobItem = useCallback((job) => {
-      const hiringManager = job.getHiringManager()
-      const { id, name } = job
-
-      return (
-         <ListItem
-            disablePadding
-            key={id}
-            onClick={() => setSelectedJob(job)}
-            sx={styles.itemWrapper}
-         >
-            <ListItemButton>
-               <ListItemIcon sx={styles.icon}>
-                  <WorkOutlineOutlinedIcon color="secondary" />
-               </ListItemIcon>
-               <ListItemText>
-                  <Typography variant="subtitle1" fontWeight="bold">
-                     {name}
-                  </Typography>
-
-                  <Typography variant="body2" mt={1} fontStyle="italic">
-                     {hiringManager && `Posted by ${hiringManager}`}
-                  </Typography>
-               </ListItemText>
-            </ListItemButton>
-         </ListItem>
-      )
-   }, [])
-
    if (jobs.length === 0) {
       return <div>No jobs at the moment</div>
    }
 
    return (
       <>
-         <List sx={styles.list}>{jobs.map((job) => renderJobItem(job))}</List>
+         <List sx={styles.list}>
+            {jobs.map((job) => (
+               <JobItem
+                  key={job.id}
+                  job={job}
+                  handleSelectJob={setSelectedJob}
+               />
+            ))}
+         </List>
          {selectedJob && (
             <JobDialog
                job={selectedJob}
