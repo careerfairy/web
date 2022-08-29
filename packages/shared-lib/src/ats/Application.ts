@@ -32,8 +32,8 @@ export class Application extends ATSModel {
          fromMergeDate(application.applied_at),
          fromMergeDate(application.rejected_at),
          application.source,
-         application.current_stage?.name,
-         application.reject_reason?.name
+         application.current_stage?.name || null,
+         application.reject_reason?.name || null
       )
    }
 
