@@ -67,10 +67,15 @@ const QuestionUpvote = () => {
    const { authenticatedUser } = useAuth()
 
    useEffect(() => {
+      if (livestream.questionsDisabled) {
+         handleNext()
+         return
+      }
+
       if (!questions.length && !hasMore) {
          handleNext()
       }
-   }, [questions, hasMore])
+   }, [questions, hasMore, livestream?.questionsDisabled])
 
    const handleUpvote = async (question) => {
       if (!authenticatedUser) {
