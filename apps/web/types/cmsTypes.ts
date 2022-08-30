@@ -176,6 +176,7 @@ export interface HygraphResponseCompanyLogosValue {
 
 export interface HygraphResponseTextBlock {
    __typename: string
+   id: string
    slug: string
    textBlockTitle: {
       raw: RichTextContent
@@ -183,6 +184,23 @@ export interface HygraphResponseTextBlock {
    content?: {
       raw: RichTextContent
    }
+}
+
+export interface HygraphResponseHighlightList {
+   __typename: string
+   id: string
+   slug: string
+   highlightListTitle: string
+   highlights?: HygraphResponseHighlight[]
+}
+
+export interface HygraphResponseHighlight {
+   __typename: string
+   slug: string
+   highlightTitle?: string
+   thumbnail?: ICmsImage
+   video?: ICmsVideo
+   logo?: ICmsImage
 }
 
 export type PageTypes =
@@ -427,5 +445,24 @@ export const textBlockQueryProps = `
         slug
         textBlockTitle ${richTextQueryProps}
         content ${richTextQueryProps}
+    }
+`
+// language=GraphQL
+export const highlightQueryProps = `
+    {
+        slug
+        highlightTitle
+        logo ${imageQueryProps}
+        video ${videoQueryProps}
+        thumbnail ${imageQueryProps}
+    }
+`
+// language=GraphQL
+export const highlightListQueryProps = `
+    {
+        __typename
+        slug
+        highlightListTitle 
+        highlights ${highlightQueryProps}
     }
 `

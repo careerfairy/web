@@ -5,6 +5,7 @@ import {
    eventsSectionQueryProps,
    fieldOfStudyQueryProps,
    heroQueryProps,
+   highlightListQueryProps,
    HygraphRemoteFieldOfStudyResponse,
    imageQueryProps,
    marketingSignupQueryProps,
@@ -61,6 +62,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                           ... on TestimonialList ${testimonialListQueryProps}
                           ... on CompanyLogos ${companyLogosQueryProps}
                           ... on TextBlock ${textBlockQueryProps}
+                          ... on HighlightList ${highlightListQueryProps}
                       }
                       seo ${seoQueryProps}
                   }
