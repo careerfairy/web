@@ -13,12 +13,13 @@ import {
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    UserLivestreamData,
 } from "./livestreams"
+import { FieldOfStudy } from "../fieldOfStudy"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
 
    getUpcomingEventsByFieldsOfStudy(
-      fieldOfStudyIds: string[],
+      fieldsOfStudy: FieldOfStudy[],
       limit?: number
    ): Promise<LivestreamEvent[] | null>
 
@@ -214,25 +215,25 @@ export class FirebaseLivestreamRepository implements ILivestreamRepository {
    }
 
    async getUpcomingEventsByFieldsOfStudy(
-      fieldOfStudyIds: string[],
+      fieldsOfStudy: FieldOfStudy[],
       limit?: number
    ): Promise<LivestreamEvent[] | null> {
-      // convert fieldOfStudyIds to array of chunks of 10
+      // convert fieldsOfStudy to array of chunks of 10
       let livestreams = []
       let i,
          j,
-         tempArray,
+         tempArray: FieldOfStudy[] = [],
          chunk = 10
       /*
-       * In case there are more than 10 fieldOfStudyIds
+       * In case there are more than 10 fieldsOfStudy
        * array-contains-any can only do 10 at a time
        * */
-      for (i = 0, j = fieldOfStudyIds.length; i < j; i += chunk) {
-         tempArray = fieldOfStudyIds.slice(i, i + chunk)
+      for (i = 0, j = fieldsOfStudy.length; i < j; i += chunk) {
+         tempArray = fieldsOfStudy.slice(i, i + chunk)
          let ref = await this.firestore
             .collection("livestreams")
             .where("start", ">", getEarliestEventBufferTime())
-            .where("fieldOfStudyIds", "array-contains-any", tempArray)
+            .where("targetFieldsOfStudy", "array-contains-any", tempArray)
             .where("test", "==", false)
             .where("hidden", "==", false)
             .orderBy("start", "asc")

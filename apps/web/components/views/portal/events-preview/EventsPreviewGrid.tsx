@@ -219,7 +219,7 @@ export interface EventsProps {
    seeMoreLink?: string
    title?: string
    loading: boolean
-   type: EventsTypes
+   type: EventsTypes | string
    id?: string
    // Not all portal widget should
    // have automatic event registrations
