@@ -1,6 +1,5 @@
 import { GetStaticProps } from "next"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
-import useServerModel from "../../components/custom-hook/useServerModel"
 import {
    HygraphRemoteFieldOfStudyResponse,
    HygraphResponseHero,
@@ -10,6 +9,7 @@ import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import * as Blocks from "../../components/cms/blocks"
 import { hookLandingPage } from "../../components/cms/constants"
 import LandingPage from "../../components/cms/landing-page/LandingPage"
+import useServerModel from "../../components/custom-hook/utils/useServerModel"
 
 type Props = {
    serverPage: MarketingLandingPage
