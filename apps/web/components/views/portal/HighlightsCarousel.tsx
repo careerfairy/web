@@ -11,6 +11,7 @@ import HighlightsRestrictedDialog from "./HighlightsRestrictedDialog"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
+import { MARKETING_LANDING_PAGE_PATH } from "../../../constants/routes"
 
 const styles = {
    root: {
@@ -26,13 +27,12 @@ const HighlightsCarousel = ({
       breakpoints: { up },
    } = useTheme()
    const [highlights] = useState<HighLight[]>(serverSideHighlights)
-   const { push, query } = useRouter()
+   const { push, query, pathname } = useRouter()
    const [
       highlightsRestrictedDialogOpen,
       handleOpenHighlightsRestrictedDialog,
       handleCloseHighlightsRestrictedDialog,
    ] = useDialogStateHandler()
-   const isExtraSmall = useMediaQuery(up("xs"))
    const isSmall = useMediaQuery(up("sm"))
    const isMedium = useMediaQuery(up("md"))
    const isLarge = useMediaQuery(up("lg"))
@@ -42,16 +42,17 @@ const HighlightsCarousel = ({
       timeoutDuration,
       canWatchAllHighlights,
    } = useCanWatchHighlights()
+   const isOnLandingPage = pathname.includes(MARKETING_LANDING_PAGE_PATH)
 
    const numSlides: number = useMemo(() => {
       return isLarge ? 5 : isMedium ? 4 : isSmall ? 3 : 1
-   }, [isExtraSmall, isSmall, isMedium, isLarge])
+   }, [isSmall, isMedium, isLarge])
 
    const [videoUrl, setVideoUrl] = useState(null)
 
    const handleOpenVideoDialog = (videoUrl: string) => {
       const { canWatchAll } = handleCheckIfCanWatchHighlight()
-      if (canWatchAll) {
+      if (isOnLandingPage || canWatchAll) {
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
       } else {
@@ -83,7 +84,13 @@ const HighlightsCarousel = ({
             },
          })
       }
-   }, [query.openDialog, Boolean(userPresenter)])
+   }, [
+      handleOpenHighlightsRestrictedDialog,
+      push,
+      query,
+      query.openDialog,
+      userPresenter,
+   ])
 
    const handleCloseVideoDialog = () => {
       setVideoUrl(null)
@@ -107,7 +114,10 @@ const HighlightsCarousel = ({
                   <HighlightItem
                      handleOpenVideoDialog={handleOpenVideoDialog}
                      highLight={highlight}
-                     locked={Boolean(!canWatchAllHighlights.canWatchAll)}
+                     locked={
+                        !isOnLandingPage &&
+                        Boolean(!canWatchAllHighlights.canWatchAll)
+                     }
                   />
                </Box>
             ))}
