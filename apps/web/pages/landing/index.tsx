@@ -1,7 +1,7 @@
 import { GetStaticProps } from "next"
 import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { Page } from "../../data/graphcms/Page"
-import useServerModel from "../../components/custom-hook/useServerModel"
+import useServerModel from "../../components/custom-hook/utils/useServerModel"
 import { HygraphRemoteFieldOfStudyResponse } from "../../types/cmsTypes"
 import CmsPageLayout from "../../layouts/CmsPageLayout"
 import LandingPage from "../../components/cms/landing-page/LandingPage"
