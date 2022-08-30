@@ -100,6 +100,7 @@ function HandRaiseInactive({
                      Hand Raise is not active
                   </GreyPermanentMarker>
                   <Typography
+                     mt={2}
                      style={{ marginBottom: "1rem" }}
                      align="center"
                      gutterBottom

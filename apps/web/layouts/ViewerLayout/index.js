@@ -156,14 +156,14 @@ const ViewerLayout = (props) => {
    }, [isRecordingWindow])
 
    useEffect(() => {
-      if (mobile) {
+      if (mobile || currentLivestream?.questionsDisabled) {
          closeLeftMenu()
       } else {
          if (!focusModeEnabled) {
             openLeftMenu()
          }
       }
-   }, [mobile])
+   }, [mobile, currentLivestream?.questionsDisabled])
 
    useEffect(() => {
       if (userData?.isAdmin) return

@@ -106,6 +106,7 @@ const ViewerOverview = ({
                handleStateChange={handleStateChange}
                streamer={false}
                includeJobs={currentLivestream.jobs?.length > 0}
+               questionsAreDisabled={currentLivestream.questionsDisabled}
             />
             <ViewerComponent
                streamerId={streamerId}
