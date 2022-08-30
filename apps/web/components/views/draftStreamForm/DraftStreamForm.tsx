@@ -172,6 +172,7 @@ const DraftStreamForm = ({
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
+      questionsDisabled: false,
    })
 
    const handleSetGroupIds = async (
@@ -274,6 +275,7 @@ const DraftStreamForm = ({
                   ),
                   status: livestream.status || {},
                   language: livestream.language || languageCodes[0],
+                  questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
                setAllFetched(false)
@@ -715,6 +717,43 @@ const DraftStreamForm = ({
                                        {errors.summary}
                                     </Collapse>
                                  </FormControl>
+                              </Grid>
+
+                              <Grid xs={12}>
+                                 <Tooltip
+                                    placement="top"
+                                    arrow
+                                    title={
+                                       <Typography>
+                                          By disabling questions the
+                                          participants will no longer be able to
+                                          use the Q&A section during the
+                                          livestream and create questions during
+                                          the registration process.
+                                       </Typography>
+                                    }
+                                 >
+                                    <FormControlLabel
+                                       labelPlacement="start"
+                                       label="Disable Questions"
+                                       control={
+                                          <Switch
+                                             checked={Boolean(
+                                                values.questionsDisabled
+                                             )}
+                                             onChange={handleChange}
+                                             disabled={Boolean(isSubmitting)}
+                                             color="primary"
+                                             id="questionsDisabled"
+                                             name="questionsDisabled"
+                                             inputProps={{
+                                                "aria-label":
+                                                   "primary checkbox",
+                                             }}
+                                          />
+                                       }
+                                    />
+                                 </Tooltip>
                               </Grid>
                            </FormGroup>
                            {Object.keys(values.speakers).map((key, index) => {
