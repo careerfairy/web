@@ -47,6 +47,7 @@ export interface LivestreamEvent extends Identifiable {
       groupId: string
    }
    universities: any[]
+   questionsDisabled?: boolean
 
    // ATS Jobs
    /**
