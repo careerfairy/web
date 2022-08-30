@@ -2,12 +2,8 @@ import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
 import { GetStaticProps } from "next"
 import * as Blocks from "../../components/cms/blocks"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
-import useServerModel from "../../components/custom-hook/useServerModel"
+import useServerModel from "../../components/custom-hook/utils/useServerModel"
 import CmsPageLayout from "../../layouts/CmsPageLayout"
-
-/**
- * Just for us to develop the UI while we don't have the hygraph cms setup
- */
 
 interface Props {
    marketingLandingPagePlainObject: MarketingLandingPage

@@ -2,10 +2,9 @@ import { sxStyles } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import { EventsTypes } from "../../views/portal/events-preview/EventsPreview"
 import EventsPreviewGrid from "../../views/portal/events-preview/EventsPreviewGrid"
-import React, { useEffect, useState } from "react"
-import { livestreamRepo } from "../../../data/RepositoryInstances"
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import React from "react"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import useUpcomingStreamsByFieldOfStudy from "../../custom-hook/useUpcomingStreamsByFieldOfStudy"
 
 const styles = sxStyles({
    wrapper: {
@@ -19,20 +18,7 @@ type Props = {
 }
 
 const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
-   const [events, setEvents] = useState<LivestreamEvent[]>([])
-
-   useEffect(() => {
-      livestreamRepo
-         .getUpcomingEventsByFieldsOfStudy(
-            fieldsOfStudy.map((el) => el.id),
-            10
-         )
-         .then((events: LivestreamEvent[]) => {
-            if (events) {
-               setEvents(events)
-            }
-         })
-   }, [fieldsOfStudy])
+   const { events, loading } = useUpcomingStreamsByFieldOfStudy(fieldsOfStudy)
 
    return (
       <Box sx={styles.wrapper}>
@@ -41,7 +27,7 @@ const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
             title={"COMING UP NEXT"}
             type={EventsTypes.comingUp}
             seeMoreLink={"/next-livestreams"}
-            loading={false}
+            loading={loading}
             events={events}
          />
       </Box>
