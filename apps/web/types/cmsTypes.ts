@@ -200,13 +200,9 @@ export interface HygraphRemoteFieldOfStudyResponse {
 
 export interface HygraphResponseMarketingPage {
    id: string
-   title: string
-   subtitle: string
-   fieldOfStudies: HygraphRemoteFieldOfStudyResponse[]
-   hero: HygraphResponseHero
-   buttons: HygraphResponseButton[]
-   pageType: PageTypes
    slug: string
+   fieldOfStudies: HygraphRemoteFieldOfStudyResponse[]
+   pageType: PageTypes
    seo: HygraphResponseSeo
    blocks: (
       | HygraphResponseEventsSection
