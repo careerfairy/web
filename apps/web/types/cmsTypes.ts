@@ -254,7 +254,7 @@ export const videoQueryProps = `
     }
 `
 // language=GraphQL
-export const richTestQueryProps = `
+export const richTextQueryProps = `
     {
         raw
     }
@@ -387,7 +387,7 @@ export const testimonialListQueryProps = `
     {
         __typename
         id
-        testimonialTitle ${richTestQueryProps}
+        testimonialTitle ${richTextQueryProps}
         testimonials ${testimonialQueryProps}
         sliderArrowColor
     }
@@ -414,7 +414,7 @@ export const textBlockQueryProps = `
     {
         __typename
         slug
-        textBlockTitle ${richTestQueryProps}
-        content ${richTestQueryProps}
+        textBlockTitle ${richTextQueryProps}
+        content ${richTextQueryProps}
     }
 `
