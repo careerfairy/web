@@ -129,8 +129,6 @@ exports.onUserRateWish = wishes.onUserRateWish
 
 // CMS
 exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
-exports.fieldsOfStudy = cms.fieldsOfStudy
-
 
 // Marketing
 exports.createMarketingUser = marketing.createMarketingUser
