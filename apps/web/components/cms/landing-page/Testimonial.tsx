@@ -21,7 +21,7 @@ const styles = sxStyles({
    background: {
       height: "60vh",
       background: `url(${quoteBackgroundLightPink}) no-repeat`,
-      backgroundSize: "110vh",
+      backgroundSize: { xs: "80vh", md: "90vh", lg: "100vh", xl: "110vh" },
       backgroundPosition: "center",
       display: "flex",
       justifyContent: "center",
