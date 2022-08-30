@@ -14,6 +14,7 @@ export const mapServerSideStream = (livestream) => {
       lastUpdatedDateString:
          livestream.lastUpdated?.toDate?.().toString() || null,
       startDateString: livestream.start?.toDate?.().toString() || null,
+      questionsDisabled: livestream.questionsDisabled,
    }
 }
 

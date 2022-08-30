@@ -1,4 +1,4 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import GroupLogo from "../common/GroupLogo"
 import {
@@ -68,6 +68,13 @@ const QuestionCreateForm = () => {
    const { replace } = useRouter()
    const { putLivestreamQuestion, rewardUserAction } = useFirebaseService()
    const { authenticatedUser, userData } = useAuth()
+
+   useEffect(() => {
+      if (livestream.questionsDisabled) {
+         handleNext()
+      }
+   }, [livestream?.questionsDisabled])
+
    const {
       handleChange,
       values,

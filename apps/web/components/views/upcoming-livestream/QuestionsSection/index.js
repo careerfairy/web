@@ -91,6 +91,12 @@ const QuestionsSection = (props) => {
                                  livestreamId={props.livestreamId}
                               />
                            )}
+                           {props.questionsAreDisabled && (
+                              <Box py={6}>
+                                 Unfortunately the Q&A functionality for this
+                                 livestream was disabled.
+                              </Box>
+                           )}
                            {!!props.questions.length && (
                               <QuestionVotingContainer
                                  loadingInitialQuestions={
@@ -136,4 +142,5 @@ QuestionsSection.propTypes = {
    color: PropTypes.any,
    subtitle: PropTypes.any,
    title: PropTypes.any,
+   questionsAreDisabled: PropTypes.bool,
 }
