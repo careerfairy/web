@@ -60,7 +60,6 @@ const styles = {
    },
    pillsBackground: {
       height: "100%",
-      minHeight: "100vh",
       background: (theme) =>
          `url(${alternateStudentBackground}) top left no-repeat, ${theme.palette.common.white}`,
       backgroundSize: "auto 120vh, auto 100vh !important",
@@ -95,5 +94,11 @@ export const PaperBackground = ({ ...props }) => {
 }
 
 export const PillsBackground = ({ ...props }) => {
-   return <Box sx={styles.pillsBackground} {...props} />
+   return (
+      <Box
+         sx={styles.pillsBackground}
+         minHeight={props?.minHeight || "100vh"}
+         {...props}
+      />
+   )
 }
