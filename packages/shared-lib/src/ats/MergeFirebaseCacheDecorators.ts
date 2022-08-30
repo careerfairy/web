@@ -21,7 +21,7 @@ interface CacheEntry<T = firebase.firestore.DocumentData> {
    /** Time data should no longer be considered fresh, as a Cloud Firestore Timestamp object */
    expiresAt: firebase.firestore.Timestamp
    /** The ETag signature of the cached resource */
-   eTag: string
+   // eTag: string
    /** The cached resource */
    data: T | T[]
 }
@@ -65,19 +65,19 @@ export function fromFirebaseCache(TTL: number = 3600000) {
                | CacheEntry["expiresAt"]
                | undefined
             const expired =
-               expiresAt !== undefined &&
-               expiresAt.toMillis() > Date.now() - 60000
+               expiresAt !== undefined && expiresAt.toMillis() > Date.now()
             if (!expired) {
                // return the entire cache entry as-is
                const cachedEntry = cachedResultSnap.data() as CacheEntry
-               let resultFromCache: BusinessModel | BusinessModel[]
+               let resultFromCache: BusinessModel | BusinessModel[] = null
+
                if (Array.isArray(cachedEntry.data)) {
                   resultFromCache = cachedEntry.data.map((data: any) =>
                      BusinessModels[
                         cachedEntry.constructorName
                      ].createFromPlainObject(data)
                   )
-               } else {
+               } else if (cachedEntry.data) {
                   resultFromCache = BusinessModels[
                      cachedEntry.constructorName
                   ].createFromPlainObject(cachedEntry.data)
@@ -90,35 +90,29 @@ export function fromFirebaseCache(TTL: number = 3600000) {
          }
          // if here, the cache entry doesn't exist or has expired
 
-         // get the live results from Merge
+         // Use the original method to get the live results directly from Merge
          const result: BusinessModel | BusinessModel[] =
             await originalMethod.apply(this, args)
 
          let cacheEntry: CacheEntry
          // create a cache entry for the result
          if (Array.isArray(result)) {
-            if (result.length === 0) {
-               return result // no need to cache an empty array
-            }
             cacheEntry = createCacheEntry(
                hashAccountToken,
                // @ts-ignore
                result.map(
                   (data) => data.serializeToPlainObject() as CacheEntry["data"]
                ),
-               result[0].constructor.name,
+               result?.[0]?.constructor?.name || "",
                firestore,
                TTL
             )
          } else {
-            if (!result) {
-               return result // no need to cache an empty response
-            }
             cacheEntry = createCacheEntry(
                hashAccountToken,
                // @ts-ignore
-               result.serializeToPlainObject() as CacheEntry["data"],
-               result.constructor.name,
+               (result?.serializeToPlainObject() as CacheEntry["data"]) || null,
+               result?.constructor?.name || "",
                firestore,
                TTL
             )
@@ -149,9 +143,8 @@ const createCacheEntry = <T>(
    return {
       hashAccountToken: hashAccountToken,
       data: data,
-      eTag: hash(data),
+      // eTag: hash(data),
       cachedAt: firestore.Timestamp.now(),
-      // set expiry as 1 day from now
       expiresAt: firestore.Timestamp.fromMillis(Date.now() + TTL),
       constructorName: constructorName,
    }
@@ -170,9 +163,11 @@ async function clearCache(
       .where("hashAccountToken", "==", hashAccountToken)
       .get()
       .then((querySnapshot) => {
+         const promises = []
          querySnapshot.forEach((doc) => {
-            doc.ref.delete()
+            promises.push(doc.ref.delete())
          })
+         return Promise.allSettled(promises)
       })
       .catch(console.error)
 }
@@ -202,9 +197,9 @@ export function clearFirebaseCache(
          const promises = targetPropertyKeys.map((key) =>
             clearCache(firestore, key, hashAccountToken)
          )
-         Promise.all(promises).catch(console.error)
+         Promise.allSettled(promises).catch(console.error)
 
-         return await originalMethod.apply(this, args)
+         return originalMethod.apply(this, args)
       }
    }
 }

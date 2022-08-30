@@ -105,7 +105,6 @@ export class MergeATSRepository implements IATSRepository {
       return data ? Candidate.createFromMerge(data) : null
    }
 
-   @clearFirebaseCache(["getCandidate"])
    async createCandidate(user: UserData): Promise<Candidate> {
       const model = createMergeCandidateFromUser(user)
       const { data } = await this.axios.post<MergeCandidate>(
@@ -154,7 +153,7 @@ export class MergeATSRepository implements IATSRepository {
       return data.results.map(Application.createFromMerge)
    }
 
-   @clearFirebaseCache(["getApplications", "getApplication"])
+   @clearFirebaseCache(["getApplications"])
    async createApplication(candidateId: string, jobId: string) {
       const model: MergeApplicationModel = {
          candidate: candidateId,
