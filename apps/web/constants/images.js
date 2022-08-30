@@ -32,6 +32,8 @@ export const alternateBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Falternate_background.webp?alt=media&token=8b374f95-ce1f-42d6-8b79-8d502ed218ac"
 export const alternateStudentBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-main-background.webp?alt=media&token=f6597bc5-71df-4445-95c8-38134ad7be79"
+export const quoteBackgroundLightPink =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fquote_background_light_pink.png?alt=media&token=f6597bc5-71df-4445-95c8-38134ad7be79"
 export const landingBottomBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fbottom-background.webp?alt=media&token=05cc7acd-b876-4944-b828-6a67ba501d1c"
 export const blankLaptop =
