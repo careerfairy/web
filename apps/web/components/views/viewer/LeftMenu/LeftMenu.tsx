@@ -18,6 +18,7 @@ import {
 } from "../../../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
+import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -106,16 +107,23 @@ const LeftMenu = ({
    }, [dispatch])
 
    const views = [
-      <QuestionCategory
-         key={"questions-category-tab"}
-         showMenu={showMenu}
-         streamer={streamer}
-         livestream={livestream}
-         isMobile={isMobile}
-         selectedState={selectedState}
-         user={user}
-         userData={userData}
-      />,
+      livestream.questionsDisabled ? (
+         <GenericCategoryInactive
+            title={"Questions Disabled"}
+            subtitle={"This livestream has the Q&A disabled."}
+         />
+      ) : (
+         <QuestionCategory
+            key={"questions-category-tab"}
+            showMenu={showMenu}
+            streamer={streamer}
+            livestream={livestream}
+            isMobile={isMobile}
+            selectedState={selectedState}
+            user={user}
+            userData={userData}
+         />
+      ),
       <PollCategory
          key={"polls-category-tab"}
          livestream={livestream}
@@ -237,7 +245,7 @@ const LeftMenu = ({
             <Drawer
                anchor="left"
                classes={desktopDrawerClasses}
-               open={focusModeEnabled ? showMenu : true}
+               open={showMenu}
                variant="persistent"
             >
                {content}
