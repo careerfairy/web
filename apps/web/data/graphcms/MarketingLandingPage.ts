@@ -4,11 +4,13 @@ import {
    HygraphResponseCompanyValues,
    HygraphResponseEventsSection,
    HygraphResponseHero,
+   HygraphResponseHighlightList,
    HygraphResponseMarketingPage,
    HygraphResponseMarketingSignup,
    HygraphResponseSeo,
    HygraphResponseTestimonialListValue,
    HygraphResponseTestimonialValue,
+   HygraphResponseTextBlock,
 } from "../../types/cmsTypes"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
@@ -26,6 +28,8 @@ export class MarketingLandingPage extends BaseModel {
          | HygraphResponseTestimonialValue
          | HygraphResponseTestimonialListValue
          | HygraphResponseCompanyLogosValue
+         | HygraphResponseTextBlock
+         | HygraphResponseHighlightList
       )[]
    ) {
       super()
