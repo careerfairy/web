@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 const useUpcomingStreamsByFieldOfStudy = (fieldsOfStudy: FieldOfStudy[]) => {
    const [events, setEvents] = useState<LivestreamEvent[]>([])
@@ -10,10 +10,7 @@ const useUpcomingStreamsByFieldOfStudy = (fieldsOfStudy: FieldOfStudy[]) => {
    useEffect(() => {
       setLoading(true)
       livestreamRepo
-         .getUpcomingEventsByFieldsOfStudy(
-            fieldsOfStudy.map((el) => el.id),
-            10
-         )
+         .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, 10)
          .then((events: LivestreamEvent[]) => {
             if (events) {
                setEvents(events)

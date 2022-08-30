@@ -213,7 +213,7 @@ export interface EventsProps {
    loading: boolean
    limit?: number
    hidePreview?: boolean
-   type: EventsTypes
+   type: EventsTypes | string
    id?: string
    isEmpty?: boolean
 }
