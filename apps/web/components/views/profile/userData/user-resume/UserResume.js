@@ -59,64 +59,67 @@ const UserResume = ({
    const [selectedIndex, setSelectedIndex] = useState(1)
    const classes = useStyles({ shareCvWithTalentPool: userData?.shareResume })
 
-   const uploadLogo = (logoFile) => {
-      var storageRef = firebase.getStorageRef()
-      let presentationRef = storageRef.child(
-         "user_resume/" + userData.userEmail + ".pdf"
-      )
+   const uploadLogo = useCallback(
+      (logoFile) => {
+         var storageRef = firebase.getStorageRef()
+         let presentationRef = storageRef.child(
+            "user_resume/" + userData.userEmail + ".pdf"
+         )
 
-      var uploadTask = presentationRef.put(logoFile)
+         var uploadTask = presentationRef.put(logoFile)
 
-      uploadTask.on(
-         "state_changed",
-         function (snapshot) {
-            var progress =
-               (snapshot.bytesTransferred / snapshot.totalBytes) * 100
-            console.log("Upload is " + progress + "% done")
-            switch (snapshot.state) {
-               case "paused":
-                  console.log("Upload is paused")
-                  break
-               case "running":
-                  console.log("Upload is running")
-                  break
-               default:
-                  break
+         uploadTask.on(
+            "state_changed",
+            function (snapshot) {
+               var progress =
+                  (snapshot.bytesTransferred / snapshot.totalBytes) * 100
+               console.log("Upload is " + progress + "% done")
+               switch (snapshot.state) {
+                  case "paused":
+                     console.log("Upload is paused")
+                     break
+                  case "running":
+                     console.log("Upload is running")
+                     break
+                  default:
+                     break
+               }
+            },
+            function (error) {
+               switch (error.code) {
+                  case "storage/unauthorized":
+                     break
+                  case "storage/canceled":
+                     break
+                  case "storage/unknown":
+                     break
+                  default:
+                     break
+               }
+            },
+            function () {
+               //Upload completed successfully, now we can get the download URL
+               console.log("upload successful")
+               uploadTask.snapshot.ref
+                  .getDownloadURL()
+                  .then(function (downloadURL) {
+                     console.log("Download Url", downloadURL)
+                     dispatch(
+                        actions.editUserProfile({
+                           userResume: downloadURL,
+                           shareResume: true,
+                        })
+                     )
+                     setSelectedIndex(0)
+                  })
             }
-         },
-         function (error) {
-            switch (error.code) {
-               case "storage/unauthorized":
-                  break
-               case "storage/canceled":
-                  break
-               case "storage/unknown":
-                  break
-               default:
-                  break
-            }
-         },
-         function () {
-            //Upload completed successfully, now we can get the download URL
-            console.log("upload successful")
-            uploadTask.snapshot.ref
-               .getDownloadURL()
-               .then(function (downloadURL) {
-                  console.log("Download Url", downloadURL)
-                  dispatch(
-                     actions.editUserProfile({
-                        userResume: downloadURL,
-                        shareResume: true,
-                     })
-                  )
-                  setSelectedIndex(0)
-               })
-         }
-      )
-      return uploadTask
-   }
+         )
+         return uploadTask
+      },
+      [dispatch, firebase, userData.userEmail]
+   )
 
-   const deleteResume = () => {
+   const deleteResume = useCallback(() => {
       var storageRef = firebase.getStorageRef()
       let presentationRef = storageRef.child(
          "user_resume/" + userData.userEmail + ".pdf"
@@ -126,11 +129,16 @@ const UserResume = ({
          console.log("delete successful")
          dispatch(actions.editUserProfile({ userResume: "" }))
       })
-   }
+   }, [dispatch, firebase, userData.userEmail])
 
-   const updateShareCvStatus = (event) => {
-      dispatch(actions.editUserProfile({ shareResume: event.target.checked }))
-   }
+   const updateShareCvStatus = useCallback(
+      (event) => {
+         dispatch(
+            actions.editUserProfile({ shareResume: event.target.checked })
+         )
+      },
+      [dispatch]
+   )
 
    const handleToggle = () => {
       setOpen((prevOpen) => !prevOpen)
@@ -221,6 +229,7 @@ const UserResume = ({
          handleMenuItemClick={handleMenuItemClick}
          openDropdown={open}
          disabled={disabled}
+         showOnlyButton={true}
       />
    ) : (
       renderUploadCvBox()
