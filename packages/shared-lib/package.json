@@ -9,10 +9,12 @@
       "copy-files": "cpx \"src/**/*.{json}\" dist/",
       "clean": "rimraf dist/"
    },
+   "dependencies": {
+      "object-hash": "^3.0.0"
+   },
    "peerDependencies": {
       "axios": "^0.27.2",
-      "firebase": "^9.9.0",
-      "object-hash": "^3.0.0"
+      "firebase": "^9.9.0"
    },
    "devDependencies": {
       "cpx": "^1.5.0",
