@@ -1,15 +1,15 @@
 import SEO from "../components/util/SEO"
 import { FC } from "react"
-import { PillsBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { PaperBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { MarketingLandingPage } from "../data/graphcms/MarketingLandingPage"
 
 interface Props {
    page: MarketingLandingPage
 }
 const CmsPageLayout: FC<Props> = ({ children, page }) => (
-   <PillsBackground>
+   <PaperBackground>
       {page?.seo && <SEO id={page?.id} {...page.seo} />}
       <>{children}</>
-   </PillsBackground>
+   </PaperBackground>
 )
 export default CmsPageLayout
