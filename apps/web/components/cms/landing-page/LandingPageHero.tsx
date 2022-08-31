@@ -14,6 +14,7 @@ import {
 } from "@mui/material"
 import { Formik } from "formik"
 import { useRouter } from "next/router"
+import { defaultMarketingLandingPage } from "../constants"
 
 type Props = {
    fieldsOfStudy: HygraphRemoteFieldOfStudyResponse[]
@@ -61,8 +62,12 @@ const LandingPageHero = ({ fieldsOfStudy, hero }: Props) => {
                selectedFieldOfStudyName.toUpperCase()
          )
 
+         const slug =
+            fieldOfStudy.marketingLandingPage?.slug ||
+            defaultMarketingLandingPage
+
          void push(
-            `/landing/${fieldOfStudy.marketingLandingPage?.slug}?fieldOfStudyId=${fieldOfStudy.fieldOfStudyId}`
+            `/landing/${slug}?fieldOfStudyId=${fieldOfStudy.fieldOfStudyId}`
          )
       },
       [fieldsOfStudy, push]
