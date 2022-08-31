@@ -33,7 +33,7 @@ const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
             title={eventsTitle?.toUpperCase() || "COMING UP NEXT"}
             type={EventsTypes.comingUp}
             events={events}
-            loading={loading}
+            loading={loading || (!loading && !events.length)}
             isEmpty={events.length === 0}
          />
       </Box>
