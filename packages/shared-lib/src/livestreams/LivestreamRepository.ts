@@ -1,6 +1,8 @@
 import firebase from "firebase/compat/app"
 import { RegisteredStudent, UserPublicData } from "../users"
-import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
+import BaseFirebaseRepository, {
+   mapFirestoreDocuments,
+} from "../BaseFirebaseRepository"
 import {
    LivestreamEvent,
    LivestreamEventParsed,
@@ -86,19 +88,34 @@ export interface ILivestreamRepository {
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void>
+
+   getById(id: string): Promise<LivestreamEvent>
 }
 
-export class FirebaseLivestreamRepository implements ILivestreamRepository {
+export class FirebaseLivestreamRepository
+   extends BaseFirebaseRepository
+   implements ILivestreamRepository
+{
    constructor(
       private readonly firestore: firebase.firestore.Firestore,
       private readonly fieldValue: typeof firebase.firestore.FieldValue
-   ) {}
+   ) {
+      super()
+   }
 
    private mapLivestreamCollections(
       documentSnapshot: firebase.firestore.QuerySnapshot
    ): LivestreamsDataParser {
       const docs = mapFirestoreDocuments<LivestreamEvent>(documentSnapshot)
       return new LivestreamsDataParser(docs).complementaryFields()
+   }
+
+   async getById(id: string): Promise<LivestreamEvent> {
+      const doc = await this.firestore.collection("livestreams").doc(id).get()
+
+      if (!doc.exists) return null
+
+      return this.addIdToDoc<LivestreamEvent>(doc)
    }
 
    heartbeat(

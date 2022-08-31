@@ -2,7 +2,14 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useAuth } from "HOCs/AuthProvider"
-import { SpeedDial, SpeedDialAction } from "@mui/material"
+import {
+   CircularProgress,
+   SpeedDial,
+   SpeedDialAction,
+   Tooltip,
+   Typography,
+   useMediaQuery,
+} from "@mui/material"
 import SpyIcon from "@mui/icons-material/Visibility"
 import RecordIcon from "@mui/icons-material/FiberManualRecord"
 import { useRouter } from "next/router"
@@ -13,12 +20,6 @@ import ConfirmRecordingDialog from "../../../admin/streams/StreamsContainer/Stre
 import StopRecordingIcon from "@mui/icons-material/Stop"
 import StartRecordingIcon from "@mui/icons-material/PlayCircleFilledWhite"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import {
-   CircularProgress,
-   Tooltip,
-   Typography,
-   useMediaQuery,
-} from "@mui/material"
 import useStreamRef from "../../../../custom-hook/useStreamRef"
 import SettingsIcon from "@mui/icons-material/Settings"
 import Box from "@mui/material/Box"
@@ -27,6 +28,7 @@ import JoinAsStreamerIcon from "@mui/icons-material/RecordVoiceOver"
 import useStreamToken from "../../../../custom-hook/useStreamToken"
 import clsx from "clsx"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import { focusModeEnabledSelector } from "../../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -98,9 +100,7 @@ const SuperAdminControls = () => {
    const recordingRequestOngoing = useSelector(
       (state) => state.streamAdmin.recording.recordingRequestOngoing
    )
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
       useState(false)
    const [confirmStartStreamingDialogOpen, setConfirmStartStreamingDialogOpen] =

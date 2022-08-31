@@ -1,12 +1,16 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import {
+   RegistrationStep,
    SavedRecruiter,
    UserATSDocument,
    UserATSRelations,
    UserData,
-   RegistrationStep,
+   UserJobApplicationDocument,
 } from "./users"
 import firebase from "firebase/compat/app"
+import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
+import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
+import { Application } from "../ats/Application"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -26,6 +30,37 @@ export interface IUserRepository {
    getUsersDataByUids(uids: string[]): Promise<UserData[]>
 
    getUserATSData(id: string): Promise<UserATSDocument>
+
+   /**
+    * Save/update the job application
+    *
+    * @param userId
+    * @param jobIdentifier
+    * @param job
+    * @param livestream
+    */
+   upsertJobApplication(
+      userId: string,
+      jobIdentifier: JobIdentifier,
+      job: Job,
+      livestream: LivestreamEvent
+   ): Promise<void>
+
+   getJobApplications(userId: string): Promise<UserJobApplicationDocument[]>
+
+   /**
+    * Updates the user's the job applications in a batch operation
+    *
+    * @param userId
+    * @param batchOperations
+    */
+   batchUpdateUserJobApplications(
+      userId: string,
+      batchOperations: {
+         application: Application
+         jobApplicationDocId: string
+      }[]
+   ): Promise<void>
 
    associateATSData(
       id: string,
@@ -51,7 +86,8 @@ export class FirebaseUserRepository
 {
    constructor(
       private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: typeof firebase.firestore.FieldValue
+      private readonly fieldValue: typeof firebase.firestore.FieldValue,
+      private readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
    }
@@ -194,6 +230,79 @@ export class FirebaseUserRepository
       return userRef.set(toUpdate, { merge: true })
    }
 
+   batchUpdateUserJobApplications(
+      userId: string,
+      batchOperations: {
+         application: Application
+         jobApplicationDocId: string
+      }[]
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+      batchOperations.forEach((operation) => {
+         const ref = this.firestore
+            .collection("userData")
+            .doc(userId)
+            .collection("jobApplications")
+            .doc(operation.jobApplicationDocId)
+
+         const toUpdate: Partial<UserJobApplicationDocument> = {
+            rejectReason: operation.application.rejectReason || null,
+            currentStage: operation.application.currentStage || null,
+            // @ts-ignore
+            updatedAt: this.fieldValue.serverTimestamp(),
+            rejectedAt: operation.application.rejectedAt
+               ? this.timestamp.fromDate(operation.application.rejectedAt)
+               : null,
+            job: operation.application.job.serializeToPlainObject() as Job,
+         }
+         batch.update(ref, toUpdate)
+      })
+      return batch.commit()
+   }
+
+   upsertJobApplication(
+      userId: string,
+      jobIdentifier: JobIdentifier,
+      job: Job,
+      livestream: LivestreamEvent
+   ): Promise<void> {
+      const docId = documentIdJobApplication(jobIdentifier)
+
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("jobApplications")
+         .doc(docId)
+
+      const toInsert: UserJobApplicationDocument = {
+         groupId: jobIdentifier.groupId,
+         integrationId: jobIdentifier.integrationId,
+         jobId: jobIdentifier.jobId,
+         // @ts-ignore
+         date: this.fieldValue.serverTimestamp(),
+         job: job.serializeToPlainObject() as Job,
+         livestream: pickPublicDataFromLivestream(livestream),
+         updatedAt: null,
+      }
+
+      return docRef.set(toInsert, { merge: true })
+   }
+
+   async getJobApplications(
+      userId: string
+   ): Promise<UserJobApplicationDocument[]> {
+      const collectionRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("jobApplications")
+         .where("job.status", "in", PUBLIC_JOB_STATUSES)
+         .orderBy("date", "desc")
+
+      const data = await collectionRef.get()
+
+      return this.addIdToDocs<UserJobApplicationDocument>(data.docs)
+   }
+
    updateAdditionalInformation(userEmail, fields): Promise<void> {
       const userRef = this.firestore.collection("userData").doc(userEmail)
 
@@ -268,4 +377,8 @@ export class FirebaseUserRepository
       }
       return userRef.set(toUpdate, { merge: true })
    }
+}
+
+const documentIdJobApplication = (jobIdentifier: JobIdentifier) => {
+   return `${jobIdentifier.groupId}_${jobIdentifier.integrationId}_${jobIdentifier.jobId}`
 }

@@ -38,6 +38,7 @@ import BadgeButton from "../../../components/views/common/BadgeButton"
 import { StylesProps } from "../../../types/commonTypes"
 import { Badge as BadgeType } from "@careerfairy/shared-lib/dist/badges/badges"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
 
 const styles: StylesProps = {
    appBar: {
@@ -107,9 +108,7 @@ const ViewerTopBar = ({
          )?.length
       )
    )
-   const focusModeEnabled = useSelector(
-      (state: any) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
 
    const careerCenters = useStreamGroups(currentLivestream?.groupIds)
 

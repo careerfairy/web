@@ -24,63 +24,61 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
    const { fetchAgoraRtmToken } = useFirebaseService()
    const dispatch = useDispatch()
 
-   useEffect(() => {
-      init()
-      return () => {
-         void end()
-      }
-   }, [])
-
-   const init = () => {
+   const init = useCallback(() => {
       rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
          logFilter: AgoraRTM.LOG_FILTER_ERROR,
       })
-   }
+   }, [])
 
-   const end = () => {
-      return agoraHandlers.handleDisconnect()
-   }
+   const onChannelMessage = useCallback(
+      (message: RtmMessage, memberId: string) => {
+         if (message.messageType === "TEXT") {
+            const messageData: EmoteMessage = JSON.parse(message.text)
+            if (messageData.textType === "EMOTE") {
+               dispatch(actions.setEmote(messageData, memberId))
+            }
+         }
+      },
+      [dispatch]
+   )
+
+   const onMemberCountUpdated = useCallback(
+      (newCount: number) => {
+         dispatch(actions.setNumberOfViewers(newCount))
+      },
+      [dispatch]
+   )
+
+   const joinAgoraRtmChannel = useCallback(
+      async (roomId: string, userUid: string) => {
+         const { data } = await fetchAgoraRtmToken({
+            uid: userUid,
+         })
+
+         try {
+            await rtmClient.current.login({
+               token: data.token.rtmToken,
+               uid: userUid,
+            })
+
+            const channel = rtmClient.current.createChannel(roomId)
+            channel.on("ChannelMessage", onChannelMessage)
+
+            await channel.join()
+            channel.on("MemberCountUpdated", onMemberCountUpdated)
+            rtmChannel.current = channel
+         } catch (error) {
+            console.error(error)
+         }
+      },
+      [fetchAgoraRtmToken, onChannelMessage, onMemberCountUpdated]
+   )
 
    useEffect(() => {
       if (roomId && userId) {
          void joinAgoraRtmChannel(roomId, userId)
       }
-   }, [roomId, userId])
-
-   const joinAgoraRtmChannel = async (roomId: string, userUid: string) => {
-      const { data } = await fetchAgoraRtmToken({
-         uid: userUid,
-      })
-
-      try {
-         await rtmClient.current.login({
-            token: data.token.rtmToken,
-            uid: userUid,
-         })
-
-         const channel = rtmClient.current.createChannel(roomId)
-         channel.on("ChannelMessage", onChannelMessage)
-
-         await channel.join()
-         channel.on("MemberCountUpdated", onMemberCountUpdated)
-         rtmChannel.current = channel
-      } catch (error) {
-         console.error(error)
-      }
-   }
-
-   const onChannelMessage = (message: RtmMessage, memberId: string) => {
-      if (message.messageType === "TEXT") {
-         const messageData: EmoteMessage = JSON.parse(message.text)
-         if (messageData.textType === "EMOTE") {
-            dispatch(actions.setEmote(messageData, memberId))
-         }
-      }
-   }
-
-   const onMemberCountUpdated = (newCount: number) => {
-      dispatch(actions.setNumberOfViewers(newCount))
-   }
+   }, [roomId, userId, joinAgoraRtmChannel])
 
    const createEmote = useCallback(
       async (emoteType: EmoteType) => {
@@ -91,7 +89,7 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
             console.error(e)
          }
       },
-      [dispatch, rtmChannel.current]
+      [dispatch]
    )
 
    const agoraHandlers = useMemo(
@@ -149,17 +147,32 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
             await channel.leave()
          },
       }),
-      [rtmClient, rtmChannel.current, roomId]
+      [rtmClient, roomId]
    )
+
+   const end = useCallback(() => {
+      return agoraHandlers.handleDisconnect()
+   }, [agoraHandlers])
+
+   useEffect(() => {
+      init()
+      return () => {
+         void end()
+      }
+   }, [init, end])
+
+   const contextValue = useMemo(
+      () => ({
+         createEmote,
+         agoraHandlers,
+         rtmChannel: rtmChannel.current,
+         rtmClient: rtmClient.current,
+      }),
+      [agoraHandlers, createEmote]
+   )
+
    return (
-      <AgoraRTMContext.Provider
-         value={{
-            createEmote,
-            agoraHandlers,
-            rtmChannel: rtmChannel.current,
-            rtmClient: rtmClient.current,
-         }}
-      >
+      <AgoraRTMContext.Provider value={contextValue}>
          {children}
       </AgoraRTMContext.Provider>
    )

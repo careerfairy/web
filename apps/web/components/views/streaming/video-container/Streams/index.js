@@ -6,6 +6,7 @@ import Banners from "./Banners"
 import { useSelector } from "react-redux"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import SuperAdminControls from "../SuperAdminControls"
+import { focusModeEnabledSelector } from "../../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -39,9 +40,7 @@ const Streams = memo(
       streamerId,
       sharingVideo,
    }) => {
-      const focusModeEnabled = useSelector(
-         (state) => state.stream.layout.focusModeEnabled
-      )
+      const focusModeEnabled = useSelector(focusModeEnabledSelector)
       const [streamData, setStreamData] = useState([])
       const [bannersBottom, setBannersBottom] = useState(false)
       const [hasManySpeakers, setHasManySpeakers] = useState(false)

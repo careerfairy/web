@@ -151,7 +151,6 @@ const CategoryBreakdown = ({
       labels: [],
       ids: [],
    })
-   // console.log("-> data", data);
 
    useEffect(() => {
       if (groups?.length || !currentGroup?.id) {
