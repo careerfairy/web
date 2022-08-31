@@ -23,9 +23,9 @@ const useUpcomingStreamsByFieldOfStudy = (
          .then((events: LivestreamEvent[]) => {
             if (events?.length) {
                setEvents(events)
-               setLoading(false)
             }
          })
+         .catch(console.error)
    }, [])
 
    useEffect(() => {
@@ -37,11 +37,12 @@ const useUpcomingStreamsByFieldOfStudy = (
          .then((events: LivestreamEvent[]) => {
             if (events?.length) {
                setEvents(events)
-               setLoading(false)
             } else if (!events?.length && fallbackToGeneralStreams) {
                getGeneralUpcomingStreams(limit)
             }
          })
+         .catch(console.error)
+         .finally(() => setLoading(false))
    }, [fallbackToGeneralStreams, fieldsOfStudy, getGeneralUpcomingStreams])
 
    return { events, loading }
