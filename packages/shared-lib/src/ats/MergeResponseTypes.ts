@@ -108,7 +108,7 @@ export interface MergeApplication {
    source?: string
    credited_to?: string
    current_stage?: MergeJobInterviewStage
-   reject_reason?: string
+   reject_reason?: MergeRejectReason
 }
 
 // creation model
@@ -129,6 +129,12 @@ export interface MergeJobInterviewStage {
    remote_id: string
    name: string
    job: string
+}
+
+export interface MergeRejectReason {
+   id: string
+   remote_id: string
+   name: string
 }
 
 /**

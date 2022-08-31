@@ -1,25 +1,44 @@
-import React from "react"
+import React, { FC } from "react"
 import * as PropTypes from "prop-types"
 import { Box } from "@mui/material"
 
-export const TabPanel = ({
-   hidden,
+type StyledBoxPanelProps = {
+   hidden?: boolean
+   className?: string
+   other?: any
+   index?: number
+   children: JSX.Element
+   height?: string
+   value?: number
+}
+
+export const StyledBox = ({
    children,
-   height,
-   value,
-   index,
-   className,
-   ...other
-}) => {
+   className = undefined,
+}: StyledBoxPanelProps) => {
+   return <Box className={className}>{children}</Box>
+}
+
+interface TabPanelProps {
+   key: any
+   value: number | string
+   activeValue: number | string
+   [x: string]: any
+}
+
+export const TabPanel: FC<TabPanelProps> = (props) => {
+   const { children, activeValue, value, ...other } = props
+
    return (
-      <Box
-         hidden={hidden}
-         className={className}
+      <div
+         role="tabpanel"
+         hidden={activeValue !== value}
+         id={`simple-tabpanel-${value}`}
+         aria-labelledby={`simple-tab-${value}`}
          {...other}
-         style={{ height: height || "100%", ...other.style }}
       >
-         {children}
-      </Box>
+         {activeValue === value && <Box>{children}</Box>}
+      </div>
    )
 }
 

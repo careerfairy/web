@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { Fragment, useCallback, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import VideoContainer from "./video-container/VideoContainer"
 import NotificationsContainer from "./notifications-container/NotificationsContainer"
@@ -14,9 +14,11 @@ import { Backdrop } from "@mui/material"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import HandRaiseNotifier from "./LeftMenu/categories/hand-raise/active/HandRaiseNotifier"
+import RootState from "../../../store/reducers"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
+      // @ts-ignore
       transitionTimingFunction: theme.transitions.easeInOut,
       // zIndex: 10,
       display: "flex",
@@ -53,11 +55,8 @@ const useStyles = makeStyles((theme) => ({
 
 const StreamerOverview = ({
    isStreamer,
-   showAudience,
-   setSliding,
    selectedState,
    handleStateChange,
-   setNumberOfViewers,
    showMenu,
    notifications,
    streamerId,
@@ -65,12 +64,22 @@ const StreamerOverview = ({
    hideAudience,
    audienceDrawerOpen,
 }) => {
-   const { currentLivestream, isBreakout } = useCurrentStream()
+   const { currentLivestream } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
    const classes = useStyles()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
-      (state) => state.stream.streaming
+      (state: RootState) => state.stream.streaming
+   )
+
+   const unmuteMutedRemoteVideosAfterFail = useCallback(
+      () => dispatch(actions.unmuteMutedRemoteVideosAfterFail()),
+      [dispatch]
+   )
+
+   const unpauseRemoteVideosAfterFail = useCallback(
+      () => dispatch(actions.unpauseRemoteVideosAfterFail()),
+      [dispatch]
    )
 
    useEffect(() => {
@@ -86,18 +95,17 @@ const StreamerOverview = ({
                currentLivestream={currentLivestream}
                streamerId={streamerId}
                smallScreen={smallScreen}
-               setNumberOfViewers={setNumberOfViewers}
-               isStreamer={isStreamer}
-               isBreakout={isBreakout}
                showMenu={showMenu}
                viewer={false}
+               isPlayMode={undefined}
             />
             <ButtonComponent
+               isMobile={undefined}
                streamer={true}
-               setSliding={setSliding}
                selectedState={selectedState}
                showMenu={showMenu}
                handleStateChange={handleStateChange}
+               includeJobs={currentLivestream.jobs?.length > 0}
             />
          </div>
          <AudienceDrawer
@@ -106,7 +114,6 @@ const StreamerOverview = ({
             isStreamer
          />
          <NotificationsContainer
-            livestreamId={currentLivestream.id}
             handRaiseMenuOpen={selectedState === "hand"}
             notifications={notifications}
          />
@@ -118,15 +125,11 @@ const StreamerOverview = ({
             isStreamer={isStreamer}
          />
 
-         <IconsContainer
-            className={classes.iconsContainer}
-            isTest={currentLivestream.test}
-            livestreamId={currentLivestream.id}
-         />
+         <IconsContainer className={classes.iconsContainer} />
          <Backdrop
             open={videoIsMuted}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
+            onClick={unmuteMutedRemoteVideosAfterFail}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />
@@ -136,7 +139,7 @@ const StreamerOverview = ({
          <Backdrop
             open={videoIsPaused}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
+            onClick={unpauseRemoteVideosAfterFail}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />
