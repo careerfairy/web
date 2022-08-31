@@ -109,8 +109,8 @@ const LeftMenu = ({
    const views = [
       livestream.questionsDisabled ? (
          <GenericCategoryInactive
-            title={"Questions Disabled"}
-            subtitle={"This livestream has the Q&A disabled."}
+            title={"No Q&A Today"}
+            subtitle={"The Q&A is disabled for this live stream."}
          />
       ) : (
          <QuestionCategory

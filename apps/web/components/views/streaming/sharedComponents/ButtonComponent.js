@@ -201,9 +201,7 @@ const ButtonComponent = ({
          {
             icon: <HelpIcon fontSize="large" />,
             name: questionsAreDisabled ? "Q&A (Disabled)" : "Q&A",
-            disabled:
-               questionsAreDisabled ||
-               (showMenu && selectedState === "questions"),
+            disabled: showMenu && selectedState === "questions",
             onClick: () => {
                handleStateChange("questions")
             },
