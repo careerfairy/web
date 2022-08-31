@@ -46,6 +46,14 @@ export class Job extends ATSModel {
       return title
    }
 
+   /**
+    * Get the Hiring Manager name if exists
+    * Useful to display in the left bar of live stream
+    */
+   getHiringManager() {
+      return this.hiringManagers?.[0]?.getName() || ""
+   }
+
    static createFromMerge(job: MergeJob) {
       return new Job(
          job.id,
