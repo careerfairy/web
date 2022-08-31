@@ -15,6 +15,7 @@ import Link from "../../components/views/common/Link"
 import { Container } from "@mui/material"
 import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
+import Jobs from "../../components/views/profile/jobs/Jobs"
 
 type TabPanelProps = {
    children: () => JSX.Element
@@ -82,6 +83,13 @@ const pages = {
          full: "Groups",
       },
       component: Groups,
+   },
+   "/profile/jobs": {
+      title: {
+         compact: "Jobs",
+         full: "Jobs",
+      },
+      component: Jobs,
    },
 }
 

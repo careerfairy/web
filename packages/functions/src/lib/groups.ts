@@ -1,5 +1,6 @@
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import { groupRepo } from "../api/repositories"
+import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
 
 /**
  * Get the Linked Account secret tokens
@@ -7,8 +8,8 @@ import { groupRepo } from "../api/repositories"
  * Returns a map integrationId => token
  * @param associations
  */
-export const getATSTokensForJobAssociations = async (
-   associations: LivestreamJobAssociation[]
+export const getATSTokens = async (
+   associations: (LivestreamJobAssociation | UserJobApplicationDocument)[]
 ) => {
    const map: Record<string, string> = {}
 

@@ -3,7 +3,7 @@ import { Typography, TypographyProps } from "@mui/material"
 
 const ContentCardTitle: FC<TypographyProps> = ({ children, ...props }) => {
    return (
-      <Typography variant={"h5"} {...props}>
+      <Typography variant={"h4"} {...props}>
          {children}
       </Typography>
    )
