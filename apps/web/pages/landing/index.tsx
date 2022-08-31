@@ -8,7 +8,7 @@ import CmsPageLayout from "../../layouts/CmsPageLayout"
 import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import * as Blocks from "../../components/cms/blocks"
 import { hookLandingPage } from "../../components/cms/constants"
-import LandingPage from "../../components/cms/landing-page/LandingPage"
+import LandingPageHero from "../../components/cms/landing-page/LandingPageHero"
 import useServerModel from "../../components/custom-hook/utils/useServerModel"
 
 type Props = {
@@ -33,7 +33,7 @@ const Landing = ({ serverPage, allFieldsOfStudy }: Props) => {
                   // in case is a hero component we want to pass the fieldsOfStudy to have the input selector
                   if (block.__typename === "Hero") {
                      return (
-                        <LandingPage
+                        <LandingPageHero
                            fieldsOfStudy={allFieldsOfStudy}
                            hero={block as HygraphResponseHero}
                            key={block.__typename}

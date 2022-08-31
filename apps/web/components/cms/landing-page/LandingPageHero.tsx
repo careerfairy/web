@@ -50,7 +50,7 @@ const styles = sxStyles({
 
 const initialValues = { selectedFieldOfStudyName: "" }
 
-const LandingPage = ({ fieldsOfStudy, hero }: Props) => {
+const LandingPageHero = ({ fieldsOfStudy, hero }: Props) => {
    const { push } = useRouter()
 
    const handleSubmit = useCallback(
@@ -142,4 +142,4 @@ const LandingPage = ({ fieldsOfStudy, hero }: Props) => {
    )
 }
 
-export default LandingPage
+export default LandingPageHero

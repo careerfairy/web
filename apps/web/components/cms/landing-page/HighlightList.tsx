@@ -2,7 +2,7 @@ import { HygraphResponseHighlightList } from "../../../types/cmsTypes"
 import Box from "@mui/material/Box"
 import { sxStyles } from "../../../types/commonTypes"
 import HighlightsCarousel from "../../views/portal/HighlightsCarousel"
-import React, { useCallback } from "react"
+import React, { useMemo } from "react"
 import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
 import Container from "@mui/material/Container"
 import { Typography } from "@mui/material"
@@ -22,7 +22,7 @@ const HighlightList = ({
    highlightListTitle,
    highlights,
 }: HygraphResponseHighlightList) => {
-   const getMappedHighlights = useCallback((): HighLight[] => {
+   const getMappedHighlights = useMemo((): HighLight[] => {
       return highlights?.map(
          (highlight) =>
             ({
@@ -43,7 +43,7 @@ const HighlightList = ({
             </Typography>
             <HighlightsCarousel
                showHighlights={true}
-               serverSideHighlights={getMappedHighlights()}
+               serverSideHighlights={getMappedHighlights}
             />
          </Container>
       </Box>
