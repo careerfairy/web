@@ -1,15 +1,16 @@
 import { sxStyles } from "../../../types/commonTypes"
 import Box from "@mui/material/Box"
-import { EventsTypes } from "../../views/portal/events-preview/EventsPreview"
-import EventsPreviewGrid from "../../views/portal/events-preview/EventsPreviewGrid"
+import EventsPreview, {
+   EventsTypes,
+} from "../../views/portal/events-preview/EventsPreview"
 import React from "react"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 import useUpcomingStreamsByFieldOfStudy from "../../custom-hook/useUpcomingStreamsByFieldOfStudy"
 
 const styles = sxStyles({
    wrapper: {
-      marginTop: 6,
-      marginBottom: 6,
+      px: { xs: 2, lg: 12 },
+      paddingY: 6,
    },
 })
 
@@ -22,13 +23,14 @@ const UpcomingLivestreams = ({ fieldsOfStudy }: Props) => {
 
    return (
       <Box sx={styles.wrapper}>
-         <EventsPreviewGrid
+         <EventsPreview
             id={"upcoming-events"}
+            limit={0}
             title={"COMING UP NEXT"}
             type={EventsTypes.comingUp}
-            seeMoreLink={"/next-livestreams"}
-            loading={loading}
             events={events}
+            loading={loading}
+            isEmpty={events.length === 0}
          />
       </Box>
    )

@@ -17,7 +17,7 @@ const styles = sxStyles({
 const Testimonial = ({ title, content, rating }: Props): JSX.Element => {
    return (
       <Box paddingY={6} marginX={{ xs: 4, md: 10, lg: 36, xl: 62 }}>
-         <Typography variant="h1">{title}</Typography>
+         <Typography variant="h3">{title}</Typography>
          {content && (
             <Typography variant="body1" marginY={3}>
                {content}

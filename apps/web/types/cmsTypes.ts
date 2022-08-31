@@ -1,5 +1,6 @@
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
+import { IColors } from "./commonTypes"
 
 export type Slug = string
 
@@ -22,7 +23,7 @@ export interface Company {
    logo: ICmsImage
 }
 
-export interface CmsVideo {
+export interface ICmsVideo {
    url: string
 }
 
@@ -70,7 +71,7 @@ export interface CompanyCaseStudy {
       raw: RichTextContent
       references: EmbedReferences
    }
-   coverVideo: CmsVideo
+   coverVideo: ICmsVideo
    statisticsContentSection: {
       raw: RichTextContent
       references: EmbedReferences
@@ -110,6 +111,8 @@ export interface HygraphResponseHero {
    id: string
    slug: string
    image: ICmsImage
+   video?: ICmsVideo
+   selectorLabel?: string
    buttons: HygraphResponseButton[]
    heroTitle?: string
    heroSubtitle?: string
@@ -146,8 +149,11 @@ export interface HygraphResponseTestimonialListValue {
    __typename: string
    id: string
    slug: string
+   testimonialTitle?: {
+      raw: RichTextContent
+   }
    testimonials?: HygraphResponseTestimonialValue[]
-   sliderArrowColor?: string
+   sliderArrowColor?: IColors
 }
 
 export interface HygraphFieldOfStudySelectResponse {
@@ -165,6 +171,17 @@ export interface HygraphResponseCompanyLogosValue {
    id: string
    title: string
    companies: Company[]
+}
+
+export interface HygraphResponseTextBlock {
+   __typename: string
+   slug: string
+   textBlockTitle: {
+      raw: RichTextContent
+   }
+   content?: {
+      raw: RichTextContent
+   }
 }
 
 export type PageTypes =
@@ -231,6 +248,18 @@ export const imageQueryProps = `
     }
 `
 // language=GraphQL
+export const videoQueryProps = `
+    {
+        url
+    }
+`
+// language=GraphQL
+export const richTextQueryProps = `
+    {
+        raw
+    }
+`
+// language=GraphQL
 export const buttonQueryProps = `
     {
         children
@@ -274,7 +303,9 @@ export const heroQueryProps = `
         id
         slug
         image ${imageQueryProps}
+        video ${videoQueryProps}
         buttons ${buttonQueryProps}
+        selectorLabel,
         heroTitle
         heroSubtitle
         fullScreenImage
@@ -356,6 +387,7 @@ export const testimonialListQueryProps = `
     {
         __typename
         id
+        testimonialTitle ${richTextQueryProps}
         testimonials ${testimonialQueryProps}
         sliderArrowColor
     }
@@ -375,5 +407,14 @@ export const companyLogosQueryProps = `
         title
         slug
         companies ${logoQueryProps}
+    }
+`
+// language=GraphQL
+export const textBlockQueryProps = `
+    {
+        __typename
+        slug
+        textBlockTitle ${richTextQueryProps}
+        content ${richTextQueryProps}
     }
 `
