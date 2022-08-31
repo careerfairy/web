@@ -20,11 +20,17 @@ import { SyncStatus } from "./SyncStatus"
 import { Application } from "./Application"
 import { UserData } from "../users"
 import { Candidate } from "./Candidate"
+import {
+   clearFirebaseCache,
+   fromFirebaseCache,
+} from "./MergeFirebaseCacheDecorators"
+import firebase from "firebase/compat"
 
 /**
  * Merge.dev HTTP API
  * Docs: https://www.merge.dev/docs/ats/overview/
  */
+
 export class MergeATSRepository implements IATSRepository {
    private readonly axios = axios.create({
       baseURL: "https://api.merge.dev/api/ats/v1",
@@ -34,10 +40,14 @@ export class MergeATSRepository implements IATSRepository {
     * Create a new instance
     * @param apiKey Merge API key
     * @param accountToken Client (Group) token
+    * @param firestore
     */
-   constructor(apiKey: string, accountToken?: string) {
+   constructor(
+      apiKey: string,
+      accountToken?: string,
+      readonly firestore?: firebase.firestore.Firestore
+   ) {
       this.axios.defaults.headers.common["Authorization"] = `Bearer ${apiKey}`
-
       // not every merge API call requires an account token
       if (accountToken) {
          this.axios.defaults.headers.common["X-Account-Token"] = accountToken
@@ -49,6 +59,7 @@ export class MergeATSRepository implements IATSRepository {
    | Jobs
    |--------------------------------------------------------------------------
    */
+   @fromFirebaseCache()
    async getJobs(): Promise<Job[]> {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
          `/jobs?expand=offices,recruiters,hiring_managers,departments`
@@ -56,11 +67,11 @@ export class MergeATSRepository implements IATSRepository {
       return data.results.map(Job.createFromMerge)
    }
 
+   @fromFirebaseCache()
    async getJob(id: string): Promise<Job> {
       const { data } = await this.axios
          .get<MergeJob>(`/jobs/${id}`)
          .catch(emptyResponseWhenNotFound)
-
       return data ? Job.createFromMerge(data) : null
    }
 
@@ -69,7 +80,7 @@ export class MergeATSRepository implements IATSRepository {
    | Offices
    |--------------------------------------------------------------------------
    */
-
+   @fromFirebaseCache()
    async getOffices(): Promise<Office[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeOffice>
@@ -83,6 +94,7 @@ export class MergeATSRepository implements IATSRepository {
    | Candidates
    |--------------------------------------------------------------------------
    */
+   @fromFirebaseCache()
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
          .get<MergeCandidate>(
@@ -103,6 +115,7 @@ export class MergeATSRepository implements IATSRepository {
       return Candidate.createFromMerge(data)
    }
 
+   @clearFirebaseCache(["getCandidate", "getApplications", "getApplication"])
    async candidateAddCVAttachment(candidateId: string, cvUrl: string) {
       const model: MergeAttachmentModel = {
          file_name: "Resume - CareerFairy",
@@ -123,6 +136,7 @@ export class MergeATSRepository implements IATSRepository {
    | Applications
    |--------------------------------------------------------------------------
    */
+   @fromFirebaseCache()
    async getApplications(jobId?: string): Promise<Application[]> {
       const qs = new URLSearchParams({
          expand: "candidate,job,current_stage,reject_reason",
@@ -139,6 +153,7 @@ export class MergeATSRepository implements IATSRepository {
       return data.results.map(Application.createFromMerge)
    }
 
+   @clearFirebaseCache(["getApplications"])
    async createApplication(candidateId: string, jobId: string) {
       const model: MergeApplicationModel = {
          candidate: candidateId,
@@ -153,15 +168,17 @@ export class MergeATSRepository implements IATSRepository {
       return data.id
    }
 
+   @fromFirebaseCache()
    async getApplication(applicationId: string): Promise<Application> {
       const qs = new URLSearchParams({
          expand: "candidate,job,current_stage,reject_reason",
       })
-      const { data } = await this.axios.get<MergeApplication>(
-         `/applications/${applicationId}?${qs.toString()}`
-      )
-
-      return Application.createFromMerge(data)
+      const { data } = await this.axios
+         .get<MergeApplication>(
+            `/applications/${applicationId}?${qs.toString()}`
+         )
+         .catch(emptyResponseWhenNotFound)
+      return data ? Application.createFromMerge(data) : null
    }
 
    /*
