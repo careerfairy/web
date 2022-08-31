@@ -1,11 +1,11 @@
-import { useCallback, useEffect, useState } from "react"
+import { useEffect, useState } from "react"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 /**
- *  To get events for the specific fields of studies
- *  If {fallbackToGeneralStreams} is true, show generic events
+ *  To get events for the specific fields of study
+ *  If {fallbackToGeneralStreams} is true and no events for the specific fields of study, show generic events
  */
 const useUpcomingStreamsByFieldOfStudy = (
    fieldsOfStudy: FieldOfStudy[],
@@ -14,20 +14,6 @@ const useUpcomingStreamsByFieldOfStudy = (
    const [events, setEvents] = useState<LivestreamEvent[]>([])
    const [loading, setLoading] = useState(true)
 
-   /**
-    *  Get the generic Upcoming Events
-    */
-   const getGeneralUpcomingStreams = useCallback((limit: number) => {
-      livestreamRepo
-         .getUpcomingEvents(limit)
-         .then((events: LivestreamEvent[]) => {
-            if (events?.length) {
-               setEvents(events)
-            }
-         })
-         .catch(console.error)
-   }, [])
-
    useEffect(() => {
       setLoading(true)
       const limit = 10
@@ -35,15 +21,21 @@ const useUpcomingStreamsByFieldOfStudy = (
       livestreamRepo
          .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, limit)
          .then((events: LivestreamEvent[]) => {
+            if (!events?.length && fallbackToGeneralStreams) {
+               // Get the generic Upcoming Events
+               return livestreamRepo.getUpcomingEvents(limit)
+            }
+
+            return events
+         })
+         .then((events: LivestreamEvent[]) => {
             if (events?.length) {
                setEvents(events)
-            } else if (!events?.length && fallbackToGeneralStreams) {
-               getGeneralUpcomingStreams(limit)
             }
          })
          .catch(console.error)
          .finally(() => setLoading(false))
-   }, [fallbackToGeneralStreams, fieldsOfStudy, getGeneralUpcomingStreams])
+   }, [fallbackToGeneralStreams, fieldsOfStudy])
 
    return { events, loading }
 }
