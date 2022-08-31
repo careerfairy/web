@@ -14,7 +14,8 @@ import {
    UserATSDocument,
 } from "@careerfairy/shared-lib/dist/users"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { getATSTokensForJobAssociations } from "./lib/groups"
+import { getATSTokens } from "./lib/groups"
+import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
 
 /*
 |--------------------------------------------------------------------------
@@ -57,7 +58,7 @@ export const fetchLivestreamJobs = functions
       }
 
       // integrationId -> token
-      const tokens = await getATSTokensForJobAssociations(jobAssociationList)
+      const tokens = await getATSTokens(jobAssociationList)
 
       const jobs: Job[] = []
 
@@ -66,9 +67,10 @@ export const fetchLivestreamJobs = functions
             process.env.MERGE_ACCESS_KEY,
             tokens[jobAssociation.integrationId]
          )
+
          try {
-            const fetched = await atsRepository.getJob(jobAssociation.jobId)
-            jobs.push(fetched)
+            const fetchedJob = await atsRepository.getJob(jobAssociation.jobId)
+            jobs.push(fetchedJob)
          } catch (e) {
             // log the error but let the function proceed
             // we want to be optimistic and try to fetch the next jobs
@@ -78,6 +80,83 @@ export const fetchLivestreamJobs = functions
 
       return serializeModels(jobs)
    })
+
+/**
+ * Updates the user's job applications
+ * sub-collection with the latest application and job data
+ * User needs to be signed in to run this function
+ */
+export const updateUserJobApplications = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(
+      onCallWrapper(async (data, context) => {
+         // user needs to be signed in
+         const token = await validateUserAuthExists(context)
+         const userApplications = await userRepo.getJobApplications(token.email)
+         const userATSDocument = await userRepo.getUserATSData(token.email)
+
+         const batchOperations: {
+            application: Application
+            jobApplicationDocId: string
+         }[] = []
+         const tokens = await getATSTokens(userApplications)
+
+         for (const userApplication of userApplications) {
+            const lastUpdatedTime = userApplication?.updatedAt
+               ?.toDate()
+               ?.getTime()
+            const nowTime = new Date().getTime()
+            const timeThreshold = 3600000 // 1 hour
+
+            if (
+               lastUpdatedTime + timeThreshold < nowTime || // check if application document hasn't been updated in the last hour
+               !lastUpdatedTime // OR hasn't been updated yet
+            ) {
+               // get the application status from ATS
+               const atsRepository = atsRepo(
+                  process.env.MERGE_ACCESS_KEY,
+                  tokens[userApplication.integrationId]
+               )
+               const atsRelation =
+                  userATSDocument.atsRelations[userApplication.integrationId]
+               const applicationId =
+                  atsRelation.jobApplications[userApplication.jobId]
+
+               try {
+                  const application = await atsRepository.getApplication(
+                     applicationId
+                  )
+                  if (!application) {
+                     // If application not found, do we delete the application document?
+                     continue
+                  }
+                  batchOperations.push({
+                     application,
+                     jobApplicationDocId: userApplication.id,
+                  })
+               } catch (e) {
+                  // log the error but let the function proceed
+                  // we want to be optimistic and try to batch update the next applications
+                  logAxiosError(e)
+               }
+            }
+         }
+         if (batchOperations.length) {
+            try {
+               await userRepo.batchUpdateUserJobApplications(
+                  token.email,
+                  batchOperations
+               )
+            } catch (e) {
+               functions.logger.error(
+                  "Error batch updating user job applications",
+                  e,
+                  batchOperations
+               )
+            }
+         }
+      })
+   )
 
 /**
  * Apply a user to a job
@@ -106,7 +185,7 @@ export const atsUserApplyToJob = functions
          const livestream = await livestreamsRepo.getById(livestreamId)
          const jobAssociation = livestream.jobs.find((a) => a.jobId === jobId)
          const integrationId = jobAssociation.integrationId
-         const tokens = await getATSTokensForJobAssociations([jobAssociation])
+         const tokens = await getATSTokens([jobAssociation])
 
          const atsRepository = atsRepo(
             process.env.MERGE_ACCESS_KEY,

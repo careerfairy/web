@@ -143,3 +143,4 @@ exports.fetchATSApplications = atsGroup.fetchATSApplications
 // User
 exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
 exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
+exports.updateUserJobApplications = atsUser.updateUserJobApplications
