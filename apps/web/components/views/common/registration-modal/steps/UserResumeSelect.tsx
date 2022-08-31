@@ -52,7 +52,7 @@ const UserResumeSelect = ({}) => {
                Cancel
             </Button>
             <Button
-               disabled={!userData.userResume}
+               disabled={!userData?.userResume}
                variant="contained"
                size="large"
                onClick={handleNext}

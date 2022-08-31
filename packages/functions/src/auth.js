@@ -19,7 +19,7 @@ const getRandomInt = (max) => {
    }
 }
 
-exports.createNewUserAccount_v3 = functions.https.onCall(
+exports.createNewUserAccount_v4 = functions.https.onCall(
    async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
@@ -30,7 +30,7 @@ exports.createNewUserAccount_v3 = functions.https.onCall(
       }
 
       const userData = data.userData
-      const recipientEmail = data.userData.email.toLowerCase()
+      const recipientEmail = data.userData.email.toLowerCase().trim()
       const pinCode = getRandomInt(9999)
       const {
          email,
@@ -41,6 +41,8 @@ exports.createNewUserAccount_v3 = functions.https.onCall(
          universityCountryCode,
          subscribed,
          gender = "",
+         fieldOfStudy = null,
+         levelOfStudy = null,
       } = userData
 
       console.log(
@@ -48,7 +50,7 @@ exports.createNewUserAccount_v3 = functions.https.onCall(
       )
       await admin
          .auth()
-         .createUser({ email: email, password: password })
+         .createUser({ email: email.trim(), password: password })
          .then(async (user) => {
             console.log(
                `Starting firestore account creation process for ${recipientEmail}`
@@ -71,6 +73,8 @@ exports.createNewUserAccount_v3 = functions.https.onCall(
                      unsubscribed: !subscribed,
                      referralCode: generateReferralCode(),
                      gender: gender,
+                     fieldOfStudy,
+                     levelOfStudy,
                   })
                )
                .then(async () => {

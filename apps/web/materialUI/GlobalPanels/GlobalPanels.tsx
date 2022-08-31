@@ -50,15 +50,20 @@ export const SimplePanel = ({ panelId, children, height, ...other }) => {
    )
 }
 
-export const SwipeablePanel = (props) => {
-   const { children, value, index, ...other } = props
-
+export const SwipeablePanel = ({
+   children,
+   value,
+   index,
+   dir = undefined,
+   ...other
+}) => {
    return (
       <Box
          role="tabpanel"
          hidden={value !== index}
          id={`full-width-tabpanel-${index}`}
          aria-labelledby={`full-width-tab-${index}`}
+         dir={dir}
          {...other}
       >
          {value === index && <>{children}</>}

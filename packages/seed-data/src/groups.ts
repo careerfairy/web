@@ -2,6 +2,7 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { v4 as uuidv4 } from "uuid"
 import { faker } from "@faker-js/faker"
 import { firestore } from "./lib/firebase"
+import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -9,6 +10,7 @@ interface GroupSeed {
 
 class GroupFirebaseSeed implements GroupSeed {
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
+      const batch = firestore.batch()
       const id = uuidv4()
       let data: Group = {
          id,
@@ -16,38 +18,53 @@ class GroupFirebaseSeed implements GroupSeed {
          description: faker.company.bs(),
          logoUrl: faker.image.business(),
          adminEmails: [faker.internet.email()],
-
-         categories: [
-            generateCategory("Job Title", faker.name.jobTitle),
-            generateCategory("Job Type", faker.name.jobType),
-            generateCategory("Gender", faker.name.gender),
-         ],
-
          test: false,
          universityName: faker.company.companyName() ?? "My university",
       }
 
       data = Object.assign(data, overrideFields)
 
-      await firestore.collection("careerCenterData").doc(id).set(data)
+      groupQuestions.forEach((questionData) => {
+         const questionRef = firestore
+            .collection("careerCenterData")
+            .doc(id)
+            .collection("groupQuestions")
+            .doc(questionData.id)
+         batch.set(questionRef, questionData)
+      })
 
+      const groupRef = firestore.collection("careerCenterData").doc(id)
+      batch.set(groupRef, data)
+      await batch.commit()
       return data
    }
 }
-
-const generateCategory = (name, generatorFn) => ({
-   id: uuidv4(),
-   name,
-   options: Array.from(
-      { length: faker.datatype.number({ min: 1, max: 10 }) },
-      () => generateCategoryOption(generatorFn)
-   ),
-})
-
-const generateCategoryOption = (generatorFn) => ({
+const generateQuestionOption = (generatorFn) => ({
    id: uuidv4(),
    name: generatorFn(),
 })
+
+export const generateQuestion = (
+   name,
+   generatorFn
+): LivestreamGroupQuestion => ({
+   id: uuidv4(),
+   questionType: "custom",
+   hidden: false,
+   name,
+   options: Array.from(
+      { length: faker.datatype.number({ min: 1, max: 10 }) },
+      () => generateQuestionOption(generatorFn)
+   ).reduce((acc, curr) => {
+      acc[curr.id] = curr
+      return acc
+   }, {}),
+})
+export const groupQuestions = [
+   generateQuestion("Job Title", faker.name.jobTitle),
+   generateQuestion("Job Type", faker.name.jobType),
+   generateQuestion("Gender", faker.name.gender),
+]
 
 const instance: GroupSeed = new GroupFirebaseSeed()
 

@@ -1,10 +1,9 @@
 import React, {
-   Fragment,
    useCallback,
    useContext,
    useEffect,
-   useMemo,
    useState,
+   useMemo,
 } from "react"
 
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -329,7 +328,7 @@ function VideoContainer({
    )
 
    return (
-      <Fragment>
+      <>
          <BreakoutRoomManagementModal leaveAgoraRoom={leaveAgoraRoom} />
          <Streams
             externalMediaStreams={remoteStreams}
@@ -412,6 +411,7 @@ function VideoContainer({
             handleScreenShare={handleScreenShare}
          />
          <DemoIntroModal
+            smallScreen={smallScreen}
             open={showDemoIntroModal}
             handleClose={handleCloseDemoIntroModal}
          />
@@ -419,7 +419,7 @@ function VideoContainer({
             open={isOpen(23)}
             handleClose={handleCloseDemoEndModal}
          />
-      </Fragment>
+      </>
    )
 }
 

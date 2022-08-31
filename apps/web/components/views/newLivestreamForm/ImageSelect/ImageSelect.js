@@ -11,8 +11,8 @@ import {
    CircularProgress,
 } from "@mui/material"
 import match from "autosuggest-highlight/match"
-import PublishIcon from "@mui/icons-material/Publish"
 import parse from "autosuggest-highlight/parse"
+import PublishIcon from "@mui/icons-material/Publish"
 import Autocomplete from "@mui/material/Autocomplete"
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
 import FilePickerContainer from "../../../ssr/FilePickerContainer"

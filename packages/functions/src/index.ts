@@ -22,7 +22,7 @@ import atsGroup = require("./atsGroup")
 dotenv.config()
 
 // Auth
-exports.createNewUserAccount_v3 = auth.createNewUserAccount_v3
+exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
@@ -51,8 +51,7 @@ exports.sendBasicTemplateEmail = admin.sendBasicTemplateEmail
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
-exports.getLivestreamReportData = groupAdmin.getLivestreamReportData
-exports.getLivestreamReportData_v2 = groupAdmin.getLivestreamReportData_v2
+exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
 
@@ -75,10 +74,6 @@ exports.scheduleTestLivestreamDeletion =
    livestreams.scheduleTestLivestreamDeletion
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
-exports.assertLivestreamRegistrationWasCompleted =
-   livestreams.assertLivestreamRegistrationWasCompleted
-exports.assertLivestreamDeregistrationWasCompleted =
-   livestreams.assertLivestreamDeregistrationWasCompleted
 exports.sendLivestreamRegistrationConfirmationEmail =
    livestreams.sendLivestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail =
