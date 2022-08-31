@@ -398,7 +398,7 @@ export const isLocalEnvironment = () => {
 }
 
 export const logAxiosError = (error: any) => {
-   functions.logger.error("Axios: JSON", error?.toJSON())
+   functions.logger.error("Axios: JSON", error?.toJSON?.())
    if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
