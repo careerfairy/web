@@ -29,7 +29,6 @@ const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
       <Box sx={styles.wrapper}>
          <EventsPreview
             id={"upcoming-events"}
-            limit={10}
             title={eventsTitle?.toUpperCase() || "COMING UP NEXT"}
             type={EventsTypes.comingUp}
             events={events}
