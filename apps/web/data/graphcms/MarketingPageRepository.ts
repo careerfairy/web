@@ -12,6 +12,7 @@ import {
    Slug,
    testimonialListQueryProps,
    testimonialQueryProps,
+   textBlockQueryProps,
    Variables,
 } from "../../types/cmsTypes"
 import { MarketingLandingPage } from "./MarketingLandingPage"
@@ -50,8 +51,6 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                       id
                       pageType
                       slug
-                      title
-                      subtitle
                       fieldOfStudies ${fieldOfStudyQueryProps}
                       blocks {
                           ... on EventsSection ${eventsSectionQueryProps}
@@ -61,6 +60,7 @@ class GraphCMSMarketingPageRepository implements IMarketingPageRepository {
                           ... on Testimonial ${testimonialQueryProps}
                           ... on TestimonialList ${testimonialListQueryProps}
                           ... on CompanyLogos ${companyLogosQueryProps}
+                          ... on TextBlock ${textBlockQueryProps}
                       }
                       seo ${seoQueryProps}
                   }

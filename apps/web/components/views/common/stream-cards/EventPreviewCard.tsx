@@ -199,6 +199,7 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
+   isOnLandingPage = false,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
@@ -562,6 +563,7 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
+   isOnLandingPage?: boolean
 }
 
 export default EventPreviewCard

@@ -1,19 +1,30 @@
-import { Testimonial } from "../../../types/cmsTypes"
+import { HygraphResponseTestimonialListValue } from "../../../types/cmsTypes"
 import Box from "@mui/material/Box"
 import TestimonialsSection from "components/views/landing/TestimonialsSection"
-import { IColors } from "../../../types/commonTypes"
+import ThemedRichTextRenderer from "../ThemedRichTextRenderer"
+import React from "react"
+import { sxStyles } from "../../../types/commonTypes"
 
-type Props = {
-   testimonials: Testimonial[]
-   sliderArrowColor: IColors
-}
+const styles = sxStyles({
+   title: {
+      marginX: { xs: 2, lg: 12, xl: 42 },
+      textAlign: "center",
+      marginBottom: -4,
+   },
+})
 
 const TestimonialList = ({
    testimonials,
    sliderArrowColor,
-}: Props): JSX.Element => {
+   testimonialTitle,
+}: HygraphResponseTestimonialListValue): JSX.Element => {
    return (
-      <Box paddingX={2}>
+      <Box paddingX={2} paddingTop={12}>
+         {testimonialTitle && (
+            <Box sx={styles.title}>
+               <ThemedRichTextRenderer rawContent={testimonialTitle.raw} />
+            </Box>
+         )}
          <TestimonialsSection
             testimonials={testimonials}
             sliderArrowColor={sliderArrowColor}
