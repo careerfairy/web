@@ -1,25 +1,48 @@
-import { useEffect, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
-const useUpcomingStreamsByFieldOfStudy = (fieldsOfStudy: FieldOfStudy[]) => {
+/**
+ *  To get events for the specific fields of studies
+ *  If {fallbackToGeneralStreams} is true, show generic events
+ */
+const useUpcomingStreamsByFieldOfStudy = (
+   fieldsOfStudy: FieldOfStudy[],
+   fallbackToGeneralStreams?: boolean
+) => {
    const [events, setEvents] = useState<LivestreamEvent[]>([])
    const [loading, setLoading] = useState(true)
 
-   useEffect(() => {
-      setLoading(true)
+   /**
+    *  Get the generic Upcoming Events
+    */
+   const getGeneralUpcomingStreams = useCallback((limit: number) => {
       livestreamRepo
-         .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, 10)
+         .getUpcomingEvents(limit)
          .then((events: LivestreamEvent[]) => {
-            if (events) {
+            if (events?.length) {
                setEvents(events)
+               setLoading(false)
             }
          })
-         .finally(() => {
-            setLoading(false)
+   }, [])
+
+   useEffect(() => {
+      setLoading(true)
+      const limit = 10
+
+      livestreamRepo
+         .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, limit)
+         .then((events: LivestreamEvent[]) => {
+            if (events?.length) {
+               setEvents(events)
+               setLoading(false)
+            } else if (!events?.length && fallbackToGeneralStreams) {
+               getGeneralUpcomingStreams(limit)
+            }
          })
-   }, [fieldsOfStudy])
+   }, [fallbackToGeneralStreams, fieldsOfStudy, getGeneralUpcomingStreams])
 
    return { events, loading }
 }

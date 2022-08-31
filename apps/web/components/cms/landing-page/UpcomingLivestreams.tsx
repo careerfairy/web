@@ -20,7 +20,10 @@ type Props = {
 } & HygraphResponseEventsSection
 
 const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
-   const { events, loading } = useUpcomingStreamsByFieldOfStudy(fieldsOfStudy)
+   const { events, loading } = useUpcomingStreamsByFieldOfStudy(
+      fieldsOfStudy,
+      true
+   )
 
    return (
       <Box sx={styles.wrapper}>
