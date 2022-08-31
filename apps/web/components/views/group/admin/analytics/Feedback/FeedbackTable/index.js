@@ -1,8 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 import clsx from "clsx"
-import PropTypes from "prop-types"
-import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material"
-import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext"
+import { Box, Card, Divider, Grow, IconButton, Tab, Tabs } from "@mui/material"
 import {
    addMinutes,
    prettyDate,
@@ -10,7 +8,6 @@ import {
 import {
    renderAppearAfter,
    renderRatingStars,
-   StarRatingInputValue,
    tableIcons,
 } from "../../common/TableUtils"
 import EditFeedbackModal from "./EditFeedbackModal"
@@ -22,6 +19,7 @@ import makeStyles from "@mui/styles/makeStyles"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
+import { useFirebaseService } from "../../../../../../../context/firebase/FirebaseServiceContext"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -49,7 +47,6 @@ const FeedbackTable = ({
    breakdownRef,
    setStreamDataType,
    streamDataType,
-   firebase,
    currentPoll,
    handleScrollToSideRef,
    currentRating,
@@ -60,12 +57,10 @@ const FeedbackTable = ({
    setUserType,
    ...rest
 }) => {
+   const firebase = useFirebaseService()
    const classes = useStyles()
    const [tableData, setTableData] = useState({ data: [], columns: [] })
-   const [feedbackModal, setFeedbackModal] = useState({
-      data: {},
-      open: false,
-   })
+   const [feedbackModalData, setFeedbackModalData] = useState(null)
    const [areYouSureModal, setAreYouSureModal] = useState({
       data: {},
       open: false,
@@ -75,19 +70,21 @@ const FeedbackTable = ({
    const { enqueueSnackbar } = useSnackbar()
 
    useEffect(() => {
-      const dataType = streamDataType.propertyName
-      const newData = currentStream?.[dataType] || []
-      let newColumns = tableData.columns
-      if (dataType === "pollEntries") {
-         newColumns = pollColumns
-      } else if (dataType === "questions") {
-         newColumns = questionColumns
-      } else if (dataType === "feedback") {
-         newColumns = feedbackColumns
-      }
-      setTableData({
-         data: newData,
-         columns: newColumns,
+      setTableData((prev) => {
+         const dataType = streamDataType.propertyName
+         const newData = currentStream?.[dataType] || []
+         let newColumns = prev.columns
+         if (dataType === "pollEntries") {
+            newColumns = pollColumns
+         } else if (dataType === "questions") {
+            newColumns = questionColumns
+         } else if (dataType === "feedback") {
+            newColumns = feedbackColumns
+         }
+         return {
+            data: newData,
+            columns: newColumns,
+         }
       })
    }, [streamDataType.propertyName, currentStream])
 
@@ -119,14 +116,14 @@ const FeedbackTable = ({
    }
 
    const handleEditFeedback = (row) => {
-      setFeedbackModal({ data: row, open: true })
+      setFeedbackModalData(row)
    }
    const handleCloseFeedbackModal = () => {
-      setFeedbackModal({ data: {}, open: false })
+      setFeedbackModalData(null)
    }
 
    const handleCreateFeedback = () => {
-      setFeedbackModal({ data: {}, open: true })
+      setFeedbackModalData({})
    }
    const handleOpenAreYouSureModal = (row) => {
       const warning = `Are you sure you want to delete the question "${row.question}"? You wont be able to revert this action`
@@ -162,11 +159,6 @@ const FeedbackTable = ({
          title: "Question",
          width: 300,
       },
-      // {
-      //     title: "Votes",
-      //     type: 'numeric',
-      //     field: "votes",
-      // },
       {
          field: "state",
          title: "Status",
@@ -217,10 +209,12 @@ const FeedbackTable = ({
          field: "average",
          title: "Average Rating",
          render: (rowData) =>
-            renderRatingStars({ rating: rowData.average, id: rowData.id }),
-         filterComponent: StarRatingInputValue,
-         customFilterAndSearch: (term, rowData) =>
-            Number(term) >= Number(rowData.average),
+            renderRatingStars({
+               rating: rowData.average,
+               id: rowData.id,
+               isSentimentRating: rowData?.isSentimentRating,
+            }),
+         filtering: false,
       },
       {
          field: "appearAfter",
@@ -248,14 +242,16 @@ const FeedbackTable = ({
          type: "boolean",
       },
       {
+         field: "isSentimentRating",
+         title: "Is Sentiment Rating",
+         type: "boolean",
+      },
+      {
          field: "isForEnd",
          title: "Ask on Stream End",
          type: "boolean",
       },
    ]
-
-   // const customOptions = {...defaultTableOptions}
-   // customOptions.selection = false
 
    const handleMenuItemClick = (event, index) => {
       setStreamDataType(streamDataTypes[index])
@@ -273,6 +269,7 @@ const FeedbackTable = ({
    }
 
    const canEdit = ({ appearAfter, isForEnd }) => {
+      return true
       if (currentStream && appearAfter) {
          const { start, hasEnded } = currentStream
          if (hasEnded) {
@@ -348,7 +345,6 @@ const FeedbackTable = ({
                icons={tableIcons}
                {...tableData}
                isLoading={fetchingStreams}
-               // options={customOptions}
                actions={[
                   exportSelectionAction(
                      tableData.columns,
@@ -358,7 +354,8 @@ const FeedbackTable = ({
                   (rowData) => ({
                      icon: tableIcons.ThemedEditIcon,
                      iconProps: { color: "primary" },
-                     hidden: !isFeedback() || !canEdit(rowData),
+                     // hidden: !isFeedback() || !canEdit(rowData),
+                     hidden: false,
                      disabled: !canEdit(rowData),
                      position: "row",
                      tooltip: "Edit",
@@ -429,11 +426,14 @@ const FeedbackTable = ({
                }
             />
          </Card>
-         <EditFeedbackModal
-            currentStream={currentStream}
-            handleClose={handleCloseFeedbackModal}
-            state={feedbackModal}
-         />
+         {feedbackModalData && (
+            <EditFeedbackModal
+               currentStream={currentStream}
+               handleClose={handleCloseFeedbackModal}
+               data={feedbackModalData}
+               open={Boolean(feedbackModalData)}
+            />
+         )}
          <AreYouSureModal
             open={areYouSureModal.open}
             message={areYouSureModal.warning}
@@ -453,8 +453,4 @@ const FeedbackTable = ({
    )
 }
 
-FeedbackTable.propTypes = {
-   className: PropTypes.string,
-}
-
-export default withFirebase(FeedbackTable)
+export default FeedbackTable

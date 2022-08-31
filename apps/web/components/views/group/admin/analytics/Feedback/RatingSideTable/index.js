@@ -1,8 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import clsx from "clsx"
-import PropTypes from "prop-types"
 import { Card } from "@mui/material"
-import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext"
 import {
    defaultTableOptions,
    getPageSize,
@@ -12,32 +9,15 @@ import {
 } from "../../common/TableUtils"
 import { prettyDate } from "../../../../../../helperFunctions/HelperFunctions"
 import { alpha, useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
-
-const useStyles = makeStyles((theme) => ({
-   root: {
-      padding: 0,
-   },
-   actions: {
-      justifyContent: "flex-end",
-   },
-   tableTooltipQuestion: {
-      fontSize: theme.spacing(2),
-   },
-}))
 
 const columns = [
    {
       field: "rating",
       title: "Rating",
       width: 160,
-      render: renderRatingStars,
-      filterComponent: StarRatingInputValue,
-      customFilterAndSearch: (term, rowData) =>
-         Number(term) >= Number(rowData.rating),
    },
    {
       field: "date",
@@ -53,18 +33,10 @@ const columns = [
    },
 ]
 
-const RatingSideTable = ({
-   currentRating,
-   streamDataType,
-   fetchingStreams,
-   sideRef,
-   className,
-   ...rest
-}) => {
+const RatingSideTable = ({ currentRating, fetchingStreams, sideRef }) => {
    const dataTableRef = useRef(null)
 
    const theme = useTheme()
-   const classes = useStyles()
    const [data, setData] = useState([])
 
    useEffect(() => {
@@ -85,11 +57,10 @@ const RatingSideTable = ({
    }
 
    const customOptions = { ...defaultTableOptions }
-   const innerTableStyle = {
+   // customOptions.selection = false;
+   customOptions.headerStyle = {
       background: alpha(theme.palette.navyBlue.main, 0.05),
    }
-   // customOptions.selection = false;
-   customOptions.headerStyle = innerTableStyle
    customOptions.exportButton.pdf = true
    customOptions.pageSize = getPageSize(customOptions.pageSizeOptions, data)
 
@@ -101,12 +72,7 @@ const RatingSideTable = ({
 
    return (
       <>
-         <Card
-            raised={active()}
-            ref={sideRef}
-            className={clsx(classes.root, className)}
-            {...rest}
-         >
+         <Card raised={active()} ref={sideRef}>
             <ExportTable
                key={data.length}
                icons={tableIcons}
@@ -116,10 +82,15 @@ const RatingSideTable = ({
                      field: "rating",
                      title: "Rating",
                      width: 160,
-                     render: renderRatingStars,
+                     render: (rowData) =>
+                        renderRatingStars({
+                           isSentimentRating: currentRating?.isSentimentRating,
+                           ...rowData,
+                        }),
                      filterComponent: StarRatingInputValue,
                      customFilterAndSearch: (term, rowData) =>
                         Number(term) >= Number(rowData.rating),
+                     filtering: !currentRating?.isSentimentRating,
                   },
                   {
                      field: "date",
@@ -158,8 +129,4 @@ const RatingSideTable = ({
    )
 }
 
-RatingSideTable.propTypes = {
-   className: PropTypes.string,
-}
-
-export default withFirebase(RatingSideTable)
+export default RatingSideTable

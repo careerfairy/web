@@ -140,6 +140,22 @@ export interface Speaker extends Identifiable {
    rank?: number
 }
 
+export interface EventRating extends Identifiable {
+   question: string
+   appearAfter: number
+   hasText?: boolean
+   title?: string
+   isForEnd?: boolean
+   noStars?: boolean // no stars means no rating system
+   isSentimentRating?: boolean
+}
+
+export interface EventRatingAnswer extends Identifiable {
+   message?: string
+   rating?: number
+   timestamp?: firebase.firestore.Timestamp
+}
+
 export interface LivestreamEventPublicData {
    summary?: string
    company?: string
