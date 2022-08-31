@@ -14,6 +14,43 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined"
 import JobEntryApply from "./JobEntryApply"
 import Typography from "@mui/material/Typography"
 import UserResume from "../../../../profile/userData/user-resume/UserResume"
+import { Stack } from "@mui/material"
+import { sxStyles } from "../../../../../../types/commonTypes"
+
+const styles = sxStyles({
+   infoItem: {
+      display: "flex",
+      alignSelf: "end",
+   },
+   itemLabel: {
+      fontWeight: "bold",
+      ml: 2,
+   },
+   uploadCvWrapper: {
+      display: "flex",
+      flexDirection: { xs: "column", md: "row" },
+      alignItems: { xs: "start", md: "center" },
+   },
+   studentsInfoWrapper: {
+      display: "flex",
+      alignSelf: "center",
+      ml: 2,
+   },
+   studentsMessage: {
+      variant: "body2",
+      ml: 1,
+      alignSelf: "center",
+   },
+   uploadCvButton: {
+      display: "flex",
+      ml: { md: 6 },
+      mt: { xs: 2, md: 0 },
+   },
+   uploadCvLabel: {
+      display: "flex",
+      alignItems: "end",
+   },
+})
 
 const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
    let { userData } = useAuth()
@@ -44,15 +81,15 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
    return (
       <GenericDialog
          onClose={onCloseDialog}
-         title={`Apply Job`}
+         title={`Apply to Job`}
          titleOnCenter={true}
          additionalLeftButton={renderApplyButton}
       >
-         <Box padding={2}>
+         <Stack spacing={3} padding={2}>
             <Box display="flex">
                <WorkOutlineOutlinedIcon color="secondary" fontSize="large" />
-               <Box display="flex" alignSelf="end">
-                  <Typography variant="h6" fontWeight="bold" ml={2}>
+               <Box sx={styles.infoItem}>
+                  <Typography variant="h6" sx={styles.itemLabel}>
                      Title
                   </Typography>
                   <Typography variant="h6" ml={4}>
@@ -61,10 +98,10 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                </Box>
             </Box>
 
-            <Box display="flex" mt={3}>
+            <Box display="flex">
                <InfoOutlinedIcon color="secondary" fontSize="large" />
-               <Box display="flex" alignSelf="end">
-                  <Typography variant="h6" fontWeight="bold" ml={2}>
+               <Box sx={styles.infoItem}>
+                  <Typography variant="h6" sx={styles.itemLabel}>
                      Status
                   </Typography>
                   <Typography variant="h6" ml={4}>
@@ -74,13 +111,13 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
             </Box>
 
             {hiringManagers && (
-               <Box display="flex" mt={3}>
+               <Box display="flex">
                   <PersonOutlineOutlinedIcon
                      color="secondary"
                      fontSize="large"
                   />
-                  <Box display="flex" alignSelf="end">
-                     <Typography variant="h6" fontWeight="bold" ml={2}>
+                  <Box sx={styles.infoItem}>
+                     <Typography variant="h6" sx={styles.itemLabel}>
                         Hiring Manager
                      </Typography>
                      <Typography variant="h6" ml={4}>
@@ -90,14 +127,14 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                </Box>
             )}
 
-            <Box mt={3}>
+            <Box>
                <Box display="flex">
                   <ChatBubbleOutlineRoundedIcon
                      color="secondary"
                      fontSize="large"
                   />
-                  <Box display="flex" alignSelf="end">
-                     <Typography variant="h6" fontWeight="bold" ml={2}>
+                  <Box sx={styles.infoItem}>
+                     <Typography variant="h6" sx={styles.itemLabel}>
                         Job Description
                      </Typography>
                   </Box>
@@ -107,42 +144,39 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                </Typography>
             </Box>
 
-            <Box mt={3}>
-               <Box display="flex">
+            <Box sx={styles.uploadCvWrapper}>
+               <Box sx={styles.uploadCvLabel}>
                   <DescriptionOutlinedIcon color="secondary" fontSize="large" />
-                  <Box display="flex" alignSelf="center">
-                     <Typography variant="h6" fontWeight="bold" ml={2}>
+                  <Box display="flex">
+                     <Typography variant="h6" sx={styles.itemLabel}>
                         Upload CV
                      </Typography>
                   </Box>
-                  {userData && (
-                     <Box sx={{ height: "36px" }} display="flex">
-                        <Box ml={6} mt={-3}>
-                           <UserResume
-                              userData={userData}
-                              showOnlyButton={true}
-                              disabled={isStreamer || alreadyApplied}
-                           />
-                        </Box>
-                        {isStreamer && (
-                           <Box display="flex" alignSelf="end" ml={2}>
-                              <InfoOutlinedIcon />
-                              <Typography
-                                 variant="body2"
-                                 ml={1}
-                                 alignSelf="center"
-                              >
-                                 Only for students
-                              </Typography>
-                           </Box>
-                        )}
-                     </Box>
-                  )}
                </Box>
+
+               {userData && (
+                  <Box sx={styles.uploadCvButton}>
+                     <Box>
+                        <UserResume
+                           userData={userData}
+                           showOnlyButton={true}
+                           disabled={isStreamer || alreadyApplied}
+                        />
+                     </Box>
+                     {isStreamer && (
+                        <Box sx={styles.studentsInfoWrapper}>
+                           <InfoOutlinedIcon />
+                           <Typography sx={styles.studentsMessage}>
+                              Only for students
+                           </Typography>
+                        </Box>
+                     )}
+                  </Box>
+               )}
             </Box>
 
-            <Box mt={3}>
-               {!userData && (
+            {!userData && (
+               <Box>
                   <Box mt={4} display="flex">
                      <Typography fontWeight="bold" variant="body1" mr={1}>
                         You need to sign in to be able to apply to jobs.
@@ -155,9 +189,9 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                         </Typography>
                      </Link>
                   </Box>
-               )}
-            </Box>
-         </Box>
+               </Box>
+            )}
+         </Stack>
       </GenericDialog>
    )
 }

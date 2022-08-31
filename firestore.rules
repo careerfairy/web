@@ -64,6 +64,10 @@ service cloud.firestore {
             allow read: if request.auth.token.email == userId;
             allow write: if false;
         }
+        match /userData/{userId}/jobApplications/{jobIdentifier} {
+            allow read: if request.auth.token.email == userId;
+            allow write: if false;
+        }
 
         match /userData/{userId}/rewards/{rewardId} {
             allow read: if request.auth.token.email == userId;

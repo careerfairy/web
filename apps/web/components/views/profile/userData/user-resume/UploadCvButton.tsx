@@ -29,6 +29,7 @@ const UploadCvButton = ({
    handleMenuItemClick,
    openDropdown,
    disabled = false,
+   showOnlyButton = false,
 }: Props) => {
    const handleClick = useCallback(
       (event, index) => {
@@ -45,6 +46,7 @@ const UploadCvButton = ({
             ref={anchorRef}
             color="inherit"
             aria-label="split button"
+            sx={{ marginTop: showOnlyButton ? "0 !important" : "" }}
          >
             {selectedIndex === 0 && (
                <Button href={userData.userResume} target="_blank">
@@ -136,7 +138,7 @@ const UploadCvButton = ({
             color="primary"
             variant="contained"
             sx={{
-               mt: 3,
+               mt: showOnlyButton ? 0 : 3,
             }}
             startIcon={<Add fontSize="small" />}
             disabled={disabled}
@@ -155,6 +157,7 @@ type Props = {
    userData: UserData
    openDropdown?: boolean
    disabled?: boolean
+   showOnlyButton?: boolean
    classes?: any
    anchorRef?: any
    selectedIndex?: number
