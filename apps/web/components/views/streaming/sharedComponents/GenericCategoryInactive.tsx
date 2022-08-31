@@ -11,7 +11,7 @@ type Props = {
 
 const styles = sxStyles({
    container: {
-      width: "100% !important",
+      width: "90%",
       display: "grid",
       placeItems: "center",
    },
