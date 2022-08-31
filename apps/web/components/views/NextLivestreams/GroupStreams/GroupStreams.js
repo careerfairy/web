@@ -45,7 +45,6 @@ const GroupStreams = ({
    mobile,
    searching,
    listenToUpcoming,
-   selectedOptions,
    isPastLivestreams,
 }) => {
    const {
@@ -55,8 +54,7 @@ const GroupStreams = ({
       useRegistrationModal()
    const { data: existingInterests } = useInterests()
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
-   const searchedButNoResults =
-      selectedOptions?.length && !searching && !livestreams?.length
+   const searchedButNoResults = !searching && !livestreams?.length
    const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(
       livestreams,
       6,

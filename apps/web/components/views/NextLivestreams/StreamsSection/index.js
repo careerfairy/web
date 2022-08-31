@@ -5,6 +5,7 @@ import { Box, CircularProgress } from "@mui/material"
 import * as PropTypes from "prop-types"
 import React, { useEffect } from "react"
 import { forceCheck } from "react-lazyload"
+import { formatLivestreamsEvents } from "../../portal/events-preview/utils"
 
 const styles = {
    loaderWrapper: {
@@ -21,11 +22,10 @@ const styles = {
 export function StreamsSection({
    currentGroup,
    pastLivestreams,
-   selectedOptions,
-   setSelectedOptions,
    upcomingLivestreams,
    listenToUpcoming,
    value,
+   minimumUpcomingStreams = 6,
 }) {
    useEffect(() => {
       forceCheck()
@@ -35,10 +35,11 @@ export function StreamsSection({
          <SwipeablePanel value={value} index={"upcomingEvents"}>
             {isLoaded(upcomingLivestreams) ? (
                <NextLivestreams
-                  setSelectedOptions={setSelectedOptions}
-                  selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
-                  livestreams={upcomingLivestreams || []}
+                  livestreams={formatLivestreamsEvents(
+                     upcomingLivestreams,
+                     minimumUpcomingStreams
+                  )}
                   currentGroup={currentGroup}
                />
             ) : (
@@ -50,8 +51,6 @@ export function StreamsSection({
          <SwipeablePanel value={value} index={"pastEvents"}>
             {isLoaded(pastLivestreams) ? (
                <NextLivestreams
-                  setSelectedOptions={setSelectedOptions}
-                  selectedOptions={selectedOptions}
                   listenToUpcoming={listenToUpcoming}
                   isPastLivestreams
                   livestreams={pastLivestreams || []}
@@ -69,10 +68,8 @@ export function StreamsSection({
 
 StreamsSection.propTypes = {
    value: PropTypes.string.isRequired,
-   dir: PropTypes.any,
    upcomingLivestreams: PropTypes.arrayOf(PropTypes.any),
-   setSelectedOptions: PropTypes.func,
-   selectedOptions: PropTypes.arrayOf(PropTypes.any),
    currentGroup: PropTypes.any,
    pastLivestreams: PropTypes.any,
+   minimumUpcomingStreams: PropTypes.number,
 }

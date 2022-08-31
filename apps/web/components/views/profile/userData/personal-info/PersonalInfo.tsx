@@ -26,6 +26,8 @@ import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle
 import { StylesProps } from "../../../../../types/commonTypes"
 import { useRouter } from "next/router"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { FieldOfStudySelector } from "../../../signup/userInformation/FieldOfStudySelector"
+import { LevelOfStudySelector } from "../../../signup/userInformation/LevelOfStudySelector"
 
 const styles: StylesProps = {
    avatar: {
@@ -106,6 +108,8 @@ const PersonalInfo = ({ userData }) => {
             university: userData?.university,
             universityCountryCode: userData?.universityCountryCode || "",
             unsubscribed: userData?.unsubscribed || false,
+            fieldOfStudy: userData?.fieldOfStudy || null,
+            levelOfStudy: userData?.levelOfStudy || null,
          }}
          enableReinitialize
          validate={(values) => {
@@ -132,6 +136,12 @@ const PersonalInfo = ({ userData }) => {
             }
             if (!values.universityCountryCode) {
                errors.universityCountryCode = "Please chose a country code"
+            }
+            if (!values.fieldOfStudy?.name || !values.fieldOfStudy?.id) {
+               errors.fieldOfStudy = "Please select a field of study"
+            }
+            if (!values.levelOfStudy?.name || !values.levelOfStudy?.id) {
+               errors.levelOfStudy = "Please select a level of study"
             }
             return errors
          }}
@@ -281,6 +291,32 @@ const PersonalInfo = ({ userData }) => {
                               values={values}
                               submitting={isSubmitting}
                               setFieldValue={setFieldValue}
+                           />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                           <FieldOfStudySelector
+                              setFieldValue={setFieldValue}
+                              value={values.fieldOfStudy}
+                              handleBlur={handleBlur}
+                              disabled={isSubmitting}
+                              error={
+                                 errors.fieldOfStudy &&
+                                 touched.fieldOfStudy &&
+                                 errors.fieldOfStudy
+                              }
+                           />
+                        </Grid>
+                        <Grid item xs={12} sm={6}>
+                           <LevelOfStudySelector
+                              setFieldValue={setFieldValue}
+                              value={values.levelOfStudy}
+                              handleBlur={handleBlur}
+                              disabled={isSubmitting}
+                              error={
+                                 errors.levelOfStudy &&
+                                 touched.levelOfStudy &&
+                                 errors.levelOfStudy
+                              }
                            />
                         </Grid>
                         <Grid item xs={12}>

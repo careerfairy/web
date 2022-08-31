@@ -44,7 +44,7 @@ const EventsPreview = ({
    title,
    seeMoreLink,
    loading,
-   limit,
+   limit = 0,
    events,
    hidePreview,
    type,
@@ -177,15 +177,11 @@ const EventsPreview = ({
                handleClose={handleCloseJoinModal}
             />
          )}
-         {shareEventDialog ? (
-            /*
-            // @ts-ignore */
+         {shareEventDialog && (
             <ShareLivestreamModal
                livestreamData={shareEventDialog}
                handleClose={handleShareEventDialogClose}
             />
-         ) : (
-            ""
          )}
       </>
    )
@@ -204,6 +200,10 @@ export enum EventsTypes {
     * upcoming events on that user has registered to ordered closest start date
     */
    myNext = "myNext",
+   /**
+    * Events that have already happened
+    */
+   pastEvents = "pastEvents",
 }
 
 export interface EventsProps {
@@ -211,7 +211,7 @@ export interface EventsProps {
    seeMoreLink?: string
    title?: string
    loading: boolean
-   limit: number
+   limit?: number
    hidePreview?: boolean
    type: EventsTypes
    id?: string

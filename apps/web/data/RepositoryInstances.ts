@@ -20,6 +20,16 @@ import {
    FirebaseLivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 
+import {
+   FirebaseFieldOfStudyRepository,
+   IFieldOfStudyRepository,
+} from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
+
+import {
+   FirebaseUniversityRepository,
+   IUniversityRepository,
+} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
+
 const firestoreInstance = firebaseApp.firestore()
 
 /**
@@ -46,3 +56,9 @@ export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
 
 export const livestreamRepo: ILivestreamRepository =
    new FirebaseLivestreamRepository(firestoreInstance, FieldValue)
+
+export const fieldOfStudyRepo: IFieldOfStudyRepository =
+   new FirebaseFieldOfStudyRepository(firestoreInstance)
+
+export const universityRepo: IUniversityRepository =
+   new FirebaseUniversityRepository(firestoreInstance)

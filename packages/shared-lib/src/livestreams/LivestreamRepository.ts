@@ -1,14 +1,16 @@
 import firebase from "firebase/compat/app"
-import { RegisteredStudent, UserPublicData } from "../users"
 import BaseFirebaseRepository, {
    mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
+import { UserPublicData } from "../users"
 import {
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
    LivestreamEventSerialized,
+   LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
+   UserLivestreamData,
 } from "./livestreams"
 
 export interface ILivestreamRepository {
@@ -78,16 +80,23 @@ export interface ILivestreamRepository {
    ): Promise<LivestreamEvent[] | null>
    serializeEvent(event: LivestreamEvent): LivestreamEventSerialized
    parseSerializedEvent(event: LivestreamEventSerialized): LivestreamEventParsed
-
-   getLivestreamRegisteredStudents(
-      eventId: string
-   ): Promise<RegisteredStudent[]>
-
    heartbeat(
       livestream: LivestreamEventPublicData,
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void>
+   getLivestreamUsers(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): Promise<UserLivestreamData[]>
+   livestreamUsersQuery(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): firebase.firestore.Query
+   livestreamUsersQueryWithRef(
+      streamRef: firebase.firestore.DocumentReference,
+      userType: LivestreamUserAction
+   ): firebase.firestore.Query
 
    getById(id: string): Promise<LivestreamEvent>
 }
@@ -97,8 +106,8 @@ export class FirebaseLivestreamRepository
    implements ILivestreamRepository
 {
    constructor(
-      private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: typeof firebase.firestore.FieldValue
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
    }
@@ -320,6 +329,7 @@ export class FirebaseLivestreamRepository
          lastUpdatedDateString:
             event.lastUpdated?.toDate?.().toString() || null,
          startDateString: event.start?.toDate?.().toString() || null,
+         groupQuestionsMap: event.groupQuestionsMap || null,
          duration: event.duration || null,
          hasEnded: event.hasEnded || false,
          targetCategories: event.targetCategories || null,
@@ -398,16 +408,32 @@ export class FirebaseLivestreamRepository
       return livestreamRef.onSnapshot(callback)
    }
 
-   async getLivestreamRegisteredStudents(
-      eventId: string
-   ): Promise<RegisteredStudent[]> {
-      let ref = await this.firestore
+   async getLivestreamUsers(
+      eventId: string,
+      userType: LivestreamUserAction
+   ): Promise<UserLivestreamData[]> {
+      const snaps = await this.livestreamUsersQuery(eventId, userType).get()
+      return mapFirestoreDocuments<UserLivestreamData>(snaps)
+   }
+
+   livestreamUsersQuery(
+      eventId: string,
+      userAction: LivestreamUserAction
+   ): firebase.firestore.Query {
+      return this.firestore
          .collection("livestreams")
          .doc(eventId)
-         .collection("registeredStudents")
-         .get()
+         .collection("userLivestreamData")
+         .where(`${userAction}.date`, "!=", null)
+   }
 
-      return mapFirestoreDocuments<RegisteredStudent>(ref)
+   livestreamUsersQueryWithRef(
+      streamRef: firebase.firestore.DocumentReference,
+      userAction: LivestreamUserAction
+   ): firebase.firestore.Query {
+      return streamRef
+         .collection("userLivestreamData")
+         .where(`${userAction}.date`, "!=", null)
    }
 }
 
@@ -445,32 +471,6 @@ export class LivestreamsDataParser {
 
          return true
       })
-      return this
-   }
-
-   filterByTargetCategories(groupId: string, categories: string[]) {
-      this.livestreams = this.livestreams.reduce(
-         (accumulator, currentLivestream) => {
-            if (currentLivestream.targetCategories) {
-               const livestreamCategories =
-                  currentLivestream.targetCategories[groupId]
-               if (categories.length && livestreamCategories) {
-                  if (
-                     categories.some((v) => livestreamCategories.includes(v))
-                  ) {
-                     return accumulator.concat(currentLivestream)
-                  }
-               } else if (!categories.length) {
-                  return accumulator.concat(currentLivestream)
-               }
-            } else {
-               return accumulator.concat(currentLivestream)
-            }
-            return accumulator
-         },
-         []
-      )
-
       return this
    }
 
