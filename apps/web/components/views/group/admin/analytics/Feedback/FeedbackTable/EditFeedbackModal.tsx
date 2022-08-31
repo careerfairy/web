@@ -253,6 +253,7 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                                        name={"demo sentiment"}
                                        value={1}
                                        highlightSelectedOnly={false}
+                                       hideLabel
                                     />
                                  </Stack>
                               </RadioGroup>

@@ -50,6 +50,7 @@ function IconContainer(props: IconContainerProps) {
 
 interface Props extends RatingProps {
    error?: string
+   hideLabel?: boolean
 }
 
 const SentimentRating = ({
@@ -59,6 +60,7 @@ const SentimentRating = ({
    value,
    name,
    highlightSelectedOnly = true,
+   hideLabel = false,
    ...rest
 }: Props) => {
    const [hover, setHover] = useState(-1)
@@ -85,7 +87,9 @@ const SentimentRating = ({
             />
             <FormHelperText>{error}</FormHelperText>
          </Box>
-         <Typography sx={{ ml: 2, minWidth: 65 }}>{label || ""}</Typography>
+         {!hideLabel && (
+            <Typography sx={{ ml: 2, minWidth: 65 }}>{label || ""}</Typography>
+         )}
       </Stack>
    )
 }
