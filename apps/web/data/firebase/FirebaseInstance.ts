@@ -72,5 +72,6 @@ export const AuthInstance = firebaseApp.auth()
 export const FunctionsInstance = firebaseApp.functions()
 
 export const FieldValue = firebase.firestore.FieldValue
+export const Timestamp = firebase.firestore.Timestamp
 
 export default firebaseApp

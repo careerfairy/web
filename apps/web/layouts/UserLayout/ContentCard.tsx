@@ -18,7 +18,7 @@ const styles: StylesProps = {
 const ContentCard: FC<ContentCardProps> = ({ sx, children }) => {
    return (
       <Paper
-         variant="outlined"
+         elevation={0}
          sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
       >
          {children}

@@ -10,6 +10,9 @@ dayjs.extend(advancedFormat)
 dayjs.extend(calendar)
 
 export default class DateUtil {
+   static getJobApplicationDate(JSDate) {
+      return dayjs(JSDate).format("DD MMM YYYY")
+   }
    static getTodaysISODate() {
       let today = new Date()
       let todaysYear = today.getFullYear()

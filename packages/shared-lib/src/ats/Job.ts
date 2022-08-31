@@ -106,3 +106,5 @@ export interface JobIdentifier {
    groupId: string
    integrationId: string
 }
+
+export const PUBLIC_JOB_STATUSES: JobStatus[] = ["OPEN", "PENDING", "CLOSED"]
