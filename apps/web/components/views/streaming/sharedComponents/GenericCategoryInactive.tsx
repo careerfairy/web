@@ -11,13 +11,14 @@ type Props = {
 
 const styles = sxStyles({
    container: {
-      width: "90%",
+      width: "100% !important",
       display: "grid",
       placeItems: "center",
    },
    subtitle: {
       color: "grey !important",
    },
+   title: { width: "100% !important" },
 })
 
 const GenericCategoryInactive = ({ title, subtitle }: Props) => {
@@ -25,7 +26,7 @@ const GenericCategoryInactive = ({ title, subtitle }: Props) => {
       <CategoryContainerCentered>
          <div style={styles.container}>
             <Box mb={2}>
-               <GreyPermanentMarker className={undefined}>
+               <GreyPermanentMarker className={undefined} sx={styles.title}>
                   {title}
                </GreyPermanentMarker>
             </Box>
