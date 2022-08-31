@@ -56,6 +56,7 @@ import {
    LivestreamJobAssociation,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
+import Stack from "@mui/material/Stack"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -721,40 +722,52 @@ const DraftStreamForm = ({
 
                               {userData?.isAdmin && (
                                  <Grid xs={12}>
-                                    <Tooltip
-                                       placement="top"
-                                       arrow
-                                       title={
-                                          <Typography>
-                                             By disabling questions the
-                                             participants will no longer be able
-                                             to use the Q&A section during the
-                                             livestream and create questions
-                                             during the registration process.
-                                          </Typography>
-                                       }
-                                    >
-                                       <FormControlLabel
-                                          labelPlacement="start"
-                                          label="Disable Q&A"
-                                          control={
-                                             <Switch
-                                                checked={Boolean(
-                                                   values.questionsDisabled
-                                                )}
-                                                onChange={handleChange}
-                                                disabled={Boolean(isSubmitting)}
-                                                color="primary"
-                                                id="questionsDisabled"
-                                                name="questionsDisabled"
-                                                inputProps={{
-                                                   "aria-label":
-                                                      "primary checkbox",
-                                                }}
-                                             />
+                                    <Stack direction="row" spacing={2}>
+                                       <Box
+                                          pl={2}
+                                          display="flex"
+                                          alignItems="center"
+                                       >
+                                          Settings only for CF Admins:
+                                       </Box>
+                                       <Tooltip
+                                          placement="top"
+                                          arrow
+                                          title={
+                                             <Typography>
+                                                By disabling questions the
+                                                participants will no longer be
+                                                able to use the Q&A section
+                                                during the livestream and create
+                                                questions during the
+                                                registration process.
+                                             </Typography>
                                           }
-                                       />
-                                    </Tooltip>
+                                       >
+                                          <FormControlLabel
+                                             labelPlacement="start"
+                                             label="Disable Q&A"
+                                             control={
+                                                <Switch
+                                                   checked={Boolean(
+                                                      values.questionsDisabled
+                                                   )}
+                                                   onChange={handleChange}
+                                                   disabled={Boolean(
+                                                      isSubmitting
+                                                   )}
+                                                   color="primary"
+                                                   id="questionsDisabled"
+                                                   name="questionsDisabled"
+                                                   inputProps={{
+                                                      "aria-label":
+                                                         "primary checkbox",
+                                                   }}
+                                                />
+                                             }
+                                          />
+                                       </Tooltip>
+                                    </Stack>
                                  </Grid>
                               )}
                            </FormGroup>
