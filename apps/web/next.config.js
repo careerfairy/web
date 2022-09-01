@@ -20,7 +20,9 @@ const securityHeaders = [
          "script-src blob: 'self' *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.youtube.com apis.google.com ajax.googleapis.com; " +
          "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com 'unsafe-inline'; " +
          "connect-src *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com;" +
-         "img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com;",
+         `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
+            notProduction && "localhost:*"
+         };`,
    },
    {
       key: "Referrer-Policy",
@@ -72,6 +74,7 @@ const moduleExports = {
          "firebasestorage.googleapis.com",
          "media.graphcms.com",
          "media.graphassets.com",
+         "localhost",
       ],
    },
    webpackDevMiddleware: (config) => {

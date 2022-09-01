@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useMemo, useState } from "react"
+import React, { FC, memo, useEffect, useMemo, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import RootState from "store/reducers"
@@ -164,4 +164,4 @@ const AgoraStateHandler: FC<Props> = () => {
    )
 }
 
-export default AgoraStateHandler
+export default memo(AgoraStateHandler)

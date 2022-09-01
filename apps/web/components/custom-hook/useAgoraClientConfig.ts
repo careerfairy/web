@@ -110,7 +110,13 @@ export default function useAgoraClientConfig(
       })
 
       rtcClient.on("network-quality", (networkStats) => {
-         setNetworkQuality(networkStats)
+         const isEqualToCurrentValue =
+            JSON.stringify(networkStats) === JSON.stringify(networkQuality)
+
+         // prevent setting unnecessary a new value to avoid re-renders
+         if (!isEqualToCurrentValue) {
+            setNetworkQuality(getQualityObjectReference(networkStats))
+         }
       })
    }
 
@@ -133,5 +139,29 @@ export default function useAgoraClientConfig(
       []
    )
 
-   return { remoteStreams, networkQuality, demoStreamHandlers }
+   return useMemo(
+      () => ({ remoteStreams, networkQuality, demoStreamHandlers }),
+      [remoteStreams, networkQuality, demoStreamHandlers]
+   )
+}
+
+/**
+ * Map that holds pointers to objects
+ * By re-using the same object instance, we avoid re-renders
+ *
+ * The network quality event is always firing and the values switch a lot between 0 and 1
+ * 0 => unknown
+ * 1 => excellent
+ */
+const mapQualityObjectReferences = {}
+
+const getQualityObjectReference = (currentReport) => {
+   const key = `${currentReport.downlinkNetworkQuality} - ${currentReport.uplinkNetworkQuality}`
+
+   if (mapQualityObjectReferences[key]) {
+      return mapQualityObjectReferences[key]
+   } else {
+      mapQualityObjectReferences[key] = currentReport
+      return currentReport
+   }
 }

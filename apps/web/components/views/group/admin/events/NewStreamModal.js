@@ -141,7 +141,8 @@ const NewStreamModal = ({
       setFormData,
       setDraftId,
       status,
-      setStatus
+      setStatus,
+      selectedJobs
    ) => {
       try {
          setSubmitting(true)
@@ -163,6 +164,10 @@ const NewStreamModal = ({
             }
             livestream.status = newStatus
             setFormData((prevState) => ({ ...prevState, status: newStatus }))
+         }
+
+         if (selectedJobs) {
+            livestream.jobs = selectedJobs
          }
 
          if (publishDraft) {

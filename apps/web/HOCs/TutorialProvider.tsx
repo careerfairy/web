@@ -44,28 +44,34 @@ const TutorialProvider = ({ children }) => {
       return Number(activeStep)
    }, [tutorialSteps])
 
-   const handleConfirmStep = (property) => {
-      setTutorialSteps({
-         ...tutorialSteps,
-         [property]: false,
-         [property + 1]: true,
-      })
-   }
+   const handleConfirmStep = useCallback(
+      (property) => {
+         setTutorialSteps({
+            ...tutorialSteps,
+            [property]: false,
+            [property + 1]: true,
+         })
+      },
+      [tutorialSteps]
+   )
 
-   const isOpen = (property, isTest) => {
-      const activeStep = getActiveTutorialStepKey()
-      if (isTest) {
+   const isOpen = useCallback(
+      (property, isTest) => {
+         const activeStep = getActiveTutorialStepKey()
+         if (isTest) {
+            return Boolean(activeStep === property)
+         }
          return Boolean(activeStep === property)
-      }
-      return Boolean(activeStep === property)
-   }
+      },
+      [getActiveTutorialStepKey]
+   )
 
-   const endTutorial = () => {
+   const endTutorial = useCallback(() => {
       setTutorialSteps((prevState) => ({
          ...prevState,
          streamerReady: true,
       }))
-   }
+   }, [])
 
    return (
       <TutorialContext.Provider

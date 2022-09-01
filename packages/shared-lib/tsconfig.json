@@ -1,5 +1,6 @@
 {
    "compilerOptions": {
+      "experimentalDecorators": true,
       "noImplicitReturns": true,
       "noUnusedLocals": true,
       "outDir": "dist",

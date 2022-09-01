@@ -20,6 +20,7 @@ import * as actions from "store/actions"
 import AgoraRTMProvider from "context/agoraRTM/AgoraRTMProvider"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
+import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -97,7 +98,7 @@ const StreamerLayout = (props) => {
 
    const [streamerReady, setStreamerReady] = useState(false)
    const [tokenChecked, setTokenChecked] = useState(false)
-   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen)
+   const showMenu = useSelector(leftMenuOpenSelector)
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false)
    const [selectedState, setSelectedState] = useState("questions")
    const [sliding, setSliding] = useState(false)

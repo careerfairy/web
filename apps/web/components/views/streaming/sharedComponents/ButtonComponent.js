@@ -13,8 +13,10 @@ import ChevronLeftRoundedIcon from "@mui/icons-material/ChevronLeftRounded"
 import TutorialContext from "../../../../context/tutorials/TutorialContext"
 import clsx from "clsx"
 import { useDispatch, useSelector } from "react-redux"
+import WorkRoundedIcon from "@mui/icons-material/WorkRounded"
 import * as storeActions from "store/actions"
 import { showActionButtonsSelector } from "../../../../store/selectors/streamSelectors"
+import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -120,10 +122,9 @@ const ButtonComponent = ({
    isMobile,
    selectedState,
    streamer,
+   includeJobs,
 }) => {
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const DELAY = 3000 //3 seconds
    const [hasMounted, setHasMounted] = useState(false)
    const dispatch = useDispatch()
@@ -226,6 +227,16 @@ const ButtonComponent = ({
          })
       }
 
+      if (includeJobs) {
+         actions.unshift({
+            icon: <WorkRoundedIcon fontSize="large" />,
+            name: "Jobs",
+            disabled: false,
+            onClick: () => handleStateChange("jobs"),
+            tutorialNum: 999999,
+         })
+      }
+
       if ((streamer || focusModeEnabled) && showMenu) {
          actions.unshift({
             icon: <ChevronLeftRoundedIcon fontSize="large" />,
@@ -235,6 +246,7 @@ const ButtonComponent = ({
             tutorialNum: 9999999,
          })
       }
+
       return actions
    }
 

@@ -1,4 +1,10 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
+import React, {
+   useCallback,
+   useContext,
+   useEffect,
+   useState,
+   useMemo,
+} from "react"
 
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import VideoControlsContainer from "./VideoControlsContainer"
@@ -91,9 +97,16 @@ function VideoContainer({
       demoStreamHandlers,
    } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true)
 
-   const { devices, deviceInitializers } = useDevices(localStream, {
-      initialize: true,
-   })
+   const deviceSettings = useMemo(
+      () => ({
+         initialize: true,
+      }),
+      []
+   )
+   const { devices, deviceInitializers } = useDevices(
+      localStream,
+      deviceSettings
+   )
 
    const { mediaControls, localMediaStream: displayableMediaStream } =
       useMediaSources(devices, localStream, true)
@@ -165,7 +178,24 @@ function VideoContainer({
       }
    }
 
-   const handlePublish = async () => {
+   const setDesktopMode = useCallback(
+      async (mode, initiatorId) => {
+         let screenSharerId =
+            mode === "desktop" ? initiatorId : currentLivestream.screenSharerId
+         await firebase.setDesktopMode(streamRef, mode, screenSharerId)
+      },
+      [currentLivestream?.screenSharerId, firebase, streamRef]
+   )
+
+   const handleOpenDemoIntroModal = useCallback(() => {
+      const activeStep = getActiveTutorialStepKey()
+      if (activeStep === 0 && !hasDismissedStreamTutorial && !hasProposedDemo) {
+         setShowDemoIntroModal(true)
+         setHasProposedDemo(true)
+      }
+   }, [hasDismissedStreamTutorial, hasProposedDemo, getActiveTutorialStepKey])
+
+   const handlePublish = useCallback(async () => {
       try {
          await handlePublishLocalStream()
          setShowLocalStreamPublishingModal(false)
@@ -175,21 +205,11 @@ function VideoContainer({
       } catch (e) {
          console.log("-> error in HANDLE PUBLISH", e)
       }
-   }
-
-   const setDesktopMode = async (mode, initiatorId) => {
-      let screenSharerId =
-         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId
-      await firebase.setDesktopMode(streamRef, mode, screenSharerId)
-   }
-
-   const handleOpenDemoIntroModal = useCallback(() => {
-      const activeStep = getActiveTutorialStepKey()
-      if (activeStep === 0 && !hasDismissedStreamTutorial && !hasProposedDemo) {
-         setShowDemoIntroModal(true)
-         setHasProposedDemo(true)
-      }
-   }, [hasDismissedStreamTutorial, hasProposedDemo, getActiveTutorialStepKey])
+   }, [
+      handlePublishLocalStream,
+      currentLivestream?.test,
+      handleOpenDemoIntroModal,
+   ])
 
    const handleJoinAsViewer = useCallback(async () => {
       await closeAndUnpublishedLocalStream()
@@ -213,38 +233,44 @@ function VideoContainer({
       }
    }, [tutorialSteps])
 
-   const isOpen = (property) => {
-      return Boolean(
-         currentLivestream.test &&
-            tutorialSteps.streamerReady &&
-            tutorialSteps[property]
-      )
-   }
+   const isOpen = useCallback(
+      (property) => {
+         return Boolean(
+            currentLivestream.test &&
+               tutorialSteps.streamerReady &&
+               tutorialSteps[property]
+         )
+      },
+      [currentLivestream?.test, tutorialSteps]
+   )
 
-   const handleCloseDemoIntroModal = (wantsDemo) => {
-      setShowDemoIntroModal(false)
-      if (wantsDemo) {
-         setShowBubbles(true)
-         setTutorialSteps({
-            ...tutorialSteps,
-            streamerReady: true,
-         })
-      } else {
-         setShowBubbles(true)
-      }
-   }
+   const handleCloseDemoIntroModal = useCallback(
+      (wantsDemo) => {
+         setShowDemoIntroModal(false)
+         if (wantsDemo) {
+            setShowBubbles(true)
+            setTutorialSteps({
+               ...tutorialSteps,
+               streamerReady: true,
+            })
+         } else {
+            setShowBubbles(true)
+         }
+      },
+      [tutorialSteps]
+   )
 
-   const handleCloseDemoEndModal = () => {
+   const handleCloseDemoEndModal = useCallback(() => {
       handleConfirmStep(23)
       endTutorial()
       setShowBubbles(true)
-   }
+   }, [])
 
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false)
    }, [])
 
-   const handleClickScreenShareButton = async () => {
+   const handleClickScreenShareButton = useCallback(async () => {
       if (currentLivestream.mode === "desktop") {
          unPublishScreenShareStream().then(async () => {
             return await setDesktopMode("default", streamerId)
@@ -252,7 +278,7 @@ function VideoContainer({
       } else {
          setShowScreenShareModal(true)
       }
-   }
+   }, [currentLivestream?.mode, streamerId, setDesktopMode])
 
    const onScreenShareStopped = useCallback(() => {
       unPublishScreenShareStream().then(async () => {
@@ -276,6 +302,29 @@ function VideoContainer({
          }
       },
       [optimizationMode, currentLivestream?.mode, streamerId]
+   )
+
+   const localStreamIsPublished = useMemo(
+      () => ({
+         audio: localStream?.isAudioPublished,
+         video: localStream?.isVideoPublished,
+      }),
+      [localStream?.isAudioPublished, localStream?.isVideoPublished]
+   )
+
+   const setShowLocalStreamPublishingModalTrue = useCallback(
+      () => setShowLocalStreamPublishingModal(true),
+      []
+   )
+
+   const WifiIndicatorMemoized = useMemo(
+      () => (
+         <WifiIndicator
+            uplink={networkQuality.uplinkNetworkQuality}
+            downlink={networkQuality.downlinkNetworkQuality}
+         />
+      ),
+      [networkQuality]
    )
 
    return (
@@ -319,13 +368,10 @@ function VideoContainer({
             handleClickScreenShareButton={handleClickScreenShareButton}
             streamerId={streamerId}
             isMainStreamer={isMainStreamer}
-            localStreamIsPublished={{
-               audio: localStream?.isAudioPublished,
-               video: localStream?.isVideoPublished,
-            }}
+            localStreamIsPublished={localStreamIsPublished}
             microphoneMuted={!Boolean(localStream.audioTrack?.enabled)}
             cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
-            openPublishingModal={() => setShowLocalStreamPublishingModal(true)}
+            openPublishingModal={setShowLocalStreamPublishingModalTrue}
             joinAsViewer={handleJoinAsViewer}
             viewer={viewer}
             localMediaControls={localMediaControls}
@@ -336,13 +382,10 @@ function VideoContainer({
             zIndex={3}
             bounds="parent"
             positionStyle={"absolute"}
-            defaultPosition={{ x: 4, y: 70 }}
+            defaultPosition={draggableDefaultPosition}
             elementId="wifiIndicatorLocation"
          >
-            <WifiIndicator
-               uplink={networkQuality.uplinkNetworkQuality}
-               downlink={networkQuality.downlinkNetworkQuality}
-            />
+            {WifiIndicatorMemoized}
          </DraggableComponent>
          <AgoraStateHandler />
          <SettingsModal
@@ -379,5 +422,7 @@ function VideoContainer({
       </>
    )
 }
+
+const draggableDefaultPosition = { x: 4, y: 70 }
 
 export default VideoContainer

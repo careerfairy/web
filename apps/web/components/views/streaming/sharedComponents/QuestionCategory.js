@@ -34,7 +34,7 @@ import {
 } from "../../../../materialUI/GlobalContainers"
 import * as actions from "../../../../store/actions"
 import SwipeableViews from "react-swipeable-views"
-import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
+import { StyledBox } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import { alpha, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import CustomInfiniteScroll from "../../../util/CustomInfiteScroll"
@@ -371,7 +371,7 @@ const QuestionCategory = (props) => {
             index={value}
             onChangeIndex={handleChangeIndex}
          >
-            <TabPanel className={classes.viewPanel} value={value} index={0}>
+            <StyledBox className={classes.viewPanel}>
                {itemsUpcoming.length ? (
                   <CustomInfiniteScroll
                      className={classes.questionScroll}
@@ -385,8 +385,8 @@ const QuestionCategory = (props) => {
                ) : (
                   <EmptyList isUpcoming />
                )}
-            </TabPanel>
-            <TabPanel className={classes.viewPanel} value={value} index={1}>
+            </StyledBox>
+            <StyledBox className={classes.viewPanel}>
                {itemsPast.length ? (
                   <CustomInfiniteScroll
                      className={classes.questionScroll}
@@ -400,7 +400,7 @@ const QuestionCategory = (props) => {
                ) : (
                   <EmptyList />
                )}
-            </TabPanel>
+            </StyledBox>
          </SwipeableViews>
          {showQuestionModal && (
             <Dialog

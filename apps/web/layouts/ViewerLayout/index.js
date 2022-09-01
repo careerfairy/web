@@ -23,6 +23,10 @@ import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
 import useRewardLivestreamAttendance from "../../components/custom-hook/useRewardLivestreamAttendance"
 import useCountLivestreamAttendanceMinutes from "../../components/custom-hook/useCountLivestreamAttendanceMinutes"
+import {
+   focusModeEnabledSelector,
+   leftMenuOpenSelector,
+} from "../../store/selectors/streamSelectors"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 
@@ -92,11 +96,9 @@ const ViewerLayout = (props) => {
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false)
    const [handRaiseActive, setHandRaiseActive] = useState(false)
    const [streamerId, setStreamerId] = useState(null)
-   const showMenu = useSelector((state) => state.stream.layout.leftMenuOpen)
+   const showMenu = useSelector(leftMenuOpenSelector)
 
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
       (state) => state.stream.streaming.spyModeEnabled
    )

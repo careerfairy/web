@@ -89,39 +89,20 @@ export default function useAgoraRtc(
       }
    }, [isStreamer, rtcClient])
 
-   const init = async () => {
-      return joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy)
-   }
-
-   const close = async () => {
-      return leaveAgoraRoom()
-   }
-
-   const handleReconnectAgora = async (options: { rePublish?: boolean }) => {
-      await close()
-      await init()
-      if (options.rePublish) {
-         try {
-            await closeLocalCameraTrack()
-            await closeLocalMicrophoneTrack()
-            await handlePublishLocalStream()
-         } catch (e) {
-            console.log("-> error in Republish in reconnect", e)
-         }
-      }
-   }
-
    const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
       screenShareRtcClientRef.current = newScreenShareRtcClient
    }
 
-   const updateScreenShareStream = (
-      newScreenShareStream:
-         | ILocalVideoTrack
-         | [ILocalVideoTrack, ILocalAudioTrack]
-   ) => {
-      screenShareStreamRef.current = newScreenShareStream
-   }
+   const updateScreenShareStream = useCallback(
+      (
+         newScreenShareStream:
+            | ILocalVideoTrack
+            | [ILocalVideoTrack, ILocalAudioTrack]
+      ) => {
+         screenShareStreamRef.current = newScreenShareStream
+      },
+      []
+   )
 
    const logStatus = (
       type: "JOIN" | "LEAVE",
@@ -137,69 +118,79 @@ export default function useAgoraRtc(
          error || ""
       )
    }
-   const joinAgoraRoom = async (
-      rtcClient: IAgoraRTCClient,
-      roomId: string,
-      userUid: string,
-      isStreamer: boolean,
-      sessionShouldUseCloudProxy: boolean
-   ) => {
-      let timeout
-      try {
-         const cfToken = router.query.token || ""
-         const { data } = await fetchAgoraRtcToken({
-            isStreamer: options?.isAHandRaiser ? false : isStreamer,
-            uid: userUid,
-            sentToken: cfToken.toString(),
-            channelName: roomId,
-            streamDocumentPath: path,
-         })
-         if (sessionShouldUseCloudProxy) {
-            rtcClient.startProxyServer(3)
-         } else {
-            timeout = setTimeout(async () => {
-               // Start reconnecting with Cloud Proxy Process
-               logStatus("LEAVE", false, sessionShouldUseCloudProxy)
-               await rtcClient.leave()
-               logStatus("LEAVE", true, sessionShouldUseCloudProxy)
-
-               // Normally client.leave() method should abort the initial join according to the docs.
-               // But that is not the case, so one must wait/sleep a bit before re-joining
-               await sleep(2000)
-               setSessionShouldUseProxy(sessionShouldUseCloudProxy)
+   const joinAgoraRoom = useCallback(
+      async (
+         rtcClient: IAgoraRTCClient,
+         roomId: string,
+         userUid: string,
+         isStreamer: boolean,
+         sessionShouldUseCloudProxy: boolean
+      ) => {
+         let timeout
+         try {
+            const cfToken = router.query.token || ""
+            const { data } = await fetchAgoraRtcToken({
+               isStreamer: options?.isAHandRaiser ? false : isStreamer,
+               uid: userUid,
+               sentToken: cfToken.toString(),
+               channelName: roomId,
+               streamDocumentPath: path,
+            })
+            if (sessionShouldUseCloudProxy) {
                rtcClient.startProxyServer(3)
-               try {
-                  await rtcClient.join(
-                     agoraCredentials.appID,
-                     roomId,
-                     data.token.rtcToken,
-                     userUid
-                  )
-               } catch (e) {
-                  console.log("-> ERROR IN RECONNECT WITH Proxy", e)
-               }
-               return
-            }, RTC_CLIENT_JOIN_TIME_LIMIT)
+            } else {
+               timeout = setTimeout(async () => {
+                  // Start reconnecting with Cloud Proxy Process
+                  logStatus("LEAVE", false, sessionShouldUseCloudProxy)
+                  await rtcClient.leave()
+                  logStatus("LEAVE", true, sessionShouldUseCloudProxy)
+
+                  // Normally client.leave() method should abort the initial join according to the docs.
+                  // But that is not the case, so one must wait/sleep a bit before re-joining
+                  await sleep(2000)
+                  setSessionShouldUseProxy(sessionShouldUseCloudProxy)
+                  rtcClient.startProxyServer(3)
+                  try {
+                     await rtcClient.join(
+                        agoraCredentials.appID,
+                        roomId,
+                        data.token.rtcToken,
+                        userUid
+                     )
+                  } catch (e) {
+                     console.log("-> ERROR IN RECONNECT WITH Proxy", e)
+                  }
+                  return
+               }, RTC_CLIENT_JOIN_TIME_LIMIT)
+            }
+            logStatus("JOIN", false, sessionShouldUseCloudProxy)
+
+            await rtcClient.join(
+               agoraCredentials.appID,
+               roomId,
+               data.token.rtcToken,
+               userUid
+            )
+            logStatus("JOIN", true, sessionShouldUseCloudProxy)
+         } catch (error) {
+            logStatus("JOIN", false, sessionShouldUseCloudProxy, error)
+            dispatch(actions.setAgoraRtcError(error))
          }
-         logStatus("JOIN", false, sessionShouldUseCloudProxy)
+         if (timeout) {
+            clearTimeout(timeout)
+         }
+      },
+      [
+         dispatch,
+         fetchAgoraRtcToken,
+         options?.isAHandRaiser,
+         path,
+         router.query.token,
+         setSessionShouldUseProxy,
+      ]
+   )
 
-         await rtcClient.join(
-            agoraCredentials.appID,
-            roomId,
-            data.token.rtcToken,
-            userUid
-         )
-         logStatus("JOIN", true, sessionShouldUseCloudProxy)
-      } catch (error) {
-         logStatus("JOIN", false, sessionShouldUseCloudProxy, error)
-         dispatch(actions.setAgoraRtcError(error))
-      }
-      if (timeout) {
-         clearTimeout(timeout)
-      }
-   }
-
-   const leaveAgoraRoom = async () => {
+   const leaveAgoraRoom = useCallback(async () => {
       console.log("-> LEAVING")
       try {
          if (rtcClient) {
@@ -211,25 +202,30 @@ export default function useAgoraRtc(
       } catch (error) {
          console.log(error)
       }
-   }
+   }, [sessionIsUsingCloudProxy])
 
-   const joinAgoraRoomWithPrimaryClient = async (
-      sessionShouldUseCloudProxy: boolean
-   ) => {
-      try {
-         await joinAgoraRoom(
-            rtcClient,
-            roomId,
-            streamerId,
-            isStreamer,
-            sessionShouldUseCloudProxy
-         )
-         return dispatch(actions.setAgoraPrimaryClientJoined(true))
-      } catch (error) {
-         dispatch(actions.setAgoraPrimaryClientJoined(false))
-         dispatch(actions.setAgoraRtcError(error))
-      }
-   }
+   const close = useCallback(async () => {
+      return leaveAgoraRoom()
+   }, [leaveAgoraRoom])
+
+   const joinAgoraRoomWithPrimaryClient = useCallback(
+      async (sessionShouldUseCloudProxy: boolean) => {
+         try {
+            await joinAgoraRoom(
+               rtcClient,
+               roomId,
+               streamerId,
+               isStreamer,
+               sessionShouldUseCloudProxy
+            )
+            return dispatch(actions.setAgoraPrimaryClientJoined(true))
+         } catch (error) {
+            dispatch(actions.setAgoraPrimaryClientJoined(false))
+            dispatch(actions.setAgoraRtcError(error))
+         }
+      },
+      [dispatch, isStreamer, joinAgoraRoom, roomId, streamerId]
+   )
 
    const initializeLocalAudioStream = async () => {
       return new Promise<void>(async (resolve, reject) => {
@@ -335,29 +331,39 @@ export default function useAgoraRtc(
       }
    }, [rtcClient, localStream])
 
-   const setLocalAudioEnabled = async (value) => {
-      try {
-         await localStream.audioTrack.setEnabled(value)
-         setLocalStream((localStream) => ({
-            ...localStream,
-            audioMuted: !value,
-         }))
-      } catch (e) {
-         console.log("-> error in toggling mic", e)
-      }
-   }
+   const setLocalAudioEnabled = useCallback(
+      async (value) => {
+         try {
+            await localStream.audioTrack.setEnabled(value)
+            setLocalStream((localStream) => ({
+               ...localStream,
+               audioMuted: !value,
+            }))
+         } catch (e) {
+            console.log("-> error in toggling mic", e)
+         }
+      },
+      [localStream.audioTrack]
+   )
 
-   const setLocalVideoEnabled = async (value) => {
-      try {
-         await localStream.videoTrack.setEnabled(value)
-         setLocalStream((localStream) => ({
-            ...localStream,
-            videoMuted: !value,
-         }))
-      } catch (e) {
-         console.log("-> error in toggling cam", e)
-      }
-   }
+   const init = useCallback(async () => {
+      return joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy)
+   }, [joinAgoraRoomWithPrimaryClient, sessionShouldUseCloudProxy])
+
+   const setLocalVideoEnabled = useCallback(
+      async (value) => {
+         try {
+            await localStream.videoTrack.setEnabled(value)
+            setLocalStream((localStream) => ({
+               ...localStream,
+               videoMuted: !value,
+            }))
+         } catch (e) {
+            console.log("-> error in toggling cam", e)
+         }
+      },
+      [localStream.videoTrack]
+   )
 
    const publishTracks = (client: IAgoraRTCClient, tracks, streamType) => {
       if (tracks) {
@@ -398,7 +404,7 @@ export default function useAgoraRtc(
       })
    }
 
-   const closeLocalCameraTrack = () => {
+   const closeLocalCameraTrack = useCallback(() => {
       return new Promise<void>(async (resolve, reject) => {
          try {
             if (localStream.videoTrack) {
@@ -419,7 +425,7 @@ export default function useAgoraRtc(
             reject(error)
          }
       })
-   }
+   }, [localStream.isVideoPublished, localStream.videoTrack])
 
    const publishLocalMicrophoneTrack = () => {
       return new Promise<void>(async (resolve, reject) => {
@@ -437,7 +443,7 @@ export default function useAgoraRtc(
       })
    }
 
-   const closeLocalMicrophoneTrack = () => {
+   const closeLocalMicrophoneTrack = useCallback(() => {
       return new Promise<void>(async (resolve, reject) => {
          try {
             if (localStream.audioTrack) {
@@ -462,7 +468,7 @@ export default function useAgoraRtc(
             reject(error)
          }
       })
-   }
+   }, [localStream.audioTrack, localStream.isAudioPublished])
 
    const returnToAudience = async () => {
       return await rtcClient.setClientRole("audience")
@@ -504,7 +510,7 @@ export default function useAgoraRtc(
       [sessionShouldUseCloudProxy, screenShareRtcClient, streamerId, roomId]
    )
 
-   const unPublishScreenShareStream = async () => {
+   const unPublishScreenShareStream = useCallback(async () => {
       return new Promise<void>(async (resolve, reject) => {
          try {
             let screenShareRtcClient = screenShareRtcClientRef.current
@@ -522,7 +528,7 @@ export default function useAgoraRtc(
             reject(error)
          }
       })
-   }
+   }, [updateScreenShareStream])
 
    const publishScreenShareTracks = async (
       screenShareTracks,
@@ -577,6 +583,29 @@ export default function useAgoraRtc(
       localStream.isVideoPublished,
    ])
 
+   const handleReconnectAgora = useCallback(
+      async (options: { rePublish?: boolean }) => {
+         await close()
+         await init()
+         if (options.rePublish) {
+            try {
+               await closeLocalCameraTrack()
+               await closeLocalMicrophoneTrack()
+               await handlePublishLocalStream()
+            } catch (e) {
+               console.log("-> error in Republish in reconnect", e)
+            }
+         }
+      },
+      [
+         close,
+         closeLocalCameraTrack,
+         closeLocalMicrophoneTrack,
+         handlePublishLocalStream,
+         init,
+      ]
+   )
+
    const localMediaHandlers = useMemo(
       () => ({
          initializeLocalAudioStream,
@@ -603,11 +632,16 @@ export default function useAgoraRtc(
       [localStream.videoTrack, localStream.audioTrack, rtcClient]
    )
 
+   const localMediaControls = useMemo(
+      () => ({ setLocalAudioEnabled, setLocalVideoEnabled }),
+      [setLocalAudioEnabled, setLocalVideoEnabled]
+   )
+
    return {
       networkQuality,
       localStream,
       localMediaHandlers,
-      localMediaControls: { setLocalAudioEnabled, setLocalVideoEnabled },
+      localMediaControls: localMediaControls,
       remoteStreams,
       screenShareStreamRef,
       publishLocalStreamTracks,

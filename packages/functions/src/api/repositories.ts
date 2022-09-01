@@ -27,13 +27,14 @@ export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
    firestoreInstance,
-   admin.firestore.FieldValue
+   admin.firestore.FieldValue,
+   admin.firestore.Timestamp
 )
 
 export const fieldOfStudyRepo: IFieldOfStudyRepository =
    new FirebaseFieldOfStudyRepository(firestoreInstance)
 
-export const livestreamRepo: ILivestreamRepository =
+export const livestreamsRepo: ILivestreamRepository =
    new FirebaseLivestreamRepository(
       firestoreInstance,
       admin.firestore.FieldValue
@@ -43,5 +44,5 @@ export const atsRepo = (
    apiKey: string,
    accountToken: string
 ): IATSRepository => {
-   return new MergeATSRepository(apiKey, accountToken)
+   return new MergeATSRepository(apiKey, accountToken, admin.firestore as any)
 }

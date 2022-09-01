@@ -10,10 +10,8 @@ import {
 } from "@mui/material"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import { useSelector } from "react-redux"
-import RootState from "store/reducers"
 import { rtcMessages } from "types/streaming"
 import OptionCard, { OptionCardProps } from "../common/OptionCard"
-// @ts-ignore
 import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../../store/selectors/streamSelectors"
 
@@ -28,31 +26,38 @@ const ConnectionStateModal: FC<Props> = (props) => {
    const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
 
    useEffect(() => {
-      ;(function handlePromptUseDebug() {
-         const { curState } = agoraRtcConnectionStatus
-         let timeout
-         const inALoadingState = [
-            "CONNECTING",
-            "RECONNECTING",
-            "DISCONNECTED",
-         ].includes(curState)
-         if (agoraRtcConnectionStatus.curState === "DISCONNECTED") {
-            setShowDebugPrompt(true)
-            return
-         }
-         if (inALoadingState) {
-            timeout = setTimeout(async () => {
-               setShowDebugPrompt(true)
-            }, loadingTimeLimit)
-         } else {
-            setShowDebugPrompt(false)
-            if (timeout) {
-               clearTimeout(timeout)
-            }
-         }
+      let mounted = true
 
-         return () => clearTimeout(timeout)
-      })()
+      const { curState } = agoraRtcConnectionStatus
+      let timeout
+      const inALoadingState = [
+         "CONNECTING",
+         "RECONNECTING",
+         "DISCONNECTED",
+      ].includes(curState)
+
+      if (agoraRtcConnectionStatus.curState === "DISCONNECTED") {
+         setShowDebugPrompt(true)
+         return
+      }
+
+      if (inALoadingState) {
+         timeout = setTimeout(async () => {
+            if (mounted) {
+               setShowDebugPrompt(true)
+            }
+         }, loadingTimeLimit)
+      } else {
+         setShowDebugPrompt(false)
+         if (timeout) {
+            clearTimeout(timeout)
+         }
+      }
+
+      return () => {
+         mounted = false
+         clearTimeout(timeout)
+      }
    }, [agoraRtcConnectionStatus])
 
    return (
@@ -74,7 +79,7 @@ const ConnectionStateModal: FC<Props> = (props) => {
             <DialogContent dividers>
                <Stack spacing={2}>
                   <Typography variant="h6">
-                     We're having trouble connecting you with CareerFairy:
+                     {"We're "} having trouble connecting you with CareerFairy:
                   </Typography>
                   {props.steps.map((step) => (
                      <OptionCard {...step} key={step.title} />
