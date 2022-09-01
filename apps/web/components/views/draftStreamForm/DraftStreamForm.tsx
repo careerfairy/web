@@ -173,6 +173,7 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
+   questionsDisabled: boolean
 }
 
 const DraftStreamForm = ({
