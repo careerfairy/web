@@ -12,6 +12,7 @@ import {
    getReferralInformation,
 } from "../../util/CommonUtil"
 import {
+   EventRating,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    pickPublicDataFromLivestream,
@@ -576,21 +577,22 @@ class FirebaseService {
 
    addLivestream = async (livestream, collection, author = {}) => {
       try {
-         const ratings = [
+         const ratings: EventRating[] = [
             {
-               message: `How happy are you with the content shared by ${livestream.company}?`,
-               type: "company",
+               question: `How happy are you with the content shared by ${livestream.company}?`,
+               id: "company",
                appearAfter: 30,
             },
             {
-               message: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
-               type: "willingnessToApply",
+               question: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
+               id: "willApply",
                appearAfter: 40,
+               isSentimentRating: true,
             },
             {
-               message:
+               question:
                   "How would you rate this live stream experience? Any feedback you would like to share?",
-               type: "overall",
+               id: "overall",
                appearAfter: 45,
                hasText: true,
             },
@@ -622,14 +624,15 @@ class FirebaseService {
                .collection(collection)
                .doc(livestreamsRef.id)
                .collection("rating")
-               .doc(rating.type)
+               .doc(rating.id)
 
-            batch.set(ratingRef, {
-               title: rating.type,
-               question: rating.message,
+            const toSet: EventRating = {
+               question: rating.question,
                appearAfter: rating.appearAfter,
                hasText: Boolean(rating.hasText),
-            })
+               id: rating.id,
+            }
+            batch.set(ratingRef, toSet)
          }
 
          await batch.commit()

@@ -1,8 +1,5 @@
-import React, { useCallback, useEffect, useState } from "react"
-import clsx from "clsx"
-import PropTypes from "prop-types"
-import { Box, Card, Divider, Grow, Tabs, Tab, IconButton } from "@mui/material"
-import { withFirebase } from "../../../../../../../context/firebase/FirebaseServiceContext"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { Box, Card, Divider, Grow, IconButton, Tab, Tabs } from "@mui/material"
 import {
    addMinutes,
    prettyDate,
@@ -10,7 +7,6 @@ import {
 import {
    renderAppearAfter,
    renderRatingStars,
-   StarRatingInputValue,
    tableIcons,
 } from "../../common/TableUtils"
 import EditFeedbackModal from "./EditFeedbackModal"
@@ -18,24 +14,10 @@ import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYou
 import { useSnackbar } from "notistack"
 import FeedbackGraph from "../FeedbackGraph"
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
-import makeStyles from "@mui/styles/makeStyles"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
-
-const useStyles = makeStyles((theme) => ({
-   root: {},
-   actions: {
-      justifyContent: "flex-end",
-   },
-   displayGraphButton: {
-      fontWeight: 500,
-      color: theme.palette.primary.main,
-   },
-   deleteButton: {
-      color: theme.palette.error.main,
-   },
-}))
+import { useFirebaseService } from "../../../../../../../context/firebase/FirebaseServiceContext"
 
 const FeedbackTable = ({
    fetchingStreams,
@@ -49,23 +31,18 @@ const FeedbackTable = ({
    breakdownRef,
    setStreamDataType,
    streamDataType,
-   firebase,
    currentPoll,
    handleScrollToSideRef,
    currentRating,
    streamDataTypes,
-   className,
    typesOfOptions,
    userTypes,
    setUserType,
    ...rest
 }) => {
-   const classes = useStyles()
+   const firebase = useFirebaseService()
    const [tableData, setTableData] = useState({ data: [], columns: [] })
-   const [feedbackModal, setFeedbackModal] = useState({
-      data: {},
-      open: false,
-   })
+   const [feedbackModalData, setFeedbackModalData] = useState(null)
    const [areYouSureModal, setAreYouSureModal] = useState({
       data: {},
       open: false,
@@ -73,60 +50,183 @@ const FeedbackTable = ({
    })
    const [deletingFeedback, setDeletingFeedback] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
+   const renderDisplayButton = useCallback(
+      (rowData) => {
+         const hasNoData = () => {
+            return Boolean(!rowData.voters?.length)
+         }
+         const handleClick = () => {
+            setCurrentRating(rowData)
+            handleScrollToSideRef()
+         }
+         return (
+            <Box display="flex" justifyContent="center">
+               <IconButton
+                  color={
+                     currentRating?.id === rowData.id ? undefined : "default"
+                  }
+                  disabled={hasNoData()}
+                  onClick={handleClick}
+                  size="large"
+               >
+                  <ArrowDownwardIcon />
+               </IconButton>
+            </Box>
+         )
+      },
+      [currentRating, handleScrollToSideRef, setCurrentRating]
+   )
+   const pollColumns = useMemo(
+      () => [
+         {
+            field: "question",
+            title: "Question",
+            width: 300,
+         },
+         {
+            field: "state",
+            title: "Status",
+            lookup: {
+               closed: "Answered",
+               upcoming: "New",
+               current: "Answering",
+            },
+         },
+         {
+            field: "date",
+            title: "Date Created",
+            type: "date",
+            render: (rowData) => prettyDate(rowData.timestamp),
+         },
+      ],
+      []
+   )
 
+   const questionColumns = useMemo(
+      () => [
+         {
+            field: "title",
+            title: "Question",
+            cellStyle: {
+               width: 400,
+            },
+         },
+         {
+            field: "votes",
+            title: "Votes",
+            type: "numeric",
+         },
+         {
+            field: "date",
+            title: "Posted On",
+            type: "date",
+            render: (rowData) => prettyDate(rowData.timestamp),
+         },
+         {
+            field: "type",
+            title: "status",
+            lookup: { done: "Answered", new: "New", current: "Answering" },
+         },
+      ],
+      []
+   )
+   const feedbackColumns = useMemo(
+      () => [
+         {
+            field: "question",
+            title: "Question",
+            cellStyle: {
+               width: 300,
+            },
+         },
+         {
+            field: "average",
+            title: "Average Rating",
+            render: (rowData) =>
+               renderRatingStars({
+                  rating: rowData.average,
+                  id: rowData.id,
+                  isSentimentRating: rowData?.isSentimentRating,
+               }),
+            filtering: false,
+         },
+         {
+            field: "appearAfter",
+            title: "Appear After",
+            type: "numeric",
+            render: renderAppearAfter,
+         },
+         {
+            field: "votes",
+            title: "Votes",
+            type: "numeric",
+         },
+         {
+            field: "options",
+            title: "Breakdown",
+            render: renderDisplayButton,
+            filtering: false,
+            sorting: false,
+            disableClickEventBubbling: true,
+            export: false,
+         },
+         {
+            field: "hasText",
+            title: "Has Written Reviews",
+            type: "boolean",
+         },
+         {
+            field: "isSentimentRating",
+            title: "Is Sentiment Rating",
+            type: "boolean",
+         },
+         {
+            field: "isForEnd",
+            title: "Ask on Stream End",
+            type: "boolean",
+         },
+      ],
+      [renderDisplayButton]
+   )
    useEffect(() => {
-      const dataType = streamDataType.propertyName
-      const newData = currentStream?.[dataType] || []
-      let newColumns = tableData.columns
-      if (dataType === "pollEntries") {
-         newColumns = pollColumns
-      } else if (dataType === "questions") {
-         newColumns = questionColumns
-      } else if (dataType === "feedback") {
-         newColumns = feedbackColumns
-      }
-      setTableData({
-         data: newData,
-         columns: newColumns,
+      setTableData((prev) => {
+         const dataType = streamDataType.propertyName
+         const newData = currentStream?.[dataType] || []
+         let newColumns = prev.columns
+         if (dataType === "pollEntries") {
+            newColumns = pollColumns
+         } else if (dataType === "questions") {
+            newColumns = questionColumns
+         } else if (dataType === "feedback") {
+            newColumns = feedbackColumns
+         }
+         return {
+            data: newData,
+            columns: newColumns,
+         }
       })
-   }, [streamDataType.propertyName, currentStream])
+   }, [
+      streamDataType.propertyName,
+      currentStream,
+      pollColumns,
+      questionColumns,
+      feedbackColumns,
+   ])
 
    const handleDisplayTable = (rowData) => {
       setCurrentRating(rowData)
       handleScrollToSideRef()
    }
 
-   const DisplayButton = (rowData) => {
-      const hasNoData = () => {
-         return Boolean(!rowData.voters?.length)
-      }
-      const handleClick = () => {
-         setCurrentRating(rowData)
-         handleScrollToSideRef()
-      }
-      return (
-         <Box display="flex" justifyContent="center">
-            <IconButton
-               color={currentRating?.id === rowData.id ? undefined : "default"}
-               disabled={hasNoData()}
-               onClick={handleClick}
-               size="large"
-            >
-               <ArrowDownwardIcon />
-            </IconButton>
-         </Box>
-      )
-   }
-
    const handleEditFeedback = (row) => {
-      setFeedbackModal({ data: row, open: true })
+      setFeedbackModalData(row)
    }
    const handleCloseFeedbackModal = () => {
-      setFeedbackModal({ data: {}, open: false })
+      setFeedbackModalData(null)
    }
 
    const handleCreateFeedback = () => {
-      setFeedbackModal({ data: {}, open: true })
+      setFeedbackModalData({})
    }
    const handleOpenAreYouSureModal = (row) => {
       const warning = `Are you sure you want to delete the question "${row.question}"? You wont be able to revert this action`
@@ -156,149 +256,46 @@ const FeedbackTable = ({
       setAreYouSureModal({ data: {}, open: false, warning: "" })
    }
 
-   const pollColumns = [
-      {
-         field: "question",
-         title: "Question",
-         width: 300,
-      },
-      // {
-      //     title: "Votes",
-      //     type: 'numeric',
-      //     field: "votes",
-      // },
-      {
-         field: "state",
-         title: "Status",
-         lookup: { closed: "Answered", upcoming: "New", current: "Answering" },
-      },
-      {
-         field: "date",
-         title: "Date Created",
-         type: "date",
-         render: (rowData) => prettyDate(rowData.timestamp),
-      },
-   ]
-
-   const questionColumns = [
-      {
-         field: "title",
-         title: "Question",
-         cellStyle: {
-            width: 400,
-         },
-      },
-      {
-         field: "votes",
-         title: "Votes",
-         type: "numeric",
-      },
-      {
-         field: "date",
-         title: "Posted On",
-         type: "date",
-         render: (rowData) => prettyDate(rowData.timestamp),
-      },
-      {
-         field: "type",
-         title: "status",
-         lookup: { done: "Answered", new: "New", current: "Answering" },
-      },
-   ]
-   const feedbackColumns = [
-      {
-         field: "question",
-         title: "Question",
-         cellStyle: {
-            width: 300,
-         },
-      },
-      {
-         field: "average",
-         title: "Average Rating",
-         render: (rowData) =>
-            renderRatingStars({ rating: rowData.average, id: rowData.id }),
-         filterComponent: StarRatingInputValue,
-         customFilterAndSearch: (term, rowData) =>
-            Number(term) >= Number(rowData.average),
-      },
-      {
-         field: "appearAfter",
-         title: "Appear After",
-         type: "numeric",
-         render: renderAppearAfter,
-      },
-      {
-         field: "votes",
-         title: "Votes",
-         type: "numeric",
-      },
-      {
-         field: "options",
-         title: "Breakdown",
-         render: DisplayButton,
-         filtering: false,
-         sorting: false,
-         disableClickEventBubbling: true,
-         export: false,
-      },
-      {
-         field: "hasText",
-         title: "Has Written Reviews",
-         type: "boolean",
-      },
-      {
-         field: "isForEnd",
-         title: "Ask on Stream End",
-         type: "boolean",
-      },
-   ]
-
-   // const customOptions = {...defaultTableOptions}
-   // customOptions.selection = false
-
    const handleMenuItemClick = (event, index) => {
       setStreamDataType(streamDataTypes[index])
    }
 
-   const active = () => {
-      return Boolean(currentStream && !currentRating && !currentPoll)
-   }
+   const active = Boolean(currentStream && !currentRating && !currentPoll)
 
-   const isFeedback = () => {
-      return Boolean(streamDataType.propertyName === "feedback")
-   }
-   const isPoll = () => {
-      return Boolean(streamDataType.propertyName === "pollEntries")
-   }
+   const isFeedback = Boolean(streamDataType.propertyName === "feedback")
 
-   const canEdit = ({ appearAfter, isForEnd }) => {
-      if (currentStream && appearAfter) {
-         const { start, hasEnded } = currentStream
-         if (hasEnded) {
+   const isPoll = Boolean(streamDataType.propertyName === "pollEntries")
+
+   const canEdit = useCallback(
+      ({ appearAfter, isForEnd }) => {
+         if (currentStream && appearAfter) {
+            const { start, hasEnded } = currentStream
+            if (hasEnded) {
+               return false
+            }
+            const now = new Date()
+            const streamStart = start?.toDate()
+            const editDeadline = addMinutes(streamStart, appearAfter)
+            const editHardDeadline = addMinutes(streamStart, 720)
+            if (now > editDeadline) {
+               return false
+            }
+            return !(isForEnd && now > editHardDeadline)
+         } else {
             return false
          }
-         const now = new Date()
-         const streamStart = start?.toDate()
-         const editDeadline = addMinutes(streamStart, appearAfter)
-         const editHardDeadline = addMinutes(streamStart, 720)
-         if (now > editDeadline) {
-            return false
-         }
-         return !(isForEnd && now > editHardDeadline)
-      } else {
-         return false
-      }
-   }
+      },
+      [currentStream]
+   )
 
    const getTitle = () => {
       let prefix = "Questions"
 
-      if (isFeedback()) {
+      if (isFeedback) {
          prefix = "Feedback"
       }
 
-      if (isPoll()) {
+      if (isPoll) {
          prefix = "Polls"
       }
 
@@ -317,12 +314,7 @@ const FeedbackTable = ({
 
    return (
       <>
-         <Card
-            raised={active()}
-            className={clsx(classes.root, className)}
-            ref={breakdownRef}
-            {...rest}
-         >
+         <Card raised={active} ref={breakdownRef} {...rest}>
             <Tabs
                value={streamDataType.propertyName}
                indicatorColor="primary"
@@ -348,7 +340,6 @@ const FeedbackTable = ({
                icons={tableIcons}
                {...tableData}
                isLoading={fetchingStreams}
-               // options={customOptions}
                actions={[
                   exportSelectionAction(
                      tableData.columns,
@@ -358,7 +349,7 @@ const FeedbackTable = ({
                   (rowData) => ({
                      icon: tableIcons.ThemedEditIcon,
                      iconProps: { color: "primary" },
-                     hidden: !isFeedback() || !canEdit(rowData),
+                     hidden: !isFeedback || !canEdit(rowData),
                      disabled: !canEdit(rowData),
                      position: "row",
                      tooltip: "Edit",
@@ -367,7 +358,7 @@ const FeedbackTable = ({
                   {
                      icon: tableIcons.RedDeleteForeverIcon,
                      iconProps: { color: "primary" },
-                     hidden: !isFeedback(),
+                     hidden: !isFeedback,
                      position: "row",
                      tooltip: "Delete",
                      onClick: (event, rowData) =>
@@ -375,7 +366,7 @@ const FeedbackTable = ({
                   },
                   {
                      icon: tableIcons.ThemedAdd,
-                     hidden: !isFeedback() || !currentStream,
+                     hidden: !isFeedback || !currentStream,
                      isFreeAction: true,
                      iconProps: { color: "primary" },
                      tooltip: "Add Question",
@@ -383,7 +374,7 @@ const FeedbackTable = ({
                   },
                   (rowData) => ({
                      icon: tableIcons.ArrowDownwardIcon,
-                     hidden: !isFeedback(),
+                     hidden: !isFeedback,
                      position: "row",
                      disabled: rowData?.votes === 0,
                      iconProps: { color: "green" },
@@ -398,7 +389,7 @@ const FeedbackTable = ({
                   )}`
                }
                detailPanel={
-                  isPoll()
+                  isPoll
                      ? [
                           {
                              tooltip: "Show Chart",
@@ -429,11 +420,14 @@ const FeedbackTable = ({
                }
             />
          </Card>
-         <EditFeedbackModal
-            currentStream={currentStream}
-            handleClose={handleCloseFeedbackModal}
-            state={feedbackModal}
-         />
+         {feedbackModalData && (
+            <EditFeedbackModal
+               currentStream={currentStream}
+               handleClose={handleCloseFeedbackModal}
+               data={feedbackModalData}
+               open={Boolean(feedbackModalData)}
+            />
+         )}
          <AreYouSureModal
             open={areYouSureModal.open}
             message={areYouSureModal.warning}
@@ -453,8 +447,4 @@ const FeedbackTable = ({
    )
 }
 
-FeedbackTable.propTypes = {
-   className: PropTypes.string,
-}
-
-export default withFirebase(FeedbackTable)
+export default FeedbackTable

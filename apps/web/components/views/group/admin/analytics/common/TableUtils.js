@@ -1,11 +1,6 @@
-import React, { forwardRef, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
-import {
-   getMinutes,
-   prettyDate,
-} from "../../../../../helperFunctions/HelperFunctions"
-import { Rating } from "@mui/material"
-import { Box, Tooltip, Typography } from "@mui/material"
+import React, { forwardRef, useCallback, useState } from "react"
+import { getMinutes } from "../../../../../helperFunctions/HelperFunctions"
+import { Box, Rating, Typography } from "@mui/material"
 
 import AddBox from "@mui/icons-material/AddBox"
 import ArrowDownward from "@mui/icons-material/ArrowDownward"
@@ -40,6 +35,8 @@ import EditOutlinedIcon from "@mui/icons-material/EditOutlined"
 import RotateLeftIcon from "@mui/icons-material/RotateLeft"
 import PictureAsPdfIcon from "@mui/icons-material/PictureAsPdf"
 import { getCSVDelimiterBasedOnOS } from "../../../../../../util/CommonUtil"
+import SentimentRating from "../../../../viewer/rating-container/SentimentRating"
+import NormalRating from "../../../../viewer/rating-container/NormalRating"
 
 export const tableIcons = {
    Add: forwardRef((props, ref) => <AddBox {...props} ref={ref} />),
@@ -160,42 +157,6 @@ export const getPageSize = (pageSizeOptions = [], totalData = []) => {
    )
 }
 
-const useStyles = makeStyles((theme) => ({
-   ratingInput: {
-      display: "inline-flex",
-      flexDirection: "row",
-      alignItems: "center",
-      height: 48,
-      paddingLeft: 20,
-   },
-   ratingText: {
-      marginLeft: theme.spacing(1),
-      color: theme.palette.text.secondary,
-      fontWeight: 500,
-   },
-   tableTooltipQuestion: {
-      fontSize: theme.spacing(2),
-   },
-}))
-
-export const getDate = (rowData, prop) => {
-   return prettyDate(rowData[prop])
-}
-export const getCount = ({ value }) => {
-   return value ? value.length : 0
-}
-export const renderLongText = ({ value }) => {
-   return (
-      <Tooltip
-         title={<Typography style={{ fontSize: "1.2rem" }}>{value}</Typography>}
-      >
-         <Typography variant="inherit" noWrap>
-            {value}
-         </Typography>
-      </Tooltip>
-   )
-}
-
 export const renderAppearAfter = ({ appearAfter }) => {
    return (
       <Typography variant="inherit" noWrap>
@@ -204,83 +165,57 @@ export const renderAppearAfter = ({ appearAfter }) => {
    )
 }
 
-export const RatingInputValue = ({ item, applyValue }) => {
-   const classes = useStyles()
-
-   const handleFilterChange = (event) => {
-      applyValue({ ...item, value: event.target.value })
-   }
-
-   return (
-      <div className={classes.ratingInput}>
-         <Rating
-            name="custom-rating-filter-operator"
-            placeholder="Filter value"
-            value={Number(item.value)}
-            onChange={handleFilterChange}
-            precision={0.5}
-         />
-      </div>
-   )
-}
 export const StarRatingInputValue = ({ columnDef, onFilterChanged }) => {
    const [rating, setRating] = useState(0)
+   const onChange = useCallback(
+      (event, newValue) => {
+         setRating(newValue)
+         onFilterChanged(columnDef?.field, newValue)
+      },
+      [columnDef, onFilterChanged]
+   )
+   const name = `ratings-${columnDef?.tableData?.id}`
+
    return (
       <Box>
          <Typography component="legend">Up to:</Typography>
          <Rating
-            name={`ratings-${columnDef.tableData.id}`}
+            name={name}
             placeholder="Ratings lower than"
             value={rating}
-            onChange={(event, value) => {
-               setRating(value)
-               onFilterChanged(columnDef.tableData.id, `${value}`)
-            }}
+            onChange={onChange}
             precision={0.5}
          />
       </Box>
    )
 }
 
-export const renderRating = ({ value, id }) => {
+export const renderRatingStars = ({ id, isSentimentRating, rating }) => {
    return (
       <Box display="flex" alignItems="center">
-         <Rating readOnly name={id} value={Number(value)} precision={0.5} />
-         {value ? (
-            <Typography
-               style={{
-                  marginLeft: 8,
-                  color: "grey",
-                  fontWeight: 500,
-               }}
-            >
-               {value}
-            </Typography>
-         ) : null}
-      </Box>
-   )
-}
-export const renderRatingStars = ({ rating, id }) => {
-   return (
-      <Box display="flex" alignItems="center">
-         <Rating readOnly name={id} value={Number(rating)} precision={0.5} />
-         {Number(rating) > 0 && (
-            <Typography
-               style={{
-                  marginLeft: 8,
-                  color: "grey",
-                  fontWeight: 500,
-               }}
-            >
-               {rating}
-            </Typography>
+         {isSentimentRating ? (
+            <SentimentRating name={id} value={Number(rating)} readOnly />
+         ) : (
+            <>
+               <NormalRating
+                  readOnly
+                  name={id}
+                  value={Number(rating)}
+                  precision={0.5}
+               />
+               {Number(rating) > 0 && (
+                  <Typography
+                     style={{
+                        marginLeft: 8,
+                        color: "grey",
+                        fontWeight: 500,
+                     }}
+                  >
+                     {rating}
+                  </Typography>
+               )}
+            </>
          )}
       </Box>
    )
-}
-
-export const filterModel = {
-   items: [
-      // {columnField: 'rating', value: '3.5', operatorValue: '>='}
-   ],
 }
