@@ -20,7 +20,7 @@ export interface ICaseStudyRepository {
       moreCompanyCaseStudies: CompanyCaseStudyPreview[]
    }>
 }
-
+// language=GraphQL
 class GraphCMSCaseStudyRepository implements ICaseStudyRepository {
    constructor() {}
 

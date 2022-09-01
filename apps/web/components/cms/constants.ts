@@ -6,3 +6,9 @@ export const caseStudyCompanyCoverImageDimensions = {
    width: 600,
    height: 340,
 }
+
+export const marketingSignUpFormId = "marketingSignUpFormId"
+
+export const hookLandingPage = "hook-landing-page"
+
+export const defaultMarketingLandingPage = "default-marketing-landing-page"

@@ -1,4 +1,8 @@
 import dotenv = require("dotenv")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
+
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")
@@ -15,11 +19,10 @@ import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
 import wishes = require("./wishes")
+import cms = require("./cms")
+import marketing = require("./marketing")
 import atsUser = require("./atsUser")
 import atsGroup = require("./atsGroup")
-
-// load values from the .env file in this directory into process.env
-dotenv.config()
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -123,8 +126,13 @@ exports.rewardUserAction = rewards.rewardUserAction
 exports.applyReferralCode = rewards.applyReferralCode
 
 // Ratings
-
 exports.onUserRateWish = wishes.onUserRateWish
+
+// CMS
+exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
+
+// Marketing
+exports.createMarketingUser = marketing.createMarketingUser
 
 // ATS
 // Group

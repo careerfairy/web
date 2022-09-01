@@ -1,0 +1,225 @@
+import { Box, Button, Container, Typography } from "@mui/material"
+import { HygraphResponseHero } from "../../types/cmsTypes"
+import { sxStyles } from "../../types/commonTypes"
+import Stack from "@mui/material/Stack"
+import CmsImage from "./image"
+import { FC } from "react"
+import LaptopVideo from "components/views/landing/HeroSection/LaptopVideo"
+import { PillsBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
+
+const styles = sxStyles({
+   imageWrapper: {
+      height: (theme) => ({
+         xs: theme.spacing(32),
+         sm: theme.spacing(36),
+         md: theme.spacing(48),
+         lg: "100%",
+      }),
+      width: {
+         xs: "100%",
+         lg: "50%",
+      },
+      position: {
+         xs: "relative",
+         lg: "absolute",
+      },
+      top: {
+         lg: 0,
+      },
+      bottom: {
+         lg: 0,
+      },
+      right: {
+         lg: 0,
+      },
+   },
+   fullScreenImageWrapper: {
+      width: "100% !important",
+      position: "absolute !important",
+      inset: 0,
+      height: "100% !important",
+   },
+   videoWrapper: {
+      display: {
+         xs: "none",
+         lg: "block",
+      },
+      width: "50%",
+      position: {
+         lg: "absolute",
+      },
+      top: {
+         lg: 0,
+      },
+      bottom: {
+         lg: 0,
+      },
+      right: {
+         lg: 0,
+      },
+      py: {
+         lg: 24,
+         xs: 10,
+      },
+   },
+   detailsWrapper: {
+      mx: "auto",
+      maxWidth: "80%",
+      width: "100%",
+      py: {
+         lg: 4,
+      },
+      pt: 2,
+      pb: 3,
+   },
+   subTitle: {
+      textAlign: {
+         xs: "center",
+         lg: "left",
+      },
+   },
+   stack: {
+      mt: 5,
+      width: {
+         xs: "100%",
+         lg: "auto",
+      },
+   },
+   root: {
+      position: "relative",
+   },
+   container: {
+      zIndex: 1,
+      bgColor: "grey.main",
+      py: {
+         lg: 24,
+         xs: 10,
+      },
+      pl: 0,
+      pr: 0,
+   },
+   title: {
+      fontWeight: 900,
+      textAlign: {
+         xs: "center",
+         lg: "left",
+      },
+   },
+   whiteText: {
+      color: "white",
+      textShadow: (theme) => theme.darkTextShadow,
+   },
+   fullScreenMain: {
+      height: "100vh",
+      display: "flex",
+      alignItems: {
+         md: "center",
+      },
+      zIndex: 1,
+   },
+})
+
+const Hero: FC<HygraphResponseHero> = ({
+   image,
+   video,
+   slug,
+   buttons,
+   heroTitle,
+   heroSubtitle,
+   fullScreenImage,
+   children,
+}) => {
+   const titleText = heroTitle
+   const subtitleText = heroSubtitle
+
+   return (
+      <PillsBackground minHeight={"fit-content"}>
+         <Box id={slug} sx={styles.root}>
+            <Box
+               sx={[fullScreenImage && styles.fullScreenMain]}
+               component="main"
+            >
+               <Container maxWidth={"xl"} sx={styles.container}>
+                  <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
+                     <Typography
+                        variant="h1"
+                        component="h1"
+                        gutterBottom
+                        sx={[styles.title, fullScreenImage && styles.whiteText]}
+                     >
+                        {titleText}
+                     </Typography>
+                     {subtitleText && (
+                        <Typography
+                           variant="h5"
+                           sx={[
+                              styles.subTitle,
+                              fullScreenImage && styles.whiteText,
+                           ]}
+                           color="text.secondary"
+                           gutterBottom
+                        >
+                           {subtitleText}
+                        </Typography>
+                     )}
+                     {buttons && (
+                        <Stack
+                           sx={styles.stack}
+                           direction={{ xs: "column", md: "row" }}
+                           justifyContent={{ sm: "center", lg: "flex-start" }}
+                           spacing={{
+                              lg: 3,
+                              xs: 1,
+                           }}
+                        >
+                           {buttons.map((button) => (
+                              <Box key={button.slug}>
+                                 <Button
+                                    fullWidth
+                                    sx={{
+                                       ":nth-of-type(even)": {
+                                          mx: {
+                                             xs: 0,
+                                             md: 3,
+                                          },
+                                       },
+                                    }}
+                                    {...button}
+                                    size={button.size || "medium"}
+                                 />
+                              </Box>
+                           ))}
+                        </Stack>
+                     )}
+                     {children}
+                  </Box>
+               </Container>
+               {image && !video && (
+                  <Box
+                     sx={[
+                        styles.imageWrapper,
+                        fullScreenImage && styles.fullScreenImageWrapper,
+                     ]}
+                  >
+                     <CmsImage
+                        cmsImage={image}
+                        imageProps={{
+                           layout: "fill",
+                           priority: true,
+                           objectFit: "cover",
+                        }}
+                     />
+                  </Box>
+               )}
+               {video && video?.url && (
+                  <Box sx={styles.videoWrapper}>
+                     <LaptopVideo videoUrl={video?.url} />
+                  </Box>
+               )}
+            </Box>
+         </Box>
+      </PillsBackground>
+   )
+}
+
+export default Hero

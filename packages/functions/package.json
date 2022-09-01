@@ -24,6 +24,8 @@
       "dotenv": "^8.2.0",
       "firebase-admin": "^10.0.2",
       "firebase-functions": "^3.22.0",
+      "graphql": "^16.5.0",
+      "graphql-request": "^4.3.0",
       "lodash": "^4.17.20",
       "luxon": "^1.22.0",
       "mailgun-js": "^0.22.0",

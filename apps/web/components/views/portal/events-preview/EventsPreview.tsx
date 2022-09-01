@@ -15,6 +15,7 @@ import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const styles = {
    carousel: {
@@ -53,6 +54,7 @@ const EventsPreview = ({
 }: EventsProps) => {
    const {
       query: { groupId },
+      pathname,
    } = useRouter()
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
@@ -79,6 +81,10 @@ const EventsPreview = ({
    const [cardsLoaded, setCardsLoaded] = useState({})
    const shouldCenter = false
 
+   const isOnMarketingLandingPage = pathname.includes(
+      MARKETING_LANDING_PAGE_PATH
+   )
+
    const handleCardsLoaded = (cardsIndexLoaded: number[]) => {
       setCardsLoaded((prev) => ({
          ...prev,
@@ -94,7 +100,7 @@ const EventsPreview = ({
             <Box id={id}>
                <Box sx={styles.eventsHeader}>
                   <Heading>{title}</Heading>
-                  {events?.length >= limit && (
+                  {events?.length >= limit && !isOnMarketingLandingPage && (
                      <Link href={seeMoreLink}>
                         <a>
                            <Typography sx={styles.seeMoreText} color="grey">
@@ -213,7 +219,7 @@ export interface EventsProps {
    loading: boolean
    limit?: number
    hidePreview?: boolean
-   type: EventsTypes
+   type: EventsTypes | string
    id?: string
    isEmpty?: boolean
 }

@@ -70,6 +70,13 @@ export async function validateUserIsCFAdmin(email: string) {
 
    return userData
 }
+export function validateUserAuthNotExistent(
+   context: functions.https.CallableContext
+) {
+   if (context.auth) {
+      logAndThrow("The user calling the function is authenticated")
+   }
+}
 
 export function logAndThrow(message: string, ...context: any[]) {
    functions.logger.error(message, { ...context })

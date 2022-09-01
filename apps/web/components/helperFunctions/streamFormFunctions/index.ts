@@ -85,6 +85,7 @@ export const buildLivestreamObject = (
       speakers: buildSpeakersArray(values),
       language: values.language,
       lastUpdated: firebase.getServerTimestamp(),
+      hasEnded: false,
       targetFieldsOfStudy: values.targetFieldsOfStudy,
       targetLevelsOfStudy: values.targetLevelsOfStudy,
    }

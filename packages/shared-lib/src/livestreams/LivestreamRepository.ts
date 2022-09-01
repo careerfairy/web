@@ -1,8 +1,9 @@
 import firebase from "firebase/compat/app"
+import { UserPublicData } from "../users"
 import BaseFirebaseRepository, {
    mapFirestoreDocuments,
+   removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
-import { UserPublicData } from "../users"
 import {
    LivestreamEvent,
    LivestreamEventParsed,
@@ -12,9 +13,15 @@ import {
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    UserLivestreamData,
 } from "./livestreams"
+import { FieldOfStudy } from "../fieldOfStudy"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
+
+   getUpcomingEventsByFieldsOfStudy(
+      fieldsOfStudy: FieldOfStudy[],
+      limit?: number
+   ): Promise<LivestreamEvent[] | null>
 
    getRegisteredEvents(
       userEmail: string,
@@ -116,7 +123,7 @@ export class FirebaseLivestreamRepository
       documentSnapshot: firebase.firestore.QuerySnapshot
    ): LivestreamsDataParser {
       const docs = mapFirestoreDocuments<LivestreamEvent>(documentSnapshot)
-      return new LivestreamsDataParser(docs).complementaryFields()
+      return new LivestreamsDataParser(docs || []).complementaryFields()
    }
 
    async getById(id: string): Promise<LivestreamEvent> {
@@ -220,6 +227,44 @@ export class FirebaseLivestreamRepository
       return this.mapLivestreamCollections(snapshots)
          .filterByNotEndedEvents()
          .get()
+   }
+
+   async getUpcomingEventsByFieldsOfStudy(
+      fieldsOfStudy: FieldOfStudy[],
+      limit?: number
+   ): Promise<LivestreamEvent[] | null> {
+      // convert fieldsOfStudy to array of chunks of 10
+      let livestreams = []
+      let i,
+         j,
+         tempArray: FieldOfStudy[] = [],
+         chunk = 10
+      /*
+       * In case there are more than 10 fieldsOfStudy
+       * array-contains-any can only do 10 at a time
+       * */
+      for (i = 0, j = fieldsOfStudy.length; i < j; i += chunk) {
+         tempArray = fieldsOfStudy.slice(i, i + chunk)
+         let ref = await this.firestore
+            .collection("livestreams")
+            .where("start", ">", getEarliestEventBufferTime())
+            .where("targetFieldsOfStudy", "array-contains-any", tempArray)
+            .where("test", "==", false)
+            .where("hidden", "==", false)
+            .orderBy("start", "asc")
+         if (limit) {
+            ref = ref.limit(limit)
+         }
+         const snapshots = await ref.get()
+         livestreams = [
+            ...livestreams,
+            ...this.mapLivestreamCollections(snapshots).get(),
+         ]
+      }
+      if (livestreams.length === 0) {
+         return null
+      }
+      return removeDuplicateDocuments(livestreams)
    }
 
    async getPastEventsFrom(

@@ -26,3 +26,17 @@ export function sxStyles<
 >(obj: Record<K, V>): Record<K, V> {
    return obj
 }
+
+/**
+ * All ours possible colors
+ */
+export type IColors =
+   | "inherit"
+   | "action"
+   | "disabled"
+   | "primary"
+   | "secondary"
+   | "error"
+   | "info"
+   | "success"
+   | "warning"
