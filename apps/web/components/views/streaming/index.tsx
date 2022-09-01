@@ -22,6 +22,7 @@ import {
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
+      // @ts-ignore
       transitionTimingFunction: theme.transitions.easeInOut,
       // zIndex: 10,
       display: "flex",
@@ -76,7 +77,6 @@ const StreamerOverview = ({
    setSliding,
    selectedState,
    handleStateChange,
-   setNumberOfViewers,
    showMenu,
    notifications,
    streamerId,
@@ -84,13 +84,23 @@ const StreamerOverview = ({
    hideAudience,
    audienceDrawerOpen,
 }) => {
-   const { currentLivestream, isBreakout } = useCurrentStream()
+   const { currentLivestream } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
    const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(streamingSelector)
    const showActionButtons = useSelector(showActionButtonsSelector)
+
+   const unmuteMutedRemoteVideosAfterFail = useCallback(
+      () => dispatch(actions.unmuteMutedRemoteVideosAfterFail()),
+      [dispatch]
+   )
+
+   const unpauseRemoteVideosAfterFail = useCallback(
+      () => dispatch(actions.unpauseRemoteVideosAfterFail()),
+      [dispatch]
+   )
 
    useEffect(() => {
       setMounted(true)
@@ -157,18 +167,17 @@ const StreamerOverview = ({
                currentLivestream={currentLivestream}
                streamerId={streamerId}
                smallScreen={smallScreen}
-               setNumberOfViewers={setNumberOfViewers}
-               isStreamer={isStreamer}
-               isBreakout={isBreakout}
                showMenu={showMenu}
                viewer={false}
+               isPlayMode={undefined}
             />
             <ButtonComponent
+               isMobile={undefined}
                streamer={true}
-               setSliding={setSliding}
                selectedState={selectedState}
                showMenu={showMenu}
                handleStateChange={handleStateChange}
+               includeJobs={currentLivestream.jobs?.length > 0}
             />
             {showTapHint && (
                <div className={classes.infoText}>Tap to hide controllers</div>
@@ -180,7 +189,6 @@ const StreamerOverview = ({
             isStreamer
          />
          <NotificationsContainer
-            livestreamId={currentLivestream.id}
             handRaiseMenuOpen={selectedState === "hand"}
             notifications={notifications}
          />
@@ -192,15 +200,11 @@ const StreamerOverview = ({
             isStreamer={isStreamer}
          />
 
-         <IconsContainer
-            className={classes.iconsContainer}
-            isTest={currentLivestream.test}
-            livestreamId={currentLivestream.id}
-         />
+         <IconsContainer className={classes.iconsContainer} />
          <Backdrop
             open={videoIsMuted}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unmuteMutedRemoteVideosAfterFail())}
+            onClick={unmuteMutedRemoteVideosAfterFail}
          >
             <div className={classes.backdropContent}>
                <VolumeUpRoundedIcon style={{ fontSize: "3rem" }} />
@@ -210,7 +214,7 @@ const StreamerOverview = ({
          <Backdrop
             open={videoIsPaused}
             className={classes.backdrop}
-            onClick={() => dispatch(actions.unpauseRemoteVideosAfterFail())}
+            onClick={unpauseRemoteVideosAfterFail}
          >
             <div className={classes.backdropContent}>
                <PlayArrowRoundedIcon style={{ fontSize: "3rem" }} />

@@ -9,3 +9,9 @@ export const showActionButtonsSelector = (state: RootState) =>
    state.stream.layout.showActionButtons
 
 export const streamingSelector = (state: RootState) => state.stream.streaming
+
+export const leftMenuOpenSelector = (state: RootState) =>
+   state.stream.layout.leftMenuOpen
+
+export const focusModeEnabledSelector = (state: RootState) =>
+   state.stream.layout.focusModeEnabled

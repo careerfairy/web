@@ -27,6 +27,7 @@ import FormGroup from "./FormGroup"
 import ErrorContext from "../../../context/error/ErrorContext"
 import {
    buildLivestreamObject,
+   getDownloadUrl,
    getStreamSubCollectionSpeakers,
    handleAddSpeaker,
    handleDeleteSpeaker,
@@ -42,6 +43,9 @@ import { useGroups, useInterests } from "../../custom-hook/useCollection"
 import StreamDurationSelect from "../draftStreamForm/StreamDurationSelect"
 import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import JobSelectorCategory from "../draftStreamForm/JobSelector/JobSelectorCategory"
 import FieldsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
 import LevelsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 
@@ -97,6 +101,9 @@ const NewLivestreamForm = () => {
    const { setGeneralError } = useContext(ErrorContext)
    const [selectedGroups, setSelectedGroups] = useState([])
    const [selectedInterests, setSelectedInterests] = useState([])
+   const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
+      []
+   )
    const [fetchingBackgrounds, setFetchingBackgrounds] = useState(true)
    const [fetchingLogos, setFetchingLogos] = useState(true)
    const [fetchingAvatars, setFetchingAvatars] = useState(true)
@@ -189,6 +196,7 @@ const NewLivestreamForm = () => {
                      newFormData.interestsIds.includes(i.id)
                   )
                )
+               setSelectedJobs(livestream.jobs || [])
                setSelectedGroups(
                   existingGroups
                      .filter((g) => newFormData.groupIds.includes(g.id))
@@ -245,20 +253,13 @@ const NewLivestreamForm = () => {
       ) {
          setAllFetched(true)
       }
-   }, [fetchingAvatars, fetchingBackgrounds, fetchingLogos])
-
-   const getDownloadUrl = (fileElement) => {
-      if (fileElement) {
-         return (
-            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/" +
-            fileElement.replace("/", "%2F") +
-            "?alt=media"
-         )
-      } else {
-         console.log("-> no fileElement", fileElement)
-         return ""
-      }
-   }
+   }, [
+      fetchingAvatars,
+      fetchingBackgrounds,
+      fetchingLogos,
+      fetchingGroups,
+      fetchingInterests,
+   ])
 
    const handleSelectGroups = (groups) => {
       setSelectedGroups(groups.map(groupAddFlattenOptions))
@@ -302,6 +303,11 @@ const NewLivestreamForm = () => {
             livestreamId as string,
             firebase
          )
+
+         if (selectedJobs.length) {
+            livestream.jobs = selectedJobs
+         }
+
          let id
          if (updateMode) {
             id = livestream.id
@@ -763,6 +769,16 @@ const NewLivestreamForm = () => {
                            />
                         </Grid>
                      </FormGroup>
+
+                     <SuspenseWithBoundary hide>
+                        {selectedGroups.length > 0 && (
+                           <JobSelectorCategory
+                              groupId={selectedGroups[0].id} // we only support a single group for now
+                              onSelectItems={setSelectedJobs}
+                              selectedItems={selectedJobs}
+                           />
+                        )}
+                     </SuspenseWithBoundary>
 
                      <Button
                         type="submit"

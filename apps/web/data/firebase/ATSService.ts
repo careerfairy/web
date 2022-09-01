@@ -2,6 +2,7 @@ import firebaseInstance from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { v4 as uuidv4 } from "uuid"
 import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 
 export class ATSService {
    constructor(
@@ -13,6 +14,18 @@ export class ATSService {
    generateIntegrationId() {
       const uuid = uuidv4()
       return uuid.replace(/-/g, "")
+   }
+
+   async getJobs(groupId: string, integrationId: string): Promise<Job[]> {
+      const data = await this.firebaseFunctions.httpsCallable("fetchATSJobs")({
+         groupId,
+         integrationId,
+      })
+
+      return data.data.map(Job.createFromPlainObject).map((job: Job) => {
+         job.setIntegrationId(integrationId)
+         return job
+      })
    }
 
    async linkCompanyWithATS(
@@ -46,6 +59,17 @@ export class ATSService {
          groupId,
          integrationId,
       })
+   }
+
+   async applyToAJob(livestreamId: string, jobId: string): Promise<any> {
+      return this.firebaseFunctions.httpsCallable("atsUserApplyToJob")({
+         livestreamId,
+         jobId,
+      })
+   }
+
+   async updateUserJobApplications(): Promise<void> {
+      await this.firebaseFunctions.httpsCallable("updateUserJobApplications")()
    }
 }
 

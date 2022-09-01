@@ -1,7 +1,8 @@
 import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
-import functions = require("firebase-functions")
 import { https } from "firebase-functions"
+import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
+import functions = require("firebase-functions")
 import { ClientError } from "graphql-request"
 
 export const setHeaders = (req, res) => {
@@ -406,7 +407,7 @@ export const isLocalEnvironment = () => {
 }
 
 export const logAxiosError = (error: any) => {
-   functions.logger.error("Axios: JSON", error?.toJSON())
+   functions.logger.error("Axios: JSON", error?.toJSON?.())
    if (error.response) {
       // The request was made and the server responded with a status code
       // that falls out of the range of 2xx
@@ -505,4 +506,12 @@ export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
          throw e
       }
    }
+}
+
+/**
+ * Convert business models into plain objects (arrays)
+ * @param result
+ */
+export function serializeModels<T extends BaseModel>(result: T[]) {
+   return result.map((entry) => entry.serializeToPlainObject())
 }

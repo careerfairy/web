@@ -3,7 +3,6 @@ import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import SwipeableViews from "react-swipeable-views"
 import QueryEditView from "./QueryEditView"
-import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import UserTableView from "./UserTableView"
 import { AppBar, Backdrop, CircularProgress, Tab, Tabs } from "@mui/material"
 import { useSelector } from "react-redux"
@@ -83,15 +82,9 @@ const QueryUsersOverview = () => {
             disabled
             onChangeIndex={handleChangeIndex}
          >
-            <TabPanel index={0} value={value}>
-               <QueryEditView loading={loading} />
-            </TabPanel>
-            <TabPanel index={1} value={value}>
-               <UserTableView isFiltered />
-            </TabPanel>
-            <TabPanel index={2} value={value}>
-               <UserTableView />
-            </TabPanel>
+            <QueryEditView loading={loading} />
+            <UserTableView isFiltered />
+            <UserTableView />
          </SwipeableViews>
          <Backdrop className={classes.backdrop} open={loading}>
             <CircularProgress color="inherit" />

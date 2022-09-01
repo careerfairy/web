@@ -16,16 +16,14 @@ import { useAuth } from "../HOCs/AuthProvider"
 import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsModal"
 import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions"
 import GeneralLayout from "../layouts/GeneralLayout"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const DraftStream = () => {
    const firebaseService = useFirebaseService()
    const [showEnterDetailsModal, setShowEnterDetailsModal] = useState(false)
    const [submitted, setSubmitted] = useState(false)
    const { authenticatedUser, userData } = useAuth()
-   const [userInfo, setUserInfo] = useState({
-      name: "",
-      email: "",
-   })
+   const [userInfo, setUserInfo] = useState<any>({})
    const { enqueueSnackbar } = useSnackbar()
    const router = useRouter()
    const formRef = useRef()
@@ -39,7 +37,7 @@ const DraftStream = () => {
          setUserInfo({
             ...userData,
             name: `${userData.firstName} ${userData.lastName}`,
-            email: userData.userEmail,
+            email: (userData as any).email || userData.userEmail,
          })
       }
    }, [userData])
@@ -88,7 +86,9 @@ const DraftStream = () => {
       draftStreamId,
       setFormData,
       setDraftId,
-      status
+      status,
+      setStatus,
+      selectedJobs
    ) => {
       try {
          setSubmitting(true)
@@ -97,7 +97,7 @@ const DraftStream = () => {
             updateMode,
             draftStreamId,
             firebaseService
-         )
+         ) as LivestreamEvent
          if (status === SUBMIT_FOR_APPROVAL) {
             if (!userInfo.email || !userInfo.name) {
                handleOpenShowEnterDetailsModal()
@@ -111,6 +111,11 @@ const DraftStream = () => {
             livestream.status = newStatus
             setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
+
+         if (selectedJobs) {
+            livestream.jobs = selectedJobs
+         }
+
          let id
          if (updateMode) {
             id = livestream.id

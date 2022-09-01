@@ -1,5 +1,5 @@
 import { firestore } from "./lib/firebase"
-import { FieldValue } from "firebase-admin/firestore"
+import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import {
    ILivestreamScriptsRepository,
    LivestreamScriptsRepository,
@@ -21,7 +21,8 @@ const firestoreInstance = firestore as any
 
 export const userRepo: IUserScriptsRepository = new UserScriptsRepository(
    firestoreInstance,
-   FieldValue
+   FieldValue,
+   Timestamp
 )
 
 export const groupRepo: IGroupRepository = new FirebaseGroupRepository(

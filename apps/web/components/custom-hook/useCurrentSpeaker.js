@@ -112,24 +112,6 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
       [streamRef]
    )
 
-   const getAllStreams = (localMediaStream, externalMediaStreams) => {
-      let allStreams = []
-      if (externalMediaStreams) {
-         allStreams = [...externalMediaStreams]
-      }
-      if (localMediaStream) {
-         allStreams.push(localMediaStream)
-      }
-      return allStreams
-   }
-
-   const checkIfHasMainStreamer = useCallback(
-      (streams) => {
-         return streams.some((stream) => stream.uid === streamId)
-      },
-      [streamId]
-   )
-
    return currentSpeakerId
 }
 

@@ -1,26 +1,19 @@
 import functions = require("firebase-functions")
-import {
-   logAndThrow,
-   validateData,
-   validateUserAuthExists,
-   validateUserIsGroupAdmin,
-} from "./lib/validations"
-import { object, string } from "yup"
-import { atsRepo, groupRepo, userRepo } from "./api/repositories"
+import { string } from "yup"
+import { atsRepo, groupRepo } from "./api/repositories"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { logAxiosErrorAndThrow, onCallWrapper } from "./util"
+import { logAxiosErrorAndThrow, serializeModels } from "./util"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
-   Group,
-   GroupATSAccountDocument,
-   GroupATSIntegrationTokensDocument,
-} from "@careerfairy/shared-lib/dist/groups"
-import { CallableContext } from "firebase-functions/lib/common/providers/https"
-import { auth } from "firebase-admin"
-import DecodedIdToken = auth.DecodedIdToken
-import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
-import { UserATSDocument } from "@careerfairy/shared-lib/dist/users"
+   atsRequestValidation,
+   atsRequestValidationWithAccountToken,
+} from "./lib/ats"
+
+/*
+|--------------------------------------------------------------------------
+| ATS Functions related to Group operations
+|--------------------------------------------------------------------------
+*/
 
 /**
  * This function will be called when the group wants to integrate with an ATS system
@@ -178,94 +171,6 @@ export const fetchATSApplications = functions
    })
 
 /**
- * Apply a user to a job
- */
-export const atsUserApplyToJob = functions
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(
-      onCallWrapper(async (data, context) => {
-         const { tokens, idToken, integrationId, jobId } =
-            await atsRequestValidationWithAccountToken<{
-               jobId?: string
-            }>({
-               data,
-               context,
-               requiredData: {
-                  jobId: string().required(),
-               },
-            })
-
-         const atsRepository = atsRepo(
-            process.env.MERGE_ACCESS_KEY,
-            tokens.merge.account_token
-         )
-
-         // Confirm if the user has already applied to this job
-
-         const userATSData: UserATSDocument = await userRepo.getUserATSData(
-            idToken.email
-         )
-         const atsRelations = userATSData?.atsRelations?.[integrationId]
-
-         if (atsRelations?.jobApplications?.[jobId]) {
-            return "User has already applied for that job"
-         }
-
-         // Create the necessary ATS models to apply the user to the job
-
-         const job: Job = await atsRepository.getJob(jobId)
-
-         if (!job) {
-            return logAndThrow("That job does not exit", jobId)
-         }
-
-         const userData = await userRepo.getUserDataById(idToken.email)
-
-         // Fetch or create a Candidate object
-         let candidate: Candidate
-         if (atsRelations?.candidateId) {
-            candidate = await atsRepository.getCandidate(
-               atsRelations.candidateId
-            )
-         } else {
-            // create
-            candidate = await atsRepository.createCandidate(userData)
-
-            // associate the candidate with the user
-            await userRepo.associateATSData(idToken.email, integrationId, {
-               candidateId: candidate.id,
-            })
-         }
-
-         // Associate CV resume if existent (and not associated already)
-         if (userData.userResume && !atsRelations?.cvAttachmentId) {
-            const attachmentId = await atsRepository.candidateAddCVAttachment(
-               candidate.id,
-               userData.userResume
-            )
-
-            await userRepo.associateATSData(idToken.email, integrationId, {
-               cvAttachmentId: attachmentId,
-            })
-         }
-
-         // Create the application
-         const applicationId = await atsRepository.createApplication(
-            candidate.id,
-            jobId
-         )
-
-         await userRepo.associateATSData(idToken.email, integrationId, {
-            jobApplications: {
-               [jobId]: applicationId,
-            },
-         })
-
-         return applicationId
-      })
-   )
-
-/**
  * Sync Status for the multiple entities
  */
 export const fetchATSSyncStatus = functions
@@ -326,100 +231,3 @@ export const mergeRemoveAccount = functions
 
       return true
    })
-
-/*
-|--------------------------------------------------------------------------
-| Utilities & Validations
-|--------------------------------------------------------------------------
-*/
-
-type AlwaysPresentData = {
-   groupId: string
-   integrationId: string
-}
-
-type AlwaysPresentArgs = AlwaysPresentData & {
-   idToken: DecodedIdToken
-   group: Group
-}
-
-type Options<T extends object> = {
-   data: T & AlwaysPresentData
-   context: CallableContext
-   requiredData?: object
-}
-
-/**
- * Common Logic to validate ATS Requests
- *
- * Returns the data fetched from the validations
- * @param options
- */
-async function atsRequestValidation<T extends object>(
-   options: Options<T>
-): Promise<T & AlwaysPresentArgs> {
-   const inputSchema = object(
-      Object.assign(
-         {
-            groupId: string().required(),
-            integrationId: string().required(),
-         },
-         options.requiredData ?? {}
-      )
-   )
-
-   // validations that throw exceptions
-   const idToken = await validateUserAuthExists(options.context)
-   const inputValidationResult = (await validateData(
-      options.data,
-      inputSchema
-   )) as T & AlwaysPresentData
-
-   const { group } = await validateUserIsGroupAdmin(
-      inputValidationResult.groupId,
-      idToken.email
-   )
-
-   return {
-      ...inputValidationResult,
-      idToken,
-      group,
-   }
-}
-
-/**
- * Extends the validation above and also fetches the account tokens
- * @param options
- */
-async function atsRequestValidationWithAccountToken<T extends object>(
-   options: Options<T>
-): Promise<
-   T & AlwaysPresentArgs & { tokens: GroupATSIntegrationTokensDocument }
-> {
-   const data = await atsRequestValidation(options)
-
-   // fetch account tokens (required to request information on behalf of the company)
-   const accountTokens = await groupRepo.getATSIntegrationTokens(
-      data.groupId,
-      data.integrationId
-   )
-   if (!accountTokens) {
-      logAndThrow("The requested integration is missing the account tokens", {
-         groupId: data.groupId,
-         integrationId: data.integrationId,
-      })
-   }
-
-   return {
-      ...data,
-      tokens: accountTokens,
-   }
-}
-
-/**
- * Convert business models into plain objects (arrays)
- * @param result
- */
-function serializeModels<T extends BaseModel>(result: T[]) {
-   return result.map((entry) => entry.serializeToPlainObject())
-}

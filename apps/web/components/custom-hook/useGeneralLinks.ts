@@ -9,7 +9,7 @@ import ReferralIcon from "@mui/icons-material/GroupAdd"
 import GroupsIcon from "@mui/icons-material/Groups"
 import ContactPageIcon from "@mui/icons-material/ContactPage"
 import AutoModeIcon from "@mui/icons-material/AutoMode"
-
+import WorkIcon from "@mui/icons-material/Work"
 import WishListIcon from "@mui/icons-material/FavoriteRounded"
 const initialMainLinks = [
    {
@@ -84,6 +84,12 @@ const authenticatedUserTopLinks: PageLinkProps[] = [
       title: "Groups",
       basePath: "/profile/groups",
       icon: GroupsIcon,
+   },
+   {
+      href: "/profile/jobs",
+      title: "Jobs",
+      basePath: "/profile/jobs",
+      icon: WorkIcon,
    },
 ]
 const authenticatedUserBottomLinks: PageLinkProps[] = [
