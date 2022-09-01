@@ -26,6 +26,9 @@ import {
 import { sxStyles } from "../../../../types/commonTypes"
 import GenericDropdown from "../../common/GenericDropdown"
 import { possibleGenders } from "../../../../constants/forms"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
+import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
 
 const styles = sxStyles({
    submit: {
@@ -42,9 +45,32 @@ const styles = sxStyles({
    },
 })
 
-const schema = yup.object().shape({
+interface IFormValues
+   extends Pick<
+      UserData,
+      | "firstName"
+      | "lastName"
+      | "fieldOfStudy"
+      | "levelOfStudy"
+      | "universityCountryCode"
+      | "gender"
+   > {
+   email: string
+   password: string
+   confirmPassword: string
+   agreeTerm: boolean
+   subscribed?: boolean
+   gender?: string
+   university: {
+      name: string
+      code: string
+   }
+}
+
+const schema: yup.SchemaOf<IFormValues> = yup.object().shape({
    email: yup
       .string()
+      .trim()
       .required("Your email is required")
       .email("Please enter a valid email address"),
    firstName: yup
@@ -58,9 +84,6 @@ const schema = yup.object().shape({
       .max(50, "Cannot be longer than 50 characters")
       .matches(/^\D+$/i, "Please enter a valid last name"),
    universityCountryCode: yup.string().required("Please chose a country code"),
-   referralCode: yup
-      .string()
-      .matches(/^[A-Za-z0-9]{11}$/, "That code seems invalid"),
    password: yup
       .string()
       .required("A password is required")
@@ -78,9 +101,37 @@ const schema = yup.object().shape({
    agreeTerm: yup
       .boolean()
       .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
+   subscribed: yup.boolean(),
+   gender: yup.string().oneOf(
+      possibleGenders.map((g) => g.value),
+      "Please select a valid gender"
+   ),
+   university: yup
+      .object()
+      .shape({
+         code: yup.string(),
+         name: yup.string(),
+      })
+      .required("Please select a university"),
+   fieldOfStudy: yup
+      .object()
+      .nullable()
+      .shape({
+         id: yup.string(),
+         name: yup.string(),
+      })
+      .required("Please select a field of study"),
+   levelOfStudy: yup
+      .object()
+      .nullable()
+      .shape({
+         id: yup.string(),
+         name: yup.string(),
+      })
+      .required("Please select a level of study"),
 })
 
-const initValues = {
+const initValues: IFormValues = {
    firstName: "",
    lastName: "",
    email: "",
@@ -91,6 +142,8 @@ const initValues = {
    university: { code: "other", name: "Other" },
    universityCountryCode: "",
    gender: "",
+   fieldOfStudy: null,
+   levelOfStudy: null,
 }
 
 function SignUpUserForm() {
@@ -180,14 +233,16 @@ function SignUpUserForm() {
                         <FormControl fullWidth>
                            <TextField
                               className="registrationInput"
-                              autoComplete="fname"
+                              autoComplete="given-name"
                               name="firstName"
                               variant="outlined"
                               fullWidth
                               id="firstName"
                               label="First Name"
                               autoFocus
-                              inputProps={{ maxLength: 50 }}
+                              inputProps={{
+                                 maxLength: 50,
+                              }}
                               onBlur={handleBlur}
                               value={values.firstName}
                               disabled={submitting(isSubmitting)}
@@ -221,7 +276,7 @@ function SignUpUserForm() {
                               inputProps={{ maxLength: 50 }}
                               label="Last Name"
                               name="lastName"
-                              autoComplete="lname"
+                              autoComplete="family-name"
                               onBlur={handleBlur}
                               disabled={submitting(isSubmitting)}
                               value={values.lastName}
@@ -389,6 +444,34 @@ function SignUpUserForm() {
                            values={values}
                            submitting={submitting(isSubmitting)}
                            setFieldValue={setFieldValue}
+                        />
+                     </Grid>
+                     <Grid item xs={12} sm={6}>
+                        <FieldOfStudySelector
+                           setFieldValue={setFieldValue}
+                           value={values.fieldOfStudy}
+                           className="registrationInput"
+                           handleBlur={handleBlur}
+                           disabled={submitting(isSubmitting)}
+                           error={
+                              errors.fieldOfStudy &&
+                              touched.fieldOfStudy &&
+                              errors.fieldOfStudy
+                           }
+                        />
+                     </Grid>
+                     <Grid item xs={12} sm={6}>
+                        <LevelOfStudySelector
+                           setFieldValue={setFieldValue}
+                           value={values.levelOfStudy}
+                           handleBlur={handleBlur}
+                           className="registrationInput"
+                           disabled={submitting(isSubmitting)}
+                           error={
+                              errors.levelOfStudy &&
+                              touched.levelOfStudy &&
+                              errors.levelOfStudy
+                           }
                         />
                      </Grid>
                      <Grid item xs={12}>

@@ -15,6 +15,7 @@ import clsx from "clsx"
 import { useDispatch, useSelector } from "react-redux"
 import WorkRoundedIcon from "@mui/icons-material/WorkRounded"
 import * as storeActions from "store/actions"
+import { showActionButtonsSelector } from "../../../../store/selectors/streamSelectors"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 
 const useStyles = makeStyles((theme) => ({
@@ -132,6 +133,7 @@ const ButtonComponent = ({
    const [open, setOpen] = useState(true)
    const [delayHandler, setDelayHandler] = useState(null)
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
+   const showActionButtons = useSelector(showActionButtonsSelector)
 
    useEffect(() => {
       setHasMounted(true)
@@ -187,7 +189,7 @@ const ButtonComponent = ({
    }
 
    const getActions = () => {
-      if (!hasMounted) {
+      if (!hasMounted || !showActionButtons) {
          return []
       }
       const actions = [
@@ -254,6 +256,7 @@ const ButtonComponent = ({
    return (
       <ClickAwayListener onClickAway={handleClose}>
          <div
+            id={"streamActionButtons"}
             onMouseEnter={handleMouseEnter}
             onMouseLeave={handleMouseLeave}
             className={classes.root}

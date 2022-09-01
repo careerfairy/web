@@ -17,10 +17,10 @@ import {
 import makeStyles from "@mui/styles/makeStyles"
 import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal"
 import Skeleton from "@mui/material/Skeleton"
-import GroupJoinModal from "./GroupJoinModal"
 import Link from "next/link"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
+import { groupRepo } from "../../../data/RepositoryInstances"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -52,7 +52,7 @@ const CurrentGroup = ({
    const [anchorEl, setAnchorEl] = useState(null)
    const [leaving, setLeaving] = useState(false)
    const [deleting, setDeleting] = useState(false)
-   const [openJoinModal, setOpenJoinModal] = useState(false)
+   const [deleted, setDeleted] = useState(false)
    const [leaveGroup, setLeaveGroup] = useState(false)
 
    useEffect(() => {
@@ -81,14 +81,6 @@ const CurrentGroup = ({
       }
    }, [])
 
-   const handleCloseJoinModal = () => {
-      setOpenJoinModal(false)
-   }
-   const handleOpenJoinModal = () => {
-      setOpenJoinModal(true)
-      setAnchorEl(null)
-   }
-
    const handleClick = (event) => {
       setAnchorEl(event.currentTarget)
    }
@@ -115,17 +107,8 @@ const CurrentGroup = ({
    const handleLeaveGroup = async () => {
       try {
          setLeaving(true)
-         const targetGroupId = localGroup.id
-         const filteredArrayOfGroups = userData.registeredGroups.filter(
-            (group) => group.groupId !== targetGroupId
-         )
-         const arrayOfGroupIds = filteredArrayOfGroups.map((obj) => obj.groupId)
-         const userId = userData.id || userData.userEmail
-         await firebase.setgroups(
-            userId,
-            arrayOfGroupIds,
-            filteredArrayOfGroups
-         )
+         await groupRepo.deleteUserGroupData(userData.userEmail, group.id)
+         setDeleted(true)
          setLeaving(false)
          setOpen(false)
       } catch (e) {
@@ -134,7 +117,7 @@ const CurrentGroup = ({
       }
    }
 
-   if (noGroup) {
+   if (noGroup || deleted) {
       return null
    }
 
@@ -155,12 +138,6 @@ const CurrentGroup = ({
             onMouseEnter: () => setLeaveGroup(true),
          }
       )
-      if (localGroup.categories) {
-         menuItems.push({
-            onClick: () => handleOpenJoinModal(),
-            label: "Update Categories",
-         })
-      }
    }
    if (isAdmin) {
       menuItems.push(
@@ -274,14 +251,6 @@ const CurrentGroup = ({
                </Card>
             </Fade>
          </Grid>
-         <GroupJoinModal
-            fromProfile={true}
-            open={openJoinModal}
-            group={localGroup}
-            alreadyJoined={userData.groupIds?.includes(localGroup.id)}
-            userData={userData}
-            closeModal={handleCloseJoinModal}
-         />
          <AreYouSureModal
             open={open}
             loading={leaveGroup ? leaving : deleting}

@@ -1,5 +1,8 @@
 import { Identifiable } from "../commonTypes"
+import { Group, GroupQuestion } from "../groups"
+import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 import firebase from "firebase/compat"
+import { FieldOfStudy } from "../fieldOfStudy"
 import Timestamp = firebase.firestore.Timestamp
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
@@ -16,12 +19,16 @@ export interface LivestreamEvent extends Identifiable {
    companyId?: string
    participants?: string[]
    participatingStudents?: string[]
+   maxRegistrants?: number
    companyLogoUrl?: string
    created?: Timestamp
    currentSpeakerId?: string
+   withResume?: boolean
    duration?: number
    groupIds?: string[]
    interestsIds?: string[]
+   levelOfStudyIds?: string[]
+   fieldOfStudyIds?: string[]
    isRecording?: boolean
    language?: {
       code?: string
@@ -29,6 +36,7 @@ export interface LivestreamEvent extends Identifiable {
    }
    hidden?: boolean
    talentPool?: string[]
+   hasNoTalentPool?: boolean
    test?: boolean
    title?: string
    type?: string
@@ -36,10 +44,23 @@ export interface LivestreamEvent extends Identifiable {
    startDate?: Date
    status?: LivestreamStatus
    registeredUsers?: string[]
-   registrants?: string[]
+   groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
+
+   /**
+    * An empty array means the livestream should target all the fields of study
+    * [] -> All fields of study
+    */
+   targetFieldsOfStudy?: FieldOfStudy[]
+
+   /**
+    * An empty array means the livestream should target all the levels of study
+    * [] -> All levels of study
+    */
+   targetLevelsOfStudy?: FieldOfStudy[]
+
    lastUpdated?: firebase.firestore.Timestamp
    speakers?: Speaker[]
    lastUpdatedAuthorInfo?: {
@@ -66,6 +87,68 @@ export interface LivestreamJobAssociation {
    integrationId: string
    jobId: string
    name: string
+}
+
+export type LivestreamUserAction = keyof Pick<
+   UserLivestreamData,
+   "talentPool" | "registered" | "participated"
+>
+
+/*
+ * This date string is used for UserLivestreamData documents
+ * that were created during the migration of the talentPool/participating/registered
+ * users subcollection. Any talentPool/participating/registered document that didn't have time stamps
+ * were given this static date
+ * */
+export const FALLBACK_DATE = "March 17, 2020 03:24:00"
+
+/*
+ * Sub-collection found on the livestream doc called userLivestreamData
+ * */
+export interface UserLivestreamData extends Identifiable {
+   userId: string
+   livestreamId: LivestreamEvent["id"]
+   user: UserData
+   answers?: UserLivestreamGroupQuestionAnswers
+   registered?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
+      date: firebase.firestore.Timestamp
+      referral?: {
+         referralCode: string
+         inviteLivestream: string
+      }
+      utm: any
+   }
+   talentPool?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
+      date: firebase.firestore.Timestamp
+      companyId: string
+   }
+   participated?: {
+      // if the date is March 17, 2020 03:24:00 it as a fallbackDate
+      date: firebase.firestore.Timestamp
+   }
+}
+
+export type LivestreamGroupQuestionsMap = Record<
+   Group["id"],
+   LivestreamGroupQuestions
+>
+
+export interface LivestreamGroupQuestion extends GroupQuestion {
+   /*
+    * The property selectedOptionId and isNew is never saved on the livestream document.
+    * It is only used to track the user selected option client-side.
+    * */
+   selectedOptionId?: string
+   isNew?: boolean
+}
+
+export interface LivestreamGroupQuestions {
+   groupName: string
+   groupId: string
+   universityCode?: string
+   questions: Record<LivestreamGroupQuestion["id"], LivestreamGroupQuestion>
 }
 
 export interface Speaker extends Identifiable {
@@ -99,6 +182,38 @@ export interface BreakoutRoom extends Identifiable {
    parentLivestream?: LivestreamEventPublicData
 }
 
+export interface LivestreamQuestion extends Identifiable {
+   author: string
+   timestamp: firebase.firestore.Timestamp
+   title: string
+   type: "new" | "current"
+   votes: number
+}
+
+export interface LivestreamPoll extends Identifiable {
+   voters: string[]
+   timestamp: firebase.firestore.Timestamp
+   state: "current" | "closed"
+   question: string
+   options: {
+      id: string
+      text: string
+   }[]
+}
+
+export interface LivestreamChatEntry extends Identifiable {
+   authorEmail: string
+   authorName: string
+   message: string
+   timestamp: firebase.firestore.Timestamp
+}
+
+export interface LivestreamIcon extends Identifiable {
+   authorEmail: string
+   timestamp: firebase.firestore.Timestamp
+   name: "heart" | "clapping" | "like"
+}
+
 /**
  * Public information about a livestream event
  *
@@ -124,7 +239,6 @@ export interface LivestreamEventSerialized
    extends Omit<
       LivestreamEvent,
       | "registeredUsers"
-      | "registrants"
       | "talentPool"
       | "participatingStudents"
       | "participants"

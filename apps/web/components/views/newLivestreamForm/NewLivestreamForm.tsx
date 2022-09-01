@@ -47,6 +47,8 @@ import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import JobSelectorCategory from "../draftStreamForm/JobSelector/JobSelectorCategory"
+import FieldsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
+import LevelsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 
@@ -134,6 +136,8 @@ const NewLivestreamForm = () => {
       speakers: { [uuidv4()]: speakerObj },
       language: languageCodes[0],
       duration: DEFAULT_STREAM_DURATION_MINUTES,
+      targetFieldsOfStudy: [],
+      targetLevelsOfStudy: [],
       questionsDisabled: false,
    })
 
@@ -187,6 +191,8 @@ const NewLivestreamForm = () => {
                      speakerQuery
                   ),
                   language: livestream.language || languageCodes[0],
+                  targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
+                  targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
                   questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
@@ -298,9 +304,8 @@ const NewLivestreamForm = () => {
          setSubmitting(true)
          const livestream: any = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
-            livestreamId,
+            livestreamId as string,
             firebase
          )
 
@@ -790,6 +795,26 @@ const NewLivestreamForm = () => {
                                  variant: "outlined",
                               }}
                               isCheckbox={true}
+                           />
+                        </Grid>
+                     </FormGroup>
+
+                     <Typography style={{ color: "white" }} variant="h4">
+                        Target Students:
+                     </Typography>
+
+                     <FormGroup>
+                        <Grid xs={12} item>
+                           <FieldsOfStudyMultiSelector
+                              selectedItems={values.targetFieldsOfStudy}
+                              setFieldValue={setFieldValue}
+                           />
+                        </Grid>
+
+                        <Grid xs={12} item>
+                           <LevelsOfStudyMultiSelector
+                              selectedItems={values.targetLevelsOfStudy}
+                              setFieldValue={setFieldValue}
                            />
                         </Grid>
                      </FormGroup>

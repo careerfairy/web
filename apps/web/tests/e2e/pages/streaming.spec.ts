@@ -1,5 +1,7 @@
 import { test as base, expect } from "@playwright/test"
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
+import LivestreamSeed, {
+   createLivestreamGroupQuestions,
+} from "@careerfairy/seed-data/dist/livestreams"
 import { LoginPage } from "../page-object-models/LoginPage"
 import {
    clearAuthData,
@@ -11,6 +13,7 @@ import { sleep } from "../utils"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { credentials } from "../../constants"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 /**
  * Test Fixture
@@ -255,12 +258,12 @@ test.describe("Streaming Journey", () => {
       streamerPage,
       viewerPage,
    }) => {
-      const { livestream, group } = await setupStreamer(streamerPage, {
+      const { livestream } = await setupStreamer(streamerPage, {
          setupGroup: true,
       })
 
       await viewerPage.open(livestream.id)
-      await viewerPage.selectRandomCategoriesFromGroup(group)
+      await viewerPage.selectRandomCategoriesFromEvent(livestream)
 
       await viewerPage.enterEvent()
       await viewerPage.assertStreamerDetailsExist()
@@ -381,7 +384,7 @@ async function setupStreamer(
 
 async function setupData(setupGroup: boolean = false) {
    let group: Group
-   let overrideLivestreamDetails = {}
+   let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
 
    if (setupGroup) {
       group = await GroupSeed.createGroup(
@@ -389,10 +392,14 @@ async function setupData(setupGroup: boolean = false) {
             adminEmails: [credentials.correctEmail],
          })
       )
+      const groupQuestions = createLivestreamGroupQuestions(group.id)
 
       // associate the group with the livestream
       overrideLivestreamDetails = {
          groupIds: [group.id],
+         groupQuestionsMap: {
+            [group.id]: groupQuestions,
+         },
       }
    }
 

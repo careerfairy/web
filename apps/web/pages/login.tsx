@@ -118,6 +118,7 @@ export default LogInPage
 const schema = yup.object().shape({
    email: yup
       .string()
+      .trim()
       .required("Your email is required")
       .email("Please enter a valid email address"),
    password: yup.string().required("A password is required"),
