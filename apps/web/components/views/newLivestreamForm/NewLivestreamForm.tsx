@@ -11,6 +11,7 @@ import {
    Grid,
    Switch,
    TextField,
+   Tooltip,
    Typography,
 } from "@mui/material"
 import { Formik } from "formik"
@@ -48,6 +49,8 @@ import { SuspenseWithBoundary } from "components/ErrorBoundary"
 import JobSelectorCategory from "../draftStreamForm/JobSelector/JobSelectorCategory"
 import FieldsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
 import LevelsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
+import Stack from "@mui/material/Stack"
+import Box from "@mui/material/Box"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -135,6 +138,7 @@ const NewLivestreamForm = () => {
       duration: DEFAULT_STREAM_DURATION_MINUTES,
       targetFieldsOfStudy: [],
       targetLevelsOfStudy: [],
+      questionsDisabled: false,
    })
 
    useEffect(() => {
@@ -189,6 +193,7 @@ const NewLivestreamForm = () => {
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                   targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
+                  questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
                setSelectedInterests(
@@ -609,6 +614,50 @@ const NewLivestreamForm = () => {
                               </Collapse>
                            </FormControl>
                         </Grid>
+
+                        {userData?.isAdmin && (
+                           <Grid xs={12}>
+                              <Stack direction="row" spacing={2}>
+                                 <Box pl={2} display="flex" alignItems="center">
+                                    Settings only for CF Admins:
+                                 </Box>
+                                 <Tooltip
+                                    placement="top"
+                                    arrow
+                                    title={
+                                       <Typography>
+                                          By disabling questions the
+                                          participants will no longer be able to
+                                          use the Q&A section during the
+                                          livestream and create questions during
+                                          the registration process.
+                                       </Typography>
+                                    }
+                                 >
+                                    <FormControlLabel
+                                       labelPlacement="start"
+                                       label="Disable Q&A"
+                                       control={
+                                          <Switch
+                                             checked={Boolean(
+                                                values.questionsDisabled
+                                             )}
+                                             onChange={handleChange}
+                                             disabled={Boolean(isSubmitting)}
+                                             color="primary"
+                                             id="questionsDisabled"
+                                             name="questionsDisabled"
+                                             inputProps={{
+                                                "aria-label":
+                                                   "primary checkbox",
+                                             }}
+                                          />
+                                       }
+                                    />
+                                 </Tooltip>
+                              </Stack>
+                           </Grid>
+                        )}
                      </FormGroup>
                      {Object.keys(values.speakers).map((key, index) => {
                         return (

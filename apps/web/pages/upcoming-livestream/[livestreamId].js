@@ -74,10 +74,14 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       auth,
    } = useFirebaseService()
 
-   const questionsQuery = useMemo(
-      () => stream && livestreamQuestionsQuery(stream.id, questionSortType),
-      [stream?.id, questionSortType]
-   )
+   const questionsQuery = useMemo(() => {
+      // prevent an extra query for the questions if they are disabled
+      if (stream?.questionsDisabled) {
+         return null
+      }
+
+      return stream && livestreamQuestionsQuery(stream.id, questionSortType)
+   }, [stream?.id, stream?.questionsDisabled, questionSortType])
 
    const handlers = useInfiniteScrollServer({
       limit: 8,
@@ -408,6 +412,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             handleUpvote={handleUpvote}
             questions={handlers.docs}
             questionSortType={questionSortType}
+            questionsAreDisabled={stream.questionsDisabled}
          />
 
          {!stream.hasNoTalentPool && (

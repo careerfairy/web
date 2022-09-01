@@ -123,6 +123,7 @@ const ButtonComponent = ({
    selectedState,
    streamer,
    includeJobs,
+   questionsAreDisabled,
 }) => {
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const DELAY = 3000 //3 seconds
@@ -201,9 +202,11 @@ const ButtonComponent = ({
          },
          {
             icon: <HelpIcon fontSize="large" />,
-            name: "Q&A",
+            name: questionsAreDisabled ? "Q&A (Disabled)" : "Q&A",
             disabled: showMenu && selectedState === "questions",
-            onClick: () => handleStateChange("questions"),
+            onClick: () => {
+               handleStateChange("questions")
+            },
             tutorialNum: 2334,
          },
       ]
@@ -237,7 +240,7 @@ const ButtonComponent = ({
          })
       }
 
-      if ((streamer || focusModeEnabled) && showMenu) {
+      if ((streamer || focusModeEnabled || questionsAreDisabled) && showMenu) {
          actions.unshift({
             icon: <ChevronLeftRoundedIcon fontSize="large" />,
             name: "",

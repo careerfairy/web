@@ -12,11 +12,11 @@ import {
    AccordionDetails,
    AccordionSummary,
    Badge,
+   Button,
    Collapse,
+   IconButton,
    TextField,
    Typography,
-   IconButton,
-   Button,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
@@ -366,18 +366,20 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
                               endAdornment: playIcon,
                            }}
                         />
-                        <Collapse
-                           align="center"
-                           style={{
-                              color: "grey",
-                              fontSize: "0.8em",
-                              marginTop: 3,
-                              padding: "0 0.8em",
-                           }}
-                           in={focused && !isStreamer}
-                        >
-                           For questions, please use the Q&A tool!
-                        </Collapse>
+                        {!livestream?.questionsDisabled && (
+                           <Collapse
+                              align="center"
+                              style={{
+                                 color: "grey",
+                                 fontSize: "0.8em",
+                                 marginTop: 3,
+                                 padding: "0 0.8em",
+                              }}
+                              in={focused && !isStreamer}
+                           >
+                              For questions, please use the Q&A tool!
+                           </Collapse>
+                        )}
                      </div>
                   </WhiteTooltip>
                </AccordionDetails>

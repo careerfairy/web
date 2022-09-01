@@ -13,6 +13,7 @@ import * as actions from "store/actions"
 import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobsCategory from "./categories/JobsCategory"
+import GenericCategoryInactive from "../sharedComponents/GenericCategoryInactive"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -105,14 +106,21 @@ const LeftMenu = ({
    )
 
    const views = [
-      <QuestionCategory
-         key={"question-category-tab"}
-         sliding={sliding}
-         showMenu={showMenu}
-         streamer={streamer}
-         livestream={livestream}
-         selectedState={selectedState}
-      />,
+      livestream.questionsDisabled ? (
+         <GenericCategoryInactive
+            title={"No Q&A Today"}
+            subtitle={"The live stream creator disabled the Q&A feature."}
+         />
+      ) : (
+         <QuestionCategory
+            key={"question-category-tab"}
+            sliding={sliding}
+            showMenu={showMenu}
+            streamer={streamer}
+            livestream={livestream}
+            selectedState={selectedState}
+         />
+      ),
       <PollCategory
          key={"poll-category-tab"}
          sliding={sliding}
