@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import {
    Box,
    FormControl,
@@ -151,14 +151,6 @@ const DeviceSelect = ({
       setHasEnabledDevice(localStorage.getItem(localStorageKey) === "true")
    }, [])
 
-   useEffect(() => {
-      if (!disableInitialize && hasEnabledDevice && openModal) {
-         ;(async function initDevice() {
-            return handleInitializeDevice()
-         })()
-      }
-   }, [hasEnabledDevice, openModal, disableInitialize])
-
    const deviceInUseByAnotherApp = useSelector((state: RootState) => {
       return state.stream.agoraState.deviceErrors[inUseError]
    })
@@ -166,17 +158,6 @@ const DeviceSelect = ({
    const deviceDenied = useSelector((state: RootState) => {
       return state.stream.agoraState.deviceErrors[deniedError]
    })
-
-   // console.log(`-> ${mediaDeviceType} Denied?`, deviceDenied);
-   if (mediaDeviceType === "camera") {
-      // console.log("-> displayableMediaStream", displayableMediaStream);
-      // console.log("-> localStream", localStream);
-      // console.log("-> mediaControls[source]", mediaControls[source]);
-      // console.log(
-      //    `-> ${mediaControls[source]?.title} in use?`,
-      //    deviceInUseByAnotherApp
-      // );
-   }
 
    const activateDeviceButtonLabel = useMemo(() => {
       const deviceName = isCamera ? "Camera" : "Microphone"
@@ -192,14 +173,17 @@ const DeviceSelect = ({
       return activateLabel
    }, [noDevices, deviceDenied, deviceInUseByAnotherApp, hasEnabledDevice])
 
-   const handleChangeDevice = async (event) => {
-      await mediaControls[updateMethod](event.target.value)
-   }
+   const handleChangeDevice = useCallback(
+      async (event) => {
+         await mediaControls[updateMethod](event.target.value)
+      },
+      [mediaControls, updateMethod]
+   )
 
-   const handleCloseDevice = async () => {
+   const handleCloseDevice = useCallback(async () => {
       await localMediaHandlers[mediaCloseMethod]()
       localStorage.setItem(localStorageKey, "false")
-   }
+   }, [localMediaHandlers, localStorageKey, mediaCloseMethod])
 
    const handleInitializeDevice = async () => {
       try {
@@ -212,6 +196,12 @@ const DeviceSelect = ({
       }
       setActivatingDevice(false)
    }
+
+   useEffect(() => {
+      if (!disableInitialize && hasEnabledDevice && openModal) {
+         handleInitializeDevice().catch(console.error)
+      }
+   }, [hasEnabledDevice, openModal, disableInitialize])
 
    const currentDeviceIsBeingUsedButThereAreOtherOnesAvailable =
       deviceInUseByAnotherApp && devices[deviceList].length > 1

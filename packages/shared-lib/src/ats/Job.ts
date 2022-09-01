@@ -1,13 +1,9 @@
 import { JobStatus, MergeJob } from "./MergeResponseTypes"
-import {
-   BaseModel,
-   fromMergeDate,
-   fromSerializedDate,
-   mapIfObject,
-} from "../BaseModel"
+import { fromSerializedDate, mapIfObject } from "../BaseModel"
 import { Office } from "./Office"
 import { Recruiter } from "./Recruiter"
 import { Department } from "./Department"
+import { ATSModel, fromMergeDate } from "./ATSModel"
 
 /**
  * Job class
@@ -15,7 +11,7 @@ import { Department } from "./Department"
  * Our own type that can be created from ATS providers
  * UI/Business logic should live here
  */
-export class Job extends BaseModel {
+export class Job extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly name: string,
@@ -29,6 +25,33 @@ export class Job extends BaseModel {
       public readonly updatedAt: Date
    ) {
       super()
+   }
+
+   /**
+    * Get the job name plus additional information if existent
+    * Useful to display in Dropdown Selectors so the user can
+    * distinguish jobs
+    */
+   getExtendedName() {
+      let title = `${this.name}, ${this.status}`
+
+      if (this.departments.length > 0) {
+         title += `, ${this.departments[0].name}`
+      }
+
+      if (this.offices.length > 0) {
+         title += `, ${this.offices[0].name}`
+      }
+
+      return title
+   }
+
+   /**
+    * Get the Hiring Manager name if exists
+    * Useful to display in the left bar of live stream
+    */
+   getHiringManager() {
+      return this.hiringManagers?.[0]?.getName() || ""
    }
 
    static createFromMerge(job: MergeJob) {
@@ -71,3 +94,17 @@ export class Job extends BaseModel {
       )
    }
 }
+
+/**
+ * Job Identifier type
+ *
+ * A job has the following association:
+ * Job -> Linked Account (integrationId) -> Group
+ */
+export interface JobIdentifier {
+   jobId: string
+   groupId: string
+   integrationId: string
+}
+
+export const PUBLIC_JOB_STATUSES: JobStatus[] = ["OPEN", "PENDING", "CLOSED"]

@@ -47,7 +47,7 @@ function mapJobsToTableRows(jobs: Job[]) {
       name: job.name,
       description: job.description,
       status: job.status,
-      hiringManager: job.hiringManagers[0].getName(),
+      hiringManager: job.hiringManagers[0]?.getName(),
       createdAt: job.createdAt.toLocaleDateString(),
    }))
 }

@@ -6,7 +6,12 @@ import {
    GroupQuestionOption,
    UserGroupQuestionsWithAnswerMap,
 } from "../groups"
-import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import {
+   LivestreamEvent,
+   LivestreamEventPublicData,
+   LivestreamGroupQuestionsMap,
+} from "../livestreams"
+import { Job } from "../ats/Job"
 
 export interface UserData extends Identifiable {
    authId: string
@@ -185,6 +190,22 @@ export type UserDataAnalytics = {
 } & Identifiable
 
 /**
+ * userData/{id}/jobApplications/{doc}
+ */
+export interface UserJobApplicationDocument extends Identifiable {
+   groupId: string
+   integrationId: string
+   jobId: string
+   date: firebase.firestore.Timestamp
+   updatedAt: firebase.firestore.Timestamp
+   job: Job // will be serialized to plain object
+   livestream: LivestreamEventPublicData
+   rejectedAt?: firebase.firestore.Timestamp
+   currentStage?: string
+   rejectReason?: string
+}
+
+/**
  * Public information about a user
  *
  * Useful to save on relationship documents
@@ -216,4 +237,24 @@ export const getLivestreamGroupQuestionAnswers = (
       },
       {}
    )
+}
+
+/**
+ * Confirm if the user has already applied for a id in the
+ * saved relations
+ *
+ * @param relations
+ * @param jobId
+ */
+export const userAlreadyAppliedForJob = (
+   relations: UserATSDocument,
+   jobId: string
+) => {
+   for (let relation of Object.values(relations?.atsRelations)) {
+      if (relation?.jobApplications?.[jobId]) {
+         return true
+      }
+   }
+
+   return false
 }

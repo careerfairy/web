@@ -73,6 +73,15 @@ service cloud.firestore {
             allow read, write: if request.auth.token.email == userId;
         }
 
+        match /userData/{userId}/atsRelations/atsRelations {
+            allow read: if request.auth.token.email == userId;
+            allow write: if false;
+        }
+        match /userData/{userId}/jobApplications/{jobIdentifier} {
+            allow read: if request.auth.token.email == userId;
+            allow write: if false;
+        }
+
         match /userData/{userId}/rewards/{rewardId} {
             allow read: if request.auth.token.email == userId;
             allow update: if request.auth.token.email == userId;
@@ -152,7 +161,7 @@ service cloud.firestore {
             }
 
             match /ats/{integrationId} {
-                allow read: if request.auth.token.email in careerCenterData().adminEmails || isCFAdmin();
+                allow read: if request.auth != null && (request.auth.token.email in careerCenterData().adminEmails || isCFAdmin());
             }
 
             match /bookingSlots/{slot} {

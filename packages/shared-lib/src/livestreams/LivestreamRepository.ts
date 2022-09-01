@@ -1,6 +1,6 @@
 import firebase from "firebase/compat/app"
 import { UserPublicData } from "../users"
-import {
+import BaseFirebaseRepository, {
    mapFirestoreDocuments,
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
@@ -104,19 +104,34 @@ export interface ILivestreamRepository {
       streamRef: firebase.firestore.DocumentReference,
       userType: LivestreamUserAction
    ): firebase.firestore.Query
+
+   getById(id: string): Promise<LivestreamEvent>
 }
 
-export class FirebaseLivestreamRepository implements ILivestreamRepository {
+export class FirebaseLivestreamRepository
+   extends BaseFirebaseRepository
+   implements ILivestreamRepository
+{
    constructor(
       readonly firestore: firebase.firestore.Firestore,
       readonly fieldValue: typeof firebase.firestore.FieldValue
-   ) {}
+   ) {
+      super()
+   }
 
    private mapLivestreamCollections(
       documentSnapshot: firebase.firestore.QuerySnapshot
    ): LivestreamsDataParser {
       const docs = mapFirestoreDocuments<LivestreamEvent>(documentSnapshot)
       return new LivestreamsDataParser(docs || []).complementaryFields()
+   }
+
+   async getById(id: string): Promise<LivestreamEvent> {
+      const doc = await this.firestore.collection("livestreams").doc(id).get()
+
+      if (!doc.exists) return null
+
+      return this.addIdToDoc<LivestreamEvent>(doc)
    }
 
    heartbeat(

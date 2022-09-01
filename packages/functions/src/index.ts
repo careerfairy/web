@@ -21,7 +21,8 @@ import rewards = require("./rewards")
 import wishes = require("./wishes")
 import cms = require("./cms")
 import marketing = require("./marketing")
-import ats = require("./ats")
+import atsUser = require("./atsUser")
+import atsGroup = require("./atsGroup")
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -134,10 +135,15 @@ exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
 exports.createMarketingUser = marketing.createMarketingUser
 
 // ATS
-exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
-exports.mergeGetAccountToken = ats.mergeGetAccountToken
-exports.mergeRemoveAccount = ats.mergeRemoveAccount
-exports.fetchATSJobs = ats.fetchATSJobs
-exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
-exports.fetchATSApplications = ats.fetchATSApplications
-exports.atsUserApplyToJob = ats.atsUserApplyToJob
+// Group
+exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
+exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
+exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
+exports.fetchATSJobs = atsGroup.fetchATSJobs
+exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
+exports.fetchATSApplications = atsGroup.fetchATSApplications
+
+// User
+exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
+exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
+exports.updateUserJobApplications = atsUser.updateUserJobApplications

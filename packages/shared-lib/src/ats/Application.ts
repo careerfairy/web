@@ -1,17 +1,13 @@
 import { MergeApplication } from "./MergeResponseTypes"
-import {
-   BaseModel,
-   fromMergeDate,
-   fromSerializedDate,
-   saveIfObject,
-} from "../BaseModel"
+import { fromSerializedDate, saveIfObject } from "../BaseModel"
 import { Job } from "./Job"
 import { Candidate } from "./Candidate"
+import { ATSModel, fromMergeDate } from "./ATSModel"
 
 /**
  * Relationship between a Job and Candidate
  */
-export class Application extends BaseModel {
+export class Application extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly job: Job,
@@ -19,7 +15,8 @@ export class Application extends BaseModel {
       public readonly appliedAt?: Date,
       public readonly rejectedAt?: Date,
       public readonly source?: string,
-      public readonly currentStage?: string
+      public readonly currentStage?: string,
+      public readonly rejectReason?: string
    ) {
       super()
    }
@@ -35,7 +32,8 @@ export class Application extends BaseModel {
          fromMergeDate(application.applied_at),
          fromMergeDate(application.rejected_at),
          application.source,
-         application.current_stage?.name
+         application.current_stage?.name || null,
+         application.reject_reason?.name || null
       )
    }
 
@@ -44,13 +42,14 @@ export class Application extends BaseModel {
          application.id,
          saveIfObject<Job>(application.job, Job.createFromPlainObject),
          saveIfObject<Candidate>(
-            application.job,
+            application.candidate,
             Candidate.createFromPlainObject
          ),
          fromSerializedDate(application.appliedAt),
          fromSerializedDate(application.rejectedAt),
          application.source,
-         application.currentStage
+         application.currentStage,
+         application.rejectReason
       )
    }
 }

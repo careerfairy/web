@@ -168,16 +168,22 @@ export default function useMediaSources(
       [localStream?.videoTrack]
    )
 
-   const mediaControls = useMemo(() => {
-      return {
+   return useMemo(
+      () => ({
+         mediaControls: {
+            audioSource,
+            updateAudioSource,
+            videoSource,
+            updateVideoSource,
+         },
+         localMediaStream,
+      }),
+      [
          audioSource,
          updateAudioSource,
          videoSource,
          updateVideoSource,
-      }
-   }, [audioSource, updateAudioSource, videoSource, updateVideoSource])
-   return {
-      mediaControls,
-      localMediaStream,
-   }
+         localMediaStream,
+      ]
+   )
 }

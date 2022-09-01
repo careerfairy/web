@@ -1,4 +1,5 @@
 import React, {
+   memo,
    useCallback,
    useContext,
    useEffect,
@@ -612,4 +613,4 @@ const VideoControlsContainer = ({
    )
 }
 
-export default VideoControlsContainer
+export default memo(VideoControlsContainer)
