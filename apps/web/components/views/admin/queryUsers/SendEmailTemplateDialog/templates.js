@@ -109,7 +109,6 @@ const basicFields = [
 
 const useTemplates = () => {
    const { sendBasicTemplateEmail } = useFirebaseService()
-
    return useMemo(
       () => [
          {
@@ -119,12 +118,14 @@ const useTemplates = () => {
             getInitialValues: getInitialValues,
             fields: basicFields,
             sendTemplate: sendBasicTemplateEmail,
-            templateId: "25653565",
+            templateId: process.env.NEXT_PUBLIC_FIREBASE_EMULATORS
+               ? "28950430"
+               : "25653565",
             templateEditUrl:
                "https://account.postmarkapp.com/servers/5274171/templates/25653565/edit",
          },
       ],
-      [sendBasicTemplateEmail]
+      [sendBasicTemplateEmail, process.env.NEXT_PUBLIC_FIREBASE_EMULATORS]
    )
 }
 

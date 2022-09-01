@@ -21,6 +21,7 @@ import { useAuth } from "../../../../../HOCs/AuthProvider"
 import SendTestEmailDialog from "./SendTestEmailDialog"
 import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect"
 import { getDownloadUrl } from "../../../../helperFunctions/streamFormFunctions"
+import { TemplateDialogStepProps } from "./SendEmailTemplateDialog"
 
 const now = new Date()
 
@@ -42,14 +43,14 @@ const EmailTemplateForm = ({
    targetTemplate,
    targetStream,
    handleBack,
-   emails,
-}) => {
+   totalUsers,
+   queryOptions,
+}: TemplateDialogStepProps) => {
    const { userData } = useAuth()
    const classes = useStyles()
    const dispatch = useDispatch()
    const [confirmSendEmailModalData, setConfirmSendEmailModalData] =
       useState(null)
-   const [showTimezone, setShowTimezone] = useState(true)
    const [confirmSendTestEmailModalData, setConfirmSendTestEmailModalData] =
       useState(null)
    const [testEmails, setTestEmails] = useState([userData.userEmail])
@@ -72,13 +73,14 @@ const EmailTemplateForm = ({
          await targetTemplate.sendTemplate({
             ...data,
             senderEmail: userData.userEmail,
+            isForRealEmails: true,
          })
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }
       setSendingEmails(false)
       handleCloseSendConfirmEmailModal()
-      successSnackbar(data.emails?.length)
+      successSnackbar(totalUsers)
       handleClose()
    }
 
@@ -86,8 +88,7 @@ const EmailTemplateForm = ({
       async (data) => {
          let dataWithTestEmails = { ...data, senderEmail: userData.userEmail }
          // ensure that the emails
-         delete dataWithTestEmails?.emails
-         dataWithTestEmails.emails = testEmails || []
+         dataWithTestEmails.testEmails = testEmails || []
          try {
             setSendingEmails(true)
             await targetTemplate.sendTemplate(dataWithTestEmails)
@@ -125,13 +126,13 @@ const EmailTemplateForm = ({
                         ).toString() + " CET",
                   },
                   templateId: targetTemplate.templateId,
+                  queryOptions: queryOptions,
                }
 
                if (values.isTestEmail) {
                   // open test email modal
                   setConfirmSendTestEmailModalData(data)
                } else {
-                  data.emails = emails
                   setConfirmSendEmailModalData(data)
                }
             } catch (e) {
@@ -169,10 +170,7 @@ const EmailTemplateForm = ({
                                              formik.errors[field.name]
                                           }
                                           value={formik.values[field.name]}
-                                          loading={
-                                             formik.isSubmitting ||
-                                             sendingEmails
-                                          }
+                                          // @ts-ignore
                                           handleBlur={formik.handleBlur}
                                           formName={field.name}
                                           setFieldValue={formik.setFieldValue}
@@ -236,6 +234,7 @@ const EmailTemplateForm = ({
                                        md={field.small && 6}
                                     >
                                        <DateTimePicker
+                                          // @ts-ignore
                                           id={field.name}
                                           clearable
                                           disablePast
@@ -243,6 +242,7 @@ const EmailTemplateForm = ({
                                              <TextField fullWidth {...params} />
                                           )}
                                           label={field.label}
+                                          // @ts-ignore
                                           labelFunc={(date) =>
                                              DateUtil.getRelativeDate(date) +
                                              " CET"
@@ -273,6 +273,8 @@ const EmailTemplateForm = ({
                                              formik.touched[field.name] &&
                                              formik.errors[field.name]
                                           }
+                                          date={formik.values[field.name]}
+                                          openPicker={true}
                                        />
                                     </Grid>
                                  )
@@ -299,6 +301,7 @@ const EmailTemplateForm = ({
                               }
                               onClick={(e) => {
                                  formik.setFieldValue("isTestEmail", true)
+                                 // @ts-ignore
                                  formik.handleSubmit(e)
                               }}
                            >
@@ -314,6 +317,7 @@ const EmailTemplateForm = ({
                               }
                               onClick={(e) => {
                                  formik.setFieldValue("isTestEmail", false)
+                                 // @ts-ignore
                                  formik.handleSubmit(e)
                               }}
                            >
@@ -330,12 +334,12 @@ const EmailTemplateForm = ({
                      message={
                         <>
                            You confirm that you are sending this email to{" "}
-                           <b>{emails.length}</b> users, this action cannot be
+                           <b>{totalUsers}</b> users, this action cannot be
                            undone.
                         </>
                      }
-                     confirmSecurityText={`I wish to send this email to ${emails.length} users`}
-                     confirmButtonText={`Send this email to ${emails.length} users`}
+                     confirmSecurityText={`I wish to send this email to ${totalUsers} users`}
+                     confirmButtonText={`Send this email to ${totalUsers} users`}
                      handleConfirm={() =>
                         handleConfirmSendEmail(confirmSendEmailModalData)
                      }

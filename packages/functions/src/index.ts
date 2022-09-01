@@ -23,6 +23,7 @@ import cms = require("./cms")
 import marketing = require("./marketing")
 import atsUser = require("./atsUser")
 import atsGroup = require("./atsGroup")
+import bigQuery = require("./bigQuery")
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -48,7 +49,7 @@ exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 exports.exportFirestoreBackup = backup.exportFirestoreBackup
 
 // Admin Functions
-exports.sendBasicTemplateEmail = admin.sendBasicTemplateEmail
+exports.sendBasicTemplateEmail_v2 = admin.sendBasicTemplateEmail_v2
 
 // Group Admin
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
@@ -147,3 +148,6 @@ exports.fetchATSApplications = atsGroup.fetchATSApplications
 exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
 exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
 exports.updateUserJobApplications = atsUser.updateUserJobApplications
+
+// BigQuery
+exports.getBigQueryUsers = bigQuery.getBigQueryUsers

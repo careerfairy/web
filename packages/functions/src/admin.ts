@@ -1,9 +1,17 @@
-const functions = require("firebase-functions")
-const { client } = require("./api/postmark")
-const { createNestedArrayOfTemplates } = require("./util")
-const { emailsToRemove } = require("./misc/emailsToRemove")
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { bigQueryRepo } from "./api/repositories"
+import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
 
-exports.sendBasicTemplateEmail = functions
+import functions = require("firebase-functions")
+
+/* eslint-disable @typescript-eslint/no-var-requires */
+const { client } = require("./api/postmark")
+
+import { createNestedArrayOfTemplates } from "./util"
+import { emailsToRemove } from "./misc/emailsToRemove"
+
+/* eslint-disable camelcase */
+export const sendBasicTemplateEmail_v2 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
@@ -17,16 +25,46 @@ exports.sendBasicTemplateEmail = functions
          eventUrl,
          subject,
          start,
-         emails,
+         testEmails,
          senderEmail,
+         queryOptions,
+         isForRealEmails,
          // Stick to server side/cloud function templateId for now
          templateId,
+      }: {
+         title: string
+         summary: string
+         companyLogoUrl: string
+         illustrationImageUrl: string
+         eventUrl: string
+         subject: string
+         start: string
+         testEmails: string[]
+         senderEmail: string
+         queryOptions: BigQueryUserQueryOptions
+         templateId: string
+         isForRealEmails: boolean
       } = data
 
-      let emailsArray =
-         emails.filter((email) => !emailsToRemove.includes(email)) || []
+      let emailsArray = []
       if (senderEmail) {
          emailsArray.push(senderEmail)
+      }
+      if (isForRealEmails === true) {
+         await userIsSignedInAndIsCFAdmin(context)
+         const users = await bigQueryRepo.getUsers(
+            queryOptions.page,
+            false,
+            queryOptions.orderBy,
+            queryOptions.sortOrder,
+            queryOptions?.filters
+         )
+         const userEmails = users.map((user) => user.userEmail)
+         emailsArray = emailsArray.concat(userEmails)
+      } else {
+         const testEmailsArray =
+            testEmails?.filter((email) => !emailsToRemove.includes(email)) || []
+         emailsArray = emailsArray.concat(testEmailsArray)
       }
 
       // Remove the sender email if the sender is already in the emails list
@@ -37,7 +75,7 @@ exports.sendBasicTemplateEmail = functions
          emailsArray.length
       )
 
-      //TODO remove before deploying to prod
+      // TODO remove before deploying to prod
       // functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
 
       // Will use the server side of the templateId for more
@@ -78,7 +116,7 @@ exports.sendBasicTemplateEmail = functions
             await client
                .sendEmailBatchWithTemplates(arrayOfTemplateEmails)
                .then(
-                  (response) => {
+                  () => {
                      functions.logger.log(
                         `Successfully sent email to ${arrayOfTemplateEmails.length}`
                      )

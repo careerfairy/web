@@ -13,31 +13,6 @@ export default class DataAccessUtil {
          },
       })
    }
-   static sendBasicTemplateEmail({ values, emails, senderEmail, templateId }) {
-      const testingEmails = ["kadirit@hotmail.com"]
-
-      const dataObj = {
-         title: values.title,
-         summary: values.summary,
-         companyLogoUrl: values.companyLogoUrl,
-         illustrationImageUrl: values.illustrationImageUrl,
-         eventUrl: values.eventUrl,
-         subject: values.subject,
-         start: values.start,
-         emails: testingEmails,
-         senderEmail,
-         templateId,
-      }
-      const localUrl =
-         "http://localhost:5001/careerfairy-e1fd9/us-central1/sendBasicTemplateEmail"
-      const prodUrl =
-         "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendBasicTemplateEmail"
-      return axios({
-         method: "post",
-         url: localUrl,
-         data: dataObj,
-      })
-   }
 
    static sendDraftApprovalRequestEmail(
       adminsInfo,

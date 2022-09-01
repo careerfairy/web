@@ -18,6 +18,11 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import {
+   bigQueryClient,
+   BigQueryRepository,
+   IBigQueryRepository,
+} from "./bigQuery"
+import {
    FirebaseMarketingUsersRepository,
    IMarketingUsersRepository,
 } from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
@@ -56,3 +61,7 @@ export const marketingUsersRepo: IMarketingUsersRepository =
       firestoreInstance,
       admin.firestore.FieldValue
    )
+
+export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
+   bigQueryClient
+)

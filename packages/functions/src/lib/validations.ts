@@ -1,6 +1,7 @@
 import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
 import { groupRepo, userRepo } from "../api/repositories"
+import { CallableContext } from "firebase-functions/lib/common/providers/https"
 
 /**
  * Validate the data object argument in a function call
@@ -81,4 +82,19 @@ export function validateUserAuthNotExistent(
 export function logAndThrow(message: string, ...context: any[]) {
    functions.logger.error(message, { ...context })
    throw new functions.https.HttpsError("failed-precondition", message)
+}
+
+/**
+ * Common Logic to validate Big Query Requests
+ *
+ * Checks if the user is authenticated and is a CF Admin
+ * @param context
+ */
+export async function userIsSignedInAndIsCFAdmin(
+   context: CallableContext
+): Promise<void> {
+   // validations that throw exceptions
+   const idToken = await validateUserAuthExists(context)
+   await validateUserIsCFAdmin(idToken.email)
+   return
 }
