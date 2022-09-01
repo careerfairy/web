@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import {
    Button,
    Checkbox,
@@ -32,6 +32,8 @@ import {
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import SentimentRating from "../../../../../viewer/rating-container/SentimentRating"
 import NormalRating from "../../../../../viewer/rating-container/NormalRating"
+import * as yup from "yup"
+import useSnackbarNotifications from "../../../../../../custom-hook/useSnackbarNotifications"
 
 const marks = [
    5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95,
@@ -47,14 +49,43 @@ type Props = {
 }
 
 interface FormValues extends Omit<EventRating, "id"> {}
+const minQuestionLength = 5
 
+const schema = yup.object().shape({
+   hasText: yup.boolean(),
+   appearAfter: yup
+      .number()
+      .oneOf(marks, "Please choose a valid duration")
+      .required("Required"),
+   question: yup
+      .string()
+      .trim()
+      .min(
+         minQuestionLength,
+         `Question must be at least ${minQuestionLength} characters long`
+      )
+      .required("Question is required"),
+   isForEnd: yup.boolean(),
+   noStars: yup.boolean().when("hasText", {
+      is: false,
+      then: yup
+         .boolean()
+         .required("Review needs to have a written review or a rating system")
+         .oneOf(
+            [false],
+            "Review needs to have a written review or a rating system"
+         ),
+   }),
+   isSentimentRating: yup.boolean(),
+})
 const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
    const firebase = useFirebaseService()
    const mobile = useIsMobile()
+   const { errorNotification, successNotification } = useSnackbarNotifications()
 
-   const isForEnd = (appearAfter) => {
+   const isForEnd = useCallback((appearAfter) => {
       return Boolean(appearAfter === marks[marks.length - 1])
-   }
+   }, [])
 
    const initialValues: FormValues = useMemo(
       () =>
@@ -68,47 +99,37 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
          } as FormValues),
       [data]
    )
+   const onSubmit = useCallback(
+      async (values, { setFieldError }) => {
+         try {
+            const { id: feedbackId } = data
+            const { id: livestreamId } = currentStream
+            if (feedbackId && livestreamId) {
+               await firebase.updateFeedbackQuestion(
+                  livestreamId,
+                  feedbackId,
+                  values
+               )
+               successNotification("Feedback question updated")
+            } else if (livestreamId) {
+               await firebase.createFeedbackQuestion(livestreamId, values)
+               successNotification("Feedback question created")
+            }
+            handleClose()
+         } catch (e) {
+            errorNotification(e, "Error updating feedback question")
+            setFieldError("appearAfter", "internal error")
+         }
+      },
+      [currentStream, data, errorNotification, firebase, handleClose]
+   )
 
    return (
       <Formik
          initialValues={initialValues}
          enableReinitialize
-         validate={(values: FormValues) => {
-            let errors: any = {}
-            const minQuestionLength = 5
-
-            if (values.noStars && !values.hasText) {
-               errors.hasText =
-                  "Review needs to have a written review or a rating system"
-               errors.noStars =
-                  "Review needs to have a written review or a rating system"
-            }
-            if (!values.question.trim()) {
-               errors.question = "Required"
-            } else if (values.question.length < minQuestionLength) {
-               errors.question = `Must be at least ${minQuestionLength} characters`
-            }
-            return errors
-         }}
-         onSubmit={async (values, { setFieldError }) => {
-            try {
-               const { id: feedbackId } = data
-               const { id: livestreamId } = currentStream
-               if (feedbackId && livestreamId) {
-                  await firebase.updateFeedbackQuestion(
-                     livestreamId,
-                     feedbackId,
-                     values
-                  )
-               } else if (livestreamId) {
-                  await firebase.createFeedbackQuestion(livestreamId, values)
-               }
-               handleClose()
-            } catch (e) {
-               console.log("-> e", e)
-               setFieldError("appearAfter", "internal error")
-            }
-         }}
+         validationSchema={schema}
+         onSubmit={onSubmit}
       >
          {({
             values,
@@ -119,7 +140,7 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
             isSubmitting,
             dirty,
             setFieldValue,
-            /* and other goodies */
+            isValid,
          }) => (
             <Dialog
                TransitionComponent={Slide}
@@ -127,6 +148,9 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                fullWidth
                fullScreen={mobile}
                maxWidth="sm"
+               component={"form"}
+               // @ts-ignore
+               onSubmit={handleSubmit}
             >
                <DialogTitle>{currentStream?.company}</DialogTitle>
                <DialogContent>
@@ -187,7 +211,7 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                            name="hasText"
                            control={
                               <Checkbox
-                                 checked={Boolean(values.hasText)}
+                                 checked={values.hasText}
                                  color="primary"
                               />
                            }
@@ -201,15 +225,16 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                         fullWidth
                         required
                      >
-                        <FormControlLabel
-                           onChange={(e) => {
-                              // @ts-ignore
+                        <FormControlLabel // need to use setFieldValue since the checkbox value is the opposite of what we want
+                           onChange={(
+                              e: React.ChangeEvent<HTMLInputElement>
+                           ) => {
                               setFieldValue("noStars", !e.target.checked)
                            }}
                            name="noStars"
                            control={
                               <Checkbox
-                                 checked={Boolean(!values.noStars)}
+                                 checked={!values.noStars}
                                  color="primary"
                               />
                            }
@@ -273,14 +298,11 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
                            <CircularProgress size={20} color="inherit" />
                         )
                      }
-                     disabled={!dirty || isSubmitting}
+                     disabled={!dirty || isSubmitting || !isValid}
                      color="primary"
-                     onClick={(e) =>
-                        // @ts-ignore
-                        handleSubmit(e)
-                     }
+                     type="submit"
                   >
-                     {!isSubmitting && "Confirm"}
+                     {isSubmitting ? "Saving" : "Confirm"}
                   </Button>
                </DialogActions>
             </Dialog>

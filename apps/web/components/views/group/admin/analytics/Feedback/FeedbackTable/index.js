@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
-import clsx from "clsx"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Box, Card, Divider, Grow, IconButton, Tab, Tabs } from "@mui/material"
 import {
    addMinutes,
@@ -15,25 +14,10 @@ import AreYouSureModal from "../../../../../../../materialUI/GlobalModals/AreYou
 import { useSnackbar } from "notistack"
 import FeedbackGraph from "../FeedbackGraph"
 import ArrowDownwardIcon from "@mui/icons-material/ArrowDownward"
-import makeStyles from "@mui/styles/makeStyles"
 import ExportTable from "../../../../../common/Tables/ExportTable"
 import { exportSelectionAction } from "../../../../../../util/tableUtils"
 import { CSVDialogDownload } from "../../../../../../custom-hook/useMetaDataActions"
 import { useFirebaseService } from "../../../../../../../context/firebase/FirebaseServiceContext"
-
-const useStyles = makeStyles((theme) => ({
-   root: {},
-   actions: {
-      justifyContent: "flex-end",
-   },
-   displayGraphButton: {
-      fontWeight: 500,
-      color: theme.palette.primary.main,
-   },
-   deleteButton: {
-      color: theme.palette.error.main,
-   },
-}))
 
 const FeedbackTable = ({
    fetchingStreams,
@@ -51,14 +35,12 @@ const FeedbackTable = ({
    handleScrollToSideRef,
    currentRating,
    streamDataTypes,
-   className,
    typesOfOptions,
    userTypes,
    setUserType,
    ...rest
 }) => {
    const firebase = useFirebaseService()
-   const classes = useStyles()
    const [tableData, setTableData] = useState({ data: [], columns: [] })
    const [feedbackModalData, setFeedbackModalData] = useState(null)
    const [areYouSureModal, setAreYouSureModal] = useState({
@@ -68,7 +50,144 @@ const FeedbackTable = ({
    })
    const [deletingFeedback, setDeletingFeedback] = useState(false)
    const { enqueueSnackbar } = useSnackbar()
+   const renderDisplayButton = useCallback(
+      (rowData) => {
+         const hasNoData = () => {
+            return Boolean(!rowData.voters?.length)
+         }
+         const handleClick = () => {
+            setCurrentRating(rowData)
+            handleScrollToSideRef()
+         }
+         return (
+            <Box display="flex" justifyContent="center">
+               <IconButton
+                  color={
+                     currentRating?.id === rowData.id ? undefined : "default"
+                  }
+                  disabled={hasNoData()}
+                  onClick={handleClick}
+                  size="large"
+               >
+                  <ArrowDownwardIcon />
+               </IconButton>
+            </Box>
+         )
+      },
+      [currentRating, handleScrollToSideRef, setCurrentRating]
+   )
+   const pollColumns = useMemo(
+      () => [
+         {
+            field: "question",
+            title: "Question",
+            width: 300,
+         },
+         {
+            field: "state",
+            title: "Status",
+            lookup: {
+               closed: "Answered",
+               upcoming: "New",
+               current: "Answering",
+            },
+         },
+         {
+            field: "date",
+            title: "Date Created",
+            type: "date",
+            render: (rowData) => prettyDate(rowData.timestamp),
+         },
+      ],
+      []
+   )
 
+   const questionColumns = useMemo(
+      () => [
+         {
+            field: "title",
+            title: "Question",
+            cellStyle: {
+               width: 400,
+            },
+         },
+         {
+            field: "votes",
+            title: "Votes",
+            type: "numeric",
+         },
+         {
+            field: "date",
+            title: "Posted On",
+            type: "date",
+            render: (rowData) => prettyDate(rowData.timestamp),
+         },
+         {
+            field: "type",
+            title: "status",
+            lookup: { done: "Answered", new: "New", current: "Answering" },
+         },
+      ],
+      []
+   )
+   const feedbackColumns = useMemo(
+      () => [
+         {
+            field: "question",
+            title: "Question",
+            cellStyle: {
+               width: 300,
+            },
+         },
+         {
+            field: "average",
+            title: "Average Rating",
+            render: (rowData) =>
+               renderRatingStars({
+                  rating: rowData.average,
+                  id: rowData.id,
+                  isSentimentRating: rowData?.isSentimentRating,
+               }),
+            filtering: false,
+         },
+         {
+            field: "appearAfter",
+            title: "Appear After",
+            type: "numeric",
+            render: renderAppearAfter,
+         },
+         {
+            field: "votes",
+            title: "Votes",
+            type: "numeric",
+         },
+         {
+            field: "options",
+            title: "Breakdown",
+            render: renderDisplayButton,
+            filtering: false,
+            sorting: false,
+            disableClickEventBubbling: true,
+            export: false,
+         },
+         {
+            field: "hasText",
+            title: "Has Written Reviews",
+            type: "boolean",
+         },
+         {
+            field: "isSentimentRating",
+            title: "Is Sentiment Rating",
+            type: "boolean",
+         },
+         {
+            field: "isForEnd",
+            title: "Ask on Stream End",
+            type: "boolean",
+         },
+      ],
+      [renderDisplayButton]
+   )
    useEffect(() => {
       setTableData((prev) => {
          const dataType = streamDataType.propertyName
@@ -86,33 +205,17 @@ const FeedbackTable = ({
             columns: newColumns,
          }
       })
-   }, [streamDataType.propertyName, currentStream])
+   }, [
+      streamDataType.propertyName,
+      currentStream,
+      pollColumns,
+      questionColumns,
+      feedbackColumns,
+   ])
 
    const handleDisplayTable = (rowData) => {
       setCurrentRating(rowData)
       handleScrollToSideRef()
-   }
-
-   const DisplayButton = (rowData) => {
-      const hasNoData = () => {
-         return Boolean(!rowData.voters?.length)
-      }
-      const handleClick = () => {
-         setCurrentRating(rowData)
-         handleScrollToSideRef()
-      }
-      return (
-         <Box display="flex" justifyContent="center">
-            <IconButton
-               color={currentRating?.id === rowData.id ? undefined : "default"}
-               disabled={hasNoData()}
-               onClick={handleClick}
-               size="large"
-            >
-               <ArrowDownwardIcon />
-            </IconButton>
-         </Box>
-      )
    }
 
    const handleEditFeedback = (row) => {
@@ -153,149 +256,46 @@ const FeedbackTable = ({
       setAreYouSureModal({ data: {}, open: false, warning: "" })
    }
 
-   const pollColumns = [
-      {
-         field: "question",
-         title: "Question",
-         width: 300,
-      },
-      {
-         field: "state",
-         title: "Status",
-         lookup: { closed: "Answered", upcoming: "New", current: "Answering" },
-      },
-      {
-         field: "date",
-         title: "Date Created",
-         type: "date",
-         render: (rowData) => prettyDate(rowData.timestamp),
-      },
-   ]
-
-   const questionColumns = [
-      {
-         field: "title",
-         title: "Question",
-         cellStyle: {
-            width: 400,
-         },
-      },
-      {
-         field: "votes",
-         title: "Votes",
-         type: "numeric",
-      },
-      {
-         field: "date",
-         title: "Posted On",
-         type: "date",
-         render: (rowData) => prettyDate(rowData.timestamp),
-      },
-      {
-         field: "type",
-         title: "status",
-         lookup: { done: "Answered", new: "New", current: "Answering" },
-      },
-   ]
-   const feedbackColumns = [
-      {
-         field: "question",
-         title: "Question",
-         cellStyle: {
-            width: 300,
-         },
-      },
-      {
-         field: "average",
-         title: "Average Rating",
-         render: (rowData) =>
-            renderRatingStars({
-               rating: rowData.average,
-               id: rowData.id,
-               isSentimentRating: rowData?.isSentimentRating,
-            }),
-         filtering: false,
-      },
-      {
-         field: "appearAfter",
-         title: "Appear After",
-         type: "numeric",
-         render: renderAppearAfter,
-      },
-      {
-         field: "votes",
-         title: "Votes",
-         type: "numeric",
-      },
-      {
-         field: "options",
-         title: "Breakdown",
-         render: DisplayButton,
-         filtering: false,
-         sorting: false,
-         disableClickEventBubbling: true,
-         export: false,
-      },
-      {
-         field: "hasText",
-         title: "Has Written Reviews",
-         type: "boolean",
-      },
-      {
-         field: "isSentimentRating",
-         title: "Is Sentiment Rating",
-         type: "boolean",
-      },
-      {
-         field: "isForEnd",
-         title: "Ask on Stream End",
-         type: "boolean",
-      },
-   ]
-
    const handleMenuItemClick = (event, index) => {
       setStreamDataType(streamDataTypes[index])
    }
 
-   const active = () => {
-      return Boolean(currentStream && !currentRating && !currentPoll)
-   }
+   const active = Boolean(currentStream && !currentRating && !currentPoll)
 
-   const isFeedback = () => {
-      return Boolean(streamDataType.propertyName === "feedback")
-   }
-   const isPoll = () => {
-      return Boolean(streamDataType.propertyName === "pollEntries")
-   }
+   const isFeedback = Boolean(streamDataType.propertyName === "feedback")
 
-   const canEdit = ({ appearAfter, isForEnd }) => {
-      return true
-      if (currentStream && appearAfter) {
-         const { start, hasEnded } = currentStream
-         if (hasEnded) {
+   const isPoll = Boolean(streamDataType.propertyName === "pollEntries")
+
+   const canEdit = useCallback(
+      ({ appearAfter, isForEnd }) => {
+         if (currentStream && appearAfter) {
+            const { start, hasEnded } = currentStream
+            if (hasEnded) {
+               return false
+            }
+            const now = new Date()
+            const streamStart = start?.toDate()
+            const editDeadline = addMinutes(streamStart, appearAfter)
+            const editHardDeadline = addMinutes(streamStart, 720)
+            if (now > editDeadline) {
+               return false
+            }
+            return !(isForEnd && now > editHardDeadline)
+         } else {
             return false
          }
-         const now = new Date()
-         const streamStart = start?.toDate()
-         const editDeadline = addMinutes(streamStart, appearAfter)
-         const editHardDeadline = addMinutes(streamStart, 720)
-         if (now > editDeadline) {
-            return false
-         }
-         return !(isForEnd && now > editHardDeadline)
-      } else {
-         return false
-      }
-   }
+      },
+      [currentStream]
+   )
 
    const getTitle = () => {
       let prefix = "Questions"
 
-      if (isFeedback()) {
+      if (isFeedback) {
          prefix = "Feedback"
       }
 
-      if (isPoll()) {
+      if (isPoll) {
          prefix = "Polls"
       }
 
@@ -314,12 +314,7 @@ const FeedbackTable = ({
 
    return (
       <>
-         <Card
-            raised={active()}
-            className={clsx(classes.root, className)}
-            ref={breakdownRef}
-            {...rest}
-         >
+         <Card raised={active} ref={breakdownRef} {...rest}>
             <Tabs
                value={streamDataType.propertyName}
                indicatorColor="primary"
@@ -354,8 +349,7 @@ const FeedbackTable = ({
                   (rowData) => ({
                      icon: tableIcons.ThemedEditIcon,
                      iconProps: { color: "primary" },
-                     // hidden: !isFeedback() || !canEdit(rowData),
-                     hidden: false,
+                     hidden: !isFeedback || !canEdit(rowData),
                      disabled: !canEdit(rowData),
                      position: "row",
                      tooltip: "Edit",
@@ -364,7 +358,7 @@ const FeedbackTable = ({
                   {
                      icon: tableIcons.RedDeleteForeverIcon,
                      iconProps: { color: "primary" },
-                     hidden: !isFeedback(),
+                     hidden: !isFeedback,
                      position: "row",
                      tooltip: "Delete",
                      onClick: (event, rowData) =>
@@ -372,7 +366,7 @@ const FeedbackTable = ({
                   },
                   {
                      icon: tableIcons.ThemedAdd,
-                     hidden: !isFeedback() || !currentStream,
+                     hidden: !isFeedback || !currentStream,
                      isFreeAction: true,
                      iconProps: { color: "primary" },
                      tooltip: "Add Question",
@@ -380,7 +374,7 @@ const FeedbackTable = ({
                   },
                   (rowData) => ({
                      icon: tableIcons.ArrowDownwardIcon,
-                     hidden: !isFeedback(),
+                     hidden: !isFeedback,
                      position: "row",
                      disabled: rowData?.votes === 0,
                      iconProps: { color: "green" },
@@ -395,7 +389,7 @@ const FeedbackTable = ({
                   )}`
                }
                detailPanel={
-                  isPoll()
+                  isPoll
                      ? [
                           {
                              tooltip: "Show Chart",
