@@ -121,7 +121,14 @@ const FeedbackModal = ({ open, data, handleClose, currentStream }: Props) => {
             setFieldError("appearAfter", "internal error")
          }
       },
-      [currentStream, data, errorNotification, firebase, handleClose]
+      [
+         currentStream,
+         data,
+         errorNotification,
+         firebase,
+         handleClose,
+         successNotification,
+      ]
    )
 
    return (
