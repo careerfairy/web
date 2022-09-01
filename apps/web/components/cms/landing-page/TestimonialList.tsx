@@ -10,6 +10,9 @@ const styles = sxStyles({
       marginX: { xs: 2, lg: 24, xl: 52 },
       textAlign: "center",
       marginBottom: -4,
+      "& :first-child": {
+         fontWeight: 500,
+      },
    },
    wrapper: {
       paddingLeft: 2,

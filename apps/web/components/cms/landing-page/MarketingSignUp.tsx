@@ -50,9 +50,11 @@ const MarketingSignUp = ({
    const isMobile = useIsMobile()
    const [isComplete, setComplete] = useState(false)
    return (
-      <Box my={4}>
+      <Box my={6}>
          <Box mb={4} ml={2}>
-            <Typography variant="h4">{formTitle}</Typography>
+            <Typography variant="h3" fontWeight={500}>
+               {formTitle}
+            </Typography>
          </Box>
          <Box
             id={marketingSignUpFormId}

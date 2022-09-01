@@ -15,6 +15,7 @@ const styles = sxStyles({
    title: {
       textAlign: "center",
       mb: 4,
+      fontWeight: 500,
    },
 })
 
