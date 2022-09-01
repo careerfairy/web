@@ -312,7 +312,7 @@ const FieldOfStudySelector = ({
    disabled,
    error,
    helperText,
-   fieldsOfStudy,
+   fieldsOfStudy = [],
 }) => {
    return (
       <>

@@ -100,15 +100,17 @@ const EventsPreview = ({
             <Box id={id}>
                <Box sx={styles.eventsHeader}>
                   <Heading>{title}</Heading>
-                  {events?.length >= limit && !isOnMarketingLandingPage && (
-                     <Link href={seeMoreLink}>
-                        <a>
-                           <Typography sx={styles.seeMoreText} color="grey">
-                              See more
-                           </Typography>
-                        </a>
-                     </Link>
-                  )}
+                  {events?.length >= limit &&
+                     !isOnMarketingLandingPage &&
+                     seeMoreLink && (
+                        <Link href={seeMoreLink}>
+                           <a>
+                              <Typography sx={styles.seeMoreText} color="grey">
+                                 See more
+                              </Typography>
+                           </a>
+                        </Link>
+                     )}
                </Box>
                <Stack sx={styles.previewContent}>
                   {isEmpty && (
