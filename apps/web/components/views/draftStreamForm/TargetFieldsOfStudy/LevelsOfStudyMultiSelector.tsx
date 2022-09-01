@@ -6,6 +6,7 @@ import { memo } from "react"
 export type LevelsOfStudyMultiSelector = {
    selectedItems: FieldOfStudy[]
    setFieldValue: (name, value) => void
+   limit?: number
 }
 
 const allOption = { id: "select-all", name: "Any Level of Study" }
@@ -13,6 +14,7 @@ const allOption = { id: "select-all", name: "Any Level of Study" }
 const LevelsOfStudyMultiSelector = ({
    selectedItems,
    setFieldValue,
+   limit = 5,
 }: LevelsOfStudyMultiSelector) => {
    const { isLoading, data: allLevelsOfStudy } = useLevelsOfStudy()
 
@@ -36,6 +38,7 @@ const LevelsOfStudyMultiSelector = ({
          chipProps={{
             variant: "outlined",
          }}
+         limit={limit}
          getValueFn={getValueFn}
          selectAllOption={{
             value: allOption,

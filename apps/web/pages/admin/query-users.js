@@ -2,7 +2,7 @@ import React from "react"
 import AdminDashboardLayout from "../../layouts/AdminDashboardLayout"
 import QueryUsersOverview from "../../components/views/admin/queryUsers"
 
-const QueryDataPage = ({}) => {
+const QueryDataPage = () => {
    return (
       <AdminDashboardLayout>
          <QueryUsersOverview />

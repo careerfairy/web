@@ -13,8 +13,6 @@ import Page, {
 } from "../../components/views/common/Page"
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 
-const desktopProp = "md"
-
 const AdminDashboardLayout = (props) => {
    const { children } = props
    const dispatch = useDispatch()

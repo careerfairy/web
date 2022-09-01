@@ -30,6 +30,7 @@ import {
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
 import DocumentReference = firebase.firestore.DocumentReference
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -58,12 +59,6 @@ class FirebaseService {
     * @fulfill {({rtcToken: string, rtmToken: string})} A project object with the format {name: String, data: Object}
     * @reject {Error}
     * @returns fPromise
-    */
-
-   /**
-    * Call an on call cloud function to generate a secure agora token.
-    * @param {{isStreamer: any; uid: any; streamDocumentPath: string; sentToken: string; channelName: string}} data
-    * @return {Promise<firebase.functions.HttpsCallableResult>}
     */
 
    fetchAgoraRtcToken = async (data) => {
@@ -145,12 +140,12 @@ class FirebaseService {
 
    sendBasicTemplateEmail = async ({
       values,
-      emails,
+      testEmails,
       senderEmail,
       templateId,
+      queryOptions,
+      isForRealEmails = false,
    }) => {
-      // const testingEmails = ["kadirit@hotmail.com"];
-
       const dataObj = {
          title: values.title,
          summary: values.summary,
@@ -159,13 +154,15 @@ class FirebaseService {
          eventUrl: values.eventUrl,
          subject: values.subject,
          start: values.start,
-         emails,
+         testEmails,
          senderEmail,
          templateId,
+         queryOptions: queryOptions as BigQueryUserQueryOptions,
+         isForRealEmails,
       }
 
       const sendBasicTemplateEmail = this.functions.httpsCallable(
-         "sendBasicTemplateEmail"
+         "sendBasicTemplateEmail_v2"
       )
 
       return sendBasicTemplateEmail(dataObj)
