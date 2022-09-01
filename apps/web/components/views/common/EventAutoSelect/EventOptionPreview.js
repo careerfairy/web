@@ -51,7 +51,7 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
    },
 }))
-const EventOptionPreview = ({ streamData, preview, selected }) => {
+const EventOptionPreview = ({ streamData, preview }) => {
    const classes = useStyles()
    return (
       <div

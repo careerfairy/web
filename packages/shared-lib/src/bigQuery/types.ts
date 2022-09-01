@@ -14,14 +14,16 @@ export interface BigQueryUserResponse {
    linkedinUrl: string
    totalHits: number
 }
-
 export interface BigQueryUserQueryOptions {
-   universityCountryCodes: string[]
-   universityName: ""
-   fieldOfStudyIds: string[]
-   levelOfStudyIds: string[]
+   filters: GetUserFilters
    page: number
    orderBy: keyof BigQueryUserResponse
    sortOrder: "DESC" | "ASC"
    limit: number
+}
+export interface GetUserFilters {
+   universityCountryCodes?: string[]
+   universityName?: string
+   fieldOfStudyIds?: string[]
+   levelOfStudyIds?: string[]
 }

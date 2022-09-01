@@ -90,7 +90,7 @@ export function logAndThrow(message: string, ...context: any[]) {
  * Checks if the user is authenticated and is a CF Admin
  * @param context
  */
-export async function bigQueryRequestValidation(
+export async function userIsSignedInAndIsCFAdmin(
    context: CallableContext
 ): Promise<void> {
    // validations that throw exceptions

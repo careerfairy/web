@@ -18,10 +18,10 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import {
+   bigQueryClient,
    BigQueryRepository,
    IBigQueryRepository,
-} from "@careerfairy/shared-lib/dist/bigQuery/BigQueryRepository"
-import { bigQueryClient } from "./bigQuery"
+} from "./bigQuery"
 import {
    FirebaseMarketingUsersRepository,
    IMarketingUsersRepository,

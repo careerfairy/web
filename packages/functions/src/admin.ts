@@ -1,6 +1,6 @@
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { bigQueryRepo } from "./api/repositories"
-import { bigQueryRequestValidation } from "./lib/validations"
+import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
 
 import functions = require("firebase-functions")
 
@@ -51,7 +51,7 @@ export const sendBasicTemplateEmail_v2 = functions
          emailsArray.push(senderEmail)
       }
       if (isForRealEmails === true) {
-         await bigQueryRequestValidation(context)
+         await userIsSignedInAndIsCFAdmin(context)
          const users = await bigQueryRepo.getUsers(
             queryOptions.page,
             false,

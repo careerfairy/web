@@ -54,11 +54,7 @@ const EventSelectView = ({
          <Box p={2}>
             <Collapse in={Boolean(targetStream)} unmountOnExit>
                <Box mb={2}>
-                  <EventOptionPreview
-                     preview
-                     streamData={targetStream}
-                     selected={undefined}
-                  />
+                  <EventOptionPreview preview streamData={targetStream} />
                </Box>
             </Collapse>
             <EventAutoSelect

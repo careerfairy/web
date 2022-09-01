@@ -72,7 +72,7 @@ const AdminUsersTable = ({
          {
             field: "universityName",
             title: "University",
-            filterOnItemSelect: true,
+            filtering: false,
          },
          {
             field: "fieldOfStudyId",
@@ -122,7 +122,7 @@ const AdminUsersTable = ({
             ),
          },
       ],
-      [fieldsOfStudyLookup, levelsOfStudyLookup, universityCountriesMap]
+      [fieldsOfStudyLookup, levelsOfStudyLookup]
    )
 
    const customTableOptions = useMemo(
@@ -141,7 +141,10 @@ const AdminUsersTable = ({
       () => setLocalQueryOptions(queryOptions),
       [queryOptions]
    )
-   const handleCloseEmailTemplateDialog = () => setLocalQueryOptions(null)
+   const handleCloseEmailTemplateDialog = useCallback(
+      () => setLocalQueryOptions(null),
+      []
+   )
 
    const actions: MaterialTableProps<BigQueryUserResponse>["actions"] = [
       {
@@ -152,51 +155,56 @@ const AdminUsersTable = ({
          isFreeAction: true,
       },
    ]
-   const onOrderChange = (
-      columnIndex: number,
-      columnSortOrder: "desc" | "asc"
-   ) => {
-      if (columnIndex <= -1) {
-         return handleSort("firstName", "DESC")
-      }
-      const field = columns[
-         columnIndex
-      ].field.toString() as keyof BigQueryUserResponse
-      handleSort(field, columnSortOrder.toUpperCase() as "DESC" | "ASC")
-   }
+   const onOrderChange = useCallback(
+      (columnIndex: number, columnSortOrder: "desc" | "asc") => {
+         if (columnIndex <= -1) {
+            return handleSort("firstName", "DESC")
+         }
+         const field = columns[
+            columnIndex
+         ].field.toString() as keyof BigQueryUserResponse
+         handleSort(field, columnSortOrder.toUpperCase() as "DESC" | "ASC")
+      },
+      [columns, handleSort]
+   )
    const onFilterChange: MaterialTableProps<BigQueryUserResponse>["onFilterChange"] =
-      (filters) => {
-         filters.forEach((filter) => {
-            if (filter.column.field === "universityCountryCode") {
-               setOptions((prev) => ({
-                  ...prev,
-                  universityCountryCodes: filter.value,
-                  page: 0,
-               }))
-            }
-            if (filter.column.field === "universityName") {
-               setOptions((prev) => ({
-                  ...prev,
-                  universityName: filter.value,
-                  page: 0,
-               }))
-            }
-            if (filter.column.field === "fieldOfStudyId") {
-               setOptions((prev) => ({
-                  ...prev,
-                  fieldOfStudyIds: filter.value,
-                  page: 0,
-               }))
-            }
-            if (filter.column.field === "levelOfStudyId") {
-               setOptions((prev) => ({
-                  ...prev,
-                  levelOfStudyIds: filter.value,
-                  page: 0,
-               }))
-            }
-         })
-      }
+      useCallback(
+         (filters) => {
+            filters.forEach((filter) => {
+               if (filter.column.field === "universityCountryCode") {
+                  setOptions((prev) => ({
+                     ...prev,
+                     filters: {
+                        ...prev.filters,
+                        universityCountryCodes: filter.value,
+                     },
+                     page: 0,
+                  }))
+               }
+               if (filter.column.field === "fieldOfStudyId") {
+                  setOptions((prev) => ({
+                     ...prev,
+                     filters: {
+                        ...prev.filters,
+                        fieldOfStudyIds: filter.value,
+                     },
+                     page: 0,
+                  }))
+               }
+               if (filter.column.field === "levelOfStudyId") {
+                  setOptions((prev) => ({
+                     ...prev,
+                     filters: {
+                        levelOfStudyIds: filter.value,
+                        ...prev.filters,
+                     },
+                     page: 0,
+                  }))
+               }
+            })
+         },
+         [setOptions]
+      )
 
    return (
       <Card>
