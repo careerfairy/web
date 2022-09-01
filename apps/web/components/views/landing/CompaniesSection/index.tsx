@@ -20,6 +20,9 @@ const styles = {
          [theme.breakpoints.down("md")]: {
             paddingTop: isOnMarketingLandingPage ? "" : 40,
          },
+         "& :first-child": {
+            fontWeight: isOnMarketingLandingPage ? 500 : "inherit",
+         },
       }
    },
 }

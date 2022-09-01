@@ -135,7 +135,7 @@ const LandingPageHero = ({ fieldsOfStudy, hero }: Props) => {
                               }
                               sx={styles.button}
                            >
-                              {hero.selectorLabel || "Send"}
+                              {hero?.buttonSelectorLabel || "Send"}
                            </Button>
                         </Box>
                      </form>
