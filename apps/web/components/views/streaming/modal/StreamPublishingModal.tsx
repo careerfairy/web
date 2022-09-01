@@ -225,7 +225,6 @@ const StreamPublishingModal = ({
                      labels.joinWithoutCameraConfirmDescription
                   }
                   hasStarted={false}
-                  mobile={undefined}
                />
             ) : (
                <LoadingButton

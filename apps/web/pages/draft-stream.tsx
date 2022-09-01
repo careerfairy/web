@@ -82,7 +82,6 @@ const DraftStream = () => {
    const onSubmit = async (
       values,
       { setSubmitting },
-      targetCategories,
       updateMode,
       draftStreamId,
       setFormData,
@@ -95,7 +94,6 @@ const DraftStream = () => {
          setSubmitting(true)
          const livestream = buildLivestreamObject(
             values,
-            targetCategories,
             updateMode,
             draftStreamId,
             firebaseService
@@ -109,6 +107,7 @@ const DraftStream = () => {
                pendingApproval: true,
                seen: false,
             }
+            // @ts-ignore
             livestream.status = newStatus
             setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }

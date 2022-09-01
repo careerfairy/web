@@ -1,4 +1,11 @@
-import React, { Fragment, useEffect, useRef, useState } from "react"
+import React, {
+   Fragment,
+   MutableRefObject,
+   useCallback,
+   useEffect,
+   useRef,
+   useState,
+} from "react"
 import DeleteIcon from "@mui/icons-material/Delete"
 import {
    Box,
@@ -16,14 +23,13 @@ import {
    Tooltip,
    Typography,
 } from "@mui/material"
-import { Formik } from "formik"
+import { Formik, FormikValues } from "formik"
 import { v4 as uuidv4 } from "uuid"
-import { withFirebase } from "../../../context/firebase/FirebaseServiceContext"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import ImageSelect from "./ImageSelect/ImageSelect"
 import makeStyles from "@mui/styles/makeStyles"
 import DateTimePicker from "@mui/lab/DateTimePicker"
 import SpeakerForm from "./SpeakerForm/SpeakerForm"
-import GroupCategorySelect from "./GroupCategorySelect/GroupCategorySelect"
 import { useRouter } from "next/router"
 import FormGroup from "./FormGroup"
 import WarningIcon from "@mui/icons-material/Warning"
@@ -53,9 +59,17 @@ import { createStyles } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
 import {
    LivestreamEvent,
+   LivestreamGroupQuestionsMap,
    LivestreamJobAssociation,
+   Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { FormikHelpers } from "formik/dist/types"
+import GroupQuestionSelect from "./GroupQuestionSelect"
+import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import FieldsOfStudyMultiSelector from "./TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
+import LevelsOfStudyMultiSelector from "./TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 import Stack from "@mui/material/Stack"
 
 const useStyles = makeStyles((theme) =>
@@ -113,8 +127,55 @@ const speakerObj = {
    background: "",
 }
 
+interface Props {
+   group?: Group
+   setSubmitted: (submitted: boolean) => void
+   submitted: boolean
+   onSubmit: (
+      values: FormikValues,
+      formikHandlers: {
+         setSubmitting: FormikHelpers<DraftFormValues>["setSubmitting"]
+      },
+      updateMode: boolean,
+      draftStreamId: string,
+      setFormData: (data: any) => void,
+      setDraftId: (id: string) => void,
+      status: string,
+      setStatus: (status: string) => void,
+      selectedJobs: LivestreamJobAssociation[]
+   ) => void
+   isActualLivestream?: boolean
+   formRef: MutableRefObject<any>
+   saveChangesButtonRef?: MutableRefObject<any>
+   currentStream?: LivestreamEvent
+}
+
+export interface DraftFormValues {
+   id?: string
+   companyLogoUrl: string
+   backgroundImageUrl: string
+   company: string
+   companyId: string
+   title: string
+   interestsIds: string[]
+   groupIds: string[]
+   start: Date
+   groupQuestionsMap: LivestreamGroupQuestionsMap
+   duration: number
+   hidden: boolean
+   summary: string
+   speakers: Record<string, Partial<Speaker>>
+   status: {}
+   language: {
+      code: string
+      name: string
+      shortName: string
+   }
+   targetFieldsOfStudy: FieldOfStudy[]
+   targetLevelsOfStudy: FieldOfStudy[]
+}
+
 const DraftStreamForm = ({
-   firebase,
    group,
    setSubmitted,
    submitted,
@@ -125,7 +186,8 @@ const DraftStreamForm = ({
    // eslint-disable-next-line react-hooks/rules-of-hooks
    saveChangesButtonRef = useRef(),
    currentStream,
-}) => {
+}: Props) => {
+   const firebase = useFirebaseService()
    const router = useRouter()
    const { userData } = useAuth()
    const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 10
@@ -138,13 +200,11 @@ const DraftStreamForm = ({
    draftStreamId = draftStreamId || currentStream?.id
    const { enqueueSnackbar } = useSnackbar()
    const [status, setStatus] = useState("")
-   const isGroupAdmin = () => Boolean(group?.id)
    const classes = useStyles({
-      isGroupAdmin: isGroupAdmin(),
+      isGroupAdmin: Boolean(group?.id),
    })
 
-   const [targetCategories, setTargetCategories] = useState({})
-   const [selectedGroups, setSelectedGroups] = useState([])
+   const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
    const [selectedInterests, setSelectedInterests] = useState([])
    const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
       []
@@ -157,22 +217,24 @@ const DraftStreamForm = ({
    const [draftId, setDraftId] = useState("")
 
    const [existingGroups, setExistingGroups] = useState([])
-   const [formData, setFormData] = useState({
+   const [formData, setFormData] = useState<DraftFormValues>({
       companyLogoUrl: "",
       backgroundImageUrl: "",
       company: "",
       companyId: "",
       title: "",
-      targetCategories: {},
       interestsIds: [],
       groupIds: [],
       start: new Date(),
+      groupQuestionsMap: {},
       duration: 60,
       hidden: false,
       summary: "",
       speakers: { [uuidv4()]: speakerObj },
       status: {},
       language: languageCodes[0],
+      targetFieldsOfStudy: [],
+      targetLevelsOfStudy: [],
       questionsDisabled: false,
    })
 
@@ -241,7 +303,7 @@ const DraftStreamForm = ({
       if (draftStreamId) {
          ;(async () => {
             setAllFetched(false)
-            const targetId = draftStreamId
+            const targetId = draftStreamId as string
             const targetCollection = isActualLivestream
                ? "livestreams"
                : "draftLivestreams"
@@ -254,18 +316,18 @@ const DraftStreamForm = ({
                targetCollection
             )
             if (livestreamQuery.exists) {
-               let livestream: LivestreamEvent = livestreamQuery.data()
-               const newFormData: any = {
+               let livestream = livestreamQuery.data() as LivestreamEvent
+               const newFormData: DraftFormValues = {
                   id: targetId,
                   companyLogoUrl: livestream.companyLogoUrl || "",
                   backgroundImageUrl: livestream.backgroundImageUrl || "",
                   company: livestream.company || "",
                   companyId: livestream.companyId || "",
                   title: livestream.title || "",
-                  targetCategories: {},
                   groupIds: livestream.groupIds || [],
                   interestsIds: livestream.interestsIds || [],
                   start: livestream.start.toDate() || new Date(),
+                  groupQuestionsMap: livestream.groupQuestionsMap || {},
                   duration:
                      livestream.duration || DEFAULT_STREAM_DURATION_MINUTES,
                   hidden: Boolean(livestream.hidden),
@@ -275,7 +337,10 @@ const DraftStreamForm = ({
                      speakerQuery
                   ),
                   status: livestream.status || {},
+                  // @ts-ignore
                   language: livestream.language || languageCodes[0],
+                  targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
+                  targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
                   questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
@@ -290,7 +355,6 @@ const DraftStreamForm = ({
                } else {
                   await handleSetGroupIds([], livestream.groupIds, newFormData)
                }
-               setTargetCategories(livestream.targetCategories || {})
                setSelectedJobs(livestream.jobs || [])
                setSelectedInterests(
                   existingInterests.filter((i) =>
@@ -331,12 +395,6 @@ const DraftStreamForm = ({
       return `By enabling this you are making this stream only visible to members of ${groupNames}.`
    }
 
-   const handleSetGroupCategories = (groupId, targetOptionIds) => {
-      const newTargetCategories = { ...targetCategories }
-      newTargetCategories[groupId] = targetOptionIds
-      setTargetCategories(newTargetCategories)
-   }
-
    const handleSetOnlyUrlIds = async () => {
       // @ts-ignore
       const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
@@ -365,7 +423,25 @@ const DraftStreamForm = ({
       setStatus(SUBMIT_FOR_APPROVAL)
    }
 
-   const isNotAdmin = () => !Boolean(userData?.isAdmin || group?.id)
+   const isNotAdmin = !Boolean(userData?.isAdmin || group?.id)
+   const isGroupAdmin = useCallback(
+      (groupId) => (group && group.id === groupId) || userData?.isAdmin,
+      [group?.id]
+   )
+
+   const handleGroupSelect = useCallback(
+      (values: DraftFormValues, selectedGroups: Group[]) => {
+         const selectedGroupIds = selectedGroups.map((group) => group.id)
+         Object.keys(values.groupQuestionsMap).forEach((groupId) => {
+            if (!selectedGroupIds.includes(groupId)) {
+               delete values.groupQuestionsMap[groupId]
+            }
+         })
+
+         setSelectedGroups(selectedGroups)
+      },
+      []
+   )
 
    const SuccessMessage = () => {
       const directLink = getDirectLink()
@@ -456,9 +532,8 @@ const DraftStreamForm = ({
                      await onSubmit(
                         values,
                         { setSubmitting },
-                        targetCategories,
                         updateMode,
-                        draftStreamId,
+                        draftStreamId as string,
                         setFormData,
                         setDraftId,
                         status,
@@ -851,7 +926,7 @@ const DraftStreamForm = ({
                                     style={{ color: "white" }}
                                     variant="h4"
                                  >
-                                    Groups & Audience:
+                                    Hosts and questions:
                                  </Typography>
                                  <FormGroup>
                                     <Grid
@@ -864,21 +939,24 @@ const DraftStreamForm = ({
                                     >
                                        <MultiListSelect
                                           inputName="groupIds"
-                                          onSelectItems={setSelectedGroups}
+                                          onSelectItems={(selectedGroups) =>
+                                             handleGroupSelect(
+                                                values,
+                                                selectedGroups
+                                             )
+                                          }
                                           selectedItems={selectedGroups}
                                           allValues={existingGroups}
-                                          disabled={
-                                             isSubmitting || isNotAdmin()
-                                          }
+                                          disabled={isSubmitting || isNotAdmin}
                                           getLabelFn={mapGroupLabel}
                                           setFieldValue={setFieldValue}
                                           inputProps={{
-                                             label: "Add some Groups",
+                                             label: "Event Hosts",
                                              placeholder:
-                                                "Add some partner groups",
+                                                "Add some Hosts to your event",
                                           }}
                                           disabledValues={
-                                             isNotAdmin()
+                                             isNotAdmin
                                                 ? existingGroups.map(
                                                      (g) => g.id
                                                   )
@@ -888,26 +966,14 @@ const DraftStreamForm = ({
                                     </Grid>
                                     {selectedGroups.map((group) => {
                                        return (
-                                          <Grid
-                                             key={group.groupId}
-                                             xs={12}
-                                             sm={12}
-                                             md={12}
-                                             lg={12}
-                                             xl={12}
-                                             item
-                                          >
-                                             <GroupCategorySelect
-                                                handleSetGroupCategories={
-                                                   handleSetGroupCategories
-                                                }
-                                                targetCategories={
-                                                   targetCategories
-                                                }
-                                                isSubmitting={isSubmitting}
-                                                group={group}
-                                             />
-                                          </Grid>
+                                          <GroupQuestionSelect
+                                             key={group.id}
+                                             group={group}
+                                             isSubmitting={isSubmitting}
+                                             isGroupAdmin={isGroupAdmin}
+                                             values={values}
+                                             setFieldValue={setFieldValue}
+                                          />
                                        )
                                     })}
                                  </FormGroup>
@@ -943,6 +1009,26 @@ const DraftStreamForm = ({
                                        variant: "outlined",
                                     }}
                                     isCheckbox={true}
+                                 />
+                              </Grid>
+                           </FormGroup>
+
+                           <Typography style={{ color: "white" }} variant="h4">
+                              Target Students:
+                           </Typography>
+
+                           <FormGroup>
+                              <Grid xs={12} item>
+                                 <FieldsOfStudyMultiSelector
+                                    selectedItems={values.targetFieldsOfStudy}
+                                    setFieldValue={setFieldValue}
+                                 />
+                              </Grid>
+
+                              <Grid xs={12} item>
+                                 <LevelsOfStudyMultiSelector
+                                    selectedItems={values.targetLevelsOfStudy}
+                                    setFieldValue={setFieldValue}
                                  />
                               </Grid>
                            </FormGroup>
@@ -1023,4 +1109,4 @@ const DraftStreamForm = ({
 
 const mapGroupLabel = (obj) => obj.universityName
 
-export default withFirebase(DraftStreamForm)
+export default DraftStreamForm

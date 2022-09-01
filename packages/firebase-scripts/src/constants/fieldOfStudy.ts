@@ -1,0 +1,40 @@
+export const possibleFieldsOfStudy = [
+   "Field of Study",
+   "Field of study",
+   "field of study",
+   "Field Of Study",
+   "Fachrichtung",
+   "Field of Work",
+   "Domaine d'études",
+   "What is your field of study?",
+   "Domaine d'étude",
+   "Study Field",
+   "Domain of study",
+   "Field of study ",
+   "Programmes",
+   "background",
+]
+export const possibleLevelsOfStudy = [
+   "Level of Study",
+   "Level of study",
+   "level of study",
+   "Level Of Study",
+   "lvl of study",
+   "Lvl of Study",
+   "Lvl Of Study",
+   "Niveau d'études",
+   "What is your current level of study?",
+   "Study Level",
+   "Level of studies",
+]
+
+export const possibleOthers = [
+   "Other",
+   "other",
+   "autre",
+   "Autre",
+   "weiter",
+   "Weiter",
+   "andere",
+   "Andere",
+]

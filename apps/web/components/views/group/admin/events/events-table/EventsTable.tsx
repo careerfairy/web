@@ -1,0 +1,519 @@
+import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { defaultTableOptions, tableIcons } from "components/util/tableUtils"
+import MaterialTable, {
+   MTableAction,
+   Column,
+   Options,
+   Action,
+} from "@material-table/core"
+import {
+   copyStringToClipboard,
+   getBaseUrl,
+   getResizedUrl,
+   prettyDate,
+} from "../../../../../helperFunctions/HelperFunctions"
+import EditIcon from "@mui/icons-material/Edit"
+import DeleteIcon from "@mui/icons-material/Delete"
+import Speakers from "./Speakers"
+import CompanyLogo from "./CompanyLogo"
+import AreYouSureModal from "materialUI/GlobalModals/AreYouSureModal"
+import StreamerLinksDialog from "../enhanced-group-stream-card/StreamerLinksDialog"
+import GetStreamerLinksIcon from "@mui/icons-material/Share"
+import PublishIcon from "@mui/icons-material/Publish"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { Box, CircularProgress } from "@mui/material"
+import { useDispatch } from "react-redux"
+import DraftLinkIcon from "@mui/icons-material/Link"
+import { useMetaDataActions } from "components/custom-hook/useMetaDataActions"
+import PdfReportDownloadDialog from "../PdfReportDownloadDialog"
+import GroupLogos from "./GroupLogos"
+import AddBoxIcon from "@mui/icons-material/AddBox"
+import ToolbarActionsDialog from "../ToolbarActionsDialog"
+import { useTheme } from "@mui/material/styles"
+import * as storeActions from "store/actions"
+import ManageStreamActions from "./ManageStreamActions"
+import ToolbarDialogAction from "./ToolbarDialogAction"
+import { useRouter } from "next/router"
+import MoreOptionsMenu from "./MoreOptionsMenu"
+import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+
+interface Props {
+   streams: LivestreamEvent[]
+   isDraft: boolean
+   handleEditStream: (stream: LivestreamEvent) => void
+   group: Group
+   publishingDraft: boolean
+   handlePublishStream: (stream: LivestreamEvent) => void
+   isPast: boolean
+   setGroupsDictionary: React.Dispatch<
+      React.SetStateAction<Record<string, Group>>
+   >
+   handleOpenNewStreamModal: () => void
+   groupsDictionary: Record<string, Group>
+   eventId: string
+}
+
+const EventsTable = ({
+   streams,
+   isDraft,
+   handleEditStream,
+   group,
+   publishingDraft,
+   handlePublishStream,
+   isPast,
+   setGroupsDictionary,
+   handleOpenNewStreamModal,
+   groupsDictionary,
+   eventId,
+}: Props) => {
+   const [clickedRows, setClickedRows] = useState({})
+   const firebase = useFirebaseService()
+   const theme = useTheme()
+   const { pathname, push, query } = useRouter()
+   const { userData } = useAuth()
+   const [deletingEvent, setDeletingEvent] = useState(false)
+   const [streamIdToBeDeleted, setStreamIdToBeDeleted] = useState(null)
+   const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] =
+      useState(false)
+   const [endOfEventDialogData, setEndOfEventDialogData] = useState(null)
+
+   const {
+      talentPoolAction,
+      pdfReportAction,
+      registeredStudentsAction,
+      removeReportPdfData,
+      reportPdfData,
+      setTargetStream,
+      registeredStudentsFromGroupDictionary,
+   } = useMetaDataActions({
+      group,
+      isPast,
+      isDraft,
+   })
+
+   const dispatch = useDispatch()
+
+   const [targetLivestreamStreamerLinksId, setTargetLivestreamStreamerLinksId] =
+      useState("")
+
+   useEffect(() => {
+      if (eventId) {
+         handleRowClick(undefined, { id: eventId })
+      }
+   }, [eventId])
+
+   useEffect(() => {
+      if (streams?.length) {
+         const handleGetGroups = async () => {
+            const groupsWithoutData = streams.reduce((acc, currentStream) => {
+               const newIdsOfGroupsThatNeedData = []
+               if (currentStream.groupIds.length) {
+                  currentStream.groupIds.forEach((groupId) => {
+                     if (!groupsDictionary[groupId]) {
+                        newIdsOfGroupsThatNeedData.push(groupId)
+                     }
+                  })
+               }
+               return acc.concat(newIdsOfGroupsThatNeedData)
+            }, [])
+            const newGroupLogoDictionary = await firebase.getGroupsInfo([
+               ...new Set(groupsWithoutData),
+            ])
+            setGroupsDictionary((prevState) => ({
+               ...prevState,
+               ...newGroupLogoDictionary,
+            }))
+         }
+         handleGetGroups()
+      }
+   }, [streams])
+
+   const handleCloseEndOfEventDialog = () => {
+      setEndOfEventDialogData(null)
+   }
+   const handleOpenEndOfEventDialog = ({ rowData }) => {
+      setEndOfEventDialogData(rowData)
+   }
+
+   const handleSpeakerSearch = useCallback(
+      (term, rowData) =>
+         rowData.speakers.some(
+            (speaker) =>
+               speaker.firstName.toLowerCase().indexOf(term.toLowerCase()) >=
+                  0 ||
+               speaker.lastName.toLowerCase().indexOf(term.toLowerCase()) >= 0
+         ),
+      []
+   )
+
+   const handleHostsSearch = useCallback(
+      (term, rowData) =>
+         rowData.groupIds?.some(
+            (groupId) =>
+               groupsDictionary[groupId]?.universityName
+                  ?.toLowerCase()
+                  .indexOf(term.toLowerCase()) >= 0
+         ),
+      [groupsDictionary]
+   )
+   const handleCompanySearch = useCallback(
+      (term, rowData) =>
+         rowData.company?.toLowerCase?.().indexOf(term.toLowerCase()) >= 0,
+      []
+   )
+
+   const handleOpenToolbarActionsDialog = useCallback(() => {
+      setToolbarActionsDialogOpen(true)
+   }, [])
+   const handleCloseToolbarActionsDialog = useCallback(() => {
+      setToolbarActionsDialogOpen(false)
+   }, [])
+
+   const handleDeleteStream = async () => {
+      try {
+         setDeletingEvent(true)
+         const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
+         await firebase.deleteLivestream(streamIdToBeDeleted, targetCollection)
+         setDeletingEvent(false)
+      } catch (e) {
+         setDeletingEvent(false)
+      }
+      setStreamIdToBeDeleted(null)
+   }
+
+   const handleOpenStreamerLinksModal = useCallback((rowData) => {
+      if (rowData.id) {
+         setTargetLivestreamStreamerLinksId(rowData.id)
+      }
+   }, [])
+   const handleCloseStreamerLinksModal = useCallback(() => {
+      setTargetLivestreamStreamerLinksId("")
+   }, [])
+
+   const handleCreateExternalLink = useCallback(
+      (rowData) => {
+         let baseUrl = getBaseUrl()
+         const draftId = rowData.id
+         const targetPath = `${baseUrl}/draft-stream?draftStreamId=${draftId}`
+         copyStringToClipboard(targetPath)
+         dispatch(
+            storeActions.enqueueSnackbar({
+               message: "Link has been copied to your clipboard!",
+               options: {
+                  variant: "success",
+                  preventDuplicate: true,
+                  key: targetPath,
+               },
+            })
+         )
+      },
+      [dispatch]
+   )
+
+   const handleClickDeleteStream = useCallback((streamId) => {
+      setStreamIdToBeDeleted(streamId)
+   }, [])
+
+   const manageStreamActions = useCallback(
+      (rowData) => [
+         {
+            icon: <EditIcon color="action" />,
+            tooltip: isDraft ? "Edit Draft Event" : "Edit Event",
+            onClick: () => handleEditStream(rowData),
+            hintTitle: isDraft ? "Edit Draft Event" : "Edit Event",
+            hintDescription:
+               "Edit the details of the event like the start date and speakers.",
+         },
+         pdfReportAction(rowData),
+         registeredStudentsAction(rowData),
+         talentPoolAction(rowData),
+         {
+            icon: <GetStreamerLinksIcon color="action" />,
+            tooltip: "Get Streamer Links",
+            onClick: () => handleOpenStreamerLinksModal(rowData),
+            hidden: isDraft,
+            hintTitle: "Get Streamer Links",
+            hintDescription:
+               "Copy your streamer links in your browser URL to access your streaming room. The first link should be use by one person only and all other speakers can use the second link.",
+         },
+         {
+            icon: <DraftLinkIcon color="action" />,
+            tooltip: "Generate external Link to Edit Draft",
+            onClick: () => handleCreateExternalLink(rowData),
+            hidden: !isDraft,
+            hintTitle: "Generate external Link to Edit Draft",
+            hintDescription:
+               "Click here to create an external link that can be shared with a company or non-admin allowing them to edit or fill in the details of the event.",
+         },
+         {
+            icon: <DeleteIcon color="action" />,
+            tooltip: isDraft ? "Delete Draft" : "Delete Event",
+            onClick: () => handleClickDeleteStream(rowData.id),
+            hintTitle: isDraft ? "Delete Draft" : "Delete Event",
+            hidden:
+               rowData.author?.groupId !== group.groupId && !userData?.isAdmin,
+            hintDescription: userData?.isAdmin
+               ? "You can delete this event because you are a CF admin"
+               : "Deleting an event is a permanent action and cannot be undone.",
+         },
+         {
+            icon: publishingDraft ? (
+               <CircularProgress size={20} color="inherit" />
+            ) : (
+               <PublishIcon color="action" />
+            ),
+            tooltip: publishingDraft
+               ? "Publishing"
+               : !rowData.status?.pendingApproval
+               ? "Needs Approval"
+               : "Publish Stream",
+            onClick: !rowData.status?.pendingApproval
+               ? () => handleEditStream(rowData)
+               : () => handlePublishStream(rowData),
+            hidden: !isDraft,
+            disabled: publishingDraft,
+            hintTitle: "Publish Stream",
+            hintDescription:
+               "Once you are happy with the contents of the drafted event, you can then make it live so that users can now register.",
+         },
+         {
+            loadedButton: (
+               <MoreOptionsMenu
+                  handleOpenEndOfEventDialog={handleOpenEndOfEventDialog}
+                  rowData={rowData}
+                  hintTitle="More options"
+               />
+            ),
+            tooltip: "More options",
+            hidden: isDraft || !userData?.isAdmin,
+         },
+      ],
+      [
+         registeredStudentsAction,
+         pdfReportAction,
+         talentPoolAction,
+         handleCreateExternalLink,
+         handleOpenStreamerLinksModal,
+         handleClickDeleteStream,
+         handleCreateExternalLink,
+         handleOpenStreamerLinksModal,
+         handleClickDeleteStream,
+         streams,
+         isDraft,
+         userData?.isAdmin,
+      ]
+   )
+
+   const actions = useMemo<Action<LivestreamEvent>[]>(
+      () => [
+         {
+            position: "toolbar",
+            icon: () => <AddBoxIcon fontSize="large" color="primary" />,
+            onClick: handleOpenToolbarActionsDialog,
+            tooltip: "Other options",
+         },
+      ],
+      [streams]
+   )
+
+   const columns = useMemo<Column<LivestreamEvent>[]>(
+      () => [
+         {
+            field: "backgroundImageUrl",
+            title: "Logo",
+            cellStyle: (backgroundImageUrl) => ({
+               padding: 0,
+               height: 70,
+               boxShadow: theme.shadows[2],
+               backgroundImage:
+                  backgroundImageUrl &&
+                  `url(${getResizedUrl(backgroundImageUrl, "xs")})`,
+               backgroundSize: "cover",
+               backgroundRepeat: "no-repeat",
+            }),
+            export: false,
+            customFilterAndSearch: handleCompanySearch,
+            render: (rowData) => (
+               <CompanyLogo
+                  onClick={(event) => {
+                     event.stopPropagation()
+                     handleEditStream(rowData)
+                  }}
+                  livestream={rowData}
+               />
+            ),
+         },
+         {
+            title: "Manage",
+            description: "Title of the event",
+            render: (rowData) => (
+               <ManageStreamActions
+                  rowData={rowData}
+                  numberOfRegisteredUsers={
+                     registeredStudentsFromGroupDictionary?.[rowData?.id]
+                        ?.length
+                  }
+                  clicked={Boolean(clickedRows[rowData?.id])}
+                  isDraft={isDraft}
+                  setTargetStream={setTargetStream}
+                  actions={manageStreamActions(rowData)}
+               />
+            ),
+         },
+         {
+            field: "date",
+            title: "Event Date",
+            render: (rowData) => {
+               return prettyDate(rowData.start)
+            },
+            type: "date",
+         },
+         {
+            field: "title",
+            title: "Title",
+            description: "Title of the event",
+         },
+         {
+            field: "company",
+            title: "Company",
+         },
+         {
+            title: "Speakers",
+            render: (rowData) => {
+               return (
+                  <Speakers
+                     clicked={Boolean(clickedRows[rowData?.id])}
+                     speakers={rowData.speakers}
+                  />
+               )
+            },
+            customFilterAndSearch: handleSpeakerSearch,
+         },
+         {
+            title: "Host(s)",
+            render: (rowData) => {
+               return (
+                  <GroupLogos
+                     groupIds={rowData.groupIds}
+                     clicked={Boolean(clickedRows[rowData?.id])}
+                     groupsDictionary={groupsDictionary}
+                  />
+               )
+            },
+            customFilterAndSearch: handleHostsSearch,
+         },
+      ],
+      [
+         handleSpeakerSearch,
+         streams,
+         groupsDictionary,
+         handleHostsSearch,
+         handleEditStream,
+         manageStreamActions,
+         registeredStudentsFromGroupDictionary,
+         clickedRows,
+      ]
+   )
+
+   const customOptions = useMemo<Options<LivestreamEvent>>(
+      () => ({
+         ...defaultTableOptions,
+         actionsColumnIndex: -1,
+         selection: false,
+         pageSize: 5,
+         actionsCellStyle: {},
+         rowStyle: (rowData) => {
+            if (rowData.id === eventId) {
+               return { border: `5px solid ${theme.palette.primary.main}` }
+            }
+            return {}
+         },
+      }),
+      [eventId]
+   )
+
+   const handleRemoveEventId = () => {
+      if (eventId) {
+         const newQuery = { ...query }
+         if (newQuery.eventId) {
+            delete newQuery.eventId
+         }
+         return push({
+            pathname,
+            query: {
+               ...newQuery,
+            },
+         })
+      }
+   }
+
+   const handleRowClick = (event, rowData) => {
+      setClickedRows((prevState) => {
+         const newClickedRows = { ...prevState }
+         newClickedRows[rowData.id] = !Boolean(newClickedRows[rowData.id])
+         return newClickedRows
+      })
+   }
+
+   return (
+      <>
+         <Box onClick={handleRemoveEventId}>
+            <MaterialTable
+               style={{ display: "inline-grid" }}
+               actions={actions}
+               columns={columns}
+               data={streams}
+               components={{
+                  Action: (props) => {
+                     return props?.action?.tooltip === "Other options" ? (
+                        <ToolbarDialogAction {...props.action} />
+                     ) : (
+                        <MTableAction {...props} />
+                     )
+                  },
+               }}
+               onRowClick={handleRowClick}
+               options={customOptions}
+               title={null}
+               icons={tableIcons}
+            />
+         </Box>
+         <AreYouSureModal
+            open={Boolean(streamIdToBeDeleted)}
+            handleClose={() => setStreamIdToBeDeleted(null)}
+            handleConfirm={handleDeleteStream}
+            loading={deletingEvent}
+            message={`Are you sure this ${
+               isDraft ? "draft" : "stream"
+            }? you will be no longer able to recover it`}
+         />
+         <StreamerLinksDialog
+            livestreamId={targetLivestreamStreamerLinksId}
+            openDialog={Boolean(targetLivestreamStreamerLinksId)}
+            onClose={handleCloseStreamerLinksModal}
+         />
+         <PdfReportDownloadDialog
+            openDialog={Boolean(reportPdfData)}
+            onClose={removeReportPdfData}
+            reportPdfData={reportPdfData}
+         />
+         <ToolbarActionsDialog
+            group={group}
+            onClose={handleCloseToolbarActionsDialog}
+            openDialog={toolbarActionsDialogOpen}
+            handleOpenNewStreamModal={handleOpenNewStreamModal}
+         />
+         <ManageEndOfEventDialog
+            open={Boolean(endOfEventDialogData)}
+            eventData={endOfEventDialogData}
+            group={group}
+            handleClose={handleCloseEndOfEventDialog}
+         />
+      </>
+   )
+}
+
+export default EventsTable

@@ -54,7 +54,6 @@ const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
-
    const { pathname, replace, asPath } = useRouter()
 
    const query = useMemo(

@@ -1,11 +1,14 @@
 import {
    LivestreamEvent,
+   LivestreamQuestion,
    Speaker,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { faker } from "@faker-js/faker"
 import { v4 as uuidv4 } from "uuid"
 import * as admin from "firebase-admin"
 import { firestore } from "./lib/firebase"
+import { groupQuestions } from "./groups"
 
 interface LivestreamSeed {
    create(overrideFields?: Partial<LivestreamEvent>): Promise<LivestreamEvent>
@@ -29,12 +32,7 @@ interface LivestreamSeed {
 class LivestreamFirebaseSeed implements LivestreamSeed {
    async getWithSubcollections(
       livestreamId: string,
-      subCollections = [
-         "registeredStudents",
-         "registrants",
-         "talentPool",
-         "questions",
-      ]
+      subCollections = ["userLivestreamData", "questions"]
    ): Promise<LivestreamEventWithSubcollections> {
       let res = {}
 
@@ -112,11 +110,11 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          },
          () => faker.internet.email()
       )
-
+      const groupId = uuidv4()
       let data: LivestreamEvent = {
          author: {
             email: faker.internet.email(),
-            groupId: uuidv4(),
+            groupId: groupId,
          },
          backgroundImageUrl: faker.image.abstract(),
          company: faker.company.companyName(),
@@ -124,20 +122,20 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          companyLogoUrl: faker.image.business(),
          created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          duration: faker.random.arrayElement([30, 60, 90, 120]),
-         groupIds: [uuidv4()],
+         groupIds: [groupId],
          hidden: false,
          id: uuidv4().replace(/-/g, ""),
          language: {
             code: faker.address.countryCode(),
             name: faker.address.country(),
          },
+         groupQuestionsMap: null,
          lastUpdated: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          lastUpdatedAuthorInfo: {
             email: faker.internet.email(),
-            groupId: uuidv4(),
+            groupId: groupId,
          },
          registeredUsers,
-         registrants: registeredUsers.map((_) => uuidv4()),
          speakers: Array.from(
             {
                length: faker.datatype.number({ min: 1, max: 5 }),
@@ -171,7 +169,16 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       return token
    }
 }
-
+export const createLivestreamGroupQuestions = (groupId: string = uuidv4()) => {
+   return {
+      groupId: groupId,
+      groupName: faker.company.companyName(),
+      questions: groupQuestions.reduce((acc, curr) => {
+         acc[curr.id] = curr
+         return acc
+      }, {}),
+   }
+}
 const generateSpeaker = (): Speaker => ({
    id: uuidv4(),
    avatar: faker.image.people(),
@@ -183,10 +190,8 @@ const generateSpeaker = (): Speaker => ({
 
 type LivestreamEventWithSubcollections = {
    livestream: LivestreamEvent
-   registeredStudents: any
-   registrants: any
-   talentPool: any
-   questions: any
+   userLivestreamData: UserLivestreamData[]
+   questions: LivestreamQuestion[]
 }
 
 const instance: LivestreamSeed = new LivestreamFirebaseSeed()

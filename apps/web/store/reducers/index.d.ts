@@ -2,6 +2,8 @@ import { DefaultRootState } from "react-redux"
 import { RTCConnectionState, RTCError, StreamData } from "../../types/streaming"
 import { FirebaseReducer, FirestoreReducer } from "react-redux-firebase"
 import { HandRaise } from "../../types/handraise"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 interface AuthReducer {
    error: null | string
@@ -31,6 +33,7 @@ interface StreamReducer {
       viewerCtaModalOpen: boolean
       leftMenuOpen: boolean
       focusModeEnabled: boolean
+      showActionButtons: boolean
    }
    stats: {
       numberOfViewers: number
@@ -62,6 +65,24 @@ interface StreamReducer {
    }
 }
 
+interface GroupAnalyticsReducer {
+   streams: {
+      fromTimeframeAndFuture: LivestreamEvent[]
+   }
+   hiddenStreamIds: Record<string, boolean>
+   visibleStreamIds: string[]
+}
+interface UserDataSetReducer {
+   total: {
+      ordered: UserData[]
+      mapped: Record<UserData["id"], UserData>
+   }
+   filtered: {
+      ordered: UserData[]
+      mapped: Record<UserData["id"], UserData>
+   }
+}
+
 interface GeneralLayout {
    layout: {
       drawerOpen: boolean
@@ -81,4 +102,6 @@ export default interface RootState extends DefaultRootState {
    stream: StreamReducer
    firebase: FirebaseReducer.Reducer<{}, Schema>
    firestore: FirestoreReducer.Reducer<{}, Schema>
+   analyticsReducer: GroupAnalyticsReducer
+   userDataSet: UserDataSetReducer
 }

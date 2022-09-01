@@ -50,13 +50,13 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const { authenticatedUser, userData, isLoggedOut } = useAuth()
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
    const handleOpenJoinModal = useCallback(
-      (dataObj) =>
+      () =>
          setJoinGroupModalData({
-            groups: dataObj.groups,
+            groups: unfilteredGroups,
             targetGroupId: targetGroupId,
-            livestream: dataObj.livestream,
+            livestream: stream,
          }),
-      [targetGroupId, userData]
+      [targetGroupId, userData, stream, unfilteredGroups]
    )
 
    const [isPastEvent, setIsPastEvent] = useState(
@@ -185,23 +185,20 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             const newQuery = { ...query }
             if (newQuery.register) {
                delete newQuery.register
+               await push({
+                  pathname,
+                  query: {
+                     ...newQuery,
+                  },
+               })
             }
-            await push({
-               pathname,
-               query: {
-                  ...newQuery,
-               },
-            })
          }
          if (
             query.register === stream?.id &&
             unfilteredGroups.length &&
             !stream?.registeredUsers?.includes(authenticatedUser.email)
          ) {
-            handleOpenJoinModal({
-               groups: unfilteredGroups,
-               livestream: stream,
-            })
+            handleOpenJoinModal()
          }
       })()
    }, [
@@ -306,10 +303,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          })
       }
 
-      handleOpenJoinModal({
-         groups: unfilteredGroups,
-         livestream: stream,
-      })
+      handleOpenJoinModal()
    }
 
    const handleRegisterClick = () => {
@@ -421,7 +415,13 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             questionsAreDisabled={stream.questionsDisabled}
          />
 
-         {!stream.hasNoTalentPool && <TalentPoolSection stream={stream} />}
+         {!stream.hasNoTalentPool && (
+            <TalentPoolSection
+               handleOpenJoinModal={handleOpenJoinModal}
+               registered={registered}
+               stream={stream}
+            />
+         )}
          <ReferralSection event={stream} />
          <ContactSection
             backgroundColor={theme.palette.common.white}

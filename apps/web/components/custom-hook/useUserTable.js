@@ -40,7 +40,7 @@ const columns = () => [
    {
       field: "linkedinUrl",
       title: "LinkedIn",
-      render: (rowData) => LinkifyText(rowData.linkedinUrl),
+      render: ({ linkedinUrl }) => <LinkifyText>{linkedinUrl}</LinkifyText>,
    },
 ]
 

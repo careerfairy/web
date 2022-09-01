@@ -1,7 +1,9 @@
-import { test, expect, Page } from "@playwright/test"
+import { expect, Page, test } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
+import LivestreamSeed, {
+   createLivestreamGroupQuestions,
+} from "@careerfairy/seed-data/dist/livestreams"
 import {
    clearAuthData,
    clearFirestoreData,
@@ -36,7 +38,7 @@ test("successful registration on a livestream event", async ({ page }) => {
    await livestreamPage.attend()
 
    // Registration Modal
-   await livestreamPage.selectRandomCategoriesFromGroup(group)
+   await livestreamPage.selectRandomCategoriesFromEvent(livestream)
    await livestreamPage.modalAttend()
 
    await expectText(page, "ASK YOUR QUESTION")
@@ -63,12 +65,14 @@ test("successful registration on a livestream event", async ({ page }) => {
    // assert firestore data is right
    const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
       livestream.id,
-      ["registrants", "registeredStudents"]
+      ["userLivestreamData"]
    )
-   expect(finalLivestreamData.registrants[0].userEmail).toBe(user.userEmail)
-   expect(finalLivestreamData.registeredStudents[0].userEmail).toBe(
+   expect(finalLivestreamData.userLivestreamData[0].user.userEmail).toBe(
       user.userEmail
    )
+   expect(
+      finalLivestreamData.userLivestreamData[0].registered.date
+   ).toBeTruthy()
    expect(finalLivestreamData.livestream.registeredUsers).toContain(
       user.userEmail
    )
@@ -86,9 +90,7 @@ test("register to an event and fill out a question and join talent pool", async 
    page,
 }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { livestream } = await setupData({
-      categories: [],
-   })
+   const { livestream } = await setupData({}, { groupQuestionsMap: null })
 
    const user = await login(page)
 
@@ -112,19 +114,22 @@ test("register to an event and fill out a question and join talent pool", async 
    // assert firestore data is right
    const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
       livestream.id,
-      ["questions", "talentPool"]
+      ["questions", "userLivestreamData"]
    )
    expect(finalLivestreamData.questions[0].title).toBe(question)
-   expect(finalLivestreamData.talentPool[0].userEmail).toBe(user.userEmail)
+   expect(finalLivestreamData.userLivestreamData[0].user.userEmail).toBe(
+      user.userEmail
+   )
+   expect(
+      finalLivestreamData.userLivestreamData[0].talentPool.date
+   ).toBeTruthy()
 })
 
 test("register to an event without login, login and proceed with registration", async ({
    page,
 }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { group, livestream } = await setupData({
-      categories: [],
-   })
+   const { group, livestream } = await setupData()
 
    // open page
    await livestreamPage.open(livestream.id)
@@ -137,7 +142,10 @@ test("register to an event without login, login and proceed with registration", 
 
    // confirm the registration modal is open
    await page.waitForURL(`**/upcoming-livestream/**`)
-   await expectExactText(page, "Join live streams from")
+   await expectExactText(
+      page,
+      `${livestream.company} Would Like To Know More About You`
+   )
    await expectExactText(page, group.description)
    await livestreamPage.cancel()
 
@@ -149,13 +157,13 @@ test("livestream has already started, confirm the redirection without any regist
    browserName,
 }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { livestream, group } = await setupData({}, {}, "createLive")
+   const { livestream } = await setupData({}, {}, "createLive")
 
    await login(page)
 
    // open page
    await livestreamPage.open(livestream.id)
-   await livestreamPage.selectRandomCategoriesFromGroup(group)
+   await livestreamPage.selectRandomCategoriesFromEvent(livestream)
    await livestreamPage.enterEvent()
 
    // https://github.com/microsoft/playwright/issues/13640
@@ -215,10 +223,15 @@ async function setupData(
       )
    )
 
+   const groupQuestions = createLivestreamGroupQuestions(group.id)
+
    const livestream = await LivestreamSeed[livestreamType](
       Object.assign(
          {
             groupIds: [group.id],
+            groupQuestionsMap: {
+               [group.id]: groupQuestions,
+            },
          },
          overrideLivestreamDetails
       )
