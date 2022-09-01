@@ -114,6 +114,7 @@ export interface HygraphResponseHero {
    image: ICmsImage
    video?: ICmsVideo
    selectorLabel?: string
+   buttonSelectorLabel?: string
    buttons: HygraphResponseButton[]
    heroTitle?: string
    heroSubtitle?: string
@@ -323,6 +324,7 @@ export const heroQueryProps = `
         video ${videoQueryProps}
         buttons ${buttonQueryProps}
         selectorLabel,
+        buttonSelectorLabel,
         heroTitle
         heroSubtitle
         fullScreenImage
