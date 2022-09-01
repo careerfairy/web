@@ -118,6 +118,8 @@ export const UNPAUSE_PAUSED_REMOTE_VIDEOS_ON_FAIL =
 export const OPEN_NAV_DRAWER = "OPEN_NAV_DRAWER"
 export const CLOSE_NAV_DRAWER = "CLOSE_NAV_DRAWER"
 export const TOGGLE_NAV_DRAWER = "TOGGLE_NAV_DRAWER"
+export const IN_LANDING_PAGE = "IN_LANDING_PAGE"
+export const OUT_OF_LANDING_PAGE = "OUT_OF_LANDING_PAGE"
 
 // Group Dashboard Actions
 

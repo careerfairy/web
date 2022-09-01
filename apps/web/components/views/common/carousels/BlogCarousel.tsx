@@ -96,7 +96,7 @@ const BlogCarousel = ({ images, nodeId }: EmbedProps<Carousel>) => {
          <Box sx={styles.root}>
             <Slider {...settings}>
                {images.map(({ url, height, width, alt }, index) => (
-                  <Box sx={styles.imageWrapper}>
+                  <Box key={url} sx={styles.imageWrapper}>
                      <Image
                         onClick={() => handleOpenLightbox(index)}
                         alt={alt || "image"}

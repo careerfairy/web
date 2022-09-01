@@ -3,13 +3,14 @@ import { Fab } from "@mui/material"
 import NextIcon from "@mui/icons-material/NavigateNextRounded"
 import PrevIcon from "@mui/icons-material/NavigateBeforeRounded"
 import React from "react"
-import { alpha } from "@mui/material/styles"
+import { alpha, useTheme } from "@mui/material/styles"
+import { IColors } from "../../../../types/commonTypes"
 
 const styles = {
-   arrow: (theme) => ({
+   arrow: (theme, color = "primary") => ({
       display: {
          xs: "none !important",
-         sm: "block !important",
+         lg: "block !important",
       },
       zIndex: 1,
       "&:before": {
@@ -17,19 +18,21 @@ const styles = {
       },
       "& button": {
          boxShadow: "none",
-         color: theme.palette.primary.main,
+         color: theme.palette[color]?.main,
          background: "transparent",
-         border: `2px solid ${theme.palette.primary.main}`,
+         border: `2px solid ${theme.palette[color]?.main}`,
          "&:hover": {
-            background: alpha(theme.palette.primary.main, 0.3),
+            background: alpha(theme.palette[color]?.main, 0.3),
          },
       },
    }),
 }
-export const SampleNextArrow = (props) => {
-   const { className, onClick } = props
+
+export const SampleNextArrow = ({ className, onClick, color }: Props) => {
+   const theme = useTheme()
+
    return (
-      <Box sx={styles.arrow} className={className}>
+      <Box sx={{ ...styles.arrow(theme, color) }} className={className}>
          <Fab
             size="small"
             onClick={onClick}
@@ -42,10 +45,11 @@ export const SampleNextArrow = (props) => {
    )
 }
 
-export const SamplePrevArrow = (props) => {
-   const { className, onClick } = props
+export const SamplePrevArrow = ({ className, onClick, color }: Props) => {
+   const theme = useTheme()
+
    return (
-      <Box sx={styles.arrow} className={className}>
+      <Box sx={{ ...styles.arrow(theme, color) }} className={className}>
          <Fab
             size="small"
             onClick={onClick}
@@ -56,4 +60,10 @@ export const SamplePrevArrow = (props) => {
          </Fab>
       </Box>
    )
+}
+
+type Props = {
+   className?: string
+   onClick?: any
+   color?: IColors
 }
