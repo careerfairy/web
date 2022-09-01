@@ -178,6 +178,7 @@ const StreamerOverview = ({
                showMenu={showMenu}
                handleStateChange={handleStateChange}
                includeJobs={currentLivestream.jobs?.length > 0}
+               questionsAreDisabled={currentLivestream.questionsDisabled}
             />
             {showTapHint && (
                <div className={classes.infoText}>Tap to hide controllers</div>

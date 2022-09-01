@@ -70,6 +70,7 @@ import GroupQuestionSelect from "./GroupQuestionSelect"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import FieldsOfStudyMultiSelector from "./TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
 import LevelsOfStudyMultiSelector from "./TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
+import Stack from "@mui/material/Stack"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -172,6 +173,7 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
+   questionsDisabled: boolean
 }
 
 const DraftStreamForm = ({
@@ -234,6 +236,7 @@ const DraftStreamForm = ({
       language: languageCodes[0],
       targetFieldsOfStudy: [],
       targetLevelsOfStudy: [],
+      questionsDisabled: false,
    })
 
    const handleSetGroupIds = async (
@@ -339,6 +342,7 @@ const DraftStreamForm = ({
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                   targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
+                  questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
                setAllFetched(false)
@@ -791,6 +795,57 @@ const DraftStreamForm = ({
                                     </Collapse>
                                  </FormControl>
                               </Grid>
+
+                              {userData?.isAdmin && (
+                                 <Grid xs={12}>
+                                    <Stack direction="row" spacing={2}>
+                                       <Box
+                                          pl={2}
+                                          display="flex"
+                                          alignItems="center"
+                                       >
+                                          Settings only for CF Admins:
+                                       </Box>
+                                       <Tooltip
+                                          placement="top"
+                                          arrow
+                                          title={
+                                             <Typography>
+                                                By disabling questions the
+                                                participants will no longer be
+                                                able to use the Q&A section
+                                                during the livestream and create
+                                                questions during the
+                                                registration process.
+                                             </Typography>
+                                          }
+                                       >
+                                          <FormControlLabel
+                                             labelPlacement="start"
+                                             label="Disable Q&A"
+                                             control={
+                                                <Switch
+                                                   checked={Boolean(
+                                                      values.questionsDisabled
+                                                   )}
+                                                   onChange={handleChange}
+                                                   disabled={Boolean(
+                                                      isSubmitting
+                                                   )}
+                                                   color="primary"
+                                                   id="questionsDisabled"
+                                                   name="questionsDisabled"
+                                                   inputProps={{
+                                                      "aria-label":
+                                                         "primary checkbox",
+                                                   }}
+                                                />
+                                             }
+                                          />
+                                       </Tooltip>
+                                    </Stack>
+                                 </Grid>
+                              )}
                            </FormGroup>
                            {Object.keys(values.speakers).map((key, index) => {
                               return (

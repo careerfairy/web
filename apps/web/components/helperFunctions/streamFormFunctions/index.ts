@@ -88,6 +88,7 @@ export const buildLivestreamObject = (
       hasEnded: false,
       targetFieldsOfStudy: values.targetFieldsOfStudy,
       targetLevelsOfStudy: values.targetLevelsOfStudy,
+      questionsDisabled: values.questionsDisabled,
    }
 }
 

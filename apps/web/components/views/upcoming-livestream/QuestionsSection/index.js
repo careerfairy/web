@@ -85,35 +85,44 @@ const QuestionsSection = (props) => {
                   <Box marginTop={2} width="100%">
                      <Fade bottom>
                         <Box>
-                           {!props.isPastEvent && (
-                              <CreateQuestion
-                                 reFetchQuestions={props.reFetchQuestions}
-                                 livestreamId={props.livestreamId}
-                              />
-                           )}
-                           {!!props.questions.length && (
-                              <QuestionVotingContainer
-                                 loadingInitialQuestions={
-                                    props.loadingInitialQuestions
-                                 }
-                                 votingDisabled={props.isPastEvent}
-                                 hasVoted={props.hasVoted}
-                                 hasMore={props.hasMore}
-                                 questionSortType={props.questionSortType}
-                                 handleUpvote={props.handleUpvote}
-                                 getMore={props.getMore}
-                                 containerHeight={
-                                    props.questions.length > 4
-                                       ? 400
-                                       : props.questions.length > 2
-                                       ? 300
-                                       : 170
-                                 }
-                                 questions={props.questions}
-                                 handleChangeQuestionSortType={
-                                    props.handleChangeQuestionSortType
-                                 }
-                              />
+                           {props.questionsAreDisabled ? (
+                              <Box py={6}>
+                                 The Q&A feature has been disabled by the host
+                                 for this live stream.
+                              </Box>
+                           ) : (
+                              <>
+                                 {!props.isPastEvent && (
+                                    <CreateQuestion
+                                       reFetchQuestions={props.reFetchQuestions}
+                                       livestreamId={props.livestreamId}
+                                    />
+                                 )}
+                                 {!!props.questions.length && (
+                                    <QuestionVotingContainer
+                                       loadingInitialQuestions={
+                                          props.loadingInitialQuestions
+                                       }
+                                       votingDisabled={props.isPastEvent}
+                                       hasVoted={props.hasVoted}
+                                       hasMore={props.hasMore}
+                                       questionSortType={props.questionSortType}
+                                       handleUpvote={props.handleUpvote}
+                                       getMore={props.getMore}
+                                       containerHeight={
+                                          props.questions.length > 4
+                                             ? 400
+                                             : props.questions.length > 2
+                                             ? 300
+                                             : 170
+                                       }
+                                       questions={props.questions}
+                                       handleChangeQuestionSortType={
+                                          props.handleChangeQuestionSortType
+                                       }
+                                    />
+                                 )}
+                              </>
                            )}
                         </Box>
                      </Fade>
@@ -136,4 +145,5 @@ QuestionsSection.propTypes = {
    color: PropTypes.any,
    subtitle: PropTypes.any,
    title: PropTypes.any,
+   questionsAreDisabled: PropTypes.bool,
 }

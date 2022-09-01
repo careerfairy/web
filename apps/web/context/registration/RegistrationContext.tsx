@@ -173,12 +173,16 @@ export function RegistrationContextProvider({
       hasAgreedToAll: false,
       totalSteps: 0,
    })
-   const questionsQuery = useMemo(
-      () =>
-         livestream &&
-         livestreamQuestionsQuery(livestream.id, questionSortType),
-      [livestream?.id, questionSortType]
-   )
+   const questionsQuery = useMemo(() => {
+      // prevent an extra query for the questions if they are disabled
+      if (livestream?.questionsDisabled) {
+         return null
+      }
+
+      return (
+         livestream && livestreamQuestionsQuery(livestream.id, questionSortType)
+      )
+   }, [livestream?.id, livestream?.questionsDisabled, questionSortType])
 
    const {
       docs,
