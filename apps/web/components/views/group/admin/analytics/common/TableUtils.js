@@ -190,24 +190,20 @@ export const StarRatingInputValue = ({ columnDef, onFilterChanged }) => {
    )
 }
 
-export const renderRatingStars = (props) => {
+export const renderRatingStars = ({ id, isSentimentRating, rating }) => {
    return (
       <Box display="flex" alignItems="center">
-         {props?.isSentimentRating ? (
-            <SentimentRating
-               name={props.id}
-               value={Number(props.rating)}
-               readOnly
-            />
+         {isSentimentRating ? (
+            <SentimentRating name={id} value={Number(rating)} readOnly />
          ) : (
             <>
                <NormalRating
                   readOnly
-                  name={props.id}
-                  value={Number(props.rating)}
+                  name={id}
+                  value={Number(rating)}
                   precision={0.5}
                />
-               {Number(props.rating) > 0 && (
+               {Number(rating) > 0 && (
                   <Typography
                      style={{
                         marginLeft: 8,
@@ -215,7 +211,7 @@ export const renderRatingStars = (props) => {
                         fontWeight: 500,
                      }}
                   >
-                     {props.rating}
+                     {rating}
                   </Typography>
                )}
             </>

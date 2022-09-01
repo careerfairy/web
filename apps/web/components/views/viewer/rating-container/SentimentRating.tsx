@@ -37,13 +37,10 @@ const customIcons: {
    },
 }
 
-function getLabelText(value: number) {
-   return `${value} Star${value !== 1 ? "s" : ""}, ${
-      customIcons?.[value]?.label
-   }`
-}
+const getLabelText = (value: number) =>
+   `${value} Star${value !== 1 ? "s" : ""}, ${customIcons?.[value]?.label}`
 
-function IconContainer(props: IconContainerProps) {
+const IconContainer = (props: IconContainerProps) => {
    const { value, ...other } = props
    return <span {...other}>{customIcons?.[value]?.icon}</span>
 }
