@@ -1,8 +1,4 @@
 import dotenv = require("dotenv")
-
-// load values from the .env file in this directory into process.env
-dotenv.config()
-
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")
@@ -19,7 +15,11 @@ import recording = require("./recording")
 import slack = require("./slack")
 import rewards = require("./rewards")
 import wishes = require("./wishes")
-import ats = require("./ats")
+import atsUser = require("./atsUser")
+import atsGroup = require("./atsGroup")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -127,10 +127,15 @@ exports.applyReferralCode = rewards.applyReferralCode
 exports.onUserRateWish = wishes.onUserRateWish
 
 // ATS
-exports.mergeGenerateLinkToken = ats.mergeGenerateLinkToken
-exports.mergeGetAccountToken = ats.mergeGetAccountToken
-exports.mergeRemoveAccount = ats.mergeRemoveAccount
-exports.fetchATSJobs = ats.fetchATSJobs
-exports.fetchATSSyncStatus = ats.fetchATSSyncStatus
-exports.fetchATSApplications = ats.fetchATSApplications
-exports.atsUserApplyToJob = ats.atsUserApplyToJob
+// Group
+exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
+exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
+exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
+exports.fetchATSJobs = atsGroup.fetchATSJobs
+exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
+exports.fetchATSApplications = atsGroup.fetchATSApplications
+
+// User
+exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
+exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
+exports.updateUserJobApplications = atsUser.updateUserJobApplications

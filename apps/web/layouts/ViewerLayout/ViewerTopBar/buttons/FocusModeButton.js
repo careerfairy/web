@@ -10,11 +10,10 @@ import {
    hasSeenFocusModeDeActivateKey,
 } from "../../../../constants/localStorageKeys"
 import NewFeatureHint from "../../../../components/util/NewFeatureHint"
+import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 
 const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
-   const focusModeEnabled = useSelector(
-      (state) => state.stream.layout.focusModeEnabled
-   )
+   const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const dispatch = useDispatch()
    const toggleFocusMode = () => {
       dispatch(actions.setFocusMode(undefined, mobile))

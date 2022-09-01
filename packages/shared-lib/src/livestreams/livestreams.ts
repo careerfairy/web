@@ -42,6 +42,7 @@ export interface LivestreamEvent extends Identifiable {
    type?: string
    start: firebase.firestore.Timestamp
    startDate?: Date
+   status?: LivestreamStatus
    registeredUsers?: string[]
    groupQuestionsMap?: LivestreamGroupQuestionsMap
    hasStarted?: boolean
@@ -67,6 +68,24 @@ export interface LivestreamEvent extends Identifiable {
       groupId: string
    }
    universities: any[]
+
+   // ATS Jobs
+   /**
+    * During livestream creating, jobs can be associated with the livestream
+    */
+   jobs?: LivestreamJobAssociation[]
+}
+
+export interface LivestreamStatus {
+   pendingApproval?: boolean
+   seen?: boolean
+}
+
+export interface LivestreamJobAssociation {
+   groupId: string
+   integrationId: string
+   jobId: string
+   name: string
 }
 
 export type LivestreamUserAction = keyof Pick<

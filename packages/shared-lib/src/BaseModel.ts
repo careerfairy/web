@@ -19,15 +19,6 @@
  */
 export abstract class BaseModel {
    /**
-    * Change to false if the model only has the ID
-    * Some relationship objects are not expanded, and we only got the id
-    * If this flag is false, the user should fetch the whole object from ATS
-    * and re-hydrate this object
-    * @protected
-    */
-   public hydrated = true
-
-   /**
     * Serialize this object into a plain object
     * Objects should be serialized before being sent as an HTTP response
     *
@@ -39,17 +30,30 @@ export abstract class BaseModel {
     */
    serializeToPlainObject() {
       const serialized: { [field: string]: any } = {}
-
       for (const key of Object.keys(this)) {
          // serialize Date
          if (this[key] instanceof Date) {
             serialized[key] = (this[key] as unknown as Date).getTime()
             continue
          }
-
+         // check if array
+         if (
+            Array.isArray(this[key]) &&
+            this[key].length > 0 &&
+            this[key][0] instanceof BaseModel
+         ) {
+            // check if array of objects
+            serialized[key] = this[key].map((item) =>
+               item.serializeToPlainObject()
+            )
+            continue
+         }
+         if (this[key] instanceof BaseModel) {
+            serialized[key] = this[key].serializeToPlainObject()
+            continue
+         }
          serialized[key] = this[key]
       }
-
       return serialized
    }
 }
@@ -74,7 +78,13 @@ export function saveIfObject<T>(
       typeof targetField === "object" &&
       Object.keys(targetField).length
    ) {
-      return creationFunction(targetField)
+      try {
+         return creationFunction(targetField)
+      } catch (e) {
+         // if for some reason the model fails creating, return null as if it doesn't exist
+         console.error(e, targetField)
+         return null
+      }
    } else {
       return null
    }
@@ -96,15 +106,6 @@ export function mapIfObject<T extends BaseModel>(
    return targetField
       .map((o) => saveIfObject<T>(o, creationFunction))
       .filter((o) => o) as T[]
-}
-
-/**
- * Convert a Merge date string to Date object
- *
- * @param dateString
- */
-export function fromMergeDate(dateString?: string): Date {
-   return dateString ? new Date(dateString) : null
 }
 
 /**

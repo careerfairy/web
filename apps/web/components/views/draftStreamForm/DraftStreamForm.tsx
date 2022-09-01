@@ -34,6 +34,7 @@ import { useRouter } from "next/router"
 import FormGroup from "./FormGroup"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
+   getDownloadUrl,
    getStreamSubCollectionSpeakers,
    handleAddSpeaker,
    handleDeleteSpeaker,
@@ -55,12 +56,15 @@ import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import MultiListSelect from "../common/MultiListSelect"
 import { useInterests } from "../../custom-hook/useCollection"
 import { createStyles } from "@mui/styles"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
 import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
+   LivestreamJobAssociation,
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import { SuspenseWithBoundary } from "../../ErrorBoundary"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { FormikHelpers } from "formik/dist/types"
 import GroupQuestionSelect from "./GroupQuestionSelect"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
@@ -136,7 +140,8 @@ interface Props {
       setFormData: (data: any) => void,
       setDraftId: (id: string) => void,
       status: string,
-      setStatus: (status: string) => void
+      setStatus: (status: string) => void,
+      selectedJobs: LivestreamJobAssociation[]
    ) => void
    isActualLivestream?: boolean
    formRef: MutableRefObject<any>
@@ -200,6 +205,9 @@ const DraftStreamForm = ({
 
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
    const [selectedInterests, setSelectedInterests] = useState([])
+   const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
+      []
+   )
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
 
@@ -306,7 +314,7 @@ const DraftStreamForm = ({
                targetCollection
             )
             if (livestreamQuery.exists) {
-               let livestream = livestreamQuery.data()
+               let livestream = livestreamQuery.data() as LivestreamEvent
                const newFormData: DraftFormValues = {
                   id: targetId,
                   companyLogoUrl: livestream.companyLogoUrl || "",
@@ -327,6 +335,7 @@ const DraftStreamForm = ({
                      speakerQuery
                   ),
                   status: livestream.status || {},
+                  // @ts-ignore
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                   targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
@@ -343,6 +352,7 @@ const DraftStreamForm = ({
                } else {
                   await handleSetGroupIds([], livestream.groupIds, newFormData)
                }
+               setSelectedJobs(livestream.jobs || [])
                setSelectedInterests(
                   existingInterests.filter((i) =>
                      newFormData.interestsIds.includes(i.id)
@@ -386,20 +396,6 @@ const DraftStreamForm = ({
       // @ts-ignore
       const arrayOfUrlIds = careerCenterIds?.split(",") || [group.id]
       await handleSetGroupIds(arrayOfUrlIds, [], formData)
-   }
-
-   const getDownloadUrl = (fileElement) => {
-      console.log("-> fileElement", fileElement)
-      if (fileElement) {
-         return (
-            "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/" +
-            fileElement.replace("/", "%2F") +
-            "?alt=media"
-         )
-      } else {
-         console.log("-> no fileElement", fileElement)
-         return ""
-      }
    }
 
    const getDirectLink = () => `/draft-stream?draftStreamId=${draftId}`
@@ -538,7 +534,8 @@ const DraftStreamForm = ({
                         setFormData,
                         setDraftId,
                         status,
-                        setStatus
+                        setStatus,
+                        selectedJobs
                      )
                   }}
                >
@@ -555,7 +552,6 @@ const DraftStreamForm = ({
                      validateForm,
                      /* and other goodies */
                   }) => {
-                     console.log("Values", values)
                      // @ts-ignore
                      return (
                         <form
@@ -982,6 +978,16 @@ const DraftStreamForm = ({
                                  />
                               </Grid>
                            </FormGroup>
+
+                           <SuspenseWithBoundary hide>
+                              {values.groupIds.length > 0 && (
+                                 <JobSelectorCategory
+                                    groupId={values.groupIds[0]} // we only support a single group for now
+                                    onSelectItems={setSelectedJobs}
+                                    selectedItems={selectedJobs}
+                                 />
+                              )}
+                           </SuspenseWithBoundary>
 
                            <ButtonGroup
                               className={classes.buttonGroup}

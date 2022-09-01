@@ -4,9 +4,9 @@ import {
    BarChart2 as AnalyticsIcon,
    Edit as EditGroupIcon,
    Film as StreamIcon,
+   Share2,
    User as ProfileIcon,
    Users as RolesIcon,
-   Share2,
 } from "react-feather"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import useFeatureFlags from "./useFeatureFlags"
@@ -99,7 +99,7 @@ const useDashboardLinks = (group) => {
                basePath: `/${baseHrefPath}/${baseParam}/admin/roles`,
             },
          ]
-         if (featureFlags.atsAdminPageFlag) {
+         if (featureFlags.atsAdminPageFlag || group.atsAdminPageFlag) {
             links.push({
                href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
                icon: Share2,

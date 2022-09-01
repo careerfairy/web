@@ -7,7 +7,11 @@ import {
    PdfCategoryChartData,
    PdfReportData,
 } from "@careerfairy/shared-lib/dist/groups/pdf-report"
-import { fieldOfStudyRepo, groupRepo, livestreamRepo } from "./api/repositories"
+import {
+   fieldOfStudyRepo,
+   groupRepo,
+   livestreamsRepo,
+} from "./api/repositories"
 
 import {
    getArrayDifference,
@@ -18,10 +22,10 @@ import {
    setHeaders,
 } from "./util"
 import { admin } from "./api/firestoreAdmin"
+import { marketingTeamEmails } from "./misc/marketingTeamEmails"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
-import { marketingTeamEmails } from "./misc/marketingTeamEmails"
 import functions = require("firebase-functions")
 
 export const sendDraftApprovalRequestEmail = functions.https.onCall(
@@ -315,7 +319,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
 
          const participatingStudents =
             (
-               await livestreamRepo.getLivestreamUsers(
+               await livestreamsRepo.getLivestreamUsers(
                   livestreamData.id,
                   "participated"
                )

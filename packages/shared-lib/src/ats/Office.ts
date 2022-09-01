@@ -1,5 +1,5 @@
 import { MergeOffice } from "./MergeResponseTypes"
-import { BaseModel } from "../BaseModel"
+import { ATSModel } from "./ATSModel"
 
 /**
  * Office class
@@ -7,7 +7,7 @@ import { BaseModel } from "../BaseModel"
  * Our own type that can be created from ATS providers
  * UI/Business logic should live here
  */
-export class Office extends BaseModel {
+export class Office extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly name?: string,
