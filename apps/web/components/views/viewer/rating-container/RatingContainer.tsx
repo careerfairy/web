@@ -278,7 +278,7 @@ const RatingContainer = ({ livestream, livestreamId }: Props) => {
             )
          return () => unsubscribeRatings()
       }
-   }, [livestream?.id])
+   }, [firebase, livestream?.id, streamRef])
 
    useEffect(() => {
       const interval = setInterval(() => {
@@ -308,21 +308,13 @@ const RatingContainer = ({ livestream, livestreamId }: Props) => {
          !rating.hasRated && authenticatedUser?.email && livestream.hasEnded
       )
    }
-   const isMultipleChoiceButNoOptions = (rating) => {
-      return Boolean(
-         rating.isMultipleChoice && !rating?.multipleChoices?.length
-      )
-   }
 
    const handleCheckRatings = async () => {
       for (const [index, rating] of ratings.entries()) {
          // this loop allows for easy async functions along with index
          if (
-            (hasNotRatedAndTimeHasPassed(rating) ||
-               hasNotRatedAndNotTimeYetButStreamEndedAndRatingIsForEnd(
-                  rating
-               )) &&
-            !isMultipleChoiceButNoOptions(rating)
+            hasNotRatedAndTimeHasPassed(rating) ||
+            hasNotRatedAndNotTimeYetButStreamEndedAndRatingIsForEnd(rating)
          ) {
             // if you've already rated, don't bother making an api call
             const hasRated = await firebase.checkIfUserRated(
