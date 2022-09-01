@@ -15,7 +15,7 @@ export interface BigQueryUserResponse {
    totalHits: number
 }
 export interface BigQueryUserQueryOptions {
-   filters: GetUserFilters
+   filters?: GetUserFilters
    page: number
    orderBy: keyof BigQueryUserResponse
    sortOrder: "DESC" | "ASC"

@@ -9,7 +9,7 @@ import {
    BigQueryUserQueryOptions,
    BigQueryUserResponse,
 } from "@careerfairy/shared-lib/dist/bigQuery/types"
-import { usePrevious, usePreviousDistinct } from "react-use"
+import { usePreviousDistinct } from "react-use"
 
 const QueryForm = () => {
    const [options, setOptions] = useState<BigQueryUserQueryOptions>({

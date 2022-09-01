@@ -57,10 +57,7 @@ export const sendBasicTemplateEmail_v2 = functions
             false,
             queryOptions.orderBy,
             queryOptions.sortOrder,
-            queryOptions.universityCountryCodes,
-            queryOptions.universityName,
-            queryOptions.fieldOfStudyIds,
-            queryOptions.levelOfStudyIds
+            queryOptions?.filters
          )
          const userEmails = users.map((user) => user.userEmail)
          emailsArray = emailsArray.concat(userEmails)

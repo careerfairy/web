@@ -1,12 +1,13 @@
 import functions = require("firebase-functions")
 import { bigQueryRepo } from "./api/repositories"
 import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 
 /**
  * Get Users
  */
 export const getBigQueryUsers = functions.https.onCall(
-   async (data, context) => {
+   async (data: BigQueryUserQueryOptions, context) => {
       await userIsSignedInAndIsCFAdmin(context)
       try {
          return await bigQueryRepo.getUsers(
@@ -14,7 +15,7 @@ export const getBigQueryUsers = functions.https.onCall(
             data.limit,
             data.orderBy,
             data.sortOrder,
-            data.filters
+            data?.filters
          )
       } catch (e) {
          functions.logger.error("ERROR in get big query users", e)

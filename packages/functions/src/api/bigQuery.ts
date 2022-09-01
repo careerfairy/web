@@ -20,8 +20,6 @@ export interface IBigQueryRepository {
    ): Promise<BigQueryUserResponse[]>
 }
 
-/**
- */
 export class BigQueryRepository implements IBigQueryRepository {
    /**
     * Create a new instance
@@ -40,7 +38,12 @@ export class BigQueryRepository implements IBigQueryRepository {
       limit: number | false = 10,
       orderBy = "firstName",
       sortOrder: "DESC" | "ASC" = "DESC",
-      filters: GetUserFilters = {}
+      filters: GetUserFilters = {
+         universityCountryCodes: [],
+         universityName: "",
+         fieldOfStudyIds: [],
+         levelOfStudyIds: [],
+      }
    ): Promise<BigQueryUserResponse[]> {
       const universityCountryCodesString = filters.universityCountryCodes
          ?.map((a) => `"${a}"`)
