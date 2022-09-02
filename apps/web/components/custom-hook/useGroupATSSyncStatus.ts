@@ -1,4 +1,4 @@
-import useSWR from "swr"
+import useSWR, { SWRConfiguration } from "swr"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
@@ -11,7 +11,8 @@ type Result = {
 
 const useGroupATSSyncStatus = (
    groupId: string,
-   integrationId: string
+   integrationId: string,
+   swrConfiguration?: SWRConfiguration
 ): Result => {
    const fetcher = useFunctionsSWR<SyncStatus[]>()
 
@@ -24,12 +25,15 @@ const useGroupATSSyncStatus = (
          },
       ],
       fetcher,
-      reducedRemoteCallsOptions
+      swrConfiguration ?? reducedRemoteCallsOptions
    )
 
    return useMemo(() => {
       // map to business model (convert plain object to class object)
-      const status = data.map((res) => SyncStatus.createFromPlainObject(res))
+      const status = data
+         .map((res) => SyncStatus.createFromPlainObject(res))
+         // we don't care about the disabled entities
+         .filter((model) => model.status !== "DISABLED")
 
       return {
          data: status,
