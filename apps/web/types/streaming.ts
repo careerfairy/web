@@ -5,7 +5,6 @@ import {
    ICameraVideoTrack,
    IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng"
-import { MediaDeviceInfo } from "agora-rtc-sdk"
 import firebase from "firebase/compat"
 import Timestamp = firebase.firestore.Timestamp
 
