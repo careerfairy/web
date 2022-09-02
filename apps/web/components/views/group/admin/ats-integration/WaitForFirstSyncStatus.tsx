@@ -133,7 +133,7 @@ const SyncStatusRow = ({ data }: { data: SyncStatus }) => {
 /**
  * Check if all models are ready
  *
- * If we don't we don't find any still "SYNCING", we should be done
+ * If we don't find any still "SYNCING", we should be done
  * PAUSED, FAILED, DISABLED shouldn't be handled here
  * @param entitiesStatus
  */
