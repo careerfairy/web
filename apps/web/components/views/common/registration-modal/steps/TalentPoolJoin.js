@@ -86,7 +86,7 @@ const TalentPoolJoin = () => {
                </Grow>
             </Grid>
             <Grid className={classes.details} item xs={12} sm={8}>
-               <GroupLogo logoUrl={group.logoUrl} />
+               <GroupLogo logoUrl={livestream.companyLogoUrl} />
                <DialogTitle align="center">
                   Join the {livestream.company} Talent Pool
                </DialogTitle>
