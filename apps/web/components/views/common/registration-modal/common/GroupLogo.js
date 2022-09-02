@@ -1,6 +1,8 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { CardMedia } from "@mui/material"
+import Image from "next/image"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 
 const useStyles = makeStyles((theme) => ({
    media: {
@@ -10,6 +12,7 @@ const useStyles = makeStyles((theme) => ({
       height: 150,
       maxWidth: 350,
       alignSelf: "center",
+      margin: "0 auto",
    },
    image: {
       objectFit: "contain",
@@ -23,7 +26,13 @@ const GroupLogo = ({ logoUrl, alt = "" }) => {
    const classes = useStyles()
    return (
       <CardMedia className={classes.media}>
-         <img src={logoUrl} className={classes.image} alt={alt} />
+         <Image
+            src={getResizedUrl(logoUrl, "md")}
+            width={350}
+            height={150}
+            className={classes.image}
+            alt={alt}
+         />
       </CardMedia>
    )
 }
