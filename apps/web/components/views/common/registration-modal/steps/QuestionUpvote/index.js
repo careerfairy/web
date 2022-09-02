@@ -110,7 +110,7 @@ const QuestionUpvote = () => {
       <div className={classes.root}>
          <Box width="100%" display="flex" justifyContent="center">
             <Hidden smDown>
-               <GroupLogo logoUrl={group.logoUrl} />
+               <GroupLogo logoUrl={livestream.companyLogoUrl} />
             </Hidden>
          </Box>
          <DialogTitle align="center">
