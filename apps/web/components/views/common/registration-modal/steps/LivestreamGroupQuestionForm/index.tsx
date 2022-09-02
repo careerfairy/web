@@ -162,6 +162,7 @@ const LivestreamGroupQuestionForm = () => {
                                  target="_blank"
                                  style={{ marginLeft: 4 }}
                                  href={group.privacyPolicyUrl}
+                                 rel="noreferrer"
                               >
                                  here
                               </a>
