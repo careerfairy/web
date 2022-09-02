@@ -144,7 +144,7 @@ const QuestionCreateForm = () => {
             container
          >
             <Grid className={classes.details} item xs={12} sm={8}>
-               <GroupLogo logoUrl={group.logoUrl} />
+               <GroupLogo logoUrl={livestream.companyLogoUrl} />
                <DialogTitle align="center">
                   ASK YOUR QUESTION. GET THE ANSWER DURING THE LIVE STREAM.
                </DialogTitle>
