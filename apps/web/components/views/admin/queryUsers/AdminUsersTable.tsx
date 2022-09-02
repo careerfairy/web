@@ -195,8 +195,8 @@ const AdminUsersTable = ({
                   setOptions((prev) => ({
                      ...prev,
                      filters: {
-                        levelOfStudyIds: filter.value,
                         ...prev.filters,
+                        levelOfStudyIds: filter.value,
                      },
                      page: 0,
                   }))
