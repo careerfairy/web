@@ -42,7 +42,13 @@ const styles = sxStyles({
    videoWrapper: {
       display: {
          xs: "none",
-         lg: "block",
+         lg: "flex",
+      },
+      alignItems: {
+         lg: "center",
+      },
+      "& .laptop-video": {
+         width: "auto",
       },
       width: "50%",
       position: {

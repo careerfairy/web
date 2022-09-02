@@ -56,7 +56,7 @@ const styles = {
 
 const LaptopVideo = ({ videoUrl }: Prop) => {
    return (
-      <Box sx={styles.laptop}>
+      <Box className={"laptop-video"} sx={styles.laptop}>
          <Box sx={styles.laptopScreenDiv}>
             <Box sx={styles.laptopScreenInnerDiv}>
                <Box sx={styles.laptopVideoWrapper}>
