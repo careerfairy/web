@@ -1,12 +1,14 @@
-import firebaseInstance from "./FirebaseInstance"
+import firebaseInstance, { FieldValue } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { v4 as uuidv4 } from "uuid"
 import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 
 export class ATSService {
    constructor(
-      private readonly firebaseFunctions: firebase.functions.Functions
+      private readonly firebaseFunctions: firebase.functions.Functions,
+      private readonly firestore: firebase.firestore.Firestore
    ) {}
 
    // not the group id to allow a group to have multiple integrations
@@ -71,8 +73,28 @@ export class ATSService {
    async updateUserJobApplications(): Promise<void> {
       await this.firebaseFunctions.httpsCallable("updateUserJobApplications")()
    }
+
+   async setFirstSyncComplete(
+      groupId: string,
+      integrationId: string
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+
+      const toUpdate: Partial<GroupATSAccountDocument> = {}
+      // update a nested object property
+      toUpdate["merge.firstSyncCompletedAt"] = FieldValue.serverTimestamp()
+
+      await docRef.update(toUpdate)
+   }
 }
 
-export const atsServiceInstance = new ATSService(firebaseInstance.functions())
+export const atsServiceInstance = new ATSService(
+   firebaseInstance.functions(),
+   firebaseInstance.firestore()
+)
 
 export default ATSService
