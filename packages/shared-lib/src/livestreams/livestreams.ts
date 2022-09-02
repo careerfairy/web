@@ -49,6 +49,8 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
+   mode?: "presentation" | "desktop" | "video"
+   screenSharerId?: string
 
    /**
     * An empty array means the livestream should target all the fields of study

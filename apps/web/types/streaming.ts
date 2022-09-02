@@ -5,44 +5,6 @@ import {
    ICameraVideoTrack,
    IMicrophoneAudioTrack,
 } from "agora-rtc-sdk-ng"
-import firebase from "firebase/compat"
-import Timestamp = firebase.firestore.Timestamp
-
-export interface StreamData {
-   author: {
-      email: string
-      groupId: string
-   }
-   backgroundImageUrl: string
-   company: string
-   companyId: string
-   companyLogoUrl: string
-
-   currentSpeakerId: string
-   groupIds: string[]
-   hidden: boolean
-   id: string
-   language: {
-      code: string
-      name: string
-   }
-   handRaiseActive?: boolean
-   hasStarted?: boolean
-   screenSharerId: string
-   registeredUsers: string[]
-   talentPool: string[]
-   participatingStudents: string[]
-   speakers: object[]
-   lastUpdated: Timestamp
-   start: Timestamp
-   created: Timestamp
-   summary: string
-   mode?: "presentation" | "desktop" | "video"
-   targetCategories: object
-   test: boolean
-   title: string
-   type: string
-}
 
 export interface LocalStream {
    uid: string
