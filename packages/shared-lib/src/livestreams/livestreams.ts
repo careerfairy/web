@@ -3,6 +3,7 @@ import { Group, GroupQuestion } from "../groups"
 import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
+import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
@@ -91,7 +92,7 @@ export interface LivestreamJobAssociation {
 
 export type LivestreamUserAction = keyof Pick<
    UserLivestreamData,
-   "talentPool" | "registered" | "participated"
+   "talentPool" | "registered" | "participated" | "jobApplications"
 >
 
 /*
@@ -128,6 +129,14 @@ export interface UserLivestreamData extends Identifiable {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
    }
+   jobApplications?: {
+      [jobId: string]: LivestreamJobApplicationDetails
+   }
+}
+
+export interface LivestreamJobApplicationDetails extends JobIdentifier {
+   date: firebase.firestore.Timestamp
+   job: Partial<Job>
 }
 
 export type LivestreamGroupQuestionsMap = Record<
