@@ -7,7 +7,8 @@ export class GroupATSAccount {
       public readonly name: string,
       public readonly image?: string,
       public readonly slug?: string,
-      public readonly lastFetchedAt?: Date
+      public readonly lastFetchedAt?: Date,
+      public readonly firstSyncCompletedAt?: Date
    ) {}
 
    static createFromDocument(account: GroupATSAccountDocument) {
@@ -17,7 +18,12 @@ export class GroupATSAccount {
          account.merge.integration_name,
          account.merge.image,
          account.merge.slug,
-         account.merge.lastFetchedAt?.toDate()
+         account.merge.lastFetchedAt?.toDate(),
+         account.merge.firstSyncCompletedAt?.toDate()
       )
+   }
+
+   isFirstSyncComplete() {
+      return Boolean(this.firstSyncCompletedAt)
    }
 }

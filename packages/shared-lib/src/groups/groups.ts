@@ -104,6 +104,8 @@ export interface GroupATSAccountDocument extends Identifiable {
       square_image?: string
       color?: string
       slug?: string
+      // used to confirm if the first sync is complete for the integration
+      firstSyncCompletedAt?: firebase.firestore.Timestamp
       lastFetchedAt?: firebase.firestore.Timestamp
    }
    createdAt: firebase.firestore.Timestamp

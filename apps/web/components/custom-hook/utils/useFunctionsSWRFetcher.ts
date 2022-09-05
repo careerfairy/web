@@ -1,6 +1,7 @@
 import { useFunctions } from "reactfire"
 import { useCallback } from "react"
 import { httpsCallable } from "firebase/functions"
+import { SWRConfiguration } from "swr"
 
 /**
  * SWR fetcher that calls Firebase cloud functions
@@ -28,7 +29,7 @@ function useFunctionsSWRFetcher<ResponseType>() {
  *
  * https://swr.vercel.app/docs/options
  */
-export const reducedRemoteCallsOptions = {
+export const reducedRemoteCallsOptions: SWRConfiguration = {
    suspense: true,
    // minimize the api calls
    revalidateIfStale: false,
