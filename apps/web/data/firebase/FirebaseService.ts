@@ -62,6 +62,8 @@ class FirebaseService {
     */
 
    fetchAgoraRtcToken = async (data) => {
+      const { isStreamer, uid, sentToken, channelName, streamDocumentPath } =
+         data
       const fetchAgoraRtcToken =
          this.functions.httpsCallable("fetchAgoraRtcToken")
       return await fetchAgoraRtcToken(data)

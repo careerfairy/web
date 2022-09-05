@@ -1,30 +1,35 @@
 import React, {
-   useState,
-   useEffect,
    useContext,
-   useRef,
+   useEffect,
    useReducer,
+   useRef,
+   useState,
 } from "react"
-import { RtcProvider } from "./RtcContext"
+import { RtcProvider } from "./RTCContext"
 import PropsContext, {
+   CallbacksInterface,
+   layout,
+   mediaStore,
    RtcPropsInterface,
    UIKitUser,
-   mediaStore,
-   layout,
-   CallbacksInterface,
 } from "./PropsContext"
-import { MaxUidProvider } from "./MaxUidContext"
-import { createClient, UID } from "agora-rtc-react"
-import { MinUidProvider } from "./MinUidContext"
+import { UID } from "agora-rtc-sdk-ng"
 import TracksContext from "./TracksContext"
 import reducer, { initState } from "./Reducer"
+import { agoraServiceInstance } from "../../data/agora/AgoraService"
+import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
-const useClient = createClient({ codec: "vp8", mode: "live" }) // pass in another client if use h264
+const useClient = agoraServiceInstance.createClient({
+   mode: "live",
+   codec: "vp8",
+}) // pass in another client if use h264
 /**
  * React component that contains the RTC logic. It manages the user state and provides it the children components by wrapping them with context providers.
  */
 const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
    const uid = useRef<UID>()
+   const { fetchAgoraRtcToken } = useFirebaseService()
+
    const { localVideoTrack, localAudioTrack } = useContext(TracksContext)
    const { callbacks, rtcProps } = useContext(PropsContext)
    const [ready, setReady] = useState<boolean>(false)
@@ -153,18 +158,11 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
                   )
                   const data = await res.json()
                   const token = data.rtcToken
-                  client.renewToken(token)
+                  await client.renewToken(token)
                })
 
                client.on("token-privilege-did-expire", async () => {
-                  const res = await fetch(
-                     tokenUrl +
-                        "/rtc/" +
-                        channel +
-                        "/publisher/uid/" +
-                        (uid || 0) +
-                        "/"
-                  )
+                  const res = await fetchAgoraRtcToken(channel, uid)
                   const data = await res.json()
                   const token = data.rtcToken
                   client.renewToken(token)
@@ -213,9 +211,9 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
          const { tokenUrl, channel, uid: userUid, appId, token } = rtcProps
          if (client && !ignore) {
             if (rtcProps.role === "audience") {
-               client.setClientRole(rtcProps.role)
+               await client.setClientRole(rtcProps.role)
             } else {
-               client.setClientRole("host")
+               await client.setClientRole("host")
             }
             if (tokenUrl) {
                try {
@@ -266,7 +264,14 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
                .catch((err: unknown) => console.log(err))
          }
       }
-   }, [rtcProps.channel, rtcProps.uid, callActive, rtcProps.tokenUrl])
+   }, [
+      rtcProps.channel,
+      rtcProps.uid,
+      callActive,
+      rtcProps.tokenUrl,
+      rtcProps,
+      client,
+   ])
 
    // publish local stream
    useEffect(() => {
@@ -392,12 +397,8 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
             channelJoined,
          }}
       >
-         <MaxUidProvider value={uidState.max}>
-            <MinUidProvider value={uidState.min}>
-               {/* <MinUidProvider value={uidState.min}> */}
-               {ready ? props.children : null}
-            </MinUidProvider>
-         </MaxUidProvider>
+         {/* <MinUidProvider value={uidState.min}> */}
+         {ready ? props.children : null}
       </RtcProvider>
    )
 }

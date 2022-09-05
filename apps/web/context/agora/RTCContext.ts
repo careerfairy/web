@@ -62,5 +62,4 @@ export interface ActionInterface<T extends keyof CallbacksInterface> {
 export type ActionType<T extends keyof CallbacksInterface> = ActionInterface<T>
 
 export const RtcProvider = RtcContext.Provider
-export const RtcConsumer = RtcContext.Consumer
 export default RtcContext
