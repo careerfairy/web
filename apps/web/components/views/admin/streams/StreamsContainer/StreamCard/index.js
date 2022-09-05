@@ -101,31 +101,40 @@ const StreamCard = ({ isUpcoming, stream }) => {
       setCsvDownloadData(null)
    }, [])
 
-   useEffect(async () => {
-      if (stream?.id) {
-         const tokenDoc = await firebase.getLivestreamRecordingSid(stream.id)
-         const recordingSid = tokenDoc.data()?.sid
-         if (recordingSid) {
-            setRecordingSid(recordingSid)
+   useEffect(() => {
+      const fetchLivestreamRecordingSid = async () => {
+         if (stream?.id) {
+            const tokenDoc = await firebase.getLivestreamRecordingSid(stream.id)
+            const recordingSid = tokenDoc.data()?.sid
+            if (recordingSid) {
+               setRecordingSid(recordingSid)
+            }
          }
       }
-   }, [stream?.id])
 
-   const handleClick = (event) => {
+      fetchLivestreamRecordingSid().catch(console.error)
+   }, [firebase, stream.id])
+
+   const handleClick = useCallback((event) => {
       setAnchorEl(event.currentTarget)
-   }
+   }, [])
 
-   const handleClose = () => {
+   const handleClose = useCallback(() => {
       setAnchorEl(null)
-   }
-   const handleOpenConfirmRecordingDialog = () => {
-      setConfirmRecordingDialogOpen(true)
-   }
-   const handleCloseConfirmRecordingDialog = () => {
-      setConfirmRecordingDialogOpen(false)
-   }
+   }, [])
 
-   const handleJoinAsStreamer = async () => {
+   const handleCloseStreamerLinksDialog = useCallback(() => {
+      setOpenStreamerLinksDialog(false)
+   }, [])
+
+   const handleOpenConfirmRecordingDialog = useCallback(() => {
+      setConfirmRecordingDialogOpen(true)
+   }, [])
+   const handleCloseConfirmRecordingDialog = useCallback(() => {
+      setConfirmRecordingDialogOpen(false)
+   }, [])
+
+   const handleJoinAsStreamer = useCallback(async () => {
       try {
          const tokenDoc = await firestore.get({
             collection: "livestreams",
@@ -149,15 +158,15 @@ const StreamCard = ({ isUpcoming, stream }) => {
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }
-   }
+   }, [dispatch, firestore, stream.id])
 
-   const handleStartRecording = async () => {
+   const handleStartRecording = useCallback(async () => {
       dispatch(actions.handleStartRecording({ firebase, streamId: stream.id }))
-   }
+   }, [dispatch, firebase, stream.id])
 
-   const handleStopRecording = async () => {
+   const handleStopRecording = useCallback(async () => {
       dispatch(actions.handleStopRecording({ firebase, streamId: stream.id }))
-   }
+   }, [dispatch, firebase, stream.id])
 
    /**
     * Download CSV with information about the registered users
@@ -174,7 +183,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                   ?.toISOString()})`,
             })
          })
-   }, [stream.id])
+   }, [stream.id, stream.start, stream.title])
 
    return (
       <Card sx={styles.root}>
@@ -347,7 +356,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
             )}
          </CardActions>
          <StreamerLinksDialog
-            onClose={handleClose}
+            onClose={handleCloseStreamerLinksDialog}
             livestreamId={stream.id}
             openDialog={openStreamerLinksDialog}
             setOpenDialog={setOpenStreamerLinksDialog}
