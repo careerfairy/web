@@ -7,11 +7,11 @@ import {
 import { object, string } from "yup"
 import { atsRepo, livestreamsRepo, userRepo } from "./api/repositories"
 import { logAxiosError, onCallWrapper, serializeModels } from "./util"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Job, JobIdentifier } from "@careerfairy/shared-lib/dist/ats/Job"
 import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
 import {
    userAlreadyAppliedForJob,
-   UserATSDocument,
+   UserATSRelations,
 } from "@careerfairy/shared-lib/dist/users"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { getATSTokens } from "./lib/groups"
@@ -162,10 +162,12 @@ export const updateUserJobApplications = functions
  * Apply a user to a job
  * User needs to be signed in
  *
- * It will create the necessary entities on the Merge (Candidate, Application, etc)
+ * It will create the necessary entities on the Merge (Candidate, Application, etc.)
  */
 export const atsUserApplyToJob = functions
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .runWith({
+      secrets: ["MERGE_ACCESS_KEY"],
+   })
    .https.onCall(
       onCallWrapper(async (data, context) => {
          // user needs to be signed in
@@ -182,9 +184,20 @@ export const atsUserApplyToJob = functions
          const { livestreamId, jobId } = data
          const userEmail = context.auth.token.email
 
-         const livestream = await livestreamsRepo.getById(livestreamId)
+         const [livestream, userATSData, userData] = await Promise.all([
+            livestreamsRepo.getById(livestreamId),
+            userRepo.getUserATSData(userEmail),
+            userRepo.getUserDataById(userEmail),
+         ])
          const jobAssociation = livestream.jobs.find((a) => a.jobId === jobId)
          const integrationId = jobAssociation.integrationId
+
+         // Confirm if the user has already applied to this job
+         if (userATSData && userAlreadyAppliedForJob(userATSData, jobId)) {
+            return { error: "User has already applied for that job" }
+         }
+
+         // Create the necessary ATS models to apply the user to the job
          const tokens = await getATSTokens([jobAssociation])
 
          const atsRepository = atsRepo(
@@ -192,26 +205,15 @@ export const atsUserApplyToJob = functions
             tokens[jobAssociation.integrationId]
          )
 
-         // Confirm if the user has already applied to this job
-         const userATSData: UserATSDocument = await userRepo.getUserATSData(
-            userEmail
-         )
-
-         const atsRelations = userATSData?.atsRelations?.[integrationId]
-
-         if (userATSData && userAlreadyAppliedForJob(userATSData, jobId)) {
-            return { error: "User has already applied for that job" }
-         }
-
-         // Create the necessary ATS models to apply the user to the job
-
          const job: Job = await atsRepository.getJob(jobId)
 
          if (!job) {
             return logAndThrow("That job does not exit", jobId)
          }
 
-         const userData = await userRepo.getUserDataById(userEmail)
+         const atsRelations = userATSData?.atsRelations?.[integrationId]
+
+         const associationsToSave: Partial<UserATSRelations> = {}
 
          // Fetch or create a Candidate object
          let candidate: Candidate
@@ -224,9 +226,7 @@ export const atsUserApplyToJob = functions
             candidate = await atsRepository.createCandidate(userData)
 
             // associate the candidate with the user
-            await userRepo.associateATSData(userEmail, integrationId, {
-               candidateId: candidate.id,
-            })
+            associationsToSave["candidateId"] = candidate.id
          }
 
          // Associate CV resume if existent (and not associated already)
@@ -242,14 +242,11 @@ export const atsUserApplyToJob = functions
                   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/development%2Fsample.pdf?alt=media&token=37d5f709-29e4-44d9-8400-f35629de64b6"
             }
 
-            const attachmentId = await atsRepository.candidateAddCVAttachment(
-               candidate.id,
-               resumeUrl
-            )
-
-            await userRepo.associateATSData(userEmail, integrationId, {
-               cvAttachmentId: attachmentId,
-            })
+            associationsToSave["cvAttachmentId"] =
+               await atsRepository.candidateAddCVAttachment(
+                  candidate.id,
+                  resumeUrl
+               )
          }
 
          // Create the application
@@ -258,19 +255,40 @@ export const atsUserApplyToJob = functions
             jobId
          )
 
-         await userRepo.associateATSData(userEmail, integrationId, {
-            jobApplications: {
-               [jobId]: applicationId,
-            },
-         })
+         associationsToSave["jobApplications"] = {
+            [jobId]: applicationId,
+         }
 
-         // Create a job application document on user side
-         await userRepo.upsertJobApplication(
-            userEmail,
-            { jobId: job.id, integrationId, groupId: jobAssociation.groupId },
-            job,
-            livestream
-         )
+         const jobIdentifier: JobIdentifier = {
+            jobId: job.id,
+            integrationId,
+            groupId: jobAssociation.groupId,
+         }
+
+         // Save related data
+         await Promise.all([
+            // Save the Merge Object IDs associations
+            userRepo.associateATSData(
+               userEmail,
+               integrationId,
+               associationsToSave
+            ),
+            // Update the UserLivestreamData document with the job application details
+            // will be used for analytics
+            livestreamsRepo.saveJobApplication(
+               livestream.id,
+               userEmail,
+               jobIdentifier,
+               job
+            ),
+            // Create a job application document on user side
+            userRepo.upsertJobApplication(
+               userEmail,
+               jobIdentifier,
+               job,
+               livestream
+            ),
+         ])
 
          return applicationId
       })
