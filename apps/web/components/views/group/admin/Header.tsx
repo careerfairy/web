@@ -49,7 +49,7 @@ type Props = {
 }
 
 const Header = ({ title, subtitle, actionNode, children }: Props) => {
-   const isScrolling = useScrollTrigger()
+   const isScrolling = useScrollTrigger({ disableHysteresis: true })
 
    return (
       <AppBar sx={styles.appBar} position="sticky" color="default">

@@ -12,9 +12,25 @@ import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { SkeletonStackMultiple } from "../../../../util/Skeletons"
 import AccountJobs from "./AccountJobs"
 import AccountApplications from "./AccountApplications"
+import WaitForFirstSyncStatus from "./WaitForFirstSyncStatus"
 
 type Props = {
    atsAccount: GroupATSAccount
+}
+
+const AccountInformation = ({ atsAccount }: Props) => {
+   /**
+    * The first sync can take a couple of minutes or hours
+    * We display a loading state while it's not finished
+    *
+    * We should only allow ATS calls for information after the first sync
+    * otherwise we'll fetch incomplete data that will be cached
+    */
+   if (!atsAccount.isFirstSyncComplete()) {
+      return <WaitForFirstSyncStatus atsAccount={atsAccount} />
+   }
+
+   return <DisplayATSContent atsAccount={atsAccount} />
 }
 
 const tabs = [
@@ -32,7 +48,7 @@ const tabs = [
    },
 ]
 
-const AccountInformation = ({ atsAccount }: Props) => {
+const DisplayATSContent = ({ atsAccount }: Props) => {
    // Tabs behaviour
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const switchTabHandler = useCallback((...args) => {
