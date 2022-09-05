@@ -9,7 +9,7 @@ import AgoraRTMContext, {
    EmoteType,
 } from "./AgoraRTMContext"
 import * as actions from "store/actions"
-import { agoraCredentials } from "../../data/AgoraInstance"
+import { agoraCredentials } from "../../data/agora/AgoraInstance"
 
 interface Props {
    children: JSX.Element

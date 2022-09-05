@@ -17,13 +17,14 @@ import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams"
 import { LocalStream } from "types/streaming"
 import RootState from "../../store/reducers"
 import { sleep } from "../helperFunctions/HelperFunctions"
-import { agoraCredentials, createClient } from "../../data/AgoraInstance"
+import { agoraCredentials } from "../../data/agora/AgoraInstance"
+import { agoraServiceInstance } from "../../data/agora/AgoraService"
 
-const useRtcClient = createClient({
+const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
 })
-const useScreenShareRtc = createClient({
+const useScreenShareRtc = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
 })

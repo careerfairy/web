@@ -29,7 +29,7 @@ import StreamPublishingModal from "components/views/streaming/modal/StreamPublis
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
-import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext"
+import AgoraRTMContext from "../../../../context/agora/AgoraRTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 

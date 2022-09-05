@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography"
 import PropTypes from "prop-types"
 import UserList from "./UserList"
 import makeStyles from "@mui/styles/makeStyles"
-import AgoraRTMContext from "context/agoraRTM/AgoraRTMContext"
+import AgoraRTMContext from "context/agora/AgoraRTMContext"
 
 const useStyles = makeStyles((theme) => ({
    listWrapper: {
