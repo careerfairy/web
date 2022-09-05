@@ -531,6 +531,9 @@ function SignUpUserForm() {
                         />
                      </Grid>
                   </Grid>
+                  <FormHelperText error hidden={!errorMessage}>
+                     <Box mt={3}>{errorMessage?.message}</Box>
+                  </FormHelperText>
                   <Button
                      type="submit"
                      fullWidth
@@ -576,9 +579,6 @@ function SignUpUserForm() {
                         </a>
                      </div>
                   </Box>
-                  <FormHelperText error hidden={!errorMessage}>
-                     {errorMessage?.message}
-                  </FormHelperText>
                </form>
             )}
          </Formik>
