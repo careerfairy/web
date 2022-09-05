@@ -98,18 +98,6 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                </Box>
             </Box>
 
-            <Box display="flex">
-               <InfoOutlinedIcon color="secondary" fontSize="large" />
-               <Box sx={styles.infoItem}>
-                  <Typography variant="h6" sx={styles.itemLabel}>
-                     Status
-                  </Typography>
-                  <Typography variant="h6" ml={4}>
-                     {job.status}
-                  </Typography>
-               </Box>
-            </Box>
-
             {hiringManagers && (
                <Box display="flex">
                   <PersonOutlineOutlinedIcon
