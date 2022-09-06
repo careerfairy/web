@@ -5,6 +5,8 @@ import { Box, Container } from "@mui/material"
 import Section from "../../common/Section"
 import SectionHeader from "../../common/SectionHeader"
 import BenefitsGrid from "../../common/BenefitsGrid"
+import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { useRouter } from "next/router"
 
 const useStyles = makeStyles((theme) => ({
    container: {
@@ -24,6 +26,10 @@ const useStyles = makeStyles((theme) => ({
 
 const ValuesSection = (props) => {
    const classes = useStyles()
+   const { pathname } = useRouter()
+   const isOnMarketingLandingPage = pathname.includes(
+      MARKETING_LANDING_PAGE_PATH
+   )
 
    return (
       <Section
@@ -39,7 +45,7 @@ const ValuesSection = (props) => {
                titleClassName={classes.title}
                subTitleClassName={classes.subTitle}
                subTitleVariant="h5"
-               titleVariant="h3"
+               titleVariant={isOnMarketingLandingPage ? "h2" : "h3"}
                subtitle={props.subtitle}
             />
             <Box marginTop={3}>

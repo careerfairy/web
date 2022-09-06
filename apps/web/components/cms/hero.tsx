@@ -3,7 +3,7 @@ import { HygraphResponseHero } from "../../types/cmsTypes"
 import { sxStyles } from "../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import CmsImage from "./image"
-import { FC } from "react"
+import React, { FC, useCallback } from "react"
 import LaptopVideo from "components/views/landing/HeroSection/LaptopVideo"
 import { PillsBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
 
@@ -116,12 +116,22 @@ const styles = sxStyles({
       textShadow: (theme) => theme.darkTextShadow,
    },
    fullScreenMain: {
-      height: "100vh",
+      height: { xs: "100%", sm: "90vh" },
       display: "flex",
       alignItems: {
          md: "center",
       },
       zIndex: 1,
+   },
+   fullScreenVideoWrapper: {
+      position: "absolute",
+      width: "100%",
+      height: "100%",
+   },
+   fullScreenVideo: {
+      width: "100%",
+      height: "100%",
+      objectFit: "cover",
    },
 })
 
@@ -138,93 +148,121 @@ const Hero: FC<HygraphResponseHero> = ({
    const titleText = heroTitle
    const subtitleText = heroSubtitle
 
-   return (
-      <PillsBackground minHeight={"fit-content"}>
-         <Box id={slug} sx={styles.root}>
+   const renderImage = useCallback(
+      () => (
+         <Box
+            sx={[
+               styles.imageWrapper,
+               fullScreenImage && styles.fullScreenImageWrapper,
+            ]}
+         >
+            <CmsImage
+               cmsImage={image}
+               imageProps={{
+                  layout: "fill",
+                  priority: true,
+                  objectFit: "cover",
+               }}
+            />
+         </Box>
+      ),
+      [fullScreenImage, image]
+   )
+
+   const renderVideo = useCallback(() => {
+      return fullScreenImage ? (
+         <Box sx={styles.fullScreenVideoWrapper}>
             <Box
-               sx={[fullScreenImage && styles.fullScreenMain]}
-               component="main"
-            >
-               <Container maxWidth={"xl"} sx={styles.container}>
-                  <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
-                     <Typography
-                        variant="h1"
-                        component="h1"
-                        gutterBottom
-                        sx={[styles.title, fullScreenImage && styles.whiteText]}
-                     >
-                        {titleText}
-                     </Typography>
-                     {subtitleText && (
+               component="video"
+               sx={styles.fullScreenVideo}
+               autoPlay
+               loop
+               muted
+               src={video?.url}
+            />
+         </Box>
+      ) : (
+         <Box sx={styles.videoWrapper}>
+            <LaptopVideo videoUrl={video?.url} />
+         </Box>
+      )
+   }, [fullScreenImage, video?.url])
+
+   return (
+      <Box paddingBottom={6}>
+         <PillsBackground minHeight={"fit-content"}>
+            <Box id={slug} sx={styles.root}>
+               <Box
+                  sx={[fullScreenImage && styles.fullScreenMain]}
+                  component="main"
+               >
+                  <Container maxWidth={"xl"} sx={styles.container}>
+                     <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
                         <Typography
-                           variant="h5"
+                           variant="h1"
+                           component="h1"
+                           gutterBottom
                            sx={[
-                              styles.subTitle,
+                              styles.title,
                               fullScreenImage && styles.whiteText,
                            ]}
-                           color="text.secondary"
-                           gutterBottom
                         >
-                           {subtitleText}
+                           {titleText}
                         </Typography>
-                     )}
-                     {buttons && (
-                        <Stack
-                           sx={styles.stack}
-                           direction={{ xs: "column", md: "row" }}
-                           justifyContent={{ sm: "center", lg: "flex-start" }}
-                           spacing={{
-                              lg: 3,
-                              xs: 1,
-                           }}
-                        >
-                           {buttons.map((button) => (
-                              <Box key={button.slug}>
-                                 <Button
-                                    fullWidth
-                                    sx={{
-                                       ":nth-of-type(even)": {
-                                          mx: {
-                                             xs: 0,
-                                             md: 3,
+                        {subtitleText && (
+                           <Typography
+                              variant="h5"
+                              sx={[
+                                 styles.subTitle,
+                                 fullScreenImage && styles.whiteText,
+                              ]}
+                              color="text.secondary"
+                              gutterBottom
+                           >
+                              {subtitleText}
+                           </Typography>
+                        )}
+                        {buttons && (
+                           <Stack
+                              sx={styles.stack}
+                              direction={{ xs: "column", md: "row" }}
+                              justifyContent={{
+                                 sm: "center",
+                                 lg: "flex-start",
+                              }}
+                              spacing={{
+                                 lg: 3,
+                                 xs: 1,
+                              }}
+                           >
+                              {buttons.map((button) => (
+                                 <Box key={button.slug}>
+                                    <Button
+                                       fullWidth
+                                       sx={{
+                                          ":nth-of-type(even)": {
+                                             mx: {
+                                                xs: 0,
+                                                md: 3,
+                                             },
                                           },
-                                       },
-                                    }}
-                                    {...button}
-                                    size={button.size || "medium"}
-                                 />
-                              </Box>
-                           ))}
-                        </Stack>
-                     )}
-                     {children}
-                  </Box>
-               </Container>
-               {image && !video && (
-                  <Box
-                     sx={[
-                        styles.imageWrapper,
-                        fullScreenImage && styles.fullScreenImageWrapper,
-                     ]}
-                  >
-                     <CmsImage
-                        cmsImage={image}
-                        imageProps={{
-                           layout: "fill",
-                           priority: true,
-                           objectFit: "cover",
-                        }}
-                     />
-                  </Box>
-               )}
-               {video && video?.url && (
-                  <Box sx={styles.videoWrapper}>
-                     <LaptopVideo videoUrl={video?.url} />
-                  </Box>
-               )}
+                                       }}
+                                       {...button}
+                                       size={button.size || "medium"}
+                                    />
+                                 </Box>
+                              ))}
+                           </Stack>
+                        )}
+                        {children}
+                     </Box>
+                  </Container>
+                  {image && !video && renderImage()}
+                  {video && video?.url && renderVideo()}
+               </Box>
             </Box>
-         </Box>
-      </PillsBackground>
+         </PillsBackground>
+      </Box>
    )
 }
 

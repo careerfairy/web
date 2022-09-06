@@ -39,7 +39,7 @@ const HighlightList = ({
    return (
       <Box sx={styles.wrapper}>
          <Container disableGutters>
-            <Typography variant="h3" sx={styles.title}>
+            <Typography variant="h2" sx={styles.title}>
                {highlightListTitle}
             </Typography>
             <HighlightsCarousel

@@ -22,6 +22,7 @@ import {
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 import { useRouter } from "next/router"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import CmsImage from "../image"
 
 const styles = sxStyles({
    largeContainer: {
@@ -33,6 +34,13 @@ const styles = sxStyles({
    smallContainer: {
       background: (theme) =>
          `linear-gradient(to right, ${theme.palette.secondary.main}, 80%, ${theme.palette.secondary.light})`,
+   },
+   leftBlock: {
+      maxWidth: {
+         xs: "100%",
+         lg: "70%",
+      },
+      textAlign: "-webkit-center",
    },
 })
 
@@ -46,13 +54,14 @@ const MarketingSignUp = ({
    formTitle,
    button,
    fieldsOfStudy,
+   icon,
 }: MarketingSignUpProps) => {
    const isMobile = useIsMobile()
    const [isComplete, setComplete] = useState(false)
    return (
       <Box my={6}>
-         <Box mb={4} ml={2}>
-            <Typography variant="h3" fontWeight={500}>
+         <Box mb={8} mx={2} textAlign="center">
+            <Typography variant="h2" fontWeight={500}>
                {formTitle}
             </Typography>
          </Box>
@@ -63,10 +72,12 @@ const MarketingSignUp = ({
             <Grid container spacing={2} p={{ xs: 6, md: 8, lg: 10 }}>
                <Grid item xs={12} lg={6}>
                   {shortText && (
-                     <Box
-                        maxWidth={{ xs: "100%", lg: "70%" }}
-                        textAlign={"center"}
-                     >
+                     <Box sx={styles.leftBlock}>
+                        {icon && (
+                           <Box pb={4} maxWidth={70}>
+                              <CmsImage cmsImage={icon} />
+                           </Box>
+                        )}
                         <Typography variant="h4" color="white">
                            {shortText}
                         </Typography>
