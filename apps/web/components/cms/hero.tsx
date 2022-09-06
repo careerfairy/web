@@ -3,7 +3,7 @@ import { HygraphResponseHero } from "../../types/cmsTypes"
 import { sxStyles } from "../../types/commonTypes"
 import Stack from "@mui/material/Stack"
 import CmsImage from "./image"
-import React, { FC, useCallback } from "react"
+import React, { FC, useMemo } from "react"
 import LaptopVideo from "components/views/landing/HeroSection/LaptopVideo"
 import { PillsBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
 
@@ -148,7 +148,7 @@ const Hero: FC<HygraphResponseHero> = ({
    const titleText = heroTitle
    const subtitleText = heroSubtitle
 
-   const renderImage = useCallback(
+   const renderImage = useMemo(
       () => (
          <Box
             sx={[
@@ -169,24 +169,26 @@ const Hero: FC<HygraphResponseHero> = ({
       [fullScreenImage, image]
    )
 
-   const renderVideo = useCallback(() => {
-      return fullScreenImage ? (
-         <Box sx={styles.fullScreenVideoWrapper}>
-            <Box
-               component="video"
-               sx={styles.fullScreenVideo}
-               autoPlay
-               loop
-               muted
-               src={video?.url}
-            />
-         </Box>
-      ) : (
-         <Box sx={styles.videoWrapper}>
-            <LaptopVideo videoUrl={video?.url} />
-         </Box>
-      )
-   }, [fullScreenImage, video?.url])
+   const renderVideo = useMemo(
+      () =>
+         fullScreenImage ? (
+            <Box sx={styles.fullScreenVideoWrapper}>
+               <Box
+                  component="video"
+                  sx={styles.fullScreenVideo}
+                  autoPlay
+                  loop
+                  muted
+                  src={video?.url}
+               />
+            </Box>
+         ) : (
+            <Box sx={styles.videoWrapper}>
+               <LaptopVideo videoUrl={video?.url} />
+            </Box>
+         ),
+      [fullScreenImage, video?.url]
+   )
 
    return (
       <Box paddingBottom={6}>
@@ -257,8 +259,8 @@ const Hero: FC<HygraphResponseHero> = ({
                         {children}
                      </Box>
                   </Container>
-                  {image && !video && renderImage()}
-                  {video && video?.url && renderVideo()}
+                  {image && !video && renderImage}
+                  {video && video?.url && renderVideo}
                </Box>
             </Box>
          </PillsBackground>

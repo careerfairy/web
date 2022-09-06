@@ -40,7 +40,7 @@ const styles = sxStyles({
          xs: "100%",
          lg: "70%",
       },
-      textAlign: "-webkit-center",
+      textAlign: "center",
    },
 })
 
@@ -74,7 +74,7 @@ const MarketingSignUp = ({
                   {shortText && (
                      <Box sx={styles.leftBlock}>
                         {icon && (
-                           <Box pb={4} maxWidth={70}>
+                           <Box pb={4} maxWidth={70} margin="auto">
                               <CmsImage cmsImage={icon} />
                            </Box>
                         )}
