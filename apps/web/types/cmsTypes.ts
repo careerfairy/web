@@ -251,6 +251,7 @@ export interface HygraphResponseMarketingSignup {
    formTitle: string
    title: string
    shortText: string
+   icon?: ICmsImage
    slug: string
    button: HygraphResponseButton
 }
@@ -352,6 +353,7 @@ export const marketingSignupQueryProps = `
         shortText
         formTitle
         slug
+        icon ${imageQueryProps}
         button ${buttonQueryProps}
     }
 `

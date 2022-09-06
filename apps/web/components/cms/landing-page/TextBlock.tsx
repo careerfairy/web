@@ -24,7 +24,7 @@ const styles = sxStyles({
 
 const TextBlock = ({ textBlockTitle, content }: HygraphResponseTextBlock) => {
    return (
-      <Box py={6}>
+      <Box py={10}>
          <Box sx={styles.title}>
             <ThemedRichTextRenderer rawContent={textBlockTitle.raw} />
          </Box>
