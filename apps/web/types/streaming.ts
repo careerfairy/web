@@ -4,10 +4,11 @@ import {
    IAgoraRTCRemoteUser,
    ICameraVideoTrack,
    IMicrophoneAudioTrack,
+   UID,
 } from "agora-rtc-sdk-ng"
 
 export interface LocalStream {
-   uid: string
+   uid: UID
    isAudioPublished: boolean
    isVideoPublished: boolean
    isLocal: boolean
@@ -152,7 +153,7 @@ export interface RTCError extends Error {
       | RTCSubscribeErrorCodes
       | RTCPublishErrorCodes
       | CustomRTCErrors
-   |AgoraRTCErrorCode
+      | AgoraRTCErrorCode
    readonly message: string
    readonly name: string
    readonly data?: any
@@ -176,9 +177,6 @@ export const rtcMessages: Messages = {
    DISCONNECTING: "",
 }
 
-/**
- * @ignore
- */
 export enum AgoraRTCErrorCode {
    UNEXPECTED_ERROR = "UNEXPECTED_ERROR",
    UNEXPECTED_RESPONSE = "UNEXPECTED_RESPONSE",

@@ -63,8 +63,6 @@ export interface AgoraRTMContextInterface {
    // peersRTM: Array<string>;
 }
 
-const AgoraRTMContext = createContext(
-   null as unknown as AgoraRTMContextInterface
-)
+const RtmContext = createContext(null as unknown as AgoraRTMContextInterface)
 
-export default AgoraRTMContext
+export default RtmContext

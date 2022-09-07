@@ -9,7 +9,7 @@ import Typography from "@mui/material/Typography"
 import PropTypes from "prop-types"
 import UserList from "./UserList"
 import makeStyles from "@mui/styles/makeStyles"
-import AgoraRTMContext from "context/agora/AgoraRTMContext"
+import RTMContext from "context/agora/RtmContext"
 
 const useStyles = makeStyles((theme) => ({
    listWrapper: {
@@ -32,7 +32,7 @@ const BreakoutRoomAccordionContent = ({
    liveSpeakers,
    openRoom,
 }) => {
-   const { agoraHandlers } = useContext(AgoraRTMContext)
+   const { agoraHandlers } = useContext(RTMContext)
 
    const {
       currentLivestream: { id: livestreamId },

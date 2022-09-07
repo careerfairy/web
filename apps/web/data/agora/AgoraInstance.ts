@@ -1,6 +1,4 @@
 // Project: Production
-import AgoraRTC, { ClientConfig, IAgoraRTCClient } from "agora-rtc-sdk-ng"
-
 let appID = "53675bc6d3884026a72ecb1de3d19eb1"
 
 if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {

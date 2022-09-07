@@ -20,7 +20,7 @@ const RemoteStreamItem = ({
    const { getActiveTutorialStepKey, handleConfirmStep } =
       useContext(TutorialContext)
    const activeStep = getActiveTutorialStepKey()
-   const isScreenShareVideo = stream.uid.includes("screen")
+   const isScreenShareVideo = stream.uid.includes?.("screen")
 
    const {
       playAllRemoteVideos,
@@ -63,7 +63,7 @@ const RemoteStreamItem = ({
    function playVideo() {
       try {
          if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
-            stream.videoTrack?.play(stream.uid, {
+            stream.videoTrack?.play(`${stream.uid}`, {
                fit: isScreenShareVideo ? "contain" : "cover",
             })
          }

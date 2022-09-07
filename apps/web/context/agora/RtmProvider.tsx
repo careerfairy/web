@@ -3,11 +3,11 @@ import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
 import { useDispatch } from "react-redux"
-import AgoraRTMContext, {
+import RtmContext, {
    AgoraRTMContextInterface,
    EmoteMessage,
    EmoteType,
-} from "./AgoraRTMContext"
+} from "./RtmContext"
 import * as actions from "store/actions"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 
@@ -17,7 +17,7 @@ interface Props {
    userId?: string
 }
 
-const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
+const RtmProvider = ({ children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!)
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!)
 
@@ -172,10 +172,8 @@ const AgoraRTMProvider = ({ children, roomId, userId }: Props) => {
    )
 
    return (
-      <AgoraRTMContext.Provider value={contextValue}>
-         {children}
-      </AgoraRTMContext.Provider>
+      <RtmContext.Provider value={contextValue}>{children}</RtmContext.Provider>
    )
 }
 
-export default AgoraRTMProvider
+export default RtmProvider

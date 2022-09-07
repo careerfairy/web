@@ -17,7 +17,7 @@ import useStreamRef from "../../components/custom-hook/useStreamRef"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu"
-import AgoraRTMProvider from "context/agora/AgoraRTMProvider"
+import RTMProvider from "context/agora/RtmProvider"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
@@ -29,6 +29,8 @@ import {
 } from "../../store/selectors/streamSelectors"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
+import { agoraCredentials } from "../../data/agora/AgoraInstance"
+import RtcProvider from "../../context/agora/RtcProvider"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -95,7 +97,7 @@ const ViewerLayout = (props) => {
    const streamRef = useStreamRef()
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false)
    const [handRaiseActive, setHandRaiseActive] = useState(false)
-   const [streamerId, setStreamerId] = useState(null)
+   const [streamerId, setStreamerId] = useState("")
    const showMenu = useSelector(leftMenuOpenSelector)
 
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
@@ -120,6 +122,10 @@ const ViewerLayout = (props) => {
       !authenticatedUser?.email
          ? "anonymous" + streamerId
          : authenticatedUser.email
+
+   const shouldInitializeAgora = Boolean(
+      currentLivestream?.hasStarted || (userData?.isAdmin && spyModeEnabled)
+   )
 
    useStreamerActiveHandRaisesConnect({ withAll: true })
 
@@ -271,7 +277,6 @@ const ViewerLayout = (props) => {
          query: { absolutePath: asPath },
       })
    }
-
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu())
    const openLeftMenu = () => dispatch(actions.openLeftMenu())
 
@@ -300,7 +305,8 @@ const ViewerLayout = (props) => {
    if (
       !isLoaded(currentLivestream) ||
       notAuthorized ||
-      checkingForCategoryData
+      checkingForCategoryData ||
+      !streamerId
    ) {
       return <Loader />
    }
@@ -315,57 +321,66 @@ const ViewerLayout = (props) => {
    }
 
    return (
-      <AgoraRTMProvider roomId={currentLivestream.id} userId={streamerId}>
-         <CurrentStreamContext.Provider
-            value={{
-               currentLivestream,
-               isBreakout,
-               streamerId,
-               isStreamer: false,
-               handRaiseId,
-               isMobile: mobile,
-            }}
-         >
-            <div className={`${classes.root} notranslate`}>
-               <ViewerTopBar
-                  showAudience={showAudience}
-                  showMenu={showMenu}
-                  audienceDrawerOpen={audienceDrawerOpen}
-                  mobile={mobile}
-               />
-               <LeftMenu
-                  streamerId={streamerId}
-                  handRaiseActive={handRaiseActive}
-                  setHandRaiseActive={setHandRaiseActive}
-                  streamer={false}
-                  handleStateChange={handleStateChange}
-                  selectedState={selectedState}
-                  setSelectedState={setSelectedState}
-                  livestream={currentLivestream}
-                  isMobile={mobile}
-               />
+      <RtcProvider
+         uid={streamerId}
+         channel={livestreamId}
+         appId={agoraCredentials.appID}
+         initialize={shouldInitializeAgora}
+         isStreamer={handRaiseActive}
+         isAHandRaiser={handRaiseActive}
+      >
+         <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
+            <CurrentStreamContext.Provider
+               value={{
+                  currentLivestream,
+                  isBreakout,
+                  streamerId,
+                  isStreamer: false,
+                  handRaiseId,
+                  isMobile: mobile,
+               }}
+            >
+               <div className={`${classes.root} notranslate`}>
+                  <ViewerTopBar
+                     showAudience={showAudience}
+                     showMenu={showMenu}
+                     audienceDrawerOpen={audienceDrawerOpen}
+                     mobile={mobile}
+                  />
+                  <LeftMenu
+                     streamerId={streamerId}
+                     handRaiseActive={handRaiseActive}
+                     setHandRaiseActive={setHandRaiseActive}
+                     streamer={false}
+                     handleStateChange={handleStateChange}
+                     selectedState={selectedState}
+                     setSelectedState={setSelectedState}
+                     livestream={currentLivestream}
+                     isMobile={mobile}
+                  />
 
-               <div className={classes.wrapper}>
-                  <div className={classes.contentContainer}>
-                     <div className={classes.content}>
-                        {React.cloneElement(children, {
-                           handRaiseActive,
-                           handleStateChange,
-                           selectedState,
-                           setSelectedState,
-                           showMenu,
-                           streamerId,
-                           mobile,
-                           showAudience,
-                           hideAudience,
-                           audienceDrawerOpen,
-                        })}
+                  <div className={classes.wrapper}>
+                     <div className={classes.contentContainer}>
+                        <div className={classes.content}>
+                           {React.cloneElement(children, {
+                              handRaiseActive,
+                              handleStateChange,
+                              selectedState,
+                              setSelectedState,
+                              showMenu,
+                              streamerId,
+                              mobile,
+                              showAudience,
+                              hideAudience,
+                              audienceDrawerOpen,
+                           })}
+                        </div>
                      </div>
                   </div>
                </div>
-            </div>
-         </CurrentStreamContext.Provider>
-      </AgoraRTMProvider>
+            </CurrentStreamContext.Provider>
+         </RTMProvider>
+      </RtcProvider>
    )
 }
 

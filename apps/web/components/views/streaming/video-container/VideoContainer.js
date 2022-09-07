@@ -6,15 +6,15 @@ import React, {
    useMemo,
 } from "react"
 
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import VideoControlsContainer from "./VideoControlsContainer"
-import useDevices from "components/custom-hook/useDevices"
-import TutorialContext from "context/tutorials/TutorialContext"
+import useDevices from "../../../../components/custom-hook/useDevices"
+import TutorialContext from "../../../../context/tutorials/TutorialContext"
 import DemoIntroModal from "../modal/DemoIntroModal"
 import DemoEndModal from "../modal/DemoEndModal"
 import { useLocalStorage } from "react-use"
 
-import useMediaSources from "components/custom-hook/useMediaSources"
+import useMediaSources from "../../../../components/custom-hook/useMediaSources"
 import WifiIndicator from "./WifiIndicator"
 import SettingsModal from "./SettingsModal"
 import ScreenShareModal from "./ScreenShareModal"
@@ -23,12 +23,13 @@ import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/Stre
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
 import Streams from "./Streams"
 import DraggableComponent from "../../banners/DraggableComponent"
-import useAgoraRtc from "components/custom-hook/useAgoraRtc"
+import useAgoraRtc from "../../../../components/custom-hook/useAgoraRtc"
 import StreamPublishingModal from "../modal/StreamPublishingModal"
 import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
+import * as actions from "../../../../store/actions"
 import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
+import { useRtc } from "../../../../context/agora/RtcProvider"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -82,6 +83,20 @@ function VideoContainer({
    const [showSettings, setShowSettings] = useState(false)
 
    const isStreamer = true
+   // const {
+   //    networkQuality,
+   //    localStream,
+   //    localMediaControls,
+   //    remoteStreams,
+   //    screenShareStreamRef,
+   //    publishScreenShareStream,
+   //    unPublishScreenShareStream,
+   //    leaveAgoraRoom,
+   //    localMediaHandlers,
+   //    handlePublishLocalStream,
+   //    closeAndUnpublishedLocalStream,
+   //    demoStreamHandlers,
+   // } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true)
    const {
       networkQuality,
       localStream,
@@ -95,7 +110,7 @@ function VideoContainer({
       handlePublishLocalStream,
       closeAndUnpublishedLocalStream,
       demoStreamHandlers,
-   } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true)
+   } = useRtc()
 
    const deviceSettings = useMemo(
       () => ({
