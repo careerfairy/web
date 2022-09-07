@@ -243,6 +243,17 @@ const StreamerLayout = (props) => {
    }
 
    return (
+      // <UserInterface
+      //    rtcProps={{
+      //       appId: agoraCredentials.appID,
+      //       channel: livestreamId,
+      //       uid: streamerId,
+      //       enableDualStream: true,
+      //       dualStreamMode: 1,
+      //       role: "host",
+      //       isStreamer: true,
+      //    }}
+      // >
       <AgoraRTMProvider roomId={currentLivestream.id} userId={streamerId}>
          <NotificationsContext.Provider
             value={{ setNewNotification, setNotificationToRemove }}
@@ -298,6 +309,7 @@ const StreamerLayout = (props) => {
             </CurrentStreamContext.Provider>
          </NotificationsContext.Provider>
       </AgoraRTMProvider>
+      // </UserInterface>
    )
 }
 

@@ -252,8 +252,8 @@ export const Highlights = ({
             fullWidth
             autoHighlight
             onChange={handleSelectGroup}
-            getOptionLabel={(option) =>
-               option.universityName ? option.universityName : ""
+            getOptionLabel={(option : Group) =>
+                option.universityName ? option.universityName : ""
             }
             renderInput={(params) => (
                <TextField

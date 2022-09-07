@@ -1,4 +1,5 @@
 import React, {
+   useCallback,
    useContext,
    useEffect,
    useReducer,
@@ -15,25 +16,37 @@ import PropsContext, {
 } from "./PropsContext"
 import { UID } from "agora-rtc-sdk-ng"
 import TracksContext from "./TracksContext"
-import reducer, { initState } from "./Reducer"
 import { agoraServiceInstance } from "../../data/agora/AgoraService"
+import { useRouter } from "next/router"
+
+import useStreamRef from "../../components/custom-hook/useStreamRef"
+
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
+import reducer, { initState } from "./Reducer"
 
 const useClient = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
-}) // pass in another client if use h264
-/**
- * React component that contains the RTC logic. It manages the user state and provides it the children components by wrapping them with context providers.
- */
-const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
+}) // pass in another client if you use h264
+
+const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = ({
+   callActive,
+   children,
+}) => {
    const uid = useRef<UID>()
    const { fetchAgoraRtcToken } = useFirebaseService()
+   const router = useRouter()
+   const { path } = useStreamRef()
 
    const { localVideoTrack, localAudioTrack } = useContext(TracksContext)
    const { callbacks, rtcProps } = useContext(PropsContext)
    const [ready, setReady] = useState<boolean>(false)
    const [channelJoined, setChannelJoined] = useState<boolean>(false)
+   const [uidState, dispatch] = useReducer<React.Reducer<stateType, any>>(
+      reducer,
+      initState
+   )
+   console.log("-> uidState", uidState)
    let joinRes: ((arg0: boolean) => void) | null = null // Resolve for canJoin -> to set canJoin to true
    const canJoin = useRef(
       new Promise<boolean | void>((resolve, reject) => {
@@ -53,17 +66,11 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
    let localAudioTrackHasPublished = false
 
    const mediaStore = useRef<mediaStore>({})
+   console.log("-> mediaStore", mediaStore)
 
-   let { callActive } = props
    if (callActive === undefined) {
       callActive = true
    }
-
-   type stateType = { max: UIKitUser[]; min: UIKitUser[] }
-   const [uidState, dispatch] = useReducer<React.Reducer<stateType, any>>(
-      reducer,
-      initState
-   )
 
    // init rtcEngine
    useEffect(() => {
@@ -144,30 +151,16 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
                })
             })
 
-            if (rtcProps.tokenUrl) {
-               const { tokenUrl, channel, uid } = rtcProps
-               client.on("token-privilege-will-expire", async () => {
-                  console.log("token will expire")
-                  const res = await fetch(
-                     tokenUrl +
-                        "/rtc/" +
-                        channel +
-                        "/publisher/uid/" +
-                        (uid || 0) +
-                        "/"
-                  )
-                  const data = await res.json()
-                  const token = data.rtcToken
-                  await client.renewToken(token)
-               })
+            client.on("token-privilege-will-expire", async () => {
+               console.log("token will expire")
+               const token = await getToken(rtcProps)
+               await client.renewToken(token)
+            })
 
-               client.on("token-privilege-did-expire", async () => {
-                  const res = await fetchAgoraRtcToken(channel, uid)
-                  const data = await res.json()
-                  const token = data.rtcToken
-                  client.renewToken(token)
-               })
-            }
+            client.on("token-privilege-did-expire", async () => {
+               const token = await getToken(rtcProps)
+               await client.renewToken(token)
+            })
 
             if (callbacks) {
                const events: [keyof CallbacksInterface] = Object.keys(
@@ -203,52 +196,54 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
       } else return () => {}
    }, [rtcProps.appId]) //, ready])
 
+   const getToken = useCallback(
+      async (rtcPropsArg: RtcPropsInterface) => {
+         const cfToken = router.query.token || ""
+         const { data } = await fetchAgoraRtcToken({
+            isStreamer: rtcPropsArg.isAHandRaiser
+               ? false
+               : rtcPropsArg.isStreamer,
+            uid: rtcPropsArg.uid,
+            sentToken: cfToken.toString(),
+            channelName: rtcPropsArg.channel,
+            streamDocumentPath: path,
+         })
+         return data.token.rtcToken
+      },
+      [router.query.token, fetchAgoraRtcToken, path]
+   )
+
    // Dynamically switches channel when channel prop changes
    useEffect(() => {
       let ignore = false
+
       async function join(): Promise<void> {
          await canJoin.current
-         const { tokenUrl, channel, uid: userUid, appId, token } = rtcProps
+         const { channel, uid: userUid, appId } = rtcProps
          if (client && !ignore) {
             if (rtcProps.role === "audience") {
                await client.setClientRole(rtcProps.role)
             } else {
                await client.setClientRole("host")
             }
-            if (tokenUrl) {
-               try {
-                  const res = await fetch(
-                     tokenUrl +
-                        "/rtc/" +
-                        channel +
-                        "/publisher/uid/" +
-                        (userUid || 0) +
-                        "/"
-                  )
-                  const data = await res.json()
-                  const token = data.rtcToken
-                  uid.current = await client.join(
-                     appId,
-                     channel,
-                     token,
-                     userUid || 0
-                  )
-               } catch (e) {
-                  console.log(e)
-               }
-            } else {
+            try {
+               const token = await getToken(rtcProps)
                uid.current = await client.join(
                   appId,
                   channel,
-                  token || null,
+                  token,
                   userUid || 0
                )
+            } catch (e) {
+               console.log(e)
             }
+
             // console.log('!uid: ', uid.current)
          } else {
             console.error("trying to join before RTC Engine was initialized")
          }
       }
+
       if (callActive) {
          join()
          console.log("Attempted join: ", rtcProps.channel)
@@ -264,14 +259,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
                .catch((err: unknown) => console.log(err))
          }
       }
-   }, [
-      rtcProps.channel,
-      rtcProps.uid,
-      callActive,
-      rtcProps.tokenUrl,
-      rtcProps,
-      client,
-   ])
+   }, [rtcProps.channel, rtcProps.uid, callActive, rtcProps, client])
 
    // publish local stream
    useEffect(() => {
@@ -295,6 +283,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
             }
          }
       }
+
       console.log("Publish", localVideoTrack, localAudioTrack, callActive)
       if (callActive) {
          publish()
@@ -308,7 +297,7 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
 
    // update local state if tracks are not null
    useEffect(() => {
-      if (localVideoTrack && localAudioTrack !== (null && undefined)) {
+      if (localVideoTrack && localAudioTrack !== null) {
          mediaStore.current[0] = {
             audioTrack: localAudioTrack,
             videoTrack: localVideoTrack,
@@ -377,8 +366,9 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
             await client.enableAudioVolumeIndicator()
          }
       }
+
       if (callActive) {
-         enableActiveSpeaker()
+         enableActiveSpeaker().then((r) => console.log(r))
       }
       return () => {
          client.removeAllListeners("volume-indicator")
@@ -397,10 +387,14 @@ const RtcConfigure: React.FC<Partial<RtcPropsInterface>> = (props) => {
             channelJoined,
          }}
       >
-         {/* <MinUidProvider value={uidState.min}> */}
-         {ready ? props.children : null}
+         {ready ? children : null}
       </RtcProvider>
    )
 }
+
+/**
+ * React component that contains the RTC logic. It manages the user state and provides it the children components by wrapping them with context providers.
+ */
+type stateType = { max: UIKitUser[]; min: UIKitUser[] }
 
 export default RtcConfigure

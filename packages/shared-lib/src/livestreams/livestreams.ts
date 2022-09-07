@@ -24,6 +24,7 @@ export interface LivestreamEvent extends Identifiable {
    companyLogoUrl?: string
    created?: Timestamp
    currentSpeakerId?: string
+   handRaiseActive?: boolean
    withResume?: boolean
    duration?: number
    groupIds?: string[]

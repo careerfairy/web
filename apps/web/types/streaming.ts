@@ -152,6 +152,7 @@ export interface RTCError extends Error {
       | RTCSubscribeErrorCodes
       | RTCPublishErrorCodes
       | CustomRTCErrors
+   |AgoraRTCErrorCode
    readonly message: string
    readonly name: string
    readonly data?: any

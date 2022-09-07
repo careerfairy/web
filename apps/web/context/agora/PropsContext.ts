@@ -1,6 +1,5 @@
 import {
    IAgoraRTCClient,
-   VideoPlayerConfig,
    IRemoteAudioTrack,
    IRemoteVideoTrack,
    ILocalVideoTrack,
@@ -21,6 +20,7 @@ import {
 
 import React from "react"
 import { rtmCallbacks } from "./AgoraRTMContext"
+import { RTCError } from "../../types/streaming"
 
 interface media {
    videoTrack?: IRemoteVideoTrack
@@ -83,167 +83,9 @@ export interface RemoteUIKitUser {
 }
 
 /**
- * Remote Buttons styles
- */
-interface remoteBtnStylesInterface {
-   /**
-    * Style for the remote mute audio button
-    */
-   muteRemoteAudio?: React.CSSProperties
-   /**
-    * Style for the remote mute video button
-    */
-   muteRemoteVideo?: React.CSSProperties
-   /**
-    * Style for the remote swap button in pinned layout
-    */
-   remoteSwap?: React.CSSProperties
-   /**
-    * Style for the overlay close button
-    */
-   minCloseBtnStyles?: React.CSSProperties
-}
-
-/**
- * Local Buttons styles
- */
-interface localBtnStylesInterface {
-   /**
-    * Style for the local mute audio button
-    */
-   muteLocalAudio?: React.CSSProperties
-   /**
-    * Style for the local mute video button
-    */
-   muteLocalVideo?: React.CSSProperties
-   /**
-    * Style for the switch camera button
-    */
-   switchCamera?: React.CSSProperties
-   /**
-    * Style for the end call button
-    */
-   endCall?: React.CSSProperties
-}
-
-/**
- * Props object for customising the UI Kit, takes in react native styling
- */
-export interface StylePropInterface {
-   /**
-    * Sets the scaling of the video
-    */
-   videoMode?: {
-      max?: VideoPlayerConfig["fit"]
-      min?: VideoPlayerConfig["fit"]
-   }
-   /**
-    * Color tint for icons
-    */
-   theme?: string
-   /**
-    * Color tint for icons
-    */
-   iconSize?: number
-   /**
-    * Custom base64 string for icon
-    */
-   customIcon?: Partial<IconsInterface>
-   /**
-    * Globals style for the local buttons (except end call)
-    */
-   BtnTemplateStyles?: React.CSSProperties
-   /**
-    * Style for the big view in pinned layout
-    */
-   maxViewStyles?: React.CSSProperties
-   /**
-    * Style for the small view in pinned layout
-    */
-   minViewStyles?: React.CSSProperties
-   /**
-    * Style for the small view container
-    */
-   minViewContainer?: React.CSSProperties
-   /**
-    * Style for the big view container
-    */
-   maxViewContainer?: React.CSSProperties
-   /**
-    * Style for the overlay on small user view when pressed in pinned layout
-    */
-   minViewOverlayContainer?: React.CSSProperties
-   /**
-    * Style for the overlay on small user view when pressed in pinned layout
-    */
-   maxViewOverlayContainer?: React.CSSProperties
-   /**
-    * Style for the remote button
-    */
-   remoteBtnStyles?: remoteBtnStylesInterface
-   /**
-    * Style for the remote button container
-    */
-   remoteBtnContainer?: React.CSSProperties
-   /**
-    * Style for specific local buttons, overrides the style applied by BtnTemplateStyles prop
-    */
-   localBtnStyles?: localBtnStylesInterface
-   /**
-    * Style for the local button container
-    */
-   localBtnContainer?: React.CSSProperties
-   /**
-    * Applies style to the individual cell (view) containing the video in the grid layout
-    */
-   gridVideoCells?: React.CSSProperties
-   /**
-    * Applies style to the grid container
-    */
-   gridVideoContainer?: React.CSSProperties
-   /**
-    * Applies style to the grid container
-    */
-   pinnedVideoContainer?: React.CSSProperties
-   /**
-    * Applies style to the pinned scrollview container
-    */
-   scrollViewContainer?: React.CSSProperties
-   /**
-    * Applies style to the global view containing the UI Kit
-    */
-   UIKitContainer?: React.CSSProperties
-   /**
-    * Applies style to the pop up container for remote mute requests
-    */
-   popUpContainer?: React.CSSProperties
-   /**
-    * Applies style to the displayed username text container
-    */
-   usernameText?: React.CSSProperties
-}
-
-/**
- * Props for the VideoPlaceholder component
- */
-export interface VideoPlaceholderProps {
-   user: UIKitUser
-   /**
-    * State value to display buttons
-    */
-   isShown: boolean
-   showButtons?: boolean
-   showSwap?: boolean
-}
-
-/**
  * Props object for customising the UI Kit functionality
  */
 export interface RtcPropsInterface {
-   /**
-    * React functional component for overriding the default video placeholder
-    */
-   CustomVideoPlaceholder?: React.FunctionComponent<VideoPlaceholderProps>
    /**
     * Agora App ID - used to authenticate the request
     */
@@ -256,14 +98,6 @@ export interface RtcPropsInterface {
     * UID for local user to join the channel (default: 0)
     */
    uid?: number
-   /**
-    * Token used to join a channel when using secured mode (default: null)
-    */
-   token?: string | null
-   /**
-    * URL for token server, manages fetching and updating tokens automatically. Must follow the schema here - https://github.com/AgoraIO-Community/agora-token-service/
-    */
-   tokenUrl?: string
    /**
     * Set to true to enable active speaker callback, switches the pinned video to active speaker if you're using the pinned layout. (default: false)
     */
@@ -297,13 +131,21 @@ export interface RtcPropsInterface {
     */
    enableAudio?: boolean
    /**
-    * Enable the camera before joining the call. Only use for initiak(default: true)
+    * Enable the camera before joining the call. Only use for initial(default: true)
     */
    enableVideo?: boolean
    /**
     * Disable Agora RTM, this also disables the use of usernames and remote mute functionality
     */
    disableRtm?: boolean
+   /**
+    * To see is the user is a hand raiser, set this to true. (default: false)
+    */
+   isAHandRaiser?: boolean
+   /**
+    * To see if the user is a host, set this to true. (default: false)
+    */
+   isStreamer?: boolean
 }
 
 /**
@@ -423,8 +265,8 @@ export interface RtcEventsInterface {
    ["token-privilege-will-expire"](): void
    ["token-privilege-did-expire"](): void
    ["network-quality"](stats: NetworkQuality): void
-   ["live-streaming-error"](url: string, err: AgoraRTCError): void
-   ["live-streaming-warning"](url: string, warning: AgoraRTCError): void
+   ["live-streaming-error"](url: string, err: RTCError): void
+   ["live-streaming-warning"](url: string, warning: RTCError): void
    ["stream-inject-status"](
       status: InjectStreamEventStatus,
       uid: UID,
@@ -442,10 +284,6 @@ export interface PropsInterface {
     */
    rtmProps?: RtmPropsInterface
    /**
-    * Props used to customise the UI Kit's appearance (accepts style object for different components)
-    */
-   styleProps?: Partial<StylePropInterface>
-   /**
     * Callbacks for different functions of the UI Kit
     */
    callbacks?: Partial<CallbacksInterface>
@@ -453,44 +291,6 @@ export interface PropsInterface {
     * Callbacks for different functions of the UI Kit
     */
    rtmCallbacks?: rtmCallbacks
-}
-
-/**
- * Interface for icons supplied with the UIKit (curtosy of https://feathericons.com/)
- */
-export interface IconsInterface {
-   /**
-    * Icon for Camera/Video mute in on state
-    */
-   videocam: string
-   /**
-    * Icon for Camera/Video mute in off state
-    */
-   videocamOff: string
-   /**
-    * Icon for Mic/Audio mute in on state
-    */
-   mic: string
-   /**
-    * Icon for Mic/Audio mute in off state
-    */
-   micOff: string
-   /**
-    * Icon to switch between device cameras
-    */
-   switchCamera: string
-   /**
-    * Icon to end the call
-    */
-   callEnd: string
-   /**
-    * Icon to swap the min user to max view
-    */
-   remoteSwap: string
-   /**
-    * Icon to close the overlay in floating layout
-    */
-   close: string
 }
 
 const initialValue: PropsInterface = {
@@ -505,9 +305,7 @@ const initialValue: PropsInterface = {
  * React Context to manage the user props
  */
 const PropsContext = React.createContext<PropsInterface>(initialValue)
-
 export const PropsProvider = PropsContext.Provider
-export const PropsConsumer = PropsContext.Consumer
 
 const enum InjectStreamEventStatus {
    /**
