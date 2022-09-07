@@ -1,5 +1,6 @@
 import LocalStorageUtil from "./LocalStorageUtil"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import * as Sentry from "@sentry/nextjs"
 
 export function getRandom(arr, n) {
    var result = new Array(n),
@@ -212,4 +213,9 @@ export const findElementsWithDuplicatePropertiesInArray = <T>(
 export const capitalizeFirstLetter = (string: string) => {
    if (!string) return string
    return string.charAt(0).toUpperCase() + string.slice(1)
+}
+
+export const errorLogAndNotify = (error: Error, metadata?: any) => {
+   console.error("error", error)
+   Sentry.captureException(error, metadata)
 }

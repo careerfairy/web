@@ -23,6 +23,7 @@ import { JobStatus } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
 import Box from "@mui/material/Box"
 import Image from "next/image"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = sxStyles({
    tabs: {
@@ -104,11 +105,11 @@ const Jobs = () => {
       : "/profile/jobs?type=open"
 
    useEffect(() => {
-      atsServiceInstance
-         .updateUserJobApplications()
-         .catch((e) =>
-            errorNotification(e, "Failed to update your job applications")
-         )
+      atsServiceInstance.updateUserJobApplications().catch((e) =>
+         errorLogAndNotify(e, {
+            description: "Failed to update your job applications",
+         })
+      )
    }, [errorNotification])
 
    const views = Object.keys(viewData).map((path) => (
