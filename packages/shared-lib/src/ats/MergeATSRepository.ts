@@ -62,7 +62,7 @@ export class MergeATSRepository implements IATSRepository {
    @fromFirebaseCache()
    async getJobs(): Promise<Job[]> {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
-         `/jobs?expand=offices,recruiters,hiring_managers,departments`
+         `/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100`
       )
       return data.results.map(Job.createFromMerge)
    }
