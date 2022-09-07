@@ -78,7 +78,7 @@ const FormSection = ({
    return (
       <>
          <Typography style={{ color: "white" }} variant="h4">
-            Jobs:
+            Open Jobs:
          </Typography>
 
          <FormGroup>

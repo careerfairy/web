@@ -19,7 +19,7 @@ export class Candidate extends ATSModel {
    }
 
    getName() {
-      return `${this.firstName} ${this.lastName}`
+      return [this.firstName, this.lastName].filter((n) => n).join(" ")
    }
 
    static createFromMerge(candidate: MergeCandidate) {

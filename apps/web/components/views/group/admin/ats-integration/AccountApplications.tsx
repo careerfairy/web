@@ -1,8 +1,9 @@
-import { useMemo } from "react"
+import React, { useMemo } from "react"
 import MaterialTable from "@material-table/core"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import useGroupATSApplications from "../../../../custom-hook/useGroupATSApplications"
 import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
+import { TableTitle } from "./AccountJobs"
 
 const columns = [
    {
@@ -12,6 +13,10 @@ const columns = [
    {
       title: "Candidate",
       field: "candidateName",
+   },
+   {
+      title: "Source",
+      field: "source",
    },
    {
       title: "Applied At",
@@ -41,7 +46,12 @@ const AccountApplications = ({ atsAccount }: Props) => {
       <MaterialTable
          columns={columns}
          data={applicationsToRows}
-         title={"Applications"}
+         title={
+            <TableTitle
+               title="Applications"
+               subtitle="Most recent applications across all sources"
+            />
+         }
       />
    )
 }
@@ -51,6 +61,7 @@ function mapApplicationsToTableRows(data: Application[]) {
       id: application.id,
       jobName: application.job.name,
       candidateName: application.candidate.getName(),
+      source: application.source,
       appliedAt: application.appliedAt.toLocaleDateString(),
       currentStage: application.currentStage,
    }))
