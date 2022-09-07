@@ -62,7 +62,7 @@ function mapApplicationsToTableRows(data: Application[]) {
       jobName: application.job.name,
       candidateName: application.candidate.getName(),
       source: application.source,
-      appliedAt: application.appliedAt.toLocaleDateString(),
+      appliedAt: application.appliedAt?.toLocaleString(),
       currentStage: application.currentStage,
    }))
 }
