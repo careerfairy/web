@@ -24,7 +24,7 @@ export const getATSTokens = async (
          association.integrationId
       )
 
-      map[association.integrationId] = tokenDoc.merge?.account_token
+      map[association.integrationId] = tokenDoc?.merge?.account_token
    }
 
    return map
