@@ -11,6 +11,7 @@
       "build:packages": "turbo run build --ignore=\"apps/**/*\" --no-deps",
       "dev": "turbo run dev --parallel",
       "test": "turbo run test",
+      "clean": "turbo run clean",
       "start": "turbo run start --parallel",
       "test:e2e-webapp": "cross-env NODE_ENV=test turbo run test:e2e-webapp --scope=@careerfairy/webapp --scope=@careerfairy/functions --include-dependencies --no-deps",
       "test:e2e-webapp-debug": "cross-env NODE_ENV=test turbo run test:e2e-webapp-debug --scope=@careerfairy/webapp --include-dependencies --no-deps",

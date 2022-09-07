@@ -9,6 +9,9 @@
          "dependsOn": ["build"],
          "outputs": ["coverage/**"]
       },
+      "clean": {
+         "dependsOn": ["^clean"]
+      },
       "start": {
          "dependsOn": ["build"],
          "cache": false
