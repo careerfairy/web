@@ -277,6 +277,7 @@ const ViewerLayout = (props) => {
          query: { absolutePath: asPath },
       })
    }
+
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu())
    const openLeftMenu = () => dispatch(actions.openLeftMenu())
 

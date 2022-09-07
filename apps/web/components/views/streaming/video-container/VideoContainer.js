@@ -82,21 +82,6 @@ function VideoContainer({
 
    const [showSettings, setShowSettings] = useState(false)
 
-   const isStreamer = true
-   // const {
-   //    networkQuality,
-   //    localStream,
-   //    localMediaControls,
-   //    remoteStreams,
-   //    screenShareStreamRef,
-   //    publishScreenShareStream,
-   //    unPublishScreenShareStream,
-   //    leaveAgoraRoom,
-   //    localMediaHandlers,
-   //    handlePublishLocalStream,
-   //    closeAndUnpublishedLocalStream,
-   //    demoStreamHandlers,
-   // } = useAgoraRtc(streamerId, currentLivestream.id, isStreamer, true)
    const {
       networkQuality,
       localStream,

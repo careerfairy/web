@@ -1,5 +1,5 @@
 import { createContext } from "react"
-import { RtmChannel, RtmClient, RtmEvents } from "agora-rtm-sdk"
+import { RtmChannel, RtmClient } from "agora-rtm-sdk"
 
 export type RTMTextMessageType = "CONTROL" | "NORMAL" | "EMOTE" | "TRANSCRIBE"
 
@@ -20,13 +20,7 @@ export interface EmoteMessage {
    timestamp: number
    memberId: string
 }
-/**
- * Callbacks to pass to RTM events
- */
-export type rtmCallbacks = {
-   channel?: Partial<RtmEvents.RtmChannelEvents>
-   client?: Partial<RtmEvents.RtmClientEvents>
-}
+
 // export interface messageStoreInterface {
 //    ts: string;
 //    uid: string;
