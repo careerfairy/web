@@ -16,6 +16,7 @@ import Typography from "@mui/material/Typography"
 import UserResume from "../../../../profile/userData/user-resume/UserResume"
 import { Stack } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import SanitizedHTML from "../../../../../util/SanitizedHTML"
 
 const styles = sxStyles({
    infoItem: {
@@ -140,7 +141,7 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                   </Box>
                </Box>
                <Typography variant="h6" mt={1}>
-                  {job.description}
+                  <SanitizedHTML htmlString={job.description} />
                </Typography>
             </Box>
 
