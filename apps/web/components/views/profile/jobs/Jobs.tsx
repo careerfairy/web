@@ -11,7 +11,6 @@ import {
 } from "./JobApplicationCard"
 import Stack from "@mui/material/Stack"
 import { atsServiceInstance } from "../../../../data/firebase/ATSService"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import Tabs from "@mui/material/Tabs"
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import { alpha, useTheme } from "@mui/material/styles"
@@ -96,7 +95,6 @@ const viewData = {
 }
 type Value = keyof typeof viewData
 const Jobs = () => {
-   const { errorNotification } = useSnackbarNotifications()
    const mobile = useIsMobile()
    const theme = useTheme()
    const { asPath } = useRouter()
@@ -110,7 +108,7 @@ const Jobs = () => {
             description: "Failed to update your job applications",
          })
       )
-   }, [errorNotification])
+   }, [])
 
    const views = Object.keys(viewData).map((path) => (
       <TabPanel
