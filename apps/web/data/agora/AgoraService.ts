@@ -30,56 +30,6 @@ export class AgoraService {
 
       return () => createClosure()
    }
-
-   /**
-    * Creates and stores the camera and microphone tracks
-    * @param audioConfig Config for the audio track
-    * @param videoConfig Config for the video track
-    * @returns React hook that can be used to access the camera and microphone tracks
-    * @category Wrapper
-    */
-   createMicrophoneAndCameraTracks(
-      audioConfig?: MicrophoneAudioTrackInitConfig | undefined,
-      videoConfig?: CameraVideoTrackInitConfig | undefined
-   ) {
-      let tracks: [IMicrophoneAudioTrack, ICameraVideoTrack] | null = null
-
-      async function createClosure() {
-         tracks = await AgoraRTC.createMicrophoneAndCameraTracks(
-            audioConfig,
-            videoConfig
-         )
-         return tracks
-      }
-
-      return function useMicrophoneAndCameraTracks() {
-         const [ready, setReady] = useState(false)
-         const [agoraRTCError, setAgoraRTCError] = useState<null | RTCError>(
-            null
-         )
-         const ref = useRef(tracks)
-
-         useEffect(() => {
-            if (ref.current === null) {
-               createClosure().then(
-                  (tracks) => {
-                     ref.current = tracks
-                     setReady(true)
-                  },
-                  (e) => {
-                     setAgoraRTCError(e)
-                  }
-               )
-            } else {
-               setReady(true)
-            }
-            return () => {
-               tracks = null
-            }
-         }, [])
-         return { ready, tracks: ref.current, error: agoraRTCError }
-      }
-   }
 }
 
 export const agoraServiceInstance = new AgoraService()

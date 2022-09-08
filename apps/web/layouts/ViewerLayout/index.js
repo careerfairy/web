@@ -88,6 +88,7 @@ const ViewerLayout = (props) => {
       replace,
       asPath,
    } = useRouter()
+   const channelId = breakoutRoomId || livestreamId
    const dispatch = useDispatch()
    const { authenticatedUser, userData } = useAuth()
    const {
@@ -324,7 +325,7 @@ const ViewerLayout = (props) => {
    return (
       <RtcProvider
          uid={streamerId}
-         channel={livestreamId}
+         channel={channelId}
          appId={agoraCredentials.appID}
          initialize={shouldInitializeAgora}
          isStreamer={handRaiseActive}
