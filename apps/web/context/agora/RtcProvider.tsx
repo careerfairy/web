@@ -200,11 +200,12 @@ const RtcProvider: React.FC<RtcPropsInterface> = ({
       console.log("-> LEAVING")
       try {
          if (rtcClient) {
-            return await rtcClient.leave()
+            await rtcClient.leave()
          }
          if (sessionIsUsingCloudProxy) {
             rtcClient.stopProxyServer()
          }
+         rtcClient?.removeAllListeners?.()
       } catch (error) {
          console.log(error)
       }
