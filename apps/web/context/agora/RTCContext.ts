@@ -82,8 +82,8 @@ export interface RtcPropsInterface {
 /**
  * Context to access local/remote tracks, client, dispatch and local UID. It's setup by {@link RTCProvider}.
  */
-const RtcContext = React.createContext<RtcContextInterface>(
+const RTCContext = React.createContext<RtcContextInterface>(
    {} as RtcContextInterface
 )
 
-export default RtcContext
+export default RTCContext

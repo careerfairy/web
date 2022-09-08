@@ -28,10 +28,10 @@ import StreamPublishingModal from "../../../../components/views/streaming/modal/
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
 import useHandRaiseState from "../../../../components/custom-hook/useHandRaiseState"
 import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
-import RTMContext from "../../../../context/agora/RtmContext"
+import RTMContext from "../../../../context/agora/RTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
-import { useRtc } from "../../../../context/agora/RtcProvider"
+import { useRtc } from "../../../../context/agora/RTCProvider"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {

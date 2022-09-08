@@ -21,7 +21,7 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import clsx from "clsx"
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
 import { addQueryParam } from "../../../../../components/helperFunctions/HelperFunctions"
-import RTMContext from "../../../../../context/agora/RtmContext"
+import RTMContext from "../../../../../context/agora/RTMContext"
 
 const useStyles = makeStyles((theme) => ({
    breakoutRoomsContent: {

@@ -6,7 +6,7 @@ import React, {
    useRef,
    useState,
 } from "react"
-import RtcContext, { RtcPropsInterface } from "./RtcContext"
+import RTCContext, { RtcPropsInterface } from "./RTCContext"
 import AgoraRTC, {
    IAgoraRTCClient,
    ILocalAudioTrack,
@@ -37,7 +37,7 @@ const useScreenShareRtc = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
 })
-const RtcProvider: React.FC<RtcPropsInterface> = ({
+const RTCProvider: React.FC<RtcPropsInterface> = ({
    children,
    appId,
    isStreamer,
@@ -687,18 +687,18 @@ const RtcProvider: React.FC<RtcPropsInterface> = ({
       ]
    )
    return (
-      <RtcContext.Provider value={value}>
+      <RTCContext.Provider value={value}>
          {init ? children : null}
-      </RtcContext.Provider>
+      </RTCContext.Provider>
    )
 }
 
 export const useRtc = () => {
-   const context = useContext(RtcContext)
+   const context = useContext(RTCContext)
    if (context === undefined) {
       throw new Error("useRtc must be used within a RtcProvider")
    }
    return context
 }
 
-export default RtcProvider
+export default RTCProvider

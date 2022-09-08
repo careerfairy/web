@@ -23,13 +23,12 @@ import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/Stre
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
 import Streams from "./Streams"
 import DraggableComponent from "../../banners/DraggableComponent"
-import useAgoraRtc from "../../../../components/custom-hook/useAgoraRtc"
 import StreamPublishingModal from "../modal/StreamPublishingModal"
 import { useDispatch } from "react-redux"
 import * as actions from "../../../../store/actions"
 import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
-import { useRtc } from "../../../../context/agora/RtcProvider"
+import { useRtc } from "../../../../context/agora/RTCProvider"
 
 const labels = {
    mainTitle: "Join the Stream",

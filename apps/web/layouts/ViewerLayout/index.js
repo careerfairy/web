@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -17,7 +17,7 @@ import useStreamRef from "../../components/custom-hook/useStreamRef"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu"
-import RTMProvider from "context/agora/RtmProvider"
+import RTMProvider from "context/agora/RTMProvider"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
@@ -30,7 +30,7 @@ import {
 import { groupRepo } from "../../data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import RtcProvider from "../../context/agora/RtcProvider"
+import RTCProvider from "../../context/agora/RTCProvider"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -300,6 +300,17 @@ const ViewerLayout = (props) => {
       setAudienceDrawerOpen(false)
    }, [])
 
+   const currentStreamContextValue = useMemo(
+      () => ({
+         currentLivestream,
+         isBreakout,
+         streamerId,
+         isStreamer: false,
+         handRaiseId,
+         isMobile: mobile,
+      }),
+      [currentLivestream, isBreakout, streamerId, handRaiseId, mobile]
+   )
    if (!browserIsCompatible) {
       return <BrowserIncompatibleOverlay />
    }
@@ -323,7 +334,7 @@ const ViewerLayout = (props) => {
    }
 
    return (
-      <RtcProvider
+      <RTCProvider
          uid={streamerId}
          channel={channelId}
          appId={agoraCredentials.appID}
@@ -332,16 +343,7 @@ const ViewerLayout = (props) => {
          isAHandRaiser={handRaiseActive}
       >
          <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
-            <CurrentStreamContext.Provider
-               value={{
-                  currentLivestream,
-                  isBreakout,
-                  streamerId,
-                  isStreamer: false,
-                  handRaiseId,
-                  isMobile: mobile,
-               }}
-            >
+            <CurrentStreamContext.Provider value={currentStreamContextValue}>
                <div className={`${classes.root} notranslate`}>
                   <ViewerTopBar
                      showAudience={showAudience}
@@ -382,7 +384,7 @@ const ViewerLayout = (props) => {
                </div>
             </CurrentStreamContext.Provider>
          </RTMProvider>
-      </RtcProvider>
+      </RTCProvider>
    )
 }
 

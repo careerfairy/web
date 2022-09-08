@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import StreamerTopBar from "./StreamerTopBar"
@@ -17,12 +17,12 @@ import useStreamRef from "../../components/custom-hook/useStreamRef"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import RTMProvider from "context/agora/RtmProvider"
+import RTMProvider from "context/agora/RTMProvider"
 import AgoraRTC from "agora-rtc-sdk-ng"
 import BrowserIncompatibleOverlay from "../../components/views/streaming/BrowserIncompatibleOverlay"
 import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import RtcProvider from "../../context/agora/RtcProvider"
+import RTCProvider from "../../context/agora/RTCProvider"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -213,6 +213,25 @@ const StreamerLayout = (props) => {
       [showMenu]
    )
 
+   const notificationsContextValue = useMemo(
+      () => ({
+         notifications,
+         setNewNotification,
+      }),
+      [notifications, setNewNotification]
+   )
+   const currentStreamContextValue = useMemo(
+      () => ({
+         currentLivestream,
+         isBreakout,
+         isMainStreamer,
+         isStreamer: true,
+         streamerId,
+         isMobile: undefined,
+      }),
+      [streamerId, currentLivestream, isBreakout, isMainStreamer]
+   )
+
    const tokenIsValidated = () => {
       if (currentLivestream?.test) {
          return true
@@ -244,7 +263,7 @@ const StreamerLayout = (props) => {
    }
 
    return (
-      <RtcProvider
+      <RTCProvider
          uid={streamerId}
          channel={livestreamId}
          appId={agoraCredentials.appID}
@@ -252,19 +271,8 @@ const StreamerLayout = (props) => {
          isStreamer
       >
          <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
-            <NotificationsContext.Provider
-               value={{ setNewNotification, setNotificationToRemove }}
-            >
-               <CurrentStreamContext.Provider
-                  value={{
-                     currentLivestream,
-                     isBreakout,
-                     isMainStreamer,
-                     isStreamer: true,
-                     streamerId,
-                     isMobile: undefined,
-                  }}
-               >
+            <NotificationsContext.Provider value={notificationsContextValue}>
+               <CurrentStreamContext.Provider value={currentStreamContextValue}>
                   <div className={classes.root}>
                      <StreamerTopBar
                         firebase={firebase}
@@ -306,7 +314,7 @@ const StreamerLayout = (props) => {
                </CurrentStreamContext.Provider>
             </NotificationsContext.Provider>
          </RTMProvider>
-      </RtcProvider>
+      </RTCProvider>
    )
 }
 
