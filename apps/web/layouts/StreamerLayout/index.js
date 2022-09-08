@@ -80,10 +80,9 @@ const useStyles = makeStyles((theme) => ({
       boxShadow: theme.shadows[7],
    },
 }))
-
+const browserIsCompatible = AgoraRTC.checkSystemRequirements()
 const StreamerLayout = (props) => {
    const { children, isBreakout, isMainStreamer } = props
-   const [browserIsCompatible] = useState(AgoraRTC.checkSystemRequirements)
    const firebase = useFirebaseService()
    const {
       query: { token, livestreamId: baseStreamId, breakoutRoomId, auto },

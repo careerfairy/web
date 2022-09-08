@@ -79,8 +79,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
+const browserIsCompatible = AgoraRTC.checkSystemRequirements()
 const ViewerLayout = (props) => {
-   const [browserIsCompatible] = useState(AgoraRTC.checkSystemRequirements)
    const { children, isBreakout } = props
    const firebase = useFirebaseService()
    const {
