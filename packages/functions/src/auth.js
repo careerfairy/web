@@ -218,7 +218,7 @@ exports.validateUserEmailWithPin = functions
 
                return updatedUserRecord
             } else {
-               functions.logger.error(
+               functions.logger.warn(
                   `The User ${recipientEmail} has failed to provide the correct Pin code, provided ${pinCode} instead of ${user.validationPin}`
                )
                error = {
