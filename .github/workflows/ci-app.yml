@@ -11,6 +11,7 @@ jobs:
    should_skip:
       name: "Pre-Check"
       runs-on: ubuntu-latest
+      timeout-minutes: 5
       outputs:
          should_skip: ${{ steps.skip_check.outputs.should_skip }}
       steps:
@@ -23,6 +24,7 @@ jobs:
    build_app_for_tests:
       name: "Pre-build cache for tests"
       runs-on: ubuntu-latest
+      timeout-minutes: 10
       needs: [should_skip]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       env:
@@ -65,6 +67,7 @@ jobs:
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
+      timeout-minutes: 10
       env:
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
@@ -117,6 +120,7 @@ jobs:
       needs: [should_skip, build_app_for_tests]
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
+      timeout-minutes: 25
       env:
          # https://turborepo.org/docs/guides/continuous-integration
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
@@ -169,6 +173,7 @@ jobs:
       if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       needs: [e2e_tests, unit_tests]
       runs-on: ubuntu-latest
+      timeout-minutes: 20
       steps:
          - uses: actions/checkout@v2
          - uses: amondnet/vercel-action@v25.1.0 #deploy

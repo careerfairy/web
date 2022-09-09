@@ -4,7 +4,11 @@
  *  - const obj = {prop1: {prop2:{prop3: "dog"}}}
  *  - getNestedProperty(obj, "prop1.prop2.prop3") returns "dog"
  * */
-export const getNestedProperty = (obj: any, path: string, separator = ".") => {
+export const getNestedProperty = (
+   obj: any,
+   path: string | string[],
+   separator = "."
+) => {
    const properties = Array.isArray(path) ? path : path.split(separator)
    return properties.reduce((prev, curr) => prev && prev[curr], obj)
 }

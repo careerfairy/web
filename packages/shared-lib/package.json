@@ -6,10 +6,12 @@
    "scripts": {
       "build": "npm run clean && npm run copy-files && tsc",
       "dev": "npm run clean && npm run copy-files && tsc --watch",
+      "test": "jest",
       "copy-files": "cpx \"src/**/*.{json}\" dist/",
       "clean": "rimraf dist/"
    },
    "dependencies": {
+      "lodash.clonedeep": "^4.5.0",
       "object-hash": "^3.0.0"
    },
    "peerDependencies": {
@@ -17,11 +19,11 @@
       "firebase": "^9.9.0"
    },
    "devDependencies": {
+      "@types/jest": "^27.4.0",
       "cpx": "^1.5.0",
+      "jest": "^27.5.1",
       "rimraf": "^3.0.2",
+      "ts-jest": "^28.0.8",
       "typescript": "^4.5.4"
-   },
-   "dependencies": {
-      "lodash.clonedeep": "^4.5.0"
    }
 }
