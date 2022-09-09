@@ -70,3 +70,13 @@ exports.userIncrementStat = async (userDataId, field, amount = 1) => {
       })
    }
 }
+
+// update user flag to display the jobs tab
+// this should be removed in the future when the feature is fully rolled out
+exports.userSetHasJobApplications = async (userId) => {
+   return admin
+      .firestore()
+      .collection("userData")
+      .doc(userId)
+      .update({ hasJobApplications: true })
+}
