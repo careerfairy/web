@@ -180,6 +180,7 @@ const Hero: FC<HygraphResponseHero> = ({
                   loop
                   muted
                   src={video?.url}
+                  playsInline
                />
             </Box>
          ) : (
