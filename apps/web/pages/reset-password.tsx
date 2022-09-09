@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 
 import MicIcon from "@mui/icons-material/Mic"
@@ -25,6 +25,8 @@ import Collapse from "@mui/material/Collapse"
 import { PillsBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
+import { errorLogAndNotify } from "../util/CommonUtil"
+import * as yup from "yup"
 
 const styles = sxStyles({
    formWrapper: {
@@ -72,7 +74,7 @@ function ResetPasswordPage() {
             void router.replace("/profile")
          }
       }
-   }, [user, firebase.auth?.currentUser?.emailVerified])
+   }, [user, firebase.auth?.currentUser?.emailVerified, router])
 
    return (
       <PillsBackground>
@@ -86,30 +88,38 @@ function ResetPasswordPage() {
 
 export default ResetPasswordPage
 
-interface Errors {
-   email?: string
-}
+const schema = yup.object().shape({
+   email: yup
+      .string()
+      .trim()
+      .required("Your email is required")
+      .email("Please enter a valid email address"),
+})
+
+const initialValues = { email: "" }
 
 export function ResetPasswordBase() {
    const [completed, setCompleted] = useState(false)
    const firebase = useFirebaseService()
 
-   const handleSubmit = async (
-      values: FormikValues,
-      helpers: FormikHelpers<FormikValues>
-   ) => {
-      try {
+   const handleSubmit = useCallback(
+      (values: FormikValues, helpers: FormikHelpers<FormikValues>) => {
          setCompleted(false)
-         await firebase.sendPasswordResetEmail({
-            recipientEmail: values.email,
-            redirectLink: `${getBaseUrl()}/login`,
-         })
-      } catch (e) {
-         // Dont show the client an error
-      }
-      setCompleted(true)
-      helpers.setSubmitting(false)
-   }
+
+         firebase
+            .sendPasswordResetEmail({
+               recipientEmail: values.email,
+               redirectLink: `${getBaseUrl()}/login`,
+            })
+            .catch(errorLogAndNotify)
+            .finally(() => {
+               setCompleted(true)
+               helpers.setSubmitting(false)
+               helpers.resetForm()
+            })
+      },
+      [firebase]
+   )
 
    return (
       <>
@@ -119,14 +129,8 @@ export function ResetPasswordBase() {
          <Container maxWidth={"sm"}>
             <Box sx={styles.formWrapper}>
                <Formik
-                  initialValues={{ email: "" }}
-                  validate={(values) => {
-                     let errors: Errors = {}
-                     if (!values.email) {
-                        errors.email = "Please enter your email"
-                     }
-                     return errors
-                  }}
+                  initialValues={initialValues}
+                  validationSchema={schema}
                   onSubmit={handleSubmit}
                >
                   {({
@@ -162,7 +166,7 @@ export function ResetPasswordBase() {
                         <TextField
                            required
                            name="email"
-                           id={"email"}
+                           id="email"
                            placeholder="Email"
                            onBlur={handleBlur}
                            onChange={handleChange}
@@ -207,9 +211,9 @@ export function ResetPasswordBase() {
                                  Done!
                               </Typography>
                               <Typography variant={"subtitle1"}>
-                                 If you're email is registered, you will shortly
-                                 receive an email to complete your password
-                                 reset.
+                                 If {"you're"} email is registered, you will
+                                 shortly receive an email to complete your
+                                 password reset.
                               </Typography>
                            </Paper>
                         </Collapse>
