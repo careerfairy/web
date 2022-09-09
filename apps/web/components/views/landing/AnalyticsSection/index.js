@@ -95,6 +95,7 @@ const AnalyticsSection = (props) => {
                         autoPlay
                         muted
                         loop
+                        playsInline
                      />
                   </Fade>
                </Box>
