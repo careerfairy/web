@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect, useState } from "react"
 import Box from "@mui/material/Box"
 import List from "@mui/material/List"
 import NavElement from "./NavElement"
@@ -13,6 +13,7 @@ import Stack from "@mui/material/Stack"
 import { StylesProps } from "../../../types/commonTypes"
 import { Divider, ListItem } from "@mui/material"
 import UserAvatarAndDetails from "../common/UserAvatarAndDetails"
+import WorkIcon from "@mui/icons-material/Work"
 
 const styles: StylesProps = {
    root: {
@@ -46,13 +47,10 @@ const DrawerContent = () => {
             </List>
          </Stack>
          {isLoggedIn && (
-            <>
-               <List>
-                  {authenticatedUserTopLinks.map((item) => (
-                     <NavElement key={item.title} {...item} />
-                  ))}
-               </List>
-            </>
+            <AuthenticatedLinks
+               hasJobApplications={userData?.hasJobApplications}
+               authenticatedUserTopLinks={authenticatedUserTopLinks}
+            />
          )}
 
          {isLoggedOut && <NavPrompt />}
@@ -72,6 +70,36 @@ const DrawerContent = () => {
             </List>
          </Box>
       </Stack>
+   )
+}
+
+const AuthenticatedLinks = ({
+   authenticatedUserTopLinks,
+   hasJobApplications,
+}) => {
+   const [links, setLinks] = useState(authenticatedUserTopLinks)
+
+   // add link to array
+   useEffect(() => {
+      if (hasJobApplications && !links.find((l) => l.title === "Jobs")) {
+         setLinks((prev) => [
+            ...prev,
+            {
+               href: "/profile/jobs",
+               title: "Jobs",
+               basePath: "/profile/jobs",
+               icon: WorkIcon,
+            },
+         ])
+      }
+   }, [links, hasJobApplications])
+
+   return (
+      <List>
+         {links.map((item) => (
+            <NavElement key={item.title} {...item} />
+         ))}
+      </List>
    )
 }
 
