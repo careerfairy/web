@@ -9,11 +9,13 @@ import {
    LivestreamEventParsed,
    LivestreamEventPublicData,
    LivestreamEventSerialized,
+   LivestreamJobApplicationDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    UserLivestreamData,
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
+import { Job, JobIdentifier } from "../ats/Job"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -106,6 +108,20 @@ export interface ILivestreamRepository {
    ): firebase.firestore.Query
 
    getById(id: string): Promise<LivestreamEvent>
+
+   /**
+    * Update the userLivestreamData/{userId} document with the job application details
+    * @param livestreamId
+    * @param userId
+    * @param jobIdentifier
+    * @param job
+    */
+   saveJobApplication(
+      livestreamId: string,
+      userId: string,
+      jobIdentifier: JobIdentifier,
+      job: Job
+   ): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -479,6 +495,35 @@ export class FirebaseLivestreamRepository
       return streamRef
          .collection("userLivestreamData")
          .where(`${userAction}.date`, "!=", null)
+   }
+
+   saveJobApplication(
+      livestreamId: string,
+      userId: string,
+      jobIdentifier: JobIdentifier,
+      job: Job
+   ): Promise<void> {
+      // should already exist since the user registered & participated
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("userLivestreamData")
+         .doc(userId)
+
+      const details: LivestreamJobApplicationDetails = {
+         jobId: jobIdentifier.jobId,
+         groupId: jobIdentifier.groupId,
+         integrationId: jobIdentifier.integrationId,
+         // @ts-ignore
+         date: this.fieldValue.serverTimestamp(),
+         job: job.serializeToPlainObject(),
+      }
+
+      const toUpdate: Partial<UserLivestreamData> = {
+         [`jobApplications.${jobIdentifier.jobId}`]: details,
+      }
+
+      return docRef.update(toUpdate)
    }
 }
 
