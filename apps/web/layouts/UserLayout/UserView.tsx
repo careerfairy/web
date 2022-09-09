@@ -16,6 +16,7 @@ import { Container } from "@mui/material"
 import MyRecruitersTab from "../../components/views/profile/saved-recruiters/MyRecruitersTab"
 import CareerSkills from "../../components/views/profile/career-skills/CareerSkills"
 import Jobs from "../../components/views/profile/jobs/Jobs"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 type TabPanelProps = {
    children: () => JSX.Element
@@ -100,6 +101,12 @@ type Props = {
 const UserView = ({ currentPath }: Props) => {
    const theme = useTheme()
    const native = useMediaQuery(theme.breakpoints.down("sm"))
+   const { userData } = useAuth()
+
+   // hide the jobs tab
+   if (!userData?.hasJobApplications) {
+      delete pages["/profile/jobs"]
+   }
 
    const views = Object.entries(pages).map(([key, value], index) => (
       <TabPanel

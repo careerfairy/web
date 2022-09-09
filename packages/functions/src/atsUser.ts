@@ -16,6 +16,7 @@ import {
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { getATSTokens } from "./lib/groups"
 import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
+import { userSetHasJobApplications } from "./lib/user"
 
 /*
 |--------------------------------------------------------------------------
@@ -288,6 +289,9 @@ export const atsUserApplyToJob = functions
                job,
                livestream
             ),
+            // update user flag to display the jobs tab
+            // this should be removed in the future when the feature is fully rolled out
+            userSetHasJobApplications(userEmail),
          ])
 
          return applicationId
