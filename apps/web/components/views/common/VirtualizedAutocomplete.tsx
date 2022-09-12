@@ -1,5 +1,4 @@
 import * as React from "react"
-import { HTMLAttributes } from "react"
 import Autocomplete, {
    autocompleteClasses,
    AutocompleteProps,
@@ -40,6 +39,7 @@ function renderRow(props: ListChildComponentProps) {
 
 const OuterElementContext = React.createContext({})
 
+// eslint-disable-next-line react/display-name
 const OuterElementType = React.forwardRef<HTMLDivElement>((props, ref) => {
    const outerProps = React.useContext(OuterElementContext)
    return <div ref={ref} {...props} {...outerProps} />
@@ -124,39 +124,21 @@ const StyledPopper = styled(Popper)({
    },
 })
 
-interface VirtualizedAutocompleteProps<T>
-   extends AutocompleteProps<T, boolean, boolean, boolean> {
-   options: T[]
-   groupBy?: (option: T) => string
-   renderOption: (
-      props: HTMLAttributes<HTMLLIElement>,
-      option: T
-   ) => React.ReactNode
-   label?: string
-   getOptionLabel?: (option: T) => string
-   fullWidth?: boolean
-}
-const VirtualizedAutocomplete = <T extends unknown>({
-   groupBy,
-   options,
-   label,
-   renderOption,
-   getOptionLabel,
-   fullWidth,
+const VirtualizedAutocomplete = <
+   T,
+   Multiple extends boolean | undefined = undefined,
+   DisableClearable extends boolean | undefined = undefined,
+   FreeSolo extends boolean | undefined = undefined
+>({
    ...rest
-}: VirtualizedAutocompleteProps<T>) => (
+}: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>) => (
    <Autocomplete
+      {...rest}
       disableListWrap
       PopperComponent={StyledPopper}
       ListboxComponent={ListboxComponent}
-      options={options}
-      groupBy={groupBy}
-      fullWidth={fullWidth}
-      getOptionLabel={getOptionLabel}
       // TODO: Post React 18 update - validate this conversion, look like a hidden bug
       renderGroup={(params) => params as unknown as React.ReactNode}
-      renderOption={renderOption}
-      {...rest}
    />
 )
 export default VirtualizedAutocomplete
