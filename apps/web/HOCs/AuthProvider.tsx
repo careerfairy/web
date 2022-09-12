@@ -164,6 +164,16 @@ const AuthProvider = ({ children }) => {
       [auth, isLoggedIn, isLoggedOut, userData, userStats]
    )
 
+   useEffect(() => {
+      // @ts-ignore
+      window?.dataLayer?.push({
+         event: "event",
+         eventProps: {
+            isAdmin: userData?.isAdmin,
+         },
+      })
+   }, [userData])
+
    const isSecurePath = () => {
       return Boolean(securePaths.includes(pathname))
    }
