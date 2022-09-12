@@ -49,7 +49,7 @@ exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 exports.exportFirestoreBackup = backup.exportFirestoreBackup
 
 // Admin Functions
-exports.sendBasicTemplateEmail_v2 = admin.sendBasicTemplateEmail_v2
+exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail_v3
 
 // Group Admin
 exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
