@@ -6,7 +6,8 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 /**
  * Get Users
  */
-export const getBigQueryUsers = functions.https.onCall(
+// eslint-disable-next-line camelcase
+export const getBigQueryUsers_v2 = functions.https.onCall(
    async (data: BigQueryUserQueryOptions, context) => {
       await userIsSignedInAndIsCFAdmin(context)
       try {
