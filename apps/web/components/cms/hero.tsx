@@ -6,6 +6,7 @@ import CmsImage from "./image"
 import React, { FC, useMemo } from "react"
 import LaptopVideo from "components/views/landing/HeroSection/LaptopVideo"
 import { PillsBackground } from "../../materialUI/GlobalBackground/GlobalBackGround"
+import { MainLogo } from "../logos"
 
 const styles = sxStyles({
    imageWrapper: {
@@ -117,10 +118,6 @@ const styles = sxStyles({
    },
    fullScreenMain: {
       height: { xs: "100%", sm: "90vh" },
-      display: "flex",
-      alignItems: {
-         md: "center",
-      },
       zIndex: 1,
    },
    fullScreenVideoWrapper: {
@@ -132,6 +129,18 @@ const styles = sxStyles({
       width: "100%",
       height: "100%",
       objectFit: "cover",
+   },
+   logo: {
+      width: { xs: 150, md: 300 },
+      position: "absolute",
+      top: { xs: "3vw", md: "3vw" },
+   },
+   defaultMain: {
+      display: "flex",
+      alignItems: {
+         md: "center",
+      },
+      height: "80vh",
    },
 })
 
@@ -196,11 +205,16 @@ const Hero: FC<HygraphResponseHero> = ({
          <PillsBackground minHeight={"fit-content"}>
             <Box id={slug} sx={styles.root}>
                <Box
-                  sx={[fullScreenImage && styles.fullScreenMain]}
+                  sx={[
+                     styles.defaultMain,
+                     fullScreenImage && styles.fullScreenMain,
+                  ]}
                   component="main"
                >
                   <Container maxWidth={"xl"} sx={styles.container}>
                      <Box px={[4, 8]} pr={{ xl: 16 }} width={{ lg: "50%" }}>
+                        <MainLogo sx={styles.logo} />
+
                         <Typography
                            variant="h1"
                            component="h1"
