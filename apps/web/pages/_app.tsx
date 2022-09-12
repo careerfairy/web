@@ -63,7 +63,9 @@ const tagManagerArgs = {
    gtmId: "GTM-P29VCWC",
 }
 
-TagManager.initialize(tagManagerArgs)
+if (!process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   TagManager.initialize(tagManagerArgs)
+}
 
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
