@@ -99,10 +99,9 @@ const GroupDashboardLayout = (props) => {
 
          return () => {
             unsubscribe()
-            setGroupQuestions([])
          }
       }
-   }, [isCorrectGroup, groupId, group.id])
+   }, [isCorrectGroup, groupId, group?.id])
 
    const groupPresenter = useMemo(
       () => group && GroupPresenter.createFromDocument(group),
