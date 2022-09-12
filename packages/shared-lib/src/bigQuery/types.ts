@@ -24,6 +24,7 @@ export interface BigQueryUserQueryOptions {
 export interface GetUserFilters {
    universityCountryCodes?: string[]
    universityName?: string
+   universityCodes?: string[]
    fieldOfStudyIds?: string[]
    levelOfStudyIds?: string[]
 }

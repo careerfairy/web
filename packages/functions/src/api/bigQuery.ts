@@ -40,11 +40,15 @@ export class BigQueryRepository implements IBigQueryRepository {
       sortOrder: "DESC" | "ASC" = "DESC",
       filters: GetUserFilters = {
          universityCountryCodes: [],
+         universityCodes: [],
          universityName: "",
          fieldOfStudyIds: [],
          levelOfStudyIds: [],
       }
    ): Promise<BigQueryUserResponse[]> {
+      const universityCodesString = filters.universityCodes
+         ?.map((a) => `"${a}"`)
+         .join(",")
       const universityCountryCodesString = filters.universityCountryCodes
          ?.map((a) => `"${a}"`)
          .join(",")
@@ -64,6 +68,11 @@ export class BigQueryRepository implements IBigQueryRepository {
       if (universityCountryCodesString.length > 0) {
          whereQueries.push(
             `JSON_VALUE(DATA, "$.universityCountryCode") IN (${universityCountryCodesString})`
+         )
+      }
+      if (universityCodesString.length > 0) {
+         whereQueries.push(
+            `JSON_VALUE(DATA, "$.university.code") IN (${universityCodesString})`
          )
       }
       if (fieldOfStudyIdsString.length > 0) {

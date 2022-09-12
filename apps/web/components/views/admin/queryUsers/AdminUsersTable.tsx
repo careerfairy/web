@@ -5,14 +5,20 @@ import ExportTable from "../../common/Tables/ExportTable"
 import { MaterialTableProps } from "@material-table/core"
 
 import SendEmailTemplateDialog from "./SendEmailTemplateDialog/SendEmailTemplateDialog"
-import { BigQueryUserResponse } from "@careerfairy/shared-lib/dist/bigQuery/types"
-import { universityCountriesMap } from "../../../util/constants/universityCountries"
+import {
+   BigQueryUserQueryOptions,
+   BigQueryUserResponse,
+} from "@careerfairy/shared-lib/dist/bigQuery/types"
 import LinkifyText from "../../../util/LinkifyText"
 import {
    useFieldsOfStudy,
    useLevelsOfStudy,
+   useUniversityCountries,
 } from "../../../custom-hook/useCollection"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { universityCountriesMap } from "../../../util/constants/universityCountries"
+import { University } from "@careerfairy/shared-lib/dist/universities"
+import UniversityCountriesFilter from "./UniversityCountriesFilter"
+import UniversitiesFilter from "./UniversitiesFilter"
 
 interface UserTableProps {
    users: BigQueryUserResponse[]
@@ -42,6 +48,42 @@ const AdminUsersTable = ({
       useFieldsOfStudy()
    const { isLoading: loadingLevelsOfStudy, data: allLevelsOfStudy } =
       useLevelsOfStudy()
+   const { data: universityCountries, isLoading: loadingUniversityCountries } =
+      useUniversityCountries()
+
+   const universityCountriesLookup = useMemo(() => {
+      return universityCountries.reduce((acc, universityCountry) => {
+         acc[universityCountry.id] =
+            universityCountriesMap[universityCountry.id] || universityCountry.id
+         return acc
+      }, {})
+   }, [universityCountries])
+   const { universityOptions, universityOptionsLookup } = useMemo(() => {
+      let universityCountriesArray = [...universityCountries] // if no countries are selected, show all universities
+      if (queryOptions.filters.universityCountryCodes.length > 0) {
+         // if countries are selected, filter universities by country
+         universityCountriesArray = universityCountries.filter(
+            (universityCountry) =>
+               queryOptions.filters.universityCountryCodes.includes(
+                  universityCountry.id
+               )
+         )
+      }
+      const universityOptions = universityCountriesArray.reduce<University[]>(
+         (acc, universityCountry) => {
+            return acc.concat(universityCountry.universities)
+         },
+         []
+      )
+      const universityOptionsLookup = universityOptions.reduce(
+         (acc, university) => {
+            acc[university.id] = university.name
+            return acc
+         },
+         {}
+      )
+      return { universityOptions, universityOptionsLookup }
+   }, [universityCountries, queryOptions.filters.universityCountryCodes])
 
    const levelsOfStudyLookup = useMemo(() => {
       return allLevelsOfStudy?.reduce((acc, levelOfStudy) => {
@@ -99,7 +141,29 @@ const AdminUsersTable = ({
          {
             field: "universityCountryCode",
             title: "University Country",
-            lookup: universityCountriesMap,
+            lookup: universityCountriesLookup,
+            filterComponent: () => (
+               <UniversityCountriesFilter
+                  universityCountries={universityCountries}
+                  setOptions={setOptions}
+                  queryOptions={queryOptions}
+                  universityCountriesLookup={universityCountriesLookup}
+               />
+            ),
+         },
+         {
+            field: "universityCode",
+            title: "University Code",
+            lookup: universityOptionsLookup,
+            filterComponent: () => {
+               return (
+                  <UniversitiesFilter
+                     universityOptions={universityOptions}
+                     setOptions={setOptions}
+                     queryOptions={queryOptions}
+                  />
+               )
+            },
          },
          {
             field: "userEmail",
@@ -122,7 +186,16 @@ const AdminUsersTable = ({
             ),
          },
       ],
-      [fieldsOfStudyLookup, levelsOfStudyLookup]
+      [
+         fieldsOfStudyLookup,
+         levelsOfStudyLookup,
+         queryOptions,
+         setOptions,
+         universityCountries,
+         universityCountriesLookup,
+         universityOptions,
+         universityOptionsLookup,
+      ]
    )
 
    const customTableOptions = useMemo(
@@ -171,16 +244,6 @@ const AdminUsersTable = ({
       useCallback(
          (filters) => {
             filters.forEach((filter) => {
-               if (filter.column.field === "universityCountryCode") {
-                  setOptions((prev) => ({
-                     ...prev,
-                     filters: {
-                        ...prev.filters,
-                        universityCountryCodes: filter.value,
-                     },
-                     page: 0,
-                  }))
-               }
                if (filter.column.field === "fieldOfStudyId") {
                   setOptions((prev) => ({
                      ...prev,
@@ -210,7 +273,12 @@ const AdminUsersTable = ({
       <Card>
          <ExportTable
             icons={tableIcons}
-            isLoading={loading || loadingFieldsOfStudy || loadingLevelsOfStudy}
+            isLoading={
+               loading ||
+               loadingFieldsOfStudy ||
+               loadingLevelsOfStudy ||
+               loadingUniversityCountries
+            }
             data={users}
             onOrderChange={onOrderChange}
             onFilterChange={onFilterChange}
