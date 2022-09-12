@@ -4,6 +4,7 @@ import React, {
    useEffect,
    useState,
    useMemo,
+   memo,
 } from "react"
 
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
@@ -44,14 +45,15 @@ const labels = {
       "You intend to join this stream with only with your microphone?",
 }
 
-function VideoContainer({
+const VideoContainer = ({
    currentLivestream,
    isPlayMode,
    showMenu,
    smallScreen,
    streamerId,
    viewer,
-}) {
+}) => {
+   console.count("VideoContainer")
    const firebase = useFirebaseService()
    const {
       tutorialSteps,
@@ -424,4 +426,4 @@ function VideoContainer({
 
 const draggableDefaultPosition = { x: 4, y: 70 }
 
-export default VideoContainer
+export default memo(VideoContainer)

@@ -8,16 +8,20 @@ import {
    UID,
 } from "agora-rtc-sdk-ng"
 import { RemoteStreamUser } from "types/streaming"
+import useAgoraError from "./useAgoraError"
 
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
    streamerId: UID
 ) {
    const [remoteStreams, setRemoteStreams] = useState([])
+   console.log("-> remoteStreams", remoteStreams)
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
    })
+
+   const { handleRtcError } = useAgoraError()
 
    const dispatch = useDispatch()
 
@@ -59,56 +63,58 @@ export default function useAgoraClientConfig(
          )
       })
 
-      rtcClient.on("user-published", async (remoteUser, mediaType) => {
-         try {
-            await rtcClient.subscribe(remoteUser, mediaType)
-         } catch (error) {}
-         setRemoteStreams((prevRemoteStreams) => {
-            return prevRemoteStreams.map((user: RemoteStreamUser) => {
-               if (user.uid === remoteUser.uid) {
-                  if (mediaType === "audio") {
-                     user.audioTrack = remoteUser.audioTrack
-                     user.audioMuted = false
-                     try {
-                        // We don't play the audiotrack for the screen share track if its being shared by the local
-                        // client, else it echoes with the sound of the original media player.
-                        if (user.uid !== `${streamerId}screen`) {
-                           remoteUser?.audioTrack?.play?.()
+      rtcClient.on("user-published", async (remoteUser, mediaType) =>
+         rtcClient
+            .subscribe(remoteUser, mediaType)
+            .catch(handleRtcError)
+            .then(() => {
+               setRemoteStreams((prevRemoteStreams) => {
+                  return prevRemoteStreams.map((user: RemoteStreamUser) => {
+                     if (user.uid === remoteUser.uid) {
+                        if (mediaType === "audio") {
+                           user.audioTrack = remoteUser.audioTrack
+                           user.audioMuted = false
+                           try {
+                              // We don't play the audiotrack for the screen share track if its being shared by the local
+                              // client, else it echoes with the sound of the original media player.
+                              if (user.uid !== `${streamerId}screen`) {
+                                 remoteUser?.audioTrack?.play?.()
+                              }
+                           } catch (e) {
+                              dispatch(actions.sendGeneralError(e))
+                           }
+                        } else if (mediaType === "video") {
+                           user.videoTrack = remoteUser.videoTrack
+                           user.videoMuted = false
                         }
-                     } catch (e) {
-                        dispatch(actions.sendGeneralError(e))
                      }
-                  } else if (mediaType === "video") {
-                     user.videoTrack = remoteUser.videoTrack
-                     user.videoMuted = false
-                  }
-               }
-               return user
+                     return user
+                  })
+               })
             })
-         })
-      })
+      )
 
-      rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
-         try {
-            await rtcClient.unsubscribe(remoteUser, mediaType)
-         } catch (error) {
-            // handleRtcError(error);
-         }
-         setRemoteStreams((prevRemoteStreams) => {
-            return prevRemoteStreams.map((user) => {
-               if (user.uid === remoteUser.uid) {
-                  if (mediaType === "audio") {
-                     user.audioTrack = null
-                     user.audioMuted = true
-                  } else if (mediaType === "video") {
-                     user.videoTrack = null
-                     user.videoMuted = true
-                  }
-               }
-               return user
+      rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
+         rtcClient
+            .unsubscribe(remoteUser, mediaType)
+            .catch(handleRtcError)
+            .then(() => {
+               setRemoteStreams((prevRemoteStreams) => {
+                  return prevRemoteStreams.map((user) => {
+                     if (user.uid === remoteUser.uid) {
+                        if (mediaType === "audio") {
+                           user.audioTrack = null
+                           user.audioMuted = true
+                        } else if (mediaType === "video") {
+                           user.videoTrack = null
+                           user.videoMuted = true
+                        }
+                     }
+                     return user
+                  })
+               })
             })
-         })
-      })
+      )
 
       rtcClient.on("network-quality", (networkStats) => {
          const isEqualToCurrentValue =

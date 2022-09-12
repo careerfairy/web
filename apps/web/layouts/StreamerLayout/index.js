@@ -82,6 +82,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 const browserIsCompatible = AgoraRTC.checkSystemRequirements()
 const StreamerLayout = (props) => {
+   console.count("StreamerLayout")
    const { children, isBreakout, isMainStreamer } = props
    const firebase = useFirebaseService()
    const {

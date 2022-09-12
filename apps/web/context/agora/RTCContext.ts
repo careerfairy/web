@@ -24,7 +24,6 @@ export interface RtcContextInterface {
    closeAndUnpublishedLocalStream: () => Promise<void>
    rtcClient: IAgoraRTCClient
    localMediaHandlers: {
-      initializeVideoCameraAudioTrack: () => Promise<void>
       closeLocalCameraTrack: () => Promise<void>
       initializeLocalVideoStream: () => Promise<void>
       closeLocalMicrophoneTrack: () => Promise<void>
