@@ -15,6 +15,7 @@ const QueryForm = () => {
    const [options, setOptions] = useState<BigQueryUserQueryOptions>({
       filters: {
          universityCountryCodes: [],
+         universityCodes: [],
          universityName: "",
          fieldOfStudyIds: [],
          levelOfStudyIds: [],
@@ -33,7 +34,7 @@ const QueryForm = () => {
       []
    )
    const { data: users, isValidating } = useSWR(
-      ["getBigQueryUsers", options],
+      ["getBigQueryUsers_v2", options],
       fetcher,
       config
    )
