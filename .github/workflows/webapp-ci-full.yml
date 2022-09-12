@@ -19,6 +19,9 @@ jobs:
          # https://turborepo.org/docs/guides/continuous-integration
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      outputs:
+         webapp: ${{ steps.changes.outputs.webapp }}
+         shared-lib: ${{ steps.changes.outputs.shared-lib }}
       steps:
          - uses: actions/checkout@v2
          - uses: actions/setup-node@v2
@@ -40,10 +43,25 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
 
+         # Check which folders have changed
+         # So that we can skip future jobs
+         - uses: dorny/paths-filter@v2
+           id: changes
+           with:
+              filters: |
+                 webapp:
+                   - 'apps/web/**'
+                   - 'packages/shared-lib/**'
+                   - 'packages/seed-data/**'
+                 shared-lib:
+                   - 'packages/shared-lib/**'
+
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
       needs: [build_app_for_tests]
+      # only run if there are changes on the webapp & shared lib
+      if: needs.build_app_for_tests.outputs.webapp == 'true' && needs.build_app_for_tests.outputs.shared-lib == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
