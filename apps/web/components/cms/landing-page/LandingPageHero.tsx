@@ -46,6 +46,12 @@ const styles = sxStyles({
       mt: 2,
       width: { xs: "100%", md: "auto" },
       minWidth: "150px",
+
+      "&:disabled": {
+         backgroundColor: (theme) =>
+            `${theme.palette.secondary.main} !important`,
+         color: "white !important",
+      },
    },
 })
 
