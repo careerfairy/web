@@ -15,8 +15,10 @@ import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import Notifier from "../components/views/notifier"
+import { useRouter } from "next/router"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
+import { useEffect, useState } from "react"
 import firebaseApp, {
    AuthInstance,
    firebaseConfig,
@@ -27,6 +29,7 @@ import firebaseApp, {
 import "../util/FirebaseUtils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
+import GoogleTagManager from "../HOCs/GoogleTagManager"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
 import TutorialProvider from "../HOCs/TutorialProvider"
 import ErrorProvider from "../HOCs/ErrorProvider"
@@ -37,7 +40,6 @@ import {
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
-import TagManager from "react-gtm-module"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -59,16 +61,10 @@ const rrfProps = {
    createFirestoreInstance,
 }
 
-const tagManagerArgs = {
-   gtmId: "GTM-P29VCWC",
-}
-
-if (!process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
-   TagManager.initialize(tagManagerArgs)
-}
-
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
+
+   const { disableCookies } = useRouterInformation()
 
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
@@ -92,22 +88,24 @@ function MyApp(props) {
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
-                           <ThemeProviderWrapper>
-                              <FirebaseServiceContext.Provider
-                                 value={firebaseServiceInstance}
-                              >
-                                 <LocalizationProvider
-                                    dateAdapter={AdapterDateFns}
+                           <GoogleTagManager disableCookies={disableCookies}>
+                              <ThemeProviderWrapper>
+                                 <FirebaseServiceContext.Provider
+                                    value={firebaseServiceInstance}
                                  >
-                                    <ErrorProvider>
-                                       <UserRewardsNotifications>
-                                          <Component {...pageProps} />
-                                       </UserRewardsNotifications>
-                                       <Notifier />
-                                    </ErrorProvider>
-                                 </LocalizationProvider>
-                              </FirebaseServiceContext.Provider>
-                           </ThemeProviderWrapper>
+                                    <LocalizationProvider
+                                       dateAdapter={AdapterDateFns}
+                                    >
+                                       <ErrorProvider>
+                                          <UserRewardsNotifications>
+                                             <Component {...pageProps} />
+                                          </UserRewardsNotifications>
+                                          <Notifier />
+                                       </ErrorProvider>
+                                    </LocalizationProvider>
+                                 </FirebaseServiceContext.Provider>
+                              </ThemeProviderWrapper>
+                           </GoogleTagManager>
                         </AuthProvider>
                      </TutorialProvider>
                   </FeatureFlagsProvider>
@@ -130,6 +128,20 @@ const ReactFireProviders = ({ children }) => {
          </FirestoreProvider>
       </FirebaseAppProvider>
    )
+}
+
+const useRouterInformation = () => {
+   const { pathname } = useRouter()
+
+   const [disableCookies, setDisableCookies] = useState(false)
+
+   useEffect(() => {
+      setDisableCookies(
+         Boolean(pathname === "/next-livestreams/[groupId]/embed")
+      )
+   }, [pathname])
+
+   return { disableCookies }
 }
 
 // Only uncomment this method if you have blocking data requirements for
