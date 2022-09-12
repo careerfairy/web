@@ -11,7 +11,7 @@ import { createNestedArrayOfTemplates } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 
 /* eslint-disable camelcase */
-export const sendBasicTemplateEmail_v2 = functions
+export const sendBasicTemplateEmail_v3 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
