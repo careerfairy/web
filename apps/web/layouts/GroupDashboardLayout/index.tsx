@@ -39,18 +39,20 @@ const styles = {
    },
 }
 
-type DefaultContext = {
+type GroupAdminContext = {
    group: Group
    flattenedGroupOptions: GroupOption[]
    groupQuestions: GroupQuestion[]
    groupPresenter?: GroupPresenter
 }
-const GroupContext = createContext<DefaultContext>({
+
+const GroupContext = createContext<GroupAdminContext>({
    group: null,
    flattenedGroupOptions: [],
    groupQuestions: [],
    groupPresenter: undefined,
 })
+
 const GroupDashboardLayout = (props) => {
    const firebase = useFirebaseService()
    const { children } = props
@@ -97,24 +99,27 @@ const GroupDashboardLayout = (props) => {
 
          return () => {
             unsubscribe()
-            setGroupQuestions([])
          }
       }
-   }, [isCorrectGroup, groupId])
+   }, [isCorrectGroup, groupId, group?.id])
+
    const groupPresenter = useMemo(
       () => group && GroupPresenter.createFromDocument(group),
       [group]
    )
 
+   const contextValues = useMemo(
+      () => ({
+         group,
+         flattenedGroupOptions,
+         groupQuestions,
+         groupPresenter,
+      }),
+      [flattenedGroupOptions, group, groupPresenter, groupQuestions]
+   )
+
    return (
-      <GroupContext.Provider
-         value={{
-            group,
-            flattenedGroupOptions,
-            groupQuestions,
-            groupPresenter,
-         }}
-      >
+      <GroupContext.Provider value={contextValues}>
          <Page>
             <TopBar notifications={notifications} />
             <PageContentWrapper>
@@ -153,6 +158,7 @@ const GroupDashboardLayout = (props) => {
       </GroupContext.Provider>
    )
 }
-export const useGroup = () => useContext<DefaultContext>(GroupContext)
+
+export const useGroup = () => useContext<GroupAdminContext>(GroupContext)
 
 export default GroupDashboardLayout
