@@ -36,6 +36,7 @@ import StreamFilterModal from "./StreamFilterModal"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import RootState from "../../../../../store/reducers"
+import Sources from "./Sources"
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -608,6 +609,7 @@ const AnalyticsOverview = () => {
                <Tab className={classes.tab} label="General" />
                <Tab className={classes.tab} label="Audience" />
                <Tab className={classes.tab} label="Feedback" />
+               <Tab className={classes.tab} label="Registration Sources" />
             </Tabs>
          </AppBar>
          <SwipeableViews
@@ -625,6 +627,9 @@ const AnalyticsOverview = () => {
             </SwipeablePanel>
             <SwipeablePanel value={value} index={2} dir={theme.direction}>
                <Feedback {...getTabProps("feedback")} />
+            </SwipeablePanel>
+            <SwipeablePanel value={value} index={3} dir={theme.direction}>
+               <Sources {...getTabProps("sources")} />
             </SwipeablePanel>
          </SwipeableViews>
          {streamFilterModalOpen && (
