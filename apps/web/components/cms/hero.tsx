@@ -131,7 +131,7 @@ const styles = sxStyles({
       objectFit: "cover",
    },
    logo: {
-      width: { xs: 150, md: 300 },
+      width: { xs: 150, lg: 300 },
       position: "absolute",
       top: { xs: "3vw", md: "3vw" },
    },
@@ -140,7 +140,6 @@ const styles = sxStyles({
       alignItems: {
          md: "center",
       },
-      height: "80vh",
    },
 })
 
