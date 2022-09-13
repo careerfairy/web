@@ -404,11 +404,6 @@ const VideoContainer = ({
             displayableMediaStream={displayableMediaStream}
             mediaControls={mediaControls}
          />
-         {/* <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-         <ErrorModal
-            agoraRtcStatus={agoraRtcStatus}
-            agoraRtmStatus={agoraRtmStatus}
-         /> */}
          <ScreenShareModal
             open={showScreenShareModal}
             smallScreen={smallScreen}
