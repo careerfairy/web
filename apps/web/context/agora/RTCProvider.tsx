@@ -32,9 +32,6 @@ import { RTC_CLIENT_JOIN_TIME_LIMIT } from "../../constants/streams"
 import * as actions from "../../store/actions"
 import useAgoraError from "../../components/custom-hook/useAgoraError"
 import { errorLogAndNotify } from "../../util/CommonUtil"
-import { sleep } from "../helperFunctions/HelperFunctions"
-import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import { agoraServiceInstance } from "../../data/agora/AgoraService"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
