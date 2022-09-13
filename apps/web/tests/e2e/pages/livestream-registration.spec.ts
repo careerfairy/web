@@ -156,6 +156,12 @@ test("livestream has already started, confirm the redirection without any regist
    page,
    browserName,
 }) => {
+   // TODO: remove this when Agora supports Webkit 16.x
+   test.skip(
+      browserName === "webkit",
+      "Temporarily disabled on WebKit until Agora supports Webkit 16.x"
+   )
+
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { livestream } = await setupData({}, {}, "createLive")
 

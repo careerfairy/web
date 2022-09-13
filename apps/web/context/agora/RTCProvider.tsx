@@ -1,24 +1,33 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { useDispatch, useSelector } from "react-redux"
-import { useRouter } from "next/router"
-import useStreamRef from "./useStreamRef"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useAgoraClientConfig from "./useAgoraClientConfig"
-
+import React, {
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
+import RTCContext, { RtcPropsInterface } from "./RTCContext"
 import AgoraRTC, {
    IAgoraRTCClient,
    ILocalAudioTrack,
    ILocalVideoTrack,
    ScreenVideoTrackInitConfig,
+   UID,
 } from "agora-rtc-sdk-ng"
-import * as actions from "store/actions"
-import { useSessionStorage } from "react-use"
-import { RTC_CLIENT_JOIN_TIME_LIMIT } from "constants/streams"
-import { LocalStream } from "types/streaming"
-import RootState from "../../store/reducers"
-import { sleep } from "../helperFunctions/HelperFunctions"
-import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import { agoraServiceInstance } from "../../data/agora/AgoraService"
+import { useRouter } from "next/router"
+
+import useStreamRef from "../../components/custom-hook/useStreamRef"
+
+import { useFirebaseService } from "../firebase/FirebaseServiceContext"
+import { useSessionStorage } from "react-use"
+import { useDispatch, useSelector } from "react-redux"
+import RootState from "../../store/reducers"
+import { LocalStream } from "../../types/streaming"
+import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
+import { sleep } from "../../components/helperFunctions/HelperFunctions"
+import { RTC_CLIENT_JOIN_TIME_LIMIT } from "../../constants/streams"
+import * as actions from "../../store/actions"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -28,19 +37,19 @@ const useScreenShareRtc = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
 })
-
-export default function useAgoraRtc(
-   streamerId: string,
-   roomId: string,
-   isStreamer: boolean,
-   initialize: boolean,
-   options?: { isAHandRaiser?: boolean }
-) {
+const RTCProvider: React.FC<RtcPropsInterface> = ({
+   children,
+   appId,
+   isStreamer,
+   uid,
+   initialize,
+   isAHandRaiser,
+   channel,
+}) => {
    const { path } = useStreamRef()
    const router = useRouter()
    const rtcClient = useRtcClient()
    const screenShareRtcClient = useScreenShareRtc()
-
    const [sessionShouldUseCloudProxy, setSessionShouldUseProxy] =
       useSessionStorage<boolean>("is-using-cloud-proxy", false)
    const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
@@ -48,7 +57,7 @@ export default function useAgoraRtc(
    })
 
    const [localStream, setLocalStream] = useState<LocalStream>({
-      uid: streamerId,
+      uid: uid,
       isAudioPublished: false,
       isVideoPublished: false,
       isLocal: true,
@@ -67,7 +76,7 @@ export default function useAgoraRtc(
    const screenShareStreamRef = useRef(screenShareStream)
 
    const { remoteStreams, networkQuality, demoStreamHandlers } =
-      useAgoraClientConfig(rtcClient, streamerId)
+      useAgoraClientConfig(rtcClient, uid)
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
@@ -124,7 +133,7 @@ export default function useAgoraRtc(
       async (
          rtcClient: IAgoraRTCClient,
          roomId: string,
-         userUid: string,
+         userUid: UID,
          isStreamer: boolean,
          sessionShouldUseCloudProxy: boolean
       ) => {
@@ -132,7 +141,7 @@ export default function useAgoraRtc(
          try {
             const cfToken = router.query.token || ""
             const { data } = await fetchAgoraRtcToken({
-               isStreamer: options?.isAHandRaiser ? false : isStreamer,
+               isStreamer: isAHandRaiser ? false : isStreamer,
                uid: userUid,
                sentToken: cfToken.toString(),
                channelName: roomId,
@@ -154,7 +163,7 @@ export default function useAgoraRtc(
                   rtcClient.startProxyServer(3)
                   try {
                      await rtcClient.join(
-                        agoraCredentials.appID,
+                        appId,
                         roomId,
                         data.token.rtcToken,
                         userUid
@@ -167,12 +176,7 @@ export default function useAgoraRtc(
             }
             logStatus("JOIN", false, sessionShouldUseCloudProxy)
 
-            await rtcClient.join(
-               agoraCredentials.appID,
-               roomId,
-               data.token.rtcToken,
-               userUid
-            )
+            await rtcClient.join(appId, roomId, data.token.rtcToken, userUid)
             logStatus("JOIN", true, sessionShouldUseCloudProxy)
          } catch (error) {
             logStatus("JOIN", false, sessionShouldUseCloudProxy, error)
@@ -185,7 +189,7 @@ export default function useAgoraRtc(
       [
          dispatch,
          fetchAgoraRtcToken,
-         options?.isAHandRaiser,
+         isAHandRaiser,
          path,
          router.query.token,
          setSessionShouldUseProxy,
@@ -196,11 +200,12 @@ export default function useAgoraRtc(
       console.log("-> LEAVING")
       try {
          if (rtcClient) {
-            return await rtcClient.leave()
+            await rtcClient.leave()
          }
          if (sessionIsUsingCloudProxy) {
             rtcClient.stopProxyServer()
          }
+         rtcClient?.removeAllListeners?.()
       } catch (error) {
          console.log(error)
       }
@@ -215,8 +220,8 @@ export default function useAgoraRtc(
          try {
             await joinAgoraRoom(
                rtcClient,
-               roomId,
-               streamerId,
+               channel,
+               uid,
                isStreamer,
                sessionShouldUseCloudProxy
             )
@@ -226,7 +231,7 @@ export default function useAgoraRtc(
             dispatch(actions.setAgoraRtcError(error))
          }
       },
-      [dispatch, isStreamer, joinAgoraRoom, roomId, streamerId]
+      [dispatch, isStreamer, joinAgoraRoom, channel, uid]
    )
 
    const initializeLocalAudioStream = async () => {
@@ -239,6 +244,7 @@ export default function useAgoraRtc(
             })
             setLocalStream((localStream) => ({
                ...localStream,
+               uid,
                audioTrack: localAudio,
             }))
             resolve()
@@ -259,6 +265,7 @@ export default function useAgoraRtc(
             })
             setLocalStream((localStream) => ({
                ...localStream,
+               uid,
                videoTrack: localVideo,
             }))
             resolve()
@@ -292,10 +299,11 @@ export default function useAgoraRtc(
       }
       setLocalStream((localStream) => ({
          ...localStream,
+         uid,
          audioTrack: audioTrack,
          videoTrack: videoTrack,
       }))
-   }, [router.query.withHighQuality])
+   }, [router.query.withHighQuality, uid])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
@@ -484,7 +492,7 @@ export default function useAgoraRtc(
       async (screenSharingMode, onScreenShareStopped) => {
          return new Promise<void>(async (resolve, reject) => {
             try {
-               const screenShareUid = `${streamerId}screen`
+               const screenShareUid = `${uid}screen`
                const screenShareTracks = await getScreenShareStream(
                   screenSharingMode,
                   onScreenShareStopped
@@ -493,7 +501,7 @@ export default function useAgoraRtc(
 
                await joinAgoraRoom(
                   screenShareRtcClient,
-                  roomId,
+                  channel,
                   screenShareUid,
                   true,
                   sessionShouldUseCloudProxy
@@ -509,7 +517,7 @@ export default function useAgoraRtc(
             }
          })
       },
-      [sessionShouldUseCloudProxy, screenShareRtcClient, streamerId, roomId]
+      [sessionShouldUseCloudProxy, screenShareRtcClient, uid, channel]
    )
 
    const unPublishScreenShareStream = useCallback(async () => {
@@ -639,20 +647,58 @@ export default function useAgoraRtc(
       [setLocalAudioEnabled, setLocalVideoEnabled]
    )
 
-   return {
-      networkQuality,
-      localStream,
-      localMediaHandlers,
-      localMediaControls: localMediaControls,
-      remoteStreams,
-      screenShareStreamRef,
-      publishLocalStreamTracks,
-      handlePublishLocalStream,
-      publishScreenShareStream,
-      unPublishScreenShareStream,
-      leaveAgoraRoom,
-      handleReconnectAgora,
-      closeAndUnpublishedLocalStream,
-      demoStreamHandlers,
-   }
+   const value = useMemo(
+      () => ({
+         localStream,
+         screenShareStream,
+         rtcClient,
+         screenShareRtcClient,
+         localMediaHandlers,
+         publishLocalStreamTracks,
+         localMediaControls,
+         handleReconnectAgora,
+         handlePublishLocalStream,
+         publishScreenShareStream,
+         unPublishScreenShareStream,
+         networkQuality,
+         remoteStreams,
+         screenShareStreamRef,
+         leaveAgoraRoom,
+         closeAndUnpublishedLocalStream,
+         demoStreamHandlers,
+      }),
+      [
+         localStream,
+         screenShareStream,
+         rtcClient,
+         screenShareRtcClient,
+         localMediaHandlers,
+         publishLocalStreamTracks,
+         localMediaControls,
+         handleReconnectAgora,
+         handlePublishLocalStream,
+         publishScreenShareStream,
+         unPublishScreenShareStream,
+         networkQuality,
+         remoteStreams,
+         leaveAgoraRoom,
+         closeAndUnpublishedLocalStream,
+         demoStreamHandlers,
+      ]
+   )
+   return (
+      <RTCContext.Provider value={value}>
+         {init ? children : null}
+      </RTCContext.Provider>
+   )
 }
+
+export const useRtc = () => {
+   const context = useContext(RTCContext)
+   if (context === undefined) {
+      throw new Error("useRtc must be used within a RtcProvider")
+   }
+   return context
+}
+
+export default RTCProvider

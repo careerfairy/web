@@ -6,11 +6,11 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import useDevices from "components/custom-hook/useDevices"
-import useMediaSources from "components/custom-hook/useMediaSources"
-import VideoControlsContainer from "components/views/streaming/video-container/VideoControlsContainer"
-import { useAuth } from "HOCs/AuthProvider"
+import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
+import useDevices from "../../../../components/custom-hook/useDevices"
+import useMediaSources from "../../../../components/custom-hook/useMediaSources"
+import VideoControlsContainer from "../../../../components/views/streaming/video-container/VideoControlsContainer"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 import makeStyles from "@mui/styles/makeStyles"
 import SettingsModal from "../../streaming/video-container/SettingsModal"
 import { Typography } from "@mui/material"
@@ -19,19 +19,19 @@ import useStreamRef from "../../../custom-hook/useStreamRef"
 import EmoteButtons from "../EmoteButtons"
 import { useDispatch, useSelector } from "react-redux"
 import { useRouter } from "next/router"
-import * as actions from "store/actions"
+import * as actions from "../../../../store/actions"
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
 import Streams from "../../streaming/video-container/Streams"
 import DraggableComponent from "../../banners/DraggableComponent"
 import WifiIndicator from "../../streaming/video-container/WifiIndicator"
-import useAgoraRtc from "components/custom-hook/useAgoraRtc"
-import StreamPublishingModal from "components/views/streaming/modal/StreamPublishingModal"
+import StreamPublishingModal from "../../../../components/views/streaming/modal/StreamPublishingModal"
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
-import useHandRaiseState from "components/custom-hook/useHandRaiseState"
+import useHandRaiseState from "../../../../components/custom-hook/useHandRaiseState"
 import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
-import AgoraRTMContext from "../../../../context/agoraRTM/AgoraRTMContext"
+import RTMContext from "../../../../context/agora/RTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
+import { useRtc } from "../../../../context/agora/RTCProvider"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -98,10 +98,6 @@ function ViewerComponent({
       currentLivestream.hasStarted || (userData?.isAdmin && spyModeEnabled)
    )
 
-   const agoraOptions = useMemo(
-      () => ({ isAHandRaiser: handRaiseActive }),
-      [handRaiseActive]
-   )
    const {
       networkQuality,
       localStream,
@@ -112,15 +108,9 @@ function ViewerComponent({
       handlePublishLocalStream,
       publishScreenShareStream,
       unPublishScreenShareStream,
-   } = useAgoraRtc(
-      streamerId,
-      currentLivestream.id,
-      handRaiseActive,
-      shouldInitializeAgora,
-      agoraOptions
-   )
+   } = useRtc()
 
-   const { createEmote } = useContext(AgoraRTMContext)
+   const { createEmote } = useContext(RTMContext)
 
    const deviceSettings = useMemo(
       () => ({

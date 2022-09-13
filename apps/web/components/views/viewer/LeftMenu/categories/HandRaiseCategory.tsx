@@ -11,7 +11,7 @@ import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import HandRaiseAcquiringMedia from "./hand-raise/active/HandRaiseAcquiringMedia"
 import { HandRaiseState } from "types/handraise"
-import { StreamData } from "types/streaming"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const HandRaiseCategory = ({
    livestream,
@@ -116,7 +116,7 @@ const HandRaiseCategory = ({
    )
 }
 type Props = {
-   livestream: StreamData
+   livestream: LivestreamEvent
    selectedState: string
    setHandRaiseActive: (active: boolean) => any
    isMobile: boolean

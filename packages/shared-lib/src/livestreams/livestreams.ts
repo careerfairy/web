@@ -24,6 +24,7 @@ export interface LivestreamEvent extends Identifiable {
    companyLogoUrl?: string
    created?: Timestamp
    currentSpeakerId?: string
+   handRaiseActive?: boolean
    withResume?: boolean
    duration?: number
    groupIds?: string[]
@@ -49,7 +50,17 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
-
+   /**
+    * These modes are used to dictate how the livestream is displayed in the UI
+    * - presentation: A PDF presentation is currently being shared
+    * - video: A YouTube video is currently being shared
+    * - desktop: A user's screen is currently being shared
+    */
+   mode?: "presentation" | "desktop" | "video"
+   /**
+    * The streamerId of the user who is currently sharing their screen
+    */
+   screenSharerId?: string
    /**
     * An empty array means the livestream should target all the fields of study
     * [] -> All fields of study
