@@ -65,7 +65,6 @@ export default function useAgoraClientConfig(
       rtcClient.on("user-published", async (remoteUser, mediaType) =>
          rtcClient
             .subscribe(remoteUser, mediaType)
-            .catch(handleRtcError)
             .then(() => {
                setRemoteStreams((prevRemoteStreams) => {
                   return prevRemoteStreams.map((user) => {
@@ -91,12 +90,12 @@ export default function useAgoraClientConfig(
                   })
                })
             })
+            .catch(handleRtcError)
       )
 
       rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
          rtcClient
             .unsubscribe(remoteUser, mediaType)
-            .catch(handleRtcError)
             .then(() => {
                setRemoteStreams((prevRemoteStreams) => {
                   return prevRemoteStreams.map((user) => {
@@ -113,6 +112,7 @@ export default function useAgoraClientConfig(
                   })
                })
             })
+            .catch(handleRtcError)
       )
 
       rtcClient.on("network-quality", (networkStats) => {
