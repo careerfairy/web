@@ -105,11 +105,11 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
    }, [firestoreCurrentSpeaker])
 
    const handleChangeCurrentSpeakerId = useCallback(
-      (id, isFallback) => {
+      (id, isFallback = false) => {
          if (isFallback || !id) return setCurrentSpeakerId(id)
          setLivestreamCurrentSpeakerId(streamRef, id)
       },
-      [streamRef]
+      [setLivestreamCurrentSpeakerId, streamRef]
    )
 
    return currentSpeakerId

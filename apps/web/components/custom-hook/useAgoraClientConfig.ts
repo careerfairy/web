@@ -7,15 +7,14 @@ import {
    NetworkQuality,
    UID,
 } from "agora-rtc-sdk-ng"
-import { RemoteStreamUser } from "types/streaming"
+import { IRemoteStream } from "types/streaming"
 import useAgoraError from "./useAgoraError"
 
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
    streamerId: UID
 ) {
-   const [remoteStreams, setRemoteStreams] = useState([])
-   console.log("-> remoteStreams", remoteStreams)
+   const [remoteStreams, setRemoteStreams] = useState<IRemoteStream[]>([])
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
@@ -69,7 +68,7 @@ export default function useAgoraClientConfig(
             .catch(handleRtcError)
             .then(() => {
                setRemoteStreams((prevRemoteStreams) => {
-                  return prevRemoteStreams.map((user: RemoteStreamUser) => {
+                  return prevRemoteStreams.map((user) => {
                      if (user.uid === remoteUser.uid) {
                         if (mediaType === "audio") {
                            user.audioTrack = remoteUser.audioTrack

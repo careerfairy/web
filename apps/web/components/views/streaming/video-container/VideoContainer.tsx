@@ -30,6 +30,7 @@ import * as actions from "../../../../store/actions"
 import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
 import { useRtc } from "../../../../context/agora/RTCProvider"
+import { useCurrentStream } from "../../../../context/stream/StreamContext"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -45,16 +46,20 @@ const labels = {
       "You intend to join this stream with only with your microphone?",
 }
 
+interface Props {
+   isPlayMode?: boolean
+   showMenu: boolean
+   smallScreen: boolean
+   viewer: boolean
+}
 const VideoContainer = ({
-   currentLivestream,
    isPlayMode,
    showMenu,
    smallScreen,
-   streamerId,
    viewer,
-}) => {
-   console.count("VideoContainer")
+}: Props) => {
    const firebase = useFirebaseService()
+   const { currentLivestream, streamerId } = useCurrentStream()
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -334,7 +339,7 @@ const VideoContainer = ({
          <Streams
             externalMediaStreams={remoteStreams}
             localMediaStream={localStream}
-            currentSpeakerId={currentSpeakerId}
+            currentSpeakerId={currentSpeakerId as string}
             streamerId={streamerId}
             handRaiseActive={currentLivestream.handRaiseActive}
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
@@ -349,7 +354,6 @@ const VideoContainer = ({
          />
          <StreamPublishingModal
             open={Boolean(showLocalStreamPublishingModal)}
-            setOpen={setShowLocalStreamPublishingModal}
             localStream={localStream}
             deviceInitializers={deviceInitializers}
             displayableMediaStream={displayableMediaStream}

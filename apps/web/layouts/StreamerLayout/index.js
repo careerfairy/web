@@ -23,6 +23,7 @@ import BrowserIncompatibleOverlay from "../../components/views/streaming/Browser
 import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import RTCProvider from "../../context/agora/RTCProvider"
+import isEqual from "react-fast-compare"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -82,7 +83,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 const browserIsCompatible = AgoraRTC.checkSystemRequirements()
 const StreamerLayout = (props) => {
-   console.count("StreamerLayout")
    const { children, isBreakout, isMainStreamer } = props
    const firebase = useFirebaseService()
    const {
@@ -100,7 +100,7 @@ const StreamerLayout = (props) => {
 
    const [streamerReady, setStreamerReady] = useState(false)
    const [tokenChecked, setTokenChecked] = useState(false)
-   const showMenu = useSelector(leftMenuOpenSelector)
+   const showMenu = useSelector(leftMenuOpenSelector, isEqual)
    const [audienceDrawerOpen, setAudienceDrawerOpen] = useState(false)
    const [selectedState, setSelectedState] = useState("questions")
    const [sliding, setSliding] = useState(false)
@@ -294,19 +294,12 @@ const StreamerLayout = (props) => {
                            <div className={classes.content}>
                               {React.cloneElement(children, {
                                  ...props,
-                                 newNotification,
-                                 isMainStreamer,
-                                 isStreamer: true,
                                  hideAudience,
                                  audienceDrawerOpen,
-                                 setSliding,
                                  smallScreen,
                                  selectedState,
                                  handleStateChange,
-                                 showAudience,
                                  showMenu,
-                                 notifications,
-                                 streamerId,
                               })}
                            </div>
                         </div>

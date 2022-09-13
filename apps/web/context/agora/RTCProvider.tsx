@@ -50,7 +50,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    isAHandRaiser,
    channel,
 }) => {
-   console.count("-> RTCProvider")
    const { path } = useStreamRef()
    const router = useRouter()
    const rtcClient = useRtcClient()

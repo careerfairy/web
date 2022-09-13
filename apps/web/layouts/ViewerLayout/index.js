@@ -370,11 +370,7 @@ const ViewerLayout = (props) => {
                               handRaiseActive,
                               handleStateChange,
                               selectedState,
-                              setSelectedState,
                               showMenu,
-                              streamerId,
-                              mobile,
-                              showAudience,
                               hideAudience,
                               audienceDrawerOpen,
                            })}

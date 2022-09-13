@@ -31,7 +31,13 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const Banners = ({ presenter, handRaiseActive, isBottom, mobile }) => {
+interface Props {
+   presenter: boolean
+   handRaiseActive: boolean
+   isBottom?: boolean
+   mobile: boolean
+}
+const Banners = ({ presenter, handRaiseActive, isBottom, mobile }: Props) => {
    const { currentLivestream } = useCurrentStream()
    const {
       query: { breakoutRoomId },

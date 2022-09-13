@@ -6,11 +6,11 @@ import {
    NetworkQuality,
    UID,
 } from "agora-rtc-sdk-ng"
-import { LocalStream } from "../../types/streaming"
+import { IRemoteStream, LocalStream } from "../../types/streaming"
 
 export interface RtcContextInterface {
    screenShareStream: ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
-   remoteStreams: any[]
+   remoteStreams: IRemoteStream[]
    demoStreamHandlers: {
       removeDemoStream: () => void
       addDemoStream: () => void

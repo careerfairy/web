@@ -1,7 +1,10 @@
-import React, { Fragment } from "react"
+import React, { Fragment, useContext } from "react"
 import StreamSnackBar from "./notification/StreamSnackBar"
+import NotificationsContext from "../../../../context/notifications/NotificationsContext"
 
-function NotificationsContainer({ notifications, handRaiseMenuOpen }) {
+function NotificationsContainer({ handRaiseMenuOpen }) {
+   const { notifications } = useContext(NotificationsContext)
+
    let streamSnackElements = notifications.map((notification, index) => {
       return (
          <StreamSnackBar
