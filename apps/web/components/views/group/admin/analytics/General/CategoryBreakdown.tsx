@@ -293,7 +293,6 @@ interface Props {
    currentStream: LivestreamEvent | null
    currentUserDataSet: UserDataSet
    group: Group
-   groups: Group[]
    userTypes: UserType[]
    handleReset: () => void
    localUserType: UserType
