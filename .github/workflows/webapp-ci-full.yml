@@ -1,6 +1,12 @@
 name: "Build, Test and Deploy"
 on:
+   # Trigger on PRs targeting these branches
    pull_request:
+      branches:
+         - main
+         - develop
+   # Trigger on pushes targeting these branches
+   push:
       branches:
          - main
          - develop

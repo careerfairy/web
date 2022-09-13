@@ -1,6 +1,12 @@
 name: "Only Build"
 on:
+   # Should be the inverse of webapp-ci-full.yml
+   # We only want to run this pipeline on all the other PRs/pushes not targeting main/develop
    pull_request:
+      branches-ignore:
+         - main
+         - develop
+   push:
       branches-ignore:
          - main
          - develop
