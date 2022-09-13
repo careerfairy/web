@@ -43,7 +43,6 @@ interface Props {
    streamsFromTimeFrameAndFuture: LivestreamEvent[]
    handleScrollToBreakdown: () => void
    handleReset: () => void
-   groups: Group[]
    userTypes: UserType[]
    userType: UserType
    setUserType: (userType: UserType) => void
@@ -65,7 +64,6 @@ const General = ({
    streamsFromTimeFrameAndFuture,
    handleScrollToBreakdown,
    handleReset,
-   groups,
    userTypes,
    userType,
    setUserType,
@@ -376,7 +374,6 @@ const General = ({
                         streamsFromTimeFrameAndFuture={
                            streamsFromTimeFrameAndFuture
                         }
-                        groups={groups}
                         handleReset={handleReset}
                         group={group}
                      />
