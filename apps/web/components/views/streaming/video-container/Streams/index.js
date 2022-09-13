@@ -89,7 +89,7 @@ const Streams = memo(
          let localStream
 
          for (const stream of allStreams) {
-            if (stream.uid.includes("screen")) {
+            if (stream.uid.includes?.("screen")) {
                screenShareStream = stream
             }
             if (stream.uid === currentSpeakerId) {

@@ -24,14 +24,14 @@ const StreamContainer = ({
                lastName: "Speaker",
                position: "✋ Hand Raiser",
             }
-         } else if (stream.uid.includes("screen")) {
+         } else if (stream.uid.includes?.("screen")) {
             newSpeaker = null
          } else {
             newSpeaker = liveSpeakers?.find(
                (speaker) => speaker.speakerUuid === stream.uid
             )
             if (!newSpeaker && stream.uid && livestreamId) {
-               const userId = stream.uid.replace(livestreamId, "")
+               const userId = stream.uid.replace?.(livestreamId, "")
                if (userId) {
                   newSpeaker = await getSpeakerInfoFromDB(userId)
                }
@@ -39,7 +39,7 @@ const StreamContainer = ({
          }
          setSpeaker(newSpeaker)
       })()
-   }, [stream.uid.includes("screen"), liveSpeakers, stream.uid])
+   }, [stream.uid.includes?.("screen"), liveSpeakers, stream.uid])
 
    const getSpeakerInfoFromDB = async (userId) => {
       let fetchedSpeaker = {

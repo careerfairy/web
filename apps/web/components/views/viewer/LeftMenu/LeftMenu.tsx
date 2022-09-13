@@ -43,10 +43,6 @@ const useStyles = makeStyles((theme) => ({
       },
       color: theme.palette.mode === "dark" && theme.palette.secondary.main,
    },
-   slides: {
-      // backgroundColor: theme.palette.background.default,
-      // overflow: "visible !important"
-   },
    blur: {
       backgroundColor: alpha(theme.palette.common.black, 0.2),
       backdropFilter: "blur(5px)",
@@ -210,7 +206,6 @@ const LeftMenu = ({
             animateTransitions
             slideStyle={slideStyle}
             hysteresis={0.3}
-            slideClassName={classes.slides}
             className={classes.viewRoot}
             onChangeIndex={handleChange}
          >

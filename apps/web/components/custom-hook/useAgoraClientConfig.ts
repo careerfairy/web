@@ -5,12 +5,13 @@ import {
    IAgoraRTCClient,
    IAgoraRTCRemoteUser,
    NetworkQuality,
+   UID,
 } from "agora-rtc-sdk-ng"
 import { RemoteStreamUser } from "types/streaming"
 
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
-   streamerId: string
+   streamerId: UID
 ) {
    const [remoteStreams, setRemoteStreams] = useState([])
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({

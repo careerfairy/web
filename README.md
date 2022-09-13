@@ -17,7 +17,7 @@ folder at the root folder for all the apps/packages.
 npm install
 
 # runs only once after cloning, will setup husky hooks
-npm prepare
+npm run prepare
 ```
 
 ## NPM Commands

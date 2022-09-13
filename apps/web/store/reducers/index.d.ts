@@ -1,5 +1,5 @@
 import { DefaultRootState } from "react-redux"
-import { RTCConnectionState, RTCError, StreamData } from "../../types/streaming"
+import { RTCConnectionState, RTCError } from "../../types/streaming"
 import { FirebaseReducer, FirestoreReducer } from "react-redux-firebase"
 import { HandRaise } from "../../types/handraise"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
@@ -92,7 +92,7 @@ interface GeneralLayoutState {
 // Optional: You can define the schema of your Firebase Redux store.
 // This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
 interface Schema {
-   livestreams: StreamData
+   livestreams: LivestreamEvent
    handRaises: HandRaise
 }
 
