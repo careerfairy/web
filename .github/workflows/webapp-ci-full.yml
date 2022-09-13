@@ -1,5 +1,9 @@
 name: "Build, Test and Deploy"
-on: [push]
+on:
+   pull_request:
+      branches:
+         - main
+         - develop
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
@@ -7,53 +11,31 @@ concurrency:
    cancel-in-progress: true
 
 jobs:
-   # Check for duplicated jobs (sometimes when merging, there are duplicated runs for the same commit)
-   should_skip:
-      name: "Pre-Check"
-      runs-on: ubuntu-latest
-      timeout-minutes: 5
-      outputs:
-         should_skip: ${{ steps.skip_check.outputs.should_skip }}
-      steps:
-         - id: skip_check
-           uses: fkirc/skip-duplicate-actions@v3.4.1
-           with:
-              skip_after_successful_duplicate: "false"
-              paths_ignore: '["**/README.md", "firestore.rules"]'
-
    build_app_for_tests:
       name: "Pre-build cache for tests"
       runs-on: ubuntu-latest
       timeout-minutes: 10
-      needs: [should_skip]
-      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       env:
          # https://turborepo.org/docs/guides/continuous-integration
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+      outputs:
+         webapp: ${{ steps.changes.outputs.webapp }}
+         shared-lib: ${{ steps.changes.outputs.shared-lib }}
       steps:
          - uses: actions/checkout@v2
          - uses: actions/setup-node@v2
            with:
               node-version: "16"
-              cache: "npm"
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v2
-           env:
-              cache-name: cache-node-modules
            with:
-              # caching node_modules
-              path: node_modules
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-              restore-keys: |
-                 ${{ runner.os }}-build-${{ env.cache-name }}-
-                 ${{ runner.os }}-build-
-                 ${{ runner.os }}-
-
+              path: "**/node_modules"
+              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm install
+           run: npm ci --ignore-scripts
 
          - name: Build
            run: npm run build
@@ -61,11 +43,25 @@ jobs:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
 
+         # Check which folders have changed
+         # So that we can skip future jobs
+         - uses: dorny/paths-filter@v2
+           id: changes
+           with:
+              filters: |
+                 webapp:
+                   - 'apps/web/**'
+                   - 'packages/shared-lib/**'
+                   - 'packages/seed-data/**'
+                 shared-lib:
+                   - 'packages/shared-lib/**'
+
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
-      needs: [should_skip, build_app_for_tests]
-      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
+      needs: [build_app_for_tests]
+      # only run if there are changes on the webapp & shared lib
+      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
@@ -78,31 +74,28 @@ jobs:
          - uses: actions/setup-node@v2
            with:
               node-version: "16"
-              cache: "npm"
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v2
-           env:
-              cache-name: cache-node-modules
            with:
-              # caching node_modules
-              path: node_modules
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-              restore-keys: |
-                 ${{ runner.os }}-build-${{ env.cache-name }}-
-                 ${{ runner.os }}-build-
-                 ${{ runner.os }}-
+              path: "**/node_modules"
+              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm install
+           run: npm ci --ignore-scripts
+
          - name: Build
            run: npm run build
+
          - name: Run Jest Unit Tests
            run: npm run test
 
    # Run E2E Tests
    e2e_tests:
       name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
+      needs: [build_app_for_tests]
+      # only run if there are changes on the webapp & shared lib
+      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
       strategy:
          fail-fast: false
          matrix:
@@ -117,8 +110,6 @@ jobs:
       #               - browser: chromium
       #                 shards: 2
       #                 total: 2
-      needs: [should_skip, build_app_for_tests]
-      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       runs-on: ubuntu-latest
       timeout-minutes: 25
       env:
@@ -127,40 +118,50 @@ jobs:
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       steps:
          - uses: actions/checkout@v2
-
          - uses: actions/setup-node@v2
            with:
               node-version: "16"
-              cache: "npm"
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v2
-           env:
-              cache-name: cache-node-modules
            with:
-              # caching node_modules
-              path: node_modules
-              key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
-              restore-keys: |
-                 ${{ runner.os }}-build-${{ env.cache-name }}-
-                 ${{ runner.os }}-build-
-                 ${{ runner.os }}-
+              path: "**/node_modules"
+              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm install
-         - name: Install Playwright deps
+           run: npm ci --ignore-scripts
+
+         # Cache playwright deps install
+         # taken from https://github.com/microsoft/playwright/issues/7249
+         - name: Get installed Playwright version
+           id: playwright-version
+           run: echo -n "::set-output name=version::$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@careerfairy/webapp"].dependencies["@playwright/test"].version')"
+
+         - uses: actions/cache@v3
+           id: playwright-cache
+           with:
+              path: "~/.cache/ms-playwright"
+              key: "${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}"
+              restore-keys: |
+                 ${{ runner.os }}-playwright-
+
+         - name: Install Playwright's dependencies
+           if: steps.playwright-cache.outputs.cache-hit != 'true'
            run: npx playwright install --with-deps
+
          - name: Run Playwright End to End tests
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
            run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
+
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
               name: ${{ matrix.shard }}-playwright-report
               path: apps/web/playwright-report
+
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
@@ -170,7 +171,6 @@ jobs:
    # Deploy
    deploy:
       name: "Deploy"
-      if: ${{ needs.should_skip.outputs.should_skip != 'true' }}
       needs: [e2e_tests, unit_tests]
       runs-on: ubuntu-latest
       timeout-minutes: 20
