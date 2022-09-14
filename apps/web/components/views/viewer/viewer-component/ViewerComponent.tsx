@@ -66,7 +66,7 @@ interface Props {
    handRaiseActive: boolean
    showMenu: boolean
 }
-function ViewerComponent({ handRaiseActive, showMenu }: Props) {
+const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
    const { setDesktopMode: setDesktopModeInstanceMethod } = useFirebaseService()
    const {
       currentLivestream,
@@ -153,14 +153,14 @@ function ViewerComponent({ handRaiseActive, showMenu }: Props) {
    useEffect(() => {
       if (
          handRaiseActive &&
-         prevHandRaiseState.current?.state === "invited" &&
+         prevHandRaiseState.current?.state === HandRaiseState.invited &&
          // Make sure not to auto invite if the viewer is still in the publishing modal
          showLocalStreamPublishingModal === false
       ) {
          void handleJoinAsHandRaiser()
       }
    }, [
-      prevHandRaiseState.current?.state === "invited",
+      prevHandRaiseState.current?.state === HandRaiseState.invited,
       showLocalStreamPublishingModal,
    ])
 
@@ -168,8 +168,8 @@ function ViewerComponent({ handRaiseActive, showMenu }: Props) {
       if (
          !handRaiseActive ||
          (handRaiseState &&
-            (handRaiseState.state === "unrequested" ||
-               handRaiseState.state === "denied"))
+            (handRaiseState.state === HandRaiseState.unrequested ||
+               handRaiseState.state === HandRaiseState.denied))
       ) {
          void handleLeaveAsHandRaiser()
       }
@@ -221,7 +221,7 @@ function ViewerComponent({ handRaiseActive, showMenu }: Props) {
    const requestHandRaise = async () => {
       try {
          switch (handRaiseState?.state) {
-            case "connected":
+            case HandRaiseState.connected:
                // If you were previously connected
                if (hasRoom) {
                   // and there is still room
@@ -230,7 +230,7 @@ function ViewerComponent({ handRaiseActive, showMenu }: Props) {
                   await updateRequest(HandRaiseState.requested)
                }
                break
-            case "connecting":
+            case HandRaiseState.connecting:
                // After being in a connecting state for god knows how long, you finally clicked join.
                if (hasRoom) {
                   // At the time of clicking join there is still room, so you can join in the stream as a HR
@@ -242,7 +242,7 @@ function ViewerComponent({ handRaiseActive, showMenu }: Props) {
                   dispatch(actions.enqueueSuccessfulHandRaiseRequest())
                }
                break
-            case "invited":
+            case HandRaiseState.invited:
                // If you are currently invited
                if (hasRoom) {
                   // and there is still room

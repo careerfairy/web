@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
          easing: theme.transitions.easing.easeInOut,
       }),
       [theme.breakpoints.up("mobile")]: {
-         paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 55,
+         paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 65,
       },
    },
    contentContainer: {
@@ -340,7 +340,6 @@ const ViewerLayout = (props) => {
          appId={agoraCredentials.appID}
          initialize={shouldInitializeAgora}
          isStreamer={handRaiseActive}
-         isAHandRaiser={handRaiseActive}
       >
          <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
             <CurrentStreamContext.Provider value={currentStreamContextValue}>

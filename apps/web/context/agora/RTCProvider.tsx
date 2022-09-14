@@ -47,7 +47,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    isStreamer,
    uid,
    initialize,
-   isAHandRaiser,
    channel,
 }) => {
    const { path } = useStreamRef()
@@ -110,7 +109,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       } catch (error) {
          console.log(error)
       }
-   }, [rtcClient, sessionIsUsingCloudProxy])
+   }, [sessionIsUsingCloudProxy])
    const joinAgoraRoom = useCallback(
       async (
          rtcClient: IAgoraRTCClient,
@@ -123,7 +122,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          try {
             const cfToken = router.query.token || ""
             const { data } = await fetchAgoraRtcToken({
-               isStreamer: isAHandRaiser ? false : isStreamer,
+               isStreamer: isStreamer,
                uid: userUid,
                sentToken: cfToken.toString(),
                channelName: roomId,
@@ -174,7 +173,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          appId,
          fetchAgoraRtcToken,
          handleRtcError,
-         isAHandRaiser,
          path,
          router.query.token,
          setSessionShouldUseProxy,
@@ -211,7 +209,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          void init()
          return () => close()
       }
-   }, [close, init, initialize])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [initialize])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
@@ -253,7 +252,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             void closeAndUnpublishedLocalStream()
          }
       }
-   }, [closeAndUnpublishedLocalStream, isStreamer, localStream, rtcClient])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [isStreamer, rtcClient])
 
    const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
       screenShareRtcClientRef.current = newScreenShareRtcClient

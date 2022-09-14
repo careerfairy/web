@@ -65,11 +65,7 @@ export interface RtcPropsInterface {
     */
    uid?: UID
    /**
-    * To see is the user is a hand raiser, set this to true. (default: false)
-    */
-   isAHandRaiser?: boolean
-   /**
-    * To see if the user is a host, set this to true. (default: false)
+    * To see if the user can publish video, set this to true. (default: false)
     */
    isStreamer?: boolean
    /**
