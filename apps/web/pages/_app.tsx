@@ -1,5 +1,6 @@
 import * as React from "react"
 import "styles.css"
+export { reportWebVitals } from "next-axiom"
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
 import config from "@stahl.luke/react-reveal/globals"
 import { newStore, wrapper } from "../store"

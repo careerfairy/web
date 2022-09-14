@@ -1,4 +1,5 @@
 const { withSentryConfig } = require("@sentry/nextjs")
+const { withAxiom } = require("next-axiom")
 
 // const withBundleAnalyzer = require("@next/bundle-analyzer")({
 //    enabled: process.env.ANALYZE === "true",
@@ -131,7 +132,9 @@ if (process.env.CI && process.env.NODE_ENV === "production") {
     * enough to catch all errors and start performance monitoring.
     * Generate and upload source maps to Sentry, so that your stacktraces contain original, demangled code.
     */
-   module.exports = withSentryConfig(moduleExports, sentryWebpackPluginOptions)
+   module.exports = withAxiom(
+      withSentryConfig(moduleExports, sentryWebpackPluginOptions)
+   )
 } else {
    module.exports = moduleExports
 }
