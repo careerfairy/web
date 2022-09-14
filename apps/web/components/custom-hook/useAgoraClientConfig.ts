@@ -45,6 +45,7 @@ export default function useAgoraClientConfig(
       /**
        * The RTC sdk 4.11.0 automatically switches to proxy mode after the initial request fails
        * release notes: https://docs.agora.io/en/Video/release_web_ng?platform=Web#v4110
+       * docs: https://docs.agora.io/en/Video/API%20Reference/web_ng/interfaces/iagorartcclient.html#event_join_fallback_to_proxy
        */
       rtcClient.on("join-fallback-to-proxy", (proxyServer) => {
          alert(proxyServer)
