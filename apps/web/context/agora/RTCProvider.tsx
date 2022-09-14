@@ -27,8 +27,6 @@ import { useDispatch, useSelector } from "react-redux"
 import RootState from "../../store/reducers"
 import { LocalStream } from "../../types/streaming"
 import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
-import { sleep } from "../../components/helperFunctions/HelperFunctions"
-import { RTC_CLIENT_JOIN_TIME_LIMIT } from "../../constants/streams"
 import * as actions from "../../store/actions"
 import useAgoraError from "../../components/custom-hook/useAgoraError"
 import { errorLogAndNotify } from "../../util/CommonUtil"
@@ -55,8 +53,10 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    const screenShareRtcClient = useScreenShareRtc()
    const { handleRtcError, handleDeviceError, handleScreenShareDeniedError } =
       useAgoraError()
-   const [sessionShouldUseCloudProxy, setSessionShouldUseProxy] =
-      useSessionStorage<boolean>("is-using-cloud-proxy", false)
+   const [sessionShouldUseCloudProxy] = useSessionStorage<boolean>(
+      "is-using-cloud-proxy",
+      false
+   )
    const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
       return state.stream.agoraState.sessionIsUsingCloudProxy
    })
@@ -130,28 +130,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             })
             if (sessionShouldUseCloudProxy) {
                rtcClient.startProxyServer(3)
-            } else {
-               timeout = setTimeout(async () => {
-                  // Start reconnecting with Cloud Proxy Process
-                  logStatus("LEAVE", false, sessionShouldUseCloudProxy)
-                  await rtcClient.leave()
-                  rtcClient.removeAllListeners()
-                  logStatus("LEAVE", true, sessionShouldUseCloudProxy)
-
-                  // Normally client.leave() method should abort the initial join according to the docs.
-                  // But that is not the case, so one must wait/sleep a bit before re-joining
-                  await sleep(2000)
-                  setSessionShouldUseProxy(sessionShouldUseCloudProxy)
-                  rtcClient.startProxyServer(3)
-                  return rtcClient
-                     .join(appId, roomId, data.token.rtcToken, userUid)
-                     .catch((err) => {
-                        handleRtcError(err, {
-                           type: "JOIN",
-                           isUsingProxy: true,
-                        })
-                     })
-               }, RTC_CLIENT_JOIN_TIME_LIMIT)
             }
             logStatus("JOIN", false, sessionShouldUseCloudProxy)
 
@@ -169,14 +147,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             clearTimeout(timeout)
          }
       },
-      [
-         appId,
-         fetchAgoraRtcToken,
-         handleRtcError,
-         path,
-         router.query.token,
-         setSessionShouldUseProxy,
-      ]
+      [appId, fetchAgoraRtcToken, handleRtcError, path, router.query.token]
    )
    const joinAgoraRoomWithPrimaryClient = useCallback(
       async (sessionShouldUseCloudProxy: boolean) =>

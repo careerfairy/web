@@ -53,6 +53,7 @@ interface StreamReducer {
    agoraState: {
       rtcConnectionState?: RTCConnectionState
       rtcError?: RTCError
+      // The rtc client is successfully connected with the cloud proxy
       sessionIsUsingCloudProxy: boolean
       primaryClientJoined: boolean
       screenSharePermissionDenied: boolean

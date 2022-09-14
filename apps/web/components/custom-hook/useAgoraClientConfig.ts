@@ -9,6 +9,7 @@ import {
 } from "agora-rtc-sdk-ng"
 import { IRemoteStream } from "types/streaming"
 import useAgoraError from "./useAgoraError"
+import { useSessionStorage } from "react-use"
 
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
@@ -19,7 +20,10 @@ export default function useAgoraClientConfig(
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
    })
-
+   const [_, setSessionShouldUseProxy] = useSessionStorage<boolean>(
+      "is-using-cloud-proxy",
+      false
+   )
    const { handleRtcError } = useAgoraError()
 
    const dispatch = useDispatch()
@@ -38,8 +42,24 @@ export default function useAgoraClientConfig(
    }
 
    const configureAgoraClient = () => {
+      /**
+       * The RTC sdk 4.11.0 automatically switches to proxy mode after the initial request fails
+       * release notes: https://docs.agora.io/en/Video/release_web_ng?platform=Web#v4110
+       */
+      rtcClient.on("join-fallback-to-proxy", (proxyServer) => {
+         alert(proxyServer)
+         setSessionShouldUseProxy(true) //
+      })
+      /**
+       * This emit only triggers when the RTC client join method SUCCEEDS when attempting to join a channel with proxy
+       * docs: https://docs.agora.io/en/Video/API%20Reference/web_ng/interfaces/iagorartcclient.html#event_is_using_cloud_proxy
+       * */
       rtcClient.on("is-using-cloud-proxy", (isUsing) => {
-         dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsing)))
+         const isUsingProxy = Boolean(isUsing)
+         if (isUsingProxy) {
+            setSessionShouldUseProxy(isUsingProxy) //
+         }
+         dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsingProxy)))
       })
       rtcClient.on("user-joined", async (remoteUser) => {
          setRemoteStreams((prevRemoteStreams) => {

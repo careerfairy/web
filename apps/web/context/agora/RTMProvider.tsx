@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useRef } from "react"
 import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
-import { useDispatch } from "react-redux"
+import { useDispatch, useSelector } from "react-redux"
 import RTMContext, {
    AgoraRTMContextInterface,
    EmoteMessage,
@@ -10,6 +10,8 @@ import RTMContext, {
 } from "./RTMContext"
 import * as actions from "store/actions"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
+import RootState from "../../store/reducers"
+import { useSessionStorage } from "react-use"
 
 interface Props {
    children: JSX.Element
@@ -20,15 +22,25 @@ interface Props {
 const RTMProvider = ({ children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!)
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!)
+   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
+      return state.stream.agoraState.sessionIsUsingCloudProxy
+   })
+   const [sessionShouldUseCloudProxy] = useSessionStorage<boolean>(
+      "is-using-cloud-proxy",
+      false
+   )
+
+   const useProxy = sessionIsUsingCloudProxy || sessionShouldUseCloudProxy
 
    const { fetchAgoraRtmToken } = useFirebaseService()
    const dispatch = useDispatch()
 
    const init = useCallback(() => {
       rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
-         logFilter: AgoraRTM.LOG_FILTER_ERROR,
+         logFilter: AgoraRTM.LOG_FILTER_INFO,
+         enableCloudProxy: useProxy,
       })
-   }, [])
+   }, [useProxy])
 
    const onChannelMessage = useCallback(
       (message: RtmMessage, memberId: string) => {
@@ -78,7 +90,7 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
       if (roomId && userId) {
          void joinAgoraRtmChannel(roomId, userId)
       }
-   }, [roomId, userId, joinAgoraRtmChannel])
+   }, [roomId, userId, joinAgoraRtmChannel, useProxy])
 
    const createEmote = useCallback(
       async (emoteType: EmoteType) => {
@@ -99,16 +111,9 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
          },
          handleDisconnect: async () => {
             try {
-               await rtmChannel.current.leave()
-               if (rtmChannel.current) {
-                  rtmChannel.current.removeAllListeners()
-               }
-               if (rtmClient.current) {
-                  rtmClient.current.removeAllListeners()
-                  await rtmClient.current
-                     .logout()
-                     .catch((error) => console.error(error))
-               }
+               // Order taken from the Agora UI KIt Logout method, works properly without errors now
+               await rtmClient.current.logout()
+               await rtmClient.current.removeAllListeners()
             } catch (e) {
                console.error(e)
             }
