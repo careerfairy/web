@@ -11,10 +11,10 @@ const GoogleTagManagerLoader = ({ disableCookies, children }) => {
 
    useEffect(() => {
       // should be loading the userData
-      if (!isLoggedIn && userData === undefined) return
+      if (isLoggedIn && userData === undefined) return
 
       // we don't want to record our team events (it will skew the analytics)
-      if (!isLoggedIn && userData?.isAdmin) return
+      if (isLoggedIn && userData?.isAdmin) return
 
       if (!disableCookies) {
          TagManager.initialize(tagManagerArgs)
