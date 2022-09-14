@@ -17,8 +17,8 @@ const securityHeaders = [
          `default-src blob: 'self' *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
             notProduction && "localhost:*"
          }; ` +
-         "script-src blob: 'self' *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.google-analytics.com *.tiktok.com *.cookiebot.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.youtube.com apis.google.com ajax.googleapis.com; " +
-         "style-src 'self' *.vitals.vercel-insights.com *.googleapis.com *.googletagmanager.com 'unsafe-inline'; " +
+         "script-src blob: 'self' *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com ajax.googleapis.com; " +
+         "style-src 'self' *.vitals.vercel-insights.com *.googletagmanager.com *.googleapis.com 'unsafe-inline'; " +
          "connect-src *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com *.tiktok.com;" +
          `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
             notProduction && "localhost:*"
