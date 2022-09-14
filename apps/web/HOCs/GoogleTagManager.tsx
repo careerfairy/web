@@ -1,6 +1,5 @@
 import { useAuth } from "./AuthProvider"
 import { useEffect } from "react"
-import { getCookieConsentValue } from "react-cookie-consent"
 import TagManager from "react-gtm-module"
 
 const tagManagerArgs = {
@@ -8,21 +7,19 @@ const tagManagerArgs = {
 }
 
 const GoogleTagManagerLoader = ({ disableCookies, children }) => {
-   const { userData, isLoggedOut } = useAuth()
-
-   const cookieValue = getCookieConsentValue()
+   const { userData, isLoggedIn } = useAuth()
 
    useEffect(() => {
       // should be loading the userData
-      if (!isLoggedOut && userData === undefined) return
+      if (!isLoggedIn && userData === undefined) return
 
       // we don't want to record our team events (it will skew the analytics)
-      if (!isLoggedOut && userData?.isAdmin) return
+      if (!isLoggedIn && userData?.isAdmin) return
 
-      if (Boolean(cookieValue === "true" && !disableCookies)) {
+      if (!disableCookies) {
          TagManager.initialize(tagManagerArgs)
       }
-   }, [cookieValue, disableCookies, userData, isLoggedOut])
+   }, [disableCookies, userData, isLoggedIn])
 
    return children
 }
