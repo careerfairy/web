@@ -36,7 +36,7 @@ import StreamFilterModal from "./StreamFilterModal"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import RootState from "../../../../../store/reducers"
-import Sources from "./Sources"
+import Sources from "./RegistrationSources"
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
