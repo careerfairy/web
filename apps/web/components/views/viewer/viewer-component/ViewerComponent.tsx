@@ -267,7 +267,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
    const handleJoinAsHandRaiser = async () => {
       await handlePublishLocalStream()
       await updateRequest(HandRaiseState.connected)
-      // await dispatch(actions.setStreamerIsPublished(true));
+      dispatch(actions.closeSuccessfulHandRaiseRequest())
    }
 
    const handleLeaveAsHandRaiser = async () => {
