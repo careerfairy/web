@@ -434,7 +434,7 @@ exports.updateFakeUser = functions.https.onRequest(async (req, res) => {
       })
 })
 
-exports.backfillUserData = functions.https.onCall(async (data, context) => {
+exports.backfillUserData = functions.https.onCall(async (timezone, context) => {
    const email = context?.auth?.token?.email
    functions.logger.debug(email, context?.auth)
 
