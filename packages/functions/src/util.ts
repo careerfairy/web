@@ -7,6 +7,8 @@ import * as crypto from "crypto"
 import { promisify } from "util"
 import * as zlib from "zlib"
 import functions = require("firebase-functions")
+import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -25,75 +27,98 @@ export const getStreamLink = (streamId) => {
    return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
-export const getLivestreamTimeInterval = (
-   livestreamStartDateTime,
-   livestreamTimeZone
-) => {
-   const startDateTime = DateTime.fromJSDate(livestreamStartDateTime.toDate(), {
-      zone: livestreamTimeZone,
-   }).toFormat("HH:mm ZZZZ", { locale: "en-GB" })
-   return `(${startDateTime})`
+/**
+ * Generate a dynamic reminder email using a stream and user registered data
+ *
+ */
+export const generateReminderEmailData = (
+   stream: LiveStreamEventWithUsersLivestreamData,
+   emailTemplateId: string,
+   minutesToRemindBefore: number
+): MailgunMessageData => {
+   const { company, start, registeredUsers, timezone } = stream
+
+   const luxonStartDate = DateTime.fromJSDate(start.toDate(), {
+      zone: timezone || "Europe/Zurich",
+   })
+
+   const formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+
+   const dateToDelivery = minutesToRemindBefore
+      ? luxonStartDate.minus({ minutes: minutesToRemindBefore }).toRFC2822()
+      : 0
+
+   const templateData = createRecipientVariables(stream, start.toDate())
+
+   const emailData = {
+      from: "CareerFairy <noreply@careerfairy.io>",
+      to: registeredUsers,
+      subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
+      template: emailTemplateId,
+      "recipient-variables": JSON.stringify(templateData),
+      "o:deliverytime": dateToDelivery,
+   }
+
+   return emailData
 }
 
-export const generateEmailData = (
-   livestreamId,
-   livestream,
-   startingNow,
-   timeToDelivery
+/**
+ * Create all the email template variables needed for the email data
+ */
+const createRecipientVariables = (
+   stream: LiveStreamEventWithUsersLivestreamData,
+   startDate: Date
 ) => {
-   const recipientEmails = livestream.registeredUsers.join()
-   const luxonStartDateTime = DateTime.fromJSDate(livestream.start.toDate(), {
-      zone: livestream.timezone || "Europe/Zurich",
-   })
-   const mailgunVariables = {
-      company: livestream.company,
-      startTime: luxonStartDateTime.toFormat("HH:mm ZZZZ", { locale: "en-GB" }),
-      companyLogo: livestream.companyLogoUrl,
-      streamTitle: livestream.title,
-      backgroundImage: livestream.backgroundImageUrl,
-      streamLink: livestream.externalEventLink
-         ? livestream.externalEventLink
-         : getStreamLink(livestreamId),
-      german: livestream.language === "DE",
-   }
-   const recipientVariablesObj = {}
-   livestream.registeredUsers.forEach((email) => {
-      recipientVariablesObj[email] = mailgunVariables
-   })
-   if (startingNow) {
-      return {
-         from: "CareerFairy <noreply@careerfairy.io>",
-         to: recipientEmails,
-         subject:
-            "NOW: Live Stream with " +
-            livestream.company +
-            " " +
-            getLivestreamTimeInterval(
-               livestream.start,
-               livestream.timezone || "Europe/Zurich"
-            ),
-         template: "registration-reminder",
-         "recipient-variables": JSON.stringify(recipientVariablesObj),
+   const {
+      company,
+      title,
+      externalEventLink,
+      speakers: [firstSpeaker],
+      usersLivestreamData,
+      id: streamId,
+      language,
+   } = stream
+
+   const {
+      firstName: speakerFirstName,
+      lastName: speakerLastName,
+      position: speakerPosition,
+   } = firstSpeaker
+
+   // Reduce over usersLivestreamData to be possible to get registered information and add it to the stream data
+   return usersLivestreamData.reduce((acc, userLivestreamData) => {
+      const { user } = userLivestreamData
+      const { id: studentEmail, firstName, timezone } = user
+
+      const luxonStartDate = DateTime.fromJSDate(startDate, {
+         zone: timezone || "Europe/Zurich",
+      })
+      const formattedDate = luxonStartDate.toLocaleString(
+         DateTime.DATETIME_FULL
+      )
+
+      const emailData = {
+         companyName: company,
+         userFirstName: firstName,
+         streamTitle: title,
+         formattedDateTime: formattedDate,
+         speaker1Name: `${speakerFirstName} ${speakerLastName}`,
+         speaker1JobTitle: speakerPosition,
+         upcomingStreamLink: externalEventLink
+            ? externalEventLink
+            : getStreamLink(streamId),
+         german: language?.code === "DE",
       }
-   } else {
+
       return {
-         from: "CareerFairy <noreply@careerfairy.io>",
-         to: recipientEmails,
-         subject:
-            "Reminder: Live Stream with " +
-            livestream.company +
-            " " +
-            getLivestreamTimeInterval(
-               livestream.start,
-               livestream.timezone || "Europe/Zurich"
-            ),
-         template: "registrationreminder-2021-10-24.070709",
-         "recipient-variables": JSON.stringify(recipientVariablesObj),
-         "o:deliverytime": luxonStartDateTime
-            .minus({ minutes: timeToDelivery })
-            .toRFC2822(),
+         ...acc,
+         [studentEmail]: emailData,
       }
-   }
+   }, {})
+}
+
+export const addMinutesDate = (date: Date, minutes: number): Date => {
+   return new Date(date.getTime() + minutes * 60000)
 }
 
 export const getArrayDifference = (array1, array2) => {

@@ -94,6 +94,11 @@ export interface LivestreamEvent extends Identifiable {
     * During livestream creating, jobs can be associated with the livestream
     */
    jobs?: LivestreamJobAssociation[]
+
+   externalEventLink?: string
+   timezone?: string
+   isFaceToFace?: boolean
+   reminderEmailsSent?: IEmailSent
 }
 
 export interface LivestreamStatus {
@@ -177,6 +182,23 @@ export interface LivestreamGroupQuestions {
    groupId: string
    universityCode?: string
    questions: Record<LivestreamGroupQuestion["id"], LivestreamGroupQuestion>
+}
+
+export interface IEmailSent {
+   reminder5Minutes: boolean
+   reminder1Hour: boolean
+   reminder24Hours: boolean
+}
+
+export interface LiveStreamEventWithUsersLivestreamData
+   extends LivestreamEvent {
+   usersLivestreamData: IUserLivestreamData[]
+}
+
+export interface IUserLivestreamData {
+   livestreamId?: string
+   userId?: string
+   user?: UserData
 }
 
 export interface Speaker extends Identifiable {

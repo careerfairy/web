@@ -1,4 +1,9 @@
 import { admin } from "../api/firestoreAdmin"
+import {
+   LivestreamEvent,
+   LiveStreamEventWithUsersLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { ReminderData } from "../reminders"
 
 export const livestreamGetById = async (id) => {
    const documentSnap = await admin
@@ -90,4 +95,83 @@ export const livestreamSetIsRecording = async (
    return ref.update({
       isRecording: value,
    })
+}
+
+/**
+ * Get all the streams filtered by starting date and with all the registered students for each stream.
+ *
+ */
+export const getStreamsByDateWithRegisteredStudents = (
+   filterStartDate: Date,
+   filterEndDate: Date
+): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
+   return admin
+      .firestore()
+      .collection("livestreams")
+      .where("start", ">=", filterStartDate)
+      .where("start", "<=", filterEndDate)
+      .get()
+      .then((querySnapshot) => {
+         const streams = querySnapshot.docs?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+
+         return addUsersDataOnStreams(streams)
+      })
+}
+
+/**
+ * Add all registered students to the correspondent streams
+ *
+ */
+const addUsersDataOnStreams = async (
+   streams: LivestreamEvent[] = []
+): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
+   const formattedStreams = []
+   for (const stream of streams) {
+      const collection = await admin
+         .firestore()
+         .collection("livestreams")
+         .doc(stream.id)
+         .collection("userLivestreamData")
+         .get()
+
+      const usersLivestreamData = collection.docs?.map((doc) => doc.data())
+
+      console.log(
+         `all the user for the stream ${stream.id} -> ${usersLivestreamData}`
+      )
+
+      formattedStreams.push({ ...stream, usersLivestreamData })
+   }
+
+   console.log("all the information formatted -> ", formattedStreams)
+   return formattedStreams
+}
+
+/**
+ * Update {reminderEmailsSent} value on livestream DB with the specific reminder email that was sent
+ *
+ */
+export const updateLiveStreamWithEmailSent = (
+   stream: LiveStreamEventWithUsersLivestreamData,
+   reminder: ReminderData
+): Promise<admin.firestore.WriteResult> => {
+   const { id, reminderEmailsSent } = stream
+   const { livestreamKey } = reminder
+
+   const fieldToUpdate = {
+      ...reminderEmailsSent,
+      [livestreamKey]: true,
+   }
+
+   return admin
+      .firestore()
+      .collection("livestreams")
+      .doc(id)
+      .update({ reminderEmailsSent: fieldToUpdate })
 }
