@@ -456,6 +456,12 @@ exports.backfillUserData = functions.https.onCall(async (timezone, context) => {
       functions.logger.info("Adding referralCode to user")
    }
 
+   // if there's no timezone it will save the current timezone provided by the browser
+   if (!userData.timezone) {
+      dataToUpdate.timezone = timezone
+      functions.logger.info("Adding time zone to user")
+   }
+
    if (Object.keys(dataToUpdate).length > 0) {
       await userUpdateFields(email, dataToUpdate)
       functions.logger.info(
