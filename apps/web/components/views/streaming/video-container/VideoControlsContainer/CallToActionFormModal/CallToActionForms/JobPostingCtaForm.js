@@ -1,6 +1,6 @@
 import React, { memo } from "react"
 import { Collapse, Grid, TextField } from "@mui/material"
-import DateTimePicker from "@mui/lab/DateTimePicker"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 
 const JobPostingCtaForm = memo(
    ({ formik, maxMessageLength, onEntered, onExited }) => {

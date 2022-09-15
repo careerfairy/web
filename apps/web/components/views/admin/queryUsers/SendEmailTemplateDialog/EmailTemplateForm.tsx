@@ -10,7 +10,7 @@ import {
    TextField,
    Typography,
 } from "@mui/material"
-import DateTimePicker from "@mui/lab/DateTimePicker"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 
 import makeStyles from "@mui/styles/makeStyles"
 import { useDispatch } from "react-redux"
