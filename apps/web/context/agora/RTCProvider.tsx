@@ -107,7 +107,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             rtcClient.removeAllListeners()
          }
       } catch (error) {
-         console.log(error)
+         errorLogAndNotify(error)
       }
    }, [sessionIsUsingCloudProxy])
    const joinAgoraRoom = useCallback(
