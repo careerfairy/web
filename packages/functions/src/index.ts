@@ -63,16 +63,11 @@ exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
 // Reminders
 exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
-exports.scheduleReminderEmailSFor2HoursBefore =
-   reminders.scheduleReminderEmailSFor2HoursBefore
-exports.scheduleReminderEmailSFor20MinutesBefore =
-   reminders.scheduleReminderEmailSFor20MinutesBefore
 exports.sendReminderEmailToUserFromUniversity =
    reminders.sendReminderEmailToUserFromUniversity
-exports.sendReminderEmailsWhenLivestreamStarts =
-   reminders.sendReminderEmailsWhenLivestreamStarts
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
+exports.scheduleReminderEmails = reminders.scheduleReminderEmails
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =

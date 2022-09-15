@@ -63,6 +63,8 @@ export interface UserData extends Identifiable {
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
    hasJobApplications?: boolean
+
+   timezone?: string
 }
 
 /*
