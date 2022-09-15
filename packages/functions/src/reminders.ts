@@ -158,25 +158,29 @@ const reminderDateDelay = 20
 const reminderScheduleRange = 20
 
 export type ReminderData = {
-   template: string
+   timeMessage: string
    minutesBefore: number
    livestreamKey: string
+   template: string
 }
 
 const Reminder5Min: ReminderData = {
-   template: "reminder-5-minutes",
+   template: "variable_message_title",
+   timeMessage: "NOW",
    minutesBefore: 5,
    livestreamKey: "reminder5Minutes",
 }
 
 const Reminder1Hour: ReminderData = {
-   template: "reminder-1-hour",
+   template: "variable_message_title",
+   timeMessage: "in 1 hour",
    minutesBefore: 60,
    livestreamKey: "reminder1Hour",
 }
 
 const Reminder24Hours: ReminderData = {
-   template: "reminder-24-hours",
+   template: "variable_message_title",
+   timeMessage: "TOMORROW",
    minutesBefore: 1440,
    livestreamKey: "reminder24Hours",
 }
@@ -275,7 +279,7 @@ const handleReminder = async (
       await handleSendEmail(filteredStreams, reminder)
    } catch (error) {
       functions.logger.error(
-         `Error handling reminder with template ${reminder.template}`,
+         `Error handling reminder with template ${reminder.livestreamKey}`,
          error
       )
       throw new functions.https.HttpsError("unknown", error)
@@ -291,7 +295,7 @@ const handleSendEmail = (
    reminder: ReminderData
 ) => {
    const promiseArrayToSendMessages = []
-   const { template, minutesBefore } = reminder
+   const { minutesBefore } = reminder
 
    streams.forEach((stream) => {
       const { isFaceToFace, company } = stream
@@ -303,7 +307,7 @@ const handleSendEmail = (
       } else {
          const emailData = generateReminderEmailData(
             stream,
-            template,
+            reminder,
             minutesBefore
          )
          promiseArrayToSendMessages.push(
@@ -317,9 +321,9 @@ const handleSendEmail = (
          const { status, value, reason } = result
 
          if (status === "fulfilled") {
-            const { template, streamId } = value
+            const { livestreamKey, streamId } = value
             functions.logger.log(
-               `Email ${template} sent successfully for the stream ${streamId}`
+               `Email ${livestreamKey} sent successfully for the stream ${streamId}`
             )
          } else {
             functions.logger.error(reason)
@@ -339,17 +343,17 @@ const createSendEmailPromise = (
    stream: LiveStreamEventWithUsersLivestreamData
 ) => {
    const { id } = stream
-   const { template } = reminder
+   const { livestreamKey } = reminder
 
    return sendMessage(emailData)
       .then(() => {
          return updateLiveStreamWithEmailSent(stream, reminder).then(() => {
-            return { template, streamId: id }
+            return { livestreamKey, streamId: id }
          })
       })
       .catch((error) => {
          throw new Error(
-            `Email ${template} was not sent for stream ${id} with the error ${error?.message}`
+            `Email ${livestreamKey} was not sent for stream ${id} with the error ${error?.message}`
          )
       })
 }

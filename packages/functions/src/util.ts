@@ -9,6 +9,7 @@ import * as zlib from "zlib"
 import functions = require("firebase-functions")
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
+import { ReminderData } from "./reminders"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -33,7 +34,7 @@ export const getStreamLink = (streamId) => {
  */
 export const generateReminderEmailData = (
    stream: LiveStreamEventWithUsersLivestreamData,
-   emailTemplateId: string,
+   reminder: ReminderData,
    minutesToRemindBefore: number
 ): MailgunMessageData => {
    const { company, start, registeredUsers, timezone } = stream
@@ -48,13 +49,17 @@ export const generateReminderEmailData = (
       ? luxonStartDate.minus({ minutes: minutesToRemindBefore }).toRFC2822()
       : 0
 
-   const templateData = createRecipientVariables(stream, start.toDate())
+   const templateData = createRecipientVariables(
+      stream,
+      start.toDate(),
+      reminder.timeMessage
+   )
 
    const emailData = {
       from: "CareerFairy <noreply@careerfairy.io>",
       to: registeredUsers,
       subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
-      template: emailTemplateId,
+      template: reminder.template,
       "recipient-variables": JSON.stringify(templateData),
       "o:deliverytime": dateToDelivery,
    }
@@ -67,7 +72,8 @@ export const generateReminderEmailData = (
  */
 const createRecipientVariables = (
    stream: LiveStreamEventWithUsersLivestreamData,
-   startDate: Date
+   startDate: Date,
+   timeMessage: string
 ) => {
    const {
       company,
@@ -98,12 +104,12 @@ const createRecipientVariables = (
       )
 
       const emailData = {
+         timeMessage: timeMessage,
          companyName: company,
          userFirstName: firstName,
          streamTitle: title,
          formattedDateTime: formattedDate,
-         speaker1Name: `${speakerFirstName} ${speakerLastName}`,
-         speaker1JobTitle: speakerPosition,
+         formattedSpeaker: `${speakerFirstName} ${speakerLastName}, ${speakerPosition}`,
          upcomingStreamLink: externalEventLink
             ? externalEventLink
             : getStreamLink(streamId),
