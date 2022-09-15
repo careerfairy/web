@@ -55,6 +55,7 @@ interface StreamReducer {
       rtcError?: RTCError
       // The rtc client is successfully connected with the cloud proxy
       sessionIsUsingCloudProxy: boolean
+      sessionShouldUseCloudProxy: boolean | undefined
       primaryClientJoined: boolean
       screenSharePermissionDenied: boolean
       deviceErrors: {

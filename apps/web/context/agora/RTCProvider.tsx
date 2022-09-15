@@ -22,7 +22,6 @@ import { useRouter } from "next/router"
 import useStreamRef from "../../components/custom-hook/useStreamRef"
 
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
-import { useSessionStorage } from "react-use"
 import { useDispatch, useSelector } from "react-redux"
 import RootState from "../../store/reducers"
 import { LocalStream } from "../../types/streaming"
@@ -50,13 +49,19 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    const { path } = useStreamRef()
    const router = useRouter()
    const rtcClient = useRtcClient()
+   const { remoteStreams, networkQuality, demoStreamHandlers } =
+      useAgoraClientConfig(rtcClient, uid)
    const screenShareRtcClient = useScreenShareRtc()
    const { handleRtcError, handleDeviceError, handleScreenShareDeniedError } =
       useAgoraError()
-   const [sessionShouldUseCloudProxy] = useSessionStorage<boolean>(
-      "is-using-cloud-proxy",
-      false
+   const sessionShouldUseCloudProxy = useSelector(
+      (state: RootState) => state.stream.agoraState.sessionShouldUseCloudProxy
    )
+
+   // Due to the way we are using this hook, we need to know
+   // whether the sessionShouldUseCloudProxy, it's initial state is undefined
+   const shouldInit = initialize && sessionShouldUseCloudProxy !== undefined
+
    const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
       return state.stream.agoraState.sessionIsUsingCloudProxy
    })
@@ -87,9 +92,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    const screenShareRtcClientRef = useRef(screenShareRtcClient)
    const screenShareStreamRef = useRef(screenShareStream)
 
-   const { remoteStreams, networkQuality, demoStreamHandlers } =
-      useAgoraClientConfig(rtcClient, uid)
-
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
          dispatch(actions.setVideoIsPaused())
@@ -107,9 +109,10 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             rtcClient.removeAllListeners()
          }
       } catch (error) {
-         console.log(error)
+         errorLogAndNotify(error)
       }
    }, [sessionIsUsingCloudProxy])
+
    const joinAgoraRoom = useCallback(
       async (
          rtcClient: IAgoraRTCClient,
@@ -176,12 +179,12 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    }, [joinAgoraRoomWithPrimaryClient, sessionShouldUseCloudProxy])
    // @ts-ignore
    useEffect(() => {
-      if (initialize) {
+      if (shouldInit) {
          void init()
          return () => close()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [initialize])
+   }, [shouldInit])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
