@@ -5,6 +5,7 @@ import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
 import useServerModel from "../../components/custom-hook/utils/useServerModel"
 import CmsPageLayout from "../../layouts/CmsPageLayout"
 import { hookLandingPage } from "../../components/cms/constants"
+import { MarketingLandingPageProvider } from "../../components/cms/landing-page/MarketingLandingPageProvider"
 
 interface Props {
    marketingLandingPagePlainObject: MarketingLandingPage
@@ -16,24 +17,26 @@ const LandingPage = ({ marketingLandingPagePlainObject }: Props) => {
    )
 
    return (
-      <CmsPageLayout page={marketingLandingPage}>
-         {marketingLandingPage.blocks && (
-            <>
-               {marketingLandingPage.blocks.map((block) => {
-                  const Component = Blocks[block.__typename]
-                  if (!Component) return null
-                  return (
-                     <Component
-                        key={block.id}
-                        page={marketingLandingPage}
-                        {...block}
-                        fieldsOfStudy={marketingLandingPage.fieldsOfStudy}
-                     />
-                  )
-               })}
-            </>
-         )}
-      </CmsPageLayout>
+      <MarketingLandingPageProvider>
+         <CmsPageLayout page={marketingLandingPage}>
+            {marketingLandingPage.blocks && (
+               <>
+                  {marketingLandingPage.blocks.map((block) => {
+                     const Component = Blocks[block.__typename]
+                     if (!Component) return null
+                     return (
+                        <Component
+                           key={block.id}
+                           page={marketingLandingPage}
+                           {...block}
+                           fieldsOfStudy={marketingLandingPage.fieldsOfStudy}
+                        />
+                     )
+                  })}
+               </>
+            )}
+         </CmsPageLayout>
+      </MarketingLandingPageProvider>
    )
 }
 
