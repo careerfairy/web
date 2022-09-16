@@ -10,6 +10,7 @@ import { stepConnectorClasses } from "@mui/material/StepConnector"
 import { Check } from "@mui/icons-material"
 import React from "react"
 import { MultiStepComponentType } from "./MultiStepWrapper"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const StepperConnector = styled(StepConnector)(({ theme }) => ({
    [`&.${stepConnectorClasses.alternativeLabel}`]: {
@@ -79,6 +80,8 @@ type GenericStepperProps = {
 }
 
 const GenericStepper = ({ currentStep, steps }: GenericStepperProps) => {
+   const isMobile = useIsMobile()
+
    return (
       <Stepper
          activeStep={currentStep}
@@ -88,7 +91,7 @@ const GenericStepper = ({ currentStep, steps }: GenericStepperProps) => {
          {steps.map((step, i) => (
             <Step key={i}>
                <StepLabel StepIconComponent={StepperIcon}>
-                  {step.description}
+                  {isMobile ? null : step.description}
                </StepLabel>
             </Step>
          ))}
