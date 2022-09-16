@@ -1,8 +1,15 @@
 import { https } from "firebase-functions"
 
-export type Middleware = (
+export type MiddlewareContext = https.CallableContext & {
+   /**
+    * Allow middlewares to store data for the next middleware to access
+    */
+   middlewares?: Record<string, any>
+}
+
+export type OnCallMiddleware = (
    data: any,
-   context: https.CallableContext,
+   context: MiddlewareContext,
    /**
     * Calls the next middleware in the chain
     */
@@ -13,7 +20,7 @@ export type Middleware = (
  * Chain multiple middleware functions with next functionality
  * @param middlewares
  */
-export const middlewares = (...middlewares: Middleware[]) => {
+export const middlewares = (...middlewares: OnCallMiddleware[]) => {
    return (data, context) => {
       let idx = 0
 

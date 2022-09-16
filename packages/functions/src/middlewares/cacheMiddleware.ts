@@ -1,7 +1,8 @@
 import { admin } from "../api/firestoreAdmin"
+import * as functions from "firebase-functions"
 import { https } from "firebase-functions"
-import { Middleware } from "./middlewares"
-import * as crypto from "crypto"
+import { OnCallMiddleware } from "./middlewares"
+import { compress, decompress, sha1 } from "../util"
 
 interface CacheEntryDocument {
    /** Hashed Cache key - will be the same as the document id */
@@ -12,18 +13,17 @@ interface CacheEntryDocument {
    cachedAt: admin.firestore.Timestamp
    /** Time data should no longer be considered fresh, as a Cloud Firestore Timestamp object */
    expiresAt: admin.firestore.Timestamp
-   /** The cached resource serialized via JSON.stringify */
-   data: string
-   // doesn't have ETag info yet because firebase callable functions don't support setting response headers
+   /** gzipped data stored as bytes */
+   data: Uint8Array
 }
 
 /**
- * Function to extract the cacheOnCallValues key from the request data/context
+ * Function to extract the cache key from the request data/context
  *
  * Should return an array of values
  *  e.g ["getJob", 123]
  *
- * This array will be concatenated and used as cacheOnCallValues key
+ * This array will be concatenated and used as cache key
  */
 export type CacheKeyOnCallFn = (
    data: any,
@@ -34,7 +34,7 @@ export type CacheKeyOnCallFn = (
  * Cache Middleware for onCall functions
  * Stores the next() middleware result in firestore
  *
- * Cache documents will be stored under cacheOnCallValues/$cacheNameSpace
+ * Cache documents will be stored under cache/functions/$cacheNameSpace
  *
  * @param cacheNameSpace
  * @param cacheKeyFn
@@ -44,17 +44,17 @@ export const cacheOnCallValues = (
    cacheNameSpace: string,
    cacheKeyFn: CacheKeyOnCallFn,
    ttlSeconds: number
-): Middleware => {
+): OnCallMiddleware => {
    return async (data, context, next) => {
       const cacheKey = generateCacheKey(cacheKeyFn(data, context))
 
-      // Try to fetch from cacheOnCallValues
+      // Try to fetch from cache
       const cachedDocument = await getFirestoreCacheDocument(
          cacheNameSpace,
          cacheKey.hashed
       )
 
-      // cacheOnCallValues exists and is not expired (still valid)
+      // cache exists and is not expired (still valid)
       if (cachedDocument && isCacheEntryValid(cachedDocument)) {
          // response headers for us to easily identify cached responses
          context.rawRequest.res?.header(
@@ -66,19 +66,38 @@ export const cacheOnCallValues = (
             cachedDocument.cachedAt.toDate().toISOString()
          )
 
-         return JSON.parse(cachedDocument.data)
+         try {
+            return getCacheEntryData(cachedDocument)
+         } catch (e) {
+            // log the error and let the middle continue to the real handler
+            functions.logger.error(
+               "Failed to get the cached document data",
+               e,
+               cachedDocument.plainKey
+            )
+         }
       }
 
-      // no cacheOnCallValues, calculate the result
+      // no cache, calculate the result
       const value = await next()
 
-      // cacheOnCallValues the result
-      const cacheEntry = createCacheEntry(cacheKey, value, ttlSeconds)
-      await upsertFirestoreCacheDocument(
-         cacheNameSpace,
-         cacheKey.hashed,
-         cacheEntry
-      )
+      // cache the result
+      let cacheEntry: CacheEntryDocument
+      try {
+         cacheEntry = await createCacheEntry(cacheKey, value, ttlSeconds)
+         await upsertFirestoreCacheDocument(
+            cacheNameSpace,
+            cacheKey.hashed,
+            cacheEntry
+         )
+      } catch (e) {
+         // log the error and let the flow continue
+         functions.logger.error(
+            "Failed to created a cached document",
+            e,
+            cacheEntry?.plainKey
+         )
+      }
 
       return value
    }
@@ -124,19 +143,27 @@ const upsertFirestoreCacheDocument = async (
 | Utils
 |--------------------------------------------------------------------------
 */
-const createCacheEntry = (
+const createCacheEntry = async (
    cacheKey: CacheKey,
    value: any,
    ttlSeconds: number
-): CacheEntryDocument => {
+): Promise<CacheEntryDocument> => {
    const ttlMs = ttlSeconds * 1000
+
+   const serializedValue = JSON.stringify(value)
+   const compressedBuffer = await compress(new Buffer(serializedValue))
+
    return {
       key: cacheKey.hashed,
       plainKey: cacheKey.plain,
       cachedAt: admin.firestore.Timestamp.now(),
       expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + ttlMs),
-      data: JSON.stringify(value),
+      data: compressedBuffer,
    }
+}
+
+const getCacheEntryData = (entry: CacheEntryDocument): Promise<any> => {
+   return decompress(entry.data).then((buffer) => JSON.parse(buffer.toString()))
 }
 
 const isCacheEntryValid = (entry: CacheEntryDocument): boolean => {
@@ -155,18 +182,6 @@ const generateCacheKey = (values: any[]): CacheKey => {
 
    return {
       plain: serialized,
-      hashed: hash(serialized),
+      hashed: sha1(serialized),
    }
 }
-
-/**
- * Deterministic Hash the input string
- *
- * Using sha1 because it has fewer collisions' probability than md5
- *  md5 would also work fine here
- *
- * We only care about hashing speed and collisions here, not security
- * @param input
- */
-const hash = (input: string) =>
-   crypto.createHash("sha1").update(input).digest("hex")
