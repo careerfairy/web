@@ -28,6 +28,7 @@ import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
 
 const styles = {
    hideOnHoverContent: {
@@ -213,6 +214,8 @@ const EventPreviewCard = ({
       MARKETING_LANDING_PAGE_PATH
    )
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
+   const { formCompleted: marketingFormCompleted, setSelectedEventId } =
+      useMarketingLandingPage()
 
    const {
       query: { groupId },
@@ -300,7 +303,11 @@ const EventPreviewCard = ({
    }
 
    const getHref = useCallback(() => {
-      if (isOnMarketingLandingPage && !authenticatedUser.email) {
+      if (
+         isOnMarketingLandingPage &&
+         !authenticatedUser.email &&
+         !marketingFormCompleted
+      ) {
          return `#${marketingSignUpFormId}`
       }
       return {
@@ -311,7 +318,21 @@ const EventPreviewCard = ({
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
          },
       }
-   }, [authenticatedUser, event, groupId, isOnMarketingLandingPage, isPast])
+   }, [
+      authenticatedUser.email,
+      event?.groupIds,
+      event?.id,
+      groupId,
+      isOnMarketingLandingPage,
+      isPast,
+      marketingFormCompleted,
+   ])
+
+   const handleDetailsClick = useCallback(() => {
+      if (isOnMarketingLandingPage) {
+         setSelectedEventId(event?.id)
+      }
+   }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
 
    return (
       <>
@@ -531,6 +552,7 @@ const EventPreviewCard = ({
                                     variant={"contained"}
                                     color={"secondary"}
                                     size={"small"}
+                                    onClick={handleDetailsClick}
                                  >
                                     {mobile ? "details" : "see details"}
                                  </Button>
