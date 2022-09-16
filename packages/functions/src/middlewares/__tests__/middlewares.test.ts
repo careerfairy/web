@@ -1,4 +1,4 @@
-import { Middleware, middlewares } from "../middlewares"
+import { middlewares, OnCallMiddleware } from "../middlewares"
 
 test("First middleware should return result instance", async () => {
    // arrange
@@ -37,12 +37,12 @@ test("First middleware throws and circuits the chain", async () => {
    }).rejects.toThrow("data field must be preset")
 })
 
-test("Dummy cacheOnCallValues middleware works", async () => {
+test("Dummy cache middleware works", async () => {
    const database = {}
 
    const chain = middlewares(cache(database, "key1"), handler("1"))
 
-   // reach the final middleware & populate cacheOnCallValues
+   // reach the final middleware & populate cache
    expect(await chain({}, {})).toBe("1")
    // should have the value cached
    expect(await chain({}, {})).toBe("cached:1")
@@ -63,7 +63,7 @@ test("Last middleware throws when calling next", async () => {
 | Utility Middlewares
 |--------------------------------------------------------------------------
 */
-const validateDataExists: Middleware = (data, context, next) => {
+const validateDataExists: OnCallMiddleware = (data, context, next) => {
    if (!data) {
       throw new Error("data field must be preset")
    }
@@ -72,7 +72,7 @@ const validateDataExists: Middleware = (data, context, next) => {
 }
 
 const cache =
-   (database: object, key: string): Middleware =>
+   (database: object, key: string): OnCallMiddleware =>
    async (data, context, next) => {
       if (database[key]) {
          return database[key]
@@ -85,12 +85,12 @@ const cache =
       return result
    }
 
-const noop: Middleware = (data, context, next) => {
+const noop: OnCallMiddleware = (data, context, next) => {
    return next()
 }
 
 const handler =
-   (result: any): Middleware =>
+   (result: any): OnCallMiddleware =>
    () => {
       return result
    }

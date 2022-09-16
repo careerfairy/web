@@ -2,8 +2,11 @@ import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
 import { https } from "firebase-functions"
 import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
-import functions = require("firebase-functions")
 import { ClientError } from "graphql-request"
+import * as crypto from "crypto"
+import { promisify } from "util"
+import * as zlib from "zlib"
+import functions = require("firebase-functions")
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -514,4 +517,27 @@ export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
  */
 export function serializeModels<T extends BaseModel>(result: T[]) {
    return result.map((entry) => entry.serializeToPlainObject())
+}
+
+/**
+ * Deterministic Hash the input string
+ *
+ * Using sha1 because it has fewer collisions' probability than md5
+ *  md5 would also work fine here
+ *
+ * We only care about hashing speed and collisions here, not security
+ * @param input
+ */
+export const sha1 = (input: string) =>
+   crypto.createHash("sha1").update(input).digest("hex")
+
+export const compress = (buffer: Buffer): Promise<Buffer> => {
+   const deflatePromise = promisify(zlib.deflate)
+
+   return deflatePromise(buffer)
+}
+
+export const decompress = (input: Buffer | Uint8Array): Promise<Buffer> => {
+   const inflatePromise = promisify(zlib.inflate)
+   return inflatePromise(input)
 }
