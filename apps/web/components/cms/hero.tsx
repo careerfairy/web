@@ -117,7 +117,7 @@ const styles = sxStyles({
       textShadow: (theme) => theme.darkTextShadow,
    },
    fullScreenMain: {
-      height: { xs: "100%", sm: "90vh" },
+      height: "100%",
       zIndex: 1,
    },
    fullScreenVideoWrapper: {
