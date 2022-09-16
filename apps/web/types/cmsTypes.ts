@@ -446,6 +446,7 @@ export const companyLogosQueryProps = `
 export const textBlockQueryProps = `
     {
         __typename
+        id
         slug
         textBlockTitle ${richTextQueryProps}
         content ${richTextQueryProps}
@@ -465,6 +466,7 @@ export const highlightQueryProps = `
 export const highlightListQueryProps = `
     {
         __typename
+        id
         slug
         highlightListTitle 
         highlights ${highlightQueryProps}
