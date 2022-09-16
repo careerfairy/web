@@ -193,6 +193,7 @@ const styles = sxStyles({
    headerWrapper: {
       marginBottom: 4,
       textAlign: "center",
+      px: 2,
    },
    title: {
       fontFamily: "Poppins",
