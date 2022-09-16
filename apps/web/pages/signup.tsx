@@ -131,7 +131,7 @@ const SignUp = () => {
    }
 
    const renderContinueAndBackButtons = () => (
-      <Grid container alignItems="center" mt={10}>
+      <Grid container alignItems="center" mt={{ xs: 5, md: 10 }}>
          <Grid item xs={6}>
             <Typography variant="body2" color="textSecondary">
                Step {currentStep + 1} of {steps.length}
