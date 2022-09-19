@@ -58,6 +58,14 @@ test("Last middleware throws when calling next", async () => {
    }).rejects.toThrow("No next middleware to call, you're the last one")
 })
 
+test("Use context value from previous middleware", async () => {
+   const chain = middlewares(addContext(), (data, context) => {
+      return Promise.resolve(context.middlewares.flag)
+   })
+
+   expect(await chain({}, {})).toBe(true)
+})
+
 /*
 |--------------------------------------------------------------------------
 | Utility Middlewares
@@ -93,4 +101,14 @@ const handler =
    (result: any): OnCallMiddleware =>
    () => {
       return result
+   }
+
+const addContext =
+   (): OnCallMiddleware<{ flag: boolean }> => (data, context, next) => {
+      context.middlewares = {
+         ...context.middlewares,
+         flag: true,
+      }
+
+      return next()
    }

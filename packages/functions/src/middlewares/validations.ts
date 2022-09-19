@@ -6,6 +6,8 @@ import {
 import { OnCallMiddleware } from "./middlewares"
 import { ObjectShape } from "yup/lib/object"
 import { object } from "yup"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 /**
  * Validate if the user is authed, is group admin or is cf admin
@@ -14,7 +16,10 @@ import { object } from "yup"
  *
  * Assumes data.groupId exists
  */
-export const userShouldBeGroupAdmin = (): OnCallMiddleware => {
+export const userShouldBeGroupAdmin = (): OnCallMiddleware<{
+   group?: Group
+   userData?: UserData
+}> => {
    return async (data, context, next) => {
       const idToken = await validateUserAuthExists(context)
 
