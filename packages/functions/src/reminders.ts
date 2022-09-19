@@ -11,64 +11,6 @@ import {
    updateLiveStreamWithEmailSent,
 } from "./lib/livestream"
 
-export const sendReminderEmailToUserFromUniversity = functions.https.onRequest(
-   async (req, res) => {
-      console.log("running")
-
-      setHeaders(req, res)
-
-      const { groupId, categoryId, categoryValueId } = req.body
-
-      const collectionRef = admin
-         .firestore()
-         .collection("userData")
-         .where("groupIds", "array-contains", groupId)
-
-      collectionRef
-         .get()
-         .then((querySnapshot) => {
-            console.log("snapshotSize:" + querySnapshot.size)
-            querySnapshot.forEach((doc) => {
-               const userData = doc.data()
-               const groupCategory = userData.registeredGroups.find(
-                  (group) => group.groupId === groupId
-               )
-               if (groupCategory) {
-                  const filteringCategory = groupCategory.categories.find(
-                     (category) => category.id === categoryId
-                  )
-                  if (
-                     filteringCategory &&
-                     filteringCategory.selectedValueId === categoryValueId
-                  ) {
-                     console.log(userData.userEmail)
-                     const email = {
-                        TemplateId: req.body.templateId,
-                        From: "CareerFairy <noreply@careerfairy.io>",
-                        To: userData.userEmail,
-                        TemplateModel: {
-                           userEmail: userData.userEmail,
-                        },
-                     }
-                     client.sendEmailWithTemplate(email).then(
-                        () => {
-                           console.log("email sent to: " + userData.userEmail)
-                        },
-                        (error) => {
-                           console.log("error:" + error)
-                        }
-                     )
-                  }
-               }
-            })
-         })
-         .catch((error) => {
-            console.log("error:" + error)
-            return res.status(400).send()
-         })
-   }
-)
-
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res)
