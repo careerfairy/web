@@ -23,12 +23,15 @@ import useStreamRef from "../../components/custom-hook/useStreamRef"
 
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 import { useDispatch, useSelector } from "react-redux"
-import RootState from "../../store/reducers"
 import { LocalStream } from "../../types/streaming"
 import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
 import * as actions from "../../store/actions"
 import useAgoraError from "../../components/custom-hook/useAgoraError"
 import { errorLogAndNotify } from "../../util/CommonUtil"
+import {
+   sessionIsUsingCloudProxySelector,
+   sessionShouldUseCloudProxySelector,
+} from "../../store/selectors/streamSelectors"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -55,16 +58,16 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    const { handleRtcError, handleDeviceError, handleScreenShareDeniedError } =
       useAgoraError()
    const sessionShouldUseCloudProxy = useSelector(
-      (state: RootState) => state.stream.agoraState.sessionShouldUseCloudProxy
+      sessionShouldUseCloudProxySelector
    )
 
    // Due to the way we are using this hook, we need to know
    // whether the sessionShouldUseCloudProxy, it's initial state is undefined
    const shouldInit = initialize && sessionShouldUseCloudProxy !== undefined
 
-   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
-      return state.stream.agoraState.sessionIsUsingCloudProxy
-   })
+   const sessionIsUsingCloudProxy = useSelector(
+      sessionIsUsingCloudProxySelector
+   )
 
    const [localStream, setLocalStream] = useState<LocalStream>({
       uid: uid,

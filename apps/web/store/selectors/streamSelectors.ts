@@ -15,3 +15,9 @@ export const leftMenuOpenSelector = (state: RootState) =>
 
 export const focusModeEnabledSelector = (state: RootState) =>
    state.stream.layout.focusModeEnabled
+
+export const sessionShouldUseCloudProxySelector = (state: RootState) =>
+   state.stream.agoraState.sessionShouldUseCloudProxy
+
+export const sessionIsUsingCloudProxySelector = (state: RootState) =>
+   state.stream.agoraState.sessionIsUsingCloudProxy

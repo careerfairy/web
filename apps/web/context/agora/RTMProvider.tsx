@@ -10,8 +10,8 @@ import RTMContext, {
 } from "./RTMContext"
 import * as actions from "store/actions"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import RootState from "../../store/reducers"
 import { useSessionStorage } from "react-use"
+import { sessionIsUsingCloudProxySelector } from "../../store/selectors/streamSelectors"
 
 interface Props {
    children: JSX.Element
@@ -22,9 +22,9 @@ interface Props {
 const RTMProvider = ({ children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!)
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!)
-   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
-      return state.stream.agoraState.sessionIsUsingCloudProxy
-   })
+   const sessionIsUsingCloudProxy = useSelector(
+      sessionIsUsingCloudProxySelector
+   )
    const [sessionShouldUseCloudProxy] = useSessionStorage<boolean>(
       "is-using-cloud-proxy",
       false
