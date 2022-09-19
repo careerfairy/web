@@ -15,10 +15,8 @@ import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import Notifier from "../components/views/notifier"
-import { useRouter } from "next/router"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
-import { useEffect, useState } from "react"
 import firebaseApp, {
    AuthInstance,
    firebaseConfig,
@@ -64,8 +62,6 @@ const rrfProps = {
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
-   const { disableCookies } = useRouterInformation()
-
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 
@@ -88,7 +84,7 @@ function MyApp(props) {
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
-                           <GoogleTagManager disableCookies={disableCookies}>
+                           <GoogleTagManager>
                               <ThemeProviderWrapper>
                                  <FirebaseServiceContext.Provider
                                     value={firebaseServiceInstance}
@@ -128,20 +124,6 @@ const ReactFireProviders = ({ children }) => {
          </FirestoreProvider>
       </FirebaseAppProvider>
    )
-}
-
-const useRouterInformation = () => {
-   const { pathname } = useRouter()
-
-   const [disableCookies, setDisableCookies] = useState(false)
-
-   useEffect(() => {
-      setDisableCookies(
-         Boolean(pathname === "/next-livestreams/[groupId]/embed")
-      )
-   }, [pathname])
-
-   return { disableCookies }
 }
 
 // Only uncomment this method if you have blocking data requirements for
