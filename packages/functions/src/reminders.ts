@@ -99,6 +99,9 @@ const reminderDateDelay = 20
 // range to how many minutes we will search
 const reminderScheduleRange = 20
 
+// Maximum size of each email chunk
+const emailMaxChunkSize = 950
+
 export type ReminderData = {
    timeMessage: string
    minutesBefore: number
@@ -247,14 +250,18 @@ const handleSendEmail = (
             `Livestream with ${company} is F2F, no reminder email sent out`
          )
       } else {
-         const emailData = generateReminderEmailData(
+         const emailsData = generateReminderEmailData(
             stream,
             reminder,
-            minutesBefore
+            minutesBefore,
+            emailMaxChunkSize
          )
-         promiseArrayToSendMessages.push(
-            createSendEmailPromise(emailData, reminder, stream)
-         )
+
+         emailsData.map((emailData) => {
+            promiseArrayToSendMessages.push(
+               createSendEmailPromise(emailData, reminder, stream)
+            )
+         })
       }
    })
 

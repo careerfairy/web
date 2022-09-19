@@ -35,8 +35,9 @@ export const getStreamLink = (streamId) => {
 export const generateReminderEmailData = (
    stream: LiveStreamEventWithUsersLivestreamData,
    reminder: ReminderData,
-   minutesToRemindBefore: number
-): MailgunMessageData => {
+   minutesToRemindBefore: number,
+   emailMaxChunkSize: number
+): MailgunMessageData[] => {
    const { company, start, registeredUsers, timezone } = stream
 
    const luxonStartDate = DateTime.fromJSDate(start.toDate(), {
@@ -55,16 +56,41 @@ export const generateReminderEmailData = (
       reminder.timeMessage
    )
 
-   const emailData = {
-      from: "CareerFairy <noreply@careerfairy.io>",
-      to: registeredUsers,
-      subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
-      template: reminder.template,
-      "recipient-variables": JSON.stringify(templateData),
-      "o:deliverytime": dateToDelivery,
+   // Mailgun has a maximum of 1k emails per bulk email
+   // So we will slice our registered users on chunks of 950 and send more than one bulk email if needed
+   const registeredUsersChunks = getRegisteredUsersIntoChunks(
+      registeredUsers,
+      emailMaxChunkSize
+   )
+
+   // create email data for all the registered users chunks
+   return registeredUsersChunks.map((registeredUsersChunk) => {
+      const emailData = {
+         from: "CareerFairy <noreply@careerfairy.io>",
+         to: registeredUsersChunk,
+         subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
+         template: reminder.template,
+         "recipient-variables": JSON.stringify(templateData),
+         "o:deliverytime": dateToDelivery,
+      }
+
+      return emailData
+   })
+}
+
+/**
+ * Slice Registered Users into chunks
+ *
+ */
+const getRegisteredUsersIntoChunks = (registeredUsers, chunkSize): string[] => {
+   const registeredUsersChunks = []
+
+   for (let i = 0; i < registeredUsers.length; i += chunkSize) {
+      const chunk = registeredUsers.slice(i, i + chunkSize)
+      registeredUsersChunks.push(chunk)
    }
 
-   return emailData
+   return registeredUsersChunks
 }
 
 /**
