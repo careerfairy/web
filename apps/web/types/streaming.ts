@@ -4,6 +4,8 @@ import {
    IAgoraRTCRemoteUser,
    ICameraVideoTrack,
    IMicrophoneAudioTrack,
+   IRemoteAudioTrack,
+   IRemoteVideoTrack,
    UID,
 } from "agora-rtc-sdk-ng"
 
@@ -18,10 +20,45 @@ export interface LocalStream {
    audioMuted?: boolean
 }
 
+export declare interface IRemoteStream {
+   /**
+    * The ID of the remote user.
+    */
+   uid: UID
+   /**
+    * The subscribed audio track.
+    */
+   audioTrack?: IRemoteAudioTrack
+   /**
+    * The subscribed video track.
+    */
+   videoTrack?: IRemoteVideoTrack
+   /**
+    * Whether the remote user is sending an audio track.
+    * - `true`: The remote user is sending an audio track.
+    * - `false`: The remote user is not sending an audio track.
+    */
+   videoMuted?: boolean
+   /**
+    * Whether the remote user is sending a video track.
+    * - `true`: The remote user is sending an audio track.
+    * - `false`: The remote user is not sending an audio track.
+    */
+   audioMuted?: boolean
+   /**
+    * This property is used to play demo streamer as a video instead of a stream in the tutorial
+    *  - It should be a url pointing to a video
+    */
+   url?: string
+   /**
+    * This property is set in the useClientConfig hook for the demo stream, not sure where its being used, will leave it as is for now
+    */
+   streamId?: string
+}
+
 export interface LocalMediaHandlers {
    initializeLocalAudioStream: () => Promise<any>
    initializeLocalVideoStream: () => Promise<any>
-   initializeVideoCameraAudioTrack: () => Promise<any>
    closeLocalCameraTrack: () => Promise<any>
    closeLocalMicrophoneTrack: () => Promise<any>
 }

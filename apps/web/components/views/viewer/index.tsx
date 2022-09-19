@@ -60,8 +60,6 @@ const useStyles = makeStyles((theme) => ({
 
 const ViewerOverview = ({
    handRaiseActive,
-   streamerId,
-   mobile,
    handleStateChange,
    selectedState,
    showMenu,
@@ -73,7 +71,7 @@ const ViewerOverview = ({
    const {
       query: { isRecordingWindow },
    } = useRouter()
-   const { currentLivestream, isBreakout } = useCurrentStream()
+   const { currentLivestream, isMobile: mobile } = useCurrentStream()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
       (state: RootState) => state.stream.streaming
@@ -109,12 +107,8 @@ const ViewerOverview = ({
                questionsAreDisabled={currentLivestream.questionsDisabled}
             />
             <ViewerComponent
-               streamerId={streamerId}
-               mobile={mobile}
                showMenu={showMenu}
-               currentLivestream={currentLivestream}
                handRaiseActive={handRaiseActive}
-               isBreakout={isBreakout}
             />
             {!focusModeEnabled && (
                <MiniChatContainer

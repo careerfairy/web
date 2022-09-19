@@ -100,7 +100,7 @@ const HandRaiseNotifier = memo(({ handRaiseMenuOpen }) => {
 
    return (
       <React.Fragment>
-         {handRaises.map((request) => {
+         {handRaises?.map((request) => {
             if (request.state === "requested") {
                return (
                   <RequestedHandRaiseElement

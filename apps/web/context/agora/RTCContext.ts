@@ -6,11 +6,11 @@ import {
    NetworkQuality,
    UID,
 } from "agora-rtc-sdk-ng"
-import { LocalStream } from "../../types/streaming"
+import { IRemoteStream, LocalStream } from "../../types/streaming"
 
 export interface RtcContextInterface {
    screenShareStream: ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
-   remoteStreams: any[]
+   remoteStreams: IRemoteStream[]
    demoStreamHandlers: {
       removeDemoStream: () => void
       addDemoStream: () => void
@@ -24,7 +24,6 @@ export interface RtcContextInterface {
    closeAndUnpublishedLocalStream: () => Promise<void>
    rtcClient: IAgoraRTCClient
    localMediaHandlers: {
-      initializeVideoCameraAudioTrack: () => Promise<void>
       closeLocalCameraTrack: () => Promise<void>
       initializeLocalVideoStream: () => Promise<void>
       closeLocalMicrophoneTrack: () => Promise<void>
@@ -66,11 +65,7 @@ export interface RtcPropsInterface {
     */
    uid?: UID
    /**
-    * To see is the user is a hand raiser, set this to true. (default: false)
-    */
-   isAHandRaiser?: boolean
-   /**
-    * To see if the user is a host, set this to true. (default: false)
+    * To see if the user can publish video, set this to true. (default: false)
     */
    isStreamer?: boolean
    /**
