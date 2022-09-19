@@ -109,7 +109,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
          if (isFallback || !id) return setCurrentSpeakerId(id)
          setLivestreamCurrentSpeakerId(streamRef, id)
       },
-      [setLivestreamCurrentSpeakerId, streamRef]
+      [streamRef]
    )
 
    return currentSpeakerId
