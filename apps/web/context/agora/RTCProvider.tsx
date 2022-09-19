@@ -1,4 +1,5 @@
 import React, {
+   memo,
    useCallback,
    useContext,
    useEffect,
@@ -10,6 +11,7 @@ import RTCContext, { RtcPropsInterface } from "./RTCContext"
 import AgoraRTC, {
    IAgoraRTCClient,
    ILocalAudioTrack,
+   ILocalTrack,
    ILocalVideoTrack,
    ScreenVideoTrackInitConfig,
    UID,
@@ -20,14 +22,16 @@ import { useRouter } from "next/router"
 import useStreamRef from "../../components/custom-hook/useStreamRef"
 
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
-import { useSessionStorage } from "react-use"
 import { useDispatch, useSelector } from "react-redux"
-import RootState from "../../store/reducers"
 import { LocalStream } from "../../types/streaming"
 import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
-import { sleep } from "../../components/helperFunctions/HelperFunctions"
-import { RTC_CLIENT_JOIN_TIME_LIMIT } from "../../constants/streams"
 import * as actions from "../../store/actions"
+import useAgoraError from "../../components/custom-hook/useAgoraError"
+import { errorLogAndNotify } from "../../util/CommonUtil"
+import {
+   sessionIsUsingCloudProxySelector,
+   sessionShouldUseCloudProxySelector,
+} from "../../store/selectors/streamSelectors"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -43,18 +47,27 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    isStreamer,
    uid,
    initialize,
-   isAHandRaiser,
    channel,
 }) => {
    const { path } = useStreamRef()
    const router = useRouter()
    const rtcClient = useRtcClient()
+   const { remoteStreams, networkQuality, demoStreamHandlers } =
+      useAgoraClientConfig(rtcClient, uid)
    const screenShareRtcClient = useScreenShareRtc()
-   const [sessionShouldUseCloudProxy, setSessionShouldUseProxy] =
-      useSessionStorage<boolean>("is-using-cloud-proxy", false)
-   const sessionIsUsingCloudProxy = useSelector((state: RootState) => {
-      return state.stream.agoraState.sessionIsUsingCloudProxy
-   })
+   const { handleRtcError, handleDeviceError, handleScreenShareDeniedError } =
+      useAgoraError()
+   const sessionShouldUseCloudProxy = useSelector(
+      sessionShouldUseCloudProxySelector
+   )
+
+   // Due to the way we are using this hook, we need to know
+   // whether the sessionShouldUseCloudProxy, it's initial state is undefined
+   const shouldInit = initialize && sessionShouldUseCloudProxy !== undefined
+
+   const sessionIsUsingCloudProxy = useSelector(
+      sessionIsUsingCloudProxySelector
+   )
 
    const [localStream, setLocalStream] = useState<LocalStream>({
       uid: uid,
@@ -65,39 +78,158 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       audioTrack: null,
    })
    const [rtcClientHost, setPrimaryRtcClientHost] = useState(false)
+   const returnToAudience = useCallback(() => {
+      return rtcClient.setClientRole("audience").catch(handleRtcError)
+   }, [handleRtcError, rtcClient])
+
+   const returnToHost = useCallback(() => {
+      return rtcClient.setClientRole("host").catch(handleRtcError)
+   }, [handleRtcError, rtcClient])
 
    const { fetchAgoraRtcToken } = useFirebaseService()
    const dispatch = useDispatch()
-   const [screenShareStream, setScreenShareStream] = useState<
+   const [screenShareStream] = useState<
       ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
    >(null)
 
    const screenShareRtcClientRef = useRef(screenShareRtcClient)
    const screenShareStreamRef = useRef(screenShareStream)
 
-   const { remoteStreams, networkQuality, demoStreamHandlers } =
-      useAgoraClientConfig(rtcClient, uid)
-
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
          dispatch(actions.setVideoIsPaused())
       }
-   }, [])
+   }, [dispatch])
 
+   const leaveAgoraRoom = useCallback(async () => {
+      console.log("-> LEAVING")
+      try {
+         if (rtcClient) {
+            await rtcClient.leave()
+            if (sessionIsUsingCloudProxy) {
+               rtcClient.stopProxyServer()
+            }
+            rtcClient.removeAllListeners()
+         }
+      } catch (error) {
+         errorLogAndNotify(error)
+      }
+   }, [sessionIsUsingCloudProxy])
+
+   const joinAgoraRoom = useCallback(
+      async (
+         rtcClient: IAgoraRTCClient,
+         roomId: string,
+         userUid: UID,
+         isStreamer: boolean,
+         sessionShouldUseCloudProxy: boolean
+      ) => {
+         let timeout
+         try {
+            const cfToken = router.query.token || ""
+            const { data } = await fetchAgoraRtcToken({
+               isStreamer: isStreamer,
+               uid: userUid,
+               sentToken: cfToken.toString(),
+               channelName: roomId,
+               streamDocumentPath: path,
+            })
+            if (sessionShouldUseCloudProxy) {
+               rtcClient.startProxyServer(3)
+            }
+            logStatus("JOIN", false, sessionShouldUseCloudProxy)
+
+            await rtcClient
+               .join(appId, roomId, data.token.rtcToken, userUid)
+               .then(() => logStatus("JOIN", true, sessionShouldUseCloudProxy))
+               .catch((err) => {
+                  logStatus("JOIN", false, sessionShouldUseCloudProxy, err)
+                  handleRtcError(err)
+               })
+         } catch (error) {
+            errorLogAndNotify(error)
+         }
+         if (timeout) {
+            clearTimeout(timeout)
+         }
+      },
+      [appId, fetchAgoraRtcToken, handleRtcError, path, router.query.token]
+   )
+   const joinAgoraRoomWithPrimaryClient = useCallback(
+      async (sessionShouldUseCloudProxy: boolean) =>
+         joinAgoraRoom(
+            rtcClient,
+            channel,
+            uid,
+            isStreamer,
+            sessionShouldUseCloudProxy
+         )
+            .then(() => {
+               dispatch(actions.setAgoraPrimaryClientJoined(true))
+            })
+            .catch((err) => {
+               errorLogAndNotify(err)
+               dispatch(actions.setAgoraPrimaryClientJoined(false))
+            }),
+      [joinAgoraRoom, rtcClient, channel, uid, isStreamer, dispatch]
+   )
+
+   const close = useCallback(async () => {
+      return leaveAgoraRoom()
+   }, [leaveAgoraRoom])
+   const init = useCallback(async () => {
+      return joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy)
+   }, [joinAgoraRoomWithPrimaryClient, sessionShouldUseCloudProxy])
    // @ts-ignore
    useEffect(() => {
-      if (initialize) {
+      if (shouldInit) {
          void init()
          return () => close()
       }
-   }, [initialize])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [shouldInit])
 
+   const closeAndUnpublishedLocalStream = useCallback(async () => {
+      if (localStream) {
+         let tracks = []
+         if (localStream.videoTrack) {
+            tracks.push(localStream.videoTrack)
+         }
+         if (localStream.audioTrack) {
+            tracks.push(localStream.audioTrack)
+         }
+         try {
+            if (tracks.length) {
+               await rtcClient.unpublish(tracks)
+               for (const track of tracks) {
+                  if (track.trackMediaType === "video") {
+                     await rtcClient.disableDualStream()
+                  }
+                  track.close()
+               }
+            }
+            await returnToAudience()
+         } catch (error) {
+            handleRtcError(error)
+         }
+         setLocalStream((localStream) => ({
+            ...localStream,
+            isAudioPublished: false,
+            isVideoPublished: false,
+            videoTrack: null,
+            audioTrack: null,
+            videoMuted: false,
+            audioMuted: false,
+         }))
+      }
+   }, [localStream, returnToAudience, rtcClient, handleRtcError])
    useEffect(() => {
       if (!isStreamer && rtcClient) {
          if (localStream) {
             void closeAndUnpublishedLocalStream()
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isStreamer, rtcClient])
 
    const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
@@ -129,255 +261,74 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          error || ""
       )
    }
-   const joinAgoraRoom = useCallback(
-      async (
-         rtcClient: IAgoraRTCClient,
-         roomId: string,
-         userUid: UID,
-         isStreamer: boolean,
-         sessionShouldUseCloudProxy: boolean
-      ) => {
-         let timeout
-         try {
-            const cfToken = router.query.token || ""
-            const { data } = await fetchAgoraRtcToken({
-               isStreamer: isAHandRaiser ? false : isStreamer,
-               uid: userUid,
-               sentToken: cfToken.toString(),
-               channelName: roomId,
-               streamDocumentPath: path,
-            })
-            if (sessionShouldUseCloudProxy) {
-               rtcClient.startProxyServer(3)
-            } else {
-               timeout = setTimeout(async () => {
-                  // Start reconnecting with Cloud Proxy Process
-                  logStatus("LEAVE", false, sessionShouldUseCloudProxy)
-                  await rtcClient.leave()
-                  logStatus("LEAVE", true, sessionShouldUseCloudProxy)
 
-                  // Normally client.leave() method should abort the initial join according to the docs.
-                  // But that is not the case, so one must wait/sleep a bit before re-joining
-                  await sleep(2000)
-                  setSessionShouldUseProxy(sessionShouldUseCloudProxy)
-                  rtcClient.startProxyServer(3)
-                  try {
-                     await rtcClient.join(
-                        appId,
-                        roomId,
-                        data.token.rtcToken,
-                        userUid
-                     )
-                  } catch (e) {
-                     console.log("-> ERROR IN RECONNECT WITH Proxy", e)
-                  }
-                  return
-               }, RTC_CLIENT_JOIN_TIME_LIMIT)
-            }
-            logStatus("JOIN", false, sessionShouldUseCloudProxy)
-
-            await rtcClient.join(appId, roomId, data.token.rtcToken, userUid)
-            logStatus("JOIN", true, sessionShouldUseCloudProxy)
-         } catch (error) {
-            logStatus("JOIN", false, sessionShouldUseCloudProxy, error)
-            dispatch(actions.setAgoraRtcError(error))
-         }
-         if (timeout) {
-            clearTimeout(timeout)
-         }
-      },
-      [
-         dispatch,
-         fetchAgoraRtcToken,
-         isAHandRaiser,
-         path,
-         router.query.token,
-         setSessionShouldUseProxy,
-      ]
-   )
-
-   const leaveAgoraRoom = useCallback(async () => {
-      console.log("-> LEAVING")
-      try {
-         if (rtcClient) {
-            await rtcClient.leave()
-         }
-         if (sessionIsUsingCloudProxy) {
-            rtcClient.stopProxyServer()
-         }
-         rtcClient?.removeAllListeners?.()
-      } catch (error) {
-         console.log(error)
-      }
-   }, [sessionIsUsingCloudProxy])
-
-   const close = useCallback(async () => {
-      return leaveAgoraRoom()
-   }, [leaveAgoraRoom])
-
-   const joinAgoraRoomWithPrimaryClient = useCallback(
-      async (sessionShouldUseCloudProxy: boolean) => {
-         try {
-            await joinAgoraRoom(
-               rtcClient,
-               channel,
-               uid,
-               isStreamer,
-               sessionShouldUseCloudProxy
-            )
-            return dispatch(actions.setAgoraPrimaryClientJoined(true))
-         } catch (error) {
-            dispatch(actions.setAgoraPrimaryClientJoined(false))
-            dispatch(actions.setAgoraRtcError(error))
-         }
-      },
-      [dispatch, isStreamer, joinAgoraRoom, channel, uid]
-   )
-
-   const initializeLocalAudioStream = async () => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            const localAudio = await AgoraRTC.createMicrophoneAudioTrack({
-               ...(router.query.withHighQuality && {
-                  encoderConfig: "high_quality_stereo",
-               }),
-            })
+   const initializeLocalAudioStream = useCallback(async () => {
+      return AgoraRTC.createMicrophoneAudioTrack({
+         ...(router.query.withHighQuality && {
+            encoderConfig: "high_quality_stereo",
+         }),
+      })
+         .then((audioTrack) => {
             setLocalStream((localStream) => ({
                ...localStream,
                uid,
-               audioTrack: localAudio,
+               audioTrack: audioTrack,
             }))
-            resolve()
-         } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "microphone"))
-            reject(error)
-         }
-      })
-   }
+         })
+         .catch((err) => {
+            handleDeviceError(err, "microphone")
+         })
+   }, [handleDeviceError, router.query.withHighQuality, uid])
 
-   const initializeLocalVideoStream = async () => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            const localVideo = await AgoraRTC.createCameraVideoTrack({
-               encoderConfig: router.query.withHighQuality
-                  ? "720p_3"
-                  : "480p_9",
-            })
+   const initializeLocalVideoStream = useCallback(async () => {
+      return AgoraRTC.createCameraVideoTrack({
+         encoderConfig: router.query.withHighQuality ? "720p_3" : "480p_9",
+      })
+         .then((videoTrack) => {
             setLocalStream((localStream) => ({
                ...localStream,
                uid,
-               videoTrack: localVideo,
+               videoTrack: videoTrack,
             }))
-            resolve()
-         } catch (error) {
-            dispatch(actions.handleSetDeviceError(error, "camera"))
-            reject(error)
-         }
-      })
-   }
-
-   const initializeVideoCameraAudioTrack = useCallback(async () => {
-      let audioTrack = null
-      let videoTrack = null
-
-      try {
-         audioTrack = await AgoraRTC.createMicrophoneAudioTrack({
-            ...(router.query.withHighQuality && {
-               encoderConfig: "high_quality_stereo",
-            }),
          })
-      } catch (error) {
-         dispatch(actions.handleSetDeviceError(error, "microphone"))
-      }
-
-      try {
-         videoTrack = await AgoraRTC.createCameraVideoTrack({
-            encoderConfig: router.query.withHighQuality ? "720p_3" : "480p_9",
-         })
-      } catch (error) {
-         dispatch(actions.handleSetDeviceError(error, "camera"))
-      }
-      setLocalStream((localStream) => ({
-         ...localStream,
-         uid,
-         audioTrack: audioTrack,
-         videoTrack: videoTrack,
-      }))
-   }, [router.query.withHighQuality, uid])
-
-   const closeAndUnpublishedLocalStream = useCallback(async () => {
-      if (localStream) {
-         let tracks = []
-         if (localStream.videoTrack) {
-            tracks.push(localStream.videoTrack)
-         }
-         if (localStream.audioTrack) {
-            tracks.push(localStream.audioTrack)
-         }
-         try {
-            if (tracks.length) {
-               await rtcClient.unpublish(tracks)
-               for (const track of tracks) {
-                  if (track.trackMediaType === "video") {
-                     await rtcClient.disableDualStream()
-                  }
-                  track.close()
-               }
-            }
-            await returnToAudience()
-         } catch (error) {
-            console.error(error)
-            dispatch(actions.setAgoraRtcError(error))
-         }
-         setLocalStream((localStream) => ({
-            ...localStream,
-            isAudioPublished: false,
-            isVideoPublished: false,
-            videoTrack: null,
-            audioTrack: null,
-            videoMuted: false,
-            audioMuted: false,
-         }))
-      }
-   }, [rtcClient, localStream])
+         .catch((err) => handleDeviceError(err, "camera"))
+   }, [handleDeviceError, router.query.withHighQuality, uid])
 
    const setLocalAudioEnabled = useCallback(
-      async (value) => {
-         try {
-            await localStream.audioTrack.setEnabled(value)
-            setLocalStream((localStream) => ({
-               ...localStream,
-               audioMuted: !value,
-            }))
-         } catch (e) {
-            console.log("-> error in toggling mic", e)
-         }
-      },
-      [localStream.audioTrack]
+      async (value) =>
+         localStream.audioTrack
+            .setEnabled(value)
+            .then(() => {
+               setLocalStream((localStream) => ({
+                  ...localStream,
+                  audioMuted: !value,
+               }))
+            })
+            .catch(handleRtcError),
+      [handleRtcError, localStream.audioTrack]
    )
-
-   const init = useCallback(async () => {
-      return joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy)
-   }, [joinAgoraRoomWithPrimaryClient, sessionShouldUseCloudProxy])
 
    const setLocalVideoEnabled = useCallback(
-      async (value) => {
-         try {
-            await localStream.videoTrack.setEnabled(value)
-            setLocalStream((localStream) => ({
-               ...localStream,
-               videoMuted: !value,
-            }))
-         } catch (e) {
-            console.log("-> error in toggling cam", e)
-         }
-      },
-      [localStream.videoTrack]
+      async (value) =>
+         localStream.videoTrack
+            .setEnabled(value)
+            .then(() => {
+               setLocalStream((localStream) => ({
+                  ...localStream,
+                  videoMuted: !value,
+               }))
+            })
+            .catch(handleRtcError),
+      [handleRtcError, localStream.videoTrack]
    )
 
-   const publishTracks = (client: IAgoraRTCClient, tracks, streamType) => {
-      if (tracks) {
-         return new Promise<void>(async (resolve, reject) => {
+   const publishTracks = useCallback(
+      async (
+         client: IAgoraRTCClient,
+         tracks: ILocalTrack | ILocalTrack[],
+         streamType: "video" | "audio" | "screen"
+      ) => {
+         if (tracks) {
             try {
                if (streamType === "screen" || !rtcClientHost) {
                   await client.setClientRole("host")
@@ -390,134 +341,164 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
                   client.enableAudioVolumeIndicator()
                }
                setPrimaryRtcClientHost(true)
-               resolve()
             } catch (error) {
-               reject(error)
+               handleRtcError(error)
             }
-         })
-      }
-   }
+         }
+      },
+      [handleRtcError, rtcClientHost]
+   )
 
-   const publishLocalCameraTrack = () => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            let localStreamTracks = [localStream.videoTrack]
-            await publishTracks(rtcClient, localStreamTracks, "video")
+   const publishLocalCameraTrack = useCallback(() => {
+      return publishTracks(rtcClient, [localStream.videoTrack], "video")
+         .then(() => {
             setLocalStream((localStream) => ({
                ...localStream,
                isVideoPublished: true,
             }))
-            resolve()
-         } catch (error) {
-            reject(error)
-         }
-      })
-   }
+         })
+         .catch(errorLogAndNotify)
+   }, [localStream.videoTrack, publishTracks, rtcClient])
 
-   const closeLocalCameraTrack = useCallback(() => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            if (localStream.videoTrack) {
-               if (localStream.isVideoPublished) {
-                  let localStreamTracks = [localStream.videoTrack]
-                  await rtcClient.unpublish(localStreamTracks)
-                  await rtcClient.disableDualStream()
-               }
-               localStream.videoTrack.close()
-               setLocalStream((localStream) => ({
-                  ...localStream,
-                  videoTrack: null,
-                  isVideoPublished: false,
-               }))
+   const closeLocalCameraTrack = useCallback(async () => {
+      try {
+         if (localStream.videoTrack) {
+            if (localStream.isVideoPublished) {
+               let localStreamTracks = [localStream.videoTrack]
+               await rtcClient.unpublish(localStreamTracks)
+               await rtcClient.disableDualStream()
             }
-            resolve()
-         } catch (error) {
-            reject(error)
+            localStream.videoTrack.close()
+            setLocalStream((localStream) => ({
+               ...localStream,
+               videoTrack: null,
+               isVideoPublished: false,
+            }))
          }
-      })
-   }, [localStream.isVideoPublished, localStream.videoTrack])
+      } catch (error) {
+         handleRtcError(error)
+      }
+   }, [
+      handleRtcError,
+      localStream.isVideoPublished,
+      localStream.videoTrack,
+      rtcClient,
+   ])
 
-   const publishLocalMicrophoneTrack = () => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            let localStreamTracks = [localStream.audioTrack]
-            await publishTracks(rtcClient, localStreamTracks, "audio")
+   const publishLocalMicrophoneTrack = useCallback(() => {
+      return publishTracks(rtcClient, [localStream.audioTrack], "audio")
+         .then(() => {
             setLocalStream((localStream) => ({
                ...localStream,
                isAudioPublished: true,
             }))
-            resolve()
-         } catch (error) {
-            reject(error)
-         }
-      })
-   }
+         })
+         .catch(errorLogAndNotify)
+   }, [localStream.audioTrack, publishTracks, rtcClient])
 
-   const closeLocalMicrophoneTrack = useCallback(() => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            if (localStream.audioTrack) {
-               if (localStream.isAudioPublished) {
-                  let localStreamTracks = [localStream.audioTrack]
-                  try {
-                     await rtcClient.unpublish(localStreamTracks)
-                  } catch (e) {
-                     console.log("-> error in unPublish", e)
-                  }
+   const closeLocalMicrophoneTrack = useCallback(async () => {
+      try {
+         if (localStream.audioTrack) {
+            if (localStream.isAudioPublished) {
+               let localStreamTracks = [localStream.audioTrack]
+               try {
+                  await rtcClient.unpublish(localStreamTracks)
+               } catch (e) {
+                  handleRtcError(e)
                }
-               setLocalStream((localStream) => ({
-                  ...localStream,
-                  audioTrack: null,
-                  isAudioPublished: false,
-               }))
-               setPrimaryRtcClientHost(false)
-               localStream.audioTrack.close()
             }
-            resolve()
-         } catch (error) {
-            reject(error)
+            setLocalStream((localStream) => ({
+               ...localStream,
+               audioTrack: null,
+               isAudioPublished: false,
+            }))
+            setPrimaryRtcClientHost(false)
+            localStream.audioTrack.close()
          }
-      })
-   }, [localStream.audioTrack, localStream.isAudioPublished])
+      } catch (error) {
+         errorLogAndNotify(error)
+      }
+   }, [
+      handleRtcError,
+      localStream.audioTrack,
+      localStream.isAudioPublished,
+      rtcClient,
+   ])
 
-   const returnToAudience = async () => {
-      return await rtcClient.setClientRole("audience")
-   }
+   const publishScreenShareTracks = useCallback(
+      async (screenShareTracks, screenShareRtcClient) => {
+         try {
+            return publishTracks(
+               screenShareRtcClient,
+               screenShareTracks,
+               "screen"
+            )
+         } catch (e) {
+            console.error(e)
+         }
+      },
+      [publishTracks]
+   )
 
-   const returnToHost = async () => {
-      return await rtcClient.setClientRole("host")
-   }
+   const getScreenShareStream = useCallback(
+      async (screenSharingMode: string, onScreenShareStopped: () => void) => {
+         let screenShareVideoResolution: ScreenVideoTrackInitConfig["encoderConfig"] =
+            screenSharingMode === "motion" ? "720p_2" : "1080p_1"
+         try {
+            const tracksObject = await AgoraRTC.createScreenVideoTrack(
+               {
+                  encoderConfig: screenShareVideoResolution,
+               },
+               "auto"
+            )
+            const videoTrack = Array.isArray(tracksObject)
+               ? tracksObject[0]
+               : tracksObject
+            videoTrack.on("track-ended", onScreenShareStopped)
+            return tracksObject
+         } catch (error) {
+            handleScreenShareDeniedError(error)
+         }
+      },
+      [handleScreenShareDeniedError]
+   )
 
    const publishScreenShareStream = useCallback(
       async (screenSharingMode, onScreenShareStopped) => {
-         return new Promise<void>(async (resolve, reject) => {
-            try {
-               const screenShareUid = `${uid}screen`
-               const screenShareTracks = await getScreenShareStream(
-                  screenSharingMode,
-                  onScreenShareStopped
-               )
-               updateScreenShareStream(screenShareTracks)
+         try {
+            const screenShareUid = `${uid}screen`
+            const screenShareTracks = await getScreenShareStream(
+               screenSharingMode,
+               onScreenShareStopped
+            )
+            updateScreenShareStream(screenShareTracks)
 
-               await joinAgoraRoom(
-                  screenShareRtcClient,
-                  channel,
-                  screenShareUid,
-                  true,
-                  sessionShouldUseCloudProxy
-               )
-               await publishScreenShareTracks(
-                  screenShareTracks,
-                  screenShareRtcClient
-               )
-               updateScreenShareRtcClient(screenShareRtcClient)
-               resolve()
-            } catch (error) {
-               reject(error)
-            }
-         })
+            await joinAgoraRoom(
+               screenShareRtcClient,
+               channel,
+               screenShareUid,
+               true,
+               sessionShouldUseCloudProxy
+            )
+            await publishScreenShareTracks(
+               screenShareTracks,
+               screenShareRtcClient
+            )
+            updateScreenShareRtcClient(screenShareRtcClient)
+         } catch (error) {
+            errorLogAndNotify(error)
+         }
       },
-      [sessionShouldUseCloudProxy, screenShareRtcClient, uid, channel]
+      [
+         uid,
+         getScreenShareStream,
+         updateScreenShareStream,
+         joinAgoraRoom,
+         screenShareRtcClient,
+         channel,
+         sessionShouldUseCloudProxy,
+         publishScreenShareTracks,
+      ]
    )
 
    const unPublishScreenShareStream = useCallback(async () => {
@@ -540,42 +521,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       })
    }, [updateScreenShareStream])
 
-   const publishScreenShareTracks = async (
-      screenShareTracks,
-      screenShareRtcClient
-   ) => {
-      try {
-         return publishTracks(screenShareRtcClient, screenShareTracks, "screen")
-      } catch (e) {
-         console.error(e)
-      }
-   }
-
-   const getScreenShareStream = async (
-      screenSharingMode: string,
-      onScreenShareStopped: () => void
-   ): Promise<ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]> => {
-      return new Promise(async (resolve, reject) => {
-         let screenShareVideoResolution: ScreenVideoTrackInitConfig["encoderConfig"] =
-            screenSharingMode === "motion" ? "720p_2" : "1080p_1"
-         try {
-            const tracksObject = await AgoraRTC.createScreenVideoTrack(
-               {
-                  encoderConfig: screenShareVideoResolution,
-               },
-               "auto"
-            )
-            const videoTrack = Array.isArray(tracksObject)
-               ? tracksObject[0]
-               : tracksObject
-            videoTrack.on("track-ended", onScreenShareStopped)
-            resolve(tracksObject)
-         } catch (error) {
-            dispatch(actions.handleScreenShareDeniedError(error))
-         }
-      })
-   }
-
    const handlePublishLocalStream = useCallback(async () => {
       await returnToHost()
       if (localStream.audioTrack && !localStream.isAudioPublished) {
@@ -587,10 +532,14 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
 
       await dispatch(actions.setStreamerIsPublished(true))
    }, [
+      returnToHost,
       localStream.audioTrack,
-      localStream.videoTrack,
       localStream.isAudioPublished,
+      localStream.videoTrack,
       localStream.isVideoPublished,
+      dispatch,
+      publishLocalMicrophoneTrack,
+      publishLocalCameraTrack,
    ])
 
    const handleReconnectAgora = useCallback(
@@ -620,16 +569,14 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       () => ({
          initializeLocalAudioStream,
          initializeLocalVideoStream,
-         initializeVideoCameraAudioTrack,
          closeLocalCameraTrack,
          closeLocalMicrophoneTrack,
       }),
       [
-         localStream.videoTrack,
-         localStream.isVideoPublished,
-         localStream.audioTrack,
-         localStream.isAudioPublished,
-         router.query.withHighQuality,
+         initializeLocalAudioStream,
+         initializeLocalVideoStream,
+         closeLocalCameraTrack,
+         closeLocalMicrophoneTrack,
       ]
    )
 
@@ -639,7 +586,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          publishLocalMicrophoneTrack,
          returnToAudience,
       }),
-      [localStream.videoTrack, localStream.audioTrack, rtcClient]
+      [publishLocalCameraTrack, publishLocalMicrophoneTrack, returnToAudience]
    )
 
    const localMediaControls = useMemo(
@@ -701,4 +648,4 @@ export const useRtc = () => {
    return context
 }
 
-export default RTCProvider
+export default memo(RTCProvider)

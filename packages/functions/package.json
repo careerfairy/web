@@ -10,6 +10,7 @@
       "start:emulators": "cross-env JAVA_TOOL_OPTIONS=-Xmx15g FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 firebase emulators:start --only auth,firestore,functions,storage --export-on-exit --import ../../emulatorData/fetched",
       "watch": "npm run clean && npm run copy-files && tsc --watch",
       "copy-files": "cpx \"src/**/*.{json,html}\" dist/",
+      "kill-emulators": "npx kill-port 8080 9099 4000 5001 9099 9199 4000",
       "clean": "rimraf dist/",
       "logs": "firebase functions:log"
    },

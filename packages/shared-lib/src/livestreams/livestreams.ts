@@ -74,7 +74,14 @@ export interface LivestreamEvent extends Identifiable {
    targetLevelsOfStudy?: FieldOfStudy[]
 
    lastUpdated?: firebase.firestore.Timestamp
+   /**
+    * The speakers that are displayed on the upcoming-livestream landing page of the event
+    */
    speakers?: Speaker[]
+   /**
+    * The actual details of the speakers in the livestream
+    */
+   liveSpeakers?: LiveSpeaker[]
    lastUpdatedAuthorInfo?: {
       email: string
       groupId: string
@@ -178,6 +185,21 @@ export interface Speaker extends Identifiable {
    lastName?: string
    position?: string
    rank?: number
+}
+
+export interface LiveSpeaker extends Identifiable {
+   firstName: string
+   lastName: string
+   position: string
+   /*
+    * - Weather or not the speaker is required to provide their LinkedIn profile in the stream prep overlay (default: true)
+    * */
+   showLinkedIn?: boolean
+   linkedIn?: string
+   /*
+    * - The ID Agora and the client uses to identify the speaker
+    * */
+   speakerUuid?: string
 }
 
 export interface EventRating extends Identifiable {

@@ -1,14 +1,4 @@
-import AgoraRTC, {
-   CameraVideoTrackInitConfig,
-   ClientConfig,
-   IAgoraRTCClient,
-   ICameraVideoTrack,
-   IMicrophoneAudioTrack,
-   MicrophoneAudioTrackInitConfig,
-} from "agora-rtc-sdk-ng"
-import { useEffect, useRef, useState } from "react"
-import { RTCError } from "../../types/streaming"
-
+import AgoraRTC, { ClientConfig, IAgoraRTCClient } from "agora-rtc-sdk-ng"
 export class AgoraService {
    constructor() {}
 

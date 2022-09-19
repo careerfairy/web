@@ -4,6 +4,7 @@ import React, {
    useEffect,
    useState,
    useMemo,
+   memo,
 } from "react"
 
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
@@ -29,6 +30,7 @@ import * as actions from "../../../../store/actions"
 import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
 import { useRtc } from "../../../../context/agora/RTCProvider"
+import { useCurrentStream } from "../../../../context/stream/StreamContext"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -44,15 +46,20 @@ const labels = {
       "You intend to join this stream with only with your microphone?",
 }
 
-function VideoContainer({
-   currentLivestream,
+interface Props {
+   isPlayMode?: boolean
+   showMenu: boolean
+   smallScreen: boolean
+   viewer: boolean
+}
+const VideoContainer = ({
    isPlayMode,
    showMenu,
    smallScreen,
-   streamerId,
    viewer,
-}) {
+}: Props) => {
    const firebase = useFirebaseService()
+   const { currentLivestream, streamerId } = useCurrentStream()
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -332,7 +339,7 @@ function VideoContainer({
          <Streams
             externalMediaStreams={remoteStreams}
             localMediaStream={localStream}
-            currentSpeakerId={currentSpeakerId}
+            currentSpeakerId={currentSpeakerId as string}
             streamerId={streamerId}
             handRaiseActive={currentLivestream.handRaiseActive}
             videoMutedBackgroundImg={currentLivestream.companyLogoUrl}
@@ -347,7 +354,6 @@ function VideoContainer({
          />
          <StreamPublishingModal
             open={Boolean(showLocalStreamPublishingModal)}
-            setOpen={setShowLocalStreamPublishingModal}
             localStream={localStream}
             deviceInitializers={deviceInitializers}
             displayableMediaStream={displayableMediaStream}
@@ -398,11 +404,6 @@ function VideoContainer({
             displayableMediaStream={displayableMediaStream}
             mediaControls={mediaControls}
          />
-         {/* <LoadingModal agoraRtcStatus={agoraRtcStatus} />
-         <ErrorModal
-            agoraRtcStatus={agoraRtcStatus}
-            agoraRtmStatus={agoraRtmStatus}
-         /> */}
          <ScreenShareModal
             open={showScreenShareModal}
             smallScreen={smallScreen}
@@ -424,4 +425,4 @@ function VideoContainer({
 
 const draggableDefaultPosition = { x: 4, y: 70 }
 
-export default VideoContainer
+export default memo(VideoContainer)
