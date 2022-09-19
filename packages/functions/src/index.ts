@@ -63,8 +63,6 @@ exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
 // Reminders
 exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailToUserFromUniversity =
-   reminders.sendReminderEmailToUserFromUniversity
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails = reminders.scheduleReminderEmails
