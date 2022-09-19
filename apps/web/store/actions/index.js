@@ -89,6 +89,7 @@ export {
    setAgoraPrimaryClientJoined,
    clearAgoraRtcError,
    setSessionIsUsingCloudProxy,
+   setSessionShouldUseCloudProxy,
    showActionButtons,
    hideActionButtons,
 } from "./streamActions"

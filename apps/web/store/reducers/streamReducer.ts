@@ -1,4 +1,4 @@
-import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "constants/agora"
+import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "../../constants/agora"
 import * as actions from "../actions/actionTypes"
 
 const initialState = {
@@ -48,6 +48,7 @@ const initialState = {
       },
       screenSharePermissionDenied: false,
       sessionIsUsingCloudProxy: false,
+      sessionShouldUseCloudProxy: undefined, // undefined means we don't know yet
       primaryClientJoined: false,
    },
 }
@@ -108,6 +109,14 @@ const streamReducer = (state = initialState, { type, payload }) => {
             agoraState: {
                ...state.agoraState,
                sessionIsUsingCloudProxy: payload,
+            },
+         }
+      case actions.SET_SESSION_SHOULD_USE_CLOUD_PROXY:
+         return {
+            ...state,
+            agoraState: {
+               ...state.agoraState,
+               sessionShouldUseCloudProxy: payload,
             },
          }
       case actions.CLEAR_AGORA_RTC_ERROR:

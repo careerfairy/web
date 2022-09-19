@@ -1,6 +1,6 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
+import * as actions from "../../store/actions"
 import {
    IAgoraRTCClient,
    IAgoraRTCRemoteUser,
@@ -9,6 +9,9 @@ import {
 } from "agora-rtc-sdk-ng"
 import { IRemoteStream } from "types/streaming"
 import useAgoraError from "./useAgoraError"
+import { useSessionStorage } from "react-use"
+
+export const SESSION_PROXY_KEY = "should-use-cloud-proxy"
 
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
@@ -19,10 +22,24 @@ export default function useAgoraClientConfig(
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
    })
+   const [sessionShouldUseCloudProxy, setSessionShouldUseProxy] =
+      useSessionStorage<boolean>(SESSION_PROXY_KEY, false)
 
    const { handleRtcError } = useAgoraError()
 
    const dispatch = useDispatch()
+
+   const handleSessionShouldUseCloudProxy = useCallback(
+      (shouldUse: boolean) => {
+         setSessionShouldUseProxy(shouldUse)
+         dispatch(actions.setSessionShouldUseCloudProxy(shouldUse))
+      },
+      [dispatch, setSessionShouldUseProxy]
+   )
+
+   useEffect(() => {
+      handleSessionShouldUseCloudProxy(sessionShouldUseCloudProxy) // Only ever listen to this once in the app
+   }, [dispatch, handleSessionShouldUseCloudProxy, sessionShouldUseCloudProxy])
 
    useEffect(() => {
       if (rtcClient) {
@@ -38,8 +55,24 @@ export default function useAgoraClientConfig(
    }
 
    const configureAgoraClient = () => {
+      /**
+       * The RTC sdk 4.11.0 automatically switches to proxy mode after the initial request fails
+       * release notes: https://docs.agora.io/en/Video/release_web_ng?platform=Web#v4110
+       * docs: https://docs.agora.io/en/Video/API%20Reference/web_ng/interfaces/iagorartcclient.html#event_join_fallback_to_proxy
+       */
+      rtcClient.on("join-fallback-to-proxy", (proxyServer) => {
+         handleSessionShouldUseCloudProxy(true)
+      })
+      /**
+       * This emit only triggers when the RTC client join method SUCCEEDS when attempting to join a channel with proxy
+       * docs: https://docs.agora.io/en/Video/API%20Reference/web_ng/interfaces/iagorartcclient.html#event_is_using_cloud_proxy
+       * */
       rtcClient.on("is-using-cloud-proxy", (isUsing) => {
-         dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsing)))
+         const isUsingProxy = Boolean(isUsing)
+         if (isUsingProxy) {
+            handleSessionShouldUseCloudProxy(true)
+         }
+         dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsingProxy)))
       })
       rtcClient.on("user-joined", async (remoteUser) => {
          setRemoteStreams((prevRemoteStreams) => {
