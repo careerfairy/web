@@ -27,6 +27,7 @@ import bigQuery = require("./bigQuery")
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
+exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
