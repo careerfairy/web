@@ -11,7 +11,6 @@ import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../types/commonTypes"
 import { HeaderLogoWrapper } from "../materialUI"
 import LoadingButton from "@mui/lab/LoadingButton"
-import { useRouter } from "next/router"
 import { userRepo } from "../data/RepositoryInstances"
 import GenericStepper from "../components/views/common/GenericStepper"
 import AdminSignUpUserForm from "../components/views/admin-signup/steps/AdminSignUpUserForm"
@@ -20,23 +19,18 @@ import AdminSignUpPinForm from "../components/views/admin-signup/steps/AdminSign
 const steps: MultiStepComponentType[] = [
    {
       component: () => AdminSignUpUserForm,
-      description: "Credentials",
+      description: "Admin Credentials",
       title: "Create your admin profile to start",
    },
    {
       component: () => AdminSignUpPinForm,
-      description: "Email Verification",
+      description: "Admin Email Verification",
       title: "Create your profile to start",
    },
 ]
 
 const SignUp = () => {
-   const SIGNUP_REDIRECT_PATH = "/portal"
    const { authenticatedUser: user, userData } = useAuth()
-   const {
-      push,
-      query: { absolutePath },
-   } = useRouter()
    const firebase = useFirebaseService()
 
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
@@ -99,11 +93,7 @@ const SignUp = () => {
          // set a loading state in the Finalise button, the next page may take some seconds to render
          setIsLoadingRedirectPage(true)
 
-         if (absolutePath) {
-            void push(absolutePath as any)
-         } else {
-            void push(SIGNUP_REDIRECT_PATH)
-         }
+         // TODO: redirect to the the group Admin page
       } else {
          setCurrentStep((prev) => prev + 1)
       }

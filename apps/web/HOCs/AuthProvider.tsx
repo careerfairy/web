@@ -1,5 +1,6 @@
 import React, {
    createContext,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
@@ -8,17 +9,13 @@ import React, {
 import { useRouter } from "next/router"
 import dynamic from "next/dynamic"
 import { useSelector } from "react-redux"
-import {
-   FirebaseReducer,
-   useFirebase,
-   useFirestoreConnect,
-} from "react-redux-firebase"
+import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase"
 import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
-import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -31,6 +28,7 @@ type DefaultContext = {
    userPresenter?: UserPresenter
    userStats?: UserStats
    isLoggedIn: boolean
+   fetchClaims: () => Promise<{ [p: string]: any }>
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
@@ -39,6 +37,7 @@ const AuthContext = createContext<DefaultContext>({
    isLoggedIn: undefined,
    userPresenter: undefined,
    userStats: undefined,
+   fetchClaims: () => Promise.resolve({}),
 })
 
 /**
@@ -64,8 +63,9 @@ const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
+   console.log("-> auth", auth)
    const { pathname, replace, asPath } = useRouter()
-   const firebase = useFirebase()
+   const firebaseService = useFirebaseService()
    const [claims, setClaims] = useState(null)
    console.log("-> claims", claims)
    const query = useMemo(
@@ -143,7 +143,7 @@ const AuthProvider = ({ children }) => {
             .length === 0
       ) {
          // There are missing fields
-         firebaseServiceInstance
+         firebaseService
             .backfillUserData()
             .then((_) => console.log("Missing user data added."))
             .catch((e) => {
@@ -153,27 +153,22 @@ const AuthProvider = ({ children }) => {
       }
    }, [userData])
 
+   const fetchClaims = useCallback(async () => {
+      if (!firebaseService.auth.currentUser) return null
+      const token = await firebaseService.auth.currentUser.getIdTokenResult(
+         true
+      )
+      return token.claims
+   }, [firebaseService.auth.currentUser])
+
    // Get user claims
-   const authUser = firebase.auth().currentUser
    useEffect(() => {
       // get claims from auth
-      console.log("-> firebase", firebase.auth().currentUser)
-      authUser?.getIdTokenResult(true).then((idTokenResult) => {
-         console.log("-> idTokenResult", idTokenResult)
-         setClaims(idTokenResult.claims)
-         // Confirm the user is an Admin.
-         if (!!idTokenResult.claims.admin) {
-            // Show admin UI.
-            console.log("User is an admin")
-         } else {
-            // Show regular user UI.
-            console.log("User is not an admin")
-         }
-      })
-   }, [authUser])
+      fetchClaims().then(setClaims)
+   }, [fetchClaims])
 
    useEffect(() => {
-      const unsub = firebase.auth().onIdTokenChanged(async (user) => {
+      const unsub = firebaseService.auth.onIdTokenChanged(async (user) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
@@ -183,7 +178,7 @@ const AuthProvider = ({ children }) => {
       })
 
       return () => unsub()
-   }, [firebase])
+   }, [firebaseService.auth])
 
    const contextValue = useMemo(
       () => ({
@@ -193,8 +188,9 @@ const AuthProvider = ({ children }) => {
          isLoggedIn,
          userPresenter: userData ? new UserPresenter(userData) : undefined,
          userStats: userStats,
+         fetchClaims,
       }),
-      [auth, isLoggedIn, isLoggedOut, userData, userStats]
+      [auth, isLoggedIn, isLoggedOut, fetchClaims, userData, userStats]
    )
 
    const isSecurePath = () => {

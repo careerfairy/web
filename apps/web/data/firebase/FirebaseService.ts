@@ -31,6 +31,7 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import DocumentReference = firebase.firestore.DocumentReference
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { IAdminUserCreateFormValues } from "../../components/views/admin-signup/steps/AdminSignUpUserForm"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -92,6 +93,15 @@ class FirebaseService {
          "createNewUserAccount_v4"
       )
       return createUserInAuthAndFirebase({ userData })
+   }
+
+   createGroupAdminUserInAuthAndFirebase = async (args: {
+      userData: IAdminUserCreateFormValues
+      groupId: string
+   }) => {
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
+         args
+      )
    }
 
    sendNewlyPublishedEventEmail = async (emailData) => {

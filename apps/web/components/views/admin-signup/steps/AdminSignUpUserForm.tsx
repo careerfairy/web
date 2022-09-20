@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import React, { Fragment, useContext, useState } from "react"
+import React, { Fragment, useContext } from "react"
 import { Formik } from "formik"
 import {
    Box,
@@ -40,7 +40,8 @@ const styles = sxStyles({
    },
 })
 
-interface IFormValues extends Pick<UserData, "firstName" | "lastName"> {
+export interface IAdminUserCreateFormValues
+   extends Pick<UserData, "firstName" | "lastName"> {
    email: string
    password: string
    confirmPassword: string
@@ -48,7 +49,7 @@ interface IFormValues extends Pick<UserData, "firstName" | "lastName"> {
    subscribed?: boolean
 }
 
-const schema: yup.SchemaOf<IFormValues> = yup.object().shape({
+const schema: yup.SchemaOf<IAdminUserCreateFormValues> = yup.object().shape({
    email: yup
       .string()
       .trim()
@@ -84,7 +85,7 @@ const schema: yup.SchemaOf<IFormValues> = yup.object().shape({
    subscribed: yup.boolean(),
 })
 
-const initValues: IFormValues = {
+const initValues: IAdminUserCreateFormValues = {
    firstName: "",
    lastName: "",
    email: "",
@@ -94,39 +95,42 @@ const initValues: IFormValues = {
    subscribed: false,
 }
 
+const demoGroupId = "rTUGXDAG2XAtpVcgvAcc!"
+
 function AdminSignUpUserForm() {
    const firebase = useFirebaseService()
    const {
       query: { absolutePath },
-      push,
    } = useRouter()
    const { setCurrentStep } = useContext<IMultiStepContext>(MultiStepContext)
 
-   const submitting = (isSubmitting) => {
-      return isSubmitting || emailSent || generalLoading
-   }
-
    const handleSubmit = async (
-      values: IFormValues,
-      { setSubmitting, setFieldError }: FormikHelpers<IFormValues>
+      values: IAdminUserCreateFormValues,
+      { setFieldError }: FormikHelpers<IAdminUserCreateFormValues>
    ) => {
       try {
-         setFieldError("general", null)
-         await firebase.createUserInAuthAndFirebase(values)
+         setFieldError("general", null) // reset the general error
+
+         /*
+          * 1. Create a new user
+          * 2. Grant them a group admin claim
+          * 3. Send them an email to verify their email address
+          * */
+         await firebase.createGroupAdminUserInAuthAndFirebase({
+            groupId: demoGroupId,
+            userData: values,
+         })
+
+         /*
+          * At this step, the initial user has been created and the group admin claim has been assigned
+          * So once signed in, they will already have the group admin claim
+          * */
          await firebase.signInWithEmailAndPassword(
             values.email,
             values.password
          )
 
-         // we need to force the next step to be 1 (pin validation) instead of nextStep()
-         // because there is a race condition with a useEffect in signup.txt:58
-         // the useEffect moves to the step 1 because the user is logged in but not confirmed
-         // if we would do nextStep() here, it would move to step 2 instead of 1
-         return setCurrentStep(1)
-         // .catch((e) => {
-         //    console.error(e)
-         //    void push("/login")
-         // })
+         return setCurrentStep(1) // Ensure the user goes to the pin validation step
       } catch (e) {
          setFieldError("general", e.message)
       }
@@ -139,6 +143,9 @@ function AdminSignUpUserForm() {
             initialValues={initValues}
             validationSchema={schema}
             onSubmit={handleSubmit}
+            initialErrors={{
+               general: null,
+            }}
          >
             {({
                values,
@@ -147,7 +154,6 @@ function AdminSignUpUserForm() {
                handleChange,
                handleBlur,
                handleSubmit,
-               setFieldValue,
                isSubmitting,
                /* and other goodies */
             }) => (
@@ -174,7 +180,7 @@ function AdminSignUpUserForm() {
                               }}
                               onBlur={handleBlur}
                               value={values.firstName}
-                              disabled={submitting(isSubmitting)}
+                              disabled={isSubmitting}
                               error={Boolean(
                                  errors.firstName &&
                                     touched.firstName &&
@@ -207,7 +213,7 @@ function AdminSignUpUserForm() {
                               name="lastName"
                               autoComplete="family-name"
                               onBlur={handleBlur}
-                              disabled={submitting(isSubmitting)}
+                              disabled={isSubmitting}
                               value={values.lastName}
                               error={Boolean(
                                  errors.lastName &&
@@ -243,7 +249,7 @@ function AdminSignUpUserForm() {
                               onChange={handleChange}
                               onBlur={handleBlur}
                               value={values.email}
-                              disabled={submitting(isSubmitting)}
+                              disabled={isSubmitting}
                               label="Email Address"
                            />
                            <Collapse
@@ -277,7 +283,7 @@ function AdminSignUpUserForm() {
                               onChange={handleChange}
                               onBlur={handleBlur}
                               value={values.password}
-                              disabled={submitting(isSubmitting)}
+                              disabled={isSubmitting}
                            />
                            <Collapse
                               in={Boolean(
@@ -312,7 +318,7 @@ function AdminSignUpUserForm() {
                               onChange={handleChange}
                               onBlur={handleBlur}
                               value={values.confirmPassword}
-                              disabled={submitting(isSubmitting)}
+                              disabled={isSubmitting}
                            />
                            <Collapse
                               in={Boolean(
@@ -336,7 +342,7 @@ function AdminSignUpUserForm() {
                                  onChange={handleChange}
                                  onBlur={handleBlur}
                                  checked={values.agreeTerm}
-                                 disabled={submitting(isSubmitting)}
+                                 disabled={isSubmitting}
                                  color="primary"
                               />
                            }
@@ -369,7 +375,7 @@ function AdminSignUpUserForm() {
                                  onChange={handleChange}
                                  onBlur={handleBlur}
                                  checked={values.subscribed}
-                                 disabled={submitting(isSubmitting)}
+                                 disabled={isSubmitting}
                                  color="primary"
                               />
                            }
@@ -384,8 +390,10 @@ function AdminSignUpUserForm() {
                         />
                      </Grid>
                   </Grid>
-                  <FormHelperText error hidden={!errorMessage}>
-                     <Box mt={3}>{errorMessage?.message}</Box>
+                  {/*@ts-ignore*/}
+                  <FormHelperText error hidden={!errors.general}>
+                     {/*@ts-ignore*/}
+                     <Box mt={3}>{errors.general}</Box>
                   </FormHelperText>
                   <Button
                      type="submit"
@@ -394,9 +402,9 @@ function AdminSignUpUserForm() {
                      variant="contained"
                      data-testid={"signup-button"}
                      color="primary"
-                     disabled={isSubmitting || emailSent}
+                     disabled={isSubmitting}
                      endIcon={
-                        (isSubmitting || generalLoading) && (
+                        isSubmitting && (
                            <CircularProgress size={20} color="inherit" />
                         )
                      }
