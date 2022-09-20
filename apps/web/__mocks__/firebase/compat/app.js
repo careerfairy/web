@@ -19,7 +19,4 @@ module.exports = {
       FieldValue: {},
       Query: {},
    },
-   auth: () => ({
-      onAuthStateChanged: () => {},
-   }),
 }
