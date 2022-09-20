@@ -1,8 +1,18 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react"
+import React, {
+   createContext,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { useRouter } from "next/router"
 import dynamic from "next/dynamic"
 import { useSelector } from "react-redux"
-import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase"
+import {
+   FirebaseReducer,
+   useFirebase,
+   useFirestoreConnect,
+} from "react-redux-firebase"
 import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
@@ -55,7 +65,9 @@ const adminPaths = ["/group/create", "/new-livestream"]
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
    const { pathname, replace, asPath } = useRouter()
-
+   const firebase = useFirebase()
+   const [claims, setClaims] = useState(null)
+   console.log("-> claims", claims)
    const query = useMemo(
       () =>
          auth.email
@@ -141,8 +153,27 @@ const AuthProvider = ({ children }) => {
       }
    }, [userData])
 
+   // Get user claims
+   const authUser = firebase.auth().currentUser
    useEffect(() => {
-      return firebaseServiceInstance.auth.onIdTokenChanged(async (user) => {
+      // get claims from auth
+      console.log("-> firebase", firebase.auth().currentUser)
+      authUser?.getIdTokenResult(true).then((idTokenResult) => {
+         console.log("-> idTokenResult", idTokenResult)
+         setClaims(idTokenResult.claims)
+         // Confirm the user is an Admin.
+         if (!!idTokenResult.claims.admin) {
+            // Show admin UI.
+            console.log("User is an admin")
+         } else {
+            // Show regular user UI.
+            console.log("User is not an admin")
+         }
+      })
+   }, [authUser])
+
+   useEffect(() => {
+      const unsub = firebase.auth().onIdTokenChanged(async (user) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
@@ -150,7 +181,9 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", token, { path: "/" })
          }
       })
-   }, [])
+
+      return () => unsub()
+   }, [firebase])
 
    const contextValue = useMemo(
       () => ({
