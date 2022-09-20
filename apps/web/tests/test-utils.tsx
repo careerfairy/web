@@ -31,13 +31,11 @@ const AllTheProviders: FC = ({ children }) => {
       <RouterContext.Provider value={{ ...mockRouter }}>
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
-               <AuthProvider>
-                  <FirebaseServiceContext.Provider
-                     value={firebaseServiceInstance}
-                  >
+               <FirebaseServiceContext.Provider value={firebaseServiceInstance}>
+                  <AuthProvider>
                      <ThemeProviderWrapper>{children}</ThemeProviderWrapper>
-                  </FirebaseServiceContext.Provider>
-               </AuthProvider>
+                  </AuthProvider>
+               </FirebaseServiceContext.Provider>
             </ReactReduxFirebaseProvider>
          </Provider>
       </RouterContext.Provider>
