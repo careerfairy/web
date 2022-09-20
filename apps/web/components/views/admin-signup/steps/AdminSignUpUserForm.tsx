@@ -95,7 +95,7 @@ const initValues: IAdminUserCreateFormValues = {
    subscribed: false,
 }
 
-const demoGroupId = "rTUGXDAG2XAtpVcgvAcc!"
+const demoGroupId = "rTUGXDAG2XAtpVcgvAcc"
 
 function AdminSignUpUserForm() {
    const firebase = useFirebaseService()
