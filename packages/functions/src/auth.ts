@@ -1,15 +1,15 @@
-const functions = require("firebase-functions")
+import functions = require("firebase-functions")
+/* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
-const { admin } = require("./api/firestoreAdmin")
+import { admin } from "./api/firestoreAdmin"
 
-const { setHeaders, generateReferralCode } = require("./util")
-const { userGetByEmail, userUpdateFields } = require("./lib/user")
-const config = require("./config")
-const {
-   handleUserNetworkerBadges,
-   handleUserStatsBadges,
-} = require("./lib/badge")
-const { marketingUsersRepo } = require("./api/repositories")
+import userLib = require("./lib/user")
+import config = require("./config")
+
+import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import { setHeaders, generateReferralCode } from "./util"
+import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
+import { marketingUsersRepo } from "./api/repositories"
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -148,6 +148,119 @@ exports.createNewUserAccount_v4 = functions.https.onCall(
          })
    }
 )
+exports.createGroupAdminAccount = functions.https.onCall(
+   async (data, context) => {
+      if (context.auth) {
+         // Throwing an HttpsError so that the client gets the error details.
+         throw new functions.https.HttpsError(
+            "failed-precondition",
+            "The function must be called while logged out."
+         )
+      }
+
+      const userData = data.userData
+      const recipientEmail = data.userData.email.toLowerCase().trim()
+      const pinCode = getRandomInt(9999)
+      const { password, firstName, lastName, subscribed } = userData
+
+      console.log(
+         `Starting auth account creation process for ${recipientEmail}`
+      )
+      await admin
+         .auth()
+         .createUser({ email: recipientEmail, password: password })
+         .then(async (user) => {
+            console.log(
+               `Starting firestore account creation process for ${recipientEmail}`
+            )
+
+            await admin
+               .firestore()
+               .collection("userData")
+               .doc(recipientEmail)
+               .set(
+                  Object.assign({
+                     authId: user.uid,
+                     id: recipientEmail,
+                     validationPin: pinCode,
+                     firstName: firstName,
+                     lastName: lastName,
+                     userEmail: recipientEmail,
+                     unsubscribed: !subscribed,
+                     referralCode: generateReferralCode(),
+                  })
+               )
+               .then(async () => {
+                  try {
+                     await marketingUsersRepo.delete(recipientEmail)
+                  } catch (e) {
+                     functions.logger.warn(
+                        `Unable to deleting marketing user: ${recipientEmail}, could be because it doesn't exist`,
+                        e
+                     )
+                  }
+               })
+               .then(async () => {
+                  console.log(`Starting sending email for ${recipientEmail}`)
+                  const email = {
+                     TemplateId:
+                        process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
+                     From: "CareerFairy <noreply@careerfairy.io>",
+                     To: recipientEmail,
+                     TemplateModel: { pinCode: pinCode },
+                  }
+                  try {
+                     const response = await client.sendEmailWithTemplate(email)
+                     console.log(
+                        `Sent email successfully for ${recipientEmail}`
+                     )
+
+                     return response
+                  } catch (error) {
+                     console.error(
+                        `Error sending PIN email to ${recipientEmail}`,
+                        error
+                     )
+                     console.error(
+                        `Starting auth and firestore user deletion ${recipientEmail}`,
+                        error
+                     )
+                     await admin.auth().deleteUser(user.uid)
+                     await admin
+                        .firestore()
+                        .collection("userData")
+                        .doc(recipientEmail)
+                        .delete()
+                     throw new functions.https.HttpsError(
+                        "resource-exhausted",
+                        "Error sending out PIN email"
+                     )
+                  }
+               })
+               .catch(async (error) => {
+                  if (error.code !== "resource-exhausted") {
+                     console.error(
+                        `Starting auth user deletion ${recipientEmail}`,
+                        error
+                     )
+                     await admin.auth().deleteUser(user.uid)
+                  }
+                  console.error(
+                     `Error creating user ${recipientEmail} in firestore`,
+                     error
+                  )
+                  throw new functions.https.HttpsError("internal", error)
+               })
+         })
+         .catch(async (error) => {
+            console.error(
+               `Error creating user ${recipientEmail} in firebase auth`,
+               error
+            )
+            throw new functions.https.HttpsError("internal", error)
+         })
+   }
+)
 
 exports.resendPostmarkEmailVerificationEmailWithPin_v2 = functions.https.onCall(
    async (data) => {
@@ -178,7 +291,7 @@ exports.validateUserEmailWithPin = functions
    .runWith({
       minInstances: 1,
    })
-   .https.onCall(async (data, context) => {
+   .https.onCall(async (data) => {
       const recipientEmail = data.userInfo.recipientEmail
       const pinCode = data.userInfo.pinCode
       let error
@@ -245,6 +358,7 @@ exports.validateUserEmailWithPin = functions
       if (error) {
          throw new functions.https.HttpsError(error.code, error.message)
       }
+      return null
    })
 
 exports.sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
@@ -448,8 +562,8 @@ exports.backfillUserData = functions.https.onCall(async (data, context) => {
       )
    }
 
-   const userData = await userGetByEmail(email)
-   const dataToUpdate = {}
+   const userData = (await userLib.userGetByEmail(email)) as UserData
+   const dataToUpdate: Partial<UserData> = {}
 
    if (!userData.referralCode) {
       dataToUpdate.referralCode = generateReferralCode()
@@ -457,7 +571,7 @@ exports.backfillUserData = functions.https.onCall(async (data, context) => {
    }
 
    if (Object.keys(dataToUpdate).length > 0) {
-      await userUpdateFields(email, dataToUpdate)
+      await userLib.userUpdateFields(email, dataToUpdate)
       functions.logger.info(
          "User updated with the following fields",
          dataToUpdate
@@ -469,8 +583,8 @@ exports.onUserUpdate = functions
    .region(config.region)
    .firestore.document("userData/{userDataId}")
    .onUpdate(async (change, context) => {
-      const previousValue = change.before.data()
-      const newValue = change.after.data()
+      const previousValue = change.before.data() as UserData
+      const newValue = change.after.data() as UserData
 
       try {
          await handleUserNetworkerBadges(context.params.userDataId, newValue)
@@ -484,8 +598,8 @@ exports.onUserStatsUpdate = functions
    .region(config.region)
    .firestore.document("userData/{userDataId}/stats/stats")
    .onUpdate(async (change, context) => {
-      const previousValue = change.before.data()
-      const newValue = change.after.data()
+      const previousValue = change.before.data() as UserStats
+      const newValue = change.after.data() as UserStats
 
       try {
          await handleUserStatsBadges(context.params.userDataId, newValue)
@@ -538,3 +652,14 @@ exports.deleteLoggedInUserAccount = functions.https.onCall(
       }
    }
 )
+
+// This function assigns a user an admin claim for a specific group
+async function grantModeratorRole(email: string, groupId: string) {
+   const user = await admin.auth().getUserByEmail(email) // 1
+   if (user.customClaims && user.customClaims.groupAdmins.includes(groupId)) {
+      return // If the user already has the claim, our work is done here
+   }
+   return admin.auth().setCustomUserClaims(user.uid, {
+      groupAdmins: [...(user.customClaims?.groupAdmins || []), groupId], // Add the group to the list of groups the user is an admin of
+   })
+}
