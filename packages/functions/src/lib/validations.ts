@@ -1,8 +1,7 @@
 import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
-import { groupRepo, inviteRepo, userRepo } from "../api/repositories"
+import { groupRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/invites/Invite"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
@@ -128,42 +127,4 @@ export async function userIsSignedInAndIsCFAdmin(
    const idToken = await validateUserAuthExists(context)
    await validateUserIsCFAdmin(idToken.email)
    return
-}
-
-/**
- * Validates if the invite is valid
- *
- * Checks if the user is authenticated and is a CF Admin
- * @param inviteId - the ID of the invite document
- * @param invitedUserEmail - the email of the user who is accepting the invite
- */
-export async function validateGroupDashboardInvite(
-   inviteId: string,
-   invitedUserEmail: string
-): Promise<GroupDashboardInvite> {
-   const groupDashboardInvite = await inviteRepo.getGroupDashboardInviteById(
-      inviteId
-   )
-
-   if (!groupDashboardInvite) {
-      logAndThrow("Group dashboard invite does not exist", inviteId)
-   }
-
-   const inviteIsValid = inviteRepo.checkIfGroupDashboardInviteIsValid(
-      groupDashboardInvite,
-      invitedUserEmail
-   )
-
-   if (invitedUserEmail !== groupDashboardInvite.details.receiver) {
-      logAndThrow(
-         "The email does not match the invited email",
-         invitedUserEmail
-      )
-   }
-
-   if (!inviteIsValid) {
-      logAndThrow("Group dashboard invite is not valid", inviteId)
-   }
-
-   return groupDashboardInvite
 }

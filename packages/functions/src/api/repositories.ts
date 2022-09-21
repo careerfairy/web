@@ -23,10 +23,6 @@ import {
    IMarketingUsersRepository,
 } from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
 import {
-   FirebaseInviteRepository,
-   IInviteRepository,
-} from "@careerfairy/shared-lib/dist/invites/InviteRepository"
-import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
 } from "../lib/GroupFunctionsRepository"
@@ -66,9 +62,4 @@ export const marketingUsersRepo: IMarketingUsersRepository =
 
 export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
-)
-
-export const inviteRepo: IInviteRepository = new FirebaseInviteRepository(
-   firestoreInstance,
-   admin.firestore.FieldValue
 )
