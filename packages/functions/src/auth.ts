@@ -160,6 +160,7 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
       }
 
       let uidToDelete = null
+      let emailToDelete = null
       const userData = data.userData
       const groupId = data.groupId
       const recipientEmail = data.userData.email.toLowerCase().trim()
@@ -205,6 +206,8 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
                })
             )
 
+         emailToDelete = recipientEmail
+
          // grant the user admin access to the group
          await grantGroupAdminRole(userRecord.email, groupId).catch((error) => {
             functions.logger.error(
@@ -241,17 +244,19 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             error
          )
          // Delete the user from firebase auth
-         const deletePromises: Promise<any>[] = [
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore // Promise<any> is not assignable to  Promise<admin.firestore.WriteResult>
-            await admin
-               .firestore()
-               .collection("userData")
-               .doc(recipientEmail)
-               .delete(),
-         ]
+         const deletePromises: Promise<any>[] = []
+
+         if (emailToDelete) {
+            deletePromises.push(
+               admin
+                  .firestore()
+                  .collection("userData")
+                  .doc(recipientEmail)
+                  .delete()
+            )
+         }
          if (uidToDelete) {
-            // if we have a uid to delete, we delete the auth record
+            // if we have a UID to delete, we delete the auth record
             deletePromises.push(admin.auth().deleteUser(uidToDelete))
          }
          // wait for all the promises to resolve
