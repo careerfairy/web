@@ -141,14 +141,9 @@ const addUsersDataOnStreams = async (
 
       const usersLivestreamData = collection.docs?.map((doc) => doc.data())
 
-      console.log(
-         `all the user for the stream ${stream.id} -> ${usersLivestreamData}`
-      )
-
       formattedStreams.push({ ...stream, usersLivestreamData })
    }
 
-   console.log("all the information formatted -> ", formattedStreams)
    return formattedStreams
 }
 
