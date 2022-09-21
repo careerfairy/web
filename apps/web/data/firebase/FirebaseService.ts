@@ -21,6 +21,7 @@ import {
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
    GroupWithPolicy,
    UserGroupData,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -146,6 +147,16 @@ class FirebaseService {
       const sendReminderEmailAboutApplicationLink =
          this.functions.httpsCallable("sendReminderEmailAboutApplicationLink")
       return sendReminderEmailAboutApplicationLink(data)
+   }
+
+   sendGroupAdminInviteEmail = async (args: {
+      recipientEmail: string
+      groupName: string
+      senderFirstName: string
+      groupId: string
+      role: GROUP_DASHBOARD_ROLE
+   }) => {
+      return this.functions.httpsCallable("sendDashboardInviteEmail_v2")(args)
    }
 
    sendBasicTemplateEmail = async ({

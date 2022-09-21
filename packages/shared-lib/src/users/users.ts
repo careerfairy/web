@@ -12,6 +12,7 @@ import {
    LivestreamGroupQuestionsMap,
 } from "../livestreams"
 import { Job } from "../ats/Job"
+import Timestamp = firebase.firestore.Timestamp
 
 export interface UserData extends Identifiable {
    authId: string
@@ -63,6 +64,11 @@ export interface UserData extends Identifiable {
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
    hasJobApplications?: boolean
+
+   /*
+    * We listen to this field to know when to refetch a new fresh token in the auth provider
+    * */
+   refreshTokenTime?: Timestamp
 }
 
 /*

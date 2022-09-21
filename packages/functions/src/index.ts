@@ -52,14 +52,12 @@ exports.exportFirestoreBackup = backup.exportFirestoreBackup
 exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail_v3
 
 // Group Admin
-exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
+exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
-exports.validateGroupAdminDashboardInvite =
-   groupAdmin.validateGroupAdminDashboardInvite
 exports.deleteGroupAdminDashboardInvite =
    groupAdmin.deleteGroupAdminDashboardInvite
 

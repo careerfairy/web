@@ -9,6 +9,7 @@ import {
 } from "@careerfairy/shared-lib/dist/groups"
 import { admin } from "../api/firestoreAdmin"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -44,6 +45,21 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * Gets the admins of a group document
     * */
    getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
+
+   createGroupDashboardInvite(
+      groupId: string,
+      userEmail: string,
+      role: GROUP_DASHBOARD_ROLE
+   ): Promise<GroupDashboardInvite>
+
+   getGroupDashboardInviteById(id: string): Promise<GroupDashboardInvite>
+
+   deleteGroupDashboardInviteById(id: string): Promise<void>
+
+   checkIfGroupDashboardInviteIsValid(
+      groupDashboardInvite: GroupDashboardInvite,
+      invitedUserEmail: string
+   ): boolean
 }
 
 export class GroupFunctionsRepository
@@ -109,17 +125,28 @@ export class GroupFunctionsRepository
             "Cannot remove the last owner of the group. There must be at least one owner."
          )
       }
+      const oldClaims = { ...user.customClaims } || {}
 
       await admin.auth().setCustomUserClaims(user.uid, {
          groupAdmins: {
-            ...user.customClaims.groupAdmins,
+            ...oldClaims.groupAdmins,
             [groupId]: {
                role: newRole,
             },
          },
       })
 
-      return this.setGroupAdminRole(groupId, targetEmail, newRole)
+      await this.setGroupAdminRole(groupId, targetEmail, newRole).catch(
+         (error) => {
+            // if there was an error, revert the custom claims
+            admin.auth().setCustomUserClaims(user.uid, oldClaims)
+            throw error
+         }
+      )
+
+      return this.firestore.collection("userData").doc(targetEmail).update({
+         refreshTokenTime: admin.firestore.FieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
+      })
    }
 
    async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
@@ -151,5 +178,59 @@ export class GroupFunctionsRepository
       )
 
       return totalOwners.length > 0 // there must be at least one owner
+   }
+
+   async createGroupDashboardInvite(
+      groupId: string,
+      userEmail: string,
+      role: GROUP_DASHBOARD_ROLE
+   ): Promise<GroupDashboardInvite> {
+      const id = this.firestore.collection("invites").doc().id
+      const invite: GroupDashboardInvite = {
+         id,
+         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+         // @ts-ignore
+         createdAt: this.fieldValue.serverTimestamp(),
+         invitedEmail: userEmail,
+         groupId,
+         role: role || GROUP_DASHBOARD_ROLE.MEMBER,
+      }
+      await this.firestore
+         .collection("groupDashboardInvites")
+         .doc(id)
+         .set(invite)
+      return invite
+   }
+
+   async getGroupDashboardInviteById(
+      inviteId: string
+   ): Promise<GroupDashboardInvite> {
+      const doc = await this.firestore
+         .collection("groupDashboardInvites")
+         .doc(inviteId)
+         .get()
+      if (doc.exists) {
+         return doc.data() as GroupDashboardInvite
+      }
+      return null
+   }
+
+   deleteGroupDashboardInviteById(inviteId: string): Promise<void> {
+      return this.firestore
+         .collection("groupDashboardInvites")
+         .doc(inviteId)
+         .delete()
+   }
+
+   checkIfGroupDashboardInviteIsValid(
+      groupDashboardInvite: GroupDashboardInvite,
+      invitedUserEmail: string
+   ): boolean {
+      return Boolean(
+         groupDashboardInvite.invitedEmail &&
+            groupDashboardInvite.groupId &&
+            groupDashboardInvite.role &&
+            invitedUserEmail
+      )
    }
 }

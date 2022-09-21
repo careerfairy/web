@@ -16,6 +16,7 @@ import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
+import { usePreviousDistinct } from "react-use"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -57,7 +58,7 @@ const securePaths = [
    "/group/[groupId]/admin/ats-integration",
    "/new-livestream",
    "/group/create",
-   "/group/[groupId]/invite/[inviteId]",
+   "/group/invite/[inviteId]",
 ]
 
 const adminPaths = ["/group/create", "/new-livestream"]
@@ -88,7 +89,6 @@ const AuthProvider = ({ children }) => {
             : [],
       [auth?.email]
    )
-
    useFirestoreConnect(query)
 
    const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
@@ -96,6 +96,7 @@ const AuthProvider = ({ children }) => {
    const userData = useSelector(({ firestore }: RootState) =>
       isLoggedOut ? undefined : firestore.data["userProfile"]
    )
+   const prevUserData = usePreviousDistinct<UserData>(userData)
 
    const userStats = useSelector(
       ({ firestore }: RootState) => firestore.data["userStats"]
@@ -162,11 +163,35 @@ const AuthProvider = ({ children }) => {
       return token.claims
    }, [firebaseService.auth.currentUser])
 
-   // // Get user claims
-   // useEffect(() => {
-   //    // get claims from auth
-   //    fetchClaims().then(setClaims)
-   // }, [fetchClaims])
+   // Get user claims
+   useEffect(() => {
+      // get claims from auth
+      const tokenExpiration = auth.stsTokenManager?.expirationTime
+      const refreshTokenTime = userData?.refreshTokenTime?.toMillis?.()
+      if (!refreshTokenTime || !tokenExpiration) return
+
+      /**
+       * Check to see if we need to refresh the token
+       * conditions:
+       * 1. token is expired
+       * 2. token is not expired, but the time difference between the token expiration and the refresh token time is greater than 1 hour
+       * */
+
+      const timeDifference = tokenExpiration - refreshTokenTime // in milliseconds
+      const isTokenExpired = tokenExpiration < Date.now() // in milliseconds (now)
+      const isTokenStale = timeDifference > 3600000 // in milliseconds (1 hour)
+
+      if (isTokenExpired || isTokenStale) {
+         // if token is expired or stale, refresh it
+         fetchClaims().then(setClaims)
+      }
+   }, [
+      auth.stsTokenManager?.expirationTime,
+      fetchClaims,
+      prevUserData,
+      userData,
+      userData?.refreshTokenTime,
+   ])
 
    useEffect(() => {
       const unsub = firebaseService.auth.onIdTokenChanged(async (user) => {
