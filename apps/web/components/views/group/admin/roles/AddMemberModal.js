@@ -40,6 +40,9 @@ const AddMemberModal = ({ open = false, onClose, group, firebase }) => {
       return `${baseUrl}/group/${
          group.id || group.groupId
       }/admin?dashboardInviteId=${notificationId}`
+      // return `${baseUrl}/group/${
+      //    group.id || group.groupId
+      // }/admin?dashboardInviteId=${notificationId}`
    }
 
    const handleSubmit = async (values, { resetForm }) => {

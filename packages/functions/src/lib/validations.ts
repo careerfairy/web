@@ -1,7 +1,12 @@
 import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
-import { groupRepo, userRepo } from "../api/repositories"
+import { groupRepo, inviteRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/invites/Invite"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+} from "@careerfairy/shared-lib/dist/groups"
 
 /**
  * Validate the data object argument in a function call
@@ -40,7 +45,15 @@ export function validateUserAuthExists(
  * @param groupId
  * @param email
  */
-export async function validateUserIsGroupAdmin(groupId: string, email: string) {
+export async function validateUserIsGroupAdmin(
+   groupId: string,
+   email: string
+): Promise<{
+   isAdmin: boolean
+   group: Group
+   role: GROUP_DASHBOARD_ROLE
+   isCFAdmin?: boolean
+}> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
    if (!response.isAdmin) {
@@ -48,10 +61,28 @@ export async function validateUserIsGroupAdmin(groupId: string, email: string) {
          // check if user is CF admin, will throw if not
          await validateUserIsCFAdmin(email)
 
-         return response
+         return { ...response, isCFAdmin: true } // TODO: Refactor CF admin logic to use claims
       } catch (e) {
          logAndThrow("The user is not a group admin", groupId, email)
       }
+   }
+
+   return response
+}
+
+export async function validateUserIsGroupAdminOwnerRole(
+   userEmail: string,
+   groupId: string
+) {
+   const response = await validateUserIsGroupAdmin(groupId, userEmail)
+
+   if (response.role !== GROUP_DASHBOARD_ROLE.OWNER && !response.isCFAdmin) {
+      logAndThrow(
+         "The user is not an owner of the group",
+         userEmail,
+         groupId,
+         response.role
+      )
    }
 
    return response
@@ -97,4 +128,42 @@ export async function userIsSignedInAndIsCFAdmin(
    const idToken = await validateUserAuthExists(context)
    await validateUserIsCFAdmin(idToken.email)
    return
+}
+
+/**
+ * Validates if the invite is valid
+ *
+ * Checks if the user is authenticated and is a CF Admin
+ * @param inviteId - the ID of the invite document
+ * @param invitedUserEmail - the email of the user who is accepting the invite
+ */
+export async function validateGroupDashboardInvite(
+   inviteId: string,
+   invitedUserEmail: string
+): Promise<GroupDashboardInvite> {
+   const groupDashboardInvite = await inviteRepo.getGroupDashboardInviteById(
+      inviteId
+   )
+
+   if (!groupDashboardInvite) {
+      logAndThrow("Group dashboard invite does not exist", inviteId)
+   }
+
+   const inviteIsValid = inviteRepo.checkIfGroupDashboardInviteIsValid(
+      groupDashboardInvite,
+      invitedUserEmail
+   )
+
+   if (invitedUserEmail !== groupDashboardInvite.details.receiver) {
+      logAndThrow(
+         "The email does not match the invited email",
+         invitedUserEmail
+      )
+   }
+
+   if (!inviteIsValid) {
+      logAndThrow("Group dashboard invite is not valid", inviteId)
+   }
+
+   return groupDashboardInvite
 }

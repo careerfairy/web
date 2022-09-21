@@ -10,6 +10,7 @@ import {
 import {
    fieldOfStudyRepo,
    groupRepo,
+   inviteRepo,
    livestreamsRepo,
 } from "./api/repositories"
 
@@ -23,6 +24,12 @@ import {
 } from "./util"
 import { admin } from "./api/firestoreAdmin"
 import { marketingTeamEmails } from "./misc/marketingTeamEmails"
+import {
+   logAndThrow,
+   validateGroupDashboardInvite,
+   validateUserAuthExists,
+   validateUserIsGroupAdminOwnerRole,
+} from "./lib/validations"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -596,3 +603,57 @@ export const joinGroupDashboard = functions.https.onCall(
       })
    }
 )
+
+export const validateGroupAdminDashboardInvite = functions.https.onCall(
+   async (data, context) => {
+      const response = {
+         groupId: null,
+      }
+      try {
+         const token = await validateUserAuthExists(context)
+
+         const { inviteId } = data
+
+         const invitedUserEmail = token.email
+
+         // fetch and validate the invite
+         const groupDashboardInvite = await validateGroupDashboardInvite(
+            inviteId,
+            invitedUserEmail
+         )
+         const groupId = groupDashboardInvite.details.sender
+         const role = groupDashboardInvite.details.additionalData.role
+
+         // delete the invite
+         await inviteRepo.deleteInviteById(inviteId)
+
+         // assign the user to the group
+         await groupRepo.grantGroupAdminRole(invitedUserEmail, groupId, role)
+
+         response.groupId = groupId
+      } catch (e) {
+         logAndThrow(e)
+      }
+      return response // return the group id so the client can redirect to the group dashboard
+   }
+)
+
+export const deleteGroupAdminDashboardInvite = functions.https.onCall(
+   async (data, context) => {
+      try {
+         const { inviteId, groupId } = data
+         const userEmail = context.auth.token.email
+         await validateUserIsGroupAdminOwnerRole(userEmail, groupId)
+
+         // delete the invite
+         await inviteRepo.deleteInviteById(inviteId)
+
+         return true
+      } catch (e) {
+         logAndThrow(e)
+      }
+      return true
+   }
+)
+
+// export const createGroupAdminDashboardInvite = functions.https.onCall(

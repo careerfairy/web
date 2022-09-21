@@ -1,7 +1,3 @@
-import {
-   FirebaseGroupRepository,
-   IGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { admin } from "./firestoreAdmin"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 import { IATSRepository } from "@careerfairy/shared-lib/src/ats/IATSRepository"
@@ -26,13 +22,19 @@ import {
    FirebaseMarketingUsersRepository,
    IMarketingUsersRepository,
 } from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
+import {
+   FirebaseInviteRepository,
+   IInviteRepository,
+} from "@careerfairy/shared-lib/dist/invites/InviteRepository"
+import {
+   GroupFunctionsRepository,
+   IGroupFunctionsRepository,
+} from "../lib/GroupFunctionsRepository"
 
 const firestoreInstance = admin.firestore() as any
 
-export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
-   firestoreInstance,
-   admin.firestore.FieldValue
-)
+export const groupRepo: IGroupFunctionsRepository =
+   new GroupFunctionsRepository(firestoreInstance, admin.firestore.FieldValue)
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
    firestoreInstance,
@@ -64,4 +66,9 @@ export const marketingUsersRepo: IMarketingUsersRepository =
 
 export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
+)
+
+export const inviteRepo: IInviteRepository = new FirebaseInviteRepository(
+   firestoreInstance,
+   admin.firestore.FieldValue
 )

@@ -32,19 +32,6 @@ export interface IGroupRepository {
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
 
-   /**
-    * Confirm if user is admin of the group
-    *
-    * Returns true if user is admin of the group and the group itself to save a
-    * network request in case you need to fetch the full group afterwards
-    * @param groupId
-    * @param userEmail
-    */
-   checkIfUserIsGroupAdmin(
-      groupId: string,
-      userEmail: string
-   ): Promise<{ isAdmin: boolean; group: Group }>
-
    // ATS actions
    getATSIntegrations(groupId: string): Promise<GroupATSAccountDocument[]>
 
@@ -125,8 +112,8 @@ export class FirebaseGroupRepository
    implements IGroupRepository
 {
    constructor(
-      private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: typeof firebase.firestore.FieldValue
+      protected readonly firestore: firebase.firestore.Firestore,
+      protected readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
    }
@@ -198,27 +185,6 @@ export class FirebaseGroupRepository
          .limit(1)
          .get()
       return adminGroups.docs.length > 0
-   }
-
-   async checkIfUserIsGroupAdmin(
-      groupId: string,
-      userEmail: string
-   ): Promise<{ isAdmin: boolean; group: Group }> {
-      const groupDoc = await this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .get()
-
-      if (!groupDoc.exists) {
-         return { isAdmin: false, group: null }
-      }
-
-      const group = this.addIdToDoc<Group>(groupDoc)
-
-      return {
-         isAdmin: group.adminEmails.includes(userEmail),
-         group,
-      }
    }
 
    /*
