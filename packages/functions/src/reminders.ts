@@ -213,15 +213,7 @@ const handleReminder = async (
          filterEndDate
       )
 
-      const { livestreamKey } = reminder
-
-      const filteredStreams = filterAlreadySentEmail(streams, livestreamKey)
-
-      functions.logger.log(
-         `${filteredStreams.length} streams with ${livestreamKey} reminder`
-      )
-
-      await handleSendEmail(filteredStreams, reminder)
+      await handleSendEmail(streams, reminder)
    } catch (error) {
       functions.logger.error(
          `Error handling reminder with template ${reminder.livestreamKey}`,
@@ -257,28 +249,61 @@ const handleSendEmail = (
             emailMaxChunkSize
          )
 
-         emailsData.map((emailData) => {
-            promiseArrayToSendMessages.push(
-               createSendEmailPromise(emailData, reminder, stream)
-            )
+         emailsData.map((emailData, index) => {
+            const currentChunk = `${index + 1}of${emailsData.length}`
+
+            // We only want to send the current email chunk reminder if it hasn't already been sent
+            if (
+               wasEmailChunkNotYetSent(
+                  stream,
+                  reminder.livestreamKey,
+                  currentChunk
+               )
+            ) {
+               promiseArrayToSendMessages.push(
+                  createSendEmailPromise(
+                     emailData,
+                     reminder,
+                     stream,
+                     currentChunk
+                  )
+               )
+            }
          })
       }
    })
 
    return Promise.allSettled(promiseArrayToSendMessages).then((results) => {
+      let emailsSent
       results.forEach((result: any) => {
          const { status, value, reason } = result
 
          if (status === "fulfilled") {
-            const { livestreamKey, streamId } = value
+            const { livestreamKey, streamId, chunk } = value
+
+            emailsSent = {
+               livestreamKey,
+               streamId,
+               chunks: emailsSent?.chunks?.length
+                  ? [...emailsSent.chunks, chunk]
+                  : [chunk],
+            }
+
             functions.logger.log(
-               `Email ${livestreamKey} sent successfully for the stream ${streamId}`
+               `Email ${livestreamKey} with chunk ${chunk} was sent successfully for the stream ${streamId}`
             )
          } else {
             functions.logger.error(reason)
             throw new Error(reason)
          }
       })
+      if (emailsSent) {
+         updateLiveStreamWithEmailSent(
+            emailsSent.streamId,
+            emailsSent.livestreamKey,
+            emailsSent.chunks
+         ).catch()
+      }
    })
 }
 
@@ -289,35 +314,36 @@ const handleSendEmail = (
 const createSendEmailPromise = (
    emailData: MailgunMessageData,
    reminder: ReminderData,
-   stream: LiveStreamEventWithUsersLivestreamData
+   stream: LiveStreamEventWithUsersLivestreamData,
+   currentChunk: string
 ) => {
    const { id } = stream
    const { livestreamKey } = reminder
 
    return sendMessage(emailData)
       .then(() => {
-         return updateLiveStreamWithEmailSent(stream, reminder).then(() => {
-            return { livestreamKey, streamId: id }
-         })
+         return { livestreamKey, streamId: id, chunk: currentChunk }
       })
       .catch((error) => {
          throw new Error(
-            `Email ${livestreamKey} was not sent for stream ${id} with the error ${error?.message}`
+            `Email ${livestreamKey} with chunk ${currentChunk} was not sent for stream ${id} with the error ${error?.message}`
          )
       })
 }
 
 /**
- * To filter all the streams to the ones
+ * To validate if the received Email Chunk has not yet been sent
  *
  */
-const filterAlreadySentEmail = (
-   streams: LiveStreamEventWithUsersLivestreamData[],
-   reminderKey: string
-): LiveStreamEventWithUsersLivestreamData[] => {
-   return streams.filter((stream) => {
-      const { reminderEmailsSent } = stream
+const wasEmailChunkNotYetSent = (
+   stream: LiveStreamEventWithUsersLivestreamData,
+   reminderKey: string,
+   currentChunk: string
+): boolean => {
+   if (stream.reminderEmailsSent) {
+      const firebaseChunks = stream.reminderEmailsSent[reminderKey]
+      return !firebaseChunks.includes(currentChunk)
+   }
 
-      return reminderEmailsSent ? !reminderEmailsSent[reminderKey] : true
-   })
+   return true
 }
