@@ -3,7 +3,6 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import { ReminderData } from "../reminders"
 
 export const livestreamGetById = async (id) => {
    const documentSnap = await admin
@@ -158,20 +157,16 @@ const addUsersDataOnStreams = async (
  *
  */
 export const updateLiveStreamWithEmailSent = (
-   stream: LiveStreamEventWithUsersLivestreamData,
-   reminder: ReminderData
+   streamId: string,
+   livestreamKey: string,
+   chunks: string[]
 ): Promise<admin.firestore.WriteResult> => {
-   const { id, reminderEmailsSent } = stream
-   const { livestreamKey } = reminder
-
-   const fieldToUpdate = {
-      ...reminderEmailsSent,
-      [livestreamKey]: true,
-   }
-
    return admin
       .firestore()
       .collection("livestreams")
-      .doc(id)
-      .update({ reminderEmailsSent: fieldToUpdate })
+      .doc(streamId)
+      .update({
+         [`reminderEmailsSent.${livestreamKey}`]:
+            admin.firestore.FieldValue.arrayUnion(...chunks),
+      })
 }
