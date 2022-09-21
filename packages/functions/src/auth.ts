@@ -208,15 +208,6 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
 
          emailToDelete = recipientEmail
 
-         // grant the user admin access to the group
-         await grantGroupAdminRole(userRecord.email, groupId).catch((error) => {
-            functions.logger.error(
-               `Error granting group admin role to ${recipientEmail} for group ${groupId}`,
-               error
-            )
-            throw new functions.https.HttpsError("internal", error)
-         })
-
          // Delete the user from the marketing list if they exist, this is not a critical step, so we don't throw an error if it fails
          await marketingUsersRepo.delete(recipientEmail).catch((e) => {
             functions.logger.warn(
@@ -660,17 +651,6 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
       }
    }
 )
-
-// This function assigns a user an admin claim for a specific group
-async function grantGroupAdminRole(email: string, groupId: string) {
-   const user = await admin.auth().getUserByEmail(email) // 1
-   if (user.customClaims && user.customClaims.groupAdmins.includes(groupId)) {
-      return // If the user already has the claim, our work is done here
-   }
-   return admin.auth().setCustomUserClaims(user.uid, {
-      groupAdmins: [...(user.customClaims?.groupAdmins || []), groupId], // Add the group to the list of groups the user is an admin of
-   })
-}
 
 const sendVerificationEmail = async (args: {
    email: string

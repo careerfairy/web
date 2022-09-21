@@ -1,8 +1,4 @@
 import dotenv = require("dotenv")
-
-// load values from the .env file in this directory into process.env
-dotenv.config()
-
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")
@@ -24,6 +20,9 @@ import marketing = require("./marketing")
 import atsUser = require("./atsUser")
 import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -59,6 +58,10 @@ exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
 exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
+exports.validateGroupAdminDashboardInvite =
+   groupAdmin.validateGroupAdminDashboardInvite
+exports.deleteGroupAdminDashboardInvite =
+   groupAdmin.deleteGroupAdminDashboardInvite
 
 // Reminders
 exports.sendReminderEmailToRegistrants =

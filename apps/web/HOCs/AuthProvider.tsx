@@ -57,6 +57,7 @@ const securePaths = [
    "/group/[groupId]/admin/ats-integration",
    "/new-livestream",
    "/group/create",
+   "/group/[groupId]/invite/[inviteId]",
 ]
 
 const adminPaths = ["/group/create", "/new-livestream"]
@@ -161,11 +162,11 @@ const AuthProvider = ({ children }) => {
       return token.claims
    }, [firebaseService.auth.currentUser])
 
-   // Get user claims
-   useEffect(() => {
-      // get claims from auth
-      fetchClaims().then(setClaims)
-   }, [fetchClaims])
+   // // Get user claims
+   // useEffect(() => {
+   //    // get claims from auth
+   //    fetchClaims().then(setClaims)
+   // }, [fetchClaims])
 
    useEffect(() => {
       const unsub = firebaseService.auth.onIdTokenChanged(async (user) => {
