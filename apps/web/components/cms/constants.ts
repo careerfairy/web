@@ -11,4 +11,4 @@ export const marketingSignUpFormId = "marketingSignUpFormId"
 
 export const hookLandingPage = "hook-landing-page"
 
-export const defaultMarketingLandingPage = "default-marketing-landing-page"
+export const defaultMarketingLandingPage = "landing-others"

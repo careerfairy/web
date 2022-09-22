@@ -74,7 +74,6 @@ const EventsPreviewGrid = ({
    events,
    type,
    id,
-   isOnLandingPage = false,
 }: EventsProps) => {
    const {
       query: { groupId },
@@ -166,7 +165,6 @@ const EventsPreviewGrid = ({
                                  onRegisterClick={handleClickRegister}
                                  key={event.id}
                                  event={event}
-                                 isOnLandingPage={isOnLandingPage}
                               />
                            </LazyLoad>
                         </Grid>
@@ -223,7 +221,6 @@ export interface EventsProps {
    loading: boolean
    type: EventsTypes | string
    id?: string
-   isOnLandingPage?: boolean
    // Not all portal widget should
    // have automatic event registrations
    // to avoid duplicate events clashing
