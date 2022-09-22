@@ -10,6 +10,7 @@ import {
 import { admin } from "../api/firestoreAdmin"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -68,15 +69,22 @@ export class GroupFunctionsRepository
 {
    async setGroupAdminRole(
       groupId: string,
-      userEmail: string,
+      userData: UserData,
       role: GROUP_DASHBOARD_ROLE
    ): Promise<void> {
+      const dataToSave: GroupAdmin = {
+         role,
+         email: userData.id,
+         firstName: userData.firstName || "",
+         lastName: userData.lastName || "",
+         id: userData.id,
+      }
       return this.firestore
          .collection("careerCenterData")
          .doc(groupId)
          .collection("admins")
-         .doc(userEmail)
-         .set({ role })
+         .doc(userData.id)
+         .set(dataToSave, { merge: true })
    }
 
    async checkIfUserIsGroupAdmin(
@@ -110,6 +118,11 @@ export class GroupFunctionsRepository
       newRole: GROUP_DASHBOARD_ROLE
    ) {
       // Get the auth user
+      const userSnap = await this.firestore
+         .collection("userData")
+         .doc(targetEmail)
+         .get()
+      const userData = this.addIdToDoc<UserData>(userSnap)
       const user = await admin.auth().getUserByEmail(targetEmail)
 
       const currentAdmins = (await this.getGroupAdmins(groupId)) || []
@@ -140,7 +153,7 @@ export class GroupFunctionsRepository
          },
       })
 
-      await this.setGroupAdminRole(groupId, targetEmail, newRole).catch(
+      await this.setGroupAdminRole(groupId, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
             admin.auth().setCustomUserClaims(user.uid, oldClaims)
@@ -169,14 +182,14 @@ export class GroupFunctionsRepository
       userEmail: string,
       currentAdmins: GroupAdmin[]
    ) {
-      const potentialNewAdmins: GroupAdmin[] = [
+      const potentialNewAdmins: Partial<GroupAdmin>[] = [
          ...currentAdmins.filter((admin) => admin.id !== userEmail),
          // add the new admin to the list of current admins if it's not already there
          { id: userEmail, role: newRole },
       ]
 
       const totalOwners = potentialNewAdmins.filter(
-         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER
+         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER || "mainAdmin" // TODO: remove this legacy "mainAdmin string when we remove the mainAdmin role after migration
       )
 
       return totalOwners.length > 0 // there must be at least one owner
