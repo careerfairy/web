@@ -9,24 +9,48 @@ import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
  */
 const useUpcomingStreamsByFieldOfStudy = (
    fieldsOfStudy: FieldOfStudy[],
-   fallbackToGeneralStreams?: boolean
+   fallbackToGeneralStreams?: boolean,
+   limit = 10
 ) => {
    const [events, setEvents] = useState<LivestreamEvent[]>([])
    const [loading, setLoading] = useState(true)
 
    useEffect(() => {
       setLoading(true)
-      const limit = 10
 
       livestreamRepo
          .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, limit)
-         .then((events: LivestreamEvent[]) => {
-            if (!events?.length && fallbackToGeneralStreams) {
-               // Get the generic Upcoming Events
-               return livestreamRepo.getUpcomingEvents(limit)
-            }
+         .then((fieldOfStudyEvents: LivestreamEvent[]) => {
+            if (fallbackToGeneralStreams) {
+               if (!fieldOfStudyEvents) {
+                  // return the generic Upcoming Events
+                  return livestreamRepo.getUpcomingEvents(limit)
+               }
+               if (fieldOfStudyEvents?.length < limit) {
+                  // return fields of study events, plus generic Upcoming Events
+                  return livestreamRepo
+                     .getUpcomingEvents(limit)
+                     .then((generalUpcomingEvents) => {
+                        // Add general upcoming events to the response without duplicating events
+                        const fieldOfStudyEventsIds = fieldOfStudyEvents.map(
+                           (event) => event.id
+                        )
+                        const filteredGeneralUpcomingEvents =
+                           generalUpcomingEvents.filter(
+                              (generalEvent) =>
+                                 !fieldOfStudyEventsIds.includes(
+                                    generalEvent.id
+                                 )
+                           )
 
-            return events
+                        return [
+                           ...fieldOfStudyEvents,
+                           ...filteredGeneralUpcomingEvents,
+                        ]
+                     })
+               }
+            }
+            return fieldOfStudyEvents
          })
          .then((events: LivestreamEvent[]) => {
             if (events?.length) {
@@ -35,7 +59,7 @@ const useUpcomingStreamsByFieldOfStudy = (
          })
          .catch(console.error)
          .finally(() => setLoading(false))
-   }, [fallbackToGeneralStreams, fieldsOfStudy])
+   }, [fallbackToGeneralStreams, fieldsOfStudy, limit])
 
    return { events, loading }
 }

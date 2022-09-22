@@ -29,7 +29,7 @@ const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
       <Box sx={styles.wrapper}>
          <EventsPreview
             id={"upcoming-events"}
-            title={eventsTitle?.toUpperCase() || "COMING UP NEXT"}
+            title={eventsTitle || "COMING UP NEXT"}
             type={EventsTypes.comingUp}
             events={events}
             loading={loading || (!loading && !events.length)}

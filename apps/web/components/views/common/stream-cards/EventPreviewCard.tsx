@@ -199,7 +199,6 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
-   isOnLandingPage = false,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
@@ -320,7 +319,7 @@ const EventPreviewCard = ({
             <DateAndShareDisplay
                startDate={getStartDate()}
                loading={loading}
-               onShareClick={handleShareClick}
+               onShareClick={isOnMarketingLandingPage ? null : handleShareClick}
                isPlaceholderEvent={isPlaceholderEvent}
             />
             <Box
@@ -381,6 +380,7 @@ const EventPreviewCard = ({
                                     layout="fill"
                                     objectFit="contain"
                                     quality={100}
+                                    alt={`logo of company ${event.company}`}
                                  />
                               </Box>
                            </Avatar>
@@ -563,7 +563,6 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
-   isOnLandingPage?: boolean
 }
 
 export default EventPreviewCard
