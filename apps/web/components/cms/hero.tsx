@@ -98,9 +98,13 @@ const styles = sxStyles({
    container: {
       zIndex: 1,
       bgColor: "grey.main",
-      py: {
-         lg: 24,
+      pt: {
+         lg: 20,
          xs: 10,
+      },
+      pb: {
+         lg: 10,
+         xs: 5,
       },
       pl: 0,
       pr: 0,

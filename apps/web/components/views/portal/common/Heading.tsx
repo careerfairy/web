@@ -1,6 +1,10 @@
 import React from "react"
 import { Typography } from "@mui/material"
 import { Theme, SxProps } from "@mui/material/styles"
+import { OverridableStringUnion } from "@mui/types"
+import { Variant } from "@mui/material/styles/createTypography"
+import { TypographyPropsVariantOverrides } from "@mui/material/Typography/Typography"
+
 const styles = {
    root: {
       color: "text.secondary",
@@ -9,10 +13,10 @@ const styles = {
    },
 } as const
 
-const Heading = ({ sx, children }: Props) => {
+const Heading = ({ sx, children, variant = "h5" }: Props) => {
    return (
       <Typography
-         variant={"h5"}
+         variant={variant}
          sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
       >
          {children}
@@ -23,5 +27,9 @@ const Heading = ({ sx, children }: Props) => {
 interface Props {
    children: React.ReactNode
    sx?: SxProps<Theme>
+   variant?: OverridableStringUnion<
+      Variant | "inherit",
+      TypographyPropsVariantOverrides
+   >
 }
 export default Heading
