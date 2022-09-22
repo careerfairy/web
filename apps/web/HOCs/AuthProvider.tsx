@@ -163,7 +163,6 @@ const AuthProvider = ({ children }) => {
       return token.claims
    }, [firebaseService.auth.currentUser])
 
-   // Get user claims
    useEffect(() => {
       // get claims from auth
       const tokenExpiration = auth.stsTokenManager?.expirationTime
@@ -172,16 +171,14 @@ const AuthProvider = ({ children }) => {
 
       /**
        * Check to see if we need to refresh the token
-       * conditions:
-       * 1. token is expired
-       * 2. token is not expired, but the time difference between the token expiration and the refresh token time is greater than 1 hour
        * */
 
-      const timeDifference = tokenExpiration - refreshTokenTime // in milliseconds
-      const isTokenExpired = tokenExpiration < Date.now() // in milliseconds (now)
-      const isTokenStale = timeDifference > 3600000 // in milliseconds (1 hour)
+      const timeDifference = tokenExpiration - refreshTokenTime // The time at which the backend demanded to refresh the token
 
-      if (isTokenExpired || isTokenStale) {
+      // If the token is expired, or the time difference is smaller than 1 hour, refresh the token
+      const isTokenStale = timeDifference < 3600000 // If the token is stale, refresh it
+
+      if (isTokenStale) {
          // if token is expired or stale, refresh it
          fetchClaims().then(setClaims)
       }
@@ -198,8 +195,10 @@ const AuthProvider = ({ children }) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
-            const token = await user.getIdToken()
-            nookies.set(undefined, "token", token, { path: "/" })
+            const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
+            setClaims(tokenResult.claims)
+
+            nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
 

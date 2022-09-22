@@ -34,10 +34,11 @@ import {
 } from "./lib/validations"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import { mixed, object, string } from "yup"
+import { auth } from "firebase-admin"
+import functions = require("firebase-functions")
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
-import functions = require("firebase-functions")
 
 export const sendDraftApprovalRequestEmail = functions.https.onCall(
    async (data) => {
@@ -480,18 +481,37 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
       //
       const { recipientEmail, groupName, senderFirstName, groupId, role } = data
 
+      // Check if the user exists in our platform, allow fail
+      const authUser = await auth()
+         .getUserByEmail(recipientEmail)
+         .catch(() => null)
+
+      if (authUser) {
+         const isAlreadyGroupMember = checkIfAuthUserHasGroupAdminRole(
+            authUser.customClaims,
+            groupId
+         )
+
+         // If the user exists and is already a member of the group, throw an error
+         if (isAlreadyGroupMember) {
+            logAndThrow(
+               `A member with email ${recipientEmail} is already a member of group ${groupId}`
+            )
+         }
+      }
+
+      // If the user does not exist, send an invite email
+
       const newInvite = await groupRepo.createGroupDashboardInvite(
          groupId,
          recipientEmail,
          role
       )
-      console.log(
-         "-> context.rawRequest.headers.origin",
-         context.rawRequest.headers.origin
-      )
+
       const inviteLink = buildInviteLink(
          newInvite.id,
-         context.rawRequest.headers.origin
+         context.rawRequest.headers.origin,
+         authUser ? "login" : "signup"
       )
 
       const email = {
@@ -631,7 +651,7 @@ export const updateUserDocAdminStatus = functions.firestore
 //    }
 // )
 
-export const joinGroupDashboard = functions.https.onCall(
+export const joinGroupDashboard_v2 = functions.https.onCall(
    async (data, context) => {
       let response: Group = null
       try {
@@ -644,14 +664,15 @@ export const joinGroupDashboard = functions.https.onCall(
          // fetch and validate the invite
          const { groupDashboardInvite, group } =
             await validateGroupDashboardInvite(inviteId, invitedUserEmail)
+
          const groupId = groupDashboardInvite.groupId
          const role = groupDashboardInvite.role
 
-         // delete the invite
-         await groupRepo.deleteGroupDashboardInviteById(inviteId)
-
          // assign the user to the group
          await groupRepo.grantGroupAdminRole(invitedUserEmail, groupId, role)
+
+         // delete the invite
+         await groupRepo.deleteGroupDashboardInviteById(inviteId)
 
          response = group
       } catch (e) {
@@ -736,6 +757,17 @@ export async function validateGroupDashboardInvite(
    return { group, groupDashboardInvite }
 }
 
-const buildInviteLink = (inviteId: string, baseUrl: string) => {
-   return `${baseUrl}/group/invite/${inviteId}`
+const buildInviteLink = (
+   inviteId: string,
+   baseUrl: string,
+   onBoardingFlow: "login" | "signup"
+) => {
+   return `${baseUrl}/group/invite/${inviteId}?flow=${onBoardingFlow}`
+}
+
+const checkIfAuthUserHasGroupAdminRole = (
+   customClaims: { [p: string]: any },
+   groupId: string
+) => {
+   return Boolean(customClaims?.groupAdmins?.[groupId])
 }

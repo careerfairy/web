@@ -189,12 +189,6 @@ class FirebaseService {
       return sendBasicTemplateEmail(dataObj)
    }
 
-   joinGroupDashboard = async (data) => {
-      const joinGroupDashboard =
-         this.functions.httpsCallable("joinGroupDashboard")
-      return joinGroupDashboard(data)
-   }
-
    /**
     * Call an on call cloud function to generate a secure agora token.
     * @param {({
