@@ -14,10 +14,6 @@ import {
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
 import {
-   FirebaseLivestreamRepository,
-   ILivestreamRepository,
-} from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
-import {
    bigQueryClient,
    BigQueryRepository,
    IBigQueryRepository,
@@ -26,6 +22,10 @@ import {
    FirebaseMarketingUsersRepository,
    IMarketingUsersRepository,
 } from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
+import {
+   ILivestreamFunctionsRepository,
+   LivestreamFunctionsRepository,
+} from "../lib/LivestreamFunctionsRepository"
 
 const firestoreInstance = admin.firestore() as any
 
@@ -43,8 +43,8 @@ export const userRepo: IUserRepository = new FirebaseUserRepository(
 export const fieldOfStudyRepo: IFieldOfStudyRepository =
    new FirebaseFieldOfStudyRepository(firestoreInstance)
 
-export const livestreamsRepo: ILivestreamRepository =
-   new FirebaseLivestreamRepository(
+export const livestreamsRepo: ILivestreamFunctionsRepository =
+   new LivestreamFunctionsRepository(
       firestoreInstance,
       admin.firestore.FieldValue
    )

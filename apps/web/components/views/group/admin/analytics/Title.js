@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import {
+   Box,
    Button,
    Card,
    CardHeader,
    Menu,
    MenuItem,
-   Box,
-   Typography,
    Tooltip,
+   Typography,
 } from "@mui/material"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips"
@@ -229,7 +229,9 @@ const Title = ({
                            variant={hiddenStreamIds ? "contained" : "outlined"}
                         >
                            {hiddenStreamIds
-                              ? `${noOfVisibleStreamIds} events selected`
+                              ? `${noOfVisibleStreamIds} event${
+                                   noOfVisibleStreamIds > 1 ? "s" : ""
+                                } selected`
                               : "Filter Events"}
                         </Button>
                      </span>

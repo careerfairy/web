@@ -1,8 +1,4 @@
 import dotenv = require("dotenv")
-
-// load values from the .env file in this directory into process.env
-dotenv.config()
-
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")
@@ -24,6 +20,11 @@ import marketing = require("./marketing")
 import atsUser = require("./atsUser")
 import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
+import groupAnalytics = require("./groupAnalytics")
+import cacheClear = require("./cacheClear")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -151,3 +152,10 @@ exports.updateUserJobApplications = atsUser.updateUserJobApplications
 
 // BigQuery
 exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers_v2
+
+// Group Analytics
+exports.getRegistrationSources = groupAnalytics.getRegistrationSources
+
+// Clear cached documents
+exports.periodicallyRemoveCachedDocument =
+   cacheClear.periodicallyRemoveCachedDocument

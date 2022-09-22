@@ -28,5 +28,7 @@ module.exports = {
       "@typescript-eslint/no-explicit-any": "off",
       "valid-jsdoc": "off",
       "require-jsdoc": 0,
+      "@typescript-eslint/ban-ts-ignore": "off",
+      "@typescript-eslint/ban-ts-comment": "off",
    },
 }
