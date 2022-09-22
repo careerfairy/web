@@ -10,6 +10,7 @@ import {
 } from "./middlewares/validations"
 import { array, string } from "yup"
 import { livestreamsRepo } from "./api/repositories"
+import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
 
 /*
 |--------------------------------------------------------------------------
@@ -36,19 +37,18 @@ export const getRegistrationSources = functions.https.onCall(
          data.groupId,
          data.livestreamIds,
       ]),
-      async (data, context) => {
+      async (data) => {
          const allRegisteredUsers =
             await livestreamsRepo.getRegisteredUsersMultipleEvents(
                data.livestreamIds
             )
 
-         return allRegisteredUsers
+         // remove unwanted fields to save bandwidth
+         // (smaller responses are more likely to fit in cache due to the 1MB limit)
+         const stats: RegistrationSourcesResponseItem[] =
+            allRegisteredUsers.map(RegistrationSourcesResponseItem.serialize)
+
+         return stats
       }
    )
 )
-
-/*
-|--------------------------------------------------------------------------
-| Utils
-|--------------------------------------------------------------------------
-*/
