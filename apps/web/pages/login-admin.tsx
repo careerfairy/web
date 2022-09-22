@@ -17,7 +17,7 @@ function LogInPage() {
          <HeaderLogoWrapper>
             <MainLogo sx={styles.logo} />
          </HeaderLogoWrapper>
-         <LogInForm />
+         <LogInForm signupPagePath={"/signup-admin"} />
       </PillsBackground>
    )
 }

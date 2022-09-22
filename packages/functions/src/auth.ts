@@ -76,6 +76,7 @@ export const createNewUserAccount_v4 = functions.https.onCall(
                      gender: gender,
                      fieldOfStudy,
                      levelOfStudy,
+                     isStudent: true,
                   })
                )
                .then(async () => {

@@ -420,10 +420,10 @@ function AdminSignUpUserForm() {
                         href={
                            absolutePath
                               ? {
-                                   pathname: "/login",
+                                   pathname: "/login-admin",
                                    query: { absolutePath },
                                 }
-                              : "/login"
+                              : "/login-admin"
                         }
                      >
                         <a href="#">Log in</a>

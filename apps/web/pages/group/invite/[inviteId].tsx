@@ -4,23 +4,31 @@ import useFunctionsSWR, {
 } from "../../../components/custom-hook/utils/useFunctionsSWRFetcher"
 import useSWR from "swr"
 import CircularProgress from "@mui/material/CircularProgress"
-import Box from "@mui/material/Box"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import useSnackbarNotifications from "../../../components/custom-hook/useSnackbarNotifications"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import GeneralLayout from "../../../layouts/GeneralLayout"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import Container from "@mui/material/Container"
 import { Typography } from "@mui/material"
+import Stack from "@mui/material/Stack"
+import { MainLogo } from "../../../components/logos"
+import { useRouter } from "next/router"
 
 type GroupInvitePageProps = InferGetServerSidePropsType<
    typeof getServerSideProps
 >
 const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
-   const { isLoggedIn } = useAuth()
+   const { isLoggedIn, isLoggedOut, refetchClaims } = useAuth()
+   const {
+      replace,
+      asPath,
+      pathname,
+      query: { flow },
+   } = useRouter()
    const { successNotification } = useSnackbarNotifications()
    const fetcher = useFunctionsSWR<Group>() //
-   const { data, error, isValidating } = useSWR(
+   const { error } = useSWR(
       isLoggedIn // only fetch if logged in
          ? [
               "joinGroupDashboard_v2",
@@ -33,47 +41,52 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
       {
          ...reducedRemoteCallsOptions,
          onSuccess: ({ id, universityName }) => {
-            successNotification(
-               `You have successfully joined the ${universityName} group`
-            )
-            // TODO: redirect to group admin dashboard
+            return refetchClaims().then(() =>
+               replace(`/group/${id}/admin/analytics`).then(() => {
+                  successNotification(
+                     `You have successfully joined the ${universityName} group`
+                  )
+               })
+            ) // redirect to group dashboard
          },
          suspense: false,
       }
    )
 
-   const renderView = useMemo(() => {
-      if (isValidating) {
-         return (
-            <Box
-               sx={{
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                  height: "100%",
-               }}
-            >
-               <CircularProgress />
-            </Box>
-         )
+   useEffect(() => {
+      // Check that initial route is OK
+      const flowPaths = {
+         signup: "/signup-admin",
+         login: "/login-admin",
       }
+      if (isLoggedOut) {
+         void replace({
+            pathname: flowPaths[flow as string] || "/login-admin",
+            query: { absolutePath: asPath },
+         })
+      }
+   }, [asPath, isLoggedOut, pathname, replace, flow])
+
+   const renderView = useMemo(() => {
+      // check if error is bad request
       if (error) {
          return (
-            <Typography align={"center"} variant={"h6"}>
-               {error.message}
-            </Typography>
+            <Stack spacing={2} direction="column" alignItems="center">
+               <MainLogo />
+               <Typography align={"center"} variant={"h6"}>
+                  {error.message?.replace("Error: ", "")}
+               </Typography>
+            </Stack>
          )
       }
-      if (data) {
-         return <div>Success!</div>
-      }
 
-      return <h1>Invalid invite</h1>
-   }, [isValidating, error, data])
+      return <CircularProgress />
+   }, [error])
 
    return (
       <GeneralLayout fullScreen>
          <Container
+            maxWidth={"sm"}
             sx={{
                display: "flex",
                justifyContent: "center",

@@ -478,7 +478,6 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
          })
       )
 
-      //
       const { recipientEmail, groupName, senderFirstName, groupId, role } = data
 
       // Check if the user exists in our platform, allow fail
@@ -495,7 +494,10 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
          // If the user exists and is already a member of the group, throw an error
          if (isAlreadyGroupMember) {
             logAndThrow(
-               `A member with email ${recipientEmail} is already a member of group ${groupId}`
+               `A member with email ${recipientEmail} is already a member of group`,
+               {
+                  groupId,
+               }
             )
          }
       }
@@ -659,17 +661,17 @@ export const joinGroupDashboard_v2 = functions.https.onCall(
 
          const { inviteId } = data
 
-         const invitedUserEmail = token.email
+         const currentUserEmail = token.email
 
          // fetch and validate the invite
          const { groupDashboardInvite, group } =
-            await validateGroupDashboardInvite(inviteId, invitedUserEmail)
+            await validateGroupDashboardInvite(inviteId, currentUserEmail)
 
          const groupId = groupDashboardInvite.groupId
          const role = groupDashboardInvite.role
 
          // assign the user to the group
-         await groupRepo.grantGroupAdminRole(invitedUserEmail, groupId, role)
+         await groupRepo.grantGroupAdminRole(currentUserEmail, groupId, role)
 
          // delete the invite
          await groupRepo.deleteGroupDashboardInviteById(inviteId)
@@ -705,11 +707,11 @@ export const deleteGroupAdminDashboardInvite = functions.https.onCall(
  *
  * Checks if the user is authenticated and is a CF Admin
  * @param inviteId - the ID of the invite document
- * @param invitedUserEmail - the email of the user who is accepting the invite
+ * @param currentUserEmail - the email of the user who is trying to accept the invite
  */
 export async function validateGroupDashboardInvite(
    inviteId: string,
-   invitedUserEmail: string
+   currentUserEmail: string
 ): Promise<{
    group: Group
    groupDashboardInvite: GroupDashboardInvite
@@ -724,17 +726,20 @@ export async function validateGroupDashboardInvite(
 
    const isValid = groupRepo.checkIfGroupDashboardInviteIsValid(
       groupDashboardInvite,
-      invitedUserEmail
+      currentUserEmail
    )
 
    if (!isValid) {
-      logAndThrow("Group dashboard invite is not valid", inviteId)
+      logAndThrow("This invite is not invalid", inviteId)
    }
 
    const group = await groupRepo.getGroupById(groupDashboardInvite.groupId)
 
    if (!group) {
-      logAndThrow("Group does not exist", groupDashboardInvite.groupId)
+      logAndThrow(
+         "The group from the given invite code cannot be found",
+         groupDashboardInvite.groupId
+      )
    }
 
    const isValidRole = Object.values(GROUP_DASHBOARD_ROLE).includes(
@@ -745,11 +750,11 @@ export async function validateGroupDashboardInvite(
       logAndThrow("Invalid role", groupDashboardInvite.role)
    }
 
-   const isValidEmail = groupDashboardInvite.invitedEmail === invitedUserEmail
+   const isValidEmail = groupDashboardInvite.invitedEmail === currentUserEmail
 
    if (!isValidEmail) {
       logAndThrow(
-         "Invited email does not match the email of the user accepting the invite",
+         `Your email ${currentUserEmail} is different from the invited Personal Account's email. Please use the proper Personal Account to log in or create one using the proper email.`,
          groupDashboardInvite.invitedEmail
       )
    }
@@ -769,5 +774,5 @@ const checkIfAuthUserHasGroupAdminRole = (
    customClaims: { [p: string]: any },
    groupId: string
 ) => {
-   return Boolean(customClaims?.groupAdmins?.[groupId])
+   return Boolean(customClaims?.adminGroups?.[groupId])
 }

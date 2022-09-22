@@ -58,7 +58,7 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
 
    checkIfGroupDashboardInviteIsValid(
       groupDashboardInvite: GroupDashboardInvite,
-      invitedUserEmail: string
+      currentUserEmail: string
    ): boolean
 }
 
@@ -114,7 +114,7 @@ export class GroupFunctionsRepository
 
       const currentAdmins = (await this.getGroupAdmins(groupId)) || []
 
-      // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER AT THE END OF THIS OPERATION
+      // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER FOR EVERY GROUP AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
          await this.checkIfThereWillBeAtLeastOneOwner(
             groupId,
@@ -132,8 +132,8 @@ export class GroupFunctionsRepository
       const oldClaims = { ...user.customClaims } || {}
 
       await admin.auth().setCustomUserClaims(user.uid, {
-         groupAdmins: {
-            ...oldClaims.groupAdmins,
+         adminGroups: {
+            ...oldClaims.adminGroups,
             [groupId]: {
                role: newRole,
             },
@@ -226,13 +226,13 @@ export class GroupFunctionsRepository
 
    checkIfGroupDashboardInviteIsValid(
       groupDashboardInvite: GroupDashboardInvite,
-      invitedUserEmail: string
+      currentUserEmail: string
    ): boolean {
       return Boolean(
          groupDashboardInvite.invitedEmail &&
             groupDashboardInvite.groupId &&
             groupDashboardInvite.role &&
-            invitedUserEmail
+            currentUserEmail
       )
    }
 }

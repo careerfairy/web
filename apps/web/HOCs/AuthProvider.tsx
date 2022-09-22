@@ -17,6 +17,7 @@ import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
+import { GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/dist/groups"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -29,7 +30,13 @@ type DefaultContext = {
    userPresenter?: UserPresenter
    userStats?: UserStats
    isLoggedIn: boolean
-   fetchClaims: () => Promise<{ [p: string]: any }>
+   adminGroups?: Record<
+      string,
+      {
+         role: GROUP_DASHBOARD_ROLE
+      }
+   >
+   refetchClaims: () => Promise<void>
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
@@ -38,7 +45,8 @@ const AuthContext = createContext<DefaultContext>({
    isLoggedIn: undefined,
    userPresenter: undefined,
    userStats: undefined,
-   fetchClaims: () => Promise.resolve({}),
+   adminGroups: undefined,
+   refetchClaims: () => Promise.resolve(),
 })
 
 /**
@@ -58,18 +66,17 @@ const securePaths = [
    "/group/[groupId]/admin/ats-integration",
    "/new-livestream",
    "/group/create",
-   "/group/invite/[inviteId]",
 ]
 
 const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
-   console.log("-> auth", auth)
+
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()
    const [claims, setClaims] = useState(null)
-   console.log("-> claims", claims)
+
    const query = useMemo(
       () =>
          auth.email
@@ -155,12 +162,12 @@ const AuthProvider = ({ children }) => {
       }
    }, [userData])
 
-   const fetchClaims = useCallback(async () => {
+   const refetchClaims = useCallback(async () => {
       if (!firebaseService.auth.currentUser) return null
       const token = await firebaseService.auth.currentUser.getIdTokenResult(
          true
       )
-      return token.claims
+      setClaims(token.claims || null)
    }, [firebaseService.auth.currentUser])
 
    useEffect(() => {
@@ -180,11 +187,11 @@ const AuthProvider = ({ children }) => {
 
       if (isTokenStale) {
          // if token is expired or stale, refresh it
-         fetchClaims().then(setClaims)
+         void refetchClaims()
       }
    }, [
       auth.stsTokenManager?.expirationTime,
-      fetchClaims,
+      refetchClaims,
       prevUserData,
       userData,
       userData?.refreshTokenTime,
@@ -196,6 +203,7 @@ const AuthProvider = ({ children }) => {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
             const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
+
             setClaims(tokenResult.claims)
 
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
@@ -213,9 +221,18 @@ const AuthProvider = ({ children }) => {
          isLoggedIn,
          userPresenter: userData ? new UserPresenter(userData) : undefined,
          userStats: userStats,
-         fetchClaims,
+         adminGroups: claims?.adminGroups || {},
+         refetchClaims,
       }),
-      [auth, isLoggedIn, isLoggedOut, fetchClaims, userData, userStats]
+      [
+         auth,
+         claims?.adminGroups,
+         isLoggedIn,
+         isLoggedOut,
+         userData,
+         userStats,
+         refetchClaims,
+      ]
    )
 
    const isSecurePath = () => {
