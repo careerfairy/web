@@ -15,6 +15,8 @@ import { userRepo } from "../data/RepositoryInstances"
 import GenericStepper from "../components/views/common/GenericStepper"
 import AdminSignUpUserForm from "../components/views/admin-signup/steps/AdminSignUpUserForm"
 import AdminSignUpPinForm from "../components/views/admin-signup/steps/AdminSignUpPinForm"
+import { SIGNUP_REDIRECT_PATH } from "./signup"
+import { useRouter } from "next/router"
 
 const steps: MultiStepComponentType[] = [
    {
@@ -32,7 +34,10 @@ const steps: MultiStepComponentType[] = [
 const SignUp = () => {
    const { authenticatedUser: user, userData } = useAuth()
    const firebase = useFirebaseService()
-
+   const {
+      push,
+      query: { absolutePath },
+   } = useRouter()
    const [isLoadingRedirectPage, setIsLoadingRedirectPage] = useState(false)
    const [currentStep, setCurrentStep] = useState(0)
    const isLastStep = currentStep === steps.length - 1
@@ -43,7 +48,7 @@ const SignUp = () => {
 
    useEffect(() => {
       if (userData && currentStep === 0) {
-         setCurrentStep(2)
+         setCurrentStep(1)
       }
    }, [userData, currentStep])
 
@@ -93,7 +98,11 @@ const SignUp = () => {
          // set a loading state in the Finalise button, the next page may take some seconds to render
          setIsLoadingRedirectPage(true)
 
-         // TODO: redirect to the the group Admin page
+         if (absolutePath) {
+            void push(absolutePath as any)
+         } else {
+            void push(SIGNUP_REDIRECT_PATH)
+         }
       } else {
          setCurrentStep((prev) => prev + 1)
       }

@@ -1,4 +1,4 @@
-import React, { Fragment, useContext, useState } from "react"
+import React, { Fragment, useState } from "react"
 import { Formik } from "formik"
 import {
    Box,
@@ -14,10 +14,7 @@ import {
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import {
-   IMultiStepContext,
-   MultiStepContext,
-} from "../../common/MultiStepWrapper"
+import { useRouter } from "next/router"
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -31,11 +28,14 @@ const schema = yup.object().shape({
 
 const AdminSignUpPinForm = () => {
    const firebase = useFirebaseService()
+   const {
+      query: { absolutePath },
+   } = useRouter()
    const [errorMessageShown] = useState(false)
    const [incorrectPin, setIncorrectPin] = useState(false)
    const [generalLoading, setGeneralLoading] = useState(false)
    const { authenticatedUser: user } = useAuth()
-   const { nextStep } = useContext<IMultiStepContext>(MultiStepContext)
+   const { push } = useRouter()
 
    async function resendVerificationEmail() {
       setGeneralLoading(true)
@@ -52,12 +52,6 @@ const AdminSignUpPinForm = () => {
       }
    }
 
-   const updateActiveStep = () => {
-      setTimeout(() => {
-         nextStep()
-      }, 500)
-   }
-
    const handleSubmit = async (values, { setSubmitting }) => {
       setIncorrectPin(false)
       const userInfo = {
@@ -66,8 +60,8 @@ const AdminSignUpPinForm = () => {
       }
       try {
          await firebase.validateUserEmailWithPin(userInfo)
-         updateActiveStep()
          await firebase.auth.currentUser.reload()
+         return push((absolutePath as string) || "/") // Once the user is verified, redirect them to the validation page
       } catch (error) {
          console.log("error", error)
          setIncorrectPin(true)

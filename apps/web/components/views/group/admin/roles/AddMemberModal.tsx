@@ -11,7 +11,7 @@ import {
    Slide,
    TextField,
 } from "@mui/material"
-import { Formik } from "formik"
+import { Formik, FormikHelpers } from "formik"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import {
@@ -53,7 +53,10 @@ const AddMemberModal = ({
       }
    }
 
-   const handleSubmit = async (values, { resetForm }) => {
+   const handleSubmit = async (
+      values,
+      { resetForm, setFieldError }: FormikHelpers<AddMemberModalProps>
+   ) => {
       try {
          let successMessage = `An invitation email has been sent to ${values.email}`
 
@@ -66,10 +69,10 @@ const AddMemberModal = ({
          })
 
          successNotification(successMessage)
+         handleClose(resetForm)
       } catch (error) {
-         errorNotification(error)
+         setFieldError("email", error.message)
       }
-      handleClose(resetForm)
    }
 
    return (
@@ -88,87 +91,83 @@ const AddMemberModal = ({
             resetForm,
             dirty,
             /* and other goodies */
-         }) => {
-            console.log("-> values", values)
-
-            return (
-               <GlassDialog
-                  TransitionComponent={Slide}
-                  onClose={() => handleClose(resetForm)}
-                  open={open}
-               >
-                  <form onSubmit={handleSubmit}>
-                     <DialogTitle>Invite Member</DialogTitle>
-                     <DialogContent>
-                        <DialogContentText
-                           sx={{
-                              mb: 2,
-                           }}
-                        >
-                           Please provide an email that you would like to invite
-                        </DialogContentText>
-                        <Grid container spacing={1}>
-                           <Grid item xs={12} sm={8}>
-                              <TextField
-                                 fullWidth
-                                 helperText={errors.email}
-                                 label="Email"
-                                 autoFocus
-                                 autoComplete="email"
-                                 disabled={isSubmitting}
-                                 name="email"
-                                 onChange={handleChange}
-                                 required
-                                 error={Boolean(errors.email)}
-                                 value={values.email}
-                              />
-                           </Grid>
-                           <Grid item xs={12} sm={4}>
-                              <TextField
-                                 id="role-select"
-                                 select
-                                 label="Choose a role"
-                                 value={values.role}
-                                 name="role"
-                                 onChange={handleChange}
-                                 helperText="Please select a role"
-                              >
-                                 {Object.values(GROUP_DASHBOARD_ROLE).map(
-                                    (role) => (
-                                       <MenuItem key={role} value={role}>
-                                          {role}
-                                       </MenuItem>
-                                    )
-                                 )}
-                              </TextField>
-                           </Grid>
+         }) => (
+            <GlassDialog
+               TransitionComponent={Slide}
+               onClose={() => handleClose(resetForm)}
+               open={open}
+            >
+               <form onSubmit={handleSubmit}>
+                  <DialogTitle>Invite Member</DialogTitle>
+                  <DialogContent>
+                     <DialogContentText
+                        sx={{
+                           mb: 2,
+                        }}
+                     >
+                        Please provide an email that you would like to invite
+                     </DialogContentText>
+                     <Grid container spacing={1}>
+                        <Grid item xs={12} sm={8}>
+                           <TextField
+                              fullWidth
+                              helperText={errors.email}
+                              label="Email"
+                              autoFocus
+                              autoComplete="email"
+                              disabled={isSubmitting}
+                              name="email"
+                              onChange={handleChange}
+                              required
+                              error={Boolean(errors.email)}
+                              value={values.email}
+                           />
                         </Grid>
-                     </DialogContent>
-                     <DialogActions>
-                        <Button
-                           color="grey"
-                           onClick={() => handleClose(resetForm)}
-                        >
-                           Cancel
-                        </Button>
-                        <Button
-                           variant="contained"
-                           type="submit"
-                           endIcon={
-                              isSubmitting && (
-                                 <CircularProgress size={20} color="inherit" />
-                              )
-                           }
-                           disabled={!dirty || isSubmitting}
-                           color="primary"
-                        >
-                           {!isSubmitting && "Send Invite"}
-                        </Button>
-                     </DialogActions>
-                  </form>
-               </GlassDialog>
-            )
-         }}
+                        <Grid item xs={12} sm={4}>
+                           <TextField
+                              id="role-select"
+                              select
+                              label="Choose a role"
+                              value={values.role}
+                              name="role"
+                              onChange={handleChange}
+                              helperText="Please select a role"
+                           >
+                              {Object.values(GROUP_DASHBOARD_ROLE).map(
+                                 (role) => (
+                                    <MenuItem key={role} value={role}>
+                                       {role}
+                                    </MenuItem>
+                                 )
+                              )}
+                           </TextField>
+                        </Grid>
+                     </Grid>
+                  </DialogContent>
+                  <DialogActions>
+                     <Button
+                        color="grey"
+                        onClick={() => handleClose(resetForm)}
+                     >
+                        Cancel
+                     </Button>
+                     <Button
+                        variant="contained"
+                        type="submit"
+                        endIcon={
+                           isSubmitting && (
+                              <CircularProgress size={20} color="inherit" />
+                           )
+                        }
+                        disabled={!dirty || isSubmitting}
+                        color="primary"
+                     >
+                        {!isSubmitting && "Send Invite"}
+                     </Button>
+                  </DialogActions>
+               </form>
+            </GlassDialog>
+         )}
       </Formik>
    )
 }
