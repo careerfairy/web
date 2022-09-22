@@ -153,26 +153,30 @@ const Chart = ({ stats }: Props) => {
       }
    }, [theme])
 
-   const data = {
-      labels: Object.keys(stats),
-      datasets: [],
-   }
+   const data = useMemo(() => {
+      const tmp = {
+         labels: Object.keys(stats),
+         datasets: [],
+      }
 
-   for (let entry of stats) {
-      data.datasets.push({
-         label: entry.source.displayName,
-         pointBackgroundColor: entry.source.color,
-         borderColor: entry.source.color,
-         fill: false,
-         borderWidth: 2,
-         data: rollupByDay(
-            entry.dates.map((date) => ({
-               x: date,
-               y: 1,
-            }))
-         ),
-      })
-   }
+      for (let entry of stats) {
+         tmp.datasets.push({
+            label: entry.source.displayName,
+            pointBackgroundColor: entry.source.color,
+            borderColor: entry.source.color,
+            fill: false,
+            borderWidth: 2,
+            data: rollupByDay(
+               entry.dates.map((date) => ({
+                  x: date,
+                  y: 1,
+               }))
+            ),
+         })
+      }
+
+      return tmp
+   }, [stats])
 
    return <Line data={data} options={chartOptions} />
 }
