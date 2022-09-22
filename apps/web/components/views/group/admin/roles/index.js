@@ -144,7 +144,6 @@ const RolesOverview = ({ firebase, group }) => {
                   areYouSureModalMessage={getAreYouSureModalMessage()}
                   loading={kicking || promoting}
                   openAddMemberModal={openAddMemberModal}
-                  group={group}
                />
             </Grid>
          </Grid>

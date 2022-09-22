@@ -147,6 +147,9 @@ export interface UserGroupData extends Identifiable {
 // careerCenterData/[groupId]/admins/[adminEmail]
 export interface GroupAdmin extends Identifiable {
    role: GROUP_DASHBOARD_ROLE
+   firstName: string
+   lastName: string
+   email: string
 }
 
 export enum GROUP_DASHBOARD_ROLE {
