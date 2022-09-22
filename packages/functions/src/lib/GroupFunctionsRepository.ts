@@ -112,12 +112,15 @@ export class GroupFunctionsRepository
       // Get the auth user
       const user = await admin.auth().getUserByEmail(targetEmail)
 
+      const currentAdmins = (await this.getGroupAdmins(groupId)) || []
+
       // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
          await this.checkIfThereWillBeAtLeastOneOwner(
             groupId,
             newRole,
-            targetEmail
+            targetEmail,
+            currentAdmins
          )
 
       if (!thereWillBeAtLeastOneOwner) {
@@ -125,6 +128,7 @@ export class GroupFunctionsRepository
             "Cannot remove the last owner of the group. There must be at least one owner."
          )
       }
+
       const oldClaims = { ...user.customClaims } || {}
 
       await admin.auth().setCustomUserClaims(user.uid, {
@@ -162,11 +166,9 @@ export class GroupFunctionsRepository
    async checkIfThereWillBeAtLeastOneOwner(
       groupId: string,
       newRole: GROUP_DASHBOARD_ROLE,
-      userEmail: string
+      userEmail: string,
+      currentAdmins: GroupAdmin[]
    ) {
-      // get the current Admins of the group
-      const currentAdmins = (await this.getGroupAdmins(groupId)) || []
-
       const potentialNewAdmins: GroupAdmin[] = [
          ...currentAdmins.filter((admin) => admin.id !== userEmail),
          // add the new admin to the list of current admins if it's not already there
