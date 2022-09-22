@@ -54,9 +54,11 @@ const Title = ({
    handleOpenStreamFilterModal,
    streamFilterModalOpen,
 }) => {
-   const hasStreamsToFilter = useSelector((state) =>
-      Boolean(state.analyticsReducer.streams.fromTimeframeAndFuture.length > 1)
+   const hasStreamsToFilterLength = useSelector(
+      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture.length
    )
+
+   const hasStreamsToFilter = hasStreamsToFilterLength > 0
 
    const hiddenStreamIds = useSelector(
       (state) => state.analyticsReducer.hiddenStreamIds
@@ -232,7 +234,7 @@ const Title = ({
                               ? `${noOfVisibleStreamIds} event${
                                    noOfVisibleStreamIds > 1 ? "s" : ""
                                 } selected`
-                              : "Filter Events"}
+                              : `Filter Events (${hasStreamsToFilterLength})`}
                         </Button>
                      </span>
                   </Tooltip>
