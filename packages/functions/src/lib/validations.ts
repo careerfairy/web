@@ -2,6 +2,8 @@ import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
 import { groupRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 /**
  * Validate the data object argument in a function call
@@ -37,18 +39,29 @@ export function validateUserAuthExists(
 
 /**
  * Validate the user is a group admin when calling a function
+ *
+ * If the user is group admin, the group object will be returned
+ *
+ * If the user is CF Admin, the userData will be returned
+ *
  * @param groupId
  * @param email
  */
-export async function validateUserIsGroupAdmin(groupId: string, email: string) {
+export async function validateUserIsGroupAdmin(
+   groupId: string,
+   email: string
+): Promise<{ group?: Group; userData?: UserData }> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
    if (!response.isAdmin) {
       try {
          // check if user is CF admin, will throw if not
-         await validateUserIsCFAdmin(email)
+         const userData = await validateUserIsCFAdmin(email)
 
-         return response
+         return {
+            ...response,
+            userData,
+         }
       } catch (e) {
          logAndThrow("The user is not a group admin", groupId, email)
       }
