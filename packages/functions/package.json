@@ -18,7 +18,7 @@
       "@careerfairy/shared-lib": "../shared-lib"
    },
    "dependencies": {
-      "@careerfairy/shared-lib": "file:./.packages/shared-lib",
+      "@careerfairy/shared-lib": "*",
       "@google-cloud/bigquery": "^6.0.2",
       "agora-access-token": "^2.0.4",
       "algoliasearch": "^4.12.1",

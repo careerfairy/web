@@ -151,7 +151,7 @@ const createCacheEntry = async (
    const ttlMs = ttlSeconds * 1000
 
    const serializedValue = JSON.stringify(value)
-   const compressedBuffer = await compress(new Buffer(serializedValue))
+   const compressedBuffer = await compress(Buffer.from(serializedValue))
 
    return {
       key: cacheKey.hashed,

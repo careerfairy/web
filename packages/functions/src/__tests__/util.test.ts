@@ -12,7 +12,7 @@ test("SHA1 should be deterministic and match other sources", async () => {
 
 test("compress string should work", async () => {
    const toCompress = "this string will be compressed"
-   const buffer = new Buffer(toCompress)
+   const buffer = Buffer.from(toCompress)
 
    const compressed = await compress(buffer)
    const decompressed = await decompress(compressed)
