@@ -67,7 +67,12 @@ const CompleteGroup = ({
 
    const handleFinalize = async () => {
       setSubmitting(true)
-      await createCareerCenter()
+      try {
+         await createCareerCenter()
+      } catch (e) {
+         console.error(e)
+      }
+      setSubmitting(false)
    }
 
    return (

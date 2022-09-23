@@ -36,6 +36,9 @@ const useStyles = makeStyles((theme) => ({
    card: {
       flex: 1,
    },
+   actions: {
+      justifyContent: "center",
+   },
 }))
 
 const CurrentGroup = ({
@@ -203,29 +206,23 @@ const CurrentGroup = ({
                   >
                      <MoreVertIcon />
                   </IconButton>
-                  <CardActions>
+                  <CardActions className={classes.actions}>
                      {!isAdmin && (
                         <Link href={`/next-livestreams/${localGroup.groupId}`}>
-                           <Button
-                              component="a"
-                              fullWidth
-                              size="large"
-                              color="primary"
-                           >
-                              View Calendar
-                           </Button>
+                           <a>
+                              <Button fullWidth size="large" color="primary">
+                                 View Calendar
+                              </Button>
+                           </a>
                         </Link>
                      )}
                      {isAdmin && (
                         <Link href={`/group/${localGroup.id}/admin`}>
-                           <Button
-                              component="a"
-                              fullWidth
-                              size="large"
-                              color="primary"
-                           >
-                              View Admin Page
-                           </Button>
+                           <a>
+                              <Button fullWidth size="large" color="primary">
+                                 View Admin Page
+                              </Button>
+                           </a>
                         </Link>
                      )}
                      <Menu

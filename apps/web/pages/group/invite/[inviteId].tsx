@@ -14,18 +14,21 @@ import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import { MainLogo } from "../../../components/logos"
 import { useRouter } from "next/router"
+import { WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import Button from "@mui/material/Button"
 
 type GroupInvitePageProps = InferGetServerSidePropsType<
    typeof getServerSideProps
 >
 const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
-   const { isLoggedIn, isLoggedOut, refetchClaims } = useAuth()
+   const { isLoggedIn, isLoggedOut, refetchClaims, signOut } = useAuth()
    const {
       replace,
       asPath,
       pathname,
       query: { flow },
    } = useRouter()
+
    const { successNotification } = useSnackbarNotifications()
    const fetcher = useFunctionsSWR<Group>() //
    const { error } = useSWR(
@@ -76,12 +79,19 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
                <Typography align={"center"} variant={"h6"}>
                   {error.message?.replace("Error: ", "")}
                </Typography>
+               {error.message?.includes(
+                  WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE
+               ) && (
+                  <Button onClick={signOut}>
+                     Logout and login with the correct email
+                  </Button>
+               )}
             </Stack>
          )
       }
 
       return <CircularProgress />
-   }, [error])
+   }, [error, signOut])
 
    return (
       <GeneralLayout fullScreen>

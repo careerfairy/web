@@ -40,7 +40,7 @@ const AddMemberModal = ({
    onClose,
    group,
 }: AddMemberModalProps) => {
-   const { successNotification, errorNotification } = useSnackbarNotifications()
+   const { successNotification } = useSnackbarNotifications()
 
    const { sendGroupAdminInviteEmail } = useFirebaseService()
 

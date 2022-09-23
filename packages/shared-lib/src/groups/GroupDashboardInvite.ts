@@ -16,3 +16,6 @@ export interface GroupDashboardInvite extends Identifiable {
    invitedEmail: string
    role: GROUP_DASHBOARD_ROLE
 }
+
+export const WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE =
+   "Your email is different from the invited Personal Account's email. Please use the proper Personal Account to log in or create one using the proper email."

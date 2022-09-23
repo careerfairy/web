@@ -16,17 +16,15 @@ import { v4 as uuidv4 } from "uuid"
 
 import { Container, Step, StepLabel, Stepper } from "@mui/material"
 import { useSnackbar } from "notistack"
-import { GENERAL_ERROR } from "../../components/util/constants"
 import {
    Group,
    GroupQuestion,
    sortGroupQuestionOptionsByName,
 } from "@careerfairy/shared-lib/dist/groups"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import { useDispatch } from "react-redux"
-import * as actions from "../../store/actions"
-import { fieldOfStudyRepo, groupRepo } from "../../data/RepositoryInstances"
+import { fieldOfStudyRepo } from "../../data/RepositoryInstances"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 
 function getSteps() {
    return [
@@ -37,7 +35,6 @@ function getSteps() {
 }
 
 export type BaseGroupInfo = {
-   adminEmails?: string[]
    logoUrl?: string
    logoFileObj?: File
    description?: string
@@ -48,9 +45,8 @@ export type BaseGroupInfo = {
 }
 const CreateGroup = () => {
    const firebase = useFirebaseService()
-   const dispatch = useDispatch()
+   const { successNotification, errorNotification } = useSnackbarNotifications()
    const router = useRouter()
-   const { enqueueSnackbar } = useSnackbar()
    const [activeStep, setActiveStep] = useState(0)
    const [baseGroupInfo, setBaseGroupInfo] = useState<BaseGroupInfo>({})
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
@@ -97,13 +93,9 @@ const CreateGroup = () => {
          ]
          setGroupQuestions(initialCategories)
       } catch (e) {
-         sendError(e)
+         errorNotification(e)
       }
       setLoadingDefaultQuestions(false)
-   }
-
-   const sendError = (error: any) => {
-      dispatch(actions.sendGeneralError(error))
    }
 
    const createGroupQuestionFromUserInfoCollection = (
@@ -189,7 +181,6 @@ const CreateGroup = () => {
          const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
          const careerCenter: Omit<Group, "id" | "groupId"> = {
             universityName: baseGroupInfo.universityName,
-            adminEmails: baseGroupInfo.adminEmails,
             logoUrl: downloadURL,
             description: baseGroupInfo.description,
             test: false,
@@ -197,26 +188,20 @@ const CreateGroup = () => {
                universityCode: baseGroupInfo.university.id,
             }),
          }
-         const ref = await groupRepo.createGroup(
-            careerCenter,
+         const { data } = await firebase.createGroup({
+            group: careerCenter,
             groupQuestions,
-            user.email
-         )
-         await router.push(`/group/${ref.id}/admin`)
-         enqueueSnackbar(
-            `Congrats! Your group ${baseGroupInfo.universityName} has now been created`,
-            {
-               variant: "success",
-               preventDuplicate: true,
-            }
-         )
-      } catch (e) {
-         console.log("error in creating group", e)
-         enqueueSnackbar(GENERAL_ERROR, {
-            variant: "error",
-            preventDuplicate: true,
          })
+         const id = data.id
+         return await router.push(`/group/${id}/admin`).then(() => {
+            successNotification(
+               `Congrats! Your group ${baseGroupInfo.universityName} has now been created`
+            )
+         })
+      } catch (e) {
+         errorNotification(e)
       }
+      return
    }
 
    const handleSkipNext = () =>

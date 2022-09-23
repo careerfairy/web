@@ -56,10 +56,12 @@ exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
-exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
 exports.joinGroupDashboard_v2 = groupAdmin.joinGroupDashboard_v2
 exports.deleteGroupAdminDashboardInvite =
    groupAdmin.deleteGroupAdminDashboardInvite
+exports.createGroup = groupAdmin.createGroup
+exports.changeRole = groupAdmin.changeRole
+exports.kickFromDashboard = groupAdmin.kickFromDashboard
 
 // Reminders
 exports.sendReminderEmailToRegistrants =

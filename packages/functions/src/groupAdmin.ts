@@ -17,7 +17,6 @@ import {
 } from "./api/repositories"
 
 import {
-   getArrayDifference,
    getDateString,
    getRatingsAverage,
    makeRequestingGroupIdFirst,
@@ -32,10 +31,14 @@ import {
    validateUserAuthExists,
    validateUserIsGroupAdminOwnerRole,
 } from "./lib/validations"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { mixed, object, string } from "yup"
+import {
+   GroupDashboardInvite,
+   WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
+} from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import { array, boolean, mixed, object, string } from "yup"
 import { auth } from "firebase-admin"
 import functions = require("firebase-functions")
+import UserRecord = auth.UserRecord
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -487,7 +490,7 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
 
       if (authUser) {
          const isAlreadyGroupMember = checkIfAuthUserHasGroupAdminRole(
-            authUser.customClaims,
+            authUser,
             groupId
          )
 
@@ -510,11 +513,11 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
          role
       )
 
-      const inviteLink = buildInviteLink(
-         newInvite.id,
-         context.rawRequest.headers.origin,
-         authUser ? "login" : "signup"
-      )
+      const inviteLink = buildInviteLink({
+         inviteId: newInvite.id,
+         origin: context.rawRequest.headers.origin,
+         onBoardingFlow: authUser ? "login" : "signup",
+      })
 
       const email = {
          TemplateId: process.env.POSTMARK_TEMPLATE_GROUP_ADMIN_INVITATION,
@@ -531,128 +534,6 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
    })
 )
 
-export const updateUserDocAdminStatus = functions.firestore
-   .document("careerCenterData/{careerCenter}")
-   .onUpdate(async (change) => {
-      try {
-         const careerCenterAfter = change.after.data()
-         const careerCenterBefore = change.before.data()
-         const newAdmins = getArrayDifference(
-            careerCenterBefore.adminEmails,
-            careerCenterAfter.adminEmails
-         )
-         const oldAdmins = getArrayDifference(
-            careerCenterAfter.adminEmails,
-            careerCenterBefore.adminEmails
-         )
-
-         if (newAdmins.length === 0 && oldAdmins.length === 0) {
-            functions.logger.info("No new admin has been added or removed")
-            return
-         }
-
-         for (const adminEmail of newAdmins) {
-            await admin
-               .firestore()
-               .collection("userData")
-               .doc(adminEmail)
-               .update({
-                  adminIds: admin.firestore.FieldValue.arrayUnion(
-                     careerCenterAfter.groupId
-                  ),
-               })
-            functions.logger.info(
-               `New group ${careerCenterAfter.groupId} has been added to user admin ${adminEmail}`
-            )
-         }
-
-         for (const adminEmail of oldAdmins) {
-            await admin
-               .firestore()
-               .collection("userData")
-               .doc(adminEmail)
-               .update({
-                  adminIds: admin.firestore.FieldValue.arrayRemove(
-                     careerCenterAfter.groupId
-                  ),
-               })
-            functions.logger.info(
-               `New group ${careerCenterAfter.groupId} has been removed from user admin ${adminEmail}`
-            )
-         }
-      } catch (error) {
-         functions.logger.error("failed to update admin email doc:", error)
-      }
-   })
-
-// export const joinGroupDashboard = functions.https.onCall(
-//    async (data, context) => {
-//       const authEmail = context.auth.token.email || null
-//
-//       if (!authEmail || authEmail !== data.userEmail) {
-//          throw new functions.https.HttpsError(
-//             "permission-denied",
-//             "Unauthorized"
-//          )
-//       }
-//
-//       const groupRef = admin
-//          .firestore()
-//          .collection("careerCenterData")
-//          .doc(data.groupId)
-//
-//       const userRef = admin
-//          .firestore()
-//          .collection("userData")
-//          .doc(data.userEmail)
-//
-//       const notificationRef = admin
-//          .firestore()
-//          .collection("notifications")
-//          .doc(data.invitationId)
-//
-//       const notificationDoc = await notificationRef.get()
-//       const notification = notificationDoc.data()
-//
-//       if (
-//          notification.details.requester !== data.groupId ||
-//          notification.details.receiver !== data.userEmail
-//       ) {
-//          functions.logger.error(
-//             `User ${data.userEmail} trying to connect to group ${data.groupId} did not pass the notification check ${notification.details}`
-//          )
-//          throw new functions.https.HttpsError(
-//             "permission-denied",
-//             "Unauthorized"
-//          )
-//       }
-//
-//       await admin.firestore().runTransaction((transaction) => {
-//          return transaction.get(userRef).then(() => {
-//             transaction.update(groupRef, {
-//                adminEmails: admin.firestore.FieldValue.arrayUnion(
-//                   data.userEmail
-//                ),
-//             })
-//             transaction.update(userRef, {
-//                adminIds: admin.firestore.FieldValue.arrayUnion(data.groupId),
-//             })
-//             const groupAdminRef = admin
-//                .firestore()
-//                .collection("careerCenterData")
-//                .doc(data.groupId)
-//                .collection("admins")
-//                .doc(data.userEmail)
-//             transaction.set(groupAdminRef, {
-//                role: "subAdmin",
-//             })
-//
-//             transaction.delete(notificationRef)
-//          })
-//       })
-//    }
-// )
-
 export const joinGroupDashboard_v2 = functions.https.onCall(
    async (data, context) => {
       let response: Group = null
@@ -664,14 +545,16 @@ export const joinGroupDashboard_v2 = functions.https.onCall(
          const currentUserEmail = token.email
 
          // fetch and validate the invite
-         const { groupDashboardInvite, group } =
+         const { groupDashboardInvite, group, isAlreadyGroupMember } =
             await validateGroupDashboardInvite(inviteId, currentUserEmail)
 
-         const groupId = groupDashboardInvite.groupId
-         const role = groupDashboardInvite.role
+         if (!isAlreadyGroupMember) {
+            // If the user is not already a member of the group, add them to the group
+            const role = groupDashboardInvite.role
 
-         // assign the user to the group
-         await groupRepo.grantGroupAdminRole(currentUserEmail, groupId, role)
+            // Make the user an admin of the group
+            await groupRepo.setAdminRole(currentUserEmail, group, role)
+         }
 
          // delete the invite
          await groupRepo.deleteGroupDashboardInviteById(inviteId)
@@ -681,6 +564,93 @@ export const joinGroupDashboard_v2 = functions.https.onCall(
          logAndThrow(e)
       }
       return response // return the group id so the client can redirect to the group dashboard
+   }
+)
+
+export const createGroup = functions.https.onCall(async (data, context) => {
+   let newGroup: Group = null
+   try {
+      const token = await validateUserAuthExists(context)
+      await validateData(
+         data,
+         object({
+            group: object({
+               universityName: string().required(),
+               logoUrl: string().required(),
+               description: string().required(),
+               universityCode: string().optional(),
+            }),
+            groupQuestions: array().of(
+               object({
+                  name: string().required(),
+                  hidden: boolean().optional(),
+                  questionType: string()
+                     .oneOf(["levelOfStudy", "fieldOfStudy", "custom"])
+                     .required(),
+                  options: object().optional(), // Yup has no support for validating dictionaries
+               })
+            ),
+         })
+      )
+      const { group, groupQuestions } = data
+      newGroup = await groupRepo.createGroup(group, token.email, groupQuestions)
+   } catch (e) {
+      logAndThrow(e)
+   }
+   return newGroup
+})
+
+export const changeRole = functions.https.onCall(async (data, context) => {
+   try {
+      await validateData(
+         data,
+         object({
+            groupId: string().required(),
+            email: string().email().required(),
+            newRole: string()
+               .oneOf(Object.values(GROUP_DASHBOARD_ROLE))
+               .required(),
+         })
+      )
+      const { groupId, email, newRole } = data
+
+      const { group } = await validateUserIsGroupAdminOwnerRole(
+         context.auth.token.email,
+         groupId
+      )
+
+      await groupRepo.setAdminRole(email, group, newRole)
+   } catch (e) {
+      logAndThrow(e)
+   }
+   return null
+})
+
+/*
+ * Keep the kick and change role functions separate, to avoid the wrong user being kicked
+ * */
+export const kickFromDashboard = functions.https.onCall(
+   async (data, context) => {
+      try {
+         await validateData(
+            data,
+            object({
+               groupId: string().required(),
+               email: string().email().required(),
+            })
+         )
+         const { groupId, email } = data
+
+         const { group } = await validateUserIsGroupAdminOwnerRole(
+            context.auth.token.email,
+            groupId
+         )
+
+         await groupRepo.setAdminRole(email, group, null)
+      } catch (e) {
+         logAndThrow(e)
+      }
+      return null
    }
 )
 
@@ -698,7 +668,7 @@ export const deleteGroupAdminDashboardInvite = functions.https.onCall(
       } catch (e) {
          logAndThrow(e)
       }
-      return true
+      return null
    }
 )
 
@@ -715,6 +685,7 @@ export async function validateGroupDashboardInvite(
 ): Promise<{
    group: Group
    groupDashboardInvite: GroupDashboardInvite
+   isAlreadyGroupMember: boolean
 }> {
    const groupDashboardInvite = await groupRepo.getGroupDashboardInviteById(
       inviteId
@@ -734,6 +705,19 @@ export async function validateGroupDashboardInvite(
    }
 
    const group = await groupRepo.getGroupById(groupDashboardInvite.groupId)
+   const authUser = await admin.auth().getUserByEmail(currentUserEmail)
+
+   const isAlreadyGroupMember = checkIfAuthUserHasGroupAdminRole(
+      authUser,
+      group.id
+   )
+
+   if (isAlreadyGroupMember) {
+      functions.logger.warn("You are already a member of this group", {
+         group,
+         authUser,
+      })
+   }
 
    if (!group) {
       logAndThrow(
@@ -754,25 +738,26 @@ export async function validateGroupDashboardInvite(
 
    if (!isValidEmail) {
       logAndThrow(
-         `Your email ${currentUserEmail} is different from the invited Personal Account's email. Please use the proper Personal Account to log in or create one using the proper email.`,
+         WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
          groupDashboardInvite.invitedEmail
       )
    }
 
-   return { group, groupDashboardInvite }
+   return { group, groupDashboardInvite, isAlreadyGroupMember }
 }
 
-const buildInviteLink = (
-   inviteId: string,
-   baseUrl: string,
+type InviteLinkOptions = {
+   inviteId: string
+   origin: string
    onBoardingFlow: "login" | "signup"
-) => {
-   return `${baseUrl}/group/invite/${inviteId}?flow=${onBoardingFlow}`
+}
+const buildInviteLink = (args: InviteLinkOptions) => {
+   return `${args.origin}/group/invite/${args.inviteId}?flow=${args.onBoardingFlow}`
 }
 
 const checkIfAuthUserHasGroupAdminRole = (
-   customClaims: { [p: string]: any },
+   authUser: UserRecord,
    groupId: string
 ) => {
-   return Boolean(customClaims?.adminGroups?.[groupId])
+   return Boolean(authUser?.customClaims?.adminGroups?.[groupId])
 }

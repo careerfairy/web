@@ -14,10 +14,13 @@ import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import {
+   AuthUserCustomClaims,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
-import { GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/dist/groups"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -30,13 +33,9 @@ type DefaultContext = {
    userPresenter?: UserPresenter
    userStats?: UserStats
    isLoggedIn: boolean
-   adminGroups?: Record<
-      string,
-      {
-         role: GROUP_DASHBOARD_ROLE
-      }
-   >
+   adminGroups?: AuthUserCustomClaims["adminGroups"]
    refetchClaims: () => Promise<void>
+   signOut: () => Promise<void>
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
@@ -47,6 +46,7 @@ const AuthContext = createContext<DefaultContext>({
    userStats: undefined,
    adminGroups: undefined,
    refetchClaims: () => Promise.resolve(),
+   signOut: () => Promise.resolve(),
 })
 
 /**
@@ -72,7 +72,6 @@ const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
-   console.log("-> auth", auth)
 
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()
@@ -199,7 +198,7 @@ const AuthProvider = ({ children }) => {
    ])
 
    useEffect(() => {
-      const unsub = firebaseService.auth.onIdTokenChanged(async (user) => {
+      const unsub = firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
@@ -224,15 +223,17 @@ const AuthProvider = ({ children }) => {
          userStats: userStats,
          adminGroups: claims?.adminGroups || {},
          refetchClaims,
+         signOut: firebaseService.doSignOut,
       }),
       [
          auth,
-         claims?.adminGroups,
-         isLoggedIn,
-         isLoggedOut,
          userData,
+         isLoggedOut,
+         isLoggedIn,
          userStats,
+         claims?.adminGroups,
          refetchClaims,
+         firebaseService.doSignOut,
       ]
    )
 
