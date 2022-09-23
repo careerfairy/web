@@ -44,7 +44,7 @@ export const getRegistrationSources = functions.https.onCall(
             )
 
          functions.logger.info(
-            `Fetched ${allRegisteredUsers} userLivestreamData docs`
+            `Fetched ${allRegisteredUsers.length} userLivestreamData docs`
          )
 
          // remove unwanted fields to save bandwidth
