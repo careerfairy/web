@@ -82,7 +82,7 @@ const useDataFromFunction = (
 
    return useMemo(() => {
       // deserialize and convert to type
-      return data?.map(RegistrationSourcesResponseItem.deserialize)
+      return data?.map(RegistrationSourcesResponseItem.deserialize) ?? []
    }, [data])
 }
 

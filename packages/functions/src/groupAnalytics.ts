@@ -43,6 +43,10 @@ export const getRegistrationSources = functions.https.onCall(
                data.livestreamIds
             )
 
+         functions.logger.info(
+            `Fetched ${allRegisteredUsers} userLivestreamData docs`
+         )
+
          // remove unwanted fields to save bandwidth
          // (smaller responses are more likely to fit in cache due to the 1MB limit)
          const stats: RegistrationSourcesResponseItem[] =
