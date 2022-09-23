@@ -44,21 +44,15 @@ service cloud.firestore {
             match /userGroups/{userGroup} {
                 allow read, write: if request.auth.token.email == userId || isCFAdmin();
             }
-//            function authUserAccessesOwnUserData() {
-//                return request.auth.token.email == userId;
-//            }
-
-//            function adminUserAccessesUser() {
-//                let requestUserData = get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data;
-//                return requestUserData.isAdmin || requestUserData.adminIds.size() > 0;
-//            }
+            match /userAdminGroups/{userAdminGroup} {
+                allow read, write: if request.auth.token.email == userId || isCFAdmin();
+            }
 
             function validateUser() {
                 return (request.resource.data.isAdmin == resource.data.isAdmin || !('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
             }
 
             allow read: if true;
-            //allow read: if authUserAccessesOwnUserData() || adminUserAccessesUser();
             allow update: if request.auth.token.email == userId && validateUser();
             allow create: if request.auth.token.email == userId && validateUser();
             allow delete: if false;
@@ -126,11 +120,6 @@ service cloud.firestore {
         match /companyData/{company} {
             allow read: if true;
             allow write: if false;
-            //allow write: if resource.data.adminEmail == request.auth.token.email;
-
-            //function companyData() {
-            // 	return get(/databases/$(database)/documents/companyData/$(company)).data
-            //}
 
             match /currentPositions/{position} {
                 allow read: if true;
@@ -147,32 +136,21 @@ service cloud.firestore {
         }
 
         match /careerCenterData/{careerCenter} {
-            allow read, write: if true;
-            //allow create : if true;
-            //allow update: if true;
-            //allow delete: if request.auth.token.email in resource.data.adminEmails;
+            allow read: if true;
+            allow write: if isCareerCenterAdmin() || isCFAdmin();
 
             function careerCenterData() {
                 return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
             }
 
             function isCareerCenterAdmin() {
-                return request.auth.token.email in careerCenterData().adminEmails;
+                return careerCenter in request.auth.token.adminGroups;
             }
 
             match /ats/{integrationId} {
-                allow read, write: if request.auth != null && (request.auth.token.email in careerCenterData().adminEmails || isCFAdmin());
+                allow read, write: if request.auth != null && (isCareerCenterAdmin() || isCFAdmin());
             }
 
-            match /bookingSlots/{slot} {
-                allow read: if true;
-                allow write: if careerCenterData().adminEmail == request.auth.token.email;
-            }
-
-            match /categories/{category} {
-                allow read: if true;
-                allow write: if true;
-            }
             match /groupQuestions/{groupQuestion} {
                         function isCustomQuestionType() {
                             return resource.data.questionType == 'custom';
@@ -187,13 +165,9 @@ service cloud.firestore {
                 allow update: if isUnchanged('questionType') && hasOptions();
             }
 
-            match /categories/{category}/elements/{element} {
-                allow read: if true;
-                allow write: if true;
-            }
             match /admins/{admin} {
-                allow read: if true;
-                allow write: if true;
+                allow read: if isCFAdmin() || isCareerCenterAdmin();
+                allow write: if isCFAdmin() || isCareerCenterAdmin();
             }
             match /usersInPolicy/{user} {
                 allow read: if true;

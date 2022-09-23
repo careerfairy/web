@@ -22,6 +22,8 @@ import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
+   GroupQuestion,
    GroupWithPolicy,
    UserGroupData,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -98,11 +100,28 @@ class FirebaseService {
 
    createGroupAdminUserInAuthAndFirebase = async (args: {
       userData: IAdminUserCreateFormValues
-      groupId: string
    }) => {
       return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
          args
       )
+   }
+   createGroup = async (args: {
+      group: Omit<Group, "id" | "groupId">
+      groupQuestions?: GroupQuestion[]
+   }) => {
+      return this.functions.httpsCallable("createGroup")(args)
+   }
+
+   changeRole = async (args: {
+      groupId: string
+      email: string
+      newRole: GROUP_DASHBOARD_ROLE
+   }) => {
+      return this.functions.httpsCallable("changeRole")(args)
+   }
+
+   kickFromDashboard = async (args: { groupId: string; email: string }) => {
+      return this.functions.httpsCallable("kickFromDashboard")(args)
    }
 
    sendNewlyPublishedEventEmail = async (emailData) => {
@@ -1497,13 +1516,6 @@ class FirebaseService {
       return ref.get()
    }
 
-   listenCareerCentersByAdminEmail = (email, callback) => {
-      let ref = this.firestore
-         .collection("careerCenterData")
-         .where("adminEmails", "array-contains", email)
-      return ref.onSnapshot(callback)
-   }
-
    listenToJoinedGroups = (groupIds, callback) => {
       let ref = this.firestore
          .collection("careerCenterData")
@@ -2519,30 +2531,6 @@ class FirebaseService {
       return dataArray
    }
 
-   kickFromDashboard = (groupId, userEmail) => {
-      let groupRef = this.firestore.collection("careerCenterData").doc(groupId)
-
-      let userRef = this.firestore.collection("userData").doc(userEmail)
-
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(userRef).then((userDoc) => {
-            const userData = userDoc.data()
-
-            const email = userData?.userEmail || userEmail
-
-            transaction.update(groupRef, {
-               adminEmails: firebase.firestore.FieldValue.arrayRemove(email),
-            })
-            let groupAdminRef = this.firestore
-               .collection("careerCenterData")
-               .doc(groupId)
-               .collection("admins")
-               .doc(email)
-            transaction.delete(groupAdminRef)
-         })
-      })
-   }
-
    findTargetEvent = async (eventId) => {
       let targetStream = null
       let typeOfStream = ""
@@ -2615,24 +2603,27 @@ class FirebaseService {
       streamId = ""
    ) => {
       let adminsInfo = []
+      const baseUrl = this.getBaseUrl()
       for (const groupId of arrayOfGroupIds) {
          const groupRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
          const groupSnap = await groupRef.get()
-         if (groupSnap.exists) {
-            const groupData = groupSnap.data()
-            if (groupData.adminEmails?.length) {
-               const baseUrl = this.getBaseUrl()
-               const newAdminsInfo = groupData.adminEmails.map((email) => ({
-                  groupId,
-                  email,
-                  eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
-                  nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
-               }))
-               adminsInfo = [...adminsInfo, ...newAdminsInfo]
+
+         if (!groupSnap.exists) continue
+
+         const adminsSnap = await groupRef.collection("admins").get()
+
+         const newAdminsInfo = adminsSnap.docs.map((adminDoc) => {
+            const adminData = adminDoc.data() as GroupAdmin
+            return {
+               groupId,
+               email: adminData.email,
+               eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
+               nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
             }
-         }
+         })
+         adminsInfo = [...adminsInfo, ...newAdminsInfo]
       }
       return adminsInfo
    }

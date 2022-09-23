@@ -66,7 +66,7 @@ const GroupDashboardLayout = (props) => {
       replace,
       push,
    } = useRouter()
-   const { userData, authenticatedUser, isLoggedIn, adminGroups } = useAuth()
+   const { userData, adminGroups, isLoggedOut } = useAuth()
    const notifications = useSelector(
       ({ firestore }: RootState) => firestore.ordered.notifications || []
    )
@@ -83,18 +83,20 @@ const GroupDashboardLayout = (props) => {
       useDashboardLinks(group)
 
    const isAdmin = useMemo(
-      () =>
-         userData?.isAdmin ||
-         group?.adminEmails?.includes(authenticatedUser?.email),
-      [userData?.isAdmin, group?.adminEmails, authenticatedUser?.email]
-   )
-   const isCorrectGroup = useMemo(
-      () => groupId === group?.groupId,
-      [groupId, group?.groupId]
+      () => userData?.isAdmin || adminGroups[group?.id],
+      [userData?.isAdmin, adminGroups, group?.id]
    )
 
+   const loadingGroup = !isLoaded(group)
+
    useEffect(() => {
-      if (!userData || !isLoaded(group)) return
+      if (
+         !userData ||
+         !isLoaded(group) ||
+         !adminGroups ||
+         isLoggedOut // We don't want to redirect here if the user is logged out in order to avoid a race condition with the auth provider(it already handles this)
+      )
+         return
 
       if (groupDoesNotExist) {
          push("/").then(() => {
@@ -102,13 +104,12 @@ const GroupDashboardLayout = (props) => {
          })
       }
 
-      const isGroupAdmin = userData?.isAdmin || adminGroups[group?.id]
+      if (userData.isAdmin || adminGroups[group.id]) return
 
-      if (!isGroupAdmin) {
-         push("/").then(() => {
-            errorNotification("You are not authorized to view this page")
-         })
-      }
+      // At this point, the user is not an admin of the group, so we redirect out of here
+      push("/").then(() => {
+         errorNotification("You are not authorized to view this page")
+      })
    }, [
       adminGroups,
       errorNotification,
@@ -118,10 +119,11 @@ const GroupDashboardLayout = (props) => {
       push,
       userData?.isAdmin,
       userData,
+      isLoggedOut,
    ])
 
    useEffect(() => {
-      if (isCorrectGroup && group?.id) {
+      if (group?.id) {
          const unsubscribe = groupRepo.listenToGroupQuestions(
             group.id,
             (categories) => {
@@ -133,7 +135,7 @@ const GroupDashboardLayout = (props) => {
             unsubscribe()
          }
       }
-   }, [isCorrectGroup, groupId, group?.id])
+   }, [groupId, group?.id])
 
    const groupPresenter = useMemo(
       () => group && GroupPresenter.createFromDocument(group),
@@ -174,9 +176,9 @@ const GroupDashboardLayout = (props) => {
                <PageChildrenWrapper
                   sx={[isDesktop && styles.childrenWrapperResponsive]}
                >
-                  {!isLoaded(group) || !isLoggedIn ? (
+                  {loadingGroup || !isAdmin ? (
                      <CircularProgress sx={{ margin: "auto" }} />
-                  ) : isEmpty(group) || !isCorrectGroup ? (
+                  ) : isEmpty(group) ? (
                      <Typography variant={"h6"} sx={{ margin: "auto" }}>
                         Group not found
                      </Typography>

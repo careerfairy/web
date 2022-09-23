@@ -2,8 +2,10 @@ import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat/app"
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
    GroupQuestion,
    GroupQuestionOption,
+   PublicGroup,
    UserGroupQuestionsWithAnswerMap,
 } from "../groups"
 import {
@@ -268,3 +270,26 @@ export const userAlreadyAppliedForJob = (
 
    return false
 }
+
+// User Admin Groups
+// Path: /userData/{userId}/userAdminGroups/{groupId}
+export interface UserAdminGroup extends PublicGroup {
+   userId: string
+}
+
+/*<------------------------>*/
+
+// Auth User custom claims
+export interface AuthUserCustomClaims {
+   adminGroups?: AdminGroupsClaim
+}
+
+/*
+ * Admin Groups Claim is a map of groupIds to the role of the user in that group
+ * */
+export type AdminGroupsClaim = Record<
+   string,
+   {
+      role: GROUP_DASHBOARD_ROLE
+   }
+>

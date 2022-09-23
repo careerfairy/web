@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import React, { Fragment, useContext } from "react"
+import React, { Fragment } from "react"
 import { Formik } from "formik"
 import {
    Box,
@@ -17,10 +17,6 @@ import {
 import Link from "next/link"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
-import {
-   IMultiStepContext,
-   MultiStepContext,
-} from "../../common/MultiStepWrapper"
 import { sxStyles } from "../../../../types/commonTypes"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { FormikHelpers } from "formik/dist/types"
@@ -95,14 +91,12 @@ const initValues: IAdminUserCreateFormValues = {
    subscribed: false,
 }
 
-const demoGroupId = "rTUGXDAG2XAtpVcgvAcc"
-
 function AdminSignUpUserForm() {
    const firebase = useFirebaseService()
    const {
       query: { absolutePath },
+      push,
    } = useRouter()
-   const { setCurrentStep } = useContext<IMultiStepContext>(MultiStepContext)
 
    const handleSubmit = async (
       values: IAdminUserCreateFormValues,
@@ -117,7 +111,6 @@ function AdminSignUpUserForm() {
           * 3. Send them an email to verify their email address
           * */
          await firebase.createGroupAdminUserInAuthAndFirebase({
-            groupId: demoGroupId,
             userData: values,
          })
 
@@ -130,7 +123,8 @@ function AdminSignUpUserForm() {
             values.password
          )
 
-         return setCurrentStep(1) // Ensure the user goes to the pin validation step
+         await firebase.auth.currentUser.reload()
+         return push((absolutePath as string) || "/") // Once the user is verified, redirect them to the validation page
       } catch (e) {
          setFieldError("general", e.message)
       }
@@ -366,28 +360,6 @@ function AdminSignUpUserForm() {
                               {errors.agreeTerm}
                            </FormHelperText>
                         </Collapse>
-                     </Grid>
-                     <Grid item xs={12}>
-                        <FormControlLabel
-                           control={
-                              <Checkbox
-                                 name="subscribed"
-                                 onChange={handleChange}
-                                 onBlur={handleBlur}
-                                 checked={values.subscribed}
-                                 disabled={isSubmitting}
-                                 color="primary"
-                              />
-                           }
-                           label={
-                              <Typography style={{ fontSize: 12 }}>
-                                 I don’t want to miss out on events from
-                                 exciting companies and would like to receive
-                                 occasional email announcements from
-                                 CareerFairy. 🚀
-                              </Typography>
-                           }
-                        />
                      </Grid>
                   </Grid>
                   {/*@ts-ignore*/}

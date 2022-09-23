@@ -9,7 +9,7 @@ import { admin } from "./api/firestoreAdmin"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
-import { groupRepo, marketingUsersRepo } from "./api/repositories"
+import { marketingUsersRepo } from "./api/repositories"
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -163,29 +163,22 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
       let uidToDelete = null
       let emailToDelete = null
       const userData = data.userData
-      const groupId = data.groupId
       const recipientEmail = data.userData.email.toLowerCase().trim()
       const pinCode = getRandomInt(9999)
+
       const { password, firstName, lastName, subscribed } = userData
+
       try {
          console.log(
-            `Starting auth account creation process for ${recipientEmail}`
+            `Starting admin auth account creation process for ${recipientEmail}`
          )
-         // check if group exists
-         await groupRepo.getGroupById(groupId).then((group) => {
-            if (!group) {
-               throw new functions.https.HttpsError(
-                  "not-found",
-                  "Group not found"
-               )
-            }
-            return group
-         })
 
          // Create user in firebase auth
-         const userRecord = await admin
-            .auth()
-            .createUser({ email: recipientEmail, password: password })
+         const userRecord = await admin.auth().createUser({
+            email: recipientEmail,
+            password: password,
+            emailVerified: true, // Email is verified by default since the user is invited by an admin
+         })
          // store the uid in case we need to delete it later
          uidToDelete = userRecord.uid
 
