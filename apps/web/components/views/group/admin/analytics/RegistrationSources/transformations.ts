@@ -101,19 +101,15 @@ export const sourcesByLivestream = (
 
    const stats = sourcesByDate(filtered)
 
-   const res: UTMsPercentage[] = []
-
-   for (let entry of stats) {
-      res.push({
+   return stats
+      .map((entry) => ({
          source: entry.source,
          total: entry.dates.length,
          percent: Math.round((entry.dates.length / filtered.length) * 100),
+      }))
+      .sort((a, b) => {
+         return b.total - a.total
       })
-   }
-
-   return res.sort((a, b) => {
-      return b.total - a.total
-   })
 }
 
 /**
