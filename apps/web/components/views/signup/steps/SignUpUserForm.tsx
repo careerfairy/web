@@ -6,17 +6,13 @@ import {
    Button,
    Checkbox,
    CircularProgress,
-   Collapse,
-   FormControl,
    FormControlLabel,
    FormHelperText,
    Grid,
-   TextField,
    Typography,
 } from "@mui/material"
 import UniversityCountrySelector from "../../universitySelect/UniversityCountrySelector"
 import UniversitySelector from "../../universitySelect/UniversitySelector"
-import Link from "next/link"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import * as yup from "yup"
 import {
@@ -29,14 +25,18 @@ import { possibleGenders } from "../../../../constants/forms"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
 import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
+import { signupSchema } from "../schemas"
+import FirstName from "../userInformation/FirstName"
+import LastName from "../userInformation/LastName"
+import Email from "../userInformation/Email"
+import Password from "../userInformation/Password"
+import TermsAgreement from "../userInformation/TermsAgreement"
+import PasswordRepeat from "../userInformation/PasswordRepeat"
+import HelperHint from "../common/HelperHint"
 
 const styles = sxStyles({
    submit: {
       margin: (theme) => theme.spacing(3, 0, 2),
-   },
-   resetEmail: {
-      margin: "20px auto 0 auto",
-      textAlign: "center",
    },
    subtitle: {
       textTransform: "uppercase",
@@ -67,69 +67,7 @@ interface IFormValues
    }
 }
 
-const schema: yup.SchemaOf<IFormValues> = yup.object().shape({
-   email: yup
-      .string()
-      .trim()
-      .required("Your email is required")
-      .email("Please enter a valid email address"),
-   firstName: yup
-      .string()
-      .required("Your first name is required")
-      .max(50, "Cannot be longer than 50 characters")
-      .matches(/^\D+$/i, "Please enter a valid first name"),
-   lastName: yup
-      .string()
-      .required("Your last name is required")
-      .max(50, "Cannot be longer than 50 characters")
-      .matches(/^\D+$/i, "Please enter a valid last name"),
-   universityCountryCode: yup.string().required("Please chose a country code"),
-   password: yup
-      .string()
-      .required("A password is required")
-      .matches(
-         /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z]).{6,}$/,
-         "Your password needs to be at least 6 characters long and contain at least one uppercase character, one lowercase character and one number"
-      ),
-   confirmPassword: yup
-      .string()
-      .required("You need to confirm your password")
-      .oneOf(
-         [yup.ref("password")],
-         "Your password was not confirmed correctly"
-      ),
-   agreeTerm: yup
-      .boolean()
-      .oneOf([true], "Please agree to our T&C and our Privacy Policy"),
-   subscribed: yup.boolean(),
-   gender: yup.string().oneOf(
-      possibleGenders.map((g) => g.value),
-      "Please select a valid gender"
-   ),
-   university: yup
-      .object()
-      .shape({
-         code: yup.string(),
-         name: yup.string(),
-      })
-      .required("Please select a university"),
-   fieldOfStudy: yup
-      .object()
-      .nullable()
-      .shape({
-         id: yup.string(),
-         name: yup.string(),
-      })
-      .required("Please select a field of study"),
-   levelOfStudy: yup
-      .object()
-      .nullable()
-      .shape({
-         id: yup.string(),
-         name: yup.string(),
-      })
-      .required("Please select a level of study"),
-})
+const schema: yup.SchemaOf<IFormValues> = yup.object().shape(signupSchema)
 
 const initValues: IFormValues = {
    firstName: "",
@@ -230,75 +168,24 @@ function SignUpUserForm() {
                         </Typography>
                      </Grid>
                      <Grid item xs={12} sm={6} md={4}>
-                        <FormControl fullWidth>
-                           <TextField
-                              className="registrationInput"
-                              autoComplete="given-name"
-                              name="firstName"
-                              variant="outlined"
-                              fullWidth
-                              id="firstName"
-                              label="First Name"
-                              autoFocus
-                              inputProps={{
-                                 maxLength: 50,
-                              }}
-                              onBlur={handleBlur}
-                              value={values.firstName}
-                              disabled={submitting(isSubmitting)}
-                              error={Boolean(
-                                 errors.firstName &&
-                                    touched.firstName &&
-                                    errors.firstName
-                              )}
-                              onChange={handleChange}
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.firstName &&
-                                    touched.firstName &&
-                                    errors.firstName
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.firstName}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
+                        <FirstName
+                           value={values.firstName}
+                           onChange={handleChange}
+                           onBlur={handleBlur}
+                           error={errors.firstName}
+                           disabled={submitting(isSubmitting)}
+                           touched={touched.firstName}
+                        />
                      </Grid>
                      <Grid item xs={12} sm={6} md={4}>
-                        <FormControl fullWidth>
-                           <TextField
-                              className="registrationInput"
-                              variant="outlined"
-                              fullWidth
-                              id="lastName"
-                              inputProps={{ maxLength: 50 }}
-                              label="Last Name"
-                              name="lastName"
-                              autoComplete="family-name"
-                              onBlur={handleBlur}
-                              disabled={submitting(isSubmitting)}
-                              value={values.lastName}
-                              error={Boolean(
-                                 errors.lastName &&
-                                    touched.lastName &&
-                                    errors.lastName
-                              )}
-                              onChange={handleChange}
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.lastName &&
-                                    touched.lastName &&
-                                    errors.lastName
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.lastName}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
+                        <LastName
+                           value={values.firstName}
+                           onChange={handleChange}
+                           onBlur={handleBlur}
+                           error={errors.lastName}
+                           disabled={submitting(isSubmitting)}
+                           touched={touched.lastName}
+                        />
                      </Grid>
                      <Grid item xs={12} sm={12} md={4}>
                         <GenericDropdown
@@ -312,102 +199,34 @@ function SignUpUserForm() {
                         />
                      </Grid>
                      <Grid item xs={12}>
-                        <FormControl fullWidth>
-                           <TextField
-                              className="registrationInput"
-                              variant="outlined"
-                              fullWidth
-                              error={Boolean(errors.email && touched.email)}
-                              autoComplete="email"
-                              id="emailInput"
-                              name="email"
-                              placeholder="Email"
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              value={values.email}
-                              disabled={submitting(isSubmitting)}
-                              label="Email Address"
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.email && touched.email && errors.email
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.email}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
+                        <Email
+                           value={values.email}
+                           onChange={handleChange}
+                           onBlur={handleBlur}
+                           error={errors.email}
+                           disabled={submitting(isSubmitting)}
+                           touched={touched.email}
+                        />
                      </Grid>
                      <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                           <TextField
-                              className="registrationInput"
-                              variant="outlined"
-                              fullWidth
-                              label="Password"
-                              id="password"
-                              autoComplete="current-password"
-                              type="password"
-                              name="password"
-                              error={Boolean(
-                                 errors.password &&
-                                    touched.password &&
-                                    errors.password
-                              )}
-                              placeholder="Password"
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              value={values.password}
-                              disabled={submitting(isSubmitting)}
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.password &&
-                                    touched.password &&
-                                    errors.password
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.password}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
+                        <Password
+                           value={values.password}
+                           onChange={handleChange}
+                           onBlur={handleBlur}
+                           error={errors.password}
+                           disabled={submitting(isSubmitting)}
+                           touched={touched.password}
+                        />
                      </Grid>
                      <Grid item xs={12} sm={6}>
-                        <FormControl fullWidth>
-                           <TextField
-                              className="registrationInput"
-                              variant="outlined"
-                              fullWidth
-                              label="Confirm Password"
-                              autoComplete="current-password"
-                              id="confirmPasswordInput"
-                              type="password"
-                              error={Boolean(
-                                 errors.confirmPassword &&
-                                    touched.confirmPassword &&
-                                    errors.confirmPassword
-                              )}
-                              name="confirmPassword"
-                              placeholder="Confirm Password"
-                              onChange={handleChange}
-                              onBlur={handleBlur}
-                              value={values.confirmPassword}
-                              disabled={submitting(isSubmitting)}
-                           />
-                           <Collapse
-                              in={Boolean(
-                                 errors.confirmPassword &&
-                                    touched.confirmPassword &&
-                                    errors.confirmPassword
-                              )}
-                           >
-                              <FormHelperText error>
-                                 {errors.confirmPassword}
-                              </FormHelperText>
-                           </Collapse>
-                        </FormControl>
+                        <PasswordRepeat
+                           value={values.confirmPassword}
+                           onChange={handleChange}
+                           onBlur={handleBlur}
+                           error={errors.confirmPassword}
+                           disabled={submitting(isSubmitting)}
+                           touched={touched.confirmPassword}
+                        />
                      </Grid>
                      <Grid item xs={12}>
                         <Typography sx={styles.subtitle} variant="h5">
@@ -475,38 +294,14 @@ function SignUpUserForm() {
                         />
                      </Grid>
                      <Grid item xs={12}>
-                        <FormControlLabel
-                           control={
-                              <Checkbox
-                                 name="agreeTerm"
-                                 placeholder="Confirm Password"
-                                 onChange={handleChange}
-                                 onBlur={handleBlur}
-                                 checked={values.agreeTerm}
-                                 disabled={submitting(isSubmitting)}
-                                 color="primary"
-                              />
-                           }
-                           label={
-                              <Typography style={{ fontSize: 12 }}>
-                                 I agree to the{" "}
-                                 <Link href="/terms">
-                                    <a>Terms & Conditions</a>
-                                 </Link>{" "}
-                                 and I have taken note of the{" "}
-                                 <Link href="/privacy">
-                                    <a>Data Protection Notice</a>
-                                 </Link>
-                              </Typography>
-                           }
+                        <TermsAgreement
+                           onChange={handleChange}
+                           value={values.agreeTerm}
+                           disabled={submitting(isSubmitting)}
+                           touched={touched.agreeTerm}
+                           error={errors.agreeTerm}
+                           onBlur={handleBlur}
                         />
-                        <Collapse
-                           in={Boolean(errors.agreeTerm && touched.agreeTerm)}
-                        >
-                           <FormHelperText error>
-                              {errors.agreeTerm}
-                           </FormHelperText>
-                        </Collapse>
                      </Grid>
                      <Grid item xs={12}>
                         <FormControlLabel
@@ -551,34 +346,7 @@ function SignUpUserForm() {
                   >
                      Sign up
                   </Button>
-                  <Box sx={styles.resetEmail}>
-                     <div style={{ marginBottom: "5px" }}>
-                        Already part of the family?
-                     </div>
-                     <Link
-                        href={
-                           absolutePath
-                              ? {
-                                   pathname: "/login",
-                                   query: { absolutePath },
-                                }
-                              : "/login"
-                        }
-                     >
-                        <a href="#">Log in</a>
-                     </Link>
-                  </Box>
-                  <Box sx={styles.resetEmail}>
-                     <div style={{ marginBottom: "5px" }}>
-                        Having issues signing up?
-                        <a
-                           style={{ marginLeft: "5px" }}
-                           href="mailto:maximilian@careerfairy.io"
-                        >
-                           Let us know
-                        </a>
-                     </div>
-                  </Box>
+                  <HelperHint />
                </form>
             )}
          </Formik>

@@ -11,6 +11,7 @@ import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
+import { NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -178,9 +179,9 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             await groupRepo.checkIfEmailHasAValidDashboardInvite(recipientEmail)
 
          if (!isValidInvite) {
-            logAndThrow(
-               `Email ${recipientEmail} is not associated with a valid group dashboard invite`
-            )
+            logAndThrow(NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE, {
+               recipientEmail,
+            })
          }
 
          // Create user in firebase auth
