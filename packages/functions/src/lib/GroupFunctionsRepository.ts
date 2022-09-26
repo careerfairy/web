@@ -60,8 +60,6 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       role: GROUP_DASHBOARD_ROLE
    ): Promise<GroupDashboardInvite>
 
-   getGroupDashboardInviteById(id: string): Promise<GroupDashboardInvite>
-
    deleteGroupDashboardInviteById(id: string): Promise<void>
 
    checkIfGroupDashboardInviteIsValid(
@@ -74,6 +72,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       userEmail: string,
       groupQuestions?: GroupQuestion[]
    ): Promise<Group>
+
+   /*
+    * This method will check if the provided email is actually part of a dashboard invite
+    * */
+   checkIfEmailHasAValidDashboardInvite(emailToCheck: string): Promise<boolean>
 }
 
 export class GroupFunctionsRepository
@@ -282,19 +285,6 @@ export class GroupFunctionsRepository
       return invite
    }
 
-   async getGroupDashboardInviteById(
-      inviteId: string
-   ): Promise<GroupDashboardInvite> {
-      const doc = await this.firestore
-         .collection("groupDashboardInvites")
-         .doc(inviteId)
-         .get()
-      if (doc.exists) {
-         return doc.data() as GroupDashboardInvite
-      }
-      return null
-   }
-
    deleteGroupDashboardInviteById(inviteId: string): Promise<void> {
       return this.firestore
          .collection("groupDashboardInvites")
@@ -369,6 +359,17 @@ export class GroupFunctionsRepository
          })
       )
       return newGroupData
+   }
+
+   checkIfEmailHasAValidDashboardInvite(
+      emailToCheck: string
+   ): Promise<boolean> {
+      return this.firestore
+         .collection("groupDashboardInvites")
+         .where("invitedEmail", "==", emailToCheck)
+         .limit(1)
+         .get()
+         .then((snap) => !snap.empty)
    }
 }
 

@@ -9,7 +9,8 @@ import { admin } from "./api/firestoreAdmin"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
-import { marketingUsersRepo } from "./api/repositories"
+import { groupRepo, marketingUsersRepo } from "./api/repositories"
+import { logAndThrow } from "./lib/validations"
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -172,9 +173,19 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
          console.log(
             `Starting admin auth account creation process for ${recipientEmail}`
          )
+         // Check if email is associated with a valid group dashboard invite
+         const isValidInvite =
+            await groupRepo.checkIfEmailHasAValidDashboardInvite(recipientEmail)
+
+         if (!isValidInvite) {
+            logAndThrow(
+               `Email ${recipientEmail} is not associated with a valid group dashboard invite`
+            )
+         }
 
          // Create user in firebase auth
          const userRecord = await admin.auth().createUser({
+            displayName: [firstName, lastName].filter((name) => name).join(" "),
             email: recipientEmail,
             password: password,
             emailVerified: true, // Email is verified by default since the user is invited by an admin

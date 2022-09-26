@@ -34,7 +34,7 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import DocumentReference = firebase.firestore.DocumentReference
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
-import { IAdminUserCreateFormValues } from "../../components/views/admin-signup/steps/AdminSignUpUserForm"
+import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/AdminSignUpUserForm"
 
 class FirebaseService {
    public readonly app: firebase.app.App

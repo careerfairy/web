@@ -66,10 +66,11 @@ const schema = yup.object().shape({
 })
 
 interface LoginFormProps {
-   signupPagePath?: string
+   groupAdmin?: boolean
 }
 
-const LogInForm = ({ signupPagePath = "/signup" }: LoginFormProps) => {
+const LogInForm = ({ groupAdmin }: LoginFormProps) => {
+   const signupPagePath = groupAdmin ? "/signup-admin" : "/signup"
    const { authenticatedUser, userData } = useAuth()
    const firebase = useFirebaseService()
 
@@ -138,9 +139,6 @@ const LogInForm = ({ signupPagePath = "/signup" }: LoginFormProps) => {
 
    return (
       <>
-         <Head>
-            <title key="title">CareerFairy | Log in</title>
-         </Head>
          <Formik
             initialValues={{ email: "", password: "" }}
             validationSchema={schema}
@@ -281,7 +279,6 @@ const LogInForm = ({ signupPagePath = "/signup" }: LoginFormProps) => {
                </Container>
             )}
          </Formik>
-         <Typography sx={styles.footer}>Meet Your Future</Typography>
       </>
    )
 }

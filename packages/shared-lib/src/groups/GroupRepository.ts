@@ -13,6 +13,7 @@ import BaseFirebaseRepository, {
 import firebase from "firebase/compat/app"
 import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import { GroupDashboardInvite } from "../../dist/groups/GroupDashboardInvite"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -99,6 +100,8 @@ export interface IGroupRepository {
    getAllUserGroupDataIds(userEmail: string): Promise<string[]>
 
    deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
+
+   getGroupDashboardInviteById(id: string): Promise<GroupDashboardInvite>
 }
 
 export class FirebaseGroupRepository
@@ -522,5 +525,21 @@ export class FirebaseGroupRepository
          .collection("userGroups")
          .get()
       return userGroupDataSnap.docs.map((doc) => doc.id)
+   }
+
+   async getGroupDashboardInviteById(
+      inviteId: string
+   ): Promise<GroupDashboardInvite> {
+      if (!inviteId) {
+         return null
+      }
+      const doc = await this.firestore
+         .collection("groupDashboardInvites")
+         .doc(inviteId)
+         .get()
+      if (doc.exists) {
+         return doc.data() as GroupDashboardInvite
+      }
+      return null
    }
 }

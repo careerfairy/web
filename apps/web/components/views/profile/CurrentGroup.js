@@ -217,7 +217,7 @@ const CurrentGroup = ({
                         </Link>
                      )}
                      {isAdmin && (
-                        <Link href={`/group/${localGroup.id}/admin`}>
+                        <Link href={`/group/${localGroup.id}/admin/analytics`}>
                            <a>
                               <Button fullWidth size="large" color="primary">
                                  View Admin Page

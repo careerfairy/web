@@ -135,6 +135,10 @@ service cloud.firestore {
             }
         }
 
+        match /groupDashboardInvites/{inviteId} {
+            allow read;
+        }
+
         match /careerCenterData/{careerCenter} {
             allow read: if true;
             allow write: if isCareerCenterAdmin() || isCFAdmin();

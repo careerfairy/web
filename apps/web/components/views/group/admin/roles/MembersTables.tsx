@@ -11,7 +11,6 @@ import {
 import { defaultTableOptions, tableIcons } from "../../../../util/tableUtils"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { convertCamelToSentence } from "../../../../helperFunctions/HelperFunctions"
-import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import {
    GROUP_DASHBOARD_ROLE,
@@ -22,8 +21,8 @@ import MaterialTable, { Column, MaterialTableProps } from "@material-table/core"
 import { sxStyles } from "../../../../../types/commonTypes"
 import TextField from "@mui/material/TextField"
 import AddMemberModal from "./AddMemberModal"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import ChangeMemberRoleModal from "./ChangeMemberRoleModal"
+import KickMemberModal from "./KickMemberModal"
 
 const customOptions = { ...defaultTableOptions }
 customOptions.selection = false
@@ -85,10 +84,6 @@ type KickMemberDialogProps = {
    email: string
 }
 const MembersTable = () => {
-   const { successNotification, errorNotification } = useSnackbarNotifications()
-
-   const { changeRole, kickFromDashboard } = useFirebaseService()
-
    const { authenticatedUser, userData } = useAuth()
 
    const { group, role } = useGroup()
@@ -96,9 +91,6 @@ const MembersTable = () => {
    const { data: admins } = useGroupAdmins(group.id)
 
    const [showAddMemberModal, setShowAddMemberModal] = useState(false)
-
-   const [changingRole, setChangingRole] = useState(false)
-   const [kickingMember, setKickingMember] = useState(false)
 
    const [changeRoleDialogData, setChangeRoleDialogData] =
       useState<ChangeRoleDialogProps>(null)
@@ -127,41 +119,6 @@ const MembersTable = () => {
       ? `(Only visible to CF Admins or ${GROUP_DASHBOARD_ROLE.OWNER})`
       : ""
 
-   const handleChangeRole = async () => {
-      try {
-         setChangingRole(true)
-         await changeRole({
-            groupId: group.id,
-            email: changeRoleDialogData.email,
-            newRole: changeRoleDialogData.newRole,
-         })
-         successNotification("Role changed successfully")
-         closeChangeRoleDialog()
-      } catch (e) {
-         errorNotification(e)
-      }
-      setChangingRole(false)
-   }
-
-   const handleKickMember = async () => {
-      try {
-         setKickingMember(true)
-         await kickFromDashboard({
-            groupId: group.id,
-            email: kickAdminDialogData.email,
-         })
-         const isMe = kickAdminDialogData.email === authenticatedUser.email
-         successNotification(
-            isMe ? "Successfully left group" : "Member kicked successfully"
-         )
-         closeKickMemberDialog()
-      } catch (e) {
-         console.log("-> e", e.message)
-         errorNotification(e)
-      }
-      setKickingMember(false)
-   }
-
    // @ts-ignore
    const actions = useMemo<MaterialTableProps<GroupAdmin>["actions"]>(
       () => [
@@ -189,13 +146,12 @@ const MembersTable = () => {
                   displayName: rowData.displayName,
                   email: rowData.id,
                }),
-            disabled: kickingMember,
             hidden: role === GROUP_DASHBOARD_ROLE.MEMBER && !userData?.isAdmin,
          }),
       ],
       [
          CFAdminNotice,
-         kickingMember,
+         authenticatedUser.email,
          openAddMemberModal,
          role,
          userData?.isAdmin,
@@ -236,9 +192,10 @@ const MembersTable = () => {
                      </SelfBadge>
                   </AdminBadge>
                   <Typography sx={styles.displayName}>
-                     {[rowData.firstName, rowData.lastName]
-                        .filter((name) => name)
-                        .join(" ")}
+                     {rowData.displayName ||
+                        [rowData.firstName, rowData.lastName]
+                           .filter((name) => name)
+                           .join(" ")}
                   </Typography>
                </Box>
             ),
@@ -263,9 +220,7 @@ const MembersTable = () => {
                const hasNoAccess =
                   role !== GROUP_DASHBOARD_ROLE.OWNER && !userData?.isAdmin
                const disabled =
-                  hasNoAccess ||
-                  changingRole ||
-                  rowData.email === authenticatedUser.email
+                  hasNoAccess || rowData.email === authenticatedUser.email
                return (
                   <Tooltip title={hasNoAccess ? "You don't have access" : ""}>
                      <TextField
@@ -307,7 +262,7 @@ const MembersTable = () => {
             render: ({ id }) => <a href={`mailto:${id}`}>{id}</a>,
          },
       ],
-      [authenticatedUser.email, changingRole, role, userData?.isAdmin]
+      [authenticatedUser.email, role, userData?.isAdmin]
    )
 
    return (
@@ -322,38 +277,27 @@ const MembersTable = () => {
                title={getTitle()}
             />
             {kickAdminDialogData && (
-               <AreYouSureModal
-                  open={Boolean(kickAdminDialogData)}
+               <KickMemberModal
+                  modalData={kickAdminDialogData}
                   handleClose={closeKickMemberDialog}
-                  loading={kickingMember}
-                  message={
-                     kickAdminDialogData.email === authenticatedUser.email
-                        ? `You are about to leave ${group.universityName}. In order to regain access at a later time, a Group Owner must invite you.`
-                        : `Are you sure you want to kick ${kickAdminDialogData.displayName}?`
-                  }
-                  handleConfirm={handleKickMember}
+                  open={!!kickAdminDialogData}
                />
             )}
             {changeRoleDialogData && (
-               <AreYouSureModal
-                  open={Boolean(changeRoleDialogData)}
+               <ChangeMemberRoleModal
+                  open={!!changeRoleDialogData}
                   handleClose={closeChangeRoleDialog}
-                  loading={changingRole}
-                  title={`Are you sure you want to change the ${changeRoleDialogData.currentRole} role of ${changeRoleDialogData.displayName}'s to ${changeRoleDialogData.newRole}?`}
-                  handleConfirm={handleChangeRole}
-                  message={
-                     changeRoleDialogData.newRole === GROUP_DASHBOARD_ROLE.OWNER
-                        ? "This user will have full access to the dashboard and will be able to invite other admins."
-                        : "This user will have limited access to your dashboard."
-                  }
+                  modalData={changeRoleDialogData}
                />
             )}
          </Card>
-         <AddMemberModal
-            group={group}
-            open={showAddMemberModal}
-            onClose={closeAddMemberModal}
-         />
+         {showAddMemberModal && (
+            <AddMemberModal
+               group={group}
+               open={showAddMemberModal}
+               onClose={closeAddMemberModal}
+            />
+         )}
       </>
    )
 }
