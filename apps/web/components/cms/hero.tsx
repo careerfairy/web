@@ -98,9 +98,13 @@ const styles = sxStyles({
    container: {
       zIndex: 1,
       bgColor: "grey.main",
-      py: {
-         lg: 24,
+      pt: {
+         lg: 20,
          xs: 10,
+      },
+      pb: {
+         lg: 10,
+         xs: 5,
       },
       pl: 0,
       pr: 0,
@@ -117,7 +121,7 @@ const styles = sxStyles({
       textShadow: (theme) => theme.darkTextShadow,
    },
    fullScreenMain: {
-      height: { xs: "100%", sm: "90vh" },
+      height: "100%",
       zIndex: 1,
    },
    fullScreenVideoWrapper: {
@@ -131,7 +135,7 @@ const styles = sxStyles({
       objectFit: "cover",
    },
    logo: {
-      width: { xs: 150, md: 300 },
+      width: { xs: 150, lg: 300 },
       position: "absolute",
       top: { xs: "3vw", md: "3vw" },
    },
@@ -140,7 +144,6 @@ const styles = sxStyles({
       alignItems: {
          md: "center",
       },
-      height: "80vh",
    },
 })
 

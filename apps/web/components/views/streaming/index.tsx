@@ -73,18 +73,14 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const StreamerOverview = ({
-   isStreamer,
-   setSliding,
    selectedState,
    handleStateChange,
    showMenu,
-   notifications,
-   streamerId,
    smallScreen,
    hideAudience,
    audienceDrawerOpen,
 }) => {
-   const { currentLivestream } = useCurrentStream()
+   const { currentLivestream, isStreamer } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
    const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
@@ -164,12 +160,9 @@ const StreamerOverview = ({
             onClick={handleClick}
          >
             <VideoContainer
-               currentLivestream={currentLivestream}
-               streamerId={streamerId}
                smallScreen={smallScreen}
                showMenu={showMenu}
                viewer={false}
-               isPlayMode={undefined}
             />
             <ButtonComponent
                isMobile={undefined}
@@ -189,10 +182,7 @@ const StreamerOverview = ({
             audienceDrawerOpen={audienceDrawerOpen}
             isStreamer
          />
-         <NotificationsContainer
-            handRaiseMenuOpen={selectedState === "hand"}
-            notifications={notifications}
-         />
+         <NotificationsContainer handRaiseMenuOpen={selectedState === "hand"} />
          <StreamNotifications isStreamer={true} />
          <HandRaiseNotifier />
          <MiniChatContainer

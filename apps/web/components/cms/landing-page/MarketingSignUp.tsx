@@ -23,6 +23,7 @@ import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUs
 import { useRouter } from "next/router"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import CmsImage from "../image"
+import { useMarketingLandingPage } from "./MarketingLandingPageProvider"
 
 const styles = sxStyles({
    largeContainer: {
@@ -134,7 +135,10 @@ interface Props {
 const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
    const {
       query: { fieldOfStudyId },
+      push,
    } = useRouter()
+   const { selectedEventId, setFormCompleted } = useMarketingLandingPage()
+
    const initialValues = useMemo(
       () => ({
          firstName: "",
@@ -158,9 +162,16 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                utmParams: SessionStorageUtil.getUTMParams() ?? {},
             })
             .then((_) => {
+               setFormCompleted(true)
                resetForm()
                setComplete(true)
                setBackendError(null)
+
+               if (selectedEventId) {
+                  void push({
+                     pathname: `/upcoming-livestream/${selectedEventId}`,
+                  })
+               }
             })
             .catch((e) => {
                setBackendError(e)
@@ -169,7 +180,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                setSubmitting(false)
             })
       },
-      [setComplete]
+      [push, selectedEventId, setComplete, setFormCompleted]
    )
 
    return (

@@ -6,8 +6,6 @@ import useHandRaiseState from "../../custom-hook/useHandRaiseState"
 import { darken } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import StopStreamingIcon from "@mui/icons-material/Stop"
-import * as actions from "store/actions"
-import { useDispatch } from "react-redux"
 import { useCurrentStream } from "../../../context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
@@ -33,17 +31,6 @@ const HandRaiseViewerBanner = () => {
    const [handRaiseActionData, setHandRaiseActionData] = useState({
       title: "Hand Raise is not active",
    })
-
-   const dispatch = useDispatch()
-
-   const requestHandRaise = async () => {
-      try {
-         await updateRequest("requested")
-         dispatch(actions.enqueueSuccessfulHandRaiseRequest())
-      } catch (e) {
-         dispatch(actions.sendGeneralError(e))
-      }
-   }
 
    useEffect(() => {
       let newHandRaiseActionData

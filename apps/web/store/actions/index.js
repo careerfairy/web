@@ -31,6 +31,7 @@ export {
    enqueueCallToAction,
    enqueueJobPostingCta,
    enqueueSuccessfulHandRaiseRequest,
+   closeSuccessfulHandRaiseRequest,
 } from "./snackbarActions.js"
 export {
    deleteFilterGroup,
@@ -88,6 +89,7 @@ export {
    setAgoraPrimaryClientJoined,
    clearAgoraRtcError,
    setSessionIsUsingCloudProxy,
+   setSessionShouldUseCloudProxy,
    showActionButtons,
    hideActionButtons,
 } from "./streamActions"
