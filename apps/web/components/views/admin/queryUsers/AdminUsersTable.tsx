@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo, useState } from "react"
-import { Card } from "@mui/material"
+import { Card, LinearProgress } from "@mui/material"
 import { defaultTableOptions, tableIcons } from "../../../util/tableUtils"
-import ExportTable from "../../common/Tables/ExportTable"
-import { MaterialTableProps } from "@material-table/core"
+import MaterialTable, {
+   MaterialTableProps,
+   Options,
+} from "@material-table/core"
 
 import SendEmailTemplateDialog from "./SendEmailTemplateDialog/SendEmailTemplateDialog"
 import {
@@ -120,11 +122,16 @@ const AdminUsersTable = ({
             field: "fieldOfStudyId",
             title: "Field of study",
             lookup: fieldsOfStudyLookup,
+            defaultFilter: queryOptions.filters.fieldOfStudyIds,
+            filterCellStyle: {
+               maxWidth: "400px",
+            },
          },
          {
             field: "levelOfStudyId",
             title: "Level of study",
             lookup: levelsOfStudyLookup,
+            defaultFilter: queryOptions.filters.levelOfStudyIds,
          },
          {
             field: "unsubscribed",
@@ -198,7 +205,7 @@ const AdminUsersTable = ({
       ]
    )
 
-   const customTableOptions = useMemo(
+   const customTableOptions = useMemo<Options<BigQueryUserResponse>>(
       () => ({
          ...defaultTableOptions,
          pageSize: pageSize || 10,
@@ -271,7 +278,7 @@ const AdminUsersTable = ({
 
    return (
       <Card>
-         <ExportTable
+         <MaterialTable
             icons={tableIcons}
             isLoading={
                loading ||
@@ -280,6 +287,9 @@ const AdminUsersTable = ({
                loadingUniversityCountries
             }
             data={users}
+            components={{
+               OverlayLoading: () => <LinearProgress />,
+            }}
             onOrderChange={onOrderChange}
             onFilterChange={onFilterChange}
             options={customTableOptions}
