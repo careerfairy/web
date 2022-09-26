@@ -135,7 +135,7 @@ const AuthProvider = ({ children }) => {
 
          // There are missing fields
          firebaseServiceInstance
-            .backfillUserData(browserTimezone)
+            .backfillUserData({ timezone: browserTimezone })
             .then((_) => console.log("Missing user data added."))
             .catch((e) => {
                Sentry.captureException(e)
