@@ -129,7 +129,8 @@ export interface UserLivestreamData extends Identifiable {
          referralCode: string
          inviteLivestream: string
       }
-      utm: any
+      utm?: any
+      referrer?: string
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
