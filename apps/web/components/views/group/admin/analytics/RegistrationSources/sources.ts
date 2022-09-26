@@ -21,7 +21,8 @@ export const VALID_SOURCES: RegistrationSource[] = [
       helpDescription: "User registered through a paid university campaign.",
       color: "#C13584",
       match: (utms) => {
-         const matchSource = /\w+_newsletter$/gi.test(utms?.utm_source)
+         // e.g unicc-ch-newsletter, unicc_ch_newsletter
+         const matchSource = /[a-z]{2}[-_]newsletter$/gi.test(utms?.utm_source)
          const matchMedium = /email/gi.test(utms?.utm_medium)
 
          return matchSource && matchMedium
@@ -32,9 +33,11 @@ export const VALID_SOURCES: RegistrationSource[] = [
       helpDescription: "User registered through a university campaign.",
       color: "#7431e2",
       match: (utms) => {
-         const matchSource = /student_assoc_\w{2}|unicc_\w{2}/gi.test(
-            utms?.utm_source
-         )
+         // e.g unicc_de, student_assoc_ch, unicc-ch
+         const matchSource =
+            /student_assoc[_-][a-z]{2}|unicc[_-][a-z]{2}/gi.test(
+               utms?.utm_source
+            )
          const matchMedium = /email/gi.test(utms?.utm_medium)
 
          return matchSource && matchMedium
