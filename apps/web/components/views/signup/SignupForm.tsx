@@ -19,7 +19,7 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { userRepo } from "../../../data/RepositoryInstances"
 import LoadingButton from "@mui/lab/LoadingButton"
 import GenericStepper from "../common/GenericStepper"
-import AdminSignUpUserForm from "./steps/AdminSignUpUserForm"
+import SignUpAdminForm from "./steps/SignUpAdminForm"
 
 const styles = sxStyles({
    icon: {
@@ -71,7 +71,7 @@ const stepsMap = new Map<string, MultiStepComponentType>([
    [
       "Admin Credentials",
       {
-         component: () => AdminSignUpUserForm,
+         component: () => SignUpAdminForm,
          description: "Admin Credentials",
          title: "Create your admin profile to start",
       },
