@@ -208,6 +208,8 @@ export default class DateUtil {
    }
 
    static getCurrentTimeZone() {
-      return Intl.DateTimeFormat().resolvedOptions().timeZone || "Europe/Zurich"
+      return (
+         Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone || "Europe/Zurich"
+      )
    }
 }
