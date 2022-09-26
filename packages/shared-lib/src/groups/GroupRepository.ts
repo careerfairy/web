@@ -13,7 +13,7 @@ import BaseFirebaseRepository, {
 import firebase from "firebase/compat/app"
 import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
-import { GroupDashboardInvite } from "../../dist/groups/GroupDashboardInvite"
+import { GroupDashboardInvite } from "./GroupDashboardInvite"
 
 const cloneDeep = require("lodash.clonedeep")
 
