@@ -1,6 +1,4 @@
-import { collection } from "firebase/firestore"
-import { useFirestore, useFirestoreCollectionData } from "reactfire"
-import { GroupAdmin } from "@careerfairy/shared-lib/dist/groups"
+import useCollection from "./useCollection"
 
 /*
  * This is a custom hook that will fetch the group admins from Firestore
@@ -9,18 +7,22 @@ import { GroupAdmin } from "@careerfairy/shared-lib/dist/groups"
  * @returns GroupAdmin[]
  * */
 const useGroupAdmins = (groupId) => {
-   const collectionRef = collection(
-      useFirestore(),
-      "careerCenterData",
-      groupId,
-      "admins"
-   )
+   return useCollection(`careerCenterData/${groupId}/admins`, true)
 
-   // fetch from firestore
-   return useFirestoreCollectionData<GroupAdmin>(collectionRef as any, {
-      idField: "id", // this field will be added to the firestore object
-      suspense: false,
-   })
+   // // The useFirestoreCollectionData hook cannot be used here since it has a bug
+   // // when trying to access data that is protected by rules on auth sing-in re-direct:
+   // // issue # [228](https://github.com/FirebaseExtended/reactfire/discussions/228)
+   // How to reproduce: uncomment bellow, go to roles page, sign out, then sign in again, it should redirect to roles page and crash
+   // const collectionRef = collection(
+   //    useFirestore(),
+   //    "careerCenterData",
+   //    groupId,
+   //    "admins"
+   // )
+   // return useFirestoreCollectionData<GroupAdmin>(collectionRef as any, {
+   //    idField: "id", // this field will be added to the firestore object
+   //    suspense: true,
+   // })
 }
 
 export default useGroupAdmins

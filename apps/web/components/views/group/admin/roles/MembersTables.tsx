@@ -88,7 +88,7 @@ const MembersTable = () => {
 
    const { group, role } = useGroup()
 
-   const { data: admins } = useGroupAdmins(group.id)
+   const { data: admins, isLoading } = useGroupAdmins(group.id)
 
    const [showAddMemberModal, setShowAddMemberModal] = useState(false)
 
@@ -271,6 +271,7 @@ const MembersTable = () => {
             <MaterialTable
                icons={tableIcons}
                data={admins}
+               isLoading={isLoading}
                columns={columns}
                options={customOptions}
                actions={actions}

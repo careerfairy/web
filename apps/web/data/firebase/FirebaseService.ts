@@ -2565,37 +2565,6 @@ class FirebaseService {
       )
    }
 
-   promoteToMainAdmin = async (groupId, userEmail) => {
-      let batch = this.firestore.batch()
-
-      let adminToPromoteRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("admins")
-         .doc(userEmail)
-
-      let groupAdminsRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("admins")
-         .where("role", "==", "mainAdmin")
-
-      const adminSnaps = await groupAdminsRef.get()
-      // Demote all main Admins to subAdmins to ensure that there is always no main admins when promoting
-      for (const mainAdminDoc of adminSnaps.docs) {
-         const mainAdminRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("admins")
-            .doc(mainAdminDoc.id)
-         batch.update(mainAdminRef, { role: "subAdmin" })
-      }
-
-      batch.set(adminToPromoteRef, { role: "mainAdmin" }, { merge: true })
-
-      return batch.commit()
-   }
-
    // Approval Queries
 
    getAllGroupAdminInfo = async (
@@ -2666,20 +2635,6 @@ class FirebaseService {
          .collection("notifications")
          .doc(notificationId)
       await notificationRef.delete()
-   }
-
-   validateDashboardInvite = async (notificationId, groupId) => {
-      let ref = this.firestore.collection("notifications").doc(notificationId)
-      const refSnap = await ref.get()
-      if (!refSnap.exists) {
-         return false
-      }
-      const notification = refSnap.data()
-      return (
-         notification.details.type === "dashboardInvite" &&
-         notification.open &&
-         notification.details.requester === groupId
-      )
    }
 
    checkForNotification = (
