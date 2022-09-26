@@ -25,6 +25,8 @@ const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
       true
    )
 
+   console.log("final events -> ", events)
+
    return (
       <Box sx={styles.wrapper}>
          <EventsPreview

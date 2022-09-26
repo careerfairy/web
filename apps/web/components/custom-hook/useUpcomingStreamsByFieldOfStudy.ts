@@ -21,6 +21,7 @@ const useUpcomingStreamsByFieldOfStudy = (
       livestreamRepo
          .getUpcomingEventsByFieldsOfStudy(fieldsOfStudy, limit)
          .then((fieldOfStudyEvents: LivestreamEvent[]) => {
+            console.log("field of study events -> ", fieldOfStudyEvents)
             if (fallbackToGeneralStreams) {
                if (!fieldOfStudyEvents) {
                   // return the generic Upcoming Events
@@ -50,6 +51,11 @@ const useUpcomingStreamsByFieldOfStudy = (
                      })
                }
             }
+
+            console.log(
+               "formatted field of study events -> ",
+               fieldOfStudyEvents
+            )
             return fieldOfStudyEvents
          })
          .then((events: LivestreamEvent[]) => {
