@@ -29,8 +29,8 @@ import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
-import DocumentReference = firebase.firestore.DocumentReference
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2171,6 +2171,7 @@ class FirebaseService {
                   referral: getReferralInformation(),
                   // Store the utm params if they exist
                   utm: SessionStorageUtil.getUTMParams(),
+                  referrer: SessionStorageUtil.getReferrer(),
                   // @ts-ignore
                   date: this.getServerTimestamp(),
                },
