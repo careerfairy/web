@@ -19,23 +19,12 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { userRepo } from "../../../data/RepositoryInstances"
 import LoadingButton from "@mui/lab/LoadingButton"
 import GenericStepper from "../common/GenericStepper"
-import AdminSignUpUserForm from "../admin-signup/steps/AdminSignUpUserForm"
+import AdminSignUpUserForm from "./steps/AdminSignUpUserForm"
 
 const styles = sxStyles({
-   footer: {
-      fontWeight: 700,
-      fontSize: "1.3em",
-      margin: "40px 0 30px 0",
-      textAlign: "center",
-      textTransform: "uppercase",
-      letterSpacing: "0.4em",
-   },
    icon: {
       margin: "0 10px",
       color: "white",
-   },
-   logo: {
-      margin: "20px 20px 0 20px",
    },
    headerWrapper: {
       marginBottom: 4,
@@ -125,16 +114,14 @@ const stepsMap = new Map<string, MultiStepComponentType>([
 ])
 
 type SignupFormProps = {
-   isForAdmin?: boolean
-   signupRedirectPath?: string
+   groupAdmin?: boolean
 }
-const SignupForm = ({
-   isForAdmin,
-   signupRedirectPath = "/portal",
-}: SignupFormProps) => {
+const SignupForm = ({ groupAdmin }: SignupFormProps) => {
+   const fallbackSignupRedirectPath = groupAdmin ? "/profile/groups" : "/portal"
+
    const steps: MultiStepComponentType[] = useMemo(
       () =>
-         isForAdmin
+         groupAdmin
             ? [stepsMap.get("Admin Credentials")]
             : [
                  stepsMap.get("Credentials"),
@@ -143,7 +130,7 @@ const SignupForm = ({
                  stepsMap.get("Location"),
                  stepsMap.get("Interests"),
               ],
-      [isForAdmin]
+      [groupAdmin]
    )
    const { authenticatedUser: user, userData } = useAuth()
    const {
@@ -233,7 +220,7 @@ const SignupForm = ({
          if (absolutePath) {
             void push(absolutePath as any)
          } else {
-            void push(signupRedirectPath)
+            void push(fallbackSignupRedirectPath)
          }
       } else {
          setCurrentStep((prev) => prev + 1)
@@ -271,29 +258,20 @@ const SignupForm = ({
 
    return (
       <>
-         <Head>
-            <title key="title">CareerFairy | Sign Up</title>
-         </Head>
-         <PillsBackground>
-            <HeaderLogoWrapper>
-               <MainLogo sx={styles.logo} />
-            </HeaderLogoWrapper>
-            {renderTitle(steps[currentStep])}
-            <Container maxWidth="md">
-               <Box data-testid={"signup-page-form"} p={3} mt={3}>
-                  <Box mb={4}>
-                     <GenericStepper steps={steps} currentStep={currentStep} />
-                  </Box>
-                  <MultiStepWrapper
-                     steps={steps}
-                     currentStep={currentStep}
-                     setCurrentStep={setCurrentStep}
-                  />
-                  {currentStep > 1 && renderContinueAndBackButtons()}
+         {renderTitle(steps[currentStep])}
+         <Container maxWidth="md">
+            <Box data-testid={"signup-page-form"} p={3} mt={3}>
+               <Box mb={4}>
+                  <GenericStepper steps={steps} currentStep={currentStep} />
                </Box>
-            </Container>
-            <Typography sx={styles.footer}>Meet Your Future</Typography>
-         </PillsBackground>
+               <MultiStepWrapper
+                  steps={steps}
+                  currentStep={currentStep}
+                  setCurrentStep={setCurrentStep}
+               />
+               {currentStep > 1 && renderContinueAndBackButtons()}
+            </Box>
+         </Container>
       </>
    )
 }

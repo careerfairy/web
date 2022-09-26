@@ -505,7 +505,7 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
          }
       }
 
-      // If the user does not exist, send an invite email
+      // If the user does not exist, send an invitation email
 
       const newInvite = await groupRepo.createGroupDashboardInvite(
          groupId,

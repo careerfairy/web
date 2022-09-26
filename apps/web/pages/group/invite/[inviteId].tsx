@@ -65,10 +65,10 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
       if (isLoggedOut) {
          void replace({
             pathname: flowPaths[flow as string] || "/login-admin",
-            query: { absolutePath: asPath },
+            query: { absolutePath: asPath, groupDashboardInviteId: inviteId },
          })
       }
-   }, [asPath, isLoggedOut, pathname, replace, flow])
+   }, [asPath, isLoggedOut, pathname, replace, flow, inviteId])
 
    const renderView = useMemo(() => {
       // check if error is bad request
