@@ -15,8 +15,8 @@ const styles = sxStyles({
 
 const RolesOverview = () => {
    return (
-      <Container className={styles.root} maxWidth="lg">
-         <Box p={3}>
+      <Container sx={styles.root} maxWidth="lg">
+         <Box p={2}>
             <MembersTable />
          </Box>
       </Container>
