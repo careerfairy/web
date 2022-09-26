@@ -22,7 +22,6 @@ import {
    setHeaders,
 } from "./util"
 import { admin } from "./api/firestoreAdmin"
-import { marketingTeamEmails } from "./misc/marketingTeamEmails"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -84,24 +83,8 @@ export const sendNewlyPublishedEventEmail = functions.https.onCall(
             "admins Info in newly published event",
             adminsInfo
          )
-         const adminLinks = {
-            eventDashboardLink:
-               adminsInfo[0] && adminsInfo[0].eventDashboardLink
-                  ? adminsInfo[0].eventDashboardLink
-                  : "",
-            nextLivestreamsLink:
-               adminsInfo[0] && adminsInfo[0].nextLivestreamsLink
-                  ? adminsInfo[0].nextLivestreamsLink
-                  : "",
-         }
 
-         const marketingTeamInfo = marketingTeamEmails.map((email) => ({
-            email,
-            eventDashboardLink: adminLinks.eventDashboardLink,
-            nextLivestreamsLink: adminLinks.nextLivestreamsLink,
-         }))
-
-         const emails = [...adminsInfo, ...marketingTeamInfo].map(
+         const emails = adminsInfo.map(
             ({ email, eventDashboardLink, nextLivestreamsLink }) => ({
                TemplateId: process.env.POSTMARK_TEMPLATE_NEWLY_PUBLISHED_EVENT,
                From: "CareerFairy <noreply@careerfairy.io>",

@@ -1,5 +1,6 @@
 import React, {
    Fragment,
+   memo,
    useCallback,
    useContext,
    useEffect,
@@ -32,6 +33,9 @@ import RTMContext from "../../../../context/agora/RTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
 import { useRtc } from "../../../../context/agora/RTCProvider"
+import RootState from "../../../../store/reducers"
+import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import { HandRaiseState } from "../../../../types/handraise"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -58,18 +62,21 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-function ViewerComponent({
-   currentLivestream,
-   handRaiseActive,
-   isBreakout,
-   showMenu,
-   streamerId,
-   mobile,
-}) {
+interface Props {
+   handRaiseActive: boolean
+   showMenu: boolean
+}
+const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
    const { setDesktopMode: setDesktopModeInstanceMethod } = useFirebaseService()
+   const {
+      currentLivestream,
+      streamerId,
+      isMobile: mobile,
+      isBreakout,
+   } = useCurrentStream()
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
-      (state) => state.stream.streaming.spyModeEnabled
+      (state: RootState) => state.stream.streaming.spyModeEnabled
    )
    const classes = useStyles()
    const dispatch = useDispatch()
@@ -79,15 +86,15 @@ function ViewerComponent({
    const [showLocalStreamPublishingModal, setShowLocalStreamPublishingModal] =
       useState(null)
    const [handRaiseState, updateRequest, hasRoom, prevHandRaiseState] =
-      useHandRaiseState(streamerId)
+      useHandRaiseState()
 
    const streamRef = useStreamRef()
    const {
       query: { livestreamId },
    } = useRouter()
 
-   const { authenticatedUser, userData } = useAuth()
-   const hasActiveRooms = useSelector((state) =>
+   const { userData } = useAuth()
+   const hasActiveRooms = useSelector((state: RootState) =>
       Boolean(
          state.firestore.ordered?.[`Active BreakoutRooms of ${livestreamId}`]
             ?.length
@@ -146,14 +153,14 @@ function ViewerComponent({
    useEffect(() => {
       if (
          handRaiseActive &&
-         prevHandRaiseState.current?.state === "invited" &&
+         prevHandRaiseState.current?.state === HandRaiseState.invited &&
          // Make sure not to auto invite if the viewer is still in the publishing modal
          showLocalStreamPublishingModal === false
       ) {
          void handleJoinAsHandRaiser()
       }
    }, [
-      prevHandRaiseState.current?.state === "invited",
+      prevHandRaiseState.current?.state === HandRaiseState.invited,
       showLocalStreamPublishingModal,
    ])
 
@@ -161,10 +168,10 @@ function ViewerComponent({
       if (
          !handRaiseActive ||
          (handRaiseState &&
-            (handRaiseState.state === "unrequested" ||
-               handRaiseState.state === "denied"))
+            (handRaiseState.state === HandRaiseState.unrequested ||
+               handRaiseState.state === HandRaiseState.denied))
       ) {
-         handleLeaveAsHandRaiser()
+         void handleLeaveAsHandRaiser()
       }
    }, [handRaiseActive, handRaiseState])
 
@@ -214,40 +221,40 @@ function ViewerComponent({
    const requestHandRaise = async () => {
       try {
          switch (handRaiseState?.state) {
-            case "connected":
+            case HandRaiseState.connected:
                // If you were previously connected
                if (hasRoom) {
                   // and there is still room
-                  await updateRequest("connecting")
+                  await updateRequest(HandRaiseState.connecting)
                } else {
-                  await updateRequest("requested")
+                  await updateRequest(HandRaiseState.requested)
                }
                break
-            case "connecting":
+            case HandRaiseState.connecting:
                // After being in a connecting state for god knows how long, you finally clicked join.
                if (hasRoom) {
                   // At the time of clicking join there is still room, so you can join in the stream as a HR
                   await handleJoinAsHandRaiser()
                } else {
                   //  At the time of clicking join there is no more room, which means you
-                  //  have to go back into the queue as a HR
-                  await updateRequest("requested")
+                  //  have to go back into the queue as an HR
+                  await updateRequest(HandRaiseState.requested)
                   dispatch(actions.enqueueSuccessfulHandRaiseRequest())
                }
                break
-            case "invited":
+            case HandRaiseState.invited:
                // If you are currently invited
                if (hasRoom) {
                   // and there is still room
                   await handleJoinAsHandRaiser()
                } else {
                   // If there is no room go back into queue
-                  await updateRequest("requested")
+                  await updateRequest(HandRaiseState.requested)
                   dispatch(actions.enqueueSuccessfulHandRaiseRequest())
                }
                break
             default:
-               await updateRequest("requested")
+               await updateRequest(HandRaiseState.requested)
                dispatch(actions.enqueueSuccessfulHandRaiseRequest())
                break
          }
@@ -259,8 +266,8 @@ function ViewerComponent({
 
    const handleJoinAsHandRaiser = async () => {
       await handlePublishLocalStream()
-      await updateRequest("connected")
-      // await dispatch(actions.setStreamerIsPublished(true));
+      await updateRequest(HandRaiseState.connected)
+      dispatch(actions.closeSuccessfulHandRaiseRequest())
    }
 
    const handleLeaveAsHandRaiser = async () => {
@@ -278,7 +285,7 @@ function ViewerComponent({
       await localMediaHandlers.closeLocalCameraTrack()
       await localMediaHandlers.closeLocalMicrophoneTrack()
       await dispatch(actions.setStreamerIsPublished(false))
-      await updateRequest("unrequested")
+      await updateRequest(HandRaiseState.unrequested)
       setShowLocalStreamPublishingModal(false)
    }
 
@@ -294,7 +301,7 @@ function ViewerComponent({
          <Streams
             externalMediaStreams={remoteStreams}
             localMediaStream={localStream}
-            currentSpeakerId={currentSpeakerId}
+            currentSpeakerId={currentSpeakerId as string}
             streamerId={streamerId}
             mobile={mobile}
             handRaiseActive={currentLivestream.handRaiseActive}
@@ -314,7 +321,6 @@ function ViewerComponent({
          {shouldInitializeAgora && <AgoraStateHandler />}
          <StreamPublishingModal
             open={Boolean(showLocalStreamPublishingModal)}
-            setOpen={setShowLocalStreamPublishingModal}
             showSoundMeter={Boolean(
                (showLocalStreamPublishingModal || showSettings) &&
                   localStream?.audioTrack
@@ -387,18 +393,14 @@ function ViewerComponent({
                   displayableMediaStream={displayableMediaStream}
                   mediaControls={mediaControls}
                   localMediaHandlers={localMediaHandlers}
+                  smallScreen={false}
                />
                <ScreenShareModal
                   open={showScreenShareModal}
                   handleClose={handleCloseScreenShareModal}
                   handleScreenShare={handleScreenShare}
+                  smallScreen={false}
                />
-               {/* <LoadingModal agoraRtcStatus={agoraRtcStatus} /> */}
-               {/* <ErrorModal
-                  agoraRtcStatus={agoraRtcStatus}
-                  agoraRtmStatus={agoraRtmStatus}
-                  agoraRtcConnectionStatus={agoraRtcConnectionStatus}
-               /> */}
             </Fragment>
          )}
 
@@ -407,8 +409,8 @@ function ViewerComponent({
             (currentLivestream.test ? (
                <div className={classes.waitingOverlay}>
                   <Typography className={classes.waitingText}>
-                     "The streamer has to press Start Streaming to be visible to
-                     students"
+                     The streamer has to press Start Streaming to be visible to
+                     students
                   </Typography>
                </div>
             ) : currentLivestream.recommendedEventIds?.length ? (
@@ -423,4 +425,4 @@ function ViewerComponent({
    )
 }
 
-export default ViewerComponent
+export default memo(ViewerComponent)

@@ -15,11 +15,8 @@ import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import Notifier from "../components/views/notifier"
-import CFCookieConsent from "../components/views/common/cookie-consent/CFCookieConsent"
-import { useRouter } from "next/router"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
-import { useEffect, useState } from "react"
 import firebaseApp, {
    AuthInstance,
    firebaseConfig,
@@ -65,8 +62,6 @@ const rrfProps = {
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
 
-   const [disableCookies, isRecordingWindow] = useRouterInformation()
-
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 
@@ -89,7 +84,7 @@ function MyApp(props) {
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
-                           <GoogleTagManager disableCookies={disableCookies}>
+                           <GoogleTagManager>
                               <ThemeProviderWrapper>
                                  <FirebaseServiceContext.Provider
                                     value={firebaseServiceInstance}
@@ -98,10 +93,6 @@ function MyApp(props) {
                                        dateAdapter={AdapterDateFns}
                                     >
                                        <ErrorProvider>
-                                          {disableCookies ||
-                                          isRecordingWindow ? null : (
-                                             <CFCookieConsent />
-                                          )}
                                           <UserRewardsNotifications>
                                              <Component {...pageProps} />
                                           </UserRewardsNotifications>
@@ -133,23 +124,6 @@ const ReactFireProviders = ({ children }) => {
          </FirestoreProvider>
       </FirebaseAppProvider>
    )
-}
-
-const useRouterInformation = () => {
-   const {
-      pathname,
-      query: { isRecordingWindow },
-   } = useRouter()
-
-   const [disableCookies, setDisableCookies] = useState(false)
-
-   useEffect(() => {
-      setDisableCookies(
-         Boolean(pathname === "/next-livestreams/[groupId]/embed")
-      )
-   }, [pathname])
-
-   return [disableCookies, isRecordingWindow]
 }
 
 // Only uncomment this method if you have blocking data requirements for

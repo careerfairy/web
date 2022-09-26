@@ -63,7 +63,6 @@ const EventsPreview = ({
    const {
       breakpoints: { up },
    } = useTheme()
-   const isSmall = useMediaQuery(up("xs"))
    const isMedium = useMediaQuery(up("md"))
    const isLarge = useMediaQuery(up("lg"))
    const [shareEventDialog, setShareEventDialog] = useState(null)
@@ -73,7 +72,7 @@ const EventsPreview = ({
    }, [setShareEventDialog])
    const numSlides: number = useMemo(() => {
       return isLarge ? 3 : isMedium ? 2 : 1
-   }, [isSmall, isMedium, isLarge])
+   }, [isMedium, isLarge])
    const numLoadingSlides = numSlides + 2
    const numElements = numSlides
    const numChildrenElements = loading ? numLoadingSlides : events?.length
@@ -99,7 +98,20 @@ const EventsPreview = ({
          {!hidePreview && (
             <Box id={id}>
                <Box sx={styles.eventsHeader}>
-                  <Heading>{title}</Heading>
+                  {isOnMarketingLandingPage ? (
+                     <Heading
+                        sx={{
+                           opacity: "unset",
+                           color: "unset",
+                           fontWeight: 500,
+                        }}
+                        variant={"h2"}
+                     >
+                        {title}
+                     </Heading>
+                  ) : (
+                     <Heading>{title}</Heading>
+                  )}
                   {events?.length >= limit &&
                      !isOnMarketingLandingPage &&
                      seeMoreLink && (
@@ -130,6 +142,7 @@ const EventsPreview = ({
                               ? "/next-livestreams"
                               : "/next-livestreams?type=pastEvents"
                         }
+                        showButton={!isOnMarketingLandingPage}
                      />
                   )}
                   <CustomButtonCarousel

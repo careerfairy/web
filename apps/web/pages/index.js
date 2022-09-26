@@ -80,7 +80,7 @@ const StudentLandingPage = ({}) => {
       },
       {
          id: 3,
-         amount: "80+",
+         amount: "230+",
          label: "Universities",
       },
    ]

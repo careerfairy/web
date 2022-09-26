@@ -1034,7 +1034,7 @@ const DraftStreamForm = ({
                               </Grid>
                            </FormGroup>
 
-                           <SuspenseWithBoundary hide>
+                           <SuspenseWithBoundary hide expected>
                               {values.groupIds.length > 0 && (
                                  <JobSelectorCategory
                                     groupId={values.groupIds[0]} // we only support a single group for now
