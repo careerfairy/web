@@ -114,7 +114,7 @@ export class CommonPage {
    }
 
    public enterEvent() {
-      return this.exactText("Enter event").click()
+      return this.resilientClick("text=Enter event")
    }
 }
 
