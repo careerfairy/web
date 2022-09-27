@@ -12,6 +12,7 @@ import { admin } from "../api/firestoreAdmin"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import { UserAdminGroup, UserData } from "@careerfairy/shared-lib/dist/users"
+import firebase from "firebase/compat"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -83,6 +84,13 @@ export class GroupFunctionsRepository
    extends FirebaseGroupRepository
    implements IGroupFunctionsRepository
 {
+   constructor(
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue,
+      private readonly auth: admin.auth.Auth
+   ) {
+      super(firestore, fieldValue)
+   }
    private async setGroupAdminRoleInFirestore(
       group: Group,
       userData: UserData,
@@ -155,7 +163,7 @@ export class GroupFunctionsRepository
       }
 
       const group = this.addIdToDoc<Group>(groupDoc)
-      const user = await admin.auth().getUserByEmail(userEmail) //
+      const user = await this.auth.getUserByEmail(userEmail) //
 
       const userRole = user.customClaims?.adminGroups?.[group.id]?.role
 
@@ -177,7 +185,7 @@ export class GroupFunctionsRepository
          .doc(targetEmail)
          .get()
       const userData = this.addIdToDoc<UserData>(userSnap)
-      const user = await admin.auth().getUserByEmail(targetEmail)
+      const user = await this.auth.getUserByEmail(targetEmail)
 
       const currentAdmins = (await this.getGroupAdmins(group.id)) || []
 
@@ -215,18 +223,18 @@ export class GroupFunctionsRepository
          delete newClaims.adminGroups[group.id]
       }
 
-      await admin.auth().setCustomUserClaims(user.uid, newClaims)
+      await this.auth.setCustomUserClaims(user.uid, newClaims)
 
       await this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            admin.auth().setCustomUserClaims(user.uid, oldClaims)
+            this.auth.setCustomUserClaims(user.uid, oldClaims)
             throw error
          }
       )
 
       return this.firestore.collection("userData").doc(targetEmail).update({
-         refreshTokenTime: admin.firestore.FieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
+         refreshTokenTime: this.fieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
       })
    }
 
