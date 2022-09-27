@@ -64,7 +64,7 @@ const useDataFromFunction = (
    groupId: string,
    livestreamIds: string[]
 ): RegistrationSourcesResponseItem[] => {
-   const fetcher = useFunctionsSWR<Job[]>()
+   const fetcher = useFunctionsSWR<RegistrationSourcesResponseItem[]>()
 
    const { data } = useSWR(
       livestreamIds.length == 0
