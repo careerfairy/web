@@ -41,6 +41,7 @@ import {
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import { actionTypes } from "redux-firestore"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -52,6 +53,16 @@ const rrfConfig = {
    // userProfile: 'userData',
    useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
    attachAuthIsReady: true, // attaches auth is ready promise to store
+   /*  react-redux-firebase doesn't clear the userData or any data when the user
+    *  logs out and logs back in with a different account, so we need to check that the id matches
+    * [issue](https://github.com/prescottprue/redux-firestore/issues/114#issuecomment-415622171)
+    */
+   onAuthStateChanged: (authData, firebase, dispatch) => {
+      // Clear redux-firestore state if auth does not exist (i.e logout)
+      if (!authData) {
+         dispatch({ type: actionTypes.CLEAR_DATA })
+      }
+   },
 }
 
 export const store = newStore()
