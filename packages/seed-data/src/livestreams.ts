@@ -88,12 +88,13 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
    createLive(
       overrideFields?: Partial<LivestreamEvent>
    ): Promise<LivestreamEvent> {
+      const minutesBefore = faker.datatype.number({ min: 1, max: 25 })
+      const pastDateMs = Date.now() - minutesBefore * 60 * 1000
+
       return this.create(
          Object.assign(
             {
-               start: admin.firestore.Timestamp.fromDate(
-                  faker.date.recent(faker.datatype.number({ min: 0, max: 1 }))
-               ),
+               start: admin.firestore.Timestamp.fromDate(new Date(pastDateMs)),
                hasStarted: true,
             },
             overrideFields

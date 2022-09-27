@@ -1,4 +1,4 @@
-import { expect, Page, test } from "@playwright/test"
+import { expect, Locator, Page, test } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import LivestreamSeed, {
@@ -46,7 +46,7 @@ test("successful registration on a livestream event", async ({ page }) => {
    await livestreamPage.skip()
    await expectExactText(page, `Join the ${livestream.company} Talent Pool`)
 
-   await livestreamPage.skip()
+   await livestreamPage.resilientClick("text=Skip")
    await livestreamPage.finish()
 
    // redirect
@@ -156,6 +156,8 @@ test("livestream has already started, confirm the redirection without any regist
    page,
    browserName,
 }) => {
+   // page.locator = slowLocator(page, 1000)
+
    // TODO: remove this when Agora supports Webkit 16.x
    test.skip(
       browserName === "webkit",
@@ -173,7 +175,7 @@ test("livestream has already started, confirm the redirection without any regist
    await livestreamPage.enterEvent()
 
    // https://github.com/microsoft/playwright/issues/13640
-   await sleep(500)
+   await sleep(3000)
    try {
       await page.reload()
    } catch (e) {
@@ -244,4 +246,30 @@ async function setupData(
    )
 
    return { group, livestream }
+}
+
+// Return a "slow" page locator that waits before 'click' and 'fill' requests
+function slowLocator(
+   page: Page,
+   waitInMs: number
+): (...args: any[]) => Locator {
+   // Grab original
+   const l = page.locator.bind(page)
+
+   // Return a new function that uses the original locator but remaps certain functions
+   return (locatorArgs) => {
+      const locator = l(locatorArgs)
+
+      locator.click = async (args) => {
+         await new Promise((r) => setTimeout(r, waitInMs))
+         return l(locatorArgs).click(args)
+      }
+
+      locator.fill = async (args) => {
+         await new Promise((r) => setTimeout(r, waitInMs))
+         return l(locatorArgs).fill(args)
+      }
+
+      return locator
+   }
 }
