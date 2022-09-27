@@ -25,7 +25,7 @@ import {
 import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
-} from "../lib/GroupFunctionsRepository"
+} from "@careerfairy/shared-lib/dist/groups/GroupFunctionsRepository"
 
 const firestoreInstance = admin.firestore() as any
 const authInstance = admin.auth()
