@@ -109,8 +109,8 @@ export class FirebaseGroupRepository
    implements IGroupRepository
 {
    constructor(
-      readonly firestore: firebase.firestore.Firestore,
-      readonly fieldValue: typeof firebase.firestore.FieldValue
+      protected readonly firestore: firebase.firestore.Firestore,
+      protected readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
    }

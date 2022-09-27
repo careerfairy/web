@@ -28,9 +28,14 @@ import {
 } from "../lib/GroupFunctionsRepository"
 
 const firestoreInstance = admin.firestore() as any
+const authInstance = admin.auth()
 
 export const groupRepo: IGroupFunctionsRepository =
-   new GroupFunctionsRepository(firestoreInstance, admin.firestore.FieldValue)
+   new GroupFunctionsRepository(
+      firestoreInstance,
+      admin.firestore.FieldValue,
+      authInstance
+   )
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
    firestoreInstance,
