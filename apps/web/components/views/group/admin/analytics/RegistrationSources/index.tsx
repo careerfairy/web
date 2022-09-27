@@ -26,19 +26,16 @@ const Sources = (props: Props) => {
             group={props.group}
             streamsFromTimeFrameAndFuture={props.streamsFromTimeFrameAndFuture}
          >
-            <>
-               <Box p={3}>
-                  <Grid container spacing={3}>
-                     <Grid item xs={12}>
-                        <AggregatedSourcesChart />
-                     </Grid>
+            <Box p={3}>
+               <Grid container spacing={3}>
+                  <Grid item xs={12}>
+                     <AggregatedSourcesChart />
                   </Grid>
-               </Box>
-
-               <Box p={3} pt={0}>
-                  <LivestreamsTable />
-               </Box>
-            </>
+                  <Grid item xs={12}>
+                     <LivestreamsTable />
+                  </Grid>
+               </Grid>
+            </Box>
          </RegistrationSourcesProvider>
       </SuspenseWithBoundary>
    )
