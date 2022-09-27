@@ -78,9 +78,9 @@ export class GroupFunctionsRepository
    implements IGroupFunctionsRepository
 {
    constructor(
-      readonly firestore: firebase.firestore.Firestore,
-      readonly fieldValue: typeof firebase.firestore.FieldValue,
-      private readonly auth: admin.auth.Auth
+      protected readonly firestore: firebase.firestore.Firestore,
+      protected readonly fieldValue: typeof firebase.firestore.FieldValue,
+      protected readonly auth: admin.auth.Auth
    ) {
       super(firestore, fieldValue)
    }
