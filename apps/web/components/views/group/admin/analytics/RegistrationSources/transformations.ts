@@ -30,7 +30,7 @@ export const sourcesByDate = (
          const refToEntry = res[entryIdx]
          res[entryIdx] = {
             ...refToEntry,
-            dates: [...refToEntry.dates, item.registered.date],
+            dates: refToEntry.dates.concat(item.registered.date),
          }
       } else {
          // add new array entry with new date
