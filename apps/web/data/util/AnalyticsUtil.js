@@ -23,24 +23,9 @@ export const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
    }
 }
 
-export const mapUserCategories = (user, group) => {
-   group.categories.forEach((category) => {
-      const targetCategoryId = category.id
-      if (targetCategoryId) {
-         const propertyName = toTitleCase(category.name)
-         if (!user[propertyName]) {
-            const categoryOptionName =
-               getCategoryOptionName(targetCategoryId, user, group) || ""
-            user[propertyName] = toTitleCase(categoryOptionName.toLowerCase())
-         }
-      }
-   })
-   return user
-}
-
-export const mapUserEngagement = (user, streams, group) => {
+export const mapUserEngagement = (user, streams) => {
    let categoryUser = {
-      ...mapUserCategories(user, group),
+      ...user,
       levelOfStudy: {
          ...user.levelOfStudy,
          name: user.levelOfStudy?.name || null,
@@ -250,7 +235,6 @@ export default {
    convertArrayOfUserObjectsToDictionary,
    getCategoryOptionName,
    getTotalUniqueIds,
-   mapUserCategories,
    getAggregateCategories,
    getTypeOfStudents,
    getTotalUniqueStreamGroupIdsFromStreams,
