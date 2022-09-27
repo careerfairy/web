@@ -1,17 +1,14 @@
-import {
-   FirebaseGroupRepository,
-   IGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+import { FirebaseGroupRepository, IGroupRepository } from "./GroupRepository"
 import {
    Group,
    GroupAdmin,
    GROUP_DASHBOARD_ROLE,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
-import { admin } from "../api/firestoreAdmin"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { UserAdminGroup, UserData } from "@careerfairy/shared-lib/dist/users"
+} from "./groups"
+import admin = require("firebase-admin")
+import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
+import { GroupDashboardInvite } from "./GroupDashboardInvite"
+import { UserAdminGroup, UserData } from "../users"
 import firebase from "firebase/compat"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {

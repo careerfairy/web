@@ -11,6 +11,7 @@
       "clean": "rimraf dist/"
    },
    "dependencies": {
+      "firebase-admin": "^10.0.2",
       "lodash.clonedeep": "^4.5.0",
       "object-hash": "^3.0.0"
    },
