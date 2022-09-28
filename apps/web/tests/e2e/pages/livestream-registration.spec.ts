@@ -50,9 +50,11 @@ test("successful registration on a livestream event", async ({ page }) => {
    await livestreamPage.finish()
 
    // redirect
-   await page.waitForURL(
-      `**/next-livestreams/${group.id}?livestreamId=${livestream.id}`
-   )
+   const expectedPath = `/next-livestreams/${group.id}?livestreamId=${livestream.id}`
+   if (page.url().indexOf(expectedPath) === -1) {
+      // wait for navigation if not there yet
+      await page.waitForURL(`**${expectedPath}`)
+   }
 
    await expectSelector(page, `h3:has-text("${group.universityName}")`)
    await expectExactText(page, group.description)
