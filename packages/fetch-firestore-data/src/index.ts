@@ -31,11 +31,14 @@ async function run(): Promise<void> {
    h1Text(`Emulators ready to receive commands`)
 
    // gdpr, delete production user data
-   const collections = ["users", "userData"]
+   const collections = ["users"]
    h1Text(`Removing collections: ${collections.join(",")}`)
    await removeExistingCollections(collections)
    h1Text(`Deleting Auth`)
    await deleteAuth()
+
+   h1Text("Re-creating auth users")
+   await createAuthUsers()
 
    h1Text(`Seeding data`)
    await createUser("carlos@careerfairy.io")
@@ -75,6 +78,17 @@ async function createUser(email: string, superAdmin: boolean = false) {
          h1Text(e)
       }
 
+      throw e
+   }
+}
+/**
+ * Create creates all the auth users based on the userData docs
+ */
+async function createAuthUsers() {
+   try {
+      return await UserSeed.createAuthUsersFromUserData()
+   } catch (e) {
+      h1Text(e)
       throw e
    }
 }

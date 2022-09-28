@@ -59,23 +59,24 @@ export function convertDictToDocArray<T>(dict: Record<string, T>): T[] {
         }))
       : []
 }
-
+type DocRef =
+   firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
 /**
  * Add the document id to the document itself
  *
  * @param documentSnapshot
  * @param withRef
  */
-export function mapFirestoreDocuments<T>(
+export function mapFirestoreDocuments<T, R extends boolean = false>(
    documentSnapshot: QuerySnapshot,
-   withRef: boolean = false
-): T[] | null {
+   withRef?: R
+): (R extends true ? T & { _ref: DocRef } : T)[] | null {
    let docs = null
    if (!documentSnapshot.empty) {
       docs = documentSnapshot.docs.map((doc) => ({
          ...doc.data(),
          id: doc.id,
-         ...(withRef ? { ref: doc.ref } : {}),
+         ...(withRef ? { _ref: doc.ref } : {}),
       }))
    }
    return docs
