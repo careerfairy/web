@@ -62,11 +62,7 @@ export class GroupScriptsRepository
    }
 
    async getAllAdmins<T extends boolean>(withRef?: T) {
-      const admins = await this.firestore
-         .collectionGroup("admins")
-         .orderBy("role")
-         .get()
-
+      const admins = await this.firestore.collectionGroup("admins").get()
       return mapFirestoreDocuments<GroupAdmin, T>(admins, withRef)
    }
 
@@ -87,23 +83,30 @@ export class GroupScriptsRepository
       )
 
       const user = await this.auth.getUserByEmail(targetEmail).catch(() => null)
-      // console.log("-> user", user)
 
-      if (!user || !group) {
+      if (!user || !group || userData.isAdmin) {
+         // If the group or users no longer exists, we can still use this to remove the user's role from the group's admins sub-collection list
+
          const groupId = group?.id ?? fallbackGroupId
+
          // If the user or group doesn't exist, delete the admin role in firestore
          // User does not exist in auth, so remove from group
          const reasons = [
             !user ? "User does not exist in auth" : "",
             !group ? "Group does not exist in firestore" : "",
+            userData.isAdmin
+               ? "User is a CF admin (Already has access to all dashboards)"
+               : "",
          ]
-         console.log(
-            `-> removing admin roles for: ${
+
+         console.info(
+            `-> removing admin roles for ${
                userData.id
             } in group ${groupId} because ${reasons
                .filter(Boolean)
                .join(" and ")}`
          )
+
          const groupAdminsRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
@@ -122,11 +125,6 @@ export class GroupScriptsRepository
          })
       }
 
-      if (userData.isAdmin) {
-         console.log("-> skipping setting claims for admin user", userData.id)
-         return
-      }
-
       // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER FOR EVERY GROUP AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
          await this.checkIfThereWillBeAtLeastOneOwner(
@@ -136,8 +134,9 @@ export class GroupScriptsRepository
          )
 
       if (!thereWillBeAtLeastOneOwner) {
+         newRole = GROUP_DASHBOARD_ROLE.OWNER
          console.warn(
-            `There will be no owner for group ${group.id} after this operation`,
+            `There will be no owner for group ${group.id} after this operation, will make them an owner`,
             {
                newRole,
                targetEmail,
@@ -146,16 +145,12 @@ export class GroupScriptsRepository
          )
       }
 
-      const oldClaims: admin.auth.UserRecord["customClaims"] = {
-         ...user.customClaims,
-      }
-
       await this.setGroupAdminRoleInClaims(user, newRole, group)
 
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            this.auth.setCustomUserClaims(user.uid, oldClaims)
+            this.auth.setCustomUserClaims(user.uid, user.customClaims)
             throw error
          }
       )
