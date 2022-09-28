@@ -1,5 +1,6 @@
 import React, {
    createContext,
+   useCallback,
    useEffect,
    useMemo,
    useReducer,
@@ -17,9 +18,12 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 
+type Variants = "standard"
+type Margins = "normal"
+
 // Applied to all fields
-const variant = "standard"
-const margin = "normal"
+const variant: Variants = "standard"
+const margin: Margins = "normal"
 
 interface DefaultContext {
    activeStep: number
@@ -28,8 +32,8 @@ interface DefaultContext {
    handleClose: () => void
    handleGoToLast: () => void
    handleSkipNext: () => void
-   variant: "standard"
-   margin: "normal"
+   variant: Variants
+   margin: Margins
    livestream: LivestreamEvent
    group?: Group
    getMore: () => Promise<void>
@@ -199,15 +203,21 @@ export function RegistrationContextProvider({
    const handleNext = () => dispatch({ type: "increase" })
    // Go back to prev step
    const handleBack = () => dispatch({ type: "decrease" })
-   const handleGoToLast = () =>
-      dispatch({ type: "set-step", payload: totalSteps ? totalSteps - 1 : 0 })
+   const handleGoToLast = useCallback(
+      () =>
+         dispatch({
+            type: "set-step",
+            payload: totalSteps ? totalSteps - 1 : 0,
+         }),
+      [totalSteps]
+   )
 
    const handleSkipNext = () => dispatch({ type: "skip-next" })
 
-   const handleClose = () => {
+   const handleClose = useCallback(() => {
       closeModal()
       dispatch({ type: "set-step", payload: 0 })
-   }
+   }, [closeModal])
 
    const handleChangeQuestionSortType = (event, newSortType) => {
       if (newSortType !== null) {
@@ -268,7 +278,7 @@ export function RegistrationContextProvider({
       })()
    }, [groups])
 
-   const verifyResumeRequirement = () => {
+   const verifyResumeRequirement = useCallback(() => {
       if (livestream) {
          if (!livestream.withResume) {
             handleNext()
@@ -276,72 +286,120 @@ export function RegistrationContextProvider({
       } else {
          handleNext()
       }
-   }
+   }, [livestream])
 
-   const completeRegistrationProcess = async (
-      userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
-   ) => {
-      try {
-         if (livestream) {
-            await registerToLivestream(
-               livestream.id,
-               authenticatedUser,
-               groupsWithPolicies,
-               userAnsweredLivestreamGroupQuestions
-            )
+   const handleSendConfirmEmail = useCallback(
+      () =>
+         sendRegistrationConfirmationEmail(
+            authenticatedUser,
+            userData,
+            livestream
+         ),
+      [
+         authenticatedUser,
+         livestream,
+         sendRegistrationConfirmationEmail,
+         userData,
+      ]
+   )
+
+   const completeRegistrationProcess = useCallback(
+      async (
+         userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
+      ) => {
+         try {
+            if (livestream) {
+               await registerToLivestream(
+                  livestream.id,
+                  authenticatedUser,
+                  groupsWithPolicies,
+                  userAnsweredLivestreamGroupQuestions
+               )
+            }
+            handleSendConfirmEmail()
+         } catch (e) {
+            console.error(e)
          }
-         handleSendConfirmEmail()
-      } catch (e) {
-         console.error(e)
-      }
-      if (livestream) {
-         // Go to booking step...
-         return handleNext()
-      } else {
-         return handleClose()
-      }
-   }
+         if (livestream) {
+            // Go to booking step...
+            return handleNext()
+         } else {
+            return handleClose()
+         }
+      },
+      [
+         authenticatedUser,
+         groupsWithPolicies,
+         handleClose,
+         handleSendConfirmEmail,
+         livestream,
+         registerToLivestream,
+      ]
+   )
 
-   const handleSendConfirmEmail = () =>
-      sendRegistrationConfirmationEmail(authenticatedUser, userData, livestream)
+   const contextValues = useMemo(() => {
+      return {
+         activeStep,
+         handleNext,
+         totalSteps,
+         handleBack,
+         variant,
+         margin,
+         group,
+         groups,
+         setGroup,
+         groupsWithPolicies,
+         hasAgreedToAll,
+         questions: docs,
+         hasMore,
+         getMore,
+         handleClientSideQuestionUpdate,
+         livestream,
+         handleClose,
+         verifyResumeRequirement,
+         completeRegistrationProcess,
+         handleSkipNext,
+         setTotalSteps,
+         sliding,
+         setSliding,
+         handleGoToLast,
+         promptOtherEventsOnFinal,
+         gettingPolicyStatus,
+         handleChangeQuestionSortType,
+         questionSortType,
+         loadingInitialQuestions,
+         onFinish,
+         onQuestionsAnswered,
+         cancelable,
+      }
+   }, [
+      activeStep,
+      cancelable,
+      completeRegistrationProcess,
+      docs,
+      getMore,
+      gettingPolicyStatus,
+      group,
+      groups,
+      groupsWithPolicies,
+      handleClientSideQuestionUpdate,
+      handleClose,
+      handleGoToLast,
+      hasAgreedToAll,
+      hasMore,
+      livestream,
+      loadingInitialQuestions,
+      onFinish,
+      onQuestionsAnswered,
+      promptOtherEventsOnFinal,
+      questionSortType,
+      sliding,
+      totalSteps,
+      verifyResumeRequirement,
+   ])
 
    return (
-      <RegistrationContext.Provider
-         value={{
-            activeStep,
-            handleNext,
-            totalSteps,
-            handleBack,
-            variant,
-            margin,
-            group,
-            groups,
-            setGroup,
-            groupsWithPolicies,
-            hasAgreedToAll,
-            questions: docs,
-            hasMore,
-            getMore,
-            handleClientSideQuestionUpdate,
-            livestream,
-            handleClose,
-            verifyResumeRequirement,
-            completeRegistrationProcess,
-            handleSkipNext,
-            setTotalSteps,
-            sliding,
-            setSliding,
-            handleGoToLast,
-            promptOtherEventsOnFinal,
-            gettingPolicyStatus,
-            handleChangeQuestionSortType,
-            questionSortType,
-            loadingInitialQuestions,
-            onFinish,
-            onQuestionsAnswered,
-            cancelable,
-         }}
-      >
+      <RegistrationContext.Provider value={contextValues}>
          {children}
       </RegistrationContext.Provider>
    )
