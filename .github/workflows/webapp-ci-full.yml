@@ -63,38 +63,38 @@ jobs:
                    - 'packages/shared-lib/**'
 
    # Run Unit Tests
-   #   unit_tests:
-   #      name: "Unit Tests"
-   #      needs: [build_app_for_tests]
-   #      # only run if there are changes on the webapp & shared lib
-   #      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
-   #      runs-on: ubuntu-latest
-   #      timeout-minutes: 10
-   #      env:
-   #         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-   #         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-   #         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-   #         NODE_ENV: test
-   #      steps:
-   #         - uses: actions/checkout@v2
-   #         - uses: actions/setup-node@v2
-   #           with:
-   #              node-version: "16"
-   #         - name: Cache node modules
-   #           id: cache-nodemodules
-   #           uses: actions/cache@v2
-   #           with:
-   #              path: "**/node_modules"
-   #              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-   #         - name: Install Dependencies
-   #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-   #           run: npm ci --ignore-scripts
-   #
-   #         - name: Build
-   #           run: npm run build
-   #
-   #         - name: Run Jest Unit Tests
-   #           run: npm run test
+   unit_tests:
+      name: "Unit Tests"
+      needs: [build_app_for_tests]
+      # only run if there are changes on the webapp & shared lib
+      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
+      runs-on: ubuntu-latest
+      timeout-minutes: 10
+      env:
+         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+         SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+         NODE_ENV: test
+      steps:
+         - uses: actions/checkout@v2
+         - uses: actions/setup-node@v2
+           with:
+              node-version: "16"
+         - name: Cache node modules
+           id: cache-nodemodules
+           uses: actions/cache@v2
+           with:
+              path: "**/node_modules"
+              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+         - name: Install Dependencies
+           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           run: npm ci --ignore-scripts
+
+         - name: Build
+           run: npm run build
+
+         - name: Run Jest Unit Tests
+           run: npm run test
 
    # Run E2E Tests
    e2e_tests:
@@ -151,8 +151,9 @@ jobs:
               restore-keys: |
                  ${{ runner.os }}-playwright-
 
-         - name: Install Playwright's dependencies
-           #           if: steps.playwright-cache.outputs.cache-hit != 'true'
+         - name:
+              Install Playwright's dependencies
+              #           if: steps.playwright-cache.outputs.cache-hit != 'true'
            run: npx playwright install --with-deps
 
          - name: Run Playwright End to End tests
@@ -162,7 +163,7 @@ jobs:
            run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
-           #           if: ${{ failure() }}
+           if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
               name: ${{ matrix.shard }}-playwright-report
@@ -174,22 +175,22 @@ jobs:
            with:
               name: ${{ matrix.shard }}-debug-logs
               path: firebase-debug.log
-#   # Deploy
-#   deploy:
-#      name: "Deploy"
-#      needs: [e2e_tests, unit_tests]
-#      runs-on: ubuntu-latest
-#      timeout-minutes: 20
-#      steps:
-#         - uses: actions/checkout@v2
-#         - uses: amondnet/vercel-action@v25.1.0 #deploy
-#           id: vercel-action
-#           with:
-#              vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
-#              github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
-#              vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
-#              vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
-#              vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
-#         - name: preview-url
-#           run: |
-#              echo ${{ steps.vercel-action.outputs.preview-url }}
+   # Deploy
+   deploy:
+      name: "Deploy"
+      needs: [e2e_tests, unit_tests]
+      runs-on: ubuntu-latest
+      timeout-minutes: 20
+      steps:
+         - uses: actions/checkout@v2
+         - uses: amondnet/vercel-action@v25.1.0 #deploy
+           id: vercel-action
+           with:
+              vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
+              github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
+              vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
+              vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
+              vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
+         - name: preview-url
+           run: |
+              echo ${{ steps.vercel-action.outputs.preview-url }}
