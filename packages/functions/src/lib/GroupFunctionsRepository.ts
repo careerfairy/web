@@ -120,18 +120,17 @@ export class GroupFunctionsRepository
          .collection("userData")
          .doc(targetEmail)
          .get()
-      const userData = this.addIdToDoc<UserData>(userSnap)
-      const user = await this.auth.getUserByEmail(targetEmail)
 
-      const currentAdmins = (await this.getGroupAdmins(group.id)) || []
+      const userData = this.addIdToDoc<UserData>(userSnap)
+
+      const user = await this.auth.getUserByEmail(targetEmail)
 
       // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER FOR EVERY GROUP AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
          await this.checkIfThereWillBeAtLeastOneOwner(
             group.id,
             newRole,
-            targetEmail,
-            currentAdmins
+            targetEmail
          )
 
       if (!thereWillBeAtLeastOneOwner) {
@@ -140,8 +139,23 @@ export class GroupFunctionsRepository
          )
       }
 
-      const oldClaims = { ...user.customClaims } // copy the old claims
+      await this.setGroupAdminRoleInClaims(user, newRole, group)
 
+      return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
+         (error) => {
+            // if there was an error, revert the custom claims
+            this.auth.setCustomUserClaims(user.uid, user.customClaims)
+            throw error
+         }
+      )
+   }
+
+   protected async setGroupAdminRoleInClaims(
+      authUser: admin.auth.UserRecord,
+      newRole: GROUP_DASHBOARD_ROLE | null,
+      group: Group
+   ) {
+      const oldClaims = { ...authUser.customClaims }
       let newClaims = JSON.parse(JSON.stringify(oldClaims)) // deep copy the old claims
 
       if (newRole) {
@@ -159,19 +173,37 @@ export class GroupFunctionsRepository
          delete newClaims.adminGroups[group.id]
       }
 
-      await this.auth.setCustomUserClaims(user.uid, newClaims)
+      return this.auth.setCustomUserClaims(authUser.uid, newClaims)
+   }
 
-      await this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
-         (error) => {
-            // if there was an error, revert the custom claims
-            this.auth.setCustomUserClaims(user.uid, oldClaims)
-            throw error
-         }
+   async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
+      const adminsSnap = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("groupAdmins")
+         .get()
+
+      return mapFirestoreDocuments(adminsSnap)
+   }
+
+   protected async checkIfThereWillBeAtLeastOneOwner(
+      groupId: string,
+      newRole: GROUP_DASHBOARD_ROLE,
+      userEmail: string
+   ) {
+      const currentAdmins = (await this.getGroupAdmins(groupId)) || []
+
+      const potentialNewAdmins: Partial<GroupAdmin>[] = [
+         ...currentAdmins.filter((admin) => admin.id !== userEmail),
+         // add the new admin to the list of current admins if it's not already there
+         ...(newRole ? [{ id: userEmail, role: newRole }] : []), // if the new role is null, then the user is being removed as an admin
+      ]
+
+      const totalOwners = potentialNewAdmins.filter(
+         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER
       )
 
-      return this.firestore.collection("userData").doc(targetEmail).update({
-         refreshTokenTime: this.fieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
-      })
+      return totalOwners.length > 0 // there must be at least one owner
    }
 
    async createGroupDashboardInvite(

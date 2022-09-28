@@ -13,8 +13,8 @@ export class UserScriptsRepository
    extends FirebaseUserRepository
    implements IUserScriptsRepository
 {
-   async getAllUsers(withRef?: boolean): Promise<UserData[]> {
+   async getAllUsers<T extends boolean>(withRef?: T): Promise<UserData[]> {
       const users = await this.firestore.collection("userData").get()
-      return mapFirestoreDocuments<UserData>(users, withRef)
+      return mapFirestoreDocuments<UserData, T>(users, withRef)
    }
 }
