@@ -258,7 +258,7 @@ const handleSendEmail = (
             emailMaxChunkSize
          )
 
-         emailsData.map((emailData, index) => {
+         emailsData.forEach((emailData, index) => {
             const currentChunk = `${index + 1}of${emailsData.length}`
 
             // We only want to send the current email chunk reminder if it hasn't already been sent
