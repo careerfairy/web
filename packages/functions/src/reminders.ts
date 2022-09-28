@@ -8,7 +8,7 @@ import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import {
    getStreamsByDateWithRegisteredStudents,
-   updateLiveStreamWithEmailSent,
+   updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
@@ -105,7 +105,7 @@ const emailMaxChunkSize = 950
 export type ReminderData = {
    timeMessage: string
    minutesBefore: number
-   livestreamKey: string
+   key: string
    template: string
 }
 
@@ -113,21 +113,21 @@ const Reminder5Min: ReminderData = {
    template: "variable_message_title",
    timeMessage: "NOW",
    minutesBefore: 5,
-   livestreamKey: "reminder5Minutes",
+   key: "reminder5Minutes",
 }
 
 const Reminder1Hour: ReminderData = {
    template: "variable_message_title",
    timeMessage: "in 1 hour",
    minutesBefore: 60,
-   livestreamKey: "reminder1Hour",
+   key: "reminder1Hour",
 }
 
 const Reminder24Hours: ReminderData = {
    template: "variable_message_title",
    timeMessage: "TOMORROW",
    minutesBefore: 1440,
-   livestreamKey: "reminder24Hours",
+   key: "reminder24Hours",
 }
 
 /**
@@ -136,8 +136,12 @@ const Reminder24Hours: ReminderData = {
  *
  * So we will be looking for streams that start on current date + {reminderDateDelay}
  */
-export const scheduleReminderEmails = functions.pubsub
-   .schedule("every 15 minutes")
+export const scheduleReminderEmails = functions
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 300,
+   })
+   .pubsub.schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
    .onRun((context) => {
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
@@ -213,10 +217,15 @@ const handleReminder = async (
          filterEndDate
       )
 
-      await handleSendEmail(streams, reminder)
+      const emailsToSave = await handleSendEmail(streams, reminder)
+
+      if (emailsToSave) {
+         // save all the successfully sent reminders on the DB
+         return await updateLiveStreamsWithEmailSent(emailsToSave)
+      }
    } catch (error) {
       functions.logger.error(
-         `Error handling reminder with template ${reminder.livestreamKey}`,
+         `Error handling reminder with template ${reminder.key}`,
          error
       )
       throw new functions.https.HttpsError("unknown", error)
@@ -253,13 +262,7 @@ const handleSendEmail = (
             const currentChunk = `${index + 1}of${emailsData.length}`
 
             // We only want to send the current email chunk reminder if it hasn't already been sent
-            if (
-               wasEmailChunkNotYetSent(
-                  stream,
-                  reminder.livestreamKey,
-                  currentChunk
-               )
-            ) {
+            if (wasEmailChunkNotYetSent(stream, reminder.key, currentChunk)) {
                promiseArrayToSendMessages.push(
                   createSendEmailPromise(
                      emailData,
@@ -273,37 +276,36 @@ const handleSendEmail = (
       }
    })
 
+   if (promiseArrayToSendMessages.length === 0) {
+      return null
+   }
+
    return Promise.allSettled(promiseArrayToSendMessages).then((results) => {
-      let emailsSent
-      results.forEach((result: any) => {
-         const { status, value, reason } = result
+      return results.reduce((acc: any, currentResult: any) => {
+         const { status, value, reason } = currentResult
 
          if (status === "fulfilled") {
-            const { livestreamKey, streamId, chunk } = value
-
-            emailsSent = {
-               livestreamKey,
-               streamId,
-               chunks: emailsSent?.chunks?.length
-                  ? [...emailsSent.chunks, chunk]
-                  : [chunk],
-            }
+            const { reminderKey, streamId, chunk } = value
 
             functions.logger.log(
-               `Email ${livestreamKey} with chunk ${chunk} was sent successfully for the stream ${streamId}`
+               `Email ${reminderKey} with chunk ${chunk} was sent successfully for the stream ${streamId}`
             )
-         } else {
-            functions.logger.error(reason)
-            throw new Error(reason)
+            return {
+               ...acc,
+               [streamId]: {
+                  reminderKey,
+                  streamId,
+                  chunks: acc?.[streamId]?.chunks?.length
+                     ? [...acc[streamId].chunks, chunk]
+                     : [chunk],
+               },
+            }
          }
-      })
-      if (emailsSent) {
-         updateLiveStreamWithEmailSent(
-            emailsSent.streamId,
-            emailsSent.livestreamKey,
-            emailsSent.chunks
-         ).catch()
-      }
+         if (status === "rejected") {
+            functions.logger.error(reason)
+         }
+         return acc
+      }, {})
    })
 }
 
@@ -318,15 +320,15 @@ const createSendEmailPromise = (
    currentChunk: string
 ) => {
    const { id } = stream
-   const { livestreamKey } = reminder
+   const { key } = reminder
 
    return sendMessage(emailData)
       .then(() => {
-         return { livestreamKey, streamId: id, chunk: currentChunk }
+         return { reminderKey: key, streamId: id, chunk: currentChunk }
       })
       .catch((error) => {
          throw new Error(
-            `Email ${livestreamKey} with chunk ${currentChunk} was not sent for stream ${id} with the error ${error?.message}`
+            `Email ${key} with chunk ${currentChunk} was not sent for stream ${id} with the error ${error?.message}`
          )
       })
 }
@@ -342,7 +344,7 @@ const wasEmailChunkNotYetSent = (
 ): boolean => {
    if (stream.reminderEmailsSent) {
       const firebaseChunks = stream.reminderEmailsSent[reminderKey]
-      return !firebaseChunks.includes(currentChunk)
+      return !firebaseChunks?.includes(currentChunk)
    }
 
    return true

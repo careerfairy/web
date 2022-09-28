@@ -148,20 +148,20 @@ const addUsersDataOnStreams = async (
 }
 
 /**
- * Update {reminderEmailsSent} value on livestream DB with the specific reminder email that was sent
- *
+ * Update all the successfully sent reminders for each livestream
  */
-export const updateLiveStreamWithEmailSent = (
-   streamId: string,
-   livestreamKey: string,
-   chunks: string[]
-): Promise<admin.firestore.WriteResult> => {
-   return admin
-      .firestore()
-      .collection("livestreams")
-      .doc(streamId)
-      .update({
-         [`reminderEmailsSent.${livestreamKey}`]:
-            admin.firestore.FieldValue.arrayUnion(...chunks),
+export const updateLiveStreamsWithEmailSent = async (emailsToSave) => {
+   const batch = admin.firestore().batch()
+
+   Object.values(emailsToSave).forEach((email: any) => {
+      const { streamId, reminderKey, chunks } = email
+
+      const ref = admin.firestore().collection("livestreams").doc(streamId)
+
+      batch.update(ref, {
+         [`reminderEmailsSent.${reminderKey}`]: chunks,
       })
+   })
+
+   await batch.commit()
 }

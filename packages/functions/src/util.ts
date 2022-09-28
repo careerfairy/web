@@ -40,6 +40,10 @@ export const generateReminderEmailData = (
 ): MailgunMessageData[] => {
    const { company, start, registeredUsers, timezone } = stream
 
+   if (!start || !registeredUsers?.length) {
+      return []
+   }
+
    const luxonStartDate = DateTime.fromJSDate(start.toDate(), {
       zone: timezone || "Europe/Zurich",
    })
