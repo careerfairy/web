@@ -7,13 +7,19 @@ module.exports = {
       auth: () => ({
          onAuthStateChanged: () => {},
          onIdTokenChanged: () => {},
+         useEmulator: () => {},
       }),
       firestore: () => ({
          settings: () => {},
          FieldValue: {},
+         useEmulator: () => {},
       }),
-      functions: () => {},
-      storage: () => {},
+      functions: () => ({
+         useEmulator: () => {},
+      }),
+      storage: () => ({
+         useEmulator: () => {},
+      }),
    }),
    firestore: {
       FieldValue: {},
