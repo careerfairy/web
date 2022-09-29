@@ -223,7 +223,7 @@ export const errorLogAndNotify = (error: Error, metadata?: any) => {
 /**
  * Check if the emulators are enabled or if we're running locally
  */
-export const isTestEnvironment = () => {
+export const shouldUseEmulators = () => {
    if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
       return true
    }
