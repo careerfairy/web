@@ -1,5 +1,6 @@
 import React, {
    createContext,
+   FC,
    useContext,
    useEffect,
    useMemo,
@@ -55,23 +56,23 @@ const GroupContext = createContext<GroupAdminContext>({
    role: undefined,
 })
 
-const GroupDashboardLayout = (props) => {
-   const { children } = props
+type GroupDashboardLayoutProps = {
+   groupId: string
+}
+const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
+   const { children, groupId } = props
    const scrollRef = useRef(null)
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
    const isDesktop = useIsDesktop()
-   const {
-      query: { groupId },
-      replace,
-      push,
-   } = useRouter()
+   const { replace, push } = useRouter()
    const { userData, adminGroups, isLoggedOut } = useAuth()
    const notifications = useSelector(
       ({ firestore }: RootState) => firestore.ordered.notifications || []
    )
 
    const group = useAdminGroup(groupId)
+
    const { errorNotification } = useSnackbarNotifications()
 
    const groupDoesNotExist = isLoaded(group) && isEmpty(group)
@@ -88,6 +89,8 @@ const GroupDashboardLayout = (props) => {
    )
 
    const loadingGroup = !isLoaded(group)
+
+   const isCorrectGroup = groupId === group?.id
 
    useEffect(() => {
       if (
@@ -176,7 +179,7 @@ const GroupDashboardLayout = (props) => {
                <PageChildrenWrapper
                   sx={[isDesktop && styles.childrenWrapperResponsive]}
                >
-                  {loadingGroup || !isAdmin ? (
+                  {loadingGroup || !isAdmin || !isCorrectGroup ? (
                      <CircularProgress sx={{ margin: "auto" }} />
                   ) : isEmpty(group) ? (
                      <Typography variant={"h6"} sx={{ margin: "auto" }}>

@@ -15,7 +15,6 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import { v4 as uuidv4 } from "uuid"
 
 import { Container, Step, StepLabel, Stepper } from "@mui/material"
-import { useSnackbar } from "notistack"
 import {
    Group,
    GroupQuestion,
