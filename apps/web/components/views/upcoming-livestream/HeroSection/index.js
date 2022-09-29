@@ -11,6 +11,7 @@ import {
 } from "../../NextLivestreams/GroupStreams/groupStreamCard/badges"
 import WhiteTagChip from "../../common/chips/TagChip"
 import LanguageIcon from "@mui/icons-material/Language"
+import Image from "next/image"
 
 const styles = {
    root: (theme) => ({
@@ -145,14 +146,14 @@ const HeroSection = ({
          eventInterests?.length
    )
    return (
-      <Box
-         sx={[
-            styles.root,
-            {
-               backgroundImage: `url(${backgroundImage});`,
-            },
-         ]}
-      >
+      <Box sx={styles.root}>
+         <Image
+            src={backgroundImage}
+            alt={stream.title}
+            layout="fill"
+            objectFit="cover"
+            quality={90}
+         />
          <Box sx={styles.containerWrapper}>
             <Container sx={styles.container}>
                <Grid sx={styles.gridContainer} spacing={2} container>
