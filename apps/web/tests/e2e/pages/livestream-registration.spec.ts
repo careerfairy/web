@@ -24,7 +24,10 @@ test.beforeEach(async () => {
    await clearFirestoreData()
 })
 
-test("successful registration on a livestream event", async ({ page }) => {
+test("successful registration on a livestream event", async ({
+   page,
+   browserName,
+}) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { group, livestream } = await setupData()
 
@@ -53,7 +56,7 @@ test("successful registration on a livestream event", async ({ page }) => {
    const expectedPath = `/next-livestreams/${group.id}?livestreamId=${livestream.id}`
    if (page.url().indexOf(expectedPath) === -1) {
       // wait for navigation if not there yet
-      await page.waitForURL(`**${expectedPath}`)
+      await page.waitForURL(`**${expectedPath}`, { timeout: 10000 })
    }
 
    await expectSelector(page, `h3:has-text("${group.universityName}")`)
