@@ -235,6 +235,7 @@ const CountDown = ({
                   disabled={disabled || registered}
                   onClick={onRegisterClick}
                   disableElevation
+                  data-testid="livestream-registration-button"
                   size="large"
                >
                   {registerButtonLabel}
