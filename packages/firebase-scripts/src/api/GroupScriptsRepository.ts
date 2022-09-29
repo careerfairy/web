@@ -3,26 +3,22 @@ import {
    IGroupFunctionsRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupFunctionsRepository"
 import firebase from "firebase/compat"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import {
+   mapFirestoreDocuments,
+   DocRef,
+} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
-   GroupAdmin,
+   LegacyGroupAdmin,
 } from "@careerfairy/shared-lib/dist/groups"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import admin = require("firebase-admin")
 
 export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
-   getAllAdmins<T extends boolean>(
+   getAllLegacyAdmins<T extends boolean>(
       withRef?: T
-   ): Promise<
-      (T extends true
-         ? GroupAdmin & {
-              _ref: firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
-           }
-         : GroupAdmin)[]
-   >
-   getAllAuthUsers(): Promise<admin.auth.UserRecord[]>
+   ): Promise<(T extends true ? LegacyGroupAdmin & DocRef : LegacyGroupAdmin)[]>
 
    /**
     * Grants or removes a user admin access to a group and a role
@@ -38,14 +34,14 @@ export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
     * 3. Removes the user's userGroupAdmin document from the user's userAdminGroups sub-collection
     * @param targetEmail
     * @param newRole
-    * @param group - The group could potentially no longer exist, could have been deleted
     * @param fallbackGroupId - If the group is deleted, we can still use this to remove the user's role from the group's admins sub-collection list
+    * @param group - The group could potentially no longer exist, could have been deleted
     */
    migrateAdminRole(
       targetEmail: string,
       newRole: GROUP_DASHBOARD_ROLE | null,
-      group?: Group,
-      fallbackGroupId?: string
+      fallbackGroupId: string,
+      group?: Group
    ): Promise<void>
 }
 
@@ -61,21 +57,16 @@ export class GroupScriptsRepository
       super(firestore, fieldValue, auth)
    }
 
-   async getAllAdmins<T extends boolean>(withRef?: T) {
+   async getAllLegacyAdmins<T extends boolean>(withRef?: T) {
       const admins = await this.firestore.collectionGroup("admins").get()
-      return mapFirestoreDocuments<GroupAdmin, T>(admins, withRef)
-   }
-
-   async getAllAuthUsers(): Promise<admin.auth.UserRecord[]> {
-      const users = await this.auth.listUsers()
-      return users.users
+      return mapFirestoreDocuments<LegacyGroupAdmin, T>(admins, withRef)
    }
 
    async migrateAdminRole(
       targetEmail: string,
       newRole: GROUP_DASHBOARD_ROLE | null,
-      group?: Group,
-      fallbackGroupId?: string
+      fallbackGroupId: string,
+      group?: Group
    ) {
       // Get the auth user
       const userData = this.addIdToDoc<UserData>(
@@ -99,18 +90,24 @@ export class GroupScriptsRepository
                : "",
          ]
 
-         console.info(
-            `-> removing admin roles for ${
-               userData.id
-            } in group ${groupId} because ${reasons
-               .filter(Boolean)
-               .join(" and ")}`
-         )
+         const onlyReasonIsBecauseUserIsCFAdmin =
+            reasons.filter(Boolean).length === 1 && reasons[2]
+
+         if (!onlyReasonIsBecauseUserIsCFAdmin) {
+            // We skip logging if the only reason is that the user is a CF admin
+            console.info(
+               `-> removing admin roles for ${
+                  userData.id
+               } in group ${groupId} because ${reasons
+                  .filter(Boolean)
+                  .join(" and ")}`
+            )
+         }
 
          const groupAdminsRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
-            .collection("admins")
+            .collection("groupAdmins")
             .doc(userData.id)
 
          const userAdminGroupsRef = this.firestore
@@ -120,7 +117,8 @@ export class GroupScriptsRepository
             .doc(groupId)
 
          return this.firestore.runTransaction(async (t) => {
-            t.delete(groupAdminsRef) // Remove the admin doc in careerCenterData/[groupId]/admins/[adminId]
+            // this is a cleanup script, in-case we run the script again
+            t.delete(groupAdminsRef) // Remove the admin doc in careerCenterData/[groupId]/groupAdmins/[adminId]
             t.delete(userAdminGroupsRef) // Remove the group doc in userData/userAdminGroups/[group] groups sub-collection
          })
       }
