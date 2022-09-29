@@ -6,12 +6,12 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users
 
 ### What it does:
 
-Goes through every admin of a group by looking at the legacy admin in `careerCenterData/admins/[email]` sub-collection then assigns them
-the new admin role in firestore under the group's admin sub-collection `careerCenterData/groupAdmins/[email]` with complementary data.
+Goes through every admin of a group by looking at the legacy admin in `careerCenterData/[groupId]/admins/[email]` sub-collection then assigns them
+the new admin role in firestore under the group's admin sub-collection `careerCenterData/[groupId]/groupAdmins/[email]` with complementary data.
 
 ### Legacy Input:
 
-`careerCenterData/admins/[email]`
+`careerCenterData/[groupId]/admins/[email]`
 
 ```sh
 {
@@ -21,7 +21,7 @@ the new admin role in firestore under the group's admin sub-collection `careerCe
 
 ### New Output:
 
-`careerCenterData/groupAdmins/[email]`
+`careerCenterData/[groupId]/groupAdmins/[email]`
 
 To render the roles table, in the group dashboard
 
@@ -36,7 +36,7 @@ To render the roles table, in the group dashboard
 }
 ```
 
-`userData/userAdminGroups/[groupId]`
+`userData/[userId]/userAdminGroups/[groupId]`
 
 For easy access to the groups the user is an admin of on their profile page
 
