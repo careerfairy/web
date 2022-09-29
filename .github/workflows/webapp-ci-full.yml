@@ -163,7 +163,7 @@ jobs:
            run: npm run test:e2e-webapp -- -- -- --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
-           if: ${{ failure() }}
+           #           if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
               name: ${{ matrix.shard }}-playwright-report
