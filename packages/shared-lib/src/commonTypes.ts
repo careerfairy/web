@@ -12,3 +12,15 @@ export type UTMParams = {
    utm_term?: string
    utm_content?: string
 }
+
+/**
+ * Useful values that can be looped
+ * (Not a type)
+ */
+export const UTMKeys = [
+   "utm_source",
+   "utm_medium",
+   "utm_campaign",
+   "utm_term",
+   "utm_content",
+]
