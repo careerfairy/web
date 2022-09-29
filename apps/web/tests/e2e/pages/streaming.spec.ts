@@ -288,20 +288,7 @@ test.describe("Streaming Journey", () => {
 
       // hand raiser details are being shown
       const userName = `${user.firstName} ${user.lastName.charAt(0)}`
-
-      // try several times to assert the viewer name, this sometimes fails on chromium
-      let tries = 3
-      while (tries-- > 0) {
-         try {
-            await expect(
-               streamerPage.page.locator(`h3:has-text("${userName}")`)
-            ).toBeVisible({ timeout: 2000 })
-         } catch (e) {
-            if (tries <= 0) {
-               throw e
-            }
-         }
-      }
+      await expect(streamerPage.text(userName)).toBeVisible({ timeout: 8000 })
       await expect(
          streamerPage.page.locator("text=✋ Hand Raiser")
       ).toBeVisible()
