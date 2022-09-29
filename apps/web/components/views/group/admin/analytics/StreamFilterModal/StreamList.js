@@ -3,6 +3,7 @@ import makeStyles from "@mui/styles/makeStyles"
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
 import MaterialTable from "@material-table/core"
 import { defaultTableOptions, tableIcons } from "../../../../../util/tableUtils"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/dist/utils"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -83,13 +84,15 @@ const StreamList = ({
       if (!streamsFromStore?.length) {
          newStreamsWithSelections = []
       } else {
-         newStreamsWithSelections = streamsFromStore.map((stream) => ({
-            ...stream,
-            tableData: {
-               ...(stream.tableData && stream.tableData),
-               checked: selectionModelMap.has(stream.id),
-            },
-         }))
+         newStreamsWithSelections = streamsFromStore
+            .map((stream) => ({
+               ...stream,
+               tableData: {
+                  ...(stream.tableData && stream.tableData),
+                  checked: selectionModelMap.has(stream.id),
+               },
+            }))
+            .sort(sortLivestreamsDesc)
       }
       setStreamsWithSelections(newStreamsWithSelections)
    }, [streamsFromStore, selectionModel])

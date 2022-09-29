@@ -577,6 +577,9 @@ const AnalyticsOverview = () => {
          streamsFromBeforeTimeFrame,
          currentUserDataSet,
       }),
+      ...(tabName === "sources" && {
+         streamsFromBeforeTimeFrame,
+      }),
    })
 
    return (
