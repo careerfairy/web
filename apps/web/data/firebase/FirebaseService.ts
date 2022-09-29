@@ -460,24 +460,6 @@ class FirebaseService {
       return ref.get()
    }
 
-   createCareerCenter = async (careerCenter, userEmail) => {
-      let batch = this.firestore.batch()
-      let groupRef = this.firestore.collection("careerCenterData").doc()
-      let groupAdminRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupRef.id)
-         .collection("admins")
-         .doc(userEmail)
-
-      careerCenter.groupId = groupRef.id
-      batch.set(groupRef, careerCenter)
-      batch.set(groupAdminRef, { role: "mainAdmin" })
-
-      await batch.commit()
-
-      return groupRef
-   }
-
    updateCareerCenter = (groupId, newCareerCenter) => {
       let ref = this.firestore.collection("careerCenterData").doc(groupId)
       return ref.update(newCareerCenter)
