@@ -28,10 +28,6 @@ export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
     * 2. Adds the user's role to the group's admins sub-collection list for querying of group admins in group/[groupId]/admin/roles
     * 3. Adds a userGroupAdmin document to the user's userAdminGroups sub-collection with the group's details
     *
-    * What it does if no role is provided:
-    * 1. Removes the user's role from the group's admins sub-collection list for querying of group admins in group/[groupId]/admin/roles
-    * 2. Removes the user's role from the user's auth custom claims
-    * 3. Removes the user's userGroupAdmin document from the user's userAdminGroups sub-collection
     * @param targetEmail
     * @param newRole
     * @param fallbackGroupId - If the group is deleted, we can still use this to remove the user's role from the group's admins sub-collection list
@@ -39,7 +35,7 @@ export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
     */
    migrateAdminRole(
       targetEmail: string,
-      newRole: GROUP_DASHBOARD_ROLE | null,
+      newRole: GROUP_DASHBOARD_ROLE,
       fallbackGroupId: string,
       group?: Group
    ): Promise<void>
@@ -64,7 +60,7 @@ export class GroupScriptsRepository
 
    async migrateAdminRole(
       targetEmail: string,
-      newRole: GROUP_DASHBOARD_ROLE | null,
+      newRole: GROUP_DASHBOARD_ROLE,
       fallbackGroupId: string,
       group?: Group
    ) {
@@ -96,7 +92,7 @@ export class GroupScriptsRepository
          if (!onlyReasonIsBecauseUserIsCFAdmin) {
             // We skip logging if the only reason is that the user is a CF admin
             console.info(
-               `-> removing admin roles for ${
+               `-> skipping setting admin roles for ${
                   userData.id
                } in group ${groupId} because ${reasons
                   .filter(Boolean)
@@ -134,7 +130,7 @@ export class GroupScriptsRepository
       if (!thereWillBeAtLeastOneOwner) {
          newRole = GROUP_DASHBOARD_ROLE.OWNER
          console.warn(
-            `There will be no owner for group ${group.id} after this operation, will make them an owner`,
+            `There will be no owner for group ${group.id} after this operation, so will make them an owner by default`,
             {
                newRole,
                targetEmail,
