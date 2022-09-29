@@ -1,15 +1,15 @@
 import { FirebaseGroupRepository, IGroupRepository } from "./GroupRepository"
 import {
    Group,
-   GroupAdmin,
    GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
    GroupQuestion,
 } from "./groups"
-import admin = require("firebase-admin")
 import { mapFirestoreDocuments } from "../BaseFirebaseRepository"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
 import { UserAdminGroup, UserData } from "../users"
 import firebase from "firebase/compat"
+import admin = require("firebase-admin")
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -72,9 +72,9 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
    ): Promise<Group>
 
    /*
-    * This method will check if the provided email is actually part of a dashboard invite
+    * This method will return the invitation document if it exists for the given email
     * */
-   checkIfEmailHasAValidDashboardInvite(emailToCheck: string): Promise<boolean>
+   getDashboardInvite(emailToCheck: string): Promise<GroupDashboardInvite>
 }
 
 export class GroupFunctionsRepository
@@ -362,15 +362,18 @@ export class GroupFunctionsRepository
       return newGroupData
    }
 
-   checkIfEmailHasAValidDashboardInvite(
+   async getDashboardInvite(
       emailToCheck: string
-   ): Promise<boolean> {
-      return this.firestore
+   ): Promise<GroupDashboardInvite> {
+      const docs = await this.firestore
          .collection("groupDashboardInvites")
          .where("invitedEmail", "==", emailToCheck)
          .limit(1)
          .get()
-         .then((snap) => !snap.empty)
+
+      if (docs.size !== 1) return null
+
+      return this.addIdToDoc<GroupDashboardInvite>(docs.docs[0])
    }
 }
 

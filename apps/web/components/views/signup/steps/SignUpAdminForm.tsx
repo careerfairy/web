@@ -42,7 +42,6 @@ export interface IAdminUserCreateFormValues
    password: string
    confirmPassword: string
    agreeTerm: boolean
-   subscribed?: boolean
 }
 
 const schema: yup.SchemaOf<IAdminUserCreateFormValues> = yup.object().shape({
@@ -52,7 +51,6 @@ const schema: yup.SchemaOf<IAdminUserCreateFormValues> = yup.object().shape({
    password: signupSchema.password,
    confirmPassword: signupSchema.confirmPassword,
    agreeTerm: signupSchema.agreeTerm,
-   subscribed: signupSchema.subscribed,
 })
 
 const initValues: IAdminUserCreateFormValues = {
@@ -62,7 +60,6 @@ const initValues: IAdminUserCreateFormValues = {
    password: "",
    confirmPassword: "",
    agreeTerm: false,
-   subscribed: false,
 }
 
 function SignUpAdminForm() {

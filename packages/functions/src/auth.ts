@@ -11,7 +11,10 @@ import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
-import { NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import {
+   GroupDashboardInvite,
+   NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
+} from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -165,8 +168,7 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
       let uidToDelete = null
       let emailToDelete = null
       const userData = data.userData
-      const recipientEmail = data.userData.email.toLowerCase().trim()
-      const pinCode = getRandomInt(9999)
+      const recipientEmail = userData.email.toLowerCase().trim()
 
       const { password, firstName, lastName, subscribed } = userData
 
@@ -175,10 +177,10 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             `Starting admin auth account creation process for ${recipientEmail}`
          )
          // Check if email is associated with a valid group dashboard invite
-         const isValidInvite =
-            await groupRepo.checkIfEmailHasAValidDashboardInvite(recipientEmail)
+         const invitation: GroupDashboardInvite =
+            await groupRepo.getDashboardInvite(recipientEmail)
 
-         if (!isValidInvite) {
+         if (!invitation) {
             logAndThrow(NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE, {
                recipientEmail,
             })
@@ -191,6 +193,18 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             password: password,
             emailVerified: true, // Email is verified by default since the user is invited by an admin
          })
+
+         // set the group role to the user
+         await admin.auth().setCustomUserClaims(userRecord.uid, {
+            adminGroups: {
+               [invitation.groupId]: {
+                  role: invitation.role,
+               },
+            },
+         })
+
+         // TODO: do we need to also add this user to the group admins list now?
+
          // store the uid in case we need to delete it later
          uidToDelete = userRecord.uid
 
@@ -203,7 +217,6 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
                Object.assign({
                   authId: userRecord.uid,
                   id: recipientEmail,
-                  validationPin: pinCode,
                   firstName: firstName,
                   lastName: lastName,
                   userEmail: recipientEmail,
@@ -222,18 +235,7 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             )
          })
 
-         // Send the verification email, if this fails we throw and need to delete the user from firebase auth and firestore
-         await sendVerificationEmail({
-            email: recipientEmail,
-            uid: userRecord.uid,
-            pinCode,
-         }).catch((error) => {
-            functions.logger.error(
-               `Error sending PIN email to ${recipientEmail}`,
-               error
-            )
-            throw new functions.https.HttpsError("internal", error)
-         })
+         await groupRepo.deleteGroupDashboardInviteById(invitation.id)
       } catch (error) {
          // if any of the steps above fail, we need to delete the user from firebase auth and firestore
          functions.logger.error(
@@ -657,21 +659,3 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
       }
    }
 )
-
-const sendVerificationEmail = async (args: {
-   email: string
-   pinCode: number
-   uid: string
-}) => {
-   console.log(`Starting sending email for ${args.email}`)
-   const emailTemplate = {
-      TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
-      From: "CareerFairy <noreply@careerfairy.io>",
-      To: args.email,
-      TemplateModel: { pinCode: args.pinCode },
-   }
-   const response = await client.sendEmailWithTemplate(emailTemplate)
-   console.log(`Sent email successfully for ${args.email}`)
-
-   return response
-}
