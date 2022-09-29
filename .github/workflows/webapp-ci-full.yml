@@ -40,11 +40,8 @@ jobs:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
          - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+           #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
-
-         - name: Install
-           run: npm install
 
          - name: Build
            run: npm run build
