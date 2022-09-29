@@ -150,9 +150,10 @@ const addUsersDataOnStreams = async (
 /**
  * Update all the successfully sent reminders for each livestream
  */
-export const updateLiveStreamsWithEmailSent = async (emailsToSave) => {
-   const batch = admin.firestore().batch()
-
+export const updateLiveStreamsWithEmailSent = (
+   batch: admin.firestore.WriteBatch,
+   emailsToSave
+) => {
    Object.values(emailsToSave).forEach((email: any) => {
       const { streamId, reminderKey, chunks } = email
 
@@ -162,6 +163,4 @@ export const updateLiveStreamsWithEmailSent = async (emailsToSave) => {
          [`reminderEmailsSent.${reminderKey}`]: chunks,
       })
    })
-
-   await batch.commit()
 }
