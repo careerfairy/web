@@ -330,7 +330,7 @@ const EventsTable = ({
                boxShadow: theme.shadows[2],
                backgroundImage:
                   backgroundImageUrl &&
-                  `url(${getResizedUrl(backgroundImageUrl, "xs")})`,
+                  `url("${getResizedUrl(backgroundImageUrl, "xs")}")`,
                backgroundSize: "cover",
                backgroundRepeat: "no-repeat",
             }),
