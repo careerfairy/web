@@ -172,29 +172,34 @@ const AuthProvider = ({ children }) => {
 
    useEffect(() => {
       // get claims from auth
-      const tokenExpiration = auth.stsTokenManager?.expirationTime
-      const refreshTokenTime = userData?.refreshTokenTime?.toMillis?.()
-      if (!refreshTokenTime || !tokenExpiration) return
+
+      const decodedToken = parseJwt(auth.stsTokenManager?.accessToken)
+
+      const issuedAt = decodedToken?.iat // time in seconds
+
+      const issuedAtDateInMillis = issuedAt * 1000
+
+      const refreshTokenTimeInMillis = userData?.refreshTokenTime?.toMillis?.()
+
+      if (!refreshTokenTimeInMillis || !issuedAtDateInMillis) return
 
       /**
        * Check to see if we need to refresh the token
        * */
 
-      const timeDifference = tokenExpiration - refreshTokenTime // The time at which the backend demanded to refresh the token
-
-      // If the token is expired, or the time difference is smaller than 1 hour, refresh the token
-      const isTokenStale = timeDifference < 3600000 // If the token is stale, refresh it
+      // Token is considered stale if the refreshTokenTime is older than the token time the token was issued
+      const isTokenStale = issuedAtDateInMillis < refreshTokenTimeInMillis // If the token is stale, refresh it
 
       if (isTokenStale) {
          // if token is expired or stale, refresh it
          void refetchClaims()
       }
    }, [
-      auth.stsTokenManager?.expirationTime,
       refetchClaims,
       prevUserData,
       userData,
       userData?.refreshTokenTime,
+      auth.stsTokenManager?.accessToken,
    ])
 
    useEffect(() => {
@@ -258,3 +263,20 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => useContext<DefaultContext>(AuthContext)
 
 export { AuthProvider, useAuth }
+
+function parseJwt(token?: string) {
+   if (!token || typeof window === "undefined") return null
+   let base64Url = token.split(".")[1]
+   let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+   let jsonPayload = decodeURIComponent(
+      window
+         .atob(base64)
+         .split("")
+         .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+         })
+         .join("")
+   )
+
+   return JSON.parse(jsonPayload)
+}
