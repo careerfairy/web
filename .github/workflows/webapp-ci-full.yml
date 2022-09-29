@@ -41,7 +41,10 @@ jobs:
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
          - name: Install Dependencies
            #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --include=dev --ignore-scripts
+           run: npm ci --ignore-scripts
+           env:
+              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+              NODE_ENV: development
 
          - name: Build
            run: npm run build
