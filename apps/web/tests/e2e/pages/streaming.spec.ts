@@ -1,4 +1,4 @@
-import { test as base, expect } from "@playwright/test"
+import { expect, test as base } from "@playwright/test"
 import LivestreamSeed, {
    createLivestreamGroupQuestions,
 } from "@careerfairy/seed-data/dist/livestreams"
@@ -285,11 +285,23 @@ test.describe("Streaming Journey", () => {
 
       // Streamer accepts the request
       await streamerPage.acceptUserRequestToJoinHandRaise()
+
       // hand raiser details are being shown
       const userName = `${user.firstName} ${user.lastName.charAt(0)}`
-      await expect(
-         streamerPage.page.locator(`h3:has-text("${userName}")`)
-      ).toBeVisible({ timeout: 30000 })
+
+      // try several times to assert the viewer name, this sometimes fails on chromium
+      let tries = 3
+      while (tries-- > 0) {
+         try {
+            await expect(
+               streamerPage.page.locator(`h3:has-text("${userName}")`)
+            ).toBeVisible({ timeout: 2000 })
+         } catch (e) {
+            if (tries <= 0) {
+               throw e
+            }
+         }
+      }
       await expect(
          streamerPage.page.locator("text=✋ Hand Raiser")
       ).toBeVisible()
