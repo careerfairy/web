@@ -239,7 +239,7 @@ export class GroupFunctionsRepository
       const adminsSnap = await this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .collection("admins")
+         .collection("groupAdmins")
          .get()
 
       return mapFirestoreDocuments(adminsSnap)
@@ -258,11 +258,7 @@ export class GroupFunctionsRepository
       ]
 
       const totalOwners = potentialNewAdmins.filter(
-         (admin) =>
-            admin.role === GROUP_DASHBOARD_ROLE.OWNER ||
-            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-            // @ts-ignore
-            admin.role === "mainAdmin" // TODO: remove this legacy "mainAdmin string when we remove the mainAdmin role after migration
+         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER
       )
 
       return totalOwners.length > 0 // there must be at least one owner

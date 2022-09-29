@@ -144,7 +144,10 @@ export interface UserGroupData extends Identifiable {
    questions?: UserGroupQuestionsWithAnswerMap
 }
 
-// LEGACY ADMIN SUB-COLLECTION careerCenterData/[groupId]/admins/[adminEmail]
+/*
+ * LEGACY ADMIN SUB-COLLECTION careerCenterData/[groupId]/admins/[adminEmail]
+ * Will be used by migration script PR
+ * */
 export interface LegacyGroupAdmin extends Identifiable {
    role: "mainAdmin" | "subAdmin"
 }
