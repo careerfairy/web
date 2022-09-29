@@ -15,20 +15,18 @@ const useAdminGroup = (groupId) => {
 
    const queries = useMemo(() => {
       let queriesArray = []
-      const targetId = groupId
-      const targetCollection = CAREER_CENTER_COLLECTION
-      if (targetId) {
+      if (groupId) {
          queriesArray.push(
             ...[
                {
-                  collection: targetCollection,
-                  doc: targetId,
+                  collection: CAREER_CENTER_COLLECTION,
+                  doc: groupId,
                   storeAs: "group",
                },
                {
                   collection: `notifications`,
                   where: [
-                     ["details.receiver", "==", targetId],
+                     ["details.receiver", "==", groupId],
                      ["open", "==", true],
                   ],
                },
@@ -44,7 +42,7 @@ const useAdminGroup = (groupId) => {
       ({ firestore }) =>
          firestore.data.group && {
             ...firestore.data.group,
-            id: groupId,
+            id: firestore.data.group.id || firestore.data.group.groupId, // TODO: run a script after migration to add the id field to all careerCenterData documents
          },
       shallowEqual
    )
