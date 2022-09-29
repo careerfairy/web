@@ -59,8 +59,7 @@ export function convertDictToDocArray<T>(dict: Record<string, T>): T[] {
         }))
       : []
 }
-type DocRef =
-   firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+
 /**
  * Add the document id to the document itself
  *
@@ -70,7 +69,7 @@ type DocRef =
 export function mapFirestoreDocuments<T, R extends boolean = false>(
    documentSnapshot: QuerySnapshot,
    withRef?: R
-): (R extends true ? T & { _ref: DocRef } : T)[] | null {
+): (R extends true ? T & DocRef : T)[] | null {
    let docs = null
    if (!documentSnapshot.empty) {
       docs = documentSnapshot.docs.map((doc) => ({
@@ -87,6 +86,10 @@ export type OnSnapshotCallback<T> = (
 ) => void
 
 export type Unsubscribe = () => void
+
+export type DocRef = {
+   _ref: firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+}
 
 /**
  * Remove duplicate documents by id from array

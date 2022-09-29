@@ -150,6 +150,9 @@ export class GroupFunctionsRepository
       )
    }
 
+   /*
+    * Stores the group admin role in the user's custom claims
+    * */
    protected async setGroupAdminRoleInClaims(
       authUser: admin.auth.UserRecord,
       newRole: GROUP_DASHBOARD_ROLE | null,
@@ -186,6 +189,9 @@ export class GroupFunctionsRepository
       return mapFirestoreDocuments(adminsSnap)
    }
 
+   /*
+    * Checks if there will be at least one owner after the role change
+    * */
    protected async checkIfThereWillBeAtLeastOneOwner(
       groupId: string,
       newRole: GROUP_DASHBOARD_ROLE,
