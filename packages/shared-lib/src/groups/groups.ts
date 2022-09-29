@@ -144,7 +144,12 @@ export interface UserGroupData extends Identifiable {
    questions?: UserGroupQuestionsWithAnswerMap
 }
 
-// careerCenterData/[groupId]/admins/[adminEmail]
+// LEGACY ADMIN SUB-COLLECTION careerCenterData/[groupId]/admins/[adminEmail]
+export interface LegacyGroupAdmin extends Identifiable {
+   role: "mainAdmin" | "subAdmin"
+}
+
+// careerCenterData/[groupId]/groupAdmins/[adminEmail]
 export interface GroupAdmin extends Identifiable {
    role: GROUP_DASHBOARD_ROLE
    firstName: string

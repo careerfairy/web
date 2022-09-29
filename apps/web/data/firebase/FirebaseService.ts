@@ -2581,7 +2581,7 @@ class FirebaseService {
 
          if (!groupSnap.exists) continue
 
-         const adminsSnap = await groupRef.collection("admins").get()
+         const adminsSnap = await groupRef.collection("groupAdmins").get()
 
          const newAdminsInfo = adminsSnap.docs.map((adminDoc) => {
             const adminData = adminDoc.data() as GroupAdmin

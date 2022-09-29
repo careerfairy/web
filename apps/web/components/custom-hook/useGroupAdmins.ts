@@ -7,7 +7,7 @@ import useCollection from "./useCollection"
  * @returns GroupAdmin[]
  * */
 const useGroupAdmins = (groupId) => {
-   return useCollection(`careerCenterData/${groupId}/admins`, true)
+   return useCollection(`careerCenterData/${groupId}/groupAdmins`, true)
 
    // // The useFirestoreCollectionData hook cannot be used here since it has a bug
    // // when trying to access data that is protected by rules on auth sing-in re-direct:
@@ -17,7 +17,7 @@ const useGroupAdmins = (groupId) => {
    //    useFirestore(),
    //    "careerCenterData",
    //    groupId,
-   //    "admins"
+   //    "groupAdmins"
    // )
    // return useFirestoreCollectionData<GroupAdmin>(collectionRef as any, {
    //    idField: "id", // this field will be added to the firestore object
