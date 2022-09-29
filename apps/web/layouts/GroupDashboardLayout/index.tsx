@@ -187,6 +187,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
                      </Typography>
                   ) : (
                      React.Children.map(children, (child) =>
+                        // @ts-ignore
                         React.cloneElement(child, {
                            notifications,
                            isAdmin,
