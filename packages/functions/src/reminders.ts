@@ -144,12 +144,15 @@ export const scheduleReminderEmails = functions
    .pubsub.schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
    .onRun((context) => {
+      const batch = admin.firestore().batch()
+
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
       const dateEndFor5Minutes = addMinutesDate(
          dateStart,
          reminderScheduleRange
       )
       const reminder5MinutesPromise = handleReminder(
+         batch,
          dateStart,
          dateEndFor5Minutes,
          Reminder5Min
@@ -164,6 +167,7 @@ export const scheduleReminderEmails = functions
          reminderScheduleRange
       )
       const reminder1HourPromise = handleReminder(
+         batch,
          dateStartFor1Hour,
          dateEndFor1Hour,
          Reminder1Hour
@@ -178,24 +182,25 @@ export const scheduleReminderEmails = functions
          reminderScheduleRange
       )
       const reminder24HoursPromise = handleReminder(
+         batch,
          dateStartFor24Hours,
          dateEndFor24Hours,
          Reminder24Hours
       )
 
-      Promise.allSettled([
+      return Promise.allSettled([
          reminder5MinutesPromise,
          reminder1HourPromise,
          reminder24HoursPromise,
-      ]).then((results) => {
+      ]).then(async (results) => {
+         await batch.commit()
+
          const rejectedPromises = results.filter(
             ({ status }) => status === "rejected"
          )
-
          if (rejectedPromises.length > 0) {
             const errorMessage = `${rejectedPromises.length} reminders were not sent`
             functions.logger.error(errorMessage)
-
             // Google Cloud monitoring should create an incident
             throw new Error(errorMessage)
          }
@@ -207,6 +212,7 @@ export const scheduleReminderEmails = functions
  *
  */
 const handleReminder = async (
+   batch: admin.firestore.WriteBatch,
    filterStartDate: Date,
    filterEndDate: Date,
    reminder: ReminderData
@@ -220,8 +226,8 @@ const handleReminder = async (
       const emailsToSave = await handleSendEmail(streams, reminder)
 
       if (emailsToSave) {
-         // save all the successfully sent reminders on the DB
-         return await updateLiveStreamsWithEmailSent(emailsToSave)
+         // update batch with all the successfully sent reminders on the DB
+         return updateLiveStreamsWithEmailSent(batch, emailsToSave)
       }
    } catch (error) {
       functions.logger.error(
