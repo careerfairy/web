@@ -1,7 +1,9 @@
 // Project: Production
+import { isTestEnvironment } from "../../util/CommonUtil"
+
 let appID = "53675bc6d3884026a72ecb1de3d19eb1"
 
-if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+if (isTestEnvironment()) {
    // Project: CareerFairyStreaming
    appID = "52e732c40bf94a8c97fdd0fd443210e0"
 

@@ -17,7 +17,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    attend() {
-      return this.resilientClick(`text="I'll attend"`)
+      return this.resilientClick(`data-testid=livestream-registration-button`)
    }
 
    async modalAttend() {

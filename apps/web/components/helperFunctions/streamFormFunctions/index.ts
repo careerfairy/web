@@ -4,6 +4,7 @@ import {
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
+import { isTestEnvironment } from "../../../util/CommonUtil"
 
 export const speakerObj = {
    avatar: "",
@@ -243,7 +244,7 @@ export const languageCodesDict = languageCodes.reduce(
 export const getDownloadUrl = (fileElement) => {
    let host = "https://firebasestorage.googleapis.com"
 
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   if (isTestEnvironment()) {
       host = " http://localhost:9199"
    }
 
