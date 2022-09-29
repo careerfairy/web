@@ -15,4 +15,13 @@ export default class SessionStorageUtil {
       const existing = sessionStorage?.getItem("utm_params")
       return existing ? JSON.parse(existing) : null
    }
+
+   static setReferrer = (value: string) => {
+      return sessionStorage?.setItem("referrer", value)
+   }
+
+   static getReferrer = () => {
+      const val = sessionStorage?.getItem("referrer")
+      return val ? val : null
+   }
 }
