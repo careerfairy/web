@@ -466,7 +466,6 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
 export const sendDashboardInviteEmail_v2 = functions.https.onCall(
    onCallWrapper(async (data, context) => {
       // user needs to be signed in
-      await validateUserAuthExists(context)
 
       await validateData(
          data,
@@ -482,6 +481,9 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
       )
 
       const { recipientEmail, groupName, senderFirstName, groupId, role } = data
+
+      const userEmail = context.auth.token.email
+      await validateUserIsGroupAdminOwnerRole(userEmail, groupId)
 
       // Check if the user exists in our platform, allow fail
       const authUser = await auth()
