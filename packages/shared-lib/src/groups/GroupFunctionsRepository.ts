@@ -97,7 +97,7 @@ export class GroupFunctionsRepository
       const groupAdminsRef = this.firestore
          .collection("careerCenterData")
          .doc(group.id)
-         .collection("admins")
+         .collection("groupAdmins")
          .doc(userData.id)
 
       const userAdminGroupsRef = this.firestore

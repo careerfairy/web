@@ -169,7 +169,7 @@ service cloud.firestore {
                 allow update: if isUnchanged('questionType') && hasOptions();
             }
 
-            match /admins/{admin} {
+            match /groupAdmins/{admin} {
                 allow read: if isCFAdmin() || isCareerCenterAdmin();
                 allow write: if isCFAdmin() || isCareerCenterAdmin();
             }
