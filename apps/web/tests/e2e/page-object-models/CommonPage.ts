@@ -22,7 +22,8 @@ export class CommonPage {
       locator: string,
       tries: number = 3,
       eachTryTimeout: number = 1000,
-      forceSecondTry: boolean = true
+      forceSecondTry: boolean = true,
+      confirmVisible: boolean = true
    ) {
       while (tries-- > 0) {
          const clickPromise = this.page.locator(locator).click()
@@ -51,7 +52,7 @@ export class CommonPage {
             }
          }
       }
-      if (await this.page.locator(locator).isVisible()) {
+      if (confirmVisible && (await this.page.locator(locator).isVisible())) {
          throw new Error("Could not click, exceeded tries")
       }
    }
@@ -100,21 +101,21 @@ export class CommonPage {
    async selectRandomCategoriesFromEvent(livestream: LivestreamEvent) {
       for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
          for (let question of Object.values(groupQuestions.questions)) {
-            await this.page
-               .locator(`text=New!​${question.name} >> div[role="button"]`)
-               .click()
+            await this.resilientClick(
+               `text=New!​${question.name} >> div[role="button"]`
+            )
 
             const options = Object.values(question.options)
             const randomOption =
                options[Math.floor(Math.random() * options.length)]
 
-            await this.page.locator(`[data-value="${randomOption.id}"]`).click()
+            await this.resilientClick(`[data-value="${randomOption.id}"]`)
          }
       }
    }
 
    public enterEvent() {
-      return this.exactText("Enter event").click()
+      return this.resilientClick("text=Enter event")
    }
 }
 

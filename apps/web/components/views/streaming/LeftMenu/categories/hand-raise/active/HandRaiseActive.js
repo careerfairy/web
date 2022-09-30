@@ -107,6 +107,7 @@ function HandRaiseActive({ livestream, showMenu, selectedState, sliding }) {
       filterMapProperty,
       sortByNew
    ) => {
+      if (!arrayOfHandRaises) return
       const newFilteredHandRaises = arrayOfHandRaises
          .filter((handRaise) => FILTER_MAP[filterMapProperty](handRaise))
          .map((handRaise) => ({

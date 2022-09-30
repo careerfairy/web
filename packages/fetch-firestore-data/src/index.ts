@@ -17,6 +17,12 @@ const DRY_RUN = process.env.DRY_RUN
 let emulatorsProcess: ChildProcessWithoutNullStreams
 let currentRunningProcess: ChildProcessWithoutNullStreams
 
+/*
+ * Only set this to true if you want to fetch the user data from the production database,
+ * but be sure to delete the downloaded backup when done testing because of GDPR
+ * */
+const INCLUDE_USERDATA = false
+
 /**
  * Main logic
  *
@@ -30,11 +36,21 @@ async function run(): Promise<void> {
    emulatorsProcess = await runEmulatorsInBackground()
    h1Text(`Emulators ready to receive commands`)
 
-   const collections = ["users"]
-   h1Text(`Removing collections: ${collections.join(",")}`)
-   await removeExistingCollections(collections)
+   // gdpr, delete production user data
+   const collectionsToRemove = INCLUDE_USERDATA
+      ? ["users"]
+      : ["users", "userData"]
+
+   h1Text(`Removing collections: ${collectionsToRemove.join(",")}`)
+   await removeExistingCollections(collectionsToRemove)
+
    h1Text(`Deleting Auth`)
    await deleteAuth()
+
+   if (INCLUDE_USERDATA) {
+      h1Text("Re-creating auth users")
+      await createAuthUsers()
+   }
 
    h1Text(`Seeding data`)
    await createUser("carlos@careerfairy.io")
@@ -74,6 +90,17 @@ async function createUser(email: string, superAdmin: boolean = false) {
          h1Text(e)
       }
 
+      throw e
+   }
+}
+/**
+ * Create creates all the auth users based on the userData docs
+ */
+async function createAuthUsers() {
+   try {
+      return await UserSeed.createAuthUsersFromUserData()
+   } catch (e) {
+      h1Text(e)
       throw e
    }
 }

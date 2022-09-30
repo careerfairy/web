@@ -1,4 +1,4 @@
-import { test as base, expect } from "@playwright/test"
+import { expect, test as base } from "@playwright/test"
 import LivestreamSeed, {
    createLivestreamGroupQuestions,
 } from "@careerfairy/seed-data/dist/livestreams"
@@ -285,11 +285,10 @@ test.describe("Streaming Journey", () => {
 
       // Streamer accepts the request
       await streamerPage.acceptUserRequestToJoinHandRaise()
+
       // hand raiser details are being shown
       const userName = `${user.firstName} ${user.lastName.charAt(0)}`
-      await expect(
-         streamerPage.page.locator(`h3:has-text("${userName}")`)
-      ).toBeVisible({ timeout: 30000 })
+      await expect(streamerPage.text(userName)).toBeVisible({ timeout: 8000 })
       await expect(
          streamerPage.page.locator("text=✋ Hand Raiser")
       ).toBeVisible()
@@ -387,11 +386,7 @@ async function setupData(setupGroup: boolean = false) {
    let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
 
    if (setupGroup) {
-      group = await GroupSeed.createGroup(
-         Object.assign({
-            adminEmails: [credentials.correctEmail],
-         })
-      )
+      group = await GroupSeed.createGroup(Object.assign({}))
       const groupQuestions = createLivestreamGroupQuestions(group.id)
 
       // associate the group with the livestream

@@ -49,11 +49,11 @@ import CheckIcon from "@mui/icons-material/Check"
 import { useDispatch, useSelector } from "react-redux"
 import * as storeActions from "store/actions"
 import LoadingButton from "@mui/lab/LoadingButton"
-import { StreamData } from "types/streaming"
 import useHandRaiseState from "components/custom-hook/useHandRaiseState"
 import { HandRaiseState } from "types/handraise"
 import ShareYoutubeVideoModal from "../../modal/ShareYoutubeVideoModal"
 import { showActionButtonsSelector } from "../../../../../store/selectors/streamSelectors"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = {
    root: {
@@ -108,7 +108,7 @@ const styles = {
 }
 const VIEWER_VIDEO_CONTROLS_HINT_LOCAL_KEY = "hasSeenVideoControlsAsViewer"
 interface Props {
-   currentLivestream: StreamData
+   currentLivestream: LivestreamEvent
    streamerId: string
    viewer: boolean
    showSettings: boolean

@@ -1,10 +1,16 @@
+import { LivestreamEvent } from "../livestreams"
+
 /*
  *
  * Method gets a nested property based on a string path
  *  - const obj = {prop1: {prop2:{prop3: "dog"}}}
  *  - getNestedProperty(obj, "prop1.prop2.prop3") returns "dog"
  * */
-export const getNestedProperty = (obj: any, path: string, separator = ".") => {
+export const getNestedProperty = (
+   obj: any,
+   path: string | string[],
+   separator = "."
+) => {
    const properties = Array.isArray(path) ? path : path.split(separator)
    return properties.reduce((prev, curr) => prev && prev[curr], obj)
 }
@@ -33,4 +39,40 @@ export const dynamicSort = <T>(property: keyof T, order?: "asc" | "desc") => {
       }
       return 0
    }
+}
+/**
+ * @description
+ * Splits an array into chunks of a given size
+ * @param list
+ * @param chunk
+ */
+export const chunkArray = <T>(list: T[], chunk: number): T[][] => {
+   const result: T[][] = []
+
+   for (let i = 0; i < list.length; i += chunk) {
+      result.push(list.slice(i, i + chunk))
+   }
+
+   return result
+}
+
+/**
+ * Sort Livestreams from more recent to oldest
+ * @param a
+ * @param b
+ */
+export const sortLivestreamsDesc = (
+   a: LivestreamEvent,
+   b: LivestreamEvent
+): number => {
+   if (a.start instanceof Date && b.start instanceof Date) {
+      return b.start.getTime() - a.start.getTime()
+   }
+
+   if (a.start["toDate"] && b.start["toDate"]) {
+      // convert from firebase timestamp type
+      return b.start.toDate().getTime() - a.start.toDate().getTime()
+   }
+
+   return 0
 }

@@ -6,4 +6,5 @@ export default {
       "./data/fieldAndLevelOfStudyMapping.json",
    exportedFieldAndLevelOfStudyMapping:
       "./data/exportedFieldAndLevelOfStudyMapping.csv",
+   failedAdminMigrationsJsonPath: "./data/failedAdminMigrations.json",
 }

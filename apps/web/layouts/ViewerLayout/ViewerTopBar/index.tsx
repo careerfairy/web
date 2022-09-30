@@ -63,7 +63,7 @@ const styles: StylesProps = {
    },
    floatingWrapper: {
       position: "absolute",
-      top: 2.5,
+      top: 11.5,
       right: 2.5,
       zIndex: 120,
       display: "flex",

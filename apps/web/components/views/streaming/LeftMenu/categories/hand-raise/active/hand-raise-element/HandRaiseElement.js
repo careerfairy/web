@@ -182,7 +182,7 @@ function RequestedHandRaiseElement(props) {
 
    function updateHandRaiseRequest(state) {
       props.updateHandRaiseRequest(props.request.id, state)
-      props.setNotificationToRemove(notificationId)
+      props?.setNotificationToRemove?.(notificationId)
    }
 
    return (
@@ -254,7 +254,7 @@ function ConnectingHandRaiseElement(props) {
 
    function updateHandRaiseRequest(state) {
       props.updateHandRaiseRequest(props.request.id, state)
-      props.setNotificationToRemove(notificationId)
+      props?.setNotificationToRemove(notificationId)
    }
 
    return (
@@ -277,7 +277,7 @@ function ConnectedHandRaiseElement(props) {
 
    function updateHandRaiseRequest(state) {
       props.updateHandRaiseRequest(props.request.id, state)
-      props.setNotificationToRemove(notificationId)
+      props?.setNotificationToRemove(notificationId)
    }
 
    return (

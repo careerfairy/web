@@ -2,8 +2,10 @@ import { Identifiable } from "../commonTypes"
 import firebase from "firebase/compat/app"
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
    GroupQuestion,
    GroupQuestionOption,
+   PublicGroup,
    UserGroupQuestionsWithAnswerMap,
 } from "../groups"
 import {
@@ -12,6 +14,7 @@ import {
    LivestreamGroupQuestionsMap,
 } from "../livestreams"
 import { Job } from "../ats/Job"
+import Timestamp = firebase.firestore.Timestamp
 
 export interface UserData extends Identifiable {
    authId: string
@@ -63,6 +66,13 @@ export interface UserData extends Identifiable {
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
    hasJobApplications?: boolean
+
+   /*
+    * We listen to this field to know when to refetch a new fresh token in the auth provider
+    * */
+   refreshTokenTime?: Timestamp
+
+   timezone?: string
 }
 
 /*
@@ -262,3 +272,26 @@ export const userAlreadyAppliedForJob = (
 
    return false
 }
+
+// User Admin Groups
+// Path: /userData/{userId}/userAdminGroups/{groupId}
+export interface UserAdminGroup extends PublicGroup {
+   userId: string
+}
+
+/*<------------------------>*/
+
+// Auth User custom claims
+export interface AuthUserCustomClaims {
+   adminGroups?: AdminGroupsClaim
+}
+
+/*
+ * Admin Groups Claim is a map of groupIds to the role of the user in that group
+ * */
+export type AdminGroupsClaim = Record<
+   string,
+   {
+      role: GROUP_DASHBOARD_ROLE
+   }
+>

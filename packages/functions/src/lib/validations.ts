@@ -2,6 +2,11 @@ import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
 import { groupRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+} from "@careerfairy/shared-lib/dist/groups"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 /**
  * Validate the data object argument in a function call
@@ -37,21 +42,57 @@ export function validateUserAuthExists(
 
 /**
  * Validate the user is a group admin when calling a function
+ *
+ * If the user is group admin, the group object will be returned
+ *
+ * If the user is CF Admin, the userData will be returned
+ *
  * @param groupId
  * @param email
  */
-export async function validateUserIsGroupAdmin(groupId: string, email: string) {
+export async function validateUserIsGroupAdmin(
+   groupId: string,
+   email: string
+): Promise<{
+   isAdmin: boolean
+   group: Group
+   role: GROUP_DASHBOARD_ROLE
+   isCFAdmin?: boolean
+   userData?: UserData
+}> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
    if (!response.isAdmin) {
       try {
          // check if user is CF admin, will throw if not
-         await validateUserIsCFAdmin(email)
+         const userData = await validateUserIsCFAdmin(email)
 
-         return response
+         return {
+            ...response,
+            userData,
+            isCFAdmin: true,
+         }
       } catch (e) {
          logAndThrow("The user is not a group admin", groupId, email)
       }
+   }
+
+   return response
+}
+
+export async function validateUserIsGroupAdminOwnerRole(
+   userEmail: string,
+   groupId: string
+) {
+   const response = await validateUserIsGroupAdmin(groupId, userEmail)
+
+   if (response.role !== GROUP_DASHBOARD_ROLE.OWNER && !response.isCFAdmin) {
+      logAndThrow(
+         "The user is not an owner of the group",
+         userEmail,
+         groupId,
+         response.role
+      )
    }
 
    return response

@@ -28,7 +28,7 @@ import { v4 as uuidv4 } from "uuid"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import ImageSelect from "./ImageSelect/ImageSelect"
 import makeStyles from "@mui/styles/makeStyles"
-import DateTimePicker from "@mui/lab/DateTimePicker"
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import SpeakerForm from "./SpeakerForm/SpeakerForm"
 import { useRouter } from "next/router"
 import FormGroup from "./FormGroup"
@@ -666,6 +666,9 @@ const DraftStreamForm = ({
                                  </Grid>
                               )}
                               <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                 <ImageResolutionText
+                                    resolution={"640 x 480"}
+                                 />
                                  <ImageSelect
                                     getDownloadUrl={getDownloadUrl}
                                     setFieldValue={setFieldValue}
@@ -683,6 +686,9 @@ const DraftStreamForm = ({
                                  />
                               </Grid>
                               <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
+                                 <ImageResolutionText
+                                    resolution={"1280 x 960"}
+                                 />
                                  <ImageSelect
                                     getDownloadUrl={getDownloadUrl}
                                     setFieldValue={setFieldValue}
@@ -701,6 +707,8 @@ const DraftStreamForm = ({
                               </Grid>
                               <Grid xs={12} sm={6} md={4} item>
                                  <DateTimePicker
+                                    inputFormat={"dd/MM/yyyy HH:mm"}
+                                    ampm={false}
                                     renderInput={(params) => (
                                        <TextField fullWidth {...params} />
                                     )}
@@ -1105,6 +1113,15 @@ const DraftStreamForm = ({
             <CircularProgress style={{ margin: "auto", color: "white" }} />
          )}
       </Container>
+   )
+}
+
+const ImageResolutionText = ({ resolution }) => {
+   return (
+      <Typography fontSize="10px" textAlign="center" color="text.secondary">
+         <strong style={{ fontWeight: 500 }}>Recommended Resolution:</strong>{" "}
+         {resolution}
+      </Typography>
    )
 }
 

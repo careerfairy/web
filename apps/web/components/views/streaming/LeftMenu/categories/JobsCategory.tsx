@@ -8,6 +8,7 @@ import { memo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobList from "./jobs/JobList"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
+import Box from "@mui/material/Box"
 
 type Props = {
    selectedState: string // current tab open, this one is "jobs"
@@ -28,7 +29,7 @@ const JobsCategory = ({ selectedState, livestream, showMenu }: Props) => {
             </QuestionContainerTitle>
          </QuestionContainerHeader>
 
-         <SuspenseWithBoundary>
+         <SuspenseWithBoundary fallback={<Box mt={1}>Fetching Jobs..</Box>}>
             <JobList livestream={livestream} />
          </SuspenseWithBoundary>
       </CategoryContainerTopAligned>

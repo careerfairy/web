@@ -28,7 +28,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Header = ({ isDraft }) => {
    const classes = useStyles()
-   const isScrolling = useScrollTrigger()
+   const isScrolling = useScrollTrigger({ disableHysteresis: true })
 
    return (
       <Collapse in={!isScrolling}>

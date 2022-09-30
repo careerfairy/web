@@ -1,24 +1,45 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useDispatch } from "react-redux"
-import * as actions from "store/actions"
+import * as actions from "../../store/actions"
 import {
    IAgoraRTCClient,
    IAgoraRTCRemoteUser,
    NetworkQuality,
+   UID,
 } from "agora-rtc-sdk-ng"
-import { RemoteStreamUser } from "types/streaming"
+import { IRemoteStream } from "types/streaming"
+import useAgoraError from "./useAgoraError"
+import { useSessionStorage } from "react-use"
+
+export const SESSION_PROXY_KEY = "should-use-cloud-proxy"
 
 export default function useAgoraClientConfig(
    rtcClient: IAgoraRTCClient,
-   streamerId: string
+   streamerId: UID
 ) {
-   const [remoteStreams, setRemoteStreams] = useState([])
+   const [remoteStreams, setRemoteStreams] = useState<IRemoteStream[]>([])
    const [networkQuality, setNetworkQuality] = useState<NetworkQuality>({
       downlinkNetworkQuality: 0,
       uplinkNetworkQuality: 0,
    })
+   const [sessionShouldUseCloudProxy, setSessionShouldUseProxy] =
+      useSessionStorage<boolean>(SESSION_PROXY_KEY, false)
+
+   const { handleRtcError } = useAgoraError()
 
    const dispatch = useDispatch()
+
+   const handleSessionShouldUseCloudProxy = useCallback(
+      (shouldUse: boolean) => {
+         setSessionShouldUseProxy(shouldUse)
+         dispatch(actions.setSessionShouldUseCloudProxy(shouldUse))
+      },
+      [dispatch, setSessionShouldUseProxy]
+   )
+
+   useEffect(() => {
+      handleSessionShouldUseCloudProxy(sessionShouldUseCloudProxy) // Only ever listen to this once in the app
+   }, [dispatch, handleSessionShouldUseCloudProxy, sessionShouldUseCloudProxy])
 
    useEffect(() => {
       if (rtcClient) {
@@ -34,8 +55,24 @@ export default function useAgoraClientConfig(
    }
 
    const configureAgoraClient = () => {
+      /**
+       * The RTC sdk 4.11.0 automatically switches to proxy mode after the initial request fails
+       * release notes: https://docs.agora.io/en/Video/release_web_ng?platform=Web#v4110
+       * docs: https://docs.agora.io/en/Video/API%20Reference/web_ng/interfaces/iagorartcclient.html#event_join_fallback_to_proxy
+       */
+      rtcClient.on("join-fallback-to-proxy", (proxyServer) => {
+         handleSessionShouldUseCloudProxy(true)
+      })
+      /**
+       * This emit only triggers when the RTC client join method SUCCEEDS when attempting to join a channel with proxy
+       * docs: https://docs.agora.io/en/Video/API%20Reference/web_ng/interfaces/iagorartcclient.html#event_is_using_cloud_proxy
+       * */
       rtcClient.on("is-using-cloud-proxy", (isUsing) => {
-         dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsing)))
+         const isUsingProxy = Boolean(isUsing)
+         if (isUsingProxy) {
+            handleSessionShouldUseCloudProxy(true)
+         }
+         dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsingProxy)))
       })
       rtcClient.on("user-joined", async (remoteUser) => {
          setRemoteStreams((prevRemoteStreams) => {
@@ -58,56 +95,58 @@ export default function useAgoraClientConfig(
          )
       })
 
-      rtcClient.on("user-published", async (remoteUser, mediaType) => {
-         try {
-            await rtcClient.subscribe(remoteUser, mediaType)
-         } catch (error) {}
-         setRemoteStreams((prevRemoteStreams) => {
-            return prevRemoteStreams.map((user: RemoteStreamUser) => {
-               if (user.uid === remoteUser.uid) {
-                  if (mediaType === "audio") {
-                     user.audioTrack = remoteUser.audioTrack
-                     user.audioMuted = false
-                     try {
-                        // We don't play the audiotrack for the screen share track if its being shared by the local
-                        // client, else it echoes with the sound of the original media player.
-                        if (user.uid !== `${streamerId}screen`) {
-                           remoteUser?.audioTrack?.play?.()
+      rtcClient.on("user-published", async (remoteUser, mediaType) =>
+         rtcClient
+            .subscribe(remoteUser, mediaType)
+            .then(() => {
+               setRemoteStreams((prevRemoteStreams) => {
+                  return prevRemoteStreams.map((user) => {
+                     if (user.uid === remoteUser.uid) {
+                        if (mediaType === "audio") {
+                           user.audioTrack = remoteUser.audioTrack
+                           user.audioMuted = false
+                           try {
+                              // We don't play the audiotrack for the screen share track if its being shared by the local
+                              // client, else it echoes with the sound of the original media player.
+                              if (user.uid !== `${streamerId}screen`) {
+                                 remoteUser?.audioTrack?.play?.()
+                              }
+                           } catch (e) {
+                              dispatch(actions.sendGeneralError(e))
+                           }
+                        } else if (mediaType === "video") {
+                           user.videoTrack = remoteUser.videoTrack
+                           user.videoMuted = false
                         }
-                     } catch (e) {
-                        dispatch(actions.sendGeneralError(e))
                      }
-                  } else if (mediaType === "video") {
-                     user.videoTrack = remoteUser.videoTrack
-                     user.videoMuted = false
-                  }
-               }
-               return user
+                     return user
+                  })
+               })
             })
-         })
-      })
+            .catch(handleRtcError)
+      )
 
-      rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
-         try {
-            await rtcClient.unsubscribe(remoteUser, mediaType)
-         } catch (error) {
-            // handleRtcError(error);
-         }
-         setRemoteStreams((prevRemoteStreams) => {
-            return prevRemoteStreams.map((user) => {
-               if (user.uid === remoteUser.uid) {
-                  if (mediaType === "audio") {
-                     user.audioTrack = null
-                     user.audioMuted = true
-                  } else if (mediaType === "video") {
-                     user.videoTrack = null
-                     user.videoMuted = true
-                  }
-               }
-               return user
+      rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
+         rtcClient
+            .unsubscribe(remoteUser, mediaType)
+            .then(() => {
+               setRemoteStreams((prevRemoteStreams) => {
+                  return prevRemoteStreams.map((user) => {
+                     if (user.uid === remoteUser.uid) {
+                        if (mediaType === "audio") {
+                           user.audioTrack = null
+                           user.audioMuted = true
+                        } else if (mediaType === "video") {
+                           user.videoTrack = null
+                           user.videoMuted = true
+                        }
+                     }
+                     return user
+                  })
+               })
             })
-         })
-      })
+            .catch(handleRtcError)
+      )
 
       rtcClient.on("network-quality", (networkStats) => {
          const isEqualToCurrentValue =

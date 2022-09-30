@@ -192,17 +192,19 @@ export const sendCustomError =
 
 // enqueue hand raise request sent
 
+const key = "Your hand raise request has been sent, please wait to be invited."
 export const enqueueSuccessfulHandRaiseRequest = () => async (dispatch) => {
-   const message =
-      "Your hand raise request has been sent, please wait to be invited."
    return dispatch(
       enqueueSnackbar({
-         message,
+         message: key,
          options: {
-            key: message,
+            key,
             variant: "info",
             preventDuplicate: true,
          },
       })
    )
+}
+export const closeSuccessfulHandRaiseRequest = () => async (dispatch) => {
+   return dispatch(closeSnackbar(key))
 }

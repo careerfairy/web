@@ -6,8 +6,8 @@ import { newStore, wrapper } from "../store"
 import NextNProgress from "nextjs-progressbar"
 import { brandedLightTheme } from "../materialUI"
 import Head from "next/head"
-import AdapterDateFns from "@mui/lab/AdapterDateFns"
-import LocalizationProvider from "@mui/lab/LocalizationProvider"
+import { LocalizationProvider } from "@mui/x-date-pickers"
+import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { AuthProvider } from "../HOCs/AuthProvider"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
 import { createFirestoreInstance } from "redux-firestore"
@@ -15,11 +15,8 @@ import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
 import Notifier from "../components/views/notifier"
-import CFCookieConsent from "../components/views/common/cookie-consent/CFCookieConsent"
-import { useRouter } from "next/router"
 import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import { ThemeProviderWrapper } from "../context/theme/ThemeContext"
-import { useEffect, useState } from "react"
 import firebaseApp, {
    AuthInstance,
    firebaseConfig,
@@ -41,6 +38,7 @@ import {
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import { actionTypes } from "redux-firestore"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -52,6 +50,16 @@ const rrfConfig = {
    // userProfile: 'userData',
    useFirestoreForProfile: true, // Firestore for Profile instead of Realtime DB
    attachAuthIsReady: true, // attaches auth is ready promise to store
+   /*  react-redux-firebase doesn't clear the userData or any data when the user
+    *  logs out and logs back in with a different account, so we need to check that the id matches
+    * [issue](https://github.com/prescottprue/redux-firestore/issues/114#issuecomment-415622171)
+    */
+   onAuthStateChanged: (authData, firebase, dispatch) => {
+      // Clear redux-firestore state if auth does not exist (i.e logout)
+      if (!authData) {
+         dispatch({ type: actionTypes.CLEAR_DATA })
+      }
+   },
 }
 
 export const store = newStore()
@@ -64,8 +72,6 @@ const rrfProps = {
 
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
-
-   const [disableCookies, isRecordingWindow] = useRouterInformation()
 
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
@@ -89,7 +95,7 @@ function MyApp(props) {
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
-                           <GoogleTagManager disableCookies={disableCookies}>
+                           <GoogleTagManager>
                               <ThemeProviderWrapper>
                                  <FirebaseServiceContext.Provider
                                     value={firebaseServiceInstance}
@@ -98,10 +104,6 @@ function MyApp(props) {
                                        dateAdapter={AdapterDateFns}
                                     >
                                        <ErrorProvider>
-                                          {disableCookies ||
-                                          isRecordingWindow ? null : (
-                                             <CFCookieConsent />
-                                          )}
                                           <UserRewardsNotifications>
                                              <Component {...pageProps} />
                                           </UserRewardsNotifications>
@@ -133,23 +135,6 @@ const ReactFireProviders = ({ children }) => {
          </FirestoreProvider>
       </FirebaseAppProvider>
    )
-}
-
-const useRouterInformation = () => {
-   const {
-      pathname,
-      query: { isRecordingWindow },
-   } = useRouter()
-
-   const [disableCookies, setDisableCookies] = useState(false)
-
-   useEffect(() => {
-      setDisableCookies(
-         Boolean(pathname === "/next-livestreams/[groupId]/embed")
-      )
-   }, [pathname])
-
-   return [disableCookies, isRecordingWindow]
 }
 
 // Only uncomment this method if you have blocking data requirements for
