@@ -1,7 +1,14 @@
-import { FirebaseGroupRepository, IGroupRepository } from "./GroupRepository"
-import { Group, GROUP_DASHBOARD_ROLE, GroupQuestion } from "./groups"
-import { GroupDashboardInvite } from "./GroupDashboardInvite"
-import { UserData } from "../users"
+import {
+   FirebaseGroupRepository,
+   IGroupRepository,
+} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+   GroupQuestion,
+} from "@careerfairy/shared-lib/dist/groups"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import firebase from "firebase/compat"
 import admin = require("firebase-admin")
 
