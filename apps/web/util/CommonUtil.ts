@@ -219,3 +219,23 @@ export const errorLogAndNotify = (error: Error, metadata?: any) => {
    console.error("error", error)
    Sentry.captureException(error, metadata)
 }
+
+/**
+ * Check if the emulators are enabled or if we're running locally
+ */
+export const shouldUseEmulators = () => {
+   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+      return true
+   }
+
+   if (typeof window !== "undefined") {
+      if (
+         location.hostname === "localhost" ||
+         location.hostname === "127.0.0.1"
+      ) {
+         return true
+      }
+   }
+
+   return false
+}

@@ -103,6 +103,7 @@ const config: PlaywrightTestConfig = {
       env: {
          FIREBASE_AUTH_EMULATOR_HOST: "localhost:9099",
          FIRESTORE_EMULATOR_HOST: "localhost:8080",
+         NEXT_PUBLIC_FIREBASE_EMULATORS: "true",
       },
       port: 3000,
       // emulators need some time to boot

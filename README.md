@@ -127,9 +127,20 @@ Create a Pull Request with the new changes, and only after approval, you should 
 ### Run E2E tests on a linux docker container
 
 Useful to find test flaws that appear during CI.
+Adjust the docker resources to match the CI runners specs (2cpu, 7GB memory).
 
 ```sh
-docker build -t tests -f apps/web/Dockerfile.test . && docker run -p 9323:9323 -it tests
+# Build the image first, it will install all deps (linux use different binaries - swc, turbo, etc)
+docker build -t tests -f apps/web/Dockerfile.test .
+
+# Run the tests inside the built docker image
+# You can modify the app files without building the image again
+docker run  -p 9323:9323 \
+            -p 8080:8080 \
+            -v $(pwd)/apps/web/:/app/apps/web \
+            -it --entrypoint "" \
+            -e DEBUG=pw:webserver tests \
+            npm run test:e2e-webapp -w @careerfairy/webapp -- --project=firefox
 ```
 
 ### Emulator Functions - Sending Emails

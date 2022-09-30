@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react"
 import TagManager from "react-gtm-module"
 import { useSelector } from "react-redux"
 import { firebaseAuthIsLoadedSelector } from "../store/selectors/firebaseSelector"
+import { shouldUseEmulators } from "../util/CommonUtil"
 
 const tagManagerArgs = {
    gtmId: "GTM-P29VCWC",
@@ -54,7 +55,7 @@ const GoogleTagManagerLoader = ({ children }) => {
 }
 
 const GoogleTagManager = ({ children }) => {
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   if (shouldUseEmulators()) {
       return children
    } else {
       return <GoogleTagManagerLoader>{children}</GoogleTagManagerLoader>

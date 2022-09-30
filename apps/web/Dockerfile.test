@@ -15,4 +15,7 @@ WORKDIR /app
 RUN npm install
 RUN npx playwright install
 
+ENV NODE_ENV test
+RUN npm run build
+
 ENTRYPOINT ["npm", "run", "test:e2e-webapp"]
