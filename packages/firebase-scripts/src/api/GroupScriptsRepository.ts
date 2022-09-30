@@ -1,24 +1,29 @@
-import {
-   GroupFunctionsRepository,
-   IGroupFunctionsRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupFunctionsRepository"
 import firebase from "firebase/compat"
 import {
-   mapFirestoreDocuments,
    DocRef,
+   mapFirestoreDocuments,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
    LegacyGroupAdmin,
 } from "@careerfairy/shared-lib/dist/groups"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   FirebaseGroupRepository,
+   IGroupRepository,
+} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import admin = require("firebase-admin")
 
-export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
+export interface IGroupScriptsRepository extends IGroupRepository {
    getAllLegacyAdmins<T extends boolean>(
       withRef?: T
    ): Promise<(T extends true ? LegacyGroupAdmin & DocRef : LegacyGroupAdmin)[]>
+
+   getAllGroupAdmins<T extends boolean>(
+      withRef?: T
+   ): Promise<(T extends true ? GroupAdmin & DocRef : GroupAdmin)[]>
 
    /**
     * Grants or removes a user admin access to a group and a role
@@ -28,6 +33,11 @@ export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
     * 2. Adds the user's role to the group's admins sub-collection list for querying of group admins in group/[groupId]/admin/roles
     * 3. Adds a userGroupAdmin document to the user's userAdminGroups sub-collection with the group's details
     *
+    * What it does if no role is provided:
+    * 1. Removes the user's role from the group's admins sub-collection list for querying of group admins in group/[groupId]/admin/roles
+    * 2. Removes the user's role from the user's auth custom claims
+    * 3. Removes the user's userGroupAdmin document from the user's userAdminGroups sub-collection
+    *
     * @param targetEmail
     * @param newRole
     * @param fallbackGroupId - If the group is deleted, we can still use this to remove the user's role from the group's admins sub-collection list
@@ -35,14 +45,14 @@ export interface IGroupScriptsRepository extends IGroupFunctionsRepository {
     */
    migrateAdminRole(
       targetEmail: string,
-      newRole: GROUP_DASHBOARD_ROLE,
+      newRole: GROUP_DASHBOARD_ROLE | null,
       fallbackGroupId: string,
       group?: Group
    ): Promise<void>
 }
 
 export class GroupScriptsRepository
-   extends GroupFunctionsRepository
+   extends FirebaseGroupRepository
    implements IGroupScriptsRepository
 {
    constructor(
@@ -50,7 +60,7 @@ export class GroupScriptsRepository
       protected readonly fieldValue: typeof firebase.firestore.FieldValue,
       protected readonly auth: admin.auth.Auth
    ) {
-      super(firestore, fieldValue, auth)
+      super(firestore, fieldValue)
    }
 
    async getAllLegacyAdmins<T extends boolean>(withRef?: T) {
@@ -58,9 +68,14 @@ export class GroupScriptsRepository
       return mapFirestoreDocuments<LegacyGroupAdmin, T>(admins, withRef)
    }
 
+   async getAllGroupAdmins<T extends boolean>(withRef?: T) {
+      const admins = await this.firestore.collectionGroup("groupAdmins").get()
+      return mapFirestoreDocuments<GroupAdmin, T>(admins, withRef)
+   }
+
    async migrateAdminRole(
       targetEmail: string,
-      newRole: GROUP_DASHBOARD_ROLE,
+      newRole: GROUP_DASHBOARD_ROLE | null,
       fallbackGroupId: string,
       group?: Group
    ) {
@@ -127,19 +142,29 @@ export class GroupScriptsRepository
             targetEmail
          )
 
-      if (!thereWillBeAtLeastOneOwner) {
-         newRole = GROUP_DASHBOARD_ROLE.OWNER
-         console.warn(
-            `There will be no owner for group ${group.id} after this operation, so will make them an owner by default`,
-            {
-               newRole,
-               targetEmail,
-               userName: [userData.firstName, userData.lastName].join(" "),
-            }
-         )
+      if (!thereWillBeAtLeastOneOwner && newRole) {
+         newRole = GROUP_DASHBOARD_ROLE.OWNER // There will be no owner for group ${group.id} after this operation, so will make them an owner by default
       }
 
-      await this.setGroupAdminRoleInClaims(user, newRole, group)
+      const oldClaims = { ...user.customClaims }
+      let newClaims = JSON.parse(JSON.stringify(oldClaims)) // deep copy the old claims
+
+      if (newRole) {
+         newClaims = {
+            ...oldClaims,
+            adminGroups: {
+               ...oldClaims.adminGroups,
+               [group.id]: {
+                  role: newRole,
+               },
+            },
+         }
+      } else {
+         // remove the role from the user's custom claims
+         delete newClaims.adminGroups[group.id]
+      }
+
+      await this.auth.setCustomUserClaims(user.uid, newClaims)
 
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {

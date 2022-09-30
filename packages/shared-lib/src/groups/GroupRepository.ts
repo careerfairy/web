@@ -579,6 +579,8 @@ export class FirebaseGroupRepository
          .collection("userAdminGroups")
          .doc(group.id)
 
+      const userRef = this.firestore.collection("userData").doc(userData.id)
+
       if (role) {
          // if a role is provided, then we are adding the user as an admin
          const groupAdminDataToSave: GroupAdmin = {
@@ -610,6 +612,10 @@ export class FirebaseGroupRepository
          batch.set(userAdminGroupsRef, userAdminGroupsDataToSave, {
             merge: true,
          })
+
+         batch.update(userRef, {
+            refreshTokenTime: this.fieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
+         })
       } else {
          // If no role is provided, then we are removing the user as an admin
          batch.delete(groupAdminsRef)
@@ -619,12 +625,16 @@ export class FirebaseGroupRepository
       return batch.commit()
    }
 
-   protected checkIfThereWillBeAtLeastOneOwner(
+   /*
+    * Checks if there will be at least one owner after the role change
+    * */
+   protected async checkIfThereWillBeAtLeastOneOwner(
       groupId: string,
       newRole: GROUP_DASHBOARD_ROLE,
-      userEmail: string,
-      currentAdmins: GroupAdmin[]
+      userEmail: string
    ) {
+      const currentAdmins = (await this.getGroupAdmins(groupId)) || []
+
       const potentialNewAdmins: Partial<GroupAdmin>[] = [
          ...currentAdmins.filter((admin) => admin.id !== userEmail),
          // add the new admin to the list of current admins if it's not already there

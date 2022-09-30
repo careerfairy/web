@@ -4,6 +4,12 @@
 npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/migrateLegacyAdminsToNewAdmins
 ```
 
+### If you want to re-run the script, you can add the `clearNewAdmins=true` flag to reset the new admins sub-collection and claims
+
+```sh
+npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/users/migrateLegacyAdminsToNewAdmins clearNewAdmins=true
+```
+
 ### What it does:
 
 Goes through every admin of a group by looking at the legacy admin in `careerCenterData/[groupId]/admins/[email]` sub-collection then assigns them
