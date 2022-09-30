@@ -245,18 +245,6 @@ const AuthProvider = ({ children }) => {
       ]
    )
 
-   const contextValue = useMemo(
-      () => ({
-         authenticatedUser: auth,
-         userData: userData,
-         isLoggedOut,
-         isLoggedIn,
-         userPresenter: userData ? new UserPresenter(userData) : undefined,
-         userStats: userStats,
-      }),
-      [auth, isLoggedIn, isLoggedOut, userData, userStats]
-   )
-
    const isSecurePath = () => {
       return Boolean(securePaths.includes(pathname))
    }
