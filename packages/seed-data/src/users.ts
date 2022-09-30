@@ -10,6 +10,7 @@ import {
    UserDataAnalytics,
 } from "@careerfairy/shared-lib/dist/users"
 import { faker } from "@faker-js/faker"
+import { chunkArray } from "@careerfairy/shared-lib/dist/utils"
 
 interface UserSeed {
    /**
@@ -34,6 +35,18 @@ interface UserSeed {
       user: UserData,
       recruiterDetails?: Partial<SavedRecruiter>
    ): Promise<SavedRecruiter>
+
+   /*
+    * This method is meant for development purposes only
+    * It creates a user on firebase auth (already verified) from a userData document
+    * As we are unable to import the prod auth in our dev environment, we need to re-create
+    * it from the userData document
+    * */
+   createAuthUserFromUserData(
+      userData: UserData
+   ): Promise<admin.auth.UserRecord>
+
+   createAuthUsersFromUserData(): Promise<void>
 }
 
 class UserFirebaseSeed implements UserSeed {
@@ -151,6 +164,46 @@ class UserFirebaseSeed implements UserSeed {
       return userAnalyticsSnap.exists
          ? (userAnalyticsSnap.data() as UserDataAnalytics)
          : null
+   }
+
+   async createAuthUserFromUserData(
+      userData: UserData
+   ): Promise<admin.auth.UserRecord> {
+      return auth.createUser({
+         uid: userData.authId,
+         email: userData.userEmail,
+         password: "password",
+         emailVerified: true,
+      })
+   }
+
+   async createAuthUsersFromUserData(): Promise<void> {
+      const allUserSnaps = await firestore.collection("userData").get() // Get all user snapshots
+
+      const allUserDocs = allUserSnaps.docs.map((doc) => doc.data() as UserData) // Get all user docs
+
+      const userChunks = chunkArray(allUserDocs, 3000) // Chunk the user docs into "n" users per chunk, to avoid hitting the node concurrent promise limit
+
+      for (const [index, userChunk] of userChunks.entries()) {
+         console.log(
+            `Creating ${userChunk.length} auth users in chunk ${index + 1} of ${
+               userChunks.length
+            }`
+         ) // Log the progress
+
+         const promises = userChunk.map((user) =>
+            this.createAuthUserFromUserData(user).catch((e) => {
+               console.log(
+                  `Error creating user ${user.userEmail} with uid ${user.authId}`, // Catch and log errors
+                  e
+               )
+            })
+         )
+
+         await Promise.all(promises) // Wait for all promises to resolve
+      }
+
+      return
    }
 }
 

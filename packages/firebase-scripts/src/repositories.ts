@@ -1,4 +1,4 @@
-import { firestore } from "./lib/firebase"
+import { auth, firestore } from "./lib/firebase"
 import { FieldValue, Timestamp } from "firebase-admin/firestore"
 import {
    ILivestreamScriptsRepository,
@@ -9,11 +9,12 @@ import {
    UserScriptsRepository,
 } from "./api/UserScriptsRepository"
 import {
-   FirebaseGroupRepository,
-   IGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+   GroupScriptsRepository,
+   IGroupScriptsRepository,
+} from "./api/GroupScriptsRepository"
 
 const firestoreInstance = firestore as any
+const authInstance = auth
 
 /**
  * Singleton instances of the repositories
@@ -25,9 +26,10 @@ export const userRepo: IUserScriptsRepository = new UserScriptsRepository(
    Timestamp
 )
 
-export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
+export const groupRepo: IGroupScriptsRepository = new GroupScriptsRepository(
    firestoreInstance,
-   FieldValue
+   FieldValue,
+   authInstance
 )
 
 export const livestreamRepo: ILivestreamScriptsRepository =

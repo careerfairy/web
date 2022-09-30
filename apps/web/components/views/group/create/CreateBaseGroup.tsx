@@ -91,7 +91,6 @@ const CreateBaseGroup = ({
    handleSkipNext,
 }: CreateGroupProps) => {
    const classes = useStyles()
-   const { authenticatedUser: user } = useAuth()
    const [groupedUniversities, setGroupedUniversities] = useState<
       GroupedUniversity[]
    >([])
@@ -137,7 +136,6 @@ const CreateBaseGroup = ({
             validationSchema={schema}
             onSubmit={(values, { setSubmitting }) => {
                let careerCenter: BaseGroupInfo = {
-                  adminEmails: [user.email],
                   logoUrl: values.logoUrl,
                   logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
                   description: values.description,

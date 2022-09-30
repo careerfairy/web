@@ -2,8 +2,11 @@ import functions = require("firebase-functions")
 import BaseSchema from "yup/lib/schema"
 import { groupRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+} from "@careerfairy/shared-lib/dist/groups"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 /**
  * Validate the data object argument in a function call
@@ -50,7 +53,13 @@ export function validateUserAuthExists(
 export async function validateUserIsGroupAdmin(
    groupId: string,
    email: string
-): Promise<{ group?: Group; userData?: UserData }> {
+): Promise<{
+   isAdmin: boolean
+   group: Group
+   role: GROUP_DASHBOARD_ROLE
+   isCFAdmin?: boolean
+   userData?: UserData
+}> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
    if (!response.isAdmin) {
@@ -61,10 +70,29 @@ export async function validateUserIsGroupAdmin(
          return {
             ...response,
             userData,
+            isCFAdmin: true,
          }
       } catch (e) {
          logAndThrow("The user is not a group admin", groupId, email)
       }
+   }
+
+   return response
+}
+
+export async function validateUserIsGroupAdminOwnerRole(
+   userEmail: string,
+   groupId: string
+) {
+   const response = await validateUserIsGroupAdmin(groupId, userEmail)
+
+   if (response.role !== GROUP_DASHBOARD_ROLE.OWNER && !response.isCFAdmin) {
+      logAndThrow(
+         "The user is not an owner of the group",
+         userEmail,
+         groupId,
+         response.role
+      )
    }
 
    return response

@@ -21,6 +21,9 @@ import {
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
+   GroupQuestion,
    GroupWithPolicy,
    UserGroupData,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -30,6 +33,7 @@ import {
    UserLivestreamGroupQuestionAnswers,
 } from "@careerfairy/shared-lib/dist/users"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
@@ -94,6 +98,34 @@ class FirebaseService {
       return createUserInAuthAndFirebase({ userData })
    }
 
+   createGroupAdminUserInAuthAndFirebase = async (args: {
+      userData: IAdminUserCreateFormValues
+   }): Promise<{
+      readonly data: Group
+   }> => {
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
+         args
+      )
+   }
+   createGroup = async (args: {
+      group: Omit<Group, "id" | "groupId">
+      groupQuestions?: GroupQuestion[]
+   }) => {
+      return this.functions.httpsCallable("createGroup")(args)
+   }
+
+   changeRole = async (args: {
+      groupId: string
+      email: string
+      newRole: GROUP_DASHBOARD_ROLE
+   }) => {
+      return this.functions.httpsCallable("changeRole")(args)
+   }
+
+   kickFromDashboard = async (args: { groupId: string; email: string }) => {
+      return this.functions.httpsCallable("kickFromDashboard")(args)
+   }
+
    sendNewlyPublishedEventEmail = async (emailData) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
          "sendNewlyPublishedEventEmail"
@@ -138,6 +170,16 @@ class FirebaseService {
       return sendReminderEmailAboutApplicationLink(data)
    }
 
+   sendGroupAdminInviteEmail = async (args: {
+      recipientEmail: string
+      groupName: string
+      senderFirstName: string
+      groupId: string
+      role: GROUP_DASHBOARD_ROLE
+   }) => {
+      return this.functions.httpsCallable("sendDashboardInviteEmail_v2")(args)
+   }
+
    sendBasicTemplateEmail = async ({
       values,
       testEmails,
@@ -166,12 +208,6 @@ class FirebaseService {
       )
 
       return sendBasicTemplateEmail(dataObj)
-   }
-
-   joinGroupDashboard = async (data) => {
-      const joinGroupDashboard =
-         this.functions.httpsCallable("joinGroupDashboard")
-      return joinGroupDashboard(data)
    }
 
    /**
@@ -424,24 +460,6 @@ class FirebaseService {
          .where("companyId", "==", companyId)
          .orderBy("priority", "asc")
       return ref.get()
-   }
-
-   createCareerCenter = async (careerCenter, userEmail) => {
-      let batch = this.firestore.batch()
-      let groupRef = this.firestore.collection("careerCenterData").doc()
-      let groupAdminRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupRef.id)
-         .collection("admins")
-         .doc(userEmail)
-
-      careerCenter.groupId = groupRef.id
-      batch.set(groupRef, careerCenter)
-      batch.set(groupAdminRef, { role: "mainAdmin" })
-
-      await batch.commit()
-
-      return groupRef
    }
 
    updateCareerCenter = (groupId, newCareerCenter) => {
@@ -1482,13 +1500,6 @@ class FirebaseService {
       return ref.get()
    }
 
-   listenCareerCentersByAdminEmail = (email, callback) => {
-      let ref = this.firestore
-         .collection("careerCenterData")
-         .where("adminEmails", "array-contains", email)
-      return ref.onSnapshot(callback)
-   }
-
    listenToJoinedGroups = (groupIds, callback) => {
       let ref = this.firestore
          .collection("careerCenterData")
@@ -2505,30 +2516,6 @@ class FirebaseService {
       return dataArray
    }
 
-   kickFromDashboard = (groupId, userEmail) => {
-      let groupRef = this.firestore.collection("careerCenterData").doc(groupId)
-
-      let userRef = this.firestore.collection("userData").doc(userEmail)
-
-      return this.firestore.runTransaction((transaction) => {
-         return transaction.get(userRef).then((userDoc) => {
-            const userData = userDoc.data()
-
-            const email = userData?.userEmail || userEmail
-
-            transaction.update(groupRef, {
-               adminEmails: firebase.firestore.FieldValue.arrayRemove(email),
-            })
-            let groupAdminRef = this.firestore
-               .collection("careerCenterData")
-               .doc(groupId)
-               .collection("admins")
-               .doc(email)
-            transaction.delete(groupAdminRef)
-         })
-      })
-   }
-
    findTargetEvent = async (eventId) => {
       let targetStream = null
       let typeOfStream = ""
@@ -2563,37 +2550,6 @@ class FirebaseService {
       )
    }
 
-   promoteToMainAdmin = async (groupId, userEmail) => {
-      let batch = this.firestore.batch()
-
-      let adminToPromoteRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("admins")
-         .doc(userEmail)
-
-      let groupAdminsRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .collection("admins")
-         .where("role", "==", "mainAdmin")
-
-      const adminSnaps = await groupAdminsRef.get()
-      // Demote all main Admins to subAdmins to ensure that there is always no main admins when promoting
-      for (const mainAdminDoc of adminSnaps.docs) {
-         const mainAdminRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("admins")
-            .doc(mainAdminDoc.id)
-         batch.update(mainAdminRef, { role: "subAdmin" })
-      }
-
-      batch.set(adminToPromoteRef, { role: "mainAdmin" }, { merge: true })
-
-      return batch.commit()
-   }
-
    // Approval Queries
 
    getAllGroupAdminInfo = async (
@@ -2601,24 +2557,27 @@ class FirebaseService {
       streamId = ""
    ) => {
       let adminsInfo = []
+      const baseUrl = this.getBaseUrl()
       for (const groupId of arrayOfGroupIds) {
          const groupRef = this.firestore
             .collection("careerCenterData")
             .doc(groupId)
          const groupSnap = await groupRef.get()
-         if (groupSnap.exists) {
-            const groupData = groupSnap.data()
-            if (groupData.adminEmails?.length) {
-               const baseUrl = this.getBaseUrl()
-               const newAdminsInfo = groupData.adminEmails.map((email) => ({
-                  groupId,
-                  email,
-                  eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
-                  nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
-               }))
-               adminsInfo = [...adminsInfo, ...newAdminsInfo]
+
+         if (!groupSnap.exists) continue
+
+         const adminsSnap = await groupRef.collection("groupAdmins").get()
+
+         const newAdminsInfo = adminsSnap.docs.map((adminDoc) => {
+            const adminData = adminDoc.data() as GroupAdmin
+            return {
+               groupId,
+               email: adminData.email,
+               eventDashboardLink: `${baseUrl}/group/${groupId}/admin/events?eventId=${streamId}`,
+               nextLivestreamsLink: `${baseUrl}/next-livestreams/${groupId}?livestreamId=${streamId}`,
             }
-         }
+         })
+         adminsInfo = [...adminsInfo, ...newAdminsInfo]
       }
       return adminsInfo
    }
@@ -2661,20 +2620,6 @@ class FirebaseService {
          .collection("notifications")
          .doc(notificationId)
       await notificationRef.delete()
-   }
-
-   validateDashboardInvite = async (notificationId, groupId) => {
-      let ref = this.firestore.collection("notifications").doc(notificationId)
-      const refSnap = await ref.get()
-      if (!refSnap.exists) {
-         return false
-      }
-      const notification = refSnap.data()
-      return (
-         notification.details.type === "dashboardInvite" &&
-         notification.open &&
-         notification.details.requester === groupId
-      )
    }
 
    checkForNotification = (

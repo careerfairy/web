@@ -386,11 +386,7 @@ async function setupData(setupGroup: boolean = false) {
    let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
 
    if (setupGroup) {
-      group = await GroupSeed.createGroup(
-         Object.assign({
-            adminEmails: [credentials.correctEmail],
-         })
-      )
+      group = await GroupSeed.createGroup(Object.assign({}))
       const groupQuestions = createLivestreamGroupQuestions(group.id)
 
       // associate the group with the livestream

@@ -228,12 +228,7 @@ async function setupData(
    livestreamType: "create" | "createPast" | "createLive" = "create"
 ) {
    const group = await GroupSeed.createGroup(
-      Object.assign(
-         {
-            adminEmails: [userEmail],
-         },
-         overrideGroupDetails
-      )
+      Object.assign({}, overrideGroupDetails)
    )
 
    const groupQuestions = createLivestreamGroupQuestions(group.id)

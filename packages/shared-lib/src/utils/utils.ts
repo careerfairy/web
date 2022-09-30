@@ -40,6 +40,21 @@ export const dynamicSort = <T>(property: keyof T, order?: "asc" | "desc") => {
       return 0
    }
 }
+/**
+ * @description
+ * Splits an array into chunks of a given size
+ * @param list
+ * @param chunk
+ */
+export const chunkArray = <T>(list: T[], chunk: number): T[][] => {
+   const result: T[][] = []
+
+   for (let i = 0; i < list.length; i += chunk) {
+      result.push(list.slice(i, i + chunk))
+   }
+
+   return result
+}
 
 /**
  * Sort Livestreams from more recent to oldest
