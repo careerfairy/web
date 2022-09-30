@@ -64,7 +64,10 @@ export class GroupScriptsRepository
    }
 
    async getAllLegacyAdmins<T extends boolean>(withRef?: T) {
-      const admins = await this.firestore.collectionGroup("admins").get()
+      const admins = await this.firestore
+         .collectionGroup("admins")
+         .orderBy("role", "asc")
+         .get()
       return mapFirestoreDocuments<LegacyGroupAdmin, T>(admins, withRef)
    }
 
