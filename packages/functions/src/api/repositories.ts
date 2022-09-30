@@ -22,10 +22,11 @@ import {
    FirebaseMarketingUsersRepository,
    IMarketingUsersRepository,
 } from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
+
 import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupFunctionsRepository"
+} from "../lib/GroupFunctionsRepository"
 
 const firestoreInstance = admin.firestore() as any
 const authInstance = admin.auth()
