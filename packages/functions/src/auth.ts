@@ -589,7 +589,7 @@ export const backfillUserData = functions.https.onCall(
       }
 
       const userData = await userGetByEmail(email)
-      const dataToUpdate = {}
+      const dataToUpdate: Partial<UserData> = {}
 
       if (!userData.referralCode) {
          dataToUpdate.referralCode = generateReferralCode()
