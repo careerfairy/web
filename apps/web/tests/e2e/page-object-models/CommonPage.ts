@@ -101,15 +101,15 @@ export class CommonPage {
    async selectRandomCategoriesFromEvent(livestream: LivestreamEvent) {
       for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
          for (let question of Object.values(groupQuestions.questions)) {
-            await this.page
-               .locator(`text=New!​${question.name} >> div[role="button"]`)
-               .click()
+            await this.resilientClick(
+               `text=New!​${question.name} >> div[role="button"]`
+            )
 
             const options = Object.values(question.options)
             const randomOption =
                options[Math.floor(Math.random() * options.length)]
 
-            await this.page.locator(`[data-value="${randomOption.id}"]`).click()
+            await this.resilientClick(`[data-value="${randomOption.id}"]`)
          }
       }
    }
