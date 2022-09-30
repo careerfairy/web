@@ -1,41 +1,64 @@
 import { useAuth } from "./AuthProvider"
-import { useEffect } from "react"
-import { getCookieConsentValue } from "react-cookie-consent"
+import { useCallback, useEffect, useState } from "react"
 import TagManager from "react-gtm-module"
+import { useSelector } from "react-redux"
+import { firebaseAuthIsLoadedSelector } from "../store/selectors/firebaseSelector"
+import { shouldUseEmulators } from "../util/CommonUtil"
 
 const tagManagerArgs = {
    gtmId: "GTM-P29VCWC",
 }
 
-const GoogleTagManagerLoader = ({ disableCookies, children }) => {
-   const { userData, isLoggedOut } = useAuth()
+const GoogleTagManagerLoader = ({ children }) => {
+   const { userData, isLoggedIn, isLoggedOut } = useAuth()
+   const [shouldLoadForCurrentUser, setShouldLoadForCurrentUser] =
+      useState(false)
+   const authIsLoaded = useSelector(firebaseAuthIsLoadedSelector)
 
-   const cookieValue = getCookieConsentValue()
+   // only set it once to avoid calling TagManager.initialize multiple times
+   const enableOnce = useCallback(() => {
+      if (!shouldLoadForCurrentUser) {
+         setShouldLoadForCurrentUser(true)
+      }
+   }, [shouldLoadForCurrentUser])
 
+   // check if user isAdmin or not
    useEffect(() => {
-      // should be loading the userData
-      if (!isLoggedOut && userData === undefined) return
+      if (!authIsLoaded) {
+         // not ready, since auth is not yet loaded
+         return
+      }
+
+      if (isLoggedOut) {
+         // anonymous traffic
+         enableOnce()
+         return
+      }
+
+      // should be loading the userData, wait
+      if (!userData) return
 
       // we don't want to record our team events (it will skew the analytics)
-      if (!isLoggedOut && userData?.isAdmin) return
+      if (userData?.isAdmin) return
 
-      if (Boolean(cookieValue === "true" && !disableCookies)) {
+      // userData loaded & is not an admin
+      enableOnce()
+   }, [userData, isLoggedIn, enableOnce])
+
+   useEffect(() => {
+      if (shouldLoadForCurrentUser) {
          TagManager.initialize(tagManagerArgs)
       }
-   }, [cookieValue, disableCookies, userData, isLoggedOut])
+   }, [shouldLoadForCurrentUser])
 
    return children
 }
 
-const GoogleTagManager = ({ disableCookies, children }) => {
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+const GoogleTagManager = ({ children }) => {
+   if (shouldUseEmulators()) {
       return children
    } else {
-      return (
-         <GoogleTagManagerLoader disableCookies={disableCookies}>
-            {children}
-         </GoogleTagManagerLoader>
-      )
+      return <GoogleTagManagerLoader>{children}</GoogleTagManagerLoader>
    }
 }
 

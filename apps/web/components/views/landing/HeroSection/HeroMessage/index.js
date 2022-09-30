@@ -61,7 +61,7 @@ const RockstarTextTalent = () => {
          <b>
             t
             <AStarIcon sx={styles.starIcon} />
-            lents
+            lent
          </b>
       </div>
    )

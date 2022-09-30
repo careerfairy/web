@@ -28,6 +28,7 @@ import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
+import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
 
 const styles = {
    hideOnHoverContent: {
@@ -199,7 +200,6 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
-   isOnLandingPage = false,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
@@ -214,6 +214,8 @@ const EventPreviewCard = ({
       MARKETING_LANDING_PAGE_PATH
    )
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
+   const { formCompleted: marketingFormCompleted, setSelectedEventId } =
+      useMarketingLandingPage()
 
    const {
       query: { groupId },
@@ -301,7 +303,11 @@ const EventPreviewCard = ({
    }
 
    const getHref = useCallback(() => {
-      if (isOnMarketingLandingPage && !authenticatedUser.email) {
+      if (
+         isOnMarketingLandingPage &&
+         !authenticatedUser.email &&
+         !marketingFormCompleted
+      ) {
          return `#${marketingSignUpFormId}`
       }
       return {
@@ -312,7 +318,21 @@ const EventPreviewCard = ({
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
          },
       }
-   }, [authenticatedUser, event, groupId, isOnMarketingLandingPage, isPast])
+   }, [
+      authenticatedUser.email,
+      event?.groupIds,
+      event?.id,
+      groupId,
+      isOnMarketingLandingPage,
+      isPast,
+      marketingFormCompleted,
+   ])
+
+   const handleDetailsClick = useCallback(() => {
+      if (isOnMarketingLandingPage) {
+         setSelectedEventId(event?.id)
+      }
+   }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
 
    return (
       <>
@@ -320,7 +340,7 @@ const EventPreviewCard = ({
             <DateAndShareDisplay
                startDate={getStartDate()}
                loading={loading}
-               onShareClick={handleShareClick}
+               onShareClick={isOnMarketingLandingPage ? null : handleShareClick}
                isPlaceholderEvent={isPlaceholderEvent}
             />
             <Box
@@ -381,6 +401,7 @@ const EventPreviewCard = ({
                                     layout="fill"
                                     objectFit="contain"
                                     quality={100}
+                                    alt={`logo of company ${event.company}`}
                                  />
                               </Box>
                            </Avatar>
@@ -531,6 +552,7 @@ const EventPreviewCard = ({
                                     variant={"contained"}
                                     color={"secondary"}
                                     size={"small"}
+                                    onClick={handleDetailsClick}
                                  >
                                     {mobile ? "details" : "see details"}
                                  </Button>
@@ -563,7 +585,6 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
-   isOnLandingPage?: boolean
 }
 
 export default EventPreviewCard

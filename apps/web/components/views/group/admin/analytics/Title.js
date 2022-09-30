@@ -1,14 +1,14 @@
 import React, { useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import {
+   Box,
    Button,
    Card,
    CardHeader,
    Menu,
    MenuItem,
-   Box,
-   Typography,
    Tooltip,
+   Typography,
 } from "@mui/material"
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown"
 import { StyledTooltipWithButton } from "../../../../../materialUI/GlobalTooltips"
@@ -54,9 +54,11 @@ const Title = ({
    handleOpenStreamFilterModal,
    streamFilterModalOpen,
 }) => {
-   const hasStreamsToFilter = useSelector((state) =>
-      Boolean(state.analyticsReducer.streams.fromTimeframeAndFuture.length > 1)
+   const hasStreamsToFilterLength = useSelector(
+      (state) => state.analyticsReducer.streams.fromTimeframeAndFuture.length
    )
+
+   const hasStreamsToFilter = hasStreamsToFilterLength > 0
 
    const hiddenStreamIds = useSelector(
       (state) => state.analyticsReducer.hiddenStreamIds
@@ -229,8 +231,10 @@ const Title = ({
                            variant={hiddenStreamIds ? "contained" : "outlined"}
                         >
                            {hiddenStreamIds
-                              ? `${noOfVisibleStreamIds} events selected`
-                              : "Filter Events"}
+                              ? `${noOfVisibleStreamIds} event${
+                                   noOfVisibleStreamIds > 1 ? "s" : ""
+                                } selected`
+                              : `Filter Events (${hasStreamsToFilterLength})`}
                         </Button>
                      </span>
                   </Tooltip>

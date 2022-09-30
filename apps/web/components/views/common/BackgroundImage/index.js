@@ -5,7 +5,7 @@ import { useTheme } from "@mui/material/styles"
 
 const styles = {
    root: (theme, { image, opacity, imagePosition, repeat }) => ({
-      backgroundImage: `url(${image})`,
+      backgroundImage: `url("${image}")`,
       opacity: opacity,
       backgroundPosition: imagePosition,
       backgroundSize: "cover",

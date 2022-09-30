@@ -251,7 +251,7 @@ exports.notifySlackWhenALivestreamIsCreated = functions
             }
          }
 
-         const webhookUrl = config.slackWebhooks.livestreamAlerts
+         const webhookUrl = config.slackWebhooks.livestreamCreated
          await notifyLivestreamCreated(webhookUrl, publisherEmailOrName, event)
       } catch (e) {
          functions.logger.error(

@@ -71,6 +71,8 @@ export interface UserData extends Identifiable {
     * We listen to this field to know when to refetch a new fresh token in the auth provider
     * */
    refreshTokenTime?: Timestamp
+
+   timezone?: string
 }
 
 /*

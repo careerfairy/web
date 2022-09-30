@@ -20,7 +20,7 @@ const NumbersSection = (props) => {
             <Box display="flex" width="100%">
                <Grid container justifyContent="space-around" spacing={5}>
                   {props.numbersData.map((data, index) => (
-                     <Grid item xs={12} sm={6} md={3} key={data.id}>
+                     <Grid item xs={12} sm={6} md={4} key={data.id}>
                         <MuiGridFade index={index} up>
                            <NumbersCard {...data} />
                         </MuiGridFade>

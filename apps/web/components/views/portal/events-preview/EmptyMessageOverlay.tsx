@@ -23,6 +23,7 @@ const EmptyMessageOverlay = ({
    buttonLink,
    buttonText,
    buttonOnClick,
+   showButton = true,
 }: Props) => {
    return (
       <Box sx={styles.stackOverlay}>
@@ -34,16 +35,18 @@ const EmptyMessageOverlay = ({
          >
             {message}
             <br />
-            <Button
-               onClick={buttonOnClick}
-               sx={{ mt: 2 }}
-               component={Link}
-               href={buttonLink}
-               variant="contained"
-               size="large"
-            >
-               {buttonText}
-            </Button>
+            {showButton && (
+               <Button
+                  onClick={buttonOnClick}
+                  sx={{ mt: 2 }}
+                  component={Link}
+                  href={buttonLink}
+                  variant="contained"
+                  size="large"
+               >
+                  {buttonText}
+               </Button>
+            )}
          </Typography>
       </Box>
    )
@@ -54,5 +57,6 @@ interface Props {
    buttonText: string
    buttonLink: string
    buttonOnClick?: () => void
+   showButton?: boolean
 }
 export default EmptyMessageOverlay

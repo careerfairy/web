@@ -1,6 +1,5 @@
 import functions = require("firebase-functions")
 
-import userLib = require("./lib/user")
 import config = require("./config")
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -15,6 +14,7 @@ import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -574,7 +574,7 @@ export const updateFakeUser = functions.https.onRequest(async (req, res) => {
 })
 
 export const backfillUserData = functions.https.onCall(
-   async (data, context) => {
+   async ({ timezone }, context) => {
       const email = context?.auth?.token?.email
       functions.logger.debug(email, context?.auth)
 
@@ -588,16 +588,22 @@ export const backfillUserData = functions.https.onCall(
          )
       }
 
-      const userData = (await userLib.userGetByEmail(email)) as UserData
-      const dataToUpdate: Partial<UserData> = {}
+      const userData = await userGetByEmail(email)
+      const dataToUpdate = {}
 
       if (!userData.referralCode) {
          dataToUpdate.referralCode = generateReferralCode()
          functions.logger.info("Adding referralCode to user")
       }
 
+      // if there's no timezone it will save the current timezone provided by the browser
+      if (!userData.timezone) {
+         dataToUpdate.timezone = timezone
+         functions.logger.info("Adding time zone to user")
+      }
+
       if (Object.keys(dataToUpdate).length > 0) {
-         await userLib.userUpdateFields(email, dataToUpdate)
+         await userUpdateFields(email, dataToUpdate)
          functions.logger.info(
             "User updated with the following fields",
             dataToUpdate

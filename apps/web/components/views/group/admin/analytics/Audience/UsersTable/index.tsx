@@ -100,15 +100,11 @@ const UsersTable = ({
       let newUsers
       newUsers =
          totalUniqueUsers?.map((user) =>
-            AnalyticsUtil.mapUserEngagement(
-               user,
-               streamsFromTimeFrameAndFuture,
-               group
-            )
+            AnalyticsUtil.mapUserEngagement(user, streamsFromTimeFrameAndFuture)
          ) || []
       setUsers(newUsers)
       setSelection([])
-   }, [totalUniqueUsers, group])
+   }, [totalUniqueUsers])
 
    useEffect(() => {
       if (dataTableRef.current) {

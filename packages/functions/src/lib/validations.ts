@@ -6,6 +6,7 @@ import {
    Group,
    GROUP_DASHBOARD_ROLE,
 } from "@careerfairy/shared-lib/dist/groups"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 /**
  * Validate the data object argument in a function call
@@ -41,6 +42,11 @@ export function validateUserAuthExists(
 
 /**
  * Validate the user is a group admin when calling a function
+ *
+ * If the user is group admin, the group object will be returned
+ *
+ * If the user is CF Admin, the userData will be returned
+ *
  * @param groupId
  * @param email
  */
@@ -52,15 +58,20 @@ export async function validateUserIsGroupAdmin(
    group: Group
    role: GROUP_DASHBOARD_ROLE
    isCFAdmin?: boolean
+   userData?: UserData
 }> {
    const response = await groupRepo.checkIfUserIsGroupAdmin(groupId, email)
 
    if (!response.isAdmin) {
       try {
          // check if user is CF admin, will throw if not
-         await validateUserIsCFAdmin(email)
+         const userData = await validateUserIsCFAdmin(email)
 
-         return { ...response, isCFAdmin: true } // TODO: Refactor CF admin logic to use claims
+         return {
+            ...response,
+            userData,
+            isCFAdmin: true,
+         }
       } catch (e) {
          logAndThrow("The user is not a group admin", groupId, email)
       }

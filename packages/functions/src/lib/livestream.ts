@@ -1,4 +1,8 @@
 import { admin } from "../api/firestoreAdmin"
+import {
+   LivestreamEvent,
+   LiveStreamEventWithUsersLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 export const livestreamGetById = async (id) => {
    const documentSnap = await admin
@@ -89,5 +93,74 @@ export const livestreamSetIsRecording = async (
 
    return ref.update({
       isRecording: value,
+   })
+}
+
+/**
+ * Get all the streams filtered by starting date and with all the registered students for each stream.
+ *
+ */
+export const getStreamsByDateWithRegisteredStudents = (
+   filterStartDate: Date,
+   filterEndDate: Date
+): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
+   return admin
+      .firestore()
+      .collection("livestreams")
+      .where("start", ">=", filterStartDate)
+      .where("start", "<=", filterEndDate)
+      .get()
+      .then((querySnapshot) => {
+         const streams = querySnapshot.docs?.map(
+            (doc) =>
+               ({
+                  id: doc.id,
+                  ...doc.data(),
+               } as LivestreamEvent)
+         )
+
+         return addUsersDataOnStreams(streams)
+      })
+}
+
+/**
+ * Add all registered students to the correspondent streams
+ *
+ */
+const addUsersDataOnStreams = async (
+   streams: LivestreamEvent[] = []
+): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
+   const formattedStreams = []
+   for (const stream of streams) {
+      const collection = await admin
+         .firestore()
+         .collection("livestreams")
+         .doc(stream.id)
+         .collection("userLivestreamData")
+         .get()
+
+      const usersLivestreamData = collection.docs?.map((doc) => doc.data())
+
+      formattedStreams.push({ ...stream, usersLivestreamData })
+   }
+
+   return formattedStreams
+}
+
+/**
+ * Update all the successfully sent reminders for each livestream
+ */
+export const updateLiveStreamsWithEmailSent = (
+   batch: admin.firestore.WriteBatch,
+   emailsToSave
+) => {
+   Object.values(emailsToSave).forEach((email: any) => {
+      const { streamId, reminderKey, chunks } = email
+
+      const ref = admin.firestore().collection("livestreams").doc(streamId)
+
+      batch.update(ref, {
+         [`reminderEmailsSent.${reminderKey}`]: chunks,
+      })
    })
 }

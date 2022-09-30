@@ -20,6 +20,11 @@ import marketing = require("./marketing")
 import atsUser = require("./atsUser")
 import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
+import groupAnalytics = require("./groupAnalytics")
+import cacheClear = require("./cacheClear")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -66,16 +71,9 @@ exports.kickFromDashboard = groupAdmin.kickFromDashboard
 // Reminders
 exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
-exports.scheduleReminderEmailSFor2HoursBefore =
-   reminders.scheduleReminderEmailSFor2HoursBefore
-exports.scheduleReminderEmailSFor20MinutesBefore =
-   reminders.scheduleReminderEmailSFor20MinutesBefore
-exports.sendReminderEmailToUserFromUniversity =
-   reminders.sendReminderEmailToUserFromUniversity
-exports.sendReminderEmailsWhenLivestreamStarts =
-   reminders.sendReminderEmailsWhenLivestreamStarts
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
+exports.scheduleReminderEmails = reminders.scheduleReminderEmails
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =
@@ -155,3 +153,10 @@ exports.updateUserJobApplications = atsUser.updateUserJobApplications
 
 // BigQuery
 exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers_v2
+
+// Group Analytics
+exports.getRegistrationSources = groupAnalytics.getRegistrationSources
+
+// Clear cached documents
+exports.periodicallyRemoveCachedDocument =
+   cacheClear.periodicallyRemoveCachedDocument

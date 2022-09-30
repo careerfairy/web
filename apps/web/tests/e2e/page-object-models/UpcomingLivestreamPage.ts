@@ -1,7 +1,5 @@
 import { Locator, Page } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { sleep } from "../utils"
 
 export default class UpcomingLivestreamPage extends CommonPage {
    public readonly buttonEventOver: Locator
@@ -19,7 +17,13 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    attend() {
-      return this.exactText("I'll attend").click()
+      return this.resilientClick(
+         `data-testid=livestream-registration-button`,
+         3,
+         1000,
+         true,
+         false
+      )
    }
 
    async modalAttend() {
