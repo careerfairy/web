@@ -99,7 +99,7 @@ export class GroupFunctionsRepository
       }
 
       const group = this.addIdToDoc<Group>(groupDoc)
-      const user = await this.auth.getUserByEmail(userEmail) //
+      const user = await this.auth.getUserByEmail(userEmail)
 
       const userRole = user.customClaims?.adminGroups?.[group.id]?.role
 
