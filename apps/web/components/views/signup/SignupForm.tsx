@@ -1,9 +1,5 @@
-import Head from "next/head"
-import { PillsBackground } from "../../../materialUI/GlobalBackground/GlobalBackGround"
-import { HeaderLogoWrapper } from "../../../materialUI"
-import { MainLogo } from "../../logos"
 import { Box, Button, Container, Grid, Typography } from "@mui/material"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import MultiStepWrapper, {
    MultiStepComponentType,
 } from "../common/MultiStepWrapper"
@@ -19,7 +15,6 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { userRepo } from "../../../data/RepositoryInstances"
 import LoadingButton from "@mui/lab/LoadingButton"
 import GenericStepper from "../common/GenericStepper"
-import SignUpAdminForm from "./steps/SignUpAdminForm"
 
 const styles = sxStyles({
    icon: {
@@ -47,8 +42,13 @@ const styles = sxStyles({
    },
 })
 
-const renderTitle = (step: MultiStepComponentType) => {
-   const { title, subTitle } = step
+export const RenderTitle = ({
+   title,
+   subTitle,
+}: {
+   title: string
+   subTitle?: string
+}) => {
    return (
       <Grid sx={styles.headerWrapper}>
          <Typography sx={styles.title}>{title}</Typography>
@@ -59,79 +59,39 @@ const renderTitle = (step: MultiStepComponentType) => {
    )
 }
 
-const stepsMap = new Map<string, MultiStepComponentType>([
-   [
-      "Credentials",
-      {
-         component: () => SignUpUserForm,
-         description: "Credentials",
-         title: "Create your profile to start",
-      },
-   ],
-   [
-      "Admin Credentials",
-      {
-         component: () => SignUpAdminForm,
-         description: "Admin Credentials",
-         title: "Create your admin profile to start",
-      },
-   ],
-   [
-      "Pin",
-      {
-         component: () => SignUpPinForm,
-         description: "Email Verification",
-         title: "Create your profile to start",
-      },
-   ],
-   [
-      "Social",
+const steps: MultiStepComponentType[] = [
+   {
+      component: () => SignUpUserForm,
+      description: "Credentials",
+      title: "Create your profile to start",
+   },
+   {
+      component: () => SignUpPinForm,
+      description: "Email Verification",
+      title: "Create your profile to start",
+   },
+   {
+      component: () => SocialInformation,
+      description: "Social",
+      title: "Before we kick off...",
+   },
+   {
+      component: () => LocationInformation,
+      description: "Location",
+      title: "Before we kick off...",
+   },
+   {
+      component: () => InterestsInformation,
+      description: "Interests",
+      title: "Additional Information",
+      subTitle:
+         "To help us pick the best events for you, tell us more about your interests",
+   },
+]
 
-      {
-         component: () => SocialInformation,
-         description: "Social",
-         title: "Before we kick off...",
-      },
-   ],
-   [
-      "Location",
-      {
-         component: () => LocationInformation,
-         description: "Location",
-         title: "Before we kick off...",
-      },
-   ],
-   [
-      "Interests",
-      {
-         component: () => InterestsInformation,
-         description: "Interests",
-         title: "Additional Information",
-         subTitle:
-            "To help us pick the best events for you, tell us more about your interests",
-      },
-   ],
-])
+const fallbackSignupRedirectPath = "/portal"
 
-type SignupFormProps = {
-   groupAdmin?: boolean
-}
-const SignupForm = ({ groupAdmin }: SignupFormProps) => {
-   const fallbackSignupRedirectPath = groupAdmin ? "/profile/groups" : "/portal"
-
-   const steps: MultiStepComponentType[] = useMemo(
-      () =>
-         groupAdmin
-            ? [stepsMap.get("Admin Credentials")]
-            : [
-                 stepsMap.get("Credentials"),
-                 stepsMap.get("Pin"),
-                 stepsMap.get("Social"),
-                 stepsMap.get("Location"),
-                 stepsMap.get("Interests"),
-              ],
-      [groupAdmin]
-   )
+const SignupForm = () => {
    const { authenticatedUser: user, userData } = useAuth()
    const {
       push,
@@ -149,7 +109,7 @@ const SignupForm = ({ groupAdmin }: SignupFormProps) => {
 
    useEffect(() => {
       if (userData && currentStep === 0) {
-         goToSocialStep()
+         setCurrentStep(2)
       }
    }, [userData, currentStep])
 
@@ -160,31 +120,13 @@ const SignupForm = ({ groupAdmin }: SignupFormProps) => {
          firebase.auth?.currentUser &&
          !firebase.auth.currentUser.emailVerified
       ) {
-         return goToEmailVerificationStep()
+         return setCurrentStep(1)
       }
    }, [user, firebase.auth?.currentUser?.emailVerified])
 
    const handlePrevious = () => {
       if (!isFirstStep) {
          setCurrentStep((prev) => prev - 1)
-      }
-   }
-
-   const goToEmailVerificationStep = () => {
-      const index = steps.findIndex(
-         (step) => step.description === stepsMap.get("Pin").description
-      )
-      if (index > -1) {
-         setCurrentStep(index)
-      }
-   }
-
-   const goToSocialStep = () => {
-      const index = steps.findIndex(
-         (step) => step.description === stepsMap.get("Social").description
-      )
-      if (index > -1) {
-         setCurrentStep(index)
       }
    }
 
@@ -258,7 +200,10 @@ const SignupForm = ({ groupAdmin }: SignupFormProps) => {
 
    return (
       <>
-         {renderTitle(steps[currentStep])}
+         <RenderTitle
+            title={steps[currentStep].title}
+            subTitle={steps[currentStep].subTitle}
+         />
          <Container maxWidth="md">
             <Box data-testid={"signup-page-form"} p={3} mt={3}>
                <Box mb={4}>

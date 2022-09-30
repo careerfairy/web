@@ -100,7 +100,9 @@ class FirebaseService {
 
    createGroupAdminUserInAuthAndFirebase = async (args: {
       userData: IAdminUserCreateFormValues
-   }) => {
+   }): Promise<{
+      readonly data: Group
+   }> => {
       return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
          args
       )

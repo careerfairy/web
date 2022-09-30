@@ -11,7 +11,10 @@ import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
-import { NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import {
+   GroupDashboardInvite,
+   NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
+} from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -161,12 +164,10 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             "The function must be called while logged out."
          )
       }
-
       let uidToDelete = null
       let emailToDelete = null
       const userData = data.userData
-      const recipientEmail = data.userData.email.toLowerCase().trim()
-      const pinCode = getRandomInt(9999)
+      const recipientEmail = userData.email.toLowerCase().trim()
 
       const { password, firstName, lastName, subscribed } = userData
 
@@ -175,12 +176,20 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             `Starting admin auth account creation process for ${recipientEmail}`
          )
          // Check if email is associated with a valid group dashboard invite
-         const isValidInvite =
-            await groupRepo.checkIfEmailHasAValidDashboardInvite(recipientEmail)
+         const invitation: GroupDashboardInvite =
+            await groupRepo.getDashboardInvite(recipientEmail)
 
-         if (!isValidInvite) {
+         if (!invitation) {
             logAndThrow(NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE, {
                recipientEmail,
+            })
+         }
+
+         const group = await groupRepo.getGroupById(invitation.groupId)
+
+         if (!group) {
+            logAndThrow("The group you are trying to join does not exist", {
+               groupId: invitation.groupId,
             })
          }
 
@@ -191,26 +200,41 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             password: password,
             emailVerified: true, // Email is verified by default since the user is invited by an admin
          })
+
+         // set the group role to the user
+         await admin.auth().setCustomUserClaims(userRecord.uid, {
+            adminGroups: {
+               [invitation.groupId]: {
+                  role: invitation.role,
+               },
+            },
+         })
+
          // store the uid in case we need to delete it later
          uidToDelete = userRecord.uid
 
+         const userData = {
+            authId: userRecord.uid,
+            id: recipientEmail,
+            firstName: firstName,
+            lastName: lastName,
+            userEmail: recipientEmail,
+            unsubscribed: !subscribed,
+            referralCode: generateReferralCode(),
+         }
          // create the user in firestore, if it fails, delete the user from firebase auth
          await admin
             .firestore()
             .collection("userData")
             .doc(recipientEmail)
-            .set(
-               Object.assign({
-                  authId: userRecord.uid,
-                  id: recipientEmail,
-                  validationPin: pinCode,
-                  firstName: firstName,
-                  lastName: lastName,
-                  userEmail: recipientEmail,
-                  unsubscribed: !subscribed,
-                  referralCode: generateReferralCode(),
-               })
-            )
+            .set(Object.assign(userData))
+
+         // Set the roles in firestore
+         await groupRepo.setGroupAdminRoleInFirestore(
+            group,
+            userData,
+            invitation.role
+         )
 
          emailToDelete = recipientEmail
 
@@ -222,18 +246,16 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             )
          })
 
-         // Send the verification email, if this fails we throw and need to delete the user from firebase auth and firestore
-         await sendVerificationEmail({
-            email: recipientEmail,
-            uid: userRecord.uid,
-            pinCode,
-         }).catch((error) => {
-            functions.logger.error(
-               `Error sending PIN email to ${recipientEmail}`,
-               error
-            )
-            throw new functions.https.HttpsError("internal", error)
-         })
+         await groupRepo // Delete the invite from the group dashboard invites collection, and don't throw an error if it fails
+            .deleteGroupDashboardInviteById(invitation.id)
+            .catch((e) => {
+               functions.logger.warn(
+                  `Unable to delete group dashboard invite: ${invitation.id}, could be because it doesn't exist`,
+                  e
+               )
+            })
+
+         return group // Return the group so that the client can redirect to the group dashboard
       } catch (error) {
          // if any of the steps above fail, we need to delete the user from firebase auth and firestore
          functions.logger.error(
@@ -657,21 +679,3 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
       }
    }
 )
-
-const sendVerificationEmail = async (args: {
-   email: string
-   pinCode: number
-   uid: string
-}) => {
-   console.log(`Starting sending email for ${args.email}`)
-   const emailTemplate = {
-      TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
-      From: "CareerFairy <noreply@careerfairy.io>",
-      To: args.email,
-      TemplateModel: { pinCode: args.pinCode },
-   }
-   const response = await client.sendEmailWithTemplate(emailTemplate)
-   console.log(`Sent email successfully for ${args.email}`)
-
-   return response
-}

@@ -1,5 +1,7 @@
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
    GroupATSAccountDocument,
    GroupATSIntegrationTokensDocument,
    GroupQuestion,
@@ -102,6 +104,22 @@ export interface IGroupRepository {
    deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
 
    getGroupDashboardInviteById(id: string): Promise<GroupDashboardInvite>
+
+   /*
+    * Stores the user's admin data in firestore two places:
+    * 1. On the group's admin sub-collection at careerCenterData/[groupId]/groupAdmins/[userEmail] with the role and display info
+    * 2. On the user's userAdminGroups sub-collection at userData/[userEmail]/userAdminGroups/[groupId] with the group's display info
+    * */
+   setGroupAdminRoleInFirestore(
+      group: Group,
+      userData: Pick<UserData, "id" | "userEmail" | "firstName" | "lastName">,
+      role?: GROUP_DASHBOARD_ROLE
+   ): Promise<void>
+
+   /*
+    * Gets the admins of a group document
+    * */
+   getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
 }
 
 export class FirebaseGroupRepository
@@ -541,5 +559,92 @@ export class FirebaseGroupRepository
          return doc.data() as GroupDashboardInvite
       }
       return null
+   }
+
+   async setGroupAdminRoleInFirestore(
+      group: Group,
+      userData: Pick<UserData, "id" | "userEmail" | "firstName" | "lastName">,
+      role?: GROUP_DASHBOARD_ROLE
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+      const groupAdminsRef = this.firestore
+         .collection("careerCenterData")
+         .doc(group.id)
+         .collection("groupAdmins")
+         .doc(userData.id)
+
+      const userAdminGroupsRef = this.firestore
+         .collection("userData")
+         .doc(userData.id)
+         .collection("userAdminGroups")
+         .doc(group.id)
+
+      if (role) {
+         // if a role is provided, then we are adding the user as an admin
+         const groupAdminDataToSave: GroupAdmin = {
+            role,
+            email: userData.userEmail,
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            displayName: [userData.firstName, userData.lastName]
+               .filter((name) => name)
+               .join(" "),
+            id: userData.id,
+            groupId: group.id,
+         }
+
+         // save the group admin data to the group's admins sub-collection
+         batch.set(groupAdminsRef, groupAdminDataToSave, { merge: true })
+
+         const userAdminGroupsDataToSave: UserAdminGroup = {
+            id: group.id,
+            userId: userData.id,
+            universityName: group.universityName,
+            description: group.description || "",
+            logoUrl: group.logoUrl || "",
+            extraInfo: group.extraInfo || "",
+            universityCode: group.universityCode || "",
+         }
+
+         // Store the group data in the user's admin groups sub-collection for easy querying
+         batch.set(userAdminGroupsRef, userAdminGroupsDataToSave, {
+            merge: true,
+         })
+      } else {
+         // If no role is provided, then we are removing the user as an admin
+         batch.delete(groupAdminsRef)
+         batch.delete(userAdminGroupsRef)
+      }
+
+      return batch.commit()
+   }
+
+   protected checkIfThereWillBeAtLeastOneOwner(
+      groupId: string,
+      newRole: GROUP_DASHBOARD_ROLE,
+      userEmail: string,
+      currentAdmins: GroupAdmin[]
+   ) {
+      const potentialNewAdmins: Partial<GroupAdmin>[] = [
+         ...currentAdmins.filter((admin) => admin.id !== userEmail),
+         // add the new admin to the list of current admins if it's not already there
+         ...(newRole ? [{ id: userEmail, role: newRole }] : []), // if the new role is null, then the user is being removed as an admin
+      ]
+
+      const totalOwners = potentialNewAdmins.filter(
+         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER
+      )
+
+      return totalOwners.length > 0 // there must be at least one owner
+   }
+
+   async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
+      const adminsSnap = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("groupAdmins")
+         .get()
+
+      return mapFirestoreDocuments(adminsSnap)
    }
 }
