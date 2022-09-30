@@ -24,6 +24,7 @@ import Password from "../userInformation/Password"
 import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
 import HelperHint from "../common/HelperHint"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    submit: {
@@ -42,7 +43,6 @@ export interface IAdminUserCreateFormValues
    password: string
    confirmPassword: string
    agreeTerm: boolean
-   subscribed?: boolean
 }
 
 const schema: yup.SchemaOf<IAdminUserCreateFormValues> = yup.object().shape({
@@ -52,7 +52,6 @@ const schema: yup.SchemaOf<IAdminUserCreateFormValues> = yup.object().shape({
    password: signupSchema.password,
    confirmPassword: signupSchema.confirmPassword,
    agreeTerm: signupSchema.agreeTerm,
-   subscribed: signupSchema.subscribed,
 })
 
 const initValues: IAdminUserCreateFormValues = {
@@ -62,15 +61,12 @@ const initValues: IAdminUserCreateFormValues = {
    password: "",
    confirmPassword: "",
    agreeTerm: false,
-   subscribed: false,
 }
 
 function SignUpAdminForm() {
    const firebase = useFirebaseService()
-   const {
-      query: { absolutePath },
-      push,
-   } = useRouter()
+   const { replace } = useRouter()
+   const { successNotification } = useSnackbarNotifications()
 
    const handleSubmit = async (
       values: IAdminUserCreateFormValues,
@@ -84,9 +80,10 @@ function SignUpAdminForm() {
           * 2. Grant them a group admin claim
           * 3. Send them an email to verify their email address
           * */
-         await firebase.createGroupAdminUserInAuthAndFirebase({
-            userData: values,
-         })
+         const { data: group } =
+            await firebase.createGroupAdminUserInAuthAndFirebase({
+               userData: values,
+            })
 
          /*
           * At this step, the initial user has been created and the group admin claim has been assigned
@@ -98,7 +95,13 @@ function SignUpAdminForm() {
          )
 
          await firebase.auth.currentUser.reload()
-         return push((absolutePath as string) || "/") // Once the user is verified, redirect them to the validation page
+
+         // Send them directly to the group admin dashboard
+         return replace(`/group/${group.id}/admin/analytics`).then(() => {
+            successNotification(
+               `Account created successfully and welcome to ${group.universityName}!`
+            )
+         })
       } catch (e) {
          setFieldError("general", e.message)
       }
