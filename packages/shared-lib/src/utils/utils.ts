@@ -45,7 +45,7 @@ export const dynamicSort = <T>(property: keyof T, order?: "asc" | "desc") => {
  * @param chunk
  */
 export const chunkArray = <T>(list: T[], chunk: number): T[][] => {
-   const result = []
+   const result: T[][] = []
 
    for (let i = 0; i < list.length; i += chunk) {
       result.push(list.slice(i, i + chunk))
