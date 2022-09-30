@@ -11,7 +11,7 @@ type Entry = {
 
 interface Props<T> {
    entries: T[]
-   fieldName: string
+   fieldName: keyof BigQueryUserQueryOptions["filters"]
    noOptionsText: string
    inputPlaceholderText: string
    setOptions: Dispatch<SetStateAction<BigQueryUserQueryOptions>>
