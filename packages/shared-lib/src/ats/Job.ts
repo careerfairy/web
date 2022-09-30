@@ -12,6 +12,11 @@ import { ATSModel, fromMergeDate } from "./ATSModel"
  * UI/Business logic should live here
  */
 export class Job extends ATSModel {
+   // description without html tags / formatted
+   // since the description can be big, we cache the formatting result in this
+   // property
+   public descriptionStripped: string
+
    constructor(
       public readonly id: string,
       public readonly name: string,
@@ -25,6 +30,7 @@ export class Job extends ATSModel {
       public readonly updatedAt: Date
    ) {
       super()
+      this.descriptionStripped = description?.replace(/<[^>]*>?/gm, "")
    }
 
    /**
@@ -58,8 +64,7 @@ export class Job extends ATSModel {
       return new Job(
          job.id,
          job.name,
-         // strip html tags (teamtailor)
-         job.description.replace(/<[^>]*>?/gm, ""),
+         job.description,
          job.status,
          mapIfObject<Office>(job.offices, Office.createFromMerge),
          mapIfObject<Recruiter>(job.hiring_managers, Recruiter.createFromMerge),

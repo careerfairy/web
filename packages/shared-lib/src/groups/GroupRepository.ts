@@ -1,19 +1,21 @@
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
    GroupATSAccountDocument,
    GroupATSIntegrationTokensDocument,
    GroupQuestion,
    UserGroupData,
 } from "./groups"
-import BaseFirebaseRepository from "../BaseFirebaseRepository"
-import firebase from "firebase/compat/app"
-import {
+import BaseFirebaseRepository, {
    mapFirestoreDocuments,
    OnSnapshotCallback,
    Unsubscribe,
 } from "../BaseFirebaseRepository"
-import { UserData } from "../users"
+import firebase from "firebase/compat/app"
+import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
+import { GroupDashboardInvite } from "./GroupDashboardInvite"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -24,26 +26,14 @@ export interface IGroupRepository {
 
    getGroupById(groupId: string): Promise<Group>
 
-   getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]>
-
-   checkIfUserHasAdminGroups(userEmail: string): Promise<boolean>
+   getAdminGroups(
+      userEmail: string,
+      isAdmin: boolean
+   ): Promise<Group[] | UserAdminGroup[]>
 
    cleanAndSerializeGroup(
       group: Group
    ): Omit<Group, "adminEmails" | "adminEmail">
-
-   /**
-    * Confirm if user is admin of the group
-    *
-    * Returns true if user is admin of the group and the group itself to save a
-    * network request in case you need to fetch the full group afterwards
-    * @param groupId
-    * @param userEmail
-    */
-   checkIfUserIsGroupAdmin(
-      groupId: string,
-      userEmail: string
-   ): Promise<{ isAdmin: boolean; group: Group }>
 
    // ATS actions
    getATSIntegrations(groupId: string): Promise<GroupATSAccountDocument[]>
@@ -84,12 +74,6 @@ export interface IGroupRepository {
       groupQuestion: GroupQuestion
    ): Promise<void>
 
-   createGroup(
-      group: Partial<Group>,
-      groupQuestions: GroupQuestion[],
-      userEmail: string
-   ): Promise<firebase.firestore.DocumentReference>
-
    deleteGroupQuestion(groupId: string, groupQuestionId: string): Promise<void>
 
    listenToGroupQuestions(
@@ -118,6 +102,24 @@ export interface IGroupRepository {
    getAllUserGroupDataIds(userEmail: string): Promise<string[]>
 
    deleteUserGroupData(userEmail: string, groupId: string): Promise<void>
+
+   getGroupDashboardInviteById(id: string): Promise<GroupDashboardInvite>
+
+   /*
+    * Stores the user's admin data in firestore two places:
+    * 1. On the group's admin sub-collection at careerCenterData/[groupId]/groupAdmins/[userEmail] with the role and display info
+    * 2. On the user's userAdminGroups sub-collection at userData/[userEmail]/userAdminGroups/[groupId] with the group's display info
+    * */
+   setGroupAdminRoleInFirestore(
+      group: Group,
+      userData: Pick<UserData, "id" | "userEmail" | "firstName" | "lastName">,
+      role?: GROUP_DASHBOARD_ROLE
+   ): Promise<void>
+
+   /*
+    * Gets the admins of a group document
+    * */
+   getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
 }
 
 export class FirebaseGroupRepository
@@ -125,8 +127,8 @@ export class FirebaseGroupRepository
    implements IGroupRepository
 {
    constructor(
-      private readonly firestore: firebase.firestore.Firestore,
-      private readonly fieldValue: typeof firebase.firestore.FieldValue
+      protected readonly firestore: firebase.firestore.Firestore,
+      protected readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
    }
@@ -172,53 +174,24 @@ export class FirebaseGroupRepository
       if (!groupSnapshot.exists) {
          return null
       }
-      return {
-         ...groupSnapshot.data(),
-         id: groupSnapshot.id,
-      } as Group
+      return this.addIdToDoc<Group>(groupSnapshot)
    }
 
-   async getAdminGroups(userEmail: string, isAdmin: boolean): Promise<Group[]> {
-      let query: firebase.firestore.Query<firebase.firestore.DocumentData> =
-         this.firestore.collection("careerCenterData")
-      if (!isAdmin) {
-         query = query.where("adminEmails", "array-contains", userEmail)
+   async getAdminGroups(
+      userEmail: string,
+      isAdmin: boolean
+   ): Promise<Group[] | UserAdminGroup[]> {
+      if (isAdmin) {
+         // If user is admin, return all groups
+         const snaps = await this.firestore.collection("careerCenterData").get()
+         return mapFirestoreDocuments<Group>(snaps)
       }
-      const groupSnapshots = await query.get()
-      return groupSnapshots.docs.map((doc) => ({
-         ...doc.data(),
-         id: doc.id,
-      })) as Group[]
-   }
-
-   async checkIfUserHasAdminGroups(userEmail: string): Promise<boolean> {
-      const adminGroups = await this.firestore
-         .collection("careerCenterData")
-         .where("adminEmails", "array-contains", userEmail)
-         .limit(1)
+      const snaps = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userAdminGroups")
          .get()
-      return adminGroups.docs.length > 0
-   }
-
-   async checkIfUserIsGroupAdmin(
-      groupId: string,
-      userEmail: string
-   ): Promise<{ isAdmin: boolean; group: Group }> {
-      const groupDoc = await this.firestore
-         .collection("careerCenterData")
-         .doc(groupId)
-         .get()
-
-      if (!groupDoc.exists) {
-         return { isAdmin: false, group: null }
-      }
-
-      const group = this.addIdToDoc<Group>(groupDoc)
-
-      return {
-         isAdmin: group.adminEmails.includes(userEmail),
-         group,
-      }
+      return mapFirestoreDocuments<UserAdminGroup>(snaps)
    }
 
    /*
@@ -385,52 +358,6 @@ export class FirebaseGroupRepository
          .doc(groupId)
          .collection("groupQuestions")
       await groupQuestionsRef.doc(groupQuestionId).delete()
-   }
-
-   async createGroup(
-      group: Partial<Group>,
-      groupQuestions: GroupQuestion[],
-      userEmail: string
-   ): Promise<firebase.firestore.DocumentReference> {
-      const removeTempGroupQuestionIds = (groupQuestions: GroupQuestion[]) => {
-         return groupQuestions.map((groupQuestion) => {
-            delete groupQuestion.id
-            return groupQuestion
-         })
-      }
-      const newGroup = { ...group }
-      const batch = this.firestore.batch()
-
-      // Create group ref
-      const groupRef = this.firestore.collection("careerCenterData").doc()
-      // Create user's reference in th group admins sub-collection
-      const groupAdminRef = this.firestore
-         .collection("careerCenterData")
-         .doc(groupRef.id)
-         .collection("admins")
-         .doc(userEmail)
-
-      // Add the groupId property to the group object for legacy purposes
-      // TODO: Remove this property in the future
-      newGroup.groupId = groupRef.id
-
-      // add the group questions to the the the groupQuestions sub-collection
-      removeTempGroupQuestionIds(groupQuestions).forEach((groupQuestion) => {
-         const groupQuestionRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupRef.id)
-            .collection("groupQuestions")
-            .doc()
-         batch.set(groupQuestionRef, groupQuestion)
-      })
-
-      batch.set(groupRef, newGroup)
-      // Set the creating user with the mainAdmin role
-      batch.set(groupAdminRef, { role: "mainAdmin" })
-
-      await batch.commit()
-
-      return groupRef
    }
 
    async getFieldOrLevelOfStudyGroupQuestion(
@@ -616,5 +543,118 @@ export class FirebaseGroupRepository
          .collection("userGroups")
          .get()
       return userGroupDataSnap.docs.map((doc) => doc.id)
+   }
+
+   async getGroupDashboardInviteById(
+      inviteId: string
+   ): Promise<GroupDashboardInvite> {
+      if (!inviteId) {
+         return null
+      }
+      const doc = await this.firestore
+         .collection("groupDashboardInvites")
+         .doc(inviteId)
+         .get()
+      if (doc.exists) {
+         return doc.data() as GroupDashboardInvite
+      }
+      return null
+   }
+
+   async setGroupAdminRoleInFirestore(
+      group: Group,
+      userData: Pick<UserData, "id" | "userEmail" | "firstName" | "lastName">,
+      role?: GROUP_DASHBOARD_ROLE
+   ): Promise<void> {
+      const batch = this.firestore.batch()
+      const groupAdminsRef = this.firestore
+         .collection("careerCenterData")
+         .doc(group.id)
+         .collection("groupAdmins")
+         .doc(userData.id)
+
+      const userAdminGroupsRef = this.firestore
+         .collection("userData")
+         .doc(userData.id)
+         .collection("userAdminGroups")
+         .doc(group.id)
+
+      const userRef = this.firestore.collection("userData").doc(userData.id)
+
+      if (role) {
+         // if a role is provided, then we are adding the user as an admin
+         const groupAdminDataToSave: GroupAdmin = {
+            role,
+            email: userData.userEmail,
+            firstName: userData.firstName || "",
+            lastName: userData.lastName || "",
+            displayName: [userData.firstName, userData.lastName]
+               .filter((name) => name)
+               .join(" "),
+            id: userData.id,
+            groupId: group.id,
+         }
+
+         // save the group admin data to the group's admins sub-collection
+         batch.set(groupAdminsRef, groupAdminDataToSave, { merge: true })
+
+         const userAdminGroupsDataToSave: UserAdminGroup = {
+            id: group.id,
+            userId: userData.id,
+            universityName: group.universityName,
+            description: group.description || "",
+            logoUrl: group.logoUrl || "",
+            extraInfo: group.extraInfo || "",
+            universityCode: group.universityCode || "",
+         }
+
+         // Store the group data in the user's admin groups sub-collection for easy querying
+         batch.set(userAdminGroupsRef, userAdminGroupsDataToSave, {
+            merge: true,
+         })
+
+         batch.update(userRef, {
+            refreshTokenTime: this.fieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
+         })
+      } else {
+         // If no role is provided, then we are removing the user as an admin
+         batch.delete(groupAdminsRef)
+         batch.delete(userAdminGroupsRef)
+      }
+
+      return batch.commit()
+   }
+
+   /*
+    * Checks if there will be at least one owner after the role change
+    * */
+   protected async checkIfThereWillBeAtLeastOneOwner(
+      groupId: string,
+      newRole: GROUP_DASHBOARD_ROLE,
+      userEmail: string
+   ) {
+      const currentAdmins = (await this.getGroupAdmins(groupId)) || []
+
+      const potentialNewAdmins: Partial<GroupAdmin>[] = [
+         ...currentAdmins.filter((admin) => admin.id !== userEmail),
+         // add the new admin to the list of current admins if it's not already there
+         ...(newRole ? [{ id: userEmail, role: newRole }] : []), // if the new role is null, then the user is being removed as an admin
+      ]
+
+      const totalOwners = potentialNewAdmins.filter(
+         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER
+      )
+
+      return totalOwners.length > 0 // there must be at least one owner
+   }
+
+   async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
+      const adminsSnap = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("groupAdmins")
+         .get()
+
+      return mapFirestoreDocuments(adminsSnap)
    }
 }

@@ -1,7 +1,7 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
-import React, { useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import GenericDialog from "../../../../common/GenericDialog"
 import Box from "@mui/material/Box"
 import Link from "../../../../common/Link"
@@ -14,8 +14,11 @@ import DescriptionOutlinedIcon from "@mui/icons-material/DescriptionOutlined"
 import JobEntryApply from "./JobEntryApply"
 import Typography from "@mui/material/Typography"
 import UserResume from "../../../../profile/userData/user-resume/UserResume"
-import { Stack } from "@mui/material"
+import { Button, Collapse, Stack } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import SanitizedHTML from "../../../../../util/SanitizedHTML"
+import ExpandLessIcon from "@mui/icons-material/ExpandLess"
+import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 
 const styles = sxStyles({
    infoItem: {
@@ -98,18 +101,6 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                </Box>
             </Box>
 
-            <Box display="flex">
-               <InfoOutlinedIcon color="secondary" fontSize="large" />
-               <Box sx={styles.infoItem}>
-                  <Typography variant="h6" sx={styles.itemLabel}>
-                     Status
-                  </Typography>
-                  <Typography variant="h6" ml={4}>
-                     {job.status}
-                  </Typography>
-               </Box>
-            </Box>
-
             {hiringManagers && (
                <Box display="flex">
                   <PersonOutlineOutlinedIcon
@@ -139,9 +130,7 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
                      </Typography>
                   </Box>
                </Box>
-               <Typography variant="h6" mt={1}>
-                  {job.description}
-               </Typography>
+               <JobDescriptionCollapsable description={job.description} />
             </Box>
 
             <Box sx={styles.uploadCvWrapper}>
@@ -193,6 +182,47 @@ const JobDialog = ({ job, onCloseDialog, livestreamId }: Props) => {
             )}
          </Stack>
       </GenericDialog>
+   )
+}
+
+const JobDescriptionCollapsable = ({ description }) => {
+   const [isCollapsed, setCollapsed] = useState(true)
+
+   const toggle = useCallback(() => {
+      setCollapsed((prev) => !prev)
+   }, [])
+
+   return (
+      <>
+         <Collapse in={!isCollapsed} collapsedSize={150}>
+            <Typography variant="h6" mt={1}>
+               <SanitizedHTML htmlString={description} />
+            </Typography>
+         </Collapse>
+         <Box display="flex" justifyContent="center">
+            {isCollapsed && (
+               <Button
+                  size="small"
+                  color="secondary"
+                  startIcon={<ExpandMoreIcon />}
+                  onClick={toggle}
+               >
+                  Read more..
+               </Button>
+            )}
+
+            {!isCollapsed && (
+               <Button
+                  size="small"
+                  color="secondary"
+                  startIcon={<ExpandLessIcon />}
+                  onClick={toggle}
+               >
+                  Read less..
+               </Button>
+            )}
+         </Box>
+      </>
    )
 }
 

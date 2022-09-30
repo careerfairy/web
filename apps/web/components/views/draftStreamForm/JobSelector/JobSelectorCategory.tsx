@@ -5,6 +5,7 @@ import FormGroup from "../FormGroup"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import useGroupATSJobsAllIntegrations from "../../../custom-hook/useGroupATSJobsAllIntegrations"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
+import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 
 type Props = {
    groupId: string
@@ -12,12 +13,57 @@ type Props = {
    selectedItems: LivestreamJobAssociation[]
 }
 
+/**
+ * Display the job selector if the Group has any ATS account linked with
+ * the first sync complete
+ *
+ * It will fetch all jobs from all accounts
+ *
+ * @param groupId
+ * @param onSelectItems
+ * @param selectedItems
+ * @constructor
+ */
 const JobSelectorCategory = ({
    groupId,
    onSelectItems,
    selectedItems,
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
+
+   // First sync should be complete to fetch the jobs
+   const filteredAccounts = useMemo(() => {
+      return accounts.filter((account) => account.firstSyncCompletedAt)
+   }, [accounts])
+
+   // Only display the selector if the Group has ATS accounts linked with first sync complete
+   if (filteredAccounts.length === 0) {
+      return null
+   }
+
+   return (
+      <FormSection
+         groupId={groupId}
+         accounts={filteredAccounts}
+         selectedItems={selectedItems}
+         onSelectItems={onSelectItems}
+      />
+   )
+}
+
+type FormSectionProps = {
+   groupId: string
+   accounts: GroupATSAccount[]
+   onSelectItems: Dispatch<any>
+   selectedItems: LivestreamJobAssociation[]
+}
+
+const FormSection = ({
+   groupId,
+   accounts,
+   selectedItems,
+   onSelectItems,
+}: FormSectionProps) => {
    const jobs = useGroupATSJobsAllIntegrations(accounts)
 
    const allValues: LivestreamJobAssociation[] = useMemo(() => {
@@ -29,15 +75,10 @@ const JobSelectorCategory = ({
       }))
    }, [jobs, groupId])
 
-   // Only display the selector if the Group has ATS accounts linked
-   if (accounts.length === 0) {
-      return null
-   }
-
    return (
       <>
          <Typography style={{ color: "white" }} variant="h4">
-            Jobs:
+            Open Jobs:
          </Typography>
 
          <FormGroup>
@@ -62,5 +103,4 @@ const JobSelectorCategory = ({
       </>
    )
 }
-
 export default JobSelectorCategory

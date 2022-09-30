@@ -2,6 +2,13 @@ import { MergeSyncStatus } from "./MergeResponseTypes"
 import { fromSerializedDate } from "../BaseModel"
 import { ATSModel, fromMergeDate } from "./ATSModel"
 
+export type SyncStatusTypes =
+   | "DISABLED"
+   | "DONE"
+   | "FAILED"
+   | "PAUSED"
+   | "SYNCING"
+
 /**
  * Linked Account synchronization status
  * Instantiated for each Entity (Job, Recruiter, Candidate, etc)
@@ -10,7 +17,7 @@ export class SyncStatus extends ATSModel {
    constructor(
       public readonly id: string,
       public readonly model: string,
-      public readonly status: string,
+      public readonly status: SyncStatusTypes,
       public readonly isInitialSync: boolean,
       public readonly lastSync?: Date,
       public readonly nextSync?: Date

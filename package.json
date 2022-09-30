@@ -11,6 +11,7 @@
       "build:packages": "turbo run build --ignore=\"apps/**/*\" --no-deps",
       "dev": "turbo run dev --parallel",
       "test": "turbo run test",
+      "clean": "turbo run clean",
       "start": "turbo run start --parallel",
       "test:e2e-webapp": "cross-env NODE_ENV=test turbo run test:e2e-webapp --scope=@careerfairy/webapp --scope=@careerfairy/functions --include-dependencies --no-deps",
       "test:e2e-webapp-debug": "cross-env NODE_ENV=test turbo run test:e2e-webapp-debug --scope=@careerfairy/webapp --include-dependencies --no-deps",
@@ -28,7 +29,7 @@
    "devDependencies": {
       "@rxdi/firelink": "^0.8.0",
       "cross-env": "^7.0.3",
-      "firebase-tools": "^10.8.0",
+      "firebase-tools": "^11.8.0",
       "husky": "^7.0.4",
       "lint-staged": "^12.4.1",
       "prettier": "^2.6.2",

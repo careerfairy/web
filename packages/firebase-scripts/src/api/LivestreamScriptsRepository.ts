@@ -45,60 +45,60 @@ export class LivestreamScriptsRepository
    /*
     * Legacy Query for migration script only
     * */
-   async getAllRegisteredStudents(
-      withRef?: boolean
+   async getAllRegisteredStudents<T extends boolean>(
+      withRef?: T
    ): Promise<RegisteredStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("registeredStudents")
          .get()
-      return mapFirestoreDocuments<RegisteredStudent>(snaps, withRef)
+      return mapFirestoreDocuments<RegisteredStudent, T>(snaps, withRef)
    }
 
    /*
     * Legacy Query for migration script only
     * */
-   async getAllParticipatingStudents(
-      withRef?: boolean
+   async getAllParticipatingStudents<T extends boolean>(
+      withRef?: T
    ): Promise<ParticipatingStudent[]> {
       const snaps = await this.firestore
          .collectionGroup("participatingStudents")
          .get()
 
-      return mapFirestoreDocuments<ParticipatingStudent>(snaps, withRef)
+      return mapFirestoreDocuments<ParticipatingStudent, T>(snaps, withRef)
    }
 
    /*
     * Legacy Query for migration script only
     * */
-   async getAllTalentPoolStudents(
-      withRef?: boolean
+   async getAllTalentPoolStudents<T extends boolean>(
+      withRef?: T
    ): Promise<TalentPoolStudent[]> {
       const snaps = await this.firestore.collectionGroup("talentPool").get()
-      return mapFirestoreDocuments<TalentPoolStudent>(snaps, withRef)
+      return mapFirestoreDocuments<TalentPoolStudent, T>(snaps, withRef)
    }
 
    /*
     * Legacy Query for migration script only
     * */
-   async getAllUserLivestreamData(
-      withRef?: boolean
+   async getAllUserLivestreamData<T extends boolean>(
+      withRef?: T
    ): Promise<UserLivestreamData[]> {
       const snaps = await this.firestore
          .collectionGroup("userLivestreamData")
          .get()
-      return mapFirestoreDocuments<UserLivestreamData>(snaps, withRef)
+      return mapFirestoreDocuments<UserLivestreamData, T>(snaps, withRef)
    }
 
-   async getAllLivestreamUsersByType(
+   async getAllLivestreamUsersByType<T extends boolean>(
       userType: LivestreamUserAction,
-      withRef?: boolean
+      withRef?: T
    ): Promise<UserLivestreamData[]> {
       const snaps = await this.firestore
          .collectionGroup("userLivestreamData")
          .where(`${userType}.date`, "!=", null)
          .orderBy(`${userType}.date`, "asc")
          .get()
-      return mapFirestoreDocuments<UserLivestreamData>(snaps, withRef)
+      return mapFirestoreDocuments<UserLivestreamData, T>(snaps, withRef)
    }
 
    async getLivestreamUsers(

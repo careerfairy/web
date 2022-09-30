@@ -11,7 +11,6 @@ import {
 } from "./JobApplicationCard"
 import Stack from "@mui/material/Stack"
 import { atsServiceInstance } from "../../../../data/firebase/ATSService"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import Tabs from "@mui/material/Tabs"
 import { TabPanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import { alpha, useTheme } from "@mui/material/styles"
@@ -23,6 +22,7 @@ import { JobStatus } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
 import Box from "@mui/material/Box"
 import Image from "next/image"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = sxStyles({
    tabs: {
@@ -95,7 +95,6 @@ const viewData = {
 }
 type Value = keyof typeof viewData
 const Jobs = () => {
-   const { errorNotification } = useSnackbarNotifications()
    const mobile = useIsMobile()
    const theme = useTheme()
    const { asPath } = useRouter()
@@ -104,12 +103,12 @@ const Jobs = () => {
       : "/profile/jobs?type=open"
 
    useEffect(() => {
-      atsServiceInstance
-         .updateUserJobApplications()
-         .catch((e) =>
-            errorNotification(e, "Failed to update your job applications")
-         )
-   }, [errorNotification])
+      atsServiceInstance.updateUserJobApplications().catch((e) =>
+         errorLogAndNotify(e, {
+            description: "Failed to update your job applications",
+         })
+      )
+   }, [])
 
    const views = Object.keys(viewData).map((path) => (
       <TabPanel

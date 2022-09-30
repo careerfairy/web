@@ -1,14 +1,27 @@
-import React, { createContext, useContext, useEffect, useMemo } from "react"
+import React, {
+   createContext,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { useRouter } from "next/router"
 import dynamic from "next/dynamic"
 import { useSelector } from "react-redux"
 import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase"
 import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
-import { firebaseServiceInstance } from "../data/firebase/FirebaseService"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import {
+   AuthUserCustomClaims,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/dist/users"
+import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
+import { usePreviousDistinct } from "react-use"
+import DateUtil from "../util/DateUtil"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -21,6 +34,9 @@ type DefaultContext = {
    userPresenter?: UserPresenter
    userStats?: UserStats
    isLoggedIn: boolean
+   adminGroups?: AuthUserCustomClaims["adminGroups"]
+   refetchClaims: () => Promise<void>
+   signOut: () => Promise<void>
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
@@ -29,6 +45,9 @@ const AuthContext = createContext<DefaultContext>({
    isLoggedIn: undefined,
    userPresenter: undefined,
    userStats: undefined,
+   adminGroups: undefined,
+   refetchClaims: () => Promise.resolve(),
+   signOut: () => Promise.resolve(),
 })
 
 /**
@@ -54,7 +73,10 @@ const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
+
    const { pathname, replace, asPath } = useRouter()
+   const firebaseService = useFirebaseService()
+   const [claims, setClaims] = useState(null)
 
    const query = useMemo(
       () =>
@@ -75,7 +97,6 @@ const AuthProvider = ({ children }) => {
             : [],
       [auth?.email]
    )
-
    useFirestoreConnect(query)
 
    const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
@@ -83,6 +104,7 @@ const AuthProvider = ({ children }) => {
    const userData = useSelector(({ firestore }: RootState) =>
       isLoggedOut ? undefined : firestore.data["userProfile"]
    )
+   const prevUserData = usePreviousDistinct<UserData>(userData)
 
    const userStats = useSelector(
       ({ firestore }: RootState) => firestore.data["userStats"]
@@ -124,15 +146,17 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       if (!userData) return
 
-      const missingFields = ["referralCode"]
+      const missingFields = ["referralCode, timezone"]
 
       if (
          Object.keys(userData).filter((f) => missingFields.includes(f))
             .length === 0
       ) {
+         const browserTimezone = DateUtil.getCurrentTimeZone()
+
          // There are missing fields
-         firebaseServiceInstance
-            .backfillUserData()
+         firebaseService
+            .backfillUserData({ timezone: browserTimezone })
             .then((_) => console.log("Missing user data added."))
             .catch((e) => {
                Sentry.captureException(e)
@@ -141,16 +165,85 @@ const AuthProvider = ({ children }) => {
       }
    }, [userData])
 
+   const refetchClaims = useCallback(async () => {
+      if (!firebaseService.auth.currentUser) return null
+      const token = await firebaseService.auth.currentUser.getIdTokenResult(
+         true
+      )
+      setClaims(token.claims || null)
+   }, [firebaseService.auth.currentUser])
+
    useEffect(() => {
-      return firebaseServiceInstance.auth.onIdTokenChanged(async (user) => {
+      // get claims from auth
+
+      const decodedToken = parseJwt(auth.stsTokenManager?.accessToken)
+
+      const issuedAt = decodedToken?.iat // time in seconds
+
+      const issuedAtDateInMillis = issuedAt * 1000
+
+      const refreshTokenTimeInMillis = userData?.refreshTokenTime?.toMillis?.()
+
+      if (!refreshTokenTimeInMillis || !issuedAtDateInMillis) return
+
+      /**
+       * Check to see if we need to refresh the token
+       * */
+
+      // Token is considered stale if the refreshTokenTime is older than the token time the token was issued
+      const isTokenStale = issuedAtDateInMillis < refreshTokenTimeInMillis // If the token is stale, refresh it
+
+      if (isTokenStale) {
+         // if token is expired or stale, refresh it
+         void refetchClaims()
+      }
+   }, [
+      refetchClaims,
+      prevUserData,
+      userData,
+      userData?.refreshTokenTime,
+      auth.stsTokenManager?.accessToken,
+   ])
+
+   useEffect(() => {
+      const unsub = firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
-            const token = await user.getIdToken()
-            nookies.set(undefined, "token", token, { path: "/" })
+            const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
+
+            setClaims(tokenResult.claims)
+
+            nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
-   }, [])
+
+      return () => unsub()
+   }, [firebaseService.auth])
+
+   const contextValue = useMemo(
+      () => ({
+         authenticatedUser: auth,
+         userData: userData,
+         isLoggedOut,
+         isLoggedIn,
+         userPresenter: userData ? new UserPresenter(userData) : undefined,
+         userStats: userStats,
+         adminGroups: claims?.adminGroups || {},
+         refetchClaims,
+         signOut: firebaseService.doSignOut,
+      }),
+      [
+         auth,
+         userData,
+         isLoggedOut,
+         isLoggedIn,
+         userStats,
+         claims?.adminGroups,
+         refetchClaims,
+         firebaseService.doSignOut,
+      ]
+   )
 
    const contextValue = useMemo(
       () => ({
@@ -185,3 +278,20 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => useContext<DefaultContext>(AuthContext)
 
 export { AuthProvider, useAuth }
+
+function parseJwt(token?: string) {
+   if (!token || typeof window === "undefined") return null
+   let base64Url = token.split(".")[1]
+   let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+   let jsonPayload = decodeURIComponent(
+      window
+         .atob(base64)
+         .split("")
+         .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+         })
+         .join("")
+   )
+
+   return JSON.parse(jsonPayload)
+}

@@ -4,49 +4,13 @@ import {
    IAgoraRTCRemoteUser,
    ICameraVideoTrack,
    IMicrophoneAudioTrack,
+   IRemoteAudioTrack,
+   IRemoteVideoTrack,
+   UID,
 } from "agora-rtc-sdk-ng"
-import { MediaDeviceInfo } from "agora-rtc-sdk"
-import firebase from "firebase/compat"
-import Timestamp = firebase.firestore.Timestamp
-
-export interface StreamData {
-   author: {
-      email: string
-      groupId: string
-   }
-   backgroundImageUrl: string
-   company: string
-   companyId: string
-   companyLogoUrl: string
-
-   currentSpeakerId: string
-   groupIds: string[]
-   hidden: boolean
-   id: string
-   language: {
-      code: string
-      name: string
-   }
-   handRaiseActive?: boolean
-   hasStarted?: boolean
-   screenSharerId: string
-   registeredUsers: string[]
-   talentPool: string[]
-   participatingStudents: string[]
-   speakers: object[]
-   lastUpdated: Timestamp
-   start: Timestamp
-   created: Timestamp
-   summary: string
-   mode?: "presentation" | "desktop" | "video"
-   targetCategories: object
-   test: boolean
-   title: string
-   type: string
-}
 
 export interface LocalStream {
-   uid: string
+   uid: UID
    isAudioPublished: boolean
    isVideoPublished: boolean
    isLocal: boolean
@@ -56,10 +20,45 @@ export interface LocalStream {
    audioMuted?: boolean
 }
 
+export declare interface IRemoteStream {
+   /**
+    * The ID of the remote user.
+    */
+   uid: UID
+   /**
+    * The subscribed audio track.
+    */
+   audioTrack?: IRemoteAudioTrack
+   /**
+    * The subscribed video track.
+    */
+   videoTrack?: IRemoteVideoTrack
+   /**
+    * Whether the remote user is sending an audio track.
+    * - `true`: The remote user is sending an audio track.
+    * - `false`: The remote user is not sending an audio track.
+    */
+   videoMuted?: boolean
+   /**
+    * Whether the remote user is sending a video track.
+    * - `true`: The remote user is sending an audio track.
+    * - `false`: The remote user is not sending an audio track.
+    */
+   audioMuted?: boolean
+   /**
+    * This property is used to play demo streamer as a video instead of a stream in the tutorial
+    *  - It should be a url pointing to a video
+    */
+   url?: string
+   /**
+    * This property is set in the useClientConfig hook for the demo stream, not sure where its being used, will leave it as is for now
+    */
+   streamId?: string
+}
+
 export interface LocalMediaHandlers {
    initializeLocalAudioStream: () => Promise<any>
    initializeLocalVideoStream: () => Promise<any>
-   initializeVideoCameraAudioTrack: () => Promise<any>
    closeLocalCameraTrack: () => Promise<any>
    closeLocalMicrophoneTrack: () => Promise<any>
 }

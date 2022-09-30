@@ -24,6 +24,7 @@ export interface LivestreamEvent extends Identifiable {
    companyLogoUrl?: string
    created?: Timestamp
    currentSpeakerId?: string
+   handRaiseActive?: boolean
    withResume?: boolean
    duration?: number
    groupIds?: string[]
@@ -49,7 +50,17 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
-
+   /**
+    * These modes are used to dictate how the livestream is displayed in the UI
+    * - presentation: A PDF presentation is currently being shared
+    * - video: A YouTube video is currently being shared
+    * - desktop: A user's screen is currently being shared
+    */
+   mode?: "presentation" | "desktop" | "video"
+   /**
+    * The streamerId of the user who is currently sharing their screen
+    */
+   screenSharerId?: string
    /**
     * An empty array means the livestream should target all the fields of study
     * [] -> All fields of study
@@ -63,7 +74,14 @@ export interface LivestreamEvent extends Identifiable {
    targetLevelsOfStudy?: FieldOfStudy[]
 
    lastUpdated?: firebase.firestore.Timestamp
+   /**
+    * The speakers that are displayed on the upcoming-livestream landing page of the event
+    */
    speakers?: Speaker[]
+   /**
+    * The actual details of the speakers in the livestream
+    */
+   liveSpeakers?: LiveSpeaker[]
    lastUpdatedAuthorInfo?: {
       email: string
       groupId: string
@@ -76,6 +94,11 @@ export interface LivestreamEvent extends Identifiable {
     * During livestream creating, jobs can be associated with the livestream
     */
    jobs?: LivestreamJobAssociation[]
+
+   externalEventLink?: string
+   timezone?: string
+   isFaceToFace?: boolean
+   reminderEmailsSent?: IEmailSent
 }
 
 export interface LivestreamStatus {
@@ -118,7 +141,8 @@ export interface UserLivestreamData extends Identifiable {
          referralCode: string
          inviteLivestream: string
       }
-      utm: any
+      utm?: any
+      referrer?: string
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
@@ -160,6 +184,23 @@ export interface LivestreamGroupQuestions {
    questions: Record<LivestreamGroupQuestion["id"], LivestreamGroupQuestion>
 }
 
+export interface IEmailSent {
+   reminder5Minutes: boolean
+   reminder1Hour: boolean
+   reminder24Hours: boolean
+}
+
+export interface LiveStreamEventWithUsersLivestreamData
+   extends LivestreamEvent {
+   usersLivestreamData: IUserLivestreamData[]
+}
+
+export interface IUserLivestreamData {
+   livestreamId?: string
+   userId?: string
+   user?: UserData
+}
+
 export interface Speaker extends Identifiable {
    avatar?: string
    background?: string
@@ -167,6 +208,21 @@ export interface Speaker extends Identifiable {
    lastName?: string
    position?: string
    rank?: number
+}
+
+export interface LiveSpeaker extends Identifiable {
+   firstName: string
+   lastName: string
+   position: string
+   /*
+    * - Weather or not the speaker is required to provide their LinkedIn profile in the stream prep overlay (default: true)
+    * */
+   showLinkedIn?: boolean
+   linkedIn?: string
+   /*
+    * - The ID Agora and the client uses to identify the speaker
+    * */
+   speakerUuid?: string
 }
 
 export interface EventRating extends Identifiable {

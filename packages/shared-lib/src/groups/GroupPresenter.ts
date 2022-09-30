@@ -11,7 +11,6 @@ export class GroupPresenter {
       public readonly id: string,
       public readonly description: string,
       public readonly logoUrl: string,
-      public readonly adminEmails: string[],
       public readonly universityName?: string,
       public readonly universityCode?: string
    ) {}
@@ -29,7 +28,6 @@ export class GroupPresenter {
          group.groupId,
          group.description,
          group.logoUrl,
-         group.adminEmails,
          group.universityName,
          group.universityCode
       )

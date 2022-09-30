@@ -4,6 +4,7 @@ import "firebase/compat/auth"
 import "firebase/compat/storage"
 import "firebase/compat/functions"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
+import { shouldUseEmulators } from "../../util/CommonUtil"
 
 export const firebaseConfig = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -33,7 +34,7 @@ export const createFirebaseInstance = (
 
    app.firestore().settings(getFirestoreSettings(firestoreSettings))
 
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   if (shouldUseEmulators()) {
       app.auth().useEmulator("http://localhost:9099")
       app.firestore().useEmulator("localhost", 8080)
       app.functions().useEmulator("localhost", 5001)
