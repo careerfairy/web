@@ -147,7 +147,7 @@ function SignUpAdminForm() {
                      </Grid>
                      <Grid item xs={12} sm={6}>
                         <LastName
-                           value={values.firstName}
+                           value={values.lastName}
                            onChange={handleChange}
                            onBlur={handleBlur}
                            error={errors.lastName}
