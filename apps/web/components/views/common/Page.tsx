@@ -16,7 +16,6 @@ const styles = {
    },
    childrenWrapper: {
       width: "100%",
-      height: "100%",
       display: "flex",
       flex: 1,
       flexDirection: "column",
@@ -45,10 +44,9 @@ export const PageContentWrapper: FC<{
    sx?: SxProps<DefaultTheme>
 }> = ({ children, sx }) => {
    return (
-      <Box
-         sx={[styles.contentWrapper, ...(Array.isArray(sx) ? sx : [sx])]}
-         children={children}
-      />
+      <Box sx={[styles.contentWrapper, ...(Array.isArray(sx) ? sx : [sx])]}>
+         {children}
+      </Box>
    )
 }
 
@@ -68,8 +66,9 @@ export const PageChildrenWrapper: FC<PageChildrenProps> = ({
             padding && styles.childrenWrapperPadded,
             ...(Array.isArray(sx) ? sx : [sx]),
          ]}
-         children={children}
-      />
+      >
+         {children}
+      </Box>
    )
 }
 

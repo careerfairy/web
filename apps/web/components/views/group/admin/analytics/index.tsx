@@ -226,9 +226,9 @@ const AnalyticsOverview = () => {
             ["test", "==", false],
          ],
          orderBy: ["start", "asc"],
-         storeAs: `livestreams of ${group.groupId}`,
+         storeAs: `livestreams of ${group.id}`,
       }),
-      [globalTimeFrame.double, group.groupId, group.id]
+      [globalTimeFrame.double, group.id]
    )
 
    useFirestoreConnect(query)

@@ -1,80 +1,40 @@
 import React, { useEffect, useMemo } from "react"
 import { useFirestoreConnect } from "react-redux-firebase"
 import { CAREER_CENTER_COLLECTION } from "../util/constants"
-import { useAuth } from "../../HOCs/AuthProvider"
 import { shallowEqual, useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import { useRouter } from "next/router"
-
-export const groupAdminPopulates = [
-   { child: "adminEmails", root: "userData", childAlias: "admins" }, // replace owner with user object
-]
 
 const useAdminGroup = (groupId) => {
    const dispatch = useDispatch()
-   const { authenticatedUser } = useAuth()
-   const { pathname, query } = useRouter()
-
-   const isValidating = useMemo(() => {
-      return Boolean(
-         pathname === "/group/[groupId]/admin" && query.dashboardInviteId
-      )
-   }, [pathname, query.dashboardInviteId])
 
    useEffect(() => {
       return () => {
          dispatch(actions.clearUserDataSet())
       }
-   }, [])
+   }, [dispatch])
 
    const queries = useMemo(() => {
       let queriesArray = []
-      const targetId = groupId
-      const targetCollection = CAREER_CENTER_COLLECTION
-      if (targetId) {
+      if (groupId) {
          queriesArray.push(
             ...[
                {
-                  collection: targetCollection,
-                  doc: targetId,
+                  collection: CAREER_CENTER_COLLECTION,
+                  doc: groupId,
                   storeAs: "group",
-                  populates: isValidating ? [] : groupAdminPopulates,
-               },
-               {
-                  collection: targetCollection,
-                  doc: targetId,
-                  subcollections: [
-                     {
-                        collection: "admins",
-                     },
-                  ],
-                  storeAs: "adminRoles",
                },
                {
                   collection: `notifications`,
                   where: [
-                     ["details.receiver", "==", targetId],
+                     ["details.receiver", "==", groupId],
                      ["open", "==", true],
                   ],
                },
             ]
          )
-         if (authenticatedUser) {
-            queriesArray.push({
-               collection: targetCollection,
-               doc: targetId,
-               subcollections: [
-                  {
-                     collection: "admins",
-                     doc: authenticatedUser.email,
-                  },
-               ],
-               storeAs: "userRole",
-            })
-         }
       }
       return queriesArray
-   }, [authenticatedUser?.email, groupId, isValidating])
+   }, [groupId])
 
    useFirestoreConnect(queries)
 
@@ -82,7 +42,7 @@ const useAdminGroup = (groupId) => {
       ({ firestore }) =>
          firestore.data.group && {
             ...firestore.data.group,
-            id: groupId,
+            id: firestore.data.group.id || firestore.data.group.groupId, // TODO: run a script after migration to add the id field to all careerCenterData documents
          },
       shallowEqual
    )
