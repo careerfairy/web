@@ -26,7 +26,6 @@ import "chartjs-plugin-labels"
 import { customDonutConfig } from "../common/TableUtils"
 import { useTheme } from "@mui/material/styles"
 import { useSelector } from "react-redux"
-import StatsUtil from "../../../../../../data/util/StatsUtil"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import RootState from "../../../../../../store/reducers"
@@ -70,7 +69,7 @@ const CategoryBreakdown = ({
 }: Props) => {
    const showUniversityBreakdown =
       currentUserDataSet.dataSet === "groupUniversityStudents"
-   const { groupQuestions, group } = useGroup()
+   const { groupQuestions } = useGroup()
    const theme = useTheme()
    const chartRef = useRef()
    const [showPercentage, setShowPercentage] = useState(true)
@@ -89,28 +88,21 @@ const CategoryBreakdown = ({
 
    const audience = useMemo<UserData[]>(() => {
       if (currentStream) {
-         return totalUsers?.filter(
-            (user) =>
-               currentStream[localUserType.propertyName]?.includes(
-                  user.userEmail
-               ) && StatsUtil.studentFollowsGroup(user, group)
+         return totalUsers?.filter((user) =>
+            currentStream[localUserType.propertyName]?.includes(user.userEmail)
          )
       } else {
          return totalUsers?.filter((user) =>
-            streamsFromTimeFrameAndFuture?.some(
-               (stream) =>
-                  stream?.[localUserType.propertyName]?.includes(
-                     user.userEmail
-                  ) && StatsUtil.studentFollowsGroup(user, group)
+            streamsFromTimeFrameAndFuture?.some((stream) =>
+               stream?.[localUserType.propertyName]?.includes(user.userEmail)
             )
          )
       }
    }, [
+      localUserType.propertyName,
       currentStream,
-      localUserType,
-      streamsFromTimeFrameAndFuture,
-      currentUserDataSet.dataSet,
       totalUsers,
+      streamsFromTimeFrameAndFuture,
    ])
 
    const {
