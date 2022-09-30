@@ -93,7 +93,12 @@ function mapJobsToTableRows(jobs: Job[]) {
    }))
 }
 
-export const TableTitle = ({ title, subtitle }) => {
+type TableTitleProps = {
+   title: string
+   subtitle?: string
+}
+
+export const TableTitle = ({ title, subtitle }: TableTitleProps) => {
    return (
       <Box display="flex" alignItems="center">
          <Typography variant="h6">{title}</Typography>

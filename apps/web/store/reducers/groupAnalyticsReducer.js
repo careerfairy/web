@@ -21,7 +21,7 @@ const groupAnalyticsReducer = (state = initialState, { type, payload }) => {
             streams: { ...state.streams, fromTimeframeAndFuture: [] },
          }
       case actions.CLEAR_HIDDEN_STREAM_IDS:
-         return { ...state, hiddenStreamIds: {} }
+         return { ...state, hiddenStreamIds: null }
       case actions.SET_VISIBLE_STREAM_IDS:
          return {
             ...state,

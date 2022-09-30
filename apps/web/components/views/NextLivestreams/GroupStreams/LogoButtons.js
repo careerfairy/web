@@ -103,10 +103,10 @@ const LogoButtons = () => {
                   <div
                      className={classes.imageSrc}
                      style={{
-                        backgroundImage: `url(${getResizedUrl(
+                        backgroundImage: `url("${getResizedUrl(
                            group.logoUrl,
                            "sm"
-                        )})`,
+                        )}")`,
                      }}
                   />
                ) : (

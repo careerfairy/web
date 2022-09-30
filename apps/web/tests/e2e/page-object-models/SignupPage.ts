@@ -1,7 +1,6 @@
-import { Locator, Page, expect } from "@playwright/test"
+import { expect, Locator, Page } from "@playwright/test"
 import { sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 export class SignupPage extends CommonPage {
    readonly page: Page
@@ -170,6 +169,8 @@ export class SignupPage extends CommonPage {
       await elementLocator.click()
       await elementLocator.focus()
       await elementLocator.fill(stringToSelect)
+      // give time for the dropdown to update the suggestions
+      await sleep(250)
       expect(await elementLocator.inputValue()).toBe(stringToSelect)
       await this.page
          .locator('div[role="presentation"]', { hasText: stringToSelect })

@@ -4,7 +4,8 @@ import ErrorContext from "../context/error/ErrorContext"
 
 type Props = {
    message?: string
-   hide?: boolean // don't show anything in case of error
+   hide?: boolean // hide the fallback UI and the toast notification
+   expected?: boolean // sometimes the error can be expected, and we don't need to log it
    detailedDescription?: boolean
    showToastNotification?: boolean
 }
@@ -25,6 +26,7 @@ export default class ErrorBoundary extends React.Component<Props, State> {
    static defaultProps = {
       detailedDescription: true,
       hide: false,
+      expected: false,
       message: "Oops, there was an error loading this data!",
       showToastNotification: true,
    }
@@ -42,10 +44,12 @@ export default class ErrorBoundary extends React.Component<Props, State> {
    }
 
    componentDidCatch(error, errorInfo) {
-      console.error({ error, errorInfo })
-      Sentry.captureException(error, { extra: { errorInfo: errorInfo } })
+      if (!this.props.expected) {
+         console.error({ error, errorInfo })
+         Sentry.captureException(error, { extra: { errorInfo: errorInfo } })
+      }
 
-      if (this.props.showToastNotification) {
+      if (!this.props.hide && this.props.showToastNotification) {
          this.context.setGeneralError(this.props.message)
       }
    }

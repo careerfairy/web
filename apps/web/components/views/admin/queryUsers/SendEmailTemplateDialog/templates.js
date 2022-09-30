@@ -3,6 +3,7 @@ import { URL_REGEX } from "../../../../util/constants"
 import { basicEmailTemplate } from "constants/images"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useMemo } from "react"
+import { shouldUseEmulators } from "../../../../../util/CommonUtil"
 
 const MAX_SUBJECT_LENGTH = 500
 const MAX_DISPLAY_TITLE_LENGTH = 1000
@@ -118,14 +119,12 @@ const useTemplates = () => {
             getInitialValues: getInitialValues,
             fields: basicFields,
             sendTemplate: sendBasicTemplateEmail,
-            templateId: process.env.NEXT_PUBLIC_FIREBASE_EMULATORS
-               ? "28950430"
-               : "25653565",
+            templateId: shouldUseEmulators() ? "28950430" : "25653565",
             templateEditUrl:
                "https://account.postmarkapp.com/servers/5274171/templates/25653565/edit",
          },
       ],
-      [sendBasicTemplateEmail, process.env.NEXT_PUBLIC_FIREBASE_EMULATORS]
+      [sendBasicTemplateEmail, shouldUseEmulators()]
    )
 }
 

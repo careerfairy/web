@@ -206,4 +206,10 @@ export default class DateUtil {
          return JsTimeMinutes
       }
    }
+
+   static getCurrentTimeZone() {
+      return (
+         Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone || "Europe/Zurich"
+      )
+   }
 }

@@ -10,6 +10,4 @@ if (isLocalEnvironment()) {
    )
 }
 
-module.exports = {
-   client: new postmark.ServerClient(serverToken),
-}
+export const client = new postmark.ServerClient(serverToken)

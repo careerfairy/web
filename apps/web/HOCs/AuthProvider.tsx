@@ -21,6 +21,7 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
+import DateUtil from "../util/DateUtil"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -145,15 +146,17 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       if (!userData) return
 
-      const missingFields = ["referralCode"]
+      const missingFields = ["referralCode, timezone"]
 
       if (
          Object.keys(userData).filter((f) => missingFields.includes(f))
             .length === 0
       ) {
+         const browserTimezone = DateUtil.getCurrentTimeZone()
+
          // There are missing fields
          firebaseService
-            .backfillUserData()
+            .backfillUserData({ timezone: browserTimezone })
             .then((_) => console.log("Missing user data added."))
             .catch((e) => {
                Sentry.captureException(e)

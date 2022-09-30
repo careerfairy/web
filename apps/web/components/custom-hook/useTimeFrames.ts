@@ -1,4 +1,3 @@
-import React from "react"
 import { v4 as uuid } from "uuid"
 
 const now = new Date()
@@ -50,9 +49,9 @@ export interface GlobalTimeFrame {
 }
 const timeFrames: TimeFrame[] = [
    {
-      name: "3 Years",
-      pastName: "3 years",
-      date: threeYears,
+      name: "2 Years",
+      pastName: "2 years",
+      date: twoYears,
       id: uuid(),
    },
    {
@@ -95,11 +94,11 @@ const timeFrames: TimeFrame[] = [
 
 const globalTimeFrames: GlobalTimeFrame[] = [
    {
-      globalDate: threeYears,
-      timeFrames: timeFrames.filter((timeOb) => timeOb.date >= threeYears),
-      name: "3 years",
+      globalDate: twoYears,
+      timeFrames: timeFrames.filter((timeOb) => timeOb.date >= twoYears),
+      name: "2 years",
       id: uuid(),
-      double: sixYears,
+      double: fourYears,
    },
    {
       globalDate: oneYear,

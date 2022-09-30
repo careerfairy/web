@@ -67,7 +67,7 @@ const QuestionUpvote = () => {
    const { authenticatedUser } = useAuth()
 
    useEffect(() => {
-      if (livestream.questionsDisabled) {
+      if (livestream?.questionsDisabled) {
          handleNext()
          return
       }

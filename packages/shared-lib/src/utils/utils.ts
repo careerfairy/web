@@ -1,3 +1,5 @@
+import { LivestreamEvent } from "../livestreams"
+
 /*
  *
  * Method gets a nested property based on a string path
@@ -52,4 +54,25 @@ export const chunkArray = <T>(list: T[], chunk: number): T[][] => {
    }
 
    return result
+}
+
+/**
+ * Sort Livestreams from more recent to oldest
+ * @param a
+ * @param b
+ */
+export const sortLivestreamsDesc = (
+   a: LivestreamEvent,
+   b: LivestreamEvent
+): number => {
+   if (a.start instanceof Date && b.start instanceof Date) {
+      return b.start.getTime() - a.start.getTime()
+   }
+
+   if (a.start["toDate"] && b.start["toDate"]) {
+      // convert from firebase timestamp type
+      return b.start.toDate().getTime() - a.start.toDate().getTime()
+   }
+
+   return 0
 }
