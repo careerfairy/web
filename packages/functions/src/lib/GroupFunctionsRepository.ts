@@ -175,7 +175,9 @@ export class GroupFunctionsRepository
          }
       } else {
          // remove the role from the user's custom claims
-         delete newClaims.adminGroups[group.id]
+         if (newClaims.adminGroups?.[group.id]) {
+            delete newClaims.adminGroups[group.id]
+         }
       }
 
       return this.auth.setCustomUserClaims(authUser.uid, newClaims)
