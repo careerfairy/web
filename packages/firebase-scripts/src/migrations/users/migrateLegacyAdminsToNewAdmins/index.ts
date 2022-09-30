@@ -1,5 +1,5 @@
 import Counter from "../../../lib/Counter"
-import { throwMigrationError } from "../../../util/misc"
+import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { groupRepo } from "../../../repositories"
 import {
    Group,
@@ -10,6 +10,7 @@ import firebase from "firebase/compat"
 import * as fs from "fs"
 import config from "../../../config"
 import { getArgValue } from "../../../index"
+const cliProgress = require("cli-progress")
 
 const customCountKeys = {
    numTotalLegacyAdmins: "Total Admins",
@@ -27,8 +28,19 @@ const rolesMap = {
    fallback: GROUP_DASHBOARD_ROLE.MEMBER,
 }
 
+const clearProgress = new cliProgress.SingleBar(
+   getCLIBarOptions("Removing Current New Admins", "New Admins Removed"),
+   cliProgress.Presets.shades_classic
+)
+
+const migrationProgress = new cliProgress.SingleBar(
+   getCLIBarOptions("Migrating Legacy Admins", "Legacy Admins Migrated"),
+   cliProgress.Presets.shades_classic
+)
+
 export async function run() {
    const counter = new Counter()
+
    const clearNewAdmins = getArgValue<"true">("clearNewAdmins")
 
    try {
@@ -88,7 +100,11 @@ export async function run() {
       // We will start assigning the roles to the admins
 
       Counter.log("Starting migrating admin roles")
+      migrationProgress.start(legacyGroupAdmins.length, 0)
+
       for (let i = 0; i < legacyGroupAdmins.length; i++) {
+         migrationProgress.update(i + 1)
+
          const groupAdmin = legacyGroupAdmins[i]
          const groupAdminGroupId = getGroupIdOfLegacyAdminRef(groupAdmin._ref)
 
@@ -121,7 +137,9 @@ export async function run() {
             })
       }
 
+      migrationProgress.stop()
       Counter.log("Finished migrating admin roles")
+
       if (failedMigrationAdmins.length > 0) {
          // If there are failed operations, we log them
          Counter.log("Failed migration admins")
@@ -160,14 +178,17 @@ const getGroupIdOfLegacyAdminRef = (
 }
 
 /*
- * In this function, we will clear all the new admins, so that we can start fresh incase we want to re-run this script
+ * In this function, we will clear all the new admins, so that we can start fresh in-case we want to re-run this script
  * Does not affect the legacy admins
  * */
 const resetAllNewAdmins = async (groupsDict: Record<string, Group>) => {
    const newAdmins = await groupRepo.getAllGroupAdmins(true)
 
    Counter.log("starting to reset all new admins")
+   clearProgress.start(newAdmins.length, 0)
    for (let i = 0; i < newAdmins.length; i++) {
+      clearProgress.update(i + 1)
+
       const newAdmin = newAdmins[i]
 
       const group = groupsDict[newAdmin.groupId]
@@ -177,6 +198,6 @@ const resetAllNewAdmins = async (groupsDict: Record<string, Group>) => {
             console.error(err)
          })
    }
-
+   clearProgress.stop()
    Counter.log("Cleared all new admins")
 }
