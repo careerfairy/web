@@ -47,12 +47,13 @@ async function run(): Promise<void> {
    h1Text(`Deleting Auth`)
    await deleteAuth()
 
+   h1Text(`Seeding data`)
+
    if (INCLUDE_USERDATA) {
       h1Text("Re-creating auth users")
       await createAuthUsers()
    }
 
-   h1Text(`Seeding data`)
    await createUser("carlos@careerfairy.io")
    await createUser("habib@careerfairy.io", true)
    await createUser("maximilian@careerfairy.io")
