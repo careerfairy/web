@@ -17,7 +17,6 @@ class GroupFirebaseSeed implements GroupSeed {
          groupId: id,
          description: faker.company.bs(),
          logoUrl: faker.image.business(),
-         adminEmails: [faker.internet.email()],
          test: false,
          universityName: faker.company.companyName() ?? "My university",
       }

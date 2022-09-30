@@ -1,8 +1,4 @@
 import dotenv = require("dotenv")
-
-// load values from the .env file in this directory into process.env
-dotenv.config()
-
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")
@@ -24,6 +20,9 @@ import marketing = require("./marketing")
 import atsUser = require("./atsUser")
 import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
 
 // Auth
 exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
@@ -53,12 +52,16 @@ exports.exportFirestoreBackup = backup.exportFirestoreBackup
 exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail_v3
 
 // Group Admin
-exports.sendDashboardInviteEmail = groupAdmin.sendDashboardInviteEmail
+exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
 exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
-exports.updateUserDocAdminStatus = groupAdmin.updateUserDocAdminStatus
-exports.joinGroupDashboard = groupAdmin.joinGroupDashboard
+exports.joinGroupDashboard_v2 = groupAdmin.joinGroupDashboard_v2
+exports.deleteGroupAdminDashboardInvite =
+   groupAdmin.deleteGroupAdminDashboardInvite
+exports.createGroup = groupAdmin.createGroup
+exports.changeRole = groupAdmin.changeRole
+exports.kickFromDashboard = groupAdmin.kickFromDashboard
 
 // Reminders
 exports.sendReminderEmailToRegistrants =

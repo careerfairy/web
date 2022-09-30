@@ -10,8 +10,6 @@ export interface Group extends Identifiable {
    groupId: string
    description: string
    logoUrl: string
-   adminEmails: string[]
-   adminEmail?: string
 
    // optional
    extraInfo?: string
@@ -28,7 +26,9 @@ export interface Group extends Identifiable {
    /*
     * Deprecated
     * */
-   categories?: GroupCategory[]
+   categories?: GroupCategory[] // deprecated
+   adminEmails?: string[] // deprecated
+   adminEmail?: string // deprecated
 }
 
 export interface GroupWithPolicy extends Group {
@@ -143,3 +143,36 @@ export interface UserGroupData extends Identifiable {
    groupUniversityCode?: Group["universityCode"]
    questions?: UserGroupQuestionsWithAnswerMap
 }
+
+/*
+ * LEGACY ADMIN SUB-COLLECTION careerCenterData/[groupId]/admins/[adminEmail]
+ * Will be used by migration script PR
+ * */
+export interface LegacyGroupAdmin extends Identifiable {
+   role: "mainAdmin" | "subAdmin"
+}
+
+// careerCenterData/[groupId]/groupAdmins/[adminEmail]
+export interface GroupAdmin extends Identifiable {
+   role: GROUP_DASHBOARD_ROLE
+   firstName: string
+   lastName: string
+   displayName: string
+   email: string
+   groupId: string
+}
+
+export enum GROUP_DASHBOARD_ROLE {
+   OWNER = "OWNER",
+   MEMBER = "MEMBER",
+}
+
+export type PublicGroup = Pick<
+   Group,
+   | "id"
+   | "description"
+   | "logoUrl"
+   | "extraInfo"
+   | "universityName"
+   | "universityCode"
+>
