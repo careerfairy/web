@@ -5,12 +5,14 @@ import {
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
    GroupQuestion,
 } from "@careerfairy/shared-lib/dist/groups"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import firebase from "firebase/compat"
 import admin = require("firebase-admin")
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -187,29 +189,6 @@ export class GroupFunctionsRepository
          .get()
 
       return mapFirestoreDocuments(adminsSnap)
-   }
-
-   /*
-    * Checks if there will be at least one owner after the role change
-    * */
-   protected async checkIfThereWillBeAtLeastOneOwner(
-      groupId: string,
-      newRole: GROUP_DASHBOARD_ROLE,
-      userEmail: string
-   ) {
-      const currentAdmins = (await this.getGroupAdmins(groupId)) || []
-
-      const potentialNewAdmins: Partial<GroupAdmin>[] = [
-         ...currentAdmins.filter((admin) => admin.id !== userEmail),
-         // add the new admin to the list of current admins if it's not already there
-         ...(newRole ? [{ id: userEmail, role: newRole }] : []), // if the new role is null, then the user is being removed as an admin
-      ]
-
-      const totalOwners = potentialNewAdmins.filter(
-         (admin) => admin.role === GROUP_DASHBOARD_ROLE.OWNER
-      )
-
-      return totalOwners.length > 0 // there must be at least one owner
    }
 
    async createGroupDashboardInvite(

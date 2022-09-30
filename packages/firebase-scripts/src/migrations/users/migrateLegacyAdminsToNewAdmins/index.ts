@@ -9,6 +9,7 @@ import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebase
 import firebase from "firebase/compat"
 import * as fs from "fs"
 import config from "../../../config"
+import { getArgValue } from "../../../index"
 
 const customCountKeys = {
    numTotalLegacyAdmins: "Total Admins",
@@ -28,20 +29,27 @@ const rolesMap = {
 
 export async function run() {
    const counter = new Counter()
+   const clearNewAdmins = getArgValue<"true">("clearNewAdmins")
 
    try {
+      const groups = await groupRepo.getAllGroups()
+      const groupsDict = convertDocArrayToDict(groups)
+
       const groupsLegacyAdminsCountDict = new Map<string, number>() // key: groupId, value: numAdmins
 
       const legacyAdmins = await groupRepo.getAllLegacyAdmins(true)
+
+      if (clearNewAdmins === "true") {
+         // Reset all new admins, so that we can start fresh
+         await resetAllNewAdmins(groupsDict)
+      }
+
       const failedMigrationAdmins: {
          targetEmail: string
          newRole: GROUP_DASHBOARD_ROLE | null
          fallbackGroupId: string
          group?: Group
       }[] = []
-
-      const groups = await groupRepo.getAllGroups()
-      const groupsDict = convertDocArrayToDict(groups)
 
       counter.addToReadCount(legacyAdmins.length + groups.length)
 
@@ -149,4 +157,26 @@ const getGroupIdOfLegacyAdminRef = (
    ref: firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
 ) => {
    return ref.parent.parent.id
+}
+
+/*
+ * In this function, we will clear all the new admins, so that we can start fresh incase we want to re-run this script
+ * Does not affect the legacy admins
+ * */
+const resetAllNewAdmins = async (groupsDict: Record<string, Group>) => {
+   const newAdmins = await groupRepo.getAllGroupAdmins(true)
+
+   Counter.log("starting to reset all new admins")
+   for (let i = 0; i < newAdmins.length; i++) {
+      const newAdmin = newAdmins[i]
+
+      const group = groupsDict[newAdmin.groupId]
+      await groupRepo
+         .migrateAdminRole(newAdmin.id, null, newAdmin.groupId, group) // We migrate the admin role
+         .catch((err) => {
+            console.error(err)
+         })
+   }
+
+   Counter.log("Cleared all new admins")
 }
