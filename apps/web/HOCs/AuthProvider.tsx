@@ -14,8 +14,13 @@ import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import nookies from "nookies"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
-import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import {
+   AuthUserCustomClaims,
+   UserData,
+   UserStats,
+} from "@careerfairy/shared-lib/dist/users"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
+import { usePreviousDistinct } from "react-use"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -28,7 +33,9 @@ type DefaultContext = {
    userPresenter?: UserPresenter
    userStats?: UserStats
    isLoggedIn: boolean
-   fetchClaims: () => Promise<{ [p: string]: any }>
+   adminGroups?: AuthUserCustomClaims["adminGroups"]
+   refetchClaims: () => Promise<void>
+   signOut: () => Promise<void>
 }
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
@@ -37,7 +44,9 @@ const AuthContext = createContext<DefaultContext>({
    isLoggedIn: undefined,
    userPresenter: undefined,
    userStats: undefined,
-   fetchClaims: () => Promise.resolve({}),
+   adminGroups: undefined,
+   refetchClaims: () => Promise.resolve(),
+   signOut: () => Promise.resolve(),
 })
 
 /**
@@ -63,11 +72,11 @@ const adminPaths = ["/group/create", "/new-livestream"]
 
 const AuthProvider = ({ children }) => {
    const auth = useSelector((state: RootState) => state.firebase.auth)
-   console.log("-> auth", auth)
+
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()
    const [claims, setClaims] = useState(null)
-   console.log("-> claims", claims)
+
    const query = useMemo(
       () =>
          auth.email
@@ -87,7 +96,6 @@ const AuthProvider = ({ children }) => {
             : [],
       [auth?.email]
    )
-
    useFirestoreConnect(query)
 
    const isLoggedOut = Boolean(auth.isLoaded && auth.isEmpty)
@@ -95,6 +103,7 @@ const AuthProvider = ({ children }) => {
    const userData = useSelector(({ firestore }: RootState) =>
       isLoggedOut ? undefined : firestore.data["userProfile"]
    )
+   const prevUserData = usePreviousDistinct<UserData>(userData)
 
    const userStats = useSelector(
       ({ firestore }: RootState) => firestore.data["userStats"]
@@ -153,27 +162,56 @@ const AuthProvider = ({ children }) => {
       }
    }, [userData])
 
-   const fetchClaims = useCallback(async () => {
+   const refetchClaims = useCallback(async () => {
       if (!firebaseService.auth.currentUser) return null
       const token = await firebaseService.auth.currentUser.getIdTokenResult(
          true
       )
-      return token.claims
+      setClaims(token.claims || null)
    }, [firebaseService.auth.currentUser])
 
-   // Get user claims
    useEffect(() => {
       // get claims from auth
-      fetchClaims().then(setClaims)
-   }, [fetchClaims])
+
+      const decodedToken = parseJwt(auth.stsTokenManager?.accessToken)
+
+      const issuedAt = decodedToken?.iat // time in seconds
+
+      const issuedAtDateInMillis = issuedAt * 1000
+
+      const refreshTokenTimeInMillis = userData?.refreshTokenTime?.toMillis?.()
+
+      if (!refreshTokenTimeInMillis || !issuedAtDateInMillis) return
+
+      /**
+       * Check to see if we need to refresh the token
+       * */
+
+      // Token is considered stale if the refreshTokenTime is older than the token time the token was issued
+      const isTokenStale = issuedAtDateInMillis < refreshTokenTimeInMillis // If the token is stale, refresh it
+
+      if (isTokenStale) {
+         // if token is expired or stale, refresh it
+         void refetchClaims()
+      }
+   }, [
+      refetchClaims,
+      prevUserData,
+      userData,
+      userData?.refreshTokenTime,
+      auth.stsTokenManager?.accessToken,
+   ])
 
    useEffect(() => {
-      const unsub = firebaseService.auth.onIdTokenChanged(async (user) => {
+      const unsub = firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
-            const token = await user.getIdToken()
-            nookies.set(undefined, "token", token, { path: "/" })
+            const tokenResult = await user.getIdTokenResult() // we get the token from the user, this does not make a network request
+
+            setClaims(tokenResult.claims)
+
+            nookies.set(undefined, "token", tokenResult.token, { path: "/" })
          }
       })
 
@@ -188,9 +226,20 @@ const AuthProvider = ({ children }) => {
          isLoggedIn,
          userPresenter: userData ? new UserPresenter(userData) : undefined,
          userStats: userStats,
-         fetchClaims,
+         adminGroups: claims?.adminGroups || {},
+         refetchClaims,
+         signOut: firebaseService.doSignOut,
       }),
-      [auth, isLoggedIn, isLoggedOut, fetchClaims, userData, userStats]
+      [
+         auth,
+         userData,
+         isLoggedOut,
+         isLoggedIn,
+         userStats,
+         claims?.adminGroups,
+         refetchClaims,
+         firebaseService.doSignOut,
+      ]
    )
 
    const isSecurePath = () => {
@@ -214,3 +263,20 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => useContext<DefaultContext>(AuthContext)
 
 export { AuthProvider, useAuth }
+
+function parseJwt(token?: string) {
+   if (!token || typeof window === "undefined") return null
+   let base64Url = token.split(".")[1]
+   let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+   let jsonPayload = decodeURIComponent(
+      window
+         .atob(base64)
+         .split("")
+         .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+         })
+         .join("")
+   )
+
+   return JSON.parse(jsonPayload)
+}

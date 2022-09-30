@@ -1,7 +1,3 @@
-import {
-   FirebaseGroupRepository,
-   IGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { admin } from "./firestoreAdmin"
 import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 import { IATSRepository } from "@careerfairy/shared-lib/src/ats/IATSRepository"
@@ -27,12 +23,20 @@ import {
    IMarketingUsersRepository,
 } from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
 
-const firestoreInstance = admin.firestore() as any
+import {
+   GroupFunctionsRepository,
+   IGroupFunctionsRepository,
+} from "../lib/GroupFunctionsRepository"
 
-export const groupRepo: IGroupRepository = new FirebaseGroupRepository(
-   firestoreInstance,
-   admin.firestore.FieldValue
-)
+const firestoreInstance = admin.firestore() as any
+const authInstance = admin.auth()
+
+export const groupRepo: IGroupFunctionsRepository =
+   new GroupFunctionsRepository(
+      firestoreInstance,
+      admin.firestore.FieldValue,
+      authInstance
+   )
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
    firestoreInstance,

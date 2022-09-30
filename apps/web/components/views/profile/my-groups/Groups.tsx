@@ -17,14 +17,14 @@ import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfinit
 import ContentCard from "../../../../layouts/UserLayout/ContentCard"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Link from "../../common/Link"
-import { useDispatch } from "react-redux"
-import * as actions from "../../../../store/actions"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import Autocomplete from "@mui/material/Autocomplete"
 import match from "autosuggest-highlight/match"
 import parse from "autosuggest-highlight/parse"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { UserAdminGroup } from "@careerfairy/shared-lib/dist/users"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -55,15 +55,17 @@ const adminTab = {
 }
 const Groups = () => {
    const classes = useStyles()
-   const { userData, authenticatedUser } = useAuth()
-
+   const { userData, authenticatedUser, adminGroups } = useAuth()
+   const { errorNotification } = useSnackbarNotifications()
    const {
       query: { type },
    } = useRouter()
-   const dispatch = useDispatch()
    const [loading, setLoading] = useState(false)
-   const [groups, setGroups] = useState([])
+
+   const [groups, setGroups] = useState<(Group | UserAdminGroup)[]>([])
+
    const [value, setValue] = useState<"joined" | "admin" | null>(null)
+
    const [hasAdminGroups, setHasAdminGroups] = useState<undefined | boolean>(
       userData?.isAdmin
    )
@@ -76,15 +78,14 @@ const Groups = () => {
    useEffect(() => {
       ;(async () => {
          const hasAdminGroups =
-            userData?.isAdmin ||
-            (await groupRepo.checkIfUserHasAdminGroups(authenticatedUser.email))
+            userData?.isAdmin || Object.keys(adminGroups || {}).length > 0
          setHasAdminGroups(hasAdminGroups)
          if (hasAdminGroups && (!type || type === "admin")) {
             addAdminTab()
             setValue("admin")
          }
       })()
-   }, [])
+   }, [adminGroups, type, userData?.isAdmin])
 
    useEffect(() => {
       ;(async () => {
@@ -116,11 +117,11 @@ const Groups = () => {
          try {
             setLoading(true)
             if (value === "admin") {
-               const adminGroups = await groupRepo.getAdminGroups(
+               const groupsUserIsAnAdminOf = await groupRepo.getAdminGroups(
                   authenticatedUser.email,
                   Boolean(userData?.isAdmin)
                )
-               setGroups(adminGroups)
+               setGroups(groupsUserIsAnAdminOf || [])
             } else if (value === "joined") {
                const groupDataIds = await groupRepo.getAllUserGroupDataIds(
                   authenticatedUser.email
@@ -129,11 +130,17 @@ const Groups = () => {
                setGroups(joinedGroups)
             }
          } catch (e) {
-            dispatch(actions.sendGeneralError(e))
+            errorNotification(e.message)
          }
          setLoading(false)
       })()
-   }, [value, userData?.groupIds, userData?.isAdmin])
+   }, [
+      value,
+      userData.groupIds,
+      userData?.isAdmin,
+      authenticatedUser.email,
+      errorNotification,
+   ])
 
    useEffect(() => {
       resetInput()
@@ -226,7 +233,7 @@ const Groups = () => {
 }
 
 interface HighlightProps {
-   groups: Group[]
+   groups: (Group | UserAdminGroup)[]
    handleSelectGroup: (event: React.SyntheticEvent, value: Group) => void
    absolutePath?: string
    hideButton?: boolean
@@ -252,8 +259,8 @@ export const Highlights = ({
             fullWidth
             autoHighlight
             onChange={handleSelectGroup}
-            getOptionLabel={(option : Group) =>
-                option.universityName ? option.universityName : ""
+            getOptionLabel={(option: Group) =>
+               option.universityName ? option.universityName : ""
             }
             renderInput={(params) => (
                <TextField
@@ -269,7 +276,7 @@ export const Highlights = ({
             renderOption={(props, option, { inputValue }) => {
                const matches = match(option.universityName, inputValue)
                const parts = parse(option.universityName, matches)
-               const key = `listItem-${option.groupId}-${option.id}`
+               const key = `listItem-${option.id}-${option.id}`
                return (
                   <li {...props} key={key}>
                      <div>

@@ -1,5 +1,6 @@
 import React, {
    createContext,
+   FC,
    useContext,
    useEffect,
    useMemo,
@@ -8,12 +9,10 @@ import React, {
 } from "react"
 import NavBar from "./NavBar"
 import { useRouter } from "next/router"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import { useSelector } from "react-redux"
 import TopBar from "./TopBar"
-import useDashboardRedirect from "../../components/custom-hook/useDashboardRedirect"
 import useAdminGroup from "../../components/custom-hook/useAdminGroup"
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks"
 import { CircularProgress, Typography } from "@mui/material"
@@ -24,6 +23,7 @@ import Page, {
 import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 import {
    Group,
+   GROUP_DASHBOARD_ROLE,
    GroupOption,
    GroupQuestion,
 } from "@careerfairy/shared-lib/dist/groups"
@@ -32,6 +32,7 @@ import GroupsUtil from "../../data/util/GroupsUtil"
 import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 
 const styles = {
    childrenWrapperResponsive: {
@@ -44,6 +45,7 @@ type GroupAdminContext = {
    flattenedGroupOptions: GroupOption[]
    groupQuestions: GroupQuestion[]
    groupPresenter?: GroupPresenter
+   role: GROUP_DASHBOARD_ROLE
 }
 
 const GroupContext = createContext<GroupAdminContext>({
@@ -51,25 +53,29 @@ const GroupContext = createContext<GroupAdminContext>({
    flattenedGroupOptions: [],
    groupQuestions: [],
    groupPresenter: undefined,
+   role: undefined,
 })
 
-const GroupDashboardLayout = (props) => {
-   const firebase = useFirebaseService()
-   const { children } = props
+type GroupDashboardLayoutProps = {
+   groupId: string
+}
+const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
+   const { children, groupId } = props
    const scrollRef = useRef(null)
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
    const isDesktop = useIsDesktop()
-   const {
-      query: { groupId },
-   } = useRouter()
-   const { userData, authenticatedUser, isLoggedIn } = useAuth()
+   const { replace, push } = useRouter()
+   const { userData, adminGroups, isLoggedOut } = useAuth()
    const notifications = useSelector(
       ({ firestore }: RootState) => firestore.ordered.notifications || []
    )
 
    const group = useAdminGroup(groupId)
-   useDashboardRedirect(group, firebase)
+
+   const { errorNotification } = useSnackbarNotifications()
+
+   const groupDoesNotExist = isLoaded(group) && isEmpty(group)
 
    const flattenedGroupOptions = useMemo<GroupOption[]>(() => {
       return group ? GroupsUtil.handleFlattenOptions(group) : []
@@ -78,18 +84,49 @@ const GroupDashboardLayout = (props) => {
       useDashboardLinks(group)
 
    const isAdmin = useMemo(
-      () =>
-         userData?.isAdmin ||
-         group?.adminEmails?.includes(authenticatedUser?.email),
-      [userData?.isAdmin, group?.adminEmails, authenticatedUser?.email]
-   )
-   const isCorrectGroup = useMemo(
-      () => groupId === group?.groupId,
-      [groupId, group?.groupId]
+      () => userData?.isAdmin || adminGroups[group?.id],
+      [userData?.isAdmin, adminGroups, group?.id]
    )
 
+   const loadingGroup = !isLoaded(group)
+
+   const isCorrectGroup = groupId === group?.id
+
    useEffect(() => {
-      if (isCorrectGroup && group?.id) {
+      if (
+         !userData ||
+         !isLoaded(group) ||
+         !adminGroups ||
+         isLoggedOut // We don't want to redirect here if the user is logged out in order to avoid a race condition with the auth provider(it already handles this)
+      )
+         return
+
+      if (groupDoesNotExist) {
+         push("/").then(() => {
+            errorNotification("The page you tried to visit is invalid")
+         })
+      }
+
+      if (userData.isAdmin || adminGroups[group.id]) return
+
+      // At this point, the user is not an admin of the group, so we redirect out of here
+      push("/").then(() => {
+         errorNotification("You are not authorized to view this page")
+      })
+   }, [
+      adminGroups,
+      errorNotification,
+      group,
+      groupDoesNotExist,
+      replace,
+      push,
+      userData?.isAdmin,
+      userData,
+      isLoggedOut,
+   ])
+
+   useEffect(() => {
+      if (group?.id) {
          const unsubscribe = groupRepo.listenToGroupQuestions(
             group.id,
             (categories) => {
@@ -101,7 +138,7 @@ const GroupDashboardLayout = (props) => {
             unsubscribe()
          }
       }
-   }, [isCorrectGroup, groupId, group?.id])
+   }, [groupId, group?.id])
 
    const groupPresenter = useMemo(
       () => group && GroupPresenter.createFromDocument(group),
@@ -114,8 +151,15 @@ const GroupDashboardLayout = (props) => {
          flattenedGroupOptions,
          groupQuestions,
          groupPresenter,
+         role: adminGroups?.[group?.id]?.role,
       }),
-      [flattenedGroupOptions, group, groupPresenter, groupQuestions]
+      [
+         adminGroups,
+         flattenedGroupOptions,
+         group,
+         groupPresenter,
+         groupQuestions,
+      ]
    )
 
    return (
@@ -135,14 +179,15 @@ const GroupDashboardLayout = (props) => {
                <PageChildrenWrapper
                   sx={[isDesktop && styles.childrenWrapperResponsive]}
                >
-                  {!isLoaded(group) || !isLoggedIn ? (
+                  {loadingGroup || !isAdmin || !isCorrectGroup ? (
                      <CircularProgress sx={{ margin: "auto" }} />
-                  ) : isEmpty(group) || !isCorrectGroup ? (
+                  ) : isEmpty(group) ? (
                      <Typography variant={"h6"} sx={{ margin: "auto" }}>
                         Group not found
                      </Typography>
                   ) : (
                      React.Children.map(children, (child) =>
+                        // @ts-ignore
                         React.cloneElement(child, {
                            notifications,
                            isAdmin,
