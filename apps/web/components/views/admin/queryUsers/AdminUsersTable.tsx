@@ -21,6 +21,7 @@ import { universityCountriesMap } from "../../../util/constants/universityCountr
 import { University } from "@careerfairy/shared-lib/dist/universities"
 import UniversityCountriesFilter from "./UniversityCountriesFilter"
 import UniversitiesFilter from "./UniversitiesFilter"
+import GenericFilterSelector from "./GenericFilterSelector"
 
 interface UserTableProps {
    users: BigQueryUserResponse[]
@@ -117,21 +118,44 @@ const AdminUsersTable = ({
             field: "universityName",
             title: "University",
             filtering: false,
+            cellStyle: {
+               minWidth: 200,
+            },
          },
          {
             field: "fieldOfStudyId",
             title: "Field of study",
             lookup: fieldsOfStudyLookup,
-            defaultFilter: queryOptions.filters.fieldOfStudyIds,
-            filterCellStyle: {
-               maxWidth: "400px",
+            filterComponent: () => {
+               return (
+                  <GenericFilterSelector
+                     entries={allFieldsOfStudy}
+                     fieldName={"fieldOfStudyIds"}
+                     noOptionsText={"All Fields of Study"}
+                     inputPlaceholderText={"Fields of Study"}
+                     setOptions={setOptions}
+                     queryOptions={queryOptions}
+                  />
+               )
             },
          },
          {
             field: "levelOfStudyId",
             title: "Level of study",
             lookup: levelsOfStudyLookup,
-            defaultFilter: queryOptions.filters.levelOfStudyIds,
+            filterComponent: () => {
+               return (
+                  <GenericFilterSelector
+                     entries={allLevelsOfStudy}
+                     fieldName={"levelOfStudyIds"}
+                     noOptionsText={"All Level of Study"}
+                     inputPlaceholderText={"Level of Study"}
+                     setOptions={setOptions}
+                     queryOptions={queryOptions}
+                     sx={{ minWidth: 150 }}
+                  />
+               )
+            },
          },
          {
             field: "unsubscribed",

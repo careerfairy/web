@@ -41,6 +41,7 @@ const UniversityCountriesFilter = ({
                page: 0,
             }))
          }}
+         size="small"
          value={universityCountries.filter((universityCountry) =>
             queryOptions.filters.universityCountryCodes.includes(
                universityCountry.id
@@ -60,7 +61,7 @@ const UniversityCountriesFilter = ({
             <TextField
                {...params}
                name={"universityCountry"}
-               label={"Choose a University Country"}
+               label={"University Country"}
             />
          )}
       />
