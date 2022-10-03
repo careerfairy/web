@@ -70,7 +70,7 @@ exports.deleteGroupAdminDashboardInvite =
    groupAdmin.deleteGroupAdminDashboardInvite
 exports.createGroup = groupAdmin.createGroup
 exports.changeRole = groupAdmin.changeRole
-exports.kickFromDashboard = groupAdmin.kickFromDashboard
+exports.kickFromDashboard_v2 = groupAdmin.kickFromDashboard_v2
 
 // Reminders
 exports.sendReminderEmailToRegistrants =
