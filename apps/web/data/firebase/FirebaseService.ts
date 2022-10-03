@@ -35,6 +35,7 @@ import {
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import DocumentReference = firebase.firestore.DocumentReference
+import CookiesUtil from "../../util/CookiesUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2181,7 +2182,7 @@ class FirebaseService {
                   // that applies the rewards
                   referral: getReferralInformation(),
                   // Store the utm params if they exist
-                  utm: SessionStorageUtil.getUTMParams(),
+                  utm: CookiesUtil.getUTMParams(),
                   referrer: SessionStorageUtil.getReferrer(),
                   // @ts-ignore
                   date: this.getServerTimestamp(),

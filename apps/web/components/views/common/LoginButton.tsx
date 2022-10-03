@@ -8,14 +8,18 @@ const styles = {
       color: (theme) => [theme.palette.common.white, "important"],
    },
 }
-const LoginButton = ({}) => {
+const LoginButton = () => {
    const { asPath } = useRouter()
    return (
       <Button
          fullWidth
          sx={styles.root}
          component={Link}
-         href={`/login?absolutePath=${asPath}`}
+         // @ts-ignore
+         href={{
+            pathname: "/login",
+            query: { absolutePath: asPath },
+         }}
          style={{ textDecoration: "none" }}
          color="primary"
          variant="contained"
