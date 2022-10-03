@@ -722,10 +722,10 @@ export async function validateGroupDashboardInvite(
    const isValidEmail = groupDashboardInvite.invitedEmail === currentUserEmail
 
    if (!isValidEmail) {
-      logAndThrow(
-         WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
-         groupDashboardInvite.invitedEmail
-      )
+      logAndThrow(WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE, {
+         invitedEmail: groupDashboardInvite.invitedEmail,
+         currentUserEmail,
+      })
    }
 
    return { group, groupDashboardInvite, isAlreadyGroupMember }
