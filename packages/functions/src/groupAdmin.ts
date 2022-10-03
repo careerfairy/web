@@ -465,12 +465,14 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
 
       const { recipientEmail, groupName, senderFirstName, groupId, role } = data
 
+      const targetEmail = recipientEmail.trim().toLowerCase()
+
       const userEmail = context.auth.token.email
       await validateUserIsGroupAdminOwnerRole(userEmail, groupId)
 
       // Check if the user exists in our platform, allow fail
       const authUser = await auth()
-         .getUserByEmail(recipientEmail)
+         .getUserByEmail(targetEmail)
          .catch(() => null)
 
       if (authUser) {
@@ -482,7 +484,7 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
          // If the user exists and is already a member of the group, throw an error
          if (isAlreadyGroupMember) {
             logAndThrow(
-               `A member with email ${recipientEmail} is already a member of group`,
+               `A member with email ${targetEmail} is already a member of group`,
                {
                   groupId,
                }
@@ -494,7 +496,7 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
 
       const newInvite = await groupRepo.createGroupDashboardInvite(
          groupId,
-         recipientEmail,
+         targetEmail,
          role
       )
 
@@ -507,7 +509,7 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
       const email = {
          TemplateId: process.env.POSTMARK_TEMPLATE_GROUP_ADMIN_INVITATION,
          From: "CareerFairy <noreply@careerfairy.io>",
-         To: recipientEmail,
+         To: targetEmail,
          TemplateModel: {
             sender_first_name: senderFirstName,
             group_name: groupName,
@@ -719,7 +721,9 @@ export async function validateGroupDashboardInvite(
       logAndThrow("Invalid role", groupDashboardInvite.role)
    }
 
-   const isValidEmail = groupDashboardInvite.invitedEmail === currentUserEmail
+   const isValidEmail =
+      groupDashboardInvite.invitedEmail.trim().toLowerCase() ===
+      currentUserEmail.trim().toLowerCase()
 
    if (!isValidEmail) {
       logAndThrow(WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE, {
