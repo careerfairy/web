@@ -109,21 +109,21 @@ export type ReminderData = {
    template: string
 }
 
-const Reminder5Min: ReminderData = {
+export const Reminder5Min: ReminderData = {
    template: "variable_message_title",
    timeMessage: "NOW",
    minutesBefore: 5,
    key: "reminder5Minutes",
 }
 
-const Reminder1Hour: ReminderData = {
+export const Reminder1Hour: ReminderData = {
    template: "variable_message_title",
    timeMessage: "in 1 hour",
    minutesBefore: 60,
    key: "reminder1Hour",
 }
 
-const Reminder24Hours: ReminderData = {
+export const Reminder24Hours: ReminderData = {
    template: "variable_message_title",
    timeMessage: "TOMORROW",
    minutesBefore: 1440,
@@ -143,7 +143,7 @@ export const scheduleReminderEmails = functions
    })
    .pubsub.schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
-   .onRun((context) => {
+   .onRun(() => {
       const batch = admin.firestore().batch()
 
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
