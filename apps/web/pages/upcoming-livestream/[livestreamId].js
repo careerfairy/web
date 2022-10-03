@@ -3,7 +3,10 @@ import { getServerSideStream, parseStreamDates } from "../../util/serverUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { getResizedUrl } from "../../components/helperFunctions/HelperFunctions"
+import {
+   getBaseUrl,
+   getResizedUrl,
+} from "../../components/helperFunctions/HelperFunctions"
 import HeroSection from "../../components/views/upcoming-livestream/HeroSection"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
@@ -47,7 +50,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    const [unfilteredGroups, setUnfilteredGroups] = useState([])
 
-   const { authenticatedUser, userData, isLoggedOut } = useAuth()
+   const { authenticatedUser, userData, isLoggedOut, isLoggedIn } = useAuth()
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
    const handleOpenJoinModal = useCallback(
       () =>
@@ -248,25 +251,16 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [isPastEvent, stream, authenticatedUser, registered])
 
    const linkToStream = useMemo(() => {
-      const notLoggedIn =
-         (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
-         !auth?.currentUser?.emailVerified
-      const registerQuery = notLoggedIn ? `&register=${stream.id}` : ""
-      const referrerQuery = query.referrerId
-         ? `&referrerId=${query.referrerId}`
-         : ""
-      const groupIdQuery = query.groupId ? `&groupId=${query.groupId}` : ""
-      const queries = `${registerQuery}${referrerQuery}${groupIdQuery}`
-      const basePath = `/upcoming-livestream/${stream.id}`
-      return queries ? `${basePath}?${queries}` : basePath
-   }, [
-      asPath,
-      stream?.id,
-      query.groupId,
-      authenticatedUser,
-      query.referrerId,
-      auth?.currentUser?.emailVerified,
-   ])
+      const url = new URL(getBaseUrl() + asPath)
+
+      const cannotRegister = !isLoggedIn || !auth?.currentUser?.emailVerified
+
+      if (cannotRegister) {
+         url.searchParams.append("register", stream.id) // add the register param so that the user auto registers when they get redirected on log in/sign up
+      }
+
+      return url.toString()
+   }, [asPath, isLoggedIn, auth?.currentUser?.emailVerified, stream.id])
 
    const numberOfSpotsRemaining = useMemo(() => {
       if (!stream.maxRegistrants) return 0
