@@ -8,30 +8,22 @@ import { styled } from "@mui/material/styles"
 // Add support for the sx prop for consistency with the other branches.
 const Anchor = styled("a")({})
 
-// @ts-ignore
 interface NextLinkComposedProps
    extends Omit<React.AnchorHTMLAttributes<HTMLAnchorElement>, "href">,
-      Omit<NextLinkProps, "href" | "as" | "onClick" | "onMouseEnter"> {
+      Omit<
+         NextLinkProps,
+         "href" | "as" | "onClick" | "onMouseEnter" | "onTouchStart"
+      > {
    to: NextLinkProps["href"]
    linkAs?: NextLinkProps["as"]
-   href?: NextLinkProps["href"]
 }
 
 export const NextLinkComposed = React.forwardRef<
    HTMLAnchorElement,
    NextLinkComposedProps
 >(function NextLinkComposed(props, ref) {
-   const {
-      to,
-      linkAs,
-      href,
-      replace,
-      scroll,
-      shallow,
-      prefetch,
-      locale,
-      ...other
-   } = props
+   const { to, linkAs, replace, scroll, shallow, prefetch, locale, ...other } =
+      props
 
    return (
       <NextLink
@@ -66,11 +58,17 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
 ) {
    const {
       activeClassName = "active",
-      as: linkAs,
+      as,
       className: classNameProps,
       href,
+      linkAs: linkAsProp,
+      locale,
       noLinkStyle,
+      prefetch,
+      replace,
       role, // Link don't have roles.
+      scroll,
+      shallow,
       ...other
    } = props
 
@@ -94,12 +92,23 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
       return <MuiLink className={className} href={href} ref={ref} {...other} />
    }
 
+   const linkAs = linkAsProp || as
+   const nextjsProps = {
+      to: href,
+      linkAs,
+      replace,
+      scroll,
+      shallow,
+      prefetch,
+      locale,
+   }
+
    if (noLinkStyle) {
       return (
          <NextLinkComposed
             className={className}
             ref={ref}
-            to={href}
+            {...nextjsProps}
             {...other}
          />
       )
@@ -108,10 +117,9 @@ const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(function Link(
    return (
       <MuiLink
          component={NextLinkComposed}
-         linkAs={linkAs}
          className={className}
          ref={ref}
-         to={href}
+         {...nextjsProps}
          {...other}
       />
    )
