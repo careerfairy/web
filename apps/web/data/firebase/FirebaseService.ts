@@ -124,7 +124,7 @@ class FirebaseService {
    }
 
    kickFromDashboard = async (args: { groupId: string; email: string }) => {
-      return this.functions.httpsCallable("kickFromDashboard")(args)
+      return this.functions.httpsCallable("kickFromDashboard_v2")(args)
    }
 
    sendNewlyPublishedEventEmail = async (emailData) => {
