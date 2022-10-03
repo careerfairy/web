@@ -13,7 +13,6 @@ import React, { useCallback, useMemo, useState } from "react"
 import { marketingServiceInstance } from "../../../data/firebase/MarketingService"
 import { Formik } from "formik"
 import * as yup from "yup"
-import SessionStorageUtil from "util/SessionStorageUtil"
 import { marketingSignUpFormId } from "../constants"
 import {
    HygraphResponseButton,
@@ -24,6 +23,7 @@ import { useRouter } from "next/router"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import CmsImage from "../image"
 import { useMarketingLandingPage } from "./MarketingLandingPageProvider"
+import CookiesUtil from "../../../util/CookiesUtil"
 
 const styles = sxStyles({
    largeContainer: {
@@ -159,7 +159,7 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
                lastName: values.lastName,
                email: values.email.trim(),
                fieldOfStudyId: values.fieldOfStudyId,
-               utmParams: SessionStorageUtil.getUTMParams() ?? {},
+               utmParams: CookiesUtil.getUTMParams() ?? {},
             })
             .then((_) => {
                setFormCompleted(true)
