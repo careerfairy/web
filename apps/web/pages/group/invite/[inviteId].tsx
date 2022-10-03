@@ -78,7 +78,7 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
 
    const renderView = useMemo(() => {
       // check if error is bad request
-      const isWrongEmailError = error.message?.includes(
+      const isWrongEmailError = error?.message?.includes(
          WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE
       )
 
