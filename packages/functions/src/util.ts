@@ -74,9 +74,9 @@ export const generateReminderEmailData = (
 
    const subjectMap = {
       [Reminder5Min.key]: `🔥 NOW: Meet ${company} Live!`,
-      [Reminder1Hour.key]: `🔥 Reminder: ${company} in 1 hour!`,
+      [Reminder1Hour.key]: `🔥 Reminder: Meet ${company} in 1 hour!`,
       [Reminder24Hours.key]: `🔥 Reminder: Meet ${company} tomorrow!`,
-      fallback: `Reminder: Live Stream with ${company} at ${formattedDate}`,
+      fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
    }
 
    // create email data for all the registered users chunks
