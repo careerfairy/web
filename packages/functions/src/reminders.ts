@@ -105,25 +105,25 @@ const emailMaxChunkSize = 950
 export type ReminderData = {
    timeMessage: string
    minutesBefore: number
-   key: string
+   key: "reminder5Minutes" | "reminder1Hour" | "reminder24Hours"
    template: string
 }
 
-export const Reminder5Min: ReminderData = {
+const Reminder5Min: ReminderData = {
    template: "variable_message_title",
    timeMessage: "NOW",
    minutesBefore: 5,
    key: "reminder5Minutes",
 }
 
-export const Reminder1Hour: ReminderData = {
+const Reminder1Hour: ReminderData = {
    template: "variable_message_title",
    timeMessage: "in 1 hour",
    minutesBefore: 60,
    key: "reminder1Hour",
 }
 
-export const Reminder24Hours: ReminderData = {
+const Reminder24Hours: ReminderData = {
    template: "variable_message_title",
    timeMessage: "TOMORROW",
    minutesBefore: 1440,

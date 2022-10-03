@@ -8,12 +8,7 @@ import { promisify } from "util"
 import * as zlib from "zlib"
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
-import {
-   Reminder1Hour,
-   Reminder24Hours,
-   Reminder5Min,
-   ReminderData,
-} from "./reminders"
+import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 
 export const setHeaders = (req, res) => {
@@ -72,10 +67,10 @@ export const generateReminderEmailData = (
       emailMaxChunkSize
    )
 
-   const subjectMap = {
-      [Reminder5Min.key]: `🔥 NOW: Meet ${company} Live!`,
-      [Reminder1Hour.key]: `🔥 Reminder: Meet ${company} in 1 hour!`,
-      [Reminder24Hours.key]: `🔥 Reminder: Meet ${company} tomorrow!`,
+   const subjectMap: Record<ReminderData["key"] | "fallback", string> = {
+      reminder5Minutes: `🔥 NOW: Meet ${company} Live!`,
+      reminder1Hour: `🔥 Reminder: Meet ${company} in 1 hour!`,
+      reminder24Hours: `🔥 Reminder: Meet ${company} tomorrow!`,
       fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
    }
 
