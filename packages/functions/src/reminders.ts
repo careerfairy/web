@@ -105,7 +105,7 @@ const emailMaxChunkSize = 950
 export type ReminderData = {
    timeMessage: string
    minutesBefore: number
-   key: string
+   key: "reminder5Minutes" | "reminder1Hour" | "reminder24Hours"
    template: string
 }
 
@@ -143,7 +143,7 @@ export const scheduleReminderEmails = functions
    })
    .pubsub.schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
-   .onRun((context) => {
+   .onRun(() => {
       const batch = admin.firestore().batch()
 
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
