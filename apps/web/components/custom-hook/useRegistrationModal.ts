@@ -19,7 +19,7 @@ const useRegistrationModal = (
       query: { groupId },
       asPath,
    } = useRouter()
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, isLoggedIn } = useAuth()
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const handleCloseJoinModal = useCallback(
       () => setJoinGroupModalData(undefined),
@@ -52,11 +52,7 @@ const useRegistrationModal = (
                )
             } else {
                const emailVerified = firebase.auth?.currentUser?.emailVerified
-               if (
-                  (authenticatedUser.isLoaded && authenticatedUser.isEmpty) ||
-                  // TODO Must re-enable this after fixing the cloud function validateUserEmailWithPin promise bug
-                  !emailVerified
-               ) {
+               if (!isLoggedIn || !emailVerified) {
                   return push({
                      pathname: `/login`,
                      query: {
@@ -76,11 +72,15 @@ const useRegistrationModal = (
          }
       },
       [
+         firebase,
          authenticatedUser,
+         isLoggedIn,
+         handleOpenJoinModal,
+         push,
          groupId,
-         asPath,
          useCurrentPath,
-         firebase?.auth?.currentUser?.emailVerified,
+         asPath,
+         dispatch,
       ]
    )
 

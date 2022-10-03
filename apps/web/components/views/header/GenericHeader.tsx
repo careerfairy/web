@@ -11,7 +11,7 @@ import useGeneralLinks, {
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import LoginButton from "../../../components/views/common/LoginButton"
+import LoginButton from "../common/LoginButton"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
