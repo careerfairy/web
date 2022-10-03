@@ -21,7 +21,13 @@ type GroupInvitePageProps = InferGetServerSidePropsType<
    typeof getServerSideProps
 >
 const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
-   const { isLoggedIn, isLoggedOut, refetchClaims, signOut } = useAuth()
+   const {
+      isLoggedIn,
+      isLoggedOut,
+      refetchClaims,
+      signOut,
+      authenticatedUser,
+   } = useAuth()
    const {
       replace,
       asPath,
@@ -72,18 +78,27 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
 
    const renderView = useMemo(() => {
       // check if error is bad request
+      const isWrongEmailError = error.message?.includes(
+         WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE
+      )
+
       if (error) {
          return (
             <Stack spacing={2} direction="column" alignItems="center">
                <MainLogo />
+               {isWrongEmailError && (
+                  <Typography align={"center"} variant={"h5"}>
+                     This invite is not for your currently logged in account:{" "}
+                     <b>{authenticatedUser?.email}</b>
+                  </Typography>
+               )}
                <Typography align={"center"} variant={"h6"}>
                   {error.message?.replace("Error: ", "")}
                </Typography>
-               {error.message?.includes(
-                  WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE
-               ) && (
-                  <Button onClick={signOut}>
-                     Logout and login with the correct email
+               {isWrongEmailError && (
+                  <Button variant={"contained"} onClick={signOut}>
+                     Click here to logout and {flow || "login"} with the correct
+                     email
                   </Button>
                )}
             </Stack>
@@ -91,7 +106,7 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
       }
 
       return <CircularProgress />
-   }, [error, signOut])
+   }, [authenticatedUser?.email, error, flow, signOut])
 
    return (
       <GeneralLayout fullScreen>
