@@ -616,7 +616,7 @@ export const changeRole = functions.https.onCall(async (data, context) => {
 /*
  * Keep the kick and change role functions separate, to avoid the wrong user being kicked
  * */
-export const kickFromDashboard = functions.https.onCall(
+export const kickFromDashboard_v2 = functions.https.onCall(
    async (data, context) => {
       try {
          await validateData(

@@ -6,10 +6,10 @@ import { ClientError } from "graphql-request"
 import * as crypto from "crypto"
 import { promisify } from "util"
 import * as zlib from "zlib"
-import functions = require("firebase-functions")
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
+import functions = require("firebase-functions")
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -67,18 +67,23 @@ export const generateReminderEmailData = (
       emailMaxChunkSize
    )
 
+   const subjectMap: Record<ReminderData["key"] | "fallback", string> = {
+      reminder5Minutes: `🔥 NOW: Meet ${company} Live!`,
+      reminder1Hour: `🔥 Reminder: Meet ${company} in 1 hour!`,
+      reminder24Hours: `🔥 Reminder: Meet ${company} tomorrow!`,
+      fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
+   }
+
    // create email data for all the registered users chunks
    return registeredUsersChunks.map((registeredUsersChunk) => {
-      const emailData = {
+      return {
          from: "CareerFairy <noreply@careerfairy.io>",
          to: registeredUsersChunk,
-         subject: `Reminder: Live Stream with ${company} at ${formattedDate}`,
+         subject: subjectMap[reminder.key] || subjectMap.fallback,
          template: reminder.template,
          "recipient-variables": JSON.stringify(templateData),
          "o:deliverytime": dateToDelivery,
       }
-
-      return emailData
    })
 }
 
