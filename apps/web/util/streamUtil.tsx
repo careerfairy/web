@@ -3,6 +3,7 @@ import {
    LivestreamEvent,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -101,9 +102,16 @@ export const getLinkToStream = (
    shouldAutoRegister?: boolean,
    asPath?: string
 ) => {
-   const registerQuery = shouldAutoRegister ? `&register=${event.id}` : ""
-   if (asPath) return `${asPath}?livestreamId=${event.id}${registerQuery}`
-   return groupId
-      ? `/next-livestreams/${groupId}?livestreamId=${event.id}${registerQuery}`
-      : `/next-livestreams?livestreamId=${event.id}${registerQuery}`
+   const path =
+      asPath || (groupId ? `/next-livestreams/${groupId}` : `/next-livestreams`)
+
+   const url = new URL(path, getBaseUrl())
+
+   url.searchParams.set("livestreamId", event.id)
+
+   if (shouldAutoRegister) {
+      url.searchParams.set("register", event.id)
+   }
+
+   return url.toString()
 }

@@ -2,6 +2,7 @@ import { useRouter } from "next/router"
 import { useEffect } from "react"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import { UTMKeys } from "@careerfairy/shared-lib/dist/commonTypes"
+import CookiesUtil from "../../util/CookiesUtil"
 
 const useStoreUTMQueryParams = () => {
    const router = useRouter()
@@ -15,7 +16,7 @@ const useStoreUTMQueryParams = () => {
       }
 
       if (Object.keys(utmParamsFound).length > 0) {
-         SessionStorageUtil.setUTMParams(utmParamsFound)
+         CookiesUtil.setUTMParams(utmParamsFound)
       }
 
       if (document?.referrer) {
