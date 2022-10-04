@@ -612,15 +612,15 @@ export class FirebaseGroupRepository
          batch.set(userAdminGroupsRef, userAdminGroupsDataToSave, {
             merge: true,
          })
-
-         batch.update(userRef, {
-            refreshTokenTime: this.fieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
-         })
       } else {
          // If no role is provided, then we are removing the user as an admin
          batch.delete(groupAdminsRef)
          batch.delete(userAdminGroupsRef)
       }
+
+      batch.update(userRef, {
+         refreshTokenTime: this.fieldValue.serverTimestamp(), // update the user's refresh token time to force a refresh of the user's custom claims in the auth provider
+      })
 
       return batch.commit()
    }
