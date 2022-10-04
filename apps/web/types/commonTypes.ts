@@ -22,7 +22,9 @@ export type StylesProps = {
  */
 export function sxStyles<
    K extends string,
-   V extends SystemStyleObject<DefaultTheme>
+   V extends
+      | SystemStyleObject<DefaultTheme>
+      | ((theme: DefaultTheme) => SystemStyleObject<DefaultTheme>)
 >(obj: Record<K, V>): Record<K, V> {
    return obj
 }

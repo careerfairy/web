@@ -1,12 +1,11 @@
-import React, { FC, useState } from "react"
+import React, { useState } from "react"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import DialogTitle from "@mui/material/DialogTitle"
-import { Stack } from "@mui/material"
-import OptionCard from "../common/OptionCard"
+import StepsView from "../common/StepsView"
 import { useRouter } from "next/router"
 
-const UidConflict: FC = (props) => {
+const UidConflict = () => {
    const router = useRouter()
    const [steps] = useState([
       {
@@ -21,11 +20,7 @@ const UidConflict: FC = (props) => {
             You seem to have the stream open on another window:
          </DialogTitle>
          <DialogContent dividers>
-            <Stack spacing={2}>
-               {steps.map((step, index) => (
-                  <OptionCard {...step} number={index + 1} key={step.title} />
-               ))}
-            </Stack>
+            <StepsView steps={steps} />
          </DialogContent>
       </Dialog>
    )
