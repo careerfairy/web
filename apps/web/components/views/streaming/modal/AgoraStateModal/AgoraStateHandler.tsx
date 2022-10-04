@@ -1,4 +1,12 @@
-import React, { FC, memo, useEffect, useMemo, useState } from "react"
+import React, {
+   ComponentProps,
+   FC,
+   memo,
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import RootState from "store/reducers"
@@ -8,14 +16,15 @@ import DebugModal from "./ModalViews/DebugModal"
 import UidConflict from "./ModalViews/UidConflict"
 import { rtcMessages } from "types/streaming"
 import { AlertProps } from "@mui/material/Alert/Alert"
-import { OptionCardProps } from "./common/OptionCard"
 import { useRouter } from "next/router"
 import ScreenShareDeniedModal from "./ModalViews/ScreenShareDeniedModal"
 import { animateProfileIcon } from "../../../../../store/actions/streamActions"
 import { ANIMATE_PROFILE_ICON_AFTER_MS } from "../../../../../constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../store/selectors/streamSelectors"
+import { StepCard } from "./common/StepsView"
 
 interface Props {}
+type Step = ComponentProps<typeof StepCard>
 
 const AgoraStateHandler: FC<Props> = () => {
    const dispatch = useDispatch()
@@ -27,31 +36,87 @@ const AgoraStateHandler: FC<Props> = () => {
       return state.stream.agoraState.rtcError
    })
 
-   const networkErrorStep = {
-      description: "Sometimes a simple refresh might resolve the issue.",
-      actionButtonProps: {
-         children: "Refresh",
-         onClick: router.reload,
-         sx: { mt: 1, mx: "auto" },
-      },
-      onClick: () => router.reload(),
-      title: "Try Refreshing",
-   }
-   const steps: OptionCardProps[] = useMemo(
+   const networkErrorStep: Step = useMemo(
+      () => ({
+         description: "Sometimes a simple refresh might resolve the issue.",
+         actionButtonProps: {
+            children: "Refresh",
+            onClick: router.reload,
+            variant: "contained",
+            color: "secondary",
+         },
+         title: "Try Refreshing",
+      }),
+      [router.reload]
+   )
+
+   const steps: Step[] = useMemo(
       () => [
          {
             title: "Change Network",
             description:
                "Try disconnecting from any VPN, switching to another " +
-               "network or use a mobile hotspot.",
+               "network or use a mobile hotspot. and click refresh once done.",
             actionButtonProps: {
                onClick: router.reload,
-               children: "Click here to refresh once done ",
-               sx: { mt: 1, mx: "auto" },
+               children: "Refresh",
+               variant: "contained",
+               color: "secondary",
             },
          },
       ],
+      [router.reload]
+   )
+
+   const sendRTCSateToast = useCallback(
+      (
+         rtcStatus: ConnectionState,
+         variant: AlertProps["severity"],
+         persist?: boolean
+      ) => {
+         dispatch(
+            actions.enqueueSnackbar({
+               message: rtcMessages[rtcStatus],
+               options: {
+                  variant: variant,
+                  preventDuplicate: true,
+                  key: rtcStatus,
+                  persist: Boolean(persist),
+               },
+            })
+         )
+      },
+      [dispatch]
+   )
+
+   const showConnectionStateModal = useCallback(
+      (additionalSteps?: Step[]) =>
+         setView(() => (
+            <ConnectionStateModal
+               steps={additionalSteps ? [...additionalSteps, ...steps] : steps}
+            />
+         )),
+      [steps]
+   )
+
+   const showDebugModal = useCallback(
+      () => setView(() => <DebugModal steps={steps} />),
+      [steps]
+   )
+   const showUidConflictModal = useCallback(
+      () => setView(() => <UidConflict />),
       []
+   )
+
+   const sendConnectedToast = useCallback(() => {
+      sendRTCSateToast("CONNECTED", "success")
+   }, [sendRTCSateToast])
+
+   const closeToast = useCallback(
+      (key: ConnectionState) => {
+         dispatch(actions.closeSnackbar(key))
+      },
+      [dispatch]
    )
 
    useEffect(() => {
@@ -100,7 +165,15 @@ const AgoraStateHandler: FC<Props> = () => {
             setView(null)
          }
       })()
-   }, [agoraRtcConnectionStatus])
+   }, [
+      agoraRtcConnectionStatus,
+      closeToast,
+      dispatch,
+      networkErrorStep,
+      sendConnectedToast,
+      showConnectionStateModal,
+      showUidConflictModal,
+   ])
 
    useEffect(() => {
       ;(function handleError() {
@@ -118,43 +191,7 @@ const AgoraStateHandler: FC<Props> = () => {
                return null
          }
       })()
-   }, [agoraRtcError?.code])
-
-   const sendRTCSateToast = (
-      rtcStatus: ConnectionState,
-      variant: AlertProps["severity"],
-      persist?: boolean
-   ) => {
-      dispatch(
-         actions.enqueueSnackbar({
-            message: rtcMessages[rtcStatus],
-            options: {
-               variant: variant,
-               preventDuplicate: true,
-               key: rtcStatus,
-               persist: Boolean(persist),
-            },
-         })
-      )
-   }
-
-   const showConnectionStateModal = (additionalSteps?: OptionCardProps[]) =>
-      setView(() => (
-         <ConnectionStateModal
-            steps={additionalSteps ? [...additionalSteps, ...steps] : steps}
-         />
-      ))
-   const showDebugModal = () => setView(() => <DebugModal steps={steps} />)
-   const showUidConflictModal = () => setView(() => <UidConflict />)
-
-   const sendConnectedToast = () => sendRTCSateToast("CONNECTED", "success")
-   const sendConnectingToast = () => sendRTCSateToast("CONNECTING", "info")
-   const sendReconnectingToast = () =>
-      sendRTCSateToast("RECONNECTING", "warning", true)
-
-   const closeToast = (key: ConnectionState) => {
-      dispatch(actions.closeSnackbar(key))
-   }
+   }, [agoraRtcError?.code, showDebugModal, showUidConflictModal])
 
    return (
       <>
