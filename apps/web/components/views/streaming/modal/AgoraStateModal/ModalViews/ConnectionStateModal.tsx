@@ -1,40 +1,52 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { ComponentProps, FC, useEffect, useState } from "react"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import {
    CircularProgress,
    Collapse,
    DialogTitle,
+   Divider,
    Stack,
    Typography,
 } from "@mui/material"
 import HighlightOffIcon from "@mui/icons-material/HighlightOff"
 import { useSelector } from "react-redux"
 import { rtcMessages } from "types/streaming"
-import OptionCard, { OptionCardProps } from "../common/OptionCard"
 import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../../store/selectors/streamSelectors"
+import { sxStyles } from "../../../../../../types/commonTypes"
+import ResourcesView, { dummyResources } from "../common/ResourcesView"
+import StepsView, { StepCard } from "../common/StepsView"
+import FaqView, { dummyFaqElements } from "../common/FaqView"
 
 interface Props {
-   steps: OptionCardProps[]
+   steps: ComponentProps<typeof StepCard>[]
 }
 
+const styles = sxStyles({
+   divider: {
+      mx: (theme) => `${theme.spacing(5)} !important`,
+      bgcolor: "none",
+      borderBottom: (theme) => `2px solid ${theme.palette.tertiary.main}`,
+   },
+})
+
 const loadingTimeLimit = RTC_CLIENT_RECONNECT_LIMIT
-const ConnectionStateModal: FC<Props> = (props) => {
+const ConnectionStateModal: FC<Props> = ({ steps }) => {
    const [showDebugPrompt, setShowDebugPrompt] = useState(false)
 
    const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
 
+   const inALoadingState = [
+      "CONNECTING",
+      "RECONNECTING",
+      "DISCONNECTED",
+   ].includes(agoraRtcConnectionStatus.curState)
+
    useEffect(() => {
       let mounted = true
 
-      const { curState } = agoraRtcConnectionStatus
       let timeout
-      const inALoadingState = [
-         "CONNECTING",
-         "RECONNECTING",
-         "DISCONNECTED",
-      ].includes(curState)
 
       if (agoraRtcConnectionStatus.curState === "DISCONNECTED") {
          setShowDebugPrompt(true)
@@ -58,15 +70,13 @@ const ConnectionStateModal: FC<Props> = (props) => {
          mounted = false
          clearTimeout(timeout)
       }
-   }, [agoraRtcConnectionStatus])
+   }, [agoraRtcConnectionStatus, inALoadingState])
 
    return (
       <Dialog open={true}>
          <DialogTitle>
-            <Stack alignItems="center" sx={{ py: 3 }} spacing={2}>
-               {["CONNECTING", "RECONNECTING", "DISCONNECTING"].includes(
-                  agoraRtcConnectionStatus.curState
-               ) && <CircularProgress />}
+            <Stack alignItems="center" sx={{ py: 2 }} spacing={2}>
+               {inALoadingState && <CircularProgress />}
                {agoraRtcConnectionStatus.curState === "DISCONNECTED" && (
                   <HighlightOffIcon color="error" fontSize="large" />
                )}
@@ -75,18 +85,21 @@ const ConnectionStateModal: FC<Props> = (props) => {
                </Typography>
             </Stack>
          </DialogTitle>
-         <Collapse in={showDebugPrompt}>
-            <DialogContent dividers>
-               <Stack spacing={2}>
-                  <Typography variant="h6">
-                     {"We're "} having trouble connecting you with CareerFairy:
-                  </Typography>
-                  {props.steps.map((step) => (
-                     <OptionCard {...step} key={step.title} />
-                  ))}
+         <DialogContent>
+            <Collapse in={showDebugPrompt}>
+               <Typography align={"center"} variant="h5">
+                  {"We're "} having trouble connecting you with CareerFairy:
+               </Typography>
+               <Stack
+                  divider={<Divider variant={"middle"} sx={styles.divider} />}
+                  spacing={2}
+               >
+                  <StepsView steps={steps} />
+                  <ResourcesView options={dummyResources} />
+                  <FaqView faqElements={dummyFaqElements} />
                </Stack>
-            </DialogContent>
-         </Collapse>
+            </Collapse>
+         </DialogContent>
       </Dialog>
    )
 }
