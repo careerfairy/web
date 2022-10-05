@@ -1,4 +1,4 @@
-import caseStudyRepo from "../../../data/graphcms/CaseStudyRepository"
+import caseStudyRepo from "../../../data/hygraph/CaseStudyRepository"
 import SEO from "../../../components/util/SEO"
 import CaseStudyLayout from "../../../layouts/CaseStudyLayout"
 import Hero from "../../../components/views/case-study/Hero"

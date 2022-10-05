@@ -1,16 +1,8 @@
 import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
 import {
-   HygraphResponseCompanyLogosValue,
-   HygraphResponseCompanyValues,
-   HygraphResponseEventsSection,
-   HygraphResponseHero,
-   HygraphResponseHighlightList,
    HygraphResponseMarketingPage,
-   HygraphResponseMarketingSignup,
+   HygraphResponseMarketingPageBlock,
    HygraphResponseSeo,
-   HygraphResponseTestimonialListValue,
-   HygraphResponseTestimonialValue,
-   HygraphResponseTextBlock,
 } from "../../types/cmsTypes"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
@@ -19,18 +11,8 @@ export class MarketingLandingPage extends BaseModel {
       public readonly id: string,
       public readonly slug: string,
       public readonly fieldsOfStudy: FieldOfStudy[],
-      public readonly seo: HygraphResponseSeo,
-      public readonly blocks: (
-         | HygraphResponseEventsSection
-         | HygraphResponseMarketingSignup
-         | HygraphResponseHero
-         | HygraphResponseCompanyValues
-         | HygraphResponseTestimonialValue
-         | HygraphResponseTestimonialListValue
-         | HygraphResponseCompanyLogosValue
-         | HygraphResponseTextBlock
-         | HygraphResponseHighlightList
-      )[]
+      public readonly seo: HygraphResponseSeo, // TODO: convert the response type into a business model
+      public readonly blocks: HygraphResponseMarketingPageBlock[] // TODO: convert the response types into a business model
    ) {
       super()
    }

@@ -121,6 +121,15 @@ export interface HygraphResponseHero {
    fullScreenImage?: boolean
    component?: HygraphFieldOfStudySelectResponse
 }
+export interface HygraphResponseGridBlock {
+   __typename: string
+   id: string
+   slug: string
+   numberOfColumns: 1 | 2 | 3 | 4
+   title?: string
+   headline?: string
+   subtitle?: string // markdown string
+}
 
 export interface HygraphResponseCompanyValues {
    __typename: string
@@ -208,6 +217,7 @@ export type PageTypes =
    | "COMPANY_CASE_STUDY"
    | "MARKETING_LANDING_PAGE"
    | "LANDING_PAGE"
+   | "FAQ_PAGE"
 
 export interface HygraphRemoteFieldOfStudyResponse {
    fieldOfStudyId: string
@@ -223,21 +233,34 @@ export interface HygraphResponseMarketingPage {
    fieldOfStudies: HygraphRemoteFieldOfStudyResponse[]
    pageType: PageTypes
    seo: HygraphResponseSeo
-   blocks: (
-      | HygraphResponseEventsSection
-      | HygraphResponseMarketingSignup
-      | HygraphResponseHero
-   )[]
+   blocks: HygraphResponseMarketingPageBlock[]
 }
+
+export type HygraphResponseMarketingPageBlock =
+   | HygraphResponseEventsSection
+   | HygraphResponseMarketingSignup
+   | HygraphResponseHero
+   | HygraphResponseCompanyValues
+   | HygraphResponseTestimonialValue
+   | HygraphResponseTestimonialListValue
+   | HygraphResponseCompanyLogosValue
+   | HygraphResponseTextBlock
+   | HygraphResponseHighlightList
+
 export interface HygraphResponsePage {
    id: string
-   title: string
-   subtitle: string
    slug: string
+   pageType: PageTypes
    seo: HygraphResponseSeo
-   image: ICmsImage
-   hero: HygraphResponseHero
+   blocks: HygraphResponsePageBlock[]
 }
+
+export type HygraphResponsePageBlock =
+   | HygraphResponseHero
+   | HygraphResponseCompanyValues
+   | HygraphResponseTestimonialValue
+   | HygraphResponseTestimonialListValue
+   | HygraphResponseCompanyLogosValue
 
 export interface HygraphResponseEventsSection {
    __typename: string

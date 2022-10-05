@@ -1,7 +1,7 @@
 import SEO from "../components/util/SEO"
 import { FC } from "react"
 import { PaperBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
-import { MarketingLandingPage } from "../data/graphcms/MarketingLandingPage"
+import { MarketingLandingPage } from "../data/hygraph/MarketingLandingPage"
 
 interface Props {
    page: MarketingLandingPage

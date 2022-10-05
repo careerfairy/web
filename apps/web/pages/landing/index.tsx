@@ -1,11 +1,11 @@
 import { GetStaticProps } from "next"
-import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
+import marketingPageRepo from "../../data/hygraph/MarketingPageRepository"
 import {
    HygraphRemoteFieldOfStudyResponse,
    HygraphResponseHero,
 } from "../../types/cmsTypes"
 import CmsPageLayout from "../../layouts/CmsPageLayout"
-import { MarketingLandingPage } from "../../data/graphcms/MarketingLandingPage"
+import { MarketingLandingPage } from "../../data/hygraph/MarketingLandingPage"
 import * as Blocks from "../../components/cms/blocks"
 import { hookLandingPage } from "../../components/cms/constants"
 import LandingPageHero from "../../components/cms/landing-page/LandingPageHero"

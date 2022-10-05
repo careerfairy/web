@@ -1,6 +1,6 @@
-import caseStudyRepo from "../../data/graphcms/CaseStudyRepository"
+import caseStudyRepo from "../../data/hygraph/CaseStudyRepository"
 import { NextApiRequest, NextApiResponse } from "next"
-import marketingPageRepo from "../../data/graphcms/MarketingPageRepository"
+import marketingPageRepo from "../../data/hygraph/MarketingPageRepository"
 import { PageTypes } from "../../types/cmsTypes"
 /*
  * You can read more about preview mode on [nextjs](https://nextjs.org/docs/advanced-features/preview-mode)
@@ -58,7 +58,7 @@ const getPreviewData = async (
    location: string
 }> => {
    const pageType: string | PageTypes = query.pageType as string
-
+   console.log("-> pageType", pageType)
    switch (pageType) {
       case "COMPANY_CASE_STUDY":
          const { companyCaseStudy } =
@@ -82,16 +82,16 @@ const getPreviewData = async (
             location: `/landing/${marketingLandingPage?.slug}`,
          }
 
-      case "LANDING_PAGE":
-         const landingPage = await marketingPageRepo.getPage({
-            slug: query.slug as string,
-            preview: true,
-         })
-
-         return {
-            hasData: Boolean(landingPage),
-            location: `/landing`,
-         }
+      // case "LANDING_PAGE":
+      //    const landingPage = await marketingPageRepo.getPage({
+      //       slug: query.slug as string,
+      //       preview: true,
+      //    })
+      //
+      //    return {
+      //       hasData: Boolean(landingPage),
+      //       location: `/landing`,
+      //    }
 
       default:
          return {
