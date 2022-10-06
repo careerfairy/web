@@ -4,16 +4,14 @@ import useServerModel from "../components/custom-hook/utils/useServerModel"
 import { Page } from "../data/hygraph/Page"
 import CmsPageLayout from "../layouts/CmsPageLayout"
 import * as Blocks from "../components/cms/blocks"
-import { Alert } from "@mui/material"
 
 type Props = InferGetStaticPropsType<typeof getStaticProps>
 
-const FAQPage = ({ page, preview }: Props) => {
+const FAQPage = ({ page }: Props) => {
    const faqPage = useServerModel<Page>(page, Page.createFromPlainObject)
 
    return (
       <>
-         {preview && <Alert severity="info">Preview mode is on</Alert>}
          <CmsPageLayout page={faqPage}>
             {faqPage.blocks && (
                <>

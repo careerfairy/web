@@ -1,1 +1,1 @@
-export { default as Faq } from "./FaqCard"
+export { default as Faq } from "../../page/FaqCard"

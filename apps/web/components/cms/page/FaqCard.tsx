@@ -1,5 +1,5 @@
-import { SerializedMarkdown } from "../../../../types/cmsTypes"
-import ThemedMDXRemote from "../../ThemedMDXRemote"
+import { SerializedMarkdown } from "../../../types/cmsTypes"
+import ThemedMDXRemote from "../ThemedMDXRemote"
 import {
    Accordion,
    AccordionDetails,
@@ -7,24 +7,25 @@ import {
    Typography,
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
+import Link from "../../views/common/Link"
 
 type Props = {
    title: string
    content: SerializedMarkdown
    slug: string
 }
-const FAQCard = ({ content, title, slug, ...rest }: Props) => {
+const FAQCard = ({ content, title, slug }: Props) => {
    return (
-      <Accordion variant="outlined">
-         <a href={`#${slug}`}>
+      <Accordion defaultExpanded variant="outlined">
+         <Link noLinkStyle href={`#${slug}`}>
             <AccordionSummary
                expandIcon={<ExpandMoreIcon />}
-               aria-controls="panel1a-content"
-               id="panel1a-header"
+               aria-controls="faq-content"
+               id={slug}
             >
                <Typography>{title}</Typography>
             </AccordionSummary>
-         </a>
+         </Link>
          <AccordionDetails>
             <Typography>
                <ThemedMDXRemote {...content.mdx} />

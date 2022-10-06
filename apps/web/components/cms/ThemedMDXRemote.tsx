@@ -1,11 +1,11 @@
 import React from "react"
-import Link from "next/link"
 import Image from "next/image"
 import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
 import { GraphCMSImageLoader } from "./util"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import { MDXRemote, MDXRemoteProps } from "next-mdx-remote"
+import Link from "../views/common/Link"
 
 const ThemedMDXRemote = (props: MDXRemoteProps) => {
    return (
@@ -52,9 +52,7 @@ const ThemedMDXRemote = (props: MDXRemoteProps) => {
             h1: ({ children }) => (
                <Typography variant="h1">{children}</Typography>
             ),
-            p: ({ children }) => (
-               <Typography variant="body1">{children}</Typography>
-            ),
+            p: ({ children }) => <Typography>{children}</Typography>,
             img: ({ title, height, width, src }) => (
                <Image
                   alt={title}
@@ -78,36 +76,35 @@ const ThemedMDXRemote = (props: MDXRemoteProps) => {
                   {children}
                </Box>
             ),
-            a: ({ children, href, rel, ...rest }) => {
+            a: ({ children, href, ...rest }) => {
                if (href.match(/^https?:\/\/|^\/\//i)) {
                   return (
-                     <Box<"a">
-                        component={"a"}
+                     <Link
                         href={href}
                         sx={{
                            color: "secondary.dark",
                         }}
                         target={"_blank"}
-                        rel={rel || "noopener noreferrer"}
+                        rel={"noopener noreferrer"}
                         {...rest}
+                        noLinkStyle
                      >
                         {children}
-                     </Box>
+                     </Link>
                   )
                }
 
                return (
-                  <Link href={href}>
-                     <Box
-                        component={"a"}
-                        sx={{
-                           color: "secondary.dark",
-                           cursor: "pointer",
-                        }}
-                        {...rest}
-                     >
-                        {children}
-                     </Box>
+                  <Link
+                     sx={{
+                        color: "secondary.dark",
+                        cursor: "pointer",
+                     }}
+                     {...rest}
+                     href={href}
+                     noLinkStyle
+                  >
+                     {children}
                   </Link>
                )
             },

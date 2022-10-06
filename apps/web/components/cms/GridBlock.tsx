@@ -37,36 +37,17 @@ export const GridBlock: FC<Props> = ({
 }) => {
    if (!gridItems || !gridItems.length) return null
 
-   const stackLayout = layout === "STACK"
    const splitLayout = layout === "SPLIT"
 
    return (
       <Box overflow="hidden" bgcolor={theme === "LIGHT" ? "gray.50" : "white"}>
-         <Container
-         // position="relative"
-         // // maxW="7xl"
-         // sx={{
-         //    maxWidth: "calc(100vw - 2rem)",
-         // }}
-         // mx="auto"
-         // py={12}
-         // px={[4, 6, null, 8]}
-         >
-            {/*{splitLayout && (*/}
-            {/*   <Box*/}
-            {/*      as={DotsSVG}*/}
-            {/*      color="gray.200"*/}
-            {/*      position="absolute"*/}
-            {/*      display={{ base: "none", lg: "block" }}*/}
-            {/*      top="100%"*/}
-            {/*      right="100%"*/}
-            {/*      left="auto"*/}
-            {/*      transform="translate(66.66%, -75%)"*/}
-            {/*   />*/}
-            {/*)}*/}
-
+         <Container>
             <Box
                position="relative"
+               py={{
+                  xs: 4,
+                  sm: 6,
+               }}
                sx={{
                   display: {
                      lg: splitLayout && "grid",
@@ -104,10 +85,8 @@ export const GridBlock: FC<Props> = ({
                   <Typography
                      mt={1}
                      component="p"
-                     variant="h3"
+                     variant="h4"
                      fontWeight="500"
-                     color="gray.900"
-                     sx={{}}
                   >
                      {gridTitle}
                   </Typography>
@@ -115,11 +94,9 @@ export const GridBlock: FC<Props> = ({
                   {gridSubtitle && (
                      <Box
                         mt={2}
-                        // sx={{
-                        //    maxWidth: "calc(100vw - 2rem)",
-                        // }}
+                        mb={1}
                         fontSize="xl"
-                        color="gray.500"
+                        color="text.secondary"
                         mx={{ lg: "auto" }}
                      >
                         <ThemedMDXRemote {...gridSubtitle.mdx} />
@@ -128,15 +105,21 @@ export const GridBlock: FC<Props> = ({
                </Box>
                <Box
                   component={gridTag || "dl"}
-                  mt={{ base: 10, lg: splitLayout && 0 }}
-                  spacing={[10, 0]}
-                  display={{ sm: "grid" }}
-                  gridColumnGap={{ sm: 8 }}
-                  gridRowGap={{ sm: 10 }}
-                  gridColumn={{ lg: "span 2 / span 2" }}
-                  gridTemplateColumns={{
-                     base: "repeat(1, 1fr)",
-                     lg: `repeat(${numberOfColumns}, 1fr)`,
+                  mt={{ xs: 1, lg: splitLayout && 0 }}
+                  spacing={[10, 5]}
+                  sx={{
+                     gridTemplateColumns: {
+                        xs: "repeat(1, 1fr)",
+                        lg: `repeat(${numberOfColumns}, 1fr)`,
+                     },
+                     display: "grid",
+                     gridColumn: {
+                        lg: "span 2 / span 2",
+                     },
+                     gridGap: {
+                        xs: 5,
+                        sm: 10,
+                     },
                   }}
                >
                   {children ||
