@@ -52,7 +52,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 const TalentPoolJoin = () => {
-   const { handleNext, group, livestream } = useContext(RegistrationContext)
+   const { handleNext, livestream } = useContext(RegistrationContext)
    const [joiningTalentPool, setJoiningTalentPool] = useState(false)
    const { joinCompanyTalentPool } = useFirebaseService()
    const classes = useStyles()
