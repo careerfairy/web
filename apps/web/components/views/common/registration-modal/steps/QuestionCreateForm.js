@@ -62,7 +62,7 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const QuestionCreateForm = () => {
-   const { handleNext, group, livestream, handleGoToLast } =
+   const { handleNext, livestream, handleGoToLast } =
       useContext(RegistrationContext)
    const classes = useStyles()
    const { replace } = useRouter()
@@ -70,7 +70,7 @@ const QuestionCreateForm = () => {
    const { authenticatedUser, userData } = useAuth()
 
    useEffect(() => {
-      if (livestream.questionsDisabled) {
+      if (livestream?.questionsDisabled) {
          handleNext()
       }
    }, [livestream?.questionsDisabled])
@@ -98,9 +98,9 @@ const QuestionCreateForm = () => {
                type: "new",
                author: authenticatedUser.email,
             }
-            await putLivestreamQuestion(livestream.id, newQuestion)
+            await putLivestreamQuestion(livestream?.id, newQuestion)
 
-            rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", livestream.id)
+            rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
 
@@ -126,8 +126,8 @@ const QuestionCreateForm = () => {
       const isAlreadyInTalentPool =
          userData?.talentPools &&
          livestream &&
-         userData.talentPools.includes(livestream.companyId)
-      if (livestream.hasNoTalentPool || isAlreadyInTalentPool) {
+         userData.talentPools.includes(livestream?.companyId)
+      if (livestream?.hasNoTalentPool || isAlreadyInTalentPool) {
          // go to final step
          handleGoToLast()
       } else {
@@ -144,7 +144,7 @@ const QuestionCreateForm = () => {
             container
          >
             <Grid className={classes.details} item xs={12} sm={8}>
-               <GroupLogo logoUrl={livestream.companyLogoUrl} />
+               <GroupLogo logoUrl={livestream?.companyLogoUrl} />
                <DialogTitle align="center">
                   ASK YOUR QUESTION. GET THE ANSWER DURING THE LIVE STREAM.
                </DialogTitle>
