@@ -2,6 +2,7 @@ import caseStudyRepo from "../../data/hygraph/CaseStudyRepository"
 import { NextApiRequest, NextApiResponse } from "next"
 import marketingPageRepo from "../../data/hygraph/MarketingPageRepository"
 import { PageTypes } from "../../types/cmsTypes"
+import pageRepo from "../../data/hygraph/PageRepository"
 /*
  * You can read more about preview mode on [nextjs](https://nextjs.org/docs/advanced-features/preview-mode)
  *
@@ -58,6 +59,7 @@ const getPreviewData = async (
    location: string
 }> => {
    const pageType: string | PageTypes = query.pageType as string
+   console.log("-> query", query)
    console.log("-> pageType", pageType)
    switch (pageType) {
       case "COMPANY_CASE_STUDY":
@@ -82,16 +84,28 @@ const getPreviewData = async (
             location: `/landing/${marketingLandingPage?.slug}`,
          }
 
-      // case "LANDING_PAGE":
-      //    const landingPage = await marketingPageRepo.getPage({
-      //       slug: query.slug as string,
-      //       preview: true,
-      //    })
-      //
-      //    return {
-      //       hasData: Boolean(landingPage),
-      //       location: `/landing`,
-      //    }
+      case "LANDING_PAGE":
+         const landingPage = await marketingPageRepo.getPage({
+            slug: query.slug as string,
+            preview: true,
+         })
+
+         return {
+            hasData: Boolean(landingPage),
+            location: `/landing`,
+         }
+
+      case "FAQ_PAGE":
+         const faqPage = await pageRepo.getPage({
+            preview: true,
+            slug: query.slug as string,
+            locale: query?.locale as string,
+         })
+
+         return {
+            hasData: Boolean(faqPage),
+            location: `/faq`,
+         }
 
       default:
          return {

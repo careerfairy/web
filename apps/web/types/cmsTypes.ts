@@ -1,8 +1,18 @@
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
 import { IColors } from "./commonTypes"
+import { MDXRemoteSerializeResult } from "next-mdx-remote"
 
 export type Slug = string
+export enum HygraphResponseTheme {
+   DARK = "DARK",
+   LIGHT = "LIGHT",
+   WHITE = "WHITE",
+}
+export enum HygraphResponseLayout {
+   STACK = "STACK",
+   SPLIT = "SPLIT",
+}
 
 export type Variables = {
    [p: string]: any
@@ -10,6 +20,7 @@ export type Variables = {
    preview?: boolean
    locale?: string
 }
+
 export interface ICmsImage {
    height?: number
    width?: number
@@ -98,6 +109,7 @@ export interface Testimonial {
    person?: Person
    title?: string
 }
+
 export interface HygraphResponseButton {
    children: string
    slug: string
@@ -121,15 +133,28 @@ export interface HygraphResponseHero {
    fullScreenImage?: boolean
    component?: HygraphFieldOfStudySelectResponse
 }
+
 export interface HygraphResponseGridBlock {
    __typename: string
    id: string
    slug: string
    numberOfColumns: 1 | 2 | 3 | 4
-   title?: string
-   headline?: string
-   subtitle?: string // markdown string
+   gridTitle?: string
+   component?: string
+   gridHeadline?: string
+   // markdown
+   gridSubtitle?: string
+   gridItems: HygraphResponseGridItem[]
+   theme: HygraphResponseTheme
+   layout: HygraphResponseLayout
 }
+
+export interface SerializedMarkdown {
+   mdx: MDXRemoteSerializeResult
+   markdown: string
+}
+
+export type HygraphResponseGridItem = HygraphResponseFaq
 
 export interface HygraphResponseCompanyValues {
    __typename: string
@@ -213,6 +238,15 @@ export interface HygraphResponseHighlight {
    logo?: ICmsImage
 }
 
+export interface HygraphResponseFaq {
+   __typename: string
+   id: string
+   title: string
+   // markdown
+   content: string
+   slug: string
+}
+
 export type PageTypes =
    | "COMPANY_CASE_STUDY"
    | "MARKETING_LANDING_PAGE"
@@ -261,6 +295,7 @@ export type HygraphResponsePageBlock =
    | HygraphResponseTestimonialValue
    | HygraphResponseTestimonialListValue
    | HygraphResponseCompanyLogosValue
+   | HygraphResponseGridBlock
 
 export interface HygraphResponseEventsSection {
    __typename: string
@@ -268,6 +303,7 @@ export interface HygraphResponseEventsSection {
    typeOfEvent: string
    eventsTitle: string
 }
+
 export interface HygraphResponseMarketingSignup {
    __typename: string
    id: string
@@ -409,21 +445,21 @@ export const companyValuesQueryProps = `
 `
 // language=GraphQL
 export const companyQueryProp = `
-{
-   id
-   name
-   logo ${imageQueryProps}
-}
+    {
+        id
+        name
+        logo ${imageQueryProps}
+    }
 `
 // language=GraphQL
 export const personQueryProps = `
-   {
-      id
-      name
-      role
-      photo ${imageQueryProps}
-      company ${companyQueryProp}
-   }
+    {
+        id
+        name
+        role
+        photo ${imageQueryProps}
+        company ${companyQueryProp}
+    }
 
 `
 // language=GraphQL
@@ -466,6 +502,38 @@ export const companyLogosQueryProps = `
     }
 `
 // language=GraphQL
+
+export const faqQueryProps = `
+    {
+        __typename
+        id
+        content
+        title
+        slug
+    }
+`
+
+// language=GraphQL
+export const gridBlockQueryProps = `
+    {
+        id
+        __typename
+        gridItems {
+        __typename
+        ... on Faq ${faqQueryProps}
+        }
+        gridItemComponent
+        component
+        gridHeadline
+        layout
+        slug
+        gridSubtitle
+        theme
+        gridTitle
+        numberOfColumns
+    }
+`
+// language=GraphQL
 export const textBlockQueryProps = `
     {
         __typename
@@ -491,7 +559,7 @@ export const highlightListQueryProps = `
         __typename
         id
         slug
-        highlightListTitle 
+        highlightListTitle
         highlights ${highlightQueryProps}
     }
 `

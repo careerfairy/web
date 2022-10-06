@@ -2,13 +2,13 @@ import { fetchAPI } from "./index"
 import {
    companyLogosQueryProps,
    companyValuesQueryProps,
+   gridBlockQueryProps,
    heroQueryProps,
    seoQueryProps,
    testimonialListQueryProps,
    testimonialQueryProps,
    Variables,
 } from "../../types/cmsTypes"
-import { MarketingLandingPage } from "./MarketingLandingPage"
 import { Page } from "./Page"
 
 export interface IPageRepository {
@@ -19,7 +19,7 @@ export interface IPageRepository {
 class PageRepository implements IPageRepository {
    constructor() {}
 
-   async getPage(variables: Variables): Promise<MarketingLandingPage> {
+   async getPage(variables: Variables): Promise<Page> {
       const response = await fetchAPI(
          `
               query PageQuery($slug: String!, $stage: Stage!) {
@@ -33,6 +33,7 @@ class PageRepository implements IPageRepository {
                           ... on Testimonial ${testimonialQueryProps}
                           ... on TestimonialList ${testimonialListQueryProps}
                           ... on CompanyLogos ${companyLogosQueryProps}
+                         ... on GridBlock ${gridBlockQueryProps}
 
                       }
                       seo ${seoQueryProps}
