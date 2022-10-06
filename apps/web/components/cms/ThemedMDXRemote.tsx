@@ -53,15 +53,17 @@ const ThemedMDXRemote = (props: MDXRemoteProps) => {
                <Typography variant="h1">{children}</Typography>
             ),
             p: ({ children }) => <Typography>{children}</Typography>,
-            img: ({ title, height, width, src }) => (
-               <Image
-                  alt={title}
-                  height={height}
-                  width={width}
-                  loader={GraphCMSImageLoader}
-                  src={src}
-               />
-            ),
+            img: ({ title, height, width, src }) => {
+               return (
+                  <Image
+                     alt={title}
+                     height={height}
+                     width={width}
+                     loader={GraphCMSImageLoader}
+                     src={src}
+                  />
+               )
+            },
             ul: ({ children }) => <Box component={"ul"}>{children}</Box>,
             li: ({ children }) => (
                <Box

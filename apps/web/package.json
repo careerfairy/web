@@ -99,6 +99,7 @@
       "redux": "^4.0.5",
       "redux-firestore": "^0.14.0",
       "redux-thunk": "^2.3.0",
+      "rehype-img-size": "^1.0.1",
       "reselect": "^4.0.0",
       "schema-dts": "^1.1.0",
       "slick-carousel": "^1.8.1",

@@ -1,5 +1,7 @@
 import { serialize } from "next-mdx-remote/serialize"
 import he from "he"
+import imageSize from "rehype-img-size"
+
 import {
    HygraphResponseGridItem,
    HygraphResponseMarketingPageBlock,
@@ -16,14 +18,14 @@ export const parseBlocksMdx = async (
             block.gridSubtitle && {
                gridSubtitle: {
                   markdown: block.gridSubtitle,
-                  mdx: await serialize(he.decode(block.gridSubtitle)),
+                  mdx: await serializer(block.gridSubtitle),
                },
             }),
          ...("content" in block &&
             block.content && {
                content: {
                   markdown: block.content,
-                  mdx: await serialize(he.decode(block.content)),
+                  mdx: await serializer(block.content as string),
                },
             }),
          ...("gridItems" in block &&
@@ -42,9 +44,18 @@ export const parseGridItemsMdx = async (
          ...(content && {
             content: {
                markdown: content,
-               mdx: await serialize(he.decode(content)),
+               mdx: await serializer(content),
             },
          }),
       }))
    )
 }
+
+const serializer = (markdown: string) =>
+   serialize(he.decode(markdown), {
+      mdxOptions: {
+         // use the image size plugin, you can also specify which folder to load images from
+         // in my case images are in /public/images/, so I just prepend 'public'
+         rehypePlugins: [[imageSize, { dir: "public" }]],
+      },
+   })
