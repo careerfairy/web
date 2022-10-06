@@ -11,21 +11,17 @@ const FAQPage = ({ page }: Props) => {
    const faqPage = useServerModel<Page>(page, Page.createFromPlainObject)
 
    return (
-      <>
-         <CmsPageLayout page={faqPage}>
-            {faqPage.blocks && (
-               <>
-                  {faqPage.blocks.map((block) => {
-                     const Component = Blocks[block.__typename]
-                     if (!Component) return null
-                     return (
-                        <Component key={block.id} page={faqPage} {...block} />
-                     )
-                  })}
-               </>
-            )}
-         </CmsPageLayout>
-      </>
+      <CmsPageLayout page={faqPage}>
+         {faqPage.blocks && (
+            <>
+               {faqPage.blocks.map((block) => {
+                  const Component = Blocks[block.__typename]
+                  if (!Component) return null
+                  return <Component key={block.id} page={faqPage} {...block} />
+               })}
+            </>
+         )}
+      </CmsPageLayout>
    )
 }
 

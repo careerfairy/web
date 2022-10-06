@@ -59,8 +59,7 @@ const getPreviewData = async (
    location: string
 }> => {
    const pageType: string | PageTypes = query.pageType as string
-   console.log("-> query", query)
-   console.log("-> pageType", pageType)
+
    switch (pageType) {
       case "COMPANY_CASE_STUDY":
          const { companyCaseStudy } =

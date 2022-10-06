@@ -1,7 +1,6 @@
 import { EmbedReferences, RichTextContent } from "@graphcms/rich-text-types"
 import { ButtonProps } from "@mui/material"
 import { IColors } from "./commonTypes"
-import { MDXRemoteSerializeResult } from "next-mdx-remote"
 
 export type Slug = string
 export enum HygraphResponseTheme {
@@ -142,16 +141,12 @@ export interface HygraphResponseGridBlock {
    gridTitle?: string
    component?: string
    gridHeadline?: string
-   // markdown
-   gridSubtitle?: string
+   gridSubtitle?: {
+      raw: RichTextContent
+   }
    gridItems: HygraphResponseGridItem[]
    theme: HygraphResponseTheme
    layout: HygraphResponseLayout
-}
-
-export interface SerializedMarkdown {
-   mdx: MDXRemoteSerializeResult
-   markdown: string
 }
 
 export type HygraphResponseGridItem = HygraphResponseFaq
@@ -242,8 +237,9 @@ export interface HygraphResponseFaq {
    __typename: string
    id: string
    title: string
-   // markdown
-   content: string
+   content: {
+      raw: RichTextContent
+   }
    slug: string
 }
 
@@ -507,7 +503,7 @@ export const faqQueryProps = `
     {
         __typename
         id
-        content
+        content ${richTextQueryProps}
         title
         slug
     }
@@ -527,7 +523,7 @@ export const gridBlockQueryProps = `
         gridHeadline
         layout
         slug
-        gridSubtitle
+        gridSubtitle ${richTextQueryProps}
         theme
         gridTitle
         numberOfColumns

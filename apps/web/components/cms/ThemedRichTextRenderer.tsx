@@ -61,8 +61,10 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
             h6: ({ children }) => (
                <Typography variant="h6">{children}</Typography>
             ),
-            h5: ({ children }) => (
-               <Typography variant="h5">{children}</Typography>
+            h5: ({ children, ...rest }) => (
+               <Typography {...rest} variant="h5">
+                  {children}
+               </Typography>
             ),
             h4: ({ children }) => (
                <Typography variant="h4">{children}</Typography>

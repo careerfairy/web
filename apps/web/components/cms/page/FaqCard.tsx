@@ -1,5 +1,3 @@
-import { SerializedMarkdown } from "../../../types/cmsTypes"
-import ThemedMDXRemote from "../ThemedMDXRemote"
 import {
    Accordion,
    AccordionDetails,
@@ -8,10 +6,15 @@ import {
 } from "@mui/material"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Link from "../../views/common/Link"
+import { RichTextContent } from "@graphcms/rich-text-types"
+import ThemedRichTextRenderer from "../ThemedRichTextRenderer"
+import React from "react"
 
 type Props = {
    title: string
-   content: SerializedMarkdown
+   content: {
+      raw: RichTextContent
+   }
    slug: string
 }
 const FAQCard = ({ content, title, slug }: Props) => {
@@ -28,7 +31,7 @@ const FAQCard = ({ content, title, slug }: Props) => {
          </Link>
          <AccordionDetails>
             <Typography>
-               <ThemedMDXRemote {...content.mdx} />
+               <ThemedRichTextRenderer rawContent={content.raw} />
             </Typography>
          </AccordionDetails>
       </Accordion>

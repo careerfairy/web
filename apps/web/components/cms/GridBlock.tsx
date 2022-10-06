@@ -1,20 +1,22 @@
 import * as GridItems from "./blocks/gridItems"
-import { parseGridItemsMdx } from "../../data/hygraph/util"
 import {
+   HygraphResponseGridItem,
    HygraphResponseLayout,
    HygraphResponseTheme,
-   SerializedMarkdown,
 } from "../../types/cmsTypes"
-import { ElementType, FC } from "react"
+import React, { ElementType, FC } from "react"
 import Box from "@mui/material/Box"
 import { Typography } from "@mui/material"
 import Container from "../views/common/Section/Container"
-import ThemedMDXRemote from "./ThemedMDXRemote"
+import { RichTextContent } from "@graphcms/rich-text-types"
+import ThemedRichTextRenderer from "./ThemedRichTextRenderer"
 
 type Props = {
    layout: HygraphResponseLayout
-   gridSubtitle: SerializedMarkdown
-   gridItems?: Awaited<ReturnType<typeof parseGridItemsMdx>>
+   gridSubtitle: {
+      raw: RichTextContent
+   }
+   gridItems?: HygraphResponseGridItem[]
    gridItemComponent?: string
    gridHeadline?: string
    gridTag?: ElementType
@@ -99,7 +101,7 @@ export const GridBlock: FC<Props> = ({
                         color="text.secondary"
                         mx={{ lg: "auto" }}
                      >
-                        <ThemedMDXRemote {...gridSubtitle.mdx} />
+                        <ThemedRichTextRenderer rawContent={gridSubtitle.raw} />
                      </Box>
                   )}
                </Box>
