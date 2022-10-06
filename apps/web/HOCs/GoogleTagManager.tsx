@@ -43,7 +43,7 @@ const GoogleTagManagerLoader = ({ children }) => {
 
       // userData loaded & is not an admin
       enableOnce()
-   }, [userData, isLoggedIn, enableOnce])
+   }, [userData, isLoggedIn, enableOnce, authIsLoaded, isLoggedOut])
 
    useEffect(() => {
       if (shouldLoadForCurrentUser) {
