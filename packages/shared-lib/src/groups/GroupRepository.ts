@@ -154,7 +154,8 @@ export class FirebaseGroupRepository
          .map((snapshot) => ({
             ...snapshot.data(),
             id: snapshot.id,
-         })) as Group[]
+         }))
+         .filter(activeGroupFilter) as Group[]
    }
 
    cleanAndSerializeGroup(
@@ -184,7 +185,7 @@ export class FirebaseGroupRepository
       if (isAdmin) {
          // If user is admin, return all groups
          const snaps = await this.firestore.collection("careerCenterData").get()
-         return mapFirestoreDocuments<Group>(snaps)
+         return mapFirestoreDocuments<Group>(snaps)?.filter(activeGroupFilter)
       }
       const snaps = await this.firestore
          .collection("userData")
@@ -658,3 +659,5 @@ export class FirebaseGroupRepository
       return mapFirestoreDocuments(adminsSnap)
    }
 }
+
+export const activeGroupFilter = (group: Group) => group.inActive !== true
