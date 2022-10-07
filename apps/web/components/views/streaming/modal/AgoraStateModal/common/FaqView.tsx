@@ -88,13 +88,13 @@ export const FaqCard = ({ href, title }: FaqCardProps) => {
    )
 }
 
-export const dummyFaqElements: ComponentProps<typeof FaqCard>[] = [
-   {
-      title: "How to use the Agora Live Streaming",
-      href: "https://www.agora.io/en/blog/video-call-invitations-with-agora-rtm-and-rtc-using-vue-js-and-flask/",
-   },
-   {
-      title: "How to use the Agora Live Streaming",
-      href: "https://www.agora.io/en/blog/extensions-marketplace-how-to-add-voice-fx-to-your-android-application-using-agora-and-synervoz/",
-   },
+export const faqResources: ComponentProps<typeof FaqCard>[] = [
+   // {
+   //    title: "How to use the Agora Live Streaming",
+   //    href: "https://www.agora.io/en/blog/video-call-invitations-with-agora-rtm-and-rtc-using-vue-js-and-flask/",
+   // },
+   // {
+   //    title: "How to use the Agora Live Streaming",
+   //    href: "https://www.agora.io/en/blog/extensions-marketplace-how-to-add-voice-fx-to-your-android-application-using-agora-and-synervoz/",
+   // },
 ]

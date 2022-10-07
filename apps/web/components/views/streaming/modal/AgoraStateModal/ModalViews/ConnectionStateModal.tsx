@@ -15,9 +15,9 @@ import { rtcMessages } from "types/streaming"
 import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../../store/selectors/streamSelectors"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import ResourcesView, { dummyResources } from "../common/ResourcesView"
+import ResourcesView, { resources } from "../common/ResourcesView"
 import StepsView, { StepCard } from "../common/StepsView"
-import FaqView, { dummyFaqElements } from "../common/FaqView"
+import FaqView, { faqResources } from "../common/FaqView"
 
 interface Props {
    steps: ComponentProps<typeof StepCard>[]
@@ -86,7 +86,7 @@ const ConnectionStateModal: FC<Props> = ({ steps }) => {
             </Stack>
          </DialogTitle>
          <DialogContent>
-            <Collapse in={showDebugPrompt}>
+            <Collapse mountOnEnter in={showDebugPrompt}>
                <Typography align={"center"} variant="h5">
                   {"We're "} having trouble connecting you with CareerFairy:
                </Typography>
@@ -95,8 +95,10 @@ const ConnectionStateModal: FC<Props> = ({ steps }) => {
                   spacing={2}
                >
                   <StepsView steps={steps} />
-                  <ResourcesView options={dummyResources} />
-                  <FaqView faqElements={dummyFaqElements} />
+                  {!!resources.length && <ResourcesView options={resources} />}
+                  {!!faqResources.length && (
+                     <FaqView faqElements={faqResources} />
+                  )}
                </Stack>
             </Collapse>
          </DialogContent>

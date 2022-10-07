@@ -1,4 +1,4 @@
-import pageRepo from "../data/hygraph/PageRepository"
+// import pageRepo from "../data/hygraph/PageRepository"
 import { GetStaticPropsContext, InferGetStaticPropsType } from "next"
 import useServerModel from "../components/custom-hook/utils/useServerModel"
 import { Page } from "../data/hygraph/Page"
@@ -25,23 +25,28 @@ const FAQPage = ({ page }: Props) => {
    )
 }
 
-export const getStaticProps = async ({
-   locale,
-   preview = false,
-}: GetStaticPropsContext) => {
-   const page = await pageRepo.getPage({
-      slug: "faq",
-      locale,
-      preview,
-   })
-
+export const getStaticProps = async ({}: // locale,
+// preview = false,
+GetStaticPropsContext) => {
    return {
-      props: {
-         page: page.serializeToPlainObject(),
-         preview,
+      redirect: {
+         destination: "/",
       },
-      revalidate: 60,
    }
+   // Disabled until further notice
+   // const page = await pageRepo.getPage({
+   //    slug: "faq",
+   //    locale,
+   //    preview,
+   // })
+   //
+   // return {
+   //    props: {
+   //       page: page.serializeToPlainObject(),
+   //       preview,
+   //    },
+   //    revalidate: 60,
+   // }
 }
 
 export default FAQPage
