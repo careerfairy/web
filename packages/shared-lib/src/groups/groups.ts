@@ -22,6 +22,7 @@ export interface Group extends Identifiable {
    hidePrivateEventsFromEmbed?: boolean
    privacyPolicyActive?: boolean
    privacyPolicyUrl?: string
+   inActive?: boolean
 
    /*
     * Deprecated
