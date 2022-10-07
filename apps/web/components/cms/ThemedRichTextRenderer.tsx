@@ -59,28 +59,36 @@ const ThemedRichTextRenderer = ({ rawContent, references }: Props) => {
             italic: ({ children }) => <em>{children}</em>,
             underline: ({ children }) => <u>{children}</u>,
             h6: ({ children }) => (
-               <Typography variant="h6">{children}</Typography>
+               <Typography gutterBottom variant="h6">
+                  {children}
+               </Typography>
             ),
-            h5: ({ children, ...rest }) => (
-               <Typography {...rest} variant="h5">
+            h5: ({ children }) => (
+               <Typography gutterBottom variant="h5">
                   {children}
                </Typography>
             ),
             h4: ({ children }) => (
-               <Typography variant="h4">{children}</Typography>
+               <Typography gutterBottom variant="h4">
+                  {children}
+               </Typography>
             ),
             h3: ({ children }) => (
-               <Typography variant="h3">{children}</Typography>
+               <Typography gutterBottom variant="h3">
+                  {children}
+               </Typography>
             ),
             h2: ({ children }) => (
-               <Typography variant="h2">{children}</Typography>
+               <Typography gutterBottom variant="h2">
+                  {children}
+               </Typography>
             ),
             h1: ({ children }) => (
-               <Typography variant="h1">{children}</Typography>
+               <Typography gutterBottom variant="h1">
+                  {children}
+               </Typography>
             ),
-            p: ({ children }) => (
-               <Typography variant="body1">{children}</Typography>
-            ),
+            p: ({ children }) => <Typography>{children}</Typography>,
             img: ({ title, altText, height, width, src }) => (
                <Image
                   alt={altText || title}
