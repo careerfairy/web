@@ -114,6 +114,7 @@
    ],
    "devDependencies": {
       "@careerfairy/seed-data": "*",
+      "@helpscout/beacon-devtools": "^0.1.0",
       "@playwright/test": "^1.22.2",
       "@svgr/webpack": "^5.5.0",
       "@testing-library/jest-dom": "^5.16.1",

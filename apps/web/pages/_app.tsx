@@ -1,3 +1,4 @@
+// import BeaconDevTools from "@helpscout/beacon-devtools"
 import * as React from "react"
 import "styles.css"
 import FirebaseServiceContext from "../context/firebase/FirebaseServiceContext"
@@ -39,6 +40,7 @@ import {
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import { actionTypes } from "redux-firestore"
+import HelpScoutBeaconScript from "../scripts/HelpScoutBeaconScript"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -72,7 +74,6 @@ const rrfProps = {
 
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
-
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 
@@ -89,12 +90,14 @@ function MyApp(props) {
             color={brandedLightTheme.palette.primary.main}
             options={{ showSpinner: false }}
          />
+         {/*<BeaconDevTools />*/}
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <ReactFireProviders>
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
+                           <HelpScoutBeaconScript />
                            <GoogleTagManager>
                               <ThemeProviderWrapper>
                                  <FirebaseServiceContext.Provider
