@@ -1,6 +1,6 @@
 import React, { Fragment, useEffect, useState } from "react"
 import ImageSelect from "../ImageSelect/ImageSelect"
-import { FormControl, Collapse, Grid, TextField, Button } from "@mui/material"
+import { Collapse, Grid, TextField, Button } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import PersonAddIcon from "@mui/icons-material/PersonAdd"
 
@@ -8,15 +8,20 @@ const useStyles = makeStyles((theme) => ({
    formGrid: {
       display: "flex",
       flexDirection: "column",
-      justifyContent: "space-between",
-      "& .MuiFormControl-root:not(:last-child)": {
-         marginBottom: theme.spacing(3.3),
-      },
+      justifyContent: "end",
+      marginLeft: theme.spacing(4),
    },
-   formGroup: {
-      background: "white",
-      marginTop: theme.spacing(3),
-      marginBottom: theme.spacing(3),
+   addButton: {
+      marginTop: theme.spacing(4),
+   },
+   addSpeaker: {
+      borderRadius: "10px",
+      height: theme.spacing(10),
+      border: "dashed",
+
+      "&:hover": {
+         border: "dashed",
+      },
    },
 }))
 const SpeakerForm = ({
@@ -24,6 +29,7 @@ const SpeakerForm = ({
    lastNameError,
    positionError,
    backgroundError,
+   emailError,
    firebase,
    speaker,
    objectKey,
@@ -32,7 +38,6 @@ const SpeakerForm = ({
    isSubmitting,
    loading,
    getDownloadUrl,
-   handleDeleteSpeaker,
    setValues,
    index,
    values,
@@ -51,135 +56,181 @@ const SpeakerForm = ({
 
    return (
       <Fragment>
-         <Collapse
-            in={animate}
-            component={Grid}
-            className={classes.formGrid}
-            xs={12}
-            sm={12}
-            md={12}
-            lg={6}
-            xl={6}
-            item
-         >
-            <FormControl fullWidth>
-               <TextField
-                  name={`speakers.${objectKey}.firstName`}
-                  id={`speakers.${objectKey}.firstName`}
-                  variant="outlined"
-                  fullWidth
-                  disabled={isSubmitting}
-                  style={{ marginBottom: 0 }}
-                  onBlur={handleBlur}
-                  label="First Name"
-                  inputProps={{ maxLength: 70 }}
-                  value={speaker.firstName}
-                  error={Boolean(firstNameError)}
-                  onChange={({ currentTarget: { value } }) =>
-                     setFieldValue(`speakers.${objectKey}.firstName`, value)
-                  }
+         <Grid sx={{ display: "flex" }} xs={12}>
+            <Collapse in={animate} component={Grid} xs={12} lg={3} item>
+               <ImageSelect
+                  path="mentors-pictures"
+                  getDownloadUrl={getDownloadUrl}
+                  formName={`speakers.${objectKey}.avatar`}
+                  label="Speaker"
+                  error={false}
+                  handleBlur={handleBlur}
+                  isSubmitting={isSubmitting}
+                  loading={loading}
+                  value={speaker.avatar}
+                  isAvatar
+                  firebase={firebase}
+                  setFieldValue={setFieldValue}
+                  showIconButton={false}
+                  isButtonOutlined={false}
+                  buttonCentered={true}
                />
-               <Collapse in={Boolean(firstNameError)} style={{ color: "red" }}>
-                  {firstNameError}
-               </Collapse>
-            </FormControl>
-            <FormControl fullWidth>
-               <TextField
-                  name={`speakers.${objectKey}.lastName`}
-                  id={`speakers.${objectKey}.lastName`}
-                  variant="outlined"
-                  fullWidth
-                  disabled={isSubmitting}
-                  style={{ marginBottom: 0 }}
-                  onBlur={handleBlur}
-                  label="Last Name"
-                  inputProps={{ maxLength: 70 }}
-                  value={speaker.lastName}
-                  error={Boolean(lastNameError)}
-                  onChange={({ currentTarget: { value } }) =>
-                     setFieldValue(`speakers.${objectKey}.lastName`, value)
-                  }
-               />
-               <Collapse in={Boolean(lastNameError)} style={{ color: "red" }}>
-                  {lastNameError}
-               </Collapse>
-            </FormControl>
-            <FormControl fullWidth>
-               <TextField
-                  name={`speakers.${objectKey}.position`}
-                  id={`speakers.${objectKey}.position`}
-                  variant="outlined"
-                  fullWidth
-                  disabled={isSubmitting}
-                  onBlur={handleBlur}
-                  label="Position"
-                  style={{ marginBottom: 0 }}
-                  inputProps={{ maxLength: 70 }}
-                  value={speaker.position}
-                  error={Boolean(positionError)}
-                  onChange={({ currentTarget: { value } }) =>
-                     setFieldValue(`speakers.${objectKey}.position`, value)
-                  }
-               />
-               <Collapse in={Boolean(positionError)} style={{ color: "red" }}>
-                  {positionError}
-               </Collapse>
-            </FormControl>
-            <FormControl fullWidth>
-               <TextField
-                  name={`speakers.${objectKey}.background`}
-                  id={`speakers.${objectKey}.background`}
-                  variant="outlined"
-                  fullWidth
-                  multiline
-                  disabled={isSubmitting}
-                  onBlur={handleBlur}
-                  label="Background"
-                  style={{ marginBottom: 0 }}
-                  inputProps={{ maxLength: 200 }}
-                  value={speaker.background}
-                  error={Boolean(backgroundError)}
-                  onChange={({ currentTarget: { value } }) =>
-                     setFieldValue(`speakers.${objectKey}.background`, value)
-                  }
-               />
-               <Collapse in={Boolean(backgroundError)} style={{ color: "red" }}>
-                  {backgroundError}
-               </Collapse>
-            </FormControl>
-         </Collapse>
-         <Collapse
-            in={animate}
-            style={{
-               display: "flex",
-               flexDirection: "column",
-               justifyContent: "flex-end",
-            }}
-            component={Grid}
-            xs={12}
-            sm={12}
-            md={12}
-            lg={6}
-            xl={6}
-            item
-         >
-            <ImageSelect
-               path="mentors-pictures"
-               getDownloadUrl={getDownloadUrl}
-               formName={`speakers.${objectKey}.avatar`}
-               label="Speaker Avatar"
-               error={false}
-               handleBlur={handleBlur}
-               isSubmitting={isSubmitting}
-               loading={loading}
-               value={speaker.avatar}
-               isAvatar
-               firebase={firebase}
-               setFieldValue={setFieldValue}
-            />
-         </Collapse>
+            </Collapse>
+
+            <Collapse
+               in={animate}
+               component={Grid}
+               className={classes.formGrid}
+               xs={12}
+               lg={9}
+               item
+            >
+               <Grid container spacing={2}>
+                  <Grid xs={12} lg={6} item>
+                     <TextField
+                        name={`speakers.${objectKey}.firstName`}
+                        id={`speakers.${objectKey}.firstName`}
+                        placeholder="Enter the speaker’s first name"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled={isSubmitting}
+                        onBlur={handleBlur}
+                        label="First Name"
+                        inputProps={{ maxLength: 70 }}
+                        value={speaker.firstName}
+                        error={Boolean(firstNameError)}
+                        onChange={({ currentTarget: { value } }) =>
+                           setFieldValue(
+                              `speakers.${objectKey}.firstName`,
+                              value
+                           )
+                        }
+                     />
+                     <Collapse
+                        in={Boolean(firstNameError)}
+                        style={{ color: "red" }}
+                     >
+                        {firstNameError}
+                     </Collapse>
+                  </Grid>
+                  <Grid xs={12} lg={6} item>
+                     <TextField
+                        name={`speakers.${objectKey}.lastName`}
+                        id={`speakers.${objectKey}.lastName`}
+                        placeholder="Enter the speaker’s last name"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled={isSubmitting}
+                        onBlur={handleBlur}
+                        label="Last Name"
+                        inputProps={{ maxLength: 70 }}
+                        value={speaker.lastName}
+                        error={Boolean(lastNameError)}
+                        onChange={({ currentTarget: { value } }) =>
+                           setFieldValue(
+                              `speakers.${objectKey}.lastName`,
+                              value
+                           )
+                        }
+                     />
+                     <Collapse
+                        in={Boolean(lastNameError)}
+                        style={{ color: "red" }}
+                     >
+                        {lastNameError}
+                     </Collapse>
+                  </Grid>
+                  <Grid xs={12} lg={6} item>
+                     <TextField
+                        name={`speakers.${objectKey}.position`}
+                        id={`speakers.${objectKey}.position`}
+                        placeholder="Enter the speaker’s position"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled={isSubmitting}
+                        onBlur={handleBlur}
+                        label="Position"
+                        inputProps={{ maxLength: 70 }}
+                        value={speaker.position}
+                        error={Boolean(positionError)}
+                        onChange={({ currentTarget: { value } }) =>
+                           setFieldValue(
+                              `speakers.${objectKey}.position`,
+                              value
+                           )
+                        }
+                     />
+                     <Collapse
+                        in={Boolean(positionError)}
+                        style={{ color: "red" }}
+                     >
+                        {positionError}
+                     </Collapse>
+                  </Grid>
+
+                  <Grid xs={12} lg={6} item>
+                     <TextField
+                        name={`speakers.${objectKey}.background`}
+                        id={`speakers.${objectKey}.background`}
+                        placeholder="Enter the speaker’s academic background"
+                        variant="outlined"
+                        fullWidth
+                        multiline
+                        disabled={isSubmitting}
+                        onBlur={handleBlur}
+                        label="Background"
+                        style={{ marginBottom: 0 }}
+                        inputProps={{ maxLength: 200 }}
+                        value={speaker.background}
+                        error={Boolean(backgroundError)}
+                        onChange={({ currentTarget: { value } }) =>
+                           setFieldValue(
+                              `speakers.${objectKey}.background`,
+                              value
+                           )
+                        }
+                     />
+                     <Collapse
+                        in={Boolean(backgroundError)}
+                        style={{ color: "red" }}
+                     >
+                        {backgroundError}
+                     </Collapse>
+                  </Grid>
+                  <Grid xs={12} item>
+                     <TextField
+                        name={`speakers.${objectKey}.email`}
+                        id={`speakers.${objectKey}.email`}
+                        placeholder="Enter the speaker’s email address"
+                        variant="outlined"
+                        fullWidth
+                        required
+                        disabled={isSubmitting}
+                        onBlur={handleBlur}
+                        label="Email Address"
+                        inputProps={{ maxLength: 70 }}
+                        value={speaker.email}
+                        error={Boolean(emailError)}
+                        onChange={({ currentTarget: { value } }) =>
+                           setFieldValue(`speakers.${objectKey}.email`, value)
+                        }
+                     />
+                     <Collapse
+                        in={Boolean(emailError)}
+                        style={{ color: "red" }}
+                     >
+                        {emailError}
+                     </Collapse>
+                  </Grid>
+               </Grid>
+            </Collapse>
+         </Grid>
+
          {isLast && (
-            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+            <Grid xs={12} className={classes.addButton}>
                <Button
                   startIcon={<PersonAddIcon />}
                   disabled={
@@ -190,8 +241,10 @@ const SpeakerForm = ({
                      handleAddSpeaker(values, setValues, speakerObj)
                   }
                   type="button"
-                  color="primary"
-                  variant="contained"
+                  color="secondary"
+                  variant="outlined"
+                  className={classes.addSpeaker}
+                  size="large"
                   fullWidth
                >
                   {Object.keys(values.speakers).length >= speakerLimit

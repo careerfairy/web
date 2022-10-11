@@ -1,44 +1,29 @@
 import React, {
-   Fragment,
    MutableRefObject,
    useCallback,
    useEffect,
+   useMemo,
    useRef,
    useState,
 } from "react"
-import DeleteIcon from "@mui/icons-material/Delete"
 import {
    Box,
    Button,
    ButtonGroup,
    CircularProgress,
-   Collapse,
    Container,
-   Fab,
-   FormControl,
-   FormControlLabel,
    Grid,
-   Switch,
-   TextField,
-   Tooltip,
    Typography,
 } from "@mui/material"
 import { Formik, FormikValues } from "formik"
 import { v4 as uuidv4 } from "uuid"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import ImageSelect from "./ImageSelect/ImageSelect"
 import makeStyles from "@mui/styles/makeStyles"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import SpeakerForm from "./SpeakerForm/SpeakerForm"
 import { useRouter } from "next/router"
 import FormGroup from "./FormGroup"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
-   getDownloadUrl,
    getStreamSubCollectionSpeakers,
-   handleAddSpeaker,
-   handleDeleteSpeaker,
-   handleError,
    handleFlattenOptions,
    languageCodes,
    validateStreamForm,
@@ -49,9 +34,7 @@ import {
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
 } from "../../util/constants"
-import { LanguageSelect } from "../../helperFunctions/streamFormFunctions/components"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import StreamDurationSelect from "./StreamDurationSelect"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import MultiListSelect from "../common/MultiListSelect"
 import { useInterests } from "../../custom-hook/useCollection"
@@ -70,7 +53,8 @@ import GroupQuestionSelect from "./GroupQuestionSelect"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import FieldsOfStudyMultiSelector from "./TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
 import LevelsOfStudyMultiSelector from "./TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
-import Stack from "@mui/material/Stack"
+import StreamInfo from "./StreamForm/StreamInfo"
+import SpeakersInfo from "./StreamForm/SpeakersInfo"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -82,15 +66,15 @@ const useStyles = makeStyles((theme) =>
          minHeight: "20vh",
          borderRadius: 5,
          marginBottom: ({ isGroupAdmin }: any) => !isGroupAdmin && 30,
+         maxWidth: "unset",
       },
       form: {
          width: "100%",
       },
-      speakersLabel: {
-         color: "white",
-         display: "flex",
-         alignItems: "center",
-         justifyContent: "space-between",
+      errorMessage: {
+         color: "red",
+         marginLeft: 8,
+         marginTop: 4,
       },
       submit: {
          color: theme.palette.primary.main,
@@ -119,13 +103,21 @@ const useStyles = makeStyles((theme) =>
    })
 )
 
+export type ISpeakerObj = {
+   avatar: string
+   firstName: string
+   lastName: string
+   position: string
+   background: string
+}
+
 const speakerObj = {
    avatar: "",
    firstName: "",
    lastName: "",
    position: "",
    background: "",
-}
+} as ISpeakerObj
 
 interface Props {
    group?: Group
@@ -383,18 +375,9 @@ const DraftStreamForm = ({
       return Boolean(formData?.status?.pendingApproval === true)
    }
 
-   const groupsSelected = () => {
+   const groupsSelected = useMemo(() => {
       return Boolean(selectedGroups.length)
-   }
-
-   const buildHiddenMessage = () => {
-      // Creates the group names string separated by commas and an "and" at the end
-      const groupNames = selectedGroups
-         .map((group) => group.universityName)
-         .join(", ")
-         .replace(/, ([^,]*)$/, " and $1")
-      return `By enabling this you are making this stream only visible to members of ${groupNames}.`
-   }
+   }, [selectedGroups.length])
 
    const handleSetOnlyUrlIds = async () => {
       // @ts-ignore
@@ -427,7 +410,7 @@ const DraftStreamForm = ({
    const isNotAdmin = !Boolean(userData?.isAdmin || group?.id)
    const isGroupAdmin = useCallback(
       (groupId) => (group && group.id === groupId) || userData?.isAdmin,
-      [group?.id]
+      [group, userData?.isAdmin]
    )
 
    const handleGroupSelect = useCallback(
@@ -519,423 +502,160 @@ const DraftStreamForm = ({
    return (
       <Container className={classes.root}>
          {allFetched ? (
-            submitted ? (
-               <SuccessMessage />
-            ) : (
-               <Formik
-                  initialValues={formData}
-                  innerRef={formRef}
-                  enableReinitialize
-                  validate={(values) =>
-                     validateStreamForm(values, true, noValidation())
-                  }
-                  onSubmit={async (values, { setSubmitting }) => {
-                     await onSubmit(
-                        values,
-                        { setSubmitting },
-                        updateMode,
-                        draftStreamId as string,
-                        setFormData,
-                        setDraftId,
-                        status,
-                        setStatus,
-                        selectedJobs
-                     )
-                  }}
-               >
-                  {({
-                     values,
-                     errors,
-                     touched,
-                     handleChange,
-                     handleBlur,
-                     handleSubmit,
-                     isSubmitting,
-                     setFieldValue,
-                     setValues,
-                     validateForm,
-                     /* and other goodies */
-                  }) => {
-                     // @ts-ignore
-                     return (
-                        <form
-                           onSubmit={async (event) => {
-                              event.preventDefault()
-                              const error = await validateForm()
-                              if (Object.keys(error).length) {
-                                 window.scrollTo({
-                                    top: 0,
-                                    left: 0,
-                                    behavior: "smooth",
-                                 })
-                              }
-                              handleSubmit()
-                           }}
-                           className={classes.form}
-                        >
-                           <Typography style={{ color: "white" }} variant="h4">
-                              Stream Info:
-                           </Typography>
-                           <FormGroup container>
-                              <Grid
-                                 xs={groupsSelected() ? 7 : 12}
-                                 sm={groupsSelected() ? 7 : 12}
-                                 md={groupsSelected() ? 9 : 12}
-                                 lg={groupsSelected() ? 9 : 12}
-                                 xl={groupsSelected() ? 9 : 12}
-                                 item
+            <Grid container spacing={2}>
+               <Grid item xs={2}>
+                  <Box sx={{ position: "fixed" }}>Stepper</Box>
+               </Grid>
+               <Grid item xs={10}>
+                  {submitted ? (
+                     <SuccessMessage />
+                  ) : (
+                     <Formik
+                        initialValues={formData}
+                        innerRef={formRef}
+                        enableReinitialize
+                        validate={(values) =>
+                           validateStreamForm(values, true, noValidation())
+                        }
+                        onSubmit={async (values, { setSubmitting }) => {
+                           await onSubmit(
+                              values,
+                              { setSubmitting },
+                              updateMode,
+                              draftStreamId as string,
+                              setFormData,
+                              setDraftId,
+                              status,
+                              setStatus,
+                              selectedJobs
+                           )
+                        }}
+                     >
+                        {({
+                           values,
+                           errors,
+                           touched,
+                           handleChange,
+                           handleBlur,
+                           handleSubmit,
+                           isSubmitting,
+                           setFieldValue,
+                           setValues,
+                           validateForm,
+                           /* and other goodies */
+                        }) => {
+                           // @ts-ignore
+                           return (
+                              <form
+                                 onSubmit={async (event) => {
+                                    event.preventDefault()
+                                    const error = await validateForm()
+                                    if (Object.keys(error).length) {
+                                       window.scrollTo({
+                                          top: 0,
+                                          left: 0,
+                                          behavior: "smooth",
+                                       })
+                                    }
+                                    handleSubmit()
+                                 }}
+                                 className={classes.form}
                               >
-                                 <FormControl fullWidth>
-                                    <TextField
-                                       name="title"
-                                       variant="outlined"
-                                       fullWidth
-                                       id="title"
-                                       label="Livestream Title"
-                                       inputProps={{ maxLength: 104 }}
-                                       onBlur={handleBlur}
-                                       value={values.title}
-                                       disabled={isSubmitting}
-                                       error={Boolean(
-                                          errors.title &&
-                                             touched.title &&
-                                             errors.title
-                                       )}
-                                       onChange={handleChange}
-                                    />
-                                    <Collapse
-                                       style={{ color: "red" }}
-                                       in={Boolean(
-                                          errors.title && touched.title
-                                       )}
-                                    >
-                                       {errors.title}
-                                    </Collapse>
-                                 </FormControl>
-                              </Grid>
-                              {groupsSelected() && (
-                                 <Grid
-                                    xs={5}
-                                    sm={5}
-                                    md={3}
-                                    lg={3}
-                                    xl={3}
-                                    style={{
-                                       display: "grid",
-                                       placeItems: "center",
-                                    }}
-                                    item
-                                 >
-                                    <Tooltip
-                                       placement="top"
-                                       arrow
-                                       disableHoverListener={Boolean(
-                                          !selectedGroups.length
-                                       )}
-                                       title={
-                                          <Typography>
-                                             {buildHiddenMessage()}
-                                          </Typography>
-                                       }
-                                    >
-                                       <FormControlLabel
-                                          labelPlacement="start"
-                                          label="Make Exclusive"
-                                          disabled={Boolean(
-                                             !selectedGroups.length
-                                          )}
-                                          control={
-                                             <Switch
-                                                checked={Boolean(values.hidden)}
-                                                onChange={handleChange}
-                                                disabled={Boolean(
-                                                   !selectedGroups.length ||
-                                                      isSubmitting
-                                                )}
-                                                color="primary"
-                                                id="hidden"
-                                                name="hidden"
-                                                inputProps={{
-                                                   "aria-label":
-                                                      "primary checkbox",
-                                                }}
-                                             />
-                                          }
-                                       />
-                                    </Tooltip>
-                                 </Grid>
-                              )}
-                              <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                 <ImageResolutionText
-                                    resolution={"640 x 480"}
+                                 <StreamInfo
+                                    isGroupsSelected={groupsSelected}
+                                    handleBlur={handleBlur}
+                                    values={values}
+                                    isSubmitting={isSubmitting}
+                                    errors={errors}
+                                    touched={touched}
+                                    handleChange={handleChange}
+                                    selectedGroups={selectedGroups}
+                                    setFieldValue={setFieldValue}
+                                    userData={userData}
+                                    classes={classes}
                                  />
-                                 <ImageSelect
-                                    getDownloadUrl={getDownloadUrl}
+
+                                 <SpeakersInfo
+                                    values={values}
+                                    setValues={setValues}
+                                    speakerLimit={SPEAKER_LIMIT}
+                                    speakerObj={speakerObj}
+                                    errors={errors}
+                                    touched={touched}
                                     setFieldValue={setFieldValue}
                                     isSubmitting={isSubmitting}
-                                    path="company-logos"
-                                    label="Logo"
-                                    formName="companyLogoUrl"
-                                    value={values.companyLogoUrl}
-                                    error={
-                                       errors.companyLogoUrl &&
-                                       touched.companyLogoUrl &&
-                                       errors.companyLogoUrl
-                                    }
-                                    isAvatar={false}
+                                    handleBlur={handleBlur}
                                  />
-                              </Grid>
-                              <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                 <ImageResolutionText
-                                    resolution={"1280 x 960"}
-                                 />
-                                 <ImageSelect
-                                    getDownloadUrl={getDownloadUrl}
-                                    setFieldValue={setFieldValue}
-                                    isSubmitting={isSubmitting}
-                                    path="illustration-images"
-                                    label="Company Background"
-                                    formName="backgroundImageUrl"
-                                    value={values.backgroundImageUrl}
-                                    error={
-                                       errors.backgroundImageUrl &&
-                                       touched.backgroundImageUrl &&
-                                       errors.backgroundImageUrl
-                                    }
-                                    isAvatar={false}
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={6} md={4} item>
-                                 <DateTimePicker
-                                    inputFormat={"dd/MM/yyyy HH:mm"}
-                                    ampm={false}
-                                    renderInput={(params) => (
-                                       <TextField fullWidth {...params} />
-                                    )}
-                                    disabled={isSubmitting}
-                                    label="Livestream Start Date"
-                                    value={values.start}
-                                    onChange={(value) => {
-                                       setFieldValue(
-                                          "start",
-                                          new Date(value),
-                                          true
-                                       )
-                                    }}
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={6} md={4} item>
-                                 <StreamDurationSelect
-                                    value={values.duration}
-                                    start={values.start}
-                                    disabled={isSubmitting}
-                                    label="Estimated Duration"
-                                    setFieldValue={setFieldValue}
-                                    fullWidth
-                                    variant="outlined"
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={12} md={4} item>
-                                 <LanguageSelect
-                                    value={values.language}
-                                    setFieldValue={setFieldValue}
-                                    name="language"
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={12} item>
-                                 <FormControl fullWidth>
-                                    <TextField
-                                       name="company"
-                                       variant="outlined"
-                                       fullWidth
-                                       id="company"
-                                       label="Company Name"
-                                       inputProps={{ maxLength: 70 }}
-                                       onBlur={handleBlur}
-                                       value={values.company}
-                                       disabled={isSubmitting}
-                                       error={Boolean(
-                                          errors.company &&
-                                             touched.company &&
-                                             errors.company
-                                       )}
-                                       onChange={handleChange}
-                                    />
-                                    <Collapse
-                                       style={{ color: "red" }}
-                                       in={Boolean(
-                                          errors.company && touched.company
-                                       )}
-                                    >
-                                       {errors.company}
-                                    </Collapse>
-                                 </FormControl>
-                              </Grid>
 
-                              <Grid xs={12} item>
-                                 <FormControl fullWidth>
-                                    <TextField
-                                       name="summary"
-                                       variant="outlined"
-                                       fullWidth
-                                       multiline
-                                       id="summary"
-                                       label="Summary"
-                                       maxRows={10}
-                                       inputProps={{ maxLength: 5000 }}
-                                       onBlur={handleBlur}
-                                       value={values.summary}
-                                       disabled={isSubmitting}
-                                       error={Boolean(
-                                          errors.summary &&
-                                             touched.summary &&
-                                             errors.summary
-                                       )}
-                                       onChange={handleChange}
-                                    />
-                                    <Collapse
-                                       style={{ color: "red" }}
-                                       in={Boolean(
-                                          errors.summary && touched.summary
-                                       )}
-                                    >
-                                       {errors.summary}
-                                    </Collapse>
-                                 </FormControl>
-                              </Grid>
-
-                              {userData?.isAdmin && (
-                                 <Grid xs={12}>
-                                    <Stack direction="row" spacing={2}>
-                                       <Box
-                                          pl={2}
-                                          display="flex"
-                                          alignItems="center"
+                                 {!!existingGroups.length && (
+                                    <>
+                                       <Typography
+                                          style={{ color: "white" }}
+                                          variant="h4"
                                        >
-                                          Settings only for CF Admins:
-                                       </Box>
-                                       <Tooltip
-                                          placement="top"
-                                          arrow
-                                          title={
-                                             <Typography>
-                                                By disabling questions the
-                                                participants will no longer be
-                                                able to use the Q&A section
-                                                during the livestream and create
-                                                questions during the
-                                                registration process.
-                                             </Typography>
-                                          }
-                                       >
-                                          <FormControlLabel
-                                             labelPlacement="start"
-                                             label="Disable Q&A"
-                                             control={
-                                                <Switch
-                                                   checked={Boolean(
-                                                      values.questionsDisabled
-                                                   )}
-                                                   onChange={handleChange}
-                                                   disabled={Boolean(
-                                                      isSubmitting
-                                                   )}
-                                                   color="primary"
-                                                   id="questionsDisabled"
-                                                   name="questionsDisabled"
-                                                   inputProps={{
-                                                      "aria-label":
-                                                         "primary checkbox",
-                                                   }}
-                                                />
-                                             }
-                                          />
-                                       </Tooltip>
-                                    </Stack>
-                                 </Grid>
-                              )}
-                           </FormGroup>
-                           {Object.keys(values.speakers).map((key, index) => {
-                              return (
-                                 <Fragment key={key}>
-                                    <div className={classes.speakersLabel}>
-                                       <Typography variant="h4">
-                                          {index === 0
-                                             ? "Main Speaker:"
-                                             : `Speaker ${index + 1}:`}
+                                          Hosts and questions:
                                        </Typography>
-                                       {!!index && (
-                                          <Fab
-                                             size="small"
-                                             color="secondary"
-                                             onClick={() =>
-                                                handleDeleteSpeaker(
-                                                   key,
-                                                   values,
-                                                   setValues
-                                                )
-                                             }
+                                       <FormGroup>
+                                          <Grid
+                                             xs={12}
+                                             sm={12}
+                                             md={12}
+                                             lg={12}
+                                             xl={12}
+                                             item
                                           >
-                                             <DeleteIcon />
-                                          </Fab>
-                                       )}
-                                    </div>
-                                    <FormGroup>
-                                       <SpeakerForm
-                                          key={key}
-                                          speakerLimit={SPEAKER_LIMIT}
-                                          handleDeleteSpeaker={
-                                             handleDeleteSpeaker
-                                          }
-                                          setValues={setValues}
-                                          speakerObj={speakerObj}
-                                          handleAddSpeaker={handleAddSpeaker}
-                                          objectKey={key}
-                                          index={index}
-                                          firstNameError={handleError(
-                                             key,
-                                             "firstName",
-                                             errors,
-                                             touched
-                                          )}
-                                          lastNameError={handleError(
-                                             key,
-                                             "lastName",
-                                             errors,
-                                             touched
-                                          )}
-                                          positionError={handleError(
-                                             key,
-                                             "position",
-                                             errors,
-                                             touched
-                                          )}
-                                          backgroundError={handleError(
-                                             key,
-                                             "background",
-                                             errors,
-                                             touched
-                                          )}
-                                          getDownloadUrl={getDownloadUrl}
-                                          speaker={values.speakers[key]}
-                                          values={values}
-                                          firebase={firebase}
-                                          setFieldValue={setFieldValue}
-                                          isSubmitting={isSubmitting}
-                                          handleBlur={handleBlur}
-                                          loading={false}
-                                       />
-                                    </FormGroup>
-                                 </Fragment>
-                              )
-                           })}
-                           {!!existingGroups.length && (
-                              <>
+                                             <MultiListSelect
+                                                inputName="groupIds"
+                                                onSelectItems={(
+                                                   selectedGroups
+                                                ) =>
+                                                   handleGroupSelect(
+                                                      values,
+                                                      selectedGroups
+                                                   )
+                                                }
+                                                selectedItems={selectedGroups}
+                                                allValues={existingGroups}
+                                                disabled={
+                                                   isSubmitting || isNotAdmin
+                                                }
+                                                getLabelFn={mapGroupLabel}
+                                                setFieldValue={setFieldValue}
+                                                inputProps={{
+                                                   label: "Event Hosts",
+                                                   placeholder:
+                                                      "Add some Hosts to your event",
+                                                }}
+                                                disabledValues={
+                                                   isNotAdmin
+                                                      ? existingGroups.map(
+                                                           (g) => g.id
+                                                        )
+                                                      : [group?.id]
+                                                }
+                                             />
+                                          </Grid>
+                                          {selectedGroups.map((group) => {
+                                             return (
+                                                <GroupQuestionSelect
+                                                   key={group.id}
+                                                   group={group}
+                                                   isSubmitting={isSubmitting}
+                                                   isGroupAdmin={isGroupAdmin}
+                                                   values={values}
+                                                   setFieldValue={setFieldValue}
+                                                />
+                                             )
+                                          })}
+                                       </FormGroup>
+                                    </>
+                                 )}
+
                                  <Typography
                                     style={{ color: "white" }}
                                     variant="h4"
                                  >
-                                    Hosts and questions:
+                                    Event Categories:
                                  </Typography>
                                  <FormGroup>
                                     <Grid
@@ -947,181 +667,128 @@ const DraftStreamForm = ({
                                        item
                                     >
                                        <MultiListSelect
-                                          inputName="groupIds"
-                                          onSelectItems={(selectedGroups) =>
-                                             handleGroupSelect(
-                                                values,
-                                                selectedGroups
-                                             )
-                                          }
-                                          selectedItems={selectedGroups}
-                                          allValues={existingGroups}
-                                          disabled={isSubmitting || isNotAdmin}
-                                          getLabelFn={mapGroupLabel}
+                                          inputName="interestsIds"
+                                          onSelectItems={setSelectedInterests}
+                                          selectedItems={selectedInterests}
+                                          allValues={existingInterests}
+                                          disabled={isSubmitting}
+                                          limit={5}
                                           setFieldValue={setFieldValue}
                                           inputProps={{
-                                             label: "Event Hosts",
+                                             label: "Add some Categories",
                                              placeholder:
-                                                "Add some Hosts to your event",
+                                                "Choose 5 categories that best describe this event",
                                           }}
-                                          disabledValues={
-                                             isNotAdmin
-                                                ? existingGroups.map(
-                                                     (g) => g.id
-                                                  )
-                                                : [group?.id]
-                                          }
+                                          chipProps={{
+                                             variant: "outlined",
+                                          }}
+                                          isCheckbox={true}
                                        />
                                     </Grid>
-                                    {selectedGroups.map((group) => {
-                                       return (
-                                          <GroupQuestionSelect
-                                             key={group.id}
-                                             group={group}
-                                             isSubmitting={isSubmitting}
-                                             isGroupAdmin={isGroupAdmin}
-                                             values={values}
-                                             setFieldValue={setFieldValue}
-                                          />
-                                       )
-                                    })}
                                  </FormGroup>
-                              </>
-                           )}
 
-                           <Typography style={{ color: "white" }} variant="h4">
-                              Event Categories:
-                           </Typography>
-                           <FormGroup>
-                              <Grid
-                                 xs={12}
-                                 sm={12}
-                                 md={12}
-                                 lg={12}
-                                 xl={12}
-                                 item
-                              >
-                                 <MultiListSelect
-                                    inputName="interestsIds"
-                                    onSelectItems={setSelectedInterests}
-                                    selectedItems={selectedInterests}
-                                    allValues={existingInterests}
-                                    disabled={isSubmitting}
-                                    limit={5}
-                                    setFieldValue={setFieldValue}
-                                    inputProps={{
-                                       label: "Add some Categories",
-                                       placeholder:
-                                          "Choose 5 categories that best describe this event",
-                                    }}
-                                    chipProps={{
-                                       variant: "outlined",
-                                    }}
-                                    isCheckbox={true}
-                                 />
-                              </Grid>
-                           </FormGroup>
-
-                           <Typography style={{ color: "white" }} variant="h4">
-                              Target Students:
-                           </Typography>
-
-                           <FormGroup>
-                              <Grid xs={12} item>
-                                 <FieldsOfStudyMultiSelector
-                                    selectedItems={values.targetFieldsOfStudy}
-                                    setFieldValue={setFieldValue}
-                                 />
-                              </Grid>
-
-                              <Grid xs={12} item>
-                                 <LevelsOfStudyMultiSelector
-                                    selectedItems={values.targetLevelsOfStudy}
-                                    setFieldValue={setFieldValue}
-                                 />
-                              </Grid>
-                           </FormGroup>
-
-                           <SuspenseWithBoundary hide expected>
-                              {values.groupIds.length > 0 && (
-                                 <JobSelectorCategory
-                                    groupId={values.groupIds[0]} // we only support a single group for now
-                                    onSelectItems={setSelectedJobs}
-                                    selectedItems={selectedJobs}
-                                 />
-                              )}
-                           </SuspenseWithBoundary>
-
-                           <ButtonGroup
-                              className={classes.buttonGroup}
-                              fullWidth
-                           >
-                              <Button
-                                 type="submit"
-                                 onClick={handleClickSubmitForApproval}
-                                 disabled={isSubmitting || isPending()}
-                                 size="large"
-                                 className={classes.submit}
-                                 endIcon={
-                                    isSubmitting && (
-                                       <CircularProgress
-                                          size={20}
-                                          color="inherit"
-                                       />
-                                    )
-                                 }
-                                 variant="contained"
-                              >
-                                 <Typography variant="h4">
-                                    {isSubmitting
-                                       ? "Submitting"
-                                       : isPending()
-                                       ? "Pending for Approval"
-                                       : "Submit Draft for Approval"}
+                                 <Typography
+                                    style={{ color: "white" }}
+                                    variant="h4"
+                                 >
+                                    Target Students:
                                  </Typography>
-                              </Button>
-                              <Button
-                                 type="submit"
-                                 ref={saveChangesButtonRef}
-                                 disabled={isSubmitting}
-                                 size="large"
-                                 onClick={() => {
-                                    setStatus(SAVE_WITH_NO_VALIDATION)
-                                 }}
-                                 className={classes.submit}
-                                 endIcon={
-                                    isSubmitting && (
-                                       <CircularProgress
-                                          size={20}
-                                          color="inherit"
+
+                                 <FormGroup>
+                                    <Grid xs={12} item>
+                                       <FieldsOfStudyMultiSelector
+                                          selectedItems={
+                                             values.targetFieldsOfStudy
+                                          }
+                                          setFieldValue={setFieldValue}
                                        />
-                                    )
-                                 }
-                                 variant="contained"
-                              >
-                                 <Typography variant="h4">
-                                    {isSubmitting ? "Saving" : "Save changes"}
-                                 </Typography>
-                              </Button>
-                           </ButtonGroup>
-                        </form>
-                     )
-                  }}
-               </Formik>
-            )
+                                    </Grid>
+
+                                    <Grid xs={12} item>
+                                       <LevelsOfStudyMultiSelector
+                                          selectedItems={
+                                             values.targetLevelsOfStudy
+                                          }
+                                          setFieldValue={setFieldValue}
+                                       />
+                                    </Grid>
+                                 </FormGroup>
+
+                                 <SuspenseWithBoundary hide expected>
+                                    {values.groupIds.length > 0 && (
+                                       <JobSelectorCategory
+                                          groupId={values.groupIds[0]} // we only support a single group for now
+                                          onSelectItems={setSelectedJobs}
+                                          selectedItems={selectedJobs}
+                                       />
+                                    )}
+                                 </SuspenseWithBoundary>
+
+                                 <ButtonGroup
+                                    className={classes.buttonGroup}
+                                    fullWidth
+                                 >
+                                    <Button
+                                       type="submit"
+                                       onClick={handleClickSubmitForApproval}
+                                       disabled={isSubmitting || isPending()}
+                                       size="large"
+                                       className={classes.submit}
+                                       endIcon={
+                                          isSubmitting && (
+                                             <CircularProgress
+                                                size={20}
+                                                color="inherit"
+                                             />
+                                          )
+                                       }
+                                       variant="contained"
+                                    >
+                                       <Typography variant="h4">
+                                          {isSubmitting
+                                             ? "Submitting"
+                                             : isPending()
+                                             ? "Pending for Approval"
+                                             : "Submit Draft for Approval"}
+                                       </Typography>
+                                    </Button>
+                                    <Button
+                                       type="submit"
+                                       ref={saveChangesButtonRef}
+                                       disabled={isSubmitting}
+                                       size="large"
+                                       onClick={() => {
+                                          setStatus(SAVE_WITH_NO_VALIDATION)
+                                       }}
+                                       className={classes.submit}
+                                       endIcon={
+                                          isSubmitting && (
+                                             <CircularProgress
+                                                size={20}
+                                                color="inherit"
+                                             />
+                                          )
+                                       }
+                                       variant="contained"
+                                    >
+                                       <Typography variant="h4">
+                                          {isSubmitting
+                                             ? "Saving"
+                                             : "Save changes"}
+                                       </Typography>
+                                    </Button>
+                                 </ButtonGroup>
+                              </form>
+                           )
+                        }}
+                     </Formik>
+                  )}
+               </Grid>
+            </Grid>
          ) : (
-            <CircularProgress style={{ margin: "auto", color: "white" }} />
+            <CircularProgress style={{ margin: "auto", color: "primary" }} />
          )}
       </Container>
-   )
-}
-
-const ImageResolutionText = ({ resolution }) => {
-   return (
-      <Typography fontSize="10px" textAlign="center" color="text.secondary">
-         <strong style={{ fontWeight: 500 }}>Recommended Resolution:</strong>{" "}
-         {resolution}
-      </Typography>
    )
 }
 

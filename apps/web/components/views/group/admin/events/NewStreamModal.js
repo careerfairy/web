@@ -1,20 +1,15 @@
 import React, { useRef, useState } from "react"
-import { alpha } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import {
    AppBar,
    Button,
-   ButtonGroup,
    CardActions,
    Dialog,
    DialogContent,
-   IconButton,
    Slide,
    Toolbar,
    Typography,
-   Zoom,
 } from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { buildLivestreamObject } from "../../../../helperFunctions/streamFormFunctions"
@@ -33,12 +28,13 @@ const useStyles = makeStyles((theme) => ({
    title: {
       marginLeft: theme.spacing(2),
       flex: 1,
+      color: theme.palette.text.primary,
    },
    background: {
-      backgroundColor: alpha(theme.palette.primary.dark, 0.7),
+      background: "white",
    },
    appBar: {
-      backgroundColor: theme.palette.navyBlue.main,
+      backgroundColor: "white",
    },
    content: {
       display: "flex",
@@ -241,35 +237,42 @@ const NewStreamModal = ({
       }
    }
 
-   const Actions = ({ size, className }) => (
+   const Actions = () => (
       <>
+         <Button
+            disabled={formRef.current?.isSubmitting}
+            size="large"
+            variant="outlined"
+            color="secondary"
+            onClick={handleCloseDialog}
+            sx={{ marginRight: 2 }}
+         >
+            <Typography variant="h7">Back to event page</Typography>
+         </Button>
          {canPublish() && (
             <Button
-               startIcon={<PublishIcon fontSize={size} />}
+               startIcon={<PublishIcon fontSize="large" />}
                disabled={formRef.current?.isSubmitting}
                variant="contained"
-               size={size}
-               className={className}
+               size="large"
                autoFocus
                color="secondary"
                onClick={handleValidate}
+               sx={{ marginRight: 2 }}
             >
-               <Typography variant={size === "large" ? "h5" : undefined}>
-                  publish as stream
-               </Typography>
+               <Typography variant="h7">publish as stream</Typography>
             </Button>
          )}
          <Button
             disabled={formRef.current?.isSubmitting}
-            size={size}
-            className={className}
-            startIcon={currentStream && <SaveIcon fontSize={size} />}
+            size="large"
+            startIcon={currentStream && <SaveIcon fontSize="large" />}
             variant="contained"
             autoFocus
-            color="primary"
+            color="secondary"
             onClick={handleSaveOrUpdate}
          >
-            <Typography variant={size === "large" ? "h5" : undefined}>
+            <Typography variant="h7">
                {!currentStream
                   ? "Create draft"
                   : isActualLivestream()
@@ -284,25 +287,16 @@ const NewStreamModal = ({
       <Dialog
          keepMounted={false}
          TransitionComponent={Transition}
-         scroll="body"
+         scroll="paper"
          onClose={handleCloseDialog}
-         fullScreen
          open={open}
+         maxWidth="xl"
          PaperProps={{
             className: classes.background,
          }}
       >
          <AppBar className={classes.appBar} position="sticky">
             <Toolbar>
-               <IconButton
-                  edge="start"
-                  color="inherit"
-                  onClick={handleCloseDialog}
-                  aria-label="close"
-                  size="large"
-               >
-                  <CloseIcon />
-               </IconButton>
                <Typography variant="h4" className={classes.title}>
                   {isActualLivestream()
                      ? "Update Stream"
@@ -331,17 +325,6 @@ const NewStreamModal = ({
                      currentStream={currentStream}
                      setSubmitted={setSubmitted}
                   />
-                  <Zoom
-                     in
-                     timeout={1500}
-                     style={{
-                        transitionDelay: "500ms",
-                     }}
-                  >
-                     <ButtonGroup>
-                        <Actions className={classes.whiteBtn} size="large" />
-                     </ButtonGroup>
-                  </Zoom>
                </DialogContent>
             </div>
          </DialogContent>

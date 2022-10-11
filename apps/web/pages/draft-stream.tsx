@@ -141,7 +141,7 @@ const DraftStream = () => {
                author
             )
             // console.log("-> Draft livestream was created with id", id);
-            push(`/draft-stream?draftStreamId=${id}`)
+            push(`/draft-stream?draftStreamId=${id}`).catch()
          }
 
          if (status === SUBMIT_FOR_APPROVAL) {
