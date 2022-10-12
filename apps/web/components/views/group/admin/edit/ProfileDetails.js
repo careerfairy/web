@@ -64,6 +64,7 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
             const minDescCharLength = 10
             const minGroupNameLength = 5
             const extraInfoMaxLength = 700
+            const groupNameMaxLength = 60
             if (!values.description) {
                errors.description = "Please fill"
             } else if (values.description.length < minDescCharLength) {
@@ -71,6 +72,10 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
             }
             if (values.extraInfo.length > extraInfoMaxLength) {
                errors.extraInfo = `Cannot be more than ${extraInfoMaxLength} characters`
+            }
+
+            if (values.universityName.length > groupNameMaxLength) {
+               errors.universityName = `Cannot be more than ${groupNameMaxLength} characters`
             }
 
             if (!values.universityName) {
