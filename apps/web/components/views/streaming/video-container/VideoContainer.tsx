@@ -31,6 +31,7 @@ import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
 import { useRtc } from "../../../../context/agora/RTCProvider"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import FloatingHelpButton from "../sharedComponents/FloatingHelpButton"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -393,6 +394,7 @@ const VideoContainer = ({
             {WifiIndicatorMemoized}
          </DraggableComponent>
          <AgoraStateHandler />
+         <FloatingHelpButton />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}
