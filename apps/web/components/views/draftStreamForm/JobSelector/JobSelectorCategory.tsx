@@ -77,12 +77,15 @@ const FormSection = ({
 
    return (
       <>
-         <Typography style={{ color: "white" }} variant="h4">
-            Open Jobs:
+         <Typography fontWeight="bold" variant="h4">
+            Job
+         </Typography>
+         <Typography variant="subtitle1" mt={1} color="textSecondary">
+            Select a job that related to this event
          </Typography>
 
-         <FormGroup>
-            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+         <FormGroup container boxShadow={0}>
+            <Grid xs={12} item>
                <MultiListSelect
                   inputName="jobIds"
                   selectedItems={selectedItems}
@@ -95,7 +98,8 @@ const FormSection = ({
                      placeholder: "Select one job",
                   }}
                   chipProps={{
-                     variant: "outlined",
+                     variant: "contained",
+                     color: "secondary",
                   }}
                />
             </Grid>

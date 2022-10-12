@@ -20,7 +20,6 @@ import { v4 as uuidv4 } from "uuid"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import makeStyles from "@mui/styles/makeStyles"
 import { useRouter } from "next/router"
-import FormGroup from "./FormGroup"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
    getStreamSubCollectionSpeakers,
@@ -36,7 +35,6 @@ import {
 } from "../../util/constants"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
-import MultiListSelect from "../common/MultiListSelect"
 import { useInterests } from "../../custom-hook/useCollection"
 import { createStyles } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
@@ -49,12 +47,13 @@ import {
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { FormikHelpers } from "formik/dist/types"
-import GroupQuestionSelect from "./GroupQuestionSelect"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import FieldsOfStudyMultiSelector from "./TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
-import LevelsOfStudyMultiSelector from "./TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 import StreamInfo from "./StreamForm/StreamInfo"
 import SpeakersInfo from "./StreamForm/SpeakersInfo"
+import TargetStudentsInfo from "./StreamForm/TargetStudentsInfo"
+import PromotionInfo from "./StreamForm/PromotionInfo"
+import EventCategoriesInfo from "./StreamForm/EventCategoriesInfo"
+import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -202,7 +201,7 @@ const DraftStreamForm = ({
    const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
       []
    )
-   const [allFetched, setAllFetched] = useState(false)
+   const [allFetched, setAllFetched] = useState(false) // TODO GS: change to false
    const [updateMode, setUpdateMode] = useState(false)
 
    const { data: existingInterests } = useInterests()
@@ -587,132 +586,17 @@ const DraftStreamForm = ({
                                     handleBlur={handleBlur}
                                  />
 
-                                 {!!existingGroups.length && (
-                                    <>
-                                       <Typography
-                                          style={{ color: "white" }}
-                                          variant="h4"
-                                       >
-                                          Hosts and questions:
-                                       </Typography>
-                                       <FormGroup>
-                                          <Grid
-                                             xs={12}
-                                             sm={12}
-                                             md={12}
-                                             lg={12}
-                                             xl={12}
-                                             item
-                                          >
-                                             <MultiListSelect
-                                                inputName="groupIds"
-                                                onSelectItems={(
-                                                   selectedGroups
-                                                ) =>
-                                                   handleGroupSelect(
-                                                      values,
-                                                      selectedGroups
-                                                   )
-                                                }
-                                                selectedItems={selectedGroups}
-                                                allValues={existingGroups}
-                                                disabled={
-                                                   isSubmitting || isNotAdmin
-                                                }
-                                                getLabelFn={mapGroupLabel}
-                                                setFieldValue={setFieldValue}
-                                                inputProps={{
-                                                   label: "Event Hosts",
-                                                   placeholder:
-                                                      "Add some Hosts to your event",
-                                                }}
-                                                disabledValues={
-                                                   isNotAdmin
-                                                      ? existingGroups.map(
-                                                           (g) => g.id
-                                                        )
-                                                      : [group?.id]
-                                                }
-                                             />
-                                          </Grid>
-                                          {selectedGroups.map((group) => {
-                                             return (
-                                                <GroupQuestionSelect
-                                                   key={group.id}
-                                                   group={group}
-                                                   isSubmitting={isSubmitting}
-                                                   isGroupAdmin={isGroupAdmin}
-                                                   values={values}
-                                                   setFieldValue={setFieldValue}
-                                                />
-                                             )
-                                          })}
-                                       </FormGroup>
-                                    </>
-                                 )}
+                                 <TargetStudentsInfo
+                                    targetFieldsOfStudy={
+                                       values.targetFieldsOfStudy
+                                    }
+                                    targetLevelsOfStudy={
+                                       values.targetLevelsOfStudy
+                                    }
+                                    setFieldValue={setFieldValue}
+                                 />
 
-                                 <Typography
-                                    style={{ color: "white" }}
-                                    variant="h4"
-                                 >
-                                    Event Categories:
-                                 </Typography>
-                                 <FormGroup>
-                                    <Grid
-                                       xs={12}
-                                       sm={12}
-                                       md={12}
-                                       lg={12}
-                                       xl={12}
-                                       item
-                                    >
-                                       <MultiListSelect
-                                          inputName="interestsIds"
-                                          onSelectItems={setSelectedInterests}
-                                          selectedItems={selectedInterests}
-                                          allValues={existingInterests}
-                                          disabled={isSubmitting}
-                                          limit={5}
-                                          setFieldValue={setFieldValue}
-                                          inputProps={{
-                                             label: "Add some Categories",
-                                             placeholder:
-                                                "Choose 5 categories that best describe this event",
-                                          }}
-                                          chipProps={{
-                                             variant: "outlined",
-                                          }}
-                                          isCheckbox={true}
-                                       />
-                                    </Grid>
-                                 </FormGroup>
-
-                                 <Typography
-                                    style={{ color: "white" }}
-                                    variant="h4"
-                                 >
-                                    Target Students:
-                                 </Typography>
-
-                                 <FormGroup>
-                                    <Grid xs={12} item>
-                                       <FieldsOfStudyMultiSelector
-                                          selectedItems={
-                                             values.targetFieldsOfStudy
-                                          }
-                                          setFieldValue={setFieldValue}
-                                       />
-                                    </Grid>
-
-                                    <Grid xs={12} item>
-                                       <LevelsOfStudyMultiSelector
-                                          selectedItems={
-                                             values.targetLevelsOfStudy
-                                          }
-                                          setFieldValue={setFieldValue}
-                                       />
-                                    </Grid>
-                                 </FormGroup>
+                                 <PromotionInfo />
 
                                  <SuspenseWithBoundary hide expected>
                                     {values.groupIds.length > 0 && (
@@ -723,6 +607,26 @@ const DraftStreamForm = ({
                                        />
                                     )}
                                  </SuspenseWithBoundary>
+
+                                 <HostAndQuestionsInfo
+                                    existingGroups={existingGroups}
+                                    handleGroupSelect={handleGroupSelect}
+                                    values={values}
+                                    selectedGroups={selectedGroups}
+                                    isSubmitting={isSubmitting}
+                                    isNotAdmin={isNotAdmin}
+                                    setFieldValue={setFieldValue}
+                                    isGroupAdmin={isGroupAdmin}
+                                    groupId={group?.id}
+                                 />
+
+                                 <EventCategoriesInfo
+                                    setSelectedInterests={setSelectedInterests}
+                                    selectedInterests={selectedInterests}
+                                    existingInterests={existingInterests}
+                                    isSubmitting={isSubmitting}
+                                    setFieldValue={setFieldValue}
+                                 />
 
                                  <ButtonGroup
                                     className={classes.buttonGroup}
@@ -791,7 +695,5 @@ const DraftStreamForm = ({
       </Container>
    )
 }
-
-const mapGroupLabel = (obj) => obj.universityName
 
 export default DraftStreamForm

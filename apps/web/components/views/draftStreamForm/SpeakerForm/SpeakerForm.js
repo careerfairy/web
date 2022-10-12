@@ -8,7 +8,7 @@ const useStyles = makeStyles((theme) => ({
    formGrid: {
       display: "flex",
       flexDirection: "column",
-      justifyContent: "end",
+      justifyContent: "center",
       marginLeft: theme.spacing(4),
    },
    addButton: {

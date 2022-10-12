@@ -48,8 +48,8 @@ const useStyles = makeStyles((theme) => ({
       },
    },
    avaLarge: {
-      width: theme.spacing(20),
-      height: theme.spacing(20),
+      width: theme.spacing(18),
+      height: theme.spacing(18),
    },
    avatarRing: {
       borderRadius: "50%",
