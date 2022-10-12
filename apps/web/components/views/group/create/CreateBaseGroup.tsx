@@ -14,7 +14,6 @@ import {
    Typography,
 } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import * as yup from "yup"
 import {
    University,
@@ -56,7 +55,7 @@ const useStyles = makeStyles((theme) => ({
 const schema = yup.object().shape({
    universityName: yup
       .string()
-      .max(30, "Must be 30 characters or less")
+      .max(60, "Must be 60 characters or less")
       .required("Required"),
    description: yup
       .string()
@@ -222,7 +221,7 @@ const CreateBaseGroup = ({
                         id="groupName"
                         value={values.universityName}
                         onChange={handleChange}
-                        inputProps={{ maxLength: 30 }}
+                        inputProps={{ maxLength: 60 }}
                         error={Boolean(
                            touched.universityName && errors.universityName
                         )}
