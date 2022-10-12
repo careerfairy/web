@@ -266,9 +266,8 @@ export class GroupFunctionsRepository
          logoUrl: group.logoUrl || "",
          universityName: group.universityName || "",
          universityCode: group.universityCode || "",
+         test: false,
       }
-
-      await groupRef.set(newGroupData)
 
       batch.set(groupRef, newGroupData)
 

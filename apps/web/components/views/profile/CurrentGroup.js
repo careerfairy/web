@@ -19,7 +19,10 @@ import AreYouSureModal from "../../../materialUI/GlobalModals/AreYouSureModal"
 import Skeleton from "@mui/material/Skeleton"
 import Link from "next/link"
 import Fade from "@stahl.luke/react-reveal/Fade"
-import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "../../helperFunctions/HelperFunctions"
 import { groupRepo } from "../../../data/RepositoryInstances"
 
 const useStyles = makeStyles((theme) => ({
@@ -38,6 +41,12 @@ const useStyles = makeStyles((theme) => ({
    },
    actions: {
       justifyContent: "center",
+   },
+   title: {
+      ...getMaxLineStyles(2),
+   },
+   description: {
+      ...getMaxLineStyles(3),
    },
 }))
 
@@ -187,12 +196,14 @@ const CurrentGroup = ({
                         gutterBottom
                         variant="h5"
                         component="h2"
+                        className={classes.title}
                      >
                         {localGroup.universityName}
                      </Typography>
                      <Typography
                         align="center"
                         variant="body2"
+                        className={classes.description}
                         color="textSecondary"
                         component="p"
                      >
