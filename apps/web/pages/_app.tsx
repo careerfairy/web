@@ -41,6 +41,7 @@ import {
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import { actionTypes } from "redux-firestore"
 import HelpScoutBeaconScript from "../scripts/HelpScoutBeaconScript"
+import useCrisp from "../components/custom-hook/useCrisp"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -76,6 +77,7 @@ function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
+   useCrisp()
 
    return (
       <CacheProvider value={emotionCache}>
