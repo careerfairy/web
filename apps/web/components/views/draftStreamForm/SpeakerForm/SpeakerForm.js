@@ -56,7 +56,7 @@ const SpeakerForm = ({
 
    return (
       <Fragment>
-         <Grid sx={{ display: "flex" }} xs={12}>
+         <Grid sx={{ display: "flex" }} xs={12} item>
             <Collapse in={animate} component={Grid} xs={12} lg={3} item>
                <ImageSelect
                   path="mentors-pictures"
@@ -230,7 +230,7 @@ const SpeakerForm = ({
          </Grid>
 
          {isLast && (
-            <Grid xs={12} className={classes.addButton}>
+            <Grid xs={12} className={classes.addButton} item>
                <Button
                   startIcon={<PersonAddIcon />}
                   disabled={

@@ -272,7 +272,7 @@ const StreamInfo = ({
             </Grid>
 
             {userData?.isAdmin && (
-               <Grid xs={12}>
+               <Grid xs={12} item>
                   <Stack direction="row" spacing={2}>
                      <Box pl={2} display="flex" alignItems="center">
                         Settings only for CF Admins:

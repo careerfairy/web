@@ -30,56 +30,50 @@ const HostAndQuestionsInfo = ({
 }: Props) => {
    return (
       <>
-         {!!existingGroups.length && (
-            <>
-               <Typography fontWeight="bold" variant="h4">
-                  Hosts and questions
-               </Typography>
-               <Typography variant="subtitle1" mt={1} color="textSecondary">
-                  Add hosts and questions to your event
-               </Typography>
-               <FormGroup container boxShadow={0}>
-                  <Grid xs={12} item>
-                     <MultiListSelect
-                        inputName="groupIds"
-                        onSelectItems={(selectedGroups) =>
-                           handleGroupSelect(values, selectedGroups)
-                        }
-                        selectedItems={selectedGroups}
-                        allValues={existingGroups}
-                        disabled={isSubmitting || isNotAdmin}
-                        getLabelFn={mapGroupLabel}
-                        setFieldValue={setFieldValue}
-                        inputProps={{
-                           label: "Event Hosts",
-                           placeholder: "Add some Hosts to your event",
-                        }}
-                        disabledValues={
-                           isNotAdmin
-                              ? existingGroups.map((g) => g.id)
-                              : [groupId]
-                        }
-                        chipProps={{
-                           variant: "contained",
-                           color: "secondary",
-                        }}
-                     />
-                  </Grid>
-                  {selectedGroups.map((group) => {
-                     return (
-                        <GroupQuestionSelect
-                           key={group.id}
-                           group={group}
-                           isSubmitting={isSubmitting}
-                           isGroupAdmin={isGroupAdmin}
-                           values={values}
-                           setFieldValue={setFieldValue}
-                        />
-                     )
-                  })}
-               </FormGroup>
-            </>
-         )}
+         <Typography fontWeight="bold" variant="h4">
+            Hosts and questions
+         </Typography>
+         <Typography variant="subtitle1" mt={1} color="textSecondary">
+            Add hosts and questions to your event
+         </Typography>
+         <FormGroup container boxShadow={0}>
+            <Grid xs={12} item>
+               <MultiListSelect
+                  inputName="groupIds"
+                  onSelectItems={(selectedGroups) =>
+                     handleGroupSelect(values, selectedGroups)
+                  }
+                  selectedItems={selectedGroups}
+                  allValues={existingGroups}
+                  disabled={isSubmitting || isNotAdmin}
+                  getLabelFn={mapGroupLabel}
+                  setFieldValue={setFieldValue}
+                  inputProps={{
+                     label: "Event Hosts",
+                     placeholder: "Add some Hosts to your event",
+                  }}
+                  disabledValues={
+                     isNotAdmin ? existingGroups.map((g) => g.id) : [groupId]
+                  }
+                  chipProps={{
+                     variant: "contained",
+                     color: "secondary",
+                  }}
+               />
+            </Grid>
+            {selectedGroups.map((group) => {
+               return (
+                  <GroupQuestionSelect
+                     key={group.id}
+                     group={group}
+                     isSubmitting={isSubmitting}
+                     isGroupAdmin={isGroupAdmin}
+                     values={values}
+                     setFieldValue={setFieldValue}
+                  />
+               )
+            })}
+         </FormGroup>
       </>
    )
 }
