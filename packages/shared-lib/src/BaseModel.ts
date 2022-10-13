@@ -109,6 +109,24 @@ export function mapIfObject<T extends BaseModel>(
 }
 
 /**
+ * Maps both types of relationships: array of ids and array of objects
+ */
+export function mapRelation<T extends BaseModel>(
+   data: any[],
+   creationFunction: (field: any) => any
+) {
+   if (!data || data.length === 0) return []
+
+   // should be an array of relationships ids
+   if (data.length > 0 && typeof data[0] === "string") {
+      return data
+   }
+
+   // map the objects
+   return mapIfObject<T>(data, creationFunction)
+}
+
+/**
  * Convert a serialized date object to Date
  *
  * This method should convert back the number of milliseconds to Date

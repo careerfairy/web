@@ -13,6 +13,7 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import firebase from "firebase/compat"
 import admin = require("firebase-admin")
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -73,6 +74,11 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
     * This method will return the invitation document if it exists for the given email
     * */
    getDashboardInvite(emailToCheck: string): Promise<GroupDashboardInvite>
+
+   getATSIntegration(
+      groupId: string,
+      integrationId: string
+   ): Promise<GroupATSAccount>
 }
 
 export class GroupFunctionsRepository
@@ -303,6 +309,22 @@ export class GroupFunctionsRepository
       if (docs.size !== 1) return null
 
       return this.addIdToDoc<GroupDashboardInvite>(docs.docs[0])
+   }
+
+   async getATSIntegration(
+      groupId: string,
+      integrationId: string
+   ): Promise<GroupATSAccount> {
+      const doc = await this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+         .get()
+
+      if (!doc.exists) return null
+
+      return GroupATSAccount.createFromDocument(doc.data() as any)
    }
 }
 
