@@ -261,8 +261,6 @@ export const atsUserApplyToJob = functions
                }
             }
 
-            console.log("candidate object", candidate)
-
             // Create the application if needed
             if (candidate.applications.length === 0) {
                // Create the application
