@@ -64,6 +64,17 @@ export class MergeATSRepository implements IATSRepository {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
          `/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100`
       )
+
+      // Sort by last updated date, in place
+      data.results.sort((a, b) => {
+         if (!a.remote_updated_at || !b.remote_updated_at) return 0
+
+         const aDate = new Date(a.remote_updated_at)
+         const bDate = new Date(b.remote_created_at)
+
+         return bDate.getTime() - aDate.getTime()
+      })
+
       return data.results.map(Job.createFromMerge)
    }
 

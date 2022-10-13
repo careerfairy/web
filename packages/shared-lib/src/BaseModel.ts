@@ -36,6 +36,7 @@ export abstract class BaseModel {
             serialized[key] = (this[key] as unknown as Date).getTime()
             continue
          }
+
          // check if array
          if (
             Array.isArray(this[key]) &&
@@ -48,10 +49,18 @@ export abstract class BaseModel {
             )
             continue
          }
+
          if (this[key] instanceof BaseModel) {
             serialized[key] = this[key].serializeToPlainObject()
             continue
          }
+
+         // Firestore doesn't accept undefined
+         if (this[key] === undefined) {
+            serialized[key] = null
+            continue
+         }
+
          serialized[key] = this[key]
       }
       return serialized
