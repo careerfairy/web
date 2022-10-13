@@ -2,7 +2,7 @@ import { Group, GroupQuestion } from "./groups"
 import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
 
-export const ATS_MAX_LINKED_ACCOUNTS = 2
+export const ATS_MAX_LINKED_ACCOUNTS = 1
 
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
