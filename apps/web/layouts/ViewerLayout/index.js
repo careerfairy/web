@@ -31,6 +31,7 @@ import { groupRepo } from "../../data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import RTCProvider from "../../context/agora/RTCProvider"
+import { LEFT_MENU_WIDTH } from "../../constants/streams"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -56,7 +57,8 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       flex: "1 1 auto",
       overflow: "hidden",
-      paddingLeft: ({ showMenu, mobile }) => (showMenu && !mobile ? 280 : 0),
+      paddingLeft: ({ showMenu, mobile }) =>
+         showMenu && !mobile ? LEFT_MENU_WIDTH : 0,
       transition: theme.transitions.create("padding-left", {
          duration: theme.transitions.duration.shortest,
          easing: theme.transitions.easing.easeInOut,

@@ -19,6 +19,7 @@ import {
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
+import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -52,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
    },
    // @ts-ignore
    desktopDrawer: ({ focusModeEnabled }) => ({
-      width: 280,
+      width: LEFT_MENU_WIDTH,
       top: focusModeEnabled ? 0 : 55,
       height: focusModeEnabled ? "100%" : "calc(100% - 55px)",
       boxShadow: theme.shadows[15],

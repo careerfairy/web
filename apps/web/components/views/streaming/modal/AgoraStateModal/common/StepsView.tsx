@@ -1,9 +1,10 @@
-import React, { ComponentProps, FC } from "react"
-import { ButtonProps, Card, Stack, Typography } from "@mui/material"
+import React, { FC, useMemo } from "react"
+import { ButtonProps, Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
+import Router from "next/router"
 
 const styles = sxStyles({
    root: {
@@ -14,10 +15,6 @@ const styles = sxStyles({
       cursor: "pointer",
       transition: (theme) =>
          theme.transitions.create(["border", "background-color"]),
-      "&:hover, &:focus": {
-         border: (theme) => `1px solid ${theme.palette.grey["600"]}`,
-         backgroundColor: "background.default",
-      },
    },
    number: {
       fontSize: "2rem",
@@ -34,10 +31,20 @@ const styles = sxStyles({
    },
 })
 
+type StepId = "networkError" | "refresh" | "uidConflict"
+
 type Props = {
-   steps: ComponentProps<typeof StepCard>[]
+   stepIds: StepId[]
 }
-const StepsView = ({ steps }: Props) => {
+const StepsView = ({ stepIds }: Props) => {
+   const steps = useMemo(
+      () =>
+         stepIds?.length
+            ? stepIds.map((stepId) => stepsDict[stepId] || null)
+            : Object.values(stepsDict),
+      [stepIds]
+   )
+
    return (
       <Stack spacing={1.5}>
          {steps.map((resource) => (
@@ -57,9 +64,8 @@ export interface StepCardProps {
 
 export const StepCard: FC<StepCardProps> = (props) => {
    return (
-      <Card
+      <Box
          onClick={props.onClick}
-         elevation={0}
          sx={{
             ...styles.root,
             ...(props.onClick && styles.clickable),
@@ -85,13 +91,15 @@ export const StepCard: FC<StepCardProps> = (props) => {
                   spacing={1}
                >
                   <Box>
-                     <Typography
-                        gutterBottom={Boolean(props.description)}
-                        sx={styles.title}
-                        variant="h5"
-                     >
-                        {props.title}
-                     </Typography>
+                     {props.title && (
+                        <Typography
+                           gutterBottom={Boolean(props.description)}
+                           sx={styles.title}
+                           variant="h5"
+                        >
+                           {props.title}
+                        </Typography>
+                     )}
                      {props.description && (
                         <Typography variant="body1">
                            {props.description}
@@ -111,8 +119,43 @@ export const StepCard: FC<StepCardProps> = (props) => {
                </Stack>
             </Grid>
          </Grid>
-      </Card>
+      </Box>
    )
+}
+
+const stepsDict: Record<StepId, StepCardProps> = {
+   networkError: {
+      title: "Change Network",
+      description:
+         "Try disconnecting from any VPN, switching to another " +
+         "network or use a mobile hotspot. and click refresh once done.",
+      actionButtonProps: {
+         onClick: Router.reload,
+         children: "Refresh",
+         variant: "contained",
+         color: "secondary",
+      },
+   },
+   refresh: {
+      description: "Sometimes a simple refresh might resolve the issue.",
+      actionButtonProps: {
+         children: "Refresh",
+         onClick: Router.reload,
+         variant: "contained",
+         color: "secondary",
+      },
+      title: "Try Refreshing",
+   },
+   uidConflict: {
+      title: "Close the stream and continue here",
+      onClick: Router.reload,
+      actionButtonProps: {
+         children: "Refresh",
+         onClick: Router.reload,
+         variant: "contained",
+         color: "secondary",
+      },
+   },
 }
 
 export default StepsView

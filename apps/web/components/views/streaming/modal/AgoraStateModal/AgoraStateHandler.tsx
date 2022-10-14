@@ -1,12 +1,4 @@
-import React, {
-   ComponentProps,
-   FC,
-   memo,
-   useCallback,
-   useEffect,
-   useMemo,
-   useState,
-} from "react"
+import React, { FC, memo, useCallback, useEffect, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
 import RootState from "store/reducers"
@@ -16,57 +8,21 @@ import DebugModal from "./ModalViews/DebugModal"
 import UidConflict from "./ModalViews/UidConflict"
 import { rtcMessages } from "types/streaming"
 import { AlertProps } from "@mui/material/Alert/Alert"
-import { useRouter } from "next/router"
 import ScreenShareDeniedModal from "./ModalViews/ScreenShareDeniedModal"
 import { animateProfileIcon } from "../../../../../store/actions/streamActions"
 import { ANIMATE_PROFILE_ICON_AFTER_MS } from "../../../../../constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../store/selectors/streamSelectors"
-import { StepCard } from "./common/StepsView"
 
 interface Props {}
-type Step = ComponentProps<typeof StepCard>
 
 const AgoraStateHandler: FC<Props> = () => {
    const dispatch = useDispatch()
-   const router = useRouter()
 
    const [view, setView] = useState(null)
    const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
    const agoraRtcError = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcError
    })
-
-   const networkErrorStep: Step = useMemo(
-      () => ({
-         description: "Sometimes a simple refresh might resolve the issue.",
-         actionButtonProps: {
-            children: "Refresh",
-            onClick: router.reload,
-            variant: "contained",
-            color: "secondary",
-         },
-         title: "Try Refreshing",
-      }),
-      [router.reload]
-   )
-
-   const steps: Step[] = useMemo(
-      () => [
-         {
-            title: "Change Network",
-            description:
-               "Try disconnecting from any VPN, switching to another " +
-               "network or use a mobile hotspot. and click refresh once done.",
-            actionButtonProps: {
-               onClick: router.reload,
-               children: "Refresh",
-               variant: "contained",
-               color: "secondary",
-            },
-         },
-      ],
-      [router.reload]
-   )
 
    const sendRTCSateToast = useCallback(
       (
@@ -90,19 +46,12 @@ const AgoraStateHandler: FC<Props> = () => {
    )
 
    const showConnectionStateModal = useCallback(
-      (additionalSteps?: Step[]) =>
-         setView(() => (
-            <ConnectionStateModal
-               steps={additionalSteps ? [...additionalSteps, ...steps] : steps}
-            />
-         )),
-      [steps]
+      () => setView(() => <ConnectionStateModal />),
+      []
    )
 
-   const showDebugModal = useCallback(
-      () => setView(() => <DebugModal steps={steps} />),
-      [steps]
-   )
+   const showDebugModal = useCallback(() => setView(() => <DebugModal />), [])
+
    const showUidConflictModal = useCallback(
       () => setView(() => <UidConflict />),
       []
@@ -144,7 +93,7 @@ const AgoraStateHandler: FC<Props> = () => {
                break
             case "DISCONNECTED":
                if (reason === "NETWORK_ERROR") {
-                  return showConnectionStateModal([networkErrorStep])
+                  return showConnectionStateModal()
                }
                if (prevState === "CONNECTING") return
                if (reason === "UID_BANNED") {
@@ -169,7 +118,6 @@ const AgoraStateHandler: FC<Props> = () => {
       agoraRtcConnectionStatus,
       closeToast,
       dispatch,
-      networkErrorStep,
       sendConnectedToast,
       showConnectionStateModal,
       showUidConflictModal,

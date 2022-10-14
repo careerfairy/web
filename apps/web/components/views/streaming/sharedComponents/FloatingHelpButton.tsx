@@ -1,7 +1,6 @@
 import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined"
-import { useCrisp } from "../../../../context/crisp/CrispProvider"
 import Button from "@mui/material/Button"
 import { alpha } from "@mui/material/styles"
 
@@ -11,6 +10,7 @@ const styles = sxStyles({
       bottom: 8,
       left: 8,
       opacity: 0.8,
+      zIndex: 1,
       display: "flex",
       flexDirection: "column",
       padding: "8px 16px",
@@ -21,14 +21,16 @@ const styles = sxStyles({
       },
    },
 })
-const FloatingHelpButton = () => {
-   const { openAndShowChatBot } = useCrisp()
 
+type Props = {
+   openSupportInLeftMenu: () => void
+}
+const FloatingHelpButton = ({ openSupportInLeftMenu }: Props) => {
    return (
       <Button
          size={"small"}
          color={"grey"}
-         onClick={openAndShowChatBot}
+         onClick={openSupportInLeftMenu}
          sx={styles.root}
       >
          <HelpOutlineOutlinedIcon />

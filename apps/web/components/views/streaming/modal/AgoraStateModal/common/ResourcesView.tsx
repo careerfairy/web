@@ -1,4 +1,4 @@
-import React, { ComponentProps } from "react"
+import React, { useMemo } from "react"
 import { CardMedia, Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Image from "next/image"
@@ -35,10 +35,20 @@ const styles = sxStyles({
    },
 })
 
+type ResourceId = "troubleshootingConnectionIssues" | "howToStreamOnCareerFairy"
+
 type Props = {
-   options: ComponentProps<typeof ResourceCard>[]
+   resourceIds?: ResourceId[]
 }
-const ResourcesView = ({ options }: Props) => {
+const ResourcesView = ({ resourceIds }: Props) => {
+   const options = useMemo(
+      () =>
+         resourceIds?.length
+            ? resourceIds.map((resourceId) => resourcesDict[resourceId] || null)
+            : Object.values(resourcesDict),
+      [resourceIds]
+   )
+
    return (
       <Stack spacing={2}>
          <Typography variant="h5" fontWeight={500}>
@@ -111,20 +121,20 @@ export const ResourceCard = ({
    )
 }
 
-export const dummyResources: ComponentProps<typeof ResourceCard>[] = [
-   {
-      title: "How to fix a black screen",
-      authorName: "Agora.io",
+const resourcesDict: Record<ResourceId, ResourceCardProps> = {
+   howToStreamOnCareerFairy: {
+      title: "How to Stream on CareerFairy",
+      authorName: "CareerFairy",
       previewImageUrl:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fbalck-screen-image.webp?alt=media&token=ee3edbe3-9b8f-4a08-b21a-2f111dfd9a7f",
       actionButtonProps: {
          href: "https://www.agora.io/en/blog/add-custom-backgrounds-to-your-live-video-calling-application-using-the-agora-android-uikit/",
-         label: "Read our blog",
+         label: "Read our article",
       },
    },
-   {
-      title: "How to use a VPN",
-      authorName: "Maximilian Schwarzmüller",
+   troubleshootingConnectionIssues: {
+      title: "Troubleshooting connection issues",
+      authorName: "CareerFairy",
       previewImageUrl:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fvpn-image.jpg?alt=media&token=f029eceb-e77b-4448-94b0-0b06e7bbade2",
       previewImageCaption: "6:49",
@@ -133,4 +143,4 @@ export const dummyResources: ComponentProps<typeof ResourceCard>[] = [
          label: "Watch video",
       },
    },
-]
+}

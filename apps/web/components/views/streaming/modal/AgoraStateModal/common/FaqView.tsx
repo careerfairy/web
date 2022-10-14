@@ -1,4 +1,4 @@
-import React, { ComponentProps } from "react"
+import React, { useMemo } from "react"
 import { Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Link from "next/link"
@@ -29,11 +29,20 @@ const styles = sxStyles({
       },
    },
 })
+type FaqId = "whatIsACareerLiveStream" | "whichDeviceShouldIUseForTheLiveStream"
 
 type Props = {
-   faqElements: ComponentProps<typeof FaqCard>[]
+   faqIds?: FaqId[]
 }
-const FaqView = ({ faqElements }: Props) => {
+const FaqView = ({ faqIds }: Props) => {
+   const faqElements = useMemo(
+      () =>
+         faqIds?.length
+            ? faqIds.map((faqId) => faqDict[faqId] || null)
+            : Object.values(faqDict),
+      [faqIds]
+   )
+
    return (
       <Stack spacing={2}>
          <Box sx={styles.viewHeader}>
@@ -43,8 +52,8 @@ const FaqView = ({ faqElements }: Props) => {
             <Link href="/faq">
                <a target={"_blank"}>
                   <Box sx={styles.viewAction}>
-                     <Typography variant={"h5"} fontWeight={500}>
-                        View all
+                     <Typography variant={"h6"} fontWeight={600}>
+                        VIEW ALL
                      </Typography>
                      <ArrowForwardIosIcon />
                   </Box>
@@ -88,13 +97,13 @@ export const FaqCard = ({ href, title }: FaqCardProps) => {
    )
 }
 
-export const dummyFaqElements: ComponentProps<typeof FaqCard>[] = [
-   {
-      title: "How to use the Agora Live Streaming",
+const faqDict: Record<FaqId, FaqCardProps> = {
+   whatIsACareerLiveStream: {
+      title: "What is a career live stream?",
       href: "https://www.agora.io/en/blog/video-call-invitations-with-agora-rtm-and-rtc-using-vue-js-and-flask/",
    },
-   {
-      title: "How to use the Agora Live Streaming",
+   whichDeviceShouldIUseForTheLiveStream: {
+      title: "Which device should I use for the live stream?",
       href: "https://www.agora.io/en/blog/extensions-marketplace-how-to-add-voice-fx-to-your-android-application-using-agora-and-synervoz/",
    },
-]
+}

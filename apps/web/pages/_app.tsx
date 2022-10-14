@@ -10,7 +10,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { AuthProvider } from "../HOCs/AuthProvider"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
-import { createFirestoreInstance } from "redux-firestore"
+import { actionTypes, createFirestoreInstance } from "redux-firestore"
 import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
@@ -32,18 +32,12 @@ import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryPa
 import TutorialProvider from "../HOCs/TutorialProvider"
 import ErrorProvider from "../HOCs/ErrorProvider"
 import {
+   AuthProvider as ReactFireAuthProvider,
    FirebaseAppProvider,
    FirestoreProvider,
-   AuthProvider as ReactFireAuthProvider,
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
-import { actionTypes } from "redux-firestore"
-import dynamic from "next/dynamic"
-
-const CrispProvider = dynamic(() => import("../context/crisp/CrispProvider"), {
-   ssr: false,
-})
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -93,7 +87,6 @@ function MyApp(props) {
             color={brandedLightTheme.palette.primary.main}
             options={{ showSpinner: false }}
          />
-         {/*<BeaconDevTools />*/}
          <Provider store={store}>
             <ReactReduxFirebaseProvider {...rrfProps}>
                <ReactFireProviders>
@@ -105,18 +98,16 @@ function MyApp(props) {
                                  <FirebaseServiceContext.Provider
                                     value={firebaseServiceInstance}
                                  >
-                                    <CrispProvider>
-                                       <LocalizationProvider
-                                          dateAdapter={AdapterDateFns}
-                                       >
-                                          <ErrorProvider>
-                                             <UserRewardsNotifications>
-                                                <Component {...pageProps} />
-                                             </UserRewardsNotifications>
-                                             <Notifier />
-                                          </ErrorProvider>
-                                       </LocalizationProvider>
-                                    </CrispProvider>
+                                    <LocalizationProvider
+                                       dateAdapter={AdapterDateFns}
+                                    >
+                                       <ErrorProvider>
+                                          <UserRewardsNotifications>
+                                             <Component {...pageProps} />
+                                          </UserRewardsNotifications>
+                                          <Notifier />
+                                       </ErrorProvider>
+                                    </LocalizationProvider>
                                  </FirebaseServiceContext.Provider>
                               </ThemeProviderWrapper>
                            </GoogleTagManager>

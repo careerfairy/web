@@ -394,7 +394,6 @@ const VideoContainer = ({
             {WifiIndicatorMemoized}
          </DraggableComponent>
          <AgoraStateHandler />
-         <FloatingHelpButton />
          <SettingsModal
             open={showSettings}
             close={() => setShowSettings(false)}

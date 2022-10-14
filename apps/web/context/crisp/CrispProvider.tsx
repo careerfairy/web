@@ -1,10 +1,6 @@
 import React, { FC, useContext, useEffect, useMemo, useState } from "react"
-import useFunctionsSWR, {
-   reducedRemoteCallsOptions,
-} from "../../components/custom-hook/utils/useFunctionsSWRFetcher"
-import useSWR from "swr"
-import { useAuth } from "../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
+import useCrispSignature from "../../components/custom-hook/useCrispSignature"
 
 declare global {
    interface Window {
@@ -23,6 +19,8 @@ type CrispContextType = {
    openAndShowChatBot: () => void
    closeAndHideChatBot: () => void
    setHideChatOnClose: (hide: boolean) => void
+   getNickname: (email: string) => string
+   reverseChatBoxPosition: (reverse: boolean) => void
 }
 const CrispContext = React.createContext<CrispContextType>({
    openChatBox: () => {},
@@ -32,6 +30,8 @@ const CrispContext = React.createContext<CrispContextType>({
    openAndShowChatBot: () => {},
    closeAndHideChatBot: () => {},
    setHideChatOnClose: () => {},
+   getNickname: () => "",
+   reverseChatBoxPosition: () => {},
 })
 
 const getNickname = (email: string) => {
@@ -83,7 +83,7 @@ const closeChatBox = () => {
    }
 }
 
-const setEmail = (data: SignatureResponse) => {
+const setEmail = (data: { email: string; signature: string }) => {
    if (window.$crisp) {
       window.$crisp.push(["set", "user:email", [data.email, data.signature]])
       window.$crisp.push(["set", "user:nickname", [getNickname(data.email)]])
@@ -96,10 +96,11 @@ const setHideChatOnClose = (hide: boolean) => {
    }
 }
 
-type SignatureResponse = {
-   signature: string
-   email: string
-} | null
+const reverseChatBoxPosition = (reverse: boolean) => {
+   if (window.$crisp) {
+      window.$crisp.push(["config", "position:reverse", [reverse]])
+   }
+}
 
 const pathsToHideChatBox = [
    "/streaming/[livestreamId]/viewer",
@@ -111,29 +112,11 @@ const pathsToHideChatBox = [
 ]
 
 const CrispProvider: FC = ({ children }) => {
-   const { authenticatedUser } = useAuth()
-
-   const [crispLoaded, setCrispLoaded] = useState(false)
-
-   const fetcher = useFunctionsSWR<SignatureResponse>()
-
    const { pathname } = useRouter()
 
-   const { data } = useSWR<SignatureResponse>(
-      authenticatedUser?.email
-         ? [
-              "getCrispSignature",
-              {
-                 email: authenticatedUser?.email,
-              },
-           ]
-         : null,
-      fetcher,
-      {
-         ...reducedRemoteCallsOptions,
-         suspense: false,
-      }
-   )
+   const data = useCrispSignature()
+
+   const [crispLoaded, setCrispLoaded] = useState(false)
 
    useEffect(() => {
       // Update the signature if the user changes
@@ -147,11 +130,12 @@ const CrispProvider: FC = ({ children }) => {
       if (!crispLoaded) return
 
       if (pathsToHideChatBox.includes(pathname)) {
-         hideChatBox()
+         setHideChatOnClose(true)
       }
 
       return () => {
          showChatBox()
+         setHideChatOnClose(false)
       }
    }, [pathname, crispLoaded])
 
@@ -162,6 +146,7 @@ const CrispProvider: FC = ({ children }) => {
       //https://docs.crisp.chat/guides/chatbox-sdks/web-sdk/dollar-crisp/#use-crisp-before-it-is-ready
       window.CRISP_READY_TRIGGER = function () {
          setCrispLoaded(true)
+         hideChatBox()
       }
       ;(() => {
          const d = document
@@ -185,6 +170,8 @@ const CrispProvider: FC = ({ children }) => {
          closeAndHideChatBot,
          openAndShowChatBot,
          setHideChatOnClose,
+         getNickname,
+         reverseChatBoxPosition,
       }),
       []
    )
@@ -194,6 +181,6 @@ const CrispProvider: FC = ({ children }) => {
    )
 }
 
-export const useCrisp = () => useContext(CrispContext)
+export const useCrisp = () => useContext(CrispContext) // To be used when we want to use crisp outside of the embedded chatbox iframe
 
-export default CrispProvider
+export default CrispProvider // To be used when we want to use crisp outside of the embedded chatbox iframe
