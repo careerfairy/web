@@ -1,5 +1,5 @@
 import * as React from "react"
-import Document, { Head, Html, Main, NextScript } from "next/document"
+import Document, { Html, Head, Main, NextScript } from "next/document"
 import createEmotionServer from "@emotion/server/create-instance"
 import { brandedLightTheme } from "materialUI"
 import createEmotionCache from "materialUI/createEmotionCache"

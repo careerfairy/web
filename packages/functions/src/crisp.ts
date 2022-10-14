@@ -4,7 +4,7 @@ import { logAndThrow, validateUserAuthExists } from "./lib/validations"
 
 const crispSecretKey = process.env.CRISP_SECRET_KEY
 
-// Get crisp chat signature
+// Get crisp chat signature https://docs.crisp.chat/guides/chatbox-sdks/web-sdk/identity-verification/#how-to-setup-user-verification
 export const getCrispSignature = functions.https.onCall(
    async (data, context) => {
       try {

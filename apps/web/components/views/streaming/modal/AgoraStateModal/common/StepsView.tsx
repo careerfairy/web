@@ -1,10 +1,11 @@
-import React, { FC, useMemo } from "react"
+import React, { FC } from "react"
 import { ButtonProps, Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
 import Router from "next/router"
+import useDictValues from "../../../../../custom-hook/useDictValues"
 
 const styles = sxStyles({
    root: {
@@ -43,13 +44,7 @@ type Props = {
    stepIds: StepId[]
 }
 const StepsView = ({ stepIds }: Props) => {
-   const steps = useMemo(
-      () =>
-         stepIds?.length
-            ? stepIds.map((stepId) => stepsDict[stepId] || null)
-            : Object.values(stepsDict),
-      [stepIds]
-   )
+   const steps = useDictValues(stepIds, stepsDict)
 
    return (
       <Stack spacing={1.5}>
