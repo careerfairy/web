@@ -94,64 +94,69 @@ export const getNickname = (email: string) => {
 }
 
 export const showChatBox = () => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["do", "chat:show"])
    }
 }
 
 export const hideChatBox = () => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["do", "chat:hide"])
    }
 }
 
 export const openChatBox = () => {
-   if (window.$crisp) {
+   if (window?.$crisp) {
       window.$crisp.push(["do", "chat:open"])
    }
 }
 
 export const closeAndHideChatBot = () => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["do", "chat:close"])
       window.$crisp.push(["do", "chat:hide"])
    }
 }
 
 export const openAndShowChatBot = () => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["do", "chat:open"])
       window.$crisp.push(["do", "chat:show"])
    }
 }
 
 export const toggleChatBox = () => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["do", "chat:toggle"])
    }
 }
 
 export const closeChatBox = () => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["do", "chat:close"])
    }
 }
 
 export const setEmail = (data: { email: string; signature: string }) => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["set", "user:email", [data.email, data.signature]])
       window.$crisp.push(["set", "user:nickname", [getNickname(data.email)]])
    }
 }
 
 export const setHideChatOnClose = (hide: boolean) => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["on", "chat:closed", hide ? hideChatBox : () => {}])
    }
 }
 
 export const reverseChatBoxPosition = (reverse: boolean) => {
-   if (window.$crisp) {
+   if (crispReady) {
       window.$crisp.push(["config", "position:reverse", [reverse]])
    }
 }
+
+const crispReady =
+   typeof window !== "undefined" &&
+   window.$crisp &&
+   window.$crisp.push !== Array.prototype.push
