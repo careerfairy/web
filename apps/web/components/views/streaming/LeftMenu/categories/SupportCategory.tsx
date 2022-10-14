@@ -33,8 +33,13 @@ const SupportCategory = ({ selectedState, showMenu }: Props) => {
          baseUrl.searchParams.append("user_email", authenticatedUser.email)
       }
 
+      if (authenticatedUser.uid) {
+         baseUrl.searchParams.append("token_id", authenticatedUser.uid)
+         baseUrl.searchParams.append("session_merge", "true")
+      }
+
       return baseUrl.toString()
-   }, [authenticatedUser.email])
+   }, [authenticatedUser.email, authenticatedUser.uid])
 
    if (selectedState !== "support" || !showMenu) {
       return null

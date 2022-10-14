@@ -15,6 +15,12 @@ const styles = sxStyles({
       cursor: "pointer",
       transition: (theme) =>
          theme.transitions.create(["border", "background-color"]),
+      px: 2,
+      borderRadius: 1,
+      border: (theme) => `1px solid ${theme.palette.grey["600"]}`,
+      "&:hover, &:focus": {
+         backgroundColor: "background.default",
+      },
    },
    number: {
       fontSize: "2rem",
@@ -31,7 +37,7 @@ const styles = sxStyles({
    },
 })
 
-type StepId = "networkError" | "refresh" | "uidConflict"
+type StepId = "networkError" | "refresh"
 
 type Props = {
    stepIds: StepId[]
@@ -145,16 +151,6 @@ const stepsDict: Record<StepId, StepCardProps> = {
          color: "secondary",
       },
       title: "Try Refreshing",
-   },
-   uidConflict: {
-      title: "Close the stream and continue here",
-      onClick: Router.reload,
-      actionButtonProps: {
-         children: "Refresh",
-         onClick: Router.reload,
-         variant: "contained",
-         color: "secondary",
-      },
    },
 }
 
