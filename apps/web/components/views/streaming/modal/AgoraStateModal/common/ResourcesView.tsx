@@ -123,24 +123,23 @@ export const ResourceCard = ({
 
 const resourcesDict: Record<ResourceId, ResourceCardProps> = {
    howToStreamOnCareerFairy: {
-      title: "How to Stream on CareerFairy",
+      title: "Best Practices Before Going Live",
       authorName: "CareerFairy",
       previewImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fbalck-screen-image.webp?alt=media&token=ee3edbe3-9b8f-4a08-b21a-2f111dfd9a7f",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fchrome-image.png?alt=media&token=b4ab3f69-3d27-4b0f-b92e-75cd9df434c4",
       actionButtonProps: {
-         href: "https://www.agora.io/en/blog/add-custom-backgrounds-to-your-live-video-calling-application-using-the-agora-android-uikit/",
+         href: "https://careerfairy-support.crisp.help/en/article/best-practices-before-going-live-1ojgf00/?bust=1665748832154",
          label: "Read our article",
       },
    },
    troubleshootingConnectionIssues: {
-      title: "Troubleshooting connection issues",
+      title: "Technical Requirements to Use CareerFairy",
       authorName: "CareerFairy",
       previewImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fvpn-image.jpg?alt=media&token=f029eceb-e77b-4448-94b0-0b06e7bbade2",
-      previewImageCaption: "6:49",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fcompat-overlay.png?alt=media&token=7461d59e-bc40-480c-a89c-9dc0fe93e782",
       actionButtonProps: {
-         href: "https://www.youtube.com/watch?v=65GUMaNrsYY",
-         label: "Watch video",
+         href: "https://careerfairy-support.crisp.help/en/article/technical-requirements-to-use-livestorm-1g4nk1t/?bust=1665749028480",
+         label: "Read our article",
       },
    },
 }

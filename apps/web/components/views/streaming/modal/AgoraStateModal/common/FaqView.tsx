@@ -100,10 +100,10 @@ export const FaqCard = ({ href, title }: FaqCardProps) => {
 const faqDict: Record<FaqId, FaqCardProps> = {
    whatIsACareerLiveStream: {
       title: "What is a career live stream?",
-      href: "https://www.agora.io/en/blog/video-call-invitations-with-agora-rtm-and-rtc-using-vue-js-and-flask/",
+      href: "https://careerfairy-support.crisp.help/",
    },
    whichDeviceShouldIUseForTheLiveStream: {
       title: "Which device should I use for the live stream?",
-      href: "https://www.agora.io/en/blog/extensions-marketplace-how-to-add-voice-fx-to-your-android-application-using-agora-and-synervoz/",
+      href: "https://careerfairy-support.crisp.help/",
    },
 }
