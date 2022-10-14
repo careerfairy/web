@@ -58,6 +58,7 @@ import StreamFormNavigator, {
    IStreamFormNavigatorSteps,
 } from "./StreamForm/StreamFormNavigator"
 import Section from "../common/Section"
+import { Option } from "../signup/utils"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -115,6 +116,7 @@ export type ISpeakerObj = {
    lastName: string
    position: string
    background: string
+   email: string
 }
 
 const speakerObj = {
@@ -123,6 +125,7 @@ const speakerObj = {
    lastName: "",
    position: "",
    background: "",
+   email: "",
 } as ISpeakerObj
 
 interface Props {
@@ -171,6 +174,9 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
+   promotionChannels: Option[]
+   promotionCountries: Option[]
+   promotionUniversities: Option[]
    questionsDisabled: boolean
 }
 
@@ -250,6 +256,9 @@ const DraftStreamForm = ({
       language: languageCodes[0],
       targetFieldsOfStudy: [],
       targetLevelsOfStudy: [],
+      promotionChannels: [],
+      promotionCountries: [],
+      promotionUniversities: [],
       questionsDisabled: false,
    })
 
@@ -359,6 +368,9 @@ const DraftStreamForm = ({
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                   targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
+                  promotionChannels: [], // TODO GS: get promotions
+                  promotionCountries: [],
+                  promotionUniversities: [],
                   questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
@@ -691,7 +703,18 @@ const DraftStreamForm = ({
                                     sectionId={"PromotionSection"}
                                     className={classes.section}
                                  >
-                                    <PromotionInfo />
+                                    <PromotionInfo
+                                       setFieldValue={setFieldValue}
+                                       promotionCountries={
+                                          values.promotionCountries
+                                       }
+                                       promotionChannels={
+                                          values.promotionChannels
+                                       }
+                                       promotionUniversities={
+                                          values.promotionUniversities
+                                       }
+                                    />
                                  </Section>
 
                                  <SuspenseWithBoundary hide expected>

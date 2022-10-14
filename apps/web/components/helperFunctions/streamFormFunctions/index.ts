@@ -12,6 +12,7 @@ export const speakerObj = {
    lastName: "",
    position: "",
    background: "",
+   email: "",
 }
 
 export const getStreamSubCollectionSpeakers = (
@@ -102,6 +103,7 @@ const buildSpeakersArray = (values) => {
          firstName: values.speakers[key].firstName,
          lastName: values.speakers[key].lastName,
          position: values.speakers[key].position,
+         email: values.speakers[key].email,
          rank: index,
       }
    })
@@ -185,6 +187,9 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
       // if (!values.speakers[key].background) { Made background not required
       //     errors.speakers[key].background = 'Required';
       // }
+      if (!values.speakers[key].email) {
+         errors.speakers[key].email = "Required"
+      }
       if (!Object.keys(errors.speakers[key]).length) {
          delete errors.speakers[key]
       }

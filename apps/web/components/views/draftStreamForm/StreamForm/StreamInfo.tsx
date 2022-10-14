@@ -80,7 +80,6 @@ const StreamInfo = ({
                      name="title"
                      variant="outlined"
                      fullWidth
-                     required
                      id="title"
                      label="Livestream Title"
                      inputProps={{ maxLength: 104 }}
@@ -219,7 +218,6 @@ const StreamInfo = ({
                   <TextField
                      name="company"
                      variant="outlined"
-                     required
                      fullWidth
                      id="company"
                      label="Company Name"

@@ -33,47 +33,7 @@ export const possibleGenders = [
 export const regionGroupId = "Regions"
 export const countryGroupId = "Country"
 
-export const countriesAndRegionsOptionCodes = [
-   {
-      id: "africa",
-      name: "Africa",
-      groupId: regionGroupId,
-   },
-   {
-      id: "asia",
-      name: "Asia",
-      groupId: regionGroupId,
-   },
-   {
-      id: "caribbean",
-      name: "Caribbean",
-      groupId: regionGroupId,
-   },
-   {
-      id: "centralAmerica",
-      name: "Central America",
-      groupId: regionGroupId,
-   },
-   {
-      id: "europe",
-      name: "Europe",
-      groupId: regionGroupId,
-   },
-   {
-      id: "northAmerica",
-      name: "North America",
-      groupId: regionGroupId,
-   },
-   {
-      id: "oceania",
-      name: "Oceania",
-      groupId: regionGroupId,
-   },
-   {
-      id: "southAmerica",
-      name: "South America",
-      groupId: regionGroupId,
-   },
+export const countriesOptionCodes = [
    {
       id: "AF",
       name: "Afghanistan",
@@ -1314,6 +1274,50 @@ export const countriesAndRegionsOptionCodes = [
       name: "Åland Islands",
       groupId: countryGroupId,
    },
+]
+
+export const countriesAndRegionsOptionCodes = [
+   {
+      id: "africa",
+      name: "Africa",
+      groupId: regionGroupId,
+   },
+   {
+      id: "asia",
+      name: "Asia",
+      groupId: regionGroupId,
+   },
+   {
+      id: "caribbean",
+      name: "Caribbean",
+      groupId: regionGroupId,
+   },
+   {
+      id: "centralAmerica",
+      name: "Central America",
+      groupId: regionGroupId,
+   },
+   {
+      id: "europe",
+      name: "Europe",
+      groupId: regionGroupId,
+   },
+   {
+      id: "northAmerica",
+      name: "North America",
+      groupId: regionGroupId,
+   },
+   {
+      id: "oceania",
+      name: "Oceania",
+      groupId: regionGroupId,
+   },
+   {
+      id: "southAmerica",
+      name: "South America",
+      groupId: regionGroupId,
+   },
+   ...countriesOptionCodes,
 ] as Option[]
 
 export const languageOptionCodes = [
@@ -1344,5 +1348,20 @@ export const languageOptionCodes = [
    {
       id: "pt",
       name: "Portuguese",
+   },
+]
+
+export const channelOptionCodes = [
+   {
+      id: "facebook",
+      name: "Facebook",
+   },
+   {
+      id: "instagram",
+      name: "Instagram",
+   },
+   {
+      id: "tikTok",
+      name: "Tik Tok",
    },
 ]

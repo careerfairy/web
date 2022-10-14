@@ -328,6 +328,14 @@ class FirebaseService {
       return ref.get()
    }
 
+   getUniversitiesFromMultipleCountryCode = async (countryCodes: string[]) => {
+      let ref = this.firestore
+         .collection("universitiesByCountry")
+         .where("countryId", "in", countryCodes)
+
+      return await ref.get()
+   }
+
    // *** Firestore API ***
 
    getStreamRef = (router): firebase.firestore.DocumentReference => {
