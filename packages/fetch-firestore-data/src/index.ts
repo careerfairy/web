@@ -21,9 +21,7 @@ let currentRunningProcess: ChildProcessWithoutNullStreams
  * Only set this to true if you want to fetch the user data from the production database,
  * but be sure to delete the downloaded backup when done testing because of GDPR
  * */
-const INCLUDE_USERDATA = process.env.INCLUDE_USERDATA
-   ? process.env.INCLUDE_USERDATA === "true"
-   : false
+const INCLUDE_USERDATA = process.env.INCLUDE_USERDATA === "true"
 
 /**
  * Main logic
