@@ -5,7 +5,7 @@ import {
 } from "child_process"
 import axios from "axios"
 import { readFile } from "fs/promises"
-import { existsSync, mkdirSync } from "fs"
+import { existsSync, mkdirSync, rmSync } from "fs"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import config from "./config"
 import * as spawn from "cross-spawn"
@@ -21,7 +21,9 @@ let currentRunningProcess: ChildProcessWithoutNullStreams
  * Only set this to true if you want to fetch the user data from the production database,
  * but be sure to delete the downloaded backup when done testing because of GDPR
  * */
-const INCLUDE_USERDATA = false
+const INCLUDE_USERDATA = process.env.INCLUDE_USERDATA
+   ? process.env.INCLUDE_USERDATA === "true"
+   : false
 
 /**
  * Main logic
@@ -94,6 +96,7 @@ async function createUser(email: string, superAdmin: boolean = false) {
       throw e
    }
 }
+
 /**
  * Create creates all the auth users based on the userData docs
  */
@@ -188,7 +191,7 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             env: {
                ...process.env,
                // emulators need a big heap to load the data
-               JAVA_TOOL_OPTIONS: "-Xmx25g",
+               JAVA_TOOL_OPTIONS: process.env.JAVA_TOOL_OPTIONS ?? "-Xmx25g",
             },
          },
          handleProcess
@@ -228,6 +231,10 @@ async function downloadRemoteBucket(): Promise<CommandOutput> {
    // create local folder if it doesn't exist
    if (!existsSync(localDstFolder)) {
       mkdirSync(localDstFolder)
+   } else {
+      // remove existing folder since it doesn't overwrite
+      rmSync(localDstFolder, { recursive: true, force: true })
+      mkdirSync(localDstFolder)
    }
 
    // clear temp folder
@@ -245,6 +252,7 @@ async function downloadRemoteBucket(): Promise<CommandOutput> {
 
    // copy remote folder into the tmp folder
    await execute("gsutil", [
+      "-m",
       "cp",
       "-r",
       `gs://${config.BUCKET}/${config.BUCKET_FOLDER}`,
