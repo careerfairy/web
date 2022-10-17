@@ -8,3 +8,4 @@ playwright-report/
 .jest/
 .vercel
 .env.local
+*.tsbuildinfo
