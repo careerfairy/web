@@ -1,5 +1,5 @@
 import { MergeAttachment, MergeCandidate, MergeUrl } from "./MergeResponseTypes"
-import { mapIfObject } from "../BaseModel"
+import { mapRelation } from "../BaseModel"
 import { Application } from "./Application"
 import { ATSModel } from "./ATSModel"
 
@@ -12,7 +12,7 @@ export class Candidate extends ATSModel {
       public readonly title?: string,
       public readonly locations?: string[],
       public readonly urls?: MergeUrl[],
-      public readonly applications?: Application[],
+      public readonly applications?: Application[] | string[],
       public readonly attachments?: MergeAttachment[]
    ) {
       super()
@@ -31,7 +31,7 @@ export class Candidate extends ATSModel {
          candidate.title,
          candidate.locations,
          candidate.urls,
-         mapIfObject<Application>(
+         mapRelation<Application>(
             candidate.applications,
             Application.createFromMerge
          ),
@@ -48,7 +48,7 @@ export class Candidate extends ATSModel {
          candidate.title,
          candidate.locations,
          candidate.urls,
-         mapIfObject<Application>(
+         mapRelation<Application>(
             candidate.applications,
             Application.createFromPlainObject
          ),
