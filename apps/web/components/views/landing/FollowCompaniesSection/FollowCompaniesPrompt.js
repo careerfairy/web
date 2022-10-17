@@ -1,21 +1,21 @@
 import React from "react"
-import makeStyles from "@mui/styles/makeStyles"
 import { Box } from "@mui/material"
 import HeroButton from "../HeroSection/HeroButton"
+import { sxStyles } from "../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       width: "100%",
       display: "flex",
       flexDirection: "column",
       alignItems: "center",
-      padding: theme.spacing(2),
+      padding: 2,
    },
-}))
+})
+
 const FollowCompaniesPrompt = () => {
-   const classes = useStyles()
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          <Box>
             <HeroButton
                href="/wishlist"
@@ -26,7 +26,7 @@ const FollowCompaniesPrompt = () => {
                Add to Wishlist
             </HeroButton>
          </Box>
-      </div>
+      </Box>
    )
 }
 
