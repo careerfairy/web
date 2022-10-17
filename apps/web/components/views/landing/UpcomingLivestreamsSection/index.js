@@ -10,7 +10,6 @@ import HeroButton from "../HeroSection/HeroButton"
 import SectionHeader from "../../common/SectionHeader"
 
 const useStyles = makeStyles((theme) => ({
-   section: {},
    subTitle: {
       color: theme.palette.text.secondary,
       fontWeight: 500,
@@ -44,7 +43,6 @@ const UpcomingLivestreamsSection = (props) => {
 
    return (
       <Section
-         className={classes.section}
          big={props.big}
          color={props.color}
          backgroundImageClassName={props.backgroundImageClassName}
