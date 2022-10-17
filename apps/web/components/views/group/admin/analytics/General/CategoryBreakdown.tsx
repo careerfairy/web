@@ -112,10 +112,7 @@ const CategoryBreakdown = ({
       hasNoData,
       chartData,
       colors,
-   } = useUserBreakdownStats(
-      audience,
-      showUniversityBreakdown ? groupQuestions : null
-   )
+   } = useUserBreakdownStats(audience, groupQuestions, showUniversityBreakdown)
 
    const options = {
       cutoutPercentage: 70,

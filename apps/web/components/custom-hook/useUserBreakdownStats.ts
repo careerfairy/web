@@ -31,7 +31,8 @@ function randomColor() {
 
 const useUserBreakdownStats = (
    users: UserData[],
-   groupQuestions?: GroupQuestion[]
+   groupQuestions?: GroupQuestion[],
+   onlyShowGroupQuestionStats?: boolean
 ) => {
    const theme = useTheme()
 
@@ -89,17 +90,32 @@ const useUserBreakdownStats = (
    }, [currentStats, theme.palette.mode, colors])
 
    const totalStats = useMemo<UserBreakdownStats[]>(() => {
-      if (users) {
-         if (groupQuestions) {
-            return getUserBreakdownStatsBasedOnGroupQuestions(
-               users,
-               groupQuestions
+      if (
+         onlyShowGroupQuestionStats && // if onlyShowGroupQuestionStats is true, which is the case for UniversityGroupAnalytics, they don't care about getGeneralUserBreakdownStats
+         groupQuestions?.length &&
+         users?.length
+      ) {
+         return getUserBreakdownStatsBasedOnGroupQuestions(
+            users,
+            groupQuestions
+         )
+      }
+
+      const stats = []
+      if (users?.length) {
+         stats.push(...getGeneralUserBreakdownStats(users))
+
+         if (groupQuestions?.length) {
+            stats.push(
+               ...getUserBreakdownStatsBasedOnGroupQuestions(
+                  users,
+                  groupQuestions
+               )
             )
          }
-         return getGeneralUserBreakdownStats(users)
       }
-      return []
-   }, [users, groupQuestions])
+      return stats
+   }, [users, groupQuestions, onlyShowGroupQuestionStats])
 
    useEffect(() => {
       handleStatChange(currentStats?.id)
