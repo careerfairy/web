@@ -88,6 +88,7 @@ const StreamInfo = ({
                      name="title"
                      variant="outlined"
                      fullWidth
+                     required
                      id="title"
                      label="Livestream Title"
                      inputProps={{ maxLength: 104 }}

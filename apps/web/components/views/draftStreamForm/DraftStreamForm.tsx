@@ -9,7 +9,6 @@ import React, {
 import {
    Box,
    Button,
-   ButtonGroup,
    CircularProgress,
    Container,
    Grid,
@@ -60,6 +59,8 @@ import StreamFormNavigator, {
 } from "./StreamForm/StreamFormNavigator"
 import { Option } from "../signup/utils"
 import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
+import PublishIcon from "@mui/icons-material/Publish"
+import SaveIcon from "@mui/icons-material/Save"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -98,12 +99,6 @@ const useStyles = makeStyles((theme) =>
             color: "white",
             background: theme.palette.primary.main,
          },
-      },
-      buttonGroup: {
-         // @ts-ignore
-         visibility: ({ isGroupAdmin }) => isGroupAdmin && "hidden",
-         // @ts-ignore
-         position: ({ isGroupAdmin }) => isGroupAdmin && "fixed",
       },
       section: {
          padding: 0,
@@ -750,16 +745,20 @@ const DraftStreamForm = ({
                                     sectionRef={eventCategoriesInfoRef}
                                  />
 
-                                 <ButtonGroup
-                                    className={classes.buttonGroup}
-                                    fullWidth
+                                 <Box
+                                    display="flex"
+                                    justifyContent="end"
+                                    mr={3}
                                  >
                                     <Button
+                                       startIcon={
+                                          <PublishIcon fontSize="large" />
+                                       }
                                        type="submit"
                                        onClick={handleClickSubmitForApproval}
                                        disabled={isSubmitting || isPending()}
                                        size="large"
-                                       className={classes.submit}
+                                       autoFocus
                                        endIcon={
                                           isSubmitting && (
                                              <CircularProgress
@@ -769,8 +768,10 @@ const DraftStreamForm = ({
                                           )
                                        }
                                        variant="contained"
+                                       color="secondary"
+                                       sx={{ marginRight: 2 }}
                                     >
-                                       <Typography variant="h4">
+                                       <Typography variant="h5">
                                           {isSubmitting
                                              ? "Submitting"
                                              : isPending()
@@ -779,6 +780,7 @@ const DraftStreamForm = ({
                                        </Typography>
                                     </Button>
                                     <Button
+                                       startIcon={<SaveIcon fontSize="large" />}
                                        type="submit"
                                        ref={saveChangesButtonRef}
                                        disabled={isSubmitting}
@@ -786,7 +788,6 @@ const DraftStreamForm = ({
                                        onClick={() => {
                                           setStatus(SAVE_WITH_NO_VALIDATION)
                                        }}
-                                       className={classes.submit}
                                        endIcon={
                                           isSubmitting && (
                                              <CircularProgress
@@ -796,14 +797,16 @@ const DraftStreamForm = ({
                                           )
                                        }
                                        variant="contained"
+                                       color="secondary"
+                                       autoFocus
                                     >
-                                       <Typography variant="h4">
+                                       <Typography variant="h5">
                                           {isSubmitting
                                              ? "Saving"
                                              : "Save changes"}
                                        </Typography>
                                     </Button>
-                                 </ButtonGroup>
+                                 </Box>
                               </form>
                            )
                         }}

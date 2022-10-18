@@ -94,6 +94,7 @@ const SpeakerForm = ({
                         placeholder="Enter the speaker’s first name"
                         variant="outlined"
                         fullWidth
+                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="First Name"
@@ -122,6 +123,7 @@ const SpeakerForm = ({
                         placeholder="Enter the speaker’s last name"
                         variant="outlined"
                         fullWidth
+                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="Last Name"
@@ -150,6 +152,7 @@ const SpeakerForm = ({
                         placeholder="Enter the speaker’s position"
                         variant="outlined"
                         fullWidth
+                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="Position"
@@ -209,6 +212,7 @@ const SpeakerForm = ({
                         placeholder="Enter the speaker’s email address"
                         variant="outlined"
                         fullWidth
+                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="Email Address"
