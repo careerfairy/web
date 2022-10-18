@@ -42,6 +42,7 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamJobAssociation,
+   LivestreamPromotions,
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
@@ -174,9 +175,9 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
-   promotionChannels: Option[]
-   promotionCountries: Option[]
-   promotionUniversities: Option[]
+   promotionChannelsCodes: Option[]
+   promotionCountriesCodes: Option[]
+   promotionUniversitiesCodes: Option[]
    questionsDisabled: boolean
 }
 
@@ -256,9 +257,9 @@ const DraftStreamForm = ({
       language: languageCodes[0],
       targetFieldsOfStudy: [],
       targetLevelsOfStudy: [],
-      promotionChannels: [],
-      promotionCountries: [],
-      promotionUniversities: [],
+      promotionChannelsCodes: [],
+      promotionCountriesCodes: [],
+      promotionUniversitiesCodes: [],
       questionsDisabled: false,
    })
 
@@ -342,8 +343,18 @@ const DraftStreamForm = ({
                targetId,
                targetCollection
             )
+            const promotionQuery = await firebase.getStreamPromotions(
+               targetId,
+               targetCollection
+            )
+            let promotion
+            if (promotionQuery.exists) {
+               promotion = promotionQuery?.data() as LivestreamPromotions
+            }
+
             if (livestreamQuery.exists) {
                let livestream = livestreamQuery.data() as LivestreamEvent
+
                const newFormData: DraftFormValues = {
                   id: targetId,
                   companyLogoUrl: livestream.companyLogoUrl || "",
@@ -368,9 +379,12 @@ const DraftStreamForm = ({
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                   targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
-                  promotionChannels: [], // TODO GS: get promotions
-                  promotionCountries: [],
-                  promotionUniversities: [],
+                  promotionChannelsCodes:
+                     promotion?.promotionChannelsCodes || [],
+                  promotionCountriesCodes:
+                     promotion?.promotionCountriesCodes || [],
+                  promotionUniversitiesCodes:
+                     promotion?.promotionUniversitiesCodes || [],
                   questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
@@ -705,14 +719,14 @@ const DraftStreamForm = ({
                                  >
                                     <PromotionInfo
                                        setFieldValue={setFieldValue}
-                                       promotionCountries={
-                                          values.promotionCountries
+                                       promotionChannelsCodes={
+                                          values.promotionChannelsCodes
                                        }
-                                       promotionChannels={
-                                          values.promotionChannels
+                                       promotionCountriesCodes={
+                                          values.promotionCountriesCodes
                                        }
-                                       promotionUniversities={
-                                          values.promotionUniversities
+                                       promotionUniversitiesCodes={
+                                          values.promotionUniversitiesCodes
                                        }
                                     />
                                  </Section>

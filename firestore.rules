@@ -315,6 +315,11 @@ service cloud.firestore {
                 }
 
             }
+            match /promotions/promotions {
+                allow read: if true;
+                allow write: if true;
+                allow update: if true;
+            }
         }
 
         match /livestreams/{livestream}/breakoutRooms/{breakoutRoom} {
@@ -414,6 +419,11 @@ service cloud.firestore {
                 allow update: if true;
             }
             match /tokens/{secureToken} {
+                allow read: if true;
+                allow write: if true;
+                allow update: if true;
+            }
+            match /promotions/promotions {
                 allow read: if true;
                 allow write: if true;
                 allow update: if true;

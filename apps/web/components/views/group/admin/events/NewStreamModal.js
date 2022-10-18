@@ -12,7 +12,10 @@ import {
 } from "@mui/material"
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { buildLivestreamObject } from "../../../../helperFunctions/streamFormFunctions"
+import {
+   buildLivestreamObject,
+   buildPromotionObj,
+} from "../../../../helperFunctions/streamFormFunctions"
 import {
    GENERAL_ERROR,
    SAVE_WITH_NO_VALIDATION,
@@ -175,6 +178,9 @@ const NewStreamModal = ({
          const targetCollection = isActualLivestream()
             ? "livestreams"
             : "draftLivestreams"
+
+         const promotion = buildPromotionObj(values, livestream.id)
+
          if (updateMode) {
             id = livestream.id
             if (!livestream.lastUpdatedAuthorInfo) {
@@ -183,7 +189,11 @@ const NewStreamModal = ({
                   email: authenticatedUser.email,
                }
             }
-            await firebase.updateLivestream(livestream, targetCollection)
+            await firebase.updateLivestream(
+               livestream,
+               targetCollection,
+               promotion
+            )
          } else {
             const author = {
                groupId: group.id,
@@ -192,7 +202,8 @@ const NewStreamModal = ({
             id = await firebase.addLivestream(
                livestream,
                targetCollection,
-               author
+               author,
+               promotion
             )
          }
          handleCloseDialog()

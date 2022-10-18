@@ -1,6 +1,7 @@
 import { v4 as uuidv4 } from "uuid"
 import {
    LivestreamEvent,
+   LivestreamPromotions,
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
@@ -107,6 +108,18 @@ const buildSpeakersArray = (values) => {
          rank: index,
       }
    })
+}
+
+export const buildPromotionObj = (
+   values,
+   livestreamId
+): Partial<LivestreamPromotions> => {
+   return {
+      livestreamId: livestreamId,
+      promotionChannelsCodes: values.promotionChannelsCodes,
+      promotionCountriesCodes: values.promotionCountriesCodes,
+      promotionUniversitiesCodes: values.promotionUniversitiesCodes,
+   }
 }
 
 export const handleAddTargetCategories = (

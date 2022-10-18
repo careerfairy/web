@@ -12,17 +12,17 @@ import FirebaseService from "../../../../data/firebase/FirebaseService"
 import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
 
 type Props = {
-   promotionCountries: Option[]
-   promotionChannels: Option[]
-   promotionUniversities: Option[]
+   promotionChannelsCodes: Option[]
+   promotionCountriesCodes: Option[]
+   promotionUniversitiesCodes: Option[]
    setFieldValue: (field, value) => void
    firebase: FirebaseService
 }
 
 const PromotionInfo = ({
-   promotionCountries,
-   promotionChannels,
-   promotionUniversities,
+   promotionChannelsCodes,
+   promotionCountriesCodes,
+   promotionUniversitiesCodes,
    setFieldValue,
    firebase,
 }: Props) => {
@@ -31,7 +31,7 @@ const PromotionInfo = ({
    useEffect(() => {
       ;(async () => {
          try {
-            const selectedCountriesIds = promotionCountries.map(
+            const selectedCountriesIds = promotionCountriesCodes.map(
                (option) => option.id
             )
             const universitiesSnapShot =
@@ -47,11 +47,10 @@ const PromotionInfo = ({
                []
             )
 
-            console.log("UNI -> ", allUniversities)
             setAllUniversities(allUniversities)
          } catch (e) {}
       })()
-   }, [firebase, promotionCountries])
+   }, [firebase, promotionCountriesCodes])
 
    return (
       <>
@@ -65,11 +64,10 @@ const PromotionInfo = ({
          <FormGroup container boxShadow={0}>
             <Grid item xs={12}>
                <MultiListSelect
-                  inputName="promotionChannels"
+                  inputName="promotionChannelsCodes"
                   isCheckbox
-                  selectedItems={promotionChannels}
+                  selectedItems={promotionChannelsCodes}
                   allValues={channelOptionCodes}
-                  getGroupByFn={mapGroupBy}
                   setFieldValue={setFieldValue}
                   inputProps={{
                      label: "Promotion Channels",
@@ -85,11 +83,10 @@ const PromotionInfo = ({
 
             <Grid item xs={12}>
                <MultiListSelect
-                  inputName="promotionCountries"
+                  inputName="promotionCountriesCodes"
                   isCheckbox
-                  selectedItems={promotionCountries}
+                  selectedItems={promotionCountriesCodes}
                   allValues={countriesOptionCodes}
-                  getGroupByFn={mapGroupBy}
                   setFieldValue={setFieldValue}
                   inputProps={{
                      label: "Countries for Promotion",
@@ -105,11 +102,10 @@ const PromotionInfo = ({
 
             <Grid item xs={12}>
                <MultiListSelect
-                  inputName="promotionUniversities"
+                  inputName="promotionUniversitiesCodes"
                   isCheckbox
-                  selectedItems={promotionUniversities}
+                  selectedItems={promotionUniversitiesCodes}
                   allValues={allUniversities}
-                  getGroupByFn={mapGroupBy}
                   setFieldValue={setFieldValue}
                   inputProps={{
                      label: "Universities for Promotion",
@@ -126,7 +122,5 @@ const PromotionInfo = ({
       </>
    )
 }
-
-const mapGroupBy = (item) => item.groupId
 
 export default withFirebase(PromotionInfo)

@@ -120,6 +120,7 @@ const SpeakersInfo = ({
                            errors,
                            touched
                         )}
+                        emailError={handleError(key, "email", errors, touched)}
                         getDownloadUrl={getDownloadUrl}
                         speaker={values.speakers[key]}
                         values={values}
@@ -128,7 +129,6 @@ const SpeakersInfo = ({
                         isSubmitting={isSubmitting}
                         handleBlur={handleBlur}
                         loading={false}
-                        emailError={undefined}
                      />
                   </FormGroup>
                </Fragment>

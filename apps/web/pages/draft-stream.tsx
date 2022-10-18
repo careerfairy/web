@@ -127,7 +127,8 @@ const DraftStream = () => {
             }
             await firebaseService.updateLivestream(
                livestream,
-               "draftLivestreams"
+               "draftLivestreams",
+               {}
             )
 
             // console.log("-> Draft livestream was updated with id", id);
@@ -138,7 +139,8 @@ const DraftStream = () => {
             id = await firebaseService.addLivestream(
                livestream,
                "draftLivestreams",
-               author
+               author,
+               {}
             )
             // console.log("-> Draft livestream was created with id", id);
             push(`/draft-stream?draftStreamId=${id}`).catch()

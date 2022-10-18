@@ -5,6 +5,7 @@ import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
+import { Option } from "@careerfairy/webapp/components/views/signup/utils"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -209,6 +210,7 @@ export interface Speaker extends Identifiable {
    lastName?: string
    position?: string
    rank?: number
+   email?: string
 }
 
 export interface LiveSpeaker extends Identifiable {
@@ -339,4 +341,11 @@ export interface LivestreamEventParsed extends LivestreamEventSerialized {
    startDate: Date
    createdDate: Date
    lastUpdatedDate: Date
+}
+
+export interface LivestreamPromotions extends Identifiable {
+   promotionChannelsCodes: string[]
+   promotionCountriesCodes: Option[]
+   promotionUniversitiesCodes: Option[]
+   livestreamId: Option
 }
