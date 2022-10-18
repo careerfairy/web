@@ -167,7 +167,7 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
 }
 
 export const validateStreamForm = (values, isDraft, noValidation = false) => {
-   let errors: Partial<DraftFormValues> = {
+   let errors: Partial<DraftFormValues | any> = {
       speakers: {},
    }
    if (!values.companyLogoUrl) {
@@ -184,6 +184,12 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
    }
    if (!values.title) {
       errors.title = "Required"
+   }
+
+   const now = new Date()
+
+   if (!values.start || values.start < now) {
+      errors.start = "Please select a date in the future"
    }
 
    Object.keys(values.speakers).forEach((key) => {

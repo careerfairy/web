@@ -4,6 +4,7 @@ import {
    FormControl,
    FormControlLabel,
    Grid,
+   IconButton,
    Switch,
    TextField,
    Tooltip,
@@ -15,11 +16,13 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import { LanguageSelect } from "../../../helperFunctions/streamFormFunctions/components"
 import Stack from "@mui/material/Stack"
 import FormGroup from "../FormGroup"
-import React from "react"
+import React, { useEffect, useState } from "react"
 import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
 import Section from "components/views/common/Section"
+import CloseIcon from "@mui/icons-material/Close"
+import { useStreamCreationProvider } from "./StreamCreationProvider"
 
 type Props = {
    isGroupsSelected: boolean
@@ -51,6 +54,27 @@ const StreamInfo = ({
    sectionRef,
 }: Props) => {
    const { palette } = useTheme()
+   const [showStartTooltip, setShowStartToolTip] = useState(false)
+   const { setShowPromotionInputs } = useStreamCreationProvider()
+
+   useEffect(() => {
+      const { start } = values
+      if (start) {
+         const now = new Date()
+         const oneMonthAgo = new Date(new Date().setDate(now.getDate() + 30))
+
+         // The tooltip will show only if the start date is between today and one month ago.
+         // The promotion inputs is the opposite, wil be only shown if the start date is between today and one month ago.
+         if (start < oneMonthAgo) {
+            setShowStartToolTip(true)
+            setShowPromotionInputs(false)
+         } else {
+            setShowStartToolTip(false)
+            setShowPromotionInputs(true)
+         }
+      }
+   }, [setShowPromotionInputs, values.start])
+
    const buildHiddenMessage = () => {
       // Creates the group names string separated by commas and an "and" at the end
       const groupNames = selectedGroups
@@ -188,14 +212,37 @@ const StreamInfo = ({
             <Grid xs={12} sm={6} md={4} item>
                <DateTimePicker
                   inputFormat={"dd/MM/yyyy HH:mm"}
+                  disablePast
                   ampm={false}
                   renderInput={(params) => (
-                     <TextField
-                        className="streamFormInput"
-                        fullWidth
-                        {...params}
-                        sx={{ svg: { color: palette.secondary.main } }}
-                     />
+                     <Tooltip
+                        placement="top"
+                        arrow
+                        open={showStartTooltip}
+                        title={
+                           <Box display="flex">
+                              <Typography>
+                                 Promotion won’t available if the event happens
+                                 within 30 days
+                              </Typography>
+                              <IconButton
+                                 onClick={() => setShowStartToolTip(false)}
+                                 size="small"
+                                 color="info"
+                              >
+                                 <CloseIcon />
+                              </IconButton>
+                           </Box>
+                        }
+                     >
+                        <TextField
+                           className="streamFormInput"
+                           fullWidth
+                           {...params}
+                           sx={{ svg: { color: palette.secondary.main } }}
+                           error={Boolean(errors.start)}
+                        />
+                     </Tooltip>
                   )}
                   disabled={isSubmitting}
                   label="Livestream Start Date"
@@ -204,6 +251,12 @@ const StreamInfo = ({
                      setFieldValue("start", new Date(value), true)
                   }}
                />
+               <Collapse
+                  className={classes.errorMessage}
+                  in={Boolean(errors.start)}
+               >
+                  {errors.start}
+               </Collapse>
             </Grid>
             <Grid xs={12} sm={6} md={4} item>
                <StreamDurationSelect

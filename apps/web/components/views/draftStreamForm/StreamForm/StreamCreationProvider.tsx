@@ -4,24 +4,31 @@ type DefaultContext = {
    isOnCreationForm: boolean
    showJobSection: boolean
    setShowJobSection: Dispatch<boolean>
+   showPromotionInputs: boolean
+   setShowPromotionInputs: Dispatch<boolean>
 }
 
 const StreamCreationContext = createContext<DefaultContext>({
    isOnCreationForm: true,
    showJobSection: false,
    setShowJobSection: () => {},
+   showPromotionInputs: false,
+   setShowPromotionInputs: () => {},
 })
 
 const StreamCreationProvider = ({ children }) => {
    const [showJobSection, setShowJobSection] = useState(false)
+   const [showPromotionInputs, setShowPromotionInputs] = useState(false)
 
    const contextValue = useMemo(
       () => ({
          isOnCreationForm: true,
          showJobSection,
          setShowJobSection,
+         showPromotionInputs,
+         setShowPromotionInputs,
       }),
-      [showJobSection]
+      [showJobSection, showPromotionInputs]
    )
 
    return (

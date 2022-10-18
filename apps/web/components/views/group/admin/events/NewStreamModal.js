@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.text.primary,
    },
    subtitle: {
-      flex: 3,
+      flex: 2,
       color: theme.palette.text.disabled,
    },
    background: {
