@@ -58,8 +58,8 @@ import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
 import StreamFormNavigator, {
    IStreamFormNavigatorSteps,
 } from "./StreamForm/StreamFormNavigator"
-import Section from "../common/Section"
 import { Option } from "../signup/utils"
+import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -231,8 +231,9 @@ const DraftStreamForm = ({
    const [selectedJobs, setSelectedJobs] = useState<LivestreamJobAssociation[]>(
       []
    )
-   const [allFetched, setAllFetched] = useState(false) // TODO GS: change to false
+   const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
+   const { showJobSection } = useStreamCreationProvider()
 
    const { data: existingInterests } = useInterests()
 
@@ -264,7 +265,6 @@ const DraftStreamForm = ({
    })
 
    const [steps, setSteps] = useState(initialSteps)
-   const myRef = useRef(null)
 
    const handleSetGroupIds = async (
       UrlIds,
@@ -447,23 +447,23 @@ const DraftStreamForm = ({
       }
    }, [existingGroups?.length])
 
-   // TODO GS : fix this logic to add Jobs stepper
-   // const handleShowJobSelector = useCallback(() => {
-   //    // if (show) {
-   //       // We want to add this section on the 5th position
-   //       setSteps((prevSteps) => [
-   //          ...prevSteps.slice(0,4),
-   //          {
-   //             label: "Job",
-   //             ref: jobInfoRef,
-   //          },
-   //          ...prevSteps.slice(4)
-   //       ])
-   //    // }
-   //    // else {
-   //    //    setSteps((prevSteps) => prevSteps.filter(({label}) => label !== "Job"))
-   //    // }
-   // }, [])
+   useEffect(() => {
+      if (showJobSection) {
+         // We want to add this section on the 5th position
+         setSteps((prevSteps) => [
+            ...prevSteps.slice(0, 4),
+            {
+               label: "Job",
+               ref: jobInfoRef,
+            },
+            ...prevSteps.slice(4),
+         ])
+      } else {
+         setSteps((prevSteps) =>
+            prevSteps.filter(({ label }) => label !== "Job")
+         )
+      }
+   }, [showJobSection])
 
    const isPending = () => {
       // @ts-ignore
@@ -597,7 +597,7 @@ const DraftStreamForm = ({
    return (
       <Container className={classes.root} id="livestreamForm">
          {allFetched ? (
-            <Grid container spacing={2} ref={myRef}>
+            <Grid container spacing={2}>
                <Grid item xs={2}>
                   <Box sx={{ position: "fixed", marginTop: "10vh" }}>
                      <StreamFormNavigator steps={steps} />
@@ -658,134 +658,97 @@ const DraftStreamForm = ({
                                  }}
                                  className={classes.form}
                               >
-                                 <Section
+                                 <StreamInfo
+                                    isGroupsSelected={groupsSelected}
+                                    handleBlur={handleBlur}
+                                    values={values}
+                                    isSubmitting={isSubmitting}
+                                    errors={errors}
+                                    touched={touched}
+                                    handleChange={handleChange}
+                                    selectedGroups={selectedGroups}
+                                    setFieldValue={setFieldValue}
+                                    userData={userData}
+                                    classes={classes}
                                     sectionRef={streamInfoRef}
-                                    sectionId={"streamInfoSection"}
-                                    className={classes.section}
-                                 >
-                                    <StreamInfo
-                                       isGroupsSelected={groupsSelected}
-                                       handleBlur={handleBlur}
-                                       values={values}
-                                       isSubmitting={isSubmitting}
-                                       errors={errors}
-                                       touched={touched}
-                                       handleChange={handleChange}
-                                       selectedGroups={selectedGroups}
-                                       setFieldValue={setFieldValue}
-                                       userData={userData}
-                                       classes={classes}
-                                    />
-                                 </Section>
+                                 />
 
-                                 <Section
+                                 <SpeakersInfo
+                                    values={values}
+                                    setValues={setValues}
+                                    speakerLimit={SPEAKER_LIMIT}
+                                    speakerObj={speakerObj}
+                                    errors={errors}
+                                    touched={touched}
+                                    setFieldValue={setFieldValue}
+                                    isSubmitting={isSubmitting}
+                                    handleBlur={handleBlur}
+                                    classes={classes}
                                     sectionRef={speakersInfoRef}
-                                    sectionId={"speakersInfoSection"}
-                                    className={classes.section}
-                                 >
-                                    <SpeakersInfo
-                                       values={values}
-                                       setValues={setValues}
-                                       speakerLimit={SPEAKER_LIMIT}
-                                       speakerObj={speakerObj}
-                                       errors={errors}
-                                       touched={touched}
-                                       setFieldValue={setFieldValue}
-                                       isSubmitting={isSubmitting}
-                                       handleBlur={handleBlur}
-                                    />
-                                 </Section>
+                                 />
 
-                                 <Section
+                                 <TargetStudentsInfo
+                                    targetFieldsOfStudy={
+                                       values.targetFieldsOfStudy
+                                    }
+                                    targetLevelsOfStudy={
+                                       values.targetLevelsOfStudy
+                                    }
+                                    setFieldValue={setFieldValue}
+                                    classes={classes}
                                     sectionRef={targetStudentsRef}
-                                    sectionId={"targetStudentsSection"}
-                                    className={classes.section}
-                                 >
-                                    <TargetStudentsInfo
-                                       targetFieldsOfStudy={
-                                          values.targetFieldsOfStudy
-                                       }
-                                       targetLevelsOfStudy={
-                                          values.targetLevelsOfStudy
-                                       }
-                                       setFieldValue={setFieldValue}
-                                    />
-                                 </Section>
+                                 />
 
-                                 <Section
+                                 <PromotionInfo
+                                    setFieldValue={setFieldValue}
+                                    promotionChannelsCodes={
+                                       values.promotionChannelsCodes
+                                    }
+                                    promotionCountriesCodes={
+                                       values.promotionCountriesCodes
+                                    }
+                                    promotionUniversitiesCodes={
+                                       values.promotionUniversitiesCodes
+                                    }
+                                    classes={classes}
                                     sectionRef={promotionInfoRef}
-                                    sectionId={"PromotionSection"}
-                                    className={classes.section}
-                                 >
-                                    <PromotionInfo
-                                       setFieldValue={setFieldValue}
-                                       promotionChannelsCodes={
-                                          values.promotionChannelsCodes
-                                       }
-                                       promotionCountriesCodes={
-                                          values.promotionCountriesCodes
-                                       }
-                                       promotionUniversitiesCodes={
-                                          values.promotionUniversitiesCodes
-                                       }
-                                    />
-                                 </Section>
+                                 />
 
                                  <SuspenseWithBoundary hide expected>
                                     {values.groupIds.length > 0 && (
-                                       <Section
+                                       <JobSelectorCategory
+                                          groupId={values.groupIds[0]} // we only support a single group for now
+                                          onSelectItems={setSelectedJobs}
+                                          selectedItems={selectedJobs}
                                           sectionRef={jobInfoRef}
-                                          sectionId={"JobSection"}
-                                          className={classes.section}
-                                       >
-                                          <JobSelectorCategory
-                                             groupId={values.groupIds[0]} // we only support a single group for now
-                                             onSelectItems={setSelectedJobs}
-                                             selectedItems={selectedJobs}
-                                          />
-                                       </Section>
+                                          classes={classes}
+                                       />
                                     )}
                                  </SuspenseWithBoundary>
 
-                                 <SuspenseWithBoundary hide expected>
-                                    {!!existingGroups.length && (
-                                       <Section
-                                          sectionRef={questionsInfoRef}
-                                          sectionId={"hostAndQuestionsSection"}
-                                          className={classes.section}
-                                       >
-                                          <HostAndQuestionsInfo
-                                             existingGroups={existingGroups}
-                                             handleGroupSelect={
-                                                handleGroupSelect
-                                             }
-                                             values={values}
-                                             selectedGroups={selectedGroups}
-                                             isSubmitting={isSubmitting}
-                                             isNotAdmin={isNotAdmin}
-                                             setFieldValue={setFieldValue}
-                                             isGroupAdmin={isGroupAdmin}
-                                             groupId={group?.id}
-                                          />
-                                       </Section>
-                                    )}
-                                 </SuspenseWithBoundary>
+                                 <HostAndQuestionsInfo
+                                    existingGroups={existingGroups}
+                                    handleGroupSelect={handleGroupSelect}
+                                    values={values}
+                                    selectedGroups={selectedGroups}
+                                    isSubmitting={isSubmitting}
+                                    isNotAdmin={isNotAdmin}
+                                    setFieldValue={setFieldValue}
+                                    isGroupAdmin={isGroupAdmin}
+                                    groupId={group?.id}
+                                    classes={classes}
+                                    sectionRef={questionsInfoRef}
+                                 />
 
-                                 <Section
+                                 <EventCategoriesInfo
+                                    setSelectedInterests={setSelectedInterests}
+                                    selectedInterests={selectedInterests}
+                                    existingInterests={existingInterests}
+                                    isSubmitting={isSubmitting}
+                                    setFieldValue={setFieldValue}
+                                    classes={classes}
                                     sectionRef={eventCategoriesInfoRef}
-                                    sectionId={"eventCategorySection"}
-                                    className={classes.section}
-                                 >
-                                    <EventCategoriesInfo
-                                       setSelectedInterests={
-                                          setSelectedInterests
-                                       }
-                                       selectedInterests={selectedInterests}
-                                       existingInterests={existingInterests}
-                                       isSubmitting={isSubmitting}
-                                       setFieldValue={setFieldValue}
-                                    />
-                                 </Section>
+                                 />
 
                                  <ButtonGroup
                                     className={classes.buttonGroup}

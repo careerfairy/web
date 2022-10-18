@@ -3,6 +3,7 @@ import { Autocomplete, Checkbox, Chip, TextField } from "@mui/material"
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import isEqual from "react-fast-compare"
+import { useStreamCreationProvider } from "../draftStreamForm/StreamForm/StreamCreationProvider"
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
@@ -32,6 +33,8 @@ const MultiListSelect = ({
 }: Props) => {
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
    const [selectedItemsLocal, setSelectedItemsLocal] = useState(selectedItems)
+
+   const { isOnCreationForm } = useStreamCreationProvider()
 
    // add select all option to the list
    useEffect(() => {
@@ -167,6 +170,7 @@ const MultiListSelect = ({
                      icon={icon}
                      checkedIcon={checkedIcon}
                      checked={selected}
+                     color={isOnCreationForm ? "secondary" : "primary"}
                   />
                </li>
             ) : (
@@ -181,7 +185,12 @@ const MultiListSelect = ({
          }
          getOptionDisabled={getOptionDisabled}
          renderInput={(params) => (
-            <TextField {...params} {...inputProps} name={inputName} />
+            <TextField
+               {...params}
+               {...inputProps}
+               name={inputName}
+               className={isOnCreationForm ? "streamFormInput" : ""}
+            />
          )}
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (

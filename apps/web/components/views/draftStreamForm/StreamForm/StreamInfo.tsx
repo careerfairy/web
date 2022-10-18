@@ -19,6 +19,7 @@ import React from "react"
 import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
+import Section from "components/views/common/Section"
 
 type Props = {
    isGroupsSelected: boolean
@@ -32,6 +33,7 @@ type Props = {
    setFieldValue: (field: string, value: any, shouldValidate?: boolean) => void
    userData: any
    classes: any
+   sectionRef: any
 }
 
 const StreamInfo = ({
@@ -46,6 +48,7 @@ const StreamInfo = ({
    setFieldValue,
    userData,
    classes,
+   sectionRef,
 }: Props) => {
    const { palette } = useTheme()
    const buildHiddenMessage = () => {
@@ -59,7 +62,11 @@ const StreamInfo = ({
 
    // @ts-ignore
    return (
-      <>
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"streamInfoSection"}
+         className={classes.section}
+      >
          <Typography fontWeight="bold" variant="h4">
             Stream Info
          </Typography>
@@ -77,6 +84,7 @@ const StreamInfo = ({
             >
                <FormControl fullWidth>
                   <TextField
+                     className="streamFormInput"
                      name="title"
                      variant="outlined"
                      fullWidth
@@ -182,6 +190,7 @@ const StreamInfo = ({
                   ampm={false}
                   renderInput={(params) => (
                      <TextField
+                        className="streamFormInput"
                         fullWidth
                         {...params}
                         sx={{ svg: { color: palette.secondary.main } }}
@@ -216,6 +225,7 @@ const StreamInfo = ({
             <Grid xs={12} sm={12} item>
                <FormControl fullWidth>
                   <TextField
+                     className="streamFormInput"
                      name="company"
                      variant="outlined"
                      fullWidth
@@ -243,6 +253,7 @@ const StreamInfo = ({
             <Grid xs={12} item>
                <FormControl fullWidth>
                   <TextField
+                     className="streamFormInput"
                      name="summary"
                      variant="outlined"
                      fullWidth
@@ -309,7 +320,7 @@ const StreamInfo = ({
                </Grid>
             )}
          </FormGroup>
-      </>
+      </Section>
    )
 }
 

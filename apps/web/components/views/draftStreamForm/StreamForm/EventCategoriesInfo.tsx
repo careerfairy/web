@@ -3,6 +3,7 @@ import FormGroup from "../FormGroup"
 import MultiListSelect from "../../common/MultiListSelect"
 import React from "react"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
+import Section from "components/views/common/Section"
 
 type Props = {
    setSelectedInterests: React.Dispatch<React.SetStateAction<Interest[]>>
@@ -10,6 +11,8 @@ type Props = {
    existingInterests: Interest[]
    isSubmitting: boolean
    setFieldValue: (field, value) => void
+   sectionRef: any
+   classes: any
 }
 
 const EventCategoriesInfo = ({
@@ -18,9 +21,15 @@ const EventCategoriesInfo = ({
    existingInterests,
    isSubmitting,
    setFieldValue,
+   sectionRef,
+   classes,
 }: Props) => {
    return (
-      <>
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"eventCategorySection"}
+         className={classes.section}
+      >
          <Typography fontWeight="bold" variant="h4">
             Event Categories
          </Typography>
@@ -50,7 +59,7 @@ const EventCategoriesInfo = ({
                />
             </Grid>
          </FormGroup>
-      </>
+      </Section>
    )
 }
 export default EventCategoriesInfo

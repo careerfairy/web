@@ -14,6 +14,7 @@ import { ISpeakerObj } from "../DraftStreamForm"
 import { FormikErrors, FormikTouched, FormikValues } from "formik"
 import makeStyles from "@mui/styles/makeStyles"
 import { createStyles } from "@mui/styles"
+import Section from "components/views/common/Section"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -35,6 +36,8 @@ type Props = {
    setFieldValue: (field, value) => void
    isSubmitting: boolean
    handleBlur: (e) => void
+   sectionRef: any
+   classes: any
 }
 
 const SpeakersInfo = ({
@@ -47,16 +50,22 @@ const SpeakersInfo = ({
    setFieldValue,
    isSubmitting,
    handleBlur,
+   sectionRef,
+   classes,
 }: Props) => {
-   const classes = useStyles()
+   const currentClasses = useStyles()
    const firebase = useFirebaseService()
 
    return (
-      <>
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"speakersInfoSection"}
+         className={classes.section}
+      >
          {Object.keys(values.speakers).map((key, index) => {
             return (
                <Fragment key={key}>
-                  <Box className={classes.speakersHeader}>
+                  <Box className={currentClasses.speakersHeader}>
                      <Box>
                         <Typography fontWeight="bold" variant="h4">
                            {index === 0
@@ -134,7 +143,7 @@ const SpeakersInfo = ({
                </Fragment>
             )
          })}
-      </>
+      </Section>
    )
 }
 

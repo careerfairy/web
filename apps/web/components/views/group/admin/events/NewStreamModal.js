@@ -26,6 +26,7 @@ import { useSnackbar } from "notistack"
 import PublishIcon from "@mui/icons-material/Publish"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { StreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -258,7 +259,7 @@ const NewStreamModal = ({
             onClick={handleCloseDialog}
             sx={{ marginRight: 2 }}
          >
-            <Typography variant="h7">Back to event page</Typography>
+            <Typography variant="h7">Back to events page</Typography>
          </Button>
          {canPublish() && (
             <Button
@@ -312,7 +313,7 @@ const NewStreamModal = ({
                   {isActualLivestream()
                      ? "Update Stream"
                      : currentStream
-                     ? "Update Draft"
+                     ? "Update draft"
                      : "New draft"}
                </Typography>
                <CardActions>
@@ -326,16 +327,18 @@ const NewStreamModal = ({
                <DialogContent
                   className={`${classes.content} ${classes.contentRoot}`}
                >
-                  <DraftStreamForm
-                     formRef={formRef}
-                     group={group}
-                     saveChangesButtonRef={saveChangesButtonRef}
-                     onSubmit={onSubmit}
-                     submitted={submitted}
-                     isActualLivestream={isActualLivestream()}
-                     currentStream={currentStream}
-                     setSubmitted={setSubmitted}
-                  />
+                  <StreamCreationProvider>
+                     <DraftStreamForm
+                        formRef={formRef}
+                        group={group}
+                        saveChangesButtonRef={saveChangesButtonRef}
+                        onSubmit={onSubmit}
+                        submitted={submitted}
+                        isActualLivestream={isActualLivestream()}
+                        currentStream={currentStream}
+                        setSubmitted={setSubmitted}
+                     />
+                  </StreamCreationProvider>
                </DialogContent>
             </div>
          </DialogContent>

@@ -10,6 +10,7 @@ import { multiListSelectMapValueFn, Option } from "../../signup/utils"
 import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext"
 import FirebaseService from "../../../../data/firebase/FirebaseService"
 import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
+import Section from "components/views/common/Section"
 
 type Props = {
    promotionChannelsCodes: Option[]
@@ -17,6 +18,8 @@ type Props = {
    promotionUniversitiesCodes: Option[]
    setFieldValue: (field, value) => void
    firebase: FirebaseService
+   classes: any
+   sectionRef: any
 }
 
 const PromotionInfo = ({
@@ -25,6 +28,8 @@ const PromotionInfo = ({
    promotionUniversitiesCodes,
    setFieldValue,
    firebase,
+   classes,
+   sectionRef,
 }: Props) => {
    const [allUniversities, setAllUniversities] = useState([])
 
@@ -53,7 +58,11 @@ const PromotionInfo = ({
    }, [firebase, promotionCountriesCodes])
 
    return (
-      <>
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"PromotionSection"}
+         className={classes.section}
+      >
          <Typography fontWeight="bold" variant="h4">
             Promotion
          </Typography>
@@ -119,7 +128,7 @@ const PromotionInfo = ({
                />
             </Grid>
          </FormGroup>
-      </>
+      </Section>
    )
 }
 

@@ -1,4 +1,4 @@
-import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { PaperBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import Head from "next/head"
 import React, { useEffect, useRef, useState } from "react"
 import { Typography } from "@mui/material"
@@ -194,13 +194,12 @@ const DraftStream = () => {
             <title key="title">CareerFairy | Draft a Live Stream</title>
          </Head>
          <GeneralLayout>
-            <TealBackground style={{ paddingBottom: 0 }}>
+            <PaperBackground style={{ paddingBottom: 0 }}>
                <Typography
                   variant="h3"
                   align="center"
                   style={{
                      marginTop: submitted ? "15vh" : "1.5rem",
-                     color: "white",
                   }}
                   gutterBottom
                >
@@ -219,7 +218,7 @@ const DraftStream = () => {
                   setUserInfo={setUserInfo}
                   userInfo={userInfo}
                />
-            </TealBackground>
+            </PaperBackground>
          </GeneralLayout>
       </>
    )

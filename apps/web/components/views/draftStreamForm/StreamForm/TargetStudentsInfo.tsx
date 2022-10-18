@@ -3,20 +3,29 @@ import FormGroup from "../FormGroup"
 import FieldsOfStudyMultiSelector from "../TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import LevelsOfStudyMultiSelector from "../TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
+import Section from "components/views/common/Section"
 
 type Props = {
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
    setFieldValue: (field, value) => void
+   classes: any
+   sectionRef: any
 }
 
 const TargetStudentsInfo = ({
    targetFieldsOfStudy,
    targetLevelsOfStudy,
    setFieldValue,
+   classes,
+   sectionRef,
 }: Props) => {
    return (
-      <>
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"targetStudentsSection"}
+         className={classes.section}
+      >
          <Typography fontWeight="bold" variant="h4">
             Target Students
          </Typography>
@@ -39,7 +48,7 @@ const TargetStudentsInfo = ({
                />
             </Grid>
          </FormGroup>
-      </>
+      </Section>
    )
 }
 

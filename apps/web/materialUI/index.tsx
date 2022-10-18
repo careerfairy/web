@@ -248,6 +248,21 @@ const getComponents = (theme: DefaultTheme): Components => ({
                   borderColor: theme.palette.error.main,
                },
             },
+            "&.streamFormInput": {
+               borderRadius: "8px",
+
+               "& fieldset": {
+                  borderRadius: "8px",
+               },
+               "& .Mui-focused fieldset": {
+                  border: "2px solid",
+                  borderColor: theme.palette.secondary.main,
+               },
+               "& .Mui-error fieldset": {
+                  border: "2px solid",
+                  borderColor: theme.palette.error.main,
+               },
+            },
          },
       },
    },
