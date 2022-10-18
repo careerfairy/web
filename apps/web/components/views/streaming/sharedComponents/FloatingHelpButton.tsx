@@ -7,18 +7,20 @@ import { alpha } from "@mui/material/styles"
 const styles = sxStyles({
    root: {
       position: "absolute",
-      bottom: 8,
+      top: 8,
       left: 8,
       opacity: 0.8,
       zIndex: 1000,
       display: "flex",
       flexDirection: "column",
-      padding: "8px 16px",
+      backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
+      boxShadow: 2,
+      backdropFilter: "blur(5px)",
+      padding: "8px 18.4px",
       borderRadius: 1.5,
       color: "white",
-      backgroundColor: (theme) => alpha(theme.palette.common.black, 0.1),
       "&:hover": {
-         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
+         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.5),
       },
    },
 })

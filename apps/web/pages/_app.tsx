@@ -38,6 +38,11 @@ import {
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import dynamic from "next/dynamic"
+
+const CrispProvider = dynamic(() => import("../context/crisp/CrispProvider"), {
+   ssr: false,
+})
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -101,12 +106,14 @@ function MyApp(props) {
                                     <LocalizationProvider
                                        dateAdapter={AdapterDateFns}
                                     >
-                                       <ErrorProvider>
-                                          <UserRewardsNotifications>
-                                             <Component {...pageProps} />
-                                          </UserRewardsNotifications>
-                                          <Notifier />
-                                       </ErrorProvider>
+                                       <CrispProvider>
+                                          <ErrorProvider>
+                                             <UserRewardsNotifications>
+                                                <Component {...pageProps} />
+                                             </UserRewardsNotifications>
+                                             <Notifier />
+                                          </ErrorProvider>
+                                       </CrispProvider>
                                     </LocalizationProvider>
                                  </FirebaseServiceContext.Provider>
                               </ThemeProviderWrapper>
