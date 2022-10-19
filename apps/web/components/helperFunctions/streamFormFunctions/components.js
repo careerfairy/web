@@ -2,11 +2,8 @@ import React from "react"
 import { Autocomplete } from "@mui/material"
 import { languageCodes } from "./index"
 import { TextField } from "@mui/material"
-import { useStreamCreationProvider } from "../../views/draftStreamForm/StreamForm/StreamCreationProvider"
 
 export const LanguageSelect = ({ name, value, setFieldValue, ...rest }) => {
-   const { isOnCreationForm } = useStreamCreationProvider()
-
    const handleChange = (event, newValue) => {
       setFieldValue(name, newValue)
    }
@@ -28,7 +25,6 @@ export const LanguageSelect = ({ name, value, setFieldValue, ...rest }) => {
                label="Chose a preferred language"
                variant="outlined"
                fullWidth
-               className={isOnCreationForm ? "streamFormInput" : ""}
             />
          )}
       />

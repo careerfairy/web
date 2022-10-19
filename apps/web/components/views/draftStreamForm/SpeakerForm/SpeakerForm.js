@@ -88,13 +88,11 @@ const SpeakerForm = ({
                <Grid container spacing={2}>
                   <Grid xs={12} lg={6} item>
                      <TextField
-                        className="streamFormInput"
                         name={`speakers.${objectKey}.firstName`}
                         id={`speakers.${objectKey}.firstName`}
                         placeholder="Enter the speaker’s first name"
                         variant="outlined"
                         fullWidth
-                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="First Name"
@@ -117,13 +115,11 @@ const SpeakerForm = ({
                   </Grid>
                   <Grid xs={12} lg={6} item>
                      <TextField
-                        className="streamFormInput"
                         name={`speakers.${objectKey}.lastName`}
                         id={`speakers.${objectKey}.lastName`}
                         placeholder="Enter the speaker’s last name"
                         variant="outlined"
                         fullWidth
-                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="Last Name"
@@ -146,13 +142,11 @@ const SpeakerForm = ({
                   </Grid>
                   <Grid xs={12} lg={6} item>
                      <TextField
-                        className="streamFormInput"
                         name={`speakers.${objectKey}.position`}
                         id={`speakers.${objectKey}.position`}
                         placeholder="Enter the speaker’s position"
                         variant="outlined"
                         fullWidth
-                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="Position"
@@ -176,7 +170,6 @@ const SpeakerForm = ({
 
                   <Grid xs={12} lg={6} item>
                      <TextField
-                        className="streamFormInput"
                         name={`speakers.${objectKey}.background`}
                         id={`speakers.${objectKey}.background`}
                         placeholder="Enter the speaker’s academic background"
@@ -206,13 +199,11 @@ const SpeakerForm = ({
                   </Grid>
                   <Grid xs={12} item>
                      <TextField
-                        className="streamFormInput"
                         name={`speakers.${objectKey}.email`}
                         id={`speakers.${objectKey}.email`}
                         placeholder="Enter the speaker’s email address"
                         variant="outlined"
                         fullWidth
-                        required
                         disabled={isSubmitting}
                         onBlur={handleBlur}
                         label="Email Address"

@@ -34,12 +34,11 @@ const useStyles = makeStyles((theme) => ({
       flex: 1,
       color: theme.palette.text.primary,
    },
-   subtitle: {
-      flex: 2,
-      color: theme.palette.text.disabled,
-   },
    background: {
       background: "white",
+      [theme.breakpoints.down("md")]: {
+         margin: theme.spacing(2),
+      },
    },
    appBar: {
       backgroundColor: "white",
@@ -319,9 +318,6 @@ const NewStreamModal = ({
                      : currentStream
                      ? "Update draft"
                      : "New draft"}
-               </Typography>
-               <Typography variant="subtitle1" className={classes.subtitle}>
-                  * This field is mandatory
                </Typography>
                <CardActions>
                   <Actions />

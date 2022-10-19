@@ -1,5 +1,4 @@
 import {
-   Box,
    Step,
    StepButton,
    StepConnector,
@@ -8,8 +7,9 @@ import {
    Typography,
 } from "@mui/material"
 import React, { useCallback, useEffect, useState } from "react"
-import { styled } from "@mui/styles"
+import { styled, useTheme } from "@mui/styles"
 import makeStyles from "@mui/styles/makeStyles"
+import useMediaQuery from "@mui/material/useMediaQuery"
 
 const StepperConnector = styled(StepConnector)(({ theme }) => ({
    visibility: "hidden",
@@ -43,6 +43,8 @@ type Props = {
 const StreamFormNavigator = ({ steps }: Props) => {
    const classes = useStyles()
    const [currentStep, setCurrentStep] = useState(0)
+   const theme = useTheme()
+   const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"))
 
    const getIsActive = useCallback(
       (currentIndex: number) => {
@@ -77,7 +79,7 @@ const StreamFormNavigator = ({ steps }: Props) => {
       let observer
       if (steps.length) {
          const options = {
-            threshold: 1,
+            threshold: 0.75,
          }
          observer = new IntersectionObserver((entries, observer) => {
             entries.forEach((entry) => {
@@ -94,32 +96,31 @@ const StreamFormNavigator = ({ steps }: Props) => {
    }, [handleChange, steps])
 
    return (
-      <Box sx={{ width: "100%" }}>
-         <Stepper
-            nonLinear
-            orientation="vertical"
-            activeStep={currentStep}
-            connector={<StepperConnector />}
-         >
-            {steps.map(({ label, ref }, index) => (
-               <Step key={label} className="stepperIdentifier">
-                  <StepButton onClick={() => handleStepChange(index, ref)}>
-                     <StepLabel
-                        StepIconProps={{
-                           classes: {
-                              root: `${classes.icon} ${
-                                 getIsActive(index) && classes.activeIcon
-                              }`,
-                           },
-                        }}
-                     >
-                        <Typography variant="h6">{label}</Typography>
-                     </StepLabel>
-                  </StepButton>
-               </Step>
-            ))}
-         </Stepper>
-      </Box>
+      <Stepper
+         nonLinear
+         orientation={isSmallScreen ? "horizontal" : "vertical"}
+         activeStep={currentStep}
+         connector={<StepperConnector />}
+         alternativeLabel={isSmallScreen}
+      >
+         {steps.map(({ label, ref }, index) => (
+            <Step key={label} className="stepperIdentifier">
+               <StepButton onClick={() => handleStepChange(index, ref)}>
+                  <StepLabel
+                     StepIconProps={{
+                        classes: {
+                           root: `${classes.icon} ${
+                              getIsActive(index) && classes.activeIcon
+                           }`,
+                        },
+                     }}
+                  >
+                     <Typography variant="h6">{label}</Typography>
+                  </StepLabel>
+               </StepButton>
+            </Step>
+         ))}
+      </Stepper>
    )
 }
 

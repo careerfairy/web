@@ -3,7 +3,6 @@ import { useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { FormControl, InputLabel, MenuItem, Select } from "@mui/material"
 import useMediaQuery from "@mui/material/useMediaQuery"
-import { useStreamCreationProvider } from "../StreamForm/StreamCreationProvider"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -39,7 +38,6 @@ const StreamDurationSelect = (props) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
    const classes = useStyles()
-   const { isOnCreationForm } = useStreamCreationProvider()
 
    return (
       <FormControl
@@ -60,7 +58,6 @@ const StreamDurationSelect = (props) => {
                setFieldValue("duration", Number(value))
             }}
             value={Number(value || 60)}
-            color={isOnCreationForm ? "secondary" : "primary"}
          >
             {durations.map((duration) =>
                mobile ? (

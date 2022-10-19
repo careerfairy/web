@@ -35,7 +35,7 @@ import {
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import { useInterests } from "../../custom-hook/useCollection"
-import { createStyles } from "@mui/styles"
+import { createStyles, useTheme } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
 import {
    LivestreamEvent,
@@ -61,6 +61,7 @@ import { Option } from "../signup/utils"
 import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
+import useMediaQuery from "@mui/material/useMediaQuery"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -102,6 +103,17 @@ const useStyles = makeStyles((theme) =>
       },
       section: {
          padding: 0,
+      },
+      navBar: {
+         position: "sticky",
+         top: 0,
+         paddingTop: "80px !important",
+         background: "white",
+         zIndex: 999,
+         overflowX: "scroll",
+         overflowY: "hidden",
+         height: "180px",
+         alignItems: "end",
       },
    })
 )
@@ -229,6 +241,8 @@ const DraftStreamForm = ({
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
    const { showJobSection } = useStreamCreationProvider()
+   const theme = useTheme()
+   const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"))
 
    const { data: existingInterests } = useInterests()
 
@@ -593,12 +607,22 @@ const DraftStreamForm = ({
       <Container className={classes.root} id="livestreamForm">
          {allFetched ? (
             <Grid container spacing={2}>
-               <Grid item xs={2}>
-                  <Box sx={{ position: "fixed", marginTop: "10vh" }}>
+               <Grid
+                  item
+                  md={12}
+                  lg={2}
+                  className={isSmallScreen ? classes.navBar : ""}
+               >
+                  <Box
+                     sx={{
+                        position: { lg: "fixed" },
+                        marginTop: { lg: "10vh" },
+                     }}
+                  >
                      <StreamFormNavigator steps={steps} />
                   </Box>
                </Grid>
-               <Grid item xs={10}>
+               <Grid item md={12} lg={10}>
                   {submitted ? (
                      <SuccessMessage />
                   ) : (
@@ -758,7 +782,6 @@ const DraftStreamForm = ({
                                        onClick={handleClickSubmitForApproval}
                                        disabled={isSubmitting || isPending()}
                                        size="large"
-                                       autoFocus
                                        endIcon={
                                           isSubmitting && (
                                              <CircularProgress
@@ -798,7 +821,6 @@ const DraftStreamForm = ({
                                        }
                                        variant="contained"
                                        color="secondary"
-                                       autoFocus
                                     >
                                        <Typography variant="h5">
                                           {isSubmitting

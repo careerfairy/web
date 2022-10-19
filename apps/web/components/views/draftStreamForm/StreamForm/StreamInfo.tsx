@@ -108,11 +108,9 @@ const StreamInfo = ({
             >
                <FormControl fullWidth>
                   <TextField
-                     className="streamFormInput"
                      name="title"
                      variant="outlined"
                      fullWidth
-                     required
                      id="title"
                      label="Livestream Title"
                      inputProps={{ maxLength: 104 }}
@@ -236,7 +234,6 @@ const StreamInfo = ({
                         }
                      >
                         <TextField
-                           className="streamFormInput"
                            fullWidth
                            {...params}
                            sx={{ svg: { color: palette.secondary.main } }}
@@ -279,7 +276,6 @@ const StreamInfo = ({
             <Grid xs={12} sm={12} item>
                <FormControl fullWidth>
                   <TextField
-                     className="streamFormInput"
                      name="company"
                      variant="outlined"
                      fullWidth
@@ -307,7 +303,6 @@ const StreamInfo = ({
             <Grid xs={12} item>
                <FormControl fullWidth>
                   <TextField
-                     className="streamFormInput"
                      name="summary"
                      variant="outlined"
                      fullWidth

@@ -134,7 +134,7 @@ const PromotionInfo = ({
                </Grid>
             </FormGroup>
          ) : (
-            <Box display="flex" mt={3} mb={10} alignItems="end">
+            <Box display="flex" mt={3} mb={10} alignItems="center">
                <InfoOutlinedIcon color="secondary" fontSize="large" />
                <Typography variant="h5" ml={2}>
                   The promotion can only be selected if the event date is at

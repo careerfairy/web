@@ -185,12 +185,7 @@ const MultiListSelect = ({
          }
          getOptionDisabled={getOptionDisabled}
          renderInput={(params) => (
-            <TextField
-               {...params}
-               {...inputProps}
-               name={inputName}
-               className={isOnCreationForm ? "streamFormInput" : ""}
-            />
+            <TextField {...params} {...inputProps} name={inputName} />
          )}
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
