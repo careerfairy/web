@@ -217,13 +217,13 @@ test.describe("Streaming Journey", () => {
          streamerPage.connectionInterruptedTroubleMessageLocator
       ).toBeVisible({ timeout: 15000 })
       await expect(
-         streamerPage.connectionInterruptedTroubleRefreshMessageLocator
+         streamerPage.connectionInterruptedTroubleRefreshButtonLocator
       ).toBeVisible()
 
       // re-connect the browser, the dialog should disappear
       await streamerPage.page.context().setOffline(false)
       await expect(
-         streamerPage.connectionInterruptedTroubleRefreshMessageLocator
+         streamerPage.connectionInterruptedTroubleRefreshButtonLocator
       ).not.toBeVisible()
    })
 
