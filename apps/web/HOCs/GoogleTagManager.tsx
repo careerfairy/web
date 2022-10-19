@@ -21,20 +21,11 @@ const GoogleTagManagerLoader = ({ children }) => {
 
    const enableOnce = useCallback((userData?: UserData) => {
       if (!gtmLoaded) {
-         let userVariables = {}
          if (userData) {
-            // userVariables = {
-            //    dataLayer: {
-            //       userId: userData.authId,
-            //       isAdmin: userData.isAdmin === true,
-            //    },
-            // }
-
             dataLayerUser(userData)
          }
 
          TagManager.initialize({
-            // ...userVariables,
             ...tagManagerArgs,
          })
 
