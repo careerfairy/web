@@ -17,6 +17,7 @@ import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsM
 import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions"
 import GeneralLayout from "../layouts/GeneralLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { StreamCreationProvider } from "../components/views/draftStreamForm/StreamForm/StreamCreationProvider"
 
 const DraftStream = () => {
    const firebaseService = useFirebaseService()
@@ -205,12 +206,14 @@ const DraftStream = () => {
                >
                   {submitted ? "Success!" : "Draft a Live Stream"}
                </Typography>
-               <DraftStreamForm
-                  onSubmit={onSubmit}
-                  formRef={formRef}
-                  submitted={submitted}
-                  setSubmitted={setSubmitted}
-               />
+               <StreamCreationProvider>
+                  <DraftStreamForm
+                     onSubmit={onSubmit}
+                     formRef={formRef}
+                     submitted={submitted}
+                     setSubmitted={setSubmitted}
+                  />
+               </StreamCreationProvider>
                <EnterDetailsModal
                   open={showEnterDetailsModal}
                   handleSubmit={handleSubmit}

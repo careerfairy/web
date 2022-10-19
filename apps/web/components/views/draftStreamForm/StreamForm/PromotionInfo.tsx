@@ -11,6 +11,9 @@ import { withFirebase } from "../../../../context/firebase/FirebaseServiceContex
 import FirebaseService from "../../../../data/firebase/FirebaseService"
 import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
 import Section from "components/views/common/Section"
+import { useStreamCreationProvider } from "./StreamCreationProvider"
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import Box from "@mui/material/Box"
 
 type Props = {
    promotionChannelsCodes: Option[]
@@ -32,6 +35,7 @@ const PromotionInfo = ({
    sectionRef,
 }: Props) => {
    const [allUniversities, setAllUniversities] = useState([])
+   const { showPromotionInputs } = useStreamCreationProvider()
 
    useEffect(() => {
       ;(async () => {
@@ -70,64 +74,74 @@ const PromotionInfo = ({
             Choose promotion options to advertise this event
          </Typography>
 
-         <FormGroup container boxShadow={0}>
-            <Grid item xs={12}>
-               <MultiListSelect
-                  inputName="promotionChannelsCodes"
-                  isCheckbox
-                  selectedItems={promotionChannelsCodes}
-                  allValues={channelOptionCodes}
-                  setFieldValue={setFieldValue}
-                  inputProps={{
-                     label: "Promotion Channels",
-                     placeholder:
-                        "Select Promotion Channel (Facebook/Instagram/Tik Tok)",
-                  }}
-                  getValueFn={multiListSelectMapValueFn}
-                  chipProps={{
-                     color: "secondary",
-                  }}
-               />
-            </Grid>
+         {showPromotionInputs ? (
+            <FormGroup container boxShadow={0}>
+               <Grid item xs={12}>
+                  <MultiListSelect
+                     inputName="promotionChannelsCodes"
+                     isCheckbox
+                     selectedItems={promotionChannelsCodes}
+                     allValues={channelOptionCodes}
+                     setFieldValue={setFieldValue}
+                     inputProps={{
+                        label: "Promotion Channels",
+                        placeholder:
+                           "Select Promotion Channel (Facebook/Instagram/Tik Tok)",
+                     }}
+                     getValueFn={multiListSelectMapValueFn}
+                     chipProps={{
+                        color: "secondary",
+                     }}
+                  />
+               </Grid>
 
-            <Grid item xs={12}>
-               <MultiListSelect
-                  inputName="promotionCountriesCodes"
-                  isCheckbox
-                  selectedItems={promotionCountriesCodes}
-                  allValues={countriesOptionCodes}
-                  setFieldValue={setFieldValue}
-                  inputProps={{
-                     label: "Countries for Promotion",
-                     placeholder:
-                        "Select Countries in which promotion is desired",
-                  }}
-                  getValueFn={multiListSelectMapValueFn}
-                  chipProps={{
-                     color: "secondary",
-                  }}
-               />
-            </Grid>
+               <Grid item xs={12}>
+                  <MultiListSelect
+                     inputName="promotionCountriesCodes"
+                     isCheckbox
+                     selectedItems={promotionCountriesCodes}
+                     allValues={countriesOptionCodes}
+                     setFieldValue={setFieldValue}
+                     inputProps={{
+                        label: "Countries for Promotion",
+                        placeholder:
+                           "Select Countries in which promotion is desired",
+                     }}
+                     getValueFn={multiListSelectMapValueFn}
+                     chipProps={{
+                        color: "secondary",
+                     }}
+                  />
+               </Grid>
 
-            <Grid item xs={12}>
-               <MultiListSelect
-                  inputName="promotionUniversitiesCodes"
-                  isCheckbox
-                  selectedItems={promotionUniversitiesCodes}
-                  allValues={allUniversities}
-                  setFieldValue={setFieldValue}
-                  inputProps={{
-                     label: "Universities for Promotion",
-                     placeholder:
-                        "Select Universities in which promotion is desired",
-                  }}
-                  getValueFn={multiListSelectMapValueFn}
-                  chipProps={{
-                     color: "secondary",
-                  }}
-               />
-            </Grid>
-         </FormGroup>
+               <Grid item xs={12}>
+                  <MultiListSelect
+                     inputName="promotionUniversitiesCodes"
+                     isCheckbox
+                     selectedItems={promotionUniversitiesCodes}
+                     allValues={allUniversities}
+                     setFieldValue={setFieldValue}
+                     inputProps={{
+                        label: "Universities for Promotion",
+                        placeholder:
+                           "Select Universities in which promotion is desired",
+                     }}
+                     getValueFn={multiListSelectMapValueFn}
+                     chipProps={{
+                        color: "secondary",
+                     }}
+                  />
+               </Grid>
+            </FormGroup>
+         ) : (
+            <Box display="flex" mt={3} mb={10} alignItems="end">
+               <InfoOutlinedIcon color="secondary" fontSize="large" />
+               <Typography variant="h5" ml={2}>
+                  The promotion can only be selected if the event date is at
+                  least 30 days in the future
+               </Typography>
+            </Box>
+         )}
       </Section>
    )
 }
