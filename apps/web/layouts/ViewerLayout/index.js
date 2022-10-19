@@ -31,6 +31,7 @@ import { groupRepo } from "../../data/RepositoryInstances"
 import { checkIfUserHasAnsweredAllLivestreamGroupQuestions } from "../../components/views/common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import RTCProvider from "../../context/agora/RTCProvider"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -294,6 +295,7 @@ const ViewerLayout = (props) => {
 
    const showAudience = useCallback(() => {
       setAudienceDrawerOpen(true)
+      dataLayerEvent("livestream_viewer_show_audience_tab")
    }, [])
 
    const hideAudience = useCallback(() => {

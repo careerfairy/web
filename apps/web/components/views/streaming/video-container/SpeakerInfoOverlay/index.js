@@ -7,6 +7,7 @@ import { IconButton, Tooltip } from "@mui/material"
 import AccountCircleOutlinedIcon from "@mui/icons-material/AccountCircleOutlined"
 import RubberBand from "@stahl.luke/react-reveal/RubberBand"
 import { useSelector } from "react-redux"
+import { dataLayerEvent } from "../../../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    speakerInformation: {
@@ -70,6 +71,7 @@ const SpeakerInfoOverlay = ({ speaker, small, zIndex }) => {
          import("./SpeakerDetailsDialog")
       )
       setDialogComponent(SpeakerDetailsDialog)
+      dataLayerEvent("livestream_see_details_about_speaker")
    }, [])
 
    const classes = useStyles({ small: small, zIndex })
