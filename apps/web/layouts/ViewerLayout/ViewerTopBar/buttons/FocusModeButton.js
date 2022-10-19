@@ -11,6 +11,7 @@ import {
 } from "../../../../constants/localStorageKeys"
 import NewFeatureHint from "../../../../components/util/NewFeatureHint"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
@@ -54,6 +55,7 @@ const FocusModeButton = ({ primary, mobile, audienceDrawerOpen }) => {
                onClick={(e) => {
                   e.stopPropagation()
                   toggleFocusMode()
+                  dataLayerEvent("livestream_viewer_toggle_focus_mode")
                }}
                size="large"
             >

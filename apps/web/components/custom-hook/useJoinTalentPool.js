@@ -5,6 +5,7 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import { useCurrentStream } from "../../context/stream/StreamContext"
 import { useDispatch } from "react-redux"
 import * as actions from "../../store/actions"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 const useJoinTalentPool = () => {
    const {
@@ -61,6 +62,7 @@ const useJoinTalentPool = () => {
          joinTalentPool: async () => {
             try {
                if (!userData) {
+                  dataLayerEvent("talent_pool_join_login")
                   return push({
                      query: { absolutePath: asPath },
                      pathname: "/login",
@@ -73,6 +75,10 @@ const useJoinTalentPool = () => {
                   currentLivestream
                )
                await joinCompanyTalentPool(companyId, userData, livestreamId)
+               dataLayerEvent("talent_pool_joined", {
+                  livestreamId,
+                  companyId,
+               })
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
@@ -94,6 +100,10 @@ const useJoinTalentPool = () => {
                )
 
                await leaveCompanyTalentPool(companyId, userData, livestreamId)
+               dataLayerEvent("talent_pool_leave", {
+                  livestreamId,
+                  companyId,
+               })
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }

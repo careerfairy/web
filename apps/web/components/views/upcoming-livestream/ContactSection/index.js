@@ -8,6 +8,7 @@ import Box from "@mui/material/Box"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import { Button } from "@mui/material"
 import EmailIcon from "@mui/icons-material/Email"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const styles = {
    header: {

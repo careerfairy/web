@@ -18,6 +18,7 @@ import Button from "@mui/material/Button"
 import CircularProgress from "@mui/material/CircularProgress"
 import Grid from "@mui/material/Grid"
 import Link from "next/link"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const styles = {
    box: {
@@ -114,6 +115,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
             values.password
          )
          helpers.setErrors({})
+         dataLayerEvent("login_complete")
       } catch (error) {
          switch (error.code) {
             case "auth/wrong-password":
@@ -134,6 +136,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
          }
       }
       helpers.setSubmitting(false)
+      dataLayerEvent("login_failed")
    }
 
    return (

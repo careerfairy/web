@@ -12,6 +12,7 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../constants/routes"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const styles = {
    root: {
@@ -55,8 +56,10 @@ const HighlightsCarousel = ({
       if (isOnLandingPage || canWatchAll) {
          setVideoUrl(videoUrl)
          setUserTimeoutWithCookie()
+         dataLayerEvent("highlight_video_play")
       } else {
          if (isLoggedOut) {
+            dataLayerEvent("highlight_video_signed_out")
             return push({
                pathname: "/login",
                query: {
@@ -67,6 +70,7 @@ const HighlightsCarousel = ({
          }
          if (videoUrl) handleCloseVideoDialog()
          handleOpenHighlightsRestrictedDialog()
+         dataLayerEvent("highlight_video_restricted")
       }
    }
 

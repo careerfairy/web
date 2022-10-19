@@ -24,6 +24,7 @@ import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import React, { useEffect, useState } from "react"
 import { streamIsOld } from "../../../util/CommonUtil"
 import ReferralPrompt from "./ReferralPrompt"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const styles = {
    title: {
@@ -64,6 +65,9 @@ const ShareLivestreamModal = ({ livestreamData, handleClose }) => {
       enqueueSnackbar("Link has been copied to your clipboard", {
          variant: "success",
          preventDuplicate: true,
+      })
+      dataLayerEvent("event_share", {
+         medium: "Copy Link",
       })
    }
 
