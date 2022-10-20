@@ -1,4 +1,4 @@
-import React, { Fragment, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import ImageSelect from "../ImageSelect/ImageSelect"
 import { Collapse, Grid, TextField, Button } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
@@ -9,7 +9,6 @@ const useStyles = makeStyles((theme) => ({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
-      marginLeft: theme.spacing(4),
    },
    addButton: {
       marginTop: theme.spacing(4),
@@ -18,6 +17,7 @@ const useStyles = makeStyles((theme) => ({
       borderRadius: "10px",
       height: theme.spacing(10),
       border: "dashed",
+      borderColor: theme.palette.grey.A400,
 
       "&:hover": {
          border: "dashed",
@@ -55,9 +55,9 @@ const SpeakerForm = ({
    const isLast = index === Object.keys(values.speakers).length - 1
 
    return (
-      <Fragment>
-         <Grid sx={{ display: "flex" }} xs={12} item>
-            <Collapse in={animate} component={Grid} xs={12} lg={3} item>
+      <>
+         <Grid container>
+            <Collapse in={animate} component={Grid} xs={12} md={3} item>
                <ImageSelect
                   path="mentors-pictures"
                   getDownloadUrl={getDownloadUrl}
@@ -82,10 +82,10 @@ const SpeakerForm = ({
                component={Grid}
                className={classes.formGrid}
                xs={12}
-               lg={9}
+               md={9}
                item
             >
-               <Grid container spacing={2}>
+               <Grid container spacing={2} mt={{ xs: 2, md: "unset" }}>
                   <Grid xs={12} lg={6} item>
                      <TextField
                         name={`speakers.${objectKey}.firstName`}
@@ -249,7 +249,7 @@ const SpeakerForm = ({
                </Button>
             </Grid>
          )}
-      </Fragment>
+      </>
    )
 }
 

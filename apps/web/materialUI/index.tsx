@@ -263,6 +263,12 @@ const getComponents = (theme: DefaultTheme): Components => ({
                   borderColor: theme.palette.error.main,
                },
             },
+            "&.multiLineInput": {
+               "& fieldset": {
+                  minHeight: "100px",
+                  textAlign: "start",
+               },
+            },
          },
       },
    },

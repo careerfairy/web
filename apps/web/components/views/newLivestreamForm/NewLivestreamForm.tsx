@@ -830,6 +830,8 @@ const NewLivestreamForm = () => {
                               groupId={selectedGroups[0].id} // we only support a single group for now
                               onSelectItems={setSelectedJobs}
                               selectedItems={selectedJobs}
+                              sectionRef={null}
+                              classes={null}
                            />
                         )}
                      </SuspenseWithBoundary>

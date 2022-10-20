@@ -134,11 +134,16 @@ const PromotionInfo = ({
                </Grid>
             </FormGroup>
          ) : (
-            <Box display="flex" mt={3} mb={10} alignItems="center">
+            <Box
+               display="flex"
+               mt={3}
+               mb={10}
+               alignItems={{ xs: "center", md: "end" }}
+            >
                <InfoOutlinedIcon color="secondary" fontSize="large" />
                <Typography variant="h5" ml={2}>
-                  The promotion can only be selected if the event date is at
-                  least 30 days in the future
+                  CareerFairy cannot promote your event if it is scheduled less
+                  than 30 days in the future
                </Typography>
             </Box>
          )}

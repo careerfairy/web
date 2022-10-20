@@ -105,15 +105,23 @@ const useStyles = makeStyles((theme) =>
          padding: 0,
       },
       navBar: {
-         position: "sticky",
+         position: ({ isOnDialog }: any) =>
+            isOnDialog ? "absolute" : "sticky",
          top: 0,
-         paddingTop: "80px !important",
+         paddingTop: "90px !important",
          background: "white",
          zIndex: 999,
          overflowX: "scroll",
          overflowY: "hidden",
-         height: "180px",
+         height: "200px",
          alignItems: "end",
+         width: ({ isOnDialog }: any) => (isOnDialog ? "90%" : "inherit"),
+         [theme.breakpoints.down("md")]: {
+            width: ({ isOnDialog }: any) => (isOnDialog ? "98%" : "inherit"),
+            height: ({ isOnDialog }: any) => (isOnDialog ? "250px" : "200px"),
+            paddingTop: ({ isOnDialog }: any) =>
+               isOnDialog ? "130px !important" : "80px !important",
+         },
       },
    })
 )
@@ -157,6 +165,8 @@ interface Props {
    formRef: MutableRefObject<any>
    saveChangesButtonRef?: MutableRefObject<any>
    currentStream?: LivestreamEvent
+   canPublish?: boolean
+   isOnDialog?: boolean
 }
 
 export interface DraftFormValues {
@@ -199,6 +209,8 @@ const DraftStreamForm = ({
    // eslint-disable-next-line react-hooks/rules-of-hooks
    saveChangesButtonRef = useRef(),
    currentStream,
+   canPublish = true,
+   isOnDialog = false,
 }: Props) => {
    const firebase = useFirebaseService()
    const router = useRouter()
@@ -231,6 +243,7 @@ const DraftStreamForm = ({
    const [status, setStatus] = useState("")
    const classes = useStyles({
       isGroupAdmin: Boolean(group?.id),
+      isOnDialog: isOnDialog,
    })
 
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
@@ -622,7 +635,16 @@ const DraftStreamForm = ({
                      <StreamFormNavigator steps={steps} />
                   </Box>
                </Grid>
-               <Grid item md={12} lg={10}>
+               <Grid
+                  item
+                  md={12}
+                  lg={10}
+                  mt={
+                     isOnDialog
+                        ? { xs: "150px", md: "100px", lg: "unset" }
+                        : "unset"
+                  }
+               >
                   {submitted ? (
                      <SuccessMessage />
                   ) : (
@@ -774,34 +796,36 @@ const DraftStreamForm = ({
                                     justifyContent="end"
                                     mr={3}
                                  >
-                                    <Button
-                                       startIcon={
-                                          <PublishIcon fontSize="large" />
-                                       }
-                                       type="submit"
-                                       onClick={handleClickSubmitForApproval}
-                                       disabled={isSubmitting || isPending()}
-                                       size="large"
-                                       endIcon={
-                                          isSubmitting && (
-                                             <CircularProgress
-                                                size={20}
-                                                color="inherit"
-                                             />
-                                          )
-                                       }
-                                       variant="contained"
-                                       color="secondary"
-                                       sx={{ marginRight: 2 }}
-                                    >
-                                       <Typography variant="h5">
-                                          {isSubmitting
-                                             ? "Submitting"
-                                             : isPending()
-                                             ? "Pending for Approval"
-                                             : "Submit Draft for Approval"}
-                                       </Typography>
-                                    </Button>
+                                    {canPublish && (
+                                       <Button
+                                          startIcon={
+                                             <PublishIcon fontSize="large" />
+                                          }
+                                          type="submit"
+                                          onClick={handleClickSubmitForApproval}
+                                          disabled={isSubmitting || isPending()}
+                                          size="large"
+                                          endIcon={
+                                             isSubmitting && (
+                                                <CircularProgress
+                                                   size={20}
+                                                   color="inherit"
+                                                />
+                                             )
+                                          }
+                                          variant="contained"
+                                          color="secondary"
+                                          sx={{ marginRight: 2 }}
+                                       >
+                                          <Typography variant="h5">
+                                             {isSubmitting
+                                                ? "Submitting"
+                                                : isPending()
+                                                ? "Pending for Approval"
+                                                : "Submit Draft for Approval"}
+                                          </Typography>
+                                       </Button>
+                                    )}
                                     <Button
                                        startIcon={<SaveIcon fontSize="large" />}
                                        type="submit"

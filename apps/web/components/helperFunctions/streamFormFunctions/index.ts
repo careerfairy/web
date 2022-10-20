@@ -116,9 +116,9 @@ export const buildPromotionObj = (
 ): Partial<LivestreamPromotions> => {
    return {
       livestreamId: livestreamId,
-      promotionChannelsCodes: values.promotionChannelsCodes,
-      promotionCountriesCodes: values.promotionCountriesCodes,
-      promotionUniversitiesCodes: values.promotionUniversitiesCodes,
+      promotionChannelsCodes: values?.promotionChannelsCodes || [],
+      promotionCountriesCodes: values?.promotionCountriesCodes || [],
+      promotionUniversitiesCodes: values?.promotionUniversitiesCodes || [],
    }
 }
 

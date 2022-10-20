@@ -98,14 +98,7 @@ const StreamInfo = ({
             Basic information about the stream
          </Typography>
          <FormGroup container boxShadow={0}>
-            <Grid
-               xs={isGroupsSelected ? 12 : 12}
-               sm={isGroupsSelected ? 12 : 12}
-               md={isGroupsSelected ? 9 : 12}
-               lg={isGroupsSelected ? 9 : 12}
-               xl={isGroupsSelected ? 9 : 12}
-               item
-            >
+            <Grid xs={12} md={isGroupsSelected ? 9 : 12} item>
                <FormControl fullWidth>
                   <TextField
                      name="title"
@@ -118,9 +111,7 @@ const StreamInfo = ({
                      value={values.title}
                      disabled={isSubmitting}
                      placeholder={"Enter the Live Stream title here"}
-                     error={Boolean(
-                        errors.title && touched.title && errors.title
-                     )}
+                     error={Boolean(errors.title && touched.title)}
                      onChange={handleChange}
                   />
                   <Collapse
@@ -134,10 +125,7 @@ const StreamInfo = ({
             {isGroupsSelected && (
                <Grid
                   xs={12}
-                  sm={12}
                   md={3}
-                  lg={3}
-                  xl={3}
                   sx={{
                      display: "grid",
                      placeItems: { xs: "start", md: "center" },
@@ -173,36 +161,32 @@ const StreamInfo = ({
                   </Tooltip>
                </Grid>
             )}
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
+            <Grid xs={12} lg={6} item>
                <ImageSelect
                   getDownloadUrl={getDownloadUrl}
                   setFieldValue={setFieldValue}
                   isSubmitting={isSubmitting}
                   path="company-logos"
-                  label="Logo"
+                  label="Your Company Logo"
                   formName="companyLogoUrl"
+                  changeImageButtonLabel="Change Logo"
                   value={values.companyLogoUrl}
-                  error={
-                     errors.companyLogoUrl &&
-                     touched.companyLogoUrl &&
-                     errors.companyLogoUrl
-                  }
+                  error={errors.companyLogoUrl && touched.companyLogoUrl}
                   resolution={"640 x 480"}
                />
             </Grid>
-            <Grid xs={12} sm={12} md={12} lg={6} xl={6} item>
+            <Grid xs={12} lg={6} item>
                <ImageSelect
                   getDownloadUrl={getDownloadUrl}
                   setFieldValue={setFieldValue}
                   isSubmitting={isSubmitting}
                   path="illustration-images"
-                  label="Company Background"
+                  label="Your Company Background"
                   formName="backgroundImageUrl"
+                  changeImageButtonLabel="Change Background"
                   value={values.backgroundImageUrl}
                   error={
-                     errors.backgroundImageUrl &&
-                     touched.backgroundImageUrl &&
-                     errors.backgroundImageUrl
+                     errors.backgroundImageUrl && touched.backgroundImageUrl
                   }
                   resolution={"640 x 480"}
                />
@@ -236,21 +220,24 @@ const StreamInfo = ({
                         <TextField
                            fullWidth
                            {...params}
+                           name="start"
+                           onBlur={handleBlur}
                            sx={{ svg: { color: palette.secondary.main } }}
-                           error={Boolean(errors.start)}
+                           error={Boolean(errors.start && touched.start)}
                         />
                      </Tooltip>
                   )}
                   disabled={isSubmitting}
                   label="Livestream Start Date"
                   value={values.start}
+                  onClose={() => handleBlur({ target: { name: "start" } })}
                   onChange={(value) => {
                      setFieldValue("start", new Date(value), true)
                   }}
                />
                <Collapse
                   className={classes.errorMessage}
-                  in={Boolean(errors.start)}
+                  in={Boolean(errors.start && touched.start)}
                >
                   {errors.start}
                </Collapse>
@@ -266,14 +253,14 @@ const StreamInfo = ({
                   variant="outlined"
                />
             </Grid>
-            <Grid xs={12} sm={12} md={4} item>
+            <Grid xs={12} sm={6} md={4} item>
                <LanguageSelect
                   value={values.language}
                   setFieldValue={setFieldValue}
                   name="language"
                />
             </Grid>
-            <Grid xs={12} sm={12} item>
+            <Grid xs={12} item>
                <FormControl fullWidth>
                   <TextField
                      name="company"
@@ -285,9 +272,7 @@ const StreamInfo = ({
                      onBlur={handleBlur}
                      value={values.company}
                      disabled={isSubmitting}
-                     error={Boolean(
-                        errors.company && touched.company && errors.company
-                     )}
+                     error={Boolean(errors.company && touched.company)}
                      onChange={handleChange}
                      placeholder="Enter your company name"
                   />
@@ -303,6 +288,7 @@ const StreamInfo = ({
             <Grid xs={12} item>
                <FormControl fullWidth>
                   <TextField
+                     className="multiLineInput"
                      name="summary"
                      variant="outlined"
                      fullWidth
@@ -314,11 +300,10 @@ const StreamInfo = ({
                      onBlur={handleBlur}
                      value={values.summary}
                      disabled={isSubmitting}
-                     error={Boolean(
-                        errors.summary && touched.summary && errors.summary
-                     )}
+                     error={Boolean(errors.summary && touched.summary)}
                      onChange={handleChange}
                      placeholder="Write something about this stream"
+                     sx={{ minHeight: "100px", textAlign: "start" }}
                   />
                   <Collapse
                      className={classes.errorMessage}

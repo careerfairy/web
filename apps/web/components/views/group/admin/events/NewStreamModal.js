@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useCallback, useMemo, useRef, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import {
    AppBar,
@@ -26,7 +26,10 @@ import { useSnackbar } from "notistack"
 import PublishIcon from "@mui/icons-material/Publish"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import { StreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
+import {
+   StreamCreationProvider,
+   useStreamCreationProvider,
+} from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -86,20 +89,26 @@ const NewStreamModal = ({
    const [submitted, setSubmitted] = useState(false)
    const [publishDraft, setPublishDraft] = useState(false)
    const classes = useStyles()
+   const { showPromotionInputs } = useStreamCreationProvider()
 
-   const isDraftsPage = () => typeOfStream === "draft"
+   const isDraftsPage = useMemo(() => typeOfStream === "draft", [typeOfStream])
    const isUpcomingPage = () => typeOfStream === "upcoming"
    const isPastPage = () => typeOfStream === "past"
 
    const isUpcomingOrPastStreamsPage = () => isPastPage() || isUpcomingPage()
 
-   const isDraft = () =>
-      Boolean((currentStream && isDraftsPage()) || !currentStream)
+   const isDraft = useMemo(
+      () => Boolean((currentStream && isDraftsPage) || !currentStream),
+      [currentStream, isDraftsPage]
+   )
 
    const isActualLivestream = () =>
       Boolean(currentStream && isUpcomingOrPastStreamsPage())
 
-   const canPublish = () => Boolean(isDraft() && currentStream)
+   const canPublish = useMemo(
+      () => Boolean(isDraft && currentStream),
+      [currentStream, isDraft]
+   )
 
    const handleCloseDialog = () => {
       handleResetCurrentStream()
@@ -108,7 +117,7 @@ const NewStreamModal = ({
    }
 
    const handlePublishDraft = async (streamToPublish) => {
-      if (canPublish()) {
+      if (canPublish) {
          try {
             formRef.current?.setSubmitting(true)
             const newStream = { ...streamToPublish }
@@ -183,7 +192,10 @@ const NewStreamModal = ({
             ? "livestreams"
             : "draftLivestreams"
 
-         const promotion = buildPromotionObj(values, livestream.id)
+         // only save the promotions if the start date is after 30 days from now
+         const promotion = showPromotionInputs
+            ? buildPromotionObj(values, livestream.id)
+            : buildPromotionObj({}, livestream.id)
 
          if (updateMode) {
             id = livestream.id
@@ -245,7 +257,7 @@ const NewStreamModal = ({
 
    const handleSaveOrUpdate = () => {
       setPublishDraft(false)
-      if (isDraft()) {
+      if (isDraft) {
          saveChangesButtonRef?.current?.click()
       } else {
          handleSubmit()
@@ -264,7 +276,7 @@ const NewStreamModal = ({
          >
             <Typography variant="h7">Back to events page</Typography>
          </Button>
-         {canPublish() && (
+         {canPublish && (
             <Button
                startIcon={<PublishIcon fontSize="large" />}
                disabled={formRef.current?.isSubmitting}
@@ -340,6 +352,8 @@ const NewStreamModal = ({
                         isActualLivestream={isActualLivestream()}
                         currentStream={currentStream}
                         setSubmitted={setSubmitted}
+                        canPublish={canPublish}
+                        isOnDialog={true}
                      />
                   </StreamCreationProvider>
                </DialogContent>
