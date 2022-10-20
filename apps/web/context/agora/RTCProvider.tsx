@@ -486,7 +486,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             updateScreenShareRtcClient(screenShareRtcClient)
          } catch (error) {
             errorLogAndNotify(error)
-            throw new Error(error)
+            throw error
          }
       },
       [
