@@ -456,7 +456,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             return tracksObject
          } catch (error) {
             handleScreenShareDeniedError(error)
-            throw new Error(error)
+            throw error
          }
       },
       [handleScreenShareDeniedError]
