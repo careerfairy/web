@@ -134,9 +134,9 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                   "An error occurred while logging in to your account."
                )
          }
+         dataLayerEvent("login_failed")
       }
       helpers.setSubmitting(false)
-      dataLayerEvent("login_failed")
    }
 
    return (

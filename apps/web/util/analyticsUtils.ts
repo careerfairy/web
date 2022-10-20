@@ -1,5 +1,6 @@
 import TagManager from "react-gtm-module"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { errorLogAndNotify } from "./CommonUtil"
 
 /**
  * Push an event to the GTM DataLayer
@@ -8,7 +9,7 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
  * @param optionalVariables
  */
 export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
-   TagManager.dataLayer({
+   dataLayerWrapper({
       dataLayer: {
          event: eventName,
          ...optionalVariables,
@@ -23,10 +24,18 @@ export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
 export const dataLayerUser = (userData: UserData) => {
    if (!userData) return
 
-   TagManager.dataLayer({
+   dataLayerWrapper({
       dataLayer: {
          user_id: userData.authId,
          isAdmin: userData.isAdmin === true,
       },
    })
+}
+
+const dataLayerWrapper = (...args) => {
+   try {
+      TagManager.dataLayer(...args)
+   } catch (e) {
+      errorLogAndNotify(e)
+   }
 }
