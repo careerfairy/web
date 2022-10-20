@@ -127,13 +127,24 @@ const VideoContainer = ({
    }, [streamerId, currentLivestream.id])
 
    useEffect(() => {
-      if (
-         ["presentation", "video"].includes(currentLivestream.mode) &&
-         screenShareStreamRef?.current
-      ) {
-         void unPublishScreenShareStream().catch(errorLogAndNotify)
+      if (!screenShareStreamRef?.current) return
+
+      const isSharingPdfOrYoutube = ["presentation", "video"].includes(
+         currentLivestream.mode
+      )
+
+      const thereIsANewScreenSharer =
+         currentLivestream.screenSharerId !== streamerId
+
+      if (isSharingPdfOrYoutube || thereIsANewScreenSharer) {
+         void unPublishScreenShareStream().catch(errorLogAndNotify) // We unpublish the current user's screen share stream if a pdf or youtube video is being shared OR someone else started sharing their screen
       }
-   }, [currentLivestream.mode, screenShareStreamRef])
+   }, [
+      currentLivestream.mode,
+      screenShareStreamRef,
+      currentLivestream.screenSharerId,
+      streamerId,
+   ])
 
    useEffect(() => {
       if (
