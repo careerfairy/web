@@ -18,6 +18,7 @@ import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
 import { SaveRecruiterButton } from "./SaveRecruiterButton"
 import { sxStyles } from "../../../../../types/commonTypes"
+import { dataLayerEvent } from "../../../../../util/analyticsUtils"
 
 const styles = sxStyles({
    dialogClose: {
@@ -138,6 +139,7 @@ const handleLinkedInClick = (url) => {
       url = "https://" + url
    }
    window.open(url, "_blank")
+   dataLayerEvent("livestream_speaker_linkedin_click")
 }
 
 /**

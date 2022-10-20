@@ -10,6 +10,7 @@ import React from "react"
 import { pick } from "lodash"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
+import { dataLayerEvent } from "../../../../../util/analyticsUtils"
 
 export const SaveRecruiterButton = ({ speaker }) => {
    const { userPresenter, isLoggedOut } = useAuth()
@@ -42,6 +43,7 @@ export const SaveRecruiterButton = ({ speaker }) => {
       )
 
       saveRecruiter(recruiter).catch(console.error)
+      dataLayerEvent("livestream_speaker_save")
    }
 
    const isButtonDisabled = Boolean(
