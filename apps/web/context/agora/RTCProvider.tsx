@@ -32,6 +32,7 @@ import {
    sessionIsUsingCloudProxySelector,
    sessionShouldUseCloudProxySelector,
 } from "../../store/selectors/streamSelectors"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -48,8 +49,10 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    uid,
    initialize,
    channel,
+   screenSharerId,
+   streamMode,
 }) => {
-   const { path } = useStreamRef()
+   const streamRef = useStreamRef()
    const router = useRouter()
    const rtcClient = useRtcClient()
    const { remoteStreams, networkQuality, demoStreamHandlers } =
@@ -86,7 +89,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       return rtcClient.setClientRole("host").catch(handleRtcError)
    }, [handleRtcError, rtcClient])
 
-   const { fetchAgoraRtcToken } = useFirebaseService()
+   const { fetchAgoraRtcToken, setDesktopMode: setDesktopModeInstanceMethod } =
+      useFirebaseService()
    const dispatch = useDispatch()
    const [screenShareStream] = useState<
       ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
@@ -125,35 +129,38 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          sessionShouldUseCloudProxy: boolean
       ) => {
          let timeout
-         try {
-            const cfToken = router.query.token || ""
-            const { data } = await fetchAgoraRtcToken({
-               isStreamer: isStreamer,
-               uid: userUid,
-               sentToken: cfToken.toString(),
-               channelName: roomId,
-               streamDocumentPath: path,
-            })
-            if (sessionShouldUseCloudProxy) {
-               rtcClient.startProxyServer(3)
-            }
-            logStatus("JOIN", false, sessionShouldUseCloudProxy)
-
-            await rtcClient
-               .join(appId, roomId, data.token.rtcToken, userUid)
-               .then(() => logStatus("JOIN", true, sessionShouldUseCloudProxy))
-               .catch((err) => {
-                  logStatus("JOIN", false, sessionShouldUseCloudProxy, err)
-                  handleRtcError(err)
-               })
-         } catch (error) {
-            errorLogAndNotify(error)
+         const cfToken = router.query.token || ""
+         const { data } = await fetchAgoraRtcToken({
+            isStreamer: isStreamer,
+            uid: userUid,
+            sentToken: cfToken.toString(),
+            channelName: roomId,
+            streamDocumentPath: streamRef.path,
+         })
+         if (sessionShouldUseCloudProxy) {
+            rtcClient.startProxyServer(3)
          }
+         logStatus("JOIN", false, sessionShouldUseCloudProxy)
+
+         await rtcClient
+            .join(appId, roomId, data.token.rtcToken, userUid)
+            .then(() => logStatus("JOIN", true, sessionShouldUseCloudProxy))
+            .catch((err) => {
+               logStatus("JOIN", false, sessionShouldUseCloudProxy, err)
+               handleRtcError(err)
+               throw new Error(err)
+            })
          if (timeout) {
             clearTimeout(timeout)
          }
       },
-      [appId, fetchAgoraRtcToken, handleRtcError, path, router.query.token]
+      [
+         appId,
+         fetchAgoraRtcToken,
+         handleRtcError,
+         streamRef.path,
+         router.query.token,
+      ]
    )
    const joinAgoraRoomWithPrimaryClient = useCallback(
       async (sessionShouldUseCloudProxy: boolean) =>
@@ -426,17 +433,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    ])
 
    const publishScreenShareTracks = useCallback(
-      async (screenShareTracks, screenShareRtcClient) => {
-         try {
-            return publishTracks(
-               screenShareRtcClient,
-               screenShareTracks,
-               "screen"
-            )
-         } catch (e) {
-            console.error(e)
-         }
-      },
+      async (screenShareTracks, screenShareRtcClient) =>
+         publishTracks(screenShareRtcClient, screenShareTracks, "screen"),
       [publishTracks]
    )
 
@@ -458,6 +456,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             return tracksObject
          } catch (error) {
             handleScreenShareDeniedError(error)
+            throw new Error(error)
          }
       },
       [handleScreenShareDeniedError]
@@ -487,6 +486,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             updateScreenShareRtcClient(screenShareRtcClient)
          } catch (error) {
             errorLogAndNotify(error)
+            throw new Error(error)
          }
       },
       [
@@ -502,24 +502,74 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    )
 
    const unPublishScreenShareStream = useCallback(async () => {
-      return new Promise<void>(async (resolve, reject) => {
-         try {
-            let screenShareRtcClient = screenShareRtcClientRef.current
-            let screenShareStream = screenShareStreamRef.current
-            await screenShareRtcClient.unpublish(screenShareStream)
-            if (Array.isArray(screenShareStream)) {
-               screenShareStream.forEach((track) => track.close())
-            } else {
-               screenShareStream.close()
-            }
-            await screenShareRtcClient.leave()
-            updateScreenShareStream(null)
-            resolve()
-         } catch (error) {
-            reject(error)
+      try {
+         let screenShareRtcClient = screenShareRtcClientRef.current
+         let screenShareStream = screenShareStreamRef.current
+
+         await screenShareRtcClient.unpublish(screenShareStream)
+         if (Array.isArray(screenShareStream)) {
+            screenShareStream.forEach((track) => track.close())
+         } else {
+            screenShareStream?.close()
          }
-      })
+         await screenShareRtcClient.leave()
+         updateScreenShareStream(null)
+      } catch (error) {
+         errorLogAndNotify(error, {
+            message: "Failed to unpublish screenshare",
+         })
+         throw new Error(error)
+      }
    }, [updateScreenShareStream])
+
+   const setDesktopMode = useCallback(
+      async (mode: LivestreamEvent["mode"], initiatorId: string) => {
+         let sharerId = mode === "desktop" ? initiatorId : screenSharerId
+         await setDesktopModeInstanceMethod(streamRef, mode, sharerId)
+      },
+      [screenSharerId, setDesktopModeInstanceMethod, streamRef]
+   )
+
+   const onScreenShareStopped = useCallback(() => {
+      unPublishScreenShareStream()
+         .then(async () => {
+            await setDesktopMode("default", uid)
+         })
+         .catch((e) =>
+            errorLogAndNotify(e, {
+               message: "Enable to unpublish screen share",
+            })
+         )
+   }, [setDesktopMode, uid, unPublishScreenShareStream])
+
+   const handleScreenShare = useCallback(
+      async (optimizationMode = "detail") => {
+         try {
+            if (streamMode === "desktop") {
+               await unPublishScreenShareStream()
+               await setDesktopMode("default", uid)
+            } else {
+               await publishScreenShareStream(
+                  optimizationMode,
+                  onScreenShareStopped
+               )
+               await setDesktopMode("desktop", uid)
+            }
+         } catch (e) {
+            errorLogAndNotify(e, {
+               message: "Error in screen share",
+            })
+         }
+      },
+      [
+         streamMode,
+         unPublishScreenShareStream,
+         setDesktopMode,
+         uid,
+         publishScreenShareStream,
+         onScreenShareStopped,
+      ]
+   )
 
    const handlePublishLocalStream = useCallback(async () => {
       await returnToHost()
@@ -605,7 +655,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          localMediaControls,
          handleReconnectAgora,
          handlePublishLocalStream,
-         publishScreenShareStream,
          unPublishScreenShareStream,
          networkQuality,
          remoteStreams,
@@ -613,6 +662,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          leaveAgoraRoom,
          closeAndUnpublishedLocalStream,
          demoStreamHandlers,
+         setDesktopMode,
+         handleScreenShare,
       }),
       [
          localStream,
@@ -624,13 +675,14 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          localMediaControls,
          handleReconnectAgora,
          handlePublishLocalStream,
-         publishScreenShareStream,
          unPublishScreenShareStream,
          networkQuality,
          remoteStreams,
          leaveAgoraRoom,
          closeAndUnpublishedLocalStream,
          demoStreamHandlers,
+         setDesktopMode,
+         handleScreenShare,
       ]
    )
    return (

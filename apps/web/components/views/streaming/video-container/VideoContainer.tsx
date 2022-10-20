@@ -1,13 +1,11 @@
 import React, {
+   memo,
    useCallback,
    useContext,
    useEffect,
-   useState,
    useMemo,
-   memo,
+   useState,
 } from "react"
-
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import VideoControlsContainer from "./VideoControlsContainer"
 import useDevices from "../../../../components/custom-hook/useDevices"
 import TutorialContext from "../../../../context/tutorials/TutorialContext"
@@ -19,7 +17,6 @@ import useMediaSources from "../../../../components/custom-hook/useMediaSources"
 import WifiIndicator from "./WifiIndicator"
 import SettingsModal from "./SettingsModal"
 import ScreenShareModal from "./ScreenShareModal"
-import useStreamRef from "../../../custom-hook/useStreamRef"
 import BreakoutRoomManagementModal from "../../../../layouts/StreamerLayout/StreamerTopBar/BreakoutRoomManagementModal"
 import useCurrentSpeaker from "../../../custom-hook/useCurrentSpeaker"
 import Streams from "./Streams"
@@ -31,6 +28,7 @@ import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
 import { useRtc } from "../../../../context/agora/RTCProvider"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -58,7 +56,6 @@ const VideoContainer = ({
    smallScreen,
    viewer,
 }: Props) => {
-   const firebase = useFirebaseService()
    const { currentLivestream, streamerId } = useCurrentStream()
    const {
       tutorialSteps,
@@ -69,7 +66,6 @@ const VideoContainer = ({
       endTutorial,
    } = useContext(TutorialContext)
    const isMainStreamer = streamerId === currentLivestream.id
-   const streamRef = useStreamRef()
    const dispatch = useDispatch()
    const [hasDismissedStreamTutorial] = useLocalStorage(
       "hasDismissedStreamTutorial",
@@ -84,7 +80,6 @@ const VideoContainer = ({
    const [showScreenShareModal, setShowScreenShareModal] = useState(false)
    const [showLocalStreamPublishingModal, setShowLocalStreamPublishingModal] =
       useState(true)
-   const [optimizationMode] = useState("detail")
 
    const [showSettings, setShowSettings] = useState(false)
 
@@ -94,13 +89,14 @@ const VideoContainer = ({
       localMediaControls,
       remoteStreams,
       screenShareStreamRef,
-      publishScreenShareStream,
       unPublishScreenShareStream,
       leaveAgoraRoom,
       localMediaHandlers,
       handlePublishLocalStream,
       closeAndUnpublishedLocalStream,
       demoStreamHandlers,
+      handleScreenShare,
+      setDesktopMode,
    } = useRtc()
 
    const deviceSettings = useMemo(
@@ -135,7 +131,7 @@ const VideoContainer = ({
          ["presentation", "video"].includes(currentLivestream.mode) &&
          screenShareStreamRef?.current
       ) {
-         void unPublishScreenShareStream()
+         void unPublishScreenShareStream().catch(errorLogAndNotify)
       }
    }, [currentLivestream.mode, screenShareStreamRef])
 
@@ -184,15 +180,6 @@ const VideoContainer = ({
       }
    }
 
-   const setDesktopMode = useCallback(
-      async (mode, initiatorId) => {
-         let screenSharerId =
-            mode === "desktop" ? initiatorId : currentLivestream.screenSharerId
-         await firebase.setDesktopMode(streamRef, mode, screenSharerId)
-      },
-      [currentLivestream?.screenSharerId, firebase, streamRef]
-   )
-
    const handleOpenDemoIntroModal = useCallback(() => {
       const activeStep = getActiveTutorialStepKey()
       if (activeStep === 0 && !hasDismissedStreamTutorial && !hasProposedDemo) {
@@ -224,7 +211,13 @@ const VideoContainer = ({
       if (currentLivestream.test && !hasDismissedStreamTutorial) {
          handleOpenDemoIntroModal()
       }
-   }, [localMediaHandlers, handleOpenDemoIntroModal])
+   }, [
+      closeAndUnpublishedLocalStream,
+      dispatch,
+      currentLivestream.test,
+      hasDismissedStreamTutorial,
+      handleOpenDemoIntroModal,
+   ])
 
    useEffect(() => {
       const activeStep = getActiveTutorialStepKey()
@@ -263,14 +256,14 @@ const VideoContainer = ({
             setShowBubbles(true)
          }
       },
-      [tutorialSteps]
+      [setShowBubbles, setTutorialSteps, tutorialSteps]
    )
 
    const handleCloseDemoEndModal = useCallback(() => {
       handleConfirmStep(23)
       endTutorial()
       setShowBubbles(true)
-   }, [])
+   }, [endTutorial, handleConfirmStep, setShowBubbles])
 
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false)
@@ -278,37 +271,24 @@ const VideoContainer = ({
 
    const handleClickScreenShareButton = useCallback(async () => {
       if (currentLivestream.mode === "desktop") {
-         unPublishScreenShareStream().then(async () => {
-            return await setDesktopMode("default", streamerId)
-         })
+         unPublishScreenShareStream()
+            .then(async () => {
+               return await setDesktopMode("default", streamerId)
+            })
+            .catch((err) =>
+               errorLogAndNotify(err, {
+                  message: "Failed on click screen share",
+               })
+            )
       } else {
          setShowScreenShareModal(true)
       }
-   }, [currentLivestream?.mode, streamerId, setDesktopMode])
-
-   const onScreenShareStopped = useCallback(() => {
-      unPublishScreenShareStream().then(async () => {
-         await setDesktopMode("default", streamerId)
-      })
-   }, [unPublishScreenShareStream])
-
-   const handleScreenShare = useCallback(
-      async (optimizationMode = "detail") => {
-         if (currentLivestream.mode === "desktop") {
-            unPublishScreenShareStream().then(async () => {
-               await setDesktopMode("default", streamerId)
-            })
-         } else {
-            publishScreenShareStream(
-               optimizationMode,
-               onScreenShareStopped
-            ).then(async () => {
-               await setDesktopMode("desktop", streamerId)
-            })
-         }
-      },
-      [optimizationMode, currentLivestream?.mode, streamerId]
-   )
+   }, [
+      currentLivestream.mode,
+      unPublishScreenShareStream,
+      setDesktopMode,
+      streamerId,
+   ])
 
    const localStreamIsPublished = useMemo(
       () => ({

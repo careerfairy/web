@@ -4,9 +4,9 @@ import {
    ILocalAudioTrack,
    ILocalVideoTrack,
    NetworkQuality,
-   UID,
 } from "agora-rtc-sdk-ng"
 import { IRemoteStream, LocalStream } from "../../types/streaming"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export interface RtcContextInterface {
    screenShareStream: ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
@@ -41,11 +41,12 @@ export interface RtcContextInterface {
    networkQuality: NetworkQuality
    leaveAgoraRoom: () => Promise<void>
    localStream: LocalStream
-   publishScreenShareStream: (
-      screenSharingMode,
-      onScreenShareStopped
-   ) => Promise<void>
    handleReconnectAgora: (options: { rePublish?: boolean }) => Promise<void>
+   handleScreenShare: (optimizationMode?: "detail" | "motion") => Promise<void>
+   setDesktopMode: (
+      mode: LivestreamEvent["mode"],
+      initiatorId: string
+   ) => Promise<void>
 }
 
 /**
@@ -63,7 +64,7 @@ export interface RtcPropsInterface {
    /**
     * UID for local user to join the channel (default: 0)
     */
-   uid?: UID
+   uid?: string
    /**
     * To see if the user can publish video, set this to true. (default: false)
     */
@@ -72,6 +73,17 @@ export interface RtcPropsInterface {
     * Weather or not to initialize the RTC SDK (default: false)
     */
    initialize: boolean
+   /*
+    * The identifier of the user who is currently sharing their screen
+    * */
+   screenSharerId?: string
+   /*
+    * These modes are used to dictate how the livestream is displayed in the UI
+    * - presentation: A PDF presentation is currently being shared
+    * - video: A YouTube video is currently being shared
+    * - desktop: A user's screen is currently being shared
+    */
+   streamMode?: LivestreamEvent["mode"]
 }
 
 /**
