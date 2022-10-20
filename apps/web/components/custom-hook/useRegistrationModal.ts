@@ -6,6 +6,7 @@ import { useDispatch } from "react-redux"
 import { getLinkToStream } from "util/streamUtil"
 import * as actions from "store/actions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -44,15 +45,18 @@ const useRegistrationModal = (
          groups: any[],
          hasRegistered: boolean
       ) => {
+         dataLayerEvent("event_registration_started")
          try {
             if (hasRegistered) {
                await firebase.deregisterFromLivestream(
                   event.id,
                   authenticatedUser
                )
+               dataLayerEvent("event_registration_removed")
             } else {
                const emailVerified = firebase.auth?.currentUser?.emailVerified
                if (!isLoggedIn || !emailVerified) {
+                  dataLayerEvent("event_registration_started_login_required")
                   return push({
                      pathname: `/login`,
                      query: {
