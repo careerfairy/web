@@ -20,6 +20,7 @@ import {
    maxQuestionLength,
    minQuestionLength,
 } from "../../../../../constants/forms"
+import { dataLayerEvent } from "../../../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -103,8 +104,9 @@ const QuestionCreateForm = () => {
             rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
-
             customHandleNext()
+
+            dataLayerEvent("event_registration_question_submit")
          } catch (e) {}
       },
       validate: (values) => {
@@ -134,6 +136,7 @@ const QuestionCreateForm = () => {
          // go to next talent pool step
          handleNext()
       }
+      dataLayerEvent("event_registration_question_skip")
    }
 
    return (
