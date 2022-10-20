@@ -518,7 +518,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          errorLogAndNotify(error, {
             message: "Failed to unpublish screenshare",
          })
-         throw new Error(error)
+         throw error
       }
    }, [updateScreenShareStream])
 
