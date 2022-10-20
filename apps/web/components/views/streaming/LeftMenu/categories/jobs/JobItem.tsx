@@ -9,6 +9,7 @@ import Typography from "@mui/material/Typography"
 import React, { memo, useCallback } from "react"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -30,6 +31,10 @@ const JobItem = ({ job, handleSelectJob }: Props) => {
 
    const handleClick = useCallback(() => {
       handleSelectJob(job)
+      dataLayerEvent("livestream_job_open", {
+         jobId: job?.id,
+         jobName: job?.name,
+      })
    }, [handleSelectJob, job])
 
    return (
