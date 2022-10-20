@@ -15,7 +15,7 @@ const LoginButton = () => {
          fullWidth
          sx={styles.root}
          component={Link}
-         href={`/login?absolutePath=${asPath}`}
+         href={`/login?absolutePath=${encodeURIComponent(asPath)}`}
          style={{ textDecoration: "none" }}
          color="primary"
          variant="contained"
