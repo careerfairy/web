@@ -305,7 +305,6 @@ const NewStreamModal = ({
                disabled={formRef.current?.isSubmitting}
                variant="contained"
                size="large"
-               autoFocus
                color="secondary"
                onClick={handleValidate}
                sx={{ marginRight: 2 }}
@@ -318,7 +317,6 @@ const NewStreamModal = ({
             size="large"
             startIcon={currentStream && <SaveIcon fontSize="large" />}
             variant="contained"
-            autoFocus
             color="secondary"
             onClick={handleSaveOrUpdate}
          >
