@@ -168,6 +168,8 @@ interface Props {
    currentStream?: LivestreamEvent
    canPublish?: boolean
    isOnDialog?: boolean
+   submitButtonLabel?: string
+   saveButtonLabel?: string
 }
 
 export interface DraftFormValues {
@@ -212,6 +214,8 @@ const DraftStreamForm = ({
    currentStream,
    canPublish = true,
    isOnDialog = false,
+   submitButtonLabel = "",
+   saveButtonLabel = "",
 }: Props) => {
    const firebase = useFirebaseService()
    const router = useRouter()
@@ -859,7 +863,8 @@ const DraftStreamForm = ({
                                                 ? "Submitting"
                                                 : isPending()
                                                 ? "Pending for Approval"
-                                                : "Submit Draft for Approval"}
+                                                : submitButtonLabel ||
+                                                  "Submit Draft for Approval"}
                                           </Typography>
                                        </Button>
                                     )}
@@ -886,7 +891,8 @@ const DraftStreamForm = ({
                                        <Typography variant="h5">
                                           {isSubmitting
                                              ? "Saving"
-                                             : "Save changes"}
+                                             : saveButtonLabel ||
+                                               "Save changes"}
                                        </Typography>
                                     </Button>
                                  </Box>

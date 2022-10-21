@@ -89,18 +89,26 @@ const NewStreamModal = ({
    const { showPromotionInputs, formHasChanged } = useStreamCreationProvider()
 
    const isDraftsPage = useMemo(() => typeOfStream === "draft", [typeOfStream])
-   const isUpcomingPage = () => typeOfStream === "upcoming"
-   const isPastPage = () => typeOfStream === "past"
+   const isUpcomingPage = useMemo(
+      () => typeOfStream === "upcoming",
+      [typeOfStream]
+   )
+   const isPastPage = useMemo(() => typeOfStream === "past", [typeOfStream])
 
-   const isUpcomingOrPastStreamsPage = () => isPastPage() || isUpcomingPage()
+   const isUpcomingOrPastStreamsPage = useMemo(
+      () => isPastPage || isUpcomingPage,
+      [isPastPage, isUpcomingPage]
+   )
 
    const isDraft = useMemo(
       () => Boolean((currentStream && isDraftsPage) || !currentStream),
       [currentStream, isDraftsPage]
    )
 
-   const isActualLivestream = () =>
-      Boolean(currentStream && isUpcomingOrPastStreamsPage())
+   const isActualLivestream = useMemo(
+      () => Boolean(currentStream && isUpcomingOrPastStreamsPage),
+      [currentStream, isUpcomingOrPastStreamsPage]
+   )
 
    const canPublish = useMemo(
       () => Boolean(isDraft && currentStream),
@@ -203,7 +211,7 @@ const NewStreamModal = ({
             return
          }
          let id
-         const targetCollection = isActualLivestream()
+         const targetCollection = isActualLivestream
             ? "livestreams"
             : "draftLivestreams"
 
@@ -317,7 +325,7 @@ const NewStreamModal = ({
             <Typography variant="inherit">
                {!currentStream
                   ? "Create draft"
-                  : isActualLivestream()
+                  : isActualLivestream
                   ? "update and close"
                   : "save changes and close"}
             </Typography>
@@ -340,7 +348,7 @@ const NewStreamModal = ({
          <AppBar className={classes.appBar} position="sticky">
             <Toolbar>
                <Typography variant="h4" className={classes.title}>
-                  {isActualLivestream()
+                  {isActualLivestream
                      ? "Update Stream"
                      : currentStream
                      ? "Update draft"
@@ -363,11 +371,19 @@ const NewStreamModal = ({
                      saveChangesButtonRef={saveChangesButtonRef}
                      onSubmit={onSubmit}
                      submitted={submitted}
-                     isActualLivestream={isActualLivestream()}
+                     isActualLivestream={isActualLivestream}
                      currentStream={currentStream}
                      setSubmitted={setSubmitted}
                      canPublish={canPublish}
                      isOnDialog={true}
+                     submitButtonLabel={"publish as stream"}
+                     saveButtonLabel={
+                        !currentStream
+                           ? "Create draft"
+                           : isActualLivestream
+                           ? "update and close"
+                           : "save changes and close"
+                     }
                   />
                </DialogContent>
             </div>

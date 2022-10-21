@@ -47,7 +47,7 @@ const EventCategoriesInfo = ({
                   limit={5}
                   setFieldValue={setFieldValue}
                   inputProps={{
-                     label: "Add some Categories",
+                     label: "Event Categories",
                      placeholder:
                         "Choose 5 categories that best describe this event",
                   }}

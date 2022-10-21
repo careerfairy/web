@@ -228,7 +228,7 @@ const StreamInfo = ({
                      </Tooltip>
                   )}
                   disabled={isSubmitting}
-                  label="Livestream Start Date"
+                  label="Live Stream Start Date"
                   value={values.start}
                   onClose={() => handleBlur({ target: { name: "start" } })}
                   onChange={(value) => {
