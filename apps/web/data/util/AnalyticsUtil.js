@@ -1,28 +1,3 @@
-import { toTitleCase } from "../../components/helperFunctions/HelperFunctions"
-import GroupsUtil from "./GroupsUtil"
-
-export const getCategoryOptionName = (targetCategoryId, user, groupContext) => {
-   const groupOptions = GroupsUtil.handleFlattenOptions(groupContext)
-   if (user.registeredGroups) {
-      const targetGroup = user.registeredGroups.find(
-         (groupObj) => groupObj.groupId === groupContext.groupId
-      )
-      if (targetGroup?.categories) {
-         const targetCategory = targetGroup.categories.find(
-            (categoryObj) => categoryObj.id === targetCategoryId
-         )
-         if (targetCategory?.selectedValueId) {
-            const targetOption = groupOptions.find(
-               (option) => option.id === targetCategory.selectedValueId
-            )
-            if (targetOption?.name) {
-               return targetOption.name
-            }
-         }
-      }
-   }
-}
-
 export const mapUserEngagement = (user, streams) => {
    let categoryUser = {
       ...user,
@@ -147,42 +122,6 @@ export const getUniqueUsersByEmailWithArrayOfUsers = (ArrayOfUsers = []) => {
    }, Object.create(null))
 }
 
-export const getAggregateCategories = (participants, group) => {
-   let categories = []
-   participants.forEach((user) => {
-      const matched = user.registeredGroups?.find(
-         (groupData) => groupData.groupId === group.id
-      )
-      if (matched) {
-         categories.push(matched)
-      }
-   })
-   return categories
-}
-
-export const getTypeOfStudents = (
-   prop,
-   { currentStream, streamsFromTimeFrameAndFuture, group, currentCategory }
-) => {
-   let students = []
-   if (currentStream?.[prop]) {
-      students = currentStream[prop]
-   } else {
-      //Get total Students
-      students = getUniqueUsers(streamsFromTimeFrameAndFuture, prop)
-   }
-   const aggregateCategories = getAggregateCategories(students, group)
-   const flattenedGroupOptions = currentCategory.options.map((option) => {
-      const count = aggregateCategories.filter((category) =>
-         category.categories.some(
-            (userOption) => userOption.selectedValueId === option.id
-         )
-      ).length
-      return { ...option, count }
-   })
-   return flattenedGroupOptions.sort((a, b) => b.count - a.count)
-}
-
 export const getTotalUniqueStreamGroupIdsFromStreams = (
    arrayOfStreams = []
 ) => {
@@ -233,10 +172,7 @@ export default {
    getUniqueUsers,
    mergeArrayOfUsers,
    convertArrayOfUserObjectsToDictionary,
-   getCategoryOptionName,
    getTotalUniqueIds,
-   getAggregateCategories,
-   getTypeOfStudents,
    getTotalUniqueStreamGroupIdsFromStreams,
    arraysOfIdsEqual,
    getUniqueUsersByEmailWithArrayOfUsers,
