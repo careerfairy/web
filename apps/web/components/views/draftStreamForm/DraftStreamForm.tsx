@@ -449,6 +449,7 @@ const DraftStreamForm = ({
       }
    }, [draftStreamId, router, submitted, existingInterests])
 
+   // to handle the visibility of the Host and Questions Steps
    useEffect(() => {
       const isHostAndQuestionsStepVisible = steps.some(
          ({ label }) => label === "Host and Questions"
@@ -475,6 +476,7 @@ const DraftStreamForm = ({
       }
    }, [existingGroups?.length])
 
+   // to handle the visibility of the Job section
    useEffect(() => {
       if (showJobSection) {
          // We want to add this section on the 5th position
@@ -494,17 +496,20 @@ const DraftStreamForm = ({
    }, [showJobSection])
 
    useEffect(() => {
-      const alertUser = (e) => {
+      const closeAlert = (e) => {
          e.preventDefault()
          e.returnValue = ""
       }
 
+      // add close alert only if the form has changed
       if (formHasChanged) {
-         window.addEventListener("beforeunload", alertUser)
+         window.addEventListener("beforeunload", closeAlert)
+      } else {
+         window.removeEventListener("beforeunload", closeAlert)
       }
 
       return () => {
-         window.removeEventListener("beforeunload", alertUser)
+         window.removeEventListener("beforeunload", closeAlert)
       }
    }, [formHasChanged])
 
@@ -673,9 +678,20 @@ const DraftStreamForm = ({
                         initialValues={formData}
                         innerRef={formRef}
                         enableReinitialize
-                        validate={(values) =>
-                           validateStreamForm(values, true, noValidation())
-                        }
+                        validate={(values) => {
+                           // saves on the context when the form has changed or if it gets back to the initial value, but only once per different status
+                           if (
+                              formHasChanged !==
+                              (_.isEqual(values, formData) === false)
+                           ) {
+                              setFormHasChanged(!formHasChanged)
+                           }
+                           return validateStreamForm(
+                              values,
+                              true,
+                              noValidation()
+                           )
+                        }}
                         onSubmit={async (values, { setSubmitting }) => {
                            await onSubmit(
                               values,
@@ -703,14 +719,6 @@ const DraftStreamForm = ({
                            validateForm,
                            /* and other goodies */
                         }) => {
-                           // save on the context if the form has any change or not
-                           if (
-                              formHasChanged !=
-                              (_.isEqual(values, formData) === false)
-                           ) {
-                              setFormHasChanged(!formHasChanged)
-                           }
-
                            // @ts-ignore
                            return (
                               <form

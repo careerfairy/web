@@ -108,17 +108,20 @@ const NewStreamModal = ({
    )
 
    useEffect(() => {
-      const alertUser = (e) => {
+      const closeAlert = (e) => {
          e.preventDefault()
          e.returnValue = ""
       }
 
+      // add close alert only if it is on the dialog and the form has changed
       if (open && formHasChanged) {
-         window.addEventListener("beforeunload", alertUser)
+         window.addEventListener("beforeunload", closeAlert)
+      } else {
+         window.removeEventListener("beforeunload", closeAlert)
       }
 
       return () => {
-         window.removeEventListener("beforeunload", alertUser)
+         window.removeEventListener("beforeunload", closeAlert)
       }
    }, [open, formHasChanged])
 
@@ -286,7 +289,7 @@ const NewStreamModal = ({
             onClick={handleCloseDialog}
             sx={{ marginRight: 2 }}
          >
-            <Typography variant="h7">Back to events page</Typography>
+            <Typography variant="inherit">Back to events page</Typography>
          </Button>
          {canPublish && (
             <Button
@@ -299,7 +302,7 @@ const NewStreamModal = ({
                onClick={handleValidate}
                sx={{ marginRight: 2 }}
             >
-               <Typography variant="h7">publish as stream</Typography>
+               <Typography variant="inherit">publish as stream</Typography>
             </Button>
          )}
          <Button
@@ -311,7 +314,7 @@ const NewStreamModal = ({
             color="secondary"
             onClick={handleSaveOrUpdate}
          >
-            <Typography variant="h7">
+            <Typography variant="inherit">
                {!currentStream
                   ? "Create draft"
                   : isActualLivestream()

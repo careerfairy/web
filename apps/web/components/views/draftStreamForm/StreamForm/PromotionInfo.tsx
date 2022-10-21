@@ -37,6 +37,7 @@ const PromotionInfo = ({
    const [allUniversities, setAllUniversities] = useState([])
    const { showPromotionInputs } = useStreamCreationProvider()
 
+   // to get all the universities based on the selected countries
    useEffect(() => {
       ;(async () => {
          try {
