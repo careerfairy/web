@@ -17,7 +17,7 @@ const securityHeaders = [
       value:
          `default-src blob: 'self' *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
             notProduction && "localhost:*"
-         }; ` +
+         } ${isVercelPreview && "https://vercel.live/"}; ` +
          `script-src blob: 'self' *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com ajax.googleapis.com ${
             isVercelPreview &&
             "https://vercel.live/_next-live/feedback/feedback.js"
