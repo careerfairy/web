@@ -34,8 +34,8 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
-import DocumentReference = firebase.firestore.DocumentReference
 import CookiesUtil from "../../util/CookiesUtil"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -385,54 +385,11 @@ class FirebaseService {
       })
    }
 
-   updateUserGroups = (userEmail, groupIds, registeredGroups) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
-      return ref.update({
-         groupIds,
-         registeredGroups,
-      })
-   }
-
-   setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
-      let userRef = this.firestore.collection("userData").doc(userId)
-      return userRef.update({
-         groupIds: Array.from(new Set(arrayOfIds)),
-         registeredGroups: arrayOfGroupObjects,
-      })
-   }
-
    listenToGroups = (callback) => {
       let groupRefs = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
       return groupRefs.onSnapshot(callback)
-   }
-
-   listenToUserGroupCategoryValue = (
-      userEmail,
-      groupId,
-      categoryId,
-      callback
-   ) => {
-      let ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("registeredGroups")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-      return ref.onSnapshot(callback)
-   }
-
-   updateUserGroupCategoryValue = (userEmail, groupId, categoryId, value) => {
-      let ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("registeredGroups")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-      return ref.update({ value: value })
    }
 
    // COMPANIES
