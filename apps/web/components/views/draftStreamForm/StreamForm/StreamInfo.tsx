@@ -171,7 +171,11 @@ const StreamInfo = ({
                   formName="companyLogoUrl"
                   changeImageButtonLabel="Change Logo"
                   value={values.companyLogoUrl}
-                  error={errors.companyLogoUrl && touched.companyLogoUrl}
+                  error={
+                     errors.companyLogoUrl &&
+                     touched.companyLogoUrl &&
+                     errors.companyLogoUrl
+                  }
                   resolution={"640 x 480"}
                />
             </Grid>
@@ -186,7 +190,9 @@ const StreamInfo = ({
                   changeImageButtonLabel="Change Background"
                   value={values.backgroundImageUrl}
                   error={
-                     errors.backgroundImageUrl && touched.backgroundImageUrl
+                     errors.backgroundImageUrl &&
+                     touched.backgroundImageUrl &&
+                     errors.backgroundImageUrl
                   }
                   resolution={"1280 x 960"}
                />

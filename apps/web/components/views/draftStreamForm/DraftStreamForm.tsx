@@ -93,15 +93,6 @@ const useStyles = makeStyles((theme) =>
             background: theme.palette.primary.main,
          },
       },
-      whiteBtn: {
-         color: theme.palette.primary.main,
-         background: "white",
-         margin: theme.spacing(1),
-         "&:hover": {
-            color: "white",
-            background: theme.palette.primary.main,
-         },
-      },
       section: {
          padding: 0,
       },
@@ -506,7 +497,7 @@ const DraftStreamForm = ({
       }
 
       // add close alert only if the form has changed
-      if (formHasChanged) {
+      if (formHasChanged && !submitted) {
          window.addEventListener("beforeunload", closeAlert)
       } else {
          window.removeEventListener("beforeunload", closeAlert)
@@ -515,7 +506,7 @@ const DraftStreamForm = ({
       return () => {
          window.removeEventListener("beforeunload", closeAlert)
       }
-   }, [formHasChanged])
+   }, [formHasChanged, submitted])
 
    const isPending = () => {
       // @ts-ignore
@@ -579,7 +570,11 @@ const DraftStreamForm = ({
       const targetPath = buildFullUrl(directLink)
       return (
          <>
-            <Typography variant="h5" align="center" style={{ color: "white" }}>
+            <Typography
+               variant="h5"
+               align="center"
+               style={{ color: "primary" }}
+            >
                {status === SAVE_WITH_NO_VALIDATION
                   ? "Your changes have been saved under the following link:"
                   : "Thanks for your submission, the direct link to this draft you created is:"}
@@ -590,10 +585,11 @@ const DraftStreamForm = ({
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
+                  mb={2}
                >
-                  <WarningIcon fontSize="large" />
+                  <WarningIcon fontSize="large" color="primary" />
                   PLEASE SAVE THE FOLLOWING LINK BELOW SOMEWHERE
-                  <WarningIcon fontSize="large" />
+                  <WarningIcon fontSize="large" color="primary" />
                </Box>
                <a onClick={handleCopyDraftLink} href={directLink}>
                   {targetPath}
@@ -605,37 +601,41 @@ const DraftStreamForm = ({
             <div
                style={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                   marginTop: 16,
                }}
             >
                {userData && (
                   <Button
-                     className={classes.whiteBtn}
                      variant="contained"
                      href="/profile"
+                     color="primary"
+                     sx={{ m: 1 }}
                   >
                      To Profile
                   </Button>
                )}
                <Button
-                  className={classes.whiteBtn}
                   variant="contained"
                   href="/next-livestreams"
+                  color="primary"
+                  sx={{ m: 1 }}
                >
                   To Next Livestreams
                </Button>
                <Button
                   onClick={handleCopyDraftLink}
-                  className={classes.whiteBtn}
                   variant="contained"
+                  color="primary"
+                  sx={{ m: 1 }}
                >
                   Copy Direct Link
                </Button>
                <Button
                   onClick={() => setSubmitted(false)}
-                  className={classes.whiteBtn}
                   variant="contained"
+                  color="primary"
+                  sx={{ m: 1 }}
                >
                   Back to draft
                </Button>
@@ -650,25 +650,27 @@ const DraftStreamForm = ({
       <Container className={classes.root} id="livestreamForm">
          {allFetched ? (
             <Grid container spacing={2}>
-               <Grid
-                  item
-                  md={12}
-                  lg={2}
-                  className={isSmallScreen ? classes.navBar : ""}
-               >
-                  <Box
-                     sx={{
-                        position: { lg: "fixed" },
-                        marginTop: { lg: "10vh" },
-                     }}
+               {submitted ? null : (
+                  <Grid
+                     item
+                     md={12}
+                     lg={2}
+                     className={isSmallScreen ? classes.navBar : ""}
                   >
-                     <StreamFormNavigator steps={steps} />
-                  </Box>
-               </Grid>
+                     <Box
+                        sx={{
+                           position: { lg: "fixed" },
+                           marginTop: { lg: "10vh" },
+                        }}
+                     >
+                        <StreamFormNavigator steps={steps} />
+                     </Box>
+                  </Grid>
+               )}
                <Grid
                   item
                   md={12}
-                  lg={10}
+                  lg={submitted ? 12 : 10}
                   mt={
                      isOnDialog
                         ? { xs: "150px", md: "100px", lg: "unset" }

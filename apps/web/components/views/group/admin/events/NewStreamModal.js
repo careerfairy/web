@@ -4,6 +4,7 @@ import {
    AppBar,
    Button,
    CardActions,
+   CircularProgress,
    Dialog,
    DialogContent,
    Slide,
@@ -308,6 +309,11 @@ const NewStreamModal = ({
                color="secondary"
                onClick={handleValidate}
                sx={{ marginRight: 2 }}
+               endIcon={
+                  formRef.current?.isSubmitting && (
+                     <CircularProgress size={20} color="inherit" />
+                  )
+               }
             >
                <Typography variant="inherit">publish as stream</Typography>
             </Button>
@@ -319,6 +325,11 @@ const NewStreamModal = ({
             variant="contained"
             color="secondary"
             onClick={handleSaveOrUpdate}
+            endIcon={
+               formRef.current?.isSubmitting && (
+                  <CircularProgress size={20} color="inherit" />
+               )
+            }
          >
             <Typography variant="inherit">
                {!currentStream

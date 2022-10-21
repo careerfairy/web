@@ -157,7 +157,6 @@ const ImageSelect = ({
          return (
             <Box
                component={CardMedia}
-               mb={4}
                position="relative"
                border="dashed"
                borderRadius={6}
@@ -217,77 +216,89 @@ const ImageSelect = ({
       }
       // render image card without any selected image
       return (
-         <Box
-            p={2}
-            component={CardMedia}
-            mb={4}
-            border="dashed"
-            borderColor={theme.palette.grey.A400}
-            borderRadius={6}
-         >
-            <Box mt={1}>
-               <Typography variant="h6" textAlign="center">
-                  {label}
-               </Typography>
-            </Box>
-
-            <Box className={classes.media} my={2}>
-               <img
-                  src={logoPlaceholder}
-                  className={classes.image}
-                  alt={formName}
-               />
-            </Box>
-
-            <FilePickerContainer
-               extensions={["jpg", "jpeg", "png"]}
-               maxSize={10}
-               onError={(errMsg) => setFilePickerError(errMsg)}
-               onChange={(fileObject) => {
-                  uploadLogo(
-                     path,
-                     fileObject,
-                     firebase,
-                     (newUrl, fullPath) => {
-                        setFieldValue(formName, getDownloadUrl(fullPath), true)
-                        setFilePickerError(null)
-                     },
-                     () => {}
-                  )
-               }}
+         <Box mb={4}>
+            <Box
+               p={2}
+               component={CardMedia}
+               border="dashed"
+               borderColor={
+                  filePickerError
+                     ? theme.palette.error.main
+                     : theme.palette.grey.A400
+               }
+               borderRadius={6}
             >
-               <Box mb={1} display="flex" justifyContent="center">
-                  <Button
-                     id="upButton"
-                     color="secondary"
-                     sx={{
-                        p: 0,
-                        textTransform: "none",
-                        minWidth: "fit-content",
-                     }}
-                  >
-                     <Typography variant="h6">Upload</Typography>
-                  </Button>
-                  <Typography variant="h6" textAlign="center" ml={1}>
-                     your image here
+               <Box mt={1}>
+                  <Typography variant="h6" textAlign="center">
+                     {label}
                   </Typography>
                </Box>
-            </FilePickerContainer>
 
-            {resolution && (
-               <Box mb={2}>
-                  <Typography
-                     fontSize="12px"
-                     textAlign="center"
-                     color="text.secondary"
-                  >
-                     <strong style={{ fontWeight: 500 }}>
-                        Recommended Resolution:
-                     </strong>{" "}
-                     {resolution}
-                  </Typography>
+               <Box className={classes.media} my={2}>
+                  <img
+                     src={logoPlaceholder}
+                     className={classes.image}
+                     alt={formName}
+                  />
                </Box>
-            )}
+
+               <FilePickerContainer
+                  extensions={["jpg", "jpeg", "png"]}
+                  maxSize={10}
+                  onError={(errMsg) => setFilePickerError(errMsg)}
+                  onChange={(fileObject) => {
+                     uploadLogo(
+                        path,
+                        fileObject,
+                        firebase,
+                        (newUrl, fullPath) => {
+                           setFieldValue(
+                              formName,
+                              getDownloadUrl(fullPath),
+                              true
+                           )
+                           setFilePickerError(null)
+                        },
+                        () => {}
+                     )
+                  }}
+               >
+                  <Box mb={1} display="flex" justifyContent="center">
+                     <Button
+                        id="upButton"
+                        color="secondary"
+                        sx={{
+                           p: 0,
+                           textTransform: "none",
+                           minWidth: "fit-content",
+                        }}
+                     >
+                        <Typography variant="h6">Upload</Typography>
+                     </Button>
+                     <Typography variant="h6" textAlign="center" ml={1}>
+                        your image here
+                     </Typography>
+                  </Box>
+               </FilePickerContainer>
+
+               {resolution && (
+                  <Box mb={2}>
+                     <Typography
+                        fontSize="12px"
+                        textAlign="center"
+                        color="text.secondary"
+                     >
+                        <strong style={{ fontWeight: 500 }}>
+                           Recommended Resolution:
+                        </strong>{" "}
+                        {resolution}
+                     </Typography>
+                  </Box>
+               )}
+            </Box>
+            <Collapse in={Boolean(filePickerError)} sx={{ ml: 2 }}>
+               <FormHelperText error>{filePickerError}</FormHelperText>
+            </Collapse>
          </Box>
       )
    }
