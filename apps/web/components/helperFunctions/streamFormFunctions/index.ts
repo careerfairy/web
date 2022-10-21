@@ -6,6 +6,7 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
+import { EMAIL_REGEX } from "components/util/constants"
 
 export const speakerObj = {
    avatar: "",
@@ -208,6 +209,9 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
       // }
       if (!values.speakers[key].email) {
          errors.speakers[key].email = "Required"
+      }
+      if (!EMAIL_REGEX.test(values.speakers[key].email)) {
+         errors.speakers[key].email = "Please add a valid email"
       }
       if (!Object.keys(errors.speakers[key]).length) {
          delete errors.speakers[key]
