@@ -265,9 +265,13 @@ const DraftStreamForm = ({
 
    const [existingGroups, setExistingGroups] = useState([])
    const [formData, setFormData] = useState<DraftFormValues>({
-      companyLogoUrl: "",
-      backgroundImageUrl: "",
-      company: "",
+      // add group logo if it has any and if it's not a university
+      companyLogoUrl: group?.universityCode ? "" : group?.logoUrl || "",
+      backgroundImageUrl: group?.universityCode
+         ? ""
+         : group?.bannerImageUrl || "",
+      // add group name if it has any and if it's not a university
+      company: group?.universityCode ? "" : group?.universityName || "",
       companyId: "",
       title: "",
       interestsIds: [],
@@ -699,6 +703,7 @@ const DraftStreamForm = ({
                            validateForm,
                            /* and other goodies */
                         }) => {
+                           // save on the context if the form has any change or not
                            if (
                               formHasChanged !=
                               (_.isEqual(values, formData) === false)
