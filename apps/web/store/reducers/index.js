@@ -7,7 +7,6 @@ import todosReducer from "./todosReducer"
 import emotesReducer from "./emotesReducer"
 import snackbarReducer from "./snackbarReducer"
 import userDataSetReducer from "./userDataSetReducer"
-import currentFilterGroupReducer from "./currentFilterGroupReducer"
 import nextLivestreamsReducer from "./nextLivestreamsReducer"
 import streamReducer from "./streamReducer"
 import generalLayoutReducer from "./generalLayoutReducer"
@@ -22,7 +21,6 @@ export default combineReducers({
    emotes: emotesReducer,
    snackbars: snackbarReducer,
    userDataSet: userDataSetReducer,
-   currentFilterGroup: currentFilterGroupReducer,
    nextLivestreams: nextLivestreamsReducer,
    generalLayout: generalLayoutReducer,
    analyticsReducer: groupAnalyticsReducer,
