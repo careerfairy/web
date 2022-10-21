@@ -25,7 +25,7 @@ const securityHeaders = [
          };` +
          "style-src 'self' *.vitals.vercel-insights.com *.googletagmanager.com *.googleapis.com 'unsafe-inline'; " +
          `connect-src *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com *.tiktok.com ${
-            isVercelPreview && "https://vercel.live"
+            isVercelPreview && "https://vercel.live 'self' data:"
          };` +
          `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
             notProduction && "localhost:*"
