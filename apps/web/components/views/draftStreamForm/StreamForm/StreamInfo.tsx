@@ -188,7 +188,7 @@ const StreamInfo = ({
                   error={
                      errors.backgroundImageUrl && touched.backgroundImageUrl
                   }
-                  resolution={"640 x 480"}
+                  resolution={"1280 x 960"}
                />
             </Grid>
             <Grid xs={12} sm={6} md={4} item>

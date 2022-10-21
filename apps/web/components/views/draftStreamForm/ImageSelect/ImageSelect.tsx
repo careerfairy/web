@@ -16,7 +16,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useTheme } from "@mui/material/styles"
 
 const logoPlaceholder =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Flogo-placeholder.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382"
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/random-logos%2Fplaceholder_logo.png?alt=media&token=ef6c8d5a-af92-4b69-a946-ce78a9997382"
 
 const useStyles = makeStyles((theme) => ({
    media: {
@@ -155,7 +155,14 @@ const ImageSelect = ({
       if (value.length) {
          // render image card with selected image
          return (
-            <Box component={CardMedia} boxShadow={2} mb={4} position="relative">
+            <Box
+               component={CardMedia}
+               mb={4}
+               position="relative"
+               border="dashed"
+               borderRadius={6}
+               borderColor={theme.palette.grey.A400}
+            >
                <FilePickerContainer
                   extensions={["jpg", "jpeg", "png"]}
                   maxSize={10}
@@ -200,8 +207,8 @@ const ImageSelect = ({
                </FilePickerContainer>
                <Box
                   className={classes.media}
-                  my={2}
-                  sx={{ height: "355px !important" }}
+                  px={1}
+                  sx={{ height: "370px !important" }}
                >
                   <img src={value} className={classes.image} alt={formName} />
                </Box>
@@ -216,6 +223,7 @@ const ImageSelect = ({
             mb={4}
             border="dashed"
             borderColor={theme.palette.grey.A400}
+            borderRadius={6}
          >
             <Box mt={1}>
                <Typography variant="h6" textAlign="center">
