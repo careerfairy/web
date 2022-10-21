@@ -17,6 +17,7 @@ import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { v4 as uuidv4 } from "uuid"
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
+import { StreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {
@@ -69,7 +70,6 @@ const EventsOverview = ({ group, scrollRef }) => {
    const {
       query: { eventId },
       replace,
-      asPath,
    } = useRouter()
 
    useEffect(() => {
@@ -177,7 +177,18 @@ const EventsOverview = ({ group, scrollRef }) => {
             dispatch(actions.sendGeneralError(e))
          }
       },
-      [dispatch, userData, group.id, replace]
+      [
+         getAuthor,
+         addLivestream,
+         getAllGroupAdminInfo,
+         userData.firstName,
+         userData.lastName,
+         sendNewlyPublishedEventEmail,
+         deleteLivestream,
+         replace,
+         group.id,
+         dispatch,
+      ]
    )
 
    const handleChange = (event, newValue) => {
@@ -262,15 +273,17 @@ const EventsOverview = ({ group, scrollRef }) => {
                />
             )}
          </Box>
-         <NewStreamModal
-            group={group}
-            typeOfStream={tabValue}
-            open={openNewStreamModal}
-            handlePublishStream={handlePublishStream}
-            handleResetCurrentStream={handleResetCurrentStream}
-            currentStream={currentStream}
-            onClose={handleCloseNewStreamModal}
-         />
+         <StreamCreationProvider>
+            <NewStreamModal
+               group={group}
+               typeOfStream={tabValue}
+               open={openNewStreamModal}
+               handlePublishStream={handlePublishStream}
+               handleResetCurrentStream={handleResetCurrentStream}
+               currentStream={currentStream}
+               onClose={handleCloseNewStreamModal}
+            />
+         </StreamCreationProvider>
       </Fragment>
    )
 }

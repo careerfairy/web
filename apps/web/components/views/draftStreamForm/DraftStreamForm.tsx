@@ -62,6 +62,7 @@ import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import _ from "lodash"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -253,7 +254,8 @@ const DraftStreamForm = ({
    )
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
-   const { showJobSection } = useStreamCreationProvider()
+   const { showJobSection, formHasChanged, setFormHasChanged } =
+      useStreamCreationProvider()
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"))
 
@@ -487,6 +489,21 @@ const DraftStreamForm = ({
       }
    }, [showJobSection])
 
+   useEffect(() => {
+      const alertUser = (e) => {
+         e.preventDefault()
+         e.returnValue = ""
+      }
+
+      if (formHasChanged) {
+         window.addEventListener("beforeunload", alertUser)
+      }
+
+      return () => {
+         window.removeEventListener("beforeunload", alertUser)
+      }
+   }, [formHasChanged])
+
    const isPending = () => {
       // @ts-ignore
       return Boolean(formData?.status?.pendingApproval === true)
@@ -682,6 +699,13 @@ const DraftStreamForm = ({
                            validateForm,
                            /* and other goodies */
                         }) => {
+                           if (
+                              formHasChanged !=
+                              (_.isEqual(values, formData) === false)
+                           ) {
+                              setFormHasChanged(!formHasChanged)
+                           }
+
                            // @ts-ignore
                            return (
                               <form

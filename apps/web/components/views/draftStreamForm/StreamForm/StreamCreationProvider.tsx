@@ -6,6 +6,8 @@ type DefaultContext = {
    setShowJobSection: Dispatch<boolean>
    showPromotionInputs: boolean
    setShowPromotionInputs: Dispatch<boolean>
+   formHasChanged: boolean
+   setFormHasChanged: Dispatch<boolean>
 }
 
 const StreamCreationContext = createContext<DefaultContext>({
@@ -14,11 +16,14 @@ const StreamCreationContext = createContext<DefaultContext>({
    setShowJobSection: () => {},
    showPromotionInputs: false,
    setShowPromotionInputs: () => {},
+   formHasChanged: false,
+   setFormHasChanged: () => {},
 })
 
 const StreamCreationProvider = ({ children }) => {
    const [showJobSection, setShowJobSection] = useState(false)
    const [showPromotionInputs, setShowPromotionInputs] = useState(false)
+   const [formHasChanged, setFormHasChanged] = useState(false)
 
    const contextValue = useMemo(
       () => ({
@@ -27,8 +32,10 @@ const StreamCreationProvider = ({ children }) => {
          setShowJobSection,
          showPromotionInputs,
          setShowPromotionInputs,
+         formHasChanged,
+         setFormHasChanged,
       }),
-      [showJobSection, showPromotionInputs]
+      [formHasChanged, showJobSection, showPromotionInputs]
    )
 
    return (

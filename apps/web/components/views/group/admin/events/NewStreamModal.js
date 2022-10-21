@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef, useState } from "react"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import {
    AppBar,
@@ -26,10 +26,7 @@ import { useSnackbar } from "notistack"
 import PublishIcon from "@mui/icons-material/Publish"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import {
-   StreamCreationProvider,
-   useStreamCreationProvider,
-} from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
+import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -89,7 +86,7 @@ const NewStreamModal = ({
    const [submitted, setSubmitted] = useState(false)
    const [publishDraft, setPublishDraft] = useState(false)
    const classes = useStyles()
-   const { showPromotionInputs } = useStreamCreationProvider()
+   const { showPromotionInputs, formHasChanged } = useStreamCreationProvider()
 
    const isDraftsPage = useMemo(() => typeOfStream === "draft", [typeOfStream])
    const isUpcomingPage = () => typeOfStream === "upcoming"
@@ -109,6 +106,21 @@ const NewStreamModal = ({
       () => Boolean(isDraft && currentStream),
       [currentStream, isDraft]
    )
+
+   useEffect(() => {
+      const alertUser = (e) => {
+         e.preventDefault()
+         e.returnValue = ""
+      }
+
+      if (open && formHasChanged) {
+         window.addEventListener("beforeunload", alertUser)
+      }
+
+      return () => {
+         window.removeEventListener("beforeunload", alertUser)
+      }
+   }, [open, formHasChanged])
 
    const handleCloseDialog = () => {
       handleResetCurrentStream()
@@ -342,20 +354,18 @@ const NewStreamModal = ({
                <DialogContent
                   className={`${classes.content} ${classes.contentRoot}`}
                >
-                  <StreamCreationProvider>
-                     <DraftStreamForm
-                        formRef={formRef}
-                        group={group}
-                        saveChangesButtonRef={saveChangesButtonRef}
-                        onSubmit={onSubmit}
-                        submitted={submitted}
-                        isActualLivestream={isActualLivestream()}
-                        currentStream={currentStream}
-                        setSubmitted={setSubmitted}
-                        canPublish={canPublish}
-                        isOnDialog={true}
-                     />
-                  </StreamCreationProvider>
+                  <DraftStreamForm
+                     formRef={formRef}
+                     group={group}
+                     saveChangesButtonRef={saveChangesButtonRef}
+                     onSubmit={onSubmit}
+                     submitted={submitted}
+                     isActualLivestream={isActualLivestream()}
+                     currentStream={currentStream}
+                     setSubmitted={setSubmitted}
+                     canPublish={canPublish}
+                     isOnDialog={true}
+                  />
                </DialogContent>
             </div>
          </DialogContent>
