@@ -10,7 +10,6 @@ export interface Group extends Identifiable {
    groupId: string
    description: string
    logoUrl: string
-   bannerImageUrl: string
 
    // optional
    extraInfo?: string
@@ -24,6 +23,7 @@ export interface Group extends Identifiable {
    privacyPolicyActive?: boolean
    privacyPolicyUrl?: string
    inActive?: boolean
+   bannerImageUrl?: string
 
    /*
     * Deprecated
