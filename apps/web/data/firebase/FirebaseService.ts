@@ -511,41 +511,6 @@ class FirebaseService {
       return ref.get()
    }
 
-   // WISHLIST
-
-   getWishList = () => {
-      let ref = this.firestore
-         .collection("wishList")
-         .orderBy("vote", "desc")
-         .where("fulfilled", "==", false)
-      return ref.get()
-   }
-
-   getLatestFulfilledWishes = () => {
-      let ref = this.firestore
-         .collection("wishList")
-         .where("fulfilled", "==", true)
-         .orderBy("vote", "desc")
-      return ref.get()
-   }
-
-   addNewWish = (user, wish) => {
-      let ref = this.firestore.collection("wishList")
-      return ref.add({
-         wish: wish,
-         fulfilled: false,
-         vote: 1,
-         date: firebase.firestore.Timestamp.fromDate(new Date()),
-      })
-   }
-
-   addVoteToWish = (wish) => {
-      let ref = this.firestore.collection("wishList").doc(wish.id)
-      return ref.update({
-         vote: wish.vote + 1,
-      })
-   }
-
    // CREATE_LIVESTREAMS
 
    addLivestream = async (livestream, collection, author = {}) => {
@@ -681,15 +646,6 @@ class FirebaseService {
          .collection("preferences")
          .doc("adminPreference")
       return adminPreferenceRef.onSnapshot(callback)
-   }
-
-   addLivestreamSpeaker = (livestreamId, speaker) => {
-      let speakersRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("speakers")
-
-      return speakersRef.add(speaker)
    }
 
    getStreamById = (streamId, collection) => {
