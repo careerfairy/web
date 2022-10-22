@@ -180,9 +180,11 @@ const NewStreamModal = ({
       setStatus,
       selectedJobs
    ) => {
+      let livestream
+
       try {
          setSubmitting(true)
-         const livestream = buildLivestreamObject(
+         livestream = buildLivestreamObject(
             values,
             updateMode,
             draftStreamId,
@@ -194,12 +196,10 @@ const NewStreamModal = ({
             setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
          if (status === SUBMIT_FOR_APPROVAL) {
-            const newStatus = {
+            livestream.status = {
                pendingApproval: true,
                seen: false,
             }
-            livestream.status = newStatus
-            setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
 
          if (selectedJobs) {
@@ -262,8 +262,18 @@ const NewStreamModal = ({
             preventDuplicate: true,
          })
          console.log("-> e", e)
+      } finally {
+         setSubmitting(false)
+
+         if (livestream && status === SUBMIT_FOR_APPROVAL) {
+            // only update the form at the end to not force a rerender
+            // and because of it the isSubmitting flag will be false until the end of this logic
+            setFormData((prevState) => ({
+               ...prevState,
+               status: livestream.status,
+            }))
+         }
       }
-      setSubmitting(false)
    }
 
    const handleSubmit = () => {
