@@ -55,8 +55,9 @@ export interface LivestreamEvent extends Identifiable {
     * - presentation: A PDF presentation is currently being shared
     * - video: A YouTube video is currently being shared
     * - desktop: A user's screen is currently being shared
+    * - default/undefined: The default livestream view (speaker is in the center of the screen with their video displayed)
     */
-   mode?: "presentation" | "desktop" | "video"
+   mode?: "presentation" | "desktop" | "video" | "default"
    /**
     * The streamerId of the user who is currently sharing their screen
     */
