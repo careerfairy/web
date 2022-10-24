@@ -639,15 +639,6 @@ class FirebaseService {
       return livestream.id
    }
 
-   listenToStreamAdminPreferences = (mainStreamId, callback) => {
-      const adminPreferenceRef = this.firestore
-         .collection("livestreams")
-         .doc(mainStreamId)
-         .collection("preferences")
-         .doc("adminPreference")
-      return adminPreferenceRef.onSnapshot(callback)
-   }
-
    getStreamById = (streamId, collection) => {
       let livestreamsRef = this.firestore.collection(collection).doc(streamId)
       return livestreamsRef.get()
