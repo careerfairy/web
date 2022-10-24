@@ -31,6 +31,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { styles } from "../profileStyles"
 import useUserRewards from "../../../custom-hook/useUserRewards"
 import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const ReferralProfileTab = () => {
    const { userData, userPresenter } = useAuth()
@@ -60,6 +61,7 @@ const ReferralProfileTab = () => {
          variant: "success",
          preventDuplicate: true,
       })
+      dataLayerEvent("referral_copy_link")
    }
 
    return (

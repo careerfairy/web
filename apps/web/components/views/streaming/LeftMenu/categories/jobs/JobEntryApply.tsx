@@ -14,6 +14,7 @@ import * as Sentry from "@sentry/nextjs"
 import LoadingButton from "@mui/lab/LoadingButton"
 import dynamic from "next/dynamic"
 import { Typography } from "@mui/material"
+import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
 
 type Props = {
    job: Job
@@ -76,6 +77,10 @@ const JobEntryApply = ({
          })
          .finally(() => {
             setIsLoading(false)
+            dataLayerEvent("livestream_job_application_complete", {
+               jobId: job?.id,
+               jobName: job?.name,
+            })
          })
    }, [
       livestreamId,

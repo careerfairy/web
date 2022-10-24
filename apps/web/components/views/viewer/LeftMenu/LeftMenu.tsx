@@ -19,6 +19,7 @@ import {
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -93,7 +94,9 @@ const LeftMenu = ({
    const handleChange = useCallback(
       (event, newValue) => {
          setValue(newValue)
-         setSelectedState(states[newValue])
+         const state = states[newValue]
+         setSelectedState(state)
+         dataLayerEvent("livestream_viewer_select_" + state)
       },
       [setSelectedState]
    )
