@@ -146,12 +146,13 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       if (!userData) return
 
-      const missingFields = ["referralCode, timezone"]
+      const missingFields = ["referralCode", "timezone"]
 
-      if (
-         Object.keys(userData).filter((f) => missingFields.includes(f))
-            .length === 0
-      ) {
+      let missingFromUserData = missingFields.filter(
+         (missing) => !userData[missing]
+      )
+      if (missingFromUserData.length > 0) {
+         console.log(`Missing fields`, missingFromUserData)
          const browserTimezone = DateUtil.getCurrentTimeZone()
 
          // There are missing fields
