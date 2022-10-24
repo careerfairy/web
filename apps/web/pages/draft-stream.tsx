@@ -51,7 +51,6 @@ const DraftStream = () => {
    }
 
    const handleSubmit = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
       if (formRef.current) {
          // @ts-ignore
          formRef.current.handleSubmit()

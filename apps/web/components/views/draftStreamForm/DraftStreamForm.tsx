@@ -640,7 +640,44 @@ const DraftStreamForm = ({
       )
    }
 
-   const noValidation = () => status === SAVE_WITH_NO_VALIDATION
+   const noValidation = useMemo(
+      () => status === SAVE_WITH_NO_VALIDATION,
+      [status]
+   )
+
+   // To handle the validation of the form
+   const handleValidate = useCallback(
+      (values) => {
+         // saves on the context when the form has changed or if it gets back to the initial value, but only once per different status
+         if (formHasChanged !== (_.isEqual(values, formData) === false)) {
+            setFormHasChanged(!formHasChanged)
+         }
+
+         return validateStreamForm(values, true, noValidation)
+      },
+      [formData, formHasChanged, noValidation, setFormHasChanged]
+   )
+
+   // handle errors and redirect to the specific 1st error input
+   const handleSubmitForm = async ({ handleSubmit, validateForm }) => {
+      handleSubmit()
+      const errors = await validateForm()
+
+      if (Object.keys(errors).length) {
+         let firstErrorId = Object.keys(errors)[0]
+
+         if (typeof errors[firstErrorId] !== "string") {
+            // If the 1st error is related to the speaker form
+            const speakerErrorId = Object.keys(errors[firstErrorId])[0]
+            firstErrorId = speakerErrorId
+         }
+
+         const errorElement = document.getElementById(firstErrorId)
+         if (errorElement) {
+            errorElement.scrollIntoView({ behavior: "smooth", block: "end" })
+         }
+      }
+   }
 
    return (
       <Container className={classes.root} id="livestreamForm">
@@ -675,20 +712,7 @@ const DraftStreamForm = ({
                         initialValues={formData}
                         innerRef={formRef}
                         enableReinitialize
-                        validate={(values) => {
-                           // saves on the context when the form has changed or if it gets back to the initial value, but only once per different status
-                           if (
-                              formHasChanged !==
-                              (_.isEqual(values, formData) === false)
-                           ) {
-                              setFormHasChanged(!formHasChanged)
-                           }
-                           return validateStreamForm(
-                              values,
-                              true,
-                              noValidation()
-                           )
-                        }}
+                        validate={handleValidate}
                         onSubmit={async (values, { setSubmitting }) => {
                            await onSubmit(
                               values,
@@ -721,14 +745,10 @@ const DraftStreamForm = ({
                               <form
                                  onSubmit={async (event) => {
                                     event.preventDefault()
-                                    const error = await validateForm()
-                                    if (Object.keys(error).length) {
-                                       window.scrollTo({
-                                          top: 0,
-                                          left: 0,
-                                          behavior: "smooth",
-                                       })
-                                    }
+                                    await handleSubmitForm({
+                                       handleSubmit,
+                                       validateForm,
+                                    })
                                     handleSubmit()
                                  }}
                                  className={classes.form}

@@ -227,6 +227,7 @@ const ImageSelect = ({
                      : theme.palette.grey.A400
                }
                borderRadius={6}
+               id={formName}
             >
                <Box mt={1}>
                   <Typography variant="h6" textAlign="center">

@@ -277,7 +277,6 @@ const NewStreamModal = ({
    }
 
    const handleSubmit = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
       if (formRef.current) {
          formRef.current.handleSubmit()
       }

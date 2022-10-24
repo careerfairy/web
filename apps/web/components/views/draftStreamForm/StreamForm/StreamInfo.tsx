@@ -226,7 +226,7 @@ const StreamInfo = ({
                         <TextField
                            fullWidth
                            {...params}
-                           name="start"
+                           id="start"
                            onBlur={handleBlur}
                            sx={{ svg: { color: palette.secondary.main } }}
                            error={Boolean(errors.start && touched.start)}
