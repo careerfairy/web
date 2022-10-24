@@ -1,12 +1,13 @@
-import React from "react"
-import { FirebaseReducer } from "react-redux-firebase"
-
 declare global {
    interface Window {
       $crisp: any[]
       CRISP_READY_TRIGGER: () => void
       CRISP_TOKEN_ID: string
    }
+}
+
+if (typeof window !== "undefined") {
+   window.$crisp = window.$crisp || []
 }
 
 const CRISP_WEBSITE_ID = "b8c454ce-84e4-4039-b6b4-203b2c86ea66"
@@ -51,7 +52,7 @@ export const setCrispEmail = (data: { email: string; signature: string }) => {
    window.$crisp.push(["set", "user:nickname", [getNickname(data.email)]])
 }
 
-const reverseChatBoxPosition = (reverse: boolean) => {
+export const reverseChatBoxPosition = (reverse: boolean) => {
    window.$crisp.push(["config", "position:reverse", [reverse]])
 }
 

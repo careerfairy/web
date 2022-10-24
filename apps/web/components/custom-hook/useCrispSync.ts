@@ -7,10 +7,6 @@ const useCrispSync = (user: FirebaseReducer.AuthState) => {
    const data = useCrispSignature(user.email)
 
    useEffect(() => {
-      window.CRISP_READY_TRIGGER = function () {}
-   }, [])
-
-   useEffect(() => {
       window.CRISP_TOKEN_ID = user?.uid || ""
    }, [user?.uid])
 
