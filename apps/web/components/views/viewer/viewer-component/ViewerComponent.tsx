@@ -7,7 +7,6 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import useDevices from "../../../../components/custom-hook/useDevices"
 import useMediaSources from "../../../../components/custom-hook/useMediaSources"
 import VideoControlsContainer from "../../../../components/views/streaming/video-container/VideoControlsContainer"
@@ -16,7 +15,6 @@ import makeStyles from "@mui/styles/makeStyles"
 import SettingsModal from "../../streaming/video-container/SettingsModal"
 import { Typography } from "@mui/material"
 import ScreenShareModal from "../../streaming/video-container/ScreenShareModal"
-import useStreamRef from "../../../custom-hook/useStreamRef"
 import EmoteButtons from "../EmoteButtons"
 import { useDispatch, useSelector } from "react-redux"
 import { useRouter } from "next/router"
@@ -36,6 +34,7 @@ import { useRtc } from "../../../../context/agora/RTCProvider"
 import RootState from "../../../../store/reducers"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { HandRaiseState } from "../../../../types/handraise"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -67,7 +66,6 @@ interface Props {
    showMenu: boolean
 }
 const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
-   const { setDesktopMode: setDesktopModeInstanceMethod } = useFirebaseService()
    const {
       currentLivestream,
       streamerId,
@@ -82,13 +80,11 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
    const dispatch = useDispatch()
    const [showSettings, setShowSettings] = useState(false)
    const [showScreenShareModal, setShowScreenShareModal] = useState(false)
-   const [optimizationMode, setOptimizationMode] = useState("detail")
    const [showLocalStreamPublishingModal, setShowLocalStreamPublishingModal] =
       useState(null)
    const [handRaiseState, updateRequest, hasRoom, prevHandRaiseState] =
       useHandRaiseState()
 
-   const streamRef = useStreamRef()
    const {
       query: { livestreamId },
    } = useRouter()
@@ -113,8 +109,9 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       localMediaHandlers,
       publishLocalStreamTracks,
       handlePublishLocalStream,
-      publishScreenShareStream,
       unPublishScreenShareStream,
+      handleScreenShare,
+      setDesktopMode,
    } = useRtc()
 
    const { createEmote } = useContext(RTMContext)
@@ -175,49 +172,26 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       }
    }, [handRaiseActive, handRaiseState])
 
-   const setDesktopMode = async (mode, initiatorId) => {
-      let screenSharerId =
-         mode === "desktop" ? initiatorId : currentLivestream.screenSharerId
-      await setDesktopModeInstanceMethod(streamRef, mode, screenSharerId)
-   }
-
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false)
    }, [])
 
    const handleClickScreenShareButton = async () => {
       if (currentLivestream.mode === "desktop") {
-         unPublishScreenShareStream().then(async () => {
-            return await setDesktopMode("default", streamerId)
-         })
+         unPublishScreenShareStream()
+            .then(async () => {
+               return await setDesktopMode("default", streamerId)
+            })
+            .catch((err) =>
+               errorLogAndNotify(err, {
+                  message: "Failed on click screen share",
+               })
+            )
       } else {
          setShowScreenShareModal(true)
       }
    }
 
-   const onScreenShareStopped = useCallback(() => {
-      unPublishScreenShareStream().then(async () => {
-         await setDesktopMode("default", streamerId)
-      })
-   }, [unPublishScreenShareStream])
-
-   const handleScreenShare = useCallback(
-      async (optimizationMode = "detail") => {
-         if (currentLivestream.mode === "desktop") {
-            unPublishScreenShareStream().then(async () => {
-               await setDesktopMode("default", streamerId)
-            })
-         } else {
-            publishScreenShareStream(
-               optimizationMode,
-               onScreenShareStopped
-            ).then(async () => {
-               await setDesktopMode("desktop", streamerId)
-            })
-         }
-      },
-      [currentLivestream?.mode, optimizationMode, streamerId]
-   )
    const requestHandRaise = async () => {
       try {
          switch (handRaiseState?.state) {

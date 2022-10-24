@@ -339,6 +339,8 @@ const ViewerLayout = (props) => {
          channel={channelId}
          appId={agoraCredentials.appID}
          initialize={shouldInitializeAgora}
+         screenSharerId={currentLivestream?.screenSharerId}
+         streamMode={currentLivestream?.mode}
          isStreamer={handRaiseActive}
       >
          <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
