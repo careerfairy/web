@@ -59,7 +59,7 @@ export class MergeATSRepository implements IATSRepository {
    | Jobs
    |--------------------------------------------------------------------------
    */
-   @fromFirebaseCache()
+   @fromFirebaseCache(2 * 60 * 1000) // 2min cache
    async getJobs(): Promise<Job[]> {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
          `/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100`

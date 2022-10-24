@@ -1,4 +1,5 @@
 import * as BusinessModels from "./BusinessModels"
+
 const hash = require("object-hash")
 import firebase from "firebase/compat"
 import { MergeATSRepository } from "./MergeATSRepository"
@@ -64,9 +65,10 @@ export function fromFirebaseCache(TTL: number = 3600000) {
             const expiresAt = cachedResultSnap.get("expiresAt") as
                | CacheEntry["expiresAt"]
                | undefined
-            const expired =
-               expiresAt !== undefined && expiresAt.toMillis() > Date.now()
-            if (!expired) {
+
+            let expired = expiresAt?.toMillis() < Date.now()
+
+            if (expiresAt && !expired) {
                // return the entire cache entry as-is
                const cachedEntry = cachedResultSnap.data() as CacheEntry
                let resultFromCache: BusinessModel | BusinessModel[] = null
@@ -117,6 +119,7 @@ export function fromFirebaseCache(TTL: number = 3600000) {
                TTL
             )
          }
+
          // save the cache entry to Firestore
          await firestore()
             .collection("cache")
