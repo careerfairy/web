@@ -24,6 +24,7 @@ import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import RTCProvider from "../../context/agora/RTCProvider"
 import isEqual from "react-fast-compare"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -197,6 +198,7 @@ const StreamerLayout = (props) => {
 
    const showAudience = useCallback(() => {
       setAudienceDrawerOpen(true)
+      dataLayerEvent("livestream_streamer_show_audience_tab")
    }, [])
 
    const hideAudience = useCallback(() => {

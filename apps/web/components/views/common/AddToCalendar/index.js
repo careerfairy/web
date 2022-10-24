@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { memo, useCallback, useMemo, useState } from "react"
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
 import {
    Avatar,
    ListItemIcon,
@@ -15,6 +15,7 @@ import {
    outlookYellowIcon,
    yahooIcon,
 } from "../../../../constants/svgs"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const styles = {
    avatar: {
@@ -101,6 +102,10 @@ export const AddToCalendar = memo(
       }, [])
       const handleClose = useCallback(() => {
          setAnchorEl(null)
+      }, [])
+
+      useEffect(() => {
+         dataLayerEvent("event_add_to_calendar")
       }, [])
 
       return (

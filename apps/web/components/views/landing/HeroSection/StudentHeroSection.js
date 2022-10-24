@@ -2,19 +2,19 @@ import React from "react"
 import HeroSection from "./"
 import HeroButton from "./HeroButton"
 import { Box, Typography } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
 import Link from "../../../../materialUI/NextNavLink"
 import { playIcon } from "../../../../constants/images"
-const useStyles = makeStyles((theme) => ({
+import { sxStyles } from "../../../../types/commonTypes"
+
+const styles = sxStyles({
    subTitleHeader: {
       fontWeight: 600,
    },
    linkButton: {
       textDecoration: "none !important",
    },
-}))
+})
 const StudentHeroSection = (props) => {
-   const classes = useStyles()
    return (
       <HeroSection
          title={
@@ -25,7 +25,7 @@ const StudentHeroSection = (props) => {
          }
          subTitle={
             <Box mt={3}>
-               <Typography className={classes.subTitleHeader} variant="h4">
+               <Typography sx={styles.subTitleHeader} variant="h4">
                   We've been there.
                </Typography>
                <Typography variant="h5">

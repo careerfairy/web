@@ -1,5 +1,6 @@
 import * as actions from "./actionTypes"
 import { firebaseServiceInstance } from "../../data/firebase/FirebaseService"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 // Sign up action creator
 export const signUp =
@@ -35,6 +36,7 @@ export const signOut =
       const firebase = getFirebase()
       try {
          await firebase.auth().signOut()
+         dataLayerEvent("logout")
       } catch (err) {
          console.log(err.message)
       }
