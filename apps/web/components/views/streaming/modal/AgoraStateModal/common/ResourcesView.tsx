@@ -1,10 +1,10 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { CardMedia, Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Image from "next/image"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import useDictValues from "../../../../../custom-hook/useDictValues"
+import { getDictValues } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -42,7 +42,10 @@ type Props = {
    resourceIds?: ResourceId[]
 }
 const ResourcesView = ({ resourceIds }: Props) => {
-   const options = useDictValues(resourceIds, resourcesDict)
+   const options = useMemo(
+      () => getDictValues(resourceIds, resourcesDict),
+      [resourceIds]
+   )
 
    return (
       <Stack spacing={2}>

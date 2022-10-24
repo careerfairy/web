@@ -1,11 +1,11 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Link from "next/link"
 import Box from "@mui/material/Box"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
-import useDictValues from "../../../../../custom-hook/useDictValues"
+import { getDictValues } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    cardRoot: {
@@ -36,7 +36,7 @@ type Props = {
    faqIds?: FaqId[]
 }
 const FaqView = ({ faqIds }: Props) => {
-   const faqElements = useDictValues(faqIds, faqDict)
+   const faqElements = useMemo(() => getDictValues(faqIds, faqDict), [faqIds])
 
    return (
       <Stack spacing={2}>

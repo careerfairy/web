@@ -1,11 +1,11 @@
-import React, { FC } from "react"
+import React, { FC, useMemo } from "react"
 import { ButtonProps, Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
 import Router from "next/router"
-import useDictValues from "../../../../../custom-hook/useDictValues"
+import { getDictValues } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -38,13 +38,13 @@ const styles = sxStyles({
    },
 })
 
-type StepId = "networkError" | "refresh"
+export type StepId = "networkError" | "refresh"
 
 type Props = {
    stepIds: StepId[]
 }
 const StepsView = ({ stepIds }: Props) => {
-   const steps = useDictValues(stepIds, stepsDict)
+   const steps = useMemo(() => getDictValues(stepIds, stepsDict), [stepIds])
 
    return (
       <Stack spacing={1.5}>

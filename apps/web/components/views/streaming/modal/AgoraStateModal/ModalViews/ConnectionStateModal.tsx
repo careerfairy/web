@@ -16,7 +16,7 @@ import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../../store/selectors/streamSelectors"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import ResourcesView from "../common/ResourcesView"
-import StepsView from "../common/StepsView"
+import StepsView, { StepId } from "../common/StepsView"
 import FaqView from "../common/FaqView"
 
 const styles = sxStyles({
@@ -28,6 +28,7 @@ const styles = sxStyles({
 })
 
 const loadingTimeLimit = RTC_CLIENT_RECONNECT_LIMIT
+const stepIds: StepId[] = ["refresh"]
 
 const ConnectionStateModal = () => {
    const [showDebugPrompt, setShowDebugPrompt] = useState(false)
@@ -91,7 +92,7 @@ const ConnectionStateModal = () => {
                   divider={<Divider variant={"middle"} sx={styles.divider} />}
                   spacing={2}
                >
-                  <StepsView stepIds={["refresh"]} />
+                  <StepsView stepIds={stepIds} />
                   <ResourcesView />
                   <FaqView />
                </Stack>

@@ -3,24 +3,21 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
 import useSWR from "swr"
-import { useAuth } from "../../HOCs/AuthProvider"
 
 type SignatureResponse = {
    signature: string
    email: string
 } | null
 
-const useCrispSignature = (): SignatureResponse => {
-   const { authenticatedUser } = useAuth()
-
+const useCrispSignature = (email?: string): SignatureResponse => {
    const fetcher = useFunctionsSWR<SignatureResponse>()
 
    const { data } = useSWR<SignatureResponse>(
-      authenticatedUser?.email
+      email
          ? [
               "getCrispSignature",
               {
-                 email: authenticatedUser.email,
+                 email,
               },
            ]
          : null,

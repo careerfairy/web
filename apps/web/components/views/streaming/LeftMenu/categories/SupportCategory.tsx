@@ -3,6 +3,7 @@ import { memo, useMemo } from "react"
 import Box from "@mui/material/Box"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { sxStyles } from "../../../../../types/commonTypes"
+import { buildCrispEmbedURL } from "../../../../../scripts/crisp"
 
 type Props = {
    selectedState: string // current tab open, this one is "jobs"
@@ -25,20 +26,7 @@ const SupportCategory = ({ selectedState, showMenu }: Props) => {
    const { authenticatedUser } = useAuth()
 
    const url = useMemo(() => {
-      const baseUrl = new URL(
-         "https://go.crisp.chat/chat/embed/?website_id=b8c454ce-84e4-4039-b6b4-203b2c86ea66"
-      )
-
-      if (authenticatedUser.email) {
-         baseUrl.searchParams.append("user_email", authenticatedUser.email)
-      }
-
-      if (authenticatedUser.uid) {
-         baseUrl.searchParams.append("token_id", authenticatedUser.uid)
-         baseUrl.searchParams.append("session_merge", "true")
-      }
-
-      return baseUrl.toString()
+      return buildCrispEmbedURL(authenticatedUser.email, authenticatedUser.uid)
    }, [authenticatedUser.email, authenticatedUser.uid])
 
    if (selectedState !== "support" || !showMenu) {
@@ -46,7 +34,7 @@ const SupportCategory = ({ selectedState, showMenu }: Props) => {
    }
 
    return (
-      <CategoryContainerTopAligned className={undefined}>
+      <CategoryContainerTopAligned>
          <Box sx={styles.root}>
             <iframe src={url}></iframe>
          </Box>

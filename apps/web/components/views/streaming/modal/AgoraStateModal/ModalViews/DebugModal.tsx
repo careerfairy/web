@@ -1,5 +1,5 @@
 import React from "react"
-import StepsView from "../common/StepsView"
+import StepsView, { StepId } from "../common/StepsView"
 import { Divider, Stack, Typography } from "@mui/material"
 import ResourcesView from "../common/ResourcesView"
 import FaqView from "../common/FaqView"
@@ -14,6 +14,8 @@ const styles = sxStyles({
    },
 })
 
+const stepIds: StepId[] = ["refresh"]
+
 const DebugModal = () => {
    return (
       <GenericDialog
@@ -26,7 +28,7 @@ const DebugModal = () => {
             divider={<Divider variant={"middle"} sx={styles.divider} />}
             spacing={2}
          >
-            <StepsView stepIds={["refresh"]} />
+            <StepsView stepIds={stepIds} />
             <ResourcesView />
             <FaqView />
             <Typography align={"center"} variant={"body1"}>

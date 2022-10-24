@@ -22,6 +22,7 @@ import {
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
 import DateUtil from "../util/DateUtil"
+import useCrispSync from "../components/custom-hook/useCrispSync"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -220,6 +221,8 @@ const AuthProvider = ({ children }) => {
 
       return () => unsub()
    }, [firebaseService.auth])
+
+   useCrispSync(auth)
 
    const contextValue = useMemo(
       () => ({
