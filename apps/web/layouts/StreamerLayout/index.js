@@ -267,6 +267,8 @@ const StreamerLayout = (props) => {
       <RTCProvider
          uid={streamerId}
          channel={livestreamId}
+         screenSharerId={currentLivestream?.screenSharerId}
+         streamMode={currentLivestream?.mode}
          appId={agoraCredentials.appID}
          initialize
          isStreamer
