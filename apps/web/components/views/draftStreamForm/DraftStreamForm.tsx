@@ -35,7 +35,7 @@ import {
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
 import { useInterests } from "../../custom-hook/useCollection"
-import { createStyles, useTheme } from "@mui/styles"
+import { createStyles } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
 import {
    LivestreamEvent,
@@ -61,7 +61,6 @@ import { Option } from "../signup/utils"
 import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
-import useMediaQuery from "@mui/material/useMediaQuery"
 import _ from "lodash"
 
 const useStyles = makeStyles((theme) =>
@@ -97,22 +96,25 @@ const useStyles = makeStyles((theme) =>
          padding: 0,
       },
       navBar: {
-         position: ({ isOnDialog }: any) =>
-            isOnDialog ? "absolute" : "sticky",
-         top: 0,
-         paddingTop: "90px !important",
-         background: "white",
-         zIndex: 999,
-         overflowX: "scroll",
-         overflowY: "hidden",
-         height: "200px",
-         alignItems: "end",
-         width: ({ isOnDialog }: any) => (isOnDialog ? "90%" : "inherit"),
-         [theme.breakpoints.down("md")]: {
-            width: ({ isOnDialog }: any) => (isOnDialog ? "98%" : "inherit"),
-            height: ({ isOnDialog }: any) => (isOnDialog ? "250px" : "200px"),
-            paddingTop: ({ isOnDialog }: any) =>
-               isOnDialog ? "130px !important" : "80px !important",
+         [theme.breakpoints.down("lg")]: {
+            position: ({ isOnDialog }: any) =>
+               isOnDialog ? "absolute" : "sticky",
+            top: 0,
+            paddingTop: "90px !important",
+            background: "white",
+            zIndex: 999,
+            overflowX: "scroll",
+            overflowY: "hidden",
+            height: "200px",
+            alignItems: "end",
+            width: ({ isOnDialog }: any) => (isOnDialog ? "90%" : "inherit"),
+            [theme.breakpoints.down("md")]: {
+               width: ({ isOnDialog }: any) => (isOnDialog ? "98%" : "inherit"),
+               height: ({ isOnDialog }: any) =>
+                  isOnDialog ? "250px" : "200px",
+               paddingTop: ({ isOnDialog }: any) =>
+                  isOnDialog ? "130px !important" : "80px !important",
+            },
          },
       },
    })
@@ -159,8 +161,6 @@ interface Props {
    currentStream?: LivestreamEvent
    canPublish?: boolean
    isOnDialog?: boolean
-   submitButtonLabel?: string
-   saveButtonLabel?: string
 }
 
 export interface DraftFormValues {
@@ -205,8 +205,6 @@ const DraftStreamForm = ({
    currentStream,
    canPublish = true,
    isOnDialog = false,
-   submitButtonLabel = "",
-   saveButtonLabel = "",
 }: Props) => {
    const firebase = useFirebaseService()
    const router = useRouter()
@@ -251,8 +249,6 @@ const DraftStreamForm = ({
    const [updateMode, setUpdateMode] = useState(false)
    const { showJobSection, formHasChanged, setFormHasChanged } =
       useStreamCreationProvider()
-   const theme = useTheme()
-   const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"))
 
    const { data: existingInterests } = useInterests()
 
@@ -651,12 +647,7 @@ const DraftStreamForm = ({
          {allFetched ? (
             <Grid container spacing={2}>
                {submitted ? null : (
-                  <Grid
-                     item
-                     md={12}
-                     lg={2}
-                     className={isSmallScreen ? classes.navBar : ""}
-                  >
+                  <Grid item md={12} lg={2} className={classes.navBar}>
                      <Box
                         sx={{
                            position: { lg: "fixed" },
@@ -835,7 +826,7 @@ const DraftStreamForm = ({
                                  />
 
                                  <Box
-                                    display="flex"
+                                    display={isOnDialog ? "none" : "flex"}
                                     justifyContent="end"
                                     mr={3}
                                  >
@@ -865,8 +856,7 @@ const DraftStreamForm = ({
                                                 ? "Submitting"
                                                 : isPending()
                                                 ? "Pending for Approval"
-                                                : submitButtonLabel ||
-                                                  "Submit Draft for Approval"}
+                                                : "Submit Draft for Approval"}
                                           </Typography>
                                        </Button>
                                     )}
@@ -893,8 +883,7 @@ const DraftStreamForm = ({
                                        <Typography variant="h5">
                                           {isSubmitting
                                              ? "Saving"
-                                             : saveButtonLabel ||
-                                               "Save changes"}
+                                             : "Save changes"}
                                        </Typography>
                                     </Button>
                                  </Box>

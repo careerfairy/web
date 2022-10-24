@@ -395,14 +395,6 @@ const NewStreamModal = ({
                      setSubmitted={setSubmitted}
                      canPublish={canPublish}
                      isOnDialog={true}
-                     submitButtonLabel={"publish as stream"}
-                     saveButtonLabel={
-                        !currentStream
-                           ? "Create draft"
-                           : isActualLivestream
-                           ? "update and close"
-                           : "save changes and close"
-                     }
                   />
                </DialogContent>
             </div>
