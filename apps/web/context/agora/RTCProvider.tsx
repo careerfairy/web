@@ -525,7 +525,11 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    const setDesktopMode = useCallback(
       async (mode: LivestreamEvent["mode"], initiatorId: string) => {
          let sharerId = mode === "desktop" ? initiatorId : screenSharerId
-         await setDesktopModeInstanceMethod(streamRef, mode, sharerId)
+         await setDesktopModeInstanceMethod(
+            streamRef,
+            mode,
+            sharerId || initiatorId
+         )
       },
       [screenSharerId, setDesktopModeInstanceMethod, streamRef]
    )
