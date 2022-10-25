@@ -286,7 +286,7 @@ const NewStreamModal = ({
       if (isDraft) {
          saveChangesButtonRef?.current?.click()
       } else {
-         handleSubmit()
+         formRef?.current?.handleSubmit()
       }
    }
 

@@ -663,7 +663,9 @@ const DraftStreamForm = ({
 
    // handle errors and redirect to the specific 1st error input
    const handleSubmitForm = async ({ handleSubmit, validateForm }) => {
-      handleSubmit()
+      if (!isOnDialog) {
+         handleSubmit()
+      }
       const errors = await validateForm()
 
       if (Object.keys(errors).length) {
@@ -679,6 +681,9 @@ const DraftStreamForm = ({
          if (errorElement) {
             errorElement.scrollIntoView({ behavior: "smooth", block: "center" })
          }
+      }
+      if (isOnDialog) {
+         handleSubmit()
       }
    }
 
@@ -752,7 +757,6 @@ const DraftStreamForm = ({
                                        handleSubmit,
                                        validateForm,
                                     })
-                                    handleSubmit()
                                  }}
                                  className={classes.form}
                               >
