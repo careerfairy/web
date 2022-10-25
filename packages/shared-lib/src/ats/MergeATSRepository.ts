@@ -177,7 +177,7 @@ export class MergeATSRepository implements IATSRepository {
   | Applications
   |--------------------------------------------------------------------------
   */
-   @fromFirebaseCache()
+   @fromFirebaseCache(60 * 1000) // 1min cache
    async getApplications(jobId?: string): Promise<Application[]> {
       const qs = new URLSearchParams({
          expand: "candidate,job,current_stage,reject_reason",
