@@ -859,7 +859,6 @@ const DraftStreamForm = ({
                                  >
                                     {canPublish && (
                                        <Button
-                                          ref={submitButtonRef}
                                           startIcon={
                                              <PublishIcon fontSize="large" />
                                           }
@@ -914,6 +913,12 @@ const DraftStreamForm = ({
                                              : "Save changes"}
                                        </Typography>
                                     </Button>
+                                    <Button
+                                       type="submit"
+                                       ref={submitButtonRef}
+                                       hidden={true}
+                                       onClick={handleClickSubmitForApproval}
+                                    />
                                  </Box>
                               </form>
                            )

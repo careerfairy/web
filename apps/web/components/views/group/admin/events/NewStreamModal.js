@@ -148,21 +148,23 @@ const NewStreamModal = ({
             const newStream = { ...streamToPublish }
             newStream.companyId = uuidv4()
             await handlePublishStream(newStream)
-            handleCloseDialog()
          } catch (e) {
             console.log("-> e", e)
             enqueueSnackbar(GENERAL_ERROR, {
                variant: "error",
                preventDuplicate: true,
             })
+         } finally {
+            formRef.current?.setSubmitting(false)
          }
-         formRef.current?.setSubmitting(false)
       } else {
          enqueueSnackbar("You cannot publish a stream!", {
             variant: "error",
             preventDuplicate: true,
          })
       }
+
+      handleCloseDialog()
    }
 
    const handleValidate = () => {
@@ -286,7 +288,7 @@ const NewStreamModal = ({
       if (isDraft) {
          saveChangesButtonRef?.current?.click()
       } else {
-         formRef?.current?.handleSubmit()
+         handleSubmit()
       }
    }
 
