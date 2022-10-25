@@ -124,9 +124,9 @@ const resourcesDict: Record<ResourceId, ResourceCardProps> = {
       title: "Best Practices Before Going Live",
       authorName: "CareerFairy",
       previewImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fchrome-image.png?alt=media&token=b4ab3f69-3d27-4b0f-b92e-75cd9df434c4",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstreamer.webp?alt=media&token=20bd52bc-860c-4f62-8292-9800e6691cee",
       actionButtonProps: {
-         href: "https://careerfairy-support.crisp.help/en/article/best-practices-before-going-live-1ojgf00/?bust=1665748832154",
+         href: "https://support.careerfairy.io/en/article/test-the-careerfairy-streaming-app-d4ec1f/",
          label: "Read our article",
       },
    },
@@ -134,9 +134,9 @@ const resourcesDict: Record<ResourceId, ResourceCardProps> = {
       title: "Technical Requirements to Use CareerFairy",
       authorName: "CareerFairy",
       previewImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/misc%2Fcompat-overlay.png?alt=media&token=7461d59e-bc40-480c-a89c-9dc0fe93e782",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fipad_680x680.jpg?alt=media&token=4e157eb7-a10b-4aed-9324-00922f96e33b",
       actionButtonProps: {
-         href: "https://careerfairy-support.crisp.help/en/article/technical-requirements-to-use-livestorm-1g4nk1t/?bust=1665749028480",
+         href: "https://support.careerfairy.io/en/article/how-to-use-the-careerfairy-streaming-app-1qmh8ci/",
          label: "Read our article",
       },
    },
