@@ -77,6 +77,10 @@ export interface MergeSyncStatus {
    is_initial_sync: boolean
 }
 
+export interface MergeModelResponseWrapper<T> {
+   model: T
+}
+
 /**
  * Candidate response
  */
