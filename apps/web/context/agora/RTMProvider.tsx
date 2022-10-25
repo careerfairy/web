@@ -12,6 +12,7 @@ import * as actions from "store/actions"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import { useSessionStorage } from "react-use"
 import { sessionIsUsingCloudProxySelector } from "../../store/selectors/streamSelectors"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
 interface Props {
    children: JSX.Element
@@ -36,10 +37,17 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
    const dispatch = useDispatch()
 
    const init = useCallback(() => {
-      rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
-         logFilter: AgoraRTM.LOG_FILTER_INFO,
-         enableCloudProxy: useProxy,
-      })
+      try {
+         rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
+            logFilter: AgoraRTM.LOG_FILTER_INFO,
+            enableCloudProxy: useProxy,
+         })
+      } catch (error) {
+         errorLogAndNotify(error, {
+            message: "Failed to create RTM instance",
+         })
+         throw error
+      }
    }, [useProxy])
 
    const onChannelMessage = useCallback(
@@ -80,7 +88,9 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
             channel.on("MemberCountUpdated", onMemberCountUpdated)
             rtmChannel.current = channel
          } catch (error) {
-            console.error(error)
+            errorLogAndNotify(error, {
+               message: "Failed to join Agora RTM channel",
+            })
          }
       },
       [fetchAgoraRtmToken, onChannelMessage, onMemberCountUpdated]
@@ -88,7 +98,7 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
 
    useEffect(() => {
       if (roomId && userId) {
-         void joinAgoraRtmChannel(roomId, userId)
+         void joinAgoraRtmChannel(roomId, userId).catch(errorLogAndNotify)
       }
    }, [roomId, userId, joinAgoraRtmChannel, useProxy])
 
@@ -98,7 +108,9 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
             const messageToSend = dispatch(actions.createEmote(emoteType))
             await rtmChannel.current.sendMessage(messageToSend as any)
          } catch (e) {
-            console.error(e)
+            errorLogAndNotify(e, {
+               message: "Failed to send emote",
+            })
          }
       },
       [dispatch]
@@ -107,7 +119,14 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
    const agoraHandlers = useMemo(
       () => ({
          getChannelMemberCount: async (channelIds: string[]) => {
-            return await rtmClient.current.getChannelMemberCount(channelIds)
+            try {
+               return await rtmClient.current.getChannelMemberCount(channelIds)
+            } catch (e) {
+               errorLogAndNotify(e, {
+                  message: "Failed to get channel member count",
+               })
+               throw e
+            }
          },
          handleDisconnect: async () => {
             try {
@@ -115,7 +134,9 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
                await rtmClient.current.logout()
                await rtmClient.current.removeAllListeners()
             } catch (e) {
-               console.error(e)
+               errorLogAndNotify(e, {
+                  message: "Failed to logout of Agora RTM",
+               })
             }
          },
          joinChannel: async (
@@ -124,32 +145,53 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
             handleMemberLeft: (leaverId: string) => any,
             updateMemberCount: (roomId: string, newMemberCount: number) => void
          ) => {
-            let newChannel: AgoraRTMContextInterface["rtmChannel"]
-            if (targetRoomId === roomId) {
-               // Dont re-join the current stream channel pls
-               newChannel = rtmChannel.current
-            } else {
-               newChannel = rtmClient.current.createChannel(targetRoomId)
-               await newChannel.join()
+            try {
+               let newChannel: AgoraRTMContextInterface["rtmChannel"]
+               if (targetRoomId === roomId) {
+                  // Dont re-join the current stream channel pls
+                  newChannel = rtmChannel.current
+               } else {
+                  newChannel = rtmClient.current.createChannel(targetRoomId)
+                  await newChannel.join()
+               }
+               newChannel.on("MemberJoined", handleMemberJoined)
+               newChannel.on("MemberLeft", handleMemberLeft)
+               newChannel.on("MemberCountUpdated", (newCount) => {
+                  updateMemberCount(roomId, newCount - 1)
+               })
+               return newChannel
+            } catch (e) {
+               errorLogAndNotify(e, {
+                  message: "Failed to join Agora RTM channel",
+               })
+               throw e
             }
-            newChannel.on("MemberJoined", handleMemberJoined)
-            newChannel.on("MemberLeft", handleMemberLeft)
-            newChannel.on("MemberCountUpdated", (newCount) => {
-               updateMemberCount(roomId, newCount - 1)
-            })
-            return newChannel
          },
          getChannelMembers: async (
             channel: AgoraRTMContextInterface["rtmChannel"]
          ) => {
-            return await channel.getMembers()
+            try {
+               return await channel.getMembers()
+            } catch (e) {
+               errorLogAndNotify(e, {
+                  message: "Failed to get channel members",
+               })
+               throw e
+            }
          },
          leaveChannel: async (
             channel: AgoraRTMContextInterface["rtmChannel"]
          ) => {
-            if (channel.channelId === roomId) return // Dont leave the current stream channel pls
-            channel.removeAllListeners()
-            await channel.leave()
+            try {
+               if (channel.channelId === roomId) return // Dont leave the current stream channel pls
+               channel.removeAllListeners()
+               await channel.leave()
+            } catch (e) {
+               errorLogAndNotify(e, {
+                  message: "Failed to leave Agora RTM channel",
+               })
+               throw e
+            }
          },
       }),
       [rtmClient, roomId]
