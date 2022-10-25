@@ -80,6 +80,7 @@ const NewStreamModal = ({
 }) => {
    const firebase = useFirebaseService()
    const formRef = useRef()
+   const submitButtonRef = useRef()
    const dialogRef = useRef()
    const saveChangesButtonRef = useRef()
    const { authenticatedUser } = useAuth()
@@ -277,15 +278,7 @@ const NewStreamModal = ({
    }
 
    const handleSubmit = () => {
-      if (formRef.current) {
-         formRef.current.handleSubmit()
-      }
-      if (dialogRef.current) {
-         dialogRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-         })
-      }
+      submitButtonRef?.current?.click()
    }
 
    const handleSaveOrUpdate = () => {
@@ -394,6 +387,7 @@ const NewStreamModal = ({
                      setSubmitted={setSubmitted}
                      canPublish={canPublish}
                      isOnDialog={true}
+                     submitButtonRef={submitButtonRef}
                   />
                </DialogContent>
             </div>

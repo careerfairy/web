@@ -157,6 +157,7 @@ interface Props {
    ) => void
    isActualLivestream?: boolean
    formRef: MutableRefObject<any>
+   submitButtonRef?: MutableRefObject<any>
    saveChangesButtonRef?: MutableRefObject<any>
    currentStream?: LivestreamEvent
    canPublish?: boolean
@@ -200,6 +201,8 @@ const DraftStreamForm = ({
    isActualLivestream,
    // eslint-disable-next-line react-hooks/rules-of-hooks
    formRef = useRef(),
+   // eslint-disable-next-line react-hooks/rules-of-hooks
+   submitButtonRef = useRef(),
    // eslint-disable-next-line react-hooks/rules-of-hooks
    saveChangesButtonRef = useRef(),
    currentStream,
@@ -674,7 +677,7 @@ const DraftStreamForm = ({
 
          const errorElement = document.getElementById(firstErrorId)
          if (errorElement) {
-            errorElement.scrollIntoView({ behavior: "smooth", block: "end" })
+            errorElement.scrollIntoView({ behavior: "smooth", block: "center" })
          }
       }
    }
@@ -852,6 +855,7 @@ const DraftStreamForm = ({
                                  >
                                     {canPublish && (
                                        <Button
+                                          ref={submitButtonRef}
                                           startIcon={
                                              <PublishIcon fontSize="large" />
                                           }
