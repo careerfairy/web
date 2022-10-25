@@ -323,7 +323,10 @@ export class GroupFunctionsRepository
 
       if (!doc.exists) return null
 
-      return GroupATSAccount.createFromDocument(doc.data() as any)
+      return GroupATSAccount.createFromDocument({
+         ...doc.data(),
+         id: integrationId,
+      } as any)
    }
 }
 
