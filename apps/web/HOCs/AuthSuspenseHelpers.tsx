@@ -9,9 +9,9 @@ import { useAuth } from "./AuthProvider"
  * @constructor
  */
 export const EnsureUserIsLoggedIn = (props) => {
-   const { isLoggedIn, authenticatedUser } = useAuth()
+   const { isLoggedIn } = useAuth()
 
-   if (!isLoggedIn || !authenticatedUser) {
+   if (!isLoggedIn) {
       return null
    }
 
