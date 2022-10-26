@@ -16,6 +16,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import useUserLivestreamData from "../../../custom-hook/useUserLivestreamData"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import useLivestreamJobs from "../../../custom-hook/useLivestreamJobs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -36,7 +37,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   livestream
+   livestream: LivestreamEvent
 }
 
 const JobApply = ({ livestream }: Props) => {
