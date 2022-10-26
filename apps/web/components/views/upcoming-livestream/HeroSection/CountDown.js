@@ -212,14 +212,6 @@ const CountDown = ({
             <Grid item xs={12}>
                <Button
                   id="register-button"
-                  sx={{
-                     "&:disabled": {
-                        color: (theme) =>
-                           registered && theme.palette.common.white,
-                        backgroundColor: (theme) =>
-                           registered && theme.palette.secondary.main,
-                     },
-                  }}
                   color={registered ? "secondary" : "primary"}
                   variant={"contained"}
                   fullWidth

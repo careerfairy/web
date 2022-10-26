@@ -252,14 +252,7 @@ const HeroSection = ({
                                     registered={registered}
                                  />
                                  {stream?.jobs?.length > 0 && (
-                                    <Box py={2}>
-                                       <JobApply livestream={stream} />
-                                    </Box>
-                                 )}
-                                 {!stream?.jobs?.length && (
-                                    <Box py={2}>
-                                       This livestream doesn't have any jobs
-                                    </Box>
+                                    <JobApply livestream={stream} />
                                  )}
                               </Paper>
                            </Box>
