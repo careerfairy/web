@@ -41,7 +41,6 @@ export interface RtcContextInterface {
    networkQuality: NetworkQuality
    leaveAgoraRoom: () => Promise<void>
    localStream: LocalStream
-   handleReconnectAgora: (options: { rePublish?: boolean }) => Promise<void>
    handleScreenShare: (optimizationMode?: "detail" | "motion") => Promise<void>
    setDesktopMode: (
       mode: LivestreamEvent["mode"],
