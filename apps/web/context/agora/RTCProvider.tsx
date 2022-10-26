@@ -142,14 +142,15 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          }
          logStatus("JOIN", false, sessionShouldUseCloudProxy)
 
-         await rtcClient
-            .join(appId, roomId, data.token.rtcToken, userUid)
-            .then(() => logStatus("JOIN", true, sessionShouldUseCloudProxy))
-            .catch((err) => {
-               logStatus("JOIN", false, sessionShouldUseCloudProxy, err)
-               handleRtcError(err)
-               throw new Error(err)
-            })
+         try {
+            await rtcClient.join(appId, roomId, data.token.rtcToken, userUid)
+         } catch (err) {
+            logStatus("JOIN", false, sessionShouldUseCloudProxy, err)
+            handleRtcError(err)
+            throw err
+         }
+
+         logStatus("JOIN", true, sessionShouldUseCloudProxy)
          if (timeout) {
             clearTimeout(timeout)
          }
@@ -230,6 +231,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          }))
       }
    }, [localStream, returnToAudience, rtcClient, handleRtcError])
+
    useEffect(() => {
       if (!isStreamer && rtcClient) {
          if (localStream) {
@@ -350,6 +352,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
                setPrimaryRtcClientHost(true)
             } catch (error) {
                handleRtcError(error)
+               throw error
             }
          }
       },
@@ -464,9 +467,10 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
 
    const publishScreenShareStream = useCallback(
       async (screenSharingMode, onScreenShareStopped) => {
+         let screenShareTracks
          try {
             const screenShareUid = `${uid}screen`
-            const screenShareTracks = await getScreenShareStream(
+            screenShareTracks = await getScreenShareStream(
                screenSharingMode,
                onScreenShareStopped
             )
@@ -485,6 +489,22 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             )
             updateScreenShareRtcClient(screenShareRtcClient)
          } catch (error) {
+            if (screenShareRtcClient) {
+               screenShareRtcClient.leave().catch(errorLogAndNotify)
+               updateScreenShareRtcClient(null)
+            }
+
+            if (screenShareTracks) {
+               if (Array.isArray(screenShareTracks)) {
+                  screenShareTracks.forEach((track) =>
+                     track.close().catch(errorLogAndNotify)
+                  )
+               } else {
+                  screenShareTracks.close().catch(errorLogAndNotify)
+               }
+               updateScreenShareStream(null)
+            }
+
             errorLogAndNotify(error)
             throw error
          }
@@ -596,29 +616,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       publishLocalCameraTrack,
    ])
 
-   const handleReconnectAgora = useCallback(
-      async (options: { rePublish?: boolean }) => {
-         await close()
-         await init()
-         if (options.rePublish) {
-            try {
-               await closeLocalCameraTrack()
-               await closeLocalMicrophoneTrack()
-               await handlePublishLocalStream()
-            } catch (e) {
-               console.log("-> error in Republish in reconnect", e)
-            }
-         }
-      },
-      [
-         close,
-         closeLocalCameraTrack,
-         closeLocalMicrophoneTrack,
-         handlePublishLocalStream,
-         init,
-      ]
-   )
-
    const localMediaHandlers = useMemo(
       () => ({
          initializeLocalAudioStream,
@@ -657,7 +654,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          localMediaHandlers,
          publishLocalStreamTracks,
          localMediaControls,
-         handleReconnectAgora,
          handlePublishLocalStream,
          unPublishScreenShareStream,
          networkQuality,
@@ -677,7 +673,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          localMediaHandlers,
          publishLocalStreamTracks,
          localMediaControls,
-         handleReconnectAgora,
          handlePublishLocalStream,
          unPublishScreenShareStream,
          networkQuality,
