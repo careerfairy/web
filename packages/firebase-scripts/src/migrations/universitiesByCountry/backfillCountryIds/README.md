@@ -1,4 +1,4 @@
-### Backfill CareerCenterData Collection:
+### Backfill UniversitiesByCountry Collection:
 
 ```sh
 npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/universitiesByCountry/backfillCountryIds
@@ -6,11 +6,10 @@ npm run script -w @careerfairy/firebase-scripts -- scriptPath=./migrations/unive
 
 #### What it does:
 
-Goes through every University by Country in the careerCenterData collection and adds a
-`countryId` field all the documents
-in `careerCenterData/{groupId}/groupQuestions/${questionId}`
+It goes through every country in the universitiesByCountry collection and adds the respective `countryId` field to every document
+in `universitiesByCountry/{countryId}`
 
-Example Output of `careerCenterData/universitiesByCountry/AD` document:
+Example Output of `universitiesByCountry/AD` document:
 
 ```sh
 {
