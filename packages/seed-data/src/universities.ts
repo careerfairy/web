@@ -27,6 +27,7 @@ class UniversitiesFirebaseSeed implements UniversitiesSeed {
             .collection("universitiesByCountry")
             .doc(country.code)
          batch.set(universityCountryRef, {
+            countryId: country.code,
             universities: [
                {
                   id: uuidv4(),
