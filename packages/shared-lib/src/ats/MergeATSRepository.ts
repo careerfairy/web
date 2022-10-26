@@ -9,11 +9,17 @@ import {
    MergeCandidateModel,
    MergeJob,
    MergeLinkTokenResponse,
+   MergeModelResponseWrapper,
    MergeOffice,
    MergePaginatedResponse,
    MergeSyncStatus,
 } from "./MergeResponseTypes"
-import { CandidateCreationOptions, IATSRepository } from "./IATSRepository"
+import {
+   ApplicationCreationOptions,
+   AttachmentCreationOptions,
+   CandidateCreationOptions,
+   IATSRepository,
+} from "./IATSRepository"
 import { Job } from "./Job"
 import { Office } from "./Office"
 import { SyncStatus } from "./SyncStatus"
@@ -55,10 +61,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Jobs
-   |--------------------------------------------------------------------------
-   */
+|--------------------------------------------------------------------------
+| Jobs
+|--------------------------------------------------------------------------
+*/
    @fromFirebaseCache(2 * 60 * 1000) // 2min cache
    async getJobs(): Promise<Job[]> {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
@@ -87,10 +93,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Offices
-   |--------------------------------------------------------------------------
-   */
+|--------------------------------------------------------------------------
+| Offices
+|--------------------------------------------------------------------------
+*/
    @fromFirebaseCache()
    async getOffices(): Promise<Office[]> {
       const { data } = await this.axios.get<
@@ -101,10 +107,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Candidates
-   |--------------------------------------------------------------------------
-   */
+|--------------------------------------------------------------------------
+| Candidates
+|--------------------------------------------------------------------------
+*/
    @fromFirebaseCache()
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
@@ -138,36 +144,40 @@ export class MergeATSRepository implements IATSRepository {
          ]
       }
 
-      const { data } = await this.axios.post<MergeCandidate>(
-         `/candidates`,
-         model
-      )
+      const body = createMergeModelBody(model, options.remoteUserId)
+      const { data } = await this.axios.post<
+         MergeModelResponseWrapper<MergeCandidate>
+      >(`/candidates`, body)
 
-      return Candidate.createFromMerge(data)
+      return Candidate.createFromMerge(data.model)
    }
 
    @clearFirebaseCache(["getCandidate", "getApplications", "getApplication"])
-   async candidateAddCVAttachment(candidateId: string, user: UserData) {
+   async candidateAddCVAttachment(
+      candidateId: string,
+      user: UserData,
+      options: AttachmentCreationOptions = {}
+   ) {
       const model: MergeAttachmentModel = createMergeAttachmentObject(user)
 
       model.candidate = {
          id: candidateId,
       }
 
-      const { data } = await this.axios.post<MergeAttachment>(
-         `/attachments`,
-         model
-      )
+      const body = createMergeModelBody(model, options.remoteUserId)
+      const { data } = await this.axios.post<
+         MergeModelResponseWrapper<MergeAttachment>
+      >(`/attachments`, body)
 
-      return data.id
+      return data.model.id
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Applications
-   |--------------------------------------------------------------------------
-   */
-   @fromFirebaseCache()
+  |--------------------------------------------------------------------------
+  | Applications
+  |--------------------------------------------------------------------------
+  */
+   @fromFirebaseCache(60 * 1000) // 1min cache
    async getApplications(jobId?: string): Promise<Application[]> {
       const qs = new URLSearchParams({
          expand: "candidate,job,current_stage,reject_reason",
@@ -185,18 +195,23 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    @clearFirebaseCache(["getApplications"])
-   async createApplication(candidateId: string, jobId: string) {
+   async createApplication(
+      candidateId: string,
+      jobId: string,
+      options: ApplicationCreationOptions = {}
+   ) {
       const model: MergeApplicationModel = {
          candidate: candidateId,
          job: jobId,
          source: "CareerFairy",
       }
-      const { data } = await this.axios.post<MergeApplicationModel>(
-         `/applications`,
-         model
-      )
 
-      return data.id
+      const body = createMergeModelBody(model, options.remoteUserId)
+      const { data } = await this.axios.post<
+         MergeModelResponseWrapper<MergeApplicationModel>
+      >(`/applications`, body)
+
+      return data.model.id
    }
 
    @fromFirebaseCache()
@@ -334,4 +349,22 @@ const emptyResponseWhenNotFound = (e: AxiosError) => {
    }
 
    throw e
+}
+
+/**
+ * Creates a Merge POST body object
+ * It will include the remote_user_id if existent
+ * @param data
+ * @param remoteUserId
+ */
+function createMergeModelBody(data: any, remoteUserId) {
+   const body: any = {
+      model: data,
+   }
+
+   if (remoteUserId) {
+      body.remote_user_id = remoteUserId
+   }
+
+   return body
 }
