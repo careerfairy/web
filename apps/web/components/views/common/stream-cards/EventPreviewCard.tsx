@@ -431,7 +431,14 @@ const EventPreviewCard = ({
                                     label={"LIVE"}
                                  />
                               )}
-                              {hasRegistered && (
+                              {hasRegistered && isPast && (
+                                 <Chip
+                                    icon={<CheckIcon />}
+                                    color="primary"
+                                    label={"Attended"}
+                                 />
+                              )}
+                              {hasRegistered && !isPast && (
                                  <Chip
                                     icon={<CheckIcon />}
                                     color="primary"
