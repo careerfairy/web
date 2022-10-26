@@ -545,7 +545,7 @@ const EventPreviewCard = ({
                                     sx={styles.btn}
                                     component={Link}
                                     /*
-                                             // @ts-ignore */
+// @ts-ignore */
                                     href={getHref()}
                                     variant={"contained"}
                                     color={"secondary"}
