@@ -312,7 +312,10 @@ const EventPreviewCard = ({
       }
       return {
          pathname: `/upcoming-livestream/[livestreamId]`,
-         hash: isPast && "#about",
+         // when an event has jobs and is in the past, we show a button for the
+         // user apply in the countdown area, we don't want the user to auto scroll to the
+         // about section in that case
+         hash: isPast && !event?.jobs?.length && "#about",
          query: {
             livestreamId: event?.id,
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
@@ -432,7 +435,7 @@ const EventPreviewCard = ({
                                  <Chip
                                     icon={<CheckIcon />}
                                     color="primary"
-                                    label={"Booked!"}
+                                    label={"Attended"}
                                  />
                               )}
                            </>
@@ -547,7 +550,7 @@ const EventPreviewCard = ({
                                     sx={styles.btn}
                                     component={Link}
                                     /*
-                                             // @ts-ignore */
+                                 // @ts-ignore */
                                     href={getHref()}
                                     variant={"contained"}
                                     color={"secondary"}

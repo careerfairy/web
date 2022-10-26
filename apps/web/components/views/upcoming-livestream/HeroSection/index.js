@@ -1,6 +1,14 @@
 import React from "react"
 import { darken } from "@mui/material/styles"
-import { Avatar, Box, Container, Grid, Hidden, Typography } from "@mui/material"
+import {
+   Avatar,
+   Box,
+   Container,
+   Grid,
+   Hidden,
+   Paper,
+   Typography,
+} from "@mui/material"
 import CountDown from "./CountDown"
 import HeroSpeakers from "./HeroSpeakers"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
@@ -12,6 +20,7 @@ import {
 import WhiteTagChip from "../../common/chips/TagChip"
 import LanguageIcon from "@mui/icons-material/Language"
 import Image from "next/image"
+import JobApply from "./JobApply"
 
 const styles = {
    root: (theme) => ({
@@ -124,6 +133,14 @@ const styles = {
          fontSize: { sm: "1.7rem" },
       },
    },
+   countdown: (theme) => ({
+      padding: theme.spacing(2),
+      width: "100%",
+      [theme.breakpoints.up("sm")]: {
+         padding: theme.spacing(3),
+      },
+      borderRadius: theme.spacing(1),
+   }),
 }
 
 const HeroSection = ({
@@ -224,15 +241,27 @@ const HeroSection = ({
                         </Grid>
                         <Grid item xs={12}>
                            <Box sx={styles.timerWrapper}>
-                              <CountDown
-                                 registerButtonLabel={registerButtonLabel}
-                                 time={stream.startDate}
-                                 stream={stream}
-                                 streamAboutToStart={streamAboutToStart}
-                                 onRegisterClick={onRegisterClick}
-                                 disabled={disabled}
-                                 registered={registered}
-                              />
+                              <Paper sx={styles.countdown}>
+                                 <CountDown
+                                    registerButtonLabel={registerButtonLabel}
+                                    time={stream.startDate}
+                                    stream={stream}
+                                    streamAboutToStart={streamAboutToStart}
+                                    onRegisterClick={onRegisterClick}
+                                    disabled={disabled}
+                                    registered={registered}
+                                 />
+                                 {stream?.jobs?.length > 0 && (
+                                    <Box py={2}>
+                                       <JobApply livestream={stream} />
+                                    </Box>
+                                 )}
+                                 {!stream?.jobs?.length && (
+                                    <Box py={2}>
+                                       This livestream doesn't have any jobs
+                                    </Box>
+                                 )}
+                              </Paper>
                            </Box>
                         </Grid>
                         {!!hosts.length && (
