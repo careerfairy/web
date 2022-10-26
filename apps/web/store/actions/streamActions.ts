@@ -180,6 +180,15 @@ export const handleScreenShareDeniedError =
             } else if (errorMessage?.includes("permission denied")) {
             }
             break
+         case "NOT_READABLE":
+            if (
+               errorMessage
+                  ?.toLowerCase()
+                  .includes("could not start video source")
+            ) {
+               dispatch(setScreenShareDeniedError(true))
+            }
+            break
          case "DEVICE_NOT_FOUND":
             dispatch(setScreenShareDeniedError(true))
             break
