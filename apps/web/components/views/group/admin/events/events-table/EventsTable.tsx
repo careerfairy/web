@@ -313,7 +313,7 @@ const EventsTable = ({
             position: "toolbar",
             icon: () => <AddBoxIcon fontSize="large" color="primary" />,
             onClick: handleOpenToolbarActionsDialog,
-            tooltip: "Other options",
+            tooltip: "New event",
          },
       ],
       [streams]
@@ -468,7 +468,7 @@ const EventsTable = ({
                data={streams}
                components={{
                   Action: (props) => {
-                     return props?.action?.tooltip === "Other options" ? (
+                     return props?.action?.tooltip === "New event" ? (
                         <ToolbarDialogAction {...props.action} />
                      ) : (
                         <MTableAction {...props} />
