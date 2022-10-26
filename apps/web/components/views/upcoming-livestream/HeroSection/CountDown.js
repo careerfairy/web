@@ -23,14 +23,6 @@ import { streamIsOld } from "../../../../util/CommonUtil"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
 const styles = {
-   root: (theme) => ({
-      padding: theme.spacing(2),
-      width: "100%",
-      [theme.breakpoints.up("sm")]: {
-         padding: theme.spacing(3),
-      },
-      borderRadius: theme.spacing(1),
-   }),
    countDownWrapper: {
       flexWrap: "nowrap",
       display: "flex",
@@ -154,7 +146,7 @@ const CountDown = ({
    }, [setShareEventDialog])
 
    return (
-      <Paper sx={styles.root}>
+      <>
          <Grid container spacing={{ xs: mobileSpacing, md: desktopSpacing }}>
             <Grid item xs={12}>
                <Collapse in={streamAboutToStart}>
@@ -302,7 +294,7 @@ const CountDown = ({
          ) : (
             ""
          )}
-      </Paper>
+      </>
    )
 }
 
