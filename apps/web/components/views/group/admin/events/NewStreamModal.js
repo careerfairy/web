@@ -44,6 +44,8 @@ const useStyles = makeStyles((theme) => ({
    },
    appBar: {
       backgroundColor: "white",
+      boxShadow: "none",
+      borderBottom: `1px solid ${theme.palette.divider}`,
    },
    content: {
       display: "flex",

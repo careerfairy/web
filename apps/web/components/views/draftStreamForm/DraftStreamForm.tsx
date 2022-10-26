@@ -110,10 +110,12 @@ const useStyles = makeStyles((theme) =>
             [theme.breakpoints.down("md")]: {
                width: ({ isOnDialog }: StyleProps) =>
                   isOnDialog ? "98%" : "inherit",
-               height: ({ isOnDialog }: StyleProps) =>
-                  isOnDialog ? "260px" : "200px",
-               paddingTop: ({ isOnDialog }: StyleProps) =>
-                  isOnDialog ? "160px !important" : "80px !important",
+               height: ({ isOnDialog, canPublish }: StyleProps) =>
+                  isOnDialog ? `${canPublish ? "280px" : "240px"} ` : "200px",
+               paddingTop: ({ isOnDialog, canPublish }: StyleProps) =>
+                  isOnDialog
+                     ? `${canPublish ? "160px" : "130px"} !important`
+                     : "80px !important",
             },
          },
          [theme.breakpoints.down("md")]: {
@@ -145,6 +147,7 @@ const speakerObj = {
 type StyleProps = {
    isGroupAdmin: boolean
    isOnDialog: boolean
+   canPublish: boolean
 }
 
 interface Props {
@@ -232,13 +235,17 @@ const DraftStreamForm = ({
    const jobInfoRef = useRef(null)
    const navRef = useRef(null)
 
-   const initialSteps = [
-      { label: "Stream Info", ref: streamInfoRef },
-      { label: "Speakers", ref: speakersInfoRef },
-      { label: "Target Students", ref: targetStudentsRef },
-      { label: "Promotion", ref: promotionInfoRef },
-      { label: "Event Categories", ref: eventCategoriesInfoRef },
-   ] as IStreamFormNavigatorSteps[]
+   const initialSteps = useMemo(
+      () =>
+         [
+            { label: "Stream Info", ref: streamInfoRef },
+            { label: "Speakers", ref: speakersInfoRef },
+            { label: "Target Students", ref: targetStudentsRef },
+            { label: "Promotion", ref: promotionInfoRef },
+            { label: "Event Categories", ref: eventCategoriesInfoRef },
+         ] as IStreamFormNavigatorSteps[],
+      []
+   )
 
    let {
       query: { careerCenterIds, draftStreamId },
@@ -250,7 +257,8 @@ const DraftStreamForm = ({
    const [status, setStatus] = useState("")
    const classes = useStyles({
       isGroupAdmin: Boolean(group?.id),
-      isOnDialog: isOnDialog,
+      isOnDialog,
+      canPublish,
    } as StyleProps)
 
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])

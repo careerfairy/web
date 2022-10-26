@@ -14,6 +14,7 @@ import Section from "components/views/common/Section"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 type Props = {
    promotionChannelsCodes: Option[]
@@ -58,7 +59,9 @@ const PromotionInfo = ({
             )
 
             setAllUniversities(allUniversities)
-         } catch (e) {}
+         } catch (e) {
+            errorLogAndNotify(e)
+         }
       })()
    }, [firebase, promotionCountriesCodes])
 
