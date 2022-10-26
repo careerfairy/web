@@ -95,10 +95,10 @@ export const FaqCard = ({ href, title }: FaqCardProps) => {
 const faqDict: Record<FaqId, FaqCardProps> = {
    whatIsACareerLiveStream: {
       title: "What is a career live stream?",
-      href: "https://careerfairy-support.crisp.help/",
+      href: "https://support.careerfairy.io/en/article/live-streaming-on-careerfairy-pqhfx3/#1-what-is-a-career-live-stream",
    },
    whichDeviceShouldIUseForTheLiveStream: {
       title: "Which device should I use for the live stream?",
-      href: "https://careerfairy-support.crisp.help/",
+      href: "https://support.careerfairy.io/en/article/technical-requirements-to-use-careerfairy-1g4nk1t/#1-compatible-browsers",
    },
 }
