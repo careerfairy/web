@@ -61,7 +61,7 @@ test("successful registration on a livestream event", async ({
 
    await expectSelector(page, `h3:has-text("${group.universityName}")`)
    await expectExactText(page, group.description)
-   await expectExactText(page, "Attended")
+   await expectExactText(page, "Booked!")
 
    // confirm we can't register again
    await livestreamPage.open(livestream.id)
