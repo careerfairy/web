@@ -72,7 +72,7 @@ const useStyles = makeStyles((theme) =>
          alignItems: "center",
          minHeight: "20vh",
          borderRadius: 5,
-         marginBottom: ({ isGroupAdmin }: any) => !isGroupAdmin && 30,
+         marginBottom: ({ isGroupAdmin }: StyleProps) => !isGroupAdmin && 30,
          maxWidth: "unset",
       },
       form: {
@@ -97,24 +97,28 @@ const useStyles = makeStyles((theme) =>
       },
       navBar: {
          [theme.breakpoints.down("lg")]: {
-            position: ({ isOnDialog }: any) =>
+            position: ({ isOnDialog }: StyleProps) =>
                isOnDialog ? "absolute" : "sticky",
             top: 0,
             paddingTop: "90px !important",
             background: "white",
             zIndex: 999,
-            overflowX: "scroll",
-            overflowY: "hidden",
             height: "200px",
             alignItems: "end",
-            width: ({ isOnDialog }: any) => (isOnDialog ? "90%" : "inherit"),
+            width: ({ isOnDialog }: StyleProps) =>
+               isOnDialog ? "90%" : "inherit",
             [theme.breakpoints.down("md")]: {
-               width: ({ isOnDialog }: any) => (isOnDialog ? "98%" : "inherit"),
-               height: ({ isOnDialog }: any) =>
-                  isOnDialog ? "250px" : "200px",
-               paddingTop: ({ isOnDialog }: any) =>
-                  isOnDialog ? "130px !important" : "80px !important",
+               width: ({ isOnDialog }: StyleProps) =>
+                  isOnDialog ? "98%" : "inherit",
+               height: ({ isOnDialog }: StyleProps) =>
+                  isOnDialog ? "260px" : "200px",
+               paddingTop: ({ isOnDialog }: StyleProps) =>
+                  isOnDialog ? "160px !important" : "80px !important",
             },
+         },
+         [theme.breakpoints.down("md")]: {
+            overflowX: "scroll",
+            overflowY: "hidden",
          },
       },
    })
@@ -137,6 +141,11 @@ const speakerObj = {
    background: "",
    email: "",
 } as ISpeakerObj
+
+type StyleProps = {
+   isGroupAdmin: boolean
+   isOnDialog: boolean
+}
 
 interface Props {
    group?: Group
@@ -221,6 +230,7 @@ const DraftStreamForm = ({
    const questionsInfoRef = useRef(null)
    const eventCategoriesInfoRef = useRef(null)
    const jobInfoRef = useRef(null)
+   const navRef = useRef(null)
 
    const initialSteps = [
       { label: "Stream Info", ref: streamInfoRef },
@@ -241,7 +251,7 @@ const DraftStreamForm = ({
    const classes = useStyles({
       isGroupAdmin: Boolean(group?.id),
       isOnDialog: isOnDialog,
-   })
+   } as StyleProps)
 
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
    const [selectedInterests, setSelectedInterests] = useState([])
@@ -692,14 +702,20 @@ const DraftStreamForm = ({
          {allFetched ? (
             <Grid container spacing={2}>
                {submitted ? null : (
-                  <Grid item md={12} lg={2} className={classes.navBar}>
+                  <Grid
+                     item
+                     md={12}
+                     lg={2}
+                     className={classes.navBar}
+                     ref={navRef}
+                  >
                      <Box
                         sx={{
                            position: { lg: "fixed" },
                            marginTop: { lg: "10vh" },
                         }}
                      >
-                        <StreamFormNavigator steps={steps} />
+                        <StreamFormNavigator steps={steps} navRef={navRef} />
                      </Box>
                   </Grid>
                )}
@@ -916,7 +932,7 @@ const DraftStreamForm = ({
                                     <Button
                                        type="submit"
                                        ref={submitButtonRef}
-                                       hidden={true}
+                                       sx={{ display: "none" }}
                                        onClick={handleClickSubmitForApproval}
                                     />
                                  </Box>

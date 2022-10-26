@@ -7,6 +7,7 @@ import {
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
+import { FormikErrors } from "formik"
 
 export const speakerObj = {
    avatar: "",
@@ -168,7 +169,7 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
 }
 
 export const validateStreamForm = (values, isDraft, noValidation = false) => {
-   let errors: Partial<DraftFormValues | any> = {
+   let errors: FormikErrors<DraftFormValues> = {
       speakers: {},
    }
    if (!values.companyLogoUrl) {

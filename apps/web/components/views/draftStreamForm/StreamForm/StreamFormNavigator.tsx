@@ -6,7 +6,12 @@ import {
    Stepper,
    Typography,
 } from "@mui/material"
-import React, { useCallback, useEffect, useState } from "react"
+import React, {
+   MutableRefObject,
+   useCallback,
+   useEffect,
+   useState,
+} from "react"
 import { styled, useTheme } from "@mui/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import useMediaQuery from "@mui/material/useMediaQuery"
@@ -33,18 +38,40 @@ const useStyles = makeStyles((theme) => ({
 
 export type IStreamFormNavigatorSteps = {
    label: string
-   ref: any
+   ref: MutableRefObject<any>
 }
 
 type Props = {
    steps: IStreamFormNavigatorSteps[]
+   navRef: MutableRefObject<any>
 }
 
-const StreamFormNavigator = ({ steps }: Props) => {
+const StreamFormNavigator = ({ steps, navRef }: Props) => {
    const classes = useStyles()
    const [currentStep, setCurrentStep] = useState(0)
    const theme = useTheme()
    const isSmallScreen = useMediaQuery(theme.breakpoints.down("lg"))
+
+   useEffect(() => {
+      const navBarElement = navRef?.current
+
+      if (isSmallScreen && navBarElement) {
+         const scrollAtStartPosition = navBarElement.scrollLeft === 0
+
+         if (currentStep > 3 && scrollAtStartPosition) {
+            navBarElement.scrollTo({
+               left: navBarElement.scrollWidth,
+               behavior: "smooth",
+            })
+         }
+         if (currentStep <= 3 && !scrollAtStartPosition) {
+            navBarElement.scrollTo({
+               left: 0,
+               behavior: "smooth",
+            })
+         }
+      }
+   }, [currentStep, isSmallScreen, navRef])
 
    const getIsActive = useCallback(
       (currentIndex: number) => {

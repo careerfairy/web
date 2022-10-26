@@ -28,6 +28,7 @@ import PublishIcon from "@mui/icons-material/Publish"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
 
 const useStyles = makeStyles((theme) => ({
    title: {
@@ -89,6 +90,7 @@ const NewStreamModal = ({
    const [publishDraft, setPublishDraft] = useState(false)
    const classes = useStyles()
    const { showPromotionInputs, formHasChanged } = useStreamCreationProvider()
+   const isMobile = useIsMobile()
 
    const isDraftsPage = useMemo(() => typeOfStream === "draft", [typeOfStream])
    const isUpcomingPage = useMemo(
@@ -296,11 +298,11 @@ const NewStreamModal = ({
       <>
          <Button
             disabled={formRef.current?.isSubmitting}
-            size="large"
+            size={isMobile ? "small" : "large"}
             variant="outlined"
             color="secondary"
             onClick={handleCloseDialog}
-            sx={{ marginRight: 2 }}
+            sx={{ marginRight: isMobile ? "unset" : 2 }}
          >
             <Typography variant="inherit">Back to events page</Typography>
          </Button>
@@ -309,10 +311,10 @@ const NewStreamModal = ({
                startIcon={<PublishIcon fontSize="large" />}
                disabled={formRef.current?.isSubmitting}
                variant="contained"
-               size="large"
+               size={isMobile ? "small" : "large"}
                color="secondary"
                onClick={handleValidate}
-               sx={{ marginRight: 2 }}
+               sx={{ marginRight: isMobile ? "unset" : 2 }}
                endIcon={
                   formRef.current?.isSubmitting && (
                      <CircularProgress size={20} color="inherit" />
@@ -324,7 +326,7 @@ const NewStreamModal = ({
          )}
          <Button
             disabled={formRef.current?.isSubmitting}
-            size="large"
+            size={isMobile ? "small" : "large"}
             startIcon={currentStream && <SaveIcon fontSize="large" />}
             variant="contained"
             color="secondary"
@@ -359,7 +361,12 @@ const NewStreamModal = ({
          }}
       >
          <AppBar className={classes.appBar} position="sticky">
-            <Toolbar>
+            <Toolbar
+               sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "unset",
+               }}
+            >
                <Typography variant="h4" className={classes.title}>
                   {isActualLivestream
                      ? "Update Stream"
