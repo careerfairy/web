@@ -226,6 +226,20 @@ export const atsUserApplyToJob = functions
 
          const associationsToSave: Partial<UserATSRelations> = {}
 
+         /**
+          * Some ATS systems require a remoteUserId on write operations
+          * it's like we're creating these entities on behalf of this user
+          * On Greenhouse, this user must be an admin
+          */
+         let remoteUserId: string = null
+         if (["greenhouse"].includes(atsAccount.slug)) {
+            // temporary chosen user for the Priogen integration
+            // bheuvel@priogen.nl
+            if (atsAccount.id === "f35ff2788e944ac1b54b0624dc0fc2ea") {
+               remoteUserId = "ceb03859-4bd5-4c8c-a0c6-341ccfba55e0"
+            }
+         }
+
          let applicationId: string
          try {
             // Fetch or create a Candidate object
@@ -241,23 +255,28 @@ export const atsUserApplyToJob = functions
 
                   candidate = await atsRepository.createCandidate(userData, {
                      jobAssociation: job,
+                     remoteUserId,
                   })
 
-                  associationsToSave["candidateId"] = candidate.id
+                  associationsToSave["candidateId"] = candidate.id ?? null
 
                   const attachmentId =
                      await atsRepository.candidateAddCVAttachment(
                         candidate.id,
-                        userData
+                        userData,
+                        {
+                           remoteUserId,
+                        }
                      )
-                  associationsToSave["cvAttachmentId"] = attachmentId
+                  associationsToSave["cvAttachmentId"] = attachmentId ?? null
                } else {
                   candidate = await atsRepository.createCandidate(userData, {
                      jobAssociation: job,
                      nestedWriteCV: true,
+                     remoteUserId,
                   })
 
-                  associationsToSave["candidateId"] = candidate.id
+                  associationsToSave["candidateId"] = candidate.id ?? null
                }
             }
 
@@ -266,7 +285,10 @@ export const atsUserApplyToJob = functions
                // Create the application
                applicationId = await atsRepository.createApplication(
                   candidate.id,
-                  jobId
+                  jobId,
+                  {
+                     remoteUserId,
+                  }
                )
             } else {
                const application = candidate.applications[0]
@@ -274,14 +296,14 @@ export const atsUserApplyToJob = functions
                   typeof application === "string" ? application : application.id
             }
             associationsToSave["jobApplications"] = {
-               [jobId]: applicationId,
+               [jobId]: applicationId ?? null,
             }
          } catch (e) {
             // save the existing associations until the error
             // so that we don't need to recreate the objects on the next try
             // e.g we have an error when creating the CV attachment, but the candidate object was created
             // on the next retry, we skip the candidate creation
-            userRepo.associateATSData(
+            await userRepo.associateATSData(
                userEmail,
                integrationId,
                associationsToSave
