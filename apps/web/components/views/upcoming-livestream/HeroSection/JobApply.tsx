@@ -123,21 +123,24 @@ const JobItem = ({ job, handleSelectJob }: JobItemProps) => {
             ) : null
          }
       >
-         <ListItemAvatar sx={styles.icon}>
-            <WorkOutlineOutlinedIcon color="secondary" />
-         </ListItemAvatar>
          <ListItemText>
             <Typography
                variant="subtitle1"
                fontWeight="bold"
                textAlign={isMobile ? "center" : undefined}
+               display="flex"
+               alignContent="center"
+               alignItems="center"
+               sx={{ flexWrap: "wrap" }}
             >
+               <WorkOutlineOutlinedIcon color="secondary" sx={{ mr: 1 }} />
                {name}
                {isMobile && (
                   <Button
                      variant={"contained"}
                      onClick={handleClick}
                      color="primary"
+                     sx={{ margin: "0 auto" }}
                   >
                      Apply Now
                   </Button>
