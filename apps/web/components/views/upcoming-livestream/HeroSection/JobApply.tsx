@@ -6,7 +6,6 @@ import {
    Button,
    List,
    ListItem,
-   ListItemAvatar,
    ListItemText,
    Typography,
 } from "@mui/material"
@@ -17,6 +16,7 @@ import useUserLivestreamData from "../../../custom-hook/useUserLivestreamData"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import useLivestreamJobs from "../../../custom-hook/useLivestreamJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { useAuth } from "../../../../HOCs/AuthProvider"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -41,9 +41,14 @@ type Props = {
 }
 
 const JobApply = ({ livestream }: Props) => {
-   const [isLoading, registeredUser] = useUserLivestreamData(livestream.id)
+   const { authenticatedUser } = useAuth()
+   const userLivestreamData = useUserLivestreamData(
+      livestream.id,
+      authenticatedUser.email
+   )
 
-   if (isLoading || !registeredUser) {
+   if (!userLivestreamData) {
+      // user didn't register / participated in the event
       return null
    }
 

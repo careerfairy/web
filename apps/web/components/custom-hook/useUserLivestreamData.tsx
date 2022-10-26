@@ -1,48 +1,30 @@
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
-import { useAuth } from "../../HOCs/AuthProvider"
-import { useEffect, useState } from "react"
-import { livestreamRepo } from "../../data/RepositoryInstances"
-import { errorLogAndNotify } from "../../util/CommonUtil"
+import { doc } from "firebase/firestore"
+import { useFirestore, useFirestoreDocDataOnce } from "reactfire"
 
 /**
  * Fetch the livestream UserLivestreamData document
+ *
  * @param livestreamId
+ * @param userId
  */
-const useUserLivestreamData = (livestreamId): [boolean, UserLivestreamData] => {
-   const { isLoggedIn, userData } = useAuth()
-   // undefined = loading
-   // null => finished loading, no user
-   const [fetchedUser, setFetchedUser] = useState<UserLivestreamData>(undefined)
+const useUserLivestreamData = (
+   livestreamId,
+   userId: string
+): UserLivestreamData => {
+   const ref = doc(
+      useFirestore(),
+      "livestreams",
+      livestreamId,
+      "userLivestreamData",
+      userId
+   )
 
-   useEffect(() => {
-      let isMounted = true
+   const { data } = useFirestoreDocDataOnce<UserLivestreamData>(ref as any, {
+      idField: "id",
+   })
 
-      if (!userData) {
-         setFetchedUser(null)
-         return
-      }
-
-      livestreamRepo
-         .getLivestreamUser(livestreamId, userData.userEmail)
-         .then((data) => {
-            if (isMounted) {
-               setFetchedUser(data)
-            }
-         })
-         .catch((e) => {
-            errorLogAndNotify(e)
-            if (isMounted) {
-               setFetchedUser(null)
-            }
-         })
-
-      return () => {
-         isMounted = false
-      }
-   }, [isLoggedIn, livestreamId, userData])
-
-   // [isLoading, user]
-   return [fetchedUser === undefined, fetchedUser]
+   return data
 }
 
 export default useUserLivestreamData

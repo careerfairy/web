@@ -21,6 +21,8 @@ import WhiteTagChip from "../../common/chips/TagChip"
 import LanguageIcon from "@mui/icons-material/Language"
 import Image from "next/image"
 import JobApply from "./JobApply"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
+import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 
 const styles = {
    root: (theme) => ({
@@ -252,7 +254,11 @@ const HeroSection = ({
                                     registered={registered}
                                  />
                                  {stream?.jobs?.length > 0 && (
-                                    <JobApply livestream={stream} />
+                                    <EnsureUserIsLoggedIn>
+                                       <SuspenseWithBoundary hide fallback="">
+                                          <JobApply livestream={stream} />
+                                       </SuspenseWithBoundary>
+                                    </EnsureUserIsLoggedIn>
                                  )}
                               </Paper>
                            </Box>
