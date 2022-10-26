@@ -51,7 +51,7 @@ const HostAndQuestionsInfo = ({
                   <Grid xs={12} item>
                      <MultiListSelect
                         inputName="groupIds"
-                        isCheckbox={true}
+                        isCheckbox
                         onSelectItems={(selectedGroups) =>
                            handleGroupSelect(values, selectedGroups)
                         }
@@ -73,6 +73,7 @@ const HostAndQuestionsInfo = ({
                            variant: "contained",
                            color: "secondary",
                         }}
+                        checkboxColor="secondary"
                      />
                   </Grid>
                   {selectedGroups.map((group) => {

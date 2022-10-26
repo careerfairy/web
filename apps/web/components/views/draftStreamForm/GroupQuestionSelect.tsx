@@ -96,6 +96,7 @@ const GroupQuestionSelect = ({
                variant: "contained",
                color: "secondary",
             }}
+            checkboxColor="secondary"
          />
       </Grid>
    )

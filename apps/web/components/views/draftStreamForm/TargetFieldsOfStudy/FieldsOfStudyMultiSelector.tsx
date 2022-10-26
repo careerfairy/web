@@ -43,6 +43,7 @@ const FieldsOfStudyMultiSelector = ({
             returnValue: [],
             selectValueType: "ReturnValue",
          }}
+         checkboxColor="secondary"
       />
    )
 }

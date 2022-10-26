@@ -93,6 +93,7 @@ const PromotionInfo = ({
                      chipProps={{
                         color: "secondary",
                      }}
+                     checkboxColor="secondary"
                   />
                </Grid>
 
@@ -112,6 +113,7 @@ const PromotionInfo = ({
                      chipProps={{
                         color: "secondary",
                      }}
+                     checkboxColor="secondary"
                   />
                </Grid>
 
@@ -131,6 +133,7 @@ const PromotionInfo = ({
                      chipProps={{
                         color: "secondary",
                      }}
+                     checkboxColor="secondary"
                   />
                </Grid>
             </FormGroup>

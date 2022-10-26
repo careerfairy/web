@@ -55,7 +55,8 @@ const EventCategoriesInfo = ({
                      variant: "contained",
                      color: "secondary",
                   }}
-                  isCheckbox={true}
+                  isCheckbox
+                  checkboxColor="secondary"
                />
             </Grid>
          </FormGroup>

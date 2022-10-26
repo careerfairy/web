@@ -1,7 +1,6 @@
 import { createContext, Dispatch, useContext, useMemo, useState } from "react"
 
 type DefaultContext = {
-   isOnCreationForm: boolean
    showJobSection: boolean
    setShowJobSection: Dispatch<boolean>
    showPromotionInputs: boolean
@@ -11,7 +10,6 @@ type DefaultContext = {
 }
 
 const StreamCreationContext = createContext<DefaultContext>({
-   isOnCreationForm: true,
    showJobSection: false,
    setShowJobSection: () => {},
    showPromotionInputs: false,
@@ -27,7 +25,6 @@ const StreamCreationProvider = ({ children }) => {
 
    const contextValue = useMemo(
       () => ({
-         isOnCreationForm: true,
          showJobSection,
          setShowJobSection,
          showPromotionInputs,

@@ -46,6 +46,7 @@ const LevelsOfStudyMultiSelector = ({
             returnValue: [],
             selectValueType: "ReturnValue",
          }}
+         checkboxColor="secondary"
       />
    )
 }
