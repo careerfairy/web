@@ -250,7 +250,7 @@ test.describe("Streaming Journey", () => {
          )
       ).toBeVisible()
       await expect(
-         viewerPage.page.locator("text=Close the stream and continue here")
+         viewerPage.page.locator("text=CLICK HERE TO FORCE CONNECTION")
       ).toBeVisible()
    })
 
