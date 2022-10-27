@@ -1,4 +1,3 @@
-import { useMemo } from "react"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
@@ -27,7 +26,7 @@ const useCrispSignature = (email?: string): SignatureResponse => {
          suspense: false,
       }
    )
-   return useMemo<SignatureResponse>(() => data, [data])
+   return data
 }
 
 export default useCrispSignature

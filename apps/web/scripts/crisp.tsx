@@ -47,9 +47,9 @@ export const closeChatBox = () => {
    window.$crisp.push(["do", "chat:close"])
 }
 
-export const setCrispEmail = (data: { email: string; signature: string }) => {
-   window.$crisp.push(["set", "user:email", [data.email, data.signature]])
-   window.$crisp.push(["set", "user:nickname", [getNickname(data.email)]])
+export const setCrispEmail = (email: string, signature: string) => {
+   window.$crisp.push(["set", "user:email", [email, signature]])
+   window.$crisp.push(["set", "user:nickname", [getNickname(email)]])
 }
 
 export const reverseChatBoxPosition = (reverse: boolean) => {

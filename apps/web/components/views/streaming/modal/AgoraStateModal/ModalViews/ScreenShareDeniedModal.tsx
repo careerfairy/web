@@ -59,7 +59,6 @@ const ScreenShareDeniedModal = () => {
                      "https://support.careerfairy.io/en/article/screen-sharing-issues-ctnit3"
                   }
                   target={"_blank"}
-                  rel="noreferrer"
                >
                   read our documentation
                </Box>{" "}

@@ -14,9 +14,9 @@ const useCrispSync = (user: FirebaseReducer.AuthState) => {
       // Update the signature if the user changes
       if (data?.email && data?.signature) {
          // https://docs.crisp.chat/guides/chatbox-sdks/web-sdk/identity-verification/ (set email)
-         setCrispEmail(data)
+         setCrispEmail(data.email, data.signature)
       }
-   }, [data])
+   }, [data?.email, data?.signature])
 
    return null
 }
