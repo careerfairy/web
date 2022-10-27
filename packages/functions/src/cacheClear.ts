@@ -1,6 +1,8 @@
 import functions = require("firebase-functions")
 import { admin } from "./api/firestoreAdmin"
 
+const DAY_IN_SECONDS = 24 * 60 * 60
+
 export const periodicallyRemoveCachedDocument = functions.pubsub
    .schedule("every 24 hours")
    .timeZone("Europe/Zurich")
@@ -9,7 +11,23 @@ export const periodicallyRemoveCachedDocument = functions.pubsub
          /**
           * Remove cache/function/analytics documents older than 2 days
           */
-         removeExpiredCacheDocuments("cache/functions/analytics", 172800),
+         removeExpiredCacheDocuments(
+            "cache/functions/analytics",
+            2 * DAY_IN_SECONDS
+         ),
+         /**
+          * Remove Merge cache older than 3 days
+          */
+         removeExpiredCacheDocuments("cache/merge/getJobs", 3 * DAY_IN_SECONDS),
+         removeExpiredCacheDocuments("cache/merge/getJob", 3 * DAY_IN_SECONDS),
+         removeExpiredCacheDocuments(
+            "cache/merge/getApplications",
+            3 * DAY_IN_SECONDS
+         ),
+         removeExpiredCacheDocuments(
+            "cache/merge/getApplication",
+            3 * DAY_IN_SECONDS
+         ),
       ])
 
       const totalRemoved = results

@@ -9,11 +9,17 @@ import {
    MergeCandidateModel,
    MergeJob,
    MergeLinkTokenResponse,
+   MergeModelResponseWrapper,
    MergeOffice,
    MergePaginatedResponse,
    MergeSyncStatus,
 } from "./MergeResponseTypes"
-import { IATSRepository } from "./IATSRepository"
+import {
+   ApplicationCreationOptions,
+   AttachmentCreationOptions,
+   CandidateCreationOptions,
+   IATSRepository,
+} from "./IATSRepository"
 import { Job } from "./Job"
 import { Office } from "./Office"
 import { SyncStatus } from "./SyncStatus"
@@ -55,15 +61,26 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Jobs
-   |--------------------------------------------------------------------------
-   */
-   @fromFirebaseCache()
+|--------------------------------------------------------------------------
+| Jobs
+|--------------------------------------------------------------------------
+*/
+   @fromFirebaseCache(2 * 60 * 1000) // 2min cache
    async getJobs(): Promise<Job[]> {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
          `/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100`
       )
+
+      // Sort by last updated date, in place
+      data.results.sort((a, b) => {
+         if (!a.remote_updated_at || !b.remote_updated_at) return 0
+
+         const aDate = new Date(a.remote_updated_at)
+         const bDate = new Date(b.remote_created_at)
+
+         return bDate.getTime() - aDate.getTime()
+      })
+
       return data.results.map(Job.createFromMerge)
    }
 
@@ -76,10 +93,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Offices
-   |--------------------------------------------------------------------------
-   */
+|--------------------------------------------------------------------------
+| Offices
+|--------------------------------------------------------------------------
+*/
    @fromFirebaseCache()
    async getOffices(): Promise<Office[]> {
       const { data } = await this.axios.get<
@@ -90,10 +107,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Candidates
-   |--------------------------------------------------------------------------
-   */
+|--------------------------------------------------------------------------
+| Candidates
+|--------------------------------------------------------------------------
+*/
    @fromFirebaseCache()
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
@@ -105,38 +122,62 @@ export class MergeATSRepository implements IATSRepository {
       return data ? Candidate.createFromMerge(data) : null
    }
 
-   async createCandidate(user: UserData): Promise<Candidate> {
+   async createCandidate(
+      user: UserData,
+      options: CandidateCreationOptions = {}
+   ): Promise<Candidate> {
       const model = createMergeCandidateFromUser(user)
-      const { data } = await this.axios.post<MergeCandidate>(
-         `/candidates`,
-         model
-      )
 
-      return Candidate.createFromMerge(data)
+      if (options.nestedWriteCV) {
+         // @ts-ignore
+         model.attachments.push(createMergeAttachmentObject(user))
+      }
+
+      // Workable requires this
+      // associate the candidate with the job
+      // no need to create the application afterwards
+      if (options.jobAssociation) {
+         model.applications = [
+            {
+               job: options.jobAssociation.id,
+            },
+         ]
+      }
+
+      const body = createMergeModelBody(model, options.remoteUserId)
+      const { data } = await this.axios.post<
+         MergeModelResponseWrapper<MergeCandidate>
+      >(`/candidates`, body)
+
+      return Candidate.createFromMerge(data.model)
    }
 
    @clearFirebaseCache(["getCandidate", "getApplications", "getApplication"])
-   async candidateAddCVAttachment(candidateId: string, cvUrl: string) {
-      const model: MergeAttachmentModel = {
-         file_name: "Resume - CareerFairy",
-         file_url: cvUrl,
-         candidate: candidateId,
-         attachment_type: "RESUME",
-      }
-      const { data } = await this.axios.post<MergeAttachment>(
-         `/attachments`,
-         model
-      )
+   async candidateAddCVAttachment(
+      candidateId: string,
+      user: UserData,
+      options: AttachmentCreationOptions = {}
+   ) {
+      const model: MergeAttachmentModel = createMergeAttachmentObject(user)
 
-      return data.id
+      model.candidate = {
+         id: candidateId,
+      }
+
+      const body = createMergeModelBody(model, options.remoteUserId)
+      const { data } = await this.axios.post<
+         MergeModelResponseWrapper<MergeAttachment>
+      >(`/attachments`, body)
+
+      return data.model.id
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Applications
-   |--------------------------------------------------------------------------
-   */
-   @fromFirebaseCache()
+  |--------------------------------------------------------------------------
+  | Applications
+  |--------------------------------------------------------------------------
+  */
+   @fromFirebaseCache(60 * 1000) // 1min cache
    async getApplications(jobId?: string): Promise<Application[]> {
       const qs = new URLSearchParams({
          expand: "candidate,job,current_stage,reject_reason",
@@ -154,18 +195,23 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    @clearFirebaseCache(["getApplications"])
-   async createApplication(candidateId: string, jobId: string) {
+   async createApplication(
+      candidateId: string,
+      jobId: string,
+      options: ApplicationCreationOptions = {}
+   ) {
       const model: MergeApplicationModel = {
          candidate: candidateId,
          job: jobId,
          source: "CareerFairy",
       }
-      const { data } = await this.axios.post<MergeApplicationModel>(
-         `/applications`,
-         model
-      )
 
-      return data.id
+      const body = createMergeModelBody(model, options.remoteUserId)
+      const { data } = await this.axios.post<
+         MergeModelResponseWrapper<MergeApplicationModel>
+      >(`/applications`, body)
+
+      return data.model.id
    }
 
    @fromFirebaseCache()
@@ -243,7 +289,6 @@ const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
    const model: MergeCandidateModel = {
       first_name: user.firstName,
       last_name: user.lastName,
-      attachments: [],
       applications: [],
       tags: ["CareerFairy"],
       urls: [],
@@ -254,6 +299,7 @@ const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
          },
       ],
       phone_numbers: [],
+      attachments: [],
    }
 
    if (user.linkedinUrl) {
@@ -264,6 +310,29 @@ const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
    }
 
    return model
+}
+
+function createMergeAttachmentObject(user: UserData): MergeAttachmentModel {
+   return {
+      file_name: "Resume - CareerFairy",
+      file_url: getResumeURL(user.userResume),
+      attachment_type: "RESUME",
+   }
+}
+
+function getResumeURL(resumeUrl: string): string {
+   let res = resumeUrl
+   // Merge doesn't accept localhost, replace with remote storage
+   // merge will try to fetch the file and store in their systems
+   // it might fail if the file not accessible
+   // this is only used during local development
+   if (res.indexOf("http://localhost:9199") !== -1) {
+      // use a remote test CV file
+      res =
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/development%2Fsample.pdf?alt=media&token=37d5f709-29e4-44d9-8400-f35629de64b6"
+   }
+
+   return res
 }
 
 /**
@@ -280,4 +349,22 @@ const emptyResponseWhenNotFound = (e: AxiosError) => {
    }
 
    throw e
+}
+
+/**
+ * Creates a Merge POST body object
+ * It will include the remote_user_id if existent
+ * @param data
+ * @param remoteUserId
+ */
+function createMergeModelBody(data: any, remoteUserId) {
+   const body: any = {
+      model: data,
+   }
+
+   if (remoteUserId) {
+      body.remote_user_id = remoteUserId
+   }
+
+   return body
 }

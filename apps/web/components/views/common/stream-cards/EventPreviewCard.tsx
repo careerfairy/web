@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
@@ -205,7 +205,6 @@ const EventPreviewCard = ({
    const { query, push, pathname } = useRouter()
    const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
-   const [hasRegistered, setHasRegistered] = useState(false)
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
@@ -216,6 +215,20 @@ const EventPreviewCard = ({
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
    const { formCompleted: marketingFormCompleted, setSelectedEventId } =
       useMarketingLandingPage()
+
+   const hasRegistered: boolean = useMemo(() => {
+      if (loading) return false
+
+      return Boolean(event?.registeredUsers?.includes(authenticatedUser?.email))
+   }, [loading, event?.registeredUsers, authenticatedUser?.email])
+
+   const hasParticipated: boolean = useMemo(() => {
+      if (loading) return false
+
+      return Boolean(
+         event?.participatingStudents?.includes(authenticatedUser?.email)
+      )
+   }, [loading, event?.participatingStudents, authenticatedUser?.email])
 
    const {
       query: { groupId },
@@ -230,14 +243,6 @@ const EventPreviewCard = ({
          )
       }
    }, [event?.interestsIds, loading, interests])
-
-   useEffect(() => {
-      if (!loading) {
-         setHasRegistered(
-            Boolean(event?.registeredUsers?.includes(authenticatedUser?.email))
-         )
-      }
-   }, [event?.registeredUsers, loading, authenticatedUser?.email])
 
    useEffect(() => {
       if (!light && !loading) {
@@ -312,7 +317,10 @@ const EventPreviewCard = ({
       }
       return {
          pathname: `/upcoming-livestream/[livestreamId]`,
-         hash: isPast && "#about",
+         // when an event has jobs and is in the past, we show a button for the
+         // user apply in the countdown area, we don't want the user to auto scroll to the
+         // about section in that case
+         hash: isPast && !event?.jobs?.length && "#about",
          query: {
             livestreamId: event?.id,
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
@@ -420,22 +428,12 @@ const EventPreviewCard = ({
                               />
                            </>
                         ) : (
-                           <>
-                              {event?.hasStarted && !isPast && (
-                                 <Chip
-                                    icon={<LiveIcon />}
-                                    color="error"
-                                    label={"LIVE"}
-                                 />
-                              )}
-                              {hasRegistered && (
-                                 <Chip
-                                    icon={<CheckIcon />}
-                                    color="primary"
-                                    label={"Booked!"}
-                                 />
-                              )}
-                           </>
+                           <ChipLabel
+                              hasParticipated={hasParticipated}
+                              isPast={isPast}
+                              hasStarted={event?.hasStarted}
+                              hasRegistered={hasRegistered}
+                           />
                         )}
                      </Stack>
                   </Box>
@@ -547,7 +545,7 @@ const EventPreviewCard = ({
                                     sx={styles.btn}
                                     component={Link}
                                     /*
-                                             // @ts-ignore */
+// @ts-ignore */
                                     href={getHref()}
                                     variant={"contained"}
                                     color={"secondary"}
@@ -565,6 +563,31 @@ const EventPreviewCard = ({
             </Box>
          </Box>
          {event && <EventSEOSchemaScriptTag event={event} />}
+      </>
+   )
+}
+
+const ChipLabel = ({ hasStarted, isPast, hasParticipated, hasRegistered }) => {
+   let ExtraChip = null
+
+   if (hasParticipated && isPast) {
+      ExtraChip = (
+         <Chip icon={<CheckIcon />} color="primary" label={"Attended"} />
+      )
+   }
+
+   if (hasRegistered && !isPast) {
+      ExtraChip = (
+         <Chip icon={<CheckIcon />} color="primary" label={"Booked!"} />
+      )
+   }
+
+   return (
+      <>
+         {hasStarted && !isPast && (
+            <Chip icon={<LiveIcon />} color="error" label={"LIVE"} />
+         )}
+         {ExtraChip}
       </>
    )
 }
