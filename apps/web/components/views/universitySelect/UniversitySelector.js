@@ -17,7 +17,6 @@ const UniversitySelector = ({
    universityCountryCode,
    setFieldValue,
    error,
-   handleBlur,
    submitting,
    values,
    className = "",
@@ -70,7 +69,6 @@ const UniversitySelector = ({
          data-testid={"university-selector"}
          disabled={submitting}
          selectOnFocus
-         onBlur={handleBlur}
          autoHighlight
          onChange={(e, value) => {
             if (value) {
@@ -105,7 +103,6 @@ const UniversitySelector = ({
                   error={Boolean(error)}
                   id="university"
                   name="university"
-                  onBlur={handleBlur}
                   label="University"
                   disabled={submitting}
                   variant="outlined"

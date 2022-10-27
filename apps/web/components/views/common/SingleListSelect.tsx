@@ -33,7 +33,6 @@ const SingleListSelect = <T extends { [key: string]: any }>({
    getKeyFn = (option: T) => option.id, // field id
    getGroupByFn = () => "",
    disabledValues = [],
-   handleBlur,
    loading,
 }: Props<T>) => {
    const handleSelect = (event, selectedOption) => {
@@ -64,7 +63,6 @@ const SingleListSelect = <T extends { [key: string]: any }>({
          disabled={disabled}
          loading={loading}
          onChange={handleSelect}
-         onBlur={handleBlur}
          blurOnSelect
          isOptionEqualToValue={isOptionEqualToValue}
          disableCloseOnSelect={isCheckbox ? true : undefined}
@@ -153,7 +151,6 @@ interface Props<T> {
    options: T[]
    extraOptions?: object
    disabledValues?: string[]
-   handleBlur?: (event: any) => void
    loading?: boolean
 }
 
