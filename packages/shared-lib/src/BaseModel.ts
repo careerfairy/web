@@ -36,6 +36,7 @@ export abstract class BaseModel {
             serialized[key] = (this[key] as unknown as Date).getTime()
             continue
          }
+
          // check if array
          if (
             Array.isArray(this[key]) &&
@@ -48,10 +49,18 @@ export abstract class BaseModel {
             )
             continue
          }
+
          if (this[key] instanceof BaseModel) {
             serialized[key] = this[key].serializeToPlainObject()
             continue
          }
+
+         // Firestore doesn't accept undefined
+         if (this[key] === undefined) {
+            serialized[key] = null
+            continue
+         }
+
          serialized[key] = this[key]
       }
       return serialized
@@ -106,6 +115,24 @@ export function mapIfObject<T extends BaseModel>(
    return targetField
       .map((o) => saveIfObject<T>(o, creationFunction))
       .filter((o) => o) as T[]
+}
+
+/**
+ * Maps both types of relationships: array of ids and array of objects
+ */
+export function mapRelation<T extends BaseModel>(
+   data: any[],
+   creationFunction: (field: any) => any
+) {
+   if (!data || data.length === 0) return []
+
+   // should be an array of relationships ids
+   if (data.length > 0 && typeof data[0] === "string") {
+      return data
+   }
+
+   // map the objects
+   return mapIfObject<T>(data, creationFunction)
 }
 
 /**
