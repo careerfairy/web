@@ -217,13 +217,13 @@ test.describe("Streaming Journey", () => {
          streamerPage.connectionInterruptedTroubleMessageLocator
       ).toBeVisible({ timeout: 15000 })
       await expect(
-         streamerPage.connectionInterruptedTroubleRefreshMessageLocator
+         streamerPage.connectionInterruptedTroubleRefreshButtonLocator
       ).toBeVisible()
 
       // re-connect the browser, the dialog should disappear
       await streamerPage.page.context().setOffline(false)
       await expect(
-         streamerPage.connectionInterruptedTroubleRefreshMessageLocator
+         streamerPage.connectionInterruptedTroubleRefreshButtonLocator
       ).not.toBeVisible()
    })
 
@@ -250,7 +250,7 @@ test.describe("Streaming Journey", () => {
          )
       ).toBeVisible()
       await expect(
-         viewerPage.page.locator("text=Close the stream and continue here")
+         viewerPage.page.locator("text=CLICK HERE TO FORCE CONNECTION")
       ).toBeVisible()
    })
 

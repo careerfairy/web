@@ -10,7 +10,7 @@ import { LocalizationProvider } from "@mui/x-date-pickers"
 import { AdapterDateFns } from "@mui/x-date-pickers/AdapterDateFns"
 import { AuthProvider } from "../HOCs/AuthProvider"
 import { ReactReduxFirebaseProvider } from "react-redux-firebase"
-import { createFirestoreInstance } from "redux-firestore"
+import { actionTypes, createFirestoreInstance } from "redux-firestore"
 import { Provider } from "react-redux"
 import { CacheProvider } from "@emotion/react"
 import createEmotionCache from "../materialUI/createEmotionCache"
@@ -32,13 +32,12 @@ import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryPa
 import TutorialProvider from "../HOCs/TutorialProvider"
 import ErrorProvider from "../HOCs/ErrorProvider"
 import {
+   AuthProvider as ReactFireAuthProvider,
    FirebaseAppProvider,
    FirestoreProvider,
-   AuthProvider as ReactFireAuthProvider,
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
-import { actionTypes } from "redux-firestore"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -72,7 +71,6 @@ const rrfProps = {
 
 function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
-
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
 

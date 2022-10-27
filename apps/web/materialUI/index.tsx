@@ -3,14 +3,14 @@
 import {
    alpha,
    createTheme,
-   PaletteOptions,
+   PaletteColorOptions,
    styled,
    Theme,
 } from "@mui/material/styles"
 import { grey } from "@mui/material/colors"
 
 import React from "react"
-import { PaletteMode, Components } from "@mui/material"
+import { Components, PaletteMode } from "@mui/material"
 import { DefaultTheme } from "@mui/styles"
 
 interface CustomThemeProps {
@@ -64,13 +64,15 @@ declare module "@mui/material/styles" {
    }
 
    interface Palette {
-      navyBlue: Palette["primary"]
-      gold: Palette["primary"]
+      navyBlue: PaletteColor
+      gold: PaletteColor
+      tertiary: PaletteColor
    }
 
    interface PaletteOptions {
-      navyBlue: PaletteOptions["primary"]
-      gold: PaletteOptions["primary"]
+      navyBlue: PaletteColorOptions
+      gold: PaletteColorOptions
+      tertiary: PaletteColorOptions
    }
 
    interface BreakpointOverrides {
@@ -78,19 +80,27 @@ declare module "@mui/material/styles" {
    }
 }
 
-const secondary: PaletteOptions["secondary"] = {
+const secondary: PaletteColorOptions = {
    light: "#b4a8ff",
    main: "#7431e2",
    dark: "#590db6",
    gradient: "#644eec",
    contrastText: "#FFFFFF",
 }
-const primary: PaletteOptions["primary"] = {
+const primary: PaletteColorOptions = {
    light: "#89c2ba",
    main: "#00d2aa",
    dark: "#00b08f",
    contrastText: "#FFFFFF",
    gradient: "#07c1a7",
+}
+
+const tertiary: PaletteColorOptions = {
+   main: "#FAEDF2",
+   light: "rgb(251, 240, 244)",
+   dark: "rgb(175, 165, 169)",
+   contrastText: "rgba(0, 0, 0, 0.87)",
+   gradient: "#f5f5f5",
 }
 
 const black = "#000000"
@@ -117,7 +127,8 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
             main: grey[300],
             dark: grey[400],
          },
-         secondary: secondary,
+         secondary,
+         tertiary,
          error: {
             main: "#e70026",
             dark: "#b00024",
