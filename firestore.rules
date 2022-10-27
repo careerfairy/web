@@ -18,9 +18,9 @@ service cloud.firestore {
             return isSignedIn() && request.auth.token.email == userEmail;
         }
 
-        function isLivestreamAdmin(livestreamId) {
-            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
-        }
+//        function isLivestreamAdmin(livestreamId) {
+//            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
+//        }
 
         match /fieldsOfStudy/{fieldOfStudy} {
             allow read: if true;
@@ -236,8 +236,7 @@ service cloud.firestore {
             }
 
             match /tokens/{secureToken} {
-                allow read: if true;
-                allow write: if isLivestreamAdmin(livestream) || isCFAdmin();
+                allow read, write: if true;
             }
 
             match /recordingToken/{token} {
@@ -397,8 +396,7 @@ service cloud.firestore {
             }
 
             match /tokens/{secureToken} {
-                allow read: if true;
-                allow write: if isLivestreamAdmin(livestream) || isCFAdmin();
+                allow read, write: if true;
             }
         }
 
@@ -414,17 +412,14 @@ service cloud.firestore {
             match /speakers/{speaker} {
                 allow read: if true;
                 allow write: if true;
-                allow update: if true;
             }
             match /rating/{ratingDoc} {
                 allow read: if true;
                 allow write: if true;
-                allow update: if true;
             }
             match /tokens/{secureToken} {
                 allow read: if true;
                 allow write: if true;
-                allow update: if true;
             }
         }
 
