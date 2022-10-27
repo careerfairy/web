@@ -79,7 +79,7 @@ function MyApp(props) {
          <Head>
             <meta
                name="viewport"
-               content="initial-scale=1, width=device-width"
+               content="initial-scale=1, width=device-width, maximum-scale=1.0, user-scalable=0" //https://github.com/vercel/next.js/issues/7176
             />
             <title>CareerFairy | Watch live streams. Get hired.</title>
          </Head>

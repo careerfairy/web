@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo, useState } from "react"
 import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
-import { FormikHandlers, FormikHelpers } from "formik"
+import { FormikHelpers } from "formik"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import SingleListSelect from "../../common/SingleListSelect"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -8,7 +8,6 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 
 interface Props {
    setFieldValue?: FormikHelpers<FieldOfStudy>["setFieldValue"]
-   handleBlur?: FormikHandlers["handleBlur"]
    value: FieldOfStudy
    className?: string
    error?: any
@@ -21,7 +20,6 @@ export const FieldOfStudySelector = ({
    value,
    className,
    error,
-   handleBlur,
    onSelectItem,
    loading,
    disabled,
@@ -42,7 +40,6 @@ export const FieldOfStudySelector = ({
    return (
       <SingleListSelect
          inputName={"fieldOfStudy"}
-         handleBlur={handleBlur}
          inputProps={multiSelectInputProps}
          getValueFn={getValueFn}
          selectedItem={value}

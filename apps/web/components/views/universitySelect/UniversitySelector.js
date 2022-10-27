@@ -10,6 +10,7 @@ import {
    TextField,
    CircularProgress,
 } from "@mui/material"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 const otherObj = { name: "Other", id: "other" }
 const UniversitySelector = ({
@@ -17,7 +18,6 @@ const UniversitySelector = ({
    universityCountryCode,
    setFieldValue,
    error,
-   handleBlur,
    submitting,
    values,
    className = "",
@@ -37,8 +37,13 @@ const UniversitySelector = ({
                      await firebase.getUniversitiesFromCountryCode(
                         universityCountryCode
                      )
-                  const fetchedUniversities = querySnapshot.data().universities
-                  setUniversities([...fetchedUniversities, otherObj])
+                  const fetchedUniversities =
+                     querySnapshot.data().universities || []
+
+                  setUniversities([
+                     ...fetchedUniversities.sort(dynamicSort("name", "asc")),
+                     otherObj,
+                  ])
                } else {
                   setFieldValue("university", otherObj)
                }
@@ -66,10 +71,10 @@ const UniversitySelector = ({
          id="university"
          name="university"
          fullWidth
+         blurOnSelect
          data-testid={"university-selector"}
          disabled={submitting}
          selectOnFocus
-         onBlur={handleBlur}
          autoHighlight
          onChange={(e, value) => {
             if (value) {
@@ -104,7 +109,6 @@ const UniversitySelector = ({
                   error={Boolean(error)}
                   id="university"
                   name="university"
-                  onBlur={handleBlur}
                   label="University"
                   disabled={submitting}
                   variant="outlined"
