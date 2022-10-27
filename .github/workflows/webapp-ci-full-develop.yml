@@ -148,14 +148,14 @@ jobs:
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.shard }}-playwright-report
+              name: chromium-playwright-report
               path: apps/web/playwright-report
 
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: ${{ matrix.shard }}-debug-logs
+              name: chromium-debug-logs
               path: firebase-debug.log
    # Deploy
    deploy:
