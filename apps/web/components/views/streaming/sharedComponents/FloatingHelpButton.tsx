@@ -1,0 +1,45 @@
+import React from "react"
+import { sxStyles } from "../../../../types/commonTypes"
+import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined"
+import Button from "@mui/material/Button"
+import { alpha } from "@mui/material/styles"
+
+const styles = sxStyles({
+   root: {
+      position: "absolute",
+      top: 8,
+      left: 8,
+      opacity: 0.8,
+      zIndex: 1000,
+      display: "flex",
+      flexDirection: "column",
+      backgroundColor: (theme) => alpha(theme.palette.common.black, 0.4),
+      boxShadow: 2,
+      backdropFilter: "blur(5px)",
+      padding: "8px 18.4px",
+      borderRadius: 1.5,
+      color: "white",
+      "&:hover": {
+         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.5),
+      },
+   },
+})
+
+type Props = {
+   openSupportInLeftMenu: () => void
+}
+const FloatingHelpButton = ({ openSupportInLeftMenu }: Props) => {
+   return (
+      <Button
+         size={"small"}
+         color={"grey"}
+         onClick={openSupportInLeftMenu}
+         sx={styles.root}
+      >
+         <HelpOutlineOutlinedIcon />
+         Help
+      </Button>
+   )
+}
+
+export default FloatingHelpButton

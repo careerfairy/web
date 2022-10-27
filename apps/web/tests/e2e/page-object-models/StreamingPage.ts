@@ -15,8 +15,8 @@ class StreamingPage extends CommonPage {
    public connectionInterruptedTroubleMessageLocator = this.page.locator(
       "text=We're having trouble connecting you with CareerFairy:"
    )
-   public connectionInterruptedTroubleRefreshMessageLocator = this.page.locator(
-      "text=Click here to refresh once done"
+   public connectionInterruptedTroubleRefreshButtonLocator = this.page.locator(
+      'button:has-text("Refresh")'
    )
 
    public backToMainRoom() {

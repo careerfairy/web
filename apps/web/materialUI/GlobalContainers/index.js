@@ -62,7 +62,10 @@ export const CategoryContainerContent = ({ ...props }) => {
    return <Box className={classes.categoryContainerContent} {...props} />
 }
 
-export const CategoryContainerTopAligned = ({ className, ...props }) => {
+export const CategoryContainerTopAligned = ({
+   className = undefined,
+   ...props
+}) => {
    const classes = useStyles()
    return (
       <Box

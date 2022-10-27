@@ -3,6 +3,7 @@ import {
    Dialog,
    DialogActions,
    DialogContent,
+   DialogProps,
    DialogTitle,
    Grow,
    Typography,
@@ -21,9 +22,10 @@ const styles: StylesProps = sxStyles({
 })
 
 type Props = {
-   onClose: () => void
+   onClose?: () => void
    title: string
    children: JSX.Element
+   maxWidth?: DialogProps["maxWidth"]
    showCloseBtn?: boolean
    titleOnCenter?: boolean
    additionalLeftButton?: JSX.Element
@@ -37,6 +39,7 @@ const GenericDialog = ({
    children,
    showCloseBtn = true,
    additionalLeftButton,
+   maxWidth = "md",
    additionalRightButton,
 }: Props) => {
    const footerButtons =
@@ -44,7 +47,7 @@ const GenericDialog = ({
 
    return (
       <Dialog
-         maxWidth="md"
+         maxWidth={maxWidth}
          fullWidth
          TransitionComponent={Grow}
          open={true}

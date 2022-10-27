@@ -14,6 +14,8 @@ import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelector
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobsCategory from "./categories/JobsCategory"
 import GenericCategoryInactive from "../sharedComponents/GenericCategoryInactive"
+import SupportCategory from "./categories/SupportCategory"
+import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -33,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
    },
    desktopDrawer: {
-      width: 280,
+      width: LEFT_MENU_WIDTH,
       top: 55,
       height: "calc(100% - 55px)",
       boxShadow: theme.shadows[15],
@@ -45,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
       bottom: 0,
       zIndex: 1,
       background: theme.palette.background.default,
+      borderRight: `none`,
    },
    drawerSmallScreen: {
       width: "100%",
@@ -55,7 +58,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const states = ["questions", "polls", "hand", "jobs"]
+const states = ["questions", "polls", "hand", "support", "jobs"]
 
 const LeftMenu = ({
    livestream,
@@ -146,6 +149,16 @@ const LeftMenu = ({
             key={"jobs-category-tab"}
             selectedState={selectedState}
             livestream={livestream}
+            showMenu={showMenu}
+         />
+      )
+   }
+
+   if (streamer) {
+      views.push(
+         <SupportCategory
+            key={"support-category-tab"}
+            selectedState={selectedState}
             showMenu={showMenu}
          />
       )
