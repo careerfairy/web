@@ -133,11 +133,11 @@ const LivestreamGroupQuestionForm = () => {
                   }}
                >
                   <DialogTitle>
-                     {`${livestream.company} Would Like To Know More About You`}
+                     {`${livestream?.company} Would Like To Know More About You`}
                   </DialogTitle>
                   <GroupLogo
                      logoUrl={livestream?.companyLogoUrl}
-                     alt={livestream.company}
+                     alt={livestream?.company}
                   />
                   <DialogContent>
                      <Stack spacing={2}>

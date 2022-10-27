@@ -29,12 +29,14 @@ const styles = sxStyles({
 const GroupLogo = ({ logoUrl, alt = "" }) => {
    return (
       <CardMedia sx={styles.media}>
-         <Image
-            src={getResizedUrl(logoUrl, "md")}
-            width={350}
-            height={150}
-            alt={alt}
-         />
+         {logoUrl && (
+            <Image
+               src={getResizedUrl(logoUrl, "md")}
+               width={350}
+               height={150}
+               alt={alt}
+            />
+         )}
       </CardMedia>
    )
 }

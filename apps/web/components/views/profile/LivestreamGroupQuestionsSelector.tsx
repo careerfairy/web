@@ -114,26 +114,24 @@ const QuestionSelect = ({
             ),
          }}
       >
-         <>
-            {native && <option value="" disabled></option>}
-            {options.map((option) => {
-               if (native) {
-                  return (
-                     <option key={option.id} value={option.id}>
+         {native && <option value="" disabled></option>}
+         {options.map((option) => {
+            if (native) {
+               return (
+                  <option key={option.id} value={option.id}>
+                     {option.name}
+                  </option>
+               )
+            } else {
+               return (
+                  <MenuItem key={option.id} value={option.id}>
+                     <Typography variant="inherit" noWrap>
                         {option.name}
-                     </option>
-                  )
-               } else {
-                  return (
-                     <MenuItem key={option.id} value={option.id}>
-                        <Typography variant="inherit" noWrap>
-                           {option.name}
-                        </Typography>
-                     </MenuItem>
-                  )
-               }
-            })}
-         </>
+                     </Typography>
+                  </MenuItem>
+               )
+            }
+         })}
       </TextField>
    )
 }
