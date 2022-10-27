@@ -16,7 +16,7 @@ import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
 import { LanguageSelect } from "../../../helperFunctions/streamFormFunctions/components"
 import Stack from "@mui/material/Stack"
 import FormGroup from "../FormGroup"
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import StreamDurationSelect from "../StreamDurationSelect"
 import { FormikErrors, FormikValues } from "formik"
 import { useTheme } from "@mui/material/styles"
@@ -55,6 +55,7 @@ const StreamInfo = ({
 }: Props) => {
    const { palette } = useTheme()
    const [showStartTooltip, setShowStartToolTip] = useState(false)
+   const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
    const { setShowPromotionInputs } = useStreamCreationProvider()
 
    useEffect(() => {
@@ -83,6 +84,11 @@ const StreamInfo = ({
          .replace(/, ([^,]*)$/, " and $1")
       return `By enabling this you are making this stream only visible to members of ${groupNames}.`
    }
+
+   const handleStartDatePickerClose = useCallback(() => {
+      setStartDatePickerOpen(false)
+      handleBlur({ target: { name: "start" } })
+   }, [handleBlur])
 
    // @ts-ignore
    return (
@@ -206,7 +212,7 @@ const StreamInfo = ({
                      <Tooltip
                         placement="top"
                         arrow
-                        open={showStartTooltip}
+                        open={showStartTooltip && !startDatePickerOpen}
                         title={
                            <Box display="flex">
                               <Typography>
@@ -236,10 +242,12 @@ const StreamInfo = ({
                   disabled={isSubmitting}
                   label="Live Stream Start Date"
                   value={values.start}
-                  onClose={() => handleBlur({ target: { name: "start" } })}
+                  onClose={handleStartDatePickerClose}
                   onChange={(value) => {
                      setFieldValue("start", new Date(value), true)
                   }}
+                  open={startDatePickerOpen}
+                  onOpen={() => setStartDatePickerOpen(true)}
                />
                <Collapse
                   className={classes.errorMessage}
