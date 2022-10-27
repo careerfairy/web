@@ -70,10 +70,16 @@ export const sendBasicTemplateEmail_v3 = functions
       // Remove the sender email if the sender is already in the emails list
       emailsArray = [...new Set(emailsArray)]
 
-      functions.logger.log(
-         "number of emails in sendBasicTemplateEmail",
-         emailsArray.length
-      )
+      functions.logger.info("Details of marketing email:", {
+         queryOptions,
+         isForRealEmails,
+         testEmails,
+         senderEmail,
+         title,
+         eventUrl,
+         templateId,
+         numberOfEmails: emailsArray.length,
+      })
 
       // TODO remove before deploying to prod
       // functions.logger.log("Total emails in sendBasicTemplateEmail", emailsArray);
