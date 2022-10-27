@@ -70,12 +70,6 @@ const QuestionCreateForm = () => {
    const { putLivestreamQuestion, rewardUserAction } = useFirebaseService()
    const { authenticatedUser, userData } = useAuth()
 
-   useEffect(() => {
-      if (livestream?.questionsDisabled) {
-         handleNext()
-      }
-   }, [livestream?.questionsDisabled])
-
    const {
       handleChange,
       values,

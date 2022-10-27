@@ -36,6 +36,7 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
    },
 }))
+
 const LivestreamGroupQuestionForm = () => {
    const {
       group,
@@ -44,12 +45,14 @@ const LivestreamGroupQuestionForm = () => {
       completeRegistrationProcess,
       handleClose,
       gettingPolicyStatus,
-      hasAgreedToAll,
+      hasAgreedToAll: hasAgreedToAllPrivacyPolicies,
       onQuestionsAnswered,
       cancelable,
    } = useContext(RegistrationContext)
+
    const { userData } = useAuth()
    const classes = useStyles()
+
    const [checkingQuestions, setCheckingQuestions] = useState(true)
    const [registrationFormValues, setRegistrationFormValues] =
       useState<LivestreamGroupQuestionsMap>({})
@@ -68,7 +71,8 @@ const LivestreamGroupQuestionForm = () => {
                checkIfUserHasAnsweredAllLivestreamGroupQuestions(
                   answeredLivestreamGroupQuestions
                )
-            if (hasAgreedToAll && hasAnsweredAllQuestions) {
+
+            if (hasAgreedToAllPrivacyPolicies && hasAnsweredAllQuestions) {
                await handleSubmit(answeredLivestreamGroupQuestions)
             } else {
                setRegistrationFormValues((prevState) =>
@@ -84,7 +88,11 @@ const LivestreamGroupQuestionForm = () => {
          }
          setCheckingQuestions(false)
       })()
-   }, [livestream?.groupQuestionsMap, userData?.userEmail, hasAgreedToAll])
+   }, [
+      livestream?.groupQuestionsMap,
+      userData?.userEmail,
+      hasAgreedToAllPrivacyPolicies,
+   ])
 
    const handleSubmit = async (values: LivestreamGroupQuestionsMap) => {
       await completeRegistrationProcess(values)
@@ -103,6 +111,7 @@ const LivestreamGroupQuestionForm = () => {
       <Formik
          initialValues={registrationFormValues}
          enableReinitialize
+         validateOnMount
          onSubmit={handleSubmit}
          validate={validate}
       >
@@ -131,45 +140,50 @@ const LivestreamGroupQuestionForm = () => {
                      alt={livestream.company}
                   />
                   <DialogContent>
-                     <DialogContentText align="center" noWrap>
-                        {group.description}
-                     </DialogContentText>
                      <Stack spacing={2}>
-                        {Object.values(values).map((groupQuestions) => (
-                           <LivestreamGroupQuestionsSelector
-                              key={groupQuestions.groupId}
-                              /*// @ts-ignore*/
-                              errors={errors}
-                              touched={touched}
-                              handleBlur={handleBlur}
-                              groupQuestions={groupQuestions}
-                              setFieldValue={setFieldValue}
-                           />
-                        ))}
+                        <DialogContentText gutterBottom align="center">
+                           {group.description}
+                        </DialogContentText>
+                        <Stack spacing={2}>
+                           {Object.values(values).map((groupQuestions) => (
+                              <LivestreamGroupQuestionsSelector
+                                 key={groupQuestions.groupId}
+                                 /*// @ts-ignore*/
+                                 errors={errors}
+                                 touched={touched}
+                                 handleBlur={handleBlur}
+                                 groupQuestions={groupQuestions}
+                                 setFieldValue={setFieldValue}
+                              />
+                           ))}
+                        </Stack>
+                        {!!groupsWithPolicies.length && (
+                           <Box className={classes.actions}>
+                              {groupsWithPolicies.map((group) => (
+                                 <Typography
+                                    key={group.id}
+                                    style={{ fontSize: "0.8rem" }}
+                                 >
+                                    Your participant information (surname, first
+                                    name, university affiliation) and the data
+                                    above will be transferred to the organizer
+                                    when you register for the event. The data
+                                    protection notice of the organizer applies.
+                                    You can find it
+                                    <a
+                                       target="_blank"
+                                       style={{ marginLeft: 4 }}
+                                       href={group.privacyPolicyUrl}
+                                       rel="noreferrer"
+                                    >
+                                       here
+                                    </a>
+                                    .
+                                 </Typography>
+                              ))}
+                           </Box>
+                        )}
                      </Stack>
-                     <Box p={2} className={classes.actions}>
-                        {groupsWithPolicies.map((group) => (
-                           <Typography
-                              key={group.id}
-                              style={{ fontSize: "0.8rem" }}
-                           >
-                              Your participant information (surname, first name,
-                              university affiliation) and the data above will be
-                              transferred to the organizer when you register for
-                              the event. The data protection notice of the
-                              organizer applies. You can find it
-                              <a
-                                 target="_blank"
-                                 style={{ marginLeft: 4 }}
-                                 href={group.privacyPolicyUrl}
-                                 rel="noreferrer"
-                              >
-                                 here
-                              </a>
-                              .
-                           </Typography>
-                        ))}
-                     </Box>
                   </DialogContent>
                   <DialogActions>
                      {!livestream?.hasStarted && cancelable && (

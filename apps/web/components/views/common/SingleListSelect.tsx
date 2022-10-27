@@ -65,6 +65,7 @@ const SingleListSelect = <T extends { [key: string]: any }>({
          loading={loading}
          onChange={handleSelect}
          onBlur={handleBlur}
+         blurOnSelect
          isOptionEqualToValue={isOptionEqualToValue}
          disableCloseOnSelect={isCheckbox ? true : undefined}
          options={options}

@@ -32,6 +32,7 @@ const UniversityCountrySelector = ({
          data-testid={"university-country-selector"}
          disabled={submitting}
          selectOnFocus
+         blurOnSelect
          onBlur={handleBlur}
          autoHighlight
          autoComplete={false}

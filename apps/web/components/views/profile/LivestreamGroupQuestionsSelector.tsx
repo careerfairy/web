@@ -88,7 +88,7 @@ const QuestionSelect = ({
    const handleChange = useCallback(
       (event: React.ChangeEvent<{ value: unknown }>) =>
          setFieldValue(inputName, event.target.value),
-      []
+      [inputName, setFieldValue]
    )
 
    return (
@@ -114,23 +114,26 @@ const QuestionSelect = ({
             ),
          }}
       >
-         {options.map((option) => {
-            if (native) {
-               return (
-                  <option key={option.id} value={option.id}>
-                     {option.name}
-                  </option>
-               )
-            } else {
-               return (
-                  <MenuItem key={option.id} value={option.id}>
-                     <Typography variant="inherit" noWrap>
+         <>
+            {native && <option value="" disabled></option>}
+            {options.map((option) => {
+               if (native) {
+                  return (
+                     <option key={option.id} value={option.id}>
                         {option.name}
-                     </Typography>
-                  </MenuItem>
-               )
-            }
-         })}
+                     </option>
+                  )
+               } else {
+                  return (
+                     <MenuItem key={option.id} value={option.id}>
+                        <Typography variant="inherit" noWrap>
+                           {option.name}
+                        </Typography>
+                     </MenuItem>
+                  )
+               }
+            })}
+         </>
       </TextField>
    )
 }

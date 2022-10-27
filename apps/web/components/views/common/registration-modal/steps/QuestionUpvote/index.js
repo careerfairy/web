@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
 const QuestionUpvote = () => {
    const {
       handleNext,
-      group,
       livestream,
       hasMore,
       getMore,
@@ -65,17 +64,6 @@ const QuestionUpvote = () => {
 
    const { push } = useRouter()
    const { authenticatedUser } = useAuth()
-
-   useEffect(() => {
-      if (livestream?.questionsDisabled) {
-         handleNext()
-         return
-      }
-
-      if (!questions.length && !hasMore) {
-         handleNext()
-      }
-   }, [questions, hasMore, livestream?.questionsDisabled])
 
    const handleUpvote = async (question) => {
       if (!authenticatedUser) {
