@@ -1,6 +1,7 @@
 import { Identifiable } from "../commonTypes"
 
 export interface UniversityCountry extends Identifiable {
+   countryId: string
    universities: University[]
    // Country Code
    id: string

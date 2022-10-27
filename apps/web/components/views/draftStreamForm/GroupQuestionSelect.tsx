@@ -41,11 +41,11 @@ const GroupQuestionSelect = ({
    const selectedItems = useMemo(() => {
       if (!values.groupQuestionsMap?.[group.id]?.questions) return []
       return Object.values(values.groupQuestionsMap[group.id].questions)
-   }, [values])
+   }, [group.id, values.groupQuestionsMap])
 
    const disabledValues = useMemo(
       () => (isGroupAdmin(group.id) ? [] : questions.map((q) => q.id)),
-      [isGroupAdmin]
+      [group.id, isGroupAdmin, questions]
    )
 
    const onSelectItems = useCallback(
@@ -67,7 +67,7 @@ const GroupQuestionSelect = ({
          }
          setFieldValue(`groupQuestionsMap.${group.id}`, groupQuestionsMap)
       },
-      [setFieldValue, values, group]
+      [setFieldValue, group]
    )
    const inputProps = useMemo(
       () => ({
@@ -81,7 +81,7 @@ const GroupQuestionSelect = ({
    if (isLoadingQuestions || !questions.length) return null
 
    return (
-      <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+      <Grid xs={12} item>
          <MultiListSelect
             inputName={`groupQuestionsMap.${group.id}`}
             onSelectItems={onSelectItems}
@@ -92,6 +92,11 @@ const GroupQuestionSelect = ({
             getLabelFn={getLabelFn}
             inputProps={inputProps}
             disabledValues={disabledValues}
+            chipProps={{
+               variant: "contained",
+               color: "secondary",
+            }}
+            checkboxColor="secondary"
          />
       </Grid>
    )

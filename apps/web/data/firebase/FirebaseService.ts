@@ -15,6 +15,7 @@ import {
    EventRating,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
+   LivestreamPromotions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -34,8 +35,8 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
-import DocumentReference = firebase.firestore.DocumentReference
 import CookiesUtil from "../../util/CookiesUtil"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -328,6 +329,14 @@ class FirebaseService {
       return ref.get()
    }
 
+   getUniversitiesFromMultipleCountryCode = async (countryCodes: string[]) => {
+      let ref = this.firestore
+         .collection("universitiesByCountry")
+         .where("countryId", "in", countryCodes)
+
+      return await ref.get()
+   }
+
    // *** Firestore API ***
 
    getStreamRef = (router): firebase.firestore.DocumentReference => {
@@ -385,54 +394,11 @@ class FirebaseService {
       })
    }
 
-   updateUserGroups = (userEmail, groupIds, registeredGroups) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
-      return ref.update({
-         groupIds,
-         registeredGroups,
-      })
-   }
-
-   setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
-      let userRef = this.firestore.collection("userData").doc(userId)
-      return userRef.update({
-         groupIds: Array.from(new Set(arrayOfIds)),
-         registeredGroups: arrayOfGroupObjects,
-      })
-   }
-
    listenToGroups = (callback) => {
       let groupRefs = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
       return groupRefs.onSnapshot(callback)
-   }
-
-   listenToUserGroupCategoryValue = (
-      userEmail,
-      groupId,
-      categoryId,
-      callback
-   ) => {
-      let ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("registeredGroups")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-      return ref.onSnapshot(callback)
-   }
-
-   updateUserGroupCategoryValue = (userEmail, groupId, categoryId, value) => {
-      let ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("registeredGroups")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-      return ref.update({ value: value })
    }
 
    // COMPANIES
@@ -554,44 +520,9 @@ class FirebaseService {
       return ref.get()
    }
 
-   // WISHLIST
-
-   getWishList = () => {
-      let ref = this.firestore
-         .collection("wishList")
-         .orderBy("vote", "desc")
-         .where("fulfilled", "==", false)
-      return ref.get()
-   }
-
-   getLatestFulfilledWishes = () => {
-      let ref = this.firestore
-         .collection("wishList")
-         .where("fulfilled", "==", true)
-         .orderBy("vote", "desc")
-      return ref.get()
-   }
-
-   addNewWish = (user, wish) => {
-      let ref = this.firestore.collection("wishList")
-      return ref.add({
-         wish: wish,
-         fulfilled: false,
-         vote: 1,
-         date: firebase.firestore.Timestamp.fromDate(new Date()),
-      })
-   }
-
-   addVoteToWish = (wish) => {
-      let ref = this.firestore.collection("wishList").doc(wish.id)
-      return ref.update({
-         vote: wish.vote + 1,
-      })
-   }
-
    // CREATE_LIVESTREAMS
 
-   addLivestream = async (livestream, collection, author = {}) => {
+   addLivestream = async (livestream, collection, author = {}, promotion) => {
       try {
          const ratings: EventRating[] = [
             {
@@ -651,6 +582,19 @@ class FirebaseService {
             batch.set(ratingRef, toSet)
          }
 
+         const promotionsRef = this.firestore
+            .collection(collection)
+            .doc(livestreamsRef.id)
+            .collection("promotions")
+            .doc("promotions")
+
+         const promotionToUpdate: LivestreamPromotions = {
+            ...promotion,
+            livestreamId: livestreamsRef.id,
+         }
+
+         batch.set(promotionsRef, promotionToUpdate, { merge: true })
+
          await batch.commit()
          return livestreamsRef.id
       } catch (error) {
@@ -708,31 +652,25 @@ class FirebaseService {
       return livestreamsRef.id
    }
 
-   updateLivestream = async (livestream, collection) => {
+   updateLivestream = async (livestream, collection, promotion) => {
+      const batch = this.firestore.batch()
       let livestreamsRef = this.firestore
          .collection(collection)
          .doc(livestream.id)
       livestream.lastUpdated = this.getServerTimestamp()
-      await livestreamsRef.update(livestream)
+
+      batch.set(livestreamsRef, livestream, { merge: true })
+
+      const promotionRef = this.firestore
+         .collection(collection)
+         .doc(livestream.id)
+         .collection("promotions")
+         .doc("promotions")
+
+      batch.set(promotionRef, promotion, { merge: true })
+
+      await batch.commit()
       return livestream.id
-   }
-
-   listenToStreamAdminPreferences = (mainStreamId, callback) => {
-      const adminPreferenceRef = this.firestore
-         .collection("livestreams")
-         .doc(mainStreamId)
-         .collection("preferences")
-         .doc("adminPreference")
-      return adminPreferenceRef.onSnapshot(callback)
-   }
-
-   addLivestreamSpeaker = (livestreamId, speaker) => {
-      let speakersRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("speakers")
-
-      return speakersRef.add(speaker)
    }
 
    getStreamById = (streamId, collection) => {
@@ -745,6 +683,16 @@ class FirebaseService {
          .collection(collection)
          .doc(streamId)
          .collection("speakers")
+      return ref.get()
+   }
+
+   getStreamPromotions = (streamId, collection) => {
+      const ref = this.firestore
+         .collection(collection)
+         .doc(streamId)
+         .collection("promotions")
+         .doc("promotions")
+
       return ref.get()
    }
 

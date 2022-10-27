@@ -34,7 +34,8 @@ const FieldsOfStudyMultiSelector = ({
             placeholder: "Select Fields of Study",
          }}
          chipProps={{
-            variant: "outlined",
+            variant: "contained",
+            color: "secondary",
          }}
          getValueFn={getValueFn}
          selectAllOption={{
@@ -42,6 +43,7 @@ const FieldsOfStudyMultiSelector = ({
             returnValue: [],
             selectValueType: "ReturnValue",
          }}
+         checkboxColor="secondary"
       />
    )
 }

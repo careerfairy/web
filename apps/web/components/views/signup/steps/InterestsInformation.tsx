@@ -8,9 +8,9 @@ import {
    formatToOptionArray,
    mapOptions,
    multiListSelectMapValueFn,
-   Option,
 } from "../utils"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const styles = sxStyles({
    inputLabel: {
@@ -27,7 +27,7 @@ const InterestsInformation = () => {
    const { authenticatedUser: user, userData } = useAuth()
 
    const [inputValues, setInputValues] = useState({
-      [SELECTED_INTERESTS_FIELD_NAME]: [] as Option[],
+      [SELECTED_INTERESTS_FIELD_NAME]: [] as OptionGroup[],
    })
 
    useEffect(() => {
@@ -44,7 +44,7 @@ const InterestsInformation = () => {
    }, [userData, allInterests])
 
    const handleSelectedInterestsChange = useCallback(
-      async (name: string, selectedInterests: Option[]) => {
+      async (name: string, selectedInterests: OptionGroup[]) => {
          try {
             await userRepo.updateAdditionalInformation(user.email, {
                [name]: mapOptions(selectedInterests),
