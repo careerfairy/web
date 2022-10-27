@@ -74,6 +74,7 @@ const RegistrationComplete = () => {
       onFinish?.()
       handleClose?.()
    }
+
    return (
       <>
          <DialogContent sx={styles.content}>
