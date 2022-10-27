@@ -12,6 +12,10 @@ import {
    GroupScriptsRepository,
    IGroupScriptsRepository,
 } from "./api/GroupScriptsRepository"
+import {
+   FirebaseUniversityRepository,
+   IUniversityRepository,
+} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
 
 const firestoreInstance = firestore as any
 const authInstance = auth
@@ -34,3 +38,6 @@ export const groupRepo: IGroupScriptsRepository = new GroupScriptsRepository(
 
 export const livestreamRepo: ILivestreamScriptsRepository =
    new LivestreamScriptsRepository(firestoreInstance, FieldValue)
+
+export const universitiesRepo: IUniversityRepository =
+   new FirebaseUniversityRepository(firestoreInstance)

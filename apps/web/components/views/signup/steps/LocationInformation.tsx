@@ -13,9 +13,9 @@ import {
    formatToOptionArray,
    mapOptions,
    multiListSelectMapValueFn,
-   Option,
 } from "../utils"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const styles = sxStyles({
    inputLabel: {
@@ -38,8 +38,8 @@ const LocationInformation = () => {
    const { authenticatedUser: user, userData } = useAuth()
 
    const [inputValues, setInputValues] = useState({
-      [COUNTRIES_OF_INTEREST_FIELD_NAME]: [] as Option[],
-      [SPOKEN_LANGUAGES_FIELD_NAME]: [] as Option[],
+      [COUNTRIES_OF_INTEREST_FIELD_NAME]: [] as OptionGroup[],
+      [SPOKEN_LANGUAGES_FIELD_NAME]: [] as OptionGroup[],
       [IS_LOOKING_FOR_JOB_FIELD_NAME]: false,
    })
 
@@ -81,7 +81,7 @@ const LocationInformation = () => {
    )
 
    const handleSelectedLanguageChange = useCallback(
-      (name: string, selectedLanguages: Option[]) => {
+      (name: string, selectedLanguages: OptionGroup[]) => {
          const fieldToUpdate = {
             spokenLanguages: mapOptions(selectedLanguages),
          }
@@ -91,7 +91,7 @@ const LocationInformation = () => {
    )
 
    const handleSelectedCountriesChange = useCallback(
-      (name: string, selectedCountriesAndRegions: Option[]) => {
+      (name: string, selectedCountriesAndRegions: OptionGroup[]) => {
          const fieldToUpdate = mapCountriesAndRegionsToFieldToUpdate(
             selectedCountriesAndRegions
          )

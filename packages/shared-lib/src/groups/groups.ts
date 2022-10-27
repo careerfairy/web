@@ -23,6 +23,7 @@ export interface Group extends Identifiable {
    privacyPolicyActive?: boolean
    privacyPolicyUrl?: string
    inActive?: boolean
+   bannerImageUrl?: string
 
    /*
     * Deprecated

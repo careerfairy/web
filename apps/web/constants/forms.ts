@@ -1,5 +1,5 @@
 import { DropdownItem } from "../components/views/common/GenericDropdown"
-import { Option } from "../components/views/signup/utils"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 export const maxQuestionLength = 170
 export const minQuestionLength = 10
@@ -33,47 +33,7 @@ export const possibleGenders = [
 export const regionGroupId = "Regions"
 export const countryGroupId = "Country"
 
-export const countriesAndRegionsOptionCodes = [
-   {
-      id: "africa",
-      name: "Africa",
-      groupId: regionGroupId,
-   },
-   {
-      id: "asia",
-      name: "Asia",
-      groupId: regionGroupId,
-   },
-   {
-      id: "caribbean",
-      name: "Caribbean",
-      groupId: regionGroupId,
-   },
-   {
-      id: "centralAmerica",
-      name: "Central America",
-      groupId: regionGroupId,
-   },
-   {
-      id: "europe",
-      name: "Europe",
-      groupId: regionGroupId,
-   },
-   {
-      id: "northAmerica",
-      name: "North America",
-      groupId: regionGroupId,
-   },
-   {
-      id: "oceania",
-      name: "Oceania",
-      groupId: regionGroupId,
-   },
-   {
-      id: "southAmerica",
-      name: "South America",
-      groupId: regionGroupId,
-   },
+export const countriesOptionCodes = [
    {
       id: "AF",
       name: "Afghanistan",
@@ -1314,7 +1274,51 @@ export const countriesAndRegionsOptionCodes = [
       name: "Åland Islands",
       groupId: countryGroupId,
    },
-] as Option[]
+]
+
+export const countriesAndRegionsOptionCodes = [
+   {
+      id: "africa",
+      name: "Africa",
+      groupId: regionGroupId,
+   },
+   {
+      id: "asia",
+      name: "Asia",
+      groupId: regionGroupId,
+   },
+   {
+      id: "caribbean",
+      name: "Caribbean",
+      groupId: regionGroupId,
+   },
+   {
+      id: "centralAmerica",
+      name: "Central America",
+      groupId: regionGroupId,
+   },
+   {
+      id: "europe",
+      name: "Europe",
+      groupId: regionGroupId,
+   },
+   {
+      id: "northAmerica",
+      name: "North America",
+      groupId: regionGroupId,
+   },
+   {
+      id: "oceania",
+      name: "Oceania",
+      groupId: regionGroupId,
+   },
+   {
+      id: "southAmerica",
+      name: "South America",
+      groupId: regionGroupId,
+   },
+   ...countriesOptionCodes,
+] as OptionGroup[]
 
 export const languageOptionCodes = [
    {
@@ -1344,5 +1348,20 @@ export const languageOptionCodes = [
    {
       id: "pt",
       name: "Portuguese",
+   },
+]
+
+export const channelOptionCodes = [
+   {
+      id: "facebook",
+      name: "Facebook",
+   },
+   {
+      id: "instagram",
+      name: "Instagram",
+   },
+   {
+      id: "tikTok",
+      name: "Tik Tok",
    },
 ]
