@@ -1,4 +1,8 @@
 import dotenv = require("dotenv")
+
+// load values from the .env file in this directory into process.env
+dotenv.config()
+
 // Imported Individual Cloud functions
 import auth = require("./auth")
 import agora = require("./agora")

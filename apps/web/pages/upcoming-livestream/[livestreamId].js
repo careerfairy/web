@@ -39,7 +39,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
 
    const [stream, setStream] = useState(parseStreamDates(serverStream))
-   const [registered, setRegistered] = useState(false)
    const { push, asPath, query, pathname, replace } = useRouter()
    const [currentGroup, setCurrentGroup] = useState(null)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
@@ -52,6 +51,29 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const [unfilteredGroups, setUnfilteredGroups] = useState([])
 
    const { authenticatedUser, userData, isLoggedOut, isLoggedIn } = useAuth()
+
+   const registered = useMemo(() => {
+      if (
+         authenticatedUser &&
+         stream?.registeredUsers?.includes(authenticatedUser.email)
+      ) {
+         return true
+      }
+
+      return false
+   }, [stream, authenticatedUser])
+
+   const participated = useMemo(() => {
+      if (
+         authenticatedUser &&
+         stream?.participatingStudents?.includes(authenticatedUser.email)
+      ) {
+         return true
+      }
+
+      return false
+   }, [stream, authenticatedUser])
+
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
    const handleOpenJoinModal = useCallback(
       () =>
@@ -147,17 +169,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [query.groupId])
 
    useEffect(() => {
-      if (
-         authenticatedUser &&
-         stream?.registeredUsers?.includes(authenticatedUser.email)
-      ) {
-         setRegistered(true)
-      } else {
-         setRegistered(false)
-      }
-   }, [stream, authenticatedUser])
-
-   useEffect(() => {
       if (stream?.groupIds?.length) {
          getDetailLivestreamCareerCenters(stream.groupIds).then(
             (querySnapshot) => {
@@ -221,8 +232,11 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [stream.hasStarted])
 
    const registerButtonLabel = useMemo(() => {
+      if (participated && isPastEvent) return "You attended this event"
+
       if (isPastEvent) return "The event is over"
-      if (authenticatedUser && registered) return "You're booked"
+
+      if (registered) return "You're booked"
 
       if (
          stream.maxRegistrants &&
@@ -232,11 +246,20 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       ) {
          return "No spots left"
       }
+
       if (authenticatedUser) {
          return "I'll attend"
       }
+
       return "Join to attend"
-   }, [authenticatedUser, registered, stream, isPastEvent])
+   }, [
+      participated,
+      isPastEvent,
+      registered,
+      stream.maxRegistrants,
+      stream.registeredUsers,
+      authenticatedUser,
+   ])
 
    const isRegistrationDisabled = useMemo(() => {
       if (isPastEvent) return true

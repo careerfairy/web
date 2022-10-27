@@ -73,6 +73,7 @@ export interface ILivestreamRepository {
       eventId: string,
       callback: (snapshot: firebase.firestore.DocumentSnapshot) => void
    )
+
    eventsOfGroupQuery(
       groupId: string,
       type: "upcoming" | "past",
@@ -87,21 +88,27 @@ export interface ILivestreamRepository {
          hideHidden?: boolean
       }
    ): Promise<LivestreamEvent[] | null>
+
    serializeEvent(event: LivestreamEvent): LivestreamEventSerialized
+
    parseSerializedEvent(event: LivestreamEventSerialized): LivestreamEventParsed
+
    heartbeat(
       livestream: LivestreamEventPublicData,
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void>
+
    getLivestreamUsers(
       eventId: string,
       userType: LivestreamUserAction
    ): Promise<UserLivestreamData[]>
+
    livestreamUsersQuery(
       eventId: string,
       userType: LivestreamUserAction
    ): firebase.firestore.Query
+
    livestreamUsersQueryWithRef(
       streamRef: firebase.firestore.DocumentReference,
       userType: LivestreamUserAction
@@ -122,6 +129,11 @@ export interface ILivestreamRepository {
       jobIdentifier: JobIdentifier,
       job: Job
    ): Promise<void>
+
+   getLivestreamUser(
+      eventId: string,
+      userId: string
+   ): Promise<UserLivestreamData>
 }
 
 export class FirebaseLivestreamRepository
@@ -133,6 +145,24 @@ export class FirebaseLivestreamRepository
       readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   async getLivestreamUser(
+      eventId: string,
+      userId: string
+   ): Promise<UserLivestreamData> {
+      const snap = await this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("userLivestreamData")
+         .doc(userId)
+         .get()
+
+      if (snap.exists) {
+         return this.addIdToDoc<UserLivestreamData>(snap)
+      }
+
+      return null
    }
 
    private mapLivestreamCollections(
