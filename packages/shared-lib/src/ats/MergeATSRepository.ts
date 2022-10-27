@@ -314,7 +314,7 @@ const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
 
 function createMergeAttachmentObject(user: UserData): MergeAttachmentModel {
    return {
-      file_name: "Resume - CareerFairy",
+      file_name: `Resume - ${user.firstName} ${user.lastName} - CareerFairy`,
       file_url: getResumeURL(user.userResume),
       attachment_type: "RESUME",
    }
