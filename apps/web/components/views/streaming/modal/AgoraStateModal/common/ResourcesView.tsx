@@ -1,9 +1,10 @@
-import React, { ComponentProps } from "react"
+import React, { useMemo } from "react"
 import { CardMedia, Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Image from "next/image"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
+import { getDictValues } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -35,10 +36,17 @@ const styles = sxStyles({
    },
 })
 
+type ResourceId = "troubleshootingConnectionIssues" | "howToStreamOnCareerFairy"
+
 type Props = {
-   options: ComponentProps<typeof ResourceCard>[]
+   resourceIds?: ResourceId[]
 }
-const ResourcesView = ({ options }: Props) => {
+const ResourcesView = ({ resourceIds }: Props) => {
+   const options = useMemo(
+      () => getDictValues(resourceIds, resourcesDict),
+      [resourceIds]
+   )
+
    return (
       <Stack spacing={2}>
          <Typography variant="h5" fontWeight={500}>
@@ -111,26 +119,25 @@ export const ResourceCard = ({
    )
 }
 
-export const dummyResources: ComponentProps<typeof ResourceCard>[] = [
-   {
-      title: "How to fix a black screen",
-      authorName: "Agora.io",
+const resourcesDict: Record<ResourceId, ResourceCardProps> = {
+   howToStreamOnCareerFairy: {
+      title: "Best Practices Before Going Live",
+      authorName: "CareerFairy",
       previewImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fbalck-screen-image.webp?alt=media&token=ee3edbe3-9b8f-4a08-b21a-2f111dfd9a7f",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstreamer.webp?alt=media&token=20bd52bc-860c-4f62-8292-9800e6691cee",
       actionButtonProps: {
-         href: "https://www.agora.io/en/blog/add-custom-backgrounds-to-your-live-video-calling-application-using-the-agora-android-uikit/",
-         label: "Read our blog",
+         href: "https://support.careerfairy.io/en/article/test-the-careerfairy-streaming-app-d4ec1f/",
+         label: "Read our article",
       },
    },
-   {
-      title: "How to use a VPN",
-      authorName: "Maximilian Schwarzmüller",
+   troubleshootingConnectionIssues: {
+      title: "Technical Requirements to Use CareerFairy",
+      authorName: "CareerFairy",
       previewImageUrl:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2Fvpn-image.jpg?alt=media&token=f029eceb-e77b-4448-94b0-0b06e7bbade2",
-      previewImageCaption: "6:49",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fipad_680x680.jpg?alt=media&token=4e157eb7-a10b-4aed-9324-00922f96e33b",
       actionButtonProps: {
-         href: "https://www.youtube.com/watch?v=65GUMaNrsYY",
-         label: "Watch video",
+         href: "https://support.careerfairy.io/en/article/how-to-use-the-careerfairy-streaming-app-1qmh8ci/",
+         label: "Read our article",
       },
    },
-]
+}

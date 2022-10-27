@@ -1,4 +1,4 @@
-import React, { ComponentProps, FC, useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import Dialog from "@mui/material/Dialog"
 import DialogContent from "@mui/material/DialogContent"
 import {
@@ -15,13 +15,9 @@ import { rtcMessages } from "types/streaming"
 import { RTC_CLIENT_RECONNECT_LIMIT } from "constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../../store/selectors/streamSelectors"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import ResourcesView, { dummyResources } from "../common/ResourcesView"
-import StepsView, { StepCard } from "../common/StepsView"
-import FaqView, { dummyFaqElements } from "../common/FaqView"
-
-interface Props {
-   steps: ComponentProps<typeof StepCard>[]
-}
+import ResourcesView from "../common/ResourcesView"
+import StepsView, { StepId } from "../common/StepsView"
+import FaqView from "../common/FaqView"
 
 const styles = sxStyles({
    divider: {
@@ -32,7 +28,9 @@ const styles = sxStyles({
 })
 
 const loadingTimeLimit = RTC_CLIENT_RECONNECT_LIMIT
-const ConnectionStateModal: FC<Props> = ({ steps }) => {
+const stepIds: StepId[] = ["refresh"]
+
+const ConnectionStateModal = () => {
    const [showDebugPrompt, setShowDebugPrompt] = useState(false)
 
    const agoraRtcConnectionStatus = useSelector(rtcConnectionStateSelector)
@@ -94,9 +92,9 @@ const ConnectionStateModal: FC<Props> = ({ steps }) => {
                   divider={<Divider variant={"middle"} sx={styles.divider} />}
                   spacing={2}
                >
-                  <StepsView steps={steps} />
-                  <ResourcesView options={dummyResources} />
-                  <FaqView faqElements={dummyFaqElements} />
+                  <StepsView stepIds={stepIds} />
+                  <ResourcesView />
+                  <FaqView />
                </Stack>
             </Collapse>
          </DialogContent>

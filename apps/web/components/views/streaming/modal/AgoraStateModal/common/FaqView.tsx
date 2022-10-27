@@ -1,10 +1,11 @@
-import React, { ComponentProps } from "react"
+import React, { useMemo } from "react"
 import { Stack, Typography } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Link from "next/link"
 import Box from "@mui/material/Box"
 import ArrowForwardIosIcon from "@mui/icons-material/ArrowForwardIos"
 import ArrowForwardRoundedIcon from "@mui/icons-material/ArrowForwardRounded"
+import { getDictValues } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    cardRoot: {
@@ -29,11 +30,14 @@ const styles = sxStyles({
       },
    },
 })
+type FaqId = "whatIsACareerLiveStream" | "whichDeviceShouldIUseForTheLiveStream"
 
 type Props = {
-   faqElements: ComponentProps<typeof FaqCard>[]
+   faqIds?: FaqId[]
 }
-const FaqView = ({ faqElements }: Props) => {
+const FaqView = ({ faqIds }: Props) => {
+   const faqElements = useMemo(() => getDictValues(faqIds, faqDict), [faqIds])
+
    return (
       <Stack spacing={2}>
          <Box sx={styles.viewHeader}>
@@ -43,8 +47,8 @@ const FaqView = ({ faqElements }: Props) => {
             <Link href="/faq">
                <a target={"_blank"}>
                   <Box sx={styles.viewAction}>
-                     <Typography variant={"h5"} fontWeight={500}>
-                        View all
+                     <Typography variant={"h6"} fontWeight={600}>
+                        VIEW ALL
                      </Typography>
                      <ArrowForwardIosIcon />
                   </Box>
@@ -88,13 +92,13 @@ export const FaqCard = ({ href, title }: FaqCardProps) => {
    )
 }
 
-export const dummyFaqElements: ComponentProps<typeof FaqCard>[] = [
-   {
-      title: "How to use the Agora Live Streaming",
-      href: "https://www.agora.io/en/blog/video-call-invitations-with-agora-rtm-and-rtc-using-vue-js-and-flask/",
+const faqDict: Record<FaqId, FaqCardProps> = {
+   whatIsACareerLiveStream: {
+      title: "What is a career live stream?",
+      href: "https://support.careerfairy.io/en/article/live-streaming-on-careerfairy-pqhfx3/#1-what-is-a-career-live-stream",
    },
-   {
-      title: "How to use the Agora Live Streaming",
-      href: "https://www.agora.io/en/blog/extensions-marketplace-how-to-add-voice-fx-to-your-android-application-using-agora-and-synervoz/",
+   whichDeviceShouldIUseForTheLiveStream: {
+      title: "Which device should I use for the live stream?",
+      href: "https://support.careerfairy.io/en/article/technical-requirements-to-use-careerfairy-1g4nk1t/#1-compatible-browsers",
    },
-]
+}
