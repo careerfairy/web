@@ -20,6 +20,7 @@ import {
    streamingSelector,
 } from "../../../store/selectors/streamSelectors"
 import FloatingHelpButton from "./sharedComponents/FloatingHelpButton"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -153,6 +154,7 @@ const StreamerOverview = ({
 
    const openSupportInLeftMenu = useCallback(() => {
       handleStateChange("support")
+      dataLayerEvent("livestream_open_support")
    }, [handleStateChange])
 
    if (!mounted) return null
