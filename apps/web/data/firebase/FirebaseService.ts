@@ -34,8 +34,8 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
-import DocumentReference = firebase.firestore.DocumentReference
 import CookiesUtil from "../../util/CookiesUtil"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -385,54 +385,11 @@ class FirebaseService {
       })
    }
 
-   updateUserGroups = (userEmail, groupIds, registeredGroups) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
-      return ref.update({
-         groupIds,
-         registeredGroups,
-      })
-   }
-
-   setgroups = (userId, arrayOfIds, arrayOfGroupObjects) => {
-      let userRef = this.firestore.collection("userData").doc(userId)
-      return userRef.update({
-         groupIds: Array.from(new Set(arrayOfIds)),
-         registeredGroups: arrayOfGroupObjects,
-      })
-   }
-
    listenToGroups = (callback) => {
       let groupRefs = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
       return groupRefs.onSnapshot(callback)
-   }
-
-   listenToUserGroupCategoryValue = (
-      userEmail,
-      groupId,
-      categoryId,
-      callback
-   ) => {
-      let ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("registeredGroups")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-      return ref.onSnapshot(callback)
-   }
-
-   updateUserGroupCategoryValue = (userEmail, groupId, categoryId, value) => {
-      let ref = this.firestore
-         .collection("userData")
-         .doc(userEmail)
-         .collection("registeredGroups")
-         .doc(groupId)
-         .collection("categories")
-         .doc(categoryId)
-      return ref.update({ value: value })
    }
 
    // COMPANIES
@@ -552,41 +509,6 @@ class FirebaseService {
    getMentors = () => {
       let ref = this.firestore.collection("mentors")
       return ref.get()
-   }
-
-   // WISHLIST
-
-   getWishList = () => {
-      let ref = this.firestore
-         .collection("wishList")
-         .orderBy("vote", "desc")
-         .where("fulfilled", "==", false)
-      return ref.get()
-   }
-
-   getLatestFulfilledWishes = () => {
-      let ref = this.firestore
-         .collection("wishList")
-         .where("fulfilled", "==", true)
-         .orderBy("vote", "desc")
-      return ref.get()
-   }
-
-   addNewWish = (user, wish) => {
-      let ref = this.firestore.collection("wishList")
-      return ref.add({
-         wish: wish,
-         fulfilled: false,
-         vote: 1,
-         date: firebase.firestore.Timestamp.fromDate(new Date()),
-      })
-   }
-
-   addVoteToWish = (wish) => {
-      let ref = this.firestore.collection("wishList").doc(wish.id)
-      return ref.update({
-         vote: wish.vote + 1,
-      })
    }
 
    // CREATE_LIVESTREAMS
@@ -715,24 +637,6 @@ class FirebaseService {
       livestream.lastUpdated = this.getServerTimestamp()
       await livestreamsRef.update(livestream)
       return livestream.id
-   }
-
-   listenToStreamAdminPreferences = (mainStreamId, callback) => {
-      const adminPreferenceRef = this.firestore
-         .collection("livestreams")
-         .doc(mainStreamId)
-         .collection("preferences")
-         .doc("adminPreference")
-      return adminPreferenceRef.onSnapshot(callback)
-   }
-
-   addLivestreamSpeaker = (livestreamId, speaker) => {
-      let speakersRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("speakers")
-
-      return speakersRef.add(speaker)
    }
 
    getStreamById = (streamId, collection) => {
