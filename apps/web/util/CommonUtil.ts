@@ -239,3 +239,12 @@ export const shouldUseEmulators = () => {
 
    return false
 }
+
+export const getDictValues = <K extends keyof any, T>(
+   valueKeys: K[],
+   dict: Record<K, T>
+): T[] => {
+   return valueKeys?.length
+      ? valueKeys.map((stepId) => dict[stepId]).filter(Boolean)
+      : Object.values(dict)
+}

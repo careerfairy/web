@@ -19,6 +19,7 @@ import {
    showActionButtonsSelector,
    streamingSelector,
 } from "../../../store/selectors/streamSelectors"
+import FloatingHelpButton from "./sharedComponents/FloatingHelpButton"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -150,6 +151,10 @@ const StreamerOverview = ({
       [smallScreen, showActionButtons, dispatch, showTapHint]
    )
 
+   const openSupportInLeftMenu = useCallback(() => {
+      handleStateChange("support")
+   }, [handleStateChange])
+
    if (!mounted) return null
 
    return (
@@ -159,6 +164,7 @@ const StreamerOverview = ({
             className={classes.blackFrame}
             onClick={handleClick}
          >
+            <FloatingHelpButton openSupportInLeftMenu={openSupportInLeftMenu} />
             <VideoContainer
                smallScreen={smallScreen}
                showMenu={showMenu}
