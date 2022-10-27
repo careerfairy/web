@@ -105,7 +105,7 @@ const AtsIntegrationContent = () => {
 
 const BlankPage = ({ groupPresenter }: { groupPresenter: GroupPresenter }) => {
    return (
-      <Grid container direction="column" alignItems="center">
+      <Grid mt={4} container direction="column" alignItems="center">
          <Grid item xs={12}>
             <h4>Link an account to see some data.</h4>
          </Grid>

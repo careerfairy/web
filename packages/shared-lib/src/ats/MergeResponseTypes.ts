@@ -1,4 +1,9 @@
 /**
+ * Integrations that we know and have a custom behaviour
+ */
+export type MergeATSAccountSlug = "teamtailor" | "greenhouse" | "workable"
+
+/**
  * Job type
  * https://www.merge.dev/docs/ats/jobs/#jobs-object
  */
@@ -72,6 +77,10 @@ export interface MergeSyncStatus {
    is_initial_sync: boolean
 }
 
+export interface MergeModelResponseWrapper<T> {
+   model: T
+}
+
 /**
  * Candidate response
  */
@@ -91,7 +100,7 @@ export interface MergeCandidate {
    phone_numbers?: MergePhoneNumber[]
    email_addresses?: MergeEmailAddress[]
    urls?: MergeUrl[]
-   applications?: MergeApplication[]
+   applications?: MergeApplication[] | string[]
    attachments?: MergeAttachment[]
 }
 
@@ -159,7 +168,7 @@ export type attachmentType =
 export interface MergeAttachmentModel {
    file_name?: string
    file_url?: string
-   candidate?: string
+   candidate?: string | { id: string }
    attachment_type: attachmentType
 }
 
@@ -194,13 +203,17 @@ export interface MergeCandidateModel {
    last_name?: string
    company?: string
    title?: string
-   attachments: string[]
-   applications: string[]
+   attachments: string[] | MergeAttachmentModel[]
+   applications?: MergeCandidateApplications[]
    tags: string[]
    urls: MergeUrl[]
    email_addresses: MergeEmailAddress[]
    phone_numbers: MergePhoneNumber[]
    locations?: string[]
+}
+
+export interface MergeCandidateApplications {
+   job: string
 }
 
 /*
