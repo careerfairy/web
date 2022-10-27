@@ -26,6 +26,7 @@ jobs:
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
+         workflow: ${{ steps.changes.outputs.workflow }}
       steps:
          - uses: actions/checkout@v2
          - uses: actions/setup-node@v2
@@ -53,6 +54,8 @@ jobs:
            id: changes
            with:
               filters: |
+                 workflow:
+                  - '.github/workflows/webapp-ci-full-main.yml'
                  webapp:
                    - 'apps/web/**'
                    - 'packages/shared-lib/**'
@@ -65,7 +68,10 @@ jobs:
       name: "Unit Tests"
       needs: [build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
-      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
+      if: |
+         needs.build_app_for_tests.outputs.webapp == 'true' ||
+         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+         needs.build_app_for_tests.outputs.workflow == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
@@ -99,7 +105,10 @@ jobs:
       name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
       needs: [build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
-      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
+      if: |
+         needs.build_app_for_tests.outputs.webapp == 'true' ||
+         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+         needs.build_app_for_tests.outputs.workflow == 'true'
       strategy:
          fail-fast: false
          matrix:
