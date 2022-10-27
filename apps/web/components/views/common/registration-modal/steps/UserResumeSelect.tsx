@@ -1,7 +1,7 @@
 // @flow
 import * as React from "react"
+import { useContext } from "react"
 import UserResume from "../../../profile/userData/user-resume/UserResume"
-import { useContext, useEffect } from "react"
 import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
 import {
    Button,
@@ -26,14 +26,10 @@ const styles = {
    },
 } as const
 
-const UserResumeSelect = ({}) => {
-   const { handleNext, handleClose, livestream, verifyResumeRequirement } =
+const UserResumeSelect = () => {
+   const { handleNext, handleClose, livestream } =
       useContext(RegistrationContext)
    const { userData } = useAuth()
-
-   useEffect(() => {
-      verifyResumeRequirement()
-   }, [livestream?.id, livestream?.withResume])
 
    return (
       <>
