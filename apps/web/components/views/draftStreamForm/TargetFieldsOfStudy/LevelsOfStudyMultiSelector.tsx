@@ -36,7 +36,8 @@ const LevelsOfStudyMultiSelector = ({
             placeholder: "Select Levels of Study",
          }}
          chipProps={{
-            variant: "outlined",
+            variant: "contained",
+            color: "secondary",
          }}
          limit={limit}
          getValueFn={getValueFn}
@@ -45,6 +46,7 @@ const LevelsOfStudyMultiSelector = ({
             returnValue: [],
             selectValueType: "ReturnValue",
          }}
+         checkboxColor="secondary"
       />
    )
 }
