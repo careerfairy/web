@@ -39,6 +39,7 @@ import ManageEndOfEventDialog from "./ManageEndOfEventDialog"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 
 interface Props {
    streams: LivestreamEvent[]
@@ -179,6 +180,7 @@ const EventsTable = ({
          await firebase.deleteLivestream(streamIdToBeDeleted, targetCollection)
          setDeletingEvent(false)
       } catch (e) {
+         errorLogAndNotify(e)
          setDeletingEvent(false)
       }
       setStreamIdToBeDeleted(null)
