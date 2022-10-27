@@ -1,23 +1,22 @@
-import React, { useRef, useState } from "react"
-import { alpha } from "@mui/material/styles"
+import React, { useEffect, useMemo, useRef, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import {
    AppBar,
    Button,
-   ButtonGroup,
    CardActions,
+   CircularProgress,
    Dialog,
    DialogContent,
-   IconButton,
    Slide,
    Toolbar,
    Typography,
-   Zoom,
 } from "@mui/material"
-import CloseIcon from "@mui/icons-material/Close"
 import DraftStreamForm from "../../../draftStreamForm/DraftStreamForm"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { buildLivestreamObject } from "../../../../helperFunctions/streamFormFunctions"
+import {
+   buildLivestreamObject,
+   buildPromotionObj,
+} from "../../../../helperFunctions/streamFormFunctions"
 import {
    GENERAL_ERROR,
    SAVE_WITH_NO_VALIDATION,
@@ -28,17 +27,25 @@ import { useSnackbar } from "notistack"
 import PublishIcon from "@mui/icons-material/Publish"
 import { v4 as uuidv4 } from "uuid"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
+import { useStreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
 
 const useStyles = makeStyles((theme) => ({
    title: {
       marginLeft: theme.spacing(2),
       flex: 1,
+      color: theme.palette.text.primary,
    },
    background: {
-      backgroundColor: alpha(theme.palette.primary.dark, 0.7),
+      background: "white",
+      [theme.breakpoints.down("md")]: {
+         margin: theme.spacing(2),
+      },
    },
    appBar: {
-      backgroundColor: theme.palette.navyBlue.main,
+      backgroundColor: "white",
+      boxShadow: "none",
+      borderBottom: `1px solid ${theme.palette.divider}`,
    },
    content: {
       display: "flex",
@@ -76,6 +83,7 @@ const NewStreamModal = ({
 }) => {
    const firebase = useFirebaseService()
    const formRef = useRef()
+   const submitButtonRef = useRef()
    const dialogRef = useRef()
    const saveChangesButtonRef = useRef()
    const { authenticatedUser } = useAuth()
@@ -83,20 +91,53 @@ const NewStreamModal = ({
    const [submitted, setSubmitted] = useState(false)
    const [publishDraft, setPublishDraft] = useState(false)
    const classes = useStyles()
+   const { formHasChanged } = useStreamCreationProvider()
+   const isMobile = useIsMobile()
 
-   const isDraftsPage = () => typeOfStream === "draft"
-   const isUpcomingPage = () => typeOfStream === "upcoming"
-   const isPastPage = () => typeOfStream === "past"
+   const isDraftsPage = useMemo(() => typeOfStream === "draft", [typeOfStream])
+   const isUpcomingPage = useMemo(
+      () => typeOfStream === "upcoming",
+      [typeOfStream]
+   )
+   const isPastPage = useMemo(() => typeOfStream === "past", [typeOfStream])
 
-   const isUpcomingOrPastStreamsPage = () => isPastPage() || isUpcomingPage()
+   const isUpcomingOrPastStreamsPage = useMemo(
+      () => isPastPage || isUpcomingPage,
+      [isPastPage, isUpcomingPage]
+   )
 
-   const isDraft = () =>
-      Boolean((currentStream && isDraftsPage()) || !currentStream)
+   const isDraft = useMemo(
+      () => Boolean((currentStream && isDraftsPage) || !currentStream),
+      [currentStream, isDraftsPage]
+   )
 
-   const isActualLivestream = () =>
-      Boolean(currentStream && isUpcomingOrPastStreamsPage())
+   const isActualLivestream = useMemo(
+      () => Boolean(currentStream && isUpcomingOrPastStreamsPage),
+      [currentStream, isUpcomingOrPastStreamsPage]
+   )
 
-   const canPublish = () => Boolean(isDraft() && currentStream)
+   const canPublish = useMemo(
+      () => Boolean(isDraft && currentStream),
+      [currentStream, isDraft]
+   )
+
+   useEffect(() => {
+      const closeAlert = (e) => {
+         e.preventDefault()
+         e.returnValue = ""
+      }
+
+      // add close alert only if it is on the dialog and the form has changed
+      if (open && formHasChanged) {
+         window.addEventListener("beforeunload", closeAlert)
+      } else {
+         window.removeEventListener("beforeunload", closeAlert)
+      }
+
+      return () => {
+         window.removeEventListener("beforeunload", closeAlert)
+      }
+   }, [open, formHasChanged])
 
    const handleCloseDialog = () => {
       handleResetCurrentStream()
@@ -105,27 +146,29 @@ const NewStreamModal = ({
    }
 
    const handlePublishDraft = async (streamToPublish) => {
-      if (canPublish()) {
+      if (canPublish) {
          try {
             formRef.current?.setSubmitting(true)
             const newStream = { ...streamToPublish }
             newStream.companyId = uuidv4()
             await handlePublishStream(newStream)
-            handleCloseDialog()
          } catch (e) {
             console.log("-> e", e)
             enqueueSnackbar(GENERAL_ERROR, {
                variant: "error",
                preventDuplicate: true,
             })
+         } finally {
+            formRef.current?.setSubmitting(false)
          }
-         formRef.current?.setSubmitting(false)
       } else {
          enqueueSnackbar("You cannot publish a stream!", {
             variant: "error",
             preventDuplicate: true,
          })
       }
+
+      handleCloseDialog()
    }
 
    const handleValidate = () => {
@@ -144,9 +187,11 @@ const NewStreamModal = ({
       setStatus,
       selectedJobs
    ) => {
+      let livestream
+
       try {
          setSubmitting(true)
-         const livestream = buildLivestreamObject(
+         livestream = buildLivestreamObject(
             values,
             updateMode,
             draftStreamId,
@@ -158,12 +203,10 @@ const NewStreamModal = ({
             setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
          if (status === SUBMIT_FOR_APPROVAL) {
-            const newStatus = {
+            livestream.status = {
                pendingApproval: true,
                seen: false,
             }
-            livestream.status = newStatus
-            setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
 
          if (selectedJobs) {
@@ -176,9 +219,13 @@ const NewStreamModal = ({
             return
          }
          let id
-         const targetCollection = isActualLivestream()
+         const targetCollection = isActualLivestream
             ? "livestreams"
             : "draftLivestreams"
+
+         // only save the promotions if the start date is after 30 days from now
+         const promotion = buildPromotionObj(values, livestream.id)
+
          if (updateMode) {
             id = livestream.id
             if (!livestream.lastUpdatedAuthorInfo) {
@@ -187,7 +234,11 @@ const NewStreamModal = ({
                   email: authenticatedUser.email,
                }
             }
-            await firebase.updateLivestream(livestream, targetCollection)
+            await firebase.updateLivestream(
+               livestream,
+               targetCollection,
+               promotion
+            )
          } else {
             const author = {
                groupId: group.id,
@@ -196,7 +247,8 @@ const NewStreamModal = ({
             id = await firebase.addLivestream(
                livestream,
                targetCollection,
-               author
+               author,
+               promotion
             )
          }
          handleCloseDialog()
@@ -215,64 +267,80 @@ const NewStreamModal = ({
             preventDuplicate: true,
          })
          console.log("-> e", e)
+      } finally {
+         setSubmitting(false)
+
+         if (livestream && status === SUBMIT_FOR_APPROVAL) {
+            // only update the form at the end to not force a rerender
+            // and because of it the isSubmitting flag will be false until the end of this logic
+            setFormData((prevState) => ({
+               ...prevState,
+               status: livestream.status,
+            }))
+         }
       }
-      setSubmitting(false)
    }
 
    const handleSubmit = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
-      if (formRef.current) {
-         formRef.current.handleSubmit()
-      }
-      if (dialogRef.current) {
-         dialogRef.current.scrollIntoView({
-            behavior: "smooth",
-            block: "start",
-         })
-      }
+      submitButtonRef?.current?.click()
    }
 
    const handleSaveOrUpdate = () => {
       setPublishDraft(false)
-      if (isDraft()) {
+      if (isDraft) {
          saveChangesButtonRef?.current?.click()
       } else {
          handleSubmit()
       }
    }
 
-   const Actions = ({ size, className }) => (
+   const Actions = () => (
       <>
-         {canPublish() && (
+         <Button
+            disabled={formRef.current?.isSubmitting}
+            size={isMobile ? "small" : "large"}
+            variant="outlined"
+            color="secondary"
+            onClick={handleCloseDialog}
+            sx={{ marginRight: isMobile ? "unset" : 2 }}
+         >
+            <Typography variant="inherit">Back to events page</Typography>
+         </Button>
+         {canPublish && (
             <Button
-               startIcon={<PublishIcon fontSize={size} />}
+               startIcon={<PublishIcon fontSize="large" />}
                disabled={formRef.current?.isSubmitting}
                variant="contained"
-               size={size}
-               className={className}
-               autoFocus
+               size={isMobile ? "small" : "large"}
                color="secondary"
                onClick={handleValidate}
+               sx={{ marginRight: isMobile ? "unset" : 2 }}
+               endIcon={
+                  formRef.current?.isSubmitting && (
+                     <CircularProgress size={20} color="inherit" />
+                  )
+               }
             >
-               <Typography variant={size === "large" ? "h5" : undefined}>
-                  publish as stream
-               </Typography>
+               <Typography variant="inherit">publish as stream</Typography>
             </Button>
          )}
          <Button
             disabled={formRef.current?.isSubmitting}
-            size={size}
-            className={className}
-            startIcon={currentStream && <SaveIcon fontSize={size} />}
+            size={isMobile ? "small" : "large"}
+            startIcon={currentStream && <SaveIcon fontSize="large" />}
             variant="contained"
-            autoFocus
-            color="primary"
+            color="secondary"
             onClick={handleSaveOrUpdate}
+            endIcon={
+               formRef.current?.isSubmitting && (
+                  <CircularProgress size={20} color="inherit" />
+               )
+            }
          >
-            <Typography variant={size === "large" ? "h5" : undefined}>
+            <Typography variant="inherit">
                {!currentStream
                   ? "Create draft"
-                  : isActualLivestream()
+                  : isActualLivestream
                   ? "update and close"
                   : "save changes and close"}
             </Typography>
@@ -284,30 +352,26 @@ const NewStreamModal = ({
       <Dialog
          keepMounted={false}
          TransitionComponent={Transition}
-         scroll="body"
+         scroll="paper"
          onClose={handleCloseDialog}
-         fullScreen
          open={open}
+         maxWidth="xl"
          PaperProps={{
             className: classes.background,
          }}
       >
          <AppBar className={classes.appBar} position="sticky">
-            <Toolbar>
-               <IconButton
-                  edge="start"
-                  color="inherit"
-                  onClick={handleCloseDialog}
-                  aria-label="close"
-                  size="large"
-               >
-                  <CloseIcon />
-               </IconButton>
+            <Toolbar
+               sx={{
+                  display: "flex",
+                  flexDirection: isMobile ? "column" : "unset",
+               }}
+            >
                <Typography variant="h4" className={classes.title}>
-                  {isActualLivestream()
+                  {isActualLivestream
                      ? "Update Stream"
                      : currentStream
-                     ? "Update Draft"
+                     ? "Update draft"
                      : "New draft"}
                </Typography>
                <CardActions>
@@ -327,21 +391,13 @@ const NewStreamModal = ({
                      saveChangesButtonRef={saveChangesButtonRef}
                      onSubmit={onSubmit}
                      submitted={submitted}
-                     isActualLivestream={isActualLivestream()}
+                     isActualLivestream={isActualLivestream}
                      currentStream={currentStream}
                      setSubmitted={setSubmitted}
+                     canPublish={canPublish}
+                     isOnDialog={true}
+                     submitButtonRef={submitButtonRef}
                   />
-                  <Zoom
-                     in
-                     timeout={1500}
-                     style={{
-                        transitionDelay: "500ms",
-                     }}
-                  >
-                     <ButtonGroup>
-                        <Actions className={classes.whiteBtn} size="large" />
-                     </ButtonGroup>
-                  </Zoom>
                </DialogContent>
             </div>
          </DialogContent>

@@ -1,10 +1,13 @@
 import { v4 as uuidv4 } from "uuid"
 import {
    LivestreamEvent,
+   LivestreamPromotions,
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
+import { EMAIL_REGEX } from "components/util/constants"
+import { FormikErrors } from "formik"
 
 export const speakerObj = {
    avatar: "",
@@ -12,6 +15,7 @@ export const speakerObj = {
    lastName: "",
    position: "",
    background: "",
+   email: "",
 }
 
 export const getStreamSubCollectionSpeakers = (
@@ -102,9 +106,22 @@ const buildSpeakersArray = (values) => {
          firstName: values.speakers[key].firstName,
          lastName: values.speakers[key].lastName,
          position: values.speakers[key].position,
+         email: values.speakers[key].email,
          rank: index,
       }
    })
+}
+
+export const buildPromotionObj = (
+   values,
+   livestreamId
+): Partial<LivestreamPromotions> => {
+   return {
+      livestreamId: livestreamId,
+      promotionChannelsCodes: values?.promotionChannelsCodes || [],
+      promotionCountriesCodes: values?.promotionCountriesCodes || [],
+      promotionUniversitiesCodes: values?.promotionUniversitiesCodes || [],
+   }
 }
 
 export const handleAddTargetCategories = (
@@ -152,7 +169,7 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
 }
 
 export const validateStreamForm = (values, isDraft, noValidation = false) => {
-   let errors: Partial<DraftFormValues> = {
+   let errors: FormikErrors<DraftFormValues> = {
       speakers: {},
    }
    if (!values.companyLogoUrl) {
@@ -171,6 +188,12 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
       errors.title = "Required"
    }
 
+   const now = new Date()
+
+   if (!values.start || values.start < now) {
+      errors.start = "Please select a date in the future"
+   }
+
    Object.keys(values.speakers).forEach((key) => {
       errors.speakers[key] = {}
       if (!values.speakers[key].firstName) {
@@ -185,6 +208,12 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
       // if (!values.speakers[key].background) { Made background not required
       //     errors.speakers[key].background = 'Required';
       // }
+      if (!values.speakers[key].email) {
+         errors.speakers[key].email = "Required"
+      }
+      if (!EMAIL_REGEX.test(values.speakers[key].email)) {
+         errors.speakers[key].email = "Please add a valid email"
+      }
       if (!Object.keys(errors.speakers[key]).length) {
          delete errors.speakers[key]
       }

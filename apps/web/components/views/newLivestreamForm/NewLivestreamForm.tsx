@@ -321,12 +321,17 @@ const NewLivestreamForm = () => {
                   email: authenticatedUser.email,
                }
             }
-            await firebase.updateLivestream(livestream, "livestreams")
+            await firebase.updateLivestream(livestream, "livestreams", {})
          } else {
             const author = {
                email: authenticatedUser.email,
             }
-            id = await firebase.addLivestream(livestream, "livestreams", author)
+            id = await firebase.addLivestream(
+               livestream,
+               "livestreams",
+               author,
+               {}
+            )
          }
          if (absolutePath) {
             return push({
@@ -825,6 +830,8 @@ const NewLivestreamForm = () => {
                               groupId={selectedGroups[0].id} // we only support a single group for now
                               onSelectItems={setSelectedJobs}
                               selectedItems={selectedJobs}
+                              sectionRef={null}
+                              classes={null}
                            />
                         )}
                      </SuspenseWithBoundary>

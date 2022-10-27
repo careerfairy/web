@@ -1,44 +1,27 @@
 import React, {
-   Fragment,
    MutableRefObject,
    useCallback,
    useEffect,
+   useMemo,
    useRef,
    useState,
 } from "react"
-import DeleteIcon from "@mui/icons-material/Delete"
 import {
    Box,
    Button,
-   ButtonGroup,
    CircularProgress,
-   Collapse,
    Container,
-   Fab,
-   FormControl,
-   FormControlLabel,
    Grid,
-   Switch,
-   TextField,
-   Tooltip,
    Typography,
 } from "@mui/material"
 import { Formik, FormikValues } from "formik"
 import { v4 as uuidv4 } from "uuid"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
-import ImageSelect from "./ImageSelect/ImageSelect"
 import makeStyles from "@mui/styles/makeStyles"
-import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker"
-import SpeakerForm from "./SpeakerForm/SpeakerForm"
 import { useRouter } from "next/router"
-import FormGroup from "./FormGroup"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
-   getDownloadUrl,
    getStreamSubCollectionSpeakers,
-   handleAddSpeaker,
-   handleDeleteSpeaker,
-   handleError,
    handleFlattenOptions,
    languageCodes,
    validateStreamForm,
@@ -49,11 +32,8 @@ import {
    SAVE_WITH_NO_VALIDATION,
    SUBMIT_FOR_APPROVAL,
 } from "../../util/constants"
-import { LanguageSelect } from "../../helperFunctions/streamFormFunctions/components"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import StreamDurationSelect from "./StreamDurationSelect"
 import { DEFAULT_STREAM_DURATION_MINUTES } from "../../../constants/streams"
-import MultiListSelect from "../common/MultiListSelect"
 import { useInterests } from "../../custom-hook/useCollection"
 import { createStyles } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
@@ -61,16 +41,27 @@ import {
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamJobAssociation,
+   LivestreamPromotions,
    Speaker,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { FormikHelpers } from "formik/dist/types"
-import GroupQuestionSelect from "./GroupQuestionSelect"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
-import FieldsOfStudyMultiSelector from "./TargetFieldsOfStudy/FieldsOfStudyMultiSelector"
-import LevelsOfStudyMultiSelector from "./TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
-import Stack from "@mui/material/Stack"
+import StreamInfo from "./StreamForm/StreamInfo"
+import SpeakersInfo from "./StreamForm/SpeakersInfo"
+import TargetStudentsInfo from "./StreamForm/TargetStudentsInfo"
+import PromotionInfo from "./StreamForm/PromotionInfo"
+import EventCategoriesInfo from "./StreamForm/EventCategoriesInfo"
+import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
+import StreamFormNavigator, {
+   IStreamFormNavigatorSteps,
+} from "./StreamForm/StreamFormNavigator"
+import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
+import PublishIcon from "@mui/icons-material/Publish"
+import SaveIcon from "@mui/icons-material/Save"
+import _ from "lodash"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -81,16 +72,16 @@ const useStyles = makeStyles((theme) =>
          alignItems: "center",
          minHeight: "20vh",
          borderRadius: 5,
-         marginBottom: ({ isGroupAdmin }: any) => !isGroupAdmin && 30,
+         marginBottom: ({ isGroupAdmin }: StyleProps) => !isGroupAdmin && 30,
+         maxWidth: "unset",
       },
       form: {
          width: "100%",
       },
-      speakersLabel: {
-         color: "white",
-         display: "flex",
-         alignItems: "center",
-         justifyContent: "space-between",
+      errorMessage: {
+         color: "red",
+         marginLeft: 8,
+         marginTop: 4,
       },
       submit: {
          color: theme.palette.primary.main,
@@ -101,23 +92,48 @@ const useStyles = makeStyles((theme) =>
             background: theme.palette.primary.main,
          },
       },
-      whiteBtn: {
-         color: theme.palette.primary.main,
-         background: "white",
-         margin: theme.spacing(1),
-         "&:hover": {
-            color: "white",
-            background: theme.palette.primary.main,
-         },
+      section: {
+         padding: 0,
       },
-      buttonGroup: {
-         // @ts-ignore
-         visibility: ({ isGroupAdmin }) => isGroupAdmin && "hidden",
-         // @ts-ignore
-         position: ({ isGroupAdmin }) => isGroupAdmin && "fixed",
+      navBar: {
+         [theme.breakpoints.down("lg")]: {
+            position: ({ isOnDialog }: StyleProps) =>
+               isOnDialog ? "absolute" : "sticky",
+            top: 0,
+            paddingTop: "90px !important",
+            background: "white",
+            zIndex: 999,
+            height: "200px",
+            alignItems: "end",
+            width: ({ isOnDialog }: StyleProps) =>
+               isOnDialog ? "90%" : "inherit",
+            [theme.breakpoints.down("md")]: {
+               width: ({ isOnDialog }: StyleProps) =>
+                  isOnDialog ? "98%" : "inherit",
+               height: ({ isOnDialog, canPublish }: StyleProps) =>
+                  isOnDialog ? `${canPublish ? "280px" : "240px"} ` : "200px",
+               paddingTop: ({ isOnDialog, canPublish }: StyleProps) =>
+                  isOnDialog
+                     ? `${canPublish ? "160px" : "130px"} !important`
+                     : "80px !important",
+            },
+         },
+         [theme.breakpoints.down("md")]: {
+            overflowX: "scroll",
+            overflowY: "hidden",
+         },
       },
    })
 )
+
+export type ISpeakerObj = {
+   avatar: string
+   firstName: string
+   lastName: string
+   position: string
+   background: string
+   email: string
+}
 
 const speakerObj = {
    avatar: "",
@@ -125,6 +141,13 @@ const speakerObj = {
    lastName: "",
    position: "",
    background: "",
+   email: "",
+} as ISpeakerObj
+
+type StyleProps = {
+   isGroupAdmin: boolean
+   isOnDialog: boolean
+   canPublish: boolean
 }
 
 interface Props {
@@ -146,8 +169,11 @@ interface Props {
    ) => void
    isActualLivestream?: boolean
    formRef: MutableRefObject<any>
+   submitButtonRef?: MutableRefObject<any>
    saveChangesButtonRef?: MutableRefObject<any>
    currentStream?: LivestreamEvent
+   canPublish?: boolean
+   isOnDialog?: boolean
 }
 
 export interface DraftFormValues {
@@ -173,6 +199,9 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
+   promotionChannelsCodes: OptionGroup[]
+   promotionCountriesCodes: OptionGroup[]
+   promotionUniversitiesCodes: OptionGroup[]
    questionsDisabled: boolean
 }
 
@@ -185,13 +214,38 @@ const DraftStreamForm = ({
    // eslint-disable-next-line react-hooks/rules-of-hooks
    formRef = useRef(),
    // eslint-disable-next-line react-hooks/rules-of-hooks
+   submitButtonRef = useRef(),
+   // eslint-disable-next-line react-hooks/rules-of-hooks
    saveChangesButtonRef = useRef(),
    currentStream,
+   canPublish = true,
+   isOnDialog = false,
 }: Props) => {
    const firebase = useFirebaseService()
    const router = useRouter()
    const { userData } = useAuth()
    const SPEAKER_LIMIT = userData?.isAdmin ? 15 : 10
+
+   const streamInfoRef = useRef(null)
+   const speakersInfoRef = useRef(null)
+   const targetStudentsRef = useRef(null)
+   const promotionInfoRef = useRef(null)
+   const questionsInfoRef = useRef(null)
+   const eventCategoriesInfoRef = useRef(null)
+   const jobInfoRef = useRef(null)
+   const navRef = useRef(null)
+
+   const initialSteps = useMemo(
+      () =>
+         [
+            { label: "Stream Info", ref: streamInfoRef },
+            { label: "Speakers", ref: speakersInfoRef },
+            { label: "Target Students", ref: targetStudentsRef },
+            { label: "Promotion", ref: promotionInfoRef },
+            { label: "Event Categories", ref: eventCategoriesInfoRef },
+         ] as IStreamFormNavigatorSteps[],
+      []
+   )
 
    let {
       query: { careerCenterIds, draftStreamId },
@@ -203,7 +257,9 @@ const DraftStreamForm = ({
    const [status, setStatus] = useState("")
    const classes = useStyles({
       isGroupAdmin: Boolean(group?.id),
-   })
+      isOnDialog,
+      canPublish,
+   } as StyleProps)
 
    const [selectedGroups, setSelectedGroups] = useState<Group[]>([])
    const [selectedInterests, setSelectedInterests] = useState([])
@@ -212,6 +268,12 @@ const DraftStreamForm = ({
    )
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
+   const {
+      showJobSection,
+      formHasChanged,
+      setFormHasChanged,
+      showPromotionInputs,
+   } = useStreamCreationProvider()
 
    const { data: existingInterests } = useInterests()
 
@@ -219,9 +281,13 @@ const DraftStreamForm = ({
 
    const [existingGroups, setExistingGroups] = useState([])
    const [formData, setFormData] = useState<DraftFormValues>({
-      companyLogoUrl: "",
-      backgroundImageUrl: "",
-      company: "",
+      // add group logo if it has any and if it's not a university
+      companyLogoUrl: group?.universityCode ? "" : group?.logoUrl || "",
+      backgroundImageUrl: group?.universityCode
+         ? ""
+         : group?.bannerImageUrl || "",
+      // add group name if it has any and if it's not a university
+      company: group?.universityCode ? "" : group?.universityName || "",
       companyId: "",
       title: "",
       interestsIds: [],
@@ -236,8 +302,13 @@ const DraftStreamForm = ({
       language: languageCodes[0],
       targetFieldsOfStudy: [],
       targetLevelsOfStudy: [],
+      promotionChannelsCodes: [],
+      promotionCountriesCodes: [],
+      promotionUniversitiesCodes: [],
       questionsDisabled: false,
    })
+
+   const [steps, setSteps] = useState(initialSteps)
 
    const handleSetGroupIds = async (
       UrlIds,
@@ -316,8 +387,18 @@ const DraftStreamForm = ({
                targetId,
                targetCollection
             )
+            const promotionQuery = await firebase.getStreamPromotions(
+               targetId,
+               targetCollection
+            )
+            let promotion
+            if (promotionQuery.exists) {
+               promotion = promotionQuery?.data() as LivestreamPromotions
+            }
+
             if (livestreamQuery.exists) {
                let livestream = livestreamQuery.data() as LivestreamEvent
+
                const newFormData: DraftFormValues = {
                   id: targetId,
                   companyLogoUrl: livestream.companyLogoUrl || "",
@@ -342,6 +423,12 @@ const DraftStreamForm = ({
                   language: livestream.language || languageCodes[0],
                   targetFieldsOfStudy: livestream.targetFieldsOfStudy ?? [],
                   targetLevelsOfStudy: livestream.targetLevelsOfStudy ?? [],
+                  promotionChannelsCodes:
+                     promotion?.promotionChannelsCodes || [],
+                  promotionCountriesCodes:
+                     promotion?.promotionCountriesCodes || [],
+                  promotionUniversitiesCodes:
+                     promotion?.promotionUniversitiesCodes || [],
                   questionsDisabled: Boolean(livestream.questionsDisabled),
                }
                setFormData(newFormData)
@@ -378,23 +465,78 @@ const DraftStreamForm = ({
       }
    }, [draftStreamId, router, submitted, existingInterests])
 
+   // to handle the visibility of the Host and Questions Steps
+   useEffect(() => {
+      const isHostAndQuestionsStepVisible = steps.some(
+         ({ label }) => label === "Host and Questions"
+      )
+
+      if (existingGroups?.length && !isHostAndQuestionsStepVisible) {
+         // We want to add this section after the Jobs section
+         // If the job section is not being shown, we should show it in its place.
+         setSteps((prevSteps) => [
+            ...prevSteps.slice(0, steps.length > 5 ? 5 : 4),
+            {
+               label: "Host and Questions",
+               ref: questionsInfoRef,
+            },
+            ...prevSteps.slice(steps.length > 5 ? 5 : 4),
+         ])
+      } else if (
+         existingGroups?.length === 0 &&
+         isHostAndQuestionsStepVisible
+      ) {
+         setSteps((prevSteps) =>
+            prevSteps.filter(({ label }) => label !== "Host and Questions")
+         )
+      }
+   }, [existingGroups?.length])
+
+   // to handle the visibility of the Job section
+   useEffect(() => {
+      if (showJobSection) {
+         // We want to add this section on the 5th position
+         setSteps((prevSteps) => [
+            ...prevSteps.slice(0, 4),
+            {
+               label: "Job",
+               ref: jobInfoRef,
+            },
+            ...prevSteps.slice(4),
+         ])
+      } else {
+         setSteps((prevSteps) =>
+            prevSteps.filter(({ label }) => label !== "Job")
+         )
+      }
+   }, [showJobSection])
+
+   useEffect(() => {
+      const closeAlert = (e) => {
+         e.preventDefault()
+         e.returnValue = ""
+      }
+
+      // add close alert only if the form has changed
+      if (formHasChanged && !submitted) {
+         window.addEventListener("beforeunload", closeAlert)
+      } else {
+         window.removeEventListener("beforeunload", closeAlert)
+      }
+
+      return () => {
+         window.removeEventListener("beforeunload", closeAlert)
+      }
+   }, [formHasChanged, submitted])
+
    const isPending = () => {
       // @ts-ignore
       return Boolean(formData?.status?.pendingApproval === true)
    }
 
-   const groupsSelected = () => {
+   const groupsSelected = useMemo(() => {
       return Boolean(selectedGroups.length)
-   }
-
-   const buildHiddenMessage = () => {
-      // Creates the group names string separated by commas and an "and" at the end
-      const groupNames = selectedGroups
-         .map((group) => group.universityName)
-         .join(", ")
-         .replace(/, ([^,]*)$/, " and $1")
-      return `By enabling this you are making this stream only visible to members of ${groupNames}.`
-   }
+   }, [selectedGroups.length])
 
    const handleSetOnlyUrlIds = async () => {
       // @ts-ignore
@@ -427,7 +569,7 @@ const DraftStreamForm = ({
    const isNotAdmin = !Boolean(userData?.isAdmin || group?.id)
    const isGroupAdmin = useCallback(
       (groupId) => (group && group.id === groupId) || userData?.isAdmin,
-      [group?.id]
+      [group, userData?.isAdmin]
    )
 
    const handleGroupSelect = useCallback(
@@ -449,7 +591,11 @@ const DraftStreamForm = ({
       const targetPath = buildFullUrl(directLink)
       return (
          <>
-            <Typography variant="h5" align="center" style={{ color: "white" }}>
+            <Typography
+               variant="h5"
+               align="center"
+               style={{ color: "primary" }}
+            >
                {status === SAVE_WITH_NO_VALIDATION
                   ? "Your changes have been saved under the following link:"
                   : "Thanks for your submission, the direct link to this draft you created is:"}
@@ -460,10 +606,11 @@ const DraftStreamForm = ({
                   display="flex"
                   justifyContent="center"
                   alignItems="center"
+                  mb={2}
                >
-                  <WarningIcon fontSize="large" />
+                  <WarningIcon fontSize="large" color="primary" />
                   PLEASE SAVE THE FOLLOWING LINK BELOW SOMEWHERE
-                  <WarningIcon fontSize="large" />
+                  <WarningIcon fontSize="large" color="primary" />
                </Box>
                <a onClick={handleCopyDraftLink} href={directLink}>
                   {targetPath}
@@ -475,37 +622,41 @@ const DraftStreamForm = ({
             <div
                style={{
                   display: "flex",
-                  justifyContent: "space-between",
+                  justifyContent: "center",
                   marginTop: 16,
                }}
             >
                {userData && (
                   <Button
-                     className={classes.whiteBtn}
                      variant="contained"
                      href="/profile"
+                     color="primary"
+                     sx={{ m: 1 }}
                   >
                      To Profile
                   </Button>
                )}
                <Button
-                  className={classes.whiteBtn}
                   variant="contained"
                   href="/next-livestreams"
+                  color="primary"
+                  sx={{ m: 1 }}
                >
                   To Next Livestreams
                </Button>
                <Button
                   onClick={handleCopyDraftLink}
-                  className={classes.whiteBtn}
                   variant="contained"
+                  color="primary"
+                  sx={{ m: 1 }}
                >
                   Copy Direct Link
                </Button>
                <Button
                   onClick={() => setSubmitted(false)}
-                  className={classes.whiteBtn}
                   variant="contained"
+                  color="primary"
+                  sx={{ m: 1 }}
                >
                   Back to draft
                </Button>
@@ -514,617 +665,319 @@ const DraftStreamForm = ({
       )
    }
 
-   const noValidation = () => status === SAVE_WITH_NO_VALIDATION
+   const noValidation = useMemo(
+      () => status === SAVE_WITH_NO_VALIDATION,
+      [status]
+   )
+
+   // To handle the validation of the form
+   const handleValidate = useCallback(
+      (values) => {
+         // saves on the context when the form has changed or if it gets back to the initial value, but only once per different status
+         if (formHasChanged !== (_.isEqual(values, formData) === false)) {
+            setFormHasChanged(!formHasChanged)
+         }
+
+         return validateStreamForm(values, true, noValidation)
+      },
+      [formData, formHasChanged, noValidation, setFormHasChanged]
+   )
+
+   // handle errors and redirect to the specific 1st error input
+   const handleSubmitForm = async ({ handleSubmit, validateForm }) => {
+      if (!isOnDialog) {
+         handleSubmit()
+      }
+      const errors = await validateForm()
+
+      if (Object.keys(errors).length) {
+         let firstErrorId = Object.keys(errors)[0]
+
+         if (typeof errors[firstErrorId] !== "string") {
+            // If the 1st error is related to the speaker form
+            const speakerErrorId = Object.keys(errors[firstErrorId])[0]
+            firstErrorId = speakerErrorId
+         }
+
+         const errorElement = document.getElementById(firstErrorId)
+         if (errorElement) {
+            errorElement.scrollIntoView({ behavior: "smooth", block: "center" })
+         }
+      }
+      if (isOnDialog) {
+         handleSubmit()
+      }
+   }
+
+   // filter values in order to save only the proper ones
+   const filterValues = useCallback(
+      (values): DraftFormValues => {
+         // only save the promotions if the start date is after 30 days from now
+         if (!showPromotionInputs) {
+            return {
+               ...values,
+               promotionChannelsCodes: [],
+               promotionCountriesCodes: [],
+               promotionUniversitiesCodes: [],
+            }
+         }
+
+         return values
+      },
+      [showPromotionInputs]
+   )
 
    return (
-      <Container className={classes.root}>
+      <Container className={classes.root} id="livestreamForm">
          {allFetched ? (
-            submitted ? (
-               <SuccessMessage />
-            ) : (
-               <Formik
-                  initialValues={formData}
-                  innerRef={formRef}
-                  enableReinitialize
-                  validate={(values) =>
-                     validateStreamForm(values, true, noValidation())
+            <Grid container spacing={2}>
+               {submitted ? null : (
+                  <Grid
+                     item
+                     md={12}
+                     lg={2}
+                     className={classes.navBar}
+                     ref={navRef}
+                  >
+                     <Box
+                        sx={{
+                           position: { lg: "fixed" },
+                           marginTop: { lg: "10vh" },
+                        }}
+                     >
+                        <StreamFormNavigator steps={steps} navRef={navRef} />
+                     </Box>
+                  </Grid>
+               )}
+               <Grid
+                  item
+                  md={12}
+                  lg={submitted ? 12 : 10}
+                  mt={
+                     isOnDialog
+                        ? { xs: "150px", md: "100px", lg: "unset" }
+                        : "unset"
                   }
-                  onSubmit={async (values, { setSubmitting }) => {
-                     await onSubmit(
-                        values,
-                        { setSubmitting },
-                        updateMode,
-                        draftStreamId as string,
-                        setFormData,
-                        setDraftId,
-                        status,
-                        setStatus,
-                        selectedJobs
-                     )
-                  }}
                >
-                  {({
-                     values,
-                     errors,
-                     touched,
-                     handleChange,
-                     handleBlur,
-                     handleSubmit,
-                     isSubmitting,
-                     setFieldValue,
-                     setValues,
-                     validateForm,
-                     /* and other goodies */
-                  }) => {
-                     // @ts-ignore
-                     return (
-                        <form
-                           onSubmit={async (event) => {
-                              event.preventDefault()
-                              const error = await validateForm()
-                              if (Object.keys(error).length) {
-                                 window.scrollTo({
-                                    top: 0,
-                                    left: 0,
-                                    behavior: "smooth",
-                                 })
-                              }
-                              handleSubmit()
-                           }}
-                           className={classes.form}
-                        >
-                           <Typography style={{ color: "white" }} variant="h4">
-                              Stream Info:
-                           </Typography>
-                           <FormGroup container>
-                              <Grid
-                                 xs={groupsSelected() ? 7 : 12}
-                                 sm={groupsSelected() ? 7 : 12}
-                                 md={groupsSelected() ? 9 : 12}
-                                 lg={groupsSelected() ? 9 : 12}
-                                 xl={groupsSelected() ? 9 : 12}
-                                 item
+                  {submitted ? (
+                     <SuccessMessage />
+                  ) : (
+                     <Formik
+                        initialValues={formData}
+                        innerRef={formRef}
+                        enableReinitialize
+                        validate={handleValidate}
+                        onSubmit={async (values, { setSubmitting }) => {
+                           await onSubmit(
+                              filterValues(values),
+                              { setSubmitting },
+                              updateMode,
+                              draftStreamId as string,
+                              setFormData,
+                              setDraftId,
+                              status,
+                              setStatus,
+                              selectedJobs
+                           )
+                        }}
+                     >
+                        {({
+                           values,
+                           errors,
+                           touched,
+                           handleChange,
+                           handleBlur,
+                           handleSubmit,
+                           isSubmitting,
+                           setFieldValue,
+                           setValues,
+                           validateForm,
+                           /* and other goodies */
+                        }) => {
+                           // @ts-ignore
+                           return (
+                              <form
+                                 onSubmit={async (event) => {
+                                    event.preventDefault()
+                                    await handleSubmitForm({
+                                       handleSubmit,
+                                       validateForm,
+                                    })
+                                 }}
+                                 className={classes.form}
                               >
-                                 <FormControl fullWidth>
-                                    <TextField
-                                       name="title"
-                                       variant="outlined"
-                                       fullWidth
-                                       id="title"
-                                       label="Livestream Title"
-                                       inputProps={{ maxLength: 104 }}
-                                       onBlur={handleBlur}
-                                       value={values.title}
-                                       disabled={isSubmitting}
-                                       error={Boolean(
-                                          errors.title &&
-                                             touched.title &&
-                                             errors.title
-                                       )}
-                                       onChange={handleChange}
-                                    />
-                                    <Collapse
-                                       style={{ color: "red" }}
-                                       in={Boolean(
-                                          errors.title && touched.title
-                                       )}
-                                    >
-                                       {errors.title}
-                                    </Collapse>
-                                 </FormControl>
-                              </Grid>
-                              {groupsSelected() && (
-                                 <Grid
-                                    xs={5}
-                                    sm={5}
-                                    md={3}
-                                    lg={3}
-                                    xl={3}
-                                    style={{
-                                       display: "grid",
-                                       placeItems: "center",
-                                    }}
-                                    item
-                                 >
-                                    <Tooltip
-                                       placement="top"
-                                       arrow
-                                       disableHoverListener={Boolean(
-                                          !selectedGroups.length
-                                       )}
-                                       title={
-                                          <Typography>
-                                             {buildHiddenMessage()}
-                                          </Typography>
-                                       }
-                                    >
-                                       <FormControlLabel
-                                          labelPlacement="start"
-                                          label="Make Exclusive"
-                                          disabled={Boolean(
-                                             !selectedGroups.length
-                                          )}
-                                          control={
-                                             <Switch
-                                                checked={Boolean(values.hidden)}
-                                                onChange={handleChange}
-                                                disabled={Boolean(
-                                                   !selectedGroups.length ||
-                                                      isSubmitting
-                                                )}
-                                                color="primary"
-                                                id="hidden"
-                                                name="hidden"
-                                                inputProps={{
-                                                   "aria-label":
-                                                      "primary checkbox",
-                                                }}
-                                             />
-                                          }
+                                 <StreamInfo
+                                    isGroupsSelected={groupsSelected}
+                                    handleBlur={handleBlur}
+                                    values={values}
+                                    isSubmitting={isSubmitting}
+                                    errors={errors}
+                                    touched={touched}
+                                    handleChange={handleChange}
+                                    selectedGroups={selectedGroups}
+                                    setFieldValue={setFieldValue}
+                                    userData={userData}
+                                    classes={classes}
+                                    sectionRef={streamInfoRef}
+                                 />
+
+                                 <SpeakersInfo
+                                    values={values}
+                                    setValues={setValues}
+                                    speakerLimit={SPEAKER_LIMIT}
+                                    speakerObj={speakerObj}
+                                    errors={errors}
+                                    touched={touched}
+                                    setFieldValue={setFieldValue}
+                                    isSubmitting={isSubmitting}
+                                    handleBlur={handleBlur}
+                                    classes={classes}
+                                    sectionRef={speakersInfoRef}
+                                 />
+
+                                 <TargetStudentsInfo
+                                    targetFieldsOfStudy={
+                                       values.targetFieldsOfStudy
+                                    }
+                                    targetLevelsOfStudy={
+                                       values.targetLevelsOfStudy
+                                    }
+                                    setFieldValue={setFieldValue}
+                                    classes={classes}
+                                    sectionRef={targetStudentsRef}
+                                 />
+
+                                 <PromotionInfo
+                                    setFieldValue={setFieldValue}
+                                    promotionChannelsCodes={
+                                       values.promotionChannelsCodes
+                                    }
+                                    promotionCountriesCodes={
+                                       values.promotionCountriesCodes
+                                    }
+                                    promotionUniversitiesCodes={
+                                       values.promotionUniversitiesCodes
+                                    }
+                                    classes={classes}
+                                    sectionRef={promotionInfoRef}
+                                 />
+
+                                 <SuspenseWithBoundary hide expected>
+                                    {values.groupIds.length > 0 && (
+                                       <JobSelectorCategory
+                                          groupId={values.groupIds[0]} // we only support a single group for now
+                                          onSelectItems={setSelectedJobs}
+                                          selectedItems={selectedJobs}
+                                          sectionRef={jobInfoRef}
+                                          classes={classes}
                                        />
-                                    </Tooltip>
-                                 </Grid>
-                              )}
-                              <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                 <ImageResolutionText
-                                    resolution={"640 x 480"}
-                                 />
-                                 <ImageSelect
-                                    getDownloadUrl={getDownloadUrl}
-                                    setFieldValue={setFieldValue}
-                                    isSubmitting={isSubmitting}
-                                    path="company-logos"
-                                    label="Logo"
-                                    formName="companyLogoUrl"
-                                    value={values.companyLogoUrl}
-                                    error={
-                                       errors.companyLogoUrl &&
-                                       touched.companyLogoUrl &&
-                                       errors.companyLogoUrl
-                                    }
-                                    isAvatar={false}
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={12} md={6} lg={6} xl={6} item>
-                                 <ImageResolutionText
-                                    resolution={"1280 x 960"}
-                                 />
-                                 <ImageSelect
-                                    getDownloadUrl={getDownloadUrl}
-                                    setFieldValue={setFieldValue}
-                                    isSubmitting={isSubmitting}
-                                    path="illustration-images"
-                                    label="Company Background"
-                                    formName="backgroundImageUrl"
-                                    value={values.backgroundImageUrl}
-                                    error={
-                                       errors.backgroundImageUrl &&
-                                       touched.backgroundImageUrl &&
-                                       errors.backgroundImageUrl
-                                    }
-                                    isAvatar={false}
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={6} md={4} item>
-                                 <DateTimePicker
-                                    inputFormat={"dd/MM/yyyy HH:mm"}
-                                    ampm={false}
-                                    renderInput={(params) => (
-                                       <TextField fullWidth {...params} />
                                     )}
-                                    disabled={isSubmitting}
-                                    label="Livestream Start Date"
-                                    value={values.start}
-                                    onChange={(value) => {
-                                       setFieldValue(
-                                          "start",
-                                          new Date(value),
-                                          true
-                                       )
-                                    }}
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={6} md={4} item>
-                                 <StreamDurationSelect
-                                    value={values.duration}
-                                    start={values.start}
-                                    disabled={isSubmitting}
-                                    label="Estimated Duration"
-                                    setFieldValue={setFieldValue}
-                                    fullWidth
-                                    variant="outlined"
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={12} md={4} item>
-                                 <LanguageSelect
-                                    value={values.language}
-                                    setFieldValue={setFieldValue}
-                                    name="language"
-                                 />
-                              </Grid>
-                              <Grid xs={12} sm={12} item>
-                                 <FormControl fullWidth>
-                                    <TextField
-                                       name="company"
-                                       variant="outlined"
-                                       fullWidth
-                                       id="company"
-                                       label="Company Name"
-                                       inputProps={{ maxLength: 70 }}
-                                       onBlur={handleBlur}
-                                       value={values.company}
-                                       disabled={isSubmitting}
-                                       error={Boolean(
-                                          errors.company &&
-                                             touched.company &&
-                                             errors.company
-                                       )}
-                                       onChange={handleChange}
-                                    />
-                                    <Collapse
-                                       style={{ color: "red" }}
-                                       in={Boolean(
-                                          errors.company && touched.company
-                                       )}
-                                    >
-                                       {errors.company}
-                                    </Collapse>
-                                 </FormControl>
-                              </Grid>
+                                 </SuspenseWithBoundary>
 
-                              <Grid xs={12} item>
-                                 <FormControl fullWidth>
-                                    <TextField
-                                       name="summary"
-                                       variant="outlined"
-                                       fullWidth
-                                       multiline
-                                       id="summary"
-                                       label="Summary"
-                                       maxRows={10}
-                                       inputProps={{ maxLength: 5000 }}
-                                       onBlur={handleBlur}
-                                       value={values.summary}
-                                       disabled={isSubmitting}
-                                       error={Boolean(
-                                          errors.summary &&
-                                             touched.summary &&
-                                             errors.summary
-                                       )}
-                                       onChange={handleChange}
-                                    />
-                                    <Collapse
-                                       style={{ color: "red" }}
-                                       in={Boolean(
-                                          errors.summary && touched.summary
-                                       )}
-                                    >
-                                       {errors.summary}
-                                    </Collapse>
-                                 </FormControl>
-                              </Grid>
+                                 <HostAndQuestionsInfo
+                                    existingGroups={existingGroups}
+                                    handleGroupSelect={handleGroupSelect}
+                                    values={values}
+                                    selectedGroups={selectedGroups}
+                                    isSubmitting={isSubmitting}
+                                    isNotAdmin={isNotAdmin}
+                                    setFieldValue={setFieldValue}
+                                    isGroupAdmin={isGroupAdmin}
+                                    groupId={group?.id}
+                                    classes={classes}
+                                    sectionRef={questionsInfoRef}
+                                 />
 
-                              {userData?.isAdmin && (
-                                 <Grid xs={12}>
-                                    <Stack direction="row" spacing={2}>
-                                       <Box
-                                          pl={2}
-                                          display="flex"
-                                          alignItems="center"
-                                       >
-                                          Settings only for CF Admins:
-                                       </Box>
-                                       <Tooltip
-                                          placement="top"
-                                          arrow
-                                          title={
-                                             <Typography>
-                                                By disabling questions the
-                                                participants will no longer be
-                                                able to use the Q&A section
-                                                during the livestream and create
-                                                questions during the
-                                                registration process.
-                                             </Typography>
-                                          }
-                                       >
-                                          <FormControlLabel
-                                             labelPlacement="start"
-                                             label="Disable Q&A"
-                                             control={
-                                                <Switch
-                                                   checked={Boolean(
-                                                      values.questionsDisabled
-                                                   )}
-                                                   onChange={handleChange}
-                                                   disabled={Boolean(
-                                                      isSubmitting
-                                                   )}
-                                                   color="primary"
-                                                   id="questionsDisabled"
-                                                   name="questionsDisabled"
-                                                   inputProps={{
-                                                      "aria-label":
-                                                         "primary checkbox",
-                                                   }}
-                                                />
-                                             }
-                                          />
-                                       </Tooltip>
-                                    </Stack>
-                                 </Grid>
-                              )}
-                           </FormGroup>
-                           {Object.keys(values.speakers).map((key, index) => {
-                              return (
-                                 <Fragment key={key}>
-                                    <div className={classes.speakersLabel}>
-                                       <Typography variant="h4">
-                                          {index === 0
-                                             ? "Main Speaker:"
-                                             : `Speaker ${index + 1}:`}
-                                       </Typography>
-                                       {!!index && (
-                                          <Fab
-                                             size="small"
-                                             color="secondary"
-                                             onClick={() =>
-                                                handleDeleteSpeaker(
-                                                   key,
-                                                   values,
-                                                   setValues
-                                                )
-                                             }
-                                          >
-                                             <DeleteIcon />
-                                          </Fab>
-                                       )}
-                                    </div>
-                                    <FormGroup>
-                                       <SpeakerForm
-                                          key={key}
-                                          speakerLimit={SPEAKER_LIMIT}
-                                          handleDeleteSpeaker={
-                                             handleDeleteSpeaker
-                                          }
-                                          setValues={setValues}
-                                          speakerObj={speakerObj}
-                                          handleAddSpeaker={handleAddSpeaker}
-                                          objectKey={key}
-                                          index={index}
-                                          firstNameError={handleError(
-                                             key,
-                                             "firstName",
-                                             errors,
-                                             touched
-                                          )}
-                                          lastNameError={handleError(
-                                             key,
-                                             "lastName",
-                                             errors,
-                                             touched
-                                          )}
-                                          positionError={handleError(
-                                             key,
-                                             "position",
-                                             errors,
-                                             touched
-                                          )}
-                                          backgroundError={handleError(
-                                             key,
-                                             "background",
-                                             errors,
-                                             touched
-                                          )}
-                                          getDownloadUrl={getDownloadUrl}
-                                          speaker={values.speakers[key]}
-                                          values={values}
-                                          firebase={firebase}
-                                          setFieldValue={setFieldValue}
-                                          isSubmitting={isSubmitting}
-                                          handleBlur={handleBlur}
-                                          loading={false}
-                                       />
-                                    </FormGroup>
-                                 </Fragment>
-                              )
-                           })}
-                           {!!existingGroups.length && (
-                              <>
-                                 <Typography
-                                    style={{ color: "white" }}
-                                    variant="h4"
+                                 <EventCategoriesInfo
+                                    setSelectedInterests={setSelectedInterests}
+                                    selectedInterests={selectedInterests}
+                                    existingInterests={existingInterests}
+                                    isSubmitting={isSubmitting}
+                                    setFieldValue={setFieldValue}
+                                    classes={classes}
+                                    sectionRef={eventCategoriesInfoRef}
+                                 />
+
+                                 <Box
+                                    display={isOnDialog ? "none" : "flex"}
+                                    justifyContent="end"
+                                    mr={3}
                                  >
-                                    Hosts and questions:
-                                 </Typography>
-                                 <FormGroup>
-                                    <Grid
-                                       xs={12}
-                                       sm={12}
-                                       md={12}
-                                       lg={12}
-                                       xl={12}
-                                       item
-                                    >
-                                       <MultiListSelect
-                                          inputName="groupIds"
-                                          onSelectItems={(selectedGroups) =>
-                                             handleGroupSelect(
-                                                values,
-                                                selectedGroups
+                                    {canPublish && (
+                                       <Button
+                                          startIcon={
+                                             <PublishIcon fontSize="large" />
+                                          }
+                                          type="submit"
+                                          onClick={handleClickSubmitForApproval}
+                                          disabled={isSubmitting || isPending()}
+                                          size="large"
+                                          endIcon={
+                                             isSubmitting && (
+                                                <CircularProgress
+                                                   size={20}
+                                                   color="inherit"
+                                                />
                                              )
                                           }
-                                          selectedItems={selectedGroups}
-                                          allValues={existingGroups}
-                                          disabled={isSubmitting || isNotAdmin}
-                                          getLabelFn={mapGroupLabel}
-                                          setFieldValue={setFieldValue}
-                                          inputProps={{
-                                             label: "Event Hosts",
-                                             placeholder:
-                                                "Add some Hosts to your event",
-                                          }}
-                                          disabledValues={
-                                             isNotAdmin
-                                                ? existingGroups.map(
-                                                     (g) => g.id
-                                                  )
-                                                : [group?.id]
-                                          }
-                                       />
-                                    </Grid>
-                                    {selectedGroups.map((group) => {
-                                       return (
-                                          <GroupQuestionSelect
-                                             key={group.id}
-                                             group={group}
-                                             isSubmitting={isSubmitting}
-                                             isGroupAdmin={isGroupAdmin}
-                                             values={values}
-                                             setFieldValue={setFieldValue}
-                                          />
-                                       )
-                                    })}
-                                 </FormGroup>
-                              </>
-                           )}
-
-                           <Typography style={{ color: "white" }} variant="h4">
-                              Event Categories:
-                           </Typography>
-                           <FormGroup>
-                              <Grid
-                                 xs={12}
-                                 sm={12}
-                                 md={12}
-                                 lg={12}
-                                 xl={12}
-                                 item
-                              >
-                                 <MultiListSelect
-                                    inputName="interestsIds"
-                                    onSelectItems={setSelectedInterests}
-                                    selectedItems={selectedInterests}
-                                    allValues={existingInterests}
-                                    disabled={isSubmitting}
-                                    limit={5}
-                                    setFieldValue={setFieldValue}
-                                    inputProps={{
-                                       label: "Add some Categories",
-                                       placeholder:
-                                          "Choose 5 categories that best describe this event",
-                                    }}
-                                    chipProps={{
-                                       variant: "outlined",
-                                    }}
-                                    isCheckbox={true}
-                                 />
-                              </Grid>
-                           </FormGroup>
-
-                           <Typography style={{ color: "white" }} variant="h4">
-                              Target Students:
-                           </Typography>
-
-                           <FormGroup>
-                              <Grid xs={12} item>
-                                 <FieldsOfStudyMultiSelector
-                                    selectedItems={values.targetFieldsOfStudy}
-                                    setFieldValue={setFieldValue}
-                                 />
-                              </Grid>
-
-                              <Grid xs={12} item>
-                                 <LevelsOfStudyMultiSelector
-                                    selectedItems={values.targetLevelsOfStudy}
-                                    setFieldValue={setFieldValue}
-                                 />
-                              </Grid>
-                           </FormGroup>
-
-                           <SuspenseWithBoundary hide expected>
-                              {values.groupIds.length > 0 && (
-                                 <JobSelectorCategory
-                                    groupId={values.groupIds[0]} // we only support a single group for now
-                                    onSelectItems={setSelectedJobs}
-                                    selectedItems={selectedJobs}
-                                 />
-                              )}
-                           </SuspenseWithBoundary>
-
-                           <ButtonGroup
-                              className={classes.buttonGroup}
-                              fullWidth
-                           >
-                              <Button
-                                 type="submit"
-                                 onClick={handleClickSubmitForApproval}
-                                 disabled={isSubmitting || isPending()}
-                                 size="large"
-                                 className={classes.submit}
-                                 endIcon={
-                                    isSubmitting && (
-                                       <CircularProgress
-                                          size={20}
-                                          color="inherit"
-                                       />
-                                    )
-                                 }
-                                 variant="contained"
-                              >
-                                 <Typography variant="h4">
-                                    {isSubmitting
-                                       ? "Submitting"
-                                       : isPending()
-                                       ? "Pending for Approval"
-                                       : "Submit Draft for Approval"}
-                                 </Typography>
-                              </Button>
-                              <Button
-                                 type="submit"
-                                 ref={saveChangesButtonRef}
-                                 disabled={isSubmitting}
-                                 size="large"
-                                 onClick={() => {
-                                    setStatus(SAVE_WITH_NO_VALIDATION)
-                                 }}
-                                 className={classes.submit}
-                                 endIcon={
-                                    isSubmitting && (
-                                       <CircularProgress
-                                          size={20}
-                                          color="inherit"
-                                       />
-                                    )
-                                 }
-                                 variant="contained"
-                              >
-                                 <Typography variant="h4">
-                                    {isSubmitting ? "Saving" : "Save changes"}
-                                 </Typography>
-                              </Button>
-                           </ButtonGroup>
-                        </form>
-                     )
-                  }}
-               </Formik>
-            )
+                                          variant="contained"
+                                          color="secondary"
+                                          sx={{ marginRight: 2 }}
+                                       >
+                                          <Typography variant="h5">
+                                             {isSubmitting
+                                                ? "Submitting"
+                                                : isPending()
+                                                ? "Pending for Approval"
+                                                : "Submit Draft for Approval"}
+                                          </Typography>
+                                       </Button>
+                                    )}
+                                    <Button
+                                       startIcon={<SaveIcon fontSize="large" />}
+                                       type="submit"
+                                       ref={saveChangesButtonRef}
+                                       disabled={isSubmitting}
+                                       size="large"
+                                       onClick={() => {
+                                          setStatus(SAVE_WITH_NO_VALIDATION)
+                                       }}
+                                       endIcon={
+                                          isSubmitting && (
+                                             <CircularProgress
+                                                size={20}
+                                                color="inherit"
+                                             />
+                                          )
+                                       }
+                                       variant="contained"
+                                       color="secondary"
+                                    >
+                                       <Typography variant="h5">
+                                          {isSubmitting
+                                             ? "Saving"
+                                             : "Save changes"}
+                                       </Typography>
+                                    </Button>
+                                    <Button
+                                       type="submit"
+                                       ref={submitButtonRef}
+                                       sx={{ display: "none" }}
+                                       onClick={handleClickSubmitForApproval}
+                                    />
+                                 </Box>
+                              </form>
+                           )
+                        }}
+                     </Formik>
+                  )}
+               </Grid>
+            </Grid>
          ) : (
-            <CircularProgress style={{ margin: "auto", color: "white" }} />
+            <CircularProgress style={{ margin: "auto", color: "primary" }} />
          )}
       </Container>
    )
 }
-
-const ImageResolutionText = ({ resolution }) => {
-   return (
-      <Typography fontSize="10px" textAlign="center" color="text.secondary">
-         <strong style={{ fontWeight: 500 }}>Recommended Resolution:</strong>{" "}
-         {resolution}
-      </Typography>
-   )
-}
-
-const mapGroupLabel = (obj) => obj.universityName
 
 export default DraftStreamForm

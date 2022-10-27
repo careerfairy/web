@@ -15,6 +15,7 @@ import {
    EventRating,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
+   LivestreamPromotions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -328,6 +329,14 @@ class FirebaseService {
       return ref.get()
    }
 
+   getUniversitiesFromMultipleCountryCode = async (countryCodes: string[]) => {
+      let ref = this.firestore
+         .collection("universitiesByCountry")
+         .where("countryId", "in", countryCodes)
+
+      return await ref.get()
+   }
+
    // *** Firestore API ***
 
    getStreamRef = (router): firebase.firestore.DocumentReference => {
@@ -513,7 +522,7 @@ class FirebaseService {
 
    // CREATE_LIVESTREAMS
 
-   addLivestream = async (livestream, collection, author = {}) => {
+   addLivestream = async (livestream, collection, author = {}, promotion) => {
       try {
          const ratings: EventRating[] = [
             {
@@ -573,6 +582,19 @@ class FirebaseService {
             batch.set(ratingRef, toSet)
          }
 
+         const promotionsRef = this.firestore
+            .collection(collection)
+            .doc(livestreamsRef.id)
+            .collection("promotions")
+            .doc("promotions")
+
+         const promotionToUpdate: LivestreamPromotions = {
+            ...promotion,
+            livestreamId: livestreamsRef.id,
+         }
+
+         batch.set(promotionsRef, promotionToUpdate, { merge: true })
+
          await batch.commit()
          return livestreamsRef.id
       } catch (error) {
@@ -630,12 +652,24 @@ class FirebaseService {
       return livestreamsRef.id
    }
 
-   updateLivestream = async (livestream, collection) => {
+   updateLivestream = async (livestream, collection, promotion) => {
+      const batch = this.firestore.batch()
       let livestreamsRef = this.firestore
          .collection(collection)
          .doc(livestream.id)
       livestream.lastUpdated = this.getServerTimestamp()
-      await livestreamsRef.update(livestream)
+
+      batch.set(livestreamsRef, livestream, { merge: true })
+
+      const promotionRef = this.firestore
+         .collection(collection)
+         .doc(livestream.id)
+         .collection("promotions")
+         .doc("promotions")
+
+      batch.set(promotionRef, promotion, { merge: true })
+
+      await batch.commit()
       return livestream.id
    }
 
@@ -649,6 +683,16 @@ class FirebaseService {
          .collection(collection)
          .doc(streamId)
          .collection("speakers")
+      return ref.get()
+   }
+
+   getStreamPromotions = (streamId, collection) => {
+      const ref = this.firestore
+         .collection(collection)
+         .doc(streamId)
+         .collection("promotions")
+         .doc("promotions")
+
       return ref.get()
    }
 
