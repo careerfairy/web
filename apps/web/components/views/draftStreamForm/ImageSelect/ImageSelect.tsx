@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import {
    Avatar,
    Box,
@@ -102,7 +102,41 @@ const ImageSelect = ({
       setFilePickerError(error)
    }, [error])
 
-   const renderAvatar = () => (
+   const handleFilePickerChange = useCallback(
+      (fileObject) => {
+         uploadLogo(
+            path,
+            fileObject,
+            firebase,
+            (newUrl, fullPath) => {
+               setFieldValue(formName, getDownloadUrl(fullPath), true)
+               setFilePickerError(null)
+            },
+            () => {}
+         )
+      },
+      [firebase, formName, getDownloadUrl, path, setFieldValue]
+   )
+
+   const handleFilePickerError = useCallback(
+      (errMsg) => setFilePickerError(errMsg),
+      []
+   )
+
+   const renderFilePicker = (content: JSX.Element): JSX.Element => {
+      return (
+         <FilePickerContainer
+            extensions={["jpg", "jpeg", "png"]}
+            maxSize={10}
+            onError={handleFilePickerError}
+            onChange={handleFilePickerChange}
+         >
+            {content}
+         </FilePickerContainer>
+      )
+   }
+
+   const renderAvatar = (): JSX.Element => (
       <>
          <div className={classes.avaWrapper}>
             <Box className={classes.avatarRing} boxShadow={3}>
@@ -114,23 +148,7 @@ const ImageSelect = ({
                />
             </Box>
          </div>
-         <FilePickerContainer
-            extensions={["jpg", "jpeg", "png"]}
-            maxSize={10}
-            onError={(errMsg) => setFilePickerError(errMsg)}
-            onChange={(fileObject) => {
-               uploadLogo(
-                  path,
-                  fileObject,
-                  firebase,
-                  (newUrl, fullPath) => {
-                     setFieldValue(formName, getDownloadUrl(fullPath), true)
-                     setFilePickerError(null)
-                  },
-                  () => {}
-               )
-            }}
-         >
+         {renderFilePicker(
             <Box sx={{ width: "100%", textAlign: buttonCentered && "center" }}>
                <Button
                   startIcon={showIconButton ? <PublishIcon /> : null}
@@ -144,14 +162,14 @@ const ImageSelect = ({
                   {value?.length ? `Change ${label}` : `Upload ${label}`}
                </Button>
             </Box>
-         </FilePickerContainer>
+         )}
          <Collapse in={Boolean(filePickerError)}>
             <FormHelperText error>{filePickerError}</FormHelperText>
          </Collapse>
       </>
    )
 
-   const renderCard = () => {
+   const renderCard = (): JSX.Element => {
       if (value.length) {
          // render image card with selected image
          return (
@@ -162,27 +180,7 @@ const ImageSelect = ({
                borderRadius={6}
                borderColor={theme.palette.grey.A400}
             >
-               <FilePickerContainer
-                  extensions={["jpg", "jpeg", "png"]}
-                  maxSize={10}
-                  onError={(errMsg) => setFilePickerError(errMsg)}
-                  onChange={(fileObject) => {
-                     uploadLogo(
-                        path,
-                        fileObject,
-                        firebase,
-                        (newUrl, fullPath) => {
-                           setFieldValue(
-                              formName,
-                              getDownloadUrl(fullPath),
-                              true
-                           )
-                           setFilePickerError(null)
-                        },
-                        () => {}
-                     )
-                  }}
-               >
+               {renderFilePicker(
                   <Box position="absolute" right={0} m={2}>
                      <Button
                         startIcon={<PublishIcon />}
@@ -203,7 +201,7 @@ const ImageSelect = ({
                         </Typography>
                      </Button>
                   </Box>
-               </FilePickerContainer>
+               )}
                <Box
                   className={classes.media}
                   px={1}
@@ -243,27 +241,7 @@ const ImageSelect = ({
                   />
                </Box>
 
-               <FilePickerContainer
-                  extensions={["jpg", "jpeg", "png"]}
-                  maxSize={10}
-                  onError={(errMsg) => setFilePickerError(errMsg)}
-                  onChange={(fileObject) => {
-                     uploadLogo(
-                        path,
-                        fileObject,
-                        firebase,
-                        (newUrl, fullPath) => {
-                           setFieldValue(
-                              formName,
-                              getDownloadUrl(fullPath),
-                              true
-                           )
-                           setFilePickerError(null)
-                        },
-                        () => {}
-                     )
-                  }}
-               >
+               {renderFilePicker(
                   <Box mb={1} display="flex" justifyContent="center">
                      <Button
                         id="upButton"
@@ -280,7 +258,7 @@ const ImageSelect = ({
                         your image here
                      </Typography>
                   </Box>
-               </FilePickerContainer>
+               )}
 
                {resolution && (
                   <Box mb={2}>

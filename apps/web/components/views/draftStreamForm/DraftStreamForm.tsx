@@ -57,11 +57,11 @@ import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
 import StreamFormNavigator, {
    IStreamFormNavigatorSteps,
 } from "./StreamForm/StreamFormNavigator"
-import { Option } from "../signup/utils"
 import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
+import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -268,8 +268,12 @@ const DraftStreamForm = ({
    )
    const [allFetched, setAllFetched] = useState(false)
    const [updateMode, setUpdateMode] = useState(false)
-   const { showJobSection, formHasChanged, setFormHasChanged } =
-      useStreamCreationProvider()
+   const {
+      showJobSection,
+      formHasChanged,
+      setFormHasChanged,
+      showPromotionInputs,
+   } = useStreamCreationProvider()
 
    const { data: existingInterests } = useInterests()
 
@@ -705,6 +709,24 @@ const DraftStreamForm = ({
       }
    }
 
+   // filter values in order to save only the proper ones
+   const filterValues = useCallback(
+      (values): DraftFormValues => {
+         // only save the promotions if the start date is after 30 days from now
+         if (!showPromotionInputs) {
+            return {
+               ...values,
+               promotionChannelsCodes: [],
+               promotionCountriesCodes: [],
+               promotionUniversitiesCodes: [],
+            }
+         }
+
+         return values
+      },
+      [showPromotionInputs]
+   )
+
    return (
       <Container className={classes.root} id="livestreamForm">
          {allFetched ? (
@@ -747,7 +769,7 @@ const DraftStreamForm = ({
                         validate={handleValidate}
                         onSubmit={async (values, { setSubmitting }) => {
                            await onSubmit(
-                              values,
+                              filterValues(values),
                               { setSubmitting },
                               updateMode,
                               draftStreamId as string,

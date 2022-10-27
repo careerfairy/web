@@ -91,7 +91,7 @@ const NewStreamModal = ({
    const [submitted, setSubmitted] = useState(false)
    const [publishDraft, setPublishDraft] = useState(false)
    const classes = useStyles()
-   const { showPromotionInputs, formHasChanged } = useStreamCreationProvider()
+   const { formHasChanged } = useStreamCreationProvider()
    const isMobile = useIsMobile()
 
    const isDraftsPage = useMemo(() => typeOfStream === "draft", [typeOfStream])
@@ -224,9 +224,7 @@ const NewStreamModal = ({
             : "draftLivestreams"
 
          // only save the promotions if the start date is after 30 days from now
-         const promotion = showPromotionInputs
-            ? buildPromotionObj(values, livestream.id)
-            : buildPromotionObj({}, livestream.id)
+         const promotion = buildPromotionObj(values, livestream.id)
 
          if (updateMode) {
             id = livestream.id

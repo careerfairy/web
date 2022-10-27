@@ -1,11 +1,10 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, Option } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
 import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
-import { Option } from "@careerfairy/webapp/components/views/signup/utils"
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -347,5 +346,5 @@ export interface LivestreamPromotions extends Identifiable {
    promotionChannelsCodes: string[]
    promotionCountriesCodes: Option[]
    promotionUniversitiesCodes: Option[]
-   livestreamId: Option
+   livestreamId: string
 }

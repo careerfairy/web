@@ -6,7 +6,7 @@ import {
    channelOptionCodes,
    countriesOptionCodes,
 } from "../../../../constants/forms"
-import { multiListSelectMapValueFn, Option } from "../../signup/utils"
+import { multiListSelectMapValueFn } from "../../signup/utils"
 import { withFirebase } from "../../../../context/firebase/FirebaseServiceContext"
 import FirebaseService from "../../../../data/firebase/FirebaseService"
 import { UniversityCountry } from "@careerfairy/shared-lib/dist/universities"
@@ -15,6 +15,7 @@ import { useStreamCreationProvider } from "./StreamCreationProvider"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
 
 type Props = {
    promotionChannelsCodes: Option[]

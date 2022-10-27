@@ -1,8 +1,5 @@
-export type Option = {
-   id: string
-   name: string
-   groupId?: string
-}
+import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
+
 export const formatToOptionArray = (
    selectedIds: string[],
    allOptions: Option[]

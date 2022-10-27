@@ -13,9 +13,9 @@ import {
    formatToOptionArray,
    mapOptions,
    multiListSelectMapValueFn,
-   Option,
 } from "../utils"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const styles = sxStyles({
    inputLabel: {

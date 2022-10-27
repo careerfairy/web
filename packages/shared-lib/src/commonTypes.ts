@@ -24,3 +24,9 @@ export const UTMKeys = [
    "utm_term",
    "utm_content",
 ]
+
+export type Option = {
+   id: string
+   name: string
+   groupId?: string
+}

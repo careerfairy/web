@@ -1,5 +1,5 @@
 import { Grid, Typography } from "@mui/material"
-import React from "react"
+import React, { useCallback } from "react"
 import FormGroup from "../FormGroup"
 import MultiListSelect from "../../common/MultiListSelect"
 import GroupQuestionSelect from "../GroupQuestionSelect"
@@ -33,6 +33,11 @@ const HostAndQuestionsInfo = ({
    sectionRef,
    classes,
 }: Props) => {
+   const handleGroupsIdsSelectItems = useCallback(
+      (selectedGroups) => handleGroupSelect(values, selectedGroups),
+      [handleGroupSelect, values]
+   )
+
    return (
       <>
          {!!existingGroups.length && (
@@ -52,9 +57,7 @@ const HostAndQuestionsInfo = ({
                      <MultiListSelect
                         inputName="groupIds"
                         isCheckbox
-                        onSelectItems={(selectedGroups) =>
-                           handleGroupSelect(values, selectedGroups)
-                        }
+                        onSelectItems={handleGroupsIdsSelectItems}
                         selectedItems={selectedGroups}
                         allValues={existingGroups}
                         disabled={isSubmitting || isNotAdmin}

@@ -3,7 +3,10 @@ import Head from "next/head"
 import React, { useEffect, useRef, useState } from "react"
 import { Typography } from "@mui/material"
 import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm"
-import { buildLivestreamObject } from "../components/helperFunctions/streamFormFunctions"
+import {
+   buildLivestreamObject,
+   buildPromotionObj,
+} from "../components/helperFunctions/streamFormFunctions"
 import { useSnackbar } from "notistack"
 import { useRouter } from "next/router"
 import {
@@ -115,6 +118,8 @@ const DraftStream = () => {
             livestream.jobs = selectedJobs
          }
 
+         const promotion = buildPromotionObj(values, livestream.id)
+
          let id
          if (updateMode) {
             id = livestream.id
@@ -127,7 +132,7 @@ const DraftStream = () => {
             await firebaseService.updateLivestream(
                livestream,
                "draftLivestreams",
-               {}
+               promotion
             )
 
             // console.log("-> Draft livestream was updated with id", id);
