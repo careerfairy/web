@@ -88,7 +88,7 @@ const QuestionSelect = ({
    const handleChange = useCallback(
       (event: React.ChangeEvent<{ value: unknown }>) =>
          setFieldValue(inputName, event.target.value),
-      []
+      [inputName, setFieldValue]
    )
 
    return (
@@ -114,6 +114,7 @@ const QuestionSelect = ({
             ),
          }}
       >
+         {native && <option value="" disabled></option>}
          {options.map((option) => {
             if (native) {
                return (

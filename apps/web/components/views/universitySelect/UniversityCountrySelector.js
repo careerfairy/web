@@ -14,7 +14,6 @@ const UniversityCountrySelector = ({
    value,
    setFieldValue,
    submitting,
-   handleBlur,
    error,
    className = "",
 }) => {
@@ -32,7 +31,7 @@ const UniversityCountrySelector = ({
          data-testid={"university-country-selector"}
          disabled={submitting}
          selectOnFocus
-         onBlur={handleBlur}
+         blurOnSelect
          autoHighlight
          autoComplete={false}
          onChange={(e, value) => {
@@ -58,7 +57,6 @@ const UniversityCountrySelector = ({
                      autoComplete="none"
                      id="universityCountryCode"
                      name="universityCountryCode"
-                     onBlur={handleBlur}
                      label="Select Country of University"
                      disabled={submitting}
                      variant="outlined"

@@ -272,14 +272,12 @@ const PersonalInfo = ({ userData }) => {
                                  touched.universityCountryCode &&
                                  errors.universityCountryCode
                               }
-                              handleBlur={handleBlur}
                               handleOpen={handleOpen}
                               open={open}
                            />
                         </Grid>
                         <Grid item xs={12} sm={6}>
                            <UniversitySelector
-                              handleBlur={handleBlur}
                               error={
                                  errors.university &&
                                  touched.university &&
@@ -297,7 +295,6 @@ const PersonalInfo = ({ userData }) => {
                            <FieldOfStudySelector
                               setFieldValue={setFieldValue}
                               value={values.fieldOfStudy}
-                              handleBlur={handleBlur}
                               disabled={isSubmitting}
                               error={
                                  errors.fieldOfStudy &&
@@ -310,7 +307,6 @@ const PersonalInfo = ({ userData }) => {
                            <LevelOfStudySelector
                               setFieldValue={setFieldValue}
                               value={values.levelOfStudy}
-                              handleBlur={handleBlur}
                               disabled={isSubmitting}
                               error={
                                  errors.levelOfStudy &&

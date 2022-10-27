@@ -246,14 +246,12 @@ function SignUpUserForm() {
                               errors.universityCountryCode
                            }
                            handleOpen={handleOpen}
-                           handleBlur={handleBlur}
                            open={open}
                         />
                      </Grid>
                      <Grid item xs={12} sm={6}>
                         <UniversitySelector
                            className="registrationInput"
-                           handleBlur={handleBlur}
                            error={
                               errors.university &&
                               touched.university &&
@@ -270,7 +268,6 @@ function SignUpUserForm() {
                            setFieldValue={setFieldValue}
                            value={values.fieldOfStudy}
                            className="registrationInput"
-                           handleBlur={handleBlur}
                            disabled={submitting(isSubmitting)}
                            error={
                               errors.fieldOfStudy &&
@@ -283,7 +280,6 @@ function SignUpUserForm() {
                         <LevelOfStudySelector
                            setFieldValue={setFieldValue}
                            value={values.levelOfStudy}
-                           handleBlur={handleBlur}
                            className="registrationInput"
                            disabled={submitting(isSubmitting)}
                            error={
