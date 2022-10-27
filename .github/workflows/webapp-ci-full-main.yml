@@ -28,13 +28,13 @@ jobs:
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
          workflow: ${{ steps.changes.outputs.workflow }}
       steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
            with:
               node-version: "16"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v2
+           uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -80,13 +80,13 @@ jobs:
          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
          NODE_ENV: test
       steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
            with:
               node-version: "16"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v2
+           uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -130,13 +130,13 @@ jobs:
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
            with:
               node-version: "16"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v2
+           uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -189,7 +189,7 @@ jobs:
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
-         - uses: actions/checkout@v2
+         - uses: actions/checkout@v3
          - uses: amondnet/vercel-action@v25.1.0 #deploy
            id: vercel-action
            with:
