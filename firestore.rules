@@ -18,9 +18,9 @@ service cloud.firestore {
             return isSignedIn() && request.auth.token.email == userEmail;
         }
 
-//        function isLivestreamAdmin(livestreamId) {
-//            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
-//        }
+        //        function isLivestreamAdmin(livestreamId) {
+        //            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
+        //        }
 
         match /fieldsOfStudy/{fieldOfStudy} {
             allow read: if true;
@@ -142,9 +142,9 @@ service cloud.firestore {
             allow read: if true;
             allow write: if isCareerCenterAdmin() || isCFAdmin();
 
-            function careerCenterData() {
-                return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
-            }
+            //            function careerCenterData() {
+            //                return get(/databases/$(database)/documents/careerCenterData/$(careerCenter)).data;
+            //            }
 
             function isCareerCenterAdmin() {
                 return careerCenter in request.auth.token.adminGroups.keys();
@@ -198,21 +198,23 @@ service cloud.firestore {
         }
 
         match /livestreams/{livestream} {
-            function userIsGroupAdmin(groupIds) {
-                return request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(groupIds);
+            function userIsGroupAdmin() {
+                // we need to fetch the document, its only present in request.resource for create/update operations
+                let doc = get(/databases/$(database)/documents/livestreams/$(livestream)).data;
+                return request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(doc.groupIds);
             }
 
             // signed in users can update certain fields
-            function publicFieldsUsersCanUpdate() {
-                let allowedFields = ['participatingStudents', 'registeredUsers', 'talentPool', 'screenSharerId'];
-                let diff = request.resource.data.diff(resource.data);
-                return isSignedIn() && diff.affectedKeys().hasAny(allowedFields);
-            }
+            //            function publicFieldsUsersCanUpdate() {
+            //                let allowedFields = ['participatingStudents', 'registeredUsers', 'talentPool', 'screenSharerId'];
+            //                let diff = request.resource.data.diff(resource.data);
+            //                return isSignedIn() && diff.affectedKeys().hasAny(allowedFields);
+            //            }
 
             // Currently anonymous users can create test livestreams and update them as if they were
             // admins, we should move this test livestreams to a different collection with more relaxed rules
             allow read, create, update: if true;
-            allow delete: if userIsGroupAdmin(request.resource.data.groupIds) || isCFAdmin();
+            allow delete: if userIsGroupAdmin() || isCFAdmin();
             // allow update: if publicFieldsUsersCanUpdate() || userIsGroupAdmin(request.resource.data.groupIds) || isCFAdmin();
 
             match /userLivestreamData/{studentEmail} {
@@ -426,7 +428,7 @@ service cloud.firestore {
         match /wishes/{slug} {
             allow read: if true;
             allow create: if isSignedIn();
-            allow delete, update: if request.resource.data.authorUid == uid || isCFAdmin();
+            allow delete, update: if request.resource.data.authorUid == request.auth.uid || isCFAdmin();
 
             match /flags/{uid} {
                 allow read, write: if isSignedIn();
