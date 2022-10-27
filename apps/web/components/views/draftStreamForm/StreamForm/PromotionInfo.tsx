@@ -11,13 +11,13 @@ import Section from "components/views/common/Section"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
-import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import useUniversitiesByCountryCodes from "../../../custom-hook/useUniversities"
 
 type Props = {
-   promotionChannelsCodes: Option[]
-   promotionCountriesCodes: Option[]
-   promotionUniversitiesCodes: Option[]
+   promotionChannelsCodes: OptionGroup[]
+   promotionCountriesCodes: OptionGroup[]
+   promotionUniversitiesCodes: OptionGroup[]
    setFieldValue: (field, value) => void
    classes: any
    sectionRef: any

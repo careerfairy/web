@@ -1,5 +1,5 @@
 import { DropdownItem } from "../components/views/common/GenericDropdown"
-import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 export const maxQuestionLength = 170
 export const minQuestionLength = 10
@@ -1318,7 +1318,7 @@ export const countriesAndRegionsOptionCodes = [
       groupId: regionGroupId,
    },
    ...countriesOptionCodes,
-] as Option[]
+] as OptionGroup[]
 
 export const languageOptionCodes = [
    {

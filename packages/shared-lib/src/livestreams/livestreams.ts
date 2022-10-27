@@ -1,4 +1,4 @@
-import { Identifiable, Option } from "../commonTypes"
+import { Identifiable, OptionGroup } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
 import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
 import firebase from "firebase/compat"
@@ -344,7 +344,7 @@ export interface LivestreamEventParsed extends LivestreamEventSerialized {
 
 export interface LivestreamPromotions extends Identifiable {
    promotionChannelsCodes: string[]
-   promotionCountriesCodes: Option[]
-   promotionUniversitiesCodes: Option[]
+   promotionCountriesCodes: OptionGroup[]
+   promotionUniversitiesCodes: OptionGroup[]
    livestreamId: string
 }

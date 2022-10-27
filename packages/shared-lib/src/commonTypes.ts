@@ -25,7 +25,7 @@ export const UTMKeys = [
    "utm_content",
 ]
 
-export type Option = {
+export type OptionGroup = {
    id: string
    name: string
    groupId?: string

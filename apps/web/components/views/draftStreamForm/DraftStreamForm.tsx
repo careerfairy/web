@@ -61,7 +61,7 @@ import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
-import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -199,9 +199,9 @@ export interface DraftFormValues {
    }
    targetFieldsOfStudy: FieldOfStudy[]
    targetLevelsOfStudy: FieldOfStudy[]
-   promotionChannelsCodes: Option[]
-   promotionCountriesCodes: Option[]
-   promotionUniversitiesCodes: Option[]
+   promotionChannelsCodes: OptionGroup[]
+   promotionCountriesCodes: OptionGroup[]
+   promotionUniversitiesCodes: OptionGroup[]
    questionsDisabled: boolean
 }
 

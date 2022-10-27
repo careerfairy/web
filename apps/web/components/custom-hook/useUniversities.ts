@@ -4,11 +4,11 @@ import {
 } from "@careerfairy/shared-lib/dist/universities"
 import { useEffect, useState } from "react"
 import { errorLogAndNotify } from "../../util/CommonUtil"
-import { Option } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
 const useUniversitiesByCountryCodes = (
-   selectedCountryCodes: Option[]
+   selectedCountryCodes: OptionGroup[]
 ): University[] => {
    const [allUniversities, setAllUniversities] = useState([] as University[])
    const firebase = useFirebaseService()
