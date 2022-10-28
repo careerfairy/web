@@ -5,6 +5,7 @@ import Image from "next/image"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import { getDictValues } from "../../../../../../util/CommonUtil"
+import { useNetworkState } from "react-use"
 
 const styles = sxStyles({
    root: {
@@ -42,6 +43,8 @@ type Props = {
    resourceIds?: ResourceId[]
 }
 const ResourcesView = ({ resourceIds }: Props) => {
+   const { online } = useNetworkState()
+
    const options = useMemo(
       () => getDictValues(resourceIds, resourcesDict),
       [resourceIds]
@@ -54,7 +57,11 @@ const ResourcesView = ({ resourceIds }: Props) => {
          </Typography>
          <Stack spacing={1.5}>
             {options.map((resource) => (
-               <ResourceCard {...resource} key={resource.title} />
+               <ResourceCard
+                  online={online}
+                  {...resource}
+                  key={resource.title}
+               />
             ))}
          </Stack>
       </Stack>
@@ -65,6 +72,7 @@ export default ResourcesView
 
 interface ResourceCardProps {
    previewImageUrl: string
+   online?: boolean
    previewImageCaption?: string
    title: string
    authorName: string
@@ -79,6 +87,7 @@ export const ResourceCard = ({
    previewImageUrl,
    actionButtonProps,
    title,
+   online,
    previewImageCaption,
 }: ResourceCardProps) => {
    return (
@@ -88,14 +97,16 @@ export const ResourceCard = ({
          component={"article"}
          spacing={2}
       >
-         <CardMedia sx={styles.image}>
-            <Image
-               width={120}
-               height={80}
-               src={previewImageUrl}
-               alt={previewImageCaption}
-            />
-         </CardMedia>
+         {online && (
+            <CardMedia sx={styles.image}>
+               <Image
+                  width={120}
+                  height={80}
+                  src={previewImageUrl}
+                  alt={previewImageCaption}
+               />
+            </CardMedia>
+         )}
          <Box sx={styles.titleText}>
             <Typography fontWeight={500} variant={"h6"}>
                {title}
