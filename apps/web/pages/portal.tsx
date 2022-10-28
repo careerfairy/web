@@ -8,7 +8,6 @@ import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
 import { GetServerSideProps } from "next"
-import { mapServerSideStream } from "../util/serverUtil"
 import SEO from "../components/util/SEO"
 import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
