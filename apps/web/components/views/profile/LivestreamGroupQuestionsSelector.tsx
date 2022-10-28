@@ -100,7 +100,7 @@ const QuestionSelect = ({
          onBlur={handleBlur}
          error={!!errorText}
          helperText={errorText}
-         value={question.selectedOptionId || ""}
+         value={question.selectedOptionId || options?.[0]?.id || ""}
          onChange={handleChange}
          SelectProps={{
             native: native,
