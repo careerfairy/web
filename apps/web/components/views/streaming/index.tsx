@@ -19,7 +19,6 @@ import {
    showActionButtonsSelector,
    streamingSelector,
 } from "../../../store/selectors/streamSelectors"
-import FloatingHelpButton from "./sharedComponents/FloatingHelpButton"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
@@ -166,11 +165,11 @@ const StreamerOverview = ({
             className={classes.blackFrame}
             onClick={handleClick}
          >
-            <FloatingHelpButton openSupportInLeftMenu={openSupportInLeftMenu} />
             <VideoContainer
                smallScreen={smallScreen}
                showMenu={showMenu}
                viewer={false}
+               openSupportInLeftMenu={openSupportInLeftMenu}
             />
             <ButtonComponent
                isMobile={undefined}

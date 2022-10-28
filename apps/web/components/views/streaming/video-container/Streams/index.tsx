@@ -1,5 +1,4 @@
 import React, { memo, useEffect, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
 import StreamsLayout from "./StreamsLayout"
 import Banners from "./Banners"
 import { useSelector } from "react-redux"
@@ -8,19 +7,22 @@ import SuperAdminControls from "../SuperAdminControls"
 import { focusModeEnabledSelector } from "../../../../../store/selectors/streamSelectors"
 import { IRemoteStream, LocalStream } from "../../../../../types/streaming"
 import { LiveSpeaker } from "@careerfairy/shared-lib/dist/livestreams"
+import FloatingHelpButton from "../../sharedComponents/FloatingHelpButton"
+import Box from "@mui/material/Box"
+import { sxStyles } from "../../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       width: "100%",
       display: "flex",
       flexDirection: "column",
-      backgroundColor: theme.palette.grey["900"],
+      backgroundColor: (theme) => theme.palette.grey["900"],
    },
    videoElementsWrapper: {
       flex: 1,
       display: "flex",
    },
-}))
+})
 
 interface Props {
    externalMediaStreams: IRemoteStream[]
@@ -39,6 +41,7 @@ interface Props {
    viewer?: boolean
    streamerId: string
    sharingVideo: boolean
+   openSupportInLeftMenu?: () => void
 }
 const Streams = ({
    externalMediaStreams,
@@ -57,12 +60,12 @@ const Streams = ({
    viewer,
    streamerId,
    sharingVideo,
+   openSupportInLeftMenu,
 }: Props) => {
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const [streamData, setStreamData] = useState([])
    const [bannersBottom, setBannersBottom] = useState(false)
    const [hasManySpeakers, setHasManySpeakers] = useState(false)
-   const classes = useStyles()
    const { userData } = useAuth()
 
    useEffect(() => {
@@ -137,7 +140,7 @@ const Streams = ({
       return allStreams.filter((stream) => stream.uid !== largeStream.uid)
    }
    return (
-      <div className={classes.root}>
+      <Box sx={styles.root}>
          {!bannersBottom && (
             <Banners
                presenter={presenter}
@@ -145,7 +148,14 @@ const Streams = ({
                mobile={mobile}
             />
          )}
-         <div className={classes.videoElementsWrapper}>
+         {openSupportInLeftMenu && (
+            <Box p={1}>
+               <FloatingHelpButton
+                  openSupportInLeftMenu={openSupportInLeftMenu}
+               />
+            </Box>
+         )}
+         <Box sx={styles.videoElementsWrapper}>
             <StreamsLayout
                streamData={streamData}
                liveSpeakers={liveSpeakers}
@@ -162,7 +172,7 @@ const Streams = ({
                streamerId={streamerId}
             />
             {userData?.isAdmin && <SuperAdminControls />}
-         </div>
+         </Box>
          {bannersBottom && (
             <Banners
                isBottom
@@ -171,7 +181,7 @@ const Streams = ({
                mobile={mobile}
             />
          )}
-      </div>
+      </Box>
    )
 }
 
