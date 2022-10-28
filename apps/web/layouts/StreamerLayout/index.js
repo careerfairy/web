@@ -229,11 +229,12 @@ const StreamerLayout = (props) => {
          currentLivestream,
          isBreakout,
          isMainStreamer,
+         selectedState,
          isStreamer: true,
          streamerId,
          isMobile: undefined,
       }),
-      [streamerId, currentLivestream, isBreakout, isMainStreamer]
+      [currentLivestream, isBreakout, isMainStreamer, selectedState, streamerId]
    )
 
    const tokenIsValidated = () => {

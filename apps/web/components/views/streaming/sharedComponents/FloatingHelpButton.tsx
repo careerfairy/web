@@ -3,6 +3,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined"
 import Button from "@mui/material/Button"
 import { alpha } from "@mui/material/styles"
+import { useCurrentStream } from "../../../../context/stream/StreamContext"
 
 const styles = sxStyles({
    root: {
@@ -19,6 +20,10 @@ const styles = sxStyles({
       "&:hover": {
          backgroundColor: (theme) => alpha(theme.palette.common.black, 0.5),
       },
+      "&:disabled": {
+         backgroundColor: (theme) => alpha(theme.palette.common.black, 0.2),
+         color: (theme) => alpha(theme.palette.common.white, 0.5),
+      },
    },
 })
 
@@ -26,10 +31,15 @@ type Props = {
    openSupportInLeftMenu: () => void
 }
 const FloatingHelpButton = ({ openSupportInLeftMenu }: Props) => {
+   const { selectedState } = useCurrentStream()
+
+   const disabled = selectedState === "support"
+
    return (
       <Button
          size={"small"}
          color={"grey"}
+         disabled={disabled}
          onClick={openSupportInLeftMenu}
          sx={styles.root}
       >
