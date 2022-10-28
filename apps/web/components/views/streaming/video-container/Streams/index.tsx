@@ -22,6 +22,10 @@ const styles = sxStyles({
       flex: 1,
       display: "flex",
    },
+   floatingButtonWrapper: {
+      position: "absolute",
+      p: 1,
+   },
 })
 
 interface Props {
@@ -148,14 +152,14 @@ const Streams = ({
                mobile={mobile}
             />
          )}
-         {openSupportInLeftMenu && (
-            <Box p={1}>
-               <FloatingHelpButton
-                  openSupportInLeftMenu={openSupportInLeftMenu}
-               />
-            </Box>
-         )}
          <Box sx={styles.videoElementsWrapper}>
+            {presenter && (
+               <Box sx={styles.floatingButtonWrapper}>
+                  <FloatingHelpButton
+                     openSupportInLeftMenu={openSupportInLeftMenu}
+                  />
+               </Box>
+            )}
             <StreamsLayout
                streamData={streamData}
                liveSpeakers={liveSpeakers}
