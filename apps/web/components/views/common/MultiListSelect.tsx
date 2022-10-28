@@ -3,6 +3,7 @@ import { Autocomplete, Checkbox, Chip, TextField } from "@mui/material"
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import isEqual from "react-fast-compare"
+import { IColors } from "../../../types/commonTypes"
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />
 const checkedIcon = <CheckBoxIcon fontSize="small" />
@@ -29,6 +30,7 @@ const MultiListSelect = ({
     * Check the type definition for more information
     */
    selectAllOption = null,
+   checkboxColor = "primary",
 }: Props) => {
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
    const [selectedItemsLocal, setSelectedItemsLocal] = useState(selectedItems)
@@ -167,6 +169,7 @@ const MultiListSelect = ({
                      icon={icon}
                      checkedIcon={checkedIcon}
                      checked={selected}
+                     color={checkboxColor}
                   />
                </li>
             ) : (
@@ -200,6 +203,8 @@ const MultiListSelect = ({
    )
 }
 
+type ICheckBoxColors = Exclude<IColors, "inherit" | "action" | "disabled">
+
 type Props = {
    inputName: string
    setFieldValue?: (name, value) => void
@@ -218,6 +223,7 @@ type Props = {
    disabledValues?: string[]
    limit?: number | false
    selectAllOption?: SelectAllOption
+   checkboxColor?: ICheckBoxColors
 }
 
 type SelectAllOption = {

@@ -36,63 +36,6 @@ export const getServerSideStream = async (livestreamId) => {
    return serverSideStream
 }
 
-export const getServerSideStreamAdminPreferences = async (livestreamId) => {
-   let streamAdminPreferences = null
-   if (livestreamId) {
-      // @ts-ignore
-      const preferenceSnap = await store.firestore.get({
-         collection: "livestreams",
-         doc: livestreamId,
-         subcollections: [
-            {
-               collection: "preferences",
-               doc: "adminPreference",
-            },
-         ],
-      })
-      if (preferenceSnap.exists) {
-         streamAdminPreferences = preferenceSnap.data()
-      }
-   }
-   return streamAdminPreferences
-}
-
-export const serializeServerSideStream = (serverSideStream) => {
-   const serverSideLivestream = { ...serverSideStream }
-   delete serverSideLivestream.registeredUsers
-   delete serverSideLivestream.registeredStudentsCount
-   delete serverSideLivestream.currentSpeakerId
-   delete serverSideLivestream.participatingStudents
-   delete serverSideLivestream.participatingStudentsCount
-   delete serverSideLivestream.talentPool
-   delete serverSideLivestream.targetGroups
-   delete serverSideLivestream.hasStarted
-   delete serverSideLivestream.hasSentEmails
-   delete serverSideLivestream.liveSpeakers
-   delete serverSideLivestream.hasEnded
-   delete serverSideLivestream.hidden
-   delete serverSideLivestream.test
-   delete serverSideLivestream.adminEmails
-   delete serverSideLivestream.adminEmail
-   delete serverSideLivestream.author
-   delete serverSideLivestream.lastUpdatedAuthorInfo
-   delete serverSideLivestream.status
-
-   serverSideLivestream.createdDateString =
-      serverSideLivestream.created?.toDate?.().toString() || null
-   serverSideLivestream.lastUpdatedDateString =
-      serverSideLivestream.lastUpdated?.toDate?.().toString() || null
-   serverSideLivestream.startDateString =
-      serverSideLivestream.start?.toDate?.().toString() || null
-
-   // Clear out props that have methods of which the server can't parse
-   delete serverSideLivestream.created
-   delete serverSideLivestream.lastUpdated
-   delete serverSideLivestream.start
-
-   return serverSideLivestream
-}
-
 export const parseStreamDates = (stream) => {
    const newStream = { ...stream }
    if (newStream.createdDateString) {
@@ -109,24 +52,6 @@ export const parseStreamDates = (stream) => {
    return newStream
 }
 
-export const convertStreamJsDatesToTimestamps = (
-   stream,
-   jsDateToTimestampCallback
-) => {
-   const newStream = { ...stream }
-   if (newStream.createdDate) {
-      newStream.created = jsDateToTimestampCallback(newStream.createdDate)
-   }
-   if (newStream.lastUpdatedDate) {
-      newStream.lastUpdated = jsDateToTimestampCallback(
-         newStream.lastUpdatedDate
-      )
-   }
-   if (newStream.startDate) {
-      newStream.start = jsDateToTimestampCallback(newStream.startDate)
-   }
-   return newStream
-}
 export const getServerSideGroup = async (groupId) => {
    let serverSideGroup = {}
    // @ts-ignore

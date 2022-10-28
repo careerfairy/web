@@ -24,6 +24,8 @@ import { leftMenuOpenSelector } from "../../store/selectors/streamSelectors"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import RTCProvider from "../../context/agora/RTCProvider"
 import isEqual from "react-fast-compare"
+import { LEFT_MENU_WIDTH } from "../../constants/streams"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -51,7 +53,7 @@ const useStyles = makeStyles((theme) => ({
       overflow: "hidden",
       paddingTop: 55,
       paddingLeft: ({ showMenu, smallScreen }) =>
-         showMenu && !smallScreen ? 280 : 0,
+         showMenu && !smallScreen ? LEFT_MENU_WIDTH : 0,
       transition: theme.transitions.create("padding-left", {
          duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,
@@ -73,7 +75,7 @@ const useStyles = makeStyles((theme) => ({
       position: "absolute",
       transition: "width 0.3s",
       transitionTimingFunction: theme.transitions.easeInOut,
-      width: ({ showMenu }) => (showMenu ? 280 : 0),
+      width: ({ showMenu }) => (showMenu ? LEFT_MENU_WIDTH : 0),
       top: 55,
       left: 0,
       bottom: 0,
@@ -197,6 +199,7 @@ const StreamerLayout = (props) => {
 
    const showAudience = useCallback(() => {
       setAudienceDrawerOpen(true)
+      dataLayerEvent("livestream_streamer_show_audience_tab")
    }, [])
 
    const hideAudience = useCallback(() => {

@@ -10,6 +10,7 @@ import { useCurrentStream } from "../../../context/stream/StreamContext"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { TEST_EMAIL } from "../streaming/LeftMenu/categories/chat/EmotesModal/utils"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    image: {
@@ -201,13 +202,16 @@ const EmoteButtons = ({ createEmote }) => {
 
    const handleClap = useCallback(() => {
       postIcon("clapping")
+      dataLayerEvent("livestream_viewer_reaction_clap")
    }, [iconsDisabled, livestreamId, authenticatedUser, createEmote])
 
    const handleLike = useCallback(() => {
       postIcon("like")
+      dataLayerEvent("livestream_viewer_reaction_like")
    }, [iconsDisabled, livestreamId, authenticatedUser, createEmote])
    const handleHeart = useCallback(() => {
       postIcon("heart")
+      dataLayerEvent("livestream_viewer_reaction_heart")
    }, [iconsDisabled, livestreamId, authenticatedUser, createEmote])
 
    const postIcon = (iconName) => {

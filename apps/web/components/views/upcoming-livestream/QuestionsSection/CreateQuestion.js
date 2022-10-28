@@ -10,6 +10,7 @@ import { useRouter } from "next/router"
 import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const styles = {
    root: {
@@ -56,6 +57,9 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
             )
             reFetchQuestions()
             resetForm()
+            dataLayerEvent("event_question_submit", {
+               livestreamId,
+            })
          } catch (e) {
             setFieldError(
                "questionTitle",

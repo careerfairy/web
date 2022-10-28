@@ -14,6 +14,8 @@ import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelector
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import JobsCategory from "./categories/JobsCategory"
 import GenericCategoryInactive from "../sharedComponents/GenericCategoryInactive"
+import SupportCategory from "./categories/SupportCategory"
+import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -33,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
       zIndex: 1,
    },
    desktopDrawer: {
-      width: 280,
+      width: LEFT_MENU_WIDTH,
       top: 55,
       height: "calc(100% - 55px)",
       boxShadow: theme.shadows[15],
@@ -45,6 +47,7 @@ const useStyles = makeStyles((theme) => ({
       bottom: 0,
       zIndex: 1,
       background: theme.palette.background.default,
+      borderRight: `none`,
    },
    drawerSmallScreen: {
       width: "100%",
@@ -54,8 +57,6 @@ const useStyles = makeStyles((theme) => ({
       backdropFilter: "blur(5px)",
    },
 }))
-
-const states = ["questions", "polls", "hand", "jobs"]
 
 const LeftMenu = ({
    livestream,
@@ -105,51 +106,80 @@ const LeftMenu = ({
       [setSelectedState, setSliding]
    )
 
-   const views = [
-      livestream.questionsDisabled ? (
-         <GenericCategoryInactive
-            title={"No Q&A Today"}
-            subtitle={"The live stream creator disabled the Q&A feature."}
-         />
-      ) : (
-         <QuestionCategory
-            key={"question-category-tab"}
+   const { states: states, views } = useMemo(() => {
+      const newStates = ["questions", "polls", "hand"]
+
+      const newViews = [
+         livestream.questionsDisabled ? (
+            <GenericCategoryInactive
+               title={"No Q&A Today"}
+               subtitle={"The live stream creator disabled the Q&A feature."}
+            />
+         ) : (
+            <QuestionCategory
+               key={"question-category-tab"}
+               sliding={sliding}
+               showMenu={showMenu}
+               streamer={streamer}
+               livestream={livestream}
+               selectedState={selectedState}
+            />
+         ),
+         <PollCategory
+            key={"poll-category-tab"}
             sliding={sliding}
             showMenu={showMenu}
+            livestream={livestream}
+            selectedState={selectedState}
             streamer={streamer}
-            livestream={livestream}
-            selectedState={selectedState}
-         />
-      ),
-      <PollCategory
-         key={"poll-category-tab"}
-         sliding={sliding}
-         showMenu={showMenu}
-         livestream={livestream}
-         selectedState={selectedState}
-         streamer={streamer}
-      />,
-      <HandRaiseCategory
-         key={"handraise-category-tab"}
-         sliding={sliding}
-         showMenu={showMenu}
-         isGlass={isGlass}
-         handleStateChange={handleStateChange}
-         livestream={livestream}
-         selectedState={selectedState}
-      />,
-   ]
-
-   if (livestream?.jobs?.length > 0) {
-      views.push(
-         <JobsCategory
-            key={"jobs-category-tab"}
-            selectedState={selectedState}
-            livestream={livestream}
+         />,
+         <HandRaiseCategory
+            key={"handraise-category-tab"}
+            sliding={sliding}
             showMenu={showMenu}
-         />
-      )
-   }
+            isGlass={isGlass}
+            handleStateChange={handleStateChange}
+            livestream={livestream}
+            selectedState={selectedState}
+         />,
+      ]
+
+      if (livestream?.jobs?.length > 0) {
+         newViews.push(
+            <JobsCategory
+               key={"jobs-category-tab"}
+               selectedState={selectedState}
+               livestream={livestream}
+               showMenu={showMenu}
+            />
+         )
+         newStates.push("jobs")
+      }
+
+      if (streamer) {
+         newViews.push(
+            <SupportCategory
+               key={"support-category-tab"}
+               selectedState={selectedState}
+               showMenu={showMenu}
+            />
+         )
+         newStates.push("support")
+      }
+
+      return {
+         states: newStates,
+         views: newViews,
+      }
+   }, [
+      handleStateChange,
+      isGlass,
+      livestream,
+      selectedState,
+      showMenu,
+      sliding,
+      streamer,
+   ])
 
    const toggleLeftMenu = useCallback(
       () => dispatch(actions.toggleLeftMenu()),

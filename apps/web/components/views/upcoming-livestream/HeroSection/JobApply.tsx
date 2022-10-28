@@ -17,6 +17,7 @@ import useIsMobile from "../../../custom-hook/useIsMobile"
 import useLivestreamJobs from "../../../custom-hook/useLivestreamJobs"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import Skeleton from "@mui/material/Skeleton"
 
 const styles = sxStyles({
    itemWrapper: {
@@ -53,9 +54,18 @@ const JobApply = ({ livestream }: Props) => {
    }
 
    return (
-      <SuspenseWithBoundary fallback={""} hide={true}>
+      <SuspenseWithBoundary fallback={<LoadingJobsSpinner />} hide={true}>
          <JobList livestream={livestream} />
       </SuspenseWithBoundary>
+   )
+}
+
+const LoadingJobsSpinner = () => {
+   return (
+      <Box py={2}>
+         <div>Loading jobs..</div>
+         <Skeleton height={30} />
+      </Box>
    )
 }
 

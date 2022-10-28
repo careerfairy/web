@@ -1,16 +1,13 @@
-export type Option = {
-   id: string
-   name: string
-   groupId?: string
-}
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+
 export const formatToOptionArray = (
    selectedIds: string[],
-   allOptions: Option[]
-): Option[] => {
+   allOptions: OptionGroup[]
+): OptionGroup[] => {
    return allOptions.filter(({ id }) => selectedIds?.includes(id))
 }
 
-export const mapOptions = (options: Option[]): string[] => {
+export const mapOptions = (options: OptionGroup[]): string[] => {
    return options.map((option) => option.id)
 }
 

@@ -5,6 +5,7 @@ const { withSentryConfig } = require("@sentry/nextjs")
 // });
 
 const notProduction = process.env.NODE_ENV !== "production"
+const isVercelPreview = process.env.VERCEL_ENV === "preview"
 
 const securityHeaders = [
    // {
@@ -14,12 +15,18 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         `default-src blob: 'self' *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
+         `default-src blob: 'self' go.crisp.chat careerfairy-support.crisp.help streaming.crisp.help client.crisp.chat *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
             notProduction && "localhost:*"
+         } ${
+            isVercelPreview && "https://vercel.live https://assets.vercel.com"
          }; ` +
-         "script-src blob: 'self' *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com ajax.googleapis.com; " +
-         "style-src 'self' *.vitals.vercel-insights.com *.googletagmanager.com *.googleapis.com 'unsafe-inline'; " +
-         "connect-src *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com *.tiktok.com;" +
+         `script-src blob: 'self' *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com ajax.googleapis.com client.crisp.chat ${
+            isVercelPreview && "https://vercel.live"
+         };` +
+         "style-src 'self' *.vitals.vercel-insights.com *.googletagmanager.com *.googleapis.com 'unsafe-inline' client.crisp.chat; " +
+         `connect-src *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com *.tiktok.com *.cookiebot.com *.hubapi.com storage.crisp.chat client.crisp.chat ${
+            isVercelPreview && "https://vercel.live 'self' data:"
+         };` +
          `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
             notProduction && "localhost:*"
          };`,

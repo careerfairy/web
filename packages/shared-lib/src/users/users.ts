@@ -35,7 +35,7 @@ export interface UserData extends Identifiable {
    }
    badges?: string[]
    groupIds: string[]
-   registeredGroups?: RegisteredGroup[]
+
    linkedinUrl: string
    isAdmin?: boolean
    userResume: string
@@ -73,6 +73,12 @@ export interface UserData extends Identifiable {
    refreshTokenTime?: Timestamp
 
    timezone?: string
+
+   /**
+    * Decommissioned field
+    * User groups now live under a subcollection named userGroups
+    */
+   registeredGroups?: RegisteredGroup[]
 }
 
 /*
@@ -82,6 +88,7 @@ export type UserReadableGroupQuestionsWithAnswerMap = Record<
    GroupQuestion["id"],
    ReadableQuestionAndAnswer
 >
+
 export interface ReadableQuestionAndAnswer {
    questionName: GroupQuestion["name"]
    questionId: GroupQuestion["id"]
@@ -97,7 +104,9 @@ export interface CSVDownloadUserData extends Record<string, string> {
    "Level of study": string
    University: string
 }
+
 export type BackFillType = "levelOfStudy" | "fieldOfStudy"
+
 export interface RegisteredGroup {
    groupId: string
    categories: RegisteredGroupCategory[]

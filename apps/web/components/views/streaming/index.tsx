@@ -19,6 +19,7 @@ import {
    showActionButtonsSelector,
    streamingSelector,
 } from "../../../store/selectors/streamSelectors"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    blackFrame: {
@@ -150,6 +151,11 @@ const StreamerOverview = ({
       [smallScreen, showActionButtons, dispatch, showTapHint]
    )
 
+   const openSupportInLeftMenu = useCallback(() => {
+      handleStateChange("support")
+      dataLayerEvent("livestream_open_support")
+   }, [handleStateChange])
+
    if (!mounted) return null
 
    return (
@@ -163,6 +169,7 @@ const StreamerOverview = ({
                smallScreen={smallScreen}
                showMenu={showMenu}
                viewer={false}
+               openSupportInLeftMenu={openSupportInLeftMenu}
             />
             <ButtonComponent
                isMobile={undefined}

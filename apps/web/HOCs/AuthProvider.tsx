@@ -22,6 +22,7 @@ import {
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
 import DateUtil from "../util/DateUtil"
+import { dataLayerUser } from "../util/analyticsUtils"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -221,6 +222,14 @@ const AuthProvider = ({ children }) => {
 
       return () => unsub()
    }, [firebaseService.auth])
+
+   // update GTM user variables, useful to keep the values updated after login/logout/etc
+   useEffect(() => {
+      if (userData?.authId) {
+         dataLayerUser(userData)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [userData?.authId, userData?.isAdmin])
 
    const contextValue = useMemo(
       () => ({

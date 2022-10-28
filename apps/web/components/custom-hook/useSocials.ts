@@ -9,6 +9,7 @@ import ShareIcon from "@mui/icons-material/ShareOutlined"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { makeLivestreamEventDetailsInviteUrl } from "../../util/makeUrls"
 import { useAuth } from "../../HOCs/AuthProvider"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 export interface SocialIconProps {
    icon: typeof LinkedInIcon
@@ -16,6 +17,7 @@ export interface SocialIconProps {
    onClick?: () => any
    href?: string
 }
+
 const useSocials = (event: LivestreamEvent) => {
    const { userData } = useAuth()
    const [state, copyEventLinkToClipboard] = useCopyToClipboard()
@@ -53,6 +55,9 @@ const useSocials = (event: LivestreamEvent) => {
             name: "LinkedIn",
             onClick: () => {
                window.open(linkedinLink, "_blank").focus()
+               dataLayerEvent("event_share", {
+                  medium: "LinkedIn",
+               })
             },
          },
          {
@@ -60,10 +65,13 @@ const useSocials = (event: LivestreamEvent) => {
             name: "Facebook",
             onClick: () => {
                /*
-               A redirect uri can be added to track where users are coming from internally or for group admins: https://developers.facebook.com/docs/sharing/reference/share-dialog/
-               &redirect_uri=https%3A%2F%2Fapp.livestorm.co%2F%3Futm_source%3Dredirect-share-webinar%26utm_medium%3Dtest%26utm_campaign%3DPDF%20Event%26participant_name%3D
-               */
+A redirect uri can be added to track where users are coming from internally or for group admins: https://developers.facebook.com/docs/sharing/reference/share-dialog/
+&redirect_uri=https%3A%2F%2Fapp.livestorm.co%2F%3Futm_source%3Dredirect-share-webinar%26utm_medium%3Dtest%26utm_campaign%3DPDF%20Event%26participant_name%3D
+*/
                window.open(facebookLink, "_blank").focus()
+               dataLayerEvent("event_share", {
+                  medium: "Facebook",
+               })
             },
          },
          {
@@ -71,6 +79,9 @@ const useSocials = (event: LivestreamEvent) => {
             name: "Twitter",
             onClick: () => {
                window.open(twitterLink, "_blank").focus()
+               dataLayerEvent("event_share", {
+                  medium: "Twitter",
+               })
             },
          },
          {
@@ -84,6 +95,9 @@ const useSocials = (event: LivestreamEvent) => {
             onClick: () => {
                setClicked((prev) => !prev)
                copyEventLinkToClipboard(eventUrl)
+               dataLayerEvent("event_share", {
+                  medium: "Copy Link",
+               })
             },
          },
       ]

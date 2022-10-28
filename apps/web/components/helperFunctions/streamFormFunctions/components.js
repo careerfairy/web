@@ -22,7 +22,7 @@ export const LanguageSelect = ({ name, value, setFieldValue, ...rest }) => {
          renderInput={(params) => (
             <TextField
                {...params}
-               label="Chose a preferred language"
+               label="Choose a Preferred Language"
                variant="outlined"
                fullWidth
             />

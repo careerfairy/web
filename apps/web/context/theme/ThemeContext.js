@@ -5,6 +5,7 @@ import { SnackbarProvider } from "notistack"
 import { useRouter } from "next/router"
 import { CssBaseline } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 // import { Button } from "@mui/material";
 
@@ -36,6 +37,7 @@ const ThemeProviderWrapper = ({ children }) => {
 
       localStorage.setItem("themeMode", newTheme.palette.mode)
       setTheme(responsiveFontSizes(newTheme))
+      dataLayerEvent("toggle_theme")
    }
 
    const getThemeObj = () => {

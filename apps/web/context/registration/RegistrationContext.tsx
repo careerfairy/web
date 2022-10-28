@@ -17,6 +17,7 @@ import {
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
+import { dataLayerEvent } from "../../util/analyticsUtils"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -46,7 +47,6 @@ interface DefaultContext {
    handleClientSideQuestionUpdate: <T>(docId: string, updateData: T) => void
    groupsWithPolicies: GroupWithPolicy[]
    hasAgreedToAll: boolean
-   verifyResumeRequirement: () => void
    completeRegistrationProcess: (
       userAnsweredLivestreamGroupQuestions: LivestreamGroupQuestionsMap
    ) => Promise<void>
@@ -64,6 +64,7 @@ interface DefaultContext {
    gettingPolicyStatus: boolean
    cancelable: boolean
 }
+
 export const RegistrationContext = createContext<DefaultContext>({
    activeStep: 0,
    handleNext() {},
@@ -85,7 +86,6 @@ export const RegistrationContext = createContext<DefaultContext>({
    handleClientSideQuestionUpdate() {},
    groupsWithPolicies: [],
    hasAgreedToAll: false,
-   verifyResumeRequirement() {},
    async completeRegistrationProcess() {},
    promptOtherEventsOnFinal: false,
    totalSteps: 0,
@@ -226,12 +226,21 @@ export function RegistrationContextProvider({
    }
    const setGroup = (group) =>
       dispatch({ type: "set-group", payload: { ...group } || {} })
-   const setTotalSteps = (totalAmountOfSteps) =>
-      dispatch({ type: "set-total-steps", payload: totalAmountOfSteps || 0 })
+
+   const setTotalSteps = useCallback(
+      (totalAmountOfSteps) =>
+         dispatch({
+            type: "set-total-steps",
+            payload: totalAmountOfSteps || 0,
+         }),
+      []
+   )
    const setPolicyGroups = (policyGroups) =>
       dispatch({ type: "set-policy-groups", payload: policyGroups || [] })
+
    const setHasAgreedToAll = (hasAgreedToAll) =>
       dispatch({ type: "set-has-agreed-to-all", payload: hasAgreedToAll })
+
    useEffect(() => {
       if (groups && groups.length) {
          if (groups.length === 1) {
@@ -278,16 +287,6 @@ export function RegistrationContextProvider({
       })()
    }, [groups])
 
-   const verifyResumeRequirement = useCallback(() => {
-      if (livestream) {
-         if (!livestream.withResume) {
-            handleNext()
-         }
-      } else {
-         handleNext()
-      }
-   }, [livestream])
-
    const handleSendConfirmEmail = useCallback(
       () =>
          sendRegistrationConfirmationEmail(
@@ -315,6 +314,10 @@ export function RegistrationContextProvider({
                   groupsWithPolicies,
                   userAnsweredLivestreamGroupQuestions
                )
+               dataLayerEvent("event_registration_complete", {
+                  livestreamId: livestream?.id,
+                  livestreamTitle: livestream?.title,
+               })
             }
             handleSendConfirmEmail()
          } catch (e) {
@@ -356,7 +359,6 @@ export function RegistrationContextProvider({
          handleClientSideQuestionUpdate,
          livestream,
          handleClose,
-         verifyResumeRequirement,
          completeRegistrationProcess,
          handleSkipNext,
          setTotalSteps,
@@ -395,7 +397,6 @@ export function RegistrationContextProvider({
       questionSortType,
       sliding,
       totalSteps,
-      verifyResumeRequirement,
    ])
 
    return (

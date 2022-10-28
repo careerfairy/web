@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { RegistrationContext } from "context/registration/RegistrationContext"
 import LivestreamGroupQuestionForm from "./steps/LivestreamGroupQuestionForm"
 import QuestionUpvote from "./steps/QuestionUpvote"
@@ -17,53 +17,74 @@ const styles = {
       justifyContent: "center",
    },
 }
-const steps = [
-   {
-      index: 0,
-      step: <UserResumeSelect />,
-      label: "Upload your resume",
-      id: "resumeUpload",
-   },
-   {
-      index: 1,
-      step: <LivestreamGroupQuestionForm />,
-      label: "Select your categories",
-      id: "categorySelect",
-   },
-   {
-      index: 2,
-      step: <QuestionUpvote />,
-      label: "Add a Question",
-      id: "questionsUpvote",
-   },
-   {
-      index: 3,
-      step: <QuestionCreateForm />,
-      label: "Upvote questions",
-      id: "questionCreate",
-   },
-   {
-      index: 4,
-      step: <TalentPoolJoin />,
-      label: "Join Talent Pool",
-      id: "talentPoolJoin",
-   },
-   {
-      index: 5,
-      step: <RegistrationComplete />,
-      label: "Finish",
-      id: "registrationComplete",
-   },
-]
 
 const RegistrationForm = () => {
-   const { activeStep, setTotalSteps, setSliding } =
-      useContext(RegistrationContext)
+   const {
+      activeStep,
+      setTotalSteps,
+      setSliding,
+      livestream,
+      questions,
+      hasMore: hasMoreQuestionsToLoad,
+   } = useContext(RegistrationContext)
    const theme = useTheme()
+
+   const steps = useMemo(() => {
+      const newSteps = []
+
+      if (livestream?.withResume) {
+         newSteps.push({
+            step: <UserResumeSelect />,
+            label: "Upload your resume",
+            id: "resumeUpload",
+         })
+      }
+      newSteps.push({
+         step: <LivestreamGroupQuestionForm />,
+         label: "Select your categories",
+         id: "categorySelect",
+      })
+
+      if (!livestream?.questionsDisabled) {
+         if (questions.length || hasMoreQuestionsToLoad) {
+            newSteps.push({
+               step: <QuestionUpvote />,
+               label: "Add a Question",
+               id: "questionsUpvote",
+            })
+         }
+         newSteps.push({
+            step: <QuestionCreateForm />,
+            label: "Upvote questions",
+            id: "questionCreate",
+         })
+      }
+
+      newSteps.push(
+         {
+            step: <TalentPoolJoin />,
+            label: "Join Talent Pool",
+            id: "talentPoolJoin",
+         },
+         {
+            step: <RegistrationComplete />,
+            label: "Finish",
+            id: "registrationComplete",
+         }
+      )
+
+      return newSteps
+   }, [
+      hasMoreQuestionsToLoad,
+      livestream?.questionsDisabled,
+      livestream?.withResume,
+      questions.length,
+   ])
 
    useEffect(() => {
       setTotalSteps(steps.length)
-   }, [steps])
+   }, [setTotalSteps, steps.length])
+
    return (
       <SwipeableViews
          axis={theme.direction === "rtl" ? "x-reverse" : "x"}
@@ -73,11 +94,11 @@ const RegistrationForm = () => {
          disableLazyLoading
          disabled
       >
-         {steps.map((stepData) => (
+         {steps.map((stepData, index) => (
             <SwipeablePanel
                value={activeStep}
-               index={stepData.index}
-               key={stepData.index}
+               index={index}
+               key={stepData.id}
                sx={styles.panel}
             >
                {stepData.step}
