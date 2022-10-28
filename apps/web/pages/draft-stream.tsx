@@ -1,9 +1,12 @@
-import { TealBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
+import { PaperBackground } from "../materialUI/GlobalBackground/GlobalBackGround"
 import Head from "next/head"
 import React, { useEffect, useRef, useState } from "react"
 import { Typography } from "@mui/material"
 import DraftStreamForm from "../components/views/draftStreamForm/DraftStreamForm"
-import { buildLivestreamObject } from "../components/helperFunctions/streamFormFunctions"
+import {
+   buildLivestreamObject,
+   buildPromotionObj,
+} from "../components/helperFunctions/streamFormFunctions"
 import { useSnackbar } from "notistack"
 import { useRouter } from "next/router"
 import {
@@ -17,6 +20,7 @@ import EnterDetailsModal from "../components/views/draftStreamForm/EnterDetailsM
 import { prettyLocalizedDate } from "../components/helperFunctions/HelperFunctions"
 import GeneralLayout from "../layouts/GeneralLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { StreamCreationProvider } from "../components/views/draftStreamForm/StreamForm/StreamCreationProvider"
 
 const DraftStream = () => {
    const firebaseService = useFirebaseService()
@@ -50,7 +54,6 @@ const DraftStream = () => {
    }
 
    const handleSubmit = () => {
-      window.scrollTo({ top: 0, left: 0, behavior: "smooth" })
       if (formRef.current) {
          // @ts-ignore
          formRef.current.handleSubmit()
@@ -90,9 +93,11 @@ const DraftStream = () => {
       setStatus,
       selectedJobs
    ) => {
+      let livestream
+
       try {
          setSubmitting(true)
-         const livestream = buildLivestreamObject(
+         livestream = buildLivestreamObject(
             values,
             updateMode,
             draftStreamId,
@@ -103,18 +108,17 @@ const DraftStream = () => {
                handleOpenShowEnterDetailsModal()
                return
             }
-            const newStatus = {
+            livestream.status = {
                pendingApproval: true,
                seen: false,
             }
-            // @ts-ignore
-            livestream.status = newStatus
-            setFormData((prevState) => ({ ...prevState, status: newStatus }))
          }
 
          if (selectedJobs) {
             livestream.jobs = selectedJobs
          }
+
+         const promotion = buildPromotionObj(values, livestream.id)
 
          let id
          if (updateMode) {
@@ -127,7 +131,8 @@ const DraftStream = () => {
             }
             await firebaseService.updateLivestream(
                livestream,
-               "draftLivestreams"
+               "draftLivestreams",
+               promotion
             )
 
             // console.log("-> Draft livestream was updated with id", id);
@@ -138,10 +143,11 @@ const DraftStream = () => {
             id = await firebaseService.addLivestream(
                livestream,
                "draftLivestreams",
-               author
+               author,
+               {}
             )
             // console.log("-> Draft livestream was created with id", id);
-            push(`/draft-stream?draftStreamId=${id}`)
+            push(`/draft-stream?draftStreamId=${id}`).catch()
          }
 
          if (status === SUBMIT_FOR_APPROVAL) {
@@ -182,8 +188,18 @@ const DraftStream = () => {
             preventDuplicate: true,
          })
          console.log("-> e", e)
+      } finally {
+         setSubmitting(false)
+
+         if (livestream && status === SUBMIT_FOR_APPROVAL) {
+            // only update the form at the end to not force a rerender
+            // and because of it the isSubmitting flag will be false until the end of this logic
+            setFormData((prevState) => ({
+               ...prevState,
+               status: livestream.status,
+            }))
+         }
       }
-      setSubmitting(false)
    }
 
    return (
@@ -192,24 +208,25 @@ const DraftStream = () => {
             <title key="title">CareerFairy | Draft a Live Stream</title>
          </Head>
          <GeneralLayout>
-            <TealBackground style={{ paddingBottom: 0 }}>
+            <PaperBackground style={{ paddingBottom: 0 }}>
                <Typography
                   variant="h3"
                   align="center"
                   style={{
                      marginTop: submitted ? "15vh" : "1.5rem",
-                     color: "white",
                   }}
                   gutterBottom
                >
                   {submitted ? "Success!" : "Draft a Live Stream"}
                </Typography>
-               <DraftStreamForm
-                  onSubmit={onSubmit}
-                  formRef={formRef}
-                  submitted={submitted}
-                  setSubmitted={setSubmitted}
-               />
+               <StreamCreationProvider>
+                  <DraftStreamForm
+                     onSubmit={onSubmit}
+                     formRef={formRef}
+                     submitted={submitted}
+                     setSubmitted={setSubmitted}
+                  />
+               </StreamCreationProvider>
                <EnterDetailsModal
                   open={showEnterDetailsModal}
                   handleSubmit={handleSubmit}
@@ -217,7 +234,7 @@ const DraftStream = () => {
                   setUserInfo={setUserInfo}
                   userInfo={userInfo}
                />
-            </TealBackground>
+            </PaperBackground>
          </GeneralLayout>
       </>
    )

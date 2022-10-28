@@ -26,6 +26,7 @@ import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
 import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
+import crisp = require("./crisp")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -164,3 +165,6 @@ exports.getRegistrationSources = groupAnalytics.getRegistrationSources
 // Clear cached documents
 exports.periodicallyRemoveCachedDocument =
    cacheClear.periodicallyRemoveCachedDocument
+
+// Crisp
+exports.getCrispSignature = crisp.getCrispSignature

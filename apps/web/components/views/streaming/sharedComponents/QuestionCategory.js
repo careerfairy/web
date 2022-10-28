@@ -48,6 +48,7 @@ import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { v4 as uuidv4 } from "uuid"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 
 const useStyles = makeStyles((theme) => ({
    view: {
@@ -91,7 +92,7 @@ const useStyles = makeStyles((theme) => ({
       background: theme.palette.background.paper,
    },
    tabs: {
-      width: ({ isMobile }) => (isMobile ? "100%" : 280),
+      width: ({ isMobile }) => (isMobile ? "100%" : LEFT_MENU_WIDTH),
    },
 }))
 

@@ -1,26 +1,38 @@
 import { useAuth } from "./AuthProvider"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect } from "react"
 import TagManager from "react-gtm-module"
 import { useSelector } from "react-redux"
 import { firebaseAuthIsLoadedSelector } from "../store/selectors/firebaseSelector"
 import { shouldUseEmulators } from "../util/CommonUtil"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { dataLayerUser } from "../util/analyticsUtils"
 
 const tagManagerArgs = {
    gtmId: "GTM-P29VCWC",
 }
 
+// Module scope variable, we only want to initialize gtm once
+// GA4 has enhanced measurement enabled to track all page views
+let gtmLoaded = false
+
 const GoogleTagManagerLoader = ({ children }) => {
    const { userData, isLoggedIn, isLoggedOut } = useAuth()
-   const [shouldLoadForCurrentUser, setShouldLoadForCurrentUser] =
-      useState(false)
    const authIsLoaded = useSelector(firebaseAuthIsLoadedSelector)
 
-   // only set it once to avoid calling TagManager.initialize multiple times
-   const enableOnce = useCallback(() => {
-      if (!shouldLoadForCurrentUser) {
-         setShouldLoadForCurrentUser(true)
+   const enableOnce = useCallback((userData?: UserData) => {
+      if (!gtmLoaded) {
+         if (userData) {
+            dataLayerUser(userData)
+         }
+
+         TagManager.initialize({
+            ...tagManagerArgs,
+         })
+
+         // prevent from setting this again
+         gtmLoaded = true
       }
-   }, [shouldLoadForCurrentUser])
+   }, [])
 
    // check if user isAdmin or not
    useEffect(() => {
@@ -38,18 +50,10 @@ const GoogleTagManagerLoader = ({ children }) => {
       // should be loading the userData, wait
       if (!userData) return
 
-      // we don't want to record our team events (it will skew the analytics)
-      if (userData?.isAdmin) return
-
-      // userData loaded & is not an admin
-      enableOnce()
+      // Initialize GTM and send a custom event with the user info
+      // some tags will not fire if the user is admin
+      enableOnce(userData)
    }, [userData, isLoggedIn, enableOnce, authIsLoaded, isLoggedOut])
-
-   useEffect(() => {
-      if (shouldLoadForCurrentUser) {
-         TagManager.initialize(tagManagerArgs)
-      }
-   }, [shouldLoadForCurrentUser])
 
    return children
 }

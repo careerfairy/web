@@ -40,12 +40,9 @@ const UniversitiesFilter = ({
          getOptionLabel={(option) => option.name}
          renderOption={(props, option) => [props, option.name]}
          fullWidth
+         size="small"
          renderInput={(params) => (
-            <TextField
-               {...params}
-               name={"university"}
-               label={"Choose a University"}
-            />
+            <TextField {...params} name={"university"} label={"University"} />
          )}
       />
    )

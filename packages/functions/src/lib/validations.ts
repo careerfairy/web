@@ -1,5 +1,4 @@
 import functions = require("firebase-functions")
-import BaseSchema from "yup/lib/schema"
 import { groupRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import {
@@ -7,6 +6,8 @@ import {
    GROUP_DASHBOARD_ROLE,
 } from "@careerfairy/shared-lib/dist/groups"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import ObjectSchema, { ObjectShape } from "yup/lib/object"
+import { InferType } from "yup"
 
 /**
  * Validate the data object argument in a function call
@@ -14,9 +15,13 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
  * @param data
  * @param schema yup schema
  */
-export async function validateData(data: any, schema: BaseSchema) {
+export async function validateData<T extends ObjectShape>(
+   data: any,
+   schema: ObjectSchema<T>
+): Promise<InferType<typeof schema>> {
    try {
-      return await schema.validate(data)
+      await schema.validate(data)
+      return schema.cast(data)
    } catch (e) {
       logAndThrow(
          "Invalid Arguments Provided (schema validation failed)",
@@ -120,7 +125,7 @@ export function validateUserAuthNotExistent(
    }
 }
 
-export function logAndThrow(message: string, ...context: any[]) {
+export function logAndThrow(message: string, ...context: any[]): never {
    functions.logger.error(message, { ...context })
    throw new functions.https.HttpsError("failed-precondition", message)
 }

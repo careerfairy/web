@@ -1,16 +1,20 @@
 import { Grid, Typography } from "@mui/material"
-import React, { Dispatch, useMemo } from "react"
+import React, { Dispatch, useEffect, useMemo } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import FormGroup from "../FormGroup"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
 import useGroupATSJobsAllIntegrations from "../../../custom-hook/useGroupATSJobsAllIntegrations"
 import useGroupATSAccounts from "../../../custom-hook/useGroupATSAccounts"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
+import { useStreamCreationProvider } from "../StreamForm/StreamCreationProvider"
+import Section from "components/views/common/Section"
 
 type Props = {
    groupId: string
    onSelectItems: Dispatch<any>
    selectedItems: LivestreamJobAssociation[]
+   sectionRef: any
+   classes: any
 }
 
 /**
@@ -22,12 +26,16 @@ type Props = {
  * @param groupId
  * @param onSelectItems
  * @param selectedItems
+ * @param sectionRef
+ * @param classes
  * @constructor
  */
 const JobSelectorCategory = ({
    groupId,
    onSelectItems,
    selectedItems,
+   sectionRef,
+   classes,
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
 
@@ -42,12 +50,18 @@ const JobSelectorCategory = ({
    }
 
    return (
-      <FormSection
-         groupId={groupId}
-         accounts={filteredAccounts}
-         selectedItems={selectedItems}
-         onSelectItems={onSelectItems}
-      />
+      <Section
+         sectionRef={sectionRef}
+         sectionId={"JobSection"}
+         className={classes.section}
+      >
+         <FormSection
+            groupId={groupId}
+            accounts={filteredAccounts}
+            selectedItems={selectedItems}
+            onSelectItems={onSelectItems}
+         />
+      </Section>
    )
 }
 
@@ -64,6 +78,14 @@ const FormSection = ({
    selectedItems,
    onSelectItems,
 }: FormSectionProps) => {
+   const { setShowJobSection, showJobSection } = useStreamCreationProvider()
+
+   useEffect(() => {
+      if (!showJobSection) {
+         setShowJobSection(true)
+      }
+   }, [setShowJobSection, showJobSection])
+
    const jobs = useGroupATSJobsAllIntegrations(accounts)
 
    const allValues: LivestreamJobAssociation[] = useMemo(() => {
@@ -77,12 +99,15 @@ const FormSection = ({
 
    return (
       <>
-         <Typography style={{ color: "white" }} variant="h4">
-            Open Jobs:
+         <Typography fontWeight="bold" variant="h4">
+            Job
+         </Typography>
+         <Typography variant="subtitle1" mt={1} color="textSecondary">
+            Select a job that related to this event
          </Typography>
 
-         <FormGroup>
-            <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
+         <FormGroup container boxShadow={0}>
+            <Grid xs={12} item>
                <MultiListSelect
                   inputName="jobIds"
                   selectedItems={selectedItems}
@@ -95,7 +120,8 @@ const FormSection = ({
                      placeholder: "Select one job",
                   }}
                   chipProps={{
-                     variant: "outlined",
+                     variant: "contained",
+                     color: "secondary",
                   }}
                />
             </Grid>

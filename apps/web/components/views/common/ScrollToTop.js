@@ -1,10 +1,10 @@
 import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import { Fab, Grow } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
 import ScrollToTopIcon from "@mui/icons-material/ExpandLessRounded"
+import { sxStyles } from "../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    scrollTop: {
       position: "fixed",
       bottom: "20px",
@@ -12,14 +12,18 @@ const useStyles = makeStyles((theme) => ({
       alignItems: "center",
       justifyContent: "center",
       zIndex: 1000,
-      [theme.breakpoints.down("md")]: {
-         width: 50,
-         height: 50,
+      width: {
+         xs: 50,
+         md: 56,
+      },
+      height: {
+         xs: 50,
+         md: 56,
       },
    },
-}))
+})
+
 const ScrollToTop = ({ fontSize = "large", size }) => {
-   const classes = useStyles()
    const [showScroll, setShowScroll] = useState(false)
 
    useEffect(() => {
@@ -42,7 +46,7 @@ const ScrollToTop = ({ fontSize = "large", size }) => {
    return (
       <Grow in={showScroll}>
          <Fab
-            className={classes.scrollTop}
+            sx={styles.scrollTop}
             onClick={scrollTop}
             color="primary"
             size={size}

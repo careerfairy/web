@@ -76,6 +76,8 @@ Section.propTypes = {
    big: PropTypes.bool,
    className: PropTypes.string,
    sx: PropTypes.oneOfType([PropTypes.object, PropTypes.array, PropTypes.func]),
+   sectionRef: PropTypes.any,
+   sectionId: PropTypes.any,
 }
 
 export default Section
