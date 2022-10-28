@@ -312,8 +312,16 @@ const ViewerLayout = (props) => {
          isStreamer: false,
          handRaiseId,
          isMobile: mobile,
+         selectedState,
       }),
-      [currentLivestream, isBreakout, streamerId, handRaiseId, mobile]
+      [
+         currentLivestream,
+         isBreakout,
+         streamerId,
+         handRaiseId,
+         mobile,
+         selectedState,
+      ]
    )
    if (!browserIsCompatible) {
       return <BrowserIncompatibleOverlay />
