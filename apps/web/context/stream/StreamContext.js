@@ -9,6 +9,7 @@ const CurrentStreamContext = React.createContext({
    handRaiseId: undefined,
    isMobile: undefined,
    streamAdminPreferences: undefined,
+   selectedState: "questions",
 })
 
 const useCurrentStream = () => useContext(CurrentStreamContext)
