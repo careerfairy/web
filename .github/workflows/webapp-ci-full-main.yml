@@ -1,15 +1,13 @@
-name: "Build, Test and Deploy"
+name: "Build, Test and Deploy - Main"
 on:
    # Trigger on PRs targeting these branches
    pull_request:
       branches:
          - main
-         - develop
    # Trigger on pushes targeting these branches
    push:
       branches:
          - main
-         - develop
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
@@ -28,14 +26,15 @@ jobs:
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
+         workflow: ${{ steps.changes.outputs.workflow }}
       steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
            with:
               node-version: "16"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v2
+           uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -55,6 +54,8 @@ jobs:
            id: changes
            with:
               filters: |
+                 workflow:
+                  - '.github/workflows/webapp-ci-full-main.yml'
                  webapp:
                    - 'apps/web/**'
                    - 'packages/shared-lib/**'
@@ -67,7 +68,10 @@ jobs:
       name: "Unit Tests"
       needs: [build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
-      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
+      if: |
+         needs.build_app_for_tests.outputs.webapp == 'true' ||
+         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+         needs.build_app_for_tests.outputs.workflow == 'true'
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
@@ -76,13 +80,13 @@ jobs:
          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
          NODE_ENV: test
       steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
            with:
               node-version: "16"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v2
+           uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -101,7 +105,10 @@ jobs:
       name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
       needs: [build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
-      if: needs.build_app_for_tests.outputs.webapp == 'true' || needs.build_app_for_tests.outputs.shared-lib == 'true'
+      if: |
+         needs.build_app_for_tests.outputs.webapp == 'true' ||
+         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+         needs.build_app_for_tests.outputs.workflow == 'true'
       strategy:
          fail-fast: false
          matrix:
@@ -123,13 +130,13 @@ jobs:
          TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
          TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       steps:
-         - uses: actions/checkout@v2
-         - uses: actions/setup-node@v2
+         - uses: actions/checkout@v3
+         - uses: actions/setup-node@v3
            with:
               node-version: "16"
          - name: Cache node modules
            id: cache-nodemodules
-           uses: actions/cache@v2
+           uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
@@ -182,7 +189,7 @@ jobs:
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
-         - uses: actions/checkout@v2
+         - uses: actions/checkout@v3
          - uses: amondnet/vercel-action@v25.1.0 #deploy
            id: vercel-action
            with:
