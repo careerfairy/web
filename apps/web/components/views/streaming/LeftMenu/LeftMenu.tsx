@@ -58,8 +58,6 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const states = ["questions", "polls", "hand", "support", "jobs"]
-
 const LeftMenu = ({
    livestream,
    streamer,
@@ -108,61 +106,80 @@ const LeftMenu = ({
       [setSelectedState, setSliding]
    )
 
-   const views = [
-      livestream.questionsDisabled ? (
-         <GenericCategoryInactive
-            title={"No Q&A Today"}
-            subtitle={"The live stream creator disabled the Q&A feature."}
-         />
-      ) : (
-         <QuestionCategory
-            key={"question-category-tab"}
+   const { states: states, views } = useMemo(() => {
+      const newStates = ["questions", "polls", "hand"]
+
+      const newViews = [
+         livestream.questionsDisabled ? (
+            <GenericCategoryInactive
+               title={"No Q&A Today"}
+               subtitle={"The live stream creator disabled the Q&A feature."}
+            />
+         ) : (
+            <QuestionCategory
+               key={"question-category-tab"}
+               sliding={sliding}
+               showMenu={showMenu}
+               streamer={streamer}
+               livestream={livestream}
+               selectedState={selectedState}
+            />
+         ),
+         <PollCategory
+            key={"poll-category-tab"}
             sliding={sliding}
             showMenu={showMenu}
+            livestream={livestream}
+            selectedState={selectedState}
             streamer={streamer}
+         />,
+         <HandRaiseCategory
+            key={"handraise-category-tab"}
+            sliding={sliding}
+            showMenu={showMenu}
+            isGlass={isGlass}
+            handleStateChange={handleStateChange}
             livestream={livestream}
             selectedState={selectedState}
-         />
-      ),
-      <PollCategory
-         key={"poll-category-tab"}
-         sliding={sliding}
-         showMenu={showMenu}
-         livestream={livestream}
-         selectedState={selectedState}
-         streamer={streamer}
-      />,
-      <HandRaiseCategory
-         key={"handraise-category-tab"}
-         sliding={sliding}
-         showMenu={showMenu}
-         isGlass={isGlass}
-         handleStateChange={handleStateChange}
-         livestream={livestream}
-         selectedState={selectedState}
-      />,
-   ]
+         />,
+      ]
 
-   if (livestream?.jobs?.length > 0) {
-      views.push(
-         <JobsCategory
-            key={"jobs-category-tab"}
-            selectedState={selectedState}
-            livestream={livestream}
-            showMenu={showMenu}
-         />
-      )
-   }
+      if (livestream?.jobs?.length > 0) {
+         newViews.push(
+            <JobsCategory
+               key={"jobs-category-tab"}
+               selectedState={selectedState}
+               livestream={livestream}
+               showMenu={showMenu}
+            />
+         )
+         newStates.push("jobs")
+      }
 
-   if (streamer) {
-      views.push(
-         <SupportCategory
-            key={"support-category-tab"}
-            selectedState={selectedState}
-            showMenu={showMenu}
-         />
-      )
-   }
+      if (streamer) {
+         newViews.push(
+            <SupportCategory
+               key={"support-category-tab"}
+               selectedState={selectedState}
+               showMenu={showMenu}
+            />
+         )
+         newStates.push("support")
+      }
+
+      return {
+         states: newStates,
+         views: newViews,
+      }
+   }, [
+      handleStateChange,
+      isGlass,
+      livestream,
+      selectedState,
+      showMenu,
+      sliding,
+      streamer,
+   ])
 
    const toggleLeftMenu = useCallback(
       () => dispatch(actions.toggleLeftMenu()),

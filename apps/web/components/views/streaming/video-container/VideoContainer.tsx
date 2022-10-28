@@ -49,12 +49,14 @@ interface Props {
    showMenu: boolean
    smallScreen: boolean
    viewer: boolean
+   openSupportInLeftMenu: () => void
 }
 const VideoContainer = ({
    isPlayMode,
    showMenu,
    smallScreen,
    viewer,
+   openSupportInLeftMenu,
 }: Props) => {
    const { currentLivestream, streamerId } = useCurrentStream()
    const {
@@ -341,6 +343,7 @@ const VideoContainer = ({
             sharingVideo={currentLivestream.mode === "video"}
             showMenu={showMenu}
             livestreamId={currentLivestream.id}
+            openSupportInLeftMenu={openSupportInLeftMenu}
             presenter
          />
          <StreamPublishingModal
