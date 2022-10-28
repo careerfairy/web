@@ -6,9 +6,6 @@ import { alpha } from "@mui/material/styles"
 
 const styles = sxStyles({
    root: {
-      position: "absolute",
-      top: 8,
-      left: 8,
       opacity: 0.8,
       zIndex: 1000,
       display: "flex",

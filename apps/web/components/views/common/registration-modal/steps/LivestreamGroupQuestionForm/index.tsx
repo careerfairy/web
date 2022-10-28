@@ -60,8 +60,10 @@ const LivestreamGroupQuestionForm = () => {
    useEffect(() => {
       ;(async () => {
          try {
+            if (!livestream || !userData?.userEmail || gettingPolicyStatus)
+               return
+
             setCheckingQuestions(true)
-            if (!livestream) return
             const answeredLivestreamGroupQuestions =
                await groupRepo.mapUserAnswersToLivestreamGroupQuestions(
                   userData,
@@ -92,6 +94,7 @@ const LivestreamGroupQuestionForm = () => {
       livestream?.groupQuestionsMap,
       userData?.userEmail,
       hasAgreedToAllPrivacyPolicies,
+      gettingPolicyStatus,
    ])
 
    const handleSubmit = async (values: LivestreamGroupQuestionsMap) => {
@@ -202,7 +205,6 @@ const LivestreamGroupQuestionForm = () => {
                            )
                         }
                         color="primary"
-                        autoFocus
                      >
                         {livestream?.hasStarted ? "Enter event" : "I'll attend"}
                      </Button>
