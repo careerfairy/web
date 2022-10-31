@@ -13,14 +13,16 @@ import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import { useSessionStorage } from "react-use"
 import { sessionIsUsingCloudProxySelector } from "../../store/selectors/streamSelectors"
 import { errorLogAndNotify } from "../../util/CommonUtil"
+import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 
 interface Props {
    children: JSX.Element
+   livestreamId: string
    roomId?: string
    userId?: string
 }
 
-const RTMProvider = ({ children, roomId, userId }: Props) => {
+const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!)
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!)
    const sessionIsUsingCloudProxy = useSelector(
@@ -42,13 +44,29 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
             logFilter: AgoraRTM.LOG_FILTER_INFO,
             enableCloudProxy: useProxy,
          })
+
+         /**
+          * Fix RtmInternalError: Cannot get illegal vid. error
+          * Sometimes users leave the streaming page open for long periods, the RTM token is only
+          * valid for 24h (https://docs.agora.io/en/signaling/develop/authentication-workflow)
+          *
+          * Redirect the user to the event page again
+          *   This shouldn't happen when the livestream is still live but if it is, the user
+          *   will be redirected back to the streaming app automatically
+          */
+         rtmClient.current.on("TokenExpired", () => {
+            errorLogAndNotify(new Error("RTM TokenExpired")) // save this event on sentry
+            if (typeof window !== "undefined") {
+               window.location.href = `${getBaseUrl()}/upcoming-livestream/${livestreamId}`
+            }
+         })
       } catch (error) {
          errorLogAndNotify(error, {
             message: "Failed to create RTM instance",
          })
          throw error
       }
-   }, [useProxy])
+   }, [useProxy, livestreamId])
 
    const onChannelMessage = useCallback(
       (message: RtmMessage, memberId: string) => {

@@ -131,16 +131,6 @@ const AuthProvider = ({ children }) => {
             console.error(e)
          }
       }
-
-      // Set Sentry User information
-      // https://docs.sentry.io/platforms/javascript/guides/nextjs/enriching-events/identify-user/
-      if (auth?.isLoaded && auth?.uid) {
-         try {
-            Sentry.setUser({ id: auth.uid })
-         } catch (e) {
-            console.error(e)
-         }
-      }
    }, [auth, userData, pathname])
 
    // Backfill missing userData fields (if they don't exist)

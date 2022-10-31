@@ -33,6 +33,7 @@ import { agoraCredentials } from "../../data/agora/AgoraInstance"
 import RTCProvider from "../../context/agora/RTCProvider"
 import { LEFT_MENU_WIDTH } from "../../constants/streams"
 import { dataLayerEvent } from "../../util/analyticsUtils"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -234,6 +235,7 @@ const ViewerLayout = (props) => {
       const checkForCategoryData = async () => {
          try {
             if (
+               userData &&
                !currentLivestream?.test &&
                currentLivestream?.groupQuestionsMap &&
                !breakoutRoomId
@@ -259,7 +261,7 @@ const ViewerLayout = (props) => {
                } else setHasAnsweredLivestreamGroupQuestions(true)
             }
          } catch (e) {
-            console.log("-> error in checkForCategoryData", e)
+            errorLogAndNotify(e)
          }
          setCheckingForCategoryData(false)
       }
@@ -355,7 +357,11 @@ const ViewerLayout = (props) => {
          streamMode={currentLivestream?.mode}
          isStreamer={handRaiseActive}
       >
-         <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
+         <RTMProvider
+            livestreamId={livestreamId}
+            roomId={currentLivestream.id}
+            userId={streamerId}
+         >
             <CurrentStreamContext.Provider value={currentStreamContextValue}>
                <div className={`${classes.root} notranslate`}>
                   <ViewerTopBar
