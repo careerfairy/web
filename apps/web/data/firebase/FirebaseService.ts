@@ -330,9 +330,11 @@ class FirebaseService {
    }
 
    getUniversitiesFromMultipleCountryCode = async (countryCodes: string[]) => {
-      let ref = this.firestore
-         .collection("universitiesByCountry")
-         .where("countryId", "in", countryCodes)
+      let ref: any = this.firestore.collection("universitiesByCountry")
+
+      if (countryCodes.length > 0) {
+         ref = ref.where("countryId", "in", countryCodes)
+      }
 
       return await ref.get()
    }
