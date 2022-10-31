@@ -10,8 +10,10 @@ import {
    REWARD_LIVESTREAM_ATTENDANCE_SECONDS,
    RewardActions,
 } from "@careerfairy/shared-lib/dist/rewards"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 const useRewardLivestreamAttendance = (livestreamData) => {
+   const { isLoggedIn } = useAuth()
    const [invite] = useLocalStorage(localStorageInvite, null, { raw: true })
    const [referralCode] = useLocalStorage(localStorageReferralCode, "", {
       raw: true,
@@ -31,6 +33,10 @@ const useRewardLivestreamAttendance = (livestreamData) => {
          livestreamData?.hasEnded
       ) {
          return // do nothing, stream is not live
+      }
+
+      if (!isLoggedIn) {
+         return // do nothing, no user to reward
       }
 
       const isInvitation =
@@ -66,6 +72,7 @@ const useRewardLivestreamAttendance = (livestreamData) => {
          console.error(e)
       }
    }, [
+      isLoggedIn,
       livestreamData?.hasStarted,
       started,
       alreadyRewarded,
