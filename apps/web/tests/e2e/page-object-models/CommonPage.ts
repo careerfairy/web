@@ -102,7 +102,7 @@ export class CommonPage {
       for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
          for (let question of Object.values(groupQuestions.questions)) {
             await this.resilientClick(
-               `text=New!​${question.name} >> div[role="button"]`
+               `text=​New!${question.name} >> div[role="button"]`
             )
 
             const options = Object.values(question.options)

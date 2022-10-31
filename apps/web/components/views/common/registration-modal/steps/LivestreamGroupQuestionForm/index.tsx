@@ -116,6 +116,7 @@ const LivestreamGroupQuestionForm = () => {
          enableReinitialize
          onSubmit={handleSubmit}
          validate={validate}
+         validateOnMount
       >
          {({
             handleSubmit,
@@ -125,6 +126,7 @@ const LivestreamGroupQuestionForm = () => {
             errors,
             handleBlur,
             touched,
+            isValid,
          }) => {
             return (
                <Form
@@ -193,7 +195,7 @@ const LivestreamGroupQuestionForm = () => {
                         </Button>
                      )}
                      <Button
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || !isValid}
                         type="submit"
                         variant="contained"
                         size="large"
