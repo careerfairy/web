@@ -397,6 +397,7 @@ const NewStreamModal = ({
                      canPublish={canPublish}
                      isOnDialog={true}
                      submitButtonRef={submitButtonRef}
+                     isDraft={isDraft}
                   />
                </DialogContent>
             </div>
