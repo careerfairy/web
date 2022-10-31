@@ -174,6 +174,7 @@ interface Props {
    currentStream?: LivestreamEvent
    canPublish?: boolean
    isOnDialog?: boolean
+   isDraft?: boolean
 }
 
 export interface DraftFormValues {
@@ -220,6 +221,7 @@ const DraftStreamForm = ({
    currentStream,
    canPublish = true,
    isOnDialog = false,
+   isDraft = true,
 }: Props) => {
    const firebase = useFirebaseService()
    const router = useRouter()
@@ -678,7 +680,8 @@ const DraftStreamForm = ({
             setFormHasChanged(!formHasChanged)
          }
 
-         return validateStreamForm(values, true, noValidation)
+         currentStream.status
+         return validateStreamForm(values, isDraft, noValidation)
       },
       [formData, formHasChanged, noValidation, setFormHasChanged]
    )
