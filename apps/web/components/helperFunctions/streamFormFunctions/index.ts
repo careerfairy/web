@@ -106,7 +106,7 @@ const buildSpeakersArray = (values) => {
          firstName: values.speakers[key].firstName,
          lastName: values.speakers[key].lastName,
          position: values.speakers[key].position,
-         email: values.speakers[key].email,
+         email: values.speakers[key].email || "",
          rank: index,
       }
    })
@@ -208,10 +208,10 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
       // if (!values.speakers[key].background) { Made background not required
       //     errors.speakers[key].background = 'Required';
       // }
-      if (!values.speakers[key].email) {
+      if (isDraft && !values.speakers[key].email) {
          errors.speakers[key].email = "Required"
       }
-      if (!EMAIL_REGEX.test(values.speakers[key].email)) {
+      if (isDraft && !EMAIL_REGEX.test(values.speakers[key].email)) {
          errors.speakers[key].email = "Please add a valid email"
       }
       if (!Object.keys(errors.speakers[key]).length) {
