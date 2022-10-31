@@ -114,7 +114,6 @@ const LivestreamGroupQuestionForm = () => {
       <Formik
          initialValues={registrationFormValues}
          enableReinitialize
-         validateOnMount
          onSubmit={handleSubmit}
          validate={validate}
       >
@@ -123,7 +122,6 @@ const LivestreamGroupQuestionForm = () => {
             isSubmitting,
             values,
             setFieldValue,
-            isValid,
             errors,
             handleBlur,
             touched,
@@ -195,7 +193,7 @@ const LivestreamGroupQuestionForm = () => {
                         </Button>
                      )}
                      <Button
-                        disabled={isSubmitting || !isValid}
+                        disabled={isSubmitting}
                         type="submit"
                         variant="contained"
                         size="large"

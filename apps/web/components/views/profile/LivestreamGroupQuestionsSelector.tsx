@@ -91,6 +91,10 @@ const QuestionSelect = ({
       [inputName, setFieldValue]
    )
 
+   useEffect(() => {
+      setFieldValue(inputName, options?.[0]?.id || null) // set default value
+   }, [inputName, options, setFieldValue])
+
    return (
       <TextField
          id={`${inputName}`}
@@ -100,7 +104,7 @@ const QuestionSelect = ({
          onBlur={handleBlur}
          error={!!errorText}
          helperText={errorText}
-         value={question.selectedOptionId || options?.[0]?.id || ""}
+         value={question.selectedOptionId || ""}
          onChange={handleChange}
          SelectProps={{
             native: native,
