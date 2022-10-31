@@ -277,7 +277,11 @@ const StreamerLayout = (props) => {
          initialize
          isStreamer
       >
-         <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
+         <RTMProvider
+            livestreamId={baseStreamId}
+            roomId={currentLivestream.id}
+            userId={streamerId}
+         >
             <NotificationsContext.Provider value={notificationsContextValue}>
                <CurrentStreamContext.Provider value={currentStreamContextValue}>
                   <div className={classes.root}>

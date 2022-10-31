@@ -17,11 +17,12 @@ import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 
 interface Props {
    children: JSX.Element
+   livestreamId: string
    roomId?: string
    userId?: string
 }
 
-const RTMProvider = ({ children, roomId, userId }: Props) => {
+const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!)
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!)
    const sessionIsUsingCloudProxy = useSelector(
@@ -56,7 +57,7 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
          rtmClient.current.on("TokenExpired", () => {
             errorLogAndNotify(new Error("RTM TokenExpired")) // save this event on sentry
             if (typeof window !== "undefined") {
-               window.location.href = `${getBaseUrl()}/upcoming-livestream/${roomId}`
+               window.location.href = `${getBaseUrl()}/upcoming-livestream/${livestreamId}`
             }
          })
       } catch (error) {
@@ -65,7 +66,7 @@ const RTMProvider = ({ children, roomId, userId }: Props) => {
          })
          throw error
       }
-   }, [useProxy, roomId])
+   }, [useProxy, livestreamId])
 
    const onChannelMessage = useCallback(
       (message: RtmMessage, memberId: string) => {
