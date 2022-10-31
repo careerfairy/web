@@ -357,7 +357,11 @@ const ViewerLayout = (props) => {
          streamMode={currentLivestream?.mode}
          isStreamer={handRaiseActive}
       >
-         <RTMProvider roomId={currentLivestream.id} userId={streamerId}>
+         <RTMProvider
+            livestreamId={livestreamId}
+            roomId={currentLivestream.id}
+            userId={streamerId}
+         >
             <CurrentStreamContext.Provider value={currentStreamContextValue}>
                <div className={`${classes.root} notranslate`}>
                   <ViewerTopBar
