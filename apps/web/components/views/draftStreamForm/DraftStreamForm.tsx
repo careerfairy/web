@@ -680,10 +680,9 @@ const DraftStreamForm = ({
             setFormHasChanged(!formHasChanged)
          }
 
-         currentStream.status
          return validateStreamForm(values, isDraft, noValidation)
       },
-      [formData, formHasChanged, noValidation, setFormHasChanged]
+      [formData, formHasChanged, isDraft, noValidation, setFormHasChanged]
    )
 
    // handle errors and redirect to the specific 1st error input
