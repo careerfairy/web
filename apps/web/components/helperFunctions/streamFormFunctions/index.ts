@@ -208,10 +208,13 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
       // if (!values.speakers[key].background) { Made background not required
       //     errors.speakers[key].background = 'Required';
       // }
-      if (isDraft && !values.speakers[key].email) {
+
+      const speakerEmail = values.speakers[key].email || ""
+
+      if (isDraft && !speakerEmail) {
          errors.speakers[key].email = "Required"
       }
-      if (isDraft && !EMAIL_REGEX.test(values.speakers[key].email)) {
+      if (speakerEmail.length && !EMAIL_REGEX.test(speakerEmail)) {
          errors.speakers[key].email = "Please add a valid email"
       }
       if (!Object.keys(errors.speakers[key]).length) {
