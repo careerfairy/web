@@ -167,7 +167,7 @@ function PollCreationModal({ open, handleClose, initialPoll }) {
                      onBlur={handleBlur}
                      placeholder="Write down your question or poll to your audience"
                   />
-                  {values.options.map(({ id, text }, index, allOptions) => {
+                  {values.options.map(({ id, text }, index) => {
                      const error = getIn(errors.options, `${index}.text`),
                         isTouched = getIn(touched.options, `${index}.text`)
 
@@ -194,18 +194,16 @@ function PollCreationModal({ open, handleClose, initialPoll }) {
                                          endAdornment: (
                                             <Box p={1}>
                                                <Fab
-                                                  disabled={
-                                                     allOptions.length <= 2 ||
-                                                     isSubmitting
-                                                  }
+                                                  disabled={isSubmitting}
                                                   onClick={() =>
                                                      removeOption(id)
                                                   }
                                                   size="small"
                                                   color="error"
-                                                  style={{
+                                                  sx={{
                                                      width: 36,
                                                      height: 36,
+                                                     p: 1,
                                                   }}
                                                >
                                                   <DeleteForeverIcon />
