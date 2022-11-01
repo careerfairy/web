@@ -23,6 +23,7 @@ import { useFormik, getIn } from "formik"
 import * as yup from "yup"
 import Stack from "@mui/material/Stack"
 import { errorLogAndNotify } from "../../../../../../../util/CommonUtil"
+import { LivestreamPoll } from "@careerfairy/shared-lib/dist/livestreams"
 
 const validationSchema = yup.object({
    question: yup
@@ -58,7 +59,17 @@ interface PollValues {
    options: { id: string; text: string }[]
 }
 
-function PollCreationModal({ open, handleClose, initialPoll }) {
+type PollCreationModalProps = {
+   open: boolean
+   handleClose: () => void
+   initialPoll?: LivestreamPoll
+}
+
+const PollCreationModal = ({
+   open,
+   handleClose,
+   initialPoll,
+}: PollCreationModalProps) => {
    const streamRef = useStreamRef()
    const firebase = useFirebaseService()
 
