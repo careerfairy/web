@@ -91,12 +91,26 @@ const QuestionSelect = ({
       [inputName, setFieldValue]
    )
 
+   const isNew = question.isNew && !question.selectedOptionId
+
    return (
       <TextField
          id={`${inputName}`}
          select
          name={inputName}
-         label={question.name}
+         label={
+            <Typography variant={"inherit"}>
+               {isNew && (
+                  <Chip
+                     sx={{ mr: 0.5 }}
+                     size={"small"}
+                     color="primary"
+                     label={"New!"}
+                  />
+               )}
+               {question.name}
+            </Typography>
+         }
          onBlur={handleBlur}
          error={!!errorText}
          helperText={errorText}
@@ -104,14 +118,6 @@ const QuestionSelect = ({
          onChange={handleChange}
          SelectProps={{
             native: native,
-            startAdornment: question.isNew && !question.selectedOptionId && (
-               <Chip
-                  sx={{ mr: native ? 1 : 2 }}
-                  size={native ? "small" : "medium"}
-                  color="primary"
-                  label={"New!"}
-               />
-            ),
          }}
       >
          {native && <option value="" disabled></option>}
