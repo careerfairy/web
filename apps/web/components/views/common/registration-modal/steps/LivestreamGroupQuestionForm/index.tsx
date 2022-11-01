@@ -114,19 +114,19 @@ const LivestreamGroupQuestionForm = () => {
       <Formik
          initialValues={registrationFormValues}
          enableReinitialize
-         validateOnMount
          onSubmit={handleSubmit}
          validate={validate}
+         validateOnMount
       >
          {({
             handleSubmit,
             isSubmitting,
             values,
             setFieldValue,
-            isValid,
             errors,
             handleBlur,
             touched,
+            isValid,
          }) => {
             return (
                <Form
