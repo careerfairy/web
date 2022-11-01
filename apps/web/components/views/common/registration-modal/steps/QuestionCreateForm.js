@@ -35,7 +35,6 @@ const useStyles = makeStyles((theme) => ({
    },
    imgGrid: {
       background: theme.palette.primary.main,
-      border: `1px solid ${theme.palette.primary.main}`,
       overflow: "hidden",
    },
    imgWrapper: {
