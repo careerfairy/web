@@ -9,7 +9,7 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "center",
       padding: "1.5em 1em 1em 1em",
-      p: 0,
+      p: 1,
       height: {
          xs: 100,
          sm: 150,
