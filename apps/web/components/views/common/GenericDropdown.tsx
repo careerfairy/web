@@ -46,9 +46,6 @@ const GenericDropdown = ({
          fullWidth
          SelectProps={{
             native: isMobile,
-            MenuProps: {
-               hideBackdrop: true,
-            },
             className,
          }}
          {...rest}
