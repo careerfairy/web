@@ -38,6 +38,7 @@ const MultiListSelect = ({
     */
    selectAllOption = null,
    checkboxColor = "primary",
+   getDisabledFn = getValueFn,
    hasError = false,
    errorMessage = "",
    errorMessageClassName = "",
@@ -150,9 +151,11 @@ const MultiListSelect = ({
                !selectedItemsLocal.includes(option)
          }
 
-         return limitWasReached || disabledValues.includes(getValueFn(option))
+         return (
+            limitWasReached || disabledValues.includes(getDisabledFn(option))
+         )
       },
-      [disabledValues, limit, getValueFn, selectedItemsLocal]
+      [limit, disabledValues, getDisabledFn, selectedItemsLocal]
    )
 
    return (
@@ -237,6 +240,7 @@ type Props = {
    getValueFn?: (obj: any) => string
    getKeyFn?: (obj: any) => string
    getGroupByFn?: (obj: any) => string
+   getDisabledFn?: (obj: any) => string
    inputProps?: object
    chipProps?: object
    isCheckbox?: boolean
