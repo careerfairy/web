@@ -1,5 +1,5 @@
 import { FormControl, FormHelperText, TextField } from "@mui/material"
-import React, { useCallback } from "react"
+import React, { useCallback, useState } from "react"
 import { useDebounce } from "react-use"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -27,6 +27,7 @@ const ReferralCodeInput = ({
 }: Props) => {
    const { applyReferralCode } = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
+   const [validating, setValidating] = useState(false)
 
    const [] = useDebounce(
       () => handleReferralCodeDebounced(referralCodeValue),
@@ -42,6 +43,7 @@ const ReferralCodeInput = ({
             onSetIsValid(false)
 
             try {
+               setValidating(true)
                const { data: isValidReferralCode } = await applyReferralCode(
                   referralCode
                )
@@ -58,6 +60,8 @@ const ReferralCodeInput = ({
                console.error(
                   `Invalid referral code: ${referralCode}, no corresponding user.`
                )
+            } finally {
+               setValidating(false)
             }
          }
       },
@@ -75,10 +79,9 @@ const ReferralCodeInput = ({
             placeholder="Enter a Referral Code"
             InputLabelProps={{ shrink: true }}
             onChange={onChange}
-            disabled={isValid}
+            disabled={isValid || validating}
             value={referralCodeValue}
             label="Copy-paste here your referral code"
-            error={!!referralCodeValue.length && !isValid}
          />
          {isValid && (
             <FormHelperText
