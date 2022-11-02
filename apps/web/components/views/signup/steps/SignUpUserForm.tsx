@@ -86,10 +86,7 @@ const initValues: IFormValues = {
 
 function SignUpUserForm() {
    const firebase = useFirebaseService()
-   const {
-      query: { absolutePath },
-      push,
-   } = useRouter()
+   const { push } = useRouter()
    const { setCurrentStep } = useContext<IMultiStepContext>(MultiStepContext)
 
    const [emailSent, setEmailSent] = useState(false)
