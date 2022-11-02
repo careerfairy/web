@@ -212,4 +212,9 @@ export default class DateUtil {
          Intl?.DateTimeFormat()?.resolvedOptions()?.timeZone || "Europe/Zurich"
       )
    }
+
+   static getDifferenceInDays(dateFrom, dateTo) {
+      const differenceInTime = dateTo.getTime() - dateFrom.getTime()
+      return differenceInTime / (1000 * 60 * 60 * 24)
+   }
 }

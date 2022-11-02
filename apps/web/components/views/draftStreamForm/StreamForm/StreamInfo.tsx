@@ -23,6 +23,7 @@ import { useTheme } from "@mui/material/styles"
 import Section from "components/views/common/Section"
 import CloseIcon from "@mui/icons-material/Close"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
+import DateUtil from "../../../../util/DateUtil"
 
 type Props = {
    isGroupsSelected: boolean
@@ -37,7 +38,11 @@ type Props = {
    userData: any
    classes: any
    sectionRef: any
+   publishDate: Date | null
+   isPastStream: boolean
 }
+
+const PROMOTION_MIN_DAYS = 30
 
 const StreamInfo = ({
    isGroupsSelected,
@@ -52,26 +57,103 @@ const StreamInfo = ({
    userData,
    classes,
    sectionRef,
+   publishDate,
+   isPastStream,
 }: Props) => {
    const { palette } = useTheme()
    const [showStartTooltip, setShowStartToolTip] = useState(false)
    const [startDatePickerOpen, setStartDatePickerOpen] = useState(false)
-   const { setShowPromotionInputs } = useStreamCreationProvider()
+   const [disableStartDatePicker, setDisableStartDatePicker] = useState(false)
+   const { setShowPromotionInputs, setIsPromotionInputsDisabled } =
+      useStreamCreationProvider()
 
+   const handleShowPromotions = (disabled = false) => {
+      setShowStartToolTip(false)
+      setShowPromotionInputs(true)
+      setIsPromotionInputsDisabled(disabled)
+   }
+
+   const handleHidePromotions = () => {
+      setShowStartToolTip(true)
+      setShowPromotionInputs(false)
+   }
+
+   // To handle all the logic of the promotions and DatePicker Tooltip visibility
    useEffect(() => {
       const { start } = values
+
       if (start) {
          const now = new Date()
-         const oneMonthAgo = new Date(new Date().setDate(now.getDate() + 30))
+         const hasPromotion = hasPromotions(values)
 
-         // The tooltip will show only if the start date is between today and one month ago.
-         // The promotion inputs is the opposite, wil be only shown if the start date is between today and one month ago.
-         if (start < oneMonthAgo) {
-            setShowStartToolTip(true)
-            setShowPromotionInputs(false)
-         } else {
-            setShowStartToolTip(false)
-            setShowPromotionInputs(true)
+         // If it doesn't have publishDate it means is a Draft
+         // so only needs to validate, is the selected date (start) between today and one month ago
+         if (!publishDate) {
+            if (
+               DateUtil.getDifferenceInDays(now, start) >= PROMOTION_MIN_DAYS
+            ) {
+               handleShowPromotions()
+            } else {
+               handleHidePromotions()
+            }
+            return
+         }
+
+         // If it is a Past Stream
+         // we should disable the Date Picker and the Promotions input and only show promotions if there's any
+         if (isPastStream) {
+            setDisableStartDatePicker(true)
+            if (hasPromotion) {
+               handleShowPromotions(true)
+            } else {
+               setShowStartToolTip(false)
+            }
+            return
+         }
+
+         // If it is an Upcoming Stream we have 4 possible scenarios
+         if (publishDate) {
+            // Handle promotions if the selected date (start) is more than 30 days apart from today
+            if (
+               DateUtil.getDifferenceInDays(now, start) >= PROMOTION_MIN_DAYS
+            ) {
+               handleShowPromotions()
+               return
+            }
+
+            // Don't accept promotions if the selected and publish date are less than 30 days from the selected date
+            if (
+               DateUtil.getDifferenceInDays(now, start) < PROMOTION_MIN_DAYS &&
+               DateUtil.getDifferenceInDays(publishDate, start) <
+                  PROMOTION_MIN_DAYS
+            ) {
+               handleHidePromotions()
+               return
+            }
+
+            // Handle promotions if the selected and publish date are less than 30 days from the selected date
+            // but had already promotions set
+            if (
+               DateUtil.getDifferenceInDays(now, start) < PROMOTION_MIN_DAYS &&
+               DateUtil.getDifferenceInDays(publishDate, start) >=
+                  PROMOTION_MIN_DAYS &&
+               hasPromotion
+            ) {
+               handleShowPromotions(true)
+               return
+            }
+
+            // Don't accept promotions if the selected and publish date are less than 30 days from the selected date
+            // and doesn't have already promotions set
+            if (
+               DateUtil.getDifferenceInDays(now, start) < PROMOTION_MIN_DAYS &&
+               DateUtil.getDifferenceInDays(publishDate, start) >=
+                  PROMOTION_MIN_DAYS &&
+               !hasPromotion
+            ) {
+               handleHidePromotions()
+               return
+            }
          }
       }
    }, [setShowPromotionInputs, values.start])
@@ -236,10 +318,11 @@ const StreamInfo = ({
                            onBlur={handleBlur}
                            sx={{ svg: { color: palette.secondary.main } }}
                            error={Boolean(errors.start && touched.start)}
+                           disabled={disableStartDatePicker}
                         />
                      </Tooltip>
                   )}
-                  disabled={isSubmitting}
+                  disabled={isSubmitting || disableStartDatePicker}
                   label="Live Stream Start Date"
                   value={values.start}
                   onClose={handleStartDatePickerClose}
@@ -369,6 +452,19 @@ const StreamInfo = ({
             )}
          </FormGroup>
       </Section>
+   )
+}
+
+const hasPromotions = (values: FormikValues) => {
+   const {
+      promotionChannelsCodes,
+      promotionCountriesCodes,
+      promotionUniversitiesCodes,
+   } = values
+   return (
+      promotionChannelsCodes.length ||
+      promotionCountriesCodes.length ||
+      promotionUniversitiesCodes.length
    )
 }
 

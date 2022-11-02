@@ -1,12 +1,15 @@
 import { Grid, Typography } from "@mui/material"
 import FormGroup from "../FormGroup"
-import React from "react"
+import React, { MutableRefObject, useCallback } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import {
    channelOptionCodes,
    countriesOptionCodes,
 } from "../../../../constants/forms"
-import { multiListSelectMapValueFn } from "../../signup/utils"
+import {
+   multiListSelectMapIdValueFn,
+   multiListSelectMapValueFn,
+} from "../../signup/utils"
 import Section from "components/views/common/Section"
 import { useStreamCreationProvider } from "./StreamCreationProvider"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
@@ -20,7 +23,8 @@ type Props = {
    promotionUniversitiesCodes: OptionGroup[]
    setFieldValue: (field, value) => void
    classes: any
-   sectionRef: any
+   sectionRef: MutableRefObject<any>
+   isPastStream?: boolean
 }
 
 const PromotionInfo = ({
@@ -30,11 +34,20 @@ const PromotionInfo = ({
    setFieldValue,
    classes,
    sectionRef,
+   isPastStream = false,
 }: Props) => {
    const allUniversities = useUniversitiesByCountryCodes(
       promotionCountriesCodes
    )
-   const { showPromotionInputs } = useStreamCreationProvider()
+   const { showPromotionInputs, isPromotionInputsDisabled } =
+      useStreamCreationProvider()
+
+   const getDisabledValues = useCallback(
+      (values: OptionGroup[]) => {
+         return isPromotionInputsDisabled ? values.map((item) => item.id) : []
+      },
+      [isPromotionInputsDisabled]
+   )
 
    return (
       <Section
@@ -68,6 +81,9 @@ const PromotionInfo = ({
                         color: "secondary",
                      }}
                      checkboxColor="secondary"
+                     disabledValues={getDisabledValues(channelOptionCodes)}
+                     getDisabledFn={multiListSelectMapIdValueFn}
+                     disabled={isPromotionInputsDisabled}
                   />
                </Grid>
 
@@ -88,6 +104,9 @@ const PromotionInfo = ({
                         color: "secondary",
                      }}
                      checkboxColor="secondary"
+                     disabledValues={getDisabledValues(countriesOptionCodes)}
+                     getDisabledFn={multiListSelectMapIdValueFn}
+                     disabled={isPromotionInputsDisabled}
                   />
                </Grid>
 
@@ -108,6 +127,9 @@ const PromotionInfo = ({
                         color: "secondary",
                      }}
                      checkboxColor="secondary"
+                     disabledValues={getDisabledValues(allUniversities)}
+                     getDisabledFn={multiListSelectMapIdValueFn}
+                     disabled={isPromotionInputsDisabled}
                   />
                </Grid>
             </FormGroup>
@@ -120,8 +142,9 @@ const PromotionInfo = ({
             >
                <InfoOutlinedIcon color="secondary" fontSize="large" />
                <Typography variant="h5" ml={2}>
-                  CareerFairy cannot promote your event if it is scheduled less
-                  than 30 days in the future
+                  {isPastStream
+                     ? "No promotion options were selected for this event."
+                     : "CareerFairy cannot promote your event if it is scheduled less than 30 days in the future"}
                </Typography>
             </Box>
          )}

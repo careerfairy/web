@@ -12,3 +12,5 @@ export const mapOptions = (options: OptionGroup[]): string[] => {
 }
 
 export const multiListSelectMapValueFn = (item) => item
+
+export const multiListSelectMapIdValueFn = (item: OptionGroup) => item.id
