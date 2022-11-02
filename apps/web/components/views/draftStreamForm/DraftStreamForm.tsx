@@ -684,7 +684,7 @@ const DraftStreamForm = ({
             setFormHasChanged(!formHasChanged)
          }
 
-         return validateStreamForm(values, isDraft, noValidation)
+         return validateStreamForm(values, isDraft, noValidation, isPastStream)
       },
       [formData, formHasChanged, isDraft, noValidation, setFormHasChanged]
    )
