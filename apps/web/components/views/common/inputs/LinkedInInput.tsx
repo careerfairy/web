@@ -2,6 +2,8 @@ import { TextField } from "@mui/material"
 import React, { useCallback } from "react"
 import { useDebounce } from "react-use"
 import { linkedInRegex } from "../../../../constants/forms"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 const LinkedInInput = ({
    name,
@@ -9,19 +11,23 @@ const LinkedInInput = ({
    onUpdateField,
    onChange,
 }: Props) => {
+   const { errorNotification } = useSnackbarNotifications()
+
    const [] = useDebounce(() => handleLinkedInDebounced(linkedInValue), 1000, [
       linkedInValue,
    ])
 
    const handleLinkedInDebounced = useCallback(
-      (linkedInLink: string) => {
+      async (linkedInLink: string) => {
          if (linkedInLink.length === 0) {
-            onUpdateField({ linkedinUrl: "" })
-         } else if (isValidLinkedInLink(linkedInLink)) {
-            onUpdateField({ linkedinUrl: linkedInLink })
+            return await onUpdateField({ linkedinUrl: "" })
          }
+         if (isValidLinkedInLink(linkedInLink)) {
+            return await onUpdateField({ linkedinUrl: linkedInLink })
+         }
+         errorNotification("The chosen LinkedIn link is not valid!")
       },
-      [onUpdateField]
+      [errorNotification, onUpdateField]
    )
 
    return (
@@ -36,7 +42,6 @@ const LinkedInInput = ({
          onChange={onChange}
          value={linkedInValue}
          label="Add your LinkedIn link here"
-         error={!!linkedInValue.length && !isValidLinkedInLink(linkedInValue)}
       />
    )
 }
@@ -48,7 +53,7 @@ const isValidLinkedInLink = (link: string): boolean => {
 type Props = {
    name: string
    linkedInValue: string
-   onUpdateField: (field) => void
+   onUpdateField: (field: Partial<UserData>) => Promise<void>
    onChange: (event) => void
 }
 
