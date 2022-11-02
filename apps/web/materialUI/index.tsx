@@ -204,13 +204,6 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
 
 const getComponents = (theme: DefaultTheme): Components => ({
    // Name of the component
-   MuiBackdrop: {
-      styleOverrides: {
-         root: {
-            backgroundColor: alpha(theme.palette.common.black, 0.2),
-         },
-      },
-   },
    MuiDialog: {
       // Name of the style
       styleOverrides: {
@@ -221,6 +214,11 @@ const getComponents = (theme: DefaultTheme): Components => ({
          },
          paperFullScreen: {
             borderRadius: 0,
+         },
+         root: {
+            "& .MuiBackdrop-root": {
+               backgroundColor: alpha(theme.palette.common.black, 0.2),
+            },
          },
       },
    },
