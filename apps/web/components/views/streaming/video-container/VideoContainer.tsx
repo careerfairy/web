@@ -381,8 +381,13 @@ const VideoContainer = ({
             zIndex={3}
             bounds="parent"
             positionStyle={"absolute"}
-            defaultPosition={draggableDefaultPosition}
+            defaultPosition={
+               currentLivestream?.handRaiseActive
+                  ? draggableHandRaisedPosition
+                  : draggableDefaultPosition
+            }
             elementId="wifiIndicatorLocation"
+            key={`wifi-${currentLivestream?.handRaiseActive}`}
          >
             {WifiIndicatorMemoized}
          </DraggableComponent>
@@ -417,6 +422,11 @@ const VideoContainer = ({
    )
 }
 
-const draggableDefaultPosition = { x: 4, y: 70 }
+const draggableDefaultPosition = { x: 0, y: 65 }
+
+const draggableHandRaisedPosition = {
+   x: draggableDefaultPosition.x,
+   y: draggableDefaultPosition.y + 70,
+}
 
 export default memo(VideoContainer)
