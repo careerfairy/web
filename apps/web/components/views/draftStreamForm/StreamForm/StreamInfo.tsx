@@ -107,6 +107,7 @@ const StreamInfo = ({
                handleShowPromotions(true)
             } else {
                setShowStartToolTip(false)
+               setShowPromotionInputs(false)
             }
             return
          }
