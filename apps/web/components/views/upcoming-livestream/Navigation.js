@@ -70,7 +70,7 @@ const Navigation = ({ aboutRef, questionsRef, speakersRef }) => {
 
    const handleChange = debounce((event, newValue) => {
       setValue(newValue)
-   }, 250)
+   }, 700)
 
    if (!tabs.length) {
       return null
