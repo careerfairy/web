@@ -141,14 +141,15 @@ const PollCategory = ({
             >
                <Button
                   startIcon={<AddIcon />}
-                  children="Create Poll"
                   onClick={() => {
                      setAddNewPoll(true)
                      isOpen(4) && handleConfirmStep(4)
                   }}
                   variant="contained"
                   color="primary"
-               />
+               >
+                  Create Poll
+               </Button>
             </WhiteTooltip>
          </QuestionContainerHeader>
          <div
@@ -161,10 +162,7 @@ const PollCategory = ({
             {pollElements}
          </div>
          <PollCreationModal
-            livestreamId={livestream.id}
             open={addNewPoll}
-            initialPoll={null}
-            initialOptions={null}
             handleClose={() => setAddNewPoll(false)}
          />
       </CategoryContainerTopAligned>

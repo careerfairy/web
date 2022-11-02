@@ -263,7 +263,6 @@ function UpcomingPollStreamer({
                </Overlay>
             )}
             <PollCreationModal
-               livestreamId={livestream.id}
                initialPoll={poll}
                open={editPoll}
                handleClose={() => setEditPoll(false)}
