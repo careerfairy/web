@@ -26,7 +26,7 @@ export default class LocalStorageUtil {
       } catch (e) {
          /**
           * Catch browser permission errors
-          * SecurityError: Failed to read the 'sessionStorage' property from 'Window': Access is denied for this document.
+          * SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
           */
          console.error(e)
          return undefined
@@ -39,7 +39,7 @@ export default class LocalStorageUtil {
       } catch (e) {
          /**
           * Catch browser permission errors
-          * SecurityError: Failed to read the 'sessionStorage' property from 'Window': Access is denied for this document.
+          * SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
           */
          console.error(e)
       }
