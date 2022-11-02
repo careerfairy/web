@@ -51,6 +51,7 @@ interface Props {
    viewer: boolean
    openSupportInLeftMenu: () => void
 }
+
 const VideoContainer = ({
    isPlayMode,
    showMenu,
@@ -58,7 +59,7 @@ const VideoContainer = ({
    viewer,
    openSupportInLeftMenu,
 }: Props) => {
-   const { currentLivestream, streamerId } = useCurrentStream()
+   const { currentLivestream, streamerId, isBreakout } = useCurrentStream()
    const {
       tutorialSteps,
       setTutorialSteps,
@@ -381,11 +382,10 @@ const VideoContainer = ({
             zIndex={3}
             bounds="parent"
             positionStyle={"absolute"}
-            defaultPosition={
+            defaultPosition={getDefaultPosition(
+               isBreakout,
                currentLivestream?.handRaiseActive
-                  ? draggableHandRaisedPosition
-                  : draggableDefaultPosition
-            }
+            )}
             elementId="wifiIndicatorLocation"
             key={`wifi-${currentLivestream?.handRaiseActive}`}
          >
@@ -422,11 +422,24 @@ const VideoContainer = ({
    )
 }
 
-const draggableDefaultPosition = { x: 0, y: 65 }
+/**
+ * Push the Wi-Fi status component below accordingly with the current active
+ * banners
+ * @param isBreakoutRoom
+ * @param handRaiseActive
+ */
+function getDefaultPosition(isBreakoutRoom, handRaiseActive) {
+   const position = { x: 0, y: 65 }
 
-const draggableHandRaisedPosition = {
-   x: draggableDefaultPosition.x,
-   y: draggableDefaultPosition.y + 70,
+   if (isBreakoutRoom) {
+      position.y = position.y += 65
+   }
+
+   if (handRaiseActive) {
+      position.y = position.y += 65
+   }
+
+   return position
 }
 
 export default memo(VideoContainer)
