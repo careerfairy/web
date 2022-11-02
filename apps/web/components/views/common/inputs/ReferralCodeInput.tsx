@@ -3,7 +3,8 @@ import React, { useCallback, useState } from "react"
 import { useDebounce } from "react-use"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { sxStyles } from "../../../../types/commonTypes"
-import { useSnackbar } from "notistack"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = sxStyles({
    inputLabel: {
@@ -26,7 +27,7 @@ const ReferralCodeInput = ({
    onSetIsValid,
 }: Props) => {
    const { applyReferralCode } = useFirebaseService()
-   const { enqueueSnackbar } = useSnackbar()
+   const { errorNotification } = useSnackbarNotifications()
    const [validating, setValidating] = useState(false)
 
    const [] = useDebounce(
@@ -50,22 +51,18 @@ const ReferralCodeInput = ({
                if (isValidReferralCode) {
                   onSetIsValid(true)
                } else {
-                  const notification = `The chosen referral code is not valid!`
-                  enqueueSnackbar(notification, {
-                     variant: "error",
-                     preventDuplicate: false,
-                  })
+                  errorNotification("The chosen referral code is not valid!")
                }
-            } catch {
-               console.error(
-                  `Invalid referral code: ${referralCode}, no corresponding user.`
-               )
+            } catch (error) {
+               errorLogAndNotify(error, {
+                  message: `Invalid referral code: ${referralCode}, no corresponding user.`,
+               })
             } finally {
                setValidating(false)
             }
          }
       },
-      [isValid, onSetIsValid, applyReferralCode, enqueueSnackbar]
+      [isValid, onSetIsValid, applyReferralCode, errorNotification]
    )
 
    return (

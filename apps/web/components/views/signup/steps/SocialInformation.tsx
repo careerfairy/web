@@ -7,6 +7,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import ReferralCodeInput from "../../common/inputs/ReferralCodeInput"
 import LinkedInInput from "../../common/inputs/LinkedInInput"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 const styles = sxStyles({
    inputLabel: {
@@ -34,7 +35,7 @@ const SocialInformation = () => {
    const [isValidReferralCode, setIsValidReferralCode] = useState(false)
 
    const updateFields = useCallback(
-      async (fieldToUpdate) => {
+      async (fieldToUpdate: Partial<UserData>) => {
          try {
             await userRepo.updateAdditionalInformation(
                currentUser.email,
