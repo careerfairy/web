@@ -311,6 +311,10 @@ const DraftStreamForm = ({
    })
 
    const [steps, setSteps] = useState(initialSteps)
+   const isPastStream = useMemo(
+      () => currentStream?.hasEnded,
+      [currentStream?.hasEnded]
+   )
 
    const handleSetGroupIds = async (
       UrlIds,
@@ -821,6 +825,8 @@ const DraftStreamForm = ({
                                     userData={userData}
                                     classes={classes}
                                     sectionRef={streamInfoRef}
+                                    publishDate={currentStream?.created?.toDate?.()}
+                                    isPastStream={isPastStream}
                                  />
 
                                  <SpeakersInfo
@@ -862,6 +868,7 @@ const DraftStreamForm = ({
                                     }
                                     classes={classes}
                                     sectionRef={promotionInfoRef}
+                                    isPastStream={isPastStream}
                                  />
 
                                  <SuspenseWithBoundary hide expected>
