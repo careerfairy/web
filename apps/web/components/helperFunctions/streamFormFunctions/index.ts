@@ -168,7 +168,12 @@ export const handleFlattenOptionsWithoutLvlOfStudy = (group) => {
    return optionsArray
 }
 
-export const validateStreamForm = (values, isDraft, noValidation = false) => {
+export const validateStreamForm = (
+   values,
+   isDraft,
+   noValidation = false,
+   isPastStream = false
+) => {
    let errors: FormikErrors<DraftFormValues> = {
       speakers: {},
    }
@@ -190,7 +195,7 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
 
    const now = new Date()
 
-   if (!values.start || values.start < now) {
+   if (!isPastStream && (!values.start || values.start < now)) {
       errors.start = "Please select a date in the future"
    }
 
