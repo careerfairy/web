@@ -1,6 +1,23 @@
-import PropTypes from "prop-types"
-import React, { useState, useRef, useEffect } from "react"
+import React, {
+   useState,
+   useRef,
+   useEffect,
+   useCallback,
+   CSSProperties,
+   useMemo,
+} from "react"
 import Draggable from "react-draggable"
+
+type Props = {
+   children: React.ReactNode
+   elementId: string
+   bounds:
+      | "parent"
+      | { left: number; top: number; right: number; bottom: number }
+   defaultPosition: { x: number; y: number }
+   positionStyle: CSSProperties["position"]
+   zIndex: CSSProperties["zIndex"]
+}
 
 const DraggableComponent = ({
    children,
@@ -9,7 +26,7 @@ const DraggableComponent = ({
    bounds,
    positionStyle,
    defaultPosition = { x: 0, y: 0 },
-}) => {
+}: Props) => {
    const [position, setPosition] = useState(null)
    const [hasLoaded, setHasLoaded] = useState(false)
    const nodeRef = useRef(null)
@@ -18,55 +35,41 @@ const DraggableComponent = ({
       const existingDivPositions = JSON.parse(localStorage.getItem(elementId))
       setPosition(existingDivPositions)
       setHasLoaded(true)
-   }, [])
+   }, [elementId])
 
-   function handleStop(e, data) {
+   const handleStop = useCallback((e, data) => {
       let newPosition = {}
       newPosition["x"] = data.x
       newPosition["y"] = data.y
       setPosition(newPosition)
-   }
+   }, [])
 
    useEffect(() => {
       localStorage.setItem(elementId, JSON.stringify(position))
-   }, [position])
+   }, [elementId, position])
+
+   const defaultPositionCalculated = useMemo(() => {
+      if (!position) return defaultPosition
+
+      return { x: position.x, y: position.y }
+   }, [defaultPosition, position])
 
    return hasLoaded ? (
       <Draggable
-         defaultPosition={
-            position === null
-               ? defaultPosition
-               : !position
-               ? defaultPosition
-               : { x: position.x, y: position.y }
-         }
+         defaultPosition={defaultPositionCalculated}
          position={null}
          nodeRef={nodeRef}
          onStop={handleStop}
          bounds={bounds}
       >
          <div
-            style={{ zIndex, position: positionStyle, left: "1%", top: "1%" }}
+            style={{ zIndex, position: positionStyle, padding: "8px" }}
             ref={nodeRef}
          >
             {children}
          </div>
       </Draggable>
    ) : null
-}
-
-DraggableComponent.propTypes = {
-   elementId: PropTypes.string.isRequired,
-   children: PropTypes.node.isRequired,
-   bounds: PropTypes.oneOf([
-      "parent",
-      PropTypes.shape({
-         left: PropTypes.number,
-         top: PropTypes.number,
-         right: PropTypes.number,
-         bottom: PropTypes.number,
-      }),
-   ]),
 }
 
 export default DraggableComponent
