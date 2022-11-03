@@ -1,5 +1,12 @@
 import React, { Dispatch, memo, useCallback, useEffect, useState } from "react"
-import { Autocomplete, Checkbox, Chip, TextField } from "@mui/material"
+import {
+   Autocomplete,
+   Checkbox,
+   Chip,
+   Collapse,
+   FormControl,
+   TextField,
+} from "@mui/material"
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank"
 import CheckBoxIcon from "@mui/icons-material/CheckBox"
 import isEqual from "react-fast-compare"
@@ -31,6 +38,10 @@ const MultiListSelect = ({
     */
    selectAllOption = null,
    checkboxColor = "primary",
+   hasError = false,
+   errorMessage = "",
+   errorMessageClassName = "",
+   handleBlur = () => {},
 }: Props) => {
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
    const [selectedItemsLocal, setSelectedItemsLocal] = useState(selectedItems)
@@ -184,7 +195,18 @@ const MultiListSelect = ({
          }
          getOptionDisabled={getOptionDisabled}
          renderInput={(params) => (
-            <TextField {...params} {...inputProps} name={inputName} />
+            <FormControl fullWidth>
+               <TextField
+                  {...params}
+                  {...inputProps}
+                  name={inputName}
+                  error={hasError}
+                  onBlur={handleBlur}
+               />
+               <Collapse className={errorMessageClassName} in={hasError}>
+                  {errorMessage}
+               </Collapse>
+            </FormControl>
          )}
          renderTags={(value, getTagProps) =>
             value.map((option, index) => (
@@ -224,6 +246,10 @@ type Props = {
    limit?: number | false
    selectAllOption?: SelectAllOption
    checkboxColor?: ICheckBoxColors
+   hasError?: boolean
+   errorMessage?: string
+   errorMessageClassName?: string
+   handleBlur?: (e) => void
 }
 
 type SelectAllOption = {
