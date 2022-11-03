@@ -1,9 +1,11 @@
 import { Grid, Typography } from "@mui/material"
 import FormGroup from "../FormGroup"
 import MultiListSelect from "../../common/MultiListSelect"
-import React from "react"
+import React, { MutableRefObject } from "react"
 import { Interest } from "@careerfairy/shared-lib/dist/interests"
 import Section from "components/views/common/Section"
+import { FormikErrors, FormikValues } from "formik"
+import { FormikTouched } from "formik/dist/types"
 
 type Props = {
    setSelectedInterests: React.Dispatch<React.SetStateAction<Interest[]>>
@@ -11,8 +13,11 @@ type Props = {
    existingInterests: Interest[]
    isSubmitting: boolean
    setFieldValue: (field, value) => void
-   sectionRef: any
+   sectionRef: MutableRefObject<any>
    classes: any
+   errors: FormikErrors<FormikValues>
+   touched: FormikTouched<FormikValues>
+   handleBlur: (e) => void
 }
 
 const EventCategoriesInfo = ({
@@ -23,6 +28,9 @@ const EventCategoriesInfo = ({
    setFieldValue,
    sectionRef,
    classes,
+   errors,
+   touched,
+   handleBlur,
 }: Props) => {
    return (
       <Section
@@ -57,6 +65,12 @@ const EventCategoriesInfo = ({
                   }}
                   isCheckbox
                   checkboxColor="secondary"
+                  hasError={Boolean(
+                     errors.interestsIds && touched.interestsIds
+                  )}
+                  errorMessage={errors.interestsIds as string}
+                  handleBlur={handleBlur}
+                  errorMessageClassName={classes.errorMessage}
                />
             </Grid>
          </FormGroup>
