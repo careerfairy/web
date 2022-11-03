@@ -32,19 +32,32 @@ const RemoteStreamItem = ({
 
    const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted())
 
+   const playVideo = useCallback(() => {
+      try {
+         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
+            stream.videoTrack?.play(`${stream.uid}`, {
+               fit: isScreenShareVideo ? "contain" : "cover",
+            })
+         }
+      } catch (e) {
+         setAVideoIsMuted()
+         console.error("-> error in PLAY VIDEO", e)
+      }
+   }, [isScreenShareVideo, setAVideoIsMuted, stream.uid, stream.videoTrack])
+
    useEffect(() => {
       if (stream.uid === "demoStream") {
          generateDemoHandRaiser()
       } else {
          !muteAllRemoteVideos && playVideo()
       }
-   }, [stream.uid, stream.videoTrack])
+   }, [stream.uid, stream.videoTrack, playVideo])
 
    useEffect(() => {
       if (playAllRemoteVideos) {
          playVideo()
       }
-   }, [playAllRemoteVideos])
+   }, [playAllRemoteVideos, playVideo])
 
    useEffect(() => {
       if (unmuteFailedMutedRemoteVideos) {
@@ -60,19 +73,6 @@ const RemoteStreamItem = ({
       }
    }, [muteAllRemoteVideos])
 
-   function playVideo() {
-      try {
-         if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
-            stream.videoTrack?.play(`${stream.uid}`, {
-               fit: isScreenShareVideo ? "contain" : "cover",
-            })
-         }
-      } catch (e) {
-         setAVideoIsMuted()
-         console.error("-> error in PLAY VIDEO", e)
-      }
-   }
-
    const generateDemoHandRaiser = useCallback(() => {
       let video = document.createElement("video")
       const videoContainer = document.querySelector("#" + stream.uid)
@@ -84,45 +84,52 @@ const RemoteStreamItem = ({
       video.play()
    }, [stream.url])
 
-   return (
-      <WhiteTooltip
-         placement="top"
-         title={
-            <React.Fragment>
-               <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
-               <TooltipText>
-                  Once connected, the viewer who raised their hand will appear
-                  as an additional streamer
-               </TooltipText>
-               {activeStep === 11 && (
-                  <TooltipButtonComponent
-                     onConfirm={() => {
-                        handleConfirmStep(11)
-                     }}
-                     buttonText="Ok"
-                  />
-               )}
-            </React.Fragment>
-         }
-         open={activeStep === 11 && stream.uid === "demoStream"}
-         style={{
-            width: "100%",
-            display: "flex",
-         }}
-      >
-         <StreamItem
-            speaker={speaker}
-            stream={stream}
-            videoMuted={!stream.videoTrack || stream.videoMuted}
-            audioMuted={
-               stream.audioMuted === undefined ? true : stream.audioMuted
-            }
-            index={index}
-            big={big}
-            videoMutedBackgroundImg={videoMutedBackgroundImg}
-         />
-      </WhiteTooltip>
+   const remoteStreamItem = (
+      <StreamItem
+         speaker={speaker}
+         stream={stream}
+         videoMuted={!stream.videoTrack || stream.videoMuted}
+         audioMuted={stream.audioMuted === undefined ? true : stream.audioMuted}
+         index={index}
+         big={big}
+         videoMutedBackgroundImg={videoMutedBackgroundImg}
+      />
    )
+
+   // only render the Tooltip if really needed
+   if (activeStep === 11 && stream.uid === "demoStream") {
+      return (
+         <WhiteTooltip
+            placement="top"
+            title={
+               <React.Fragment>
+                  <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
+                  <TooltipText>
+                     Once connected, the viewer who raised their hand will
+                     appear as an additional streamer
+                  </TooltipText>
+                  {activeStep === 11 && (
+                     <TooltipButtonComponent
+                        onConfirm={() => {
+                           handleConfirmStep(11)
+                        }}
+                        buttonText="Ok"
+                     />
+                  )}
+               </React.Fragment>
+            }
+            open={activeStep === 11 && stream.uid === "demoStream"}
+            style={{
+               width: "100%",
+               display: "flex",
+            }}
+         >
+            {remoteStreamItem}
+         </WhiteTooltip>
+      )
+   }
+
+   return remoteStreamItem
 }
 
 export default RemoteStreamItem
