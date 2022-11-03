@@ -14,7 +14,7 @@ const LocalStreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
          videoMutedBackgroundImg={videoMutedBackgroundImg}
          stream={stream}
          videoMuted={!stream.videoTrack || stream.videoMuted}
-         audioMuted={stream.audioMuted}
+         audioMuted={stream.audioMuted === undefined ? true : stream.audioMuted}
          big={big}
       />
    )
