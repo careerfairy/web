@@ -177,7 +177,10 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
          case "CONNECTED":
             return {
                icon: (
-                  <InternetIcon sx={styles.svg} style={{ color: "#00F92C" }} />
+                  <InternetIcon
+                     sx={styles.svg}
+                     style={{ color: gradient[Math.max(uplink, downlink)] }}
+                  />
                ),
                message: "You are connected to the internet",
             }
@@ -211,7 +214,10 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
          case "CONNECTED":
             return {
                icon: (
-                  <ServerIcon sx={styles.svg} style={{ color: "#00F92C" }} />
+                  <ServerIcon
+                     sx={styles.svg}
+                     style={{ color: gradient[Math.max(uplink, downlink)] }}
+                  />
                ),
                message: "You are connected to our streaming server",
             }
@@ -243,9 +249,12 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
    const uplinkInfo = useMemo(() => getNetWorkInfo(true)[uplink], [uplink])
    const downlinkInfo = useMemo(() => getNetWorkInfo()[downlink], [downlink])
 
+   /**
+    * FIXME: it should be the RTM connection info but its pointing to RTC
+    */
    const rtmConnectionInfo = useMemo(
       () => getRtmConnectionInfo(agoraRtcConnectionStatus.curState),
-      [agoraRtcConnectionStatus.curState]
+      [agoraRtcConnectionStatus.curState, uplink, downlink]
    )
    const rtcConnectionInfo = useMemo(
       () => getRtcConnectionInfo(agoraRtcConnectionStatus?.curState),
