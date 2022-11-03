@@ -898,6 +898,9 @@ const DraftStreamForm = ({
                                     setFieldValue={setFieldValue}
                                     classes={classes}
                                     sectionRef={eventCategoriesInfoRef}
+                                    errors={errors}
+                                    touched={touched}
+                                    handleBlur={handleBlur}
                                  />
 
                                  <Box
