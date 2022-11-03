@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material"
+import { Grid, Tooltip, Typography } from "@mui/material"
 import FormGroup from "../FormGroup"
 import React, { MutableRefObject, useCallback } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
@@ -110,28 +110,46 @@ const PromotionInfo = ({
                   />
                </Grid>
 
-               <Grid item xs={12}>
-                  <MultiListSelect
-                     inputName="promotionUniversitiesCodes"
-                     isCheckbox
-                     selectedItems={promotionUniversitiesCodes}
-                     allValues={allUniversities}
-                     setFieldValue={setFieldValue}
-                     inputProps={{
-                        label: "Universities for Promotion",
-                        placeholder:
-                           "Select Universities in which promotion is desired",
-                     }}
-                     getValueFn={multiListSelectMapValueFn}
-                     chipProps={{
-                        color: "secondary",
-                     }}
-                     checkboxColor="secondary"
-                     disabledValues={getDisabledValues(allUniversities)}
-                     getDisabledFn={multiListSelectMapIdValueFn}
-                     disabled={isPromotionInputsDisabled}
-                  />
-               </Grid>
+               <Tooltip
+                  placement="bottom"
+                  arrow
+                  title={
+                     <Typography>
+                        Please first select the countries in which you would
+                        like to promote your event.
+                     </Typography>
+                  }
+                  disableHoverListener={Boolean(
+                     promotionCountriesCodes?.length ||
+                        isPromotionInputsDisabled
+                  )}
+               >
+                  <Grid item xs={12}>
+                     <MultiListSelect
+                        inputName="promotionUniversitiesCodes"
+                        isCheckbox
+                        selectedItems={promotionUniversitiesCodes}
+                        allValues={allUniversities}
+                        setFieldValue={setFieldValue}
+                        inputProps={{
+                           label: "Universities for Promotion",
+                           placeholder:
+                              "Select Universities in which promotion is desired",
+                        }}
+                        getValueFn={multiListSelectMapValueFn}
+                        chipProps={{
+                           color: "secondary",
+                        }}
+                        checkboxColor="secondary"
+                        disabledValues={getDisabledValues(allUniversities)}
+                        getDisabledFn={multiListSelectMapIdValueFn}
+                        disabled={
+                           isPromotionInputsDisabled ||
+                           promotionCountriesCodes?.length === 0
+                        }
+                     />
+                  </Grid>
+               </Tooltip>
             </FormGroup>
          ) : (
             <Box
