@@ -16,26 +16,29 @@ const useUniversitiesByCountryCodes = (
    // to get all the universities based on the selected countries
    useEffect(() => {
       ;(async () => {
-         try {
-            const selectedCountriesIds = selectedCountryCodes.map(
-               (option) => option.id
-            )
-            const universitiesSnapShot =
-               await firebase.getUniversitiesFromMultipleCountryCode(
-                  selectedCountriesIds
+         if (selectedCountryCodes && selectedCountryCodes.length) {
+            try {
+               const selectedCountriesIds = selectedCountryCodes.map(
+                  (option) => option.id
+               )
+               const universitiesSnapShot =
+                  await firebase.getUniversitiesFromMultipleCountryCode(
+                     selectedCountriesIds
+                  )
+
+               const allUniversities = universitiesSnapShot.docs.reduce(
+                  (acc, doc) => {
+                     const universitiesCountries =
+                        doc.data() as UniversityCountry
+                     return [...acc, ...universitiesCountries.universities]
+                  },
+                  []
                )
 
-            const allUniversities = universitiesSnapShot.docs.reduce(
-               (acc, doc) => {
-                  const universitiesCountries = doc.data() as UniversityCountry
-                  return [...acc, ...universitiesCountries.universities]
-               },
-               []
-            )
-
-            setAllUniversities(allUniversities)
-         } catch (e) {
-            errorLogAndNotify(e)
+               setAllUniversities(allUniversities)
+            } catch (e) {
+               errorLogAndNotify(e)
+            }
          }
       })()
    }, [firebase, selectedCountryCodes])
