@@ -6,6 +6,7 @@ import { useEffect, useState } from "react"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 const useUniversitiesByCountryCodes = (
    selectedCountryCodes: OptionGroup[]
@@ -13,31 +14,34 @@ const useUniversitiesByCountryCodes = (
    const [allUniversities, setAllUniversities] = useState([] as University[])
    const firebase = useFirebaseService()
 
-   // to get all the universities based on the selected countries
+   // to get all the universities based on the selected countries sorted by alphabetic order
    useEffect(() => {
       ;(async () => {
-         if (selectedCountryCodes && selectedCountryCodes.length) {
-            try {
-               const selectedCountriesIds = selectedCountryCodes.map(
-                  (option) => option.id
-               )
-               const universitiesSnapShot =
-                  await firebase.getUniversitiesFromMultipleCountryCode(
-                     selectedCountriesIds
+         if (selectedCountryCodes) {
+            if (selectedCountryCodes.length === 0) {
+               setAllUniversities([])
+            } else {
+               try {
+                  const selectedCountriesIds = selectedCountryCodes.map(
+                     (option) => option.id
                   )
+                  const universitiesSnapShot =
+                     await firebase.getUniversitiesFromMultipleCountryCode(
+                        selectedCountriesIds
+                     )
 
-               const allUniversities = universitiesSnapShot.docs.reduce(
-                  (acc, doc) => {
-                     const universitiesCountries =
-                        doc.data() as UniversityCountry
-                     return [...acc, ...universitiesCountries.universities]
-                  },
-                  []
-               )
+                  const allUniversities = universitiesSnapShot.docs
+                     .reduce((acc, doc) => {
+                        const universitiesCountries =
+                           doc.data() as UniversityCountry
+                        return [...acc, ...universitiesCountries.universities]
+                     }, [])
+                     .sort(dynamicSort("name"))
 
-               setAllUniversities(allUniversities)
-            } catch (e) {
-               errorLogAndNotify(e)
+                  setAllUniversities(allUniversities)
+               } catch (e) {
+                  errorLogAndNotify(e)
+               }
             }
          }
       })()
