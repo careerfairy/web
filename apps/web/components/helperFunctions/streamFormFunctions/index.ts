@@ -224,6 +224,11 @@ export const validateStreamForm = (values, isDraft, noValidation = false) => {
    if (!Object.keys(errors.speakers).length) {
       delete errors.speakers
    }
+
+   if (values.interestsIds?.length === 0) {
+      errors.interestsIds = "Please select at least one category."
+   }
+
    return noValidation ? {} : errors
 }
 
