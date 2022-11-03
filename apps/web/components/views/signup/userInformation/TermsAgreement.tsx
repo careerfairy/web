@@ -45,11 +45,11 @@ const TermsAgreement = ({
             label={
                <Typography style={{ fontSize: 12 }}>
                   I agree to the{" "}
-                  <Link href="/apps/web/pages/terms">
+                  <Link href="/terms">
                      <a>Terms & Conditions</a>
                   </Link>{" "}
                   and I have taken note of the{" "}
-                  <Link href="/apps/web/pages/privacy">
+                  <Link href="/privacy">
                      <a>Data Protection Notice</a>
                   </Link>
                </Typography>
