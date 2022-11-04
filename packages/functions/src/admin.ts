@@ -84,7 +84,6 @@ export const sendBasicTemplateEmail_v4 = functions
          eventUrl,
          templateId,
          numberOfEmails: emailsArray.length,
-         emailUnsubscribeSecret: process.env.EMAIL_UNSUBSCRIBE_SECRET,
       })
 
       // TODO remove before deploying to prod
