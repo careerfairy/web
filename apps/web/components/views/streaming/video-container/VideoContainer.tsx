@@ -26,9 +26,14 @@ import { useDispatch } from "react-redux"
 import * as actions from "../../../../store/actions"
 import AgoraStateHandler from "../modal/AgoraStateModal/AgoraStateHandler"
 import { useRouter } from "next/router"
-import { useRtc } from "../../../../context/agora/RTCProvider"
+import {
+   getVideoEncoderPreset,
+   useRtc,
+} from "../../../../context/agora/RTCProvider"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import { LocalStream } from "../../../../types/streaming"
+import { getRandomInt } from "../../../helperFunctions/HelperFunctions"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -86,6 +91,11 @@ const VideoContainer = ({
 
    const [showSettings, setShowSettings] = useState(false)
 
+   // used to only change the agora preset if it's different from the current one
+   const [currentVideoPreset, setCurrentVideoPreset] = useState(
+      getVideoEncoderPreset(withHighQuality)
+   )
+
    const {
       networkQuality,
       localStream,
@@ -116,7 +126,10 @@ const VideoContainer = ({
    const { mediaControls, localMediaStream: displayableMediaStream } =
       useMediaSources(devices, localStream, true)
 
-   const currentSpeakerId = useCurrentSpeaker(localStream, remoteStreams)
+   const currentSpeakerId = useCurrentSpeaker(
+      localStream,
+      remoteStreams
+   ) as string
 
    useEffect(() => {
       if (streamerId && currentLivestream.id) {
@@ -149,50 +162,87 @@ const VideoContainer = ({
       streamerId,
    ])
 
+   const setVideoQuality = useCallback(
+      async (quality) => {
+         try {
+            if (
+               localStream.isVideoPublished &&
+               currentVideoPreset !== quality
+            ) {
+               await localStream.videoTrack.setEncoderConfiguration(quality)
+               setCurrentVideoPreset(quality)
+            }
+         } catch (e) {
+            console.log("-> e in set video quality", e)
+            dispatch(actions.setAgoraRtcError(e))
+         }
+      },
+      [
+         currentVideoPreset,
+         dispatch,
+         localStream.isVideoPublished,
+         localStream.videoTrack,
+      ]
+   )
+
+   /**
+    * Downgrade the local stream video quality if:
+    *  > 3 streamers
+    *  no highQuality flag
+    */
    useEffect(() => {
       if (
-         localStream &&
          remoteStreams &&
-         !withHighQuality &&
-         localStream.videoTrack
+         !withHighQuality && // if we have high quality flag, we don't downgrade ever our quality
+         localStream?.videoTrack &&
+         localStream?.isVideoPublished
       ) {
          const manyStreams = remoteStreams.length > 3
+         const defaultPreset = getVideoEncoderPreset(withHighQuality)
          if (manyStreams) {
-            const IAmCurrentlySpeakingAndBig =
-               streamerId === currentSpeakerId &&
-               currentLivestream.mode !== "desktop" &&
-               currentLivestream.mode !== "presentation" &&
-               currentLivestream.mode !== "video"
-            if (IAmCurrentlySpeakingAndBig) {
+            const iAmBig = IAmCurrentlySpeakingAndBig(
+               streamerId,
+               currentSpeakerId,
+               currentLivestream.speakerSwitchMode,
+               currentLivestream.mode,
+               localStream
+            )
+
+            /**
+             * Do not switch the resolutions right away because there is an odd effect
+             * when this happens, instead delay it a little bit
+             */
+            const secondsToChangePreset = getRandomInt(2, 7)
+            if (iAmBig) {
+               // reset to original quality
                const makeStreamerHigherQualityTimeout = setTimeout(() => {
-                  void setVideoQuality("480p_9")
-               }, 20000)
+                  void setVideoQuality(defaultPreset)
+               }, secondsToChangePreset)
 
                return () => clearTimeout(makeStreamerHigherQualityTimeout)
             } else {
+               // downgrade quality to save bandwidth
                const makeStreamerLowerQualityTimeout = setTimeout(() => {
                   void setVideoQuality("180p")
-               }, 15000)
+               }, secondsToChangePreset)
 
                return () => clearTimeout(makeStreamerLowerQualityTimeout)
             }
          } else {
-            // if not manyStreams then make the streams high quality
-            void setVideoQuality("480p_9")
-         }
+            // if not manyStreams then make the local stream the default quality
+            void setVideoQuality(defaultPreset)
       }
-   }, [localStream, remoteStreams, currentSpeakerId, currentLivestream.mode])
-
-   const setVideoQuality = async (quality) => {
-      try {
-         if (localStream.isVideoPublished) {
-            await localStream.videoTrack.setEncoderConfiguration(quality)
-         }
-      } catch (e) {
-         console.log("-> e in set video quality", e)
-         dispatch(actions.setAgoraRtcError(e))
       }
-   }
+   }, [
+      localStream,
+      remoteStreams,
+      currentSpeakerId,
+      currentLivestream.mode,
+      withHighQuality,
+      streamerId,
+      currentLivestream.speakerSwitchMode,
+      setVideoQuality,
+   ])
 
    const handleOpenDemoIntroModal = useCallback(() => {
       const activeStep = getActiveTutorialStepKey()
@@ -327,6 +377,10 @@ const VideoContainer = ({
       [networkQuality]
    )
 
+   const closeSettings = useCallback(() => {
+      setShowSettings(false)
+   }, [])
+
    return (
       <>
          <BreakoutRoomManagementModal leaveAgoraRoom={leaveAgoraRoom} />
@@ -347,22 +401,24 @@ const VideoContainer = ({
             openSupportInLeftMenu={openSupportInLeftMenu}
             presenter
          />
-         <StreamPublishingModal
-            open={Boolean(showLocalStreamPublishingModal)}
-            localStream={localStream}
-            deviceInitializers={deviceInitializers}
-            displayableMediaStream={displayableMediaStream}
-            showSoundMeter={Boolean(
-               (showLocalStreamPublishingModal || showSettings) &&
-                  localStream.audioTrack
-            )}
-            devices={devices}
-            mediaControls={mediaControls}
-            onConfirmStream={handlePublish}
-            onRefuseStream={handleJoinAsViewer}
-            localMediaHandlers={localMediaHandlers}
-            labels={labels}
-         />
+         {Boolean(showLocalStreamPublishingModal) && (
+            <StreamPublishingModal
+               open={Boolean(showLocalStreamPublishingModal)}
+               localStream={localStream}
+               deviceInitializers={deviceInitializers}
+               displayableMediaStream={displayableMediaStream}
+               showSoundMeter={Boolean(
+                  (showLocalStreamPublishingModal || showSettings) &&
+                     localStream.audioTrack
+               )}
+               devices={devices}
+               mediaControls={mediaControls}
+               onConfirmStream={handlePublish}
+               onRefuseStream={handleJoinAsViewer}
+               localMediaHandlers={localMediaHandlers}
+               labels={labels}
+            />
+         )}
          <VideoControlsContainer
             currentLivestream={currentLivestream}
             handleClickScreenShareButton={handleClickScreenShareButton}
@@ -392,34 +448,64 @@ const VideoContainer = ({
             {WifiIndicatorMemoized}
          </DraggableComponent>
          <AgoraStateHandler />
-         <SettingsModal
-            open={showSettings}
-            close={() => setShowSettings(false)}
-            smallScreen={smallScreen}
-            devices={devices}
-            deviceInitializers={deviceInitializers}
-            localMediaHandlers={localMediaHandlers}
-            localStream={localStream}
-            displayableMediaStream={displayableMediaStream}
-            mediaControls={mediaControls}
-         />
-         <ScreenShareModal
-            open={showScreenShareModal}
-            smallScreen={smallScreen}
-            handleClose={handleCloseScreenShareModal}
-            handleScreenShare={handleScreenShare}
-         />
-         <DemoIntroModal
-            smallScreen={smallScreen}
-            open={showDemoIntroModal}
-            handleClose={handleCloseDemoIntroModal}
-         />
-         <DemoEndModal
-            open={isOpen(23)}
-            handleClose={handleCloseDemoEndModal}
-         />
+         {showSettings && (
+            <SettingsModal
+               open={showSettings}
+               close={closeSettings}
+               smallScreen={smallScreen}
+               devices={devices}
+               deviceInitializers={deviceInitializers}
+               localMediaHandlers={localMediaHandlers}
+               localStream={localStream}
+               displayableMediaStream={displayableMediaStream}
+               mediaControls={mediaControls}
+            />
+         )}
+         {showScreenShareModal && (
+            <ScreenShareModal
+               open={showScreenShareModal}
+               smallScreen={smallScreen}
+               handleClose={handleCloseScreenShareModal}
+               handleScreenShare={handleScreenShare}
+            />
+         )}
+         {showDemoIntroModal && (
+            <DemoIntroModal
+               smallScreen={smallScreen}
+               open={showDemoIntroModal}
+               handleClose={handleCloseDemoIntroModal}
+            />
+         )}
+         {isOpen(23) && (
+            <DemoEndModal
+               open={isOpen(23)}
+               handleClose={handleCloseDemoEndModal}
+            />
+         )}
       </>
    )
+}
+
+function IAmCurrentlySpeakingAndBig(
+   streamerId: string,
+   currentSpeakerId: string,
+   speakerSwitchMode: string,
+   livestreamMode: string,
+   localStream: LocalStream
+) {
+   if (
+      livestreamMode === "desktop" || // screen sharing
+      livestreamMode === "presentation" || // pdf sharing
+      livestreamMode === "video" // youtube video
+   ) {
+      return false
+   }
+
+   if (speakerSwitchMode === "manual" && streamerId === currentSpeakerId) {
+      return true
+   }
+
+   return currentSpeakerId === localStream.uid
 }
 
 /**
