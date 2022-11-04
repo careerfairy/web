@@ -89,7 +89,7 @@ const RemoteStreamItem = ({
          speaker={speaker}
          stream={stream}
          videoMuted={!stream.videoTrack || stream.videoMuted}
-         audioMuted={stream.audioMuted === undefined ? true : stream.audioMuted}
+         audioMuted={isRemoteStreamMuted(stream)}
          index={index}
          big={big}
          videoMutedBackgroundImg={videoMutedBackgroundImg}
@@ -130,6 +130,16 @@ const RemoteStreamItem = ({
    }
 
    return remoteStreamItem
+}
+
+function isRemoteStreamMuted(stream) {
+   // if we receive the remotestream without audioTrack/audioMuted means the
+   // streamer is muted
+   if (stream.audioMuted || !stream.audioTrack) {
+      return true
+   }
+
+   return false
 }
 
 export default RemoteStreamItem
