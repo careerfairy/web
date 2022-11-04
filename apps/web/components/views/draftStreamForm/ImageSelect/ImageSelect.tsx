@@ -109,6 +109,10 @@ const ImageSelect = ({
             fileObject,
             firebase,
             (newUrl, fullPath) => {
+               console.log(
+                  "-> getDownloadUrl(fullPath)",
+                  `|${getDownloadUrl(fullPath)}|`
+               )
                setFieldValue(formName, getDownloadUrl(fullPath), true)
                setFilePickerError(null)
             },

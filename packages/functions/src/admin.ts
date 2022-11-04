@@ -15,8 +15,12 @@ export const sendBasicTemplateEmail_v3 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
+      secrets: ["EMAIL_UNSUBSCRIBE_SECRET"],
    })
    .https.onCall(async (data, context) => {
+      functions.logger.info({
+         emailUnsubscribeSecret: process.env.EMAIL_UNSUBSCRIBE_SECRET,
+      })
       const {
          title,
          summary,
