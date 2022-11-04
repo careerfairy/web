@@ -205,7 +205,14 @@ export const MultilineText = ({ text }) => {
 }
 
 export const copyStringToClipboard = (string) => {
-   navigator.clipboard.writeText(string)
+   try {
+      navigator.clipboard.writeText(string)
+   } catch (e) {
+      // overlay browsers (e.g instagram) don't seem to allow this
+      // The request is not allowed by the user agent or the platform in the current context, possibly because the user denied permission.
+      //https://sentry.io/organizations/careerfairy/issues/3713073375
+      console.error(e)
+   }
 }
 
 export const mustBeNumber = (value, decimals = 2) => {
