@@ -25,7 +25,9 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
 
    const { setLivestreamCurrentSpeakerId } = useFirebaseService()
    const [currentSpeakerId, setCurrentSpeakerId] = useState(
-      firestoreCurrentSpeaker
+      speakerSwitchMode === "manual"
+         ? firestoreCurrentSpeaker
+         : localMediaStream?.uid
    )
 
    useEffect(() => {
@@ -102,10 +104,12 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
    }, [externalMediaStreams, speakerSwitchMode])
 
    useEffect(() => {
+      if (speakerSwitchMode !== "manual") return
+
       if (firestoreCurrentSpeaker) {
          setCurrentSpeakerId(firestoreCurrentSpeaker)
       }
-   }, [firestoreCurrentSpeaker])
+   }, [firestoreCurrentSpeaker, speakerSwitchMode])
 
    const handleChangeCurrentSpeakerId = useCallback(
       (id, isFallback = false) => {

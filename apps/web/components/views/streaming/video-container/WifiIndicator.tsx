@@ -214,10 +214,7 @@ const WifiIndicator: FC<WifiIndicatorProps> = ({ uplink, downlink }) => {
          case "CONNECTED":
             return {
                icon: (
-                  <ServerIcon
-                     sx={styles.svg}
-                     style={{ color: gradient[Math.max(uplink, downlink)] }}
-                  />
+                  <ServerIcon sx={styles.svg} style={{ color: gradient[1] }} />
                ),
                message: "You are connected to our streaming server",
             }
