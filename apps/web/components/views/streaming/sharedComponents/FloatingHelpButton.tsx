@@ -4,6 +4,8 @@ import HelpOutlineOutlinedIcon from "@mui/icons-material/HelpOutlineOutlined"
 import Button from "@mui/material/Button"
 import { alpha } from "@mui/material/styles"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
+import { useSelector } from "react-redux"
+import { leftMenuOpenSelector } from "../../../../store/selectors/streamSelectors"
 
 const styles = sxStyles({
    root: {
@@ -32,8 +34,9 @@ type Props = {
 }
 const FloatingHelpButton = ({ openSupportInLeftMenu }: Props) => {
    const { selectedState } = useCurrentStream()
+   const leftMenuOpen = useSelector(leftMenuOpenSelector)
 
-   const disabled = selectedState === "support"
+   const disabled = selectedState === "support" && leftMenuOpen
 
    return (
       <Button
