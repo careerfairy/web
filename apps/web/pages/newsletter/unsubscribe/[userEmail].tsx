@@ -29,7 +29,7 @@ const View = (props: UnsubscribeProps) => {
 
    const { data, isValidating, error } = useSWR(
       [
-         "unsubscribeEmail",
+         "unsubscribeFromMarketingEmails",
          {
             email: userEmail,
             signature,
