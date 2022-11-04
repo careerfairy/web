@@ -5,18 +5,43 @@ import {
 
 export default class LocalStorageUtil {
    static getInviteLivestream = () => {
-      return localStorage?.getItem(localStorageInvite)
+      return LocalStorageUtil.get(localStorageInvite)
    }
 
    static getReferralCode = () => {
-      return localStorage?.getItem(localStorageReferralCode)
+      return LocalStorageUtil.get(localStorageReferralCode)
    }
 
    static setInviteLivestream = (livestreamId) => {
-      return localStorage?.setItem(localStorageInvite, livestreamId)
+      return LocalStorageUtil.set(localStorageInvite, livestreamId)
    }
 
    static setReferralCode = (referralCode) => {
-      return localStorage?.setItem(localStorageReferralCode, referralCode)
+      return LocalStorageUtil.set(localStorageReferralCode, referralCode)
+   }
+
+   static get(key: string) {
+      try {
+         return localStorage?.getItem(key)
+      } catch (e) {
+         /**
+          * Catch browser permission errors
+          * SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+          */
+         console.error(e)
+         return undefined
+      }
+   }
+
+   static set(key: string, value: any) {
+      try {
+         return localStorage?.setItem(key, value)
+      } catch (e) {
+         /**
+          * Catch browser permission errors
+          * SecurityError: Failed to read the 'localStorage' property from 'Window': Access is denied for this document.
+          */
+         console.error(e)
+      }
    }
 }
