@@ -60,6 +60,7 @@ exports.exportFirestoreBackup = backup.exportFirestoreBackup
 
 // Admin Functions
 exports.sendBasicTemplateEmail_v3 = admin.sendBasicTemplateEmail_v3
+exports.unsubscribeEmail = admin.unsubscribeEmail
 
 // Group Admin
 exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2

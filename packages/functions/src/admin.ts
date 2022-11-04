@@ -1,14 +1,18 @@
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
-import { bigQueryRepo } from "./api/repositories"
-import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
-
+import { bigQueryRepo, userRepo } from "./api/repositories"
+import {
+   logAndThrow,
+   userIsSignedInAndIsCFAdmin,
+   validateData,
+} from "./lib/validations"
+import * as crypto from "crypto"
+import { createNestedArrayOfTemplates } from "./util"
+import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
+import { object, string } from "yup"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
-
-import { createNestedArrayOfTemplates } from "./util"
-import { emailsToRemove } from "./misc/emailsToRemove"
 
 /* eslint-disable camelcase */
 export const sendBasicTemplateEmail_v3 = functions
@@ -18,9 +22,6 @@ export const sendBasicTemplateEmail_v3 = functions
       secrets: ["EMAIL_UNSUBSCRIBE_SECRET"],
    })
    .https.onCall(async (data, context) => {
-      functions.logger.info({
-         emailUnsubscribeSecret: process.env.EMAIL_UNSUBSCRIBE_SECRET,
-      })
       const {
          title,
          summary,
@@ -83,6 +84,7 @@ export const sendBasicTemplateEmail_v3 = functions
          eventUrl,
          templateId,
          numberOfEmails: emailsArray.length,
+         emailUnsubscribeSecret: process.env.EMAIL_UNSUBSCRIBE_SECRET,
       })
 
       // TODO remove before deploying to prod
@@ -108,6 +110,10 @@ export const sendBasicTemplateEmail_v3 = functions
             illustrationImageUrl,
             userEmail: email,
             subject,
+            signature: generateSignature(
+               email,
+               process.env.EMAIL_UNSUBSCRIBE_SECRET
+            ),
          },
       }))
 
@@ -147,3 +153,45 @@ export const sendBasicTemplateEmail_v3 = functions
          }
       }
    })
+
+export const unsubscribeEmail = functions
+   .runWith({
+      secrets: ["EMAIL_UNSUBSCRIBE_SECRET"],
+   })
+   .https.onCall(async (data) => {
+      try {
+         const { email, signature } = await validateData(
+            data,
+            object({
+               email: string().email().required(),
+               signature: string().required(),
+            })
+         )
+         const actualSignature = generateSignature(
+            email,
+            process.env.EMAIL_UNSUBSCRIBE_SECRET
+         )
+
+         if (actualSignature === signature) {
+            return userRepo.unsubscribeUser(email)
+         } else {
+            logAndThrow("Invalid signature", {
+               email,
+               signature,
+               actualSignature,
+            })
+         }
+      } catch (e) {
+         logAndThrow("Failed to unsubscribe email", {
+            data,
+            error: e,
+         })
+      }
+   })
+
+/*
+ * This function is used to generate a signature for the unsubscribe link
+ * */
+const generateSignature = (email: string, secret: string) => {
+   return crypto.createHmac("sha256", secret).update(email).digest("hex")
+}
