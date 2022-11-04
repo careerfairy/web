@@ -57,7 +57,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
                audioLevel: localMediaStream.audioTrack.getVolumeLevel(),
             })
          }
-         if (audioLevels && audioLevels.length > 1) {
+         if (audioLevels && audioLevels.length > 0) {
             const maxEntry = audioLevels.reduce((prev, current) =>
                prev.audioLevel > current.audioLevel ? prev : current
             )
@@ -87,6 +87,9 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
    }, [mode])
 
    useEffect(() => {
+      if (speakerSwitchMode !== "manual") return
+
+      // only switch based on firestore speaker if we're in manual mode
       if (externalMediaStreams && firestoreCurrentSpeaker) {
          // TODO get rid of this
          let existingCurrentSpeaker = externalMediaStreams.find(
@@ -96,7 +99,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
             handleChangeCurrentSpeakerId(streamId)
          }
       }
-   }, [externalMediaStreams])
+   }, [externalMediaStreams, speakerSwitchMode])
 
    useEffect(() => {
       if (firestoreCurrentSpeaker) {
