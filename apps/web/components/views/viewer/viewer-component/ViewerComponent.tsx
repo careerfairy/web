@@ -65,6 +65,7 @@ interface Props {
    handRaiseActive: boolean
    showMenu: boolean
 }
+
 const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
    const {
       currentLivestream,
@@ -263,6 +264,20 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       setShowLocalStreamPublishingModal(false)
    }
 
+   const openPublishModal = useCallback(
+      () => setShowLocalStreamPublishingModal(true),
+      []
+   )
+
+   const localStreamIsPublished = useMemo(() => {
+      return {
+         audio: localStream?.isAudioPublished,
+         video: localStream?.isVideoPublished,
+      }
+   }, [localStream?.isAudioPublished, localStream?.isVideoPublished])
+
+   const closeSettings = useCallback(() => setShowSettings(false), [])
+
    if (!currentLivestream) {
       return null
    }
@@ -293,44 +308,46 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
             viewer
          />
          {shouldInitializeAgora && <AgoraStateHandler />}
-         <StreamPublishingModal
-            open={Boolean(showLocalStreamPublishingModal)}
-            showSoundMeter={Boolean(
-               (showLocalStreamPublishingModal || showSettings) &&
-                  localStream?.audioTrack
-            )}
-            localStream={localStream}
-            displayableMediaStream={displayableMediaStream}
-            devices={devices}
-            deviceInitializers={deviceInitializers}
-            mediaControls={mediaControls}
-            onConfirmStream={requestHandRaise}
-            onRefuseStream={handleJoinAsViewer}
-            localMediaHandlers={localMediaHandlers}
-            labels={{
-               mainTitle: "Activate Your Devices To Join The Stream",
-               refuseTooltip: "Cancel Hand Raise",
-               refuseLabel: "Cancel",
-               joinWithoutCameraLabel: "Join without camera",
-               joinWithoutCameraTooltip:
-                  "We recommend to activate your camera for a better experience.",
-               joinButtonLabel: ["connecting", "connected"].includes(
-                  handRaiseState?.state
-               )
-                  ? "Enter now"
-                  : "Confirm Hand Raise",
-               disabledJoinButtonLabel: "Activate Microphone to Join",
-               joinWithoutCameraConfirmDescription:
-                  "You intend to join this stream with only with your microphone?",
-            }}
-         />
+         {Boolean(showLocalStreamPublishingModal) && (
+            <StreamPublishingModal
+               open={Boolean(showLocalStreamPublishingModal)}
+               showSoundMeter={Boolean(
+                  (showLocalStreamPublishingModal || showSettings) &&
+                     localStream?.audioTrack
+               )}
+               localStream={localStream}
+               displayableMediaStream={displayableMediaStream}
+               devices={devices}
+               deviceInitializers={deviceInitializers}
+               mediaControls={mediaControls}
+               onConfirmStream={requestHandRaise}
+               onRefuseStream={handleJoinAsViewer}
+               localMediaHandlers={localMediaHandlers}
+               labels={{
+                  mainTitle: "Activate Your Devices To Join The Stream",
+                  refuseTooltip: "Cancel Hand Raise",
+                  refuseLabel: "Cancel",
+                  joinWithoutCameraLabel: "Join without camera",
+                  joinWithoutCameraTooltip:
+                     "We recommend to activate your camera for a better experience.",
+                  joinButtonLabel: ["connecting", "connected"].includes(
+                     handRaiseState?.state
+                  )
+                     ? "Enter now"
+                     : "Confirm Hand Raise",
+                  disabledJoinButtonLabel: "Activate Microphone to Join",
+                  joinWithoutCameraConfirmDescription:
+                     "You intend to join this stream with only with your microphone?",
+               }}
+            />
+         )}
          {handRaiseActive && (
             <Fragment>
                <DraggableComponent
                   zIndex={3}
                   bounds="parent"
                   positionStyle={"absolute"}
-                  defaultPosition={{ x: 4, y: 70 }}
+                  defaultPosition={defaultPosition}
                   elementId="wifiIndicatorLocation"
                >
                   <WifiIndicator
@@ -343,38 +360,38 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                   handleClickScreenShareButton={handleClickScreenShareButton}
                   streamerId={streamerId}
                   isMainStreamer={false}
-                  localStreamIsPublished={{
-                     audio: localStream?.isAudioPublished,
-                     video: localStream?.isVideoPublished,
-                  }}
+                  localStreamIsPublished={localStreamIsPublished}
                   microphoneMuted={!Boolean(localStream.audioTrack?.enabled)}
                   cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
-                  openPublishingModal={() =>
-                     setShowLocalStreamPublishingModal(true)
-                  }
+                  openPublishingModal={openPublishModal}
                   viewer={true}
                   localMediaControls={localMediaControls}
                   showSettings={showSettings}
                   setShowSettings={setShowSettings}
                />
 
-               <SettingsModal
-                  open={showSettings}
-                  close={() => setShowSettings(false)}
-                  devices={devices}
-                  deviceInitializers={deviceInitializers}
-                  localStream={localStream}
-                  displayableMediaStream={displayableMediaStream}
-                  mediaControls={mediaControls}
-                  localMediaHandlers={localMediaHandlers}
-                  smallScreen={false}
-               />
-               <ScreenShareModal
-                  open={showScreenShareModal}
-                  handleClose={handleCloseScreenShareModal}
-                  handleScreenShare={handleScreenShare}
-                  smallScreen={false}
-               />
+               {showSettings && (
+                  <SettingsModal
+                     open={showSettings}
+                     close={closeSettings}
+                     devices={devices}
+                     deviceInitializers={deviceInitializers}
+                     localStream={localStream}
+                     displayableMediaStream={displayableMediaStream}
+                     mediaControls={mediaControls}
+                     localMediaHandlers={localMediaHandlers}
+                     smallScreen={false}
+                  />
+               )}
+
+               {showScreenShareModal && (
+                  <ScreenShareModal
+                     open={showScreenShareModal}
+                     handleClose={handleCloseScreenShareModal}
+                     handleScreenShare={handleScreenShare}
+                     smallScreen={false}
+                  />
+               )}
             </Fragment>
          )}
 
@@ -398,5 +415,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       </React.Fragment>
    )
 }
+
+const defaultPosition = { x: 4, y: 70 }
 
 export default memo(ViewerComponent)
