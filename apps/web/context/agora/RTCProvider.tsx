@@ -27,10 +27,11 @@ import { LocalStream } from "../../types/streaming"
 import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientConfig"
 import * as actions from "../../store/actions"
 import useAgoraError from "../../components/custom-hook/useAgoraError"
-import { errorLogAndNotify } from "../../util/CommonUtil"
+import { errorLogAndNotify, isMobileBrowser } from "../../util/CommonUtil"
 import {
    sessionIsUsingCloudProxySelector,
    sessionShouldUseCloudProxySelector,
+   streamerBreakoutRoomModalOpen,
 } from "../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
@@ -38,10 +39,12 @@ const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
 })
+
 const useScreenShareRtc = agoraServiceInstance.createClient({
    mode: "live",
    codec: "vp8",
 })
+
 const RTCProvider: React.FC<RtcPropsInterface> = ({
    children,
    appId,
@@ -210,8 +213,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             if (tracks.length) {
                await rtcClient.unpublish(tracks)
                for (const track of tracks) {
-                  if (track.trackMediaType === "video") {
-                     await rtcClient.disableDualStream()
+                  if (track.trackMediaType === "video" && !isMobileBrowser()) {
+                     await disableDualStream(rtcClient)
                   }
                   track.close()
                }
@@ -291,7 +294,9 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
 
    const initializeLocalVideoStream = useCallback(async () => {
       return AgoraRTC.createCameraVideoTrack({
-         encoderConfig: router.query.withHighQuality ? "720p_3" : "480p_9",
+         encoderConfig: getVideoEncoderPreset(
+            router.query.withHighQuality
+         ) as any,
       })
          .then((videoTrack) => {
             setLocalStream((localStream) => ({
@@ -342,13 +347,10 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
                if (streamType === "screen" || !rtcClientHost) {
                   await client.setClientRole("host")
                }
-               await client.publish(tracks)
                if (streamType === "video") {
-                  await client.enableDualStream()
+                  enableDualStream(client).catch(errorLogAndNotify)
                }
-               if (streamType === "audio") {
-                  client.enableAudioVolumeIndicator()
-               }
+               await client.publish(tracks)
                setPrimaryRtcClientHost(true)
             } catch (error) {
                handleRtcError(error)
@@ -376,7 +378,8 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
             if (localStream.isVideoPublished) {
                let localStreamTracks = [localStream.videoTrack]
                await rtcClient.unpublish(localStreamTracks)
-               await rtcClient.disableDualStream()
+
+               disableDualStream(rtcClient).catch(console.error)
             }
             localStream.videoTrack.close()
             setLocalStream((localStream) => ({
@@ -645,6 +648,18 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
       [setLocalAudioEnabled, setLocalVideoEnabled]
    )
 
+   /**
+    * Prompt confirmation before leaving the page
+    * Only for streamers sharing video and when the breakout room dialog is not open
+    */
+   const breakoutRoomDialogOpen = useSelector(streamerBreakoutRoomModalOpen)
+   const shouldWarnBeforeLeave = Boolean(
+      !breakoutRoomDialogOpen && // may be switching to a breakout room
+         localStream?.videoTrack && // sharing video
+         !localStream?.videoMuted // allow leaving with the camera turned off
+   )
+   useBeforeLeaveConfirmation(shouldWarnBeforeLeave)
+
    const value = useMemo(
       () => ({
          localStream,
@@ -697,6 +712,61 @@ export const useRtc = () => {
       throw new Error("useRtc must be used within a RtcProvider")
    }
    return context
+}
+
+// Agora doesn't recommend enabling dual streams on mobile browsers
+// https://api-ref.agora.io/en/voice-sdk/web/4.x/interfaces/iagorartcclient.html#enabledualstream
+function enableDualStream(client: IAgoraRTCClient) {
+   if (isMobileBrowser()) return Promise.resolve()
+
+   return client.enableDualStream()
+}
+
+function disableDualStream(client: IAgoraRTCClient) {
+   if (isMobileBrowser()) return Promise.resolve()
+
+   return client.disableDualStream()
+}
+
+/**
+ * Get the video encoder quality from the url query param withHighQuality
+ * Defaults to if not present 480p_9
+ *
+ * https://api-ref.agora.io/en/voice-sdk/web/4.x/globals.html#videoencoderconfigurationpreset
+ * @param withHighQuality
+ */
+export function getVideoEncoderPreset(
+   withHighQuality: string | string[]
+): string {
+   if (!withHighQuality) return "480p_9"
+
+   if (/^\d{3,4}p(_\d)?$/.test(withHighQuality + "")) {
+      // matches a preset format
+      return withHighQuality + ""
+   }
+
+   // high quality default preset
+   return "720p_3"
+}
+
+const useBeforeLeaveConfirmation = (enabled: boolean) => {
+   useEffect(() => {
+      if (!enabled) return
+      const beforeUnloadListener = (event) => {
+         event.preventDefault()
+         return (event.returnValue = "Are you sure you want to leave?")
+      }
+
+      window.addEventListener("beforeunload", beforeUnloadListener, {
+         capture: false,
+      })
+
+      return () => {
+         window.removeEventListener("beforeunload", beforeUnloadListener, {
+            capture: false,
+         })
+      }
+   }, [enabled])
 }
 
 export default memo(RTCProvider)
