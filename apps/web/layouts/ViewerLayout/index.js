@@ -229,7 +229,7 @@ const ViewerLayout = (props) => {
       } else {
          dispatch(actions.muteAllRemoteVideos())
       }
-   }, [currentLivestream?.hasStarted, spyModeEnabled])
+   }, [currentLivestream?.hasStarted, dispatch, spyModeEnabled])
 
    useEffect(() => {
       const checkForCategoryData = async () => {

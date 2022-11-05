@@ -23,14 +23,17 @@ const RemoteStreamItem = ({
    const isScreenShareVideo = stream.uid.includes?.("screen")
 
    const {
-      playAllRemoteVideos,
       muteAllRemoteVideos,
       unmuteFailedMutedRemoteVideos,
+      unpauseFailedPlayRemoteVideos,
    } = useSelector((state) => state.stream.streaming)
 
    const dispatch = useDispatch()
 
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted())
+   const setAVideoIsMuted = useCallback(
+      () => dispatch(actions.setVideoIsMuted()),
+      [dispatch]
+   )
 
    const playVideo = useCallback(() => {
       try {
@@ -43,27 +46,27 @@ const RemoteStreamItem = ({
          setAVideoIsMuted()
          console.error("-> error in PLAY VIDEO", e)
       }
-   }, [isScreenShareVideo, setAVideoIsMuted, stream.uid, stream.videoTrack])
+   }, [isScreenShareVideo, setAVideoIsMuted, stream])
 
    useEffect(() => {
       if (stream.uid === "demoStream") {
-         generateDemoHandRaiser()
+         generateDemoHandRaiser(stream)
       } else {
          !muteAllRemoteVideos && playVideo()
       }
-   }, [stream.uid, stream.videoTrack, playVideo])
+   }, [stream.uid, stream.videoTrack, playVideo, muteAllRemoteVideos, stream])
 
    useEffect(() => {
-      if (playAllRemoteVideos) {
+      if (unpauseFailedPlayRemoteVideos) {
          playVideo()
       }
-   }, [playAllRemoteVideos, playVideo])
+   }, [unpauseFailedPlayRemoteVideos, playVideo])
 
    useEffect(() => {
       if (unmuteFailedMutedRemoteVideos) {
          stream?.audioTrack?.play()
       }
-   }, [unmuteFailedMutedRemoteVideos])
+   }, [stream?.audioTrack, unmuteFailedMutedRemoteVideos])
 
    useEffect(() => {
       if (muteAllRemoteVideos) {
@@ -71,18 +74,7 @@ const RemoteStreamItem = ({
       } else {
          stream?.stream?.audioTrack?.play()
       }
-   }, [muteAllRemoteVideos])
-
-   const generateDemoHandRaiser = useCallback(() => {
-      let video = document.createElement("video")
-      const videoContainer = document.querySelector("#" + stream.uid)
-      videoContainer.style.zIndex = 1000
-      videoContainer.style.backgroundColor = "black"
-      videoContainer.appendChild(video)
-      video.src = stream.url
-      video.loop = true
-      video.play()
-   }, [stream.url])
+   }, [muteAllRemoteVideos, stream?.stream?.audioTrack])
 
    const remoteStreamItem = (
       <StreamItem
@@ -140,6 +132,17 @@ function isRemoteStreamMuted(stream) {
    }
 
    return false
+}
+
+function generateDemoHandRaiser(stream) {
+   let video = document.createElement("video")
+   const videoContainer = document.querySelector("#" + stream.uid)
+   videoContainer.style.zIndex = 1000
+   videoContainer.style.backgroundColor = "black"
+   videoContainer.appendChild(video)
+   video.src = stream.url
+   video.loop = true
+   video.play()
 }
 
 export default RemoteStreamItem
