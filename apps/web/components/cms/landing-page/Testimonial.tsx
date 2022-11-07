@@ -30,8 +30,8 @@ const styles = sxStyles({
       alignItems: "center",
    },
    avatar: {
-      width: (theme) => theme.spacing(6),
-      height: (theme) => theme.spacing(6),
+      width: (theme) => theme.spacing(10),
+      height: (theme) => theme.spacing(10),
    },
 })
 
@@ -73,7 +73,7 @@ const Testimonial = ({
                   alt={`${name} avatar`}
                   sx={styles.avatar}
                />
-               <Typography variant="h5" ml={2} alignSelf="end">
+               <Typography variant="h4" ml={2} alignSelf="end">
                   {name}, {role}
                </Typography>
             </Box>
