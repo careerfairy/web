@@ -17,11 +17,11 @@ const styles = sxStyles({
       color: (theme) => theme.palette.primary.main,
    },
    wrapper: {
-      paddingTop: 10,
       maxWidth: { xs: "80vw", lg: "60vw" },
       height: "fit-content",
    },
    background: {
+      paddingY: 10,
       background: `url(${quoteBackgroundLightPink}) no-repeat`,
       backgroundSize: { md: "90vw", lg: "70vw", xl: "60vw" },
       backgroundPosition: "center",
