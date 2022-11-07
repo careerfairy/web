@@ -5,8 +5,7 @@ import {
    userIsSignedInAndIsCFAdmin,
    validateData,
 } from "./lib/validations"
-import * as crypto from "crypto"
-import { createNestedArrayOfTemplates } from "./util"
+import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
@@ -19,7 +18,7 @@ export const sendBasicTemplateEmail_v4 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
-      secrets: ["EMAIL_UNSUBSCRIBE_SECRET"],
+      secrets: ["SIGNATURE_SECRET"],
    })
    .https.onCall(async (data, context) => {
       const {
@@ -109,9 +108,10 @@ export const sendBasicTemplateEmail_v4 = functions
             illustrationImageUrl,
             userEmail: email,
             subject,
-            signature: generateSignature(
+            newsLetterUnsubscribeLink: getNewsletterUnsubscribeLink(
                email,
-               process.env.EMAIL_UNSUBSCRIBE_SECRET
+               process.env.SIGNATURE_SECRET,
+               context?.rawRequest?.headers?.origin
             ),
          },
       }))
@@ -155,7 +155,7 @@ export const sendBasicTemplateEmail_v4 = functions
 
 export const unsubscribeFromMarketingEmails = functions
    .runWith({
-      secrets: ["EMAIL_UNSUBSCRIBE_SECRET"],
+      secrets: ["SIGNATURE_SECRET"],
    })
    .https.onCall(async (data) => {
       try {
@@ -168,7 +168,7 @@ export const unsubscribeFromMarketingEmails = functions
          )
          const actualSignature = generateSignature(
             email,
-            process.env.EMAIL_UNSUBSCRIBE_SECRET
+            process.env.SIGNATURE_SECRET
          )
 
          if (actualSignature === signature) {
@@ -188,9 +188,12 @@ export const unsubscribeFromMarketingEmails = functions
       }
    })
 
-/*
- * This function is used to generate a signature for the unsubscribe link
- * */
-const generateSignature = (email: string, secret: string) => {
-   return crypto.createHmac("sha256", secret).update(email).digest("hex")
+const getNewsletterUnsubscribeLink = (
+   email: string,
+   secret: string,
+   origin?: string
+): string => {
+   const signature = generateSignature(email, secret)
+   const baseUrl = origin || "https://careerfairy.io"
+   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${signature}`
 }
