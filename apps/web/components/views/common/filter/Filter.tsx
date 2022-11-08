@@ -1,5 +1,5 @@
-import React, { useState } from "react"
-import { wishListBorderRadius } from "../../../constants/pages"
+import React, { useMemo, useState } from "react"
+import { wishListBorderRadius } from "../../../../constants/pages"
 import { alpha } from "@mui/material/styles"
 import FilterIcon from "@mui/icons-material/FilterAltOutlined"
 import SearchIcon from "@mui/icons-material/Search"
@@ -37,17 +37,29 @@ const styles = {
    },
 }
 
-type Props = {
-   showSearch?: boolean
+export enum FilterEnum {
+   sortBy = "sortBy",
+   languages = "languages",
+   interests = "interests",
+   jobCheck = "jobCheck",
+   search = "search",
 }
 
-const Search = ({ showSearch = true }: Props) => {
+type Props = {
+   filtersToShow: FilterEnum[]
+}
+
+const Filter = ({ filtersToShow }: Props) => {
    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
    const { query, push, pathname } = useRouter()
    const [searchValue, setSearchValue] = useState<string>(
       (query.search as string) || ""
    )
 
+   const showSearch = useMemo(
+      () => filtersToShow.includes(FilterEnum.search),
+      [filtersToShow]
+   )
    const filterActive = Boolean(query.upvote || query.interests || query.date)
    const handleOpenFilterMenu = (
       event: React.MouseEvent<HTMLButtonElement>
@@ -144,9 +156,10 @@ const Search = ({ showSearch = true }: Props) => {
             open={open}
             anchorEl={anchorEl}
             handleClose={handleClose}
+            filtersToShow={filtersToShow}
          />
       </>
    )
 }
 
-export default Search
+export default Filter
