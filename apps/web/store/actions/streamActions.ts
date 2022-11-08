@@ -272,3 +272,15 @@ export const setSpyMode = (mode) => async (dispatch, getState) => {
    )
    dispatch({ type: actions.SET_SPY_MODE, payload: Boolean(newSpyMode) })
 }
+
+export const setVideoBlurStart = () => (dispatch) => {
+   dispatch({ type: actions.SET_VIDEO_BLUR_START })
+}
+
+export const setVideoBlurEnabled = () => (dispatch) => {
+   dispatch({ type: actions.SET_VIDEO_BLUR_ENABLED })
+}
+
+export const setVideoBlurDisabled = () => (dispatch) => {
+   dispatch({ type: actions.SET_VIDEO_BLUR_DISABLED })
+}
