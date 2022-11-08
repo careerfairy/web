@@ -18,6 +18,11 @@ export interface LocalStream {
    videoTrack?: ICameraVideoTrack
    videoMuted?: boolean
    audioMuted?: boolean
+   /**
+    * Blur & Background Image processor enabled for the
+    * videoTrack
+    */
+   virtualBackgroundProcessorEnabled?: boolean
 }
 
 export declare interface IRemoteStream {
@@ -62,6 +67,7 @@ export interface LocalMediaHandlers {
    closeLocalCameraTrack: () => Promise<any>
    closeLocalMicrophoneTrack: () => Promise<any>
 }
+
 export interface MediaControls {
    audioSource: MediaDeviceInfo["deviceId"]
    videoSource: MediaDeviceInfo["deviceId"]
@@ -120,6 +126,7 @@ export enum RTCSubscribeErrorCodes {
     */
    NO_ICE_CANDIDATE = "NO_ICE_CANDIDATE",
 }
+
 export enum RTCPublishErrorCodes {
    /**
     * An incorrect operation, indicating that publish is called before joining the channel successfully.
@@ -153,6 +160,7 @@ export enum RTCPublishErrorCodes {
     *      The local network exit cannot be found, possibly because a network firewall does not allow the connection or a browser plug-in disables WebRTC. See [FAQ](https://docs.agora.io/en/faq/console_error_web#none-ice-candidate-not-alloweda-namecandidatea) for details.
     */
 }
+
 export enum CustomRTCErrors {
    /**
     * If cloud proxy is on, the SDK gets relay candidates from a TURN server so:
@@ -184,6 +192,7 @@ enum CustomConnectionDisconnectedReason {
     */
    SLOW_CONNECTING = "SLOW_CONNECTING",
 }
+
 export interface RTCError extends Error {
    readonly code:
       | string
@@ -201,6 +210,7 @@ export interface RTCConnectionState {
    reason?: ConnectionDisconnectedReason
    warning?: CustomConnectionDisconnectedReason
 }
+
 type Messages = {
    [key in ConnectionState]?: string
 }

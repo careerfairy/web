@@ -1,5 +1,6 @@
 import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "../../constants/agora"
 import * as actions from "../actions/actionTypes"
+import { SET_VIDEO_BLUR_START } from "../actions/actionTypes"
 
 const initialState = {
    layout: {
@@ -25,6 +26,10 @@ const initialState = {
       unmuteFailedMutedRemoteVideos: false,
       unpauseFailedPlayRemoteVideos: false,
       spyModeEnabled: false,
+   },
+   videoOptions: {
+      isBlurEnabled: false,
+      isBlurLoading: false,
    },
    agoraState: {
       rtcConnectionState: {
@@ -160,6 +165,39 @@ const streamReducer = (state = initialState, { type, payload }) => {
                   ...state.agoraState.deviceErrors,
                   ...payload,
                },
+            },
+         }
+      case actions.SET_VIDEO_BLUR_START:
+         return {
+            ...state,
+            videoOptions: {
+               ...state.videoOptions,
+               isBlurLoading: true,
+               isBlurEnabled: false,
+               isBackgroundImageLoading: false,
+               backgroundImage: undefined,
+            },
+         }
+      case actions.SET_VIDEO_BLUR_ENABLED:
+         return {
+            ...state,
+            videoOptions: {
+               ...state.videoOptions,
+               isBlurLoading: false,
+               isBlurEnabled: true,
+               isBackgroundImageLoading: false,
+               backgroundImage: undefined,
+            },
+         }
+      case actions.SET_VIDEO_BLUR_DISABLED:
+         return {
+            ...state,
+            videoOptions: {
+               ...state.videoOptions,
+               isBlurLoading: false,
+               isBlurEnabled: false,
+               isBackgroundImageLoading: false,
+               backgroundImage: undefined,
             },
          }
       case actions.SET_SCREEN_SHARE_DENIED_ERROR:
