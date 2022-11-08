@@ -36,7 +36,12 @@ const styles = {
       borderRadius: wishListBorderRadius,
    },
 }
-const Search = () => {
+
+type Props = {
+   showSearch?: boolean
+}
+
+const Search = ({ showSearch = true }: Props) => {
    const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null)
    const { query, push, pathname } = useRouter()
    const [searchValue, setSearchValue] = useState<string>(
@@ -98,26 +103,28 @@ const Search = () => {
    return (
       <>
          <Stack sx={styles.root} direction={"row"} spacing={2}>
-            <Paper
-               component={"form"}
-               onSubmit={(e) => {
-                  e.preventDefault()
-                  cancelDebounce()
-                  handleQuery(searchValue)
-               }}
-               variant="outlined"
-               sx={styles.search}
-            >
-               <InputBase
-                  sx={styles.inputRoot}
-                  fullWidth
-                  startAdornment={<SearchIcon />}
-                  value={searchValue}
-                  onChange={handleSearch}
-                  placeholder="Search…"
-                  inputProps={{ "aria-label": "search" }}
-               />
-            </Paper>
+            {showSearch ? (
+               <Paper
+                  component={"form"}
+                  onSubmit={(e) => {
+                     e.preventDefault()
+                     cancelDebounce()
+                     handleQuery(searchValue)
+                  }}
+                  variant="outlined"
+                  sx={styles.search}
+               >
+                  <InputBase
+                     sx={styles.inputRoot}
+                     fullWidth
+                     startAdornment={<SearchIcon />}
+                     value={searchValue}
+                     onChange={handleSearch}
+                     placeholder="Search…"
+                     inputProps={{ "aria-label": "search" }}
+                  />
+               </Paper>
+            ) : null}
             <Button
                aria-describedby={id}
                startIcon={
