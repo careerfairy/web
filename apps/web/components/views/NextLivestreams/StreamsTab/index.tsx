@@ -2,7 +2,7 @@ import React, { useMemo } from "react"
 import { AppBar, Tabs } from "@mui/material"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
 import { sxStyles } from "../../../../types/commonTypes"
-import Search from "../../wishlist/Search"
+import Filter, { FilterEnum } from "../../common/filter/Filter"
 import Box from "@mui/material/Box"
 
 const styles = sxStyles({
@@ -85,7 +85,13 @@ const StreamsTab = ({
                   mt: 1,
                }}
             >
-               <Search showSearch={false} />
+               <Filter
+                  filtersToShow={[
+                     FilterEnum.languages,
+                     FilterEnum.interests,
+                     FilterEnum.jobCheck,
+                  ]}
+               />
             </Box>
          ) : null}
       </AppBar>

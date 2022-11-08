@@ -1,6 +1,6 @@
 import algoliaIndexes from "./AlgoliaInstance"
 import { SearchClient } from "algoliasearch"
-import { SortType } from "../../components/views/wishlist/FilterMenu"
+import { SortType } from "../../components/views/common/filter/FilterMenu"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import { SearchResponse } from "../../types/algolia"
 
