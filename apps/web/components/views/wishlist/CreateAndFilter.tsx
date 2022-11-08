@@ -1,7 +1,7 @@
 import React from "react"
 import { Grid } from "@mui/material"
 import CreateWishButton from "./CreateWishButton"
-import Search from "./Search"
+import Filter, { FilterEnum } from "../common/filter/Filter"
 import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 
 interface Props {
@@ -14,7 +14,13 @@ const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {
             <CreateWishButton handleAddNewWishToHits={handleAddNewWishToHits} />
          </Grid>
          <Grid item xs={12}>
-            <Search />
+            <Filter
+               filtersToShow={[
+                  FilterEnum.search,
+                  FilterEnum.sortBy,
+                  FilterEnum.interests,
+               ]}
+            />
          </Grid>
       </Grid>
    )
