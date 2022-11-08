@@ -13,9 +13,6 @@ import {
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 
-const placeholderBanner =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
-
 const pageMetadata = {
    description: "Catch the upcoming streams on CareerFairy.",
    title: `CareerFairy | Upcoming Livestreams`,
@@ -27,7 +24,6 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
    const {
       palette: {
          common: { white },
-         navyBlue,
       },
    } = useTheme()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
@@ -60,16 +56,6 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
          <NextLivestreamsLayout>
             <NextLivestreamsBannerSection
                color={white}
-               backgroundImageClassName=""
-               backgroundColor={navyBlue.main}
-               backgroundImage={placeholderBanner}
-               backgroundImageOpacity={0.5}
-               title={
-                  value === "upcomingEvents"
-                     ? "Upcoming Events on CareerFairy"
-                     : "Past Events on CareerFairy"
-               }
-               subtitle=""
                handleChange={handleChange}
                value={value}
             />
