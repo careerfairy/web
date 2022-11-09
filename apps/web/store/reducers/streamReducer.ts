@@ -174,8 +174,6 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: true,
                isBlurEnabled: false,
-               isBackgroundImageLoading: false,
-               backgroundImage: undefined,
             },
          }
       case actions.SET_VIDEO_BLUR_ENABLED:
@@ -185,19 +183,15 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: false,
                isBlurEnabled: true,
-               isBackgroundImageLoading: false,
-               backgroundImage: undefined,
             },
          }
-      case actions.SET_VIDEO_BLUR_DISABLED:
+      case actions.SET_VIDEO_EFFECTS_OFF:
          return {
             ...state,
             videoOptions: {
                ...state.videoOptions,
                isBlurLoading: false,
                isBlurEnabled: false,
-               isBackgroundImageLoading: false,
-               backgroundImage: undefined,
             },
          }
       case actions.SET_SCREEN_SHARE_DENIED_ERROR:
