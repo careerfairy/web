@@ -430,3 +430,10 @@ export const decompress = (input: Buffer | Uint8Array): Promise<Buffer> => {
    const inflatePromise = promisify(zlib.inflate)
    return inflatePromise(input)
 }
+
+/*
+ * This function is used to generate a signature for the unsubscribe link
+ * */
+export const generateSignature = (body: string, secret: string) => {
+   return crypto.createHmac("sha256", secret).update(body).digest("hex")
+}

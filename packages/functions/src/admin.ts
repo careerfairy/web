@@ -1,20 +1,24 @@
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
-import { bigQueryRepo } from "./api/repositories"
-import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
-
+import { bigQueryRepo, userRepo } from "./api/repositories"
+import {
+   logAndThrow,
+   userIsSignedInAndIsCFAdmin,
+   validateData,
+} from "./lib/validations"
+import { createNestedArrayOfTemplates, generateSignature } from "./util"
+import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
+import { object, string } from "yup"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
 
-import { createNestedArrayOfTemplates } from "./util"
-import { emailsToRemove } from "./misc/emailsToRemove"
-
 /* eslint-disable camelcase */
-export const sendBasicTemplateEmail_v3 = functions
+export const sendBasicTemplateEmail_v4 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
+      secrets: ["SIGNATURE_SECRET"],
    })
    .https.onCall(async (data, context) => {
       const {
@@ -104,6 +108,11 @@ export const sendBasicTemplateEmail_v3 = functions
             illustrationImageUrl,
             userEmail: email,
             subject,
+            newsLetterUnsubscribeLink: getNewsletterUnsubscribeLink(
+               email,
+               process.env.SIGNATURE_SECRET,
+               context?.rawRequest?.headers?.origin
+            ),
          },
       }))
 
@@ -143,3 +152,48 @@ export const sendBasicTemplateEmail_v3 = functions
          }
       }
    })
+
+export const unsubscribeFromMarketingEmails = functions
+   .runWith({
+      secrets: ["SIGNATURE_SECRET"],
+   })
+   .https.onCall(async (data) => {
+      try {
+         const { email, signature } = await validateData(
+            data,
+            object({
+               email: string().email().required(),
+               signature: string().required(),
+            })
+         )
+         const actualSignature = generateSignature(
+            email,
+            process.env.SIGNATURE_SECRET
+         )
+
+         if (actualSignature === signature) {
+            return userRepo.unsubscribeUser(email)
+         } else {
+            logAndThrow("Invalid signature", {
+               email,
+               signature,
+               actualSignature,
+            })
+         }
+      } catch (e) {
+         logAndThrow("Failed to unsubscribe email", {
+            data,
+            error: e,
+         })
+      }
+   })
+
+const getNewsletterUnsubscribeLink = (
+   email: string,
+   secret: string,
+   origin?: string
+): string => {
+   const signature = generateSignature(email, secret)
+   const baseUrl = origin || "https://careerfairy.io"
+   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${signature}`
+}
