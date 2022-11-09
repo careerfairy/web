@@ -287,7 +287,7 @@ export const getDownloadUrl = (fileElement) => {
    let host = "https://firebasestorage.googleapis.com"
 
    if (shouldUseEmulators()) {
-      host = " http://localhost:9199"
+      host = "http://localhost:9199"
    }
 
    console.log("-> fileElement", fileElement)
