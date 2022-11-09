@@ -52,7 +52,8 @@ export interface ILivestreamRepository {
    getPastEventsFrom(
       fromDate: Date,
       filterByGroupId?: string,
-      limit?: number
+      limit?: number,
+      showHidden?: boolean
    ): Promise<LivestreamEvent[]>
 
    recommendEventsQuery(
@@ -316,7 +317,8 @@ export class FirebaseLivestreamRepository
    async getPastEventsFrom(
       fromDate: Date,
       filterByGroupId?: string,
-      limit?: number
+      limit?: number,
+      showHidden = false
    ) {
       let query = this.firestore
          .collection("livestreams")
@@ -331,6 +333,10 @@ export class FirebaseLivestreamRepository
 
       if (filterByGroupId) {
          query = query.where("groupIds", "array-contains", filterByGroupId)
+      }
+
+      if (showHidden === false) {
+         query = query.where("hidden", "==", false)
       }
 
       return this.mapLivestreamCollections(await query.get())
