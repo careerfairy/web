@@ -42,7 +42,7 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
             new Date().setMonth(new Date().getMonth() - 6)
          )
          livestreamRepo
-            .getPastEventsFrom(sixMonthsAgo)
+            .getPastEventsFrom({ fromDate: sixMonthsAgo })
             .then((data) => {
                setPastLivestreams(data)
             })
