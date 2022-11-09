@@ -14,7 +14,7 @@ import { object, string } from "yup"
 const { client } = require("./api/postmark")
 
 /* eslint-disable camelcase */
-export const sendBasicTemplateEmail_v4 = functions
+export const sendBasicTemplateEmail_v5 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
@@ -153,7 +153,7 @@ export const sendBasicTemplateEmail_v4 = functions
       }
    })
 
-export const unsubscribeFromMarketingEmails = functions
+export const unsubscribeFromMarketingEmails_v2 = functions
    .runWith({
       secrets: ["SIGNATURE_SECRET"],
    })
