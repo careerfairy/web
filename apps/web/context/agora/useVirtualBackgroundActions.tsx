@@ -12,12 +12,13 @@ import {
 
 /**
  * Singleton instance of the Processor
- * null -> it's not piped in the video track
  */
 let processor: IVirtualBackgroundProcessor
 
 /**
  * Applies a video processor transformation to the local stream video track
+ *
+ * This hook provides the necessary actions to apply the background effects
  * @param localStream
  */
 const useVirtualBackgroundActions = (localStream: LocalStream) => {
@@ -112,8 +113,6 @@ const useVirtualBackgroundActions = (localStream: LocalStream) => {
    const checkCompatibility = useCallback(() => {
       return agoraVirtualBackgroundExtension.checkCompatibility()
    }, [])
-
-   // todo: test when videotrack goes null after being enabled
 
    return {
       setBackgroundBlurring,
