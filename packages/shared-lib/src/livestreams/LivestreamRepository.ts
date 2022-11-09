@@ -49,12 +49,12 @@ export interface ILivestreamRepository {
       callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    )
 
-   getPastEventsFrom(
-      fromDate: Date,
-      filterByGroupId?: string,
-      limit?: number,
+   getPastEventsFrom(props: {
+      fromDate: Date
+      filterByGroupId?: string
+      limit?: number
       showHidden?: boolean
-   ): Promise<LivestreamEvent[]>
+   }): Promise<LivestreamEvent[]>
 
    recommendEventsQuery(
       userInterestsIds?: string[]
@@ -314,12 +314,12 @@ export class FirebaseLivestreamRepository
       return removeDuplicateDocuments(livestreams)
    }
 
-   async getPastEventsFrom(
-      fromDate: Date,
-      filterByGroupId?: string,
-      limit?: number,
-      showHidden = false
-   ) {
+   async getPastEventsFrom({
+      fromDate,
+      filterByGroupId,
+      limit,
+      showHidden = false,
+   }) {
       let query = this.firestore
          .collection("livestreams")
          .where("start", ">", fromDate)
