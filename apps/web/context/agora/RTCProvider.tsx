@@ -31,7 +31,7 @@ import {
    sessionShouldUseCloudProxySelector,
 } from "../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import useVirtualBackground from "./useVirtualBackground"
+import { setVideoEffectsOff } from "store/actions/streamActions"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -104,12 +104,6 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
          dispatch(actions.setVideoIsPaused())
       }
    }, [dispatch])
-
-   /**
-    * Subscribes to Redux for the Blur/Background Image enable status
-    * Updates localStream to include the videoProcessor unit
-    */
-   useVirtualBackground(localStream, setLocalStream)
 
    const leaveAgoraRoom = useCallback(async () => {
       console.log("-> LEAVING")
@@ -390,6 +384,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
                videoTrack: null,
                isVideoPublished: false,
             }))
+            dispatch(setVideoEffectsOff())
          }
       } catch (error) {
          handleRtcError(error)
