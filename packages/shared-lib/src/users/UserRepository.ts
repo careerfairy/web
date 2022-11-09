@@ -92,6 +92,8 @@ export interface IUserRepository {
       stepId: string,
       totalSteps: number
    ): Promise<void>
+
+   unsubscribeUser(userEmail: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -443,6 +445,16 @@ export class FirebaseUserRepository
          },
       }
       return userRef.set(toUpdate, { merge: true })
+   }
+
+   async unsubscribeUser(userEmail: string): Promise<void> {
+      const userRef = this.firestore.collection("userData").doc(userEmail)
+
+      const toUpdate: Pick<UserData, "unsubscribed"> = {
+         unsubscribed: true,
+      }
+
+      return userRef.update(toUpdate)
    }
 }
 
