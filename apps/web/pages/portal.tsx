@@ -74,11 +74,10 @@ export const getServerSideProps: GetServerSideProps = async () => {
          highlightRepo.shouldShowHighlightsCarousel(),
          highlightRepo.getHighlights(5),
          livestreamRepo.getUpcomingEvents(20),
-         livestreamRepo.getPastEventsFrom(
-            new Date(START_DATE_FOR_REPORTED_EVENTS),
-            undefined,
-            6
-         ),
+         livestreamRepo.getPastEventsFrom({
+            fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
+            limit: 6,
+         }),
       ])
    // Parse
    return {

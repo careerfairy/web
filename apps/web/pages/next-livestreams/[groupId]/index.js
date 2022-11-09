@@ -67,10 +67,10 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
       // load past events when changing tabs
       if (value === "pastEvents") {
          livestreamRepo
-            .getPastEventsFrom(
-               new Date(START_DATE_FOR_REPORTED_EVENTS),
-               currentGroup.groupId
-            )
+            .getPastEventsFrom({
+               fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
+               filterByGroupId: currentGroup.groupId,
+            })
             .then((data) => {
                setPastLivestreams(data ?? [])
             })
