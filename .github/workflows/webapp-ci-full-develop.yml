@@ -1,13 +1,13 @@
 name: "Build, Test and Deploy - Develop"
 on:
-   # Trigger on PRs targeting these branches
+   # Trigger on all PRs targeting all branches but main
    pull_request:
-      branches:
-         - develop
-   # Trigger on pushes targeting these branches
+      branches-ignore:
+         - main
+   # Trigger on pushes targeting all branches but main
    push:
-      branches:
-         - develop
+      branches-ignore:
+         - main
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
