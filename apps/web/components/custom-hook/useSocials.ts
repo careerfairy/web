@@ -10,6 +10,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { makeLivestreamEventDetailsInviteUrl } from "../../util/makeUrls"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 export interface SocialIconProps {
    icon: typeof LinkedInIcon
@@ -18,7 +19,7 @@ export interface SocialIconProps {
    href?: string
 }
 
-const useSocials = (event: LivestreamEvent) => {
+const useSocials = (event: LivestreamEvent | Livestream) => {
    const { userData } = useAuth()
    const [state, copyEventLinkToClipboard] = useCopyToClipboard()
    const [shareLinkTooltipMessage, setShareLinkTooltipMessage] =

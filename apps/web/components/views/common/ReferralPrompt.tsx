@@ -4,6 +4,7 @@ import Stack from "@mui/material/Stack"
 import { Typography } from "@mui/material"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import ReferralWidget from "./ReferralWidget"
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 const styles: StylesProps = {
    root: {
@@ -12,7 +13,7 @@ const styles: StylesProps = {
 }
 
 interface Props {
-   event: LivestreamEvent
+   event: LivestreamEvent | Livestream
    title?: string
    subtitle?: string
 }
