@@ -42,7 +42,6 @@ import HideImageIcon from "@mui/icons-material/HideImage"
 import FilePickerContainer from "../../../ssr/FilePickerContainer"
 import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
 import { firebaseServiceInstance } from "data/firebase/FirebaseService"
-import { getDownloadUrl } from "../../../helperFunctions/streamFormFunctions"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 const styles = {

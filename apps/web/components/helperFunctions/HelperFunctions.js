@@ -29,7 +29,7 @@ export const uploadLogo = (
    firebase,
    callback,
    progressCallback,
-   errorCallback
+   errorCallback = undefined
 ) => {
    const storageRef = firebase.getStorageRef()
    let splitters = [" ", "(", ")", "-"]
