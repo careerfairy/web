@@ -45,7 +45,9 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
       },
    ])
 
-   const upcomingLivestreams = useListenToUpcomingStreams(currentGroup.groupId)
+   const upcomingLivestreams = useListenToUpcomingStreams({
+      filterByGroupId: currentGroup.groupId,
+   })
 
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
