@@ -367,13 +367,14 @@ type CameraControlButtonsProps = {
 }
 
 const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
-   const { isBlurLoading, isBlurEnabled } = useSelector(videoOptionsSelector)
+   const { isBlurLoading, isBlurEnabled, hasErrored } =
+      useSelector(videoOptionsSelector)
    const { clearBackgroundEffects, setBackgroundBlurring, checkCompatibility } =
       useVirtualBackgroundActions(localStream)
 
    const deviceIsCompatible = useMemo(() => {
-      return checkCompatibility()
-   }, [checkCompatibility])
+      return !hasErrored && checkCompatibility()
+   }, [checkCompatibility, hasErrored])
 
    const toggleBlur = useCallback(() => {
       if (isBlurLoading) return
@@ -428,7 +429,7 @@ const LoadingIconButton = ({
 }: LoadingIconButtonProps) => {
    let body = children
    if (isLoading) {
-      body = <CircularProgress color="inherit" size={16} />
+      body = <CircularProgress color="inherit" size={21} />
    }
 
    if (disabled && disabledChildren) {
