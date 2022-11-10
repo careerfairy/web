@@ -57,17 +57,6 @@ const useRecommendedEvents = (
       }),
       [events, status]
    )
-
-   // return useMemo(
-   //    () =>
-   //       events
-   //          .map((event) => Livestream.createFromFirebase(event))
-   //          .map((livestream) => {
-   //             livestream.setIsRecommended(true)
-   //             return livestream
-   //          }),
-   //    [events]
-   // )
 }
 
 export default useRecommendedEvents
