@@ -37,7 +37,7 @@ const AdminStreams = ({ typeOfStream }) => {
                ["test", "==", false],
             ],
             orderBy: ["start", typeOfStream === "upcoming" ? "asc" : "desc"],
-            limit: 50,
+            limit: 150,
             storeAs: `${typeOfStream}-livestreams`,
          },
       ],
