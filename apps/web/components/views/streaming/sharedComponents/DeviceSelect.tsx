@@ -1,6 +1,4 @@
 import React, {
-   Dispatch,
-   forwardRef,
    ReactNode,
    useCallback,
    useEffect,
@@ -10,6 +8,7 @@ import React, {
 } from "react"
 import {
    Box,
+   capitalize,
    CircularProgress,
    FormControl,
    IconButton,
@@ -34,11 +33,17 @@ import { useSelector } from "react-redux"
 import RootState from "../../../../store/reducers"
 import SoundLevelDisplay from "../../common/SoundLevelDisplay"
 import MicOffIcon from "@mui/icons-material/MicOff"
-import Stack from "@mui/material/Stack"
 import BlurOnIcon from "@mui/icons-material/BlurOn"
 import useVirtualBackgroundActions from "../../../../context/agora/useVirtualBackgroundActions"
 import { videoOptionsSelector } from "../../../../store/selectors/streamSelectors"
 import BlurOffIcon from "@mui/icons-material/BlurOff"
+import ImageIcon from "@mui/icons-material/Image"
+import HideImageIcon from "@mui/icons-material/HideImage"
+import FilePickerContainer from "../../../ssr/FilePickerContainer"
+import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import { getDownloadUrl } from "../../../helperFunctions/streamFormFunctions"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 const styles = {
    gridItemContent: {
@@ -72,6 +77,9 @@ const styles = {
    container: {
       paddingBottom: 3,
       textAlign: "center",
+   },
+   iconButtonSpan: {
+      height: "37px",
    },
 } as const
 export type DeviceSelectProps = {
@@ -367,17 +375,28 @@ type CameraControlButtonsProps = {
 }
 
 const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
-   const { isBlurLoading, isBlurEnabled, hasErrored } =
-      useSelector(videoOptionsSelector)
-   const { clearBackgroundEffects, setBackgroundBlurring, checkCompatibility } =
-      useVirtualBackgroundActions(localStream)
+   const {
+      isBlurLoading,
+      isBlurEnabled,
+      hasErrored,
+      backgroundImage,
+      isBackgroundImageLoading,
+   } = useSelector(videoOptionsSelector)
+   const {
+      clearBackgroundEffects,
+      setBackgroundBlurring,
+      checkCompatibility,
+      setBackgroundImage,
+   } = useVirtualBackgroundActions(localStream)
+
+   const isBackgroundImageEnabled = backgroundImage && !isBackgroundImageLoading
 
    const deviceIsCompatible = useMemo(() => {
       return !hasErrored && checkCompatibility()
    }, [checkCompatibility, hasErrored])
 
    const toggleBlur = useCallback(() => {
-      if (isBlurLoading) return
+      if (isBlurLoading || isBackgroundImageLoading) return
 
       if (isBlurEnabled) {
          void clearBackgroundEffects()
@@ -386,15 +405,38 @@ const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
       }
    }, [
       clearBackgroundEffects,
+      isBackgroundImageLoading,
       isBlurEnabled,
       isBlurLoading,
       setBackgroundBlurring,
    ])
 
+   const toggleBackgroundImage = useCallback(
+      (imageUrl = undefined) => {
+         if (isBackgroundImageLoading || isBlurLoading) return
+
+         if (isBackgroundImageEnabled) {
+            void clearBackgroundEffects()
+         } else {
+            if (imageUrl && typeof imageUrl === "string") {
+               void setBackgroundImage(imageUrl)
+            }
+         }
+      },
+      [
+         clearBackgroundEffects,
+         isBackgroundImageEnabled,
+         isBackgroundImageLoading,
+         isBlurLoading,
+         setBackgroundImage,
+      ]
+   )
+
    return (
       <>
          <LoadingIconButton
-            tooltipTitle={getBlurButtonTooltip(
+            tooltipTitle={getButtonTooltip(
+               "blur",
                isBlurEnabled,
                isBlurLoading,
                deviceIsCompatible
@@ -406,7 +448,73 @@ const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
          >
             <BlurOnIcon color={isBlurEnabled ? "primary" : undefined} />
          </LoadingIconButton>
+
+         <LoadingIconButton
+            tooltipTitle={getButtonTooltip(
+               "image",
+               isBackgroundImageEnabled,
+               isBackgroundImageLoading,
+               deviceIsCompatible
+            )}
+            isLoading={isBackgroundImageLoading}
+            onClickHandler={
+               isBackgroundImageEnabled ? toggleBackgroundImage : undefined
+            }
+            disabled={!deviceIsCompatible}
+            disabledChildren={<HideImageIcon />}
+         >
+            {isBackgroundImageEnabled && <ImageIcon color={"primary"} />}
+
+            {!isBackgroundImageEnabled && (
+               <ImageUpload onImageUploadFinished={toggleBackgroundImage}>
+                  <ImageIcon />
+               </ImageUpload>
+            )}
+         </LoadingIconButton>
       </>
+   )
+}
+
+const ImageUpload = ({ children, onImageUploadFinished }) => {
+   const { errorNotification } = useSnackbarNotifications()
+
+   const handleFilePickerError = useCallback(
+      (errMsg) => {
+         errorNotification(errMsg)
+      },
+      [errorNotification]
+   )
+
+   const handleFilePickerChange = useCallback(
+      (fileObject) => {
+         uploadLogo(
+            "stream-background-images",
+            fileObject,
+            firebaseServiceInstance,
+            (newUrl) => {
+               onImageUploadFinished(newUrl)
+            },
+            () => {},
+            (error) => {
+               errorNotification(
+                  error,
+                  "Failed to upload image, try to use a different image"
+               )
+            }
+         )
+      },
+      [errorNotification, onImageUploadFinished]
+   )
+
+   return (
+      <FilePickerContainer
+         extensions={["jpg", "jpeg", "png"]}
+         maxSize={5}
+         onError={handleFilePickerError}
+         onChange={handleFilePickerChange}
+      >
+         {children}
+      </FilePickerContainer>
    )
 }
 
@@ -414,7 +522,7 @@ type LoadingIconButtonProps = {
    isLoading: boolean
    children: ReactNode
    tooltipTitle: string
-   onClickHandler: () => void
+   onClickHandler?: () => void
    disabledChildren?: ReactNode
    disabled?: boolean
 }
@@ -438,20 +546,25 @@ const LoadingIconButton = ({
 
    return (
       <Tooltip title={tooltipTitle}>
-         <span>
+         <Box sx={styles.iconButtonSpan}>
             <IconButton onClick={onClickHandler} disabled={disabled}>
                {body}
             </IconButton>
-         </span>
+         </Box>
       </Tooltip>
    )
 }
 
-function getBlurButtonTooltip(isEnabled, isLoading, deviceIsCompatible) {
+function getButtonTooltip(
+   type: "blur" | "image",
+   isEnabled,
+   isLoading,
+   deviceIsCompatible
+) {
    if (!deviceIsCompatible) {
-      return `Your browser doesn't support the background blur functionality`
+      return `Your browser doesn't support the background ${type} functionality`
    }
-   const suffix = "Background Blur"
+   const suffix = `Background ${capitalize(type)}`
 
    if (isLoading) {
       return `Loading ${suffix}`
