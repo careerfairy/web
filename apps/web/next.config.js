@@ -15,7 +15,7 @@ const securityHeaders = [
    {
       key: "Content-Security-Policy",
       value:
-         `default-src blob: 'self' go.crisp.chat careerfairy-support.crisp.help streaming.crisp.help client.crisp.chat *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
+         `default-src blob: 'self' careerfairy-e1fd9.firebaseapp.com go.crisp.chat careerfairy-support.crisp.help streaming.crisp.help client.crisp.chat *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
             notProduction && "localhost:*"
          } ${
             isVercelPreview && "https://vercel.live https://assets.vercel.com"
