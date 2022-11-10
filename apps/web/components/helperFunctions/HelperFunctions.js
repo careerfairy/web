@@ -21,15 +21,17 @@ dayjs.extend(relativeTime)
  * @param {FirebaseService} firebase
  * @param {function} callback
  * @param {function} progressCallback
+ * @param errorCallback
  */
 export const uploadLogo = (
    location,
    fileObject,
    firebase,
    callback,
-   progressCallback
+   progressCallback,
+   errorCallback
 ) => {
-   var storageRef = firebase.getStorageRef()
+   const storageRef = firebase.getStorageRef()
    let splitters = [" ", "(", ")", "-"]
    let fileName = fileObject.name
    let imageName = splitters
@@ -40,7 +42,7 @@ export const uploadLogo = (
    }
    let fullPath = `${location}/${uuidv4()}_${imageName}`
    let companyLogoRef = storageRef.child(fullPath)
-   var uploadTask = companyLogoRef.put(fileObject)
+   const uploadTask = companyLogoRef.put(fileObject)
 
    uploadTask.on(
       "state_changed",
@@ -66,6 +68,9 @@ export const uploadLogo = (
          }
       },
       function (error) {
+         if (errorCallback) {
+            errorCallback(error)
+         }
          switch (error.code) {
             case "storage/unauthorized":
                // User doesn't have permission to access the object
