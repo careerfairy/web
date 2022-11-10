@@ -26,6 +26,7 @@ export function StreamsSection({
    listenToUpcoming,
    value,
    minimumUpcomingStreams = 6,
+   noResultsComponent,
 }) {
    useEffect(() => {
       forceCheck()
@@ -41,6 +42,7 @@ export function StreamsSection({
                      minimumUpcomingStreams
                   )}
                   currentGroup={currentGroup}
+                  noResultsComponent={noResultsComponent}
                />
             ) : (
                <Box sx={styles.loaderWrapper}>
@@ -72,4 +74,5 @@ StreamsSection.propTypes = {
    currentGroup: PropTypes.any,
    pastLivestreams: PropTypes.any,
    minimumUpcomingStreams: PropTypes.number,
+   noResultsComponent: PropTypes.element,
 }
