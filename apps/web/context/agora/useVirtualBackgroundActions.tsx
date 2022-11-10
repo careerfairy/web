@@ -7,8 +7,10 @@ import { useDispatch } from "react-redux"
 import {
    setVideoBlurEnabled,
    setVideoBlurStart,
+   setVideoEffectsErrored,
    setVideoEffectsOff,
 } from "../../store/actions/streamActions"
+import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 
 /**
  * Singleton instance of the Processor
@@ -32,17 +34,24 @@ const useVirtualBackgroundActions = (localStream: LocalStream) => {
       if (!processor && localStream.videoTrack) {
          processor = agoraVirtualBackgroundExtension.createProcessor()
 
-         // Initialize the extension and pass in the URL of the Wasm file
-         // fixme: check why the wasm url doesn't need to be set
-         await processor.init(null)
+         try {
+            // Initialize the extension and pass in the URL of the Wasm file
+            await processor.init(`${getBaseUrl()}/wasms/agora-wasm.wasm`)
 
-         // When the system performance cannot meet the processing requirements, the SDK triggers onoverload
-         processor.onoverload = async () => {
-            errorNotification(
-               "Virtual Background Processor Overload",
-               "Disabled Background Effects due to slow device"
-            )
-            await processor.disable()
+            // When the system performance cannot meet the processing requirements, the SDK triggers onoverload
+            processor.onoverload = async () => {
+               errorNotification(
+                  "Virtual Background Processor Overload",
+                  "Disabled Background Effects due to slow device"
+               )
+               await processor.disable()
+            }
+         } catch (e) {
+            // do not persist the processor in case of an error
+            processor = null
+
+            dispatch(setVideoEffectsErrored())
+            throw e
          }
       }
 
@@ -99,9 +108,10 @@ const useVirtualBackgroundActions = (localStream: LocalStream) => {
          let processor = await getProcessorInstance()
 
          await processor.disable()
-         dispatch(setVideoEffectsOff())
       } catch (e) {
          errorNotification(e, "Failed to clear the background effects")
+      } finally {
+         dispatch(setVideoEffectsOff())
       }
    }, [
       dispatch,

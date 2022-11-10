@@ -53,6 +53,7 @@ interface StreamReducer {
    videoOptions: {
       isBlurEnabled: boolean
       isBlurLoading: boolean
+      hasErrored: boolean
    }
    agoraState: {
       rtcConnectionState?: RTCConnectionState

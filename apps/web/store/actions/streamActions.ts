@@ -284,3 +284,7 @@ export const setVideoBlurEnabled = () => {
 export const setVideoEffectsOff = () => {
    return { type: actions.SET_VIDEO_EFFECTS_OFF }
 }
+
+export const setVideoEffectsErrored = () => {
+   return { type: actions.SET_VIDEO_EFFECTS_ERROR }
+}

@@ -30,6 +30,7 @@ const initialState = {
    videoOptions: {
       isBlurEnabled: false,
       isBlurLoading: false,
+      hasErrored: false,
    },
    agoraState: {
       rtcConnectionState: {
@@ -192,6 +193,16 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: false,
                isBlurEnabled: false,
+            },
+         }
+      case actions.SET_VIDEO_EFFECTS_ERROR:
+         return {
+            ...state,
+            videoOptions: {
+               ...state.videoOptions,
+               isBlurLoading: false,
+               isBlurEnabled: false,
+               hasErrored: true,
             },
          }
       case actions.SET_SCREEN_SHARE_DENIED_ERROR:
