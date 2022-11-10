@@ -63,7 +63,7 @@ export const sendBasicTemplateEmail_v4 = functions
             queryOptions.sortOrder,
             queryOptions?.filters
          )
-         const userEmails = users.map((user) => user.userEmail)
+         const userEmails = users.map((user) => user.userEmail).filter(Boolean)
          emailsArray = emailsArray.concat(userEmails)
       } else {
          const testEmailsArray =
