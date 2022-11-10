@@ -45,7 +45,11 @@ const MultiListSelect = ({
    handleBlur = () => {},
 }: Props) => {
    const [allValuesLocal, setAllValuesLocal] = useState(allValues)
-   const [selectedItemsLocal, setSelectedItemsLocal] = useState(selectedItems)
+   const [selectedItemsLocal, setSelectedItemsLocal] = useState([])
+
+   useEffect(() => {
+      setSelectedItemsLocal(selectedItems)
+   }, [selectedItems])
 
    // add select all option to the list
    useEffect(() => {

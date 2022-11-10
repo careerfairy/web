@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useCallback, useMemo } from "react"
 import {
    Button,
    Chip,
@@ -103,26 +103,7 @@ const FilterMenu = ({
    filtersToShow,
 }: Props) => {
    const { data: interests } = useInterests()
-   const [selectedLanguages, setSelectedOptions] = useState([] as OptionGroup[])
-   const [selectedJobCheck, setSelectedJobCheck] = useState(false)
    const { pathname, push, query } = useRouter()
-
-   useEffect(() => {
-      const queryLanguages = query.languages as string
-      const queryJobCheck = query.jobCheck
-
-      if (queryLanguages) {
-         const selectedOptions = formatToOptionArray(
-            queryLanguages.split(","),
-            languageOptionCodes
-         )
-         setSelectedOptions(selectedOptions)
-      }
-
-      if (queryJobCheck) {
-         setSelectedJobCheck(queryJobCheck === "true")
-      }
-   }, [query.jobCheck, query.languages])
 
    const handleQuery = (queryParam: string, queryValue: string | string[]) => {
       const newQuery = {
@@ -183,7 +164,13 @@ const FilterMenu = ({
    )
 
    const numberOfActiveFilters = useMemo(
-      () => [query.interests, query.sortType].filter((value) => value).length,
+      () =>
+         [
+            query.interests,
+            query.sortType,
+            query.languages,
+            query.jobCheck,
+         ].filter((value) => value).length,
       [query]
    )
 
@@ -246,6 +233,12 @@ const FilterMenu = ({
             page: 0,
          }
 
+         // if job check is false we don't want the filter to be applied
+         // no jobCheck = false on the url
+         if (!checked) {
+            delete newQuery?.["jobCheck"]
+         }
+
          void push(
             {
                pathname: pathname,
@@ -267,9 +260,27 @@ const FilterMenu = ({
       [query.interests]
    )
 
+   const isJobChecked = useCallback(
+      () => query?.jobCheck === "true",
+      [query.jobCheck]
+   )
+
+   const getSelectedLanguages = useCallback(() => {
+      const queryLanguages = query.languages as string
+      let selectedLanguages = []
+
+      if (queryLanguages) {
+         selectedLanguages = formatToOptionArray(
+            queryLanguages.split(","),
+            languageOptionCodes
+         )
+      }
+      return selectedLanguages
+   }, [query.languages])
+
    const renderSortBy = useCallback((): JSX.Element => {
       return (
-         <>
+         <div key="sort-select">
             {selects.map((select, index) => (
                <FormControl key={select.id} variant={"outlined"} fullWidth>
                   <Stack
@@ -321,26 +332,44 @@ const FilterMenu = ({
                   </ResponsiveSelect>
                </FormControl>
             ))}
-         </>
+         </div>
       )
    }, [handleClearQueries, numberOfActiveFilters, selects])
 
    const renderLanguages = useCallback(() => {
       return (
-         <FormControl variant={"outlined"} fullWidth>
-            <Typography
-               htmlFor="language-select"
-               component={"label"}
-               variant={"h6"}
-               id={"language-select-label"}
+         <FormControl key={"language-select"} variant={"outlined"} fullWidth>
+            <Stack
+               direction={"row"}
+               justifyContent={"space-between"}
+               alignItems={"center"}
+               spacing={2}
+               sx={{ mb: 1 }}
             >
-               {"Languages"}
-            </Typography>
+               <Typography
+                  htmlFor="language-select"
+                  component={"label"}
+                  variant={"h6"}
+                  id={"language-select-label"}
+               >
+                  {"Languages"}
+               </Typography>
+               {!!numberOfActiveFilters && (
+                  <Button
+                     onClick={handleClearQueries}
+                     variant={"text"}
+                     size={"small"}
+                     color={"secondary"}
+                  >
+                     Clear all
+                  </Button>
+               )}
+            </Stack>
             <Box id={"language-select"} mt={1}>
                <MultiListSelect
                   inputName={"languages"}
                   isCheckbox
-                  selectedItems={selectedLanguages}
+                  selectedItems={getSelectedLanguages()}
                   allValues={languageOptionCodes}
                   setFieldValue={handleChangeLanguages}
                   inputProps={{
@@ -354,12 +383,17 @@ const FilterMenu = ({
             </Box>
          </FormControl>
       )
-   }, [handleChangeLanguages, selectedLanguages])
+   }, [
+      handleChangeLanguages,
+      handleClearQueries,
+      numberOfActiveFilters,
+      query.languages,
+   ])
 
    const renderInterests = useCallback(() => {
       if (interests.length > 0) {
          return (
-            <FormControl variant={"outlined"} fullWidth>
+            <FormControl key="tags-select" variant={"outlined"} fullWidth>
                <Typography
                   htmlFor="tags-select"
                   component={"label"}
@@ -393,18 +427,19 @@ const FilterMenu = ({
    const renderJobCheck = useCallback(() => {
       return (
          <FormControlLabel
+            key="job-check"
             control={
                <Checkbox
                   // @ts-ignore
                   size="large"
-                  checked={selectedJobCheck}
+                  checked={isJobChecked()}
                   onChange={handleJobCheck}
                />
             }
             label="Job opening available"
          />
       )
-   }, [handleJobCheck, selectedJobCheck])
+   }, [handleJobCheck, isJobChecked])
 
    const renderFilters = useCallback(
       (filter: FilterEnum): JSX.Element => {

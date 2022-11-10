@@ -601,7 +601,14 @@ export class LivestreamsDataParser {
    }
 
    filterByHasJobs() {
-      this.livestreams = this.livestreams?.filter((e) => e.jobs.length > 0)
+      this.livestreams = this.livestreams?.filter(({ jobs }) => jobs.length > 0)
+      return this
+   }
+
+   filterByLanguages(languagesIds: string[]) {
+      this.livestreams = this.livestreams?.filter(({ language }) =>
+         languagesIds.includes(language.code)
+      )
       return this
    }
 
