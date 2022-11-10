@@ -22,6 +22,7 @@ import {
 } from "@mui/material"
 import {
    getBaseUrl,
+   getResizedUrl,
    prettyDate,
 } from "../../../../../helperFunctions/HelperFunctions"
 import RegistrationsIcon from "@mui/icons-material/People"
@@ -41,8 +42,10 @@ import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions
 import { format } from "date-fns"
 import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import Image from "next/image"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
-const styles = {
+const styles = sxStyles({
    root: {
       position: "relative",
    },
@@ -58,8 +61,9 @@ const styles = {
       },
    },
    media: {
-      objectFit: "contain",
       padding: (theme) => theme.spacing(1),
+      display: "flex",
+      justifyContent: "center",
    },
    list: {
       width: "100%",
@@ -80,7 +84,7 @@ const styles = {
       textTransform: "uppercase",
       fontWeight: 800,
    },
-}
+})
 
 const StreamCard = ({ isUpcoming, stream }) => {
    const firestore = useFirestore()
@@ -187,14 +191,15 @@ const StreamCard = ({ isUpcoming, stream }) => {
 
    return (
       <Card sx={styles.root}>
-         <CardMedia
-            component="img"
-            alt="Contemplative Reptile"
-            height="140"
-            sx={styles.media}
-            image={stream.companyLogoUrl}
-            title={stream.company}
-         />
+         <CardMedia sx={styles.media} title={stream.company}>
+            <Image
+               src={getResizedUrl(stream.companyLogoUrl, "md")}
+               height={140}
+               alt={stream.company}
+               objectFit="contain"
+               width={300}
+            />
+         </CardMedia>
          <CardHeader
             sx={styles.cardHeader}
             title={stream.company}
