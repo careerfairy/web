@@ -5,18 +5,15 @@ import {
    addMinutes,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 interface EventSEOProps {
-   event: LivestreamEvent
+   event: LivestreamEvent | Livestream
 }
 const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
-   const data = useMemo(
-      () => ({
-         startDate: event?.startDate
-            ? new Date(event?.startDate)
-            : event.start
-            ? event.start.toDate?.()
-            : new Date(),
+   const data = useMemo(() => {
+      return {
+         startDate: getStartDate(event),
          eventCompanyImageUrl: getResizedUrl(event?.companyLogoUrl, "md"),
          companyImageXSmall: getResizedUrl(event?.companyLogoUrl, "xs"),
          companyImageSmall: getResizedUrl(event?.companyLogoUrl, "sm"),
@@ -27,9 +24,9 @@ const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
          eventCompanyName: event?.company,
          url: `https://www.careerfairy.io/upcoming-livestream/${event?.id}`,
          duration: event?.duration || 60,
-      }),
-      [event]
-   )
+      }
+   }, [event])
+
    const eventSchema: Event = {
       "@type": "Event",
       name: data.eventName,
@@ -91,4 +88,20 @@ const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
    )
 }
 
+const getStartDate = (event: LivestreamEvent | Livestream) => {
+   let startDate: Date
+
+   if (event instanceof Livestream) {
+      const timestamp = event.start.getTime()
+      startDate = isNaN(timestamp) ? new Date() : event.start
+   } else {
+      startDate = event?.startDate
+         ? new Date(event?.startDate)
+         : event.start
+         ? event.start.toDate?.()
+         : new Date()
+   }
+
+   return startDate
+}
 export default EventSEOSchemaScriptTag

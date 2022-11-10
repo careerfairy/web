@@ -4,6 +4,8 @@ import {
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
+import firebase from "firebase/compat/app"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -53,8 +55,8 @@ export const mapDevices = (deviceInfos: MediaDeviceInfo[]) => {
    }
 }
 
-export const checkIfPast = (event: LivestreamEvent) => {
-   const eventDate = event?.start?.toDate?.() || new Date(event?.startDate)
+export const checkIfPast = (event: Livestream) => {
+   const eventDate = event?.start
 
    return (
       event?.hasEnded ||
@@ -72,7 +74,7 @@ export const getRelevantHosts = (
    // by providing the university group ID the function will try and find the university in the group list
    // and register only through that university and not any other groups attached to the event
    targetHostGroupId: string,
-   event: LivestreamEvent,
+   event: LivestreamEvent | Livestream,
    // groups returned from fetching the group IDs array field on the livestream Document
    groupList: any[]
 ) => {
@@ -97,7 +99,7 @@ export const getRelevantHosts = (
 }
 
 export const getLinkToStream = (
-   event: LivestreamEvent,
+   event: LivestreamEvent | Livestream,
    groupId: string,
    shouldAutoRegister?: boolean,
    asPath?: string
@@ -114,4 +116,11 @@ export const getLinkToStream = (
    }
 
    return url.toString()
+}
+
+export const getDate = (data: Date | firebase.firestore.Timestamp) => {
+   if (data instanceof Date) return data
+   if (data instanceof firebase.firestore.Timestamp)
+      return data?.toDate?.() || null
+   return null
 }

@@ -37,6 +37,8 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
+import { getDate } from "../../util/streamUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -230,7 +232,11 @@ class FirebaseService {
       return handleGetLivestreamReportData(data)
    }
 
-   sendRegistrationConfirmationEmail = (user, userData, livestream) => {
+   sendRegistrationConfirmationEmail = (
+      user,
+      userData,
+      livestream: LivestreamEvent | Livestream
+   ) => {
       if (livestream.isHybrid) {
          return this.sendHybridEventEmailRegistrationConfirmation(
             user,
@@ -255,7 +261,7 @@ class FirebaseService {
    sendLivestreamEmailRegistrationConfirmation = (
       user,
       userData,
-      livestream
+      livestream: LivestreamEvent | Livestream
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
@@ -264,8 +270,8 @@ class FirebaseService {
       return sendLivestreamRegistrationConfirmationEmail({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         regular_date: livestream.start.toDate().toString(),
-         livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
+         regular_date: getDate(livestream.start)?.toString?.() || "",
+         livestream_date: DateUtil.getPrettyDate(getDate(livestream.start)),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          livestream_title: livestream.title,
@@ -273,7 +279,11 @@ class FirebaseService {
       })
    }
 
-   sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
+   sendPhysicalEventEmailRegistrationConfirmation = (
+      user,
+      userData,
+      event: LivestreamEvent | Livestream
+   ) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
             "sendPhysicalEventRegistrationConfirmationEmail"
@@ -281,7 +291,7 @@ class FirebaseService {
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         event_date: DateUtil.getPrettyDate(getDate(event.start)),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
@@ -289,7 +299,11 @@ class FirebaseService {
       })
    }
 
-   sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
+   sendHybridEventEmailRegistrationConfirmation = (
+      user,
+      userData,
+      event: LivestreamEvent | Livestream
+   ) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
             "sendHybridEventRegistrationConfirmationEmail"
@@ -297,7 +311,7 @@ class FirebaseService {
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         event_date: DateUtil.getPrettyDate(getDate(event.start)),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
@@ -2057,12 +2071,16 @@ class FirebaseService {
     * @param authenticatedUser
     * @param {*[]} groupsWithPolicies
     * @param userAnsweredLivestreamQuestions
+    * @param options - {isRecommended: boolean}
     */
    registerToLivestream = async (
       livestreamId: string,
       authenticatedUser: { uid: string; email: string },
       groupsWithPolicies: GroupWithPolicy[],
-      userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap
+      userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap,
+      options: {
+         isRecommended?: boolean
+      } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
          userAnsweredLivestreamQuestions
@@ -2136,6 +2154,9 @@ class FirebaseService {
                   referrer: SessionStorageUtil.getReferrer(),
                   // @ts-ignore
                   date: this.getServerTimestamp(),
+                  ...(options.isRecommended && {
+                     isRecommended: true,
+                  }),
                },
             }
 

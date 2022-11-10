@@ -10,10 +10,7 @@ export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
 
 export interface LivestreamEvent extends Identifiable {
-   author?: {
-      email: string
-      groupId?: string
-   }
+   author?: AuthorInfo
    summary?: string
    backgroundImageUrl?: string
    company?: string
@@ -32,10 +29,7 @@ export interface LivestreamEvent extends Identifiable {
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
    isRecording?: boolean
-   language?: {
-      code?: string
-      name?: string
-   }
+   language?: LivestreamLanguage
    hidden?: boolean
    talentPool?: string[]
    hasNoTalentPool?: boolean
@@ -50,14 +44,7 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
-   /**
-    * These modes are used to dictate how the livestream is displayed in the UI
-    * - presentation: A PDF presentation is currently being shared
-    * - video: A YouTube video is currently being shared
-    * - desktop: A user's screen is currently being shared
-    * - default/undefined: The default livestream view (speaker is in the center of the screen with their video displayed)
-    */
-   mode?: "presentation" | "desktop" | "video" | "default"
+   mode?: LivestreamMode
    /**
     * The streamerId of the user who is currently sharing their screen
     */
@@ -90,10 +77,7 @@ export interface LivestreamEvent extends Identifiable {
     * The actual details of the speakers in the livestream
     */
    liveSpeakers?: LiveSpeaker[]
-   lastUpdatedAuthorInfo?: {
-      email: string
-      groupId: string
-   }
+   lastUpdatedAuthorInfo?: AuthorInfo
    universities: any[]
    questionsDisabled?: boolean
 
@@ -103,10 +87,38 @@ export interface LivestreamEvent extends Identifiable {
     */
    jobs?: LivestreamJobAssociation[]
 
+   /*
+    * True if the event is also taking place in person
+    * */
+   isHybrid?: boolean
+
+   /*
+    * The physical location of the event if there is one
+    * */
+   address?: string
    externalEventLink?: string
    timezone?: string
    isFaceToFace?: boolean
    reminderEmailsSent?: IEmailSent
+}
+
+/**
+ * These modes are used to dictate how the livestream is displayed in the UI
+ * - presentation: A PDF presentation is currently being shared
+ * - video: A YouTube video is currently being shared
+ * - desktop: A user's screen is currently being shared
+ * - default/undefined: The default livestream view (speaker is in the center of the screen with their video displayed)
+ */
+export type LivestreamMode = "presentation" | "desktop" | "video" | "default"
+
+export type LivestreamLanguage = {
+   code?: string
+   name?: string
+}
+
+export type AuthorInfo = {
+   email: string
+   groupId?: string
 }
 
 export interface LivestreamStatus {
@@ -151,6 +163,7 @@ export interface UserLivestreamData extends Identifiable {
       }
       utm?: any
       referrer?: string
+      isRecommended?: boolean
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate

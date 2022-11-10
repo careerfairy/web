@@ -25,10 +25,10 @@ import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 const styles = {
    hideOnHoverContent: {
@@ -203,7 +203,7 @@ const EventPreviewCard = ({
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
-   const getStartDate = () => event?.startDate || event?.start?.toDate?.()
+   const getStartDate = () => event?.start
    const [eventInterests, setSetEventInterests] = useState([])
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
@@ -593,15 +593,15 @@ const ChipLabel = ({ hasStarted, isPast, hasParticipated, hasRegistered }) => {
 }
 
 interface EventPreviewCardProps {
-   event?: LivestreamEvent
+   event?: Livestream
    loading?: boolean
    light?: boolean
    registering?: boolean
    autoRegister?: boolean
    interests?: Interest[]
-   openShareDialog?: React.Dispatch<React.SetStateAction<LivestreamEvent>>
+   openShareDialog?: React.Dispatch<React.SetStateAction<Livestream>>
    onRegisterClick?: (
-      event: LivestreamEvent,
+      event: Livestream,
       targetGroupId: string,
       groups: any[],
       hasRegistered: boolean

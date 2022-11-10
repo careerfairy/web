@@ -8,6 +8,8 @@ import RegistrationModal from "../../common/registration-modal"
 import { useRouter } from "next/router"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import { useInterests } from "../../../custom-hook/useCollection"
+import useBusinessModels from "../../../custom-hook/utils/useBusinessModels"
+import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 const styles = {
    emptyMessage: {
@@ -73,7 +75,12 @@ const GroupStreams = ({
       setShareEventDialog(null)
    }, [setShareEventDialog])
 
-   const renderStreamCards = slicedLivestreams?.map((livestream) => {
+   const slicedBusinessLivestreams = useBusinessModels(
+      slicedLivestreams,
+      Livestream.createFromFirebase
+   )
+
+   const renderStreamCards = slicedBusinessLivestreams?.map((livestream) => {
       if (livestream) {
          return (
             <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>

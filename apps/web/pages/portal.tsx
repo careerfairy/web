@@ -44,9 +44,7 @@ const PortalPage = ({
                      showHighlights={showHighlights}
                      serverSideHighlights={highlights}
                   />
-                  {hasInterests && (
-                     <RecommendedEvents maxLimitIncreaseTimes={5} limit={30} />
-                  )}
+                  {hasInterests && <RecommendedEvents limit={10} />}
                   <ComingUpNextEvents
                      serverSideEvents={comingUpNextEvents}
                      limit={20}

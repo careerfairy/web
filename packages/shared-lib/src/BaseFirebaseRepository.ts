@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "./commonTypes"
 import QuerySnapshot = firebase.firestore.QuerySnapshot
+import Timestamp = firebase.firestore.Timestamp
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 /**
@@ -102,4 +103,8 @@ export function removeDuplicateDocuments<T extends Identifiable>(
    return docs.filter((item, index) => {
       return docs.findIndex((i) => i.id === item.id) === index
    })
+}
+
+export const dateFromFirebaseTimestamp = (timestamp?: Timestamp) => {
+   return timestamp?.toDate?.() || null
 }

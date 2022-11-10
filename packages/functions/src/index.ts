@@ -27,6 +27,7 @@ import bigQuery = require("./bigQuery")
 import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
 import crisp = require("./crisp")
+import recommendation = require("./recommendation")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -169,3 +170,6 @@ exports.periodicallyRemoveCachedDocument =
 
 // Crisp
 exports.getCrispSignature = crisp.getCrispSignature
+
+// Recommendations
+exports.getRecommendedEvents = recommendation.getRecommendedEvents

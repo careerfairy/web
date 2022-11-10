@@ -1,60 +1,21 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { usePagination } from "use-pagination-firestore"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 
-const RecommendedEvents = ({ limit, maxLimitIncreaseTimes }: Props) => {
-   const { authenticatedUser, userData } = useAuth()
-   const [currentLimit, setCurrentLimit] = useState(limit)
-   const [numLimitIncreases, setNumLimitIncreases] = useState(0)
+const RecommendedEvents = ({ limit }: Props) => {
+   const { authenticatedUser } = useAuth()
 
-   const [nonRegisteredRecommendedEvents, setNonRegisteredRecommendedEvents] =
-      useState<LivestreamEvent[]>([])
+   const options = useMemo(
+      () => ({
+         limit,
+      }),
+      [limit]
+   )
 
-   const query = useMemo(() => {
-      return livestreamRepo.recommendEventsQuery(userData?.interestsIds)
-   }, [userData?.interestsIds])
+   const { loading, events } = useRecommendedEvents(options)
 
-   const {
-      items: recommendedEvents,
-      isLoading,
-      isEnd,
-   } = usePagination<LivestreamEvent>(userData?.interestsIds && query, {
-      limit: currentLimit,
-   })
-
-   useEffect(() => {
-      if (
-         !isEnd &&
-         !isLoading &&
-         nonRegisteredRecommendedEvents.length < 20 &&
-         numLimitIncreases <= maxLimitIncreaseTimes
-      ) {
-         increaseLimit()
-      }
-   }, [
-      isLoading,
-      maxLimitIncreaseTimes,
-      nonRegisteredRecommendedEvents.length,
-      isEnd,
-   ])
-
-   const increaseLimit = () => {
-      setCurrentLimit((prev) => prev + limit)
-      setNumLimitIncreases((prev) => prev + 1)
-   }
-
-   useEffect(() => {
-      setNonRegisteredRecommendedEvents(
-         recommendedEvents.filter(
-            (event) => !event.registeredUsers?.includes(authenticatedUser.email)
-         )
-      )
-   }, [recommendedEvents])
-
-   if (!authenticatedUser.email || !userData?.interestsIds) {
+   if (!authenticatedUser.email || !events?.length) {
       return null
    }
 
@@ -62,22 +23,15 @@ const RecommendedEvents = ({ limit, maxLimitIncreaseTimes }: Props) => {
       <EventsPreview
          limit={limit}
          title={"RECOMMENDED FOR YOU"}
-         events={nonRegisteredRecommendedEvents}
-         loading={isLoading}
+         events={events}
          type={EventsTypes.recommended}
-         hidePreview={Boolean(
-            !isLoading && !nonRegisteredRecommendedEvents.length
-         )}
+         loading={loading}
       />
    )
 }
 
 interface Props {
-   limit?: number
-   // The max number of times we will increase the limit of the query
-   // if the recommended events of the current
-   // query is less than 20
-   maxLimitIncreaseTimes?: number
+   limit?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 // max of 10 events to allow for firestore query limit
 }
 
 export default RecommendedEvents
