@@ -28,7 +28,7 @@ import { useInterests } from "../../components/custom-hook/useCollection"
 import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
-import { dataLayerEvent } from "../../util/analyticsUtils"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -303,9 +303,12 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [isPastEvent, stream?.isFaceToFace, stream?.startDate])
 
    const startRegistrationProcess = async () => {
-      dataLayerEvent("event_registration_started")
+      dataLayerLivestreamEvent("event_registration_started", stream)
       if (isLoggedOut || !auth?.currentUser?.emailVerified) {
-         dataLayerEvent("event_registration_started_login_required")
+         dataLayerLivestreamEvent(
+            "event_registration_started_login_required",
+            stream
+         )
          return push(
             asPath
                ? {
@@ -317,7 +320,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
 
       if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         dataLayerEvent("event_registration_started_profile_incomplete")
+         dataLayerLivestreamEvent(
+            "event_registration_started_profile_incomplete",
+            stream
+         )
          return push({
             pathname: `/profile`,
             query: { absolutePath: asPath },
