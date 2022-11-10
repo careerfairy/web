@@ -13,6 +13,17 @@ import {
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useRouter } from "next/router"
+import { Grid, Typography } from "@mui/material"
+import Image from "next/image"
+
+const styles = {
+   noResultsMessage: {
+      maxWidth: "800px",
+      margin: "0 auto",
+      color: "rgb(130,130,130)",
+      textAlign: "center",
+   },
+}
 
 const pageMetadata = {
    description: "Catch the upcoming streams on CareerFairy.",
@@ -86,6 +97,8 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
                upcomingLivestreams={upcomingLivestreams}
                listenToUpcoming
                pastLivestreams={pastLivestreams}
+               minimumUpcomingStreams={0}
+               noResultsComponent={renderNoResults()}
             />
          </NextLivestreamsLayout>
          <ScrollToTop />
@@ -116,4 +129,25 @@ export async function getServerSideProps({ query: { careerCenterId, type } }) {
    }
 }
 
+const renderNoResults = () => {
+   return (
+      <Grid container mx={1}>
+         <Grid xs={12} mt={20} textAlign="center" item>
+            <Image
+               src="/empty-search.svg"
+               width="800"
+               height="400"
+               alt="Empty search illustration"
+            />
+         </Grid>
+         <Grid xs={12} mt={4} item>
+            <Typography sx={styles.noResultsMessage} variant="h5">
+               {/* eslint-disable-next-line react/no-unescaped-entities */}
+               We didn't find any events matching your criteria. Remove some
+               filters or start a new by clearing all filter. 😕
+            </Typography>
+         </Grid>
+      </Grid>
+   )
+}
 export default withFirebase(NextLivestreamsPage)

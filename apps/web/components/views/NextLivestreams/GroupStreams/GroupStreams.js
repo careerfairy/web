@@ -46,6 +46,7 @@ const GroupStreams = ({
    searching,
    listenToUpcoming,
    isPastLivestreams,
+   noResultsComponent,
 }) => {
    const {
       query: { groupId },
@@ -105,6 +106,8 @@ const GroupStreams = ({
                      </Grid>
                   ) : livestreams.length ? (
                      renderStreamCards
+                  ) : noResultsComponent ? (
+                     noResultsComponent
                   ) : (
                      <Grid xs={12} item sx={styles.loaderWrapper}>
                         <Typography
