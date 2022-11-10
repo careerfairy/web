@@ -81,7 +81,6 @@ const useJoinTalentPool = () => {
                dataLayerLivestreamEvent(
                   "talent_pool_joined",
                   currentLivestream,
-                  { groupId: companyId }
                )
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
