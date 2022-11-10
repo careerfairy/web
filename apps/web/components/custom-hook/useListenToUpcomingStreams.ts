@@ -21,7 +21,9 @@ const useListenToUpcomingStreams = (props?: Props) => {
          query = query.where("groupIds", "array-contains", filterByGroupId)
       }
 
-      if (languagesIds) {
+      // only do this query if no interests IDs
+      // since firestore does not support in and array-container-any on the same query
+      if (languagesIds && !interestsIds) {
          query = query.where("language.code", "in", languagesIds)
       }
 
@@ -43,6 +45,12 @@ const useListenToUpcomingStreams = (props?: Props) => {
 
    if (jobCheck) {
       res = res.filterByHasJobs()
+   }
+
+   // only do this filter on client side if any interests IDs filter
+   // since firestore does not support in and array-container-any on the same query
+   if (languagesIds && interestsIds) {
+      res = res.filterByLanguages(languagesIds)
    }
 
    return res.complementaryFields().get()
