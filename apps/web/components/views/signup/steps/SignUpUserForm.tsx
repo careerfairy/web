@@ -33,6 +33,7 @@ import Password from "../userInformation/Password"
 import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
 import HelperHint from "../common/HelperHint"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const styles = sxStyles({
    submit: {
@@ -125,6 +126,8 @@ function SignUpUserForm() {
                   // the useEffect moves to the step 1 because the user is logged in but not confirmed
                   // if we would do nextStep() here, it would move to step 2 instead of 1
                   setCurrentStep(1)
+
+                  dataLayerEvent("signup_started")
                })
                .catch((e) => {
                   console.error(e)
