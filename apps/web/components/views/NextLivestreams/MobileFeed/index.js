@@ -13,6 +13,7 @@ const MobileFeed = ({
    listenToUpcoming,
    selectedOptions,
    isPastLivestreams,
+   noResultsComponent,
 }) => {
    const [value, setValue] = useState(0)
    const { query } = useRouter()
@@ -44,6 +45,7 @@ const MobileFeed = ({
             searching={searching}
             livestreams={livestreams}
             groupData={groupData}
+            noResultsComponent={noResultsComponent}
          />
       </Box>
    )

@@ -11,6 +11,7 @@ const NextLivestreams = ({
    currentGroup,
    isPastLivestreams,
    listenToUpcoming,
+   noResultsComponent,
 }) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -60,6 +61,7 @@ const NextLivestreams = ({
          listenToUpcoming={listenToUpcoming}
          careerCenterId={careerCenterId}
          isPastLivestreams={isPastLivestreams}
+         noResultsComponent={noResultsComponent}
       />
    ) : (
       <DesktopFeed
@@ -70,6 +72,7 @@ const NextLivestreams = ({
          mobile={mobile}
          groupData={groupData}
          isPastLivestreams={isPastLivestreams}
+         noResultsComponent={noResultsComponent}
       />
    )
 }
