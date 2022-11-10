@@ -600,6 +600,11 @@ export class LivestreamsDataParser {
       return this
    }
 
+   filterByHasJobs() {
+      this.livestreams = this.livestreams?.filter((e) => e.jobs.length > 0)
+      return this
+   }
+
    complementaryFields() {
       this.livestreams = this.livestreams?.map((e) => ({
          ...e,

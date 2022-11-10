@@ -2,7 +2,7 @@ import { withFirebase } from "../../context/firebase/FirebaseServiceContext"
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout"
 import useListenToUpcomingStreams from "../../components/custom-hook/useListenToUpcomingStreams"
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import { StreamsSection } from "../../components/views/NextLivestreams/StreamsSection"
 import HeadWithMeta from "../../components/page/HeadWithMeta"
@@ -12,6 +12,7 @@ import {
 } from "../../constants/routes"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import { livestreamRepo } from "../../data/RepositoryInstances"
+import { useRouter } from "next/router"
 
 const pageMetadata = {
    description: "Catch the upcoming streams on CareerFairy.",
@@ -20,15 +21,36 @@ const pageMetadata = {
    fullPath: `${PRODUCTION_BASE_URL}}${NEXT_LIVESTREAMS_PATH}`,
 }
 
+const getQueryVariables = (query) => {
+   const languages = query.languages as string
+   const interests = query.interests as string
+   const jobCheck = query.jobCheck as string
+
+   return {
+      languages: languages && languages.split(","),
+      interests: interests && interests.split(","),
+      jobCheck: jobCheck?.toLowerCase() === "true" || false,
+   }
+}
+
 const NextLivestreamsPage = ({ initialTabValue }) => {
    const {
       palette: {
          common: { white },
       },
    } = useTheme()
+   const { query } = useRouter()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
+   const { languages, interests, jobCheck } = useMemo(
+      () => getQueryVariables(query),
+      [query]
+   )
 
-   const upcomingLivestreams = useListenToUpcomingStreams()
+   const upcomingLivestreams = useListenToUpcomingStreams({
+      languagesIds: languages,
+      interestsIds: interests,
+      jobCheck: jobCheck,
+   })
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
    useEffect(() => {

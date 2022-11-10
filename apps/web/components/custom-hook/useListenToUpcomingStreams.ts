@@ -4,7 +4,16 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 
-const useListenToUpcomingStreams = (filterByGroupId?: string) => {
+type Props = {
+   filterByGroupId?: string
+   languagesIds?: string[]
+   interestsIds?: string[]
+   jobCheck?: boolean
+}
+
+const useListenToUpcomingStreams = (props?: Props) => {
+   const { filterByGroupId, languagesIds, interestsIds, jobCheck } = props
+
    const upcomingEventsQuery = useMemo(() => {
       let query = livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
@@ -12,8 +21,16 @@ const useListenToUpcomingStreams = (filterByGroupId?: string) => {
          query = query.where("groupIds", "array-contains", filterByGroupId)
       }
 
+      if (languagesIds) {
+         query = query.where("language.code", "in", languagesIds)
+      }
+
+      if (interestsIds) {
+         query = query.where("interestsIds", "array-contains-any", interestsIds)
+      }
+
       return query
-   }, [filterByGroupId])
+   }, [filterByGroupId, interestsIds, languagesIds])
 
    let { data, isLoading } = useCollection<LivestreamEvent>(
       upcomingEventsQuery,
@@ -23,6 +40,10 @@ const useListenToUpcomingStreams = (filterByGroupId?: string) => {
    if (isLoading) return undefined
 
    let res = new LivestreamsDataParser(data).filterByNotEndedEvents()
+
+   if (jobCheck) {
+      res = res.filterByHasJobs()
+   }
 
    return res.complementaryFields().get()
 }
