@@ -13,7 +13,7 @@ const styles = sxStyles({
    root: {
       boxShadow: "none",
       display: "flex",
-      flexDirection: "row",
+      flexDirection: { xs: "column", sm: "row" },
    },
    tab: {
       fontWeight: (theme) => theme.typography.fontWeightBold,
@@ -53,7 +53,7 @@ const StreamsTab = ({
             }
             variant={hasFilter ? "standard" : "fullWidth"}
             aria-label="full width tabs example"
-            sx={{ width: "100%" }}
+            sx={{ width: "100%", minWidth: "fit-content" }}
          >
             <SimpleTab
                sx={{
