@@ -60,7 +60,13 @@ const Filter = ({ filtersToShow }: Props) => {
       () => filtersToShow.includes(FilterEnum.search),
       [filtersToShow]
    )
-   const filterActive = Boolean(query.upvote || query.interests || query.date)
+   const filterActive = Boolean(
+      query.upvote ||
+         query.interests ||
+         query.date ||
+         query.jobCheck ||
+         query.languages
+   )
    const handleOpenFilterMenu = (
       event: React.MouseEvent<HTMLButtonElement>
    ) => {
