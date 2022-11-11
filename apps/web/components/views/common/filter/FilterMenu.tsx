@@ -307,7 +307,7 @@ const FilterMenu = ({
                      justifyContent={"space-between"}
                      alignItems={"center"}
                      spacing={2}
-                     sx={{ mb: 1 }}
+                     sx={{ mb: 1, height: "35px" }}
                   >
                      <Typography
                         htmlFor={select.id}
@@ -363,7 +363,7 @@ const FilterMenu = ({
                justifyContent={"space-between"}
                alignItems={"center"}
                spacing={2}
-               sx={{ mb: 1 }}
+               sx={{ height: "35px" }}
             >
                <Typography
                   htmlFor="language-select"
