@@ -451,6 +451,7 @@ const FilterMenu = ({
                <Checkbox
                   // @ts-ignore
                   size="large"
+                  sx={{ pl: 0 }}
                   checked={isJobChecked()}
                   onChange={handleJobCheck}
                />

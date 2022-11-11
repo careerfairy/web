@@ -132,8 +132,8 @@ export async function getServerSideProps({ query: { careerCenterId, type } }) {
 
 const renderNoResults = () => {
    return (
-      <Grid container mx={1}>
-         <Grid xs={12} mt={20} textAlign="center" item>
+      <>
+         <Grid xs={12} mt={{ xs: 12, md: 20 }} textAlign="center" item>
             <Image
                src="/empty-search.svg"
                width="800"
@@ -141,7 +141,7 @@ const renderNoResults = () => {
                alt="Empty search illustration"
             />
          </Grid>
-         <Grid xs={12} mt={4} item>
+         <Grid xs={12} mt={4} mx={1} item>
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
                We didn't find any events matching your criteria. Remove some
@@ -149,7 +149,7 @@ const renderNoResults = () => {
                <Link href="/next-livestreams">clearing all filter</Link>. 😕
             </Typography>
          </Grid>
-      </Grid>
+      </>
    )
 }
 export default withFirebase(NextLivestreamsPage)
