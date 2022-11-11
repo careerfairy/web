@@ -17,7 +17,7 @@ import {
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
-import { dataLayerEvent } from "../../util/analyticsUtils"
+import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -314,10 +314,10 @@ export function RegistrationContextProvider({
                   groupsWithPolicies,
                   userAnsweredLivestreamGroupQuestions
                )
-               dataLayerEvent("event_registration_complete", {
-                  livestreamId: livestream?.id,
-                  livestreamTitle: livestream?.title,
-               })
+               dataLayerLivestreamEvent(
+                  "event_registration_complete",
+                  livestream
+               )
             }
             handleSendConfirmEmail()
          } catch (e) {
