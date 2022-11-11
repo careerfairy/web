@@ -32,10 +32,10 @@ export const getRecommendedEvents = functions.https.onCall(
 
          return recommendedEventsIds
       } catch (error) {
-         console.error(error)
          logAndThrow("Error in getting recommended events", {
             data,
             context,
+            error,
          })
       }
    }
