@@ -18,6 +18,7 @@ import {
    IMultiStepContext,
    MultiStepContext,
 } from "../../common/MultiStepWrapper"
+import { dataLayerEvent } from "../../../../util/analyticsUtils"
 
 const schema = yup.object().shape({
    pinCode: yup
@@ -68,6 +69,7 @@ const SignUpPinForm = () => {
          await firebase.validateUserEmailWithPin(userInfo)
          updateActiveStep()
          await firebase.auth.currentUser.reload()
+         dataLayerEvent("signup_pin_complete")
       } catch (error) {
          console.log("error", error)
          setIncorrectPin(true)

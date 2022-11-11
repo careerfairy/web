@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from "react"
+import React, { useContext } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import GroupLogo from "../common/GroupLogo"
 import {
@@ -20,7 +20,7 @@ import {
    maxQuestionLength,
    minQuestionLength,
 } from "../../../../../constants/forms"
-import { dataLayerEvent } from "../../../../../util/analyticsUtils"
+import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -100,7 +100,10 @@ const QuestionCreateForm = () => {
                .catch(console.error)
             customHandleNext()
 
-            dataLayerEvent("event_registration_question_submit")
+            dataLayerLivestreamEvent(
+               "event_registration_question_submit",
+               livestream
+            )
          } catch (e) {}
       },
       validate: (values) => {
@@ -130,7 +133,7 @@ const QuestionCreateForm = () => {
          // go to next talent pool step
          handleNext()
       }
-      dataLayerEvent("event_registration_question_skip")
+      dataLayerLivestreamEvent("event_registration_question_skip", livestream)
    }
 
    return (
