@@ -25,7 +25,7 @@ const MobileFeed = ({
    }, [groupData.universityName])
 
    useEffect(() => {
-      if (Object.keys(query).length) {
+      if (query?.groupId) {
          scrollToTop()
       }
    }, [value, query])

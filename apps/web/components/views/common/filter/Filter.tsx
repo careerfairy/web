@@ -34,6 +34,8 @@ const styles = {
    },
    filterButton: {
       borderRadius: wishListBorderRadius,
+      height: "48px",
+      width: "116px",
    },
 }
 
