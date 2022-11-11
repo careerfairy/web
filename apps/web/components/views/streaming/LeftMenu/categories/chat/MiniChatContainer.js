@@ -36,7 +36,10 @@ import useStreamRef from "../../../../../custom-hook/useStreamRef"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { MAX_STREAM_CHAT_ENTRIES } from "../../../../../../constants/streams"
-import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
+import {
+   dataLayerEvent,
+   dataLayerLivestreamEvent,
+} from "../../../../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -257,7 +260,7 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
             // close the chat after two seconds
             setTimeout(() => setOpen(false), 2000)
          }
-         dataLayerEvent("livestream_chat_new_message")
+         dataLayerLivestreamEvent("livestream_chat_new_message", livestream)
       }
    }
 

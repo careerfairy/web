@@ -15,6 +15,7 @@ import { useFirebaseService } from "../../../context/firebase/FirebaseServiceCon
 import { userRepo } from "../../../data/RepositoryInstances"
 import LoadingButton from "@mui/lab/LoadingButton"
 import GenericStepper from "../common/GenericStepper"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const styles = sxStyles({
    icon: {
@@ -165,6 +166,8 @@ const SignupForm = () => {
          } else {
             void push(fallbackSignupRedirectPath)
          }
+
+         dataLayerEvent("signup_complete_redirect")
       } else {
          setCurrentStep((prev) => prev + 1)
       }

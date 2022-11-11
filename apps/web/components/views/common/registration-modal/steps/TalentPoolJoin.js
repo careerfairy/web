@@ -15,7 +15,7 @@ import { RegistrationContext } from "../../../../../context/registration/Registr
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { connectedIcon } from "../../../../../constants/svgs"
-import { dataLayerEvent } from "../../../../../util/analyticsUtils"
+import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -69,7 +69,7 @@ const TalentPoolJoin = () => {
          handleNext()
       } catch (e) {}
       setJoiningTalentPool(false)
-      dataLayerEvent("event_registration_talentpool_join")
+      dataLayerLivestreamEvent("event_registration_talentpool_join", livestream)
    }
    if (!livestream) return null
 
@@ -109,7 +109,10 @@ const TalentPoolJoin = () => {
                      size="large"
                      onClick={() => {
                         handleNext()
-                        dataLayerEvent("event_registration_talentpool_skip")
+                        dataLayerLivestreamEvent(
+                           "event_registration_talentpool_skip",
+                           livestream
+                        )
                      }}
                      color="primary"
                      autoFocus
