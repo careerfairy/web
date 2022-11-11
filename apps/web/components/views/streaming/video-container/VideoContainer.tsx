@@ -32,8 +32,6 @@ import {
 } from "../../../../context/agora/RTCProvider"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
-import { LocalStream } from "../../../../types/streaming"
-import { getRandomInt } from "../../../helperFunctions/HelperFunctions"
 
 const labels = {
    mainTitle: "Join the Stream",
@@ -204,34 +202,32 @@ const VideoContainer = ({
                streamerId,
                currentSpeakerId,
                currentLivestream.speakerSwitchMode,
-               currentLivestream.mode,
-               localStream
+               currentLivestream.mode
             )
 
             /**
              * Do not switch the resolutions right away because there is an odd effect
              * when this happens, instead delay it a little bit
              */
-            const secondsToChangePreset = getRandomInt(2, 7)
             if (iAmBig) {
                // reset to original quality
                const makeStreamerHigherQualityTimeout = setTimeout(() => {
                   void setVideoQuality(defaultPreset)
-               }, secondsToChangePreset)
+               }, 10000)
 
                return () => clearTimeout(makeStreamerHigherQualityTimeout)
             } else {
                // downgrade quality to save bandwidth
                const makeStreamerLowerQualityTimeout = setTimeout(() => {
                   void setVideoQuality("180p")
-               }, secondsToChangePreset)
+               }, 10000)
 
                return () => clearTimeout(makeStreamerLowerQualityTimeout)
             }
          } else {
             // if not manyStreams then make the local stream the default quality
             void setVideoQuality(defaultPreset)
-      }
+         }
       }
    }, [
       localStream,
@@ -490,8 +486,7 @@ function IAmCurrentlySpeakingAndBig(
    streamerId: string,
    currentSpeakerId: string,
    speakerSwitchMode: string,
-   livestreamMode: string,
-   localStream: LocalStream
+   livestreamMode: string
 ) {
    if (
       livestreamMode === "desktop" || // screen sharing
@@ -501,11 +496,7 @@ function IAmCurrentlySpeakingAndBig(
       return false
    }
 
-   if (speakerSwitchMode === "manual" && streamerId === currentSpeakerId) {
-      return true
-   }
-
-   return currentSpeakerId === localStream.uid
+   return streamerId === currentSpeakerId
 }
 
 /**
