@@ -507,6 +507,7 @@ const ImageUpload = ({ children, onImageUploadFinished }) => {
 
    return (
       <FilePickerContainer
+         style={filePickerDivStyles}
          extensions={["jpg", "jpeg", "png"]}
          maxSize={5}
          onError={handleFilePickerError}
@@ -516,6 +517,9 @@ const ImageUpload = ({ children, onImageUploadFinished }) => {
       </FilePickerContainer>
    )
 }
+
+// fix to make the button round again
+const filePickerDivStyles = { height: "21px" }
 
 type LoadingIconButtonProps = {
    isLoading: boolean
@@ -546,7 +550,11 @@ const LoadingIconButton = ({
    return (
       <Tooltip title={tooltipTitle}>
          <Box sx={styles.iconButtonSpan}>
-            <IconButton onClick={onClickHandler} disabled={disabled}>
+            <IconButton
+               onClick={onClickHandler}
+               disabled={disabled}
+               disableRipple={isLoading}
+            >
                {body}
             </IconButton>
          </Box>
