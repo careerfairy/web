@@ -15,6 +15,7 @@ import { livestreamRepo } from "../../data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { Grid, Typography } from "@mui/material"
 import Image from "next/image"
+import Link from "../../components/views/common/Link"
 
 const styles = {
    noResultsMessage: {
@@ -144,7 +145,8 @@ const renderNoResults = () => {
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
                We didn't find any events matching your criteria. Remove some
-               filters or start a new by clearing all filter. 😕
+               filters or start anew by{" "}
+               <Link href="/next-livestreams">clearing all filter</Link>. 😕
             </Typography>
          </Grid>
       </Grid>
