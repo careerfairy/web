@@ -35,7 +35,7 @@ const MobileFeed = ({
    }
 
    return (
-      <Box p={1}>
+      <Box p={2}>
          <GroupStreams
             mobile
             listenToUpcoming={listenToUpcoming}
