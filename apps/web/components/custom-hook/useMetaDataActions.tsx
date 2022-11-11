@@ -1,6 +1,4 @@
-import StatsUtil from "data/util/StatsUtil"
 import React, { FC, useCallback, useEffect, useState } from "react"
-import TalentPoolIcon from "@mui/icons-material/HowToRegRounded"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import {
    Button,
@@ -12,168 +10,74 @@ import {
    DialogTitle,
 } from "@mui/material"
 import { CSVLink } from "react-csv"
-import GetAppIcon from "@mui/icons-material/GetApp"
 import PDFIcon from "@mui/icons-material/PictureAsPdf"
 import { useAuth } from "../../HOCs/AuthProvider"
-import RegisteredUsersIcon from "@mui/icons-material/People"
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
-import ButtonWithHint from "../views/group/admin/events/events-table/ButtonWithHint"
-import { useTheme } from "@mui/material/styles"
 import { getCSVDelimiterBasedOnOS } from "../../util/CommonUtil"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import {
-   LivestreamEvent,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
-import { livestreamRepo } from "../../data/RepositoryInstances"
-import { useGroup } from "../../layouts/GroupDashboardLayout"
-import { CSVDownloadUserData } from "@careerfairy/shared-lib/dist/users"
+import { useLivestreamCsvData } from "../useLivestreamCsvData"
 
 interface MetaDataActionsProps {
    group: Group
    isPast: boolean
    isDraft: boolean
+   targetStream: LivestreamEvent
 }
 
 export function useMetaDataActions({
    group,
    isPast,
    isDraft,
+   targetStream,
 }: MetaDataActionsProps) {
-   const { groupPresenter, groupQuestions } = useGroup()
    const firebase = useFirebaseService()
    const { userData } = useAuth()
-   const theme = useTheme()
    const dispatch = useDispatch()
-   const [talentPoolDictionary, setTalentPoolDictionary] = useState<
-      Record<string, CSVDownloadUserData[]>
-   >({})
-   const [targetStream, setTargetStream] = useState<LivestreamEvent>(null)
    const [loadingReportData, setLoadingReportData] = useState<
       Record<string, boolean>
    >({})
-   const [
-      loadingRegisteredUsersFromGroupData,
-      setLoadingRegisteredUsersFromGroupData,
-   ] = useState<Record<string, boolean>>({})
-   const [loadingTalentPool, setLoadingTalentPool] = useState<
-      Record<string, boolean>
-   >({})
 
-   const [
-      registeredStudentsFromGroupDictionary,
-      setRegisteredStudentsFromGroupDictionary,
-   ] = useState<Record<string, CSVDownloadUserData[]>>({})
    const [reportDataDictionary, setReportDataDictionary] = useState<
       Record<string, PdfReportData>
    >({})
    const [reportPdfData, setReportPdfData] = useState<PdfReportData>(null)
 
-   const [registeredStudentsDictionary, setRegisteredStudentsDictionary] =
-      useState<Record<string, UserLivestreamData[]>>({})
+   const canDownloadUsers = Boolean(
+      !isDraft && // We can't download users for a draft
+         (group.universityCode || // If the group is a university group
+            group.privacyPolicyActive || // If the group is not a uni but has their privacy policy active
+            userData?.isAdmin) // If the user is a CF admin
+   )
+
+   const canDownloadTalentPool = Boolean(!isDraft) // All talent pools can be downloaded regardless of group type
+
+   const { action: talentPoolAction } = useLivestreamCsvData({
+      userType: "talentPool",
+      canDownload: canDownloadTalentPool,
+      targetStream,
+   })
+
+   const {
+      action: registeredStudentsAction,
+      getNumberOfUsers: getNumberOfRegisteredStudents,
+   } = useLivestreamCsvData({
+      userType: "registered",
+      canDownload: canDownloadUsers,
+      targetStream,
+   })
+
+   const { action: participatedStudentsAction } = useLivestreamCsvData({
+      userType: "participated",
+      canDownload: canDownloadUsers,
+      targetStream,
+   })
 
    const removeReportPdfData = useCallback(() => {
       setReportPdfData(null)
    }, [])
-
-   useEffect(() => {
-      ;(function handleGetRegisteredUsersFromGroup() {
-         try {
-            if (!targetStream?.id) return
-            const targetRegisteredStudents =
-               registeredStudentsDictionary[targetStream?.id]
-            setLoadingRegisteredUsersFromGroupData((prevState) => ({
-               ...prevState,
-               [targetStream.id]: true,
-            }))
-            if (
-               targetRegisteredStudents &&
-               targetRegisteredStudents.length &&
-               !registeredStudentsFromGroupDictionary?.[targetStream.id]
-            ) {
-               let users = targetRegisteredStudents
-               if (group.universityCode) {
-                  users = targetRegisteredStudents.filter((data) =>
-                     groupPresenter.isUniversityStudent(data.user)
-                  )
-               }
-               const csvData = StatsUtil.getCsvData(
-                  group,
-                  targetStream,
-                  users,
-                  groupQuestions
-               )
-
-               setRegisteredStudentsFromGroupDictionary({
-                  ...registeredStudentsFromGroupDictionary,
-                  [targetStream.id]: csvData,
-               })
-            }
-         } catch (e) {
-            dispatch(actions.sendGeneralError(e))
-         }
-         setLoadingRegisteredUsersFromGroupData((prevState) => ({
-            ...prevState,
-            [targetStream.id]: false,
-         }))
-      })()
-   }, [registeredStudentsDictionary, targetStream, group, groupQuestions])
-
-   useEffect(() => {
-      if (
-         targetStream &&
-         group &&
-         !registeredStudentsDictionary?.[targetStream?.id]
-      ) {
-         ;(async function () {
-            const newRegisteredStudents =
-               await livestreamRepo.getLivestreamUsers(
-                  targetStream.id,
-                  "registered"
-               )
-
-            setRegisteredStudentsDictionary({
-               ...registeredStudentsDictionary,
-               [targetStream.id]: newRegisteredStudents,
-            })
-         })()
-      }
-   }, [targetStream, group])
-
-   useEffect(() => {
-      if (targetStream) {
-         ;(async function () {
-            setLoadingTalentPool((prevState) => ({
-               ...prevState,
-               [targetStream.id]: true,
-            }))
-            try {
-               if (!talentPoolDictionary[targetStream.id]) {
-                  const users = await livestreamRepo.getLivestreamUsers(
-                     targetStream.id,
-                     "talentPool"
-                  )
-                  const csvData = StatsUtil.getCsvData(
-                     group,
-                     targetStream,
-                     users,
-                     groupQuestions
-                  )
-                  setTalentPoolDictionary({
-                     ...talentPoolDictionary,
-                     [targetStream.id]: csvData,
-                  })
-               }
-            } catch (e) {}
-            setLoadingTalentPool((prevState) => ({
-               ...prevState,
-               [targetStream.id]: false,
-            }))
-         })()
-      }
-   }, [targetStream, registeredStudentsFromGroupDictionary, groupQuestions])
 
    const handleGetLivestreamReportData = useCallback(
       async (rowData: LivestreamEvent) => {
@@ -212,71 +116,6 @@ export function useMetaDataActions({
       [dispatch, group?.id, userData?.userEmail, reportDataDictionary]
    )
 
-   function studentBelongsToGroup(student) {
-      if (group.universityCode) {
-         if (student.university?.code === group.universityCode) {
-            return student.groupIds && student.groupIds.includes(group.groupId)
-         } else {
-            return false
-         }
-      } else {
-         return student.groupIds && student.groupIds.includes(group.groupId)
-      }
-   }
-
-   // Memorised talentPool action
-   const talentPoolAction = useCallback(
-      (rowData) => {
-         const targetStreamTalentPoolData = talentPoolDictionary[rowData?.id]
-         const actionLoading = loadingTalentPool[rowData?.id]
-
-         const hintTitle = "Download Talent Pool"
-         return {
-            icon: targetStreamTalentPoolData ? (
-               <GetAppIcon color="primary" />
-            ) : actionLoading ? (
-               <CircularProgress color="inherit" size={15} />
-            ) : (
-               <TalentPoolIcon color="action" />
-            ),
-            hintTitle,
-            hintDescription:
-               "Download a CSV with the details of the students who opted to put themselves in the talent pool",
-            loadedButton: targetStreamTalentPoolData && (
-               <CSVDialogDownload
-                  title={hintTitle}
-                  data={targetStreamTalentPoolData}
-                  filename={
-                     "TalentPool " + rowData.company + " " + rowData.id + ".csv"
-                  }
-               >
-                  <ButtonWithHint
-                     hintTitle={hintTitle}
-                     style={{
-                        marginTop: theme.spacing(0.5),
-                     }}
-                     hintDescription={
-                        "Download a CSV with the details of the students who opted to put themselves in the talent pool"
-                     }
-                     startIcon={<TalentPoolIcon color="action" />}
-                  >
-                     Download Talent Pool
-                  </ButtonWithHint>
-               </CSVDialogDownload>
-            ),
-            tooltip: targetStreamTalentPoolData
-               ? "Download Talent Pool"
-               : actionLoading
-               ? "Getting Talent Pool..."
-               : "Get Talent Pool",
-            onClick: () => {},
-            disabled: actionLoading,
-            hidden: isDraft,
-         }
-      },
-      [loadingTalentPool, targetStream, talentPoolDictionary, isDraft]
-   )
-
    const pdfReportAction = useCallback(
       (rowData) => {
          const actionLoading = loadingReportData[rowData?.id]
@@ -306,83 +145,14 @@ export function useMetaDataActions({
       [isDraft, isPast, loadingReportData, reportDataDictionary, group]
    )
 
-   const registeredStudentsAction = useCallback(
-      (rowData) => {
-         const actionLoading = loadingRegisteredUsersFromGroupData[rowData?.id]
-         const registeredStudentsData =
-            registeredStudentsFromGroupDictionary[rowData?.id]
-         const canDownloadRegisteredStudents = Boolean(
-            !isDraft &&
-               (group.universityCode ||
-                  group.privacyPolicyActive ||
-                  userData?.isAdmin)
-         )
-
-         const hintTitle = "Download Registered Users"
-
-         return {
-            icon: actionLoading ? (
-               <CircularProgress size={15} color="inherit" />
-            ) : (
-               <RegisteredUsersIcon color="action" />
-            ),
-            hintTitle,
-            hintDescription:
-               "Download a CSV with the details of the students who registered to your event",
-            tooltip: registeredStudentsData
-               ? "Download Registered Users"
-               : actionLoading
-               ? "Getting Registered Users..."
-               : "Get Registered Users",
-            onClick: () => {},
-            hidden: !canDownloadRegisteredStudents,
-            disabled: actionLoading || !canDownloadRegisteredStudents,
-            loadedButton: registeredStudentsData && (
-               <CSVDialogDownload
-                  title={hintTitle}
-                  data={registeredStudentsData}
-                  filename={
-                     "Registered Students " +
-                     rowData.company +
-                     " " +
-                     rowData.id +
-                     ".csv"
-                  }
-               >
-                  <ButtonWithHint
-                     startIcon={<RegisteredUsersIcon color="action" />}
-                     hintTitle={hintTitle}
-                     style={{
-                        marginTop: theme.spacing(0.5),
-                     }}
-                     hintDescription={
-                        "Download a CSV with the details of the students who registered to your event"
-                     }
-                  >
-                     Download Registered Students
-                  </ButtonWithHint>
-               </CSVDialogDownload>
-            ),
-         }
-      },
-      [
-         isDraft,
-         isPast,
-         registeredStudentsFromGroupDictionary,
-         group,
-         loadingRegisteredUsersFromGroupData,
-         userData?.isAdmin,
-      ]
-   )
-
    return {
       talentPoolAction,
       pdfReportAction,
       reportPdfData,
       removeReportPdfData,
       registeredStudentsAction,
-      setTargetStream,
-      registeredStudentsFromGroupDictionary,
+      getNumberOfRegisteredStudents,
+      participatedStudentsAction,
    }
 }
 
