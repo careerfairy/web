@@ -59,7 +59,7 @@ const StreamsTab = ({
                sx={{
                   ...styles.tab,
                   color: tabsColor,
-                  minWidth: "200px",
+                  minWidth: { xs: "50%", sm: "200px" },
                }}
                label="Upcoming Events"
                value="upcomingEvents"
@@ -69,7 +69,7 @@ const StreamsTab = ({
                sx={{
                   ...styles.tab,
                   color: tabsColor,
-                  minWidth: "200px",
+                  minWidth: { xs: "50%", sm: "200px" },
                }}
                label="Past Events"
                value="pastEvents"
