@@ -41,7 +41,7 @@ const PeopleWhoJoinedTab = ({ isStreamer, participatingStudents }: Props) => {
          (data) =>
             data.user.firstName?.toLowerCase().includes(searchParams) ||
             data.user.lastName?.toLowerCase().includes(searchParams) ||
-            data.user.university.name?.toLowerCase().includes(searchParams)
+            data.user.university?.name?.toLowerCase().includes(searchParams)
       )
       if (currentOption === TALENT_POOL_OPTION) {
          filtered = filtered.filter((userData) => userData.talentPool?.date)
