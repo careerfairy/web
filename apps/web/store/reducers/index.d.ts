@@ -54,6 +54,8 @@ interface StreamReducer {
       isBlurEnabled: boolean
       isBlurLoading: boolean
       hasErrored: boolean
+      backgroundImage: string | undefined
+      isBackgroundImageLoading: boolean
    }
    agoraState: {
       rtcConnectionState?: RTCConnectionState

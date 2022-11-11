@@ -1,6 +1,5 @@
 import { AGORA_RTC_CONNECTION_STATE_CONNECTING } from "../../constants/agora"
 import * as actions from "../actions/actionTypes"
-import { SET_VIDEO_BLUR_START } from "../actions/actionTypes"
 
 const initialState = {
    layout: {
@@ -31,6 +30,8 @@ const initialState = {
       isBlurEnabled: false,
       isBlurLoading: false,
       hasErrored: false,
+      backgroundImage: undefined,
+      isBackgroundImageLoading: false,
    },
    agoraState: {
       rtcConnectionState: {
@@ -175,6 +176,8 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: true,
                isBlurEnabled: false,
+               backgroundImage: undefined,
+               isBackgroundImageLoading: false,
             },
          }
       case actions.SET_VIDEO_BLUR_ENABLED:
@@ -184,6 +187,8 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: false,
                isBlurEnabled: true,
+               backgroundImage: undefined,
+               isBackgroundImageLoading: false,
             },
          }
       case actions.SET_VIDEO_EFFECTS_OFF:
@@ -193,6 +198,8 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: false,
                isBlurEnabled: false,
+               backgroundImage: undefined,
+               isBackgroundImageLoading: false,
             },
          }
       case actions.SET_VIDEO_EFFECTS_ERROR:
@@ -202,7 +209,31 @@ const streamReducer = (state = initialState, { type, payload }) => {
                ...state.videoOptions,
                isBlurLoading: false,
                isBlurEnabled: false,
+               backgroundImage: undefined,
+               isBackgroundImageLoading: false,
                hasErrored: true,
+            },
+         }
+      case actions.SET_VIDEO_BACKGROUND_IMAGE:
+         return {
+            ...state,
+            videoOptions: {
+               ...state.videoOptions,
+               isBlurLoading: false,
+               isBlurEnabled: false,
+               backgroundImage: payload,
+               isBackgroundImageLoading: true,
+            },
+         }
+      case actions.SET_VIDEO_BACKGROUND_IMAGE_ENABLED:
+         return {
+            ...state,
+            videoOptions: {
+               ...state.videoOptions,
+               isBlurLoading: false,
+               isBlurEnabled: false,
+               hasErrored: false,
+               isBackgroundImageLoading: false,
             },
          }
       case actions.SET_SCREEN_SHARE_DENIED_ERROR:
