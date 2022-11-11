@@ -288,3 +288,11 @@ export const setVideoEffectsOff = () => {
 export const setVideoEffectsErrored = () => {
    return { type: actions.SET_VIDEO_EFFECTS_ERROR }
 }
+
+export const setVideoBackgroundImage = (imageUrl: string) => {
+   return { type: actions.SET_VIDEO_BACKGROUND_IMAGE, payload: imageUrl }
+}
+
+export const setVideoBackgroundImageEnabled = () => {
+   return { type: actions.SET_VIDEO_BACKGROUND_IMAGE_ENABLED }
+}

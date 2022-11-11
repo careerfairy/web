@@ -1,10 +1,12 @@
 import { LocalStream } from "../../types/streaming"
-import { useCallback, useEffect } from "react"
+import { useCallback } from "react"
 import { agoraVirtualBackgroundExtension } from "../../data/agora/AgoraService"
 import { IVirtualBackgroundProcessor } from "agora-extension-virtual-background"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import { useDispatch } from "react-redux"
 import {
+   setVideoBackgroundImage,
+   setVideoBackgroundImageEnabled,
    setVideoBlurEnabled,
    setVideoBlurStart,
    setVideoEffectsErrored,
@@ -66,7 +68,7 @@ const useVirtualBackgroundActions = (localStream: LocalStream) => {
       }
 
       return processor
-   }, [errorNotification, localStream.videoTrack])
+   }, [dispatch, errorNotification, localStream.videoTrack])
 
    /**
     * Blur the user's actual background
@@ -101,6 +103,45 @@ const useVirtualBackgroundActions = (localStream: LocalStream) => {
       localStream.videoTrack,
    ])
 
+   const setBackgroundImage = useCallback(
+      async (imageUrl) => {
+         if (!localStream.videoTrack) return
+
+         dispatch(setVideoBackgroundImage(imageUrl))
+
+         const imgElement = document.createElement("img")
+         imgElement.crossOrigin = "Anonymous" // required for cross-origin urls
+         imgElement.src = imageUrl
+         imgElement.onload = async () => {
+            try {
+               const processor = await getProcessorInstance()
+
+               processor.setOptions({ type: "img", source: imgElement })
+               await processor.enable()
+
+               /**
+                * There is a delay between enabling the processor and the effect being visually applied
+                * I couldn't find any event / flag that would indicate the effect apply was complete
+                * So to improve the UX, let's display the loading state a bit
+                */
+               setTimeout(() => {
+                  dispatch(setVideoBackgroundImageEnabled())
+               }, 1500)
+            } catch (e) {
+               errorNotification(e, "Failed to set Background Image")
+               dispatch(setVideoEffectsOff())
+               imgElement?.remove() // remove elem from DOM
+            }
+         }
+      },
+      [
+         dispatch,
+         errorNotification,
+         getProcessorInstance,
+         localStream.videoTrack,
+      ]
+   )
+
    const clearBackgroundEffects = useCallback(async () => {
       if (!localStream.videoTrack) return
 
@@ -127,6 +168,7 @@ const useVirtualBackgroundActions = (localStream: LocalStream) => {
    return {
       setBackgroundBlurring,
       clearBackgroundEffects,
+      setBackgroundImage,
       checkCompatibility,
    }
 }
