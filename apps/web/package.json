@@ -14,7 +14,8 @@
       "test:watch": "jest --watch",
       "test:coverage": "jest --coverage",
       "test:e2e-webapp": "playwright test",
-      "test:e2e-webapp-debug": "cross-env PWDEBUG=console DEBUG=pw:webserver playwright test --debug"
+      "test:e2e-webapp-debug": "cross-env PWDEBUG=console DEBUG=pw:webserver playwright test --debug",
+      "prepare": "copy-files-from-to"
    },
    "dependencies": {
       "@careerfairy/seed-data": "*",
@@ -35,6 +36,7 @@
       "@reduxjs/toolkit": "^1.8.3",
       "@sentry/nextjs": "^6.17.9",
       "@stahl.luke/react-reveal": "^1.2.3",
+      "agora-extension-virtual-background": "^1.1.1",
       "agora-rtc-sdk-ng": "^4.14.0",
       "agora-rtm-sdk": "^1.5.1",
       "algoliasearch": "^4.13.0",
@@ -125,6 +127,7 @@
       "@types/react": "^17.0.38",
       "babel-jest": "^27.5.1",
       "clsx": "^1.1.1",
+      "copy-files-from-to": "^3.2.2",
       "cross-env": "^7.0.3",
       "esbuild-jest": "^0.5.0",
       "eslint": "8.9.0",
@@ -143,5 +146,11 @@
    },
    "engines": {
       "node": "14.x"
-   }
+   },
+   "copyFiles": [
+      {
+         "from": "../../node_modules/agora-extension-virtual-background/wasms/agora-wasm.wasm",
+         "to": "public/wasms/agora-wasm.wasm"
+      }
+   ]
 }
