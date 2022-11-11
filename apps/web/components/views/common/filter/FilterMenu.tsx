@@ -105,23 +105,26 @@ const FilterMenu = ({
    const { data: interests } = useInterests()
    const { pathname, push, query } = useRouter()
 
-   const handleQuery = (queryParam: string, queryValue: string | string[]) => {
-      const newQuery = {
-         ...query,
-         [queryParam]: Array.isArray(queryValue)
-            ? queryValue.join(",")
-            : queryValue,
-         page: 0,
-      }
-      void push(
-         {
-            pathname: pathname,
-            query: newQuery,
-         },
-         undefined,
-         { shallow: true }
-      )
-   }
+   const handleQuery = useCallback(
+      (queryParam: string, queryValue: string | string[]) => {
+         const newQuery = {
+            ...query,
+            [queryParam]: Array.isArray(queryValue)
+               ? queryValue.join(",")
+               : queryValue,
+            page: 0,
+         }
+         void push(
+            {
+               pathname: pathname,
+               query: newQuery,
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [pathname, push, query]
+   )
 
    const selects = useMemo<SelectProps[]>(
       () => [
@@ -180,15 +183,24 @@ const FilterMenu = ({
             ? query.interests
             : query.interests?.split(",") || []
          const isInQuery = currentInterests.includes(interestName)
+
+         const newInterests = isInQuery
+            ? currentInterests
+                 .filter((interest) => interest !== interestName)
+                 .join(",")
+            : currentInterests.concat(interestName).join(",")
+
          const newQuery = {
             ...query,
-            interests: isInQuery
-               ? currentInterests
-                    .filter((interest) => interest !== interestName)
-                    .join(",")
-               : currentInterests.concat(interestName).join(","),
+            interests: newInterests,
             page: 0,
          }
+
+         // if there´s no filter, no need to have an empty query param
+         if (newInterests.length === 0) {
+            delete newQuery.interests
+         }
+
          void push(
             {
                pathname: pathname,
@@ -205,10 +217,17 @@ const FilterMenu = ({
       (name: string, selectedLanguages: OptionGroup[]) => {
          const languages = mapOptions(selectedLanguages)
 
+         const newLanguage = languages.join(",")
+
          const newQuery = {
             ...query,
-            [name]: languages.join(","),
+            [name]: newLanguage,
             page: 0,
+         }
+
+         // if there´s no filter, no need to have an empty query param
+         if (newLanguage.length === 0) {
+            delete newQuery[name]
          }
 
          void push(
@@ -384,10 +403,10 @@ const FilterMenu = ({
          </FormControl>
       )
    }, [
+      getSelectedLanguages,
       handleChangeLanguages,
       handleClearQueries,
       numberOfActiveFilters,
-      query.languages,
    ])
 
    const renderInterests = useCallback(() => {
