@@ -80,6 +80,7 @@ const EventsTable = ({
    const [toolbarActionsDialogOpen, setToolbarActionsDialogOpen] =
       useState(false)
    const [endOfEventDialogData, setEndOfEventDialogData] = useState(null)
+   const [targetStream, setTargetStream] = useState<LivestreamEvent>(null)
 
    const {
       talentPoolAction,
@@ -87,12 +88,13 @@ const EventsTable = ({
       registeredStudentsAction,
       removeReportPdfData,
       reportPdfData,
-      setTargetStream,
-      registeredStudentsFromGroupDictionary,
+      participatedStudentsAction,
+      getNumberOfRegisteredStudents,
    } = useMetaDataActions({
       group,
       isPast,
       isDraft,
+      targetStream,
    })
 
    const dispatch = useDispatch()
@@ -173,7 +175,7 @@ const EventsTable = ({
       setToolbarActionsDialogOpen(false)
    }, [])
 
-   const handleDeleteStream = async () => {
+   const handleDeleteStream = useCallback(async () => {
       try {
          setDeletingEvent(true)
          const targetCollection = isDraft ? "draftLivestreams" : "livestreams"
@@ -184,7 +186,7 @@ const EventsTable = ({
          setDeletingEvent(false)
       }
       setStreamIdToBeDeleted(null)
-   }
+   }, [isDraft, firebase, streamIdToBeDeleted])
 
    const handleOpenStreamerLinksModal = useCallback((rowData) => {
       if (rowData.id) {
@@ -231,6 +233,7 @@ const EventsTable = ({
          },
          pdfReportAction(rowData),
          registeredStudentsAction(rowData),
+         participatedStudentsAction(rowData),
          talentPoolAction(rowData),
          {
             icon: <GetStreamerLinksIcon color="action" />,
@@ -294,18 +297,19 @@ const EventsTable = ({
          },
       ],
       [
-         registeredStudentsAction,
-         pdfReportAction,
-         talentPoolAction,
-         handleCreateExternalLink,
-         handleOpenStreamerLinksModal,
-         handleClickDeleteStream,
-         handleCreateExternalLink,
-         handleOpenStreamerLinksModal,
-         handleClickDeleteStream,
-         streams,
          isDraft,
+         pdfReportAction,
+         registeredStudentsAction,
+         participatedStudentsAction,
+         talentPoolAction,
+         group.groupId,
          userData?.isAdmin,
+         publishingDraft,
+         handleEditStream,
+         handleOpenStreamerLinksModal,
+         handleCreateExternalLink,
+         handleClickDeleteStream,
+         handlePublishStream,
       ]
    )
 
@@ -318,7 +322,7 @@ const EventsTable = ({
             tooltip: "New event",
          },
       ],
-      [streams]
+      [handleOpenToolbarActionsDialog]
    )
 
    const columns = useMemo<Column<LivestreamEvent>[]>(
@@ -354,10 +358,9 @@ const EventsTable = ({
             render: (rowData) => (
                <ManageStreamActions
                   rowData={rowData}
-                  numberOfRegisteredUsers={
-                     registeredStudentsFromGroupDictionary?.[rowData?.id]
-                        ?.length
-                  }
+                  numberOfRegisteredUsers={getNumberOfRegisteredStudents(
+                     rowData
+                  )}
                   clicked={Boolean(clickedRows[rowData?.id])}
                   isDraft={isDraft}
                   setTargetStream={setTargetStream}
@@ -409,14 +412,16 @@ const EventsTable = ({
          },
       ],
       [
+         handleCompanySearch,
          handleSpeakerSearch,
-         streams,
-         groupsDictionary,
          handleHostsSearch,
+         theme.shadows,
          handleEditStream,
-         manageStreamActions,
-         registeredStudentsFromGroupDictionary,
+         getNumberOfRegisteredStudents,
          clickedRows,
+         isDraft,
+         manageStreamActions,
+         groupsDictionary,
       ]
    )
 
@@ -434,7 +439,7 @@ const EventsTable = ({
             return {}
          },
       }),
-      [eventId]
+      [eventId, theme.palette.primary.main]
    )
 
    const handleRemoveEventId = () => {
