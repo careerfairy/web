@@ -1,11 +1,22 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, {
+   Dispatch,
+   forwardRef,
+   ReactNode,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import {
    Box,
+   CircularProgress,
    FormControl,
    IconButton,
    InputLabel,
    MenuItem,
    Select,
+   Tooltip,
    Typography,
 } from "@mui/material"
 import VideocamOffIcon from "@mui/icons-material/VideocamOff"
@@ -23,6 +34,11 @@ import { useSelector } from "react-redux"
 import RootState from "../../../../store/reducers"
 import SoundLevelDisplay from "../../common/SoundLevelDisplay"
 import MicOffIcon from "@mui/icons-material/MicOff"
+import Stack from "@mui/material/Stack"
+import BlurOnIcon from "@mui/icons-material/BlurOn"
+import useVirtualBackgroundActions from "../../../../context/agora/useVirtualBackgroundActions"
+import { videoOptionsSelector } from "../../../../store/selectors/streamSelectors"
+import BlurOffIcon from "@mui/icons-material/BlurOff"
 
 const styles = {
    gridItemContent: {
@@ -300,25 +316,30 @@ const DeviceSelect = ({
                      )}
                   </>
                )}
-               {showDisableIcon && (
-                  <Box sx={styles.iconWrapper}>
+               <Box sx={styles.iconWrapper}>
+                  {showDisableIcon && isCamera && (
                      <IconButton
-                        aria-label={
-                           isCamera
-                              ? "turn-off-video-icon"
-                              : "turn-off-camera-icon"
-                        }
+                        aria-label={"turn-off-video-icon"}
                         size="medium"
                         onClick={handleCloseDevice}
                      >
-                        {isCamera ? (
-                           <VideocamOffIcon fontSize="inherit" />
-                        ) : (
-                           <MicOffIcon fontSize="inherit" />
-                        )}
+                        <VideocamOffIcon fontSize="inherit" />
                      </IconButton>
-                  </Box>
-               )}
+                  )}
+
+                  {showDisableIcon && !isCamera && (
+                     <IconButton
+                        aria-label={"turn-off-mic-icon"}
+                        size="medium"
+                        onClick={handleCloseDevice}
+                     >
+                        <MicOffIcon fontSize="inherit" />
+                     </IconButton>
+                  )}
+                  {isCamera && (
+                     <CameraControlButtons localStream={localStream} />
+                  )}
+               </Box>
             </>
          ) : (
             <Box sx={styles.container}>
@@ -339,6 +360,104 @@ const DeviceSelect = ({
          )}
       </Box>
    )
+}
+
+type CameraControlButtonsProps = {
+   localStream: LocalStream
+}
+
+const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
+   const { isBlurLoading, isBlurEnabled, hasErrored } =
+      useSelector(videoOptionsSelector)
+   const { clearBackgroundEffects, setBackgroundBlurring, checkCompatibility } =
+      useVirtualBackgroundActions(localStream)
+
+   const deviceIsCompatible = useMemo(() => {
+      return !hasErrored && checkCompatibility()
+   }, [checkCompatibility, hasErrored])
+
+   const toggleBlur = useCallback(() => {
+      if (isBlurLoading) return
+
+      if (isBlurEnabled) {
+         void clearBackgroundEffects()
+      } else {
+         void setBackgroundBlurring()
+      }
+   }, [
+      clearBackgroundEffects,
+      isBlurEnabled,
+      isBlurLoading,
+      setBackgroundBlurring,
+   ])
+
+   return (
+      <>
+         <LoadingIconButton
+            tooltipTitle={getBlurButtonTooltip(
+               isBlurEnabled,
+               isBlurLoading,
+               deviceIsCompatible
+            )}
+            isLoading={isBlurLoading}
+            onClickHandler={toggleBlur}
+            disabled={!deviceIsCompatible}
+            disabledChildren={<BlurOffIcon />}
+         >
+            <BlurOnIcon color={isBlurEnabled ? "primary" : undefined} />
+         </LoadingIconButton>
+      </>
+   )
+}
+
+type LoadingIconButtonProps = {
+   isLoading: boolean
+   children: ReactNode
+   tooltipTitle: string
+   onClickHandler: () => void
+   disabledChildren?: ReactNode
+   disabled?: boolean
+}
+
+const LoadingIconButton = ({
+   isLoading,
+   children,
+   tooltipTitle,
+   onClickHandler,
+   disabledChildren,
+   disabled,
+}: LoadingIconButtonProps) => {
+   let body = children
+   if (isLoading) {
+      body = <CircularProgress color="inherit" size={21} />
+   }
+
+   if (disabled && disabledChildren) {
+      body = disabledChildren
+   }
+
+   return (
+      <Tooltip title={tooltipTitle}>
+         <span>
+            <IconButton onClick={onClickHandler} disabled={disabled}>
+               {body}
+            </IconButton>
+         </span>
+      </Tooltip>
+   )
+}
+
+function getBlurButtonTooltip(isEnabled, isLoading, deviceIsCompatible) {
+   if (!deviceIsCompatible) {
+      return `Your browser doesn't support the background blur functionality`
+   }
+   const suffix = "Background Blur"
+
+   if (isLoading) {
+      return `Loading ${suffix}`
+   }
+
+   return `${isEnabled ? "Disable" : "Enable"} ${suffix}`
 }
 
 export default DeviceSelect
