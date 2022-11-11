@@ -25,9 +25,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
 
    const { setLivestreamCurrentSpeakerId } = useFirebaseService()
    const [currentSpeakerId, setCurrentSpeakerId] = useState(
-      speakerSwitchMode === "manual"
-         ? firestoreCurrentSpeaker
-         : localMediaStream?.uid
+      firestoreCurrentSpeaker
    )
 
    useEffect(() => {
@@ -59,7 +57,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
                audioLevel: localMediaStream.audioTrack.getVolumeLevel(),
             })
          }
-         if (audioLevels && audioLevels.length > 0) {
+         if (audioLevels && audioLevels.length > 1) {
             const maxEntry = audioLevels.reduce((prev, current) =>
                prev.audioLevel > current.audioLevel ? prev : current
             )
@@ -89,9 +87,6 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
    }, [mode])
 
    useEffect(() => {
-      if (speakerSwitchMode !== "manual") return
-
-      // only switch based on firestore speaker if we're in manual mode
       if (externalMediaStreams && firestoreCurrentSpeaker) {
          // TODO get rid of this
          let existingCurrentSpeaker = externalMediaStreams.find(
@@ -101,15 +96,13 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
             handleChangeCurrentSpeakerId(streamId)
          }
       }
-   }, [externalMediaStreams, speakerSwitchMode])
+   }, [externalMediaStreams])
 
    useEffect(() => {
-      if (speakerSwitchMode !== "manual") return
-
       if (firestoreCurrentSpeaker) {
          setCurrentSpeakerId(firestoreCurrentSpeaker)
       }
-   }, [firestoreCurrentSpeaker, speakerSwitchMode])
+   }, [firestoreCurrentSpeaker])
 
    const handleChangeCurrentSpeakerId = useCallback(
       (id, isFallback = false) => {
