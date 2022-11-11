@@ -1,7 +1,7 @@
 export interface BigQueryUserResponse {
    firstName: string
    lastName: string
-   userEmail: string
+   userEmail?: string
    id: string
    unsubscribed: boolean
    fieldOfStudyName: string
