@@ -9,6 +9,7 @@ import Stack from "@mui/material/Stack"
 import FilterMenu from "./FilterMenu"
 import { useRouter } from "next/router"
 import { useDebounce } from "react-use"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 const styles = {
    root: {
       height: "100%",
@@ -34,8 +35,8 @@ const styles = {
    },
    filterButton: {
       borderRadius: wishListBorderRadius,
-      height: "48px",
-      width: "116px",
+      height: "100%",
+      maxWidth: "116px",
    },
 }
 
@@ -57,6 +58,7 @@ const Filter = ({ filtersToShow }: Props) => {
    const [searchValue, setSearchValue] = useState<string>(
       (query.search as string) || ""
    )
+   const isMobile = useIsMobile()
 
    const showSearch = useMemo(
       () => filtersToShow.includes(FilterEnum.search),
@@ -145,19 +147,32 @@ const Filter = ({ filtersToShow }: Props) => {
                   />
                </Paper>
             ) : null}
-            <Button
-               aria-describedby={id}
-               startIcon={
+            {isMobile ? (
+               <Button
+                  aria-describedby={id}
+                  sx={{ ...styles.filterButton, p: 1, minWidth: 0 }}
+                  onClick={handleOpenFilterMenu}
+                  disableElevation
+                  variant={filterActive ? "contained" : "outlined"}
+                  color={filterActive ? "primary" : "grey"}
+               >
                   <FilterIcon color={filterActive ? "inherit" : "primary"} />
-               }
-               sx={styles.filterButton}
-               onClick={handleOpenFilterMenu}
-               disableElevation
-               variant={filterActive ? "contained" : "outlined"}
-               color={filterActive ? "primary" : "grey"}
-            >
-               Filter
-            </Button>
+               </Button>
+            ) : (
+               <Button
+                  aria-describedby={id}
+                  startIcon={
+                     <FilterIcon color={filterActive ? "inherit" : "primary"} />
+                  }
+                  sx={styles.filterButton}
+                  onClick={handleOpenFilterMenu}
+                  disableElevation
+                  variant={filterActive ? "contained" : "outlined"}
+                  color={filterActive ? "primary" : "grey"}
+               >
+                  Filter
+               </Button>
+            )}
          </Stack>
          <FilterMenu
             id={id}
