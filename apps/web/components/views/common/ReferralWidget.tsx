@@ -5,11 +5,10 @@ import { Button, IconButton, Tooltip, useMediaQuery } from "@mui/material"
 import useSocials from "../../custom-hook/useSocials"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { StylesProps } from "../../../types/commonTypes"
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 const mobileProp = "sm"
 
 interface WidgetButtonProps extends StackProps {
-   event: LivestreamEvent | Livestream
+   event: LivestreamEvent
    iconsColor?: "grey" | "primary" | "secondary"
    noBackgroundColor?: boolean
 }

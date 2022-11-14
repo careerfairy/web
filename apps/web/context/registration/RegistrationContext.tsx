@@ -18,7 +18,6 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -36,7 +35,7 @@ interface DefaultContext {
    handleSkipNext: () => void
    variant: Variants
    margin: Margins
-   livestream: LivestreamEvent | Livestream
+   livestream: LivestreamEvent
    group?: Group
    getMore: () => Promise<void>
    groups?: Group[]
@@ -150,13 +149,14 @@ function reducer(state, action) {
 type Props = {
    children: React.ReactNode
    groups?: Group[]
-   livestream?: LivestreamEvent | Livestream
+   livestream?: LivestreamEvent
    closeModal?: () => void
    promptOtherEventsOnFinal?: boolean
    onQuestionsAnswered?: (...any) => void
    onFinish?: () => void
    cancelable?: boolean
    targetGroupId?: string
+   isRecommended?: boolean
 }
 export function RegistrationContextProvider({
    children,
@@ -168,6 +168,7 @@ export function RegistrationContextProvider({
    onFinish,
    cancelable,
    targetGroupId,
+   isRecommended = false,
 }: Props) {
    const {
       checkIfUserAgreedToGroupPolicy,
@@ -326,9 +327,7 @@ export function RegistrationContextProvider({
                   groupsWithPolicies,
                   userAnsweredLivestreamGroupQuestions,
                   {
-                     ...(livestream instanceof Livestream && {
-                        isRecommended: livestream.isRecommended,
-                     }),
+                     isRecommended,
                   }
                )
                dataLayerLivestreamEvent(

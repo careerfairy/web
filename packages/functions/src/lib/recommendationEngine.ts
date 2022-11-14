@@ -1,6 +1,6 @@
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 import { livestreamsRepo, userRepo } from "../api/repositories"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 /**
  *  The function takes a user's ID and returns a list of recommended events
@@ -14,7 +14,7 @@ export const recommendationEngine = async (
 ): Promise<string[]> => {
    const userData = await userRepo.getUserDataById(userId)
 
-   const recommendedEvents: Livestream[][] = await Promise.all([
+   const recommendedEvents: LivestreamPresenter[][] = await Promise.all([
       // Fetch top {limit} recommended events based on the user's Metadata
       getRecommendedEventsBasedOnUserData({ userData, limit }),
 
@@ -44,12 +44,12 @@ const getRecommendedEventsBasedOnUserData = async ({
 }: {
    userData: UserData
    limit: number
-}): Promise<Livestream[]> => {
+}): Promise<LivestreamPresenter[]> => {
    if (!userData) {
       return []
    }
 
-   const arrayOfRecommendedEventsBasedOnUserData: Livestream[][] =
+   const arrayOfRecommendedEventsBasedOnUserData: LivestreamPresenter[][] =
       await Promise.all([
          // Fetch recommended events based on the user's interests
          livestreamsRepo.getRecommendEventsBasedOnUserInterests(

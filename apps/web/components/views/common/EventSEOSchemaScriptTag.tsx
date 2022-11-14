@@ -5,10 +5,10 @@ import {
    addMinutes,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 interface EventSEOProps {
-   event: LivestreamEvent | Livestream
+   event: LivestreamEvent | LivestreamPresenter
 }
 const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
    const data = useMemo(() => {
@@ -88,10 +88,10 @@ const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
    )
 }
 
-const getStartDate = (event: LivestreamEvent | Livestream) => {
+const getStartDate = (event: LivestreamEvent | LivestreamPresenter) => {
    let startDate: Date
 
-   if (event instanceof Livestream) {
+   if (event instanceof LivestreamPresenter) {
       const timestamp = event.start.getTime()
       startDate = isNaN(timestamp) ? new Date() : event.start
    } else {

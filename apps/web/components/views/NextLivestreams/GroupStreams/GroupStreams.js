@@ -9,7 +9,7 @@ import { useRouter } from "next/router"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import { useInterests } from "../../../custom-hook/useCollection"
 import useBusinessModels from "../../../custom-hook/utils/useBusinessModels"
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const styles = {
    emptyMessage: {
@@ -77,7 +77,7 @@ const GroupStreams = ({
 
    const slicedBusinessLivestreams = useBusinessModels(
       slicedLivestreams,
-      Livestream.createFromFirebase
+      LivestreamPresenter.createFromDocument
    )
 
    const renderStreamCards = slicedBusinessLivestreams?.map((livestream) => {

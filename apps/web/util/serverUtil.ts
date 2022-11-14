@@ -1,4 +1,7 @@
 import { store } from "../pages/_app"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { omit, pick } from "lodash"
 
 export const mapServerSideStream = (livestream) => {
    return {
@@ -7,7 +10,6 @@ export const mapServerSideStream = (livestream) => {
       title: livestream.title || null,
       companyLogoUrl: livestream.companyLogoUrl || null,
       backgroundImageUrl: livestream.backgroundImageUrl || null,
-      isBeta: livestream.isBeta ?? null,
       speakers: livestream.speakers || [],
       summary: livestream.summary || null,
       createdDateString: livestream.created?.toDate?.().toString() || null,
@@ -27,10 +29,22 @@ export const getServerSideStream = async (livestreamId) => {
          doc: livestreamId,
       })
       if (livestreamSnap.exists) {
-         serverSideStream = mapServerSideStream({
+         const livestreamEvent = {
             id: livestreamSnap.id,
             ...livestreamSnap.data(),
-         })
+         } as LivestreamEvent
+         serverSideStream =
+            LivestreamPresenter.createFromDocument(
+               livestreamEvent
+            ).serializeToPlainObject()
+         return omit<LivestreamPresenter>(serverSideStream, [
+            "registeredUsers",
+            "talentPool",
+            "participatingStudents",
+            "participants",
+            "liveSpeakers",
+            "author",
+         ])
       }
    }
    return serverSideStream

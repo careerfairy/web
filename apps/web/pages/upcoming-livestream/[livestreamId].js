@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getServerSideStream, parseStreamDates } from "../../util/serverUtil"
+import { getServerSideStream } from "../../util/serverUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -29,6 +29,7 @@ import ReferralSection from "../../components/views/upcoming-livestream/Referral
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -38,7 +39,11 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
 
-   const [stream, setStream] = useState(parseStreamDates(serverStream))
+   const [stream, setStream] = useState(
+      LivestreamPresenter.createFromPlainObject(
+         serverStream
+      ).convertToDocument()
+   )
    const { push, asPath, query, pathname, replace } = useRouter()
    const [currentGroup, setCurrentGroup] = useState(null)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
@@ -141,9 +146,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                   const data = querySnapshot.data()
                   setStream({
                      ...data,
-                     createdDate: data.created?.toDate?.(),
-                     lastUpdatedDate: data.lastUpdated?.toDate?.(),
-                     startDate: data.start?.toDate?.(),
                      id: querySnapshot.id,
                   })
                }

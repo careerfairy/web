@@ -16,7 +16,7 @@ import {
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
-import { Livestream } from "./Livestream"
+import { LivestreamPresenter } from "./LivestreamPresenter"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -140,7 +140,7 @@ export interface ILivestreamRepository {
    getRecommendEventsBasedOnUserInterests(
       userInterestsIds?: string[],
       limit?: number
-   ): Promise<Livestream[] | null>
+   ): Promise<LivestreamPresenter[] | null>
 }
 
 export class FirebaseLivestreamRepository
@@ -471,7 +471,7 @@ export class FirebaseLivestreamRepository
    async getRecommendEventsBasedOnUserInterests(
       userInterestsIds: string[] = [],
       limit: number = 10
-   ): Promise<Livestream[] | null> {
+   ): Promise<LivestreamPresenter[] | null> {
       let query = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
@@ -491,7 +491,7 @@ export class FirebaseLivestreamRepository
       const snapshots = await query.get()
 
       return mapFirestoreDocuments<LivestreamEvent>(snapshots)
-         .map(Livestream.createFromFirebase)
+         .map(LivestreamPresenter.createFromDocument)
          .map((livestream) => {
             livestream.setIsRecommended(true)
             return livestream

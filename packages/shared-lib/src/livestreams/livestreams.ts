@@ -78,7 +78,7 @@ export interface LivestreamEvent extends Identifiable {
     */
    liveSpeakers?: LiveSpeaker[]
    lastUpdatedAuthorInfo?: AuthorInfo
-   universities: any[]
+   universities?: any[]
    questionsDisabled?: boolean
 
    // ATS Jobs
@@ -100,6 +100,12 @@ export interface LivestreamEvent extends Identifiable {
    timezone?: string
    isFaceToFace?: boolean
    reminderEmailsSent?: IEmailSent
+
+   /*
+    * Breakout rooms
+    * */
+   index?: number
+   parentLivestream?: LivestreamEventPublicData
 }
 
 /**
@@ -271,18 +277,6 @@ export interface LivestreamEventPublicData {
    start?: firebase.firestore.Timestamp
    companyLogoUrl?: string
    test?: boolean
-}
-
-export interface BreakoutRoom extends Identifiable {
-   companyLogoUrl?: string
-   test?: boolean
-   title?: string
-   start: firebase.firestore.Timestamp
-   hasStarted?: boolean
-   hasEnded?: boolean
-   liveSpeakers?: Speaker[]
-   index?: number
-   parentLivestream?: LivestreamEventPublicData
 }
 
 export interface LivestreamQuestion extends Identifiable {

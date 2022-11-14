@@ -17,7 +17,7 @@ import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import useBusinessModels from "../../../custom-hook/utils/useBusinessModels"
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const styles = {
    carousel: {
@@ -96,7 +96,10 @@ const EventsPreview = ({
       }))
    }
 
-   const livestreams = useBusinessModels(events, Livestream.createFromFirebase)
+   const livestreams = useBusinessModels(
+      events,
+      LivestreamPresenter.createFromDocument
+   )
 
    return (
       <>

@@ -7,7 +7,6 @@ import { getLinkToStream } from "util/streamUtil"
 import * as actions from "store/actions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -30,11 +29,7 @@ const useRegistrationModal = (
    const dispatch = useDispatch()
 
    const handleOpenJoinModal = useCallback(
-      (
-         groups: any[],
-         targetGroupId: string,
-         livestream: LivestreamEvent | Livestream
-      ) =>
+      (groups: any[], targetGroupId: string, livestream: LivestreamEvent) =>
          setJoinGroupModalData({
             groups: groups,
             targetGroupId,
@@ -45,7 +40,7 @@ const useRegistrationModal = (
 
    const handleClickRegister = useCallback(
       async (
-         event: LivestreamEvent | Livestream,
+         event: LivestreamEvent,
          targetGroupId: string,
          groups: any[],
          hasRegistered: boolean

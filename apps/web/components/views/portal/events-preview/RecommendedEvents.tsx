@@ -2,6 +2,7 @@ import React, { useMemo } from "react"
 import EventsPreview, { EventsTypes } from "./EventsPreview"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 const RecommendedEvents = ({ limit }: Props) => {
    const { authenticatedUser } = useAuth()
@@ -31,7 +32,7 @@ const RecommendedEvents = ({ limit }: Props) => {
 }
 
 interface Props {
-   limit?: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 // max of 10 events to allow for firestore query limit
+   limit?: FirebaseInArrayLimit
 }
 
 export default RecommendedEvents

@@ -37,8 +37,7 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
-import { Livestream } from "@careerfairy/shared-lib/dist/livestreams/Livestream"
-import { getDate } from "../../util/streamUtil"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -235,25 +234,27 @@ class FirebaseService {
    sendRegistrationConfirmationEmail = (
       user,
       userData,
-      livestream: LivestreamEvent | Livestream
+      livestream: LivestreamEvent
    ) => {
-      if (livestream.isHybrid) {
+      const livestreamPresenter =
+         LivestreamPresenter.createFromDocument(livestream)
+      if (livestreamPresenter.isHybrid) {
          return this.sendHybridEventEmailRegistrationConfirmation(
             user,
             userData,
-            livestream
+            livestreamPresenter
          )
-      } else if (livestream.isFaceToFace) {
+      } else if (livestreamPresenter.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
             user,
             userData,
-            livestream
+            livestreamPresenter
          )
       } else {
          return this.sendLivestreamEmailRegistrationConfirmation(
             user,
             userData,
-            livestream
+            livestreamPresenter
          )
       }
    }
@@ -261,7 +262,7 @@ class FirebaseService {
    sendLivestreamEmailRegistrationConfirmation = (
       user,
       userData,
-      livestream: LivestreamEvent | Livestream
+      livestream: LivestreamPresenter
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
@@ -270,8 +271,8 @@ class FirebaseService {
       return sendLivestreamRegistrationConfirmationEmail({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         regular_date: getDate(livestream.start)?.toString?.() || "",
-         livestream_date: DateUtil.getPrettyDate(getDate(livestream.start)),
+         regular_date: livestream.start?.toString?.() || "",
+         livestream_date: DateUtil.getPrettyDate(livestream.start),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          livestream_title: livestream.title,
@@ -282,7 +283,7 @@ class FirebaseService {
    sendPhysicalEventEmailRegistrationConfirmation = (
       user,
       userData,
-      event: LivestreamEvent | Livestream
+      event: LivestreamPresenter
    ) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
@@ -291,7 +292,7 @@ class FirebaseService {
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(getDate(event.start)),
+         event_date: DateUtil.getPrettyDate(event.start),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
@@ -302,7 +303,7 @@ class FirebaseService {
    sendHybridEventEmailRegistrationConfirmation = (
       user,
       userData,
-      event: LivestreamEvent | Livestream
+      event: LivestreamPresenter
    ) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
@@ -311,7 +312,7 @@ class FirebaseService {
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(getDate(event.start)),
+         event_date: DateUtil.getPrettyDate(event.start),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,

@@ -6,9 +6,10 @@ import { useMemo } from "react"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import { collection, query, where } from "firebase/firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 type Config = {
-   limit: 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 // Max 10 to allow firestore query to work
+   limit: FirebaseInArrayLimit
 }
 
 const useRecommendedEvents = (

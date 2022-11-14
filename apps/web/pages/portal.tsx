@@ -7,22 +7,21 @@ import ComingUpNextEvents from "../components/views/portal/events-preview/Coming
 import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents"
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
-import { GetServerSideProps } from "next"
+import { InferGetServerSidePropsType } from "next"
 import SEO from "../components/util/SEO"
 import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
-import { HighLight } from "@careerfairy/shared-lib/dist/highlights/Highlight"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const PortalPage = ({
    highlights,
    comingUpNextEvents,
    showHighlights,
    pastEvents,
-}: Props) => {
+}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -66,7 +65,7 @@ const PortalPage = ({
    )
 }
 
-export const getServerSideProps: GetServerSideProps = async () => {
+export const getServerSideProps = async () => {
    const [showHighlights, highlights, comingUpNextEvents, pastEvents] =
       await Promise.all([
          highlightRepo.shouldShowHighlightsCarousel(),
@@ -83,12 +82,12 @@ export const getServerSideProps: GetServerSideProps = async () => {
          showHighlights,
          ...(highlights && { highlights }),
          ...(comingUpNextEvents && {
-            comingUpNextEvents: comingUpNextEvents.map((event) =>
-               livestreamRepo.serializeEvent(event)
+            comingUpNextEvents: comingUpNextEvents.map(
+               LivestreamPresenter.serializeDocument
             ),
          }),
          ...(pastEvents && {
-            pastEvents: pastEvents.map((event) => JSON.stringify(event)),
+            pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
       },
    }
@@ -97,15 +96,8 @@ export const getServerSideProps: GetServerSideProps = async () => {
 /**
  * To parse the events coming from server side
  */
-const mapFromServerSide = (events = []): LivestreamEvent[] => {
-   return events.map((event) => JSON.parse(event))
-}
-
-type Props = {
-   highlights: HighLight[]
-   comingUpNextEvents: LivestreamEvent[]
-   showHighlights: boolean
-   pastEvents: string[]
+const mapFromServerSide = (events: { [p: string]: any }[]) => {
+   return events.map(LivestreamPresenter.parseDocument)
 }
 
 export default PortalPage
