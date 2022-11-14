@@ -379,6 +379,7 @@ const FilterMenu = ({
                      variant={"text"}
                      size={"small"}
                      color={"secondary"}
+                     sx={{ p: 0 }}
                   >
                      Clear all
                   </Button>

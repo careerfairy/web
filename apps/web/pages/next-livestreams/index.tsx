@@ -16,6 +16,7 @@ import { useRouter } from "next/router"
 import { Grid, Typography } from "@mui/material"
 import Image from "next/image"
 import Link from "../../components/views/common/Link"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 
 const styles = {
    noResultsMessage: {
@@ -57,6 +58,7 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
       () => getQueryVariables(query),
       [query]
    )
+   const isMobile = useIsMobile()
 
    const upcomingLivestreams = useListenToUpcomingStreams({
       languagesIds: languages,
@@ -83,6 +85,36 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
    const handleChange = useCallback((event, newValue) => {
       setValue(newValue)
    }, [])
+
+   const renderNoResults = useCallback(() => {
+      return (
+         <>
+            <Grid xs={12} mt={{ xs: 12, md: 20 }} textAlign="center" item>
+               <Image
+                  src="/empty-search.svg"
+                  width="800"
+                  height="400"
+                  alt="Empty search illustration"
+               />
+            </Grid>
+            <Grid xs={12} mt={4} mx={1} item>
+               <Typography sx={styles.noResultsMessage} variant="h5">
+                  {/* eslint-disable-next-line react/no-unescaped-entities */}
+                  We didn't find any events matching your criteria. 😕{" "}
+                  {isMobile ? (
+                     <Link href="/next-livestreams">clear all filters</Link>
+                  ) : null}
+               </Typography>
+               {isMobile ? null : (
+                  <Typography sx={styles.noResultsMessage} variant="h5">
+                     Remove some filters or start anew by{" "}
+                     <Link href="/next-livestreams">clearing all filters</Link>.
+                  </Typography>
+               )}
+            </Grid>
+         </>
+      )
+   }, [isMobile])
 
    return (
       <React.Fragment>
@@ -130,26 +162,4 @@ export async function getServerSideProps({ query: { careerCenterId, type } }) {
    }
 }
 
-const renderNoResults = () => {
-   return (
-      <>
-         <Grid xs={12} mt={{ xs: 12, md: 20 }} textAlign="center" item>
-            <Image
-               src="/empty-search.svg"
-               width="800"
-               height="400"
-               alt="Empty search illustration"
-            />
-         </Grid>
-         <Grid xs={12} mt={4} mx={1} item>
-            <Typography sx={styles.noResultsMessage} variant="h5">
-               {/* eslint-disable-next-line react/no-unescaped-entities */}
-               We didn't find any events matching your criteria. Remove some
-               filters or start anew by{" "}
-               <Link href="/next-livestreams">clearing all filter</Link>. 😕
-            </Typography>
-         </Grid>
-      </>
-   )
-}
 export default withFirebase(NextLivestreamsPage)
