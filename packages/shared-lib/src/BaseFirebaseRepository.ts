@@ -1,4 +1,5 @@
 import firebase from "firebase/compat/app"
+import "firebase/compat/firestore"
 import { Identifiable } from "./commonTypes"
 import QuerySnapshot = firebase.firestore.QuerySnapshot
 import Timestamp = firebase.firestore.Timestamp
@@ -113,7 +114,5 @@ export const dateFromFirebaseTimestamp = (timestamp?: Timestamp) => {
 }
 
 export const dateToFirebaseTimestamp = (date?: Date | number) => {
-   return date
-      ? firebase.firestore?.Timestamp?.fromDate?.(new Date(date))
-      : null
+   return date ? Timestamp.fromDate(new Date(date)) : null
 }

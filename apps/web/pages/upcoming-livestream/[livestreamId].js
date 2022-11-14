@@ -40,9 +40,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
 
    const [stream, setStream] = useState(
-      LivestreamPresenter.createFromPlainObject(
-         serverStream
-      ).convertToDocument()
+      LivestreamPresenter.parseDocument(serverStream)
    )
    const { push, asPath, query, pathname, replace } = useRouter()
    const [currentGroup, setCurrentGroup] = useState(null)
@@ -90,9 +88,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       [targetGroupId, userData, stream, unfilteredGroups]
    )
 
-   const [isPastEvent, setIsPastEvent] = useState(
-      streamIsOld(stream?.startDate)
-   )
+   const [isPastEvent, setIsPastEvent] = useState(streamIsOld(stream?.start))
 
    const streamLanguage = languageCodesDict?.[stream?.language?.code]
 
@@ -134,8 +130,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [])
 
    useEffect(() => {
-      setIsPastEvent(streamIsOld(stream?.startDate))
-   }, [stream?.startDate])
+      setIsPastEvent(streamIsOld(stream?.start))
+   }, [stream?.start])
 
    useEffect(() => {
       if (stream.id) {

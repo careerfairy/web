@@ -33,11 +33,11 @@ export const getServerSideStream = async (livestreamId) => {
             id: livestreamSnap.id,
             ...livestreamSnap.data(),
          } as LivestreamEvent
+
          serverSideStream =
-            LivestreamPresenter.createFromDocument(
-               livestreamEvent
-            ).serializeToPlainObject()
-         return omit<LivestreamPresenter>(serverSideStream, [
+            LivestreamPresenter.serializeDocument(livestreamEvent)
+
+         return omit(serverSideStream, [
             "registeredUsers",
             "talentPool",
             "participatingStudents",

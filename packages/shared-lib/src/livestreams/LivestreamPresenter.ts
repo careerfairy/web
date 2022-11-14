@@ -11,13 +11,13 @@ import {
    LivestreamMode,
    LivestreamStatus,
    Speaker,
+   NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import {
    dateFromFirebaseTimestamp,
    dateToFirebaseTimestamp,
 } from "../BaseFirebaseRepository"
-import { NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST } from "../../dist/livestreams"
 
 /**
  * Livestream class
