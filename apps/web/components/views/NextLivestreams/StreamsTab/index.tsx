@@ -4,6 +4,7 @@ import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
 import { sxStyles } from "../../../../types/commonTypes"
 import Filter, { FilterEnum } from "../../common/filter/Filter"
 import Box from "@mui/material/Box"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    indicator: {
@@ -36,6 +37,7 @@ const StreamsTab = ({
    const showFilter = useMemo(() => {
       return hasFilter && value === "upcomingEvents"
    }, [hasFilter, value])
+   const isMobile = useIsMobile()
 
    return (
       <AppBar sx={styles.root} position="static" color="transparent">
@@ -59,7 +61,7 @@ const StreamsTab = ({
                sx={{
                   ...styles.tab,
                   color: tabsColor,
-                  minWidth: { xs: "50%", sm: "200px" },
+                  minWidth: { xs: showFilter ? "40%" : "50%", sm: "200px" },
                }}
                label="Upcoming Events"
                value="upcomingEvents"
@@ -69,14 +71,32 @@ const StreamsTab = ({
                sx={{
                   ...styles.tab,
                   color: tabsColor,
-                  minWidth: { xs: "50%", sm: "200px" },
+                  minWidth: { xs: showFilter ? "40%" : "50%", sm: "200px" },
                }}
                label="Past Events"
                value="pastEvents"
                index={1}
             />
+            {isMobile && showFilter ? (
+               <Box
+                  sx={{
+                     display: "flex",
+                     width: "100%",
+                     justifyContent: "end",
+                     mt: 1,
+                  }}
+               >
+                  <Filter
+                     filtersToShow={[
+                        FilterEnum.languages,
+                        FilterEnum.interests,
+                        FilterEnum.jobCheck,
+                     ]}
+                  />
+               </Box>
+            ) : null}
          </Tabs>
-         {showFilter ? (
+         {!isMobile && showFilter ? (
             <Box
                sx={{
                   display: "flex",
