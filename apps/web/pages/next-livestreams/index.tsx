@@ -83,7 +83,9 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
    }, [value, pastLivestreams])
 
    const handleChange = useCallback((event, newValue) => {
-      setValue(newValue)
+      if (newValue) {
+         setValue(newValue)
+      }
    }, [])
 
    const renderNoResults = useCallback(() => {
