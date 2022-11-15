@@ -119,9 +119,9 @@ const useTemplates = () => {
             getInitialValues: getInitialValues,
             fields: basicFields,
             sendTemplate: sendBasicTemplateEmail,
-            templateId: shouldUseEmulators() ? "28950430" : "25653565",
+            templateId: "29794311",
             templateEditUrl:
-               "https://account.postmarkapp.com/servers/5274171/templates/25653565/edit",
+               "https://account.postmarkapp.com/servers/5274171/templates/29794311/edit",
          },
       ],
       [sendBasicTemplateEmail, shouldUseEmulators()]
