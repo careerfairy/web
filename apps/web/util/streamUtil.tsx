@@ -4,7 +4,6 @@ import {
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
-import firebase from "firebase/compat/app"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -115,11 +114,4 @@ export const getLinkToStream = (
    }
 
    return url.toString()
-}
-
-export const getDate = (data: Date | firebase.firestore.Timestamp) => {
-   if (data instanceof Date) return data
-   if (data instanceof firebase.firestore.Timestamp)
-      return data?.toDate?.() || null
-   return null
 }

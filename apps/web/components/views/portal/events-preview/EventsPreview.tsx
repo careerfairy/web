@@ -16,8 +16,6 @@ import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
-import useBusinessModels from "../../../custom-hook/utils/useBusinessModels"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const styles = {
    carousel: {
@@ -95,12 +93,6 @@ const EventsPreview = ({
          ),
       }))
    }
-
-   const livestreams = useBusinessModels(
-      events,
-      LivestreamPresenter.createFromDocument
-   )
-
    return (
       <>
          {!hidePreview && (
@@ -120,7 +112,7 @@ const EventsPreview = ({
                   ) : (
                      <Heading>{title}</Heading>
                   )}
-                  {livestreams?.length >= limit &&
+                  {events?.length >= limit &&
                      !isOnMarketingLandingPage &&
                      seeMoreLink && (
                         <Link href={seeMoreLink}>
@@ -175,7 +167,7 @@ const EventsPreview = ({
                                 />
                              </Box>
                           ))
-                        : livestreams.map((event, index, arr) => (
+                        : events.map((event, index, arr) => (
                              <Box key={event.id} sx={{ px: { xs: 1, sm: 1 } }}>
                                 <EventPreviewCard
                                    loading={

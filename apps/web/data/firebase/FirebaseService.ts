@@ -37,7 +37,6 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -231,30 +230,24 @@ class FirebaseService {
       return handleGetLivestreamReportData(data)
    }
 
-   sendRegistrationConfirmationEmail = (
-      user,
-      userData,
-      livestream: LivestreamEvent
-   ) => {
-      const livestreamPresenter =
-         LivestreamPresenter.createFromDocument(livestream)
-      if (livestreamPresenter.isHybrid) {
+   sendRegistrationConfirmationEmail = (user, userData, livestream) => {
+      if (livestream.isHybrid) {
          return this.sendHybridEventEmailRegistrationConfirmation(
             user,
             userData,
-            livestreamPresenter
+            livestream
          )
-      } else if (livestreamPresenter.isFaceToFace) {
+      } else if (livestream.isFaceToFace) {
          return this.sendPhysicalEventEmailRegistrationConfirmation(
             user,
             userData,
-            livestreamPresenter
+            livestream
          )
       } else {
          return this.sendLivestreamEmailRegistrationConfirmation(
             user,
             userData,
-            livestreamPresenter
+            livestream
          )
       }
    }
@@ -262,7 +255,7 @@ class FirebaseService {
    sendLivestreamEmailRegistrationConfirmation = (
       user,
       userData,
-      livestream: LivestreamPresenter
+      livestream
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
@@ -271,8 +264,8 @@ class FirebaseService {
       return sendLivestreamRegistrationConfirmationEmail({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         regular_date: livestream.start?.toString?.() || "",
-         livestream_date: DateUtil.getPrettyDate(livestream.start),
+         regular_date: livestream.start.toDate().toString(),
+         livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          livestream_title: livestream.title,
@@ -280,11 +273,7 @@ class FirebaseService {
       })
    }
 
-   sendPhysicalEventEmailRegistrationConfirmation = (
-      user,
-      userData,
-      event: LivestreamPresenter
-   ) => {
+   sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
             "sendPhysicalEventRegistrationConfirmationEmail"
@@ -292,7 +281,7 @@ class FirebaseService {
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(event.start),
+         event_date: DateUtil.getPrettyDate(event.start.toDate()),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
@@ -300,11 +289,7 @@ class FirebaseService {
       })
    }
 
-   sendHybridEventEmailRegistrationConfirmation = (
-      user,
-      userData,
-      event: LivestreamPresenter
-   ) => {
+   sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
             "sendHybridEventRegistrationConfirmationEmail"
@@ -312,7 +297,7 @@ class FirebaseService {
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(event.start),
+         event_date: DateUtil.getPrettyDate(event.start.toDate()),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,

@@ -25,11 +25,10 @@ import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = {
    hideOnHoverContent: {
@@ -204,12 +203,12 @@ const EventPreviewCard = ({
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
    const { query, push, pathname } = useRouter()
-   const getStartDate = () => event?.start
+   const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
-   const [isPast, setIsPast] = useState(event ? event.isPast() : false)
+   const [isPast, setIsPast] = useState(checkIfPast(event))
    const isOnMarketingLandingPage = pathname.includes(
       MARKETING_LANDING_PAGE_PATH
    )
@@ -254,11 +253,7 @@ const EventPreviewCard = ({
 
             setHosts(
                newHosts.length
-                  ? getRelevantHosts(
-                       groupId as string,
-                       event.convertToDocument(),
-                       newHosts
-                    )
+                  ? getRelevantHosts(groupId as string, event, newHosts)
                   : null
             )
          })()
@@ -266,10 +261,10 @@ const EventPreviewCard = ({
    }, [event, firebase, groupId, light, loading])
 
    useEffect(() => {
-      if (!loading && event) {
-         setIsPast(event.isPast())
+      if (!loading) {
+         setIsPast(checkIfPast(event))
       }
-   }, [event, event?.start, loading])
+   }, [event?.start, loading])
 
    useEffect(() => {
       if (
@@ -309,14 +304,7 @@ const EventPreviewCard = ({
    }
 
    const onClickRegister = () => {
-      if (event) {
-         onRegisterClick(
-            event.convertToDocument(),
-            hosts?.[0]?.id,
-            hosts,
-            hasRegistered
-         )
-      }
+      onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
    }
 
    const getHref = useCallback(() => {
@@ -605,13 +593,13 @@ const ChipLabel = ({ hasStarted, isPast, hasParticipated, hasRegistered }) => {
 }
 
 interface EventPreviewCardProps {
-   event?: LivestreamPresenter
+   event?: LivestreamEvent
    loading?: boolean
    light?: boolean
    registering?: boolean
    autoRegister?: boolean
    interests?: Interest[]
-   openShareDialog?: React.Dispatch<React.SetStateAction<LivestreamPresenter>>
+   openShareDialog?: React.Dispatch<React.SetStateAction<LivestreamEvent>>
    onRegisterClick?: (
       event: LivestreamEvent,
       targetGroupId: string,

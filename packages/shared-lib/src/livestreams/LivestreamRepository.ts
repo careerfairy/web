@@ -29,7 +29,7 @@ export interface ILivestreamRepository {
       userEmail: string,
       limit?: number
    ): Promise<LivestreamEvent[] | null>
-   fixed
+
    getRecommendEvents(
       userEmail: string,
       userInterestsIds?: string[],

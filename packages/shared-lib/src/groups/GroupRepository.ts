@@ -16,7 +16,6 @@ import firebase from "firebase/compat/app"
 import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
-import { LivestreamPresenter } from "../livestreams/LivestreamPresenter"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -95,7 +94,7 @@ export interface IGroupRepository {
 
    mapUserAnswersToLivestreamGroupQuestions(
       userData: UserData,
-      livestream: LivestreamEvent | LivestreamPresenter
+      livestream: LivestreamEvent
    ): Promise<LivestreamGroupQuestionsMap>
 
    getUserGroupDataByGroupId(userEmail: string, groupId): Promise<UserGroupData>
@@ -446,7 +445,7 @@ export class FirebaseGroupRepository
     * */
    async mapUserAnswersToLivestreamGroupQuestions(
       userData: UserData,
-      livestream: LivestreamEvent | LivestreamPresenter
+      livestream: LivestreamEvent
    ): Promise<LivestreamGroupQuestionsMap> {
       let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap = cloneDeep(
          livestream.groupQuestionsMap
