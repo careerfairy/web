@@ -1,5 +1,4 @@
 import firebase from "firebase/compat/app"
-import "firebase/compat/firestore"
 import { Identifiable } from "./commonTypes"
 import QuerySnapshot = firebase.firestore.QuerySnapshot
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
@@ -107,13 +106,3 @@ export function removeDuplicateDocuments<T extends Identifiable>(
 
 // max of 10 events to allow for firestore query limit
 export type FirebaseInArrayLimit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
-
-export const dateFromFirebaseTimestamp = (
-   timestamp?: firebase.firestore.Timestamp
-) => {
-   return timestamp?.toDate?.() || null
-}
-
-export const dateToFirebaseTimestamp = (date?: Date | number) => {
-   return date ? firebase.firestore.Timestamp.fromDate(new Date(date)) : null
-}

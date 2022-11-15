@@ -17,7 +17,7 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import {
    dateFromFirebaseTimestamp,
    dateToFirebaseTimestamp,
-} from "../BaseFirebaseRepository"
+} from "../utils/firebaseSerializerMethods"
 
 /**
  * Livestream class
