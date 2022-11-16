@@ -313,10 +313,9 @@ function SignUpUserForm() {
                            }
                            label={
                               <Typography style={{ fontSize: 12 }}>
-                                 I don’t want to miss out on events from
-                                 exciting companies and would like to receive
-                                 occasional email announcements from
-                                 CareerFairy. 🚀
+                                 Join <b>60’000+ students and graduates</b> who
+                                 receive personalised invitations to career
+                                 events and job openings 👍
                               </Typography>
                            }
                         />
