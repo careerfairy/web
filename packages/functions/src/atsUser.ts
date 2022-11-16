@@ -240,9 +240,9 @@ export const atsUserApplyToJob = functions
             }
 
             // temporary chosen user for the HelloFresh integration
-            // madi.ference@hellofresh.com
+            // epor@hellofresh.com
             if (atsAccount.id === "c37a8a6ac25e449aa3cd93ccb75ca9d6") {
-               remoteUserId = "2c335fe3-a2e2-46fa-8b4f-ba726d4f4f4f"
+               remoteUserId = "a93f1eac-816d-4da1-afbb-c3a1e3f611e9"
             }
          }
 
