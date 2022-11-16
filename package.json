@@ -42,5 +42,6 @@
    "packageManager": "npm@8.5.5",
    "engines": {
       "npm": ">=7"
-   }
+   },
+   "fireConfig": {}
 }
