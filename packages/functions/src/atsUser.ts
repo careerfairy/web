@@ -238,6 +238,12 @@ export const atsUserApplyToJob = functions
             if (atsAccount.id === "f35ff2788e944ac1b54b0624dc0fc2ea") {
                remoteUserId = "ceb03859-4bd5-4c8c-a0c6-341ccfba55e0"
             }
+
+            // temporary chosen user for the HelloFresh integration
+            // epor@hellofresh.com
+            if (atsAccount.id === "c37a8a6ac25e449aa3cd93ccb75ca9d6") {
+               remoteUserId = "a93f1eac-816d-4da1-afbb-c3a1e3f611e9"
+            }
          }
 
          let applicationId: string

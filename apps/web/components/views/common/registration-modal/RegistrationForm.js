@@ -93,6 +93,7 @@ const RegistrationForm = () => {
          onTransitionEnd={() => setSliding(false)}
          disableLazyLoading
          disabled
+         animateTransitions={false}
       >
          {steps.map((stepData, index) => (
             <SwipeablePanel
