@@ -68,7 +68,7 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
          // If it was accepted we should set it as completed
          const reminder = {
             complete: true,
-            isFirstReminder: false,
+            isFirstReminder: isFirstReminder,
             type: UserReminderType.NewsletterReminder,
          } as IUserReminder
 
