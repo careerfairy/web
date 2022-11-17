@@ -38,7 +38,7 @@ import {
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
-import UserReminderProvider from "../HOCs/UserReminderProvider"
+import { UserReminderProvider } from "../HOCs/UserReminderProvider"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()

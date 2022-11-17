@@ -22,7 +22,11 @@ import {
 import { sxStyles } from "../../../../types/commonTypes"
 import GenericDropdown from "../../common/GenericDropdown"
 import { possibleGenders } from "../../../../constants/forms"
-import { UserReminderType, UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   UserReminderType,
+   UserData,
+   IUserReminder,
+} from "@careerfairy/shared-lib/dist/users"
 import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
 import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
 import { signupSchema } from "../schemas"
@@ -118,6 +122,30 @@ function SignUpUserForm() {
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
+               .then(async () => {
+                  // To create a newsletter reminder for 7 days in the future
+                  // in case the subscribed input is not checked
+                  try {
+                     if (values.subscribed) {
+                        return
+                     }
+
+                     const sevenDaysFromNow = new Date(
+                        new Date().setDate(new Date().getDate() + 7)
+                     )
+
+                     const reminder = {
+                        complete: false,
+                        notBeforeThan: sevenDaysFromNow,
+                        type: UserReminderType.NewsletterReminder,
+                        isFirstReminder: true,
+                     } as IUserReminder
+
+                     await userRepo.updateUserReminder(values.email, reminder)
+                  } catch (e) {
+                     console.error(e)
+                  }
+               })
                .then(() => {
                   setSubmitting(false)
                   setGeneralLoading(false)

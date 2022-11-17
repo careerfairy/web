@@ -18,6 +18,8 @@ import {
    UserReminderType,
 } from "@careerfairy/shared-lib/dist/users"
 import CircularProgress from "@mui/material/CircularProgress"
+import { sendGeneralError } from "../../../store/actions"
+import { useDispatch } from "react-redux"
 
 const styles = sxStyles({
    closeBtnWrapper: {
@@ -47,72 +49,73 @@ const styles = sxStyles({
 })
 
 type Props = {
-   isFinalReminder: boolean
+   isFirstReminder: boolean
 }
 
 const TransitionDown = (props) => <Slide {...props} direction="up" />
 
-const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
+const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
    const { userData } = useAuth()
    const [open, setOpen] = useState(true)
    const [isSubmitting, setIsSubmitting] = useState(false)
    const isMobile = useIsMobile()
+   const dispatch = useDispatch()
 
    const handleAcceptNewsletter = useCallback(async () => {
       setIsSubmitting(true)
 
       try {
-         // If it was accepted we should remove the reminder from the DB and update unsubscribed the user data
-         await userRepo.removeUserReminder(
-            userData.id,
-            UserReminderType.NewsletterReminder
-         )
+         // If it was accepted we should set it as completed
+         const reminder = {
+            complete: true,
+            isFirstReminder: false,
+            type: UserReminderType.NewsletterReminder,
+         } as IUserReminder
+
+         await userRepo.updateUserReminder(userData.id, reminder)
          await userRepo.updateAdditionalInformation(userData.id, {
             unsubscribed: false,
          })
 
          setOpen(false)
       } catch (e) {
-         console.log("error", e)
+         dispatch(sendGeneralError(e))
       } finally {
          setIsSubmitting(false)
       }
-   }, [userData?.id])
+   }, [dispatch, userData?.id])
 
    const handleDeclineNewsletter = useCallback(async () => {
-      setIsSubmitting(true)
-
       try {
-         // If this is the final reminder and is declined, we should be removed it to not display this reminder again
-         if (isFinalReminder) {
-            await userRepo.removeUserReminder(
-               userData.id,
-               UserReminderType.NewsletterReminder
+         // If this is the first reminder, we should wait another 30 days for the next reminder
+         if (isFirstReminder) {
+            const thirtyDaysFromNow = new Date(
+               new Date().setDate(new Date().getDate() + 30)
             )
+
+            const reminder = {
+               complete: false,
+               type: UserReminderType.NewsletterReminder,
+               notBeforeThan: thirtyDaysFromNow,
+               isFirstReminder: false,
+            } as IUserReminder
+
+            await userRepo.updateUserReminder(userData.id, reminder)
             setOpen(false)
-            return
+         } else {
+            // If this is not the first reminder and is declined, we should be set it as completed
+            const reminder = {
+               complete: true,
+               type: UserReminderType.NewsletterReminder,
+            } as IUserReminder
+
+            await userRepo.updateUserReminder(userData.id, reminder)
+            setOpen(false)
          }
-
-         // If this is not the final reminder, we should wait another 30 days for the next reminder
-         const thirtyDaysFromNow = new Date(
-            new Date().setDate(new Date().getDate() + 30)
-         )
-
-         const notification = {
-            complete: false,
-            type: UserReminderType.NewsletterReminder,
-            notBeforeThan: thirtyDaysFromNow,
-            isFinalReminder: true,
-         } as IUserReminder
-
-         await userRepo.updateUserReminder(userData.id, notification)
-         setOpen(false)
       } catch (e) {
-         console.log("error", e)
-      } finally {
-         setIsSubmitting(false)
+         dispatch(sendGeneralError(e))
       }
-   }, [isFinalReminder, userData?.id])
+   }, [dispatch, isFirstReminder, userData?.id])
 
    return (
       <Snackbar
@@ -133,7 +136,7 @@ const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
                      <IconButton
                         aria-label="close"
                         color="default"
-                        onClick={() => setOpen(false)}
+                        onClick={handleDeclineNewsletter}
                         size="small"
                      >
                         <CloseIcon />
@@ -141,16 +144,16 @@ const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
                   </Grid>
                   <Grid xs={11} item>
                      <Grid xs={12} item>
-                        {isFinalReminder ? (
+                        {isFirstReminder ? (
+                           <Typography variant="h6" sx={styles.message}>
+                              Sure you want to miss our <b>relevant tips</b> for
+                              your career?
+                           </Typography>
+                        ) : (
                            <Typography variant="h6" sx={styles.message}>
                               Oh 😣 <br /> <br />
                               You just missed an event you may have liked. This
                               is the last chance you have to stay up-to-date.
-                           </Typography>
-                        ) : (
-                           <Typography variant="h6" sx={styles.message}>
-                              Sure you want to miss our <b>relevant tips</b> for
-                              your career?
                            </Typography>
                         )}
 
@@ -164,7 +167,7 @@ const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
                         <Grid
                            xs={8}
                            display="flex"
-                           justifyContent={isFinalReminder ? "end" : "start"}
+                           justifyContent={isFirstReminder ? "start" : "end"}
                            item
                         >
                            <Typography
@@ -172,7 +175,7 @@ const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
                               variant="h6"
                               onClick={handleDeclineNewsletter}
                            >
-                              {isFinalReminder ? "No" : "Remind me later"}
+                              {isFirstReminder ? "Remind me later" : "No"}
                            </Typography>
                         </Grid>
                         <Grid xs={4} display="flex" justifyContent="end" item>
