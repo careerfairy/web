@@ -102,6 +102,11 @@ export interface IUserRepository {
 
    getUserReminders(userEmail: string): Promise<IUserReminder[]>
 
+   getUserReminder(
+      userEmail: string,
+      reminderIdentifier: UserReminderType
+   ): Promise<IUserReminder>
+
    removeUserReminder(
       userEmail: string,
       reminderIdentifier: UserReminderType
@@ -489,13 +494,28 @@ export class FirebaseUserRepository
          .collection("userData")
          .doc(userEmail)
          .collection("userReminders")
-         .where("notBeforeThan", ">=", new Date())
+         .where("notBeforeThan", "<=", new Date())
          .where("complete", "==", false)
          .orderBy("notBeforeThan", "asc")
 
       const data = await ref.get()
 
       return data.docs.map((doc) => doc.data() as IUserReminder)
+   }
+
+   async getUserReminder(
+      userEmail,
+      reminderIdentifier
+   ): Promise<IUserReminder> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userReminders")
+         .doc(reminderIdentifier)
+
+      const data = await ref.get()
+
+      return data.data() as IUserReminder
    }
 
    removeUserReminder(userEmail, reminderIdentifier): Promise<void> {

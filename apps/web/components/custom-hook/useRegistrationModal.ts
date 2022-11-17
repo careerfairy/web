@@ -7,6 +7,8 @@ import { getLinkToStream } from "util/streamUtil"
 import * as actions from "store/actions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { useUserReminders } from "../../HOCs/UserReminderProvider"
+import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -21,6 +23,7 @@ const useRegistrationModal = (
       asPath,
    } = useRouter()
    const { authenticatedUser, isLoggedIn } = useAuth()
+   const { forceShowReminder } = useUserReminders()
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const handleCloseJoinModal = useCallback(
       () => setJoinGroupModalData(undefined),
@@ -72,6 +75,8 @@ const useRegistrationModal = (
                      },
                   })
                }
+               // Try to force show newsletter reminder
+               forceShowReminder(UserReminderType.NewsletterReminder)
                return handleOpenJoinModal(groups, targetGroupId, event)
             }
          } catch (e) {
@@ -82,6 +87,7 @@ const useRegistrationModal = (
          firebase,
          authenticatedUser,
          isLoggedIn,
+         forceShowReminder,
          handleOpenJoinModal,
          push,
          groupId,

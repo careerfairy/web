@@ -1,12 +1,15 @@
-import UserReminderContext from "context/userReminder/UserRemindersContext"
+import UserReminderContext, {
+   IUserReminderContext,
+} from "context/userReminder/UserRemindersContext"
 import NewsletterSnackbar from "../components/views/common/NewsletterSnackbar"
 import { useAuth } from "./AuthProvider"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useState } from "react"
 import { userRepo } from "../data/RepositoryInstances"
 import {
    IUserReminder,
    UserReminderType,
 } from "@careerfairy/shared-lib/dist/users"
+import { errorLogAndNotify } from "../util/CommonUtil"
 
 const UserReminderProvider = ({ children }) => {
    const [reminders, setReminders] = useState<IUserReminder[]>([])
@@ -24,11 +27,57 @@ const UserReminderProvider = ({ children }) => {
                   setReminders(reminders)
                }
             } catch (e) {
-               console.error("Error getting the user Reminders ->", e)
+               errorLogAndNotify(e)
             }
          })()
       }
    }, [userData?.id])
+
+   const forceShowReminder = useCallback(
+      async (reminderType) => {
+         // If the user has subscribed already do nothing
+         if (userData.unsubscribed === false) {
+            return
+         }
+
+         // Confirm if the reminder is shown, if yes do nothing
+         const visibleReminder = reminders.some(
+            (reminder) => reminder.type === reminderType
+         )
+         if (visibleReminder) {
+            return
+         }
+
+         try {
+            const userReminder = await userRepo.getUserReminder(
+               userData.id,
+               reminderType
+            )
+
+            // If reminder was already completed or isn't the 1st one, do nothing
+            if (
+               userReminder?.complete ||
+               userReminder?.isFirstReminder === false
+            ) {
+               return
+            }
+
+            // Create and show reminder
+            const reminder = {
+               complete: false,
+               type: reminderType,
+               notBeforeThan: new Date(),
+               isFirstReminder: true,
+            } as IUserReminder
+
+            await userRepo.updateUserReminder(userData.id, reminder)
+            setReminders((prevReminders) => [...prevReminders, reminder])
+         } catch (e) {
+            errorLogAndNotify(e)
+         }
+      },
+      [reminders, userData?.id, userData?.unsubscribed]
+   )
 
    const getReminders = useCallback(() => {
       return reminders.map((reminder: IUserReminder) => {
@@ -37,7 +86,7 @@ const UserReminderProvider = ({ children }) => {
             case UserReminderType.NewsletterReminder:
                return (
                   <NewsletterSnackbar
-                     isFinalReminder={!!reminder.isFinalReminder}
+                     isFirstReminder={reminder.isFirstReminder}
                      key={reminder.type}
                   />
                )
@@ -46,7 +95,7 @@ const UserReminderProvider = ({ children }) => {
    }, [reminders])
 
    return (
-      <UserReminderContext.Provider value={{}}>
+      <UserReminderContext.Provider value={{ forceShowReminder }}>
          <>
             {children}
             {getReminders()}
@@ -55,4 +104,7 @@ const UserReminderProvider = ({ children }) => {
    )
 }
 
-export default UserReminderProvider
+const useUserReminders = () =>
+   useContext<IUserReminderContext>(UserReminderContext)
+
+export { useUserReminders, UserReminderProvider }
