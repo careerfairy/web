@@ -304,3 +304,14 @@ export type AdminGroupsClaim = Record<
       role: GROUP_DASHBOARD_ROLE
    }
 >
+
+export type IUserReminder = {
+   complete: boolean
+   notBeforeThan?: Date
+   type: UserReminderType
+   isFinalReminder?: boolean
+}
+
+export enum UserReminderType {
+   NewsletterReminder = "NewsletterReminder",
+}

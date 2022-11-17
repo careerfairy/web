@@ -6,17 +6,22 @@ import {
    SnackbarContent,
    Typography,
 } from "@mui/material"
-import { useState } from "react"
+import { useCallback, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../types/commonTypes"
+import { userRepo } from "../../../data/RepositoryInstances"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import {
+   IUserReminder,
+   UserReminderType,
+} from "@careerfairy/shared-lib/dist/users"
 
 const styles = sxStyles({
    closeBtnWrapper: {
       display: "flex",
       justifyContent: "end",
-      mb: 1,
    },
    message: {
       color: "black",
@@ -40,14 +45,60 @@ const styles = sxStyles({
    },
 })
 
-type Props = {}
+type Props = {
+   isFinalReminder: boolean
+}
 
 const TransitionDown = (props) => <Slide {...props} direction="up" />
 
-const NewsletterSnackbar = ({}: Props): JSX.Element => {
+const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
+   const { userData } = useAuth()
    const [open, setOpen] = useState(true)
-   const [isFirst, setIsFirst] = useState(true)
    const isMobile = useIsMobile()
+
+   const handleAcceptNewsletter = useCallback(async () => {
+      try {
+         // If it was accepted we should remove the reminder from the DB
+         await userRepo.removeUserReminder(
+            userData.id,
+            UserReminderType.NewsletterReminder
+         )
+         setOpen(false)
+      } catch (e) {
+         console.log("error", e)
+      }
+   }, [userData.id])
+
+   const handleDeclineNewsletter = useCallback(async () => {
+      try {
+         // If this is the final reminder and is declined, we should be removed it to not display this reminder again
+         if (isFinalReminder) {
+            await userRepo.removeUserReminder(
+               userData.id,
+               UserReminderType.NewsletterReminder
+            )
+            setOpen(false)
+            return
+         }
+
+         // If this is not the final reminder, we should wait another 30 days for the next reminder
+         const thirtyDaysFromNow = new Date(
+            new Date().setDate(new Date().getDate() + 30)
+         )
+
+         const notification = {
+            complete: false,
+            type: UserReminderType.NewsletterReminder,
+            notBeforeThan: thirtyDaysFromNow,
+            isFinalReminder: true,
+         } as IUserReminder
+
+         await userRepo.updateUserReminder(userData.id, notification)
+         setOpen(false)
+      } catch (e) {
+         console.log("error", e)
+      }
+   }, [isFinalReminder, userData.id])
 
    return (
       <Snackbar
@@ -61,7 +112,7 @@ const NewsletterSnackbar = ({}: Props): JSX.Element => {
          sx={isMobile && { left: 26, right: 26, bottom: 36 }}
       >
          <SnackbarContent
-            sx={{ backgroundColor: "white" }}
+            style={{ backgroundColor: "white" }}
             message={
                <Grid container maxWidth={isMobile ? "inherit" : "350px"}>
                   <Grid xs={12} item sx={styles.closeBtnWrapper}>
@@ -76,16 +127,16 @@ const NewsletterSnackbar = ({}: Props): JSX.Element => {
                   </Grid>
                   <Grid xs={11} item>
                      <Grid xs={12} item>
-                        {isFirst ? (
-                           <Typography variant="h6" sx={styles.message}>
-                              Sure you want to miss our <b>relevant tips</b> for
-                              your career?
-                           </Typography>
-                        ) : (
+                        {isFinalReminder ? (
                            <Typography variant="h6" sx={styles.message}>
                               Oh 😣 <br /> <br />
                               You just missed an event you may have liked. This
                               is the last chance you have to stay up-to-date.
+                           </Typography>
+                        ) : (
+                           <Typography variant="h6" sx={styles.message}>
+                              Sure you want to miss our <b>relevant tips</b> for
+                              your career?
                            </Typography>
                         )}
 
@@ -99,19 +150,20 @@ const NewsletterSnackbar = ({}: Props): JSX.Element => {
                         <Grid
                            xs={8}
                            display="flex"
-                           justifyContent={isFirst ? "start" : "end"}
+                           justifyContent={isFinalReminder ? "end" : "start"}
+                           item
                         >
                            <Typography
                               sx={styles.noButton}
                               variant="h6"
-                              onClick={() => {}}
+                              onClick={handleDeclineNewsletter}
                            >
-                              {isFirst ? "Remind me later" : "No"}
+                              {isFinalReminder ? "No" : "Remind me later"}
                            </Typography>
                         </Grid>
-                        <Grid xs={4} display="flex" justifyContent="end">
+                        <Grid xs={4} display="flex" justifyContent="end" item>
                            <Button
-                              onClick={() => setIsFirst(!isFirst)}
+                              onClick={handleAcceptNewsletter}
                               variant="contained"
                               color="secondary"
                               size="large"

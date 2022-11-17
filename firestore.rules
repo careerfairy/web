@@ -97,6 +97,10 @@ service cloud.firestore {
                 allow read, write: if isSignedInAndIsSameUser(userId);
             }
 
+            match /userReminders/{reminderIdentifier} {
+                allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+            }
+
             function preventUserFromSettingIsAdminField() {
                 return (request.resource.data.isAdmin == resource.data.isAdmin || !('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
             }
