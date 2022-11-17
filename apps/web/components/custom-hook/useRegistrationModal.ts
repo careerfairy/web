@@ -7,8 +7,8 @@ import { getLinkToStream } from "util/streamUtil"
 import * as actions from "store/actions"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { useUserReminders } from "../../HOCs/UserReminderProvider"
 import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
+import { useUserReminders } from "HOCs/UserReminderProvider"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking

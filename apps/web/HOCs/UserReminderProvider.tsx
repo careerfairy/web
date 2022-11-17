@@ -104,7 +104,7 @@ const UserReminderProvider = ({ children }) => {
    )
 }
 
-const useUserReminders = () =>
+export const useUserReminders = () =>
    useContext<IUserReminderContext>(UserReminderContext)
 
-export { useUserReminders, UserReminderProvider }
+export default UserReminderProvider

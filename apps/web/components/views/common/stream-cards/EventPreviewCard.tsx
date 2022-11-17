@@ -273,7 +273,7 @@ const EventPreviewCard = ({
          query.register &&
          query.register === event?.id &&
          hosts?.length &&
-         !event.registeredUsers?.includes(authenticatedUser.email)
+         !event.registeredUsers.includes(authenticatedUser.email)
       ) {
          ;(async function handleAutoRegister() {
             const newQuery = { ...query }
@@ -330,7 +330,6 @@ const EventPreviewCard = ({
       authenticatedUser.email,
       event?.groupIds,
       event?.id,
-      event?.jobs?.length,
       groupId,
       isOnMarketingLandingPage,
       isPast,
