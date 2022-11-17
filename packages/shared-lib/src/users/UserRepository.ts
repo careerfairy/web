@@ -399,6 +399,7 @@ export class FirebaseUserRepository
          linkedinUrl,
          referredBy,
          fieldOfStudy,
+         unsubscribed,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -417,6 +418,8 @@ export class FirebaseUserRepository
       const referredByToUpdate = referredBy !== undefined ? { referredBy } : {}
       const fieldOfStudyToUpdate =
          fieldOfStudy !== undefined ? { fieldOfStudy } : {}
+      const unsubscribedToUpdate =
+         unsubscribed !== undefined ? { unsubscribed } : {}
 
       const toUpdate = {
          ...genderToUpdate,
@@ -428,6 +431,7 @@ export class FirebaseUserRepository
          ...linkedInLinkToUpdate,
          ...referredByToUpdate,
          ...fieldOfStudyToUpdate,
+         ...unsubscribedToUpdate,
       }
 
       return userRef.update(toUpdate)
