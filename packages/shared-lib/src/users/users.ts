@@ -309,7 +309,7 @@ export type IUserReminder = {
    complete: boolean
    notBeforeThan?: Date
    type: UserReminderType
-   isFinalReminder?: boolean
+   isFirstReminder?: boolean
 }
 
 export enum UserReminderType {
