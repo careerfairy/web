@@ -6,7 +6,7 @@ import {
    SnackbarContent,
    Typography,
 } from "@mui/material"
-import { useCallback, useState } from "react"
+import React, { useCallback, useState } from "react"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
 import useIsMobile from "../../custom-hook/useIsMobile"
@@ -17,6 +17,7 @@ import {
    IUserReminder,
    UserReminderType,
 } from "@careerfairy/shared-lib/dist/users"
+import CircularProgress from "@mui/material/CircularProgress"
 
 const styles = sxStyles({
    closeBtnWrapper: {
@@ -54,22 +55,33 @@ const TransitionDown = (props) => <Slide {...props} direction="up" />
 const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
    const { userData } = useAuth()
    const [open, setOpen] = useState(true)
+   const [isSubmitting, setIsSubmitting] = useState(false)
    const isMobile = useIsMobile()
 
    const handleAcceptNewsletter = useCallback(async () => {
+      setIsSubmitting(true)
+
       try {
-         // If it was accepted we should remove the reminder from the DB
+         // If it was accepted we should remove the reminder from the DB and update unsubscribed the user data
          await userRepo.removeUserReminder(
             userData.id,
             UserReminderType.NewsletterReminder
          )
+         await userRepo.updateAdditionalInformation(userData.id, {
+            unsubscribed: false,
+         })
+
          setOpen(false)
       } catch (e) {
          console.log("error", e)
+      } finally {
+         setIsSubmitting(false)
       }
-   }, [userData.id])
+   }, [userData?.id])
 
    const handleDeclineNewsletter = useCallback(async () => {
+      setIsSubmitting(true)
+
       try {
          // If this is the final reminder and is declined, we should be removed it to not display this reminder again
          if (isFinalReminder) {
@@ -97,8 +109,10 @@ const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
          setOpen(false)
       } catch (e) {
          console.log("error", e)
+      } finally {
+         setIsSubmitting(false)
       }
-   }, [isFinalReminder, userData.id])
+   }, [isFinalReminder, userData?.id])
 
    return (
       <Snackbar
@@ -168,6 +182,14 @@ const NewsletterSnackbar = ({ isFinalReminder }: Props): JSX.Element => {
                               color="secondary"
                               size="large"
                               sx={{ py: 1 }}
+                              startIcon={
+                                 isSubmitting && (
+                                    <CircularProgress
+                                       color={"inherit"}
+                                       size={15}
+                                    />
+                                 )
+                              }
                            >
                               Yes
                            </Button>
