@@ -83,7 +83,7 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
       } finally {
          setIsSubmitting(false)
       }
-   }, [dispatch, userData?.id])
+   }, [dispatch, isFirstReminder, userData?.id])
 
    const handleDeclineNewsletter = useCallback(async () => {
       try {
