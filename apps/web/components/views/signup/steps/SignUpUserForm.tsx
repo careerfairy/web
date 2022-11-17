@@ -22,7 +22,7 @@ import {
 import { sxStyles } from "../../../../types/commonTypes"
 import GenericDropdown from "../../common/GenericDropdown"
 import { possibleGenders } from "../../../../constants/forms"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { UserReminderType, UserData } from "@careerfairy/shared-lib/dist/users"
 import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
 import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
 import { signupSchema } from "../schemas"
@@ -34,6 +34,7 @@ import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
 import HelperHint from "../common/HelperHint"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    submit: {
