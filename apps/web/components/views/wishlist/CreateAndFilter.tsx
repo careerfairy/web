@@ -7,12 +7,14 @@ import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 interface Props {
    handleAddNewWishToHits: HandleAddNewWishToHits
 }
-const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {
-   const filtersToShow = useMemo(
-      () => [FilterEnum.search, FilterEnum.sortBy, FilterEnum.interests],
-      []
-   )
 
+const filtersToShow = [
+   FilterEnum.search,
+   FilterEnum.sortBy,
+   FilterEnum.interests,
+]
+
+const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {
    return (
       <Grid container spacing={2}>
          <Grid item xs={12}>
