@@ -140,6 +140,11 @@ export interface ILivestreamRepository {
       userInterestsIds?: string[],
       limit?: number
    ): Promise<LivestreamEvent[] | null>
+
+   getRecommendEventsBasedOnUserFieldOfStudy(
+      userFieldOfStudy: FieldOfStudy,
+      limit: number
+   ): Promise<LivestreamEvent[] | null>
 }
 
 export class FirebaseLivestreamRepository
@@ -488,6 +493,36 @@ export class FirebaseLivestreamRepository
       query = query.orderBy("start", "asc").limit(limit)
 
       const snapshots = await query.get()
+
+      return mapFirestoreDocuments<LivestreamEvent>(snapshots)
+   }
+
+   async getRecommendEventsBasedOnUserFieldOfStudy(
+      userFieldOfStudyId: FieldOfStudy,
+      limit: number = 10
+   ): Promise<LivestreamEvent[] | null> {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", getEarliestEventBufferTime())
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+
+      console.log(
+         "-> userFieldOfStudyId in getRecommendEventsBasedOnUserFieldOfStudy",
+         userFieldOfStudyId
+      )
+      if (userFieldOfStudyId) {
+         query = query.where(
+            "targetFieldsOfStudy",
+            "array-contains",
+            userFieldOfStudyId
+         )
+      }
+
+      query = query.orderBy("start", "asc").limit(limit)
+
+      const snapshots = await query.get()
+      console.log("-> num docs", snapshots.docs.length)
 
       return mapFirestoreDocuments<LivestreamEvent>(snapshots)
    }

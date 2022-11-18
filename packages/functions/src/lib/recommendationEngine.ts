@@ -1,6 +1,7 @@
 import { livestreamsRepo, userRepo } from "../api/repositories"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { removeDuplicateDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 /**
  *  The function takes a user's ID and returns a list of recommended events
@@ -49,21 +50,125 @@ const getRecommendedEventsBasedOnUserData = async ({
       return []
    }
 
-   const arrayOfRecommendedEventsBasedOnUserData: LivestreamEvent[][] =
-      await Promise.all([
-         // Fetch recommended events based on the user's interests
-         livestreamsRepo.getRecommendEventsBasedOnUserInterests(
-            userData.interestsIds,
-            limit
-         ),
-         // TODO: Fetch recommended events based on the user's field of study
-      ])
+   try {
+      const arrayOfRecommendedEventsBasedOnUserData: LivestreamEvent[][] =
+         await Promise.all([
+            // Fetch recommended events based on the user's interests
+            livestreamsRepo.getRecommendEventsBasedOnUserInterests(
+               userData.interestsIds,
+               limit
+            ),
+            livestreamsRepo.getRecommendEventsBasedOnUserFieldOfStudy(
+               userData.fieldOfStudy,
+               limit
+            ),
+         ])
 
-   // TODO: Combine the results from the two queries above and remove duplicates
+      const [_, fieldOfStudyEvents] = arrayOfRecommendedEventsBasedOnUserData
 
-   // TODO: Assign a score to each event based on the user's interests and field of study
+      console.log("-> USER FIELD OF STUDY", userData.fieldOfStudy)
+      console.log(
+         "targetFieldsOfStudy OF EVENTS",
+         fieldOfStudyEvents?.map((event) => event.targetFieldsOfStudy)
+      )
 
-   // TODO: Sort by points and return the top {limit} events
+      // Combine the results from the two queries above and remove duplicates
+      const results = removeDuplicateDocuments(
+         arrayOfRecommendedEventsBasedOnUserData.filter(Boolean).flat()
+      )
+      console.log("-> num results", results.length)
 
-   return arrayOfRecommendedEventsBasedOnUserData.flat().slice(0, limit)
+      const livestreamRanker = new LivestreamRanker(results, userData)
+
+      return livestreamRanker.getTopEventsBasedOnUserFieldOfStudy(10)
+   } catch (e) {
+      console.log("-> ERROR getRecommendedEventsBasedOnUserData", e)
+      throw e
+   }
+}
+
+class RankedLivestreamEvent {
+   public points: number
+   constructor(public model: LivestreamEvent) {
+      this.model = model
+   }
+
+   static create(livestream: LivestreamEvent) {
+      return new RankedLivestreamEvent(livestream)
+   }
+
+   addPoints(points: number) {
+      this.points += points
+   }
+
+   removePoints(points: number) {
+      this.points -= points
+   }
+
+   getPoints() {
+      return this.points
+   }
+}
+
+class LivestreamRanker {
+   private readonly rankedLivestreamEvents: RankedLivestreamEvent[]
+   private readonly user: UserData
+   private readonly pointsPerInterestMatch = 1
+   private readonly pointsPerFieldOfStudyMatch = 1
+
+   constructor(livestreams: LivestreamEvent[], user: UserData) {
+      this.rankedLivestreamEvents = livestreams.map(
+         RankedLivestreamEvent.create
+      )
+      this.user = user
+   }
+
+   public getTopEventsBasedOnUserInterests(
+      limit: number
+   ): RankedLivestreamEvent[] {
+      const events = this.rankedLivestreamEvents.map((livestream) => {
+         const numInterestsMatched = livestream.model.interestsIds.filter(
+            (interest) => this.user.interestsIds.includes(interest)
+         ).length
+
+         livestream.addPoints(numInterestsMatched * this.pointsPerInterestMatch)
+
+         return livestream
+      })
+
+      return LivestreamRanker.sortRankedLivestreamEventByPoints(events).slice(
+         0,
+         limit
+      )
+   }
+
+   public getTopEventsBasedOnUserFieldOfStudy(
+      limit: 10
+   ): RankedLivestreamEvent[] {
+      const events = this.rankedLivestreamEvents.map((rankedLivestream) => {
+         const isFieldOfStudyMatched =
+            rankedLivestream.model.targetFieldsOfStudy.find(
+               (fieldOfStudy) => fieldOfStudy.id === this.user.fieldOfStudy.id
+            )
+
+         if (isFieldOfStudyMatched) {
+            rankedLivestream.addPoints(this.pointsPerFieldOfStudyMatch)
+         }
+
+         return rankedLivestream
+      })
+
+      return LivestreamRanker.sortRankedLivestreamEventByPoints(events).slice(
+         0,
+         limit
+      )
+   }
+
+   static sortRankedLivestreamEventByPoints(
+      rankedLivestreamEvents: RankedLivestreamEvent[]
+   ) {
+      return [...rankedLivestreamEvents].sort(
+         (a, b) => b.getPoints() - a.getPoints()
+      )
+   }
 }
