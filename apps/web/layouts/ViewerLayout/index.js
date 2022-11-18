@@ -34,6 +34,7 @@ import RTCProvider from "../../context/agora/RTCProvider"
 import { LEFT_MENU_WIDTH } from "../../constants/streams"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
+import GroupsUtil from "../../data/util/GroupsUtil"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -241,19 +242,46 @@ const ViewerLayout = (props) => {
                !breakoutRoomId
             ) {
                setCheckingForCategoryData(true)
+
                const livestreamGroups = await firebase.getGroupsWithIds(
                   currentLivestream.groupIds
                )
-               const answeredLivestreamGroupQuestions =
-                  await groupRepo.mapUserAnswersToLivestreamGroupQuestions(
-                     userData,
-                     currentLivestream
-                  )
+
+               const [{ hasAgreedToAll }, answeredLivestreamGroupQuestions] =
+                  await Promise.all([
+                     GroupsUtil.getPolicyStatus(
+                        livestreamGroups,
+                        userData.userEmail,
+                        firebase.checkIfUserAgreedToGroupPolicy
+                     ),
+                     groupRepo.mapUserAnswersToLivestreamGroupQuestions(
+                        userData,
+                        currentLivestream
+                     ),
+                  ])
+
+               /*
+                * Here we check if the user has answered all the questions for the livestream
+                * by looking at the user's answers and the livestreams questions in userData/userGroups
+                * */
                const hasAnsweredAllQuestions =
                   checkIfUserHasAnsweredAllLivestreamGroupQuestions(
                      answeredLivestreamGroupQuestions
                   )
-               if (!hasAnsweredAllQuestions) {
+
+               // The user might have answered all the questions but not registered to the event,
+               // so we check if the user has registered to the event
+               const hasRegisteredToEvent =
+                  currentLivestream?.registeredUsers?.includes?.(
+                     userData.userEmail
+                  )
+
+               if (
+                  !hasAnsweredAllQuestions || // if the user has not answered all the event questions
+                  !hasRegisteredToEvent || // if the user has not registered to the event
+                  !hasAgreedToAll // if the user has not agreed to all the policies
+               ) {
+                  // we show the registration modal
                   handleOpenJoinModal({
                      groups: livestreamGroups,
                      livestream: currentLivestream,
