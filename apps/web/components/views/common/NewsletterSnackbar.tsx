@@ -98,10 +98,10 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
       )
 
       try {
-         // If this is the first reminder, we should wait another 30 days for the next reminder
+         // If this is the first reminder, we should wait another 15 days for the next reminder
          if (isFirstReminder) {
             const thirtyDaysFromNow = new Date(
-               new Date().setDate(new Date().getDate() + 30)
+               new Date().setDate(new Date().getDate() + 15)
             )
 
             const reminder = {
