@@ -127,6 +127,7 @@ function SignUpUserForm() {
                   // in case the subscribed input is not checked
                   try {
                      if (values.subscribed) {
+                        dataLayerEvent("newsletter_accepted_on_signup")
                         return
                      }
 
