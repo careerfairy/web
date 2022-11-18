@@ -28,6 +28,12 @@ type Props = {
    hasFilter?: boolean
 }
 
+const filtersToShow = [
+   FilterEnum.languages,
+   FilterEnum.interests,
+   FilterEnum.jobCheck,
+]
+
 const StreamsTab = ({
    handleChange,
    value,
@@ -38,11 +44,6 @@ const StreamsTab = ({
       return hasFilter && value === "upcomingEvents"
    }, [hasFilter, value])
    const isMobile = useIsMobile()
-
-   const filtersToShow = useMemo(
-      () => [FilterEnum.languages, FilterEnum.interests, FilterEnum.jobCheck],
-      []
-   )
 
    return (
       <AppBar sx={styles.root} position="static" color="transparent">
