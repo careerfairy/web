@@ -39,6 +39,11 @@ const StreamsTab = ({
    }, [hasFilter, value])
    const isMobile = useIsMobile()
 
+   const filtersToShow = useMemo(
+      () => [FilterEnum.languages, FilterEnum.interests, FilterEnum.jobCheck],
+      []
+   )
+
    return (
       <AppBar sx={styles.root} position="static" color="transparent">
          <Tabs
@@ -86,13 +91,7 @@ const StreamsTab = ({
                      mt: 1,
                   }}
                >
-                  <Filter
-                     filtersToShow={[
-                        FilterEnum.languages,
-                        FilterEnum.interests,
-                        FilterEnum.jobCheck,
-                     ]}
-                  />
+                  <Filter filtersToShow={filtersToShow} />
                </Box>
             ) : null}
          </Tabs>
