@@ -20,6 +20,7 @@ import {
 import CircularProgress from "@mui/material/CircularProgress"
 import { sendGeneralError } from "../../../store/actions"
 import { useDispatch } from "react-redux"
+import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const styles = sxStyles({
    closeBtnWrapper: {
@@ -63,7 +64,11 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
 
    const handleAcceptNewsletter = useCallback(async () => {
       setIsSubmitting(true)
-
+      dataLayerEvent(
+         `newsletter_accepted_on_${
+            isFirstReminder ? "1st_reminder" : "2nd_reminder"
+         }`
+      )
       try {
          // If it was accepted we should set it as completed
          const reminder = {
@@ -86,6 +91,12 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
    }, [dispatch, isFirstReminder, userData?.id])
 
    const handleDeclineNewsletter = useCallback(async () => {
+      dataLayerEvent(
+         `newsletter_denied_on_${
+            isFirstReminder ? "1st_reminder" : "2nd_reminder"
+         }`
+      )
+
       try {
          // If this is the first reminder, we should wait another 30 days for the next reminder
          if (isFirstReminder) {
