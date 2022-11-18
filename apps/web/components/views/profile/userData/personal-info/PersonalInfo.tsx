@@ -374,7 +374,13 @@ const PersonalInfo = ({ userData }) => {
                                        name="unsubscribed"
                                     />
                                  }
-                                 label="I want to be informed about companies interested in my profile by subscribing to the CareerFairy newsletter."
+                                 label={
+                                    <Typography>
+                                       I want to join <b>60’000+ students</b>{" "}
+                                       who receive personalised invitations to
+                                       career events and job openings 👍
+                                    </Typography>
+                                 }
                               />
                            </FormControl>
                         </Grid>
