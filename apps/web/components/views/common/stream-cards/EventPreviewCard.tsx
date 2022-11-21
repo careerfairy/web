@@ -330,6 +330,7 @@ const EventPreviewCard = ({
       authenticatedUser.email,
       event?.groupIds,
       event?.id,
+      event?.jobs?.length,
       groupId,
       isOnMarketingLandingPage,
       isPast,
@@ -536,7 +537,7 @@ const EventPreviewCard = ({
                                           ? "cancel"
                                           : mobile
                                           ? "attend"
-                                          : "I'll attend"}
+                                          : "Attend Event"}
                                     </Button>
                                  )}
 
