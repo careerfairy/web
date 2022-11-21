@@ -27,7 +27,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    async modalAttend() {
-      return this.resilientClick('div[role="dialog"] >> text=I\'ll attend')
+      return this.resilientClick('div[role="dialog"] >> text=Attend Event')
    }
 
    modalSubmit() {
