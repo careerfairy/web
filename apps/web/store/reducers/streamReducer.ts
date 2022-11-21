@@ -18,7 +18,6 @@ const initialState = {
       isPublished: false,
       videoIsPaused: false,
       videoIsMuted: false,
-      playAllRemoteVideos: false,
       muteAllRemoteVideos: false,
       playLocalVideo: true,
       playLocalAudio: true,

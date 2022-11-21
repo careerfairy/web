@@ -63,7 +63,6 @@ interface Props {
    localStream: LocalStream
    mediaControls: MediaControls
    showSoundMeter: boolean
-   open: boolean
    onRefuseStream: () => Promise<any>
    onConfirmStream: () => Promise<any>
    deviceInitializers: {
@@ -80,7 +79,6 @@ const StreamPublishingModal = ({
    mediaControls,
    onConfirmStream,
    onRefuseStream,
-   open,
    showSoundMeter,
    deviceInitializers,
 }: Props) => {
@@ -97,8 +95,8 @@ const StreamPublishingModal = ({
    })
 
    const openModal = useMemo(() => {
-      return open && agoraRtcConnectionState.curState === "CONNECTED"
-   }, [open, agoraRtcConnectionState])
+      return agoraRtcConnectionState.curState === "CONNECTED"
+   }, [agoraRtcConnectionState])
 
    const handleConfirmPublishStream = useCallback(async () => {
       try {
