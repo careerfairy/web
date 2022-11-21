@@ -333,5 +333,7 @@ const getNewsletterUnsubscribeLink = (
 ): string => {
    const signature = generateSignature(email, secret)
    const baseUrl = origin || "https://careerfairy.io"
-   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${signature}`
+   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${encodeURIComponent(
+      signature
+   )}`
 }
