@@ -39,7 +39,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    skip() {
-      return this.text("Skip").click()
+      return this.page.locator('button:has-text("Skip")').click()
    }
 
    finish() {
