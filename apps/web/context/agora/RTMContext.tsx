@@ -53,7 +53,7 @@ export interface AgoraRTMContextInterface {
       getChannelMembers: (channel: RtmChannel) => Promise<any>
       leaveChannel: (channel: RtmChannel) => Promise<any>
    }
-   rtmStatus: RTMStatus
+   rtmStatus: RTMStatus | null
    // localUid: string;
    // userList: any;
    // peersRTM: Array<string>;

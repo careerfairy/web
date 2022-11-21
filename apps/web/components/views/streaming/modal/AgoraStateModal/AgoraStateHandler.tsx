@@ -146,10 +146,9 @@ const AgoraStateHandler: FC<Props> = () => {
 
    useEffect(() => {
       ;(function handleStatus() {
-         const { connectionState, reason } = rtmStatus
-         switch (connectionState) {
+         switch (rtmStatus?.connectionState) {
             case "ABORTED":
-               if (reason === "REMOTE_LOGIN") {
+               if (rtmStatus?.reason === "REMOTE_LOGIN") {
                   console.log("REMOTE_LOGIN OPENING CONFLICT MODAL")
                   showUidConflictModal()
                }
