@@ -29,6 +29,7 @@ import ReferralSection from "../../components/views/upcoming-livestream/Referral
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import FooterButton from "../../components/views/common/FooterButton"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -248,7 +249,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
 
       if (authenticatedUser) {
-         return "I'll attend"
+         return "Attend Event"
       }
 
       return "Join to attend"
@@ -376,93 +377,101 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }
 
    return (
-      <UpcomingLayout>
-         <EventSEOSchemaScriptTag event={stream} />
-         <SEO {...getStreamMetaInfo(stream)} />
-         <HeroSection
-            backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
-            stream={stream}
-            eventInterests={eventInterests}
-            streamAboutToStart={streamAboutToStart}
-            registerButtonLabel={registerButtonLabel}
-            disabled={isRegistrationDisabled}
-            registered={registered}
-            streamLanguage={streamLanguage}
-            numberOfSpotsRemaining={numberOfSpotsRemaining}
-            hosts={filteredGroups}
-            onRegisterClick={handleRegisterClick}
-         />
-         <Navigation
-            aboutRef={aboutRef}
-            speakersRef={speakersRef}
-            questionsRef={questionsRef}
-         />
-         {stream.summary && (
-            <AboutSection
-               summary={stream.summary}
-               sectionRef={aboutRef}
-               sectionId="about"
-               title={`${stream.company}`}
-               forceReveal={mobile}
-               big
-               overheadText={"ABOUT"}
-            />
-         )}
-         {!!stream?.speakers?.length && (
-            <SpeakersSection
-               overheadText={"OUR SPEAKERS"}
-               sectionRef={speakersRef}
-               backgroundColor={theme.palette.common.white}
-               sectionId="speakers"
-               big
-               speakers={stream.speakers}
-            />
-         )}
-
-         <QuestionsSection
-            livestreamId={stream.id}
-            title={
-               isPastEvent
-                  ? "Questions that were asked"
-                  : `Have any questions for the speakers?`
-            }
-            big
-            handleChangeQuestionSortType={handleChangeQuestionSortType}
-            getMore={handlers.getMore}
-            loadingInitialQuestions={handlers.loadingInitial}
-            hasVoted={hasVoted}
-            sectionRef={questionsRef}
-            isPastEvent={isPastEvent}
-            sectionId="questions"
-            hasMore={handlers.hasMore}
-            reFetchQuestions={handlers.getInitialQuery}
-            handleUpvote={handleUpvote}
-            questions={handlers.docs}
-            questionSortType={questionSortType}
-            questionsAreDisabled={stream.questionsDisabled}
-         />
-
-         {!stream.hasNoTalentPool && (
-            <TalentPoolSection
-               handleOpenJoinModal={handleOpenJoinModal}
-               registered={registered}
+      <>
+         <UpcomingLayout>
+            <EventSEOSchemaScriptTag event={stream} />
+            <SEO {...getStreamMetaInfo(stream)} />
+            <HeroSection
+               backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
                stream={stream}
+               eventInterests={eventInterests}
+               streamAboutToStart={streamAboutToStart}
+               registerButtonLabel={registerButtonLabel}
+               disabled={isRegistrationDisabled}
+               registered={registered}
+               streamLanguage={streamLanguage}
+               numberOfSpotsRemaining={numberOfSpotsRemaining}
+               hosts={filteredGroups}
+               onRegisterClick={handleRegisterClick}
+            />
+            <Navigation
+               aboutRef={aboutRef}
+               speakersRef={speakersRef}
+               questionsRef={questionsRef}
+            />
+            {stream.summary && (
+               <AboutSection
+                  summary={stream.summary}
+                  sectionRef={aboutRef}
+                  sectionId="about"
+                  title={`${stream.company}`}
+                  forceReveal={mobile}
+                  big
+                  overheadText={"ABOUT"}
+               />
+            )}
+            {!!stream?.speakers?.length && (
+               <SpeakersSection
+                  overheadText={"OUR SPEAKERS"}
+                  sectionRef={speakersRef}
+                  backgroundColor={theme.palette.common.white}
+                  sectionId="speakers"
+                  big
+                  speakers={stream.speakers}
+               />
+            )}
+
+            <QuestionsSection
+               livestreamId={stream.id}
+               title={
+                  isPastEvent
+                     ? "Questions that were asked"
+                     : `Have any questions for the speakers?`
+               }
+               big
+               handleChangeQuestionSortType={handleChangeQuestionSortType}
+               getMore={handlers.getMore}
+               loadingInitialQuestions={handlers.loadingInitial}
+               hasVoted={hasVoted}
+               sectionRef={questionsRef}
+               isPastEvent={isPastEvent}
+               sectionId="questions"
+               hasMore={handlers.hasMore}
+               reFetchQuestions={handlers.getInitialQuery}
+               handleUpvote={handleUpvote}
+               questions={handlers.docs}
+               questionSortType={questionSortType}
+               questionsAreDisabled={stream.questionsDisabled}
+            />
+
+            {!stream.hasNoTalentPool && (
+               <TalentPoolSection
+                  handleOpenJoinModal={handleOpenJoinModal}
+                  registered={registered}
+                  stream={stream}
+               />
+            )}
+            <ReferralSection event={stream} />
+            <ContactSection
+               backgroundColor={theme.palette.common.white}
+               subtitle={"Any problem or question ? We want to hear from you"}
+            />
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               handleClose={handleCloseJoinModal}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+            />
+         </UpcomingLayout>
+         {mobile && !isRegistrationDisabled && (
+            <FooterButton
+               handleClick={handleRegisterClick}
+               buttonMessage={"Attend Event"}
             />
          )}
-         <ReferralSection event={stream} />
-         <ContactSection
-            backgroundColor={theme.palette.common.white}
-            subtitle={"Any problem or question ? We want to hear from you"}
-         />
-         <RegistrationModal
-            open={Boolean(joinGroupModalData)}
-            handleClose={handleCloseJoinModal}
-            onFinish={handleCloseJoinModal}
-            promptOtherEventsOnFinal
-            livestream={joinGroupModalData?.livestream}
-            groups={joinGroupModalData?.groups}
-         />
-      </UpcomingLayout>
+      </>
    )
 }
 
