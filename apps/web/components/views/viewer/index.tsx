@@ -84,10 +84,10 @@ const ViewerOverview = ({
       [dispatch]
    )
 
-   const unpauseRemoteVideosAfterFail = useCallback(
-      () => dispatch(actions.unpauseRemoteVideosAfterFail()),
-      [dispatch]
-   )
+   const unpauseRemoteVideosAfterFail = useCallback(() => {
+      dispatch(actions.unpauseRemoteVideosAfterFail())
+      dispatch(actions.unmuteMutedRemoteVideosAfterFail())
+   }, [dispatch])
 
    return (
       <Fragment>

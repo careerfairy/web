@@ -23,44 +23,19 @@ const RemoteStreamItem = ({
    const isScreenShareVideo = stream.uid.includes?.("screen")
 
    const {
-      playAllRemoteVideos,
       muteAllRemoteVideos,
       unmuteFailedMutedRemoteVideos,
+      unpauseFailedPlayRemoteVideos,
    } = useSelector((state) => state.stream.streaming)
 
    const dispatch = useDispatch()
 
-   const setAVideoIsMuted = () => dispatch(actions.setVideoIsMuted())
+   const setAVideoIsMuted = useCallback(
+      () => dispatch(actions.setVideoIsMuted()),
+      [dispatch]
+   )
 
-   useEffect(() => {
-      if (stream.uid === "demoStream") {
-         generateDemoHandRaiser()
-      } else {
-         !muteAllRemoteVideos && playVideo()
-      }
-   }, [stream.uid, stream.videoTrack])
-
-   useEffect(() => {
-      if (playAllRemoteVideos) {
-         playVideo()
-      }
-   }, [playAllRemoteVideos])
-
-   useEffect(() => {
-      if (unmuteFailedMutedRemoteVideos) {
-         stream?.audioTrack?.play()
-      }
-   }, [unmuteFailedMutedRemoteVideos])
-
-   useEffect(() => {
-      if (muteAllRemoteVideos) {
-         stream?.stream?.audioTrack?.stop()
-      } else {
-         stream?.stream?.audioTrack?.play()
-      }
-   }, [muteAllRemoteVideos])
-
-   function playVideo() {
+   const playVideo = useCallback(() => {
       try {
          if (stream?.videoTrack && !stream?.videoTrack?.isPlaying) {
             stream.videoTrack?.play(`${stream.uid}`, {
@@ -71,56 +46,95 @@ const RemoteStreamItem = ({
          setAVideoIsMuted()
          console.error("-> error in PLAY VIDEO", e)
       }
+   }, [isScreenShareVideo, setAVideoIsMuted, stream])
+
+   useEffect(() => {
+      if (stream.uid === "demoStream") {
+         generateDemoHandRaiser(stream)
+      } else {
+         !muteAllRemoteVideos && playVideo()
+      }
+   }, [stream.uid, stream.videoTrack, playVideo, muteAllRemoteVideos, stream])
+
+   useEffect(() => {
+      if (unpauseFailedPlayRemoteVideos) {
+         playVideo()
+      }
+   }, [unpauseFailedPlayRemoteVideos, playVideo])
+
+   useEffect(() => {
+      if (unmuteFailedMutedRemoteVideos) {
+         stream?.audioTrack?.play()
+      }
+   }, [stream?.audioTrack, unmuteFailedMutedRemoteVideos])
+
+   useEffect(() => {
+      if (muteAllRemoteVideos) {
+         stream?.stream?.audioTrack?.stop()
+      } else {
+         stream?.stream?.audioTrack?.play()
+      }
+   }, [muteAllRemoteVideos, stream?.stream?.audioTrack])
+
+   const remoteStreamMuted = !!(stream.audioMuted || !stream.audioTrack)
+
+   const remoteStreamItem = (
+      <StreamItem
+         speaker={speaker}
+         stream={stream}
+         videoMuted={!stream.videoTrack || stream.videoMuted}
+         audioMuted={remoteStreamMuted}
+         index={index}
+         big={big}
+         videoMutedBackgroundImg={videoMutedBackgroundImg}
+      />
+   )
+
+   // only render the Tooltip if really needed
+   if (activeStep === 11 && stream.uid === "demoStream") {
+      return (
+         <WhiteTooltip
+            placement="top"
+            title={
+               <React.Fragment>
+                  <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
+                  <TooltipText>
+                     Once connected, the viewer who raised their hand will
+                     appear as an additional streamer
+                  </TooltipText>
+                  {activeStep === 11 && (
+                     <TooltipButtonComponent
+                        onConfirm={() => {
+                           handleConfirmStep(11)
+                        }}
+                        buttonText="Ok"
+                     />
+                  )}
+               </React.Fragment>
+            }
+            open={activeStep === 11 && stream.uid === "demoStream"}
+            style={{
+               width: "100%",
+               display: "flex",
+            }}
+         >
+            {remoteStreamItem}
+         </WhiteTooltip>
+      )
    }
 
-   const generateDemoHandRaiser = useCallback(() => {
-      let video = document.createElement("video")
-      const videoContainer = document.querySelector("#" + stream.uid)
-      videoContainer.style.zIndex = 1000
-      videoContainer.style.backgroundColor = "black"
-      videoContainer.appendChild(video)
-      video.src = stream.url
-      video.loop = true
-      video.play()
-   }, [stream.url])
+   return remoteStreamItem
+}
 
-   return (
-      <WhiteTooltip
-         placement="top"
-         title={
-            <React.Fragment>
-               <TooltipTitle>Hand Raise (3/5)</TooltipTitle>
-               <TooltipText>
-                  Once connected, the viewer who raised their hand will appear
-                  as an additional streamer
-               </TooltipText>
-               {activeStep === 11 && (
-                  <TooltipButtonComponent
-                     onConfirm={() => {
-                        handleConfirmStep(11)
-                     }}
-                     buttonText="Ok"
-                  />
-               )}
-            </React.Fragment>
-         }
-         open={activeStep === 11 && stream.uid === "demoStream"}
-         style={{
-            width: "100%",
-            display: "flex",
-         }}
-      >
-         <StreamItem
-            speaker={speaker}
-            stream={stream}
-            videoMuted={!stream.videoTrack || stream.videoMuted}
-            audioMuted={stream.audioMuted}
-            index={index}
-            big={big}
-            videoMutedBackgroundImg={videoMutedBackgroundImg}
-         />
-      </WhiteTooltip>
-   )
+function generateDemoHandRaiser(stream) {
+   let video = document.createElement("video")
+   const videoContainer = document.querySelector("#" + stream.uid)
+   videoContainer.style.zIndex = 1000
+   videoContainer.style.backgroundColor = "black"
+   videoContainer.appendChild(video)
+   video.src = stream.url
+   video.loop = true
+   video.play()
 }
 
 export default RemoteStreamItem

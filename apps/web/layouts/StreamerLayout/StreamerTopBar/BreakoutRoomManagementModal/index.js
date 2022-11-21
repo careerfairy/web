@@ -20,6 +20,7 @@ import useMediaQuery from "@mui/material/useMediaQuery"
 import { useTheme } from "@mui/material/styles"
 import breakoutRoomsSelector from "../../../../components/selectors/breakoutRoomsSelector"
 import * as actions from "store/actions"
+import { streamerBreakoutRoomModalOpen } from "../../../../store/selectors/streamSelectors"
 
 const Content = ({ handleClose, leaveAgoraRoom }) => {
    const {
@@ -100,9 +101,7 @@ const Content = ({ handleClose, leaveAgoraRoom }) => {
    )
 }
 const BreakoutRoomManagementModal = ({ leaveAgoraRoom }) => {
-   const open = useSelector(
-      (state) => state.stream.layout.streamerBreakoutRoomModalOpen
-   )
+   const open = useSelector(streamerBreakoutRoomModalOpen)
    const theme = useTheme()
    const dispatch = useDispatch()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
