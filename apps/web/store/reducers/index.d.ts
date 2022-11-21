@@ -42,7 +42,6 @@ interface StreamReducer {
       isPublished: boolean
       videoIsPaused: boolean
       videoIsMuted: boolean
-      playAllRemoteVideos: boolean
       muteAllRemoteVideos: boolean
       playLocalVideo: boolean
       playLocalAudio: boolean
