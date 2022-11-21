@@ -11,7 +11,7 @@ on:
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
-   group: ${{ github.head_ref || github.ref_name }}
+   group: ${{ github.workflow }}-${{ github.head_ref || github.ref_name }}
    cancel-in-progress: true
 
 jobs:
