@@ -41,6 +41,7 @@ const AgoraStateHandler: FC<Props> = () => {
                   preventDuplicate: true,
                   key: rtcStatus,
                   persist: Boolean(persist),
+                  autoHideDuration: 1500,
                },
             })
          )
