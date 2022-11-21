@@ -75,7 +75,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       return false
    }, [stream, authenticatedUser])
 
-   const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
+   const handleCloseJoinModal = useCallback(
+      () => setJoinGroupModalData(undefined),
+      []
+   )
    const handleOpenJoinModal = useCallback(
       () =>
          setJoinGroupModalData({
@@ -83,7 +86,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             targetGroupId: targetGroupId,
             livestream: stream,
          }),
-      [targetGroupId, userData, stream, unfilteredGroups]
+      [targetGroupId, stream, unfilteredGroups]
    )
 
    const [isPastEvent, setIsPastEvent] = useState(
@@ -108,7 +111,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
 
       return stream && livestreamQuestionsQuery(stream.id, questionSortType)
-   }, [stream?.id, stream?.questionsDisabled, questionSortType])
+   }, [stream, livestreamQuestionsQuery, questionSortType])
 
    const handlers = useInfiniteScrollServer({
       limit: 8,
@@ -152,7 +155,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          )
          return () => unsubscribe()
       }
-   }, [stream?.id])
+   }, [listenToScheduledLivestreamById, stream?.id])
 
    useEffect(() => {
       if (query.groupId) {
@@ -167,7 +170,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          )
          return () => unsubscribe()
       }
-   }, [query.groupId])
+   }, [listenToCareerCenterById, query.groupId])
 
    useEffect(() => {
       if (stream?.groupIds?.length) {
@@ -190,7 +193,12 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             }
          )
       }
-   }, [stream?.groupIds, currentGroup?.groupId])
+   }, [
+      stream?.groupIds,
+      currentGroup?.groupId,
+      stream,
+      getDetailLivestreamCareerCenters,
+   ])
 
    useEffect(() => {
       ;(async function handleAutoRegister() {
@@ -218,19 +226,23 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          }
       })()
    }, [
-      query.register,
+      query?.register,
       stream?.id,
       stream?.hasStarted,
       unfilteredGroups,
       stream?.registeredUsers,
-      authenticatedUser.email,
+      authenticatedUser?.email,
+      query,
+      push,
+      pathname,
+      handleOpenJoinModal,
    ])
 
    useEffect(() => {
       if (stream.hasStarted) {
          replace?.(`/streaming/${stream.id}/viewer`)
       }
-   }, [stream.hasStarted])
+   }, [replace, stream?.hasStarted, stream?.id])
 
    const registerButtonLabel = useMemo(() => {
       if (participated && isPastEvent) return "You attended this event"
@@ -293,7 +305,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       else {
          return stream.maxRegistrants - stream.registeredUsers.length
       }
-   })
+   }, [stream?.maxRegistrants, stream?.registeredUsers])
 
    const streamAboutToStart = useMemo(() => {
       return Boolean(
@@ -303,71 +315,102 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       )
    }, [isPastEvent, stream?.isFaceToFace, stream?.startDate])
 
-   const startRegistrationProcess = async () => {
-      dataLayerLivestreamEvent("event_registration_started", stream)
-      if (isLoggedOut || !auth?.currentUser?.emailVerified) {
+   const startRegistrationProcess = useCallback(
+      async (fromFooterButton = false) => {
          dataLayerLivestreamEvent(
-            "event_registration_started_login_required",
+            `event_registration_started${
+               fromFooterButton ? "_from_footer_button" : ""
+            }`,
             stream
          )
-         return push(
-            asPath
-               ? {
-                    pathname: `/login`,
-                    query: { absolutePath: linkToStream },
-                 }
-               : "/signup"
-         )
-      }
+         if (isLoggedOut || !auth?.currentUser?.emailVerified) {
+            dataLayerLivestreamEvent(
+               "event_registration_started_login_required",
+               stream
+            )
+            return push(
+               asPath
+                  ? {
+                       pathname: `/login`,
+                       query: { absolutePath: linkToStream },
+                    }
+                  : "/signup"
+            )
+         }
 
-      if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         dataLayerLivestreamEvent(
-            "event_registration_started_profile_incomplete",
-            stream
-         )
-         return push({
-            pathname: `/profile`,
-            query: { absolutePath: asPath },
-         })
-      }
+         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            dataLayerLivestreamEvent(
+               "event_registration_started_profile_incomplete",
+               stream
+            )
+            return push({
+               pathname: `/profile`,
+               query: { absolutePath: asPath },
+            })
+         }
 
-      handleOpenJoinModal()
-   }
+         handleOpenJoinModal()
+      },
+      [
+         asPath,
+         auth?.currentUser?.emailVerified,
+         handleOpenJoinModal,
+         isLoggedOut,
+         linkToStream,
+         push,
+         stream,
+         userData,
+      ]
+   )
 
-   const handleRegisterClick = () => {
-      if (!registered) {
-         return startRegistrationProcess(stream.id)
-      }
-   }
+   const handleRegisterClick = useCallback(
+      (fromFooterButton = false) => {
+         if (!registered) {
+            return startRegistrationProcess(fromFooterButton)
+         }
+      },
+      [registered, startRegistrationProcess]
+   )
 
-   const handleChangeQuestionSortType = (event, newSortType) => {
+   const handleChangeQuestionSortType = useCallback((event, newSortType) => {
       if (newSortType !== null) {
          setQuestionSortType(newSortType)
       }
-   }
+   }, [])
 
-   const handleUpvote = async (question) => {
-      if (isLoggedOut) {
-         return push({
-            pathname: `/signup`,
-            query: { absolutePath: asPath },
-         })
-      }
-      try {
-         await upvoteLivestreamQuestion(
-            stream.id,
-            question,
-            authenticatedUser.email
-         )
-
-         handlers.handleClientUpdate(question.id, {
-            votes: question.votes + 1 || 1,
-            emailOfVoters: question.emailOfVoters?.concat(
+   const handleUpvote = useCallback(
+      async (question) => {
+         if (isLoggedOut) {
+            return push({
+               pathname: `/signup`,
+               query: { absolutePath: asPath },
+            })
+         }
+         try {
+            await upvoteLivestreamQuestion(
+               stream.id,
+               question,
                authenticatedUser.email
-            ) || [authenticatedUser.email],
-         })
-      } catch (e) {}
-   }
+            )
+
+            handlers.handleClientUpdate(question.id, {
+               votes: question.votes + 1 || 1,
+               emailOfVoters: question.emailOfVoters?.concat(
+                  authenticatedUser.email
+               ) || [authenticatedUser.email],
+            })
+         } catch (e) {}
+      },
+      [
+         asPath,
+         authenticatedUser.email,
+         handlers,
+         isLoggedOut,
+         push,
+         stream.id,
+         upvoteLivestreamQuestion,
+      ]
+   )
 
    function hasVoted(question) {
       if (!authenticatedUser || !question.emailOfVoters) {
@@ -375,6 +418,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
       return question.emailOfVoters.indexOf(authenticatedUser.email) > -1
    }
+
+   const handleFooterAttendButtonClick = useCallback(async () => {
+      await handleRegisterClick(true)
+   }, [handleRegisterClick])
 
    return (
       <>
@@ -467,7 +514,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          </UpcomingLayout>
          {mobile && !isRegistrationDisabled && (
             <FooterButton
-               handleClick={handleRegisterClick}
+               handleClick={handleFooterAttendButtonClick}
                buttonMessage={"Attend Event"}
             />
          )}
