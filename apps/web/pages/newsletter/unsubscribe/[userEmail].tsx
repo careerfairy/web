@@ -64,7 +64,7 @@ export const getServerSideProps = async ({
    return {
       props: {
          userEmail: params.userEmail,
-         signature: (query?.signature as string) || null,
+         signature: (query?.signature as string) || "",
       },
    }
 }
