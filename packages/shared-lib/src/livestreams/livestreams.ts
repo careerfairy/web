@@ -62,6 +62,13 @@ export interface LivestreamEvent extends Identifiable {
     * The streamerId of the user who is currently sharing their screen
     */
    screenSharerId?: string
+
+   /**
+    * Livestream with manually speaker switch
+    * Main Streamer needs to click on each video to switch to it
+    */
+   speakerSwitchMode?: "manual"
+
    /**
     * An empty array means the livestream should target all the fields of study
     * [] -> All fields of study

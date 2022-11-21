@@ -22,5 +22,8 @@ export const sessionShouldUseCloudProxySelector = (state: RootState) =>
 export const sessionIsUsingCloudProxySelector = (state: RootState) =>
    state.stream.agoraState.sessionIsUsingCloudProxy
 
+export const streamerBreakoutRoomModalOpen = (state: RootState) =>
+   state.stream.layout.streamerBreakoutRoomModalOpen
+
 export const videoOptionsSelector = (state: RootState) =>
    state.stream.videoOptions

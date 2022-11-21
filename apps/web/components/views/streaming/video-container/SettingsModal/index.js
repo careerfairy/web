@@ -10,7 +10,6 @@ import { GlassDialog } from "../../../../../materialUI/GlobalModals"
 import DeviceSelectMenu from "../../sharedComponents/DeviceSelectMenu"
 
 function SettingsModal({
-   open,
    close,
    smallScreen,
    devices,
@@ -21,7 +20,7 @@ function SettingsModal({
    deviceInitializers,
 }) {
    return (
-      <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" open={open}>
+      <GlassDialog fullScreen={smallScreen} fullWidth maxWidth="sm" open>
          <DialogTitle>
             <div style={{ color: "lightgrey" }}>
                <SettingsIcon

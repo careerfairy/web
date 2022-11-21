@@ -10,6 +10,7 @@ import {
 import { IRemoteStream } from "types/streaming"
 import useAgoraError from "./useAgoraError"
 import { useSessionStorage } from "react-use"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
 export const SESSION_PROXY_KEY = "should-use-cloud-proxy"
 
@@ -95,8 +96,8 @@ export default function useAgoraClientConfig(
          )
       })
 
-      rtcClient.on("user-published", async (remoteUser, mediaType) =>
-         rtcClient
+      rtcClient.on("user-published", async (remoteUser, mediaType) => {
+         return rtcClient
             .subscribe(remoteUser, mediaType)
             .then(() => {
                setRemoteStreams((prevRemoteStreams) => {
@@ -122,9 +123,26 @@ export default function useAgoraClientConfig(
                      return user
                   })
                })
+
+               /**
+                * To benefit from the dual streams feature (on the sender)
+                * Set a stream fallback option to automatically switch remote video quality when network conditions degrade
+                *
+                * https://github.com/AgoraIO-Community/AgoraWebSDK-NG/blob/eb8a5b2ef2/Docs/en/stream_fallback.md
+                */
+               rtcClient
+                  .setStreamFallbackOption(remoteUser.uid, 1) // 1 - fallback to low quality video
+                  .catch((e) => {
+                     console.error(
+                        "Failed to set setStreamFallbackOption",
+                        remoteUser,
+                        e
+                     )
+                     errorLogAndNotify(e)
+                  })
             })
             .catch(handleRtcError)
-      )
+      })
 
       rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
          rtcClient
@@ -156,6 +174,24 @@ export default function useAgoraClientConfig(
          if (!isEqualToCurrentValue) {
             setNetworkQuality(getQualityObjectReference(networkStats))
          }
+      })
+
+      // https://api-ref.agora.io/en/voice-sdk/web/4.x/interfaces/iagorartcclient.html#event_stream_type_changed
+      rtcClient.on("stream-type-changed", (uid, streamType) => {
+         console.log(
+            "RTC Event stream-type-changed (stream quality changed)",
+            uid,
+            streamType
+         )
+      })
+
+      // https://api-ref.agora.io/en/voice-sdk/web/4.x/interfaces/iagorartcclient.html#event_stream_fallback
+      rtcClient.on("stream-fallback", (uid, isFallbackOrRecover) => {
+         console.log(
+            "RTC Event stream-fallback (stream toggle between audio mode only)",
+            uid,
+            isFallbackOrRecover
+         )
       })
    }
 
