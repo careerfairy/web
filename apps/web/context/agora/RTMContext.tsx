@@ -1,5 +1,6 @@
-import { createContext } from "react"
+import React, { createContext } from "react"
 import { RtmChannel, RtmClient } from "agora-rtm-sdk"
+import { RTMStatus } from "../../types/streaming"
 
 export type RTMTextMessageType = "CONTROL" | "NORMAL" | "EMOTE" | "TRANSCRIBE"
 
@@ -52,11 +53,17 @@ export interface AgoraRTMContextInterface {
       getChannelMembers: (channel: RtmChannel) => Promise<any>
       leaveChannel: (channel: RtmChannel) => Promise<any>
    }
+   rtmStatus: RTMStatus | null
    // localUid: string;
    // userList: any;
    // peersRTM: Array<string>;
 }
 
-const RTMContext = createContext(null as unknown as AgoraRTMContextInterface)
+/**
+ * Context to access the client, and rtm status. It's setup by {@link RTMProvider}.
+ */
+const RTMContext = createContext<AgoraRTMContextInterface>(
+   {} as AgoraRTMContextInterface
+)
 
 export default RTMContext

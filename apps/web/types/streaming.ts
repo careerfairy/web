@@ -8,6 +8,7 @@ import {
    IRemoteVideoTrack,
    UID,
 } from "agora-rtc-sdk-ng"
+import { RtmStatusCode } from "agora-rtm-sdk"
 
 export interface LocalStream {
    uid: UID
@@ -211,4 +212,9 @@ export const rtcMessages: Messages = {
    CONNECTING: "Connecting...",
    CONNECTED: "Connected",
    DISCONNECTING: "",
+}
+
+export interface RTMStatus {
+   connectionState: RtmStatusCode.ConnectionState
+   reason: RtmStatusCode.ConnectionChangeReason
 }
