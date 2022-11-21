@@ -277,7 +277,7 @@ function ConnectedHandRaiseElement(props) {
 
    function updateHandRaiseRequest(state) {
       props.updateHandRaiseRequest(props.request.id, state)
-      props?.setNotificationToRemove(notificationId)
+      props?.setNotificationToRemove?.(notificationId)
    }
 
    return (

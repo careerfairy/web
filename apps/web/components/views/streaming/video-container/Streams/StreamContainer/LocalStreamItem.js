@@ -14,20 +14,10 @@ const LocalStreamItem = ({ stream, big, speaker, videoMutedBackgroundImg }) => {
          videoMutedBackgroundImg={videoMutedBackgroundImg}
          stream={stream}
          videoMuted={!stream.videoTrack || stream.videoMuted}
-         audioMuted={isLocalStreamMuted(stream)}
+         audioMuted={!!stream.audioMuted}
          big={big}
       />
    )
-}
-
-function isLocalStreamMuted(stream) {
-   // local streamer will publish the audiotrack, but initially it will not have the
-   // audioMuted field set
-   if (stream.audioMuted) {
-      return true
-   }
-
-   return false
 }
 
 export default LocalStreamItem

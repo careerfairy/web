@@ -76,12 +76,14 @@ const RemoteStreamItem = ({
       }
    }, [muteAllRemoteVideos, stream?.stream?.audioTrack])
 
+   const remoteStreamMuted = !!(stream.audioMuted || !stream.audioTrack)
+
    const remoteStreamItem = (
       <StreamItem
          speaker={speaker}
          stream={stream}
          videoMuted={!stream.videoTrack || stream.videoMuted}
-         audioMuted={isRemoteStreamMuted(stream)}
+         audioMuted={remoteStreamMuted}
          index={index}
          big={big}
          videoMutedBackgroundImg={videoMutedBackgroundImg}
@@ -122,16 +124,6 @@ const RemoteStreamItem = ({
    }
 
    return remoteStreamItem
-}
-
-function isRemoteStreamMuted(stream) {
-   // if we receive the remotestream without audioTrack/audioMuted means the
-   // streamer is muted
-   if (stream.audioMuted || !stream.audioTrack) {
-      return true
-   }
-
-   return false
 }
 
 function generateDemoHandRaiser(stream) {

@@ -399,7 +399,6 @@ const VideoContainer = ({
          />
          {Boolean(showLocalStreamPublishingModal) && (
             <StreamPublishingModal
-               open={Boolean(showLocalStreamPublishingModal)}
                localStream={localStream}
                deviceInitializers={deviceInitializers}
                displayableMediaStream={displayableMediaStream}
@@ -446,7 +445,6 @@ const VideoContainer = ({
          <AgoraStateHandler />
          {showSettings && (
             <SettingsModal
-               open={showSettings}
                close={closeSettings}
                smallScreen={smallScreen}
                devices={devices}

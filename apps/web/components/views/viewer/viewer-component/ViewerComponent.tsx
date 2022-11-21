@@ -310,7 +310,6 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
          {shouldInitializeAgora && <AgoraStateHandler />}
          {Boolean(showLocalStreamPublishingModal) && (
             <StreamPublishingModal
-               open={Boolean(showLocalStreamPublishingModal)}
                showSoundMeter={Boolean(
                   (showLocalStreamPublishingModal || showSettings) &&
                      localStream?.audioTrack
@@ -372,7 +371,6 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
 
                {showSettings && (
                   <SettingsModal
-                     open={showSettings}
                      close={closeSettings}
                      devices={devices}
                      deviceInitializers={deviceInitializers}
