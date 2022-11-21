@@ -1,9 +1,5 @@
 name: "Build, Test and Deploy - Develop"
 on:
-   # Trigger on all PRs targeting all branches but main
-   pull_request:
-      branches-ignore:
-         - main
    # Trigger on pushes targeting all branches but main
    push:
       branches-ignore:
@@ -11,7 +7,7 @@ on:
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
-   group: ${{ github.head_ref || github.ref_name }}
+   group: ${{ github.workflow }}-${{ github.ref }}
    cancel-in-progress: true
 
 jobs:

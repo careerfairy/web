@@ -1,4 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef } from "react"
+import {
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
@@ -14,6 +21,7 @@ import { useSessionStorage } from "react-use"
 import { sessionIsUsingCloudProxySelector } from "../../store/selectors/streamSelectors"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
+import { RTMStatus } from "../../types/streaming"
 
 interface Props {
    children: JSX.Element
@@ -25,6 +33,9 @@ interface Props {
 const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
    const rtmClient = useRef<AgoraRTMContextInterface["rtmClient"]>(null!)
    const rtmChannel = useRef<AgoraRTMContextInterface["rtmChannel"]>(null!)
+
+   const [rtmStatus, setRtmStatus] = useState<RTMStatus>(null)
+
    const sessionIsUsingCloudProxy = useSelector(
       sessionIsUsingCloudProxySelector
    )
@@ -44,6 +55,12 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
             logFilter: AgoraRTM.LOG_FILTER_INFO,
             enableCloudProxy: useProxy,
          })
+
+         rtmClient.current.on(
+            "ConnectionStateChanged",
+            (connectionState, reason) =>
+               setRtmStatus({ connectionState, reason })
+         )
 
          /**
           * Fix RtmInternalError: Cannot get illegal vid. error
@@ -232,13 +249,22 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
          agoraHandlers,
          rtmChannel: rtmChannel.current,
          rtmClient: rtmClient.current,
+         rtmStatus,
       }),
-      [agoraHandlers, createEmote]
+      [agoraHandlers, createEmote, rtmStatus]
    )
 
    return (
       <RTMContext.Provider value={contextValue}>{children}</RTMContext.Provider>
    )
+}
+
+export const useRTM = () => {
+   const context = useContext(RTMContext)
+   if (!context) {
+      throw new Error("useRTM must be used within a RTMProvider")
+   }
+   return context
 }
 
 export default RTMProvider
