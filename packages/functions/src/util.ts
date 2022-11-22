@@ -437,3 +437,12 @@ export const decompress = (input: Buffer | Uint8Array): Promise<Buffer> => {
 export const generateSignature = (body: string, secret: string) => {
    return crypto.createHmac("sha256", secret).update(body).digest("hex")
 }
+
+export const mapFirestoreAdminSnapshots = <T>(
+   snapshots: FirebaseFirestore.QuerySnapshot<FirebaseFirestore.DocumentData>
+): T[] =>
+   snapshots.docs.map((doc) => {
+      const data = doc.data()
+      const id = doc.id
+      return { id, ...data } as T
+   })

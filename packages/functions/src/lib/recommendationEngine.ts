@@ -1,4 +1,8 @@
-import { livestreamsRepo, userRepo } from "../api/repositories"
+import {
+   livestreamsRepo,
+   recommendationRepo,
+   userRepo,
+} from "../api/repositories"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
@@ -54,12 +58,12 @@ const getRecommendedEventsBasedOnUserData = async ({
       const arrayOfRecommendedEventsBasedOnUserData: LivestreamEvent[][] =
          await Promise.all([
             // Fetch recommended events based on the user's interests
-            livestreamsRepo.getRecommendEventsBasedOnUserInterests(
-               userData.interestsIds,
+            recommendationRepo.getRecommendEventsBasedOnUserInterests(
+               userData,
                limit
             ),
-            livestreamsRepo.getRecommendEventsBasedOnUserFieldOfStudy(
-               userData.fieldOfStudy,
+            recommendationRepo.getRecommendEventsBasedOnUserFieldOfStudy(
+               userData,
                limit
             ),
          ])

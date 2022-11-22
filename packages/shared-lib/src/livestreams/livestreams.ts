@@ -362,3 +362,9 @@ export interface LivestreamPromotions extends Identifiable {
    promotionUniversitiesCodes: OptionGroup[]
    livestreamId: string
 }
+
+export function getEarliestEventBufferTime() {
+   return new Date(
+      Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+   )
+}
