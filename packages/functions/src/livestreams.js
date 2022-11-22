@@ -6,6 +6,8 @@ const {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
 } = require("./api/slack")
+const { DateTime } = require("luxon")
+const ical = require("ical-generator")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -33,28 +35,28 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
-      //   const cal = ical({
-      //      domain: "careerfairy.io",
-      //      name: "Live Stream Invite",
-      //   });
-      //   const start = DateTime.fromJSDate(new Date(req.body.regular_date));
+      const cal = ical({
+         domain: "careerfairy.io",
+         name: "Live Stream Invite",
+      })
+      const start = DateTime.fromJSDate(new Date(data.regular_date))
 
-      //   cal.createEvent({
-      //      start: start,
-      //      end: start.plus({ minutes: 45 }),
-      //      summary: `Live stream with ${req.body.company_name}`,
-      //      description: req.body.livestream_title,
-      //      location: "On CareerFairy",
-      //      timezone: "Europe/Zurich",
-      //      organizer: {
-      //         name: "CareerFairy",
-      //         mailto: "noreply@careerfairy.io",
-      //      },
-      //      url: req.body.livestream_link,
-      //   });
+      cal.createEvent({
+         start: start,
+         end: start.plus({ minutes: 45 }),
+         summary: `Live stream with ${data.company_name}`,
+         description: data.livestream_title,
+         location: "On CareerFairy",
+         timezone: "Europe/Zurich",
+         organizer: {
+            name: "CareerFairy",
+            mailto: "noreply@careerfairy.io",
+         },
+         url: `${data.livestream_link}?fromEmailCalendar=true`,
+      })
 
-      //   let calStr = cal.toString();
-      //   let calBase64Str = Buffer.from(calStr).toString("base64");
+      const calStr = cal.toString()
+      const calBase64Str = Buffer.from(calStr).toString("base64")
 
       const email = {
          TemplateId:
@@ -69,13 +71,13 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             livestream_title: data.livestream_title,
             livestream_link: data.livestream_link,
          },
-         //  Attachments: [
-         //     {
-         //        Name: "livestream.ics",
-         //        Content: calBase64Str,
-         //        ContentType: "text/calendar; charset=utf-8; method=REQUEST",
-         //     },
-         //  ],
+         Attachments: [
+            {
+               Name: "livestream.ics",
+               Content: calBase64Str,
+               ContentType: "text/calendar; charset=utf-8; method=REQUEST",
+            },
+         ],
       }
 
       client.sendEmailWithTemplate(email).then(
