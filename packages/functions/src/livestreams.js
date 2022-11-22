@@ -43,11 +43,11 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
 
       cal.createEvent({
          start: start,
-         end: start.plus({ minutes: 45 }),
+         end: start.plus({ minutes: data.duration_date || 45 }),
          summary: `Live stream with ${data.company_name}`,
          description: data.livestream_title,
          location: "On CareerFairy",
-         timezone: "Europe/Zurich",
+         timezone: data.timezone || "Europe/Zurich",
          organizer: {
             name: "CareerFairy",
             mailto: "noreply@careerfairy.io",

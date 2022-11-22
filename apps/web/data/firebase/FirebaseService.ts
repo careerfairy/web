@@ -264,7 +264,9 @@ class FirebaseService {
       return sendLivestreamRegistrationConfirmationEmail({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
+         timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
+         duration_date: livestream.duration,
          livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
