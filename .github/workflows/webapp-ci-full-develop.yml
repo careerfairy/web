@@ -97,71 +97,71 @@ jobs:
            run: npm run test
 
    # Run E2E Tests
-   e2e_tests:
-      name: E2E Tests for Chromium
-      needs: [build_app_for_tests]
-      # only run if there are changes on the webapp & shared lib
-      if: |
-         needs.build_app_for_tests.outputs.webapp == 'true' ||
-         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
-      runs-on: ubuntu-latest
-      timeout-minutes: 25
-      env:
-         # https://turborepo.org/docs/guides/continuous-integration
-         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
-      steps:
-         - uses: actions/checkout@v3
-         - uses: actions/setup-node@v3
-           with:
-              node-version: "16"
-         - name: Cache node modules
-           id: cache-nodemodules
-           uses: actions/cache@v3
-           with:
-              path: "**/node_modules"
-              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
-         - name: Install Dependencies
-           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
-           run: npm ci --ignore-scripts
-
-         # Cache playwright deps install
-         # taken from https://github.com/microsoft/playwright/issues/7249
-         - name: Get installed Playwright version
-           id: playwright-version
-           run: echo -n "::set-output name=version::$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@careerfairy/webapp"].dependencies["@playwright/test"].version')"
-
-         - uses: actions/cache@v3
-           id: playwright-cache
-           with:
-              path: "~/.cache/ms-playwright"
-              key: "${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}"
-              restore-keys: |
-                 ${{ runner.os }}-playwright-
-
-         - name: Install Playwright's dependencies
-           run: npx playwright install --with-deps
-
-         - name: Run Playwright End to End tests
-           env:
-              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
-              NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- -- --project=chromium
-
-         - name: Upload test results
-           if: ${{ failure() }}
-           uses: actions/upload-artifact@v3
-           with:
-              name: chromium-playwright-report
-              path: apps/web/playwright-report
-
-         - name: Upload debug logs
-           if: ${{ failure() }}
-           uses: actions/upload-artifact@v3
-           with:
-              name: chromium-debug-logs
-              path: firebase-debug.log
+   #   e2e_tests:
+   #      name: E2E Tests for Chromium
+   #      needs: [build_app_for_tests]
+   #      # only run if there are changes on the webapp & shared lib
+   #      if: |
+   #         needs.build_app_for_tests.outputs.webapp == 'true' ||
+   #         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+   #         needs.build_app_for_tests.outputs.workflow == 'true'
+   #      runs-on: ubuntu-latest
+   #      timeout-minutes: 25
+   #      env:
+   #         # https://turborepo.org/docs/guides/continuous-integration
+   #         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+   #         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+   #      steps:
+   #         - uses: actions/checkout@v3
+   #         - uses: actions/setup-node@v3
+   #           with:
+   #              node-version: "16"
+   #         - name: Cache node modules
+   #           id: cache-nodemodules
+   #           uses: actions/cache@v3
+   #           with:
+   #              path: "**/node_modules"
+   #              key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+   #         - name: Install Dependencies
+   #           if: steps.cache-nodemodules.outputs.cache-hit != 'true'
+   #           run: npm ci --ignore-scripts
+   #
+   #         # Cache playwright deps install
+   #         # taken from https://github.com/microsoft/playwright/issues/7249
+   #         - name: Get installed Playwright version
+   #           id: playwright-version
+   #           run: echo -n "::set-output name=version::$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@careerfairy/webapp"].dependencies["@playwright/test"].version')"
+   #
+   #         - uses: actions/cache@v3
+   #           id: playwright-cache
+   #           with:
+   #              path: "~/.cache/ms-playwright"
+   #              key: "${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}"
+   #              restore-keys: |
+   #                 ${{ runner.os }}-playwright-
+   #
+   #         - name: Install Playwright's dependencies
+   #           run: npx playwright install --with-deps
+   #
+   #         - name: Run Playwright End to End tests
+   #           env:
+   #              SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+   #              NODE_ENV: test
+   #           run: npm run test:e2e-webapp -- -- -- --project=chromium
+   #
+   #         - name: Upload test results
+   #           if: ${{ failure() }}
+   #           uses: actions/upload-artifact@v3
+   #           with:
+   #              name: chromium-playwright-report
+   #              path: apps/web/playwright-report
+   #
+   #         - name: Upload debug logs
+   #           if: ${{ failure() }}
+   #           uses: actions/upload-artifact@v3
+   #           with:
+   #              name: chromium-debug-logs
+   #              path: firebase-debug.log
    # Deploy
    deploy:
       name: "Deploy"
