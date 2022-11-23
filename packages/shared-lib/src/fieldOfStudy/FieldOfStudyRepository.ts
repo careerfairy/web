@@ -1,5 +1,5 @@
 import firebase from "firebase/compat/app"
-import BaseFirebaseRepository, {
+import {
    convertDocArrayToDict,
    mapFirestoreDocuments,
 } from "../BaseFirebaseRepository"
@@ -14,16 +14,10 @@ export interface IFieldOfStudyRepository {
    getFieldsOfStudyAsGroupQuestion(
       categoryType: "fieldOfStudy" | "levelOfStudy"
    ): Promise<GroupQuestion>
-   getFieldOfStudyById(id: string): Promise<FieldOfStudy>
 }
 
-export class FirebaseFieldOfStudyRepository
-   extends BaseFirebaseRepository
-   implements IFieldOfStudyRepository
-{
-   constructor(private readonly firestore: firebase.firestore.Firestore) {
-      super()
-   }
+export class FirebaseFieldOfStudyRepository implements IFieldOfStudyRepository {
+   constructor(private readonly firestore: firebase.firestore.Firestore) {}
 
    async getAllFieldsOfStudy(): Promise<FieldOfStudy[]> {
       const snapshots = await this.firestore.collection("fieldsOfStudy").get()
@@ -48,13 +42,5 @@ export class FirebaseFieldOfStudyRepository
          questionType: isFieldOfStudy ? "fieldOfStudy" : "levelOfStudy",
          options: convertDocArrayToDict(categories),
       }
-   }
-
-   async getFieldOfStudyById(id: string): Promise<FieldOfStudy> {
-      const snapshot = await this.firestore
-         .collection("fieldsOfStudy")
-         .doc(id)
-         .get()
-      return this.addIdToDoc<FieldOfStudy>(snapshot)
    }
 }
