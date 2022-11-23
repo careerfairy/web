@@ -27,10 +27,6 @@ import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
 } from "../lib/GroupFunctionsRepository"
-import {
-   IRecommendationRepository,
-   RecommendationRepository,
-} from "../lib/RecommendationRepository"
 
 const firestoreInstance = admin.firestore() as any
 const authInstance = admin.auth()
@@ -73,6 +69,3 @@ export const marketingUsersRepo: IMarketingUsersRepository =
 export const bigQueryRepo: IBigQueryRepository = new BigQueryRepository(
    bigQueryClient
 )
-
-export const recommendationRepo: IRecommendationRepository =
-   new RecommendationRepository(admin.firestore)

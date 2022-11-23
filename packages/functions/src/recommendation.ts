@@ -5,7 +5,7 @@ import {
    validateUserAuthExists,
 } from "./lib/validations"
 import { number, object } from "yup"
-import { recommendationEngine } from "./lib/recommendationEngine"
+import { userEventRecommendationService } from "./api/services"
 
 /**
  * Get Recommended Events
@@ -24,13 +24,10 @@ export const getRecommendedEvents = functions.https.onCall(
             })
          )
 
-         const recommendedEventsIds = await recommendationEngine(email, limit)
-
-         functions.logger.info(
-            `Recommended event IDs for user ${email}: ${recommendedEventsIds}`
+         return await userEventRecommendationService.getRecommendations(
+            email,
+            limit
          )
-
-         return recommendedEventsIds
       } catch (error) {
          logAndThrow("Error in getting recommended events", {
             data,
