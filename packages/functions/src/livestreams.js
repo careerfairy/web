@@ -8,6 +8,7 @@ const {
 } = require("./api/slack")
 const { DateTime } = require("luxon")
 const ical = require("ical-generator")
+const fs = require("fs")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -63,6 +64,7 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipientEmail,
+         // To: "goncaloarnauth@outlook.com",
          TemplateModel: {
             user_first_name: data.user_first_name,
             livestream_date: data.livestream_date,
@@ -72,6 +74,11 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             livestream_link: data.livestream_link,
          },
          Attachments: [
+            {
+               Name: "readme.txt",
+               Content: "dGVzdCBjb250ZW50",
+               ContentType: "text/plain",
+            },
             {
                Name: "livestream.ics",
                Content: calBase64Str,
