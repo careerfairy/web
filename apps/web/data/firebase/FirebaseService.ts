@@ -10,11 +10,13 @@ import { HandRaiseState } from "types/handraise"
 import {
    getQueryStringFromUrl,
    getReferralInformation,
+   shouldUseEmulators,
 } from "../../util/CommonUtil"
 import {
    EventRating,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
+   LivestreamImpression,
    LivestreamPromotions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
@@ -37,6 +39,7 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2921,6 +2924,46 @@ class FirebaseService {
       return await this.functions.httpsCallable("applyReferralCode")(
          referralCode
       )
+   }
+
+   // Impressions
+   async addImpression(
+      livestreamId: string,
+      impressionData: Omit<LivestreamImpression, "createdAt" | "id">
+   ): Promise<void> {
+      const streamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const impressionsCounter = new Counter(streamRef, "impressions")
+
+      const data: Omit<LivestreamImpression, "id"> = {
+         livestreamId: impressionData.livestreamId,
+         isRecommended: impressionData.isRecommended,
+         livestream: impressionData.livestream,
+         createdAt: this.getServerTimestamp() as any,
+         user: impressionData.user || null,
+         positionInResults: impressionData.positionInResults,
+         userId: impressionData.userId,
+         numberOfResults: impressionData.numberOfResults,
+         pathname: impressionData.pathname,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("impressions")
+         .add(data)
+
+      // Don't use the distributed counter for emulators
+      if (shouldUseEmulators()) {
+         const toUpdate: Pick<LivestreamEvent, "impressions"> = {
+            impressions: firebase.firestore.FieldValue.increment(1) as any,
+         }
+         return streamRef.update(toUpdate)
+      } else {
+         return impressionsCounter.incrementBy(1).catch(console.error)
+      }
    }
 
    // Backfill user data

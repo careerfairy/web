@@ -73,7 +73,7 @@ const GroupStreams = ({
       setShareEventDialog(null)
    }, [setShareEventDialog])
 
-   const renderStreamCards = slicedLivestreams?.map((livestream, index) => {
+   const renderStreamCards = slicedLivestreams?.map((livestream) => {
       if (livestream) {
          return (
             <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
@@ -82,8 +82,6 @@ const GroupStreams = ({
                      onRegisterClick={handleClickRegister}
                      interests={existingInterests}
                      autoRegister
-                     index={index}
-                     totalElements={slicedLivestreams.length}
                      event={livestream}
                      openShareDialog={setShareEventDialog}
                   />

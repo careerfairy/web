@@ -1,9 +1,7 @@
 import axios, { AxiosPromise } from "axios"
 import { DateTime } from "luxon"
-import { isLocalEnvironment } from "../util"
 
 export const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
-   if (isLocalEnvironment()) return null
    const link = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
 
    const body = {
@@ -44,7 +42,6 @@ export const notifyLivestreamCreated = (
    publisherEmailOrName,
    livestreamObj
 ) => {
-   if (isLocalEnvironment()) return null
    const adminLink = `https://www.careerfairy.io/group/${livestreamObj.author?.groupId}/admin/events?eventId=${livestreamObj.id}`
    const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
 
@@ -109,8 +106,6 @@ export const notifyLivestreamRecordingCreated = (
    livestreamObj,
    downloadLink
 ) => {
-   if (isLocalEnvironment()) return null
-
    const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
 
    return generateRequest(webhookUrl, {

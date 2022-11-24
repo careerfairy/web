@@ -50,6 +50,12 @@ export interface LivestreamEvent extends Identifiable {
    hasEnded?: boolean
    targetCategories?: string[]
    mode?: LivestreamMode
+
+   /**
+    * Number of times the livestream has been viewed by users when recommended
+    * */
+   impressions?: number
+
    /**
     * The streamerId of the user who is currently sharing their screen
     */

@@ -7,9 +7,9 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { useAuth } from "../../HOCs/AuthProvider"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
 type Props = {
    positionInResults?: number
@@ -25,6 +25,7 @@ const useTrackRecommendedLivestreamImpressions = ({
 }: Props) => {
    const { pathname } = useRouter()
    const { userData } = useAuth()
+   const firebase = useFirebaseService()
 
    const metaData = useMemo<Omit<LivestreamImpression, "createdAt" | "id">>(
       () => ({
@@ -64,9 +65,7 @@ const useTrackRecommendedLivestreamImpressions = ({
 
             // Store the impression in the database.
             // This is a good place to use the `metaData` object.
-            livestreamRepo
-               .addImpression(event.id, metaData)
-               .catch(console.error)
+            firebase.addImpression(event.id, metaData).catch(console.error)
          }
       },
    })
