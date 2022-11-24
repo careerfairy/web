@@ -56,7 +56,6 @@ const useTrackRecommendedLivestreamImpressions = ({
       onChange: (inView) => {
          if (inView && isRecommended && event) {
             // Fire a tracking event to your tracking service of choice.
-            console.log("DataLayer Sent")
             dataLayerLivestreamEvent("recommended_event_impression", event, {
                positionInResults,
                numberOfResults,
