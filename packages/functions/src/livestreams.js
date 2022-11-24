@@ -6,9 +6,6 @@ const {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
 } = require("./api/slack")
-const { DateTime } = require("luxon")
-const ical = require("ical-generator")
-const fs = require("fs")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -36,35 +33,11 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
-      const cal = ical({
-         domain: "careerfairy.io",
-         name: "Live Stream Invite",
-      })
-      const start = DateTime.fromJSDate(new Date(data.regular_date))
-
-      cal.createEvent({
-         start: start,
-         end: start.plus({ minutes: data.duration_date || 45 }),
-         summary: `Live stream with ${data.company_name}`,
-         description: data.livestream_title,
-         location: "On CareerFairy",
-         timezone: data.timezone || "Europe/Zurich",
-         organizer: {
-            name: "CareerFairy",
-            mailto: "noreply@careerfairy.io",
-         },
-         url: `${data.livestream_link}?fromEmailCalendar=true`,
-      })
-
-      const calStr = cal.toString()
-      const calBase64Str = Buffer.from(calStr).toString("base64")
-
       const email = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipientEmail,
-         // To: "goncaloarnauth@outlook.com",
          TemplateModel: {
             user_first_name: data.user_first_name,
             livestream_date: data.livestream_date,
@@ -72,19 +45,11 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             company_logo_url: data.company_logo_url,
             livestream_title: data.livestream_title,
             livestream_link: data.livestream_link,
+            // calendar_event_i_calendar: data.eventCalendarUrls.ics,
+            calendar_event_google: data.eventCalendarUrls.google,
+            calendar_event_outlook: data.eventCalendarUrls.outlook,
+            calendar_event_yahoo: data.eventCalendarUrls.yahoo,
          },
-         Attachments: [
-            {
-               Name: "readme.txt",
-               Content: "dGVzdCBjb250ZW50",
-               ContentType: "text/plain",
-            },
-            {
-               Name: "livestream.ics",
-               Content: calBase64Str,
-               ContentType: "text/calendar; charset=utf-8; method=REQUEST",
-            },
-         ],
       }
 
       client.sendEmailWithTemplate(email).then(

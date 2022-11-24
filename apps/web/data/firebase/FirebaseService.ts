@@ -37,6 +37,7 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import { makeUrls } from "../../util/makeUrls"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -261,7 +262,26 @@ class FirebaseService {
          this.functions.httpsCallable(
             "sendLivestreamRegistrationConfirmationEmail"
          )
+
+      const livestreamStartDate = livestream.start.toDate()
+      const linkToLivestream = `https://careerfairy.io/upcoming-livestream/${livestream.id}`
+      const linkWithUTM = `${linkToLivestream}?utm_campaign=fromCalendarEvent`
+
+      const calendarEvent = {
+         name: livestream.title,
+         details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
+         location: `Hosted virtually on CareerFairy ${linkWithUTM}`,
+         startsAt: livestreamStartDate.toISOString(),
+         endsAt: new Date(
+            livestreamStartDate.getTime() +
+               (livestream.duration || 45) * 60 * 1000
+         ).toISOString(),
+      }
+
+      const urls = makeUrls(calendarEvent)
+
       return sendLivestreamRegistrationConfirmationEmail({
+         eventCalendarUrls: urls,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
          timezone: userData.timezone,
@@ -271,7 +291,7 @@ class FirebaseService {
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          livestream_title: livestream.title,
-         livestream_link: `https://careerfairy.io/upcoming-livestream/${livestream.id}`,
+         livestream_link: linkToLivestream,
       })
    }
 
