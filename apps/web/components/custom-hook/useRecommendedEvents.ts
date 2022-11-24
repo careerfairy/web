@@ -19,8 +19,8 @@ const useRecommendedEvents = (
 ) => {
    const firestore = useFirestore()
    const fetcher = useFunctionsSWR<string[]>()
-   const eventIds = []
-   const { data: eventIdsasd } = useSWR<string[]>(
+
+   const { data: eventIds } = useSWR<string[]>(
       [
          "getRecommendedEvents",
          {
@@ -31,6 +31,7 @@ const useRecommendedEvents = (
       {
          ...reducedRemoteCallsOptions,
          suspense: false,
+         fallbackData: [""], // query method does not accept where() clauses with an empty array, it will throw an error, so we provide an initial value that will be filtered out
       }
    )
 
