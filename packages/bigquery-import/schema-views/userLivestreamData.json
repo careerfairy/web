@@ -1,0 +1,70 @@
+{
+   "fields": [
+      {
+         "name": "userId",
+         "type": "string"
+      },
+      {
+         "name": "livestreamId",
+         "type": "string"
+      },
+      {
+         "name": "answers",
+         "type": "stringified_map"
+      },
+      {
+         "fields": [
+            {
+               "name": "date",
+               "type": "timestamp"
+            },
+            {
+               "name": "referral",
+               "type": "stringified_map"
+            },
+            {
+               "name": "utm",
+               "type": "stringified_map"
+            },
+            {
+               "name": "referrer",
+               "type": "string"
+            },
+            {
+               "name": "isRecommended",
+               "type": "boolean"
+            }
+         ],
+         "name": "registered",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "date",
+               "type": "timestamp"
+            }
+         ],
+         "name": "participated",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "date",
+               "type": "timestamp"
+            },
+            {
+               "name": "companyId",
+               "type": "string"
+            }
+         ],
+         "name": "talentPool",
+         "type": "map"
+      },
+      {
+         "name": "jobApplications",
+         "type": "stringified_map"
+      }
+   ]
+}
