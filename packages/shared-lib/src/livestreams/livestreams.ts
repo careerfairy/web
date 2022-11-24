@@ -5,6 +5,7 @@ import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
+import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -361,6 +362,17 @@ export interface LivestreamPromotions extends Identifiable {
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
    livestreamId: string
+}
+
+export interface LivestreamImpression extends Identifiable, DocumentData {
+   livestreamId: string
+   userId: string
+   livestream: LivestreamEventPublicData
+   pathname: string
+   createdAt: firebase.firestore.Timestamp
+   positionInList: number
+   listSize: number
+   isRecommended: boolean
 }
 
 export function getEarliestEventBufferTime() {

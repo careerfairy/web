@@ -217,6 +217,14 @@ service cloud.firestore {
             allow delete: if userIsGroupAdmin() || isCFAdmin();
             // allow update: if publicFieldsUsersCanUpdate() || userIsGroupAdmin(request.resource.data.groupIds) || isCFAdmin();
 
+            // Allow to increment only the 'impressions' field and only by 1.
+            match /_counter_shards_/{shardId} {
+                allow get;
+                allow write: if request.resource.data.keys() == ["impressions"]
+                                && (resource == null || request.resource.data.impressions ==
+                                                        resource.data.impressions + 1);
+            }
+
             match /userLivestreamData/{studentEmail} {
                 allow read: if true;
                 allow write: if isSignedInAndIsSameUser(studentEmail);

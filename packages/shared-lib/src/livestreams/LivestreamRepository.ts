@@ -10,6 +10,7 @@ import {
    LivestreamEventParsed,
    LivestreamEventPublicData,
    LivestreamEventSerialized,
+   LivestreamImpression,
    LivestreamJobApplicationDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
@@ -201,6 +202,28 @@ export class FirebaseLivestreamRepository
          .collection("participatingStats")
          .doc(userData.id)
          .set(data, { merge: true })
+   }
+
+   addImpression(
+      livestreamId: string,
+      impressionData: Omit<LivestreamImpression, "createdAt" | "id">
+   ) {
+      const ref = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("impressions")
+         .doc()
+
+      const data: Omit<LivestreamImpression, "id"> = {
+         createdAt: this.fieldValue.serverTimestamp() as any,
+      }
+      return this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("impressions")
+         .add({
+            ...impressionData,
+         })
    }
 
    listenToSingleEvent(
