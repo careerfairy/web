@@ -27,6 +27,7 @@ const RecommendedEvents = ({ limit }: Props) => {
          events={events}
          type={EventsTypes.recommended}
          loading={loading}
+         isRecommended
       />
    )
 }

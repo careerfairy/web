@@ -51,6 +51,7 @@ const EventsPreview = ({
    type,
    id,
    isEmpty,
+   isRecommended,
 }: EventsProps) => {
    const {
       query: { groupId },
@@ -189,6 +190,7 @@ const EventsPreview = ({
          )}
          {joinGroupModalData && (
             <RegistrationModal
+               isRecommended={isRecommended}
                open={Boolean(joinGroupModalData)}
                onFinish={handleCloseJoinModal}
                promptOtherEventsOnFinal={!groupId}
@@ -237,6 +239,7 @@ export interface EventsProps {
    type: EventsTypes | string
    id?: string
    isEmpty?: boolean
+   isRecommended?: boolean
 }
 
 export default EventsPreview
