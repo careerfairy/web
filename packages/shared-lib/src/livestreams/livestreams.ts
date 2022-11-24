@@ -1,6 +1,10 @@
 import { Identifiable, OptionGroup } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
-import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
+import {
+   UserData,
+   UserLivestreamGroupQuestionAnswers,
+   UserPublicData,
+} from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
@@ -368,10 +372,11 @@ export interface LivestreamImpression extends Identifiable, DocumentData {
    livestreamId: string
    userId: string
    livestream: LivestreamEventPublicData
+   user: UserPublicData | null
    pathname: string
    createdAt: firebase.firestore.Timestamp
-   positionInList: number
-   listSize: number
+   positionInResults: number
+   numberOfResults: number
    isRecommended: boolean
 }
 

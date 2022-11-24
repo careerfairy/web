@@ -1,6 +1,7 @@
 const algoliasearch = require("algoliasearch")
 const functions = require("firebase-functions")
 const dotenv = require("dotenv")
+const { isLocalEnvironment } = require("./util")
 
 // Cloud Trigger functions
 // load values from the .env file in this directory into process.env
@@ -18,6 +19,7 @@ const streamIndex = algolia.initIndex(ALGOLIA_STREAM_INDEX_NAME)
 exports.addToIndex = functions.firestore
    .document("careerCenterData/{careerCenter}")
    .onCreate((snapshot) => {
+      if (isLocalEnvironment()) return
       const data = snapshot.data()
       const objectID = snapshot.id
       data.groupId = objectID
@@ -40,6 +42,8 @@ exports.addToIndex = functions.firestore
 exports.addToStreamIndex = functions.firestore
    .document("livestreams/{livestream}")
    .onCreate((snapshot) => {
+      if (isLocalEnvironment()) return
+
       const data = snapshot.data()
       if (data.test === false) {
          // dont add test streams to algolia
@@ -66,6 +70,8 @@ exports.addToStreamIndex = functions.firestore
 exports.updateIndex = functions.firestore
    .document("careerCenterData/{careerCenter}")
    .onUpdate((change) => {
+      if (isLocalEnvironment()) return
+
       const newData = change.after.data()
       // deletes personal Identifiable data
       delete newData.adminEmail
@@ -88,6 +94,8 @@ exports.updateIndex = functions.firestore
 exports.updateStreamIndex = functions.firestore
    .document("livestreams/{livestream}")
    .onUpdate((change) => {
+      if (isLocalEnvironment()) return
+
       const newData = change.after.data()
       if (newData.test === false) {
          // dont add test streams to algolia
@@ -114,8 +122,14 @@ exports.updateStreamIndex = functions.firestore
 
 exports.deleteFromIndex = functions.firestore
    .document("careerCenterData/{careerCenter}")
-   .onDelete((snapshot) => groupIndex.deleteObject(snapshot.id))
+   .onDelete(
+      (snapshot) =>
+         !isLocalEnvironment() && groupIndex.deleteObject(snapshot.id)
+   )
 
 exports.deleteStreamFromIndex = functions.firestore
    .document("livestreams/{livestream}")
-   .onDelete((snapshot) => streamIndex.deleteObject(snapshot.id))
+   .onDelete(
+      (snapshot) =>
+         !isLocalEnvironment() && streamIndex.deleteObject(snapshot.id)
+   )

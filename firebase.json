@@ -33,5 +33,8 @@
    },
    "storage": {
       "rules": "storage.rules"
+   },
+   "extensions": {
+      "firestore-counter": "firebase/firestore-counter@0.2.5"
    }
 }

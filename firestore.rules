@@ -225,6 +225,10 @@ service cloud.firestore {
                                                         resource.data.impressions + 1);
             }
 
+            match /impressions/{impressionId} {
+                allow create;
+            }
+
             match /userLivestreamData/{studentEmail} {
                 allow read: if true;
                 allow write: if isSignedInAndIsSameUser(studentEmail);

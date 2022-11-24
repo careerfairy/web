@@ -175,12 +175,15 @@ const EventsPreview = ({
                                       !cardsLoaded[index] &&
                                       !cardsLoaded[arr.length - (index + 1)]
                                    }
+                                   index={index}
+                                   totalElements={arr.length}
                                    interests={existingInterests}
                                    autoRegister
                                    openShareDialog={setShareEventDialog}
                                    onRegisterClick={handleClickRegister}
                                    key={event.id}
                                    event={event}
+                                   isRecommended={isRecommended}
                                 />
                              </Box>
                           ))}

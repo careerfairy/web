@@ -29,6 +29,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
+import useTrackRecommendedLivestreamImpressions from "../../../custom-hook/useTrackRecommendedLivestreamImpressions"
 
 const styles = {
    hideOnHoverContent: {
@@ -200,8 +201,17 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
+   isRecommended,
+   totalElements,
+   index,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
+   const ref = useTrackRecommendedLivestreamImpressions({
+      event,
+      isRecommended,
+      positionInResults: index,
+      numberOfResults: totalElements,
+   })
    const { query, push, pathname } = useRouter()
    const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
@@ -344,7 +354,7 @@ const EventPreviewCard = ({
 
    return (
       <>
-         <Box>
+         <Box ref={ref}>
             <DateAndShareDisplay
                startDate={getStartDate()}
                loading={loading}
@@ -608,6 +618,11 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
+   isRecommended?: boolean
+   // The index of the event in the list
+   index?: number
+   // The total number of events in the list
+   totalElements?: number
 }
 
 export default EventPreviewCard

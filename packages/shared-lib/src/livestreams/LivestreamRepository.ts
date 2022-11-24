@@ -18,6 +18,7 @@ import {
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
+import { Counter } from "../FirestoreCounter"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -100,6 +101,11 @@ export interface ILivestreamRepository {
       livestream: LivestreamEventPublicData,
       userData: UserPublicData,
       elapsedMinutes: number
+   ): Promise<void>
+
+   addImpression(
+      livestreamId: string,
+      impressionData: Omit<LivestreamImpression, "createdAt" | "id">
    ): Promise<void>
 
    getLivestreamUsers(
@@ -204,26 +210,38 @@ export class FirebaseLivestreamRepository
          .set(data, { merge: true })
    }
 
-   addImpression(
+   async addImpression(
       livestreamId: string,
       impressionData: Omit<LivestreamImpression, "createdAt" | "id">
-   ) {
-      const ref = this.firestore
+   ): Promise<void> {
+      const streamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-         .collection("impressions")
-         .doc()
+
+      const impressionsCounter = new Counter(streamRef, "impressions")
 
       const data: Omit<LivestreamImpression, "id"> = {
+         livestreamId: impressionData.livestreamId,
+         isRecommended: impressionData.isRecommended,
+         livestream: impressionData.livestream,
          createdAt: this.fieldValue.serverTimestamp() as any,
+         user: impressionData.user || null,
+         positionInResults: impressionData.positionInResults,
+         userId: impressionData.userId,
+         numberOfResults: impressionData.numberOfResults,
+         pathname: impressionData.pathname,
       }
-      return this.firestore
+
+      await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("impressions")
-         .add({
-            ...impressionData,
-         })
+         .add(data)
+
+      console.log("impressionsCounter", impressionsCounter)
+      impressionsCounter.incrementBy(1).catch(console.error)
+
+      return
    }
 
    listenToSingleEvent(
