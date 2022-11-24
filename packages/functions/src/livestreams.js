@@ -33,29 +33,6 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
-      //   const cal = ical({
-      //      domain: "careerfairy.io",
-      //      name: "Live Stream Invite",
-      //   });
-      //   const start = DateTime.fromJSDate(new Date(req.body.regular_date));
-
-      //   cal.createEvent({
-      //      start: start,
-      //      end: start.plus({ minutes: 45 }),
-      //      summary: `Live stream with ${req.body.company_name}`,
-      //      description: req.body.livestream_title,
-      //      location: "On CareerFairy",
-      //      timezone: "Europe/Zurich",
-      //      organizer: {
-      //         name: "CareerFairy",
-      //         mailto: "noreply@careerfairy.io",
-      //      },
-      //      url: req.body.livestream_link,
-      //   });
-
-      //   let calStr = cal.toString();
-      //   let calBase64Str = Buffer.from(calStr).toString("base64");
-
       const email = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
@@ -68,14 +45,10 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             company_logo_url: data.company_logo_url,
             livestream_title: data.livestream_title,
             livestream_link: data.livestream_link,
+            calendar_event_google: data.eventCalendarUrls.google,
+            calendar_event_outlook: data.eventCalendarUrls.outlook,
+            calendar_event_yahoo: data.eventCalendarUrls.yahoo,
          },
-         //  Attachments: [
-         //     {
-         //        Name: "livestream.ics",
-         //        Content: calBase64Str,
-         //        ContentType: "text/calendar; charset=utf-8; method=REQUEST",
-         //     },
-         //  ],
       }
 
       client.sendEmailWithTemplate(email).then(
