@@ -16,7 +16,7 @@ const RecommendedEvents = ({ limit }: Props) => {
 
    const { loading, events } = useRecommendedEvents(options)
 
-   if (!authenticatedUser.email || !events?.length) {
+   if (!authenticatedUser?.email || !events?.length) {
       return null
    }
 

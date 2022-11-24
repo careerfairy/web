@@ -19,8 +19,8 @@ const useRecommendedEvents = (
 ) => {
    const firestore = useFirestore()
    const fetcher = useFunctionsSWR<string[]>()
-
-   const { data: eventIds } = useSWR<string[]>(
+   const eventIds = []
+   const { data: eventIdsasd } = useSWR<string[]>(
       [
          "getRecommendedEvents",
          {
@@ -38,7 +38,7 @@ const useRecommendedEvents = (
       () =>
          query(
             collection(firestore, "livestreams"),
-            where("id", "in", eventIds?.length ? eventIds : [""])
+            where("id", "in", eventIds)
          ),
       [eventIds, firestore]
    )
