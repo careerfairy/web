@@ -6,6 +6,8 @@ const {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
 } = require("./api/slack")
+const { setHeaders } = require("./util")
+const ical = require("ical-generator")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -30,6 +32,59 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
             })
          })
    })
+
+exports.getLivestreamICalendarEvent = functions.https.onRequest(
+   async (req, res) => {
+      setHeaders(req, res)
+      const livestreamId = req.query.eventId || "7asjdTMBMxxVqYmQjZex"
+
+      if (livestreamId) {
+         try {
+            // get the livestream
+            const querySnapshot = await admin
+               .firestore()
+               .collection("livestreams")
+               .doc(livestreamId)
+               .get()
+
+            if (querySnapshot.exists) {
+               const livestream = querySnapshot.data()
+
+               // create calendar event
+               const livestreamStartDate = livestream.start.toDate()
+               const linkWithUTM = `https://careerfairy.io/upcoming-livestream/${livestream.id}?utm_campaign=fromCalendarEvent`
+
+               const cal = ical({
+                  events: [
+                     {
+                        start: livestreamStartDate.toISOString(),
+                        end: new Date(
+                           livestreamStartDate.getTime() +
+                              (livestream.duration || 45) * 60 * 1000
+                        ).toISOString(),
+                        location: `${linkWithUTM}`,
+                        summary: livestream.title,
+                        description: "Join the event now!",
+                        timezone: livestream.timezone || "Europe/Zurich",
+                        organizer: {
+                           name: "CareerFairy",
+                           mailto: "noreply@careerfairy.io",
+                        },
+                        url: linkWithUTM,
+                     },
+                  ],
+               })
+               cal.serve(res)
+            }
+         } catch (e) {
+            functions.logger.warn(
+               `An error has occurred creating the ICalendar event from the livestream ${livestreamId}`
+            )
+            res.sendStatus(500)
+         }
+      }
+   }
+)
 
 exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
    async (data, context) => {
