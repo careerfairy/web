@@ -52,9 +52,19 @@ export interface LivestreamEvent extends Identifiable {
    mode?: LivestreamMode
 
    /**
-    * Number of times the livestream has been viewed by users when recommended
+    * If tru, the livestream can be attended anonymously
+    * */
+   openStream?: boolean
+
+   /**
+    * Number of times the livestream has appeared in a user's feed
     * */
    impressions?: number
+
+   /**
+    * Number of times the livestream has appeared in a user's recommended feed
+    * */
+   recommendedImpressions?: number
 
    /**
     * The streamerId of the user who is currently sharing their screen
@@ -384,6 +394,25 @@ export interface LivestreamImpression extends Identifiable, DocumentData {
    positionInResults: number
    numberOfResults: number
    isRecommended: boolean
+   location: Location
+   asPath: string
+}
+
+export enum ImpressionLocation {
+   recommendedEventsCarousel = "recommendedEventsCarousel",
+   comingUpCarousel = "comingUpCarousel",
+   myNextEventsCarousel = "myNextEventsCarousel",
+   pastEventsCarousel = "pastEventsCarousel",
+   nextLivestreams = "nextLivestreams",
+   pastLivestreams = "pastLivestreams",
+   nextLivestreamsGroup = "nextLivestreamsGroup",
+   pastLivestreamsGroup = "pastLivestreamsGroup",
+   marketingPageCarousel = "marketingPageCarousel",
+   embeddedNextLivestreams = "embeddedNextLivestreams",
+   embeddedPastLivestreams = "embeddedPastLivestreams",
+   landingPageCarousel = "landingPageCarousel",
+   viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
+   unknown = "unknown",
 }
 
 export function getEarliestEventBufferTime() {

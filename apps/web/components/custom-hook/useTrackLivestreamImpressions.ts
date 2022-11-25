@@ -1,6 +1,9 @@
 import { useInView } from "react-intersection-observer"
+import "intersection-observer" // polyfill for unsupported browsers
+
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import {
+   ImpressionLocation,
    LivestreamEvent,
    LivestreamImpression,
    pickPublicDataFromLivestream,
@@ -16,14 +19,16 @@ type Props = {
    numberOfResults?: number
    isRecommended?: boolean
    event?: LivestreamEvent
+   location: ImpressionLocation
 }
-const useTrackRecommendedLivestreamImpressions = ({
+const useTrackLivestreamImpressions = ({
    event,
    numberOfResults,
    positionInResults,
    isRecommended,
+   location = ImpressionLocation.unknown,
 }: Props) => {
-   const { pathname } = useRouter()
+   const { pathname, asPath } = useRouter()
    const { userData } = useAuth()
    const firebase = useFirebaseService()
 
@@ -39,10 +44,14 @@ const useTrackRecommendedLivestreamImpressions = ({
          userId: userData?.id ?? null,
          numberOfResults: numberOfResults || 0,
          positionInResults: positionInResults || 0,
+         location,
+         asPath,
       }),
       [
+         asPath,
          event,
          isRecommended,
+         location,
          numberOfResults,
          pathname,
          positionInResults,
@@ -51,15 +60,18 @@ const useTrackRecommendedLivestreamImpressions = ({
    )
 
    const { ref } = useInView({
-      triggerOnce: true,
-      rootMargin: "-100px",
+      triggerOnce: true, // only ever trigger once per element
+      threshold: 0.5, // At least 50% of the element must be visible
+      delay: 1000, // Element must be at least visible for 1 second before triggering
       onChange: (inView) => {
-         if (inView && isRecommended && event) {
+         if (inView && event) {
+            // console.log("-> event", event)
             // Fire a tracking event to your tracking service of choice.
             dataLayerLivestreamEvent("recommended_event_impression", event, {
                positionInResults,
                numberOfResults,
                pathname,
+               location,
             })
 
             // Store the impression in the database.
@@ -72,4 +84,4 @@ const useTrackRecommendedLivestreamImpressions = ({
    return ref
 }
 
-export default useTrackRecommendedLivestreamImpressions
+export default useTrackLivestreamImpressions

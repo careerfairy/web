@@ -5,6 +5,10 @@ import Slider from "react-slick"
 import { Box } from "@mui/material"
 import UpcomingLivestreamCard from "../../../common/stream-cards/UpcomingLivestreamCard"
 import { getMaxSlides } from "util/CommonUtil"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const styles = {
    root: (theme) => ({
@@ -26,14 +30,22 @@ const styles = {
       },
    }),
 }
-
+type Props = {
+   upcomingStreams: LivestreamEvent[]
+   handleOpenJoinModal?: (any) => void
+   additionalSettings?: { [key: string]: any }
+   disableAutoPlay?: boolean
+   noRegister?: boolean
+   location: ImpressionLocation
+}
 const UpcomingLivestreamsCarousel = ({
    upcomingStreams,
    handleOpenJoinModal,
    additionalSettings,
    disableAutoPlay,
    noRegister,
-}) => {
+   location = ImpressionLocation.unknown,
+}: Props) => {
    const settings = {
       infinite: true,
       speed: 500,
@@ -79,13 +91,16 @@ const UpcomingLivestreamsCarousel = ({
    return (
       <Box sx={styles.root}>
          <Slider {...settings}>
-            {upcomingStreams.map((livestream) => (
+            {upcomingStreams.map((livestream, index, arr) => (
                <Box key={livestream.id} p={2}>
                   <UpcomingLivestreamCard
                      handleOpenJoinModal={handleOpenJoinModal}
                      livestream={livestream}
                      disableExpand
                      noRegister={noRegister}
+                     index={index}
+                     totalElements={arr.length}
+                     location={location}
                   />
                </Box>
             ))}

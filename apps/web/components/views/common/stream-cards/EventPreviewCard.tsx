@@ -25,11 +25,14 @@ import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
-import useTrackRecommendedLivestreamImpressions from "../../../custom-hook/useTrackRecommendedLivestreamImpressions"
+import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
 
 const styles = {
    hideOnHoverContent: {
@@ -204,13 +207,15 @@ const EventPreviewCard = ({
    isRecommended,
    totalElements,
    index,
+   location = ImpressionLocation.unknown,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
-   const ref = useTrackRecommendedLivestreamImpressions({
+   const ref = useTrackLivestreamImpressions({
       event,
       isRecommended,
       positionInResults: index,
       numberOfResults: totalElements,
+      location,
    })
    const { query, push, pathname } = useRouter()
    const getStartDate = () => event?.startDate || event?.start?.toDate?.()
@@ -623,6 +628,7 @@ interface EventPreviewCardProps {
    index?: number
    // The total number of events in the list
    totalElements?: number
+   location?: ImpressionLocation
 }
 
 export default EventPreviewCard

@@ -2936,17 +2936,14 @@ class FirebaseService {
          .doc(livestreamId)
 
       const impressionsCounter = new Counter(streamRef, "impressions")
+      const recommendedImpressionsCounter = new Counter(
+         streamRef,
+         "recommendedImpressions"
+      )
 
       const data: Omit<LivestreamImpression, "id"> = {
-         livestreamId: impressionData.livestreamId,
-         isRecommended: impressionData.isRecommended,
-         livestream: impressionData.livestream,
+         ...impressionData,
          createdAt: this.getServerTimestamp() as any,
-         user: impressionData.user || null,
-         positionInResults: impressionData.positionInResults,
-         userId: impressionData.userId,
-         numberOfResults: impressionData.numberOfResults,
-         pathname: impressionData.pathname,
       }
 
       await this.firestore
@@ -2957,12 +2954,26 @@ class FirebaseService {
 
       // Don't use the distributed counter for emulators
       if (shouldUseEmulators()) {
-         const toUpdate: Pick<LivestreamEvent, "impressions"> = {
+         const toUpdate: Pick<
+            LivestreamEvent,
+            "impressions" | "recommendedImpressions"
+         > = {
             impressions: firebase.firestore.FieldValue.increment(1) as any,
          }
+         if (impressionData.isRecommended) {
+            toUpdate.recommendedImpressions =
+               firebase.firestore.FieldValue.increment(1) as any
+         }
+
          return streamRef.update(toUpdate)
       } else {
-         return impressionsCounter.incrementBy(1).catch(console.error)
+         impressionsCounter.incrementBy(1).catch(console.error)
+
+         if (impressionData.isRecommended) {
+            // If the impression is recommended, increment the recommended impressions counter
+            recommendedImpressionsCounter.incrementBy(1).catch(console.error)
+         }
+         return
       }
    }
 

@@ -53,6 +53,7 @@
       "global": "^4.4.0",
       "graphql": "^16.6.0",
       "graphql-request": "^5.0.0",
+      "intersection-observer": "^0.12.2",
       "jszip": "^3.6.0",
       "keyword-extractor": "^0.0.22",
       "lodash": "^4.17.20",
