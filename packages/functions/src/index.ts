@@ -96,6 +96,7 @@ exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
+exports.getLivestreamICalendarEvent = livestreams.getLivestreamICalendarEvent
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =
