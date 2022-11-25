@@ -260,7 +260,7 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail"
+            "sendLivestreamRegistrationConfirmationEmail_v2"
          )
 
       const livestreamStartDate = livestream.start.toDate()
@@ -270,7 +270,7 @@ class FirebaseService {
       const calendarEvent = {
          name: livestream.title,
          details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
-         location: `Hosted virtually on CareerFairy ${linkWithUTM}`,
+         location: linkWithUTM,
          startsAt: livestreamStartDate.toISOString(),
          endsAt: new Date(
             livestreamStartDate.getTime() +
@@ -282,6 +282,7 @@ class FirebaseService {
 
       return sendLivestreamRegistrationConfirmationEmail({
          eventCalendarUrls: urls,
+         livestream_id: livestream.id,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
          timezone: userData.timezone,
