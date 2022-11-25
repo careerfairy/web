@@ -6,7 +6,7 @@ const {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
 } = require("./api/slack")
-const { setHeaders } = require("./util")
+const { setHeaders, isLocalEnvironment } = require("./util")
 const ical = require("ical-generator")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
@@ -86,7 +86,7 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
    }
 )
 
-exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
+exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
    async (data, context) => {
       const email = {
          TemplateId:
@@ -100,6 +100,9 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             company_logo_url: data.company_logo_url,
             livestream_title: data.livestream_title,
             livestream_link: data.livestream_link,
+            calendar_event_i_calendar: isLocalEnvironment()
+               ? `http://localhost:5001/careerfairy-e1fd9/us-central1/getLivestreamICalendarEvent?evnetId=${data.livestream_id}`
+               : `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v2?evnetId=${data.livestream_id}`,
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,
