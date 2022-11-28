@@ -13,6 +13,7 @@ import RecommendationServiceCore, {
 } from "../IRecommendationService"
 import { mapFirestoreAdminSnapshots } from "../../../util"
 import { userEventRecommendationService } from "../../../api/services"
+import { handlePromisesAllSettled, RankedLivestreamEvent } from "../util"
 
 type FirebaseAdmin = typeof import("firebase-admin") // This only imports the types at compile time and not the actual library at runtime
 
@@ -47,12 +48,19 @@ export default class UserEventRecommendationService
    async getRecommendations(userId: string, limit = 10): Promise<string[]> {
       const userData = await this.userRepo.getUserDataById(userId)
 
-      const recommendedEvents: RankedLivestreamEvent[][] = await Promise.all([
+      const promises: Promise<RankedLivestreamEvent[]>[] = []
+
+      if (userData) {
          // Fetch top {limit} recommended events based on the user's Metadata
-         this.getRecommendedEventsBasedOnUserData(userData, 10),
+         promises.push(this.getRecommendedEventsBasedOnUserData(userData, 10))
 
          // TODO: Fetch top {limit} recommended events based on the user actions, eg. the events they have attended
-      ])
+      }
+
+      const recommendedEvents = await handlePromisesAllSettled(
+         promises,
+         this.log.error
+      )
 
       // TODO: Rank Events
 
@@ -62,9 +70,9 @@ export default class UserEventRecommendationService
       // Log some debug info
       this.log.info("Metadata", {
          userMetaData: {
-            userId: userData.id,
-            userInterestIds: userData.interestsIds,
-            userFieldOfStudyId: userData.fieldOfStudy.id,
+            userId: userData?.id || "N/A",
+            userInterestIds: userData?.interestsIds || [],
+            userFieldOfStudyId: userData?.fieldOfStudy?.id || "N/A",
          },
          eventMetaData: deDupedEvents.map((e) => ({
             id: e.id,
@@ -92,24 +100,17 @@ export default class UserEventRecommendationService
    private async getRecommendEventsBasedOnUserInterests(
       user: UserData,
       limit = 10
-   ): Promise<RankedLivestreamEvent[] | null> {
-      let query = this.firestore
+   ): Promise<RankedLivestreamEvent[]> {
+      const userInterestIds = user.interestsIds
+
+      const query = this.firestore
          .collection("livestreams")
          .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
          .where("hidden", "==", false)
-
-      const userInterestIds = user.interestsIds || []
-
-      if (userInterestIds) {
-         query = query.where(
-            "interestsIds",
-            "array-contains-any",
-            userInterestIds
-         )
-      }
-
-      query = query.orderBy("start", "asc").limit(limit)
+         .where("interestsIds", "array-contains-any", userInterestIds)
+         .orderBy("start", "asc")
+         .limit(limit)
 
       const snapshots = await query.get()
 
@@ -165,17 +166,24 @@ export default class UserEventRecommendationService
       userData: UserData,
       limit: number
    ): Promise<RankedLivestreamEvent[]> {
-      if (!userData) {
-         return []
-      }
-      const arrayOfRecommendedEventsBasedOnUserData: RankedLivestreamEvent[][] =
-         await Promise.all([
-            // Fetch recommended events based on the user's interests
-            this.getRecommendEventsBasedOnUserInterests(userData, limit),
+      const promises: Promise<RankedLivestreamEvent[]>[] = []
 
+      if (userData.interestsIds?.length) {
+         promises.push(
+            // Fetch recommended events based on the user's interests
+            this.getRecommendEventsBasedOnUserInterests(userData, limit)
+         )
+      }
+
+      if (userData.fieldOfStudy?.id) {
+         promises.push(
             // Fetch the top recommended events based on the user's field of study
-            this.getRecommendEventsBasedOnUserFieldOfStudy(userData, limit),
-         ])
+            this.getRecommendEventsBasedOnUserFieldOfStudy(userData, limit)
+         )
+      }
+
+      const arrayOfRecommendedEventsBasedOnUserData =
+         await handlePromisesAllSettled(promises, this.log.error)
 
       // Combine the results from the two queries above and remove duplicates
       const uniqueResults = removeDuplicateDocuments(
@@ -211,40 +219,5 @@ export default class UserEventRecommendationService
       return [...rankedLivestreamEvents].sort(
          (a, b) => b.getPoints() - a.getPoints()
       )
-   }
-}
-
-class RankedLivestreamEvent {
-   public points: number
-   public id: string
-
-   constructor(public model: LivestreamEvent) {
-      this.model = model
-      this.id = model.id
-      this.points = 0 // Initial value could also be livestream.popularity once that field is added
-   }
-
-   static create(livestream: LivestreamEvent) {
-      return new RankedLivestreamEvent(livestream)
-   }
-
-   getFieldOfStudyIds(): string[] {
-      return this.model.targetFieldsOfStudy.map((e) => e.id)
-   }
-
-   getInterestIds(): string[] {
-      return this.model.interestsIds || []
-   }
-
-   addPoints(points: number) {
-      this.points += points
-   }
-
-   // removePoints(points: number) {
-   //    this.points -= points
-   // }
-
-   getPoints() {
-      return this.points
    }
 }
