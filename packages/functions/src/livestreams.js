@@ -52,7 +52,7 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
 
                // create calendar event
                const livestreamStartDate = livestream.start.toDate()
-               const linkWithUTM = `https://careerfairy.io/upcoming-livestream/${livestream.id}?utm_campaign=fromCalendarEvent`
+               const linkWithUTM = `https://careerfairy.io/upcoming-livestream/${livestreamId}?utm_campaign=fromCalendarEvent`
 
                const cal = ical({
                   events: [
