@@ -12,6 +12,7 @@ import ScreenShareDeniedModal from "./ModalViews/ScreenShareDeniedModal"
 import { animateProfileIcon } from "../../../../../store/actions/streamActions"
 import { ANIMATE_PROFILE_ICON_AFTER_MS } from "../../../../../constants/streams"
 import { rtcConnectionStateSelector } from "../../../../../store/selectors/streamSelectors"
+import { useRTM } from "../../../../../context/agora/RTMProvider"
 
 interface Props {}
 
@@ -23,6 +24,8 @@ const AgoraStateHandler: FC<Props> = () => {
    const agoraRtcError = useSelector((state: RootState) => {
       return state.stream.agoraState.rtcError
    })
+
+   const { rtmStatus } = useRTM()
 
    const sendRTCSateToast = useCallback(
       (
@@ -38,6 +41,7 @@ const AgoraStateHandler: FC<Props> = () => {
                   preventDuplicate: true,
                   key: rtcStatus,
                   persist: Boolean(persist),
+                  autoHideDuration: 1500,
                },
             })
          )
@@ -140,6 +144,21 @@ const AgoraStateHandler: FC<Props> = () => {
          }
       })()
    }, [agoraRtcError?.code, showDebugModal, showUidConflictModal])
+
+   useEffect(() => {
+      ;(function handleStatus() {
+         switch (rtmStatus?.connectionState) {
+            case "ABORTED":
+               if (rtmStatus?.reason === "REMOTE_LOGIN") {
+                  console.log("REMOTE_LOGIN OPENING CONFLICT MODAL")
+                  showUidConflictModal()
+               }
+               break
+            default:
+               return null
+         }
+      })()
+   }, [rtmStatus, showUidConflictModal])
 
    return (
       <>

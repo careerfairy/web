@@ -1,22 +1,7 @@
 import { store } from "../pages/_app"
-
-export const mapServerSideStream = (livestream) => {
-   return {
-      id: livestream.id,
-      company: livestream.company || null,
-      title: livestream.title || null,
-      companyLogoUrl: livestream.companyLogoUrl || null,
-      backgroundImageUrl: livestream.backgroundImageUrl || null,
-      isBeta: livestream.isBeta ?? null,
-      speakers: livestream.speakers || [],
-      summary: livestream.summary || null,
-      createdDateString: livestream.created?.toDate?.().toString() || null,
-      lastUpdatedDateString:
-         livestream.lastUpdated?.toDate?.().toString() || null,
-      startDateString: livestream.start?.toDate?.().toString() || null,
-      questionsDisabled: livestream.questionsDisabled || null,
-   }
-}
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { omit } from "lodash"
 
 export const getServerSideStream = async (livestreamId) => {
    let serverSideStream = null
@@ -27,29 +12,25 @@ export const getServerSideStream = async (livestreamId) => {
          doc: livestreamId,
       })
       if (livestreamSnap.exists) {
-         serverSideStream = mapServerSideStream({
+         const livestreamEvent = {
             id: livestreamSnap.id,
             ...livestreamSnap.data(),
-         })
+         } as LivestreamEvent
+
+         serverSideStream =
+            LivestreamPresenter.serializeDocument(livestreamEvent)
+
+         return omit(serverSideStream, [
+            "registeredUsers",
+            "talentPool",
+            "participatingStudents",
+            "participants",
+            "liveSpeakers",
+            "author",
+         ])
       }
    }
    return serverSideStream
-}
-
-export const parseStreamDates = (stream) => {
-   const newStream = { ...stream }
-   if (newStream.createdDateString) {
-      newStream.createdDate = new Date(Date.parse(newStream.createdDateString))
-   }
-   if (newStream.lastUpdatedDateString) {
-      newStream.lastUpdatedDate = new Date(
-         Date.parse(newStream.lastUpdatedDateString)
-      )
-   }
-   if (newStream.startDateString) {
-      newStream.startDate = new Date(Date.parse(newStream.startDateString))
-   }
-   return newStream
 }
 
 export const getServerSideGroup = async (groupId) => {

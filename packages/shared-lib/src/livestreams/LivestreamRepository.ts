@@ -5,6 +5,7 @@ import BaseFirebaseRepository, {
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
 import {
+   getEarliestEventBufferTime,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -563,12 +564,6 @@ export class FirebaseLivestreamRepository
    }
 }
 
-function getEarliestEventBufferTime() {
-   return new Date(
-      Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
-   )
-}
-
 /*
 |--------------------------------------------------------------------------
 | Mappings and Filters
@@ -597,6 +592,18 @@ export class LivestreamsDataParser {
 
          return true
       })
+      return this
+   }
+
+   filterByHasJobs() {
+      this.livestreams = this.livestreams?.filter(({ jobs }) => jobs.length > 0)
+      return this
+   }
+
+   filterByLanguages(languagesIds: string[]) {
+      this.livestreams = this.livestreams?.filter(({ language }) =>
+         languagesIds.includes(language.code)
+      )
       return this
    }
 

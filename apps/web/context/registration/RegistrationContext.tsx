@@ -18,6 +18,7 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -146,6 +147,18 @@ function reducer(state, action) {
    }
 }
 
+type Props = {
+   children: React.ReactNode
+   groups?: Group[]
+   livestream?: LivestreamEvent
+   closeModal?: () => void
+   promptOtherEventsOnFinal?: boolean
+   onQuestionsAnswered?: (...any) => void
+   onFinish?: () => void
+   cancelable?: boolean
+   targetGroupId?: string
+   isRecommended?: boolean
+}
 export function RegistrationContextProvider({
    children,
    groups,
@@ -156,7 +169,8 @@ export function RegistrationContextProvider({
    onFinish,
    cancelable,
    targetGroupId,
-}) {
+   isRecommended = false,
+}: Props) {
    const {
       checkIfUserAgreedToGroupPolicy,
       sendRegistrationConfirmationEmail,
@@ -312,16 +326,29 @@ export function RegistrationContextProvider({
                   livestream.id,
                   authenticatedUser,
                   groupsWithPolicies,
-                  userAnsweredLivestreamGroupQuestions
+                  userAnsweredLivestreamGroupQuestions,
+                  {
+                     isRecommended,
+                  }
                )
                dataLayerLivestreamEvent(
                   "event_registration_complete",
                   livestream
                )
             }
-            handleSendConfirmEmail()
+            handleSendConfirmEmail().catch((e) =>
+               errorLogAndNotify(e, {
+                  message: "Failed to send confirmation email",
+                  user: authenticatedUser,
+                  livestream,
+               })
+            )
          } catch (e) {
-            console.error(e)
+            errorLogAndNotify(e, {
+               message: "Error registering to livestream",
+               user: authenticatedUser,
+               livestream,
+            })
          }
          if (livestream) {
             // Go to booking step...

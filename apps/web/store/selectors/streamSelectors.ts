@@ -24,3 +24,6 @@ export const sessionIsUsingCloudProxySelector = (state: RootState) =>
 
 export const streamerBreakoutRoomModalOpen = (state: RootState) =>
    state.stream.layout.streamerBreakoutRoomModalOpen
+
+export const videoOptionsSelector = (state: RootState) =>
+   state.stream.videoOptions

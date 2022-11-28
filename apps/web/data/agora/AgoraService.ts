@@ -1,4 +1,11 @@
 import AgoraRTC, { ClientConfig, IAgoraRTCClient } from "agora-rtc-sdk-ng"
+import VirtualBackgroundExtension from "agora-extension-virtual-background"
+
+// Single instance for the whole app, registered into AgoraRTC
+export const agoraVirtualBackgroundExtension: VirtualBackgroundExtension =
+   new VirtualBackgroundExtension()
+AgoraRTC.registerExtensions([agoraVirtualBackgroundExtension])
+
 export class AgoraService {
    constructor() {}
 

@@ -18,9 +18,7 @@ import AgoraRTC, {
 } from "agora-rtc-sdk-ng"
 import { agoraServiceInstance } from "../../data/agora/AgoraService"
 import { useRouter } from "next/router"
-
 import useStreamRef from "../../components/custom-hook/useStreamRef"
-
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 import { useDispatch, useSelector } from "react-redux"
 import { LocalStream } from "../../types/streaming"
@@ -34,6 +32,7 @@ import {
    streamerBreakoutRoomModalOpen,
 } from "../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { setVideoEffectsOff } from "store/actions/streamActions"
 
 const useRtcClient = agoraServiceInstance.createClient({
    mode: "live",
@@ -387,6 +386,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
                videoTrack: null,
                isVideoPublished: false,
             }))
+            dispatch(setVideoEffectsOff())
          }
       } catch (error) {
          handleRtcError(error)

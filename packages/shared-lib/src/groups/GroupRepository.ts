@@ -447,13 +447,12 @@ export class FirebaseGroupRepository
       userData: UserData,
       livestream: LivestreamEvent
    ): Promise<LivestreamGroupQuestionsMap> {
-      let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap = cloneDeep(
-         livestream.groupQuestionsMap
-      )
+      let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap =
+         cloneDeep(livestream.groupQuestionsMap) || {}
 
       const userUniversityCode = userData.university?.code
       const usersUniversityGroup = Object.values(
-         livestream.groupQuestionsMap || {}
+         livestreamGroupQuestionsMap
       )?.find(
          (data) =>
             data.universityCode && data.universityCode === userUniversityCode
@@ -466,8 +465,8 @@ export class FirebaseGroupRepository
             )
       }
 
-      if (!Object.keys(livestreamGroupQuestionsMap || {}).length) {
-         return null
+      if (!Object.keys(livestreamGroupQuestionsMap).length) {
+         return livestreamGroupQuestionsMap
       }
 
       const arrayOfGroups = Object.values(livestreamGroupQuestionsMap || {})

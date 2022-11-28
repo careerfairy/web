@@ -24,63 +24,32 @@ test.beforeEach(async () => {
    await clearFirestoreData()
 })
 
-test("successful registration on a livestream event", async ({
-   page,
-   browserName,
-}) => {
+test("successful registration on a livestream event", async ({ page }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { group, livestream } = await setupData()
 
-   const user: UserData = await login(page)
+   await completeSuccessfulRegistration({
+      page,
+      livestreamPage,
+      livestream,
+      group,
+   })
+})
 
-   // open page
-   await livestreamPage.open(livestream.id)
-   await expectExactText(page, livestream.title)
+test("successful registration on a livestream event with no questions", async ({
+   page,
+}) => {
+   const livestreamPage = new UpcomingLivestreamPage(page)
+   const { group, livestream } = await setupData(undefined, {
+      groupQuestionsMap: null,
+   })
 
-   // click to attend
-   await livestreamPage.attend()
-
-   // Registration Modal
-   await livestreamPage.selectRandomCategoriesFromEvent(livestream)
-   await livestreamPage.modalAttend()
-
-   await expectText(page, "ASK YOUR QUESTION")
-
-   await livestreamPage.skip()
-   await expectExactText(page, `Join the ${livestream.company} Talent Pool`)
-
-   await livestreamPage.resilientClick("text=Skip")
-   await livestreamPage.finish()
-
-   // redirect
-   const expectedPath = `/next-livestreams/${group.id}?livestreamId=${livestream.id}`
-   if (page.url().indexOf(expectedPath) === -1) {
-      // wait for navigation if not there yet
-      await page.waitForURL(`**${expectedPath}`, { timeout: 10000 })
-   }
-
-   await expectSelector(page, `h3:has-text("${group.universityName}")`)
-   await expectExactText(page, group.description)
-   await expectExactText(page, "Booked!")
-
-   // confirm we can't register again
-   await livestreamPage.open(livestream.id)
-   await expect(await livestreamPage.buttonAlreadyBooked).toBeDisabled()
-
-   // assert firestore data is right
-   const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
-      livestream.id,
-      ["userLivestreamData"]
-   )
-   expect(finalLivestreamData.userLivestreamData[0].user.userEmail).toBe(
-      user.userEmail
-   )
-   expect(
-      finalLivestreamData.userLivestreamData[0].registered.date
-   ).toBeTruthy()
-   expect(finalLivestreamData.livestream.registeredUsers).toContain(
-      user.userEmail
-   )
+   await completeSuccessfulRegistration({
+      page,
+      livestreamPage,
+      livestream,
+      group,
+   })
 })
 
 test("past event shouldn't be able to register", async ({ page }) => {
@@ -272,4 +241,70 @@ function slowLocator(
 
       return locator
    }
+}
+
+const completeSuccessfulRegistration = async ({
+   page,
+   livestreamPage,
+   livestream,
+   group,
+}: {
+   page: Page
+   livestreamPage: UpcomingLivestreamPage
+   livestream: LivestreamEvent
+   group: Group
+}) => {
+   const user: UserData = await login(page)
+
+   // open page
+   await livestreamPage.open(livestream.id)
+   await expectExactText(page, livestream.title)
+
+   // click to attend
+   await livestreamPage.attend()
+
+   // Registration Modal
+   if (livestream.groupQuestionsMap) {
+      await livestreamPage.selectRandomCategoriesFromEvent(livestream)
+   }
+
+   await livestreamPage.modalAttend()
+
+   await expectText(page, "ASK YOUR QUESTION")
+
+   await livestreamPage.skip()
+   await expectExactText(page, `Join the ${livestream.company} Talent Pool`)
+
+   await livestreamPage.resilientClick("text=Skip")
+   await livestreamPage.finish()
+
+   // redirect
+   const expectedPath = `/next-livestreams/${group.id}?livestreamId=${livestream.id}`
+   if (page.url().indexOf(expectedPath) === -1) {
+      // wait for navigation if not there yet
+      await page.waitForURL(`**${expectedPath}`, { timeout: 10000 })
+   }
+
+   await expectSelector(page, `h3:has-text("${group.universityName}")`)
+   await expectExactText(page, group.description)
+   await expectExactText(page, "Booked!")
+
+   // confirm we can't register again
+   await livestreamPage.open(livestream.id)
+   await expect(await livestreamPage.buttonAlreadyBooked).toBeDisabled()
+
+   // assert firestore data is right
+   const finalLivestreamData = await LivestreamSeed.getWithSubcollections(
+      livestream.id,
+      ["userLivestreamData"]
+   )
+   expect(finalLivestreamData.userLivestreamData[0].user.userEmail).toBe(
+      user.userEmail
+   )
+   expect(
+      finalLivestreamData.userLivestreamData[0].registered.date
+   ).toBeTruthy()
+   expect(finalLivestreamData.livestream.registeredUsers).toContain(
+      user.userEmail
+   )
 }

@@ -22,7 +22,11 @@ import {
 import { sxStyles } from "../../../../types/commonTypes"
 import GenericDropdown from "../../common/GenericDropdown"
 import { possibleGenders } from "../../../../constants/forms"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   UserReminderType,
+   UserData,
+   IUserReminder,
+} from "@careerfairy/shared-lib/dist/users"
 import { FieldOfStudySelector } from "../userInformation/FieldOfStudySelector"
 import { LevelOfStudySelector } from "../userInformation/LevelOfStudySelector"
 import { signupSchema } from "../schemas"
@@ -34,6 +38,7 @@ import TermsAgreement from "../userInformation/TermsAgreement"
 import PasswordRepeat from "../userInformation/PasswordRepeat"
 import HelperHint from "../common/HelperHint"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { userRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    submit: {
@@ -117,6 +122,31 @@ function SignUpUserForm() {
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
+               .then(async () => {
+                  // To create a newsletter reminder for 7 days in the future
+                  // in case the subscribed input is not checked
+                  try {
+                     if (values.subscribed) {
+                        dataLayerEvent("newsletter_accepted_on_signup")
+                        return
+                     }
+
+                     const sevenDaysFromNow = new Date(
+                        new Date().setDate(new Date().getDate() + 7)
+                     )
+
+                     const reminder = {
+                        complete: false,
+                        notBeforeThan: sevenDaysFromNow,
+                        type: UserReminderType.NewsletterReminder,
+                        isFirstReminder: true,
+                     } as IUserReminder
+
+                     await userRepo.updateUserReminder(values.email, reminder)
+                  } catch (e) {
+                     console.error(e)
+                  }
+               })
                .then(() => {
                   setSubmitting(false)
                   setGeneralLoading(false)
@@ -313,10 +343,9 @@ function SignUpUserForm() {
                            }
                            label={
                               <Typography style={{ fontSize: 12 }}>
-                                 I don’t want to miss out on events from
-                                 exciting companies and would like to receive
-                                 occasional email announcements from
-                                 CareerFairy. 🚀
+                                 Join <b>60’000+ students and graduates</b> who
+                                 receive personalised invitations to career
+                                 events and job openings 👍
                               </Typography>
                            }
                         />

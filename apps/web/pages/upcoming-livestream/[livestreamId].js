@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getServerSideStream, parseStreamDates } from "../../util/serverUtil"
+import { getServerSideStream } from "../../util/serverUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -29,6 +29,8 @@ import ReferralSection from "../../components/views/upcoming-livestream/Referral
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import FooterButton from "../../components/views/common/FooterButton"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
@@ -38,7 +40,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
 
-   const [stream, setStream] = useState(parseStreamDates(serverStream))
+   const [stream, setStream] = useState(
+      LivestreamPresenter.parseDocument(serverStream)
+   )
    const { push, asPath, query, pathname, replace } = useRouter()
    const [currentGroup, setCurrentGroup] = useState(null)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
@@ -74,7 +78,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       return false
    }, [stream, authenticatedUser])
 
-   const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
+   const handleCloseJoinModal = useCallback(
+      () => setJoinGroupModalData(undefined),
+      []
+   )
    const handleOpenJoinModal = useCallback(
       () =>
          setJoinGroupModalData({
@@ -82,12 +89,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             targetGroupId: targetGroupId,
             livestream: stream,
          }),
-      [targetGroupId, userData, stream, unfilteredGroups]
+      [targetGroupId, stream, unfilteredGroups]
    )
 
-   const [isPastEvent, setIsPastEvent] = useState(
-      streamIsOld(stream?.startDate)
-   )
+   const [isPastEvent, setIsPastEvent] = useState(streamIsOld(stream?.start))
 
    const streamLanguage = languageCodesDict?.[stream?.language?.code]
 
@@ -107,7 +112,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
 
       return stream && livestreamQuestionsQuery(stream.id, questionSortType)
-   }, [stream?.id, stream?.questionsDisabled, questionSortType])
+   }, [stream, livestreamQuestionsQuery, questionSortType])
 
    const handlers = useInfiniteScrollServer({
       limit: 8,
@@ -129,8 +134,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [])
 
    useEffect(() => {
-      setIsPastEvent(streamIsOld(stream?.startDate))
-   }, [stream?.startDate])
+      setIsPastEvent(streamIsOld(stream?.start))
+   }, [stream?.start])
 
    useEffect(() => {
       if (stream.id) {
@@ -141,9 +146,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                   const data = querySnapshot.data()
                   setStream({
                      ...data,
-                     createdDate: data.created?.toDate?.(),
-                     lastUpdatedDate: data.lastUpdated?.toDate?.(),
-                     startDate: data.start?.toDate?.(),
                      id: querySnapshot.id,
                   })
                }
@@ -151,7 +153,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          )
          return () => unsubscribe()
       }
-   }, [stream?.id])
+   }, [listenToScheduledLivestreamById, stream?.id])
 
    useEffect(() => {
       if (query.groupId) {
@@ -166,7 +168,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          )
          return () => unsubscribe()
       }
-   }, [query.groupId])
+   }, [listenToCareerCenterById, query.groupId])
 
    useEffect(() => {
       if (stream?.groupIds?.length) {
@@ -189,7 +191,12 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
             }
          )
       }
-   }, [stream?.groupIds, currentGroup?.groupId])
+   }, [
+      stream?.groupIds,
+      currentGroup?.groupId,
+      stream,
+      getDetailLivestreamCareerCenters,
+   ])
 
    useEffect(() => {
       ;(async function handleAutoRegister() {
@@ -217,19 +224,23 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
          }
       })()
    }, [
-      query.register,
+      query?.register,
       stream?.id,
       stream?.hasStarted,
       unfilteredGroups,
       stream?.registeredUsers,
-      authenticatedUser.email,
+      authenticatedUser?.email,
+      query,
+      push,
+      pathname,
+      handleOpenJoinModal,
    ])
 
    useEffect(() => {
       if (stream.hasStarted) {
          replace?.(`/streaming/${stream.id}/viewer`)
       }
-   }, [stream.hasStarted])
+   }, [replace, stream?.hasStarted, stream?.id])
 
    const registerButtonLabel = useMemo(() => {
       if (participated && isPastEvent) return "You attended this event"
@@ -248,7 +259,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       }
 
       if (authenticatedUser) {
-         return "I'll attend"
+         return "Attend Event"
       }
 
       return "Join to attend"
@@ -292,7 +303,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       else {
          return stream.maxRegistrants - stream.registeredUsers.length
       }
-   })
+   }, [stream?.maxRegistrants, stream?.registeredUsers])
 
    const streamAboutToStart = useMemo(() => {
       return Boolean(
@@ -302,71 +313,102 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       )
    }, [isPastEvent, stream?.isFaceToFace, stream?.startDate])
 
-   const startRegistrationProcess = async () => {
-      dataLayerLivestreamEvent("event_registration_started", stream)
-      if (isLoggedOut || !auth?.currentUser?.emailVerified) {
+   const startRegistrationProcess = useCallback(
+      async (fromFooterButton = false) => {
          dataLayerLivestreamEvent(
-            "event_registration_started_login_required",
+            `event_registration_started${
+               fromFooterButton ? "_from_footer_button" : ""
+            }`,
             stream
          )
-         return push(
-            asPath
-               ? {
-                    pathname: `/login`,
-                    query: { absolutePath: linkToStream },
-                 }
-               : "/signup"
-         )
-      }
+         if (isLoggedOut || !auth?.currentUser?.emailVerified) {
+            dataLayerLivestreamEvent(
+               "event_registration_started_login_required",
+               stream
+            )
+            return push(
+               asPath
+                  ? {
+                       pathname: `/login`,
+                       query: { absolutePath: linkToStream },
+                    }
+                  : "/signup"
+            )
+         }
 
-      if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-         dataLayerLivestreamEvent(
-            "event_registration_started_profile_incomplete",
-            stream
-         )
-         return push({
-            pathname: `/profile`,
-            query: { absolutePath: asPath },
-         })
-      }
+         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            dataLayerLivestreamEvent(
+               "event_registration_started_profile_incomplete",
+               stream
+            )
+            return push({
+               pathname: `/profile`,
+               query: { absolutePath: asPath },
+            })
+         }
 
-      handleOpenJoinModal()
-   }
+         handleOpenJoinModal()
+      },
+      [
+         asPath,
+         auth?.currentUser?.emailVerified,
+         handleOpenJoinModal,
+         isLoggedOut,
+         linkToStream,
+         push,
+         stream,
+         userData,
+      ]
+   )
 
-   const handleRegisterClick = () => {
-      if (!registered) {
-         return startRegistrationProcess(stream.id)
-      }
-   }
+   const handleRegisterClick = useCallback(
+      (fromFooterButton = false) => {
+         if (!registered) {
+            return startRegistrationProcess(fromFooterButton)
+         }
+      },
+      [registered, startRegistrationProcess]
+   )
 
-   const handleChangeQuestionSortType = (event, newSortType) => {
+   const handleChangeQuestionSortType = useCallback((event, newSortType) => {
       if (newSortType !== null) {
          setQuestionSortType(newSortType)
       }
-   }
+   }, [])
 
-   const handleUpvote = async (question) => {
-      if (isLoggedOut) {
-         return push({
-            pathname: `/signup`,
-            query: { absolutePath: asPath },
-         })
-      }
-      try {
-         await upvoteLivestreamQuestion(
-            stream.id,
-            question,
-            authenticatedUser.email
-         )
-
-         handlers.handleClientUpdate(question.id, {
-            votes: question.votes + 1 || 1,
-            emailOfVoters: question.emailOfVoters?.concat(
+   const handleUpvote = useCallback(
+      async (question) => {
+         if (isLoggedOut) {
+            return push({
+               pathname: `/signup`,
+               query: { absolutePath: asPath },
+            })
+         }
+         try {
+            await upvoteLivestreamQuestion(
+               stream.id,
+               question,
                authenticatedUser.email
-            ) || [authenticatedUser.email],
-         })
-      } catch (e) {}
-   }
+            )
+
+            handlers.handleClientUpdate(question.id, {
+               votes: question.votes + 1 || 1,
+               emailOfVoters: question.emailOfVoters?.concat(
+                  authenticatedUser.email
+               ) || [authenticatedUser.email],
+            })
+         } catch (e) {}
+      },
+      [
+         asPath,
+         authenticatedUser.email,
+         handlers,
+         isLoggedOut,
+         push,
+         stream.id,
+         upvoteLivestreamQuestion,
+      ]
+   )
 
    function hasVoted(question) {
       if (!authenticatedUser || !question.emailOfVoters) {
@@ -375,94 +417,106 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       return question.emailOfVoters.indexOf(authenticatedUser.email) > -1
    }
 
+   const handleFooterAttendButtonClick = useCallback(async () => {
+      await handleRegisterClick(true)
+   }, [handleRegisterClick])
+
    return (
-      <UpcomingLayout>
-         <EventSEOSchemaScriptTag event={stream} />
-         <SEO {...getStreamMetaInfo(stream)} />
-         <HeroSection
-            backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
-            stream={stream}
-            eventInterests={eventInterests}
-            streamAboutToStart={streamAboutToStart}
-            registerButtonLabel={registerButtonLabel}
-            disabled={isRegistrationDisabled}
-            registered={registered}
-            streamLanguage={streamLanguage}
-            numberOfSpotsRemaining={numberOfSpotsRemaining}
-            hosts={filteredGroups}
-            onRegisterClick={handleRegisterClick}
-         />
-         <Navigation
-            aboutRef={aboutRef}
-            speakersRef={speakersRef}
-            questionsRef={questionsRef}
-         />
-         {stream.summary && (
-            <AboutSection
-               summary={stream.summary}
-               sectionRef={aboutRef}
-               sectionId="about"
-               title={`${stream.company}`}
-               forceReveal={mobile}
-               big
-               overheadText={"ABOUT"}
-            />
-         )}
-         {!!stream?.speakers?.length && (
-            <SpeakersSection
-               overheadText={"OUR SPEAKERS"}
-               sectionRef={speakersRef}
-               backgroundColor={theme.palette.common.white}
-               sectionId="speakers"
-               big
-               speakers={stream.speakers}
-            />
-         )}
-
-         <QuestionsSection
-            livestreamId={stream.id}
-            title={
-               isPastEvent
-                  ? "Questions that were asked"
-                  : `Have any questions for the speakers?`
-            }
-            big
-            handleChangeQuestionSortType={handleChangeQuestionSortType}
-            getMore={handlers.getMore}
-            loadingInitialQuestions={handlers.loadingInitial}
-            hasVoted={hasVoted}
-            sectionRef={questionsRef}
-            isPastEvent={isPastEvent}
-            sectionId="questions"
-            hasMore={handlers.hasMore}
-            reFetchQuestions={handlers.getInitialQuery}
-            handleUpvote={handleUpvote}
-            questions={handlers.docs}
-            questionSortType={questionSortType}
-            questionsAreDisabled={stream.questionsDisabled}
-         />
-
-         {!stream.hasNoTalentPool && (
-            <TalentPoolSection
-               handleOpenJoinModal={handleOpenJoinModal}
-               registered={registered}
+      <>
+         <UpcomingLayout>
+            <EventSEOSchemaScriptTag event={stream} />
+            <SEO {...getStreamMetaInfo(stream)} />
+            <HeroSection
+               backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
                stream={stream}
+               eventInterests={eventInterests}
+               streamAboutToStart={streamAboutToStart}
+               registerButtonLabel={registerButtonLabel}
+               disabled={isRegistrationDisabled}
+               registered={registered}
+               streamLanguage={streamLanguage}
+               numberOfSpotsRemaining={numberOfSpotsRemaining}
+               hosts={filteredGroups}
+               onRegisterClick={handleRegisterClick}
+            />
+            <Navigation
+               aboutRef={aboutRef}
+               speakersRef={speakersRef}
+               questionsRef={questionsRef}
+            />
+            {stream.summary && (
+               <AboutSection
+                  summary={stream.summary}
+                  sectionRef={aboutRef}
+                  sectionId="about"
+                  title={`${stream.company}`}
+                  forceReveal={mobile}
+                  big
+                  overheadText={"ABOUT"}
+               />
+            )}
+            {!!stream?.speakers?.length && (
+               <SpeakersSection
+                  overheadText={"OUR SPEAKERS"}
+                  sectionRef={speakersRef}
+                  backgroundColor={theme.palette.common.white}
+                  sectionId="speakers"
+                  big
+                  speakers={stream.speakers}
+               />
+            )}
+
+            <QuestionsSection
+               livestreamId={stream.id}
+               title={
+                  isPastEvent
+                     ? "Questions that were asked"
+                     : `Have any questions for the speakers?`
+               }
+               big
+               handleChangeQuestionSortType={handleChangeQuestionSortType}
+               getMore={handlers.getMore}
+               loadingInitialQuestions={handlers.loadingInitial}
+               hasVoted={hasVoted}
+               sectionRef={questionsRef}
+               isPastEvent={isPastEvent}
+               sectionId="questions"
+               hasMore={handlers.hasMore}
+               reFetchQuestions={handlers.getInitialQuery}
+               handleUpvote={handleUpvote}
+               questions={handlers.docs}
+               questionSortType={questionSortType}
+               questionsAreDisabled={stream.questionsDisabled}
+            />
+
+            {!stream.hasNoTalentPool && (
+               <TalentPoolSection
+                  handleOpenJoinModal={handleOpenJoinModal}
+                  registered={registered}
+                  stream={stream}
+               />
+            )}
+            <ReferralSection event={stream} />
+            <ContactSection
+               backgroundColor={theme.palette.common.white}
+               subtitle={"Any problem or question ? We want to hear from you"}
+            />
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               handleClose={handleCloseJoinModal}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+            />
+         </UpcomingLayout>
+         {mobile && !isRegistrationDisabled && (
+            <FooterButton
+               handleClick={handleFooterAttendButtonClick}
+               buttonMessage={"Attend Event"}
             />
          )}
-         <ReferralSection event={stream} />
-         <ContactSection
-            backgroundColor={theme.palette.common.white}
-            subtitle={"Any problem or question ? We want to hear from you"}
-         />
-         <RegistrationModal
-            open={Boolean(joinGroupModalData)}
-            handleClose={handleCloseJoinModal}
-            onFinish={handleCloseJoinModal}
-            promptOtherEventsOnFinal
-            livestream={joinGroupModalData?.livestream}
-            groups={joinGroupModalData?.groups}
-         />
-      </UpcomingLayout>
+      </>
    )
 }
 

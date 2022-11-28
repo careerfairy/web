@@ -272,3 +272,27 @@ export const setSpyMode = (mode) => async (dispatch, getState) => {
    )
    dispatch({ type: actions.SET_SPY_MODE, payload: Boolean(newSpyMode) })
 }
+
+export const setVideoBlurStart = () => {
+   return { type: actions.SET_VIDEO_BLUR_START }
+}
+
+export const setVideoBlurEnabled = () => {
+   return { type: actions.SET_VIDEO_BLUR_ENABLED }
+}
+
+export const setVideoEffectsOff = () => {
+   return { type: actions.SET_VIDEO_EFFECTS_OFF }
+}
+
+export const setVideoEffectsErrored = () => {
+   return { type: actions.SET_VIDEO_EFFECTS_ERROR }
+}
+
+export const setVideoBackgroundImage = (imageUrl: string) => {
+   return { type: actions.SET_VIDEO_BACKGROUND_IMAGE, payload: imageUrl }
+}
+
+export const setVideoBackgroundImageEnabled = () => {
+   return { type: actions.SET_VIDEO_BACKGROUND_IMAGE_ENABLED }
+}

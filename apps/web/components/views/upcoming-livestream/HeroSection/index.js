@@ -246,7 +246,7 @@ const HeroSection = ({
                               <Paper sx={styles.countdown}>
                                  <CountDown
                                     registerButtonLabel={registerButtonLabel}
-                                    time={stream.startDate}
+                                    time={stream.start?.toDate?.() || null}
                                     stream={stream}
                                     streamAboutToStart={streamAboutToStart}
                                     onRegisterClick={onRegisterClick}

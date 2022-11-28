@@ -1,19 +1,21 @@
 import { Identifiable, OptionGroup } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
-import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
+import {
+   UserData,
+   UserLivestreamGroupQuestionAnswers,
+   UserPublicData,
+} from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
+import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
 
 export interface LivestreamEvent extends Identifiable {
-   author?: {
-      email: string
-      groupId?: string
-   }
+   author?: AuthorInfo
    summary?: string
    backgroundImageUrl?: string
    company?: string
@@ -32,10 +34,7 @@ export interface LivestreamEvent extends Identifiable {
    levelOfStudyIds?: string[]
    fieldOfStudyIds?: string[]
    isRecording?: boolean
-   language?: {
-      code?: string
-      name?: string
-   }
+   language?: LivestreamLanguage
    hidden?: boolean
    talentPool?: string[]
    hasNoTalentPool?: boolean
@@ -50,14 +49,23 @@ export interface LivestreamEvent extends Identifiable {
    hasStarted?: boolean
    hasEnded?: boolean
    targetCategories?: string[]
+   mode?: LivestreamMode
+
    /**
-    * These modes are used to dictate how the livestream is displayed in the UI
-    * - presentation: A PDF presentation is currently being shared
-    * - video: A YouTube video is currently being shared
-    * - desktop: A user's screen is currently being shared
-    * - default/undefined: The default livestream view (speaker is in the center of the screen with their video displayed)
-    */
-   mode?: "presentation" | "desktop" | "video" | "default"
+    * If true, the livestream can be attended anonymously
+    * */
+   openStream?: boolean
+
+   /**
+    * Number of times the livestream has appeared in a user's feed
+    * */
+   impressions?: number
+
+   /**
+    * Number of times the livestream has appeared in a user's recommended feed
+    * */
+   recommendedImpressions?: number
+
    /**
     * The streamerId of the user who is currently sharing their screen
     */
@@ -90,11 +98,8 @@ export interface LivestreamEvent extends Identifiable {
     * The actual details of the speakers in the livestream
     */
    liveSpeakers?: LiveSpeaker[]
-   lastUpdatedAuthorInfo?: {
-      email: string
-      groupId: string
-   }
-   universities: any[]
+   lastUpdatedAuthorInfo?: AuthorInfo
+   universities?: any[]
    questionsDisabled?: boolean
 
    // ATS Jobs
@@ -103,10 +108,44 @@ export interface LivestreamEvent extends Identifiable {
     */
    jobs?: LivestreamJobAssociation[]
 
+   /*
+    * True if the event is also taking place in person
+    * */
+   isHybrid?: boolean
+
+   /*
+    * The physical location of the event if there is one
+    * */
+   address?: string
    externalEventLink?: string
    timezone?: string
    isFaceToFace?: boolean
    reminderEmailsSent?: IEmailSent
+
+   /*
+    * Breakout rooms
+    * */
+   index?: number
+   parentLivestream?: LivestreamEventPublicData
+}
+
+/**
+ * These modes are used to dictate how the livestream is displayed in the UI
+ * - presentation: A PDF presentation is currently being shared
+ * - video: A YouTube video is currently being shared
+ * - desktop: A user's screen is currently being shared
+ * - default/undefined: The default livestream view (speaker is in the center of the screen with their video displayed)
+ */
+export type LivestreamMode = "presentation" | "desktop" | "video" | "default"
+
+export type LivestreamLanguage = {
+   code?: string
+   name?: string
+}
+
+export type AuthorInfo = {
+   email: string
+   groupId?: string
 }
 
 export interface LivestreamStatus {
@@ -151,6 +190,7 @@ export interface UserLivestreamData extends Identifiable {
       }
       utm?: any
       referrer?: string
+      isRecommended?: boolean
    }
    talentPool?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
@@ -260,18 +300,6 @@ export interface LivestreamEventPublicData {
    test?: boolean
 }
 
-export interface BreakoutRoom extends Identifiable {
-   companyLogoUrl?: string
-   test?: boolean
-   title?: string
-   start: firebase.firestore.Timestamp
-   hasStarted?: boolean
-   hasEnded?: boolean
-   liveSpeakers?: Speaker[]
-   index?: number
-   parentLivestream?: LivestreamEventPublicData
-}
-
 export interface LivestreamQuestion extends Identifiable {
    author: string
    timestamp: firebase.firestore.Timestamp
@@ -354,4 +382,41 @@ export interface LivestreamPromotions extends Identifiable {
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
    livestreamId: string
+}
+
+export interface LivestreamImpression extends Identifiable, DocumentData {
+   livestreamId: string
+   userId: string
+   livestream: LivestreamEventPublicData
+   user: UserPublicData | null
+   pathname: string
+   createdAt: firebase.firestore.Timestamp
+   positionInResults: number
+   numberOfResults: number
+   isRecommended: boolean
+   location: Location
+   asPath: string
+}
+
+export enum ImpressionLocation {
+   recommendedEventsCarousel = "recommendedEventsCarousel",
+   comingUpCarousel = "comingUpCarousel",
+   myNextEventsCarousel = "myNextEventsCarousel",
+   pastEventsCarousel = "pastEventsCarousel",
+   nextLivestreams = "nextLivestreams",
+   pastLivestreams = "pastLivestreams",
+   nextLivestreamsGroup = "nextLivestreamsGroup",
+   pastLivestreamsGroup = "pastLivestreamsGroup",
+   marketingPageCarousel = "marketingPageCarousel",
+   embeddedNextLivestreams = "embeddedNextLivestreams",
+   embeddedPastLivestreams = "embeddedPastLivestreams",
+   landingPageCarousel = "landingPageCarousel",
+   viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
+   unknown = "unknown",
+}
+
+export function getEarliestEventBufferTime() {
+   return new Date(
+      Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
+   )
 }

@@ -6,6 +6,8 @@ const {
    notifyLivestreamStarting,
    notifyLivestreamCreated,
 } = require("./api/slack")
+const { setHeaders, isLocalEnvironment } = require("./util")
+const ical = require("ical-generator")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -31,31 +33,60 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
          })
    })
 
-exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
+exports.getLivestreamICalendarEvent = functions.https.onRequest(
+   async (req, res) => {
+      setHeaders(req, res)
+      const livestreamId = req.query.eventId
+
+      if (livestreamId) {
+         try {
+            // get the livestream
+            const querySnapshot = await admin
+               .firestore()
+               .collection("livestreams")
+               .doc(livestreamId)
+               .get()
+
+            if (querySnapshot.exists) {
+               const livestream = querySnapshot.data()
+
+               // create calendar event
+               const livestreamStartDate = livestream.start.toDate()
+               const linkWithUTM = `https://careerfairy.io/upcoming-livestream/${livestreamId}?utm_campaign=fromCalendarEvent`
+
+               const cal = ical({
+                  events: [
+                     {
+                        start: livestreamStartDate.toISOString(),
+                        end: new Date(
+                           livestreamStartDate.getTime() +
+                              (livestream.duration || 45) * 60 * 1000
+                        ).toISOString(),
+                        location: `${linkWithUTM}`,
+                        summary: livestream.title,
+                        description: "Join the event now!",
+                        organizer: {
+                           name: "CareerFairy",
+                           mailto: "noreply@careerfairy.io",
+                        },
+                        url: linkWithUTM,
+                     },
+                  ],
+               })
+               cal.serve(res)
+            }
+         } catch (e) {
+            functions.logger.warn(
+               `An error has occurred creating the ICalendar event from the livestream ${livestreamId}`
+            )
+            res.sendStatus(500)
+         }
+      }
+   }
+)
+
+exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
    async (data, context) => {
-      //   const cal = ical({
-      //      domain: "careerfairy.io",
-      //      name: "Live Stream Invite",
-      //   });
-      //   const start = DateTime.fromJSDate(new Date(req.body.regular_date));
-
-      //   cal.createEvent({
-      //      start: start,
-      //      end: start.plus({ minutes: 45 }),
-      //      summary: `Live stream with ${req.body.company_name}`,
-      //      description: req.body.livestream_title,
-      //      location: "On CareerFairy",
-      //      timezone: "Europe/Zurich",
-      //      organizer: {
-      //         name: "CareerFairy",
-      //         mailto: "noreply@careerfairy.io",
-      //      },
-      //      url: req.body.livestream_link,
-      //   });
-
-      //   let calStr = cal.toString();
-      //   let calBase64Str = Buffer.from(calStr).toString("base64");
-
       const email = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
@@ -68,14 +99,13 @@ exports.sendLivestreamRegistrationConfirmationEmail = functions.https.onCall(
             company_logo_url: data.company_logo_url,
             livestream_title: data.livestream_title,
             livestream_link: data.livestream_link,
+            calendar_event_i_calendar: isLocalEnvironment()
+               ? `http://localhost:5001/careerfairy-e1fd9/us-central1/getLivestreamICalendarEvent?eventId=${data.livestream_id}`
+               : `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent?eventId=${data.livestream_id}`,
+            calendar_event_google: data.eventCalendarUrls.google,
+            calendar_event_outlook: data.eventCalendarUrls.outlook,
+            calendar_event_yahoo: data.eventCalendarUrls.yahoo,
          },
-         //  Attachments: [
-         //     {
-         //        Name: "livestream.ics",
-         //        Content: calBase64Str,
-         //        ContentType: "text/calendar; charset=utf-8; method=REQUEST",
-         //     },
-         //  ],
       }
 
       client.sendEmailWithTemplate(email).then(
