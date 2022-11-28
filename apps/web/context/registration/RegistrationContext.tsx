@@ -18,6 +18,7 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -319,9 +320,19 @@ export function RegistrationContextProvider({
                   livestream
                )
             }
-            handleSendConfirmEmail()
+            handleSendConfirmEmail().catch((e) =>
+               errorLogAndNotify(e, {
+                  message: "Failed to send confirmation email",
+                  user: authenticatedUser,
+                  livestream,
+               })
+            )
          } catch (e) {
-            console.error(e)
+            errorLogAndNotify(e, {
+               message: "Error registering to livestream",
+               user: authenticatedUser,
+               livestream,
+            })
          }
          if (livestream) {
             // Go to booking step...
