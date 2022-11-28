@@ -450,9 +450,6 @@ export class FirebaseGroupRepository
       let livestreamGroupQuestionsMap: LivestreamGroupQuestionsMap = cloneDeep(
          livestream.groupQuestionsMap
       )
-      if (!livestreamGroupQuestionsMap) {
-         return null
-      }
 
       const userUniversityCode = userData.university?.code
       const usersUniversityGroup = Object.values(
@@ -468,6 +465,11 @@ export class FirebaseGroupRepository
                livestreamGroupQuestionsMap
             )
       }
+
+      if (!Object.keys(livestreamGroupQuestionsMap || {}).length) {
+         return null
+      }
+
       const arrayOfGroups = Object.values(livestreamGroupQuestionsMap || {})
 
       for (const groupDataWithQuestions of arrayOfGroups) {

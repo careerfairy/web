@@ -1,12 +1,19 @@
-import React from "react"
+import React, { useMemo } from "react"
 import { Grid } from "@mui/material"
 import CreateWishButton from "./CreateWishButton"
-import Search from "./Search"
+import Filter, { FilterEnum } from "../common/filter/Filter"
 import { HandleAddNewWishToHits } from "../../../pages/wishlist"
 
 interface Props {
    handleAddNewWishToHits: HandleAddNewWishToHits
 }
+
+const filtersToShow = [
+   FilterEnum.search,
+   FilterEnum.sortBy,
+   FilterEnum.interests,
+]
+
 const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {
    return (
       <Grid container spacing={2}>
@@ -14,7 +21,7 @@ const CreateAndFilter = ({ handleAddNewWishToHits }: Props) => {
             <CreateWishButton handleAddNewWishToHits={handleAddNewWishToHits} />
          </Grid>
          <Grid item xs={12}>
-            <Search />
+            <Filter filtersToShow={filtersToShow} />
          </Grid>
       </Grid>
    )

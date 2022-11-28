@@ -551,7 +551,7 @@ const EventPreviewCard = ({
                                           ? "cancel"
                                           : mobile
                                           ? "attend"
-                                          : "I'll attend"}
+                                          : "Attend Event"}
                                     </Button>
                                  )}
 

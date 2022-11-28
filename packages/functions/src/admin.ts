@@ -14,7 +14,7 @@ import { object, string } from "yup"
 const { client } = require("./api/postmark")
 
 /* eslint-disable camelcase */
-export const sendBasicTemplateEmail_v4 = functions
+export const sendBasicTemplateEmail = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
@@ -195,5 +195,12 @@ const getNewsletterUnsubscribeLink = (
 ): string => {
    const signature = generateSignature(email, secret)
    const baseUrl = origin || "https://careerfairy.io"
-   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${signature}`
+
+   /*
+    * encodeURIComponent is needed to encode the signature
+    * because it contains special characters like + and =
+    * */
+   const encodedSignature = encodeURIComponent(signature)
+
+   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${encodedSignature}`
 }

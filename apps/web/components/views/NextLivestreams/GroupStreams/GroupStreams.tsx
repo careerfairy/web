@@ -57,6 +57,7 @@ type GroupStreamsProps = {
    searching: boolean
    listenToUpcoming: boolean
    isPastLivestreams: boolean
+   noResultsComponent?: React.ReactNode
 }
 const GroupStreams = ({
    groupData,
@@ -65,6 +66,7 @@ const GroupStreams = ({
    searching,
    listenToUpcoming,
    isPastLivestreams,
+   noResultsComponent,
 }: GroupStreamsProps) => {
    const {
       query: { groupId },
@@ -140,6 +142,8 @@ const GroupStreams = ({
                      </Grid>
                   ) : livestreams.length ? (
                      renderStreamCards
+                  ) : noResultsComponent ? (
+                     noResultsComponent
                   ) : (
                      <Grid xs={12} item sx={styles.loaderWrapper}>
                         <Typography

@@ -206,7 +206,9 @@ const LivestreamGroupQuestionForm = () => {
                         }
                         color="primary"
                      >
-                        {livestream?.hasStarted ? "Enter event" : "I'll attend"}
+                        {livestream?.hasStarted
+                           ? "Enter event"
+                           : "Attend Event"}
                      </Button>
                   </DialogActions>
                </Form>
