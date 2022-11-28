@@ -14,6 +14,7 @@ const RegistrationModal = memo(
       onQuestionsAnswered,
       onFinish,
       targetGroupId,
+      isRecommended,
    }: Props) => {
       const cancelable = Boolean(handleClose)
       const onClose = () => {
@@ -37,6 +38,7 @@ const RegistrationModal = memo(
                cancelable={cancelable}
                groups={groups}
                promptOtherEventsOnFinal={promptOtherEventsOnFinal}
+               isRecommended={isRecommended}
             >
                <RegistrationForm />
             </RegistrationContextProvider>
@@ -54,5 +56,6 @@ interface Props {
    groups: any[]
    promptOtherEventsOnFinal?: boolean
    targetGroupId?: string
+   isRecommended?: boolean
 }
 export default RegistrationModal

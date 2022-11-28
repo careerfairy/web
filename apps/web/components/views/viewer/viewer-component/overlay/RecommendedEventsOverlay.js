@@ -5,6 +5,7 @@ import { Box, Container, Typography } from "@mui/material"
 import UpcomingLivestreamsCarousel from "../../../landing/UpcomingLivestreamsSection/UpcomingLivestreamsCarousel"
 import { getMaxSlides } from "util/CommonUtil"
 import RegistrationModal from "../../../common/registration-modal"
+import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -105,6 +106,9 @@ const RecommendedEventsOverlay = ({ recommendedEventIds, mobile }) => {
                upcomingStreams={recommendedEvents}
                additionalSettings={additionalSettings}
                disableAutoPlay={Boolean(joinGroupModalData)}
+               location={
+                  ImpressionLocation.viewerStreamingPageLivestreamsCarousel
+               }
             />
          </Container>
          <RegistrationModal

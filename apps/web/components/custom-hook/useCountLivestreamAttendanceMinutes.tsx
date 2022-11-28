@@ -1,18 +1,17 @@
 import { useCallback } from "react"
 import { useAuth } from "../../HOCs/AuthProvider"
 import {
-   BreakoutRoom,
    LivestreamEvent,
    LivestreamEventPublicData,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import LivestreamPresenter from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import usePersistentInterval from "./usePersistentInterval"
 import { pickPublicDataFromUser } from "@careerfairy/shared-lib/dist/users"
 import { useRouter } from "next/router"
 import { useSelector } from "react-redux"
 import { rtcConnectionStateSelector } from "../../store/selectors/streamSelectors"
 import { livestreamRepo } from "../../data/RepositoryInstances"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 // Send a heartbeat event to the server every minute
 const HEARTBEAT_INTERVAL_SECONDS = 60
@@ -26,7 +25,7 @@ const HEARTBEAT_INTERVAL_SECONDS = 60
  * @param livestreamData
  */
 const useCountLivestreamAttendanceMinutes = (
-   livestreamData: LivestreamEvent | BreakoutRoom
+   livestreamData: LivestreamEvent
 ) => {
    const { userData, isLoggedIn } = useAuth()
    const {
@@ -51,9 +50,8 @@ const useCountLivestreamAttendanceMinutes = (
             return
          }
 
-         const livestreamPresenter = new LivestreamPresenter(
-            livestreamData as LivestreamEvent
-         )
+         const livestreamPresenter =
+            LivestreamPresenter.createFromDocument(livestreamData)
 
          // do nothing, stream is not live or is a test event
          if (!livestreamPresenter.isLive() || livestreamPresenter.isTest()) {

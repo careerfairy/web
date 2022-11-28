@@ -37,6 +37,12 @@ export abstract class BaseModel {
             continue
          }
 
+         // serialize firebase timestamps
+         if (this[key]?.constructor?.name === "Timestamp") {
+            serialized[key] = this[key].toDate().toMillis()
+            continue
+         }
+
          // check if array
          if (
             Array.isArray(this[key]) &&

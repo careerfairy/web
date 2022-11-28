@@ -5,6 +5,7 @@ import { isEmpty, isLoaded } from "react-redux-firebase"
 import EmbedStreamCard from "../../../common/stream-cards/EmbedStreamCard"
 import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import Fade from "@stahl.luke/react-reveal/Fade"
+import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    streamsContainer: {
@@ -45,13 +46,20 @@ const Streams = (props) => {
                </Typography>
             </Grid>
          ) : (
-            slicedLivestreams.map((stream) => (
+            slicedLivestreams.map((stream, index, arr) => (
                <Grid key={stream.id} xs={12} md={6} lg={4} item>
                   <Fade mountOnEnter>
                      <EmbedStreamCard
                         currentGroup={currentGroup}
                         isPast={isPast}
                         stream={stream}
+                        index={index}
+                        totalElements={arr.length}
+                        location={
+                           isPast
+                              ? ImpressionLocation.embeddedPastLivestreams
+                              : ImpressionLocation.embeddedNextLivestreams
+                        }
                      />
                   </Fade>
                </Grid>

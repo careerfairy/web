@@ -5,6 +5,7 @@ import BaseFirebaseRepository, {
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
 import {
+   getEarliestEventBufferTime,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -561,12 +562,6 @@ export class FirebaseLivestreamRepository
 
       return docRef.update(toUpdate)
    }
-}
-
-function getEarliestEventBufferTime() {
-   return new Date(
-      Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
-   )
 }
 
 /*
