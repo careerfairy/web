@@ -65,7 +65,6 @@ const useTrackLivestreamImpressions = ({
       delay: 1000, // Element must be at least visible for 1 second before triggering
       onChange: (inView) => {
          if (inView && event) {
-            // console.log("-> event", event)
             // Fire a tracking event to your tracking service of choice.
             dataLayerLivestreamEvent("recommended_event_impression", event, {
                positionInResults,

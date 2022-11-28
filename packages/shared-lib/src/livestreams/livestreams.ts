@@ -52,7 +52,7 @@ export interface LivestreamEvent extends Identifiable {
    mode?: LivestreamMode
 
    /**
-    * If tru, the livestream can be attended anonymously
+    * If true, the livestream can be attended anonymously
     * */
    openStream?: boolean
 
