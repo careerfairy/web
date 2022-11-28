@@ -87,8 +87,8 @@ exports.scheduleTestLivestreamDeletion =
    livestreams.scheduleTestLivestreamDeletion
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
-exports.sendLivestreamRegistrationConfirmationEmail =
-   livestreams.sendLivestreamRegistrationConfirmationEmail
+exports.sendLivestreamRegistrationConfirmationEmail_v2 =
+   livestreams.sendLivestreamRegistrationConfirmationEmail_v2
 exports.sendPhysicalEventRegistrationConfirmationEmail =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
 exports.sendHybridEventRegistrationConfirmationEmail =
@@ -97,6 +97,7 @@ exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
+exports.getLivestreamICalendarEvent = livestreams.getLivestreamICalendarEvent
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =

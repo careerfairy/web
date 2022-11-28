@@ -40,6 +40,7 @@ import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
 import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
+import { makeUrls } from "../../util/makeUrls"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -262,17 +263,39 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail"
+            "sendLivestreamRegistrationConfirmationEmail_v2"
          )
+
+      const livestreamStartDate = livestream.start.toDate()
+      const linkToLivestream = `https://careerfairy.io/upcoming-livestream/${livestream.id}`
+      const linkWithUTM = `${linkToLivestream}?utm_campaign=fromCalendarEvent`
+
+      const calendarEvent = {
+         name: livestream.title,
+         details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
+         location: linkWithUTM,
+         startsAt: livestreamStartDate.toISOString(),
+         endsAt: new Date(
+            livestreamStartDate.getTime() +
+               (livestream.duration || 45) * 60 * 1000
+         ).toISOString(),
+      }
+
+      const urls = makeUrls(calendarEvent)
+
       return sendLivestreamRegistrationConfirmationEmail({
+         eventCalendarUrls: urls,
+         livestream_id: livestream.id,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
+         timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
+         duration_date: livestream.duration,
          livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          livestream_title: livestream.title,
-         livestream_link: `https://careerfairy.io/upcoming-livestream/${livestream.id}`,
+         livestream_link: linkToLivestream,
       })
    }
 
