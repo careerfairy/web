@@ -12,7 +12,10 @@ import {
    LivestreamUserAction,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import {
+   DocRef,
+   mapFirestoreDocuments,
+} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllRegisteredStudents(withRef?: boolean): Promise<RegisteredStudent[]>
@@ -34,6 +37,10 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       userType: LivestreamUserAction,
       withRef?: boolean
    ): Promise<UserLivestreamData[]>
+
+   getAllLivestreamUsers(
+      eventId: string
+   ): Promise<(UserLivestreamData & DocRef)[]>
 
    getAllLivestreams(withTest?: boolean): Promise<LivestreamEvent[]>
 }
@@ -112,6 +119,17 @@ export class LivestreamScriptsRepository
          .where(`${userType}.date`, "!=", null)
          .get()
       return mapFirestoreDocuments<UserLivestreamData>(snaps)
+   }
+
+   async getAllLivestreamUsers(
+      eventId: string
+   ): Promise<(UserLivestreamData & DocRef)[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("userLivestreamData")
+         .get()
+      return mapFirestoreDocuments<UserLivestreamData, true>(snaps, true)
    }
 
    async getAllLivestreams(
