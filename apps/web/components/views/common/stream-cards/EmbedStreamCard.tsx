@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, {
+   forwardRef,
+   memo,
+   useCallback,
+   useEffect,
+   useState,
+} from "react"
 import cx from "clsx"
 import { alpha, useTheme } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
@@ -23,8 +29,15 @@ import RegisterIcon from "@mui/icons-material/AddToPhotosRounded"
 import LibraryBooksIcon from "@mui/icons-material/LibraryBooks"
 import EmbedTimeDisplay from "../time-display/EmbedTimeDisplay"
 import MobileCarousel from "../carousels/MobileCarousel"
+import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 
 const useStyles = makeStyles((theme) => ({
+   // @ts-ignore
    color: ({ color }) => ({
       "&:before": {
          backgroundColor: color,
@@ -89,12 +102,12 @@ const useStyles = makeStyles((theme) => ({
       // backgroundColor: alpha(theme.palette.common.black, 0.4),
       //   backdropFilter: "blur(5px)",
    },
-   content: ({ color }) => ({
+   content: {
       position: "relative",
       zIndex: 1,
       borderRadius: "1rem",
       "&:before": {},
-   }),
+   },
    title: {
       fontSize: "1.25rem",
       fontWeight: 500,
@@ -129,6 +142,7 @@ const useStyles = makeStyles((theme) => ({
    },
    date: {
       color: theme.palette.common.white,
+      // @ts-ignore
       backgroundColor: ({ color }) => color,
       opacity: 1,
       fontSize: "1rem",
@@ -148,23 +162,42 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const CustomCard = ({
-   classes,
-   cover,
-   logo,
-   title,
-   brand,
-   date,
-   speakers,
-   handleMouseEnter,
-   handleMouseLeave,
-   isPast,
-   logoTooltip,
-   showCarousel,
-   actionLink,
-}) => {
+type CustomCardProps = {
+   classes?: any
+   cover: string
+   logo: string
+   title: string
+   brand: React.ReactNode
+   date?: Date
+   speakers: any
+   handleMouseEnter: () => void
+   handleMouseLeave: () => void
+   isPast: boolean
+   logoTooltip: string
+   showCarousel: boolean
+   actionLink: string
+}
+const CustomCard = forwardRef(function CustomCard(
+   {
+      classes,
+      cover,
+      logo,
+      title,
+      brand,
+      date,
+      speakers,
+      handleMouseEnter,
+      handleMouseLeave,
+      isPast,
+      logoTooltip,
+      showCarousel,
+      actionLink,
+   }: CustomCardProps,
+   ref
+) {
    return (
       <Box
+         ref={ref}
          onMouseEnter={handleMouseEnter}
          onMouseLeave={handleMouseLeave}
          className={cx(classes.root, classes.color)}
@@ -286,9 +319,32 @@ const CustomCard = ({
          </Box>
       </Box>
    )
+})
+
+type Props = {
+   stream: LivestreamEvent
+   isPast: boolean
+   currentGroup: Group
+   index: number
+   totalElements: number
+   location: ImpressionLocation
 }
 
-const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
+const EmbedStreamCard = ({
+   stream,
+   isPast,
+   currentGroup,
+   index,
+   totalElements,
+   location,
+}: Props) => {
+   const ref = useTrackLivestreamImpressions({
+      event: stream,
+      positionInResults: index,
+      numberOfResults: totalElements,
+      location,
+   })
+
    const {
       palette: { primary, secondary },
       breakpoints,
@@ -332,6 +388,7 @@ const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
 
    return (
       <CustomCard
+         ref={ref}
          classes={classes}
          showCarousel={showCarousel}
          handleMouseEnter={handleMouseEnter}
@@ -340,7 +397,6 @@ const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
          isPast={isPast}
          actionLink={getStreamLink(currentGroup.id, stream.id)}
          logoTooltip={stream.company}
-         hovered={hovered}
          brand={<MainLogo white className={classes.careerFairyLogo} />}
          date={stream.startDate || stream.start.toDate()}
          cover={getResizedUrl(stream.backgroundImageUrl, "md")}
@@ -348,6 +404,5 @@ const EmbedStreamCard = React.memo(({ stream, isPast, currentGroup }) => {
          title={stream.title}
       />
    )
-})
-
-export default EmbedStreamCard
+}
+export default memo(EmbedStreamCard)

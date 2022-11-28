@@ -10,11 +10,13 @@ import { HandRaiseState } from "types/handraise"
 import {
    getQueryStringFromUrl,
    getReferralInformation,
+   shouldUseEmulators,
 } from "../../util/CommonUtil"
 import {
    EventRating,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
+   LivestreamImpression,
    LivestreamPromotions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
@@ -37,6 +39,7 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2921,6 +2924,57 @@ class FirebaseService {
       return await this.functions.httpsCallable("applyReferralCode")(
          referralCode
       )
+   }
+
+   // Impressions
+   async addImpression(
+      livestreamId: string,
+      impressionData: Omit<LivestreamImpression, "createdAt" | "id">
+   ): Promise<void> {
+      const streamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const impressionsCounter = new Counter(streamRef, "impressions")
+      const recommendedImpressionsCounter = new Counter(
+         streamRef,
+         "recommendedImpressions"
+      )
+
+      const data: Omit<LivestreamImpression, "id"> = {
+         ...impressionData,
+         createdAt: this.getServerTimestamp() as any,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("impressions")
+         .add(data)
+
+      // Don't use the distributed counter for emulators
+      if (shouldUseEmulators()) {
+         const toUpdate: Pick<
+            LivestreamEvent,
+            "impressions" | "recommendedImpressions"
+         > = {
+            impressions: firebase.firestore.FieldValue.increment(1) as any,
+         }
+         if (impressionData.isRecommended) {
+            toUpdate.recommendedImpressions =
+               firebase.firestore.FieldValue.increment(1) as any
+         }
+
+         return streamRef.update(toUpdate)
+      } else {
+         impressionsCounter.incrementBy(1).catch(console.error)
+
+         if (impressionData.isRecommended) {
+            // If the impression is recommended, increment the recommended impressions counter
+            recommendedImpressionsCounter.incrementBy(1).catch(console.error)
+         }
+         return
+      }
    }
 
    // Backfill user data

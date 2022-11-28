@@ -25,10 +25,14 @@ import { Chip, useMediaQuery } from "@mui/material"
 import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
+import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
 
 const styles = {
    hideOnHoverContent: {
@@ -200,8 +204,19 @@ const EventPreviewCard = ({
    animation,
    autoRegister,
    openShareDialog,
+   isRecommended,
+   totalElements,
+   index,
+   location = ImpressionLocation.unknown,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
+   const ref = useTrackLivestreamImpressions({
+      event,
+      isRecommended,
+      positionInResults: index,
+      numberOfResults: totalElements,
+      location,
+   })
    const { query, push, pathname } = useRouter()
    const getStartDate = () => event?.startDate || event?.start?.toDate?.()
    const [eventInterests, setSetEventInterests] = useState([])
@@ -344,7 +359,7 @@ const EventPreviewCard = ({
 
    return (
       <>
-         <Box>
+         <Box ref={ref}>
             <DateAndShareDisplay
                startDate={getStartDate()}
                loading={loading}
@@ -608,6 +623,12 @@ interface EventPreviewCardProps {
    ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
+   isRecommended?: boolean
+   // The index of the event in the list
+   index?: number
+   // The total number of events in the list
+   totalElements?: number
+   location?: ImpressionLocation
 }
 
 export default EventPreviewCard

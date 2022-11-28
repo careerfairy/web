@@ -1,10 +1,15 @@
 import { Identifiable, OptionGroup } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
-import { UserData, UserLivestreamGroupQuestionAnswers } from "../users"
+import {
+   UserData,
+   UserLivestreamGroupQuestionAnswers,
+   UserPublicData,
+} from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
+import DocumentData = firebase.firestore.DocumentData
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -45,6 +50,22 @@ export interface LivestreamEvent extends Identifiable {
    hasEnded?: boolean
    targetCategories?: string[]
    mode?: LivestreamMode
+
+   /**
+    * If true, the livestream can be attended anonymously
+    * */
+   openStream?: boolean
+
+   /**
+    * Number of times the livestream has appeared in a user's feed
+    * */
+   impressions?: number
+
+   /**
+    * Number of times the livestream has appeared in a user's recommended feed
+    * */
+   recommendedImpressions?: number
+
    /**
     * The streamerId of the user who is currently sharing their screen
     */
@@ -361,6 +382,37 @@ export interface LivestreamPromotions extends Identifiable {
    promotionCountriesCodes: OptionGroup[]
    promotionUniversitiesCodes: OptionGroup[]
    livestreamId: string
+}
+
+export interface LivestreamImpression extends Identifiable, DocumentData {
+   livestreamId: string
+   userId: string
+   livestream: LivestreamEventPublicData
+   user: UserPublicData | null
+   pathname: string
+   createdAt: firebase.firestore.Timestamp
+   positionInResults: number
+   numberOfResults: number
+   isRecommended: boolean
+   location: Location
+   asPath: string
+}
+
+export enum ImpressionLocation {
+   recommendedEventsCarousel = "recommendedEventsCarousel",
+   comingUpCarousel = "comingUpCarousel",
+   myNextEventsCarousel = "myNextEventsCarousel",
+   pastEventsCarousel = "pastEventsCarousel",
+   nextLivestreams = "nextLivestreams",
+   pastLivestreams = "pastLivestreams",
+   nextLivestreamsGroup = "nextLivestreamsGroup",
+   pastLivestreamsGroup = "pastLivestreamsGroup",
+   marketingPageCarousel = "marketingPageCarousel",
+   embeddedNextLivestreams = "embeddedNextLivestreams",
+   embeddedPastLivestreams = "embeddedPastLivestreams",
+   landingPageCarousel = "landingPageCarousel",
+   viewerStreamingPageLivestreamsCarousel = "viewerStreamingPageLivestreamsCarousel",
+   unknown = "unknown",
 }
 
 export function getEarliestEventBufferTime() {
