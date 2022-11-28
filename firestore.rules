@@ -10,6 +10,12 @@ service cloud.firestore {
             return request.resource.data[field] == resource.data[field];
         }
 
+        function allowIncrementField(field) {
+            return request.resource.data.keys() == [field]
+                   && (resource == null || request.resource.data[field] ==
+                                           resource.data[field] + 1);
+        }
+
         function isSignedIn() {
             return request.auth != null;
         }
@@ -216,6 +222,17 @@ service cloud.firestore {
             allow read, create, update: if true;
             allow delete: if userIsGroupAdmin() || isCFAdmin();
             // allow update: if publicFieldsUsersCanUpdate() || userIsGroupAdmin(request.resource.data.groupIds) || isCFAdmin();
+
+            // Allow to increment only the 'impressions' or 'recommendedImpressions' field and only by 1.
+            match /_counter_shards_/{shardId} {
+
+                allow get;
+                allow write: if allowIncrementField('impressions') || allowIncrementField('recommendedImpressions');
+            }
+
+            match /impressions/{impressionId} {
+                allow create;
+            }
 
             match /userLivestreamData/{studentEmail} {
                 allow read: if true;

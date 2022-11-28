@@ -25,6 +25,11 @@ import UserUtil from "../../../../../data/util/UserUtil"
 import { useRouter } from "next/router"
 import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants"
 import useMediaQuery from "@mui/material/useMediaQuery"
+import useTrackLivestreamImpressions from "../../../../custom-hook/useTrackLivestreamImpressions"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 
 const backgroundImageHeight = 200
 const cardBorderRadius = 6
@@ -203,12 +208,33 @@ const fortyFiveMinutesAgo = new Date(
 )
 
 const throttle_speed = 50
+type Props = {
+   livestream: LivestreamEvent
+   handleOpenJoinModal?: (any) => void
+   noRegister?: boolean
+   disableExpand?: boolean
+   isRecommended?: boolean
+   location?: ImpressionLocation
+   totalElements?: number
+   index?: number
+}
 const UpcomingLivestreamCard = ({
    livestream,
    handleOpenJoinModal,
    disableExpand,
    noRegister,
-}) => {
+   isRecommended = false,
+   location = ImpressionLocation.unknown,
+   totalElements,
+   index,
+}: Props) => {
+   const ref = useTrackLivestreamImpressions({
+      event: livestream,
+      isRecommended,
+      positionInResults: index,
+      numberOfResults: totalElements,
+      location,
+   })
    const theme = useTheme()
    const isLandscapeOnMobile = useMediaQuery(
       `${theme.breakpoints.down("md")} and (orientation: landscape)`
@@ -372,6 +398,7 @@ const UpcomingLivestreamCard = ({
 
    return (
       <Paper
+         ref={ref}
          onMouseEnter={handleMouseEnter}
          onMouseLeave={handleMouseLeave}
          sx={[

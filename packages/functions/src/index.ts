@@ -12,7 +12,7 @@ import admin = require("./admin")
 import reminders = require("./reminders")
 import livestreams = require("./livestreams")
 import universityEmails = require("./universityEmails")
-import algolia = require("./algolia")
+// import algolia = require("./algolia")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
@@ -103,12 +103,12 @@ exports.sendEmailToStudentOfUniversityAndField =
    universityEmails.sendEmailToStudentOfUniversityAndField
 
 // Algolia
-exports.addToIndex = algolia.addToIndex
-exports.updateIndex = algolia.updateIndex
-exports.deleteFromIndex = algolia.deleteFromIndex
-exports.addToStreamIndex = algolia.addToStreamIndex
-exports.updateStreamIndex = algolia.updateStreamIndex
-exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
+// exports.addToIndex = algolia.addToIndex
+// exports.updateIndex = algolia.updateIndex
+// exports.deleteFromIndex = algolia.deleteFromIndex
+// exports.addToStreamIndex = algolia.addToStreamIndex
+// exports.updateStreamIndex = algolia.updateStreamIndex
+// exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
 
 // Analytics
 exports.updateUserDataAnalytcicsOnWrite =

@@ -5,6 +5,7 @@ import BaseFirebaseRepository, {
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
 import {
+   getEarliestEventBufferTime,
    LivestreamEvent,
    LivestreamEventParsed,
    LivestreamEventPublicData,
@@ -135,11 +136,6 @@ export interface ILivestreamRepository {
       eventId: string,
       userId: string
    ): Promise<UserLivestreamData>
-
-   getRecommendEventsBasedOnUserInterests(
-      userInterestsIds?: string[],
-      limit?: number
-   ): Promise<LivestreamEvent[] | null>
 }
 
 export class FirebaseLivestreamRepository
@@ -467,31 +463,6 @@ export class FirebaseLivestreamRepository
       }
    }
 
-   async getRecommendEventsBasedOnUserInterests(
-      userInterestsIds: string[] = [],
-      limit: number = 10
-   ): Promise<LivestreamEvent[] | null> {
-      let query = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("hidden", "==", false)
-
-      if (userInterestsIds.length) {
-         query = query.where(
-            "interestsIds",
-            "array-contains-any",
-            userInterestsIds
-         )
-      }
-
-      query = query.orderBy("start", "asc").limit(limit)
-
-      const snapshots = await query.get()
-
-      return mapFirestoreDocuments<LivestreamEvent>(snapshots)
-   }
-
    async getRecommendEvents(
       userEmail: string,
       userInterestsIds?: string[],
@@ -591,12 +562,6 @@ export class FirebaseLivestreamRepository
 
       return docRef.update(toUpdate)
    }
-}
-
-function getEarliestEventBufferTime() {
-   return new Date(
-      Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
-   )
 }
 
 /*
