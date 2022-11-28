@@ -64,7 +64,7 @@ const makeYahooCalendarUrl = function (event) {
       in_loc: event.location,
    })
 }
-export const makeICSCalendarUrl = function (event) {
+const makeICSCalendarUrl = function (event) {
    const components = ["BEGIN:VCALENDAR", "VERSION:2.0", "BEGIN:VEVENT"]
    // In case of SSR, document won't be defined
    if (typeof document !== "undefined") {
