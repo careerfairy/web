@@ -8,7 +8,6 @@ import {
    Grid,
    Hidden,
    IconButton,
-   Paper,
    Tooltip,
    Typography,
 } from "@mui/material"
@@ -131,13 +130,12 @@ const CountDown = ({
          name: stream.title,
          details: `Here is your Link: ${linkToStream}`,
          location: "Hosted virtually on CareerFairy (link in the description)",
-         startsAt: new Date(stream.startDate).toISOString(),
+         startsAt: new Date(time).toISOString(),
          endsAt: new Date(
-            new Date(stream.startDate).getTime() +
-               1 * (stream.duration || 45) * 60 * 1000
+            new Date(time).getTime() + 1 * (stream.duration || 45) * 60 * 1000
          ).toISOString(),
       }
-   }, [stream, livestreamId, groupId])
+   }, [livestreamId, groupId, stream.title, stream.duration, time])
 
    const [shareEventDialog, setShareEventDialog] = useState(null)
 

@@ -12,7 +12,7 @@ import admin = require("./admin")
 import reminders = require("./reminders")
 import livestreams = require("./livestreams")
 import universityEmails = require("./universityEmails")
-import algolia = require("./algolia")
+// import algolia = require("./algolia")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
 import recording = require("./recording")
@@ -27,6 +27,7 @@ import bigQuery = require("./bigQuery")
 import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
 import crisp = require("./crisp")
+import recommendation = require("./recommendation")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -103,12 +104,12 @@ exports.sendEmailToStudentOfUniversityAndField =
    universityEmails.sendEmailToStudentOfUniversityAndField
 
 // Algolia
-exports.addToIndex = algolia.addToIndex
-exports.updateIndex = algolia.updateIndex
-exports.deleteFromIndex = algolia.deleteFromIndex
-exports.addToStreamIndex = algolia.addToStreamIndex
-exports.updateStreamIndex = algolia.updateStreamIndex
-exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
+// exports.addToIndex = algolia.addToIndex
+// exports.updateIndex = algolia.updateIndex
+// exports.deleteFromIndex = algolia.deleteFromIndex
+// exports.addToStreamIndex = algolia.addToStreamIndex
+// exports.updateStreamIndex = algolia.updateStreamIndex
+// exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
 
 // Analytics
 exports.updateUserDataAnalytcicsOnWrite =
@@ -170,3 +171,6 @@ exports.periodicallyRemoveCachedDocument =
 
 // Crisp
 exports.getCrispSignature = crisp.getCrispSignature
+
+// Recommendations
+exports.getRecommendedEvents = recommendation.getRecommendedEvents

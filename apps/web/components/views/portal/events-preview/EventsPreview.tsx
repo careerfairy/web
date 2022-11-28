@@ -14,7 +14,10 @@ import { useInterests } from "../../../custom-hook/useCollection"
 import EmptyMessageOverlay from "./EmptyMessageOverlay"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   ImpressionLocation,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const styles = {
@@ -51,6 +54,7 @@ const EventsPreview = ({
    type,
    id,
    isEmpty,
+   isRecommended,
 }: EventsProps) => {
    const {
       query: { groupId },
@@ -174,12 +178,16 @@ const EventsPreview = ({
                                       !cardsLoaded[index] &&
                                       !cardsLoaded[arr.length - (index + 1)]
                                    }
+                                   index={index}
+                                   totalElements={arr.length}
                                    interests={existingInterests}
                                    autoRegister
+                                   location={getLocation(type)}
                                    openShareDialog={setShareEventDialog}
                                    onRegisterClick={handleClickRegister}
                                    key={event.id}
                                    event={event}
+                                   isRecommended={isRecommended}
                                 />
                              </Box>
                           ))}
@@ -189,6 +197,7 @@ const EventsPreview = ({
          )}
          {joinGroupModalData && (
             <RegistrationModal
+               isRecommended={isRecommended}
                open={Boolean(joinGroupModalData)}
                onFinish={handleCloseJoinModal}
                promptOtherEventsOnFinal={!groupId}
@@ -207,7 +216,22 @@ const EventsPreview = ({
       </>
    )
 }
-
+const getLocation = (eventType: EventsTypes | string): ImpressionLocation => {
+   switch (eventType) {
+      case EventsTypes.myNext:
+         return ImpressionLocation.myNextEventsCarousel
+      case EventsTypes.pastEvents:
+         return ImpressionLocation.pastEventsCarousel
+      case EventsTypes.recommended:
+         return ImpressionLocation.recommendedEventsCarousel
+      case EventsTypes.comingUp:
+         return ImpressionLocation.comingUpCarousel
+      case EventsTypes.comingUpMarketing:
+         return ImpressionLocation.marketingPageCarousel
+      default:
+         return ImpressionLocation.unknown
+   }
+}
 export enum EventsTypes {
    /**
     * Top Picks for User based on the interests they selected at signup
@@ -225,6 +249,10 @@ export enum EventsTypes {
     * Events that have already happened
     */
    pastEvents = "pastEvents",
+   /*
+    * coming up marketing events
+    * */
+   comingUpMarketing = "comingUpMarketing",
 }
 
 export interface EventsProps {
@@ -234,9 +262,10 @@ export interface EventsProps {
    loading: boolean
    limit?: number
    hidePreview?: boolean
-   type: EventsTypes | string
+   type: EventsTypes
    id?: string
    isEmpty?: boolean
+   isRecommended?: boolean
 }
 
 export default EventsPreview

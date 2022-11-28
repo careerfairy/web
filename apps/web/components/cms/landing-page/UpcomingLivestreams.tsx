@@ -30,7 +30,7 @@ const UpcomingLivestreams = ({ fieldsOfStudy, eventsTitle }: Props) => {
          <EventsPreview
             id={"upcoming-events"}
             title={eventsTitle || "COMING UP NEXT"}
-            type={EventsTypes.comingUp}
+            type={EventsTypes.comingUpMarketing}
             events={events}
             loading={loading || (!loading && !events.length)}
             isEmpty={events.length === 0}

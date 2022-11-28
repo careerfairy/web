@@ -146,6 +146,18 @@ function reducer(state, action) {
    }
 }
 
+type Props = {
+   children: React.ReactNode
+   groups?: Group[]
+   livestream?: LivestreamEvent
+   closeModal?: () => void
+   promptOtherEventsOnFinal?: boolean
+   onQuestionsAnswered?: (...any) => void
+   onFinish?: () => void
+   cancelable?: boolean
+   targetGroupId?: string
+   isRecommended?: boolean
+}
 export function RegistrationContextProvider({
    children,
    groups,
@@ -156,7 +168,8 @@ export function RegistrationContextProvider({
    onFinish,
    cancelable,
    targetGroupId,
-}) {
+   isRecommended = false,
+}: Props) {
    const {
       checkIfUserAgreedToGroupPolicy,
       sendRegistrationConfirmationEmail,
@@ -312,7 +325,10 @@ export function RegistrationContextProvider({
                   livestream.id,
                   authenticatedUser,
                   groupsWithPolicies,
-                  userAnsweredLivestreamGroupQuestions
+                  userAnsweredLivestreamGroupQuestions,
+                  {
+                     isRecommended,
+                  }
                )
                dataLayerLivestreamEvent(
                   "event_registration_complete",

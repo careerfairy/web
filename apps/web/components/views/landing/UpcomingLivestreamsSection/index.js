@@ -8,6 +8,7 @@ import UpcomingLivestreamsCarousel from "./UpcomingLivestreamsCarousel"
 import Link from "../../../../materialUI/NextNavLink"
 import HeroButton from "../HeroSection/HeroButton"
 import SectionHeader from "../../common/SectionHeader"
+import { ImpressionLocation } from "@careerfairy/shared-lib/dist/livestreams"
 
 const useStyles = makeStyles((theme) => ({
    subTitle: {
@@ -24,7 +25,6 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const UpcomingLivestreamsSection = (props) => {
-   const classes = useStyles()
    const { getUpcomingLivestreams } = useFirebaseService()
    const [upcomingLivestreams, setUpcomingLivestreams] = useState([])
 
@@ -59,6 +59,7 @@ const UpcomingLivestreamsSection = (props) => {
             handleOpenJoinModal={props.handleOpenJoinModal}
             upcomingStreams={upcomingLivestreams}
             noRegister
+            location={ImpressionLocation.landingPageCarousel}
          />
          <Box display="flex" justifyContent="center" p={2} pt={4}>
             <HeroButton
