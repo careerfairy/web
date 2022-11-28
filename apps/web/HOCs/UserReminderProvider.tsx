@@ -3,7 +3,7 @@ import UserReminderContext, {
 } from "context/userReminder/UserRemindersContext"
 import NewsletterSnackbar from "../components/views/common/NewsletterSnackbar"
 import { useAuth } from "./AuthProvider"
-import { useCallback, useContext, useEffect, useState } from "react"
+import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { userRepo } from "../data/RepositoryInstances"
 import {
    IUserReminder,
@@ -79,6 +79,13 @@ const UserReminderProvider = ({ children }) => {
       [reminders, userData?.id, userData?.unsubscribed]
    )
 
+   const contextValue = useMemo(
+      () => ({
+         forceShowReminder,
+      }),
+      [forceShowReminder]
+   )
+
    const getReminders = useCallback(() => {
       return reminders.map((reminder: IUserReminder) => {
          // Prepared to handle future reminders
@@ -95,7 +102,7 @@ const UserReminderProvider = ({ children }) => {
    }, [reminders])
 
    return (
-      <UserReminderContext.Provider value={{ forceShowReminder }}>
+      <UserReminderContext.Provider value={contextValue}>
          <>
             {children}
             {getReminders()}
