@@ -65,7 +65,6 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
                         location: `${linkWithUTM}`,
                         summary: livestream.title,
                         description: "Join the event now!",
-                        timezone: livestream.timezone || "Europe/Zurich",
                         organizer: {
                            name: "CareerFairy",
                            mailto: "noreply@careerfairy.io",
