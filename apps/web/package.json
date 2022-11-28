@@ -14,7 +14,8 @@
       "test:watch": "jest --watch",
       "test:coverage": "jest --coverage",
       "test:e2e-webapp": "playwright test",
-      "test:e2e-webapp-debug": "cross-env PWDEBUG=console DEBUG=pw:webserver playwright test --debug"
+      "test:e2e-webapp-debug": "cross-env PWDEBUG=console DEBUG=pw:webserver playwright test --debug",
+      "prepare": "copy-files-from-to"
    },
    "dependencies": {
       "@careerfairy/seed-data": "*",
@@ -35,6 +36,7 @@
       "@reduxjs/toolkit": "^1.8.3",
       "@sentry/nextjs": "^6.17.9",
       "@stahl.luke/react-reveal": "^1.2.3",
+      "agora-extension-virtual-background": "^1.1.1",
       "agora-rtc-sdk-ng": "^4.14.0",
       "agora-rtm-sdk": "^1.5.1",
       "algoliasearch": "^4.13.0",
@@ -51,6 +53,7 @@
       "global": "^4.4.0",
       "graphql": "^16.6.0",
       "graphql-request": "^5.0.0",
+      "intersection-observer": "^0.12.2",
       "jszip": "^3.6.0",
       "keyword-extractor": "^0.0.22",
       "lodash": "^4.17.20",
@@ -77,6 +80,7 @@
       "react-gtm-module": "^2.0.11",
       "react-image-lightbox": "^5.1.4",
       "react-infinite-scroll-component": "^5.1.0",
+      "react-intersection-observer": "^9.4.1",
       "react-lazyload": "^3.2.0",
       "react-linkify": "^1.0.0-alpha",
       "react-pdf": "^5.6.0",
@@ -125,6 +129,7 @@
       "@types/react": "^17.0.38",
       "babel-jest": "^27.5.1",
       "clsx": "^1.1.1",
+      "copy-files-from-to": "^3.2.2",
       "cross-env": "^7.0.3",
       "esbuild-jest": "^0.5.0",
       "eslint": "8.9.0",
@@ -143,5 +148,11 @@
    },
    "engines": {
       "node": "14.x"
-   }
+   },
+   "copyFiles": [
+      {
+         "from": "../../node_modules/agora-extension-virtual-background/wasms/agora-wasm.wasm",
+         "to": "public/wasms/agora-wasm.wasm"
+      }
+   ]
 }

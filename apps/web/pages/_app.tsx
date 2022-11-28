@@ -38,6 +38,7 @@ import {
    FunctionsProvider,
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
+import UserReminderProvider from "../HOCs/UserReminderProvider"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -101,12 +102,14 @@ function MyApp(props) {
                                     <LocalizationProvider
                                        dateAdapter={AdapterDateFns}
                                     >
-                                       <ErrorProvider>
-                                          <UserRewardsNotifications>
-                                             <Component {...pageProps} />
-                                          </UserRewardsNotifications>
-                                          <Notifier />
-                                       </ErrorProvider>
+                                       <UserReminderProvider>
+                                          <ErrorProvider>
+                                             <UserRewardsNotifications>
+                                                <Component {...pageProps} />
+                                             </UserRewardsNotifications>
+                                             <Notifier />
+                                          </ErrorProvider>
+                                       </UserReminderProvider>
                                     </LocalizationProvider>
                                  </FirebaseServiceContext.Provider>
                               </ThemeProviderWrapper>

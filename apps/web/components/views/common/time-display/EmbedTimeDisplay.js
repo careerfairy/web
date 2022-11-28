@@ -50,8 +50,8 @@ const useStyles = makeStyles((theme) => {
    }
 })
 
-const EmbedTimeDisplay = ({ date, mobile }) => {
-   const classes = useStyles({ mobile })
+const EmbedTimeDisplay = ({ date }) => {
+   const classes = useStyles()
 
    const month = dayjs(date).format("MMM")
    const dayOfMonth = dayjs(date).format("D")

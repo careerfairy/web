@@ -49,6 +49,13 @@ interface StreamReducer {
       unpauseFailedPlayRemoteVideos: boolean
       spyModeEnabled: boolean
    }
+   videoOptions: {
+      isBlurEnabled: boolean
+      isBlurLoading: boolean
+      hasErrored: boolean
+      backgroundImage: string | undefined
+      isBackgroundImageLoading: boolean
+   }
    agoraState: {
       rtcConnectionState?: RTCConnectionState
       rtcError?: RTCError
@@ -73,6 +80,7 @@ interface GroupAnalyticsReducer {
    hiddenStreamIds: Record<string, boolean>
    visibleStreamIds: string[]
 }
+
 interface UserDataSetReducer {
    total: {
       ordered: UserData[]

@@ -2,7 +2,7 @@ import { withFirebase } from "../../context/firebase/FirebaseServiceContext"
 import NextLivestreamsLayout from "../../layouts/NextLivestreamsLayout"
 import useListenToUpcomingStreams from "../../components/custom-hook/useListenToUpcomingStreams"
 import NextLivestreamsBannerSection from "../../components/views/NextLivestreams/NextLivestreamsBannerSection"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import { StreamsSection } from "../../components/views/NextLivestreams/StreamsSection"
 import HeadWithMeta from "../../components/page/HeadWithMeta"
@@ -12,9 +12,20 @@ import {
 } from "../../constants/routes"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import { livestreamRepo } from "../../data/RepositoryInstances"
+import { useRouter } from "next/router"
+import { Grid, Typography } from "@mui/material"
+import Image from "next/image"
+import Link from "../../components/views/common/Link"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 
-const placeholderBanner =
-   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-banners%2Fdefault-banner.svg?alt=media&token=9c53d78f-8f4d-420a-b5ef-36a8fd1c1ee0"
+const styles = {
+   noResultsMessage: {
+      maxWidth: "800px",
+      margin: "0 auto",
+      color: "rgb(130,130,130)",
+      textAlign: "center",
+   },
+}
 
 const pageMetadata = {
    description: "Catch the upcoming streams on CareerFairy.",
@@ -23,16 +34,37 @@ const pageMetadata = {
    fullPath: `${PRODUCTION_BASE_URL}}${NEXT_LIVESTREAMS_PATH}`,
 }
 
+const getQueryVariables = (query) => {
+   const languages = query.languages as string
+   const interests = query.interests as string
+   const jobCheck = query.jobCheck as string
+
+   return {
+      languages: languages && languages.split(","),
+      interests: interests && interests.split(","),
+      jobCheck: jobCheck?.toLowerCase() === "true" || false,
+   }
+}
+
 const NextLivestreamsPage = ({ initialTabValue }) => {
    const {
       palette: {
          common: { white },
-         navyBlue,
       },
    } = useTheme()
+   const { query } = useRouter()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
+   const { languages, interests, jobCheck } = useMemo(
+      () => getQueryVariables(query),
+      [query]
+   )
+   const isMobile = useIsMobile()
 
-   const upcomingLivestreams = useListenToUpcomingStreams()
+   const upcomingLivestreams = useListenToUpcomingStreams({
+      languagesIds: languages,
+      interestsIds: interests,
+      jobCheck: jobCheck,
+   })
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 
    useEffect(() => {
@@ -51,8 +83,40 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
    }, [value, pastLivestreams])
 
    const handleChange = useCallback((event, newValue) => {
-      setValue(newValue)
+      if (newValue) {
+         setValue(newValue)
+      }
    }, [])
+
+   const renderNoResults = useCallback(() => {
+      return (
+         <>
+            <Grid xs={12} mt={{ xs: 12, md: 20 }} textAlign="center" item>
+               <Image
+                  src="/empty-search.svg"
+                  width="800"
+                  height="400"
+                  alt="Empty search illustration"
+               />
+            </Grid>
+            <Grid xs={12} mt={4} mx={1} item>
+               <Typography sx={styles.noResultsMessage} variant="h5">
+                  {/* eslint-disable-next-line react/no-unescaped-entities */}
+                  We didn't find any events matching your criteria. 😕{" "}
+                  {isMobile ? (
+                     <Link href="/next-livestreams">clear all filters</Link>
+                  ) : null}
+               </Typography>
+               {isMobile ? null : (
+                  <Typography sx={styles.noResultsMessage} variant="h5">
+                     Remove some filters or start anew by{" "}
+                     <Link href="/next-livestreams">clearing all filters</Link>.
+                  </Typography>
+               )}
+            </Grid>
+         </>
+      )
+   }, [isMobile])
 
    return (
       <React.Fragment>
@@ -60,16 +124,6 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
          <NextLivestreamsLayout>
             <NextLivestreamsBannerSection
                color={white}
-               backgroundImageClassName=""
-               backgroundColor={navyBlue.main}
-               backgroundImage={placeholderBanner}
-               backgroundImageOpacity={0.5}
-               title={
-                  value === "upcomingEvents"
-                     ? "Upcoming Events on CareerFairy"
-                     : "Past Events on CareerFairy"
-               }
-               subtitle=""
                handleChange={handleChange}
                value={value}
             />
@@ -78,6 +132,8 @@ const NextLivestreamsPage = ({ initialTabValue }) => {
                upcomingLivestreams={upcomingLivestreams}
                listenToUpcoming
                pastLivestreams={pastLivestreams}
+               minimumUpcomingStreams={0}
+               noResultsComponent={renderNoResults()}
             />
          </NextLivestreamsLayout>
          <ScrollToTop />

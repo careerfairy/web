@@ -10,11 +10,13 @@ import { HandRaiseState } from "types/handraise"
 import {
    getQueryStringFromUrl,
    getReferralInformation,
+   shouldUseEmulators,
 } from "../../util/CommonUtil"
 import {
    EventRating,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
+   LivestreamImpression,
    LivestreamPromotions,
    pickPublicDataFromLivestream,
    UserLivestreamData,
@@ -37,6 +39,8 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
+import { makeUrls } from "../../util/makeUrls"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -259,17 +263,39 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail"
+            "sendLivestreamRegistrationConfirmationEmail_v2"
          )
+
+      const livestreamStartDate = livestream.start.toDate()
+      const linkToLivestream = `https://careerfairy.io/upcoming-livestream/${livestream.id}`
+      const linkWithUTM = `${linkToLivestream}?utm_campaign=fromCalendarEvent`
+
+      const calendarEvent = {
+         name: livestream.title,
+         details: `<p style=\"font-style:italic;display:inline-block\">Join the event now!</p> Click <a href=\"${linkWithUTM}\">here</a>`,
+         location: linkWithUTM,
+         startsAt: livestreamStartDate.toISOString(),
+         endsAt: new Date(
+            livestreamStartDate.getTime() +
+               (livestream.duration || 45) * 60 * 1000
+         ).toISOString(),
+      }
+
+      const urls = makeUrls(calendarEvent)
+
       return sendLivestreamRegistrationConfirmationEmail({
+         eventCalendarUrls: urls,
+         livestream_id: livestream.id,
          recipientEmail: user.email,
          user_first_name: userData.firstName,
+         timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
+         duration_date: livestream.duration,
          livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          livestream_title: livestream.title,
-         livestream_link: `https://careerfairy.io/upcoming-livestream/${livestream.id}`,
+         livestream_link: linkToLivestream,
       })
    }
 
@@ -2057,12 +2083,16 @@ class FirebaseService {
     * @param authenticatedUser
     * @param {*[]} groupsWithPolicies
     * @param userAnsweredLivestreamQuestions
+    * @param options - {isRecommended: boolean}
     */
    registerToLivestream = async (
       livestreamId: string,
       authenticatedUser: { uid: string; email: string },
       groupsWithPolicies: GroupWithPolicy[],
-      userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap
+      userAnsweredLivestreamQuestions: LivestreamGroupQuestionsMap,
+      options: {
+         isRecommended?: boolean
+      } = {}
    ): Promise<void> => {
       const userQuestionsAndAnswersDict = getLivestreamGroupQuestionAnswers(
          userAnsweredLivestreamQuestions
@@ -2136,6 +2166,9 @@ class FirebaseService {
                   referrer: SessionStorageUtil.getReferrer(),
                   // @ts-ignore
                   date: this.getServerTimestamp(),
+                  ...(options.isRecommended && {
+                     isRecommended: true,
+                  }),
                },
             }
 
@@ -2914,6 +2947,57 @@ class FirebaseService {
       return await this.functions.httpsCallable("applyReferralCode")(
          referralCode
       )
+   }
+
+   // Impressions
+   async addImpression(
+      livestreamId: string,
+      impressionData: Omit<LivestreamImpression, "createdAt" | "id">
+   ): Promise<void> {
+      const streamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const impressionsCounter = new Counter(streamRef, "impressions")
+      const recommendedImpressionsCounter = new Counter(
+         streamRef,
+         "recommendedImpressions"
+      )
+
+      const data: Omit<LivestreamImpression, "id"> = {
+         ...impressionData,
+         createdAt: this.getServerTimestamp() as any,
+      }
+
+      await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("impressions")
+         .add(data)
+
+      // Don't use the distributed counter for emulators
+      if (shouldUseEmulators()) {
+         const toUpdate: Pick<
+            LivestreamEvent,
+            "impressions" | "recommendedImpressions"
+         > = {
+            impressions: firebase.firestore.FieldValue.increment(1) as any,
+         }
+         if (impressionData.isRecommended) {
+            toUpdate.recommendedImpressions =
+               firebase.firestore.FieldValue.increment(1) as any
+         }
+
+         return streamRef.update(toUpdate)
+      } else {
+         impressionsCounter.incrementBy(1).catch(console.error)
+
+         if (impressionData.isRecommended) {
+            // If the impression is recommended, increment the recommended impressions counter
+            recommendedImpressionsCounter.incrementBy(1).catch(console.error)
+         }
+         return
+      }
    }
 
    // Backfill user data

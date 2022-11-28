@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Box, Grid, LinearProgress, Typography } from "@mui/material"
 import LazyLoad from "react-lazyload"
 import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
@@ -8,8 +8,15 @@ import RegistrationModal from "../../common/registration-modal"
 import { useRouter } from "next/router"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import { useInterests } from "../../../custom-hook/useCollection"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { sxStyles } from "../../../../types/commonTypes"
+import {
+   LivestreamEvent,
+   ImpressionLocation,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { isEmptyObject } from "../../../helperFunctions/HelperFunctions"
 
-const styles = {
+const styles = sxStyles({
    emptyMessage: {
       maxWidth: "400px",
       margin: "0 auto",
@@ -21,9 +28,13 @@ const styles = {
       justifyContent: "center",
       minHeight: "50vh",
    },
-}
+})
 
-const Wrapper = ({ children, streamId }) => {
+type WrapperProps = {
+   children: React.ReactNode
+   streamId: string
+}
+const Wrapper = ({ children, streamId }: WrapperProps) => {
    return (
       <LazyLoad
          key={streamId}
@@ -39,6 +50,15 @@ const Wrapper = ({ children, streamId }) => {
    )
 }
 
+type GroupStreamsProps = {
+   groupData: Group
+   livestreams: LivestreamEvent[]
+   mobile: boolean
+   searching: boolean
+   listenToUpcoming: boolean
+   isPastLivestreams: boolean
+   noResultsComponent?: React.ReactNode
+}
 const GroupStreams = ({
    groupData,
    livestreams,
@@ -46,7 +66,8 @@ const GroupStreams = ({
    searching,
    listenToUpcoming,
    isPastLivestreams,
-}) => {
+   noResultsComponent,
+}: GroupStreamsProps) => {
    const {
       query: { groupId },
    } = useRouter()
@@ -73,23 +94,39 @@ const GroupStreams = ({
       setShareEventDialog(null)
    }, [setShareEventDialog])
 
-   const renderStreamCards = slicedLivestreams?.map((livestream) => {
-      if (livestream) {
-         return (
-            <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
-               <Wrapper streamId={livestream.id}>
-                  <EventPreviewCard
-                     onRegisterClick={handleClickRegister}
-                     interests={existingInterests}
-                     autoRegister
-                     event={livestream}
-                     openShareDialog={setShareEventDialog}
-                  />
-               </Wrapper>
-            </Grid>
-         )
+   const location = useMemo(() => {
+      if (isEmptyObject(groupData)) {
+         return isPastLivestreams
+            ? ImpressionLocation.pastLivestreams
+            : ImpressionLocation.nextLivestreams
       }
-   })
+      return isPastLivestreams
+         ? ImpressionLocation.pastLivestreamsGroup
+         : ImpressionLocation.nextLivestreamsGroup
+   }, [groupData, isPastLivestreams])
+
+   const renderStreamCards = slicedLivestreams?.map(
+      (livestream, index, arr) => {
+         if (livestream) {
+            return (
+               <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
+                  <Wrapper streamId={livestream.id}>
+                     <EventPreviewCard
+                        index={index}
+                        totalElements={arr.length}
+                        onRegisterClick={handleClickRegister}
+                        interests={existingInterests}
+                        autoRegister
+                        location={location}
+                        event={livestream}
+                        openShareDialog={setShareEventDialog}
+                     />
+                  </Wrapper>
+               </Grid>
+            )
+         }
+      }
+   )
 
    return (
       <>
@@ -105,6 +142,8 @@ const GroupStreams = ({
                      </Grid>
                   ) : livestreams.length ? (
                      renderStreamCards
+                  ) : noResultsComponent ? (
+                     noResultsComponent
                   ) : (
                      <Grid xs={12} item sx={styles.loaderWrapper}>
                         <Typography

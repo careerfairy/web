@@ -1,11 +1,13 @@
 import BaseFirebaseRepository from "../BaseFirebaseRepository"
 import {
+   IUserReminder,
    RegistrationStep,
    SavedRecruiter,
    UserATSDocument,
    UserATSRelations,
    UserData,
    UserJobApplicationDocument,
+   UserReminderType,
 } from "./users"
 import firebase from "firebase/compat/app"
 import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
@@ -91,6 +93,23 @@ export interface IUserRepository {
       userEmail: string,
       stepId: string,
       totalSteps: number
+   ): Promise<void>
+
+   updateUserReminder(
+      userEmail: string,
+      notification: IUserReminder
+   ): Promise<void>
+
+   getUserReminders(userEmail: string): Promise<IUserReminder[]>
+
+   getUserReminder(
+      userEmail: string,
+      reminderIdentifier: UserReminderType
+   ): Promise<IUserReminder>
+
+   removeUserReminder(
+      userEmail: string,
+      reminderIdentifier: UserReminderType
    ): Promise<void>
 
    unsubscribeUser(userEmail: string): Promise<void>
@@ -385,6 +404,7 @@ export class FirebaseUserRepository
          linkedinUrl,
          referredBy,
          fieldOfStudy,
+         unsubscribed,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -403,6 +423,8 @@ export class FirebaseUserRepository
       const referredByToUpdate = referredBy !== undefined ? { referredBy } : {}
       const fieldOfStudyToUpdate =
          fieldOfStudy !== undefined ? { fieldOfStudy } : {}
+      const unsubscribedToUpdate =
+         unsubscribed !== undefined ? { unsubscribed } : {}
 
       const toUpdate = {
          ...genderToUpdate,
@@ -414,6 +436,7 @@ export class FirebaseUserRepository
          ...linkedInLinkToUpdate,
          ...referredByToUpdate,
          ...fieldOfStudyToUpdate,
+         ...unsubscribedToUpdate,
       }
 
       return userRef.update(toUpdate)
@@ -455,6 +478,54 @@ export class FirebaseUserRepository
       }
 
       return userRef.update(toUpdate)
+   }
+
+   async updateUserReminder(userEmail, notification): Promise<void> {
+      return this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userReminders")
+         .doc(notification.type)
+         .set(notification, { merge: true })
+   }
+
+   async getUserReminders(userEmail): Promise<IUserReminder[]> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userReminders")
+         .where("notBeforeThan", "<=", new Date())
+         .where("complete", "==", false)
+         .orderBy("notBeforeThan", "asc")
+
+      const data = await ref.get()
+
+      return data.docs.map((doc) => doc.data() as IUserReminder)
+   }
+
+   async getUserReminder(
+      userEmail,
+      reminderIdentifier
+   ): Promise<IUserReminder> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userReminders")
+         .doc(reminderIdentifier)
+
+      const data = await ref.get()
+
+      return data.data() as IUserReminder
+   }
+
+   removeUserReminder(userEmail, reminderIdentifier): Promise<void> {
+      const ref = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("userReminders")
+         .doc(reminderIdentifier)
+
+      return ref.delete()
    }
 }
 

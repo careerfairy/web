@@ -3,11 +3,11 @@ import EventsPreview, { EventsTypes } from "./EventsPreview"
 import { usePagination } from "use-pagination-firestore"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
-import { parseStreamDates } from "../../../../util/serverUtil"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedIn } = useAuth()
@@ -16,7 +16,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    } = useRouter()
 
    const [localEvents, setLocalEvents] = useState<LivestreamEvent[]>(
-      serverSideEvents?.map((event) => parseStreamDates(event)) || []
+      serverSideEvents?.map(LivestreamPresenter.parseDocument) || []
    )
    const [eventFromQuery, setEventFromQuery] = useState(null)
 
@@ -78,7 +78,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
 
 interface Props {
    limit?: number
-   serverSideEvents?: LivestreamEvent[]
+   serverSideEvents?: { [p: string]: any }[]
 }
 
 export default ComingUpNextEvents

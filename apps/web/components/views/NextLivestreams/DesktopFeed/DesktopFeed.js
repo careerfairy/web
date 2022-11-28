@@ -14,6 +14,7 @@ const DesktopFeed = ({
    careerCenterId,
    listenToUpcoming,
    isPastLivestreams,
+   noResultsComponent,
 }) => {
    return (
       <Grow in>
@@ -35,6 +36,7 @@ const DesktopFeed = ({
                   searching={searching}
                   livestreams={livestreams}
                   groupData={groupData}
+                  noResultsComponent={noResultsComponent}
                />
             </Grid>
          </Container>

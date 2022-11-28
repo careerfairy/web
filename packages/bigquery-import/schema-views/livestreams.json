@@ -39,6 +39,18 @@
          "type": "number"
       },
       {
+         "name": "impressions",
+         "type": "number"
+      },
+      {
+         "name": "recommendedImpressions",
+         "type": "number"
+      },
+      {
+         "name": "isFaceToFace",
+         "type": "boolean"
+      },
+      {
          "name": "groupIds",
          "type": "stringified_map"
       },

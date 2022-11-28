@@ -103,3 +103,6 @@ export function removeDuplicateDocuments<T extends Identifiable>(
       return docs.findIndex((i) => i.id === item.id) === index
    })
 }
+
+// max of 10 events to allow for firestore query limit
+export type FirebaseInArrayLimit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10

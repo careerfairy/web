@@ -13,6 +13,7 @@ const MobileFeed = ({
    listenToUpcoming,
    selectedOptions,
    isPastLivestreams,
+   noResultsComponent,
 }) => {
    const [value, setValue] = useState(0)
    const { query } = useRouter()
@@ -24,7 +25,7 @@ const MobileFeed = ({
    }, [groupData.universityName])
 
    useEffect(() => {
-      if (Object.keys(query).length) {
+      if (query?.groupId) {
          scrollToTop()
       }
    }, [value, query])
@@ -34,7 +35,7 @@ const MobileFeed = ({
    }
 
    return (
-      <Box p={1}>
+      <Box p={2}>
          <GroupStreams
             mobile
             listenToUpcoming={listenToUpcoming}
@@ -44,6 +45,7 @@ const MobileFeed = ({
             searching={searching}
             livestreams={livestreams}
             groupData={groupData}
+            noResultsComponent={noResultsComponent}
          />
       </Box>
    )

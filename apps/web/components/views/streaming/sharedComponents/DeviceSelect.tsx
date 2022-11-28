@@ -1,11 +1,21 @@
-import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import React, {
+   ReactNode,
+   useCallback,
+   useEffect,
+   useMemo,
+   useRef,
+   useState,
+} from "react"
 import {
    Box,
+   capitalize,
+   CircularProgress,
    FormControl,
    IconButton,
    InputLabel,
    MenuItem,
    Select,
+   Tooltip,
    Typography,
 } from "@mui/material"
 import VideocamOffIcon from "@mui/icons-material/VideocamOff"
@@ -23,6 +33,16 @@ import { useSelector } from "react-redux"
 import RootState from "../../../../store/reducers"
 import SoundLevelDisplay from "../../common/SoundLevelDisplay"
 import MicOffIcon from "@mui/icons-material/MicOff"
+import BlurOnIcon from "@mui/icons-material/BlurOn"
+import useVirtualBackgroundActions from "../../../../context/agora/useVirtualBackgroundActions"
+import { videoOptionsSelector } from "../../../../store/selectors/streamSelectors"
+import BlurOffIcon from "@mui/icons-material/BlurOff"
+import ImageIcon from "@mui/icons-material/Image"
+import HideImageIcon from "@mui/icons-material/HideImage"
+import FilePickerContainer from "../../../ssr/FilePickerContainer"
+import { uploadLogo } from "../../../helperFunctions/HelperFunctions"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 const styles = {
    gridItemContent: {
@@ -56,6 +76,9 @@ const styles = {
    container: {
       paddingBottom: 3,
       textAlign: "center",
+   },
+   iconButtonSpan: {
+      height: "37px",
    },
 } as const
 export type DeviceSelectProps = {
@@ -300,25 +323,30 @@ const DeviceSelect = ({
                      )}
                   </>
                )}
-               {showDisableIcon && (
-                  <Box sx={styles.iconWrapper}>
+               <Box sx={styles.iconWrapper}>
+                  {showDisableIcon && isCamera && (
                      <IconButton
-                        aria-label={
-                           isCamera
-                              ? "turn-off-video-icon"
-                              : "turn-off-camera-icon"
-                        }
+                        aria-label={"turn-off-video-icon"}
                         size="medium"
                         onClick={handleCloseDevice}
                      >
-                        {isCamera ? (
-                           <VideocamOffIcon fontSize="inherit" />
-                        ) : (
-                           <MicOffIcon fontSize="inherit" />
-                        )}
+                        <VideocamOffIcon fontSize="inherit" />
                      </IconButton>
-                  </Box>
-               )}
+                  )}
+
+                  {showDisableIcon && !isCamera && (
+                     <IconButton
+                        aria-label={"turn-off-mic-icon"}
+                        size="medium"
+                        onClick={handleCloseDevice}
+                     >
+                        <MicOffIcon fontSize="inherit" />
+                     </IconButton>
+                  )}
+                  {isCamera && (
+                     <CameraControlButtons localStream={localStream} />
+                  )}
+               </Box>
             </>
          ) : (
             <Box sx={styles.container}>
@@ -339,6 +367,217 @@ const DeviceSelect = ({
          )}
       </Box>
    )
+}
+
+type CameraControlButtonsProps = {
+   localStream: LocalStream
+}
+
+const CameraControlButtons = ({ localStream }: CameraControlButtonsProps) => {
+   const {
+      isBlurLoading,
+      isBlurEnabled,
+      hasErrored,
+      backgroundImage,
+      isBackgroundImageLoading,
+   } = useSelector(videoOptionsSelector)
+   const {
+      clearBackgroundEffects,
+      setBackgroundBlurring,
+      checkCompatibility,
+      setBackgroundImage,
+   } = useVirtualBackgroundActions(localStream)
+
+   const isBackgroundImageEnabled = backgroundImage && !isBackgroundImageLoading
+
+   const deviceIsCompatible = useMemo(() => {
+      return !hasErrored && checkCompatibility()
+   }, [checkCompatibility, hasErrored])
+
+   const toggleBlur = useCallback(() => {
+      if (isBlurLoading || isBackgroundImageLoading) return
+
+      if (isBlurEnabled) {
+         void clearBackgroundEffects()
+      } else {
+         void setBackgroundBlurring()
+      }
+   }, [
+      clearBackgroundEffects,
+      isBackgroundImageLoading,
+      isBlurEnabled,
+      isBlurLoading,
+      setBackgroundBlurring,
+   ])
+
+   const toggleBackgroundImage = useCallback(
+      (imageUrl = undefined) => {
+         if (isBackgroundImageLoading || isBlurLoading) return
+
+         if (isBackgroundImageEnabled) {
+            void clearBackgroundEffects()
+         } else {
+            if (imageUrl && typeof imageUrl === "string") {
+               void setBackgroundImage(imageUrl)
+            }
+         }
+      },
+      [
+         clearBackgroundEffects,
+         isBackgroundImageEnabled,
+         isBackgroundImageLoading,
+         isBlurLoading,
+         setBackgroundImage,
+      ]
+   )
+
+   return (
+      <>
+         <LoadingIconButton
+            tooltipTitle={getButtonTooltip(
+               "blur",
+               isBlurEnabled,
+               isBlurLoading,
+               deviceIsCompatible
+            )}
+            isLoading={isBlurLoading}
+            onClickHandler={toggleBlur}
+            disabled={!deviceIsCompatible}
+            disabledChildren={<BlurOffIcon />}
+         >
+            <BlurOnIcon color={isBlurEnabled ? "primary" : undefined} />
+         </LoadingIconButton>
+
+         <LoadingIconButton
+            tooltipTitle={getButtonTooltip(
+               "image",
+               isBackgroundImageEnabled,
+               isBackgroundImageLoading,
+               deviceIsCompatible
+            )}
+            isLoading={isBackgroundImageLoading}
+            onClickHandler={
+               isBackgroundImageEnabled ? toggleBackgroundImage : undefined
+            }
+            disabled={!deviceIsCompatible}
+            disabledChildren={<HideImageIcon />}
+         >
+            {isBackgroundImageEnabled && <ImageIcon color={"primary"} />}
+
+            {!isBackgroundImageEnabled && (
+               <ImageUpload onImageUploadFinished={toggleBackgroundImage}>
+                  <ImageIcon />
+               </ImageUpload>
+            )}
+         </LoadingIconButton>
+      </>
+   )
+}
+
+const ImageUpload = ({ children, onImageUploadFinished }) => {
+   const { errorNotification } = useSnackbarNotifications()
+
+   const handleFilePickerError = useCallback(
+      (errMsg) => {
+         errorNotification(errMsg)
+      },
+      [errorNotification]
+   )
+
+   const handleFilePickerChange = useCallback(
+      (fileObject) => {
+         uploadLogo(
+            "stream-background-images",
+            fileObject,
+            firebaseServiceInstance,
+            (newUrl) => {
+               onImageUploadFinished(newUrl)
+            },
+            () => {},
+            (error) => {
+               errorNotification(
+                  error,
+                  "Failed to upload image, try to use a different image"
+               )
+            }
+         )
+      },
+      [errorNotification, onImageUploadFinished]
+   )
+
+   return (
+      <FilePickerContainer
+         style={filePickerDivStyles}
+         extensions={["jpg", "jpeg", "png"]}
+         maxSize={5}
+         onError={handleFilePickerError}
+         onChange={handleFilePickerChange}
+      >
+         {children}
+      </FilePickerContainer>
+   )
+}
+
+// fix to make the button round again
+const filePickerDivStyles = { height: "21px" }
+
+type LoadingIconButtonProps = {
+   isLoading: boolean
+   children: ReactNode
+   tooltipTitle: string
+   onClickHandler?: () => void
+   disabledChildren?: ReactNode
+   disabled?: boolean
+}
+
+const LoadingIconButton = ({
+   isLoading,
+   children,
+   tooltipTitle,
+   onClickHandler,
+   disabledChildren,
+   disabled,
+}: LoadingIconButtonProps) => {
+   let body = children
+   if (isLoading) {
+      body = <CircularProgress color="inherit" size={21} />
+   }
+
+   if (disabled && disabledChildren) {
+      body = disabledChildren
+   }
+
+   return (
+      <Tooltip title={tooltipTitle}>
+         <Box sx={styles.iconButtonSpan}>
+            <IconButton
+               onClick={onClickHandler}
+               disabled={disabled}
+               disableRipple={isLoading}
+            >
+               {body}
+            </IconButton>
+         </Box>
+      </Tooltip>
+   )
+}
+
+function getButtonTooltip(
+   type: "blur" | "image",
+   isEnabled,
+   isLoading,
+   deviceIsCompatible
+) {
+   if (!deviceIsCompatible) {
+      return `Your browser doesn't support the background ${type} functionality`
+   }
+   const suffix = `Background ${capitalize(type)}`
+
+   if (isLoading) {
+      return `Loading ${suffix}`
+   }
+
+   return `${isEnabled ? "Disable" : "Enable"} ${suffix}`
 }
 
 export default DeviceSelect

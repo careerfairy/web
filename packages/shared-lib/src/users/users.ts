@@ -15,19 +15,14 @@ import {
 } from "../livestreams"
 import { Job } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
+import { FieldOfStudy, LevelOfStudy } from "../fieldOfStudy"
 
 export interface UserData extends Identifiable {
    authId: string
    firstName: string
    lastName: string
-   fieldOfStudy?: {
-      name: string
-      id: string
-   }
-   levelOfStudy?: {
-      name: string
-      id: string
-   }
+   fieldOfStudy?: FieldOfStudy
+   levelOfStudy?: LevelOfStudy
    university: {
       code: string
       name: string
@@ -304,3 +299,14 @@ export type AdminGroupsClaim = Record<
       role: GROUP_DASHBOARD_ROLE
    }
 >
+
+export type IUserReminder = {
+   complete: boolean
+   notBeforeThan?: Date
+   type: UserReminderType
+   isFirstReminder?: boolean
+}
+
+export enum UserReminderType {
+   NewsletterReminder = "NewsletterReminder",
+}
