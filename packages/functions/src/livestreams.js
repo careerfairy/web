@@ -67,7 +67,7 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
                         description: "Join the event now!",
                         organizer: {
                            name: "CareerFairy",
-                           mailto: "noreply@careerfairy.io",
+                           email: "noreply@careerfairy.io",
                         },
                         url: linkWithUTM,
                      },
