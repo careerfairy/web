@@ -138,7 +138,7 @@ export class LivestreamPresenter extends BaseModel {
     */
    elapsedMinutesSinceStart(): number {
       let start = this.start
-      if ("parentLivestream" in this) {
+      if (this.parentLivestream) {
          // breakout room support
          start = dateFromFirebaseTimestamp(this["parentLivestream"].start)
       }
