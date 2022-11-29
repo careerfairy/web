@@ -22,6 +22,7 @@ const FooterV2 = ({
             sx,
             bottom && { mt: "auto" },
          ]}
+         id="page-footer"
       >
          <Container
             sx={(theme) => ({
