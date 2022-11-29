@@ -4,6 +4,7 @@ import { sxStyles } from "../../../types/commonTypes"
 import { quoteBackgroundLightPink } from "../../../constants/images"
 import { Person } from "../../../types/cmsTypes"
 import React, { useCallback } from "react"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 type Props = {
    title: string
@@ -15,10 +16,6 @@ type Props = {
 const styles = sxStyles({
    stars: {
       color: (theme) => theme.palette.primary.main,
-   },
-   wrapper: {
-      maxWidth: { xs: "80vw", lg: "60vw" },
-      height: "fit-content",
    },
    background: {
       paddingY: 10,
@@ -42,6 +39,7 @@ const Testimonial = ({
    person,
 }: Props): JSX.Element => {
    const isQuote = title && !content && !rating
+   const isMobile = useIsMobile()
 
    const renderQuote = useCallback(() => {
       const { name, role, photo } = person
@@ -54,11 +52,13 @@ const Testimonial = ({
                   fontSize={"100px !important"}
                   lineHeight={0}
                >{`"`}</Typography>
-               <Typography variant="h2" lineHeight={1.5} textAlign="center">
-                  I love watching live streams, especially seeing people from
-                  other teams, not just recruiters. It helped me to choose the
-                  best companies I applied to work for. I am pretty confident
-                  one of them will hire me.{" "}
+               <Typography
+                  variant={isMobile ? "h4" : "h2"}
+                  lineHeight={1.5}
+                  textAlign="center"
+                  pb={2}
+               >
+                  {title}
                </Typography>
                <Typography
                   variant="h1"
@@ -73,13 +73,17 @@ const Testimonial = ({
                   alt={`${name} avatar`}
                   sx={styles.avatar}
                />
-               <Typography variant="h4" ml={2} alignSelf="end">
+               <Typography
+                  variant={isMobile ? "h6" : "h4"}
+                  ml={2}
+                  alignSelf="end"
+               >
                   {name}, {role}
                </Typography>
             </Box>
          </>
       )
-   }, [person])
+   }, [isMobile, person, title])
 
    const renderSimpleTestimonial = useCallback(() => {
       return (
@@ -121,10 +125,17 @@ const Testimonial = ({
             ...styles.background,
             height: isQuote
                ? { xs: "100%", xl: "60vh" }
-               : { xs: "100%", md: "60vh" },
+               : { xs: "100%", md: "70vh" },
          }}
       >
-         <Box sx={styles.wrapper}>
+         <Box
+            sx={{
+               height: "fit-content",
+               maxWidth: isQuote
+                  ? { xs: "80vw", md: "70vw" }
+                  : { xs: "80vw", md: "60vw", lg: "50vw" },
+            }}
+         >
             {isQuote ? renderQuote() : renderSimpleTestimonial()}
          </Box>
       </Box>
