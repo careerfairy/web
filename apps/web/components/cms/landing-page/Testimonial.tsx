@@ -132,7 +132,7 @@ const Testimonial = ({
             sx={{
                height: "fit-content",
                maxWidth: isQuote
-                  ? { xs: "80vw", md: "70vw" }
+                  ? { xs: "80vw", md: "70vw", xl: "60vw" }
                   : { xs: "80vw", md: "60vw", lg: "50vw" },
             }}
          >
