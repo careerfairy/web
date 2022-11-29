@@ -210,12 +210,15 @@ const EventPreviewCard = ({
    location = ImpressionLocation.unknown,
 }: EventPreviewCardProps) => {
    const mobile = useMediaQuery("(max-width:700px)")
+   const isPlaceholderEvent = event?.id.includes("placeholderEvent")
+
    const ref = useTrackLivestreamImpressions({
       event,
       isRecommended,
       positionInResults: index,
       numberOfResults: totalElements,
       location,
+      disableTracking: isPlaceholderEvent,
    })
    const { query, push, pathname } = useRouter()
    const getStartDate = () => event?.startDate || event?.start?.toDate?.()
@@ -227,7 +230,6 @@ const EventPreviewCard = ({
    const isOnMarketingLandingPage = pathname.includes(
       MARKETING_LANDING_PAGE_PATH
    )
-   const isPlaceholderEvent = event?.id.includes("placeholderEvent")
    const { formCompleted: marketingFormCompleted, setSelectedEventId } =
       useMarketingLandingPage()
 
