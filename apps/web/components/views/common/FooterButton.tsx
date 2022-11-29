@@ -38,9 +38,15 @@ const FooterButton = ({
    }, [showButton])
 
    const checkShowButton = useCallback(() => {
-      if (showButton && window.scrollY >= 4000) {
+      const footerElement = document.getElementById("page-footer")
+
+      if (showButton && window.scrollY >= footerElement.offsetTop - 800) {
          setShowButton(false)
-      } else if (!showButton && window.scrollY > 600 && window.scrollY < 4000) {
+      } else if (
+         !showButton &&
+         window.scrollY > 600 &&
+         window.scrollY < footerElement.offsetTop - 800
+      ) {
          setShowButton(true)
       } else if (showButton && window.scrollY <= 600) {
          setShowButton(false)
