@@ -20,6 +20,7 @@ type Props = {
    isRecommended?: boolean
    event?: LivestreamEvent
    location: ImpressionLocation
+   disableTracking?: boolean
 }
 const useTrackLivestreamImpressions = ({
    event,
@@ -27,6 +28,7 @@ const useTrackLivestreamImpressions = ({
    positionInResults,
    isRecommended,
    location = ImpressionLocation.unknown,
+   disableTracking,
 }: Props) => {
    const { pathname, asPath } = useRouter()
    const { userData } = useAuth()
@@ -63,6 +65,7 @@ const useTrackLivestreamImpressions = ({
       triggerOnce: true, // only ever trigger once per element
       threshold: 0.5, // At least 50% of the element must be visible
       delay: 1000, // Element must be at least visible for 1 second before triggering
+      skip: disableTracking || !event,
       onChange: (inView) => {
          if (inView && event) {
             // Fire a tracking event to your tracking service of choice.
