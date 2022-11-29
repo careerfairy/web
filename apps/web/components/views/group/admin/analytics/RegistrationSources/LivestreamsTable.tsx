@@ -107,9 +107,15 @@ type PercentageTablesProps = {
 }
 
 const tableStyles = sxStyles({
-   cell: { borderBottom: 0, paddingBottom: 1 },
-   nameCell: { borderBottom: 0, paddingBottom: 1, textAlign: "right" },
-   progressCell: { width: "50%", borderBottom: 0, paddingBottom: 1 },
+   cell: { borderBottom: 0, paddingBottom: 1, width: 40, textAlign: "center" },
+   nameCell: {
+      borderBottom: 0,
+      paddingBottom: 1,
+      textAlign: "right",
+      minWidth: 185,
+      maxWidth: 185,
+   },
+   progressCell: { minWidth: 100, borderBottom: 0, paddingBottom: 1 },
 })
 
 const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
@@ -123,9 +129,18 @@ const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
             {stats.map((entry, i) => (
                <TableRow key={i} sx={{ marginBottom: 1 }}>
                   <TableCell sx={tableStyles.nameCell}>
-                     <Typography pr={2} variant="body2" color="text.secondary">
-                        {entry.source.displayName}
-                     </Typography>
+                     <Tooltip
+                        title={entry.source.helpDescription}
+                        placement="bottom"
+                     >
+                        <Typography
+                           pr={2}
+                           variant="body2"
+                           color="text.secondary"
+                        >
+                           {entry.source.displayName}
+                        </Typography>
+                     </Tooltip>
                   </TableCell>
                   <TableCell sx={tableStyles.progressCell}>
                      <ProgressBar source={entry} />
