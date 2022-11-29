@@ -22,8 +22,8 @@ export const VALID_SOURCES: RegistrationSource[] = [
       color: "#C13584",
       match: (utms) => {
          // e.g unicc-ch-newsletter, unicc_ch_newsletter
-         const matchSource = /[a-z]{2}[-_]newsletter$/gi.test(utms?.utm_source)
-         const matchMedium = /email/gi.test(utms?.utm_medium)
+         const matchSource = /[a-z]{2}[-_]newsletter$/i.test(utms?.utm_source)
+         const matchMedium = /email/i.test(utms?.utm_medium)
 
          return matchSource && matchMedium
       },
@@ -35,10 +35,10 @@ export const VALID_SOURCES: RegistrationSource[] = [
       match: (utms) => {
          // e.g unicc_de, student_assoc_ch, unicc-ch
          const matchSource =
-            /student_assoc[_-][a-z]{2}|unicc[_-][a-z]{2}/gi.test(
+            /student_assoc[_-][a-z]{2}|unicc[_-][a-z]{2}/i.test(
                utms?.utm_source
             )
-         const matchMedium = /email/gi.test(utms?.utm_medium)
+         const matchMedium = /email/i.test(utms?.utm_medium)
 
          return matchSource && matchMedium
       },
@@ -49,8 +49,8 @@ export const VALID_SOURCES: RegistrationSource[] = [
          "User registered through a campaign inside our Platform.",
       color: "#FFC34F",
       match: (utms) => {
-         const matchSource = /^email$/gi.test(utms?.utm_source)
-         const matchMedium = /^careerfairy$/gi.test(utms?.utm_medium)
+         const matchSource = /^email$/i.test(utms?.utm_source)
+         const matchMedium = /^careerfairy$/i.test(utms?.utm_medium)
 
          return matchSource && matchMedium
       },
@@ -61,7 +61,7 @@ export const VALID_SOURCES: RegistrationSource[] = [
          "User registered through a social media ad (Facebook, Instagram, etc).",
       color: "#4267B2",
       match: matchAnyUtmParam(
-         /instagram|facebook|meta|twitter|linkedin|tiktok/gi
+         /instagram|facebook|meta|twitter|linkedin|tiktok/i
       ),
    },
    {
