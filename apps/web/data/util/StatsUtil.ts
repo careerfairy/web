@@ -32,7 +32,7 @@ export default class StatsUtil {
       groupQuestions: GroupQuestion[]
    ): CSVDownloadUserData[] {
       return users
-         .map((data) => {
+         ?.map((data) => {
             const otherCustomUniversityCategories = Object.keys(
                targetStream.groupQuestionsMap || {}
             ).reduce<
