@@ -451,6 +451,7 @@ export const mapFirestoreAdminSnapshots = <T>(
 /**
  * Add parentheses to offset in a date string
  * 1 May 2018 at 14:44 WEST => 1 May 2018 at 14:44 (WEST)
+ * November 30, 2022, 11:15 AM GMT => November 30, 2022, 11:15 AM (GMT)
  *
  * This implementation is fragile and doesn't support multiple locales
  * (the format of the date changes)
@@ -460,11 +461,20 @@ export const mapFirestoreAdminSnapshots = <T>(
 export const dateFormatOffset = (dateString: string) => {
    if (!dateString) return dateString
 
+   const matchingExpressions = [
+      /(.*, \d{2}:\d{2} [AP]M) (.+)$/,
+      /(.* at \d{2}:\d{2}) (.+)$/,
+   ]
+
    try {
-      // capture the offset from the date string
-      const matches = dateString.match(/(.* at \d{2}:\d{2}) (\w+)$/)
-      if (matches?.length > 2) {
-         return `${matches[1]} (${matches[2]})`
+      for (const regex of matchingExpressions) {
+         if (regex.test(dateString)) {
+            // capture the offset from the date string
+            const matches = dateString.match(regex)
+            if (matches?.length > 2) {
+               return `${matches[1]} (${matches[2]})`
+            }
+         }
       }
    } catch (e) {
       console.error(e)
