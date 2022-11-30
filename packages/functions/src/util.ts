@@ -48,7 +48,8 @@ export const generateReminderEmailData = (
       zone: timezone || "Europe/Zurich",
    })
 
-   const formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+   let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+   formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
 
    const dateToDelivery = minutesToRemindBefore
       ? luxonStartDate.minus({ minutes: minutesToRemindBefore }).toRFC2822()
@@ -446,3 +447,28 @@ export const mapFirestoreAdminSnapshots = <T>(
       const id = doc.id
       return { id, ...data } as T
    })
+
+/**
+ * Add parentheses to offset in a date string
+ * 1 May 2018 at 14:44 WEST => 1 May 2018 at 14:44 (WEST)
+ *
+ * This implementation is fragile and doesn't support multiple locales
+ * (the format of the date changes)
+ *
+ * @param dateString
+ */
+export const dateFormatOffset = (dateString: string) => {
+   if (!dateString) return dateString
+
+   try {
+      // capture the offset from the date string
+      const matches = dateString.match(/(.* at \d{2}:\d{2}) (\w+)$/)
+      if (matches?.length > 2) {
+         return `${matches[1]} (${matches[2]})`
+      }
+   } catch (e) {
+      console.error(e)
+   }
+
+   return dateString
+}
