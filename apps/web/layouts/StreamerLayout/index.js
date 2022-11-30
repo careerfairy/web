@@ -26,6 +26,7 @@ import RTCProvider from "../../context/agora/RTCProvider"
 import isEqual from "react-fast-compare"
 import { LEFT_MENU_WIDTH } from "../../constants/streams"
 import { dataLayerEvent } from "../../util/analyticsUtils"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const useStyles = makeStyles((theme) => ({
    "& ::-webkit-scrollbar": {
@@ -233,6 +234,9 @@ const StreamerLayout = (props) => {
          isStreamer: true,
          streamerId,
          isMobile: undefined,
+         presenter: currentLivestream
+            ? LivestreamPresenter.createFromDocument(currentLivestream)
+            : null,
       }),
       [currentLivestream, isBreakout, isMainStreamer, selectedState, streamerId]
    )

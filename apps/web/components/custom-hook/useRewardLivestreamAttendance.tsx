@@ -11,8 +11,9 @@ import {
    RewardActions,
 } from "@careerfairy/shared-lib/dist/rewards"
 import { useAuth } from "../../HOCs/AuthProvider"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
-const useRewardLivestreamAttendance = (livestreamData) => {
+const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
    const { isLoggedIn } = useAuth()
    const [invite] = useLocalStorage(localStorageInvite, null, { raw: true })
    const [referralCode] = useLocalStorage(localStorageReferralCode, "", {
@@ -26,23 +27,27 @@ const useRewardLivestreamAttendance = (livestreamData) => {
    )
    const firebaseService = useFirebaseService()
 
+   const mainStreamId = livestreamData?.parentLivestream
+      ? livestreamData.parentLivestream?.id
+      : livestreamData?.id
+
    useEffect(() => {
       if (
          !livestreamData ||
          !livestreamData?.hasStarted ||
-         livestreamData?.hasEnded
+         livestreamData?.hasEnded ||
+         !mainStreamId // We don't want to reward the attendance if there is no main stream to begin with
       ) {
-         return // do nothing, stream is not live
+         return // do nothing, the current stream you're in is not live
       }
 
       if (!isLoggedIn) {
          return // do nothing, no user to reward
       }
 
-      const isInvitation =
-         invite && referralCode && invite !== livestreamData.id
+      const isInvitation = invite && referralCode && invite !== mainStreamId
 
-      if (alreadyRewarded === livestreamData.id) {
+      if (alreadyRewarded === mainStreamId) {
          return // do nothing, user already has been rewarded
       }
 
@@ -78,17 +83,15 @@ const useRewardLivestreamAttendance = (livestreamData) => {
       alreadyRewarded,
       invite,
       referralCode,
+      mainStreamId,
    ])
 
    const reward = (isInvitation) => {
-      setAlreadyRewarded(livestreamData.id)
+      setAlreadyRewarded(mainStreamId)
       setStarted(null)
 
       firebaseService
-         .rewardUserAction(
-            RewardActions.LIVESTREAM_USER_ATTENDED,
-            livestreamData.id
-         )
+         .rewardUserAction(RewardActions.LIVESTREAM_USER_ATTENDED, mainStreamId)
          .then((r) => {
             console.log("User Attendance rewarded!")
          })
@@ -98,7 +101,7 @@ const useRewardLivestreamAttendance = (livestreamData) => {
 
       if (isInvitation) {
          firebaseService
-            .rewardLivestreamAttendance(livestreamData.id, referralCode)
+            .rewardLivestreamAttendance(mainStreamId, referralCode)
             .then((r) => {
                console.log("Participation rewarded!")
             })
