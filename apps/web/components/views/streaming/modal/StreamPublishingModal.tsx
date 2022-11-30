@@ -184,7 +184,7 @@ const StreamPublishingModal = ({
                            sx={{ m1: 1, mx: "auto" }}
                            endIcon={<OpenInNewIcon />}
                            href={
-                              "https://support.google.com/chrome/answer/2693767?hl=en&co=GENIE.Platform%3DDesktop#zippy=%2Cturn-on-permissions-in-computer-settings"
+                              "https://support.careerfairy.io/en/article/camera-and-microphone-issues-1oxpag9/"
                            }
                            target="_blank"
                            color="grey"
