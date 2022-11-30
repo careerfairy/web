@@ -122,7 +122,7 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    getMainStreamId(): string {
-      return this.parentLivestream.id || this.id
+      return this.parentLivestream?.id || this.id
    }
 
    isPast(): boolean {
