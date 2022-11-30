@@ -131,6 +131,8 @@ function SignUpUserForm() {
                         return
                      }
 
+                     dataLayerEvent("newsletter_denied_on_signup")
+
                      const sevenDaysFromNow = new Date(
                         new Date().setDate(new Date().getDate() + 7)
                      )
