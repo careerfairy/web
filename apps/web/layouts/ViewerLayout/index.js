@@ -35,6 +35,7 @@ import { LEFT_MENU_WIDTH } from "../../constants/streams"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import GroupsUtil from "../../data/util/GroupsUtil"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -343,6 +344,9 @@ const ViewerLayout = (props) => {
          handRaiseId,
          isMobile: mobile,
          selectedState,
+         presenter: currentLivestream
+            ? LivestreamPresenter.createFromDocument(currentLivestream)
+            : null,
       }),
       [
          currentLivestream,

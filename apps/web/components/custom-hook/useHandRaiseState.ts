@@ -10,13 +10,15 @@ import { HandRaise } from "types/handraise"
 import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 
 const useHandRaiseState = () => {
-   const { currentLivestream, handRaiseId } = useCurrentStream()
+   const { currentLivestream, handRaiseId, presenter } = useCurrentStream()
    const { authenticatedUser, userData } = useAuth()
    const prevHandRaiseState = useRef<HandRaise>(null)
 
    const streamRef = useStreamRef()
    const { createHandRaiseRequest, updateHandRaiseRequest, rewardUserAction } =
       useFirebaseService()
+
+   const mainStreamId = presenter?.getMainStreamId()
 
    const numberOfActiveHandRaises = useSelector(
       (state: RootState) =>
@@ -53,7 +55,7 @@ const useHandRaiseState = () => {
                   if (userData && state === "requested") {
                      rewardUserAction(
                         RewardActions.LIVESTREAM_USER_HAND_RAISED,
-                        currentLivestream.id
+                        mainStreamId
                      )
                         .then((_) => console.log("Rewarded Hand Raised"))
                         .catch(console.error)
@@ -71,6 +73,7 @@ const useHandRaiseState = () => {
             }
          },
          [
+            mainStreamId,
             currentLivestream.test,
             currentLivestream.openStream,
             authenticatedUser?.email,

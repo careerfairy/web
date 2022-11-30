@@ -108,7 +108,8 @@ const EmptyList = ({ isUpcoming }) => {
 const QuestionCategory = (props) => {
    const { selectedState, sliding, streamer, firebase, showMenu, isMobile } =
       props
-   const { currentLivestream: livestream } = useCurrentStream()
+   const { currentLivestream: livestream, presenter } = useCurrentStream()
+   const mainStreamId = presenter?.getMainStreamId()
    const theme = useTheme()
 
    const streamRef = useStreamRef()
@@ -252,10 +253,7 @@ const QuestionCategory = (props) => {
 
          if (userData) {
             firebase
-               .rewardUserAction(
-                  "LIVESTREAM_USER_ASKED_QUESTION",
-                  livestream.id
-               )
+               .rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", mainStreamId)
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
          }
