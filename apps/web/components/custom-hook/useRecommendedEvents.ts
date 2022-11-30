@@ -39,7 +39,7 @@ const useRecommendedEvents = (
          query(
             collection(firestore, "livestreams"),
             // query method does not accept where() clauses with an empty array, it will throw an error, so we provide an initial value that will be filtered out
-            where("id", "in", eventIds.length > 0 ? eventIds : [""])
+            where("id", "in", eventIds?.length > 0 ? eventIds : [""])
          ),
       [eventIds, firestore]
    )
