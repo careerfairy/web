@@ -220,11 +220,13 @@ const EmoteButtons = ({ createEmote }) => {
          if (!userData || !userData.isClapAdmin) {
             setIconsDisabled(true)
          }
-         firebase.postIcon(
-            livestreamId,
-            iconName,
-            authenticatedUser.email || TEST_EMAIL
-         )
+         firebase
+            .postIcon(
+               livestreamId,
+               iconName,
+               authenticatedUser.email || TEST_EMAIL
+            )
+            .catch(console.error)
       }
    }
    const enableIcons = useCallback(() => {
