@@ -720,12 +720,6 @@ const NewLivestreamForm = () => {
                                        errors,
                                        touched
                                     )}
-                                    avatarError={handleError(
-                                       key,
-                                       "avatar",
-                                       errors,
-                                       touched
-                                    )}
                                     getDownloadUrl={getDownloadUrl}
                                     loading={fetchingAvatars}
                                     speaker={values.speakers[key]}
