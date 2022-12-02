@@ -50,6 +50,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly isRecording: boolean,
       public readonly hasNoTalentPool: boolean,
       public readonly test: boolean,
+      public readonly openStream: boolean,
       public readonly registeredUsers: string[],
       public readonly hasStarted: boolean,
       public readonly hasEnded: boolean,
@@ -120,6 +121,10 @@ export class LivestreamPresenter extends BaseModel {
       return this.test
    }
 
+   getMainStreamId(): string {
+      return this.parentLivestream?.id || this.id
+   }
+
    isPast(): boolean {
       return (
          this.hasEnded ||
@@ -172,6 +177,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.isRecording ?? false,
          livestream.hasNoTalentPool ?? false,
          livestream.test ?? false,
+         livestream.openStream ?? false,
          livestream.registeredUsers ?? [],
          livestream.hasStarted ?? false,
          livestream.hasEnded ?? false,
@@ -232,6 +238,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.isRecording,
          livestream.hasNoTalentPool,
          livestream.test,
+         livestream.openStream,
          livestream.registeredUsers,
          livestream.hasStarted,
          livestream.hasEnded,
@@ -309,6 +316,7 @@ export class LivestreamPresenter extends BaseModel {
          isRecording: this.isRecording,
          hasNoTalentPool: this.hasNoTalentPool,
          test: this.test,
+         openStream: this.openStream,
          registeredUsers: this.registeredUsers,
          hasStarted: this.hasStarted,
          startDate: this.start,
