@@ -142,8 +142,9 @@ const ImageSelect = ({
             <Box
                className={classes.avatarRing}
                sx={{
-                  borderColor:
-                     error && `${theme.palette.error.main} !important`,
+                  borderColor: error
+                     ? `${theme.palette.error.main} !important`
+                     : "",
                }}
                boxShadow={3}
             >
