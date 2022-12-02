@@ -52,6 +52,26 @@ export interface LivestreamEvent extends Identifiable {
    mode?: LivestreamMode
 
    /**
+    * The maximum number of active hand raises there can be at any given time
+    * */
+   maxHandRaisers?: number
+
+   /**
+    * THis property is used to determine if we should dispatch the feedback toasts during the event
+    */
+   hasNoRatings?: boolean
+
+   /**
+    * An array of livestream Ids that should be rendered in a carousel at the end of the livestream
+    */
+   recommendedEventIds?: string[]
+
+   /**
+    * Which call to actions have been activated for this event
+    */
+   activeCallToActionIds?: string[]
+
+   /**
     * If true, the livestream can be attended anonymously
     * */
    openStream?: boolean

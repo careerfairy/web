@@ -389,7 +389,9 @@ async function validateLivestreamEvent(
    )) as LivestreamEvent
 
    if (!livestreamDoc) {
-      functions.logger.error("The livestream does not exist")
+      functions.logger.error("The livestream does not exist", {
+         livestreamId,
+      })
       throw new functions.https.HttpsError(
          "failed-precondition",
          "Something wrong happened"
@@ -405,7 +407,9 @@ async function validateLivestreamEvent(
       livestreamMustBeLive &&
       (!livestreamDoc.hasStarted || livestreamDoc.hasEnded)
    ) {
-      functions.logger.error("The livestream is not live or does not exist")
+      functions.logger.error("The livestream is not live or does not exist", {
+         livestreamDoc,
+      })
       throw new functions.https.HttpsError(
          "failed-precondition",
          "Something wrong happened"
@@ -417,7 +421,12 @@ async function validateLivestreamEvent(
       !livestreamDoc.registeredUsers?.includes(userMustBeRegistered)
    ) {
       functions.logger.error(
-         "The user is not registered in the livestream, someone trying to hack us?"
+         "The user is not registered in the livestream, someone trying to hack us?",
+         {
+            userMustBeRegistered,
+            livestreamDoc,
+            livestreamId,
+         }
       )
       throw new functions.https.HttpsError(
          "failed-precondition",
