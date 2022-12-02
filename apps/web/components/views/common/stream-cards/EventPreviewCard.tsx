@@ -316,13 +316,13 @@ const EventPreviewCard = ({
       loading,
    ])
 
-   const handleShareClick = () => {
+   const handleShareClick = useCallback(() => {
       openShareDialog?.(event)
-   }
+   }, [event, openShareDialog])
 
-   const onClickRegister = () => {
+   const onClickRegister = useCallback(() => {
       onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
-   }
+   }, [event, hasRegistered, hosts, onRegisterClick])
 
    const getHref = useCallback(() => {
       if (
@@ -347,6 +347,7 @@ const EventPreviewCard = ({
       authenticatedUser.email,
       event?.groupIds,
       event?.id,
+      event?.jobs?.length,
       groupId,
       isOnMarketingLandingPage,
       isPast,
@@ -358,6 +359,78 @@ const EventPreviewCard = ({
          setSelectedEventId(event?.id)
       }
    }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
+
+   const isLive = useMemo(
+      () => event?.hasStarted && !isPast,
+      [event?.hasStarted, isPast]
+   )
+
+   const renderButtons = useCallback(() => {
+      if (isLive) {
+         return (
+            <Button
+               sx={styles.btn}
+               component={Link}
+               /* @ts-ignore */
+               href={getHref()}
+               variant={"contained"}
+               color={"primary"}
+               size={"medium"}
+               onClick={handleDetailsClick}
+            >
+               Join event
+            </Button>
+         )
+      }
+
+      return (
+         <>
+            {onRegisterClick && !isPast && !isOnMarketingLandingPage && (
+               <Button
+                  sx={styles.btn}
+                  onClick={onClickRegister}
+                  variant={hasRegistered ? "outlined" : "contained"}
+                  color={hasRegistered ? "info" : "primary"}
+                  disabled={registering}
+                  size={"medium"}
+               >
+                  {hasRegistered
+                     ? "cancel"
+                     : mobile
+                     ? "attend"
+                     : "Attend Event"}
+               </Button>
+            )}
+
+            {!isPlaceholderEvent && (
+               <Button
+                  sx={styles.btn}
+                  component={Link}
+                  /* @ts-ignore */
+                  href={getHref()}
+                  variant={"contained"}
+                  color={"secondary"}
+                  size={"small"}
+                  onClick={handleDetailsClick}
+               >
+                  {mobile ? "details" : "see details"}
+               </Button>
+            )}
+         </>
+      )
+   }, [
+      getHref,
+      handleDetailsClick,
+      hasRegistered,
+      isLive,
+      isOnMarketingLandingPage,
+      isPast,
+      isPlaceholderEvent,
+      mobile,
+      onClickRegister,
+      onRegisterClick,
+      registering,
+   ])
 
    return (
       <>
@@ -448,7 +521,7 @@ const EventPreviewCard = ({
                            <ChipLabel
                               hasParticipated={hasParticipated}
                               isPast={isPast}
-                              hasStarted={event?.hasStarted}
+                              isLive={isLive}
                               hasRegistered={hasRegistered}
                            />
                         )}
@@ -532,46 +605,7 @@ const EventPreviewCard = ({
                               {event?.summary}
                            </Typography>
                            <Stack spacing={1} direction="row">
-                              {onRegisterClick &&
-                                 !isPast &&
-                                 !isOnMarketingLandingPage && (
-                                    <Button
-                                       sx={styles.btn}
-                                       onClick={onClickRegister}
-                                       variant={
-                                          hasRegistered
-                                             ? "outlined"
-                                             : "contained"
-                                       }
-                                       color={
-                                          hasRegistered ? "info" : "primary"
-                                       }
-                                       disabled={registering}
-                                       size={"medium"}
-                                    >
-                                       {hasRegistered
-                                          ? "cancel"
-                                          : mobile
-                                          ? "attend"
-                                          : "Attend Event"}
-                                    </Button>
-                                 )}
-
-                              {!isPlaceholderEvent && (
-                                 <Button
-                                    sx={styles.btn}
-                                    component={Link}
-                                    /*
-// @ts-ignore */
-                                    href={getHref()}
-                                    variant={"contained"}
-                                    color={"secondary"}
-                                    size={"small"}
-                                    onClick={handleDetailsClick}
-                                 >
-                                    {mobile ? "details" : "see details"}
-                                 </Button>
-                              )}
+                              {renderButtons()}
                            </Stack>
                         </>
                      )}
@@ -584,7 +618,7 @@ const EventPreviewCard = ({
    )
 }
 
-const ChipLabel = ({ hasStarted, isPast, hasParticipated, hasRegistered }) => {
+const ChipLabel = ({ isLive, isPast, hasParticipated, hasRegistered }) => {
    let ExtraChip = null
 
    if (hasParticipated && isPast) {
@@ -601,9 +635,7 @@ const ChipLabel = ({ hasStarted, isPast, hasParticipated, hasRegistered }) => {
 
    return (
       <>
-         {hasStarted && !isPast && (
-            <Chip icon={<LiveIcon />} color="error" label={"LIVE"} />
-         )}
+         {isLive && <Chip icon={<LiveIcon />} color="error" label={"LIVE"} />}
          {ExtraChip}
       </>
    )
