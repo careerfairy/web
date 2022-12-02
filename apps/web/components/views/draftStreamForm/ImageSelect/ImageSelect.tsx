@@ -139,7 +139,14 @@ const ImageSelect = ({
    const renderAvatar = (): JSX.Element => (
       <>
          <div className={classes.avaWrapper}>
-            <Box className={classes.avatarRing} boxShadow={3}>
+            <Box
+               className={classes.avatarRing}
+               sx={{
+                  borderColor:
+                     error && `${theme.palette.error.main} !important`,
+               }}
+               boxShadow={3}
+            >
                <Box
                   component={Avatar}
                   src={value}
@@ -155,7 +162,7 @@ const ImageSelect = ({
                   disabled={isSubmitting}
                   fullWidth={!buttonCentered}
                   style={{ marginTop: "0.5rem" }}
-                  color={error ? "secondary" : "primary"}
+                  color="primary"
                   variant={isButtonOutlined ? "outlined" : "contained"}
                   id="upButton"
                >
