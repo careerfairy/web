@@ -18,6 +18,7 @@ import {
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
    LivestreamPromotions,
+   LivestreamQuestion,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -1074,6 +1075,13 @@ class FirebaseService {
       return streamRef.collection("questions").where("type", "==", "done")
    }
 
+   deleteLivestreamQuestion = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      questionId: string
+   ) => {
+      return streamRef.collection("questions").doc(questionId).delete()
+   }
+
    listenToLivestreamQuestions = (livestreamId, callback) => {
       let ref = this.firestore
          .collection("livestreams")
@@ -1196,10 +1204,16 @@ class FirebaseService {
       return ref.add(question)
    }
 
-   addLivestreamQuestion = (streamRef, question) => {
-      question.timestamp = firebase.firestore.Timestamp.fromDate(new Date())
-      let ref = streamRef.collection("questions")
-      return ref.add(question)
+   addLivestreamQuestion = (
+      streamRef,
+      question: Omit<LivestreamQuestion, "id" | "timestamp">
+   ) => {
+      const ref = streamRef.collection("questions")
+      const addQuestionData: Omit<LivestreamQuestion, "id"> = {
+         ...question,
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+      }
+      return ref.add(addQuestionData)
    }
 
    upvoteLivestreamQuestion = (livestreamId, question, userEmail) => {

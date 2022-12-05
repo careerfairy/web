@@ -16,6 +16,7 @@ import {
    Card,
    CircularProgress,
    Collapse,
+   IconButton,
    Paper,
    Slide,
    TextField,
@@ -31,14 +32,19 @@ import {
 import TutorialContext from "context/tutorials/TutorialContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import useStreamRef from "../../../../custom-hook/useStreamRef"
-import { useCurrentStream } from "../../../../../context/stream/StreamContext"
+import {
+   CurrentStreamContextInterface,
+   useCurrentStream,
+} from "../../../../../context/stream/StreamContext"
 import BadgeButton from "../../../common/BadgeButton"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import LinkifyText from "../../../../util/LinkifyText"
-import { FirebaseReducer } from "react-redux-firebase"
 import { LivestreamQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
+import Stack from "@mui/material/Stack"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { containsBadgeOrLevelsAbove } from "@careerfairy/shared-lib/dist/users/UserBadges"
 
 const styles = sxStyles({
    chatInput: {
@@ -101,26 +107,31 @@ const styles = sxStyles({
    showTextActive: {
       color: "rgb(200,200,200)",
    },
-   upVotes: {
-      position: "absolute",
+   topContainer: {
+      // display: "flex",
+      // justifyContent: "space-between",
+      // flexDirection: "row-reverse",
+      // alignItems: "center",
       top: 10,
+      left: 10,
       right: 10,
+      // border: "2px solid pink",
+      position: "absolute",
+   },
+   deleteButton: {},
+   upVotes: {
       fontSize: "1.2em",
       display: "inline-block",
-      margin: "0 0 0 30px",
       fontWeight: 700,
       color: "primary.main",
+      marginRight: "auto !important",
    },
    upVotesActive: {
       color: "white",
    },
    badge: {
-      position: "absolute",
-      top: 10,
-      left: 0,
       fontSize: "1.2em",
       display: "inline-block",
-      margin: "0 0 0 10px",
       fontWeight: 700,
       color: "primary.main",
    },
@@ -180,16 +191,17 @@ const ReactionsToggle = ({
 type QuestionContainerProps = {
    sessionUuid: string
    sliding: boolean
-   user: FirebaseReducer.AuthState
+   user: UserData
    streamer: boolean
    question: LivestreamQuestion
    index: number
    isNextQuestions: boolean
-   selectedState: string
+   selectedState: CurrentStreamContextInterface["selectedState"]
    goToThisQuestion: (questionId: string) => Promise<void>
    setOpenQuestionId: React.Dispatch<React.SetStateAction<string>>
    openQuestionId: string
    showMenu: boolean
+   setQuestionIdToDelete: React.Dispatch<React.SetStateAction<string>>
 }
 
 const QuestionContainer = ({
@@ -205,10 +217,8 @@ const QuestionContainer = ({
    setOpenQuestionId,
    openQuestionId,
    showMenu,
+   setQuestionIdToDelete,
 }: QuestionContainerProps) => {
-   console.count(
-      `Question ${question.id} rendered ${isNextQuestions ? "next" : "current"}`
-   )
    const firebase = useFirebaseService()
    const streamRef = useStreamRef()
    const { currentLivestream: livestream, isBreakout } = useCurrentStream()
@@ -234,6 +244,10 @@ const QuestionContainer = ({
                  : authenticatedUser.email
            ) > -1
          : false)
+
+   const canDeleteQuestion = Boolean(
+      streamer || user?.userEmail === question?.author || user?.isAdmin
+   )
 
    useEffect(() => {
       if (livestream.id && question.id && showAllReactions) {
@@ -415,46 +429,67 @@ const QuestionContainer = ({
             ]}
          >
             <div style={{ padding: "20px 20px 5px 20px" }}>
-               {containsBadgeOrLevelsAbove(
-                  question?.badges,
-                  UserPresenter.questionsHighlightedRequiredBadge()
-               ) && (
-                  <Box sx={[styles.badge, active && styles.badgeActive]}>
-                     <BadgeButton
-                        badge={UserPresenter.questionsHighlightedRequiredBadge()}
-                        showBadgeSuffix={false}
-                        onlyIcon
-                        activeTooltip={(badge) =>
-                           `${badge.name} Level ${badge.level} Badge`
-                        }
-                        buttonProps={{
-                           color: "gold",
-                           size: "small",
-                           variant: "contained",
-                           sx: {
-                              minWidth: "30px",
-                              width: "30px",
-                              height: "30px",
-                              borderRadius: "100%",
-                              padding: 0,
-                           },
-                        }}
-                        badgeIconProps={{
-                           noBg: true,
-                        }}
+               <Stack
+                  direction={"row-reverse"}
+                  justifyContent={"space-between"}
+                  alignItems={"center"}
+                  spacing={2}
+                  sx={styles.topContainer}
+               >
+                  {canDeleteQuestion && (
+                     <Box sx={styles.deleteButton}>
+                        <IconButton
+                           size={"small"}
+                           onClick={() => {
+                              setQuestionIdToDelete(question.id)
+                           }}
+                        >
+                           <DeleteForeverIcon />
+                        </IconButton>
+                     </Box>
+                  )}
+                  <Box sx={[styles.upVotes, active && styles.upVotesActive]}>
+                     <span data-testid={"streaming-question-votes"}>
+                        {question.votes}
+                     </span>
+                     <ThumbUpRoundedIcon
+                        color="inherit"
+                        style={{ verticalAlign: "text-top" }}
+                        fontSize="small"
                      />
                   </Box>
-               )}
-               <Box sx={[styles.upVotes, active && styles.upVotesActive]}>
-                  <span data-testid={"streaming-question-votes"}>
-                     {question.votes}
-                  </span>
-                  <ThumbUpRoundedIcon
-                     color="inherit"
-                     style={{ verticalAlign: "text-top" }}
-                     fontSize="small"
-                  />
-               </Box>
+                  {containsBadgeOrLevelsAbove(
+                     question?.badges,
+                     UserPresenter.questionsHighlightedRequiredBadge()
+                  ) && (
+                     <Box sx={[styles.badge, active && styles.badgeActive]}>
+                        <BadgeButton
+                           badge={UserPresenter.questionsHighlightedRequiredBadge()}
+                           showBadgeSuffix={false}
+                           onlyIcon
+                           activeTooltip={(badge) =>
+                              `${badge.name} Level ${badge.level} Badge`
+                           }
+                           buttonProps={{
+                              color: "gold",
+                              size: "small",
+                              variant: "contained",
+                              sx: {
+                                 minWidth: "30px",
+                                 width: "30px",
+                                 height: "30px",
+                                 borderRadius: "100%",
+                                 padding: 0,
+                                 boxShadow: "default",
+                              },
+                           }}
+                           badgeIconProps={{
+                              noBg: true,
+                           }}
+                        />
+                     </Box>
+                  )}
+               </Stack>
                <Box
                   sx={[
                      styles.reactionsQuestion,
@@ -606,7 +641,7 @@ const QuestionContainer = ({
                   {!livestream.test &&
                   question.emailOfVoters &&
                   user &&
-                  question.emailOfVoters.indexOf(user.email) > -1 ? (
+                  question.emailOfVoters.indexOf(user.userEmail) > -1 ? (
                      <span>UPVOTED!</span>
                   ) : (
                      <span>UPVOTE</span>
@@ -616,22 +651,6 @@ const QuestionContainer = ({
          </Paper>
       </WhiteTooltip>
    )
-}
-
-// Temporary function while this file isn't converted into TS
-// reuse UserBadges.ts version at that time
-const containsBadgeOrLevelsAbove = (badges: string[], badge: Badge) => {
-   if (!badges) return false
-
-   let curr = badge
-
-   while (curr) {
-      if (badges.includes(curr.key)) {
-         return true
-      }
-      curr = curr.next
-   }
-   return false
 }
 
 export default memo(QuestionContainer)

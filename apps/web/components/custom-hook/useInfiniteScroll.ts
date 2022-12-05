@@ -1,9 +1,13 @@
 import { useEffect, useState } from "react"
 
-const useInfiniteScroll = (query, limit = 3, loadAdditional = 0) => {
+const useInfiniteScroll = <TData>(
+   query,
+   limit = 3,
+   loadAdditional = 0
+): readonly [TData[], () => void, boolean, TData[]] => {
    const [hasMore, setHasMore] = useState(true)
-   const [items, setItems] = useState([])
-   const [totalItems, setTotalItems] = useState([])
+   const [items, setItems] = useState<TData[]>([])
+   const [totalItems, setTotalItems] = useState<TData[]>([])
    const [end, setEnd] = useState(limit)
 
    useEffect(() => {
@@ -29,13 +33,14 @@ const useInfiniteScroll = (query, limit = 3, loadAdditional = 0) => {
    }, [])
 
    const getMore = () => {
+      console.log("getting MORE")
       const stillMore = Boolean(totalItems.length > items.length)
       if (stillMore) {
          setEnd((prevState) => prevState + (limit + loadAdditional))
       }
    }
 
-   return [items, getMore, hasMore, totalItems]
+   return [items, getMore, hasMore, totalItems] as const
 }
 
 export default useInfiniteScroll

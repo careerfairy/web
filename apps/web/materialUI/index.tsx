@@ -23,6 +23,7 @@ interface CustomThemeProps {
       grey_5_15?: string
       primary_5_15_50?: string
       dark_12_13?: string
+      gold_5_15_50?: string
    }
    dropShadows?: {
       // color_y_blur_opacity
@@ -38,6 +39,7 @@ declare module "@mui/styles/defaultTheme" {
 declare module "@mui/material/Button" {
    interface ButtonPropsColorOverrides {
       grey: true
+      gold: true
    }
 }
 
@@ -103,6 +105,13 @@ const tertiary: PaletteColorOptions = {
    gradient: "#f5f5f5",
 }
 
+const gold: PaletteColorOptions = {
+   main: "#FFC34F",
+   contrastText: "#FFFFFF",
+   dark: "#FFC34F",
+   light: "#FFC34F",
+}
+
 const black = "#000000"
 const white = "#FFFFFF"
 
@@ -138,9 +147,7 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
             main: "#2C4251",
             contrastText: "#FFFFFF",
          },
-         gold: {
-            main: "#FFC34F",
-         },
+         gold,
          info: {
             ...(mode === "light"
                ? {
@@ -189,6 +196,10 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          )}`,
          primary_5_15_50: `0px 5px 15px ${alpha(
             mode === "light" ? primary.main : primary.dark,
+            mode === "light" ? 0.5 : 0.2
+         )}`,
+         gold_5_15_50: `0px 5px 15px ${alpha(
+            mode === "light" ? gold.main : gold.dark,
             mode === "light" ? 0.5 : 0.2
          )}`,
       },
@@ -379,14 +390,6 @@ const getComponents = (theme: DefaultTheme): Components => ({
          {
             props: {
                variant: "contained",
-            },
-            style: {
-               boxShadow: theme.boxShadows.primary_5_15_50,
-            },
-         },
-         {
-            props: {
-               variant: "contained",
                color: "primary",
             },
             style: {
@@ -452,6 +455,14 @@ const getComponents = (theme: DefaultTheme): Components => ({
                      theme.palette.action.hoverOpacity
                   ),
                },
+            },
+         },
+         {
+            props: { color: "gold", variant: "contained" },
+            style: {
+               color: theme.palette.text.primary,
+               backgroundColor: theme.palette.gold.main,
+               boxShadow: theme.boxShadows.gold_5_15_50,
             },
          },
       ],

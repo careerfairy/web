@@ -340,6 +340,8 @@ export interface LivestreamQuestion extends Identifiable {
     * The number of badges the question has
     * */
    badges: string[]
+
+   displayName?: string
 }
 
 export interface LivestreamPoll extends Identifiable {
