@@ -216,6 +216,13 @@ class FirebaseService {
       return sendBasicTemplateEmail(dataObj)
    }
 
+   sendPostmarkWelcomeEmail = async (userData) => {
+      const sendPostmarkWelcomeEmail = this.functions.httpsCallable(
+         "sendPostmarkWelcomeEmail"
+      )
+      return sendPostmarkWelcomeEmail(userData)
+   }
+
    /**
     * Call an on call cloud function to generate a secure agora token.
     * @param {({
