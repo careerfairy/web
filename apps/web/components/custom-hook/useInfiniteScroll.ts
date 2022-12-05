@@ -33,7 +33,6 @@ const useInfiniteScroll = <TData>(
    }, [])
 
    const getMore = () => {
-      console.log("getting MORE")
       const stillMore = Boolean(totalItems.length > items.length)
       if (stillMore) {
          setEnd((prevState) => prevState + (limit + loadAdditional))

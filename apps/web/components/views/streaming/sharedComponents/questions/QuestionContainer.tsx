@@ -117,13 +117,15 @@ const styles = sxStyles({
       // border: "2px solid pink",
       position: "absolute",
    },
-   deleteButton: {},
+   deleteButton: {
+      marginLeft: "auto !important",
+   },
    upVotes: {
       fontSize: "1.2em",
       display: "inline-block",
       fontWeight: 700,
       color: "primary.main",
-      marginRight: "auto !important",
+      // marginRight: "auto !important",
    },
    upVotesActive: {
       color: "white",

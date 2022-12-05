@@ -443,9 +443,8 @@ const QuestionCategory = ({
             {showQuestionModal && (
                <Dialog
                   TransitionComponent={Slide}
-                  PaperProps={{ className: `notranslate` }}
+                  PaperProps={{ className: `notranslate`, sx: styles.dialog }}
                   fullWidth
-                  sx={styles.dialog}
                   onClose={handleClose}
                   open={showQuestionModal}
                >
