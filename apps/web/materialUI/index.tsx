@@ -7,7 +7,7 @@ import {
    styled,
    Theme,
 } from "@mui/material/styles"
-import { grey } from "@mui/material/colors"
+import { grey, red } from "@mui/material/colors"
 
 import React from "react"
 import { Components, PaletteMode } from "@mui/material"
@@ -24,6 +24,7 @@ interface CustomThemeProps {
       primary_5_15_50?: string
       dark_12_13?: string
       gold_5_15_50?: string
+      error_5_15_50?: string
    }
    dropShadows?: {
       // color_y_blur_opacity
@@ -200,6 +201,10 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
          )}`,
          gold_5_15_50: `0px 5px 15px ${alpha(
             mode === "light" ? gold.main : gold.dark,
+            mode === "light" ? 0.5 : 0.2
+         )}`,
+         error_5_15_50: `0px 5px 15px ${alpha(
+            mode === "light" ? red[500] : red[700],
             mode === "light" ? 0.5 : 0.2
          )}`,
       },
@@ -463,6 +468,12 @@ const getComponents = (theme: DefaultTheme): Components => ({
                color: theme.palette.text.primary,
                backgroundColor: theme.palette.gold.main,
                boxShadow: theme.boxShadows.gold_5_15_50,
+            },
+         },
+         {
+            props: { color: "error", variant: "contained" },
+            style: {
+               boxShadow: theme.boxShadows.error_5_15_50,
             },
          },
       ],
