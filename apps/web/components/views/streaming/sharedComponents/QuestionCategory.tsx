@@ -112,10 +112,10 @@ const EmptyList = ({ isUpcoming = false }) => {
 }
 
 type Props = {
-   isMobile: boolean
+   isMobile?: boolean
    selectedState: CurrentStreamContextInterface["selectedState"]
    showMenu: boolean
-   sliding: boolean
+   sliding?: boolean
    streamer: boolean
 }
 const QuestionCategory = ({
