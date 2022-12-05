@@ -135,9 +135,8 @@ const createRecipientVariables = (
       const luxonStartDate = DateTime.fromJSDate(startDate, {
          zone: timezone || "Europe/Zurich",
       })
-      const formattedDate = luxonStartDate.toLocaleString(
-         DateTime.DATETIME_FULL
-      )
+      let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+      formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
 
       const emailData = {
          timeMessage: timeMessage,
