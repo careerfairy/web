@@ -685,3 +685,60 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
       }
    }
 )
+
+export const sendPostmarkWelcomeEmail = functions.https.onCall(
+   async ({ recipientEmail }) => {
+      functions.logger.log(
+         `Starting sending welcome email to  ${recipientEmail}`
+      )
+      let error
+
+      try {
+         const querySnapshot = await admin
+            .firestore()
+            .collection("userData")
+            .doc(recipientEmail)
+            .get()
+
+         if (querySnapshot.exists) {
+            const user = querySnapshot.data()
+            const userName = `${user.firstName || ""} ${user.lastName || ""}`
+
+            const email = {
+               TemplateId: process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL,
+               From: "CareerFairy <noreply@careerfairy.io>",
+               To: recipientEmail,
+               TemplateModel: { user_name: userName },
+            }
+
+            const response = await client.sendEmailWithTemplate(email)
+            functions.logger.info("response", response)
+
+            if (response.ErrorCode) {
+               functions.logger.error(
+                  "error in sendEmailWithTemplate response",
+                  response
+               )
+            }
+         } else {
+            functions.logger.error(
+               `Was unable to find any userData with ${recipientEmail}`
+            )
+
+            error = {
+               code: "not-found",
+               message: `Was unable to find any userData with ${recipientEmail}`,
+            }
+         }
+      } catch (error) {
+         functions.logger.warn(
+            `An error has occurred sending welcome email to ${recipientEmail}`
+         )
+         throw new functions.https.HttpsError("unknown", error)
+      }
+
+      if (error) {
+         throw new functions.https.HttpsError(error.code, error.message)
+      }
+   }
+)

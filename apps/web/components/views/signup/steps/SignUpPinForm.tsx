@@ -70,6 +70,9 @@ const SignUpPinForm = () => {
          updateActiveStep()
          await firebase.auth.currentUser.reload()
          dataLayerEvent("signup_pin_complete")
+
+         // after pin confirmation send welcome email
+         await firebase.sendPostmarkWelcomeEmail({ recipientEmail: user.email })
       } catch (error) {
          console.log("error", error)
          setIncorrectPin(true)
