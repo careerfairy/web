@@ -43,7 +43,6 @@ import { LivestreamQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../../types/commonTypes"
 import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import Stack from "@mui/material/Stack"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { containsBadgeOrLevelsAbove } from "@careerfairy/shared-lib/dist/users/UserBadges"
 
 const styles = sxStyles({
@@ -191,7 +190,6 @@ const ReactionsToggle = ({
 type QuestionContainerProps = {
    sessionUuid: string
    sliding: boolean
-   user: UserData
    streamer: boolean
    question: LivestreamQuestion
    index: number
@@ -207,7 +205,6 @@ type QuestionContainerProps = {
 const QuestionContainer = ({
    sessionUuid,
    sliding,
-   user,
    streamer,
    question,
    index,
@@ -221,11 +218,15 @@ const QuestionContainer = ({
 }: QuestionContainerProps) => {
    const firebase = useFirebaseService()
    const streamRef = useStreamRef()
-   const { currentLivestream: livestream, isBreakout } = useCurrentStream()
+   const {
+      currentLivestream: livestream,
+      isBreakout,
+      presenter,
+   } = useCurrentStream()
    const [newCommentTitle, setNewCommentTitle] = useState("")
    const [comments, setComments] = useState([])
    const [showAllReactions, setShowAllReactions] = useState(false)
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, adminGroups } = useAuth()
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
    const [loadingQuestions, setLoadingQuestions] = useState(false)
    const [disableComments, setDisableComments] = useState(false)
@@ -236,7 +237,7 @@ const QuestionContainer = ({
    const active = question?.type === "current"
    const old = question?.type !== "new"
    const upvoted =
-      (!user && !livestream?.test) ||
+      (!userData && !livestream?.test) ||
       (question?.emailOfVoters
          ? question?.emailOfVoters.indexOf(
               livestream?.test || livestream?.openStream
@@ -246,7 +247,10 @@ const QuestionContainer = ({
          : false)
 
    const canDeleteQuestion = Boolean(
-      streamer || user?.userEmail === question?.author || user?.isAdmin
+      streamer ||
+         userData?.userEmail === question?.author ||
+         userData?.isAdmin ||
+         presenter.isStreamAdmin(adminGroups)
    )
 
    useEffect(() => {
@@ -640,8 +644,8 @@ const QuestionContainer = ({
                >
                   {!livestream.test &&
                   question.emailOfVoters &&
-                  user &&
-                  question.emailOfVoters.indexOf(user.userEmail) > -1 ? (
+                  userData &&
+                  question.emailOfVoters.indexOf(userData.userEmail) > -1 ? (
                      <span>UPVOTED!</span>
                   ) : (
                      <span>UPVOTE</span>

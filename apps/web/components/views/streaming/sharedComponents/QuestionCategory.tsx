@@ -52,6 +52,7 @@ import { LivestreamQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../types/commonTypes"
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal"
 import { StyledBox } from "../../../../materialUI/GlobalPanels/GlobalPanels"
+import Box from "@mui/material/Box"
 
 const styles = sxStyles({
    view: {
@@ -315,7 +316,6 @@ const QuestionCategory = ({
                openQuestionId={openQuestionId}
                selectedState={selectedState}
                question={question}
-               user={userData}
                setQuestionIdToDelete={setQuestionIdToDelete}
             />
          )
@@ -338,7 +338,6 @@ const QuestionCategory = ({
                goToThisQuestion={goToThisQuestion}
                selectedState={selectedState}
                question={question}
-               user={userData}
                setQuestionIdToDelete={setQuestionIdToDelete}
             />
          )
@@ -395,7 +394,8 @@ const QuestionCategory = ({
                   />
                </Tabs>
             </QuestionContainerHeader>
-            <SwipeableViews
+            <Box
+               component={SwipeableViews}
                containerStyle={{ WebkitOverflowScrolling: "touch" }}
                disabled
                ref={parentRef}
@@ -439,7 +439,7 @@ const QuestionCategory = ({
                      <EmptyList />
                   )}
                </StyledBox>
-            </SwipeableViews>
+            </Box>
             {showQuestionModal && (
                <Dialog
                   TransitionComponent={Slide}
