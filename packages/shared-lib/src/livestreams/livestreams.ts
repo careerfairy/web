@@ -360,6 +360,28 @@ export interface LivestreamChatEntry extends Identifiable {
    authorName: string
    message: string
    timestamp: firebase.firestore.Timestamp
+
+   type?: // used to identify a chat entry that was sent by a host to all breakout rooms (only used in the UI)
+   | "broadcast"
+      // used to identify a chat entry that was sent by a host (only used in the UI)
+      | "streamer"
+
+   /*
+    * Array of userIds who reacted with 😮
+    * */
+   wow: string[]
+   /*
+    * Array of userIds who reacted with  ❤
+    */
+   heart: string[]
+   /*
+    * Array of userIds who reacted with  👍
+    */
+   thumbsUp: string[]
+   /*
+    * Array of userIds who reacted with 😂
+    */
+   laughing: string[]
 }
 
 export interface LivestreamIcon extends Identifiable {

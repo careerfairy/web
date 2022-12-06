@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
       right: 40,
       width: "20%",
       minWidth: 250,
-      zIndex: 1,
+      zIndex: 2,
    },
    iconsContainer: {
       position: "absolute",

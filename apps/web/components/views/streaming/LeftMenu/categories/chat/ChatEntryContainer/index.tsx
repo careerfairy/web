@@ -1,6 +1,4 @@
-import PropTypes from "prop-types"
 import React, { memo, useEffect, useState } from "react"
-import makeStyles from "@mui/styles/makeStyles"
 import { Box, Card, IconButton, Popover, Typography } from "@mui/material"
 import { getTimeFromNow } from "../../../../../../helperFunctions/HelperFunctions"
 import { useAuth } from "../../../../../../../HOCs/AuthProvider"
@@ -10,85 +8,102 @@ import EmotesPreview from "./EmotesPreview"
 import EmotesPopUp from "./EmotesPopUp"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import isEqual from "react-fast-compare"
-
-import clsx from "clsx"
 import LinkifyText from "../../../../../../util/LinkifyText"
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
+import { sxStyles } from "../../../../../../../types/commonTypes"
 
 const dayjs = require("dayjs")
 const relativeTime = require("dayjs/plugin/relativeTime")
 dayjs.extend(relativeTime)
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    emotesMenuButton: {
       position: "absolute",
       top: "50%",
-      right: ({ isMe }) => !isMe && "-30px",
-      left: ({ isMe }) => isMe && "-30px",
+      // right: ({ isMe }) => !isMe && "-30px",
+      // left: ({ isMe }) => isMe && "-30px",
+      right: "-30px",
       transform: "translateY(-50%)",
       opacity: 0.3,
    },
+   emotesMenuButtonMe: {
+      right: 0,
+      left: "unset",
+   },
    chatWrapper: {
-      marginLeft: ({ isMe }) => (isMe ? "auto" : 0),
-      marginBottom: ({ last }) => !last && theme.spacing(1.4),
+      marginBottom: 1.4,
       maxWidth: "80%",
       width: "min-content",
       display: "flex",
       position: "relative",
    },
-
+   chatWrapperMe: {
+      marginLeft: "auto",
+   },
+   chatWrapperLast: {
+      marginBottom: 0,
+   },
    emotesPaperWrapper: {
       display: "flex",
       alignItems: "center",
       zChatEntryContainer: 1,
-      padding: theme.spacing(1),
+      padding: 1,
       "&  > *": {
-         marginRight: theme.spacing(0.5),
+         marginRight: 0.5,
       },
       overflow: "hidden",
-      borderRadius: theme.spacing(2),
+      borderRadius: 2,
    },
    chatBubble: {
-      borderRadius: ({ isMe }) =>
-         isMe ? "23px 23px 5px 23px" : "23px 23px 23px 5px",
+      borderRadius: "23px 23px 23px 5px",
       width: "max-content",
       minWidth: 140,
       padding: "8px 13px",
-      paddingBottom: 5,
-      backgroundColor: ({ isMe, isStreamer }) =>
-         isMe
-            ? theme.palette.primary.main
-            : isStreamer
-            ? "#ff1493"
-            : theme.palette.background.paper,
-      color: ({ isMe, isStreamer }) =>
-         isMe || isStreamer ? "white" : "inherit",
+      paddingBottom: 0.6,
+      backgroundColor: "background.paper",
+      color: "inherit",
       overflowWrap: "break-word",
    },
+   chatBubbleStreamer: {
+      backgroundColor: "#ff1493",
+   },
+   chatBubbleMe: {
+      borderRadius: "23px 23px 5px 23px",
+      backgroundColor: "primary.main",
+   },
+   chatBubbleBroadcaster: {
+      backgroundColor: (theme) => `${theme.palette.warning.main} !important`,
+   },
+   textWhite: {
+      color: "white",
+   },
    broadcast: {
-      backgroundColor: `${theme.palette.warning.main} !important`,
-      color: `${theme.palette.common.white} !important`,
+      color: (theme) => `${theme.palette.common.white} !important`,
    },
    author: {
       fontSize: "0.8em",
-      color: ({ isMe, isStreamer }) =>
-         isMe || isStreamer ? "white" : "rgb(180,180,180)",
+      color: "rgb(180,180,180)",
       overflowWrap: "break-word",
       whiteSpace: "nowrap",
    },
+
    stamp: {
       fontSize: "0.7em",
       marginBottom: 0,
-      color: ({ isMe, isStreamer }) =>
-         isMe || isStreamer ? "white" : "rgb(180,180,180)",
+      color: "rgb(180,180,180)",
    },
-}))
+})
 
+type Props = {
+   chatEntry: LivestreamChatEntry
+   handleSetCurrentEntry: (entry: LivestreamChatEntry) => void
+   last: boolean
+}
 const ChatEntryContainer = ({
    chatEntry,
    handleSetCurrentEntry,
-   currentEntry,
    last,
-}) => {
+}: Props) => {
    const firebase = useFirebaseService()
    const isNew = chatEntry.timestamp === null
    const [anchorEl, setAnchorEl] = useState(null)
@@ -100,14 +115,11 @@ const ChatEntryContainer = ({
       chatEntry?.authorEmail === authenticatedUser?.email
    )
    const [isStreamer, setIsStreamer] = useState(
-      chatEntry?.authorEmail === "Streamer"
+      chatEntry?.authorEmail === "Streamer" || chatEntry.type === "streamer"
    )
+   console.log("-> chatEntry.type", chatEntry.type)
 
-   const classes = useStyles({
-      isMe,
-      isStreamer,
-      last,
-   })
+   const hasTimestamp = Boolean(chatEntry.timestamp)
 
    useEffect(() => {
       setTime(getTimeFromNow(chatEntry.timestamp))
@@ -115,7 +127,8 @@ const ChatEntryContainer = ({
          setTime(getTimeFromNow(chatEntry.timestamp))
       }, 60000)
       return () => clearInterval(interval)
-   }, [Boolean(chatEntry.timestamp)])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [hasTimestamp])
 
    useEffect(() => {
       setIsMe(chatEntry?.authorEmail === authenticatedUser?.email)
@@ -137,14 +150,20 @@ const ChatEntryContainer = ({
    const open = Boolean(anchorEl)
    return (
       <Fade left={!isMe && isNew} right={isMe && isNew} duration={250}>
-         <span className={classes.chatWrapper}>
+         <Box
+            component={"span"}
+            sx={[
+               styles.chatWrapper,
+               isMe && styles.chatWrapperMe,
+               last && styles.chatWrapperLast,
+            ]}
+         >
             <Popover
                id="mouse-over-popover"
                elevation={20}
-               classes={{
-                  paper: classes.emotesPaperWrapper,
+               PaperProps={{
+                  sx: styles.emotesPaperWrapper,
                }}
-               PaperProps={{}}
                open={open}
                anchorEl={anchorEl}
                anchorOrigin={{
@@ -165,58 +184,41 @@ const ChatEntryContainer = ({
             </Popover>
             <Box
                component={Card}
-               className={clsx(classes.chatBubble, {
-                  [classes.broadcast]: chatEntry.type === "broadcast",
-               })}
+               sx={[
+                  styles.chatBubble,
+                  isStreamer && styles.chatBubbleStreamer,
+                  isMe && styles.chatBubbleMe,
+                  chatEntry.type === "broadcast" &&
+                     styles.chatBubbleBroadcaster,
+                  isMe || isStreamer || chatEntry.type === "broadcast"
+                     ? styles.textWhite
+                     : null,
+               ]}
             >
                <LinkifyText>{chatEntry.message}</LinkifyText>
-               <Typography className={classes.author}>
+               <Typography
+                  sx={[styles.author, (isMe || isStreamer) && styles.textWhite]}
+               >
                   {chatEntry.authorName}
                </Typography>
-               <Typography align="right" className={classes.stamp}>
+               <Typography
+                  align="right"
+                  sx={[styles.stamp, (isMe || isStreamer) && styles.textWhite]}
+               >
                   {time || "..."}
                </Typography>
             </Box>
             <IconButton
                size="small"
-               className={classes.emotesMenuButton}
+               sx={[styles.emotesMenuButton, isMe && styles.emotesMenuButtonMe]}
                onClick={handleOpenEmotesMenu}
             >
                <EmojiEmotionsOutlinedIcon />
             </IconButton>
             <EmotesPreview onClick={handleClickPreview} chatEntry={chatEntry} />
-         </span>
+         </Box>
       </Fade>
    )
 }
-
-ChatEntryContainer.propTypes = {
-   chatEntry: PropTypes.object.isRequired,
-   currentEntry: PropTypes.object,
-   firebase: PropTypes.object,
-   handleSetCurrentEntry: PropTypes.func.isRequired,
-}
-
-// function areEqual(prevProps, nextProps) {
-//    /*
-//    return true if passing nextProps to render would return
-//    the same result as passing prevProps to render,
-//    otherwise return false
-//    */
-//    return Boolean(
-//       prevProps.chatEntry?.message === nextProps.chatEntry?.message &&
-//          prevProps.chatEntry?.heart?.length ===
-//             nextProps.chatEntry?.heart?.length &&
-//          prevProps.chatEntry?.laughing?.length ===
-//             nextProps.chatEntry?.laughing?.length &&
-//          prevProps.chatEntry?.thumbsUp?.length ===
-//             nextProps.chatEntry?.thumbsUp?.length &&
-//          prevProps.chatEntry?.wow?.length ===
-//             nextProps.chatEntry?.wow?.length &&
-//          Boolean(prevProps.chatEntry?.timestamp) ===
-//             Boolean(nextProps.chatEntry?.timestamp) &&
-//          prevProps.last === nextProps.last
-//    );
-// }
 
 export default memo(ChatEntryContainer, isEqual)

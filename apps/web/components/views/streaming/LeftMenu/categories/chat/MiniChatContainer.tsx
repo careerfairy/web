@@ -1,9 +1,12 @@
-import React, { useCallback, useContext, useEffect, useState } from "react"
+import React, {
+   KeyboardEventHandler,
+   useCallback,
+   useContext,
+   useEffect,
+   useState,
+} from "react"
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined"
-import {
-   useFirebaseService,
-   withFirebase,
-} from "context/firebase/FirebaseServiceContext"
+import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import ChevronRightRoundedIcon from "@mui/icons-material/ChevronRightRounded"
 import ChatEntryContainer from "./ChatEntryContainer"
 import ExpandLessRoundedIcon from "@mui/icons-material/ExpandLessRounded"
@@ -12,6 +15,7 @@ import {
    AccordionDetails,
    AccordionSummary,
    Badge,
+   Box,
    Button,
    Collapse,
    IconButton,
@@ -19,7 +23,6 @@ import {
    Typography,
 } from "@mui/material"
 import { alpha, useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import { grey } from "@mui/material/colors"
 import TutorialContext from "../../../../../../context/tutorials/TutorialContext"
 import {
@@ -40,32 +43,38 @@ import {
    dataLayerEvent,
    dataLayerLivestreamEvent,
 } from "../../../../../../util/analyticsUtils"
+import {
+   LivestreamChatEntry,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
-   root: {},
+const styles = sxStyles({
    accordionRoot: {
-      boxShadow: theme.shadows[3],
-      background: theme.palette.background.paper,
+      boxShadow: 3,
+      background: "background.paper",
    },
    sendIcon: {
       background: "white",
-      color: ({ isEmpty }) => (isEmpty ? "grey" : theme.palette.primary.main),
+      color: "primary.main",
       borderRadius: "50%",
       fontSize: 15,
+   },
+   sendIconEmpty: {
+      color: "grey",
    },
    sendBtn: {
       width: 30,
       height: 30,
-      background: alpha(theme.palette.primary.main, 0.5),
+      background: (theme) => alpha(theme.palette.primary.main, 0.5),
       "&$buttonDisabled": {
          color: grey[800],
       },
       "&:hover": {
-         backgroundColor: theme.palette.primary.main,
+         backgroundColor: "primary.main",
       },
       margin: "0.5rem",
    },
-   buttonDisabled: {},
    chatInput: {
       borderRadius: 10,
       "& .MuiInputBase-root": {
@@ -75,36 +84,47 @@ const useStyles = makeStyles((theme) => ({
    },
    header: {
       height: "41px !important",
+      minHeight: "41px !important",
       padding: "10px 15px",
       "& .MuiAccordionSummary-content": {
          margin: 0,
          display: "flex",
          alignItems: "center",
       },
+      "& .Mui-expanded": {
+         margin: 0,
+      },
    },
-   expanded: {
-      minHeight: "41px !important",
-   },
+   expanded: {},
    chatRoom: {
       display: "flex",
       flexDirection: "column",
       padding: 0,
    },
    scrollToBottom: {
-      backgroundColor: theme.palette.background.default,
+      backgroundColor: "background.default",
       height: "240px",
-      "& div": {
+      "& > div": {
+         padding: 1.4,
          overflowX: "hidden",
       },
    },
-   entriesWrapper: {
-      padding: theme.spacing(1.4),
-   },
-}))
+})
 
 const now = new Date()
 
-function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
+type Props = {
+   isStreamer: boolean
+   livestream: LivestreamEvent
+   className: string
+   mobile?: boolean
+}
+const MiniChatContainer = ({
+   isStreamer,
+   livestream,
+   className,
+   mobile = false,
+}) => {
    const { authenticatedUser, userData } = useAuth()
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
@@ -125,7 +145,6 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    const isEmpty =
       !newChatEntry.trim() ||
       (!userData && !livestream.test && !livestream.openStream && !isStreamer)
-   const classes = useStyles({ isEmpty })
 
    useEffect(() => {
       if (livestream.id) {
@@ -211,19 +230,17 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    }
 
    const getAuthorName = () => {
-      if (isStreamer || livestream.test) return "Streamer"
-      else if (livestream.openStream) return "anonymous"
-      else if (userData) {
+      if (userData) {
          return userData.firstName + " " + userData.lastName.charAt(0)
       }
+      if (isStreamer || livestream.test) return "Streamer"
+      return "anonymous"
    }
 
    const getAuthorEmail = () => {
+      if (authenticatedUser.email) return authenticatedUser.email
       if (isStreamer || livestream.test) return "Streamer"
-      else if (livestream.openStream) return "anonymous"
-      else if (authenticatedUser) {
-         return authenticatedUser.email
-      }
+      return "anonymous"
    }
 
    function addNewChatEntry() {
@@ -232,11 +249,13 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
       }
       setSubmitting(true)
 
-      const newChatEntryObject = {
+      const newChatEntryObject: Partial<LivestreamChatEntry> = {
          message: newChatEntry,
          authorName: getAuthorName(),
          authorEmail: getAuthorEmail(),
-         votes: 0,
+         ...(isStreamer && {
+            type: "streamer",
+         }),
       }
 
       isOpen(15) && handleConfirmStep(15)
@@ -252,8 +271,8 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
       )
    }
 
-   function addNewChatEntryOnEnter(target) {
-      if (target.charCode == 13) {
+   const addNewChatEntryOnEnter: KeyboardEventHandler = (event) => {
+      if (event.key === "Enter") {
          addNewChatEntry()
          if (isOpen(15)) {
             handleConfirmStep(15)
@@ -271,21 +290,20 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    const playIcon = (
       <div>
          <IconButton
-            classes={{
-               root: classes.sendBtn,
-               disabled: classes.buttonDisabled,
-            }}
+            sx={styles.sendBtn}
             disabled={isEmpty}
             onClick={() => addNewChatEntry()}
             size="large"
          >
-            <ChevronRightRoundedIcon className={classes.sendIcon} />
+            <ChevronRightRoundedIcon
+               sx={[styles.sendIcon, isEmpty && styles.sendIconEmpty]}
+            />
          </IconButton>
       </div>
    )
 
    return (
-      <div className={clsx(classes.root, className)}>
+      <div className={className}>
          <WhiteTooltip
             placement="top"
             title={
@@ -316,31 +334,30 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
                      dataLayerEvent("livestream_chat_open")
                   }
                }}
-               className={classes.accordionRoot}
+               sx={styles.accordionRoot}
                expanded={open}
             >
                <AccordionSummary
-                  className={classes.header}
+                  sx={styles.header}
                   expandIcon={<ExpandLessRoundedIcon />}
                   aria-controls="chat-header"
                   id="chat-header"
-                  classes={{ expanded: classes.expanded }}
+                  // classes={{ expanded: classes.expanded }}
                >
                   <Badge badgeContent={numberOfMissedEntries} color="error">
                      <ForumOutlinedIcon fontSize="small" />
                   </Badge>
                   <Typography style={{ marginLeft: "0.6rem" }}>Chat</Typography>
                </AccordionSummary>
-               <AccordionDetails className={classes.chatRoom}>
-                  <CustomScrollToBottom
-                     scrollViewClassName={classes.entriesWrapper}
-                     className={classes.scrollToBottom}
+               <AccordionDetails sx={styles.chatRoom}>
+                  <Box
+                     component={CustomScrollToBottom}
+                     sx={styles.scrollToBottom}
                      scrollItems={chatEntries.map(
                         (chatEntry, index, entries) => (
                            <ChatEntryContainer
                               handleSetCurrentEntry={handleSetCurrentEntry}
                               last={index === entries.length - 1}
-                              currentEntry={currentEntry}
                               key={chatEntry.id}
                               chatEntry={chatEntry}
                            />
@@ -364,20 +381,23 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
                            autoFocus
                            onBlur={() => setFocused(false)}
                            onFocus={() => setFocused(true)}
-                           className={classes.chatInput}
+                           sx={styles.chatInput}
                            size="small"
                            onKeyPress={addNewChatEntryOnEnter}
                            value={newChatEntry}
-                           onChange={() => setNewChatEntry(event.target.value)}
+                           onChange={(event) =>
+                              setNewChatEntry(event.target.value)
+                           }
                            placeholder="Post in the chat..."
                            InputProps={{
+                              // @ts-ignore
                               maxLength: 340,
                               endAdornment: playIcon,
                            }}
                         />
                         {!livestream?.questionsDisabled && (
                            <Collapse
-                              align="center"
+                              // align="center"
                               style={{
                                  color: "grey",
                                  fontSize: "0.8em",
@@ -402,4 +422,4 @@ function MiniChatContainer({ isStreamer, livestream, className, mobile }) {
    )
 }
 
-export default withFirebase(MiniChatContainer)
+export default MiniChatContainer
