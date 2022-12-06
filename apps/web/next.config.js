@@ -32,7 +32,7 @@ const securityHeaders = [
          `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
             notProduction ? "localhost:*" : ""
          };` +
-         `frame-src https://optimize.google.com https://consentcdn.cookiebot.com ${
+         `frame-src https://optimize.google.com https://consentcdn.cookiebot.com https://vars.hotjar.com https://www.facebook.com ${
             isVercelPreview ? "https://vercel.live" : ""
          };` +
          `font-src 'self' https://fonts.gstatic.com;`,
