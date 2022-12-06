@@ -8,8 +8,8 @@ import { admin } from "./api/firestoreAdmin"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
-import { groupRepo, marketingUsersRepo } from "./api/repositories"
-import { logAndThrow } from "./lib/validations"
+import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
+import { logAndThrow, validateUserAuthExists } from "./lib/validations"
 import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
@@ -687,21 +687,18 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
 )
 
 export const sendPostmarkWelcomeEmail = functions.https.onCall(
-   async ({ recipientEmail }) => {
+   async ({ recipientEmail }, context) => {
+      let error
+
       functions.logger.log(
          `Starting sending welcome email to  ${recipientEmail}`
       )
-      let error
 
       try {
-         const querySnapshot = await admin
-            .firestore()
-            .collection("userData")
-            .doc(recipientEmail)
-            .get()
+         const { email: recipientEmail } = await validateUserAuthExists(context)
+         const user = await userRepo.getUserDataById(recipientEmail)
 
-         if (querySnapshot.exists) {
-            const user = querySnapshot.data()
+         if (user) {
             const userName = `${user.firstName || ""} ${user.lastName || ""}`
 
             const email = {
