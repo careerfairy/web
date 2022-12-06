@@ -16,20 +16,24 @@ const securityHeaders = [
       key: "Content-Security-Policy",
       value:
          `default-src blob: 'self' careerfairy-e1fd9.firebaseapp.com go.crisp.chat careerfairy-support.crisp.help streaming.crisp.help client.crisp.chat *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
-            notProduction && "localhost:*"
+            notProduction ? "localhost:*" : ""
          } ${
-            isVercelPreview && "https://vercel.live https://assets.vercel.com"
+            isVercelPreview
+               ? "https://vercel.live https://assets.vercel.com"
+               : ""
          }; ` +
-         `script-src blob: 'self' https://optimize.google.com https://www.googleanalytics.com https://www.google-analytics.com https://www.googleoptimize.com *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com ajax.googleapis.com client.crisp.chat ${
-            isVercelPreview && "https://vercel.live"
+         `script-src blob: 'self' https://optimize.google.com https://www.googleanalytics.com https://www.google-analytics.com https://www.googleoptimize.com *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com client.crisp.chat ${
+            isVercelPreview ? "https://vercel.live" : ""
          };` +
          "style-src 'self' https://optimize.google.com https://fonts.googleapis.com *.vitals.vercel-insights.com *.googletagmanager.com *.googleapis.com 'unsafe-inline' client.crisp.chat; " +
-         `connect-src data: *.analytics.google.com *.facebook.com *.linkedin.oribi.io *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io firebase.googleapis.com firestore.googleapis.com securetoken.googleapis.com www.googleapis.com *.tiktok.com *.cookiebot.com *.hubapi.com storage.crisp.chat client.crisp.chat ${
-            isVercelPreview && "https://vercel.live 'self' data:"
+         `connect-src data: *.analytics.google.com *.facebook.com *.linkedin.oribi.io *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io *.tiktok.com *.cookiebot.com *.hubapi.com storage.crisp.chat client.crisp.chat ${
+            isVercelPreview ? "https://vercel.live" : ""
          };` +
-         `img-src https: blob: data: 'self' https://optimize.google.com https://www.google-analytics.com https://www.googletagmanager.com *.googleapis.com *.calendly.com *.ads.linkedin.com ${
-            notProduction && "localhost:*"
-         };`,
+         `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
+            notProduction ? "localhost:*" : ""
+         };` +
+         `frame-src https://optimize.google.com;` +
+         `font-src 'self' https://fonts.gstatic.com;`,
    },
    {
       key: "Referrer-Policy",
