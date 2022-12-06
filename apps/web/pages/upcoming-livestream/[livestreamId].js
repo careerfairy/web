@@ -361,14 +361,11 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       ]
    )
 
-   const handleRegisterClick = useCallback(
-      (fromFooterButton = false) => {
-         if (!registered) {
-            return startRegistrationProcess(fromFooterButton)
-         }
-      },
-      [registered, startRegistrationProcess]
-   )
+   const handleRegisterClick = useCallback(() => {
+      if (!registered) {
+         return startRegistrationProcess()
+      }
+   }, [registered, startRegistrationProcess])
 
    const handleChangeQuestionSortType = useCallback((event, newSortType) => {
       if (newSortType !== null) {
@@ -418,8 +415,8 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }
 
    const handleFooterAttendButtonClick = useCallback(async () => {
-      await handleRegisterClick(true)
-   }, [handleRegisterClick])
+      await startRegistrationProcess(true)
+   }, [startRegistrationProcess])
 
    return (
       <>
@@ -510,7 +507,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                groups={joinGroupModalData?.groups}
             />
          </UpcomingLayout>
-         {mobile && !isRegistrationDisabled && (
+         {mobile && !isRegistrationDisabled && !registered && (
             <FooterButton
                handleClick={handleFooterAttendButtonClick}
                buttonMessage={"Attend Event"}
