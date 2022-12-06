@@ -41,6 +41,24 @@
       {
          "fields": [
             {
+               "name": "firstName",
+               "type": "string"
+            },
+            {
+               "name": "lastName",
+               "type": "string"
+            },
+            {
+               "name": "id",
+               "type": "string"
+            }
+         ],
+         "name": "user",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
                "name": "date",
                "type": "timestamp"
             }

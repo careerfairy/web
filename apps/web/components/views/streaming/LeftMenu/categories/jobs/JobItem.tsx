@@ -16,6 +16,7 @@ const styles = sxStyles({
       boxShadow: (theme) => theme.shadows[3],
       background: (theme) => theme.palette.background.default,
       borderRadius: 2,
+      marginBottom: 1,
    },
    icon: {
       minWidth: "unset",
