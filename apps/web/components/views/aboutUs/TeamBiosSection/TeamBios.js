@@ -36,13 +36,13 @@ const TeamBios = ({ people }) => {
          <Masonry gutter={theme.spacing(2)}>
             {people.map((person, index) => (
                <Bounce
-                  key={person.id}
+                  key={index}
                   delay={index % 2 !== 0 ? 200 : 0}
                   left={index % 2 === 0}
                   right={index % 2 !== 0}
                >
                   <TeamMemberCard
-                     key={person.id}
+                     key={index}
                      person={person}
                      classes={classes}
                   />
@@ -66,7 +66,7 @@ const TeamBios = ({ people }) => {
                md={6}
                lg={4}
                xl={3}
-               key={person.id}
+               key={index}
             >
                <TeamMemberCard person={person} classes={classes} />
             </Grid>
