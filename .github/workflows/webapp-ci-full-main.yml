@@ -4,7 +4,11 @@ on:
    push:
       branches:
          - main
-   pull_request_target:
+
+   # Trigger on pull requests targeting these branches
+   pull_request:
+      branches:
+         - main
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
@@ -155,9 +159,8 @@ jobs:
               restore-keys: |
                  ${{ runner.os }}-playwright-
 
-         - name:
-              Install Playwright's dependencies
-              #           if: steps.playwright-cache.outputs.cache-hit != 'true'
+         - name: Install Playwright's dependencies
+           #           if: steps.playwright-cache.outputs.cache-hit != 'true'
            run: npx playwright install --with-deps
 
          - name: Run Playwright End to End tests
