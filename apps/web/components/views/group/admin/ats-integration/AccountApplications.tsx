@@ -59,8 +59,8 @@ const AccountApplications = ({ atsAccount }: Props) => {
 function mapApplicationsToTableRows(data: Application[]) {
    return data.map((application) => ({
       id: application.id,
-      jobName: application.job.name,
-      candidateName: application.candidate.getName(),
+      jobName: application.job?.name,
+      candidateName: application.candidate?.getName(),
       source: application.source,
       appliedAt: application.appliedAt?.toLocaleString(),
       currentStage: application.currentStage,
