@@ -18,7 +18,6 @@ const styles = {
 }
 const people = [
    {
-      id: 1,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fthomas.jpg?alt=media&token=0edea68e-b08e-40fe-a33a-fd48657a5865",
       name: "Thomas Schulz",
@@ -28,7 +27,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/thomas-schulz-553301a9/",
    },
    {
-      id: 2,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fmax.jpg?alt=media&token=0ec96792-9c2d-4741-9f73-75c668a78153",
       name: "Maximilian Voss",
@@ -38,7 +36,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/maximilian-voss/",
    },
    {
-      id: 3,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fhabib.jpg?alt=media&token=572dadf8-2e04-4da8-81d2-08f6060cdca8",
       name: "Habib Kadiri",
@@ -46,18 +43,7 @@ const people = [
       bio: "With his training as a Full-Stack developer at SIT Academy and with a strong passion for coding, Habib’s knowledgeable understanding of front-end frameworks allows him to design and implement features based on the needs of our ever growing platform. \n\nIn his free time, he likes to workout and help others get in shape.\n",
       linkedinUrl: "https://www.linkedin.com/in/habib-kadiri/",
    },
-   // {
-   //    id: 4,
-   //    avatar:
-   //       "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fsolene.png?alt=media&token=f050377b-1d62-4775-8893-88a059bb9627",
-   //    name: "Solène Wolf",
-   //    role: "Business Development & Strategy",
-   //    bio:
-   //       "Solène owns a Master in Management from Skema Business School in France and started her international path during her exchange semesters in Munich, Germany and Québec, Canada.\nStarting her career in HR Marketing for Alstom in Switzerland made her decide to join Randstad Professionals to deepen her knowledge in recruitment. This experiences were later applied at the Career Center of the Swiss Federal Institute of Technology (ETH Zürich), where she helped students find the right career start. This path naturally lead her to CareerFairy where she enables companies to attract their next generation of talents and realises her purpose: helping students get the insights they need to start their career. \n\nShe loves to spend time with her friends and family, hiking or skiing in the Swiss mountains.\n",
-   //    linkedinUrl: "https://www.linkedin.com/in/solwolff/",
-   // },
    {
-      id: 5,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Ffabian.jpg?alt=media&token=77bab994-e8b9-4894-ae18-c2442c4c3ced",
       name: "Fabian Koolstra",
@@ -66,7 +52,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/fabian-koolstra/",
    },
    {
-      id: 6,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fkandee.jpg?alt=media&token=c2424e74-a6b5-4ffc-b9e8-6d3344960984",
       name: "Kandeeban Uthayarajah",
@@ -76,7 +61,6 @@ const people = [
          "https://www.linkedin.com/in/kandeeban-uthayarajah-850a541b4/",
    },
    {
-      id: 7,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Framona.jpg?alt=media&token=49030c21-a7ad-4bae-8a1a-e027234e9215",
       name: "Ramona Neff",
@@ -85,16 +69,16 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/ramona-neff/",
    },
    {
-      id: 8,
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fmikhail.jpg?alt=media&token=36f7ebfa-e4b0-4b37-a546-973d5c2b9aaa",
-      name: "Mikhail Asryan",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FLisa.jpg?alt=media&token=e95898ed-fa21-42a4-9874-443b331f4de8",
+      name: "Lisa Brandenberger",
       role: "Business Development",
-      bio: "Mikhail holds a BBA degree from IUG and University of Plymouth. He is currently doing his finance analytics masters at King’s College London. He is passionate about entrepreneurship, startups and communication with people. At CareerFairy, Mikhail is your go-to person for partnerships and business development. \n\nIn his free time he enjoys spending time with his family, dancing (disco-fox, walzer), listening to audiobooks (biographies), listening to russian rap (don’t judge him), cooking, but most importantly - petting his cat!\n",
-      linkedinUrl: "https://www.linkedin.com/in/mikhail-asryan-a67915160/",
+      bio:
+         "Lisa is about to finish her Bachelor’s degree in Applied Linguistics at ZHAW. Her passion for languages has led her to gain a toehold in an international start up. Besides work, she loves spending time with her family and friends or pursuing her interests in photography, social media and fashion trends.\n" +
+         "In addition to her commitment to ESN Winterthur, Lisa also tries to keep up to date with the latest political developments.\n",
+      linkedinUrl: "https://www.linkedin.com/in/lisa-brandenberger-000707236/",
    },
    {
-      id: 9,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fgary.jpg?alt=media&token=c5893021-c141-43af-89cc-b3d440cbad78",
       name: "Gary Terol",
@@ -106,7 +90,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/gary-terol/",
    },
    {
-      id: 10,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fcarlos.jpg?alt=media&token=be83b56c-a848-4028-8a2f-a1a293a80c62",
       name: "Carlos Florêncio",
@@ -118,7 +101,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/carlosflorencio/",
    },
    {
-      id: 11,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Flinda.jpg?alt=media&token=c8585b38-ca90-4093-9f28-eb37d485d8ed",
       name: "Linda Fairgrieve",
@@ -129,7 +111,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/lindafairgrieve/",
    },
    {
-      id: 12,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fzippy.jpg?alt=media&token=e7221990-e3fe-4453-9fc8-f4377251e448",
       name: "Zarbab Aamir",
@@ -141,7 +122,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/zarbab-aamir-601065b1/",
    },
    {
-      id: 13,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FHugo.jpg?alt=media&token=b0a67b4f-ec54-45d8-92a3-64c17ad216c5",
       name: "Hugo Lammers",
@@ -154,7 +134,6 @@ const people = [
       linkedinUrl: "https://www.linkedin.com/in/hugo-lammers-57730920/",
    },
    {
-      id: 14,
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FLina.jpg?alt=media&token=2ae6cfc0-3c95-4e92-a3c2-2bbe3e2edad9",
       name: "Carolina Gentsch",
@@ -164,6 +143,40 @@ const people = [
          "\n" +
          "In her free time she loves to play the guitar, recently started snowboarding and has this unique hobby called LARP: google will help you to learn more about it ;)",
       linkedinUrl: "https://www.linkedin.com/in/carolina-gentsch-hrm/",
+   },
+   {
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FGonc%CC%A7alo.jpg?alt=media&token=36e33bae-ab55-493e-8c15-6e6f68594f88",
+      name: "Gonçalo Santos",
+      role: "Software Engineer",
+      bio:
+         "Gonçalo is a Portuguese Computer Science Engineer who was involved in several projects as a front-end developer, focused on web and mobile applications.\n" +
+         "\n" +
+         "In his free time he likes to surf and travel",
+      linkedinUrl: "https://www.linkedin.com/in/gon%C3%A7alothsantos/",
+   },
+   {
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FSimone.jpg?alt=media&token=983cb018-a6ed-4670-be1a-fe5cbeb1ecc0",
+      name: "Simone Angeloni",
+      role: "Product Manager",
+      bio:
+         "Simone holds a Master’s degree in Mathematics from ETH Zürich. After 4 years at Big4  consulting company working as a Digital Experience & Innovation consultant, he decided to take a big leap and join a start-up. \n" +
+         "In his free time he likes to travel and has been to all ASEAN countries. His passion is to discover new music - yes he flew half a continent just for a concert (twice!).\n" +
+         "\n" +
+         "At CareerFairy he is our Product Manager focussing on the growth of our platform.",
+      linkedinUrl: "https://www.linkedin.com/in/sangeloni/",
+   },
+   {
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fdaniel.jpeg?alt=media&token=b2f8164d-a9fd-4112-b548-de4649c1e38a",
+      name: "Daniel Butt",
+      role: "Marketing Manager",
+      bio:
+         "The latest addition to the German Market Team and the sunburst of energy that is coming the German market's way -\n" +
+         'Daniel has a Master\'s degree in "something with media", blogged about feminist erotica, dabbled briefly in revolutionising the energy industry, spent lots of time recruiting young talent for NGOs (we adore this bit), growing B2B markets and, as a proper German linguistic enthusiast, loves run-on-sentences.\n' +
+         "At CareerFairy he will put his skills into action by growing our business in Germany, so his lifelong dream of becoming Pirate King will just have to wait a tad longer.",
+      linkedinUrl: "https://www.linkedin.com/in/daniel-butt-8b138314b/",
    },
 ]
 
