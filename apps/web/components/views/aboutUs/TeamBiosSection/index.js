@@ -47,7 +47,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Ffabian.jpg?alt=media&token=77bab994-e8b9-4894-ae18-c2442c4c3ced",
       name: "Fabian Koolstra",
-      role: "Sales",
+      role: "Business Development UK",
       bio: "Fabian obtained his Master’s degree in Accountancy & Control at the University of Amsterdam. After that he joined the Erasmus Student Network in Utrecht and made sure foreign students in Utrecht had a home away from home. Starting his career at Utrecht University where he was a project manager for student and career events. This led to using the CareerFairy platform and subsequently joining the team to expand it throughout Europe.\n\nIn his free time he’s making music, playing music or partying. \n",
       linkedinUrl: "https://www.linkedin.com/in/fabian-koolstra/",
    },
@@ -55,7 +55,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fkandee.jpg?alt=media&token=c2424e74-a6b5-4ffc-b9e8-6d3344960984",
       name: "Kandeeban Uthayarajah",
-      role: "Business Development",
+      role: "Business Development CH",
       bio: "Kandee holds a bachelor's degree in business administration with a major in general management. He is currently studying for a Master's degree in Business Information Systems. During his education, he has always been passionate about entrepreneurship. Which is why he was also looking for a job in a start-up. As you can see he succeeded, he landed here at CareerFairy as an intern in Business Development.\n\nIn his free time, Kandee loves to party at the weekend after going running or to the gym several times during the week. He also likes to travel around the world and read books.\n",
       linkedinUrl:
          "https://www.linkedin.com/in/kandeeban-uthayarajah-850a541b4/",
@@ -72,7 +72,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FLisa.jpg?alt=media&token=e95898ed-fa21-42a4-9874-443b331f4de8",
       name: "Lisa Brandenberger",
-      role: "Business Development",
+      role: "Sales and Marketing Intern",
       bio:
          "Lisa is about to finish her Bachelor’s degree in Applied Linguistics at ZHAW. Her passion for languages has led her to gain a toehold in an international start up. Besides work, she loves spending time with her family and friends or pursuing her interests in photography, social media and fashion trends.\n" +
          "In addition to her commitment to ESN Winterthur, Lisa also tries to keep up to date with the latest political developments.\n",
@@ -104,7 +104,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Flinda.jpg?alt=media&token=c8585b38-ca90-4093-9f28-eb37d485d8ed",
       name: "Linda Fairgrieve",
-      role: "B2B Content Marketing",
+      role: "Head of Marketing",
       bio:
          "After obtaining the Swiss Federal Marketing Diploma as a generalist, Linda gained her digital marketing scars on the front lines of Swiss Digital Agencies. Passionate about B2B sector and communication, she never stops learning and has found that Content Management for startup growth is her playground of choice.\n\n" +
          "When she is not reading marketing blogs or testing new martech tools, she makes memories in the company of her colourful ‘family of friends’ discovering new wine varieties.",
@@ -114,7 +114,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fzippy.jpg?alt=media&token=e7221990-e3fe-4453-9fc8-f4377251e448",
       name: "Zarbab Aamir",
-      role: "Marketing Intern",
+      role: "Digital Marketing & Social Media",
       bio:
          "Zarbab (but call her Zippy) has recently graduated with a bachelor’s in International Business Management with a major in Digital Marketing. Zippy joined the team as a marketing intern to gain further skills and knowledge in the field of marketing. She believes this experience will give her the right skill-set when moving forward with her career. \n" +
          "\n" +
@@ -125,7 +125,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FHugo.jpg?alt=media&token=b0a67b4f-ec54-45d8-92a3-64c17ad216c5",
       name: "Hugo Lammers",
-      role: "Business Development & Finance",
+      role: "Business Development NL & Finance",
       bio:
          "After a few years in a financial consulting role at a Big4 firm, Hugo joined a Dutch scale-up as Business Development Manager.\n" +
          "He now likes to apply both his finance and BD experience in the fast-growth environment at CareerFairy.\n" +
@@ -137,7 +137,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FLina.jpg?alt=media&token=2ae6cfc0-3c95-4e92-a3c2-2bbe3e2edad9",
       name: "Carolina Gentsch",
-      role: "Business Development",
+      role: "Business Development DE",
       bio:
          "Carolina holds a M.Sc. in Human Resource Management, with a background in Applied Business Languages and International Management. While studying and working in Japan, China and the USA, she fostered her passion for working and interacting with people rather than solely with numbers. This led her to join the CareerFairy team as a Business Development Manager, where she combines her people skills with her management background. \n" +
          "\n" +
