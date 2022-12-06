@@ -105,7 +105,7 @@ jobs:
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
          needs.build_app_for_tests.outputs.workflow == 'true'
-      runs-on: ubuntu-latest
+      runs-on: ubuntu-20.04
       timeout-minutes: 25
       env:
          # https://turborepo.org/docs/guides/continuous-integration
