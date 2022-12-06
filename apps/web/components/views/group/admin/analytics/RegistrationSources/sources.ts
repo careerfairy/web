@@ -17,27 +17,17 @@ export type RegistrationSource = {
  */
 export const VALID_SOURCES: RegistrationSource[] = [
    {
-      displayName: "University Network Promo (Paid)",
-      helpDescription: "User registered through a paid university campaign.",
-      color: "#C13584",
-      match: (utms) => {
-         // e.g unicc-ch-newsletter, unicc_ch_newsletter
-         const matchSource = /[a-z]{2}[-_]newsletter$/i.test(utms?.utm_source)
-         const matchMedium = /email/i.test(utms?.utm_medium)
-
-         return matchSource && matchMedium
-      },
-   },
-   {
       displayName: "University Network Promo",
       helpDescription: "User registered through a university campaign.",
       color: "#7431e2",
       match: (utms) => {
-         // e.g unicc_de, student_assoc_ch, unicc-ch
-         const matchSource =
-            /student_assoc[_-][a-z]{2}|unicc[_-][a-z]{2}/i.test(
-               utms?.utm_source
-            )
+         const validSources = [
+            // e.g unicc-ch-newsletter, unicc_ch_newsletter
+            /[a-z]{2}[-_]newsletter$/i,
+            // e.g unicc_de, student_assoc_ch, unicc-ch
+            /student_assoc[_-][a-z]{2}|unicc[_-][a-z]{2}/i,
+         ]
+         const matchSource = validSources.some((r) => r.test(utms?.utm_source))
          const matchMedium = /email/i.test(utms?.utm_medium)
 
          return matchSource && matchMedium
