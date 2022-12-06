@@ -40,6 +40,18 @@ export const userShouldBeGroupAdmin = (): OnCallMiddleware<{
 }
 
 /**
+ * Validate the user auth exists
+ */
+export const userAuthExists = (): OnCallMiddleware => {
+   return async (data, context, next) => {
+      // throws if auth isn't present
+      await validateUserAuthExists(context)
+
+      return next()
+   }
+}
+
+/**
  * Validate a schema against the data property
  * @param objectSchemaShape
  */

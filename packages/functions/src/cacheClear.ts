@@ -8,16 +8,17 @@ export const periodicallyRemoveCachedDocument = functions.pubsub
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       const results = await Promise.allSettled([
-         /**
-          * Remove cache/function/analytics documents older than 2 days
-          */
+         // remove user recommended events older than 2 days
+         removeExpiredCacheDocuments(
+            "cache/functions/recommendedEvents",
+            2 * DAY_IN_SECONDS
+         ),
+         // Remove cache/function/analytics documents older than 2 days
          removeExpiredCacheDocuments(
             "cache/functions/analytics",
             2 * DAY_IN_SECONDS
          ),
-         /**
-          * Remove Merge cache older than 3 days
-          */
+         // Remove Merge cache older than 3 days
          removeExpiredCacheDocuments("cache/merge/getJobs", 3 * DAY_IN_SECONDS),
          removeExpiredCacheDocuments("cache/merge/getJob", 3 * DAY_IN_SECONDS),
          removeExpiredCacheDocuments(
