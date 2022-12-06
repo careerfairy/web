@@ -53,6 +53,15 @@ const JobApply = ({ livestream }: Props) => {
       return null
    }
 
+   // don't show the job list if the event didn't start yet
+   const startDate = livestream?.start?.toDate()?.getTime()
+   // also don't show the job list while the students are joining,
+   // show them 20min after the livestream has started at least
+   const delay = 20 * 60 * 1000 // 20m
+   if (startDate > Date.now() - delay) {
+      return null
+   }
+
    return (
       <SuspenseWithBoundary fallback={<LoadingJobsSpinner />} hide={true}>
          <JobList livestream={livestream} />
@@ -124,6 +133,7 @@ const JobItem = ({ job, handleSelectJob }: JobItemProps) => {
 
    return (
       <ListItem
+         sx={{ marginBottom: 3 }}
          disablePadding
          key={id}
          secondaryAction={
