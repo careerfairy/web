@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import VideoContainer from "./video-container/VideoContainer"
 import NotificationsContainer from "./notifications-container/NotificationsContainer"
-import MiniChatContainer from "./LeftMenu/categories/chat/MiniChatContainer"
+import MiniChatContainer from "./sharedComponents/chat/MiniChatContainer"
 import IconsContainer from "./icons-container/IconsContainer"
 import { useCurrentStream } from "../../../context/stream/StreamContext"
 import StreamNotifications from "./sharedComponents/StreamNotifications"
@@ -195,7 +195,6 @@ const StreamerOverview = ({
          <MiniChatContainer
             className={classes.miniChatContainer}
             livestream={currentLivestream}
-            isStreamer={isStreamer}
          />
 
          <IconsContainer className={classes.iconsContainer} />

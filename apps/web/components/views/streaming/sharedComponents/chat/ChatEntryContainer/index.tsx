@@ -1,16 +1,16 @@
 import React, { memo, useEffect, useState } from "react"
 import { Box, Card, IconButton, Popover, Typography } from "@mui/material"
-import { getTimeFromNow } from "../../../../../../helperFunctions/HelperFunctions"
-import { useAuth } from "../../../../../../../HOCs/AuthProvider"
+import { getTimeFromNow } from "../../../../../helperFunctions/HelperFunctions"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined"
 import EmotesPreview from "./EmotesPreview"
 import EmotesPopUp from "./EmotesPopUp"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import isEqual from "react-fast-compare"
-import LinkifyText from "../../../../../../util/LinkifyText"
+import LinkifyText from "../../../../../util/LinkifyText"
 import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
 const dayjs = require("dayjs")
 const relativeTime = require("dayjs/plugin/relativeTime")

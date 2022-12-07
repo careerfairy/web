@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import ViewerComponent from "./viewer-component/ViewerComponent"
-import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer"
+import MiniChatContainer from "../streaming/sharedComponents/chat/MiniChatContainer"
 import IconsContainer from "../streaming/icons-container/IconsContainer"
 import RatingContainer from "./rating-container/RatingContainer"
 import { Backdrop } from "@mui/material"
@@ -115,7 +115,6 @@ const ViewerOverview = ({
                   mobile={mobile}
                   className={classes.miniChatContainer}
                   livestream={currentLivestream}
-                  isStreamer={false}
                />
             )}
          </div>
