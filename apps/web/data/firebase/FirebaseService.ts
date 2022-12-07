@@ -1261,6 +1261,26 @@ class FirebaseService {
       return ref.onSnapshot(callback)
    }
 
+   deleteChatEntry = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      chatEntryId: string
+   ) => {
+      let ref = streamRef.collection("chatEntries").doc(chatEntryId)
+      return ref.delete()
+   }
+
+   deleteAllChatEntries = async (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>
+   ) => {
+      const snaps = await streamRef.collection("chatEntries").get()
+
+      return Promise.allSettled(
+         snaps.docs.map((doc) => {
+            return doc.ref.delete().catch(console.error)
+         })
+      )
+   }
+
    putChatEntry = (streamRef, chatEntry) => {
       chatEntry.timestamp = this.getServerTimestamp()
       const newChatEntry = {

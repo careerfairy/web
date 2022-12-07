@@ -114,7 +114,6 @@ const ViewerOverview = ({
                <MiniChatContainer
                   mobile={mobile}
                   className={classes.miniChatContainer}
-                  livestream={currentLivestream}
                />
             )}
          </div>

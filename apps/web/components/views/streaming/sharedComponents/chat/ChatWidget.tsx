@@ -3,6 +3,7 @@ import React, {
    useCallback,
    useContext,
    useEffect,
+   useMemo,
    useState,
 } from "react"
 import { Box, Button, Collapse, IconButton, TextField } from "@mui/material"
@@ -33,11 +34,13 @@ import EmotesModal from "./EmotesModal"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SystemStyleObject } from "@mui/system/styleFunctionSx/styleFunctionSx"
 import DocumentChange = firebase.firestore.DocumentChange
+import ConfirmDeleteModal from "../../modal/ConfirmDeleteModal"
+import { errorLogAndNotify } from "../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    sendIcon: {
       background: "white",
-      color: "primary.main",
+      color: "black",
       borderRadius: "50%",
       fontSize: 15,
    },
@@ -45,8 +48,6 @@ const styles = sxStyles({
       color: "grey",
    },
    sendBtn: {
-      width: 30,
-      height: 30,
       background: (theme) => alpha(theme.palette.primary.main, 0.5),
       "&$buttonDisabled": {
          color: grey[800],
@@ -72,6 +73,10 @@ const styles = sxStyles({
          overflowX: "hidden",
       },
    },
+   textWrapper: {
+      backgroundColor: (theme) => theme.palette.background.paper,
+      p: 0.5,
+   },
 })
 
 const now = new Date()
@@ -91,17 +96,18 @@ const ChatWidget = ({
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
    const streamRef = useStreamRef()
-
-   const { isStreamer, currentLivestream } = useCurrentStream()
-   const { authenticatedUser, userData } = useAuth()
+   const { isStreamer, currentLivestream, presenter } = useCurrentStream()
+   const { authenticatedUser, userData, adminGroups } = useAuth()
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
 
+   const [chatEntryIdToDelete, setChatEntryIdToDelete] = useState(null)
    const [chatEntries, setChatEntries] = useState([])
    const [focused, setFocused] = useState(false)
    const [submitting, setSubmitting] = useState(false)
    const [currentEntry, setCurrentEntry] = useState(null)
    const [numberOfLatestChanges, setNumberOfLatestChanges] = useState(0)
    const [newChatEntry, setNewChatEntry] = useState("")
+   const [deletingChatEntry, setDeletingChatEntry] = useState(false)
 
    const isEmpty =
       !newChatEntry.trim() ||
@@ -151,6 +157,11 @@ const ChatWidget = ({
          setNumberOfMissedEntries?.(3) // resets the missed entries back to 3
       }
    }, [tutorialSteps.streamerReady])
+
+   const isStreamAdmin = useMemo(
+      () => presenter.isStreamAdmin(adminGroups),
+      [adminGroups, presenter]
+   )
 
    const isOpen = (property) => {
       return Boolean(
@@ -226,6 +237,23 @@ const ChatWidget = ({
       }
    }
 
+   const handleDeleteChatEntry = useCallback(async () => {
+      try {
+         setDeletingChatEntry(true)
+         await firebase.deleteChatEntry(streamRef, chatEntryIdToDelete)
+         setChatEntryIdToDelete(null)
+      } catch (e) {
+         errorLogAndNotify(e, {
+            message: "Error deleting chat entry",
+         })
+      }
+      setDeletingChatEntry(false)
+   }, [chatEntryIdToDelete, firebase, streamRef])
+
+   const handleCloseDeleteChatEntryDialog = useCallback(() => {
+      setChatEntryIdToDelete(null)
+   }, [])
+
    const playIcon = (
       <div>
          <IconButton
@@ -244,7 +272,6 @@ const ChatWidget = ({
    if (notVisible) {
       return null
    }
-
    return (
       <>
          <Box
@@ -256,6 +283,9 @@ const ChatWidget = ({
                   last={index === entries.length - 1}
                   key={chatEntry.id}
                   chatEntry={chatEntry}
+                  setChatEntryIdToDelete={setChatEntryIdToDelete}
+                  userIsStreamer={isStreamer}
+                  isStreamAdmin={isStreamAdmin}
                />
             ))}
          />
@@ -269,7 +299,7 @@ const ChatWidget = ({
             }
             open={isOpen(15)}
          >
-            <Box bgcolor={"white"} p={0.5}>
+            <Box sx={styles.textWrapper}>
                <TextField
                   variant="outlined"
                   fullWidth
@@ -307,6 +337,17 @@ const ChatWidget = ({
             chatEntry={currentEntry}
             onClose={handleClearCurrentEntry}
          />
+         {chatEntryIdToDelete && (
+            <ConfirmDeleteModal
+               description={
+                  "Are you sure you want to delete this message? This action cannot be undone."
+               }
+               title={"Delete question"}
+               loading={deletingChatEntry}
+               onClose={handleCloseDeleteChatEntryDialog}
+               onConfirm={handleDeleteChatEntry}
+            />
+         )}
       </>
    )
 }

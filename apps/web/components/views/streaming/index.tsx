@@ -192,10 +192,7 @@ const StreamerOverview = ({
          <NotificationsContainer handRaiseMenuOpen={selectedState === "hand"} />
          <StreamNotifications isStreamer={true} />
          <HandRaiseNotifier />
-         <MiniChatContainer
-            className={classes.miniChatContainer}
-            livestream={currentLivestream}
-         />
+         <MiniChatContainer className={classes.miniChatContainer} />
 
          <IconsContainer className={classes.iconsContainer} />
          <Backdrop

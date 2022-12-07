@@ -1,9 +1,10 @@
-import React, { memo, useEffect, useState } from "react"
+import React, { memo, useCallback, useEffect, useState } from "react"
 import { Box, Card, IconButton, Popover, Typography } from "@mui/material"
 import { getTimeFromNow } from "../../../../../helperFunctions/HelperFunctions"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import EmojiEmotionsOutlinedIcon from "@mui/icons-material/EmojiEmotionsOutlined"
+import DeleteForeverIcon from "@mui/icons-material/DeleteForever"
 import EmotesPreview from "./EmotesPreview"
 import EmotesPopUp from "./EmotesPopUp"
 import Fade from "@stahl.luke/react-reveal/Fade"
@@ -17,31 +18,28 @@ const relativeTime = require("dayjs/plugin/relativeTime")
 dayjs.extend(relativeTime)
 
 const styles = sxStyles({
-   emotesMenuButton: {
-      position: "absolute",
-      top: "50%",
-      // right: ({ isMe }) => !isMe && "-30px",
-      // left: ({ isMe }) => isMe && "-30px",
-      right: "-30px",
-      transform: "translateY(-50%)",
+   root: {
+      display: "flex",
+      justifyContent: "flex-start",
+      flexWrap: "nowrap",
+      alignItems: "center",
+   },
+   rootMe: {
+      justifyContent: "flex-start",
+      flexDirection: "row-reverse",
+   },
+   chatButtons: {
       opacity: 0.3,
    },
-   emotesMenuButtonMe: {
-      right: 0,
-      left: "unset",
-   },
    chatWrapper: {
-      marginBottom: 1.4,
-      maxWidth: "80%",
+      my: 0.7,
+      maxWidth: "74%",
       width: "min-content",
       display: "flex",
       position: "relative",
    },
-   chatWrapperMe: {
-      marginLeft: "auto",
-   },
    chatWrapperLast: {
-      marginBottom: 0,
+      mb: 0,
    },
    emotesPaperWrapper: {
       display: "flex",
@@ -98,26 +96,32 @@ type Props = {
    chatEntry: LivestreamChatEntry
    handleSetCurrentEntry: (entry: LivestreamChatEntry) => void
    last: boolean
+   setChatEntryIdToDelete: React.Dispatch<React.SetStateAction<string>>
+   userIsStreamer: boolean
+   isStreamAdmin: boolean
 }
 const ChatEntryContainer = ({
    chatEntry,
    handleSetCurrentEntry,
    last,
+   setChatEntryIdToDelete,
+   userIsStreamer,
+   isStreamAdmin,
 }: Props) => {
    const firebase = useFirebaseService()
    const isNew = chatEntry.timestamp === null
    const [anchorEl, setAnchorEl] = useState(null)
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    const [time, setTime] = useState(getTimeFromNow(chatEntry.timestamp))
 
-   const [isMe, setIsMe] = useState(
-      chatEntry?.authorEmail === authenticatedUser?.email
-   )
-   const [isStreamer, setIsStreamer] = useState(
+   const isMe = chatEntry?.authorEmail === authenticatedUser?.email
+
+   const isStreamer =
       chatEntry?.authorEmail === "Streamer" || chatEntry.type === "streamer"
-   )
-   console.log("-> chatEntry.type", chatEntry.type)
+
+   const canDelete =
+      isMe || userIsStreamer || userData?.isAdmin || isStreamAdmin
 
    const hasTimestamp = Boolean(chatEntry.timestamp)
 
@@ -130,14 +134,6 @@ const ChatEntryContainer = ({
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [hasTimestamp])
 
-   useEffect(() => {
-      setIsMe(chatEntry?.authorEmail === authenticatedUser?.email)
-   }, [chatEntry?.authorEmail, authenticatedUser?.email])
-
-   useEffect(() => {
-      setIsStreamer(chatEntry?.authorEmail === "Streamer")
-   }, [chatEntry?.authorEmail])
-
    const handleOpenEmotesMenu = (event) => {
       setAnchorEl(event.currentTarget)
    }
@@ -145,77 +141,91 @@ const ChatEntryContainer = ({
       setAnchorEl(null)
    }
 
+   const handleClickDeleteChatEntry = useCallback(() => {
+      setChatEntryIdToDelete(chatEntry.id)
+   }, [chatEntry.id, setChatEntryIdToDelete])
+
    const handleClickPreview = () => handleSetCurrentEntry(chatEntry)
 
    const open = Boolean(anchorEl)
    return (
       <Fade left={!isMe && isNew} right={isMe && isNew} duration={250}>
-         <Box
-            component={"span"}
-            sx={[
-               styles.chatWrapper,
-               isMe && styles.chatWrapperMe,
-               last && styles.chatWrapperLast,
-            ]}
-         >
-            <Popover
-               id="mouse-over-popover"
-               elevation={20}
-               PaperProps={{
-                  sx: styles.emotesPaperWrapper,
-               }}
-               open={open}
-               anchorEl={anchorEl}
-               anchorOrigin={{
-                  vertical: "top",
-                  horizontal: "center",
-               }}
-               transformOrigin={{
-                  vertical: "top",
-                  horizontal: "left",
-               }}
-               onClose={handleCloseEmotesMenu}
-            >
-               <EmotesPopUp
-                  chatEntry={chatEntry}
-                  firebase={firebase}
-                  handleCloseEmotesMenu={handleCloseEmotesMenu}
-               />
-            </Popover>
+         <Box sx={[styles.root, isMe && styles.rootMe]}>
             <Box
-               component={Card}
-               sx={[
-                  styles.chatBubble,
-                  isStreamer && styles.chatBubbleStreamer,
-                  isMe && styles.chatBubbleMe,
-                  chatEntry.type === "broadcast" &&
-                     styles.chatBubbleBroadcaster,
-                  isMe || isStreamer || chatEntry.type === "broadcast"
-                     ? styles.textWhite
-                     : null,
-               ]}
+               component={"span"}
+               sx={[styles.chatWrapper, last && styles.chatWrapperLast]}
             >
-               <LinkifyText>{chatEntry.message}</LinkifyText>
-               <Typography
-                  sx={[styles.author, (isMe || isStreamer) && styles.textWhite]}
+               <Popover
+                  id="mouse-over-popover"
+                  elevation={20}
+                  PaperProps={{
+                     sx: styles.emotesPaperWrapper,
+                  }}
+                  open={open}
+                  anchorEl={anchorEl}
+                  anchorOrigin={{
+                     vertical: "top",
+                     horizontal: "center",
+                  }}
+                  transformOrigin={{
+                     vertical: "top",
+                     horizontal: "left",
+                  }}
+                  onClose={handleCloseEmotesMenu}
                >
-                  {chatEntry.authorName}
-               </Typography>
-               <Typography
-                  align="right"
-                  sx={[styles.stamp, (isMe || isStreamer) && styles.textWhite]}
+                  <EmotesPopUp
+                     chatEntry={chatEntry}
+                     firebase={firebase}
+                     handleCloseEmotesMenu={handleCloseEmotesMenu}
+                  />
+               </Popover>
+               <Box
+                  component={Card}
+                  sx={[
+                     styles.chatBubble,
+                     isStreamer && styles.chatBubbleStreamer,
+                     isMe && styles.chatBubbleMe,
+                     chatEntry.type === "broadcast" &&
+                        styles.chatBubbleBroadcaster,
+                     isMe || isStreamer || chatEntry.type === "broadcast"
+                        ? styles.textWhite
+                        : null,
+                  ]}
                >
-                  {time || "..."}
-               </Typography>
+                  <LinkifyText>{chatEntry.message}</LinkifyText>
+                  <Typography
+                     sx={[
+                        styles.author,
+                        (isMe || isStreamer) && styles.textWhite,
+                     ]}
+                  >
+                     {chatEntry.authorName}
+                  </Typography>
+                  <Typography
+                     align="right"
+                     sx={[
+                        styles.stamp,
+                        (isMe || isStreamer) && styles.textWhite,
+                     ]}
+                  >
+                     {time || "..."}
+                  </Typography>
+               </Box>
+               <EmotesPreview
+                  onClick={handleClickPreview}
+                  chatEntry={chatEntry}
+               />
             </Box>
-            <IconButton
-               size="small"
-               sx={[styles.emotesMenuButton, isMe && styles.emotesMenuButtonMe]}
-               onClick={handleOpenEmotesMenu}
-            >
-               <EmojiEmotionsOutlinedIcon />
-            </IconButton>
-            <EmotesPreview onClick={handleClickPreview} chatEntry={chatEntry} />
+            <Box sx={styles.chatButtons}>
+               <IconButton size="small" onClick={handleOpenEmotesMenu}>
+                  <EmojiEmotionsOutlinedIcon />
+               </IconButton>
+               {canDelete && (
+                  <IconButton onClick={handleClickDeleteChatEntry} size="small">
+                     <DeleteForeverIcon />
+                  </IconButton>
+               )}
+            </Box>
          </Box>
       </Fade>
    )

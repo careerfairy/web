@@ -16,6 +16,9 @@ const styles = sxStyles({
       },
    },
    chatContainer: {
+      "& > :last-child": {
+         flex: 1,
+      },
       height: "100vh",
       display: "flex",
       flexDirection: "column",
