@@ -8,8 +8,8 @@ import { admin } from "./api/firestoreAdmin"
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
-import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
-import { logAndThrow, validateUserAuthExists } from "./lib/validations"
+import { groupRepo, marketingUsersRepo } from "./api/repositories"
+import { logAndThrow } from "./lib/validations"
 import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
@@ -312,7 +312,8 @@ export const resendPostmarkEmailVerificationEmailWithPin_v2 =
       }
    })
 
-export const validateUserEmailWithPin = functions
+// eslint-disable-next-line camelcase
+export const validateUserEmailWithPin_v2 = functions
    .runWith({
       minInstances: 1,
    })
@@ -353,6 +354,39 @@ export const validateUserEmailWithPin = functions
                )
 
                functions.logger.log("Updated User Record", updatedUserRecord)
+
+               // after pin confirmation send welcome email
+               functions.logger.log(
+                  `Starting sending welcome email to  ${recipientEmail}`
+               )
+               const email = {
+                  TemplateId: process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL,
+                  From: "CareerFairy <noreply@careerfairy.io>",
+                  To: recipientEmail,
+                  TemplateModel: {
+                     user_name: `${user.firstName || ""} ${
+                        user.lastName || ""
+                     }`,
+                  },
+               }
+
+               try {
+                  const response = await client.sendEmailWithTemplate(email)
+
+                  if (response.ErrorCode) {
+                     functions.logger.error(
+                        `An error has occurred sending welcome email to ${recipientEmail}`
+                     )
+                  } else {
+                     functions.logger.log(
+                        `The welcome email was sent successfully to ${recipientEmail}`
+                     )
+                  }
+               } catch (error) {
+                  functions.logger.error(
+                     `An error has occurred sending welcome email to ${recipientEmail}`
+                  )
+               }
 
                return updatedUserRecord
             } else {
@@ -681,60 +715,6 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
             `Error deleting user ${userEmail} with the id ${userId} in firestore`,
             error
          )
-         throw new functions.https.HttpsError(error.code, error.message)
-      }
-   }
-)
-
-export const sendPostmarkWelcomeEmail = functions.https.onCall(
-   async ({ recipientEmail }, context) => {
-      let error
-
-      functions.logger.log(
-         `Starting sending welcome email to  ${recipientEmail}`
-      )
-
-      try {
-         const { email: recipientEmail } = await validateUserAuthExists(context)
-         const user = await userRepo.getUserDataById(recipientEmail)
-
-         if (user) {
-            const userName = `${user.firstName || ""} ${user.lastName || ""}`
-
-            const email = {
-               TemplateId: process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL,
-               From: "CareerFairy <noreply@careerfairy.io>",
-               To: recipientEmail,
-               TemplateModel: { user_name: userName },
-            }
-
-            const response = await client.sendEmailWithTemplate(email)
-            functions.logger.info("response", response)
-
-            if (response.ErrorCode) {
-               functions.logger.error(
-                  "error in sendEmailWithTemplate response",
-                  response
-               )
-            }
-         } else {
-            functions.logger.error(
-               `Was unable to find any userData with ${recipientEmail}`
-            )
-
-            error = {
-               code: "not-found",
-               message: `Was unable to find any userData with ${recipientEmail}`,
-            }
-         }
-      } catch (error) {
-         functions.logger.warn(
-            `An error has occurred sending welcome email to ${recipientEmail}`
-         )
-         throw new functions.https.HttpsError("unknown", error)
-      }
-
-      if (error) {
          throw new functions.https.HttpsError(error.code, error.message)
       }
    }
