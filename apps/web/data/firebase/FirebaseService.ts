@@ -148,7 +148,7 @@ class FirebaseService {
 
    validateUserEmailWithPin = async (userInfo) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin"
+         "validateUserEmailWithPin_v2"
       )
       return validateUserEmailWithPin({ userInfo })
    }
@@ -215,13 +215,6 @@ class FirebaseService {
       )
 
       return sendBasicTemplateEmail(dataObj)
-   }
-
-   sendPostmarkWelcomeEmail = async (userData) => {
-      const sendPostmarkWelcomeEmail = this.functions.httpsCallable(
-         "sendPostmarkWelcomeEmail"
-      )
-      return sendPostmarkWelcomeEmail(userData)
    }
 
    /**
