@@ -58,6 +58,7 @@ jobs:
                    - 'packages/seed-data/**'
                  shared-lib:
                    - 'packages/shared-lib/**'
+
    # Run Unit Tests
    unit_tests:
       name: "Unit Tests"
@@ -100,7 +101,10 @@ jobs:
       name: E2E Tests - ${{ matrix.shard }}/${{ matrix.total }}
       needs: [build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
-      if: ${{ false }}
+      if: |
+         needs.build_app_for_tests.outputs.webapp == 'true' ||
+         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
+         needs.build_app_for_tests.outputs.workflow == 'true'
       strategy:
          fail-fast: false
          matrix:
@@ -149,8 +153,10 @@ jobs:
               key: "${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}"
               restore-keys: |
                  ${{ runner.os }}-playwright-
-         - name: Install Playwright's dependencies
-           #           if: steps.playwright-cache.outputs.cache-hit != 'true'
+
+         - name:
+              Install Playwright's dependencies
+              #           if: steps.playwright-cache.outputs.cache-hit != 'true'
            run: npx playwright install --with-deps
 
          - name: Run Playwright End to End tests
@@ -175,7 +181,7 @@ jobs:
    # Deploy
    deploy:
       name: "Deploy"
-      needs: [unit_tests]
+      needs: [e2e_tests, unit_tests]
       runs-on: ubuntu-latest
       timeout-minutes: 20
       steps:
