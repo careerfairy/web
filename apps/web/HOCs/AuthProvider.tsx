@@ -77,7 +77,7 @@ const AuthProvider = ({ children }) => {
 
    const { pathname, replace, asPath } = useRouter()
    const firebaseService = useFirebaseService()
-   const [claims, setClaims] = useState(null)
+   const [claims, setClaims] = useState<{ [p: string]: any }>(null)
 
    const query = useMemo(
       () =>
@@ -221,7 +221,7 @@ const AuthProvider = ({ children }) => {
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData?.authId, userData?.isAdmin])
 
-   const contextValue = useMemo(
+   const contextValue = useMemo<DefaultContext>(
       () => ({
          authenticatedUser: auth,
          userData: userData,

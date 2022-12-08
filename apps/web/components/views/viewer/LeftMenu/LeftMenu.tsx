@@ -21,6 +21,7 @@ import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
 import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { CurrentStreamContextInterface } from "../../../../context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -117,11 +118,8 @@ const LeftMenu = ({
             key={"questions-category-tab"}
             showMenu={showMenu}
             streamer={streamer}
-            livestream={livestream}
             isMobile={isMobile}
             selectedState={selectedState}
-            user={user}
-            userData={userData}
          />
       ),
       <PollCategory
@@ -262,7 +260,7 @@ type LeftMenuProps = {
    setHandRaiseActive: (args) => any
    streamer: any
    setSelectedState: (args) => any
-   selectedState: string
+   selectedState: CurrentStreamContextInterface["selectedState"]
    livestream: LivestreamEvent
    isMobile: boolean
 }

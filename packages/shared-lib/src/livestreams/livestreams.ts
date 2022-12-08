@@ -326,6 +326,22 @@ export interface LivestreamQuestion extends Identifiable {
    title: string
    type: "new" | "current"
    votes: number
+   emailOfVoters?: string[]
+   /**
+    * We store the most recent comment to the question on the question document
+    * */
+   firstComment?: LivestreamQuestion
+   /*
+    * The number of comments on the question
+    * */
+   numberOfComments?: number
+
+   /*
+    * The number of badges the question has
+    * */
+   badges: string[]
+
+   displayName?: string
 }
 
 export interface LivestreamPoll extends Identifiable {

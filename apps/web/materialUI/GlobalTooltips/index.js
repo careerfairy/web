@@ -45,7 +45,13 @@ const useStyles = makeStyles((theme) => {
    }
 })
 //
-export const WhiteTooltip = ({ title, children, open, style, ...props }) => {
+export const WhiteTooltip = ({
+   title,
+   children,
+   open,
+   style = {},
+   ...props
+}) => {
    const classes = useStyles()
 
    return (
