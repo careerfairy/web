@@ -72,6 +72,23 @@ const styles = sxStyles({
          padding: 1.4,
          overflowX: "hidden",
       },
+      "& .scroll-to-bottom-button": {
+         backgroundColor: "transparent !important",
+         // add an arrow down icon as a pseudo element
+         "&:after": {
+            borderRadius: 1,
+            content: "''",
+            position: "absolute",
+            top: "50%",
+            right: "50%",
+            transform: "translate(50%, -50%)",
+            width: 0,
+            height: 0,
+            borderLeft: "10px solid transparent",
+            borderRight: "10px solid transparent",
+            borderTop: (theme) => `10px solid ${theme.palette.grey[500]}`,
+         },
+      },
    },
    textWrapper: {
       backgroundColor: (theme) => theme.palette.background.paper,
@@ -276,6 +293,7 @@ const ChatWidget = ({
       <>
          <Box
             component={CustomScrollToBottom}
+            followButtonClassName="scroll-to-bottom-button"
             sx={[styles.scrollToBottom, scrollToBottomSx]}
             scrollItems={chatEntries.map((chatEntry, index, entries) => (
                <ChatEntryContainer
@@ -340,9 +358,13 @@ const ChatWidget = ({
          {chatEntryIdToDelete && (
             <ConfirmDeleteModal
                description={
-                  "Are you sure you want to delete this message? This action cannot be undone."
+                  <>
+                     Are you sure you want to delete this message?
+                     <br />
+                     This action cannot be undone.
+                  </>
                }
-               title={"Delete question"}
+               title={"Delete message"}
                loading={deletingChatEntry}
                onClose={handleCloseDeleteChatEntryDialog}
                onConfirm={handleDeleteChatEntry}

@@ -88,11 +88,12 @@ const MiniChatContainer = ({ className, mobile = false }: Props) => {
    const canDeleteAllChats = useMemo(
       () =>
          Boolean(
-            isStreamer ||
+            (isStreamer ||
                presenter.isStreamAdmin(adminGroups) ||
-               userData?.isAdmin
+               userData?.isAdmin) &&
+               open // only ever show the delete button if the chat is open
          ),
-      [isStreamer, presenter, adminGroups, userData]
+      [isStreamer, presenter, adminGroups, userData?.isAdmin, open]
    )
 
    const isOpen = (property) => {
@@ -225,7 +226,11 @@ const MiniChatContainer = ({ className, mobile = false }: Props) => {
          {deleteChatsDialogOpen && canDeleteAllChats && (
             <ConfirmDeleteModal
                description={
-                  "Are you sure you want to delete all messages? This action cannot be undone."
+                  <>
+                     Are you sure you want to delete all messages?
+                     <br />
+                     This action cannot be undone.
+                  </>
                }
                title={"Delete all messages"}
                loading={deletingAllMessages}
