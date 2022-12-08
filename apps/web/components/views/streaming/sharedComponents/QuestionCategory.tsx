@@ -515,7 +515,11 @@ const QuestionCategory = ({
             <ConfirmDeleteModal
                title={"Delete question"}
                description={
-                  "Are you sure you want to delete this question? This action cannot be undone."
+                  <>
+                     Are you sure you want to delete this question?
+                     <br />
+                     This action cannot be undone.
+                  </>
                }
                onConfirm={handleDeleteQuestion}
                loading={deletingQuestion}

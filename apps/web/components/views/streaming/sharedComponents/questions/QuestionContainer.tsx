@@ -107,14 +107,11 @@ const styles = sxStyles({
       color: "rgb(200,200,200)",
    },
    topContainer: {
-      // display: "flex",
-      // justifyContent: "space-between",
-      // flexDirection: "row-reverse",
-      // alignItems: "center",
-      top: 10,
-      left: 10,
-      right: 10,
-      // border: "2px solid pink",
+      top: 0,
+      left: 0,
+      right: 0,
+      px: "20px",
+      pt: "10px",
       position: "absolute",
    },
    deleteButton: {
@@ -125,7 +122,6 @@ const styles = sxStyles({
       display: "inline-block",
       fontWeight: 700,
       color: "primary.main",
-      // marginRight: "auto !important",
    },
    upVotesActive: {
       color: "white",
@@ -248,12 +244,17 @@ const QuestionContainer = ({
            ) > -1
          : false)
 
-   const canDeleteQuestion = Boolean(
-      streamer ||
-         userData?.userEmail === question?.author ||
-         userData?.isAdmin ||
-         presenter.isStreamAdmin(adminGroups)
+   const questionIsBeingAnswered = Boolean(
+      question?.type === "current" && isNextQuestions
    )
+
+   const canDeleteQuestion =
+      Boolean(
+         streamer ||
+            userData?.userEmail === question?.author ||
+            userData?.isAdmin ||
+            presenter.isStreamAdmin(adminGroups)
+      ) && !questionIsBeingAnswered
 
    useEffect(() => {
       if (livestream.id && question.id && showAllReactions) {

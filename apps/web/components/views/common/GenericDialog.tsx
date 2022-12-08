@@ -30,6 +30,7 @@ type Props = {
    titleOnCenter?: boolean
    additionalLeftButton?: JSX.Element
    additionalRightButton?: JSX.Element
+   closeBtnText?: string
 }
 
 const GenericDialog = ({
@@ -41,6 +42,7 @@ const GenericDialog = ({
    additionalLeftButton,
    maxWidth = "md",
    additionalRightButton,
+   closeBtnText = "Close",
 }: Props) => {
    const footerButtons =
       showCloseBtn || !!additionalLeftButton || !!additionalRightButton
@@ -62,7 +64,7 @@ const GenericDialog = ({
                {additionalLeftButton}
                {showCloseBtn && (
                   <Button variant="outlined" onClick={onClose}>
-                     Close
+                     {closeBtnText}
                   </Button>
                )}
                {additionalRightButton}

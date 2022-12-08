@@ -5,7 +5,7 @@ import LoadingButton from "@mui/lab/LoadingButton"
 
 type Props = {
    title: string
-   description: string
+   description: string | React.ReactNode
    onConfirm: () => Promise<any> | any
    onClose: () => void
    loading?: boolean
@@ -25,6 +25,7 @@ const ConfirmDeleteModal = (props: Props) => {
                Delete
             </LoadingButton>
          }
+         closeBtnText={"Cancel"}
          onClose={props.onClose}
          showCloseBtn
          titleOnCenter
