@@ -218,11 +218,11 @@ const ChatEntryContainer = ({
             </Box>
             <Box sx={styles.chatButtons}>
                <IconButton size="small" onClick={handleOpenEmotesMenu}>
-                  <EmojiEmotionsOutlinedIcon />
+                  <EmojiEmotionsOutlinedIcon fontSize={"small"} />
                </IconButton>
                {canDelete && (
                   <IconButton onClick={handleClickDeleteChatEntry} size="small">
-                     <DeleteForeverIcon />
+                     <DeleteForeverIcon fontSize={"small"} />
                   </IconButton>
                )}
             </Box>

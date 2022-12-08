@@ -140,7 +140,7 @@ test.describe("Streaming Journey", () => {
 
       // streamer posts a chat message
       const message = "First chat entry"
-      await streamerPage.openChat()
+      await streamerPage.openChat(0, true)
       await streamerPage.sendChatMessage(message)
 
       // viewer receives the message
