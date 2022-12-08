@@ -65,16 +65,9 @@ class StreamingPage extends CommonPage {
          .press("Enter")
    }
 
-   public openChat(
-      expectedNotifications: number = 0,
-      canDeleteAllChats = false
-   ) {
+   public openChat(expectedNotifications: number = 0) {
       return this.page
-         .getByRole("button", {
-            name:
-               `${expectedNotifications} Chat` +
-               (canDeleteAllChats ? " Clear all chats" : ""),
-         })
+         .locator(`div[role="button"]:has-text("${expectedNotifications}Chat")`)
          .click()
    }
 

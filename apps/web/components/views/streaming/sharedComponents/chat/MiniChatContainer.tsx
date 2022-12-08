@@ -12,7 +12,8 @@ import {
    AccordionDetails,
    AccordionSummary,
    Badge,
-   Button,
+   IconButton,
+   Tooltip,
    Typography,
 } from "@mui/material"
 import TutorialContext from "../../../../../context/tutorials/TutorialContext"
@@ -32,6 +33,7 @@ import useStreamRef from "../../../../custom-hook/useStreamRef"
 import { errorLogAndNotify } from "../../../../../util/CommonUtil"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
+import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
 
 const styles = sxStyles({
    accordionRoot: {
@@ -42,7 +44,7 @@ const styles = sxStyles({
       display: "flex",
    },
    header: {
-      height: "41px !important",
+      height: "45px !important",
       minHeight: "41px !important",
       padding: "10px 15px",
       "& .MuiAccordionSummary-content": {
@@ -198,14 +200,16 @@ const MiniChatContainer = ({ className, mobile = false }: Props) => {
                         </Typography>
                      </Box>
                      {canDeleteAllChats && (
-                        <Button
-                           size={"small"}
-                           onClick={handleClickDeleteAllChats}
-                           sx={styles.clearAllButton}
-                           color={"grey"}
-                        >
-                           Clear all chats
-                        </Button>
+                        <Box sx={styles.clearAllButton}>
+                           <Tooltip arrow title={"Clear all chat messages"}>
+                              <IconButton
+                                 size={"small"}
+                                 onClick={handleClickDeleteAllChats}
+                              >
+                                 <DeleteSweepIcon />
+                              </IconButton>
+                           </Tooltip>
+                        </Box>
                      )}
                   </AccordionSummary>
                   <AccordionDetails sx={styles.chatRoom}>

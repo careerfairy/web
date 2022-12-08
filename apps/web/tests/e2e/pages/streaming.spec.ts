@@ -140,12 +140,13 @@ test.describe("Streaming Journey", () => {
 
       // streamer posts a chat message
       const message = "First chat entry"
-      await streamerPage.openChat(0, true)
+      const name = user.firstName + " " + user.lastName.charAt(0)
+      await streamerPage.openChat()
       await streamerPage.sendChatMessage(message)
 
       // viewer receives the message
       await viewerPage.openChat(1)
-      await expect(viewerPage.text(`${message}Streamer`)).toBeVisible()
+      await expect(viewerPage.text(`${message}${name}`)).toBeVisible()
 
       // viewer answers
       const response = "Viewer Response"
