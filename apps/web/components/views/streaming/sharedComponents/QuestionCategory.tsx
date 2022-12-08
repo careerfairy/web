@@ -292,10 +292,10 @@ const QuestionCategory = ({
       try {
          setDeletingQuestion(true)
          await firebase.deleteLivestreamQuestion(streamRef, questionIdToDelete)
-         setQuestionIdToDelete(null)
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }
+      setQuestionIdToDelete(null)
       setDeletingQuestion(false)
    }
 
