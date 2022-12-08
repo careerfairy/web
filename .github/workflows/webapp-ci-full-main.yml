@@ -5,7 +5,7 @@ on:
       branches:
          - main
 
-   # Trigger on pull requests targeting this branch
+   # Trigger on pull requests targeting this branch.
    pull_request:
       branches:
          - main
