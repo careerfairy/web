@@ -16,6 +16,7 @@ import JobsCategory from "./categories/JobsCategory"
 import GenericCategoryInactive from "../sharedComponents/GenericCategoryInactive"
 import SupportCategory from "./categories/SupportCategory"
 import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
+import { CurrentStreamContextInterface } from "../../../../context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
    root: {},
@@ -121,7 +122,6 @@ const LeftMenu = ({
                sliding={sliding}
                showMenu={showMenu}
                streamer={streamer}
-               livestream={livestream}
                selectedState={selectedState}
             />
          ),
@@ -232,7 +232,7 @@ const LeftMenu = ({
 type LeftMenuProps = {
    streamer: any
    setSelectedState?: (args) => any
-   selectedState: string
+   selectedState: CurrentStreamContextInterface["selectedState"]
    livestream: LivestreamEvent
    isMobile?: boolean
    handleStateChange?: (args) => any
