@@ -33,9 +33,9 @@ import ChatEntryContainer from "./ChatEntryContainer"
 import EmotesModal from "./EmotesModal"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SystemStyleObject } from "@mui/system/styleFunctionSx/styleFunctionSx"
-import DocumentChange = firebase.firestore.DocumentChange
 import ConfirmDeleteModal from "../../modal/ConfirmDeleteModal"
-import { errorLogAndNotify } from "../../../../../util/CommonUtil"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import DocumentChange = firebase.firestore.DocumentChange
 
 const styles = sxStyles({
    sendIcon: {
@@ -113,6 +113,8 @@ const ChatWidget = ({
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
    const streamRef = useStreamRef()
+
+   const { errorNotification } = useSnackbarNotifications()
    const { isStreamer, currentLivestream, presenter } = useCurrentStream()
    const { authenticatedUser, userData, adminGroups } = useAuth()
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
@@ -258,14 +260,12 @@ const ChatWidget = ({
       try {
          setDeletingChatEntry(true)
          await firebase.deleteChatEntry(streamRef, chatEntryIdToDelete)
-         setChatEntryIdToDelete(null)
       } catch (e) {
-         errorLogAndNotify(e, {
-            message: "Error deleting chat entry",
-         })
+         errorNotification(e, "Error deleting chat entry")
       }
+      setChatEntryIdToDelete(null)
       setDeletingChatEntry(false)
-   }, [chatEntryIdToDelete, firebase, streamRef])
+   }, [chatEntryIdToDelete, errorNotification, firebase, streamRef])
 
    const handleCloseDeleteChatEntryDialog = useCallback(() => {
       setChatEntryIdToDelete(null)

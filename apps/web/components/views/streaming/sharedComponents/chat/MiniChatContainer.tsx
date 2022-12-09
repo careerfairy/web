@@ -30,10 +30,10 @@ import Box from "@mui/material/Box"
 import ConfirmDeleteModal from "../../modal/ConfirmDeleteModal"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import useStreamRef from "../../../../custom-hook/useStreamRef"
-import { errorLogAndNotify } from "../../../../../util/CommonUtil"
 import { useCurrentStream } from "../../../../../context/stream/StreamContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import DeleteSweepIcon from "@mui/icons-material/DeleteSweep"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    accordionRoot: {
@@ -76,6 +76,7 @@ const MiniChatContainer = ({ className, mobile = false }: Props) => {
    const firebase = useFirebaseService()
    const streamRef = useStreamRef()
 
+   const { errorNotification } = useSnackbarNotifications()
    const { isStreamer, currentLivestream, presenter } = useCurrentStream()
    const { tutorialSteps, handleConfirmStep } = useContext(TutorialContext)
    const { adminGroups, userData } = useAuth()
@@ -127,14 +128,18 @@ const MiniChatContainer = ({ className, mobile = false }: Props) => {
       try {
          setDeletingAllMessages(true)
          await firebase.deleteAllChatEntries(streamRef)
-         handleCloseDeleteChatsDialog()
       } catch (e) {
-         errorLogAndNotify(e, {
-            message: "Error deleting all chat entries",
-         })
+         errorNotification(e, "Error deleting all chat messages")
       }
+      handleCloseDeleteChatsDialog()
       setDeletingAllMessages(false)
-   }, [canDeleteAllChats, firebase, streamRef, handleCloseDeleteChatsDialog])
+   }, [
+      canDeleteAllChats,
+      handleCloseDeleteChatsDialog,
+      firebase,
+      streamRef,
+      errorNotification,
+   ])
 
    const handleClickDeleteAllChats = useCallback(
       (event: React.MouseEvent<HTMLButtonElement>) => {
