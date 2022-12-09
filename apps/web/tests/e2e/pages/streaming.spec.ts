@@ -12,7 +12,6 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { sleep } from "../utils"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { credentials } from "../../constants"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 /**
