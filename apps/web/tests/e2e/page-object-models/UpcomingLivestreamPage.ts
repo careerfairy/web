@@ -12,8 +12,24 @@ export default class UpcomingLivestreamPage extends CommonPage {
       this.buttonAlreadyBooked = this.text("You're booked")
    }
 
-   async open(livestreamId: string) {
-      return this.resilientGoto(`/upcoming-livestream/${livestreamId}`)
+   /**
+    * Open the upcoming livestream page
+    *
+    * If the livestream is live, there will be an automatic redirect
+    * to /streaming/livestreamId where the user will have to answer group questions
+    *
+    * @param livestreamId
+    * @param handleRedirectAfterwards
+    */
+   async open(livestreamId: string, handleRedirectAfterwards: boolean = false) {
+      const path = `/upcoming-livestream/${livestreamId}`
+
+      if (handleRedirectAfterwards) {
+         // probably there is a redirect, don't wait for the page load
+         return this.page.goto(path, { waitUntil: "domcontentloaded" })
+      }
+
+      return this.resilientGoto(path)
    }
 
    attend() {
