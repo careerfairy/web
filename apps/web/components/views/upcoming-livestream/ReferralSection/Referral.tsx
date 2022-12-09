@@ -26,6 +26,7 @@ const styles: StylesProps = {
    alert: {
       backgroundColor: (theme) => theme.palette.grey["200"],
       borderRadius: 2,
+      width: { xs: "70%", md: "100%" },
       "& svg": {
          color: (theme) => theme.palette.common.black,
       },
@@ -41,12 +42,14 @@ const Referral = ({ event }: Props) => {
          <Box sx={styles.sharePrompt}>
             <Typography variant="h6">SHARE</Typography>
          </Box>
-         <ReferralWidget
-            event={event}
-            noBackgroundColor
-            iconsColor={"grey"}
-            justifyContent={"center"}
-         />
+         <Box width={"100%"}>
+            <ReferralWidget
+               event={event}
+               noBackgroundColor
+               iconsColor={"primary"}
+               justifyContent={"center"}
+            />
+         </Box>
          <Alert sx={styles.alert} icon={<InfoIcon />} severity="info">
             Share the event with your network! Your questions will be shown on
             top and answered first!
