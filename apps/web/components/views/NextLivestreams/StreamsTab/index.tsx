@@ -109,7 +109,7 @@ const StreamsTab = ({
                   filtersToShow={[
                      FilterEnum.languages,
                      FilterEnum.interests,
-                     FilterEnum.jobCheck,
+                     // FilterEnum.jobCheck, TODO: Removed temporarily
                   ]}
                />
             </Box>
