@@ -29,6 +29,7 @@ const SpeakerForm = ({
    lastNameError,
    positionError,
    backgroundError,
+   avatarError,
    emailError,
    firebase,
    speaker,
@@ -63,7 +64,7 @@ const SpeakerForm = ({
                   getDownloadUrl={getDownloadUrl}
                   formName={`speakers.${objectKey}.avatar`}
                   label="Avatar"
-                  error={false}
+                  error={Boolean(avatarError)}
                   handleBlur={handleBlur}
                   isSubmitting={isSubmitting}
                   loading={loading}

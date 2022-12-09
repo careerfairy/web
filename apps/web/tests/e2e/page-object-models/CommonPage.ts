@@ -99,6 +99,8 @@ export class CommonPage {
    // Multiple pages might need to fill the event group questions
    // when joining a livestream event
    async selectRandomCategoriesFromEvent(livestream: LivestreamEvent) {
+      // sometimes the browser fails when selecting the questions, are we going too fast?
+      await sleep(1000)
       for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
          for (let question of Object.values(groupQuestions.questions)) {
             await this.resilientClick(
@@ -109,6 +111,7 @@ export class CommonPage {
             const randomOption =
                options[Math.floor(Math.random() * options.length)]
 
+            await sleep(500) // wait for options to appear
             await this.resilientClick(`[data-value="${randomOption.id}"]`)
          }
       }
