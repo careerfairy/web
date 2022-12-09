@@ -210,9 +210,9 @@ export const validateStreamForm = (
       if (!values.speakers[key].position) {
          errors.speakers[key].position = "Required"
       }
-      // if (!values.speakers[key].background) { Made background not required
-      //     errors.speakers[key].background = 'Required';
-      // }
+      if (!values.speakers[key].avatar) {
+         errors.speakers[key].avatar = "Required"
+      }
 
       const speakerEmail = values.speakers[key].email || ""
 

@@ -129,6 +129,12 @@ const SpeakersInfo = ({
                            errors,
                            touched
                         )}
+                        avatarError={handleError(
+                           key,
+                           "avatar",
+                           errors,
+                           touched
+                        )}
                         emailError={handleError(key, "email", errors, touched)}
                         getDownloadUrl={getDownloadUrl}
                         speaker={values.speakers[key]}
