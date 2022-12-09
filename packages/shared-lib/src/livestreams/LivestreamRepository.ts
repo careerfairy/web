@@ -136,6 +136,8 @@ export interface ILivestreamRepository {
       eventId: string,
       userId: string
    ): Promise<UserLivestreamData>
+
+   isUserRegisterOnAnyLivestream(userId: string): Promise<boolean>
 }
 
 export class FirebaseLivestreamRepository
@@ -561,6 +563,22 @@ export class FirebaseLivestreamRepository
       }
 
       return docRef.update(toUpdate)
+   }
+
+   async isUserRegisterOnAnyLivestream(authUid: string): Promise<boolean> {
+      try {
+         const snaps = await this.firestore
+            .collectionGroup("userLivestreamData")
+            .where("userId", "==", authUid)
+            .where(`registered.date`, "!=", null)
+            .limit(1)
+            .get()
+
+         return !snaps.empty
+      } catch (error) {
+         debugger
+         return false
+      }
    }
 }
 
