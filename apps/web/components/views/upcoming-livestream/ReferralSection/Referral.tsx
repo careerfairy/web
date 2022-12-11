@@ -7,6 +7,7 @@ import { alpha } from "@mui/material/styles"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
 import ReferralWidget from "../../common/ReferralWidget"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles: StylesProps = {
    root: {
@@ -37,6 +38,8 @@ interface Props {
    event: LivestreamEvent
 }
 const Referral = ({ event }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <Stack spacing={2} alignItems={"center"} sx={styles.root}>
          <Box sx={styles.sharePrompt}>
@@ -46,8 +49,9 @@ const Referral = ({ event }: Props) => {
             <ReferralWidget
                event={event}
                noBackgroundColor
-               iconsColor={"primary"}
+               iconsColor={"grey"}
                justifyContent={"center"}
+               iconStyle={{ height: isMobile ? "32px" : "unset", padding: 0 }}
             />
          </Box>
          <Alert sx={styles.alert} icon={<InfoIcon />} severity="info">
