@@ -4,6 +4,7 @@ import Stack from "@mui/material/Stack"
 import { Typography } from "@mui/material"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import ReferralWidget from "./ReferralWidget"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles: StylesProps = {
    root: {
@@ -17,6 +18,7 @@ interface Props {
    subtitle?: string
 }
 const ReferralPrompt = ({ event, title, subtitle }: Props) => {
+   const isMobile = useIsMobile()
    return (
       <Stack spacing={2} sx={styles.root}>
          {(title || subtitle) && (
@@ -25,7 +27,11 @@ const ReferralPrompt = ({ event, title, subtitle }: Props) => {
                {subtitle && <Typography variant="body1">{subtitle}</Typography>}
             </span>
          )}
-         <ReferralWidget event={event} />
+         <ReferralWidget
+            event={event}
+            noBackgroundColor
+            iconStyle={{ height: isMobile ? "32px" : "unset", padding: 0 }}
+         />
          <Typography variant="body1">
             <b>Pro tip:</b> By sharing the event your questions will be more
             visible for the event hosts
