@@ -26,7 +26,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
 
       if (handleRedirectAfterwards) {
          // probably there is a redirect, don't wait for the page load
-         return this.page.goto(path, { waitUntil: "domcontentloaded" })
+         return this.page.goto(path, { waitUntil: "commit" })
       }
 
       return this.resilientGoto(path)
