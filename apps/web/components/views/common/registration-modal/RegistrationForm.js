@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo } from "react"
+import React, { useContext, useEffect, useMemo, useState } from "react"
 import { RegistrationContext } from "context/registration/RegistrationContext"
 import LivestreamGroupQuestionForm from "./steps/LivestreamGroupQuestionForm"
 import QuestionUpvote from "./steps/QuestionUpvote"
@@ -9,6 +9,8 @@ import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import UserResumeSelect from "./steps/UserResumeSelect"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
 
 const styles = {
    panel: {
@@ -28,6 +30,8 @@ const RegistrationForm = () => {
       hasMore: hasMoreQuestionsToLoad,
    } = useContext(RegistrationContext)
    const theme = useTheme()
+   const { userData } = useAuth()
+   const [isFirstRegistrationEver, setIsFirstRegistrationEver] = useState(false)
 
    const steps = useMemo(() => {
       const newSteps = []
@@ -67,7 +71,11 @@ const RegistrationForm = () => {
             id: "talentPoolJoin",
          },
          {
-            step: <RegistrationComplete />,
+            step: (
+               <RegistrationComplete
+                  isFirstRegistration={isFirstRegistrationEver}
+               />
+            ),
             label: "Finish",
             id: "registrationComplete",
          }
@@ -76,6 +84,7 @@ const RegistrationForm = () => {
       return newSteps
    }, [
       hasMoreQuestionsToLoad,
+      isFirstRegistrationEver,
       livestream?.questionsDisabled,
       livestream?.withResume,
       questions.length,
@@ -84,6 +93,18 @@ const RegistrationForm = () => {
    useEffect(() => {
       setTotalSteps(steps.length)
    }, [setTotalSteps, steps.length])
+
+   useEffect(() => {
+      if (userData?.authId) {
+         ;(async () => {
+            const isFirstLivestream =
+               await livestreamRepo.isUserRegisterOnAnyLivestream(
+                  userData.authId
+               )
+            setIsFirstRegistrationEver(isFirstLivestream)
+         })()
+      }
+   }, [userData])
 
    return (
       <SwipeableViews

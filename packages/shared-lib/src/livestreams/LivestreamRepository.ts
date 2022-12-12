@@ -576,7 +576,6 @@ export class FirebaseLivestreamRepository
 
          return !snaps.empty
       } catch (error) {
-         debugger
          return false
       }
    }
