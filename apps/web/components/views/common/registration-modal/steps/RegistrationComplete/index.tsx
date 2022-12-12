@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useContext, useEffect } from "react"
 import {
    Box,
    Button,
@@ -11,10 +11,10 @@ import {
 import { RegistrationContext } from "../../../../../../context/registration/RegistrationContext"
 import { useRouter } from "next/router"
 import { StylesProps } from "../../../../../../types/commonTypes"
-import { useAuth } from "../../../../../../HOCs/AuthProvider"
-import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
 import ReferralWidget from "../../../ReferralWidget"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import confetti from "canvas-confetti"
+
 const styles: StylesProps = {
    root: {},
    linkBtn: {
@@ -53,7 +53,10 @@ const styles: StylesProps = {
    },
 }
 
-const RegistrationComplete = () => {
+type Props = {
+   isFirstRegistration: boolean
+}
+const RegistrationComplete = ({ isFirstRegistration }: Props) => {
    const {
       group,
       livestream,
@@ -65,21 +68,7 @@ const RegistrationComplete = () => {
       query: { groupId, referrerId },
       push,
    } = useRouter()
-   const { userData } = useAuth()
-   const [isFirstEver, setIsFirstEver] = useState(false)
    const isMobile = useIsMobile()
-
-   useEffect(() => {
-      if (userData) {
-         ;(async () => {
-            const isFirstLivestream =
-               await livestreamRepo.isUserRegisterOnAnyLivestream(
-                  userData.authId
-               )
-            setIsFirstEver(isFirstLivestream)
-         })()
-      }
-   }, [userData])
 
    function handleUrl() {
       return {
@@ -102,6 +91,18 @@ const RegistrationComplete = () => {
       handleClose?.()
    }
 
+   useEffect(() => {
+      if (isFirstRegistration) {
+         confetti({
+            particleCount: isMobile ? 500 : 1000,
+            spread: 120,
+            origin: { y: isMobile ? 0.9 : 0.7 },
+            decay: isMobile ? null : 0.93,
+            startVelocity: isMobile ? null : 45,
+         })
+      }
+   }, [isFirstRegistration, isMobile])
+
    return (
       <>
          <DialogContent sx={{ pb: 2 }}>
@@ -122,7 +123,7 @@ const RegistrationComplete = () => {
                      align="center"
                      sx={styles.shareMessage}
                   >
-                     {isFirstEver
+                     {isFirstRegistration
                         ? "You have successfully completed your first step towards becoming a member of the community. You can share the event with your network!"
                         : "That’s one more step as active member of this community. You can share the event with your network!"}
                   </Typography>
