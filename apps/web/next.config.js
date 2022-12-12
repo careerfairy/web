@@ -32,10 +32,10 @@ const securityHeaders = [
          `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
             notProduction ? "localhost:*" : ""
          };` +
-         `frame-src blob: https://go.crisp.chat https://optimize.google.com https://consentcdn.cookiebot.com https://vars.hotjar.com https://www.facebook.com ${
+         `frame-src blob: https://cdn.merge.dev https://go.crisp.chat https://optimize.google.com https://consentcdn.cookiebot.com https://vars.hotjar.com https://www.facebook.com ${
             isVercelPreview ? "https://vercel.live" : ""
          };` +
-         `font-src 'self' https://fonts.gstatic.com;`,
+         `font-src 'self' https://script.hotjar.com https://fonts.gstatic.com;`,
    },
    {
       key: "Referrer-Policy",
