@@ -59,7 +59,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
    }
 
    finish() {
-      return this.resilientClick("text=See all our events")
+      return this.resilientClick("text=Discover more live streams")
    }
 
    cancel() {
