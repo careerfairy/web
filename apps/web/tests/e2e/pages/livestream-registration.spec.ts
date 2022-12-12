@@ -26,13 +26,12 @@ test.beforeEach(async () => {
 
 test("successful registration on a livestream event", async ({ page }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { group, livestream } = await setupData()
+   const { livestream } = await setupData()
 
    await completeSuccessfulRegistration({
       page,
       livestreamPage,
       livestream,
-      group,
    })
 })
 
@@ -40,7 +39,7 @@ test("successful registration on a livestream event with no questions", async ({
    page,
 }) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
-   const { group, livestream } = await setupData(undefined, {
+   const { livestream } = await setupData(undefined, {
       groupQuestionsMap: null,
    })
 
@@ -48,7 +47,6 @@ test("successful registration on a livestream event with no questions", async ({
       page,
       livestreamPage,
       livestream,
-      group,
    })
 })
 
@@ -249,12 +247,10 @@ const completeSuccessfulRegistration = async ({
    page,
    livestreamPage,
    livestream,
-   group,
 }: {
    page: Page
    livestreamPage: UpcomingLivestreamPage
    livestream: LivestreamEvent
-   group: Group
 }) => {
    const user: UserData = await login(page)
 
@@ -281,14 +277,13 @@ const completeSuccessfulRegistration = async ({
    await livestreamPage.finish()
 
    // redirect
-   const expectedPath = `/next-livestreams/${group.id}?livestreamId=${livestream.id}`
+   const expectedPath = "/next-livestreams"
    if (page.url().indexOf(expectedPath) === -1) {
       // wait for navigation if not there yet
       await page.waitForURL(`**${expectedPath}`, { timeout: 10000 })
    }
 
-   await expectSelector(page, `h3:has-text("${group.universityName}")`)
-   await expectExactText(page, group.description)
+   await expectSelector(page, `h6:has-text("NEXT LIVE STREAMS")`)
    await expectExactText(page, "Booked!")
 
    // confirm we can't register again
