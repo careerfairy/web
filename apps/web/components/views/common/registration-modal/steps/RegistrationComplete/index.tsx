@@ -14,6 +14,7 @@ import { StylesProps } from "../../../../../../types/commonTypes"
 import ReferralWidget from "../../../ReferralWidget"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import confetti from "canvas-confetti"
+import { PillsBackground } from "materialUI/GlobalBackground/GlobalBackGround"
 
 const styles: StylesProps = {
    root: {},
@@ -57,34 +58,10 @@ type Props = {
    isFirstRegistration: boolean
 }
 const RegistrationComplete = ({ isFirstRegistration }: Props) => {
-   const {
-      group,
-      livestream,
-      promptOtherEventsOnFinal,
-      handleClose,
-      onFinish,
-   } = useContext(RegistrationContext)
-   const {
-      query: { groupId, referrerId },
-      push,
-   } = useRouter()
+   const { livestream, promptOtherEventsOnFinal, handleClose, onFinish } =
+      useContext(RegistrationContext)
+   const { push } = useRouter()
    const isMobile = useIsMobile()
-
-   function handleUrl() {
-      return {
-         pathname: group?.id
-            ? `/next-livestreams/${group?.id}`
-            : groupId
-            ? `/next-livestreams/${groupId}`
-            : "/next-livestreams",
-         query: {
-            ...(referrerId && { referrerId }),
-            ...(livestream?.id && {
-               livestreamId: livestream.id,
-            }),
-         },
-      }
-   }
 
    const handleFinish = () => {
       onFinish?.()
@@ -105,7 +82,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
    }, [isFirstRegistration, isMobile])
 
    return (
-      <>
+      <PillsBackground minHeight={"fit-content"} isOnDialog={true}>
          <DialogContent sx={{ pb: 2 }}>
             <Box sx={styles.confettiIcon}>🎉</Box>
             <Grow timeout={1000} in>
@@ -125,8 +102,8 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
                      sx={styles.shareMessage}
                   >
                      {isFirstRegistration
-                        ? "You have successfully completed your first step towards becoming a member of the community. You can share the event with your network!"
-                        : "That’s one more step as active member of this community. You can share the event with your network!"}
+                        ? "You have successfully completed your first step towards becoming a member of the community. You can share the live with your network!"
+                        : "That’s one more step as active member of this community. You can share the live stream with your network!"}
                   </Typography>
                   <ReferralWidget
                      event={livestream}
@@ -154,7 +131,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
                            color="secondary"
                            onClick={async () => {
                               handleFinish()
-                              push(handleUrl())
+                              await push("/next-livestreams")
                            }}
                            variant="contained"
                            size="large"
@@ -176,7 +153,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
                </Box>
             </Stack>
          </DialogActions>
-      </>
+      </PillsBackground>
    )
 }
 

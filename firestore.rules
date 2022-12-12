@@ -467,5 +467,9 @@ service cloud.firestore {
                 allow read, write: if request.auth.uid == uid || isCFAdmin();
             }
         }
+        match /{somePath=**}/userLivestreamData/{userEmail} {
+            allow read: if true;
+            allow write: if isSignedInAndIsSameUser(studentEmail);
+        }
     }
 }
