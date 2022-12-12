@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import React, { Fragment, useContext, useEffect, useState } from "react"
+import React, { Fragment, useContext, useState } from "react"
 import { Formik } from "formik"
 import {
    Box,
@@ -99,10 +99,6 @@ function SignUpUserForm() {
    const [errorMessage, setErrorMessage] = useState(null)
    const [generalLoading, setGeneralLoading] = useState(false)
    const [open, setOpen] = React.useState(false)
-
-   useEffect(() => {
-      dataLayerEvent("signup_started")
-   }, [])
 
    const submitting = (isSubmitting) => {
       return isSubmitting || emailSent || generalLoading
