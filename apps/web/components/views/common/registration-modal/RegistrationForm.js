@@ -97,11 +97,11 @@ const RegistrationForm = () => {
    useEffect(() => {
       if (userData?.authId) {
          ;(async () => {
-            const isFirstLivestream =
+            const isUserRegisterOnAnyLivestream =
                await livestreamRepo.isUserRegisterOnAnyLivestream(
                   userData.authId
                )
-            setIsFirstRegistrationEver(isFirstLivestream)
+            setIsFirstRegistrationEver(!isUserRegisterOnAnyLivestream)
          })()
       }
    }, [userData])
