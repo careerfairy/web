@@ -49,6 +49,7 @@ jobs:
          - uses: dorny/paths-filter@v2
            id: changes
            with:
+              base: main
               filters: |
                  workflow:
                   - '.github/workflows/webapp-ci-full-main.yml'

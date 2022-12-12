@@ -21,7 +21,7 @@ class StreamingPage extends CommonPage {
 
    public backToMainRoom() {
       return Promise.all([
-         this.page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+         this.page.waitForNavigation({ waitUntil: "commit" }),
          this.page.locator('[aria-label="Back to main room"]').click(),
       ])
    }
@@ -110,7 +110,7 @@ export class StreamerPage extends StreamingPage {
             options?.secureToken ? queryString : ""
          }`,
          {
-            waitUntil: "domcontentloaded",
+            waitUntil: "commit",
          }
       )
    }
@@ -236,7 +236,7 @@ export class StreamerPage extends StreamingPage {
 
    public async joinBreakoutRoom() {
       await Promise.all([
-         this.page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+         this.page.waitForNavigation({ waitUntil: "commit" }),
          this.exactText("Join Room").click(),
       ])
       await this.exactText("Join now").click()
@@ -260,7 +260,7 @@ export class ViewerPage extends StreamingPage {
 
    public open(livestreamId: string) {
       return this.page.goto(`/streaming/${livestreamId}/viewer`, {
-         waitUntil: "domcontentloaded",
+         waitUntil: "commit",
       })
    }
 
@@ -296,7 +296,7 @@ export class ViewerPage extends StreamingPage {
    public async clickFirstBreakoutRoomBannerLink() {
       return Promise.all([
          this.page.locator('[data-testid="breakout-room-banner-item"]').click(),
-         this.page.waitForNavigation({ waitUntil: "domcontentloaded" }),
+         this.page.waitForNavigation({ waitUntil: "commit" }),
       ])
    }
 }
