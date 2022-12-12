@@ -143,6 +143,8 @@ test("livestream has already started, confirm the redirection without any regist
 
    await login(page)
 
+   // await page.pause()
+
    // open page
    await livestreamPage.open(livestream.id, true)
    await livestreamPage.selectRandomCategoriesFromEvent(livestream)
@@ -151,7 +153,7 @@ test("livestream has already started, confirm the redirection without any regist
    // https://github.com/microsoft/playwright/issues/13640
    await sleep(3000)
    try {
-      await page.reload({ waitUntil: "domcontentloaded" })
+      await page.reload({ waitUntil: "commit" })
    } catch (e) {
       // ignore this test if it fails for webkit, the page seems to crash for some reason
       test.skip(browserName === "webkit", "Page crashed on reload")
