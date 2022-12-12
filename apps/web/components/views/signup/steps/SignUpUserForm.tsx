@@ -1,5 +1,5 @@
 import { useRouter } from "next/router"
-import React, { Fragment, useContext, useState } from "react"
+import React, { Fragment, useContext, useEffect, useState } from "react"
 import { Formik } from "formik"
 import {
    Box,
@@ -100,6 +100,10 @@ function SignUpUserForm() {
    const [generalLoading, setGeneralLoading] = useState(false)
    const [open, setOpen] = React.useState(false)
 
+   useEffect(() => {
+      dataLayerEvent("signup_started")
+   }, [])
+
    const submitting = (isSubmitting) => {
       return isSubmitting || emailSent || generalLoading
    }
@@ -159,7 +163,7 @@ function SignUpUserForm() {
                   // if we would do nextStep() here, it would move to step 2 instead of 1
                   setCurrentStep(1)
 
-                  dataLayerEvent("signup_started")
+                  dataLayerEvent("signup_credentials_completed")
                })
                .catch((e) => {
                   console.error(e)
