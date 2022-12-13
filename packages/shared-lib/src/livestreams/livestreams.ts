@@ -127,6 +127,10 @@ export interface LivestreamEvent extends Identifiable {
     * During livestream creating, jobs can be associated with the livestream
     */
    jobs?: LivestreamJobAssociation[]
+   /**
+    * Firestore has limitations when querying for jobs != []
+    */
+   hasJobs?: boolean
 
    /*
     * True if the event is also taking place in person

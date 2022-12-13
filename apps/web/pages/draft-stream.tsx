@@ -116,6 +116,7 @@ const DraftStream = () => {
 
          if (selectedJobs) {
             livestream.jobs = selectedJobs
+            livestream.hasJobs = selectedJobs.length > 0
          }
 
          const promotion = buildPromotionObj(values, livestream.id)
