@@ -228,6 +228,7 @@ export interface UserLivestreamData extends Identifiable {
 
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
    date: firebase.firestore.Timestamp
+   applicatonId?: string
    job: Partial<Job>
 }
 
