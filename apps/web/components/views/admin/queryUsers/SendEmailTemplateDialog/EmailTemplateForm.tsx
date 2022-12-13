@@ -27,6 +27,7 @@ const now = new Date()
 
 const useStyles = makeStyles((theme) => ({
    actions: {
+      display: "flex",
       padding: theme.spacing(1, 0, 0, 0),
    },
    loaderWrapper: {
@@ -36,6 +37,11 @@ const useStyles = makeStyles((theme) => ({
       height: "90%",
       alignItems: "center",
       justifyContent: "center",
+   },
+   actionSectionButtons: {
+      display: "flex",
+      width: "100%",
+      justifyContent: "space-between",
    },
 }))
 const EmailTemplateForm = ({
@@ -56,16 +62,19 @@ const EmailTemplateForm = ({
    const [testEmails, setTestEmails] = useState([userData.userEmail])
    const [sendingEmails, setSendingEmails] = useState(false)
 
-   const successSnackbar = (numberOfEmails) =>
-      dispatch(
-         actions.enqueueSnackbar({
-            message: `Emails have successfully been sent to ${numberOfEmails} user(s).`,
-            options: {
-               variant: "success",
-               preventDuplicate: true,
-            },
-         })
-      )
+   const successSnackbar = useCallback(
+      (numberOfEmails) =>
+         dispatch(
+            actions.enqueueSnackbar({
+               message: `Emails have successfully been sent to ${numberOfEmails} user(s).`,
+               options: {
+                  variant: "success",
+                  preventDuplicate: true,
+               },
+            })
+         ),
+      [dispatch]
+   )
 
    const handleConfirmSendEmail = async (data) => {
       try {
@@ -99,7 +108,13 @@ const EmailTemplateForm = ({
          handleCloseSendTestEmailModalData()
          successSnackbar(testEmails.length)
       },
-      [testEmails, userData.userEmail]
+      [
+         dispatch,
+         successSnackbar,
+         targetTemplate,
+         testEmails,
+         userData.userEmail,
+      ]
    )
 
    const handleCloseSendConfirmEmailModal = () =>
@@ -117,13 +132,16 @@ const EmailTemplateForm = ({
          validationSchema={targetTemplate.validationSchema}
          onSubmit={async (values, { setSubmitting }) => {
             try {
+               const utmTags = `utm_source=careerfairy&utm_medium=email&utm_campaign=events&utm_content=${targetStream.company}`
+
                const data = {
                   values: {
-                     ...values,
+                     eventUrl: `${values.eventUrl}?${utmTags}`,
                      start:
                         DateUtil.getRelativeDate(
                            values.eventStartDate
                         ).toString() + " CET",
+                     ...values,
                   },
                   templateId: targetTemplate.templateId,
                   queryOptions: queryOptions,
@@ -282,47 +300,72 @@ const EmailTemplateForm = ({
                               return null
                            })}
                         </Grid>
-                        <DialogActions className={classes.actions}>
-                           <Box marginRight="auto">
-                              <Button
-                                 onClick={handleClose}
-                                 children={"Close"}
-                                 disabled={sendingEmails}
-                              />
+                        <DialogActions
+                           className={classes.actions}
+                           sx={{
+                              flexDirection: {
+                                 xs: "column-reverse",
+                                 md: "row",
+                              },
+                           }}
+                        >
+                           <Box className={classes.actionSectionButtons}>
+                              <Box marginRight="auto">
+                                 <Button
+                                    onClick={handleClose}
+                                    disabled={sendingEmails}
+                                 >
+                                    Close
+                                 </Button>
+                              </Box>
+                              <Button onClick={handleBack}>Back</Button>
                            </Box>
-                           <Button onClick={handleBack}>Back</Button>
-                           <Button
-                              color={"secondary"}
-                              variant="outlined"
-                              disabled={
-                                 formik.isSubmitting ||
-                                 !formik.isValid ||
-                                 sendingEmails
-                              }
-                              onClick={(e) => {
-                                 formik.setFieldValue("isTestEmail", true)
-                                 // @ts-ignore
-                                 formik.handleSubmit(e)
-                              }}
+
+                           <Box
+                              className={classes.actionSectionButtons}
+                              sx={{ marginY: { xs: 1, sm: 0 } }}
                            >
-                              Send a test email
-                           </Button>
-                           <Button
-                              color={"primary"}
-                              variant="contained"
-                              disabled={
-                                 formik.isSubmitting ||
-                                 !formik.isValid ||
-                                 sendingEmails
-                              }
-                              onClick={(e) => {
-                                 formik.setFieldValue("isTestEmail", false)
-                                 // @ts-ignore
-                                 formik.handleSubmit(e)
-                              }}
-                           >
-                              Finalize and Send Emails
-                           </Button>
+                              <Button
+                                 color={"secondary"}
+                                 variant="outlined"
+                                 disabled={
+                                    formik.isSubmitting ||
+                                    !formik.isValid ||
+                                    sendingEmails
+                                 }
+                                 sx={{
+                                    width: { xs: "49%", sm: "unset" },
+                                    height: { xs: "70px", sm: "unset" },
+                                 }}
+                                 onClick={(e) => {
+                                    formik.setFieldValue("isTestEmail", true)
+                                    // @ts-ignore
+                                    formik.handleSubmit(e)
+                                 }}
+                              >
+                                 Send a test email
+                              </Button>
+                              <Button
+                                 color={"primary"}
+                                 variant="contained"
+                                 disabled={
+                                    formik.isSubmitting ||
+                                    !formik.isValid ||
+                                    sendingEmails
+                                 }
+                                 sx={{
+                                    width: { xs: "49%", sm: "unset" },
+                                    height: { xs: "70px", sm: "unset" },
+                                 }}
+                                 onClick={(e) => {
+                                    formik.setFieldValue("isTestEmail", false)
+                                    // @ts-ignore
+                                    formik.handleSubmit(e)
+                                 }}
+                              >
+                                 Finalize and Send Emails
+                              </Button>
+                           </Box>
                         </DialogActions>
                      </Box>
                   </Box>
