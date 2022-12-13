@@ -63,7 +63,7 @@ const styles = {
       background: (theme) =>
          `url(${alternateStudentBackground}) top left no-repeat, ${theme.palette.common.white}`,
       backgroundSize: `auto ${
-         isOnDialog ? "25vh" : "120vh"
+         isOnDialog ? "60%" : "120vh"
       }, auto 100vh !important`,
    }),
 }

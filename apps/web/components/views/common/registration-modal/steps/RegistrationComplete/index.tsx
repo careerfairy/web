@@ -102,7 +102,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
                      sx={styles.shareMessage}
                   >
                      {isFirstRegistration
-                        ? "You have successfully completed your first step towards becoming a member of the community. You can share the live with your network!"
+                        ? "You have successfully completed your first step towards becoming a member of the community. You can share the live stream with your network!"
                         : "That’s one more step as active member of this community. You can share the live stream with your network!"}
                   </Typography>
                   <ReferralWidget
