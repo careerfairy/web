@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useMemo, useState } from "react"
+import React, { useContext, useEffect, useMemo } from "react"
 import { RegistrationContext } from "context/registration/RegistrationContext"
 import LivestreamGroupQuestionForm from "./steps/LivestreamGroupQuestionForm"
 import QuestionUpvote from "./steps/QuestionUpvote"
@@ -28,10 +28,10 @@ const RegistrationForm = () => {
       livestream,
       questions,
       hasMore: hasMoreQuestionsToLoad,
+      setIsFirstRegistrationEver,
    } = useContext(RegistrationContext)
    const theme = useTheme()
    const { userData } = useAuth()
-   const [isFirstRegistrationEver, setIsFirstRegistrationEver] = useState(false)
 
    const steps = useMemo(() => {
       const newSteps = []
@@ -71,11 +71,7 @@ const RegistrationForm = () => {
             id: "talentPoolJoin",
          },
          {
-            step: (
-               <RegistrationComplete
-                  isFirstRegistration={isFirstRegistrationEver}
-               />
-            ),
+            step: <RegistrationComplete />,
             label: "Finish",
             id: "registrationComplete",
          }
@@ -84,7 +80,6 @@ const RegistrationForm = () => {
       return newSteps
    }, [
       hasMoreQuestionsToLoad,
-      isFirstRegistrationEver,
       livestream?.questionsDisabled,
       livestream?.withResume,
       questions.length,
@@ -104,7 +99,7 @@ const RegistrationForm = () => {
             setIsFirstRegistrationEver(!isUserRegisterOnAnyLivestream)
          })()
       }
-   }, [userData])
+   }, [userData?.authId])
 
    return (
       <SwipeableViews
