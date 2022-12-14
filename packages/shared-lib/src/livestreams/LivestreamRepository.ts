@@ -145,6 +145,12 @@ export interface ILivestreamRepository {
     */
    getApplications(livestreamIds: string[]): Promise<UserLivestreamData[]>
 
+   /**
+    * Fetches livestreams from a group that have jobs associated
+    * @param groupId
+    */
+   getLivestreamsWithJobs(groupId): Promise<LivestreamEvent[] | null>
+
    getLivestreamUser(
       eventId: string,
       userId: string
@@ -578,13 +584,21 @@ export class FirebaseLivestreamRepository
       return docRef.update(toUpdate)
    }
 
+   async getLivestreamsWithJobs(
+      groupId: any
+   ): Promise<LivestreamEvent[] | null> {
+      let docs = await this.firestore
+         .collection("livestreams")
+         .where("groupIds", "array-contains", groupId)
+         .where("hasJobs", "==", true)
+         .get()
+
+      return mapFirestoreDocuments(docs)
+   }
+
    async getApplications(
       livestreamIds: string[]
    ): Promise<UserLivestreamData[]> {
-      // if (!livestreamIds || livestreamIds.length === 0) {
-      //    return []
-      // }
-
       let chunks = chunkArray(livestreamIds, 10)
       let promises = []
 
