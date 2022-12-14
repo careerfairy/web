@@ -566,18 +566,14 @@ export class FirebaseLivestreamRepository
    }
 
    async isUserRegisterOnAnyLivestream(authUid: string): Promise<boolean> {
-      try {
-         const snaps = await this.firestore
-            .collectionGroup("userLivestreamData")
-            .where("userId", "==", authUid)
-            .where(`registered.date`, "!=", null)
-            .limit(1)
-            .get()
+      const snaps = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("userId", "==", authUid)
+         .where(`registered.date`, "!=", null)
+         .limit(1)
+         .get()
 
-         return !snaps.empty
-      } catch (error) {
-         return false
-      }
+      return !snaps.empty
    }
 }
 

@@ -1,6 +1,5 @@
 import React, {
    createContext,
-   Dispatch,
    useCallback,
    useEffect,
    useMemo,
@@ -20,6 +19,7 @@ import {
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
+import { livestreamRepo } from "data/RepositoryInstances"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -66,7 +66,6 @@ interface DefaultContext {
    gettingPolicyStatus: boolean
    cancelable: boolean
    isFirstRegistrationEver: boolean
-   setIsFirstRegistrationEver: Dispatch<boolean>
 }
 
 export const RegistrationContext = createContext<DefaultContext>({
@@ -102,7 +101,6 @@ export const RegistrationContext = createContext<DefaultContext>({
    gettingPolicyStatus: false,
    cancelable: false,
    isFirstRegistrationEver: false,
-   setIsFirstRegistrationEver: () => {},
 })
 
 function reducer(state, action) {
@@ -197,6 +195,23 @@ export function RegistrationContextProvider({
       hasAgreedToAll: false,
       totalSteps: 0,
    })
+
+   useEffect(() => {
+      if (userData?.authId) {
+         ;(async () => {
+            try {
+               const isUserRegisterOnAnyLivestream =
+                  await livestreamRepo.isUserRegisterOnAnyLivestream(
+                     userData.authId
+                  )
+               setIsFirstRegistrationEver(!isUserRegisterOnAnyLivestream)
+            } catch (error) {
+               setIsFirstRegistrationEver(false)
+            }
+         })()
+      }
+   }, [userData?.authId])
+
    const questionsQuery = useMemo(() => {
       // prevent an extra query for the questions if they are disabled
       if (livestream?.questionsDisabled) {
@@ -408,7 +423,6 @@ export function RegistrationContextProvider({
          onQuestionsAnswered,
          cancelable,
          isFirstRegistrationEver,
-         setIsFirstRegistrationEver,
       }
    }, [
       activeStep,
