@@ -259,3 +259,15 @@ export const isMobileBrowser = () => {
       return navigator?.userAgent?.match(toMatchItem)
    })
 }
+
+/**
+ * To slugify any string
+ */
+export const slugify = (text: string): string => {
+   return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+}

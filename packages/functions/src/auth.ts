@@ -6,7 +6,7 @@ const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
 
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
-import { generateReferralCode, setHeaders } from "./util"
+import { addUtmTagsToLink, generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
@@ -453,7 +453,7 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: recipientEmail,
-            TemplateModel: { action_url: link },
+            TemplateModel: { action_url: addUtmTagsToLink({ link: link }) },
          }
 
          const response = await client.sendEmailWithTemplate(email)
