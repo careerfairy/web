@@ -139,6 +139,10 @@ const createRecipientVariables = (
       let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
       formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
 
+      const upcomingStreamLink = externalEventLink
+         ? externalEventLink
+         : getStreamLink(streamId)
+
       const emailData = {
          timeMessage: timeMessage,
          companyName: company,
@@ -146,9 +150,7 @@ const createRecipientVariables = (
          streamTitle: title,
          formattedDateTime: formattedDate,
          formattedSpeaker: `${speakerFirstName} ${speakerLastName}, ${speakerPosition}`,
-         upcomingStreamLink: externalEventLink
-            ? externalEventLink
-            : getStreamLink(streamId),
+         upcomingStreamLink: addUtmTagsToLink({ link: upcomingStreamLink }),
          german: language?.code === "DE",
       }
 
@@ -494,4 +496,23 @@ export const dateFormatOffset = (dateString: string) => {
    }
 
    return dateString
+}
+
+type AddUtmTagsToLinkProps = {
+   link: string
+   source?: string
+   medium?: string
+   campaign?: string
+}
+
+export const addUtmTagsToLink = ({
+   link,
+   source = "careerfairy",
+   medium = "email",
+   campaign = "events",
+}: AddUtmTagsToLinkProps): string => {
+   const utm = `utm_source=${source}&utm_medium=${medium}&utm_campaign=${campaign}`
+   const linkAlreadyHasQueryParams = link.includes("?")
+
+   return `${link}${linkAlreadyHasQueryParams ? "&" : "?"}${utm}`
 }

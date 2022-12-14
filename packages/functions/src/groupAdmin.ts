@@ -17,6 +17,7 @@ import {
 } from "./api/repositories"
 
 import {
+   addUtmTagsToLink,
    getDateString,
    getRatingsAverage,
    makeRequestingGroupIdFirst,
@@ -65,7 +66,9 @@ export const sendDraftApprovalRequestEmail = functions.https.onCall(
                sender_name: senderName,
                livestream_title: livestream.title,
                livestream_company_name: livestream.company,
-               draft_stream_link: eventDashboardLink,
+               draft_stream_link: addUtmTagsToLink({
+                  link: eventDashboardLink,
+               }),
                submit_time: submitTime,
             },
          }))
@@ -106,8 +109,12 @@ export const sendNewlyPublishedEventEmail = functions.https.onCall(
                To: email,
                TemplateModel: {
                   sender_name: senderName,
-                  dashboard_link: eventDashboardLink,
-                  next_livestreams_link: nextLivestreamsLink,
+                  dashboard_link: addUtmTagsToLink({
+                     link: eventDashboardLink,
+                  }),
+                  next_livestreams_link: addUtmTagsToLink({
+                     link: nextLivestreamsLink,
+                  }),
                   livestream_title: stream.title,
                   livestream_company_name: stream.company,
                   submit_time: submitTime,
@@ -513,7 +520,7 @@ export const sendDashboardInviteEmail_v2 = functions.https.onCall(
          TemplateModel: {
             sender_first_name: senderFirstName,
             group_name: groupName,
-            invite_link: inviteLink,
+            invite_link: addUtmTagsToLink({ link: inviteLink }),
          },
       }
 
