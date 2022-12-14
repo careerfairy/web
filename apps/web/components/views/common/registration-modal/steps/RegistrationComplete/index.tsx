@@ -54,12 +54,14 @@ const styles: StylesProps = {
    },
 }
 
-type Props = {
-   isFirstRegistration: boolean
-}
-const RegistrationComplete = ({ isFirstRegistration }: Props) => {
-   const { livestream, promptOtherEventsOnFinal, handleClose, onFinish } =
-      useContext(RegistrationContext)
+const RegistrationComplete = () => {
+   const {
+      livestream,
+      promptOtherEventsOnFinal,
+      handleClose,
+      onFinish,
+      isFirstRegistrationEver,
+   } = useContext(RegistrationContext)
    const { push } = useRouter()
    const isMobile = useIsMobile()
 
@@ -69,7 +71,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
    }
 
    useEffect(() => {
-      if (isFirstRegistration) {
+      if (isFirstRegistrationEver) {
          confetti({
             particleCount: isMobile ? 500 : 1000,
             spread: 120,
@@ -79,7 +81,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
             zIndex: 99999,
          })
       }
-   }, [isFirstRegistration, isMobile])
+   }, [isFirstRegistrationEver, isMobile])
 
    return (
       <PillsBackground minHeight={"fit-content"} isOnDialog={true}>
@@ -101,7 +103,7 @@ const RegistrationComplete = ({ isFirstRegistration }: Props) => {
                      align="center"
                      sx={styles.shareMessage}
                   >
-                     {isFirstRegistration
+                     {isFirstRegistrationEver
                         ? "You have successfully completed your first step towards becoming a member of the community. You can share the live stream with your network!"
                         : "That’s one more step as active member of this community. You can share the live stream with your network!"}
                   </Typography>

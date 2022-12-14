@@ -1,5 +1,6 @@
 import React, {
    createContext,
+   Dispatch,
    useCallback,
    useEffect,
    useMemo,
@@ -64,6 +65,8 @@ interface DefaultContext {
    loadingInitialQuestions: boolean
    gettingPolicyStatus: boolean
    cancelable: boolean
+   isFirstRegistrationEver: boolean
+   setIsFirstRegistrationEver: Dispatch<boolean>
 }
 
 export const RegistrationContext = createContext<DefaultContext>({
@@ -98,6 +101,8 @@ export const RegistrationContext = createContext<DefaultContext>({
    loadingInitialQuestions: false,
    gettingPolicyStatus: false,
    cancelable: false,
+   isFirstRegistrationEver: false,
+   setIsFirstRegistrationEver: () => {},
 })
 
 function reducer(state, action) {
@@ -181,6 +186,7 @@ export function RegistrationContextProvider({
    const [sliding, setSliding] = useState(false)
    const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false)
    const [questionSortType, setQuestionSortType] = useState("timestamp")
+   const [isFirstRegistrationEver, setIsFirstRegistrationEver] = useState(false)
    const [
       { activeStep, group, groupsWithPolicies, hasAgreedToAll, totalSteps },
       dispatch,
@@ -200,7 +206,7 @@ export function RegistrationContextProvider({
       return (
          livestream && livestreamQuestionsQuery(livestream.id, questionSortType)
       )
-   }, [livestream?.id, livestream?.questionsDisabled, questionSortType])
+   }, [livestream, livestreamQuestionsQuery, questionSortType])
 
    const {
       docs,
@@ -362,6 +368,7 @@ export function RegistrationContextProvider({
          groupsWithPolicies,
          handleClose,
          handleSendConfirmEmail,
+         isRecommended,
          livestream,
          registerToLivestream,
       ]
@@ -400,6 +407,8 @@ export function RegistrationContextProvider({
          onFinish,
          onQuestionsAnswered,
          cancelable,
+         isFirstRegistrationEver,
+         setIsFirstRegistrationEver,
       }
    }, [
       activeStep,
@@ -416,12 +425,14 @@ export function RegistrationContextProvider({
       handleGoToLast,
       hasAgreedToAll,
       hasMore,
+      isFirstRegistrationEver,
       livestream,
       loadingInitialQuestions,
       onFinish,
       onQuestionsAnswered,
       promptOtherEventsOnFinal,
       questionSortType,
+      setTotalSteps,
       sliding,
       totalSteps,
    ])
