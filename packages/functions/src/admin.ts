@@ -5,7 +5,11 @@ import {
    userIsSignedInAndIsCFAdmin,
    validateData,
 } from "./lib/validations"
-import { createNestedArrayOfTemplates, generateSignature } from "./util"
+import {
+   addUtmTagsToLink,
+   createNestedArrayOfTemplates,
+   generateSignature,
+} from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
@@ -202,5 +206,7 @@ const getNewsletterUnsubscribeLink = (
     * */
    const encodedSignature = encodeURIComponent(signature)
 
-   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${encodedSignature}`
+   return addUtmTagsToLink({
+      link: `${baseUrl}/newsletter/unsubscribe/${email}?signature=${encodedSignature}`,
+   })
 }
