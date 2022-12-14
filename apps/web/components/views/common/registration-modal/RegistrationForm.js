@@ -9,8 +9,6 @@ import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import UserResumeSelect from "./steps/UserResumeSelect"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 
 const styles = {
    panel: {
@@ -28,10 +26,8 @@ const RegistrationForm = () => {
       livestream,
       questions,
       hasMore: hasMoreQuestionsToLoad,
-      setIsFirstRegistrationEver,
    } = useContext(RegistrationContext)
    const theme = useTheme()
-   const { userData } = useAuth()
 
    const steps = useMemo(() => {
       const newSteps = []
@@ -88,18 +84,6 @@ const RegistrationForm = () => {
    useEffect(() => {
       setTotalSteps(steps.length)
    }, [setTotalSteps, steps.length])
-
-   useEffect(() => {
-      if (userData?.authId) {
-         ;(async () => {
-            const isUserRegisterOnAnyLivestream =
-               await livestreamRepo.isUserRegisterOnAnyLivestream(
-                  userData.authId
-               )
-            setIsFirstRegistrationEver(!isUserRegisterOnAnyLivestream)
-         })()
-      }
-   }, [userData?.authId])
 
    return (
       <SwipeableViews
