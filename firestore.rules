@@ -468,4 +468,8 @@ service cloud.firestore {
             }
         }
     }
+    match /{somePath=**}/userLivestreamData/{userEmail} {
+        allow read: if true;
+        allow write: if isSignedInAndIsSameUser(studentEmail);
+    }
 }
