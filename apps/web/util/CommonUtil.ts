@@ -271,3 +271,27 @@ export const slugify = (text: string): string => {
       .replace(/[\s_-]+/g, "-")
       .replace(/^-+|-+$/g, "")
 }
+
+type AddUtmTagsToLinkProps = {
+   link: string
+   source?: string
+   medium?: string
+   campaign?: string
+   content?: string
+}
+
+export const addUtmTagsToLink = ({
+   link,
+   source = "careerfairy",
+   medium = "email",
+   campaign,
+   content,
+}: AddUtmTagsToLinkProps): string => {
+   const campaignUtm = campaign ? `&utm_campaign=${campaign}` : ""
+   const contentUtm = content ? `&utm_content=${content}` : ""
+
+   const utm = `utm_source=${source}&utm_medium=${medium}${campaignUtm}${contentUtm}`
+   const linkAlreadyHasQueryParams = link.includes("?")
+
+   return `${link}${linkAlreadyHasQueryParams ? "&" : "?"}${utm}`
+}
