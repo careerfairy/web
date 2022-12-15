@@ -148,16 +148,7 @@ const LeftMenu = ({
    ]
 
    if (showMenu && (isMobile || focusModeEnabled)) {
-      views.push(
-         <ChatCategory
-            livestream={livestream}
-            selectedState={selectedState}
-            // @ts-ignore
-            user={user}
-            userData={userData}
-            isStreamer={false}
-         />
-      )
+      views.push(<ChatCategory />)
    }
 
    if (livestream?.jobs?.length > 0) {

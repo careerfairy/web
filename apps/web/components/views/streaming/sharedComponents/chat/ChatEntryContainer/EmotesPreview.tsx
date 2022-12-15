@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import {
    heartPng,
@@ -7,43 +6,53 @@ import {
    wowPng,
 } from "../EmotesModal/utils"
 import { Paper, Typography, Zoom } from "@mui/material"
-import makeStyles from "@mui/styles/makeStyles"
+import { LivestreamChatEntry } from "@careerfairy/shared-lib/dist/livestreams"
+import Image from "next/image"
+import { sxStyles } from "../../../../../../types/commonTypes"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    emotesPreviewPaperWrapper: {
       zIndex: 1,
       cursor: "pointer",
       bottom: "-10px !important",
       display: "flex",
-      boxShadow: theme.shadows[3],
+      boxShadow: 3,
       alignItems: "center",
       zChatEntryContainer: 1,
-      padding: theme.spacing(0.1),
+      padding: 0.1,
       position: "absolute",
       right: 0,
       overflow: "hidden",
-      borderRadius: theme.spacing(2),
-      "&  > *": {
-         margin: theme.spacing(0, 0.3),
-      },
-   },
-   previewImg: {
-      width: theme.spacing(1.5),
-      height: theme.spacing(1.5),
+      borderRadius: 2,
+      "&  > *": (theme) => ({
+         margin: (theme) => `0 ${theme.spacing(0.3)} !important`,
+      }),
    },
    totalText: {
-      fontSize: theme.spacing(1.3),
+      fontSize: 10,
    },
-}))
+})
+
+type Props = {
+   chatEntry: LivestreamChatEntry
+   onClick: () => void
+}
+type Emote = {
+   src: string
+   alt: string
+   prop: string
+   data: string[]
+}
 const EmotesPreview = ({
    chatEntry: { wow, heart, thumbsUp, laughing },
    onClick,
-}) => {
-   const classes = useStyles()
-   const [emotes, setEmotes] = useState([])
-   const [total, setTotal] = useState(0)
+}: Props) => {
+   const [emotes, setEmotes] = useState<Emote[]>([])
+
+   const [total, setTotal] = useState<number>(0)
+
    useEffect(() => {
-      const newEmotes = [
+      const newEmotes: Emote[] = [
          {
             src: laughingPng.src,
             alt: laughingPng.alt,
@@ -79,23 +88,14 @@ const EmotesPreview = ({
 
    return (
       <Zoom unmountOnExit mountOnEnter in={Boolean(emotes.length)}>
-         <Paper onClick={onClick} className={classes.emotesPreviewPaperWrapper}>
+         <Paper onClick={onClick} sx={styles.emotesPreviewPaperWrapper}>
             {emotes.map(({ alt, src, prop }) => (
-               <img
-                  key={prop}
-                  className={classes.previewImg}
-                  alt={alt}
-                  src={src}
-               />
+               <Image key={prop} alt={alt} width={12} height={12} src={src} />
             ))}
-            <Typography className={classes.totalText}>{total || 0}</Typography>
+            <Typography sx={styles.totalText}>{total || 0}</Typography>
          </Paper>
       </Zoom>
    )
 }
 
-EmotesPreview.propTypes = {
-   chatEntry: PropTypes.object.isRequired,
-   onClick: PropTypes.func.isRequired,
-}
 export default EmotesPreview
