@@ -107,6 +107,9 @@ export const TableTitle = ({ title, subtitle }: TableTitleProps) => {
                variant="subtitle1"
                fontSize="0.8rem"
                color="gray"
+               sx={{
+                  marginTop: "5px",
+               }}
                ml={1}
             >
                {subtitle}
