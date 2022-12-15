@@ -38,7 +38,7 @@ import { array, boolean, mixed, object, string } from "yup"
 import { auth } from "firebase-admin"
 import functions = require("firebase-functions")
 import UserRecord = auth.UserRecord
-import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
