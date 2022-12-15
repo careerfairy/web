@@ -1,4 +1,4 @@
-import { useAuth } from "../../../../../../../HOCs/AuthProvider"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import React, { useEffect } from "react"
 import {
    Avatar,
@@ -9,7 +9,7 @@ import {
 } from "@mui/material"
 import PropTypes from "prop-types"
 import makeStyles from "@mui/styles/makeStyles"
-import { useCurrentStream } from "../../../../../../../context/stream/StreamContext"
+import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
    emojiImg: {

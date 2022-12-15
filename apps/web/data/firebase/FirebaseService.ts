@@ -14,6 +14,7 @@ import {
 } from "../../util/CommonUtil"
 import {
    EventRating,
+   LivestreamChatEntry,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
@@ -40,8 +41,10 @@ import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
 import DocumentReference = firebase.firestore.DocumentReference
+import QuerySnapshot = firebase.firestore.QuerySnapshot
 import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
 import { makeUrls } from "../../util/makeUrls"
+import { OnSnapshotCallback } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -1246,12 +1249,36 @@ class FirebaseService {
       return ref.add(comment)
    }
 
-   listenToChatEntries = (streamRef, limit, callback) => {
+   listenToChatEntries = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      limit: number,
+      callback: OnSnapshotCallback<LivestreamChatEntry>
+   ) => {
       let ref = streamRef
          .collection("chatEntries")
          .limit(limit)
          .orderBy("timestamp", "desc")
       return ref.onSnapshot(callback)
+   }
+
+   deleteChatEntry = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      chatEntryId: string
+   ) => {
+      let ref = streamRef.collection("chatEntries").doc(chatEntryId)
+      return ref.delete()
+   }
+
+   deleteAllChatEntries = async (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>
+   ) => {
+      const snaps = await streamRef.collection("chatEntries").get()
+
+      return Promise.allSettled(
+         snaps.docs.map((doc) => {
+            return doc.ref.delete().catch(console.error)
+         })
+      )
    }
 
    putChatEntry = (streamRef, chatEntry) => {
