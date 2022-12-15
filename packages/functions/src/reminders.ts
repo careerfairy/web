@@ -1,12 +1,7 @@
 import functions = require("firebase-functions")
 import { client } from "./api/postmark"
 import { admin } from "./api/firestoreAdmin"
-import {
-   addMinutesDate,
-   addUtmTagsToLink,
-   generateReminderEmailData,
-   setHeaders,
-} from "./util"
+import { addMinutesDate, generateReminderEmailData, setHeaders } from "./util"
 import { sendMessage } from "./api/mailgun"
 import { TemplatedMessage } from "postmark"
 import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
@@ -15,6 +10,7 @@ import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
+import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
@@ -82,7 +78,11 @@ export const sendReminderEmailAboutApplicationLink = functions
          To: data.recipient,
          TemplateModel: {
             recipient_name: data.recipient_name,
-            application_link: addUtmTagsToLink({ link: data.application_link }),
+            application_link: addUtmTagsToLink({
+               link: data.application_link,
+               campaign: "jobApplication",
+               content: data.position_name,
+            }),
             position_name: data.position_name,
          },
       } as TemplatedMessage

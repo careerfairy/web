@@ -22,7 +22,7 @@ import SendTestEmailDialog from "./SendTestEmailDialog"
 import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect"
 import { getDownloadUrl } from "../../../../helperFunctions/streamFormFunctions"
 import { TemplateDialogStepProps } from "./SendEmailTemplateDialog"
-import { slugify } from "util/CommonUtil"
+import { addUtmTagsToLink, slugify } from "util/CommonUtil"
 
 const now = new Date()
 
@@ -133,18 +133,18 @@ const EmailTemplateForm = ({
          validationSchema={targetTemplate.validationSchema}
          onSubmit={async (values, { setSubmitting }) => {
             try {
-               const utmTags = `utm_source=careerfairy&utm_medium=email&utm_campaign=events&utm_content=${slugify(
-                  targetStream.company
-               )}`
-
                const data = {
                   values: {
-                     eventUrl: `${values.eventUrl}?${utmTags}`,
+                     ...values,
+                     eventUrl: addUtmTagsToLink({
+                        link: values.eventUrl,
+                        campaign: "events",
+                        content: slugify(targetStream.company),
+                     }),
                      start:
                         DateUtil.getRelativeDate(
                            values.eventStartDate
                         ).toString() + " CET",
-                     ...values,
                   },
                   templateId: targetTemplate.templateId,
                   queryOptions: queryOptions,

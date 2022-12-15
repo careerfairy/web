@@ -17,7 +17,6 @@ import {
 } from "./api/repositories"
 
 import {
-   addUtmTagsToLink,
    getDateString,
    getRatingsAverage,
    makeRequestingGroupIdFirst,
@@ -39,6 +38,7 @@ import { array, boolean, mixed, object, string } from "yup"
 import { auth } from "firebase-admin"
 import functions = require("firebase-functions")
 import UserRecord = auth.UserRecord
+import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -114,6 +114,7 @@ export const sendNewlyPublishedEventEmail = functions.https.onCall(
                   }),
                   next_livestreams_link: addUtmTagsToLink({
                      link: nextLivestreamsLink,
+                     campaign: "shareEvents",
                   }),
                   livestream_title: stream.title,
                   livestream_company_name: stream.company,
