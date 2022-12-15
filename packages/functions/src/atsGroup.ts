@@ -1,13 +1,13 @@
 import functions = require("firebase-functions")
 import { string } from "yup"
 import { atsRepo, groupRepo } from "./api/repositories"
-import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
 import { logAxiosErrorAndThrow, serializeModels } from "./util"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
    atsRequestValidation,
    atsRequestValidationWithAccountToken,
 } from "./lib/ats"
+import { MergeATSRepository } from "./lib/merge/MergeATSRepository"
 
 /*
 |--------------------------------------------------------------------------

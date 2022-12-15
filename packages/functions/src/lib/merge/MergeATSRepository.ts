@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import axios, { AxiosError } from "axios"
 import {
    MergeAccountTokenResponse,
@@ -13,24 +14,24 @@ import {
    MergeOffice,
    MergePaginatedResponse,
    MergeSyncStatus,
-} from "./MergeResponseTypes"
-import {
-   ApplicationCreationOptions,
-   AttachmentCreationOptions,
-   CandidateCreationOptions,
-   IATSRepository,
-} from "./IATSRepository"
-import { Job } from "./Job"
-import { Office } from "./Office"
-import { SyncStatus } from "./SyncStatus"
-import { Application } from "./Application"
-import { UserData } from "../users"
-import { Candidate } from "./Candidate"
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Office } from "@careerfairy/shared-lib/dist/ats/Office"
+import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
+import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
 import {
    clearFirebaseCache,
    fromFirebaseCache,
 } from "./MergeFirebaseCacheDecorators"
 import firebase from "firebase/compat"
+import {
+   ApplicationCreationOptions,
+   AttachmentCreationOptions,
+   CandidateCreationOptions,
+   IATSRepository,
+} from "../IATSRepository"
 
 /**
  * Merge.dev HTTP API
@@ -68,7 +69,7 @@ export class MergeATSRepository implements IATSRepository {
    @fromFirebaseCache(2 * 60 * 1000) // 2min cache
    async getJobs(): Promise<Job[]> {
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
-         `/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100`
+         "/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100"
       )
 
       // Sort by last updated date, in place
@@ -101,7 +102,7 @@ export class MergeATSRepository implements IATSRepository {
    async getOffices(): Promise<Office[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeOffice>
-      >(`/offices`)
+      >("/offices")
 
       return data.results.map(Office.createFromMerge)
    }
@@ -147,7 +148,7 @@ export class MergeATSRepository implements IATSRepository {
       const body = createMergeModelBody(model, options.remoteUserId)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeCandidate>
-      >(`/candidates`, body)
+      >("/candidates", body)
 
       return Candidate.createFromMerge(data.model)
    }
@@ -167,7 +168,7 @@ export class MergeATSRepository implements IATSRepository {
       const body = createMergeModelBody(model, options.remoteUserId)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeAttachment>
-      >(`/attachments`, body)
+      >("/attachments", body)
 
       return data.model.id
    }
@@ -209,7 +210,7 @@ export class MergeATSRepository implements IATSRepository {
       const body = createMergeModelBody(model, options.remoteUserId)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeApplicationModel>
-      >(`/applications`, body)
+      >("/applications", body)
 
       return data.model.id
    }
@@ -235,7 +236,7 @@ export class MergeATSRepository implements IATSRepository {
    async getSyncStatus(): Promise<SyncStatus[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeSyncStatus>
-      >(`/sync-status`)
+      >("/sync-status")
 
       return data.results.map(SyncStatus.createFromMerge)
    }
@@ -258,7 +259,7 @@ export class MergeATSRepository implements IATSRepository {
       categories: string[] = ["ats"]
    ) {
       const { data } = await this.axios.post<MergeLinkTokenResponse>(
-         `https://api.merge.dev/api/integrations/create-link-token`,
+         "https://api.merge.dev/api/integrations/create-link-token",
          {
             end_user_origin_id,
             end_user_organization_name,
@@ -279,7 +280,7 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    async removeAccount() {
-      const { data } = await this.axios.post<any>(`/delete-account`)
+      const { data } = await this.axios.post<any>("/delete-account")
 
       return data
    }

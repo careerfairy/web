@@ -1,7 +1,7 @@
 import firebaseInstance, { FieldValue } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { v4 as uuidv4 } from "uuid"
-import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
+import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 
