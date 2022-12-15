@@ -14,6 +14,7 @@ import {
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    UserLivestreamData,
+   UserParticipatingStats,
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
@@ -136,6 +137,12 @@ export interface ILivestreamRepository {
       eventId: string,
       userId: string
    ): Promise<UserLivestreamData>
+
+   /*
+    * Get a maximum of 10 livestreams via their IDs
+    * @param ids - the IDs of the livestreams to get (max 10). If more than 10 are provided, only the first 10 will be used
+    * */
+   getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -187,11 +194,11 @@ export class FirebaseLivestreamRepository
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void> {
-      const data = {
+      const data: UserParticipatingStats = {
          id: userData.id,
          livestreamId: livestream.id,
-         totalMinutes: this.fieldValue.increment(1),
-         minutes: this.fieldValue.arrayUnion(elapsedMinutes),
+         totalMinutes: this.fieldValue.increment(1) as any,
+         minutes: this.fieldValue.arrayUnion(elapsedMinutes) as any,
          livestream,
          user: userData,
       }
@@ -561,6 +568,14 @@ export class FirebaseLivestreamRepository
       }
 
       return docRef.update(toUpdate)
+   }
+
+   async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .where("id", "in", ids.slice(0, 10))
+         .get()
+      return mapFirestoreDocuments<LivestreamEvent>(snaps)
    }
 }
 

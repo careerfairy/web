@@ -434,6 +434,30 @@ export interface LivestreamImpression extends Identifiable, DocumentData {
    asPath: string
 }
 
+// Collection Path: livestreams/{livestreamId}/participatingStats/{userId}
+export interface UserParticipatingStats extends DocumentData, Identifiable {
+   /**
+    *  The ID of the livestream document
+    * */
+   livestreamId: string
+   /**
+    * The total amount of minutes the user has participated in the livestream
+    * */
+   totalMinutes: number
+   /**
+    * An array of minutes the user has participated in the livestream (e.g. [5, 6, 7] means the user was present at minute 5, 6 and 7)
+    */
+   minutes: string[]
+   /**
+    * Snapshot of the livestream document at the time the user last participated
+    */
+   livestream: LivestreamEventPublicData
+   /**
+    * Snapshot of the user document at the time the user last participated
+    */
+   user: UserPublicData
+}
+
 export enum ImpressionLocation {
    recommendedEventsCarousel = "recommendedEventsCarousel",
    comingUpCarousel = "comingUpCarousel",
