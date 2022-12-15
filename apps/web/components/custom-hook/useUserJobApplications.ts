@@ -3,7 +3,7 @@ import { useMemo } from "react"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
-import { JobStatus } from "@careerfairy/shared-lib/dist/ats/MergeResponseTypes"
+import { JobStatus } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 
 type Result = {
    data: UserJobApplicationDocument[]
