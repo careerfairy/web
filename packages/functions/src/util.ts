@@ -11,6 +11,7 @@ import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import { ATSPaginatedData } from "./lib/merge/MergeATSRepository"
+import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -150,7 +151,11 @@ const createRecipientVariables = (
          streamTitle: title,
          formattedDateTime: formattedDate,
          formattedSpeaker: `${speakerFirstName} ${speakerLastName}, ${speakerPosition}`,
-         upcomingStreamLink: addUtmTagsToLink({ link: upcomingStreamLink }),
+         upcomingStreamLink: addUtmTagsToLink({
+            link: upcomingStreamLink,
+            campaign: "eventReminders",
+            content: title,
+         }),
          german: language?.code === "DE",
       }
 
@@ -496,23 +501,4 @@ export const dateFormatOffset = (dateString: string) => {
    }
 
    return dateString
-}
-
-type AddUtmTagsToLinkProps = {
-   link: string
-   source?: string
-   medium?: string
-   campaign?: string
-}
-
-export const addUtmTagsToLink = ({
-   link,
-   source = "careerfairy",
-   medium = "email",
-   campaign = "events",
-}: AddUtmTagsToLinkProps): string => {
-   const utm = `utm_source=${source}&utm_medium=${medium}&utm_campaign=${campaign}`
-   const linkAlreadyHasQueryParams = link.includes("?")
-
-   return `${link}${linkAlreadyHasQueryParams ? "&" : "?"}${utm}`
 }

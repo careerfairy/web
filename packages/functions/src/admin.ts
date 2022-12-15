@@ -5,14 +5,11 @@ import {
    userIsSignedInAndIsCFAdmin,
    validateData,
 } from "./lib/validations"
-import {
-   addUtmTagsToLink,
-   createNestedArrayOfTemplates,
-   generateSignature,
-} from "./util"
+import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
+import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -112,11 +109,13 @@ export const sendBasicTemplateEmail = functions
             illustrationImageUrl,
             userEmail: email,
             subject,
-            newsLetterUnsubscribeLink: getNewsletterUnsubscribeLink(
-               email,
-               process.env.SIGNATURE_SECRET,
-               context?.rawRequest?.headers?.origin
-            ),
+            newsLetterUnsubscribeLink: addUtmTagsToLink({
+               link: getNewsletterUnsubscribeLink(
+                  email,
+                  process.env.SIGNATURE_SECRET,
+                  context?.rawRequest?.headers?.origin
+               ),
+            }),
          },
       }))
 
@@ -206,7 +205,5 @@ const getNewsletterUnsubscribeLink = (
     * */
    const encodedSignature = encodeURIComponent(signature)
 
-   return addUtmTagsToLink({
-      link: `${baseUrl}/newsletter/unsubscribe/${email}?signature=${encodedSignature}`,
-   })
+   return `${baseUrl}/newsletter/unsubscribe/${email}?signature=${encodedSignature}`
 }

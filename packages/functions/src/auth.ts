@@ -6,7 +6,7 @@ const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
 
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
-import { addUtmTagsToLink, generateReferralCode, setHeaders } from "./util"
+import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
@@ -14,6 +14,7 @@ import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
