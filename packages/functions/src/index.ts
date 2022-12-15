@@ -43,8 +43,8 @@ exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
 exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin_v2
-exports.sendPostmarkResetPasswordEmail_v2 =
-   auth.sendPostmarkResetPasswordEmail_v2
+exports.sendPostmarkResetPasswordEmail_v3 =
+   auth.sendPostmarkResetPasswordEmail_v3
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
 exports.sendPostmarkEmailUserDataAndUniWithName =
    auth.sendPostmarkEmailUserDataAndUniWithName
@@ -60,13 +60,15 @@ exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 exports.exportFirestoreBackup = backup.exportFirestoreBackup
 
 // Admin Functions
-exports.sendBasicTemplateEmail_v5 = admin.sendBasicTemplateEmail
+exports.sendBasicTemplateEmail_v6 = admin.sendBasicTemplateEmail_v6
 exports.unsubscribeFromMarketingEmails = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
-exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
-exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
-exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
+exports.sendDashboardInviteEmail_v3 = groupAdmin.sendDashboardInviteEmail_v3
+exports.sendDraftApprovalRequestEmail_v2 =
+   groupAdmin.sendDraftApprovalRequestEmail_v2
+exports.sendNewlyPublishedEventEmail_v2 =
+   groupAdmin.sendNewlyPublishedEventEmail_v2
 exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
 exports.joinGroupDashboard_v2 = groupAdmin.joinGroupDashboard_v2
 exports.deleteGroupAdminDashboardInvite =
@@ -78,8 +80,8 @@ exports.kickFromDashboard_v2 = groupAdmin.kickFromDashboard_v2
 // Reminders
 exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailAboutApplicationLink =
-   reminders.sendReminderEmailAboutApplicationLink
+exports.sendReminderEmailAboutApplicationLink_v2 =
+   reminders.sendReminderEmailAboutApplicationLink_v2
 exports.scheduleReminderEmails = reminders.scheduleReminderEmails
 
 // Livestreams
@@ -87,12 +89,12 @@ exports.scheduleTestLivestreamDeletion =
    livestreams.scheduleTestLivestreamDeletion
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
-exports.sendLivestreamRegistrationConfirmationEmail_v2 =
-   livestreams.sendLivestreamRegistrationConfirmationEmail_v2
+exports.sendLivestreamRegistrationConfirmationEmail_v3 =
+   livestreams.sendLivestreamRegistrationConfirmationEmail_v3
 exports.sendPhysicalEventRegistrationConfirmationEmail =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
-exports.sendHybridEventRegistrationConfirmationEmail =
-   livestreams.sendHybridEventRegistrationConfirmationEmail
+exports.sendHybridEventRegistrationConfirmationEmail_v2 =
+   livestreams.sendHybridEventRegistrationConfirmationEmail_v2
 exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
