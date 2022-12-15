@@ -138,13 +138,13 @@ class FirebaseService {
 
    sendNewlyPublishedEventEmail = async (emailData) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
-         "sendNewlyPublishedEventEmail"
+         "sendNewlyPublishedEventEmail_v2"
       )
       return sendNewlyPublishedEventEmail(emailData)
    }
    sendDraftApprovalRequestEmail = async (data) => {
       const sendDraftApprovalRequestEmail = this.functions.httpsCallable(
-         "sendDraftApprovalRequestEmail"
+         "sendDraftApprovalRequestEmail_v2"
       )
       return sendDraftApprovalRequestEmail(data)
    }
@@ -160,7 +160,7 @@ class FirebaseService {
       redirectLink: string
    }) => {
       const sendPasswordResetEmail = this.functions.httpsCallable(
-         "sendPostmarkResetPasswordEmail_v2"
+         "sendPostmarkResetPasswordEmail_v3"
       )
       return sendPasswordResetEmail(data)
    }
@@ -176,7 +176,9 @@ class FirebaseService {
 
    sendReminderEmailAboutApplicationLink = async (data) => {
       const sendReminderEmailAboutApplicationLink =
-         this.functions.httpsCallable("sendReminderEmailAboutApplicationLink")
+         this.functions.httpsCallable(
+            "sendReminderEmailAboutApplicationLink_v2"
+         )
       return sendReminderEmailAboutApplicationLink(data)
    }
 
@@ -187,7 +189,7 @@ class FirebaseService {
       groupId: string
       role: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("sendDashboardInviteEmail_v2")(args)
+      return this.functions.httpsCallable("sendDashboardInviteEmail_v3")(args)
    }
 
    sendBasicTemplateEmail = async ({
@@ -214,7 +216,7 @@ class FirebaseService {
       }
 
       const sendBasicTemplateEmail = this.functions.httpsCallable(
-         "sendBasicTemplateEmail_v5"
+         "sendBasicTemplateEmail_v6"
       )
 
       return sendBasicTemplateEmail(dataObj)
@@ -267,7 +269,7 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v2"
+            "sendLivestreamRegistrationConfirmationEmail_v3"
          )
 
       const livestreamStartDate = livestream.start.toDate()
@@ -322,7 +324,7 @@ class FirebaseService {
    sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendHybridEventRegistrationConfirmationEmail"
+            "sendHybridEventRegistrationConfirmationEmail_v2"
          )
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
