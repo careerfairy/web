@@ -9,7 +9,7 @@ import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
-import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")

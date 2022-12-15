@@ -11,7 +11,7 @@ import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import { ATSPaginatedData } from "./lib/merge/MergeATSRepository"
-import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")

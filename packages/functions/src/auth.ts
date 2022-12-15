@@ -14,7 +14,7 @@ import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {

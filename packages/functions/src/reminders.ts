@@ -10,7 +10,7 @@ import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
-import { addUtmTagsToLink } from "@careerfairy/webapp/util/CommonUtil"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
