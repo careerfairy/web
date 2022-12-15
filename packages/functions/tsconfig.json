@@ -7,7 +7,8 @@
       "sourceMap": true,
       "strict": false,
       "target": "es2020",
-      "allowJs": true
+      "allowJs": true,
+      "experimentalDecorators": true
    },
    "compileOnSave": true,
    "include": ["src"]
