@@ -8,7 +8,7 @@ const {
 } = require("./api/slack")
 const { setHeaders, isLocalEnvironment } = require("./util")
 const ical = require("ical-generator")
-const { addUtmTagsToLink } = require("@careerfairy/webapp/util/CommonUtil")
+const { addUtmTagsToLink } = require("../dist/util")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")

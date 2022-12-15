@@ -22,7 +22,7 @@ import SendTestEmailDialog from "./SendTestEmailDialog"
 import ImageSelect from "../../../draftStreamForm/ImageSelect/ImageSelect"
 import { getDownloadUrl } from "../../../../helperFunctions/streamFormFunctions"
 import { TemplateDialogStepProps } from "./SendEmailTemplateDialog"
-import { addUtmTagsToLink, slugify } from "util/CommonUtil"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 const now = new Date()
 
@@ -139,7 +139,7 @@ const EmailTemplateForm = ({
                      eventUrl: addUtmTagsToLink({
                         link: values.eventUrl,
                         campaign: "events",
-                        content: slugify(targetStream.company),
+                        content: targetStream.company,
                      }),
                      start:
                         DateUtil.getRelativeDate(
