@@ -1,7 +1,7 @@
 import React from "react"
 import Stack, { StackProps } from "@mui/material/Stack"
 import { alpha, useTheme } from "@mui/material/styles"
-import { Button, IconButton, Tooltip, useMediaQuery } from "@mui/material"
+import { IconButton, Tooltip, useMediaQuery } from "@mui/material"
 import useSocials from "../../custom-hook/useSocials"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { StylesProps } from "../../../types/commonTypes"
@@ -11,6 +11,7 @@ interface WidgetButtonProps extends StackProps {
    event: LivestreamEvent
    iconsColor?: "grey" | "primary" | "secondary"
    noBackgroundColor?: boolean
+   iconStyle?: any
 }
 const styles: StylesProps = {
    socialIcons: {
@@ -35,6 +36,7 @@ export const ReferralWidget = ({
    event,
    iconsColor = "secondary",
    noBackgroundColor,
+   iconStyle,
    ...rest
 }: WidgetButtonProps) => {
    const theme = useTheme()
@@ -43,7 +45,7 @@ export const ReferralWidget = ({
 
    return (
       <Stack
-         direction={{ xs: "column", [mobileProp]: "row" }}
+         direction={{ xs: "row", [mobileProp]: "row" }}
          justifyContent={"space-evenly"}
          sx={[
             styles.socialIcons,
@@ -52,41 +54,30 @@ export const ReferralWidget = ({
          spacing={1}
          {...rest}
       >
-         {socials.map((icon) =>
-            mobile ? (
-               <Button
-                  fullWidth
-                  key={icon.name}
-                  color={iconsColor}
-                  variant={"outlined"}
+         {socials.map((icon) => (
+            <Tooltip key={icon.name} arrow title={icon.name}>
+               <IconButton
+                  sx={[
+                     styles.iconButton,
+                     {
+                        color:
+                           iconsColor === "grey"
+                              ? "common.black"
+                              : `${iconsColor}.main`,
+                        width: mobile ? "15%" : "unset",
+                     },
+                  ]}
                   size={"large"}
                   onClick={icon.onClick}
                   href={icon.href}
-                  startIcon={<icon.icon />}
                >
-                  {icon.name}
-               </Button>
-            ) : (
-               <Tooltip key={icon.name} arrow title={icon.name}>
-                  <IconButton
-                     sx={[
-                        styles.iconButton,
-                        {
-                           color:
-                              iconsColor === "grey"
-                                 ? "common.black"
-                                 : `${iconsColor}.main`,
-                        },
-                     ]}
-                     size={"large"}
-                     onClick={icon.onClick}
-                     href={icon.href}
-                  >
-                     <icon.icon color={"inherit"} sx={styles.icon} />
-                  </IconButton>
-               </Tooltip>
-            )
-         )}
+                  <icon.icon
+                     color={"inherit"}
+                     sx={[styles.icon, iconStyle && { ...iconStyle }]}
+                  />
+               </IconButton>
+            </Tooltip>
+         ))}
       </Stack>
    )
 }
