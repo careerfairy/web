@@ -99,20 +99,18 @@ export class CommonPage {
    // Multiple pages might need to fill the event group questions
    // when joining a livestream event
    async selectRandomCategoriesFromEvent(livestream: LivestreamEvent) {
-      // sometimes the browser fails when selecting the questions, are we going too fast?
-      await sleep(1000)
+      // wait for the questions tab to appear
+      await this.assertTextIsVisible("Would Like To Know More About You", false)
+
       for (let groupQuestions of Object.values(livestream.groupQuestionsMap)) {
          for (let question of Object.values(groupQuestions.questions)) {
-            await this.resilientClick(
-               `text=​New!${question.name} >> div[role="button"]`
-            )
+            let inputId = `#${groupQuestions.groupId}\\.questions\\.${question.id}\\.selectedOptionId`
 
             const options = Object.values(question.options)
             const randomOption =
                options[Math.floor(Math.random() * options.length)]
 
-            await sleep(500) // wait for options to appear
-            await this.resilientClick(`[data-value="${randomOption.id}"]`)
+            await materialSelectOption(this.page, randomOption.name, inputId)
          }
       }
    }
@@ -120,6 +118,34 @@ export class CommonPage {
    public enterEvent() {
       return this.resilientClick("text=Enter event")
    }
+}
+
+/**
+ * Select option from MaterialUI Select Input
+ * An approach to solve the flakiness of the tests
+ *
+ * Taken from https://stackoverflow.com/a/61856762
+ * @param page
+ * @param newSelectedValue
+ * @param cssSelector
+ * @constructor
+ */
+const materialSelectOption = async (page, newSelectedValue, cssSelector) => {
+   return page.evaluate(
+      ({ newSelectedValue, cssSelector }) => {
+         let clickEvent = document.createEvent("MouseEvents")
+         clickEvent.initEvent("mousedown", true, true)
+         let selectNode = document.querySelector(cssSelector)
+         selectNode.dispatchEvent(clickEvent)
+         ;[...document.querySelectorAll("li")]
+            .filter((el) => el.innerText == newSelectedValue)[0]
+            .click()
+      },
+      {
+         newSelectedValue,
+         cssSelector,
+      }
+   )
 }
 
 const promiseTimeout = (promise, timeoutInMilliseconds) => {
