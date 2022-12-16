@@ -15,6 +15,7 @@ import ReferralWidget from "../../../ReferralWidget"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import confetti from "canvas-confetti"
 import { PillsBackground } from "materialUI/GlobalBackground/GlobalBackGround"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 
 const styles: StylesProps = {
    root: {},
@@ -55,13 +56,9 @@ const styles: StylesProps = {
 }
 
 const RegistrationComplete = () => {
-   const {
-      livestream,
-      promptOtherEventsOnFinal,
-      handleClose,
-      onFinish,
-      isFirstRegistrationEver,
-   } = useContext(RegistrationContext)
+   const { livestream, promptOtherEventsOnFinal, handleClose, onFinish } =
+      useContext(RegistrationContext)
+   const { userStats } = useAuth()
    const { push } = useRouter()
    const isMobile = useIsMobile()
 
@@ -71,7 +68,7 @@ const RegistrationComplete = () => {
    }
 
    useEffect(() => {
-      if (isFirstRegistrationEver) {
+      if (!userStats?.hasRegisteredOnAnyLivestream) {
          confetti({
             particleCount: isMobile ? 500 : 1000,
             spread: 120,
@@ -81,7 +78,7 @@ const RegistrationComplete = () => {
             zIndex: 99999,
          })
       }
-   }, [isFirstRegistrationEver, isMobile])
+   }, [isMobile, userStats?.hasRegisteredOnAnyLivestream])
 
    return (
       <PillsBackground minHeight={"fit-content"} isOnDialog={true}>
@@ -103,7 +100,7 @@ const RegistrationComplete = () => {
                      align="center"
                      sx={styles.shareMessage}
                   >
-                     {isFirstRegistrationEver
+                     {!userStats?.hasRegisteredOnAnyLivestream
                         ? "You have successfully completed your first step towards becoming a member of the community. You can share the live stream with your network!"
                         : "That’s one more step as active member of this community. You can share the live stream with your network!"}
                   </Typography>
