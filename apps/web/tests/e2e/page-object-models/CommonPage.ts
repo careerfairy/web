@@ -110,7 +110,16 @@ export class CommonPage {
             const randomOption =
                options[Math.floor(Math.random() * options.length)]
 
-            await materialSelectOption(this.page, randomOption.name, inputId)
+            if (
+               this.page.context().browser().browserType().name() === "webkit"
+            ) {
+               // mui seems to use native select/options for webkit
+               await this.page
+                  .locator(`input[name="${inputId.substring(1)}"]`)
+                  .fill(randomOption.id)
+            } else {
+               await materialSelectOption(this.page, randomOption.name, inputId)
+            }
          }
       }
    }
