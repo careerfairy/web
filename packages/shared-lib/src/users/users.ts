@@ -117,6 +117,7 @@ export interface UserStats {
    totalLivestreamAttendances?: number
    totalQuestionsAsked?: number
    totalHandRaises?: number
+   hasRegisteredOnAnyLivestream?: boolean
 }
 
 export interface SavedRecruiter extends Identifiable {
