@@ -10,6 +10,7 @@ import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
+import { ATSPaginatedData } from "./lib/merge/MergeATSRepository"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -406,6 +407,19 @@ export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
  */
 export function serializeModels<T extends BaseModel>(result: T[]) {
    return result.map((entry) => entry.serializeToPlainObject())
+}
+
+/**
+ * Convert business models into plain objects (arrays)
+ * @param result
+ */
+export function serializePaginatedModels<T extends BaseModel>(
+   result: ATSPaginatedData<T>
+): ATSPaginatedData<object> {
+   return {
+      ...result,
+      results: result.results.map((e) => e.serializeToPlainObject()),
+   }
 }
 
 /**

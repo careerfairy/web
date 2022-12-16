@@ -26,10 +26,12 @@ const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
 
    return useMemo(() => {
       // map to business model (convert plain object to class object)
-      const jobs = data.map(Job.createFromPlainObject).map((job: Job) => {
-         job.setIntegrationId(integrationId)
-         return job
-      })
+      const jobs = data.results
+         .map(Job.createFromPlainObject)
+         .map((job: Job) => {
+            job.setIntegrationId(integrationId)
+            return job
+         })
 
       return {
          jobs,
