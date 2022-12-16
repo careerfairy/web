@@ -42,7 +42,7 @@ exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
-exports.validateUserEmailWithPin = auth.validateUserEmailWithPin
+exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin_v2
 exports.sendPostmarkResetPasswordEmail_v2 =
    auth.sendPostmarkResetPasswordEmail_v2
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
