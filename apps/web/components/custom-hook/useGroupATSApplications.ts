@@ -31,7 +31,7 @@ const useGroupATSApplications = (
 
    return useMemo(() => {
       // map to business model (convert plain object to class object)
-      const applications = data.map(Application.createFromPlainObject)
+      const applications = data.results.map(Application.createFromPlainObject)
 
       return {
          applications,
