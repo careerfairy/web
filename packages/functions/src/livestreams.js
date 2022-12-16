@@ -8,7 +8,7 @@ const {
 } = require("./api/slack")
 const { setHeaders, isLocalEnvironment } = require("./util")
 const ical = require("ical-generator")
-const { addUtmTagsToLink } = require("../dist/util")
+const { addUtmTagsToLink } = require("@careerfairy/shared-lib/dist/utils")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -107,6 +107,11 @@ exports.sendLivestreamRegistrationConfirmationEmail_v3 = functions.https.onCall(
                campaign: "eventRegistration",
                content: data.livestream_title,
             }),
+            next_livestreams_link: addUtmTagsToLink({
+               link: "https://careerfairy.io/next-livestreams",
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
             calendar_event_i_calendar: isLocalEnvironment()
                ? `http://localhost:5001/careerfairy-e1fd9/us-central1/getLivestreamICalendarEvent?eventId=${data.livestream_id}`
                : `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent?eventId=${data.livestream_id}`,
@@ -174,6 +179,11 @@ exports.sendHybridEventRegistrationConfirmationEmail_v2 =
             event_address: data.event_address,
             livestream_link: addUtmTagsToLink({
                link: data.livestream_link,
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
+            next_livestreams_link: addUtmTagsToLink({
+               link: "https://careerfairy.io/next-livestreams",
                campaign: "eventRegistration",
                content: data.livestream_title,
             }),
