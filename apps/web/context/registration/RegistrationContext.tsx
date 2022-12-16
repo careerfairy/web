@@ -19,7 +19,7 @@ import {
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
-import { livestreamRepo } from "data/RepositoryInstances"
+import { livestreamRepo, userRepo } from "data/RepositoryInstances"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -65,7 +65,6 @@ interface DefaultContext {
    loadingInitialQuestions: boolean
    gettingPolicyStatus: boolean
    cancelable: boolean
-   isFirstRegistrationEver: boolean
 }
 
 export const RegistrationContext = createContext<DefaultContext>({
@@ -100,7 +99,6 @@ export const RegistrationContext = createContext<DefaultContext>({
    loadingInitialQuestions: false,
    gettingPolicyStatus: false,
    cancelable: false,
-   isFirstRegistrationEver: false,
 })
 
 function reducer(state, action) {
@@ -180,11 +178,10 @@ export function RegistrationContextProvider({
       registerToLivestream,
       livestreamQuestionsQuery,
    } = useFirebaseService()
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, userStats } = useAuth()
    const [sliding, setSliding] = useState(false)
    const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false)
    const [questionSortType, setQuestionSortType] = useState("timestamp")
-   const [isFirstRegistrationEver, setIsFirstRegistrationEver] = useState(false)
    const [
       { activeStep, group, groupsWithPolicies, hasAgreedToAll, totalSteps },
       dispatch,
@@ -197,20 +194,29 @@ export function RegistrationContextProvider({
    })
 
    useEffect(() => {
-      if (userData?.authId) {
+      if (userData?.authId && !userStats?.hasRegisteredOnAnyLivestream) {
          ;(async () => {
             try {
                const isUserRegisterOnAnyLivestream =
                   await livestreamRepo.isUserRegisterOnAnyLivestream(
                      userData.authId
                   )
-               setIsFirstRegistrationEver(!isUserRegisterOnAnyLivestream)
+               await userRepo.updateUserHasRegisteredToAnyLivestreamEver(
+                  userData.userEmail,
+                  isUserRegisterOnAnyLivestream
+               )
             } catch (error) {
-               setIsFirstRegistrationEver(false)
+               errorLogAndNotify(error, {
+                  message: `Not able to very if ${userData.userEmail} has registered to any Livestream`,
+               })
             }
          })()
       }
-   }, [userData?.authId])
+   }, [
+      userData?.authId,
+      userData?.userEmail,
+      userStats?.hasRegisteredOnAnyLivestream,
+   ])
 
    const questionsQuery = useMemo(() => {
       // prevent an extra query for the questions if they are disabled
@@ -422,7 +428,6 @@ export function RegistrationContextProvider({
          onFinish,
          onQuestionsAnswered,
          cancelable,
-         isFirstRegistrationEver,
       }
    }, [
       activeStep,
@@ -439,7 +444,6 @@ export function RegistrationContextProvider({
       handleGoToLast,
       hasAgreedToAll,
       hasMore,
-      isFirstRegistrationEver,
       livestream,
       loadingInitialQuestions,
       onFinish,
