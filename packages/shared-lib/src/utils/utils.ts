@@ -107,13 +107,23 @@ export const addUtmTagsToLink = ({
    campaign,
    content,
 }: AddUtmTagsToLinkProps): string => {
-   const campaignUtm = campaign ? `&utm_campaign=${slugify(campaign)}` : ""
-   const contentUtm = content ? `&utm_content=${slugify(content)}` : ""
+   const url = new URL(link)
+   const params = new URLSearchParams(url.search)
 
-   const utm = `utm_source=${slugify(source)}&utm_medium=${slugify(
-      medium
-   )}${campaignUtm}${contentUtm}`
-   const linkAlreadyHasQueryParams = link.includes("?")
+   if (!params.get("utm_source")) {
+      params.set("utm_source", slugify(source))
+   }
+   if (!params.get("utm_medium")) {
+      params.set("utm_medium", slugify(medium))
+   }
+   if (!params.get("utm_campaign") && campaign) {
+      params.set("utm_campaign", slugify(campaign))
+   }
+   if (!params.get("utm_content") && content) {
+      params.set("utm_content", slugify(content))
+   }
 
-   return `${link}${linkAlreadyHasQueryParams ? "&" : "?"}${utm}`
+   url.search = params.toString()
+
+   return url.toString()
 }
