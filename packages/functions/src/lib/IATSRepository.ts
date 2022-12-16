@@ -4,6 +4,11 @@ import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
 import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+import {
+   ATSApplicationOptions,
+   ATSPaginatedData,
+   ATSPaginationOptions,
+} from "./merge/MergeATSRepository"
 
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean
@@ -20,11 +25,11 @@ export type ApplicationCreationOptions = {
 }
 
 export interface IATSRepository {
-   getJobs(): Promise<Job[]>
+   getJobs(options?: ATSPaginationOptions): Promise<ATSPaginatedData<Job>>
 
    getJob(id: string): Promise<Job>
 
-   getOffices(): Promise<Office[]>
+   getOffices(options?: ATSPaginationOptions): Promise<ATSPaginatedData<Office>>
 
    getCandidate(id: string): Promise<Candidate>
 
@@ -33,7 +38,9 @@ export interface IATSRepository {
       options?: CandidateCreationOptions
    ): Promise<Candidate>
 
-   getApplications(jobId?: string): Promise<Application[]>
+   getApplications(
+      options?: ATSApplicationOptions
+   ): Promise<ATSPaginatedData<Application>>
 
    getSyncStatus(): Promise<SyncStatus[]>
 
