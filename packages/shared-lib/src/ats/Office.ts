@@ -1,5 +1,5 @@
-import { MergeOffice } from "./MergeResponseTypes"
 import { ATSModel } from "./ATSModel"
+import { MergeOffice } from "./merge/MergeResponseTypes"
 
 /**
  * Office class
