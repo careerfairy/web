@@ -461,8 +461,4 @@ service cloud.firestore {
             allow write: if isSignedInAndIsSameUser(userEmail);
         }
     }
-    match /{somePath=**}/userLivestreamData/{userEmail} {
-        allow read: if true;
-        allow write: if isSignedInAndIsSameUser(studentEmail);
-    }
 }
