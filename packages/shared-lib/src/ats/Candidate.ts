@@ -1,7 +1,11 @@
-import { MergeAttachment, MergeCandidate, MergeUrl } from "./MergeResponseTypes"
 import { mapRelation } from "../BaseModel"
 import { Application } from "./Application"
 import { ATSModel } from "./ATSModel"
+import {
+   MergeAttachment,
+   MergeCandidate,
+   MergeUrl,
+} from "./merge/MergeResponseTypes"
 
 export class Candidate extends ATSModel {
    constructor(

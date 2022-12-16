@@ -1,9 +1,9 @@
-import { Office } from "./Office"
-import { Job } from "./Job"
-import { SyncStatus } from "./SyncStatus"
-import { Application } from "./Application"
-import { UserData } from "../users"
-import { Candidate } from "./Candidate"
+import { Office } from "@careerfairy/shared-lib/dist/ats/Office"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
+import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
 
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean

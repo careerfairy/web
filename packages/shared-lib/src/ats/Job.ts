@@ -1,9 +1,9 @@
-import { JobStatus, MergeJob } from "./MergeResponseTypes"
 import { fromSerializedDate, mapIfObject } from "../BaseModel"
 import { Office } from "./Office"
 import { Recruiter } from "./Recruiter"
 import { Department } from "./Department"
 import { ATSModel, fromMergeDate } from "./ATSModel"
+import { JobStatus, MergeJob } from "./merge/MergeResponseTypes"
 
 /**
  * Job class

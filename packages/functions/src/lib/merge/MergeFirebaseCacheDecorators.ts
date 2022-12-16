@@ -1,6 +1,5 @@
-import * as BusinessModels from "./BusinessModels"
-
-const hash = require("object-hash")
+import * as BusinessModels from "@careerfairy/shared-lib/dist/ats/BusinessModels"
+import * as hash from "object-hash"
 import firebase from "firebase/compat"
 import { MergeATSRepository } from "./MergeATSRepository"
 
@@ -31,7 +30,7 @@ interface CacheEntry<T = firebase.firestore.DocumentData> {
  * Firebase cache decorator
  * @param TTL  The time to live for the cache entry in milliseconds default is 1 hour
  */
-export function fromFirebaseCache(TTL: number = 3600000) {
+export function fromFirebaseCache(TTL = 3600000) {
    return function (
       constructor: any,
       propertyKey: string,
@@ -47,7 +46,7 @@ export function fromFirebaseCache(TTL: number = 3600000) {
 
          if (!token) {
             throw new Error(
-               `@fromFirebaseCache can only be applied to methods that require an account token`
+               "@fromFirebaseCache can only be applied to methods that require an account token"
             )
          }
          const hashAccountToken = hash(token)
@@ -66,7 +65,7 @@ export function fromFirebaseCache(TTL: number = 3600000) {
                | CacheEntry["expiresAt"]
                | undefined
 
-            let expired = expiresAt?.toMillis() < Date.now()
+            const expired = expiresAt?.toMillis() < Date.now()
 
             if (expiresAt && !expired) {
                // return the entire cache entry as-is

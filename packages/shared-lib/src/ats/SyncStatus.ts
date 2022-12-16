@@ -1,6 +1,6 @@
-import { MergeSyncStatus } from "./MergeResponseTypes"
 import { fromSerializedDate } from "../BaseModel"
 import { ATSModel, fromMergeDate } from "./ATSModel"
+import { MergeSyncStatus } from "./merge/MergeResponseTypes"
 
 export type SyncStatusTypes =
    | "DISABLED"
