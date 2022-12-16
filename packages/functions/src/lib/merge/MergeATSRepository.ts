@@ -296,8 +296,8 @@ export class MergeATSRepository implements IATSRepository {
     * @private
     */
    private mapPaginatedResults<T>(
-      results: MergePaginatedResponse<any>,
-      mapper: (model: any) => T
+      results: MergePaginatedResponse<unknown>,
+      mapper: (model: unknown) => T
    ): ATSPaginatedData<T> {
       return {
          next: results.next,
