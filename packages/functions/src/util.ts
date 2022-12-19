@@ -170,6 +170,10 @@ export const addMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() + minutes * 60000)
 }
 
+export const removeMinutesDate = (date: Date, minutes: number): Date => {
+   return new Date(date.getTime() - minutes * 60000)
+}
+
 export const getArrayDifference = (array1, array2) => {
    return array2.filter((element) => {
       return !array1.includes(element)
