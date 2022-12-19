@@ -35,6 +35,7 @@ import RootState from "../../../../store/reducers"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { HandRaiseState } from "../../../../types/handraise"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import EndOfStreamView from "../EndOfStreamView"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -48,7 +49,7 @@ const useStyles = makeStyles((theme) => ({
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,
-      display: "flex",
+      // display: "flex",
       justifyContent: "center",
       alignItems: "center",
    },
@@ -72,6 +73,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       streamerId,
       isMobile: mobile,
       isBreakout,
+      presenter,
    } = useCurrentStream()
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
@@ -87,7 +89,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       useHandRaiseState()
 
    const {
-      query: { livestreamId },
+      query: { livestreamId, isRecordingWindow },
    } = useRouter()
 
    const { userData } = useAuth()
@@ -280,6 +282,10 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
 
    if (!currentLivestream) {
       return null
+   }
+
+   if (presenter?.streamHasFinished() && !isRecordingWindow && userData) {
+      return <EndOfStreamView />
    }
 
    return (
