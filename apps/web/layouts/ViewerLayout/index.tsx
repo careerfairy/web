@@ -64,6 +64,9 @@ const styles = sxStyles({
       display: "flex",
       flex: "1 1 auto",
       overflow: "hidden",
+      paddingTop: {
+         mobile: "65px",
+      },
       transition: theme.transitions.create("padding-left", {
          duration: theme.transitions.duration.shortest,
          easing: theme.transitions.easing.easeInOut,
@@ -87,7 +90,7 @@ const styles = sxStyles({
       height: "100%",
       background: "black",
       position: "relative",
-      // overflow: 'auto'
+      overflow: "auto",
    },
 })
 
@@ -364,6 +367,7 @@ const ViewerLayout = (props) => {
          presenter: currentLivestream
             ? LivestreamPresenter.createFromDocument(currentLivestream)
             : null,
+         streamAdminPreferences: null,
       }),
       [
          currentLivestream,

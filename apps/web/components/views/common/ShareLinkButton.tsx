@@ -1,14 +1,68 @@
-import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
-import { Button, FormControl, Tooltip } from "@mui/material"
-import FileCopyIcon from "@mui/icons-material/FileCopy"
+import { Button, ButtonBase, ButtonProps, Tooltip } from "@mui/material"
 import { useCopyToClipboard } from "react-use"
 import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
+import { sxStyles } from "../../../types/commonTypes"
+import ContentPasteIcon from "@mui/icons-material/ContentPaste"
+import Box from "@mui/material/Box"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
-const ShareLinkButton = ({ linkUrl }) => {
+const hoveredContentClassName = "hovered-content"
+const contentClassName = "non-hovered-content"
+const styles = sxStyles({
+   root: {
+      position: "relative",
+      "&:hover": {
+         [`& .${hoveredContentClassName}`]: {
+            opacity: 1,
+         },
+         [`& .${contentClassName}`]: {
+            opacity: 0,
+         },
+      },
+      [`& .${hoveredContentClassName}`]: {
+         opacity: 0,
+         transition: "opacity 0.5s",
+      },
+      [`& .${contentClassName}`]: {
+         opacity: 1,
+         transition: "opacity 0.5s",
+      },
+      borderRadius: (theme) => theme.shape.borderRadius,
+   },
+   iconButton: {
+      borderTopRightRadius: 0,
+      borderBottomRightRadius: 0,
+   },
+   urlButton: {
+      px: 2,
+      maxWidth: 200,
+      borderBottomLeftRadius: 0,
+      borderTopLeftRadius: 0,
+   },
+   ButtonText: {
+      overflow: "hidden",
+      textOverflow: "ellipsis",
+      whiteSpace: "nowrap",
+      fontSize: "0.815rem",
+   },
+   hoveredContent: {
+      display: "flex",
+   },
+   content: {
+      position: "absolute",
+   },
+})
+
+type Props = {
+   linkUrl: string
+   size?: ButtonProps["size"]
+}
+const ShareLinkButton = ({ linkUrl, size }: Props) => {
    const [copiedFromButton, setCopiedFromButton] = useState(false)
    const [_, copyToClipboard] = useCopyToClipboard()
    const { successNotification } = useSnackbarNotifications()
+   const isMobile = useIsMobile()
 
    const copyFromButton = () => {
       copyToClipboard(linkUrl)
@@ -25,35 +79,58 @@ const ShareLinkButton = ({ linkUrl }) => {
    }, [copiedFromButton])
 
    return (
-      <FormControl variant="outlined">
-         <Tooltip
-            title="Copied!"
-            placement="top"
-            open={copiedFromButton}
-            enterDelay={500}
-            PopperProps={{
-               disablePortal: true,
-            }}
-            leaveDelay={200}
-            disableFocusListener
-            disableHoverListener
-            disableTouchListener
-         >
+      <Tooltip
+         title="Copied!"
+         placement="bottom"
+         open={copiedFromButton}
+         enterDelay={500}
+         PopperProps={{
+            disablePortal: true,
+         }}
+         arrow
+         leaveDelay={200}
+         disableFocusListener
+         disableHoverListener
+         disableTouchListener
+      >
+         <ButtonBase onClick={copyFromButton} sx={styles.root}>
             <Button
-               color="primary"
-               variant="outlined"
-               startIcon={<FileCopyIcon />}
-               onClick={copyFromButton}
+               className={contentClassName}
+               color={"primary"}
+               sx={styles.content}
+               variant={"contained"}
+               size={size}
             >
-               Copy Link
+               SHARE CAREERFAIRY
             </Button>
-         </Tooltip>
-      </FormControl>
+            <Box
+               className={hoveredContentClassName}
+               sx={styles.hoveredContent}
+               component={"span"}
+            >
+               <Button
+                  size={size}
+                  sx={styles.iconButton}
+                  color="primary"
+                  variant="contained"
+                  disableRipple
+                  disableElevation
+                  startIcon={!isMobile && <ContentPasteIcon />}
+               >
+                  {isMobile ? <ContentPasteIcon /> : "COPY"}
+               </Button>
+               <Button
+                  size={size}
+                  disableRipple
+                  sx={styles.urlButton}
+                  variant={"outlined"}
+               >
+                  <Box sx={styles.ButtonText}>{linkUrl}</Box>
+               </Button>
+            </Box>
+         </ButtonBase>
+      </Tooltip>
    )
-}
-
-ShareLinkButton.propTypes = {
-   linkUrl: PropTypes.string.isRequired,
 }
 
 export default ShareLinkButton
