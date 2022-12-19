@@ -211,6 +211,7 @@ const NewStreamModal = ({
 
          if (selectedJobs) {
             livestream.jobs = selectedJobs
+            livestream.hasJobs = selectedJobs.length > 0
          }
 
          if (publishDraft) {
