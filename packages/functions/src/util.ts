@@ -418,7 +418,7 @@ export function serializePaginatedModels<T extends BaseModel>(
 ): ATSPaginatedData<object> {
    return {
       ...result,
-      results: result.results.map((e) => e.serializeToPlainObject()),
+      results: result?.results?.map((e) => e.serializeToPlainObject()),
    }
 }
 

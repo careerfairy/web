@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { string } from "yup"
+import { boolean, string } from "yup"
 import { atsRepo, groupRepo } from "./api/repositories"
 import {
    logAxiosErrorAndThrow,
@@ -122,15 +122,17 @@ type ATSDataPagination = {
 export const fetchATSJobs = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const requestData =
-         await atsRequestValidationWithAccountToken<ATSDataPagination>({
-            data,
-            context,
-            requiredData: {
-               cursor: string().optional().nullable(),
-               pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
-            },
-         })
+      const requestData = await atsRequestValidationWithAccountToken<
+         ATSDataPagination & { allJobs?: boolean }
+      >({
+         data,
+         context,
+         requiredData: {
+            cursor: string().optional().nullable(),
+            pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
+            allJobs: boolean().optional().nullable(),
+         },
+      })
 
       try {
          const atsRepository = atsRepo(
@@ -138,8 +140,15 @@ export const fetchATSJobs = functions
             requestData.tokens.merge.account_token
          )
 
+         if (requestData.allJobs) {
+            return await atsRepository.getAllJobs().then(serializeModels)
+         }
+
          return await atsRepository
-            .getJobs({ cursor: data?.cursor })
+            .getJobs({
+               cursor: requestData?.cursor,
+               pageSize: requestData?.pageSize + "",
+            })
             .then(serializePaginatedModels)
       } catch (e) {
          return logAxiosErrorAndThrow(

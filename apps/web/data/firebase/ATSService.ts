@@ -18,10 +18,21 @@ export class ATSService {
       return uuid.replace(/-/g, "")
    }
 
-   async getJobs(groupId: string, integrationId: string): Promise<Job[]> {
-      const data = await this.firebaseFunctions.httpsCallable("fetchATSJobs")({
+   /**
+    * Gets all the jobs for a given integration
+    *
+    * This can fan out to several ats requests since'll need to go
+    * through paginated responses
+    * @param groupId
+    * @param integrationId
+    */
+   async getAllJobs(groupId: string, integrationId: string): Promise<Job[]> {
+      const data = await this.firebaseFunctions.httpsCallable(
+         "fetchATSJobs_v2"
+      )({
          groupId,
          integrationId,
+         allJobs: true,
       })
 
       return data.data.map(Job.createFromPlainObject).map((job: Job) => {
