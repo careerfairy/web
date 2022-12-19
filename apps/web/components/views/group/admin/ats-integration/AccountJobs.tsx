@@ -88,27 +88,30 @@ const fetchPage = (
          pageSize: query.pageSize,
       }
 
-      atsServiceInstance.getJobs(groupId, id, pagination).then((result) => {
-         let total = query.page * pageSize + result.results.length
+      atsServiceInstance
+         .getJobs(groupId, id, pagination)
+         .then((result) => {
+            let total = query.page * pageSize + result.results.length
 
-         if (result.next) {
-            // hack for us to have the next page link, if there is a next cursor
-            // we know that at least there is one more item in the next page
-            total += 1
-         }
+            if (result.next) {
+               // hack for us to have the next page link, if there is a next cursor
+               // we know that at least there is one more item in the next page
+               total += 1
+            }
 
-         pageHistory.current.push({
-            pageNumber: page,
-            next: result.next,
-            prev: result.previous,
+            pageHistory.current.push({
+               pageNumber: page,
+               next: result.next,
+               prev: result.previous,
+            })
+
+            resolve({
+               data: mapJobsToTableRows(result.results),
+               page: page,
+               totalCount: total,
+            })
          })
-
-         resolve({
-            data: mapJobsToTableRows(result.results),
-            page: page,
-            totalCount: total,
-         })
-      })
+         .catch(reject)
    })
 
 const renderDescriptionColumn = (row) => {
