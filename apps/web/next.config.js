@@ -97,26 +97,7 @@ const moduleExports = {
       }
       return config
    },
-   webpack: (config, { dev }) => {
-      /**
-       * Reduce .next/cache folder size
-       *
-       * https://webpack.js.org/plugins/split-chunks-plugin/
-       * Taken from https://github.com/vercel/next.js/discussions/17218#discussioncomment-4381152
-       */
-      if (dev) {
-         config.optimization.splitChunks = {
-            cacheGroups: {
-               framework: {
-                  chunks: "all",
-                  test: /[\\/]node_modules[\\/]/,
-                  name: "framework",
-                  enforce: true,
-               },
-            },
-         }
-      }
-
+   webpack: (config) => {
       config.module.rules.push({
          test: /\.wav$/,
          loader: "file-loader",
