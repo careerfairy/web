@@ -130,6 +130,10 @@ export class LivestreamPresenter extends BaseModel {
       return this.groupIds.some((groupId) => userGroupAdminClaims?.[groupId])
    }
 
+   streamHasFinished(): boolean {
+      return this.hasEnded && this.hasStarted === false
+   }
+
    isPast(): boolean {
       return (
          this.hasEnded ||
