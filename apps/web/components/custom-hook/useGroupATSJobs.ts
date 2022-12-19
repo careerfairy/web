@@ -14,7 +14,7 @@ const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
 
    const { data } = useSWR(
       [
-         "fetchATSJobs",
+         "fetchATSJobs_v2",
          {
             groupId,
             integrationId,

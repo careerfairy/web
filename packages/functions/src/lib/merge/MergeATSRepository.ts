@@ -78,16 +78,37 @@ export class MergeATSRepository implements IATSRepository {
       )
 
       // Sort by last updated date, in place
-      data.results.sort((a, b) => {
-         if (!a.remote_updated_at || !b.remote_updated_at) return 0
-
-         const aDate = new Date(a.remote_updated_at)
-         const bDate = new Date(b.remote_created_at)
-
-         return bDate.getTime() - aDate.getTime()
-      })
+      data.results.sort(sortMergeJobsDesc)
 
       return this.mapPaginatedResults<Job>(data, Job.createFromMerge)
+   }
+
+   /**
+    * Fetches all open jobs
+    *
+    * Goes through all pages sequentially
+    */
+   async getAllJobs(): Promise<Job[]> {
+      let jobs: Job[] = []
+      let cursor: string = null
+      let counter = 0
+
+      do {
+         try {
+            console.log(`Fetching page ${++counter}`)
+            const pageResults = await this.getJobs({ cursor })
+
+            jobs = jobs.concat(pageResults.results)
+            cursor = pageResults.next
+         } catch (e) {
+            console.error(e)
+            cursor = null // we don't have a next page to fetch
+         }
+      } while (cursor !== null)
+
+      console.log(`Total jobs: ${jobs.length}`)
+
+      return jobs.sort(sortJobsDesc)
    }
 
    async getJob(id: string): Promise<Job> {
@@ -302,14 +323,14 @@ export class MergeATSRepository implements IATSRepository {
       return {
          next: results.next,
          previous: results.previous,
-         results: results.results.map(mapper),
+         results: results.results?.map(mapper),
       }
    }
 
    /**
     * Builds the Merge Path with Query Params
     *
-    * Remove falsy params (e.g optional options that are null)
+    * Remove falsy params (e.g. optional options that are null)
     * Appends the first slash to the path if it's missing
     * @param path
     * @param queryParams
@@ -444,4 +465,19 @@ function createMergeModelBody(data: any, remoteUserId) {
    }
 
    return body
+}
+
+function sortMergeJobsDesc(a: MergeJob, b: MergeJob) {
+   if (!a.remote_updated_at || !b.remote_updated_at) return 0
+
+   const aDate = new Date(a.remote_updated_at)
+   const bDate = new Date(b.remote_updated_at)
+
+   return bDate.getTime() - aDate.getTime()
+}
+
+function sortJobsDesc(a: Job, b: Job) {
+   if (!a.updatedAt || !b.updatedAt) return 0
+
+   return b.updatedAt?.getTime() - a.updatedAt?.getTime()
 }
