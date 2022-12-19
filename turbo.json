@@ -30,5 +30,5 @@
          "cache": false
       }
    },
-   "globalDependencies": ["$NODE_ENV"]
+   "globalEnv": ["NODE_ENV"]
 }

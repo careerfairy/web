@@ -27,13 +27,13 @@
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions"
    },
    "devDependencies": {
-      "@rxdi/firelink": "^0.8.0",
+      "@rxdi/firelink": "^0.9.1",
       "cross-env": "^7.0.3",
-      "firebase-tools": "^11.8.0",
+      "firebase-tools": "^11.18.0",
       "husky": "^7.0.4",
       "lint-staged": "^12.4.1",
       "prettier": "^2.6.2",
-      "turbo": "^1.2.8",
+      "turbo": "^1.6.3",
       "vercel": "^24.2.0"
    },
    "lint-staged": {
