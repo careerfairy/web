@@ -48,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,
-      display: "flex",
+      // display: "flex",
       justifyContent: "center",
       alignItems: "center",
    },
