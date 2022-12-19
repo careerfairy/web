@@ -1,8 +1,8 @@
-import { MergeApplication } from "./MergeResponseTypes"
 import { fromSerializedDate, saveIfObject } from "../BaseModel"
 import { Job } from "./Job"
 import { Candidate } from "./Candidate"
 import { ATSModel, fromMergeDate } from "./ATSModel"
+import { MergeApplication } from "./merge/MergeResponseTypes"
 
 /**
  * Relationship between a Job and Candidate
