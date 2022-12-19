@@ -1,30 +1,59 @@
 import useGroupATSJobs from "../../../../custom-hook/useGroupATSJobs"
-import React, { useMemo } from "react"
-import MaterialTable from "@material-table/core"
+import React, { useMemo, useState } from "react"
+import MaterialTable, { Options } from "@material-table/core"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import Box from "@mui/material/Box"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
 import { Typography } from "@mui/material"
+import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 type Props = {
    atsAccount: GroupATSAccount
 }
 
+const tableOptions: Partial<Options<object>> = {
+   paginationType: "stepped",
+   showFirstLastPageButtons: false,
+}
+
+type Page = {
+   cursor: string
+   page: number
+}
+
 const AccountJobs = ({ atsAccount }: Props) => {
-   const { jobs } = useGroupATSJobs(atsAccount.groupId, atsAccount.id)
+   const [page, setPage] = useState<Page>({
+      cursor: null,
+      page: 1,
+   })
+
+   let atsPagination: ATSDataPaginationOptions = useMemo(
+      () => ({ cursor: page.cursor, pageSize: 1 }),
+      [page.cursor]
+   )
+
+   const data = useGroupATSJobs(
+      atsAccount.groupId,
+      atsAccount.id,
+      atsPagination
+   )
 
    const jobsToRows = useMemo(() => {
-      return mapJobsToTableRows(jobs)
-   }, [jobs])
+      return mapJobsToTableRows(data?.results)
+   }, [data?.results])
 
    return (
       <MaterialTable
+         onPageChange={(pageNumber, pageSize) => {
+            console.log("here onChangePage", pageNumber, pageSize)
+         }}
          columns={columns}
          data={jobsToRows}
          title={<TableTitle title="Jobs" subtitle="Most recent open Jobs" />}
          detailPanel={RowDetailPanel}
          onRowClick={expandDetailPanel}
+         options={tableOptions}
       />
    )
 }
