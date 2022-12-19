@@ -219,22 +219,31 @@ const stopRecording = async (
       breakoutRoomId
    )
 
-   try {
-      await agora.recordingStop(
+   const promises = []
+
+   promises.push(
+      agora.recordingStop(
          cname,
          recordingToken?.resourceId,
          recordingToken?.sid
-      )
+      ),
+      livestreamSetIsRecording(livestreamId, false, breakoutRoomId)
+   )
 
-      await livestreamSetIsRecording(livestreamId, false, breakoutRoomId)
-   } catch (e) {
-      logAxiosErrorAndThrow(
-         "Failed to stop recording",
-         e,
-         livestreamId,
-         breakoutRoomId
-      )
-   }
+   Promise.allSettled(promises).then(async (results) => {
+      const rejectedPromises = results.filter(
+         ({ status }) => status === "rejected"
+      ) as PromiseRejectedResult[]
+
+      if (rejectedPromises.length > 0) {
+         logAxiosErrorAndThrow(
+            "Failed to stop recording",
+            rejectedPromises[0].reason,
+            livestreamId,
+            breakoutRoomId
+         )
+      }
+   })
 
    functions.logger.info(
       `Download recorded file: ${downloadLink(
