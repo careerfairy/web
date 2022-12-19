@@ -1,62 +1,115 @@
-import useGroupATSJobs from "../../../../custom-hook/useGroupATSJobs"
-import React, { useMemo, useState } from "react"
-import MaterialTable, { Options } from "@material-table/core"
+import React, { RefObject, useCallback, useRef } from "react"
+import MaterialTable, {
+   Options,
+   Query,
+   QueryResult,
+} from "@material-table/core"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import Box from "@mui/material/Box"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
 import { Typography } from "@mui/material"
 import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
+import { sxStyles } from "../../../../../types/commonTypes"
 
 type Props = {
    atsAccount: GroupATSAccount
 }
 
+const perPage = 7
+
 const tableOptions: Partial<Options<object>> = {
    paginationType: "stepped",
    showFirstLastPageButtons: false,
+   pageSizeOptions: [perPage], // don't allow the user to change the page size
+   pageSize: perPage,
+   search: false,
 }
 
-type Page = {
-   cursor: string
-   page: number
+type PageData = {
+   pageNumber: number
+   next: string
+   prev: string
 }
+
+const styles = sxStyles({
+   table: {
+      "& .MuiTablePagination-displayedRows": {
+         display: "none",
+      },
+   },
+})
 
 const AccountJobs = ({ atsAccount }: Props) => {
-   const [page, setPage] = useState<Page>({
-      cursor: null,
-      page: 1,
-   })
+   // keep track of previous page
+   let pageHistory = useRef<PageData[]>([
+      {
+         pageNumber: 0,
+         next: null,
+         prev: null,
+      },
+   ])
 
-   let atsPagination: ATSDataPaginationOptions = useMemo(
-      () => ({ cursor: page.cursor, pageSize: 1 }),
-      [page.cursor]
+   const fetcher = useCallback(
+      (query) => {
+         return fetchPage(query, pageHistory, atsAccount.groupId, atsAccount.id)
+      },
+      [atsAccount.groupId, atsAccount.id]
    )
-
-   const data = useGroupATSJobs(
-      atsAccount.groupId,
-      atsAccount.id,
-      atsPagination
-   )
-
-   const jobsToRows = useMemo(() => {
-      return mapJobsToTableRows(data?.results)
-   }, [data?.results])
 
    return (
-      <MaterialTable
-         onPageChange={(pageNumber, pageSize) => {
-            console.log("here onChangePage", pageNumber, pageSize)
-         }}
-         columns={columns}
-         data={jobsToRows}
-         title={<TableTitle title="Jobs" subtitle="Most recent open Jobs" />}
-         detailPanel={RowDetailPanel}
-         onRowClick={expandDetailPanel}
-         options={tableOptions}
-      />
+      <Box sx={styles.table}>
+         <MaterialTable
+            columns={columns}
+            data={fetcher}
+            title={<TableTitle title="Jobs" subtitle="Most recent open Jobs" />}
+            detailPanel={RowDetailPanel}
+            onRowClick={expandDetailPanel}
+            options={tableOptions}
+         />
+      </Box>
    )
 }
+
+const fetchPage = (
+   query: Query<object>,
+   pageHistory: RefObject<PageData[]>,
+   groupId: string,
+   id: string
+): Promise<QueryResult<object>> =>
+   new Promise((resolve, reject) => {
+      const { page, pageSize } = query
+      let pageData: PageData = pageHistory.current.pop()
+      const isBackwards = pageData.pageNumber > query.page
+
+      let pagination: ATSDataPaginationOptions = {
+         cursor: isBackwards ? pageData.prev : pageData.next,
+         pageSize: query.pageSize,
+      }
+
+      atsServiceInstance.getJobs(groupId, id, pagination).then((result) => {
+         let total = query.page * pageSize + result.results.length
+
+         if (result.next) {
+            // hack for us to have the next page link, if there is a next cursor
+            // we know that at least there is one more item in the next page
+            total += 1
+         }
+
+         pageHistory.current.push({
+            pageNumber: page,
+            next: result.next,
+            prev: result.previous,
+         })
+
+         resolve({
+            data: mapJobsToTableRows(result.results),
+            page: page,
+            totalCount: total,
+         })
+      })
+   })
 
 const renderDescriptionColumn = (row) => {
    return (
@@ -93,8 +146,8 @@ const columns = [
       field: "hiringManager",
    },
    {
-      title: "Created At",
-      field: "createdAt",
+      title: "Updated At",
+      field: "updatedAt",
    },
 ]
 
@@ -111,14 +164,14 @@ const RowDetailPanel = (row) => {
 const expandDetailPanel = (event, rowData, togglePanel) => togglePanel()
 
 function mapJobsToTableRows(jobs: Job[]) {
-   return jobs.map((job) => ({
+   return jobs?.map((job) => ({
       id: job.id,
       name: job.name,
       description: job.description,
       descriptionStripped: job.descriptionStripped,
       status: job.status,
       hiringManager: job.hiringManagers[0]?.getName(),
-      createdAt: job.createdAt?.toLocaleString(),
+      updatedAt: job.updatedAt?.toLocaleString(),
    }))
 }
 
