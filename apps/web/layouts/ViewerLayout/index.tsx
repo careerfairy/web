@@ -1,18 +1,19 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
-import makeStyles from "@mui/styles/makeStyles"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import ViewerTopBar from "./ViewerTopBar"
 import { isLoaded } from "react-redux-firebase"
 import { useAuth } from "../../HOCs/AuthProvider"
 import Loader from "../../components/views/loader/Loader"
-import { useMediaQuery } from "@mui/material"
+import { Box, useMediaQuery } from "@mui/material"
 import LeftMenu from "../../components/views/viewer/LeftMenu/LeftMenu"
 import { v4 as uuidv4 } from "uuid"
-import { CurrentStreamContext } from "../../context/stream/StreamContext"
+import {
+   CurrentStreamContext,
+   CurrentStreamContextInterface,
+} from "../../context/stream/StreamContext"
 import useStreamConnect from "../../components/custom-hook/useStreamConnect"
-import PropTypes from "prop-types"
 import useStreamRef from "../../components/custom-hook/useStreamRef"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
@@ -36,39 +37,44 @@ import { dataLayerEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import GroupsUtil from "../../data/util/GroupsUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { sxStyles } from "../../types/commonTypes"
+import RootState from "../../store/reducers"
 
-const useStyles = makeStyles((theme) => ({
+const styles = sxStyles({
    root: {
       position: "relative",
       "& ::-webkit-scrollbar": {
          width: "3px",
          backgroundColor: "transparent",
-         borderRadius: theme.spacing(1),
+         borderRadius: 1,
       },
       "& ::-webkit-scrollbar-thumb": {
-         borderRadius: theme.spacing(1),
+         borderRadius: 1,
          WebkitBoxShadow: "inset 0 0 6px rgba(0,0,0,.3)",
-         backgroundColor: theme.palette.text.secondary,
+         backgroundColor: "text.secondary",
       },
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      backgroundColor: theme.palette.background.dark,
+      // backgroundColor: theme =>theme.palette.background.dark,
       display: "flex",
       overflow: "hidden",
    },
-   wrapper: {
+   wrapper: (theme) => ({
       display: "flex",
       flex: "1 1 auto",
       overflow: "hidden",
-      paddingLeft: ({ showMenu, mobile }) =>
-         showMenu && !mobile ? LEFT_MENU_WIDTH : 0,
       transition: theme.transitions.create("padding-left", {
          duration: theme.transitions.duration.shortest,
          easing: theme.transitions.easing.easeInOut,
       }),
-      [theme.breakpoints.up("mobile")]: {
-         paddingTop: ({ focusModeEnabled }) => !focusModeEnabled && 65,
+   }),
+   wrapperDesktopMenuOpen: {
+      pl: `${LEFT_MENU_WIDTH}px`,
+   },
+   wrapperFocusMode: {
+      pt: {
+         mobile: "0",
       },
    },
    contentContainer: {
@@ -79,11 +85,11 @@ const useStyles = makeStyles((theme) => ({
    content: {
       flex: "1 1 auto",
       height: "100%",
-      background: theme.palette.common.black,
+      background: "black",
       position: "relative",
       // overflow: 'auto'
    },
-}))
+})
 
 const browserIsCompatible = AgoraRTC.checkSystemRequirements()
 const ViewerLayout = (props) => {
@@ -92,6 +98,7 @@ const ViewerLayout = (props) => {
    const {
       query: { livestreamId, breakoutRoomId, token, isRecordingWindow },
       replace,
+      push,
       asPath,
    } = useRouter()
    const channelId = breakoutRoomId || livestreamId
@@ -109,10 +116,11 @@ const ViewerLayout = (props) => {
 
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
-      (state) => state.stream.streaming.spyModeEnabled
+      (state: RootState) => state.stream.streaming.spyModeEnabled
    )
-   const classes = useStyles({ showMenu, mobile, focusModeEnabled })
-   const [selectedState, setSelectedState] = useState("questions")
+   const desktopMenuOpen = showMenu && !mobile
+   const [selectedState, setSelectedState] =
+      useState<CurrentStreamContextInterface["selectedState"]>("questions")
    const [notAuthorized, setNotAuthorized] = useState(false)
    const [checkingForCategoryData, setCheckingForCategoryData] = useState(false)
    const [
@@ -146,7 +154,7 @@ const ViewerLayout = (props) => {
                   .getLivestreamSecureTokenWithRef(streamRef)
                   .then((doc) => {
                      if (!doc.exists) {
-                        router.push("/streaming/error")
+                        void push("/streaming/error")
                      }
                      let storedToken = doc.data().value
                      if (storedToken !== token) {
@@ -163,22 +171,24 @@ const ViewerLayout = (props) => {
             }
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [token, currentLivestream?.test, currentLivestream?.id])
 
    useEffect(() => {
       if (Boolean(isRecordingWindow)) {
-         dispatch(actions.setFocusMode(true, mobile))
+         void dispatch(actions.setFocusMode(true, mobile))
       }
-   }, [isRecordingWindow])
+   }, [dispatch, isRecordingWindow, mobile])
 
    useEffect(() => {
       if (mobile || currentLivestream?.questionsDisabled) {
-         closeLeftMenu()
+         void closeLeftMenu()
       } else {
          if (!focusModeEnabled) {
-            openLeftMenu()
+            void openLeftMenu()
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [mobile, currentLivestream?.questionsDisabled])
 
    useEffect(() => {
@@ -192,6 +202,7 @@ const ViewerLayout = (props) => {
             void firebase.setUserIsParticipatingWithRef(streamRef, userData)
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       livestreamId,
       userData?.userEmail,
@@ -219,6 +230,7 @@ const ViewerLayout = (props) => {
             setStreamerId(uuidv4())
          }
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       currentLivestream?.test,
       currentLivestream?.id,
@@ -227,9 +239,9 @@ const ViewerLayout = (props) => {
 
    useEffect(() => {
       if (currentLivestream?.hasStarted || spyModeEnabled) {
-         dispatch(actions.unmuteAllRemoteVideos())
+         void dispatch(actions.unmuteAllRemoteVideos())
       } else {
-         dispatch(actions.muteAllRemoteVideos())
+         void dispatch(actions.muteAllRemoteVideos())
       }
    }, [currentLivestream?.hasStarted, dispatch, spyModeEnabled])
 
@@ -296,6 +308,7 @@ const ViewerLayout = (props) => {
       }
 
       void checkForCategoryData()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [Boolean(userData), Boolean(currentLivestream)])
 
    const onRegistrationQuestionsAnswered = useCallback(async () => {
@@ -307,23 +320,26 @@ const ViewerLayout = (props) => {
    useCountLivestreamAttendanceMinutes(currentLivestream)
 
    if (notAuthorized) {
-      replace({
+      void replace({
          pathname: `/login`,
          query: { absolutePath: asPath },
       })
    }
 
    const closeLeftMenu = () => dispatch(actions.closeLeftMenu())
-   const openLeftMenu = () => dispatch(actions.openLeftMenu())
+   const openLeftMenu = useCallback(
+      () => dispatch(actions.openLeftMenu()),
+      [dispatch]
+   )
 
    const handleStateChange = useCallback(
       (state) => {
          if (!showMenu) {
-            openLeftMenu()
+            void openLeftMenu()
          }
          setSelectedState(state)
       },
-      [showMenu]
+      [openLeftMenu, showMenu]
    )
 
    const showAudience = useCallback(() => {
@@ -335,12 +351,13 @@ const ViewerLayout = (props) => {
       setAudienceDrawerOpen(false)
    }, [])
 
-   const currentStreamContextValue = useMemo(
+   const currentStreamContextValue = useMemo<CurrentStreamContextInterface>(
       () => ({
          currentLivestream,
          isBreakout,
          streamerId,
          isStreamer: false,
+         isMainStreamer: false,
          handRaiseId,
          isMobile: mobile,
          selectedState,
@@ -382,7 +399,7 @@ const ViewerLayout = (props) => {
    return (
       <RTCProvider
          uid={streamerId}
-         channel={channelId}
+         channel={channelId.toString()}
          appId={agoraCredentials.appID}
          initialize={shouldInitializeAgora}
          screenSharerId={currentLivestream?.screenSharerId}
@@ -390,12 +407,12 @@ const ViewerLayout = (props) => {
          isStreamer={handRaiseActive}
       >
          <RTMProvider
-            livestreamId={livestreamId}
+            livestreamId={livestreamId as string}
             roomId={currentLivestream.id}
             userId={streamerId}
          >
             <CurrentStreamContext.Provider value={currentStreamContextValue}>
-               <div className={`${classes.root} notranslate`}>
+               <Box sx={styles.root} className={`notranslate`}>
                   <ViewerTopBar
                      showAudience={showAudience}
                      showMenu={showMenu}
@@ -403,20 +420,24 @@ const ViewerLayout = (props) => {
                      mobile={mobile}
                   />
                   <LeftMenu
-                     streamerId={streamerId}
                      handRaiseActive={handRaiseActive}
                      setHandRaiseActive={setHandRaiseActive}
                      streamer={false}
-                     handleStateChange={handleStateChange}
                      selectedState={selectedState}
                      setSelectedState={setSelectedState}
                      livestream={currentLivestream}
                      isMobile={mobile}
                   />
 
-                  <div className={classes.wrapper}>
-                     <div className={classes.contentContainer}>
-                        <div className={classes.content}>
+                  <Box
+                     sx={[
+                        styles.wrapper,
+                        focusModeEnabled && styles.wrapperFocusMode,
+                        desktopMenuOpen && styles.wrapperDesktopMenuOpen,
+                     ]}
+                  >
+                     <Box sx={styles.contentContainer}>
+                        <Box sx={styles.content}>
                            {React.cloneElement(children, {
                               handRaiseActive,
                               handleStateChange,
@@ -425,18 +446,14 @@ const ViewerLayout = (props) => {
                               hideAudience,
                               audienceDrawerOpen,
                            })}
-                        </div>
-                     </div>
-                  </div>
-               </div>
+                        </Box>
+                     </Box>
+                  </Box>
+               </Box>
             </CurrentStreamContext.Provider>
          </RTMProvider>
       </RTCProvider>
    )
-}
-
-ViewerLayout.propTypes = {
-   children: PropTypes.node.isRequired,
 }
 
 export default ViewerLayout
