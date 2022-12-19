@@ -1,13 +1,17 @@
 import functions = require("firebase-functions")
 import { string } from "yup"
 import { atsRepo, groupRepo } from "./api/repositories"
-import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { logAxiosErrorAndThrow, serializeModels } from "./util"
+import {
+   logAxiosErrorAndThrow,
+   serializeModels,
+   serializePaginatedModels,
+} from "./util"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
    atsRequestValidation,
    atsRequestValidationWithAccountToken,
 } from "./lib/ats"
+import { MergeATSRepository } from "./lib/merge/MergeATSRepository"
 
 /*
 |--------------------------------------------------------------------------
@@ -107,17 +111,26 @@ export const mergeGetAccountToken = functions
       }
    })
 
+type ATSDataPagination = {
+   cursor: string | null
+   pageSize: string | number | null
+}
+
 /**
  * Fetch Jobs
  */
 export const fetchATSJobs = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const requestData = await atsRequestValidationWithAccountToken({
-         data,
-         context,
-         requiredData: {},
-      })
+      const requestData =
+         await atsRequestValidationWithAccountToken<ATSDataPagination>({
+            data,
+            context,
+            requiredData: {
+               cursor: string().optional().nullable(),
+               pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
+            },
+         })
 
       try {
          const atsRepository = atsRepo(
@@ -125,7 +138,9 @@ export const fetchATSJobs = functions
             requestData.tokens.merge.account_token
          )
 
-         return await atsRepository.getJobs().then(serializeModels)
+         return await atsRepository
+            .getJobs({ cursor: data?.cursor })
+            .then(serializePaginatedModels)
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to fetch the account jobs",

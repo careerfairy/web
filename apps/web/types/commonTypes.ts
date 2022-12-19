@@ -20,12 +20,9 @@ export type StylesProps = {
  *
  * @param obj
  */
-export function sxStyles<
-   K extends string,
-   V extends
-      | SystemStyleObject<DefaultTheme>
-      | ((theme: DefaultTheme) => SystemStyleObject<DefaultTheme>)
->(obj: Record<K, V>): Record<K, V> {
+export function sxStyles<TObject extends SystemStyleObject<DefaultTheme>>(
+   obj: TObject
+): TObject {
    return obj
 }
 

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import axios, { AxiosError } from "axios"
 import {
    MergeAccountTokenResponse,
@@ -13,30 +14,27 @@ import {
    MergeOffice,
    MergePaginatedResponse,
    MergeSyncStatus,
-} from "./MergeResponseTypes"
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Office } from "@careerfairy/shared-lib/dist/ats/Office"
+import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
+import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+import firebase from "firebase/compat"
 import {
    ApplicationCreationOptions,
    AttachmentCreationOptions,
    CandidateCreationOptions,
    IATSRepository,
-} from "./IATSRepository"
-import { Job } from "./Job"
-import { Office } from "./Office"
-import { SyncStatus } from "./SyncStatus"
-import { Application } from "./Application"
-import { UserData } from "../users"
-import { Candidate } from "./Candidate"
-import {
-   clearFirebaseCache,
-   fromFirebaseCache,
-} from "./MergeFirebaseCacheDecorators"
-import firebase from "firebase/compat"
+} from "../IATSRepository"
+
+const MERGE_DEFAULT_PAGE_SIZE = "100"
 
 /**
  * Merge.dev HTTP API
  * Docs: https://www.merge.dev/docs/ats/overview/
  */
-
 export class MergeATSRepository implements IATSRepository {
    private readonly axios = axios.create({
       baseURL: "https://api.merge.dev/api/ats/v1",
@@ -65,10 +63,18 @@ export class MergeATSRepository implements IATSRepository {
 | Jobs
 |--------------------------------------------------------------------------
 */
-   @fromFirebaseCache(2 * 60 * 1000) // 2min cache
-   async getJobs(): Promise<Job[]> {
+   async getJobs(
+      options?: ATSPaginationOptions
+   ): Promise<ATSPaginatedData<Job>> {
+      const path = this.buildPath("/jobs", {
+         expand: "offices,recruiters,hiring_managers,departments",
+         status: "OPEN",
+         cursor: options?.cursor,
+         page_size: options?.pageSize ?? MERGE_DEFAULT_PAGE_SIZE,
+      })
+
       const { data } = await this.axios.get<MergePaginatedResponse<MergeJob>>(
-         `/jobs?expand=offices,recruiters,hiring_managers,departments&status=OPEN&page_size=100`
+         path
       )
 
       // Sort by last updated date, in place
@@ -81,10 +87,9 @@ export class MergeATSRepository implements IATSRepository {
          return bDate.getTime() - aDate.getTime()
       })
 
-      return data.results.map(Job.createFromMerge)
+      return this.mapPaginatedResults<Job>(data, Job.createFromMerge)
    }
 
-   @fromFirebaseCache()
    async getJob(id: string): Promise<Job> {
       const { data } = await this.axios
          .get<MergeJob>(`/jobs/${id}`)
@@ -97,13 +102,19 @@ export class MergeATSRepository implements IATSRepository {
 | Offices
 |--------------------------------------------------------------------------
 */
-   @fromFirebaseCache()
-   async getOffices(): Promise<Office[]> {
+   async getOffices(
+      options?: ATSPaginationOptions
+   ): Promise<ATSPaginatedData<Office>> {
+      const path = this.buildPath("/offices", {
+         cursor: options?.cursor,
+         page_size: options?.pageSize ?? MERGE_DEFAULT_PAGE_SIZE,
+      })
+
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeOffice>
-      >(`/offices`)
+      >(path)
 
-      return data.results.map(Office.createFromMerge)
+      return this.mapPaginatedResults(data, Office.createFromMerge)
    }
 
    /*
@@ -111,7 +122,6 @@ export class MergeATSRepository implements IATSRepository {
 | Candidates
 |--------------------------------------------------------------------------
 */
-   @fromFirebaseCache()
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
          .get<MergeCandidate>(
@@ -147,12 +157,11 @@ export class MergeATSRepository implements IATSRepository {
       const body = createMergeModelBody(model, options.remoteUserId)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeCandidate>
-      >(`/candidates`, body)
+      >("/candidates", body)
 
       return Candidate.createFromMerge(data.model)
    }
 
-   @clearFirebaseCache(["getCandidate", "getApplications", "getApplication"])
    async candidateAddCVAttachment(
       candidateId: string,
       user: UserData,
@@ -167,34 +176,33 @@ export class MergeATSRepository implements IATSRepository {
       const body = createMergeModelBody(model, options.remoteUserId)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeAttachment>
-      >(`/attachments`, body)
+      >("/attachments", body)
 
       return data.model.id
    }
 
    /*
-  |--------------------------------------------------------------------------
-  | Applications
-  |--------------------------------------------------------------------------
-  */
-   @fromFirebaseCache(60 * 1000) // 1min cache
-   async getApplications(jobId?: string): Promise<Application[]> {
-      const qs = new URLSearchParams({
+|--------------------------------------------------------------------------
+| Applications
+|--------------------------------------------------------------------------
+*/
+   async getApplications(
+      options?: ATSApplicationOptions
+   ): Promise<ATSPaginatedData<Application>> {
+      const path = this.buildPath("/offices", {
          expand: "candidate,job,current_stage,reject_reason",
+         job_id: options.jobId,
+         cursor: options?.cursor,
+         page_size: options?.pageSize ?? MERGE_DEFAULT_PAGE_SIZE,
       })
-
-      if (jobId) {
-         qs.append("job_id", jobId)
-      }
 
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeApplication>
-      >(`/applications?${qs.toString()}`)
+      >(path)
 
-      return data.results.map(Application.createFromMerge)
+      return this.mapPaginatedResults(data, Application.createFromMerge)
    }
 
-   @clearFirebaseCache(["getApplications"])
    async createApplication(
       candidateId: string,
       jobId: string,
@@ -209,33 +217,30 @@ export class MergeATSRepository implements IATSRepository {
       const body = createMergeModelBody(model, options.remoteUserId)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeApplicationModel>
-      >(`/applications`, body)
+      >("/applications", body)
 
       return data.model.id
    }
 
-   @fromFirebaseCache()
    async getApplication(applicationId: string): Promise<Application> {
-      const qs = new URLSearchParams({
+      const path = this.buildPath(`/applications/${applicationId}`, {
          expand: "candidate,job,current_stage,reject_reason",
       })
       const { data } = await this.axios
-         .get<MergeApplication>(
-            `/applications/${applicationId}?${qs.toString()}`
-         )
+         .get<MergeApplication>(path)
          .catch(emptyResponseWhenNotFound)
       return data ? Application.createFromMerge(data) : null
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Sync Status & Others
-   |--------------------------------------------------------------------------
-   */
+|--------------------------------------------------------------------------
+| Sync Status & Others
+|--------------------------------------------------------------------------
+*/
    async getSyncStatus(): Promise<SyncStatus[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeSyncStatus>
-      >(`/sync-status`)
+      >("/sync-status")
 
       return data.results.map(SyncStatus.createFromMerge)
    }
@@ -258,7 +263,7 @@ export class MergeATSRepository implements IATSRepository {
       categories: string[] = ["ats"]
    ) {
       const { data } = await this.axios.post<MergeLinkTokenResponse>(
-         `https://api.merge.dev/api/integrations/create-link-token`,
+         "https://api.merge.dev/api/integrations/create-link-token",
          {
             end_user_origin_id,
             end_user_organization_name,
@@ -279,10 +284,82 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    async removeAccount() {
-      const { data } = await this.axios.post<any>(`/delete-account`)
+      const { data } = await this.axios.post<any>("/delete-account")
 
       return data
    }
+
+   /**
+    * Maps a Merge paginated response to our Business model type
+    * @param results
+    * @param mapper
+    * @private
+    */
+   private mapPaginatedResults<T>(
+      results: MergePaginatedResponse<unknown>,
+      mapper: (model: unknown) => T
+   ): ATSPaginatedData<T> {
+      return {
+         next: results.next,
+         previous: results.previous,
+         results: results.results.map(mapper),
+      }
+   }
+
+   /**
+    * Builds the Merge Path with Query Params
+    *
+    * Remove falsy params (e.g optional options that are null)
+    * Appends the first slash to the path if it's missing
+    * @param path
+    * @param queryParams
+    * @private
+    */
+   private buildPath(path: string, queryParams?: object) {
+      if (path.charAt(0) !== "/") {
+         path = "/" + path
+      }
+
+      const qs = new URLSearchParams()
+
+      // remove falsy values from query params
+      for (const param in queryParams) {
+         if (queryParams[param]) {
+            qs.set(param, queryParams[param])
+         }
+      }
+
+      const qsFinal = qs.toString()
+
+      if (qsFinal.length > 0) {
+         return `${path}?${qsFinal}`
+      }
+
+      return path
+   }
+}
+
+/*
+|--------------------------------------------------------------------------
+| Utility interfaces
+|--------------------------------------------------------------------------
+*/
+export interface ATSPaginationOptions {
+   cursor?: string
+   pageSize?: string
+}
+
+export interface ATSApplicationOptions extends ATSPaginationOptions {
+   /**
+    * Filter by job id
+    */
+   jobId?: string
+}
+
+export type ATSPaginatedData<Model> = {
+   next: string | null
+   previous: string | null
+   results: Model[]
 }
 
 const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {

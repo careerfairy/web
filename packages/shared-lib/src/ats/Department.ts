@@ -1,5 +1,5 @@
-import { MergeDepartment } from "./MergeResponseTypes"
 import { ATSModel } from "./ATSModel"
+import { MergeDepartment } from "./merge/MergeResponseTypes"
 
 export class Department extends ATSModel {
    constructor(public readonly id: string, public readonly name: string) {
