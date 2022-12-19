@@ -42,7 +42,7 @@ function fetchAllJobs(accounts: GroupATSAccount[]) {
    const promises = []
 
    for (let account of accounts) {
-      promises.push(atsServiceInstance.getJobs(account.groupId, account.id))
+      promises.push(atsServiceInstance.getAllJobs(account.groupId, account.id))
    }
 
    return Promise.allSettled(promises)

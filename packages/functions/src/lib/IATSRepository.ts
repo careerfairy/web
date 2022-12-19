@@ -27,6 +27,8 @@ export type ApplicationCreationOptions = {
 export interface IATSRepository {
    getJobs(options?: ATSPaginationOptions): Promise<ATSPaginatedData<Job>>
 
+   getAllJobs(): Promise<Job[]>
+
    getJob(id: string): Promise<Job>
 
    getOffices(options?: ATSPaginationOptions): Promise<ATSPaginatedData<Office>>

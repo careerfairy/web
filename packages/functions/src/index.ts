@@ -150,7 +150,7 @@ exports.createMarketingUser = marketing.createMarketingUser
 exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
 exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
 exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
-exports.fetchATSJobs = atsGroup.fetchATSJobs
+exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
 exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
 
 // User
