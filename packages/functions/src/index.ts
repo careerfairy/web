@@ -121,6 +121,8 @@ exports.stopRecordingLivestream_v2 = recording.stopRecordingLivestream
 exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
 exports.automaticallyRecordLivestreamBreakoutRoom =
    recording.automaticallyRecordLivestreamBreakoutRoom
+exports.checkForUnfinishedLivestreamsAndStopRecording =
+   recording.checkForUnfinishedLivestreamsAndStopRecording
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =

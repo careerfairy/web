@@ -5,6 +5,7 @@ import {
    livestreamGetSecureToken,
    livestreamSetIsRecording,
    livestreamUpdateRecordingToken,
+   updateUnfinishedLivestreams,
 } from "./lib/livestream"
 import { logAxiosErrorAndThrow } from "./util"
 import {
@@ -13,6 +14,7 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import config = require("./config")
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { MAX_RECORDING_HOURS } from "../.packages/shared-lib/dist/livestreams/recordings"
 
 /**
  * Automatically record a livestream
@@ -253,3 +255,20 @@ const stopRecording = async (
       )}`
    )
 }
+
+/**
+ * Every 30 minutes, it searches for livestreams that have started but have not finished after { MAX_RECORDING_HOURS }
+ */
+export const checkForUnfinishedLivestreamsAndStopRecording = functions.pubsub
+   .schedule("every 30 minutes")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
+      try {
+         await updateUnfinishedLivestreams()
+      } catch (e) {
+         logAxiosErrorAndThrow(
+            `Failed to update livestreams that have started but have not finished after ${MAX_RECORDING_HOURS} hours`,
+            e
+         )
+      }
+   })
