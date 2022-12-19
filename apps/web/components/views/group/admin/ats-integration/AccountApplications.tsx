@@ -2,8 +2,12 @@ import React, { useMemo } from "react"
 import MaterialTable from "@material-table/core"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import useGroupATSApplications from "../../../../custom-hook/useGroupATSApplications"
-import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
 import { TableTitle } from "./AccountJobs"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import Box from "@mui/material/Box"
+import LinkedInIcon from "@mui/icons-material/LinkedIn"
+import { LINKEDIN_COLOR } from "../../../../util/colors"
+import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions"
 
 const columns = [
    {
@@ -15,16 +19,16 @@ const columns = [
       field: "candidateName",
    },
    {
-      title: "Source",
-      field: "source",
+      field: "linkedinUrl",
+      title: "LinkedIn",
+      filtering: false,
+      render: (rowData) => (
+         <LinkedInColumnField linkedInUrl={rowData.linkedinUrl} />
+      ),
    },
    {
       title: "Applied At",
       field: "appliedAt",
-   },
-   {
-      title: "Current Stage",
-      field: "currentStage",
    },
 ]
 
@@ -33,14 +37,15 @@ type Props = {
 }
 
 const AccountApplications = ({ atsAccount }: Props) => {
-   const { applications } = useGroupATSApplications(
-      atsAccount.groupId,
-      atsAccount.id
-   )
+   const data = useGroupATSApplications(atsAccount.groupId, atsAccount.id)
 
    const applicationsToRows = useMemo(() => {
-      return mapApplicationsToTableRows(applications)
-   }, [applications])
+      if (data?.length === 0) {
+         return []
+      }
+
+      return mapApplicationsToTableRows(data)
+   }, [data])
 
    return (
       <MaterialTable
@@ -49,22 +54,73 @@ const AccountApplications = ({ atsAccount }: Props) => {
          title={
             <TableTitle
                title="Applications"
-               subtitle="Most recent applications across all sources"
+               subtitle="All applications from CareerFairy"
             />
          }
       />
    )
 }
 
-function mapApplicationsToTableRows(data: Application[]) {
-   return data.map((application) => ({
-      id: application.id,
-      jobName: application.job?.name,
-      candidateName: application.candidate?.getName(),
-      source: application.source,
-      appliedAt: application.appliedAt?.toLocaleString(),
-      currentStage: application.currentStage,
-   }))
+const LinkedInColumnField = ({ linkedInUrl }) => {
+   if (!linkedInUrl) {
+      return null
+   }
+
+   return (
+      <Box>
+         <a
+            target="_blank"
+            href={makeExternalLink(linkedInUrl)}
+            style={{ color: LINKEDIN_COLOR }}
+            rel="noreferrer"
+         >
+            <LinkedInIcon />
+         </a>
+      </Box>
+   )
+}
+
+type RowData = {
+   jobName?: string
+   candidateName: string
+   appliedAt: string
+   linkedinUrl?: string
+}
+
+/**
+ * Transforms userLivestreamData docs into row data objects
+ * Sorts the applications by application date desc
+ * @param data
+ */
+function mapApplicationsToTableRows(data: UserLivestreamData[]): RowData[] {
+   return data
+      .map((doc) => {
+         let applications = []
+
+         for (let jobApplicationsKey in doc.jobApplications) {
+            let job = doc.jobApplications[jobApplicationsKey].job
+            applications.push({
+               jobName: job?.name,
+               candidateName: `${doc?.user?.firstName} ${doc?.user?.lastName}`,
+               appliedAt:
+                  doc.jobApplications[jobApplicationsKey].date?.toDate(),
+               linkedinUrl: doc.user?.linkedinUrl,
+            })
+         }
+
+         return applications
+      })
+      .flat()
+      .sort((a, b) => {
+         // sort desc
+         if (!a?.appliedAt || !b?.appliedAt) return 0
+
+         return b?.appliedAt?.getTime() - a?.appliedAt?.getTime()
+      })
+      .map((a) => ({
+         ...a,
+         appliedAt: a?.appliedAt?.toLocaleString(),
+      }))
 }
 
 export default AccountApplications

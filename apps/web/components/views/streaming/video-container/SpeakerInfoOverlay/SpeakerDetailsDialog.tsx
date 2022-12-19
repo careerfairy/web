@@ -19,6 +19,7 @@ import IconButton from "@mui/material/IconButton"
 import { SaveRecruiterButton } from "./SaveRecruiterButton"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { dataLayerEvent } from "../../../../../util/analyticsUtils"
+import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    dialogClose: {
@@ -135,10 +136,7 @@ const SpeakerDetailsDialog = ({ speaker, onClose }) => {
 }
 
 const handleLinkedInClick = (url) => {
-   if (!url.match(/^[a-zA-Z]+:\/\//)) {
-      url = "https://" + url
-   }
-   window.open(url, "_blank")
+   window.open(makeExternalLink(url), "_blank")
    dataLayerEvent("livestream_speaker_linkedin_click")
 }
 

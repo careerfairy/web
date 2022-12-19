@@ -151,41 +151,6 @@ export const fetchATSJobs = functions
    })
 
 /**
- * Fetch Job Applications
- * Possibility to filter by job id
- */
-export const fetchATSApplications = functions
-   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
-   .https.onCall(async (data, context) => {
-      const requestData = await atsRequestValidationWithAccountToken<{
-         jobId?: string
-      }>({
-         data,
-         context,
-         requiredData: {
-            jobId: string().optional().nullable(),
-         },
-      })
-
-      try {
-         const atsRepository = atsRepo(
-            process.env.MERGE_ACCESS_KEY,
-            requestData.tokens.merge.account_token
-         )
-
-         return await atsRepository
-            .getApplications({ jobId: requestData.jobId })
-            .then(serializePaginatedModels)
-      } catch (e) {
-         return logAxiosErrorAndThrow(
-            "Failed to fetch the account applications",
-            e,
-            requestData
-         )
-      }
-   })
-
-/**
  * Sync Status for the multiple entities
  */
 export const fetchATSSyncStatus = functions
