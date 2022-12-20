@@ -4,7 +4,7 @@ import {
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { removeMinutesDate } from "../util"
-import { MAX_RECORDING_HOURS } from "../../.packages/shared-lib/dist/livestreams/recordings"
+import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 
 export const livestreamGetById = async (id) => {
    const documentSnap = await admin
