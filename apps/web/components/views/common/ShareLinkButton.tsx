@@ -1,14 +1,17 @@
-import React, { useEffect, useState } from "react"
-import { Button, ButtonBase, ButtonProps, Tooltip } from "@mui/material"
-import { useCopyToClipboard } from "react-use"
-import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
-import { sxStyles } from "../../../types/commonTypes"
 import ContentPasteIcon from "@mui/icons-material/ContentPaste"
 import Box from "@mui/material/Box"
+
+import { Button, ButtonBase, ButtonProps, Tooltip } from "@mui/material"
+import React, { useEffect, useState } from "react"
+import { useCopyToClipboard } from "react-use"
+
+import useSnackbarNotifications from "../../custom-hook/useSnackbarNotifications"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import { sxStyles } from "../../../types/commonTypes"
 
 const hoveredContentClassName = "hovered-content"
 const contentClassName = "non-hovered-content"
+
 const styles = sxStyles({
    root: {
       position: "relative",
@@ -84,9 +87,7 @@ const ShareLinkButton = ({ linkUrl, size }: Props) => {
          placement="bottom"
          open={copiedFromButton}
          enterDelay={500}
-         PopperProps={{
-            disablePortal: true,
-         }}
+         PopperProps={popperProps}
          arrow
          leaveDelay={200}
          disableFocusListener
@@ -131,6 +132,10 @@ const ShareLinkButton = ({ linkUrl, size }: Props) => {
          </ButtonBase>
       </Tooltip>
    )
+}
+
+const popperProps = {
+   disablePortal: true,
 }
 
 export default ShareLinkButton
