@@ -214,6 +214,7 @@ export interface MergeCandidateModel {
 
 export interface MergeCandidateApplications {
    job: string
+   source?: string
 }
 
 /*
