@@ -56,7 +56,6 @@ const styles = sxStyles({
       height: "100vh",
       width: "100%",
       touchAction: "manipulation",
-      // backgroundColor: theme =>theme.palette.background.dark,
       display: "flex",
       overflow: "hidden",
    },
