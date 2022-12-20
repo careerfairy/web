@@ -188,7 +188,11 @@ export const updateUnfinishedLivestreams = async () => {
       .get()
 
    collection.docs?.forEach((doc) => {
-      batch.update(doc.ref, { hasEnded: true })
+      batch.update(doc.ref, {
+         hasStarted: false,
+         hasEnded: true,
+         isRecording: false,
+      })
    })
 
    return batch.commit()
