@@ -43,7 +43,6 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
 
-// eslint-disable-next-line camelcase
 export const sendDraftApprovalRequestEmail = functions.https.onCall(
    async (data) => {
       try {
@@ -94,7 +93,6 @@ export const sendDraftApprovalRequestEmail = functions.https.onCall(
    }
 )
 
-// eslint-disable-next-line camelcase
 export const sendNewlyPublishedEventEmail = functions.https.onCall(
    async (data) => {
       try {
