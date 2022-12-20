@@ -55,7 +55,6 @@ const AuthContext = createContext<DefaultContext>({
  * Paths that require sign in
  */
 const securePaths = [
-   "/test", // TODO: Remove this WHEN DONE TESTING
    "/profile",
    "/groups",
    "/group/[groupId]/admin",
