@@ -3,7 +3,7 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import { removeMinutesDate } from "../util"
+import { addMinutesDate, removeMinutesDate } from "../util"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 
 export const livestreamGetById = async (id) => {
@@ -184,15 +184,24 @@ export const updateUnfinishedLivestreams = async () => {
       .where("hasStarted", "==", true)
       .where("hasEnded", "==", false)
       .where("test", "==", false)
-      .where("start", "<=", new Date(dateNowLess4Hours))
+      .where("start", "<=", dateNowLess4Hours)
       .get()
 
    collection.docs?.forEach((doc) => {
-      batch.update(doc.ref, {
-         hasStarted: false,
-         hasEnded: true,
-         isRecording: false,
-      })
+      const event = doc.data() as LivestreamEvent
+
+      const startDatePlusDuration = addMinutesDate(
+         event.start.toDate(),
+         event.duration
+      )
+
+      if (startDatePlusDuration <= dateNowLess4Hours) {
+         batch.update(doc.ref, {
+            hasStarted: false,
+            hasEnded: true,
+            isRecording: false,
+         })
+      }
    })
 
    return batch.commit()

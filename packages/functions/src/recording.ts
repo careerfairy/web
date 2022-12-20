@@ -259,8 +259,9 @@ const stopRecording = async (
 /**
  * Every 30 minutes, it searches for livestreams that have started but have not finished after { MAX_RECORDING_HOURS }
  */
-export const checkForUnfinishedLivestreamsAndStopRecording = functions.pubsub
-   .schedule("every 30 minutes")
+export const checkForUnfinishedLivestreamsAndStopRecording = functions
+   .region(config.region)
+   .pubsub.schedule("every 30 minutes")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       try {
