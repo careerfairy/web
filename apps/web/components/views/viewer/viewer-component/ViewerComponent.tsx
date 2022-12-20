@@ -26,7 +26,6 @@ import WifiIndicator from "../../streaming/video-container/WifiIndicator"
 import StreamPublishingModal from "../../../../components/views/streaming/modal/StreamPublishingModal"
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
 import useHandRaiseState from "../../../../components/custom-hook/useHandRaiseState"
-import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
 import RTMContext from "../../../../context/agora/RTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
@@ -35,7 +34,7 @@ import RootState from "../../../../store/reducers"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { HandRaiseState } from "../../../../types/handraise"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
-import EndOfStreamView from "../EndOfStreamView"
+import EndOfStreamView from "./EndOfStreamView"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -49,9 +48,9 @@ const useStyles = makeStyles((theme) => ({
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,
-      // display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      display: "flex",
    },
    waitingText: {
       fontSize: "1.1em",
@@ -284,7 +283,12 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       return null
    }
 
-   if (presenter?.streamHasFinished() && !isRecordingWindow && userData) {
+   if (
+      presenter?.streamHasFinished() &&
+      !isRecordingWindow &&
+      userData &&
+      !spyModeEnabled
+   ) {
       return <EndOfStreamView />
    }
 
@@ -408,11 +412,6 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                      students
                   </Typography>
                </div>
-            ) : currentLivestream.recommendedEventIds?.length ? (
-               <RecommendedEventsOverlay
-                  recommendedEventIds={currentLivestream.recommendedEventIds}
-                  mobile={mobile}
-               />
             ) : (
                <StreamStoppedOverlay />
             ))}
