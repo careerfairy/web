@@ -51,3 +51,19 @@ export const handlePromisesAllSettled = async <TPromiseResolve>(
 
    return resolvedResults
 }
+
+export const sortElementsByFrequency = (elements: string[]) => {
+   // count the number of times each element appears
+   const elementCounts = elements.reduce<Record<string, number>>(
+      (acc, element) => {
+         acc[element] = acc[element] ? acc[element] + 1 : 1
+         return acc
+      },
+      {}
+   )
+
+   // sort the elements by the number of times they appear
+   return Object.entries(elementCounts)
+      .sort((a, b) => b[1] - a[1])
+      .map((entry) => entry[0])
+}

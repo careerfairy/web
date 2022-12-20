@@ -14,7 +14,11 @@ import RecommendationServiceCore, {
 } from "../IRecommendationService"
 import { mapFirestoreAdminSnapshots } from "../../../util"
 import { userEventRecommendationService } from "../../../api/services"
-import { handlePromisesAllSettled, RankedLivestreamEvent } from "../util"
+import {
+   handlePromisesAllSettled,
+   RankedLivestreamEvent,
+   sortElementsByFrequency,
+} from "../util"
 import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 
 type FirebaseAdmin = typeof import("firebase-admin") // This only imports the types at compile time and not the actual library at runtime
@@ -229,14 +233,15 @@ export default class UserEventRecommendationService
    }
 
    private async getMostRecentlyWatchedEvents(
-      userId: string
+      userId: string,
+      limit: number
    ): Promise<LivestreamEvent[]> {
       // Get most recently watched event stats
       const snaps = await this.firestore
          .collectionGroup("participatingStats")
          .where("id", "==", userId)
          .orderBy("livestream.start", "desc")
-         .limit(10)
+         .limit(limit)
          .get()
 
       const participatingStats =
@@ -261,7 +266,8 @@ export default class UserEventRecommendationService
    ): Promise<RankedLivestreamEvent[]> {
       // Get most recently watched events
       const mostRecentlyWatchedEvents = await this.getMostRecentlyWatchedEvents(
-         userId
+         userId,
+         limit
       )
 
       // Get most common Interests from the most recently watched events
@@ -309,16 +315,7 @@ export default class UserEventRecommendationService
          .flatMap((livestream) => livestream.interestsIds)
          .filter(Boolean)
 
-      // count the number of times each interest id appears
-      const interestIdCounts = interestIds.reduce((acc, interestId) => {
-         acc[interestId] = acc[interestId] ? acc[interestId] + 1 : 1
-         return acc
-      }, {} as Record<string, number>)
-
-      // sort the interest ids by the number of times they appear
-      return Object.entries(interestIdCounts)
-         .sort((a, b) => b[1] - a[1])
-         .map((entry) => entry[0])
+      return sortElementsByFrequency(interestIds)
    }
 
    getMostCommonFieldsOfStudies(
@@ -329,23 +326,16 @@ export default class UserEventRecommendationService
          .flatMap((livestream) => livestream.targetFieldsOfStudy)
          .filter(Boolean)
 
-      // count the number of times each field of study appears
-      const fieldsOfStudyCounts = fieldsOfStudy.reduce((acc, fieldOfStudy) => {
-         acc[fieldOfStudy.id] = acc[fieldOfStudy.id]
-            ? acc[fieldOfStudy.id] + 1
-            : 1
-         return acc
-      }, {} as Record<string, number>)
+      const sortedFieldOfStudyIds = sortElementsByFrequency(
+         fieldsOfStudy.map((fieldOfStudy) => fieldOfStudy.id)
+      )
 
-      // sort the fields of study by the number of times they appear
-      return Object.entries(fieldsOfStudyCounts)
-         .sort((a, b) => b[1] - a[1])
-         .map((entry) => {
-            const fieldOfStudyId = entry[0]
-            return fieldsOfStudy.find(
-               (fieldOfStudy) => fieldOfStudy.id === fieldOfStudyId
-            )
-         })
+      // return the fields of study objects sorted by frequency
+      return sortedFieldOfStudyIds.map((fieldOfStudyId) =>
+         fieldsOfStudy.find(
+            (fieldOfStudy) => fieldOfStudy.id === fieldOfStudyId
+         )
+      )
    }
 
    private rankEvents({
