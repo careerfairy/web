@@ -65,7 +65,7 @@ export const sendReminderEmailToRegistrants = functions.https.onRequest(
 )
 
 // eslint-disable-next-line camelcase
-export const sendReminderEmailAboutApplicationLink_v2 = functions
+export const sendReminderEmailAboutApplicationLink = functions
    .runWith({
       minInstances: 1,
    })

@@ -44,7 +44,7 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 const { client } = require("./api/postmark")
 
 // eslint-disable-next-line camelcase
-export const sendDraftApprovalRequestEmail_v2 = functions.https.onCall(
+export const sendDraftApprovalRequestEmail = functions.https.onCall(
    async (data) => {
       try {
          const {
@@ -95,7 +95,7 @@ export const sendDraftApprovalRequestEmail_v2 = functions.https.onCall(
 )
 
 // eslint-disable-next-line camelcase
-export const sendNewlyPublishedEventEmail_v2 = functions.https.onCall(
+export const sendNewlyPublishedEventEmail = functions.https.onCall(
    async (data) => {
       try {
          const { adminsInfo, senderName, stream, submitTime } = data
@@ -456,7 +456,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
    }
 )
 
-export const sendDashboardInviteEmail_v3 = functions.https.onCall(
+export const sendDashboardInviteEmail_v2 = functions.https.onCall(
    onCallWrapper(async (data, context) => {
       // user needs to be signed in
 
