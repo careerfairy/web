@@ -11,10 +11,10 @@ import { logAxiosErrorAndThrow } from "./util"
 import {
    downloadLink,
    S3_ROOT_PATH,
+   MAX_RECORDING_HOURS,
 } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import config = require("./config")
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { MAX_RECORDING_HOURS } from "../.packages/shared-lib/dist/livestreams/recordings"
 
 /**
  * Automatically record a livestream
