@@ -1,5 +1,7 @@
 import React, { RefObject, useCallback, useRef } from "react"
 import MaterialTable, {
+   Column,
+   MaterialTableProps,
    Options,
    Query,
    QueryResult,
@@ -19,7 +21,7 @@ type Props = {
 
 const perPage = 7
 
-const tableOptions: Partial<Options<object>> = {
+const tableOptions: Partial<Options<TRowData>> = {
    paginationType: "stepped",
    showFirstLastPageButtons: false,
    pageSizeOptions: [perPage], // don't allow the user to change the page size
@@ -73,11 +75,11 @@ const AccountJobs = ({ atsAccount }: Props) => {
 }
 
 const fetchPage = (
-   query: Query<object>,
+   query: Query<TRowData>,
    pageHistory: RefObject<PageData[]>,
    groupId: string,
    id: string
-): Promise<QueryResult<object>> =>
+): Promise<QueryResult<TRowData>> =>
    new Promise((resolve, reject) => {
       const { page, pageSize } = query
       let pageData: PageData = pageHistory.current.pop()
@@ -114,7 +116,7 @@ const fetchPage = (
          .catch(reject)
    })
 
-const renderDescriptionColumn = (row) => {
+const renderDescriptionColumn = (row: TRowData) => {
    return (
       <Box
          sx={{
@@ -130,7 +132,7 @@ const renderDescriptionColumn = (row) => {
    )
 }
 
-const columns = [
+const columns: Column<TRowData>[] = [
    {
       title: "Name",
       field: "name",
@@ -154,8 +156,8 @@ const columns = [
    },
 ]
 
-const RowDetailPanel = (row) => {
-   const job: Job = row.rowData
+const RowDetailPanel: MaterialTableProps<TRowData>["detailPanel"] = (row) => {
+   const job = row.rowData
    return (
       <Box p={2}>
          <strong>Description:</strong>
@@ -164,7 +166,11 @@ const RowDetailPanel = (row) => {
    )
 }
 
-const expandDetailPanel = (event, rowData, togglePanel) => togglePanel()
+const expandDetailPanel: MaterialTableProps<TRowData>["onRowClick"] = (
+   event,
+   rowData,
+   togglePanel
+) => togglePanel()
 
 function mapJobsToTableRows(jobs: Job[]) {
    return jobs?.map((job) => ({
@@ -177,6 +183,8 @@ function mapJobsToTableRows(jobs: Job[]) {
       updatedAt: job.updatedAt?.toLocaleString(),
    }))
 }
+
+type TRowData = ReturnType<typeof mapJobsToTableRows>[number]
 
 type TableTitleProps = {
    title: string
