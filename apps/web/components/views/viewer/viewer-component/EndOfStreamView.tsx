@@ -11,14 +11,15 @@ import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadge
 import { EngageBadge } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
 
 import { sxStyles } from "../../../../types/commonTypes"
+import { makeReferralUrl } from "../../../../util/makeUrls"
+
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 
 import RecommendedEvents from "../../portal/events-preview/RecommendedEvents"
+import { CircularBadgeProgress } from "./CircularBadgeProgress"
 import ShareLinkButton from "../../common/ShareLinkButton"
 import Link from "../../common/Link"
-import { CircularBadgeProgress } from "./CircularBadgeProgress"
-import { getBaseUrl } from "../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -51,7 +52,7 @@ const styles = sxStyles({
 const EndOfStreamView = () => {
    const { currentLivestream } = useCurrentStream()
 
-   const { userPresenter } = useAuth()
+   const { userPresenter, userData } = useAuth()
 
    return (
       <Box sx={styles.root}>
@@ -134,10 +135,12 @@ const EndOfStreamView = () => {
                   >
                      SEE MORE LIVE STREAMS
                   </Button>
-                  <ShareLinkButton
-                     size={"large"}
-                     linkUrl={getLinkUrl(currentLivestream.id)}
-                  />
+                  {userData?.referralCode && (
+                     <ShareLinkButton
+                        size={"large"}
+                        linkUrl={makeReferralUrl(userData?.referralCode)}
+                     />
+                  )}
                </Stack>
             </Stack>
          </Container>
@@ -145,6 +148,4 @@ const EndOfStreamView = () => {
    )
 }
 
-const getLinkUrl = (streamId: string) =>
-   `${getBaseUrl()}/upcoming-livestream/${streamId}?utm_source=end_of_stream&utm_medium=share`
 export default EndOfStreamView
