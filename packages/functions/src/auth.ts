@@ -422,7 +422,7 @@ export const validateUserEmailWithPin_v2 = functions
    })
 
 // eslint-disable-next-line camelcase
-export const sendPostmarkResetPasswordEmail_v3 = functions.https.onCall(
+export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
    async (data) => {
       const recipientEmail = data?.recipientEmail?.trim()
 

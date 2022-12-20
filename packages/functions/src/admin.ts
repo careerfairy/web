@@ -15,7 +15,7 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 const { client } = require("./api/postmark")
 
 /* eslint-disable camelcase */
-export const sendBasicTemplateEmail_v6 = functions
+export const sendBasicTemplateEmail_v5 = functions
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,

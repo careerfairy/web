@@ -89,7 +89,7 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
    }
 )
 
-exports.sendLivestreamRegistrationConfirmationEmail_v3 = functions.https.onCall(
+exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
    async (data, context) => {
       const email = {
          TemplateId:
@@ -161,8 +161,8 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
    }
 )
 
-exports.sendHybridEventRegistrationConfirmationEmail_v2 =
-   functions.https.onCall(async (data, context) => {
+exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
+   async (data, context) => {
       console.log("Starting")
       const email = {
          TemplateId:
@@ -199,7 +199,8 @@ exports.sendHybridEventRegistrationConfirmationEmail_v2 =
             return { status: 500, error: error }
          }
       )
-   })
+   }
+)
 
 exports.setFirstCommentOfQuestionOnCreate = functions.firestore
    .document("livestreams/{livestream}/questions/{question}/comments/{comment}")
