@@ -145,7 +145,7 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- -- --project=chromium
+           run: npm run test:e2e-webapp -- -- --project=chromium
 
          - name: Upload test results
            if: ${{ failure() }}
