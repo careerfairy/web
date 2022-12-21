@@ -13,6 +13,7 @@ import { SkeletonStackMultiple } from "../../../../util/Skeletons"
 import AccountJobs from "./AccountJobs"
 import AccountApplications from "./AccountApplications"
 import WaitForFirstSyncStatus from "./WaitForFirstSyncStatus"
+import ApplicationTestButtonDialog from "./application-test/ApplicationTestButtonDialog"
 
 type Props = {
    atsAccount: GroupATSAccount
@@ -58,18 +59,18 @@ const DisplayATSContent = ({ atsAccount }: Props) => {
 
    return (
       <Grid container>
-         <Grid item xs={6} pl={2}>
+         <Grid item xs={4} pl={2}>
             <Tabs
                value={activeTabIndex}
                onChange={switchTabHandler}
                aria-label="ats content tabs"
             >
-               {tabs.map((tab, i) => (
+               {tabs.map((tab, _) => (
                   <Tab key={tab.label} label={tab.label} />
                ))}
             </Tabs>
          </Grid>
-         <Grid item xs={6}>
+         <Grid item xs={8}>
             <Box
                display={"flex"}
                justifyContent={"end"}
@@ -77,6 +78,14 @@ const DisplayATSContent = ({ atsAccount }: Props) => {
                mt={1}
                pr={3}
             >
+               {!atsAccount.isApplicationTestComplete() && (
+                  <Box mr={1}>
+                     <ApplicationTestButtonDialog
+                        groupId={atsAccount.groupId}
+                        integrationId={atsAccount.id}
+                     />
+                  </Box>
+               )}
                <Box mr={1}>
                   <SyncStatusButtonDialog
                      groupId={atsAccount.groupId}
