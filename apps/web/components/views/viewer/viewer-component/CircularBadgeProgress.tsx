@@ -160,4 +160,4 @@ const CircularBadgeProgress = ({
    )
 }
 
-export default memo(CircularBadgeProgress) // Memoize to prevent re-rendering due to useTween hook animation
+export default memo(CircularBadgeProgress) // Memoize to prevent re-rendering due to useAnimatedNumber hook causing re-renders
