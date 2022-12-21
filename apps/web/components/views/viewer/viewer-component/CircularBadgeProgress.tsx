@@ -99,8 +99,8 @@ const CircularBadgeProgress = ({
 
    const { percentProgress: initialPercentProgress } = useBadgeStepProgress(
       badge,
-      initialSnapshot.userStats,
-      initialSnapshot.userData
+      initialSnapshot?.userStats,
+      initialSnapshot?.userData
          ? new UserPresenter(initialSnapshot.userData)
          : null
    )
