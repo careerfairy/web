@@ -10,8 +10,8 @@ import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
-import { ATSPaginatedData } from "./lib/merge/MergeATSRepository"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -421,8 +421,8 @@ export function serializeModels<T extends BaseModel>(result: T[]) {
  * @param result
  */
 export function serializePaginatedModels<T extends BaseModel>(
-   result: ATSPaginatedData<T>
-): ATSPaginatedData<object> {
+   result: ATSPaginatedResults<T>
+): ATSPaginatedResults<object> {
    return {
       ...result,
       results: result?.results?.map((e) => e.serializeToPlainObject()),

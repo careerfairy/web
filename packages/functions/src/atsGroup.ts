@@ -12,6 +12,7 @@ import {
    atsRequestValidationWithAccountToken,
 } from "./lib/ats"
 import { MergeATSRepository } from "./lib/merge/MergeATSRepository"
+import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 /*
 |--------------------------------------------------------------------------
@@ -111,11 +112,6 @@ export const mergeGetAccountToken = functions
       }
    })
 
-type ATSDataPagination = {
-   cursor: string | null
-   pageSize: string | number | null
-}
-
 /**
  * Fetch Jobs
  */
@@ -123,7 +119,7 @@ export const fetchATSJobs = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidationWithAccountToken<
-         ATSDataPagination & { allJobs?: boolean }
+         ATSDataPaginationOptions & { allJobs?: boolean }
       >({
          data,
          context,

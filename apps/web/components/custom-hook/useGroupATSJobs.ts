@@ -4,13 +4,17 @@ import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
 import { useMemo } from "react"
+import {
+   ATSDataPaginationOptions,
+   ATSPaginatedResults,
+} from "@careerfairy/shared-lib/dist/ats/Functions"
 
-type Result = {
-   jobs: Job[]
-}
-
-const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
-   const fetcher = useFunctionsSWR<Job[]>()
+const useGroupATSJobs = (
+   groupId: string,
+   integrationId: string,
+   pagination?: ATSDataPaginationOptions
+): ATSPaginatedResults<Job> => {
+   const fetcher = useFunctionsSWR<ATSPaginatedResults<Job>>()
 
    const { data } = useSWR(
       [
@@ -18,6 +22,7 @@ const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
          {
             groupId,
             integrationId,
+            ...pagination,
          },
       ],
       fetcher,
@@ -34,7 +39,8 @@ const useGroupATSJobs = (groupId: string, integrationId: string): Result => {
          })
 
       return {
-         jobs,
+         ...data,
+         results: jobs,
       }
    }, [data, integrationId])
 }

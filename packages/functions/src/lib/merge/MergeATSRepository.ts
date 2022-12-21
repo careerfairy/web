@@ -28,6 +28,7 @@ import {
    CandidateCreationOptions,
    IATSRepository,
 } from "../IATSRepository"
+import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 const MERGE_DEFAULT_PAGE_SIZE = "100"
 const SOURCE = "CareerFairy"
@@ -66,7 +67,7 @@ export class MergeATSRepository implements IATSRepository {
 */
    async getJobs(
       options?: ATSPaginationOptions
-   ): Promise<ATSPaginatedData<Job>> {
+   ): Promise<ATSPaginatedResults<Job>> {
       const path = this.buildPath("/jobs", {
          expand: "offices,recruiters,hiring_managers,departments",
          status: "OPEN",
@@ -126,7 +127,7 @@ export class MergeATSRepository implements IATSRepository {
 */
    async getOffices(
       options?: ATSPaginationOptions
-   ): Promise<ATSPaginatedData<Office>> {
+   ): Promise<ATSPaginatedResults<Office>> {
       const path = this.buildPath("/offices", {
          cursor: options?.cursor,
          page_size: options?.pageSize ?? MERGE_DEFAULT_PAGE_SIZE,
@@ -211,7 +212,7 @@ export class MergeATSRepository implements IATSRepository {
 */
    async getApplications(
       options?: ATSApplicationOptions
-   ): Promise<ATSPaginatedData<Application>> {
+   ): Promise<ATSPaginatedResults<Application>> {
       const path = this.buildPath("/offices", {
          expand: "candidate,job,current_stage,reject_reason",
          job_id: options.jobId,
@@ -321,7 +322,7 @@ export class MergeATSRepository implements IATSRepository {
    private mapPaginatedResults<T>(
       results: MergePaginatedResponse<unknown>,
       mapper: (model: unknown) => T
-   ): ATSPaginatedData<T> {
+   ): ATSPaginatedResults<T> {
       return {
          next: results.next,
          previous: results.previous,
@@ -377,12 +378,6 @@ export interface ATSApplicationOptions extends ATSPaginationOptions {
     * Filter by job id
     */
    jobId?: string
-}
-
-export type ATSPaginatedData<Model> = {
-   next: string | null
-   previous: string | null
-   results: Model[]
 }
 
 const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {

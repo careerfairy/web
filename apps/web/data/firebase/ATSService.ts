@@ -4,6 +4,10 @@ import { v4 as uuidv4 } from "uuid"
 import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
+import {
+   ATSDataPaginationOptions,
+   ATSPaginatedResults,
+} from "@careerfairy/shared-lib/dist/ats/Functions"
 
 export class ATSService {
    constructor(
@@ -39,6 +43,46 @@ export class ATSService {
          job.setIntegrationId(integrationId)
          return job
       })
+   }
+
+   /**
+    * Get Jobs Paginated
+    * @param groupId
+    * @param integrationId
+    * @param pagination
+    */
+   async getJobs(
+      groupId: string,
+      integrationId: string,
+      pagination?: ATSDataPaginationOptions
+   ): Promise<ATSPaginatedResults<Job>> {
+      let params = {
+         groupId,
+         integrationId,
+      }
+
+      if (pagination) {
+         params = {
+            ...params,
+            ...pagination,
+         }
+      }
+
+      const data = await this.firebaseFunctions.httpsCallable(
+         "fetchATSJobs_v2"
+      )(params)
+
+      let mappedData = data.data.results
+         .map(Job.createFromPlainObject)
+         .map((job: Job) => {
+            job.setIntegrationId(integrationId)
+            return job
+         })
+
+      return {
+         ...data.data,
+         results: mappedData,
+      }
    }
 
    async linkCompanyWithATS(
