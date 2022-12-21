@@ -78,9 +78,13 @@ const styles = createStyles({
 })
 
 export const BadgeStepper = ({ badge }: { badge: Badge }) => {
-   const { userPresenter } = useAuth()
+   const { userPresenter, userStats } = useAuth()
 
-   const { activeStep, steps } = useBadgeStepProgress(userPresenter, badge)
+   const { activeStep, steps } = useBadgeStepProgress(
+      badge,
+      userStats,
+      userPresenter
+   )
 
    return (
       <Stepper
