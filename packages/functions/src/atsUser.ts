@@ -338,7 +338,8 @@ export const atsUserApplyToJob = functions
                livestream.id,
                userEmail,
                jobIdentifier,
-               job
+               job,
+               applicationId
             ),
             // Create a job application document on user side
             userRepo.upsertJobApplication(

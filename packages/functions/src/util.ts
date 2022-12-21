@@ -10,6 +10,7 @@ import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 export const setHeaders = (req, res) => {
@@ -139,6 +140,10 @@ const createRecipientVariables = (
       let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
       formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
 
+      const upcomingStreamLink = externalEventLink
+         ? externalEventLink
+         : getStreamLink(streamId)
+
       const emailData = {
          timeMessage: timeMessage,
          companyName: company,
@@ -146,9 +151,11 @@ const createRecipientVariables = (
          streamTitle: title,
          formattedDateTime: formattedDate,
          formattedSpeaker: `${speakerFirstName} ${speakerLastName}, ${speakerPosition}`,
-         upcomingStreamLink: externalEventLink
-            ? externalEventLink
-            : getStreamLink(streamId),
+         upcomingStreamLink: addUtmTagsToLink({
+            link: upcomingStreamLink,
+            campaign: "eventReminders",
+            content: title,
+         }),
          german: language?.code === "DE",
       }
 

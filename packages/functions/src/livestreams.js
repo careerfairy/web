@@ -8,6 +8,7 @@ const {
 } = require("./api/slack")
 const { setHeaders, isLocalEnvironment } = require("./util")
 const ical = require("ical-generator")
+const { addUtmTagsToLink } = require("@careerfairy/shared-lib/dist/utils")
 
 exports.scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
@@ -52,7 +53,10 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
 
                // create calendar event
                const livestreamStartDate = livestream.start.toDate()
-               const linkWithUTM = `https://careerfairy.io/upcoming-livestream/${livestreamId}?utm_campaign=fromCalendarEvent`
+               const linkWithUTM = addUtmTagsToLink({
+                  link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
+                  campaign: "fromCalendarEvent",
+               })
 
                const cal = ical({
                   events: [
@@ -98,7 +102,16 @@ exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
             company_name: data.company_name,
             company_logo_url: data.company_logo_url,
             livestream_title: data.livestream_title,
-            livestream_link: data.livestream_link,
+            livestream_link: addUtmTagsToLink({
+               link: data.livestream_link,
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
+            next_livestreams_link: addUtmTagsToLink({
+               link: "https://careerfairy.io/next-livestreams",
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
             calendar_event_i_calendar: isLocalEnvironment()
                ? `http://localhost:5001/careerfairy-e1fd9/us-central1/getLivestreamICalendarEvent?eventId=${data.livestream_id}`
                : `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent?eventId=${data.livestream_id}`,
@@ -164,7 +177,16 @@ exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
             company_logo_url: data.company_logo_url,
             event_title: data.event_title,
             event_address: data.event_address,
-            livestream_link: data.livestream_link,
+            livestream_link: addUtmTagsToLink({
+               link: data.livestream_link,
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
+            next_livestreams_link: addUtmTagsToLink({
+               link: "https://careerfairy.io/next-livestreams",
+               campaign: "eventRegistration",
+               content: data.livestream_title,
+            }),
          },
       }
 

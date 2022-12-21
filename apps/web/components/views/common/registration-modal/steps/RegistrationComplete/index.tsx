@@ -1,132 +1,158 @@
-import React, { useContext } from "react"
+import React, { useContext, useEffect } from "react"
 import {
    Box,
    Button,
    DialogActions,
    DialogContent,
-   Divider,
    Grow,
    Stack,
    Typography,
 } from "@mui/material"
 import { RegistrationContext } from "../../../../../../context/registration/RegistrationContext"
-import SuccessCheckmark from "./SuccessCheckmark"
 import { useRouter } from "next/router"
 import { StylesProps } from "../../../../../../types/commonTypes"
-import ReferralPrompt from "../../../ReferralPrompt"
+import ReferralWidget from "../../../ReferralWidget"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import confetti from "canvas-confetti"
+import { PillsBackground } from "materialUI/GlobalBackground/GlobalBackGround"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 
 const styles: StylesProps = {
    root: {},
-   title: {
-      color: "white",
-      fontWeight: 600,
-   },
    linkBtn: {
       textDecoration: "none !important",
    },
    actions: {
       display: "flex",
+      flexDirection: "column",
       justifyContent: "center",
       width: "100%",
-   },
-   content: {
-      backgroundColor: "primary.main",
-   },
-   titleWrapper: {
-      paddingTop: 2,
    },
    actionsWrapper: {
       p: 2,
       width: "100%",
    },
+   actionMessage: {
+      mb: 4,
+      mt: {
+         xs: 1,
+         sm: 4,
+      },
+   },
+   shareMessage: {
+      mx: { xs: 0, sm: "10%" },
+      mb: { xs: 1, sm: 2 },
+   },
+   actionButton: {
+      display: "flex",
+      justifyContent: "center",
+   },
+   confettiIcon: {
+      display: "flex",
+      justifyContent: "center",
+      fontSize: { xs: "40px", sm: "70px" },
+      marginTop: { xs: 0, sm: 4 },
+   },
 }
 
 const RegistrationComplete = () => {
-   const {
-      group,
-      livestream,
-      promptOtherEventsOnFinal,
-      handleClose,
-      onFinish,
-   } = useContext(RegistrationContext)
-   const {
-      query: { groupId, referrerId },
-      push,
-   } = useRouter()
-
-   function handleUrl() {
-      return {
-         pathname: group?.id
-            ? `/next-livestreams/${group?.id}`
-            : groupId
-            ? `/next-livestreams/${groupId}`
-            : "/next-livestreams",
-         query: {
-            ...(referrerId && { referrerId }),
-            ...(livestream?.id && {
-               livestreamId: livestream.id,
-            }),
-         },
-      }
-   }
+   const { livestream, promptOtherEventsOnFinal, handleClose, onFinish } =
+      useContext(RegistrationContext)
+   const { userStats } = useAuth()
+   const { push } = useRouter()
+   const isMobile = useIsMobile()
 
    const handleFinish = () => {
       onFinish?.()
       handleClose?.()
    }
 
+   useEffect(() => {
+      if (!userStats?.hasRegisteredOnAnyLivestream) {
+         confetti({
+            particleCount: isMobile ? 500 : 1000,
+            spread: 120,
+            origin: { y: isMobile ? 0.9 : 0.7 },
+            decay: isMobile ? null : 0.93,
+            startVelocity: isMobile ? null : 45,
+            zIndex: 99999,
+         })
+      }
+   }, [isMobile, userStats?.hasRegisteredOnAnyLivestream])
+
    return (
-      <>
-         <DialogContent sx={styles.content}>
-            <SuccessCheckmark />
+      <PillsBackground minHeight={"fit-content"} isOnDialog={true}>
+         <DialogContent sx={{ pb: 2 }}>
+            <Box sx={styles.confettiIcon}>🎉</Box>
             <Grow timeout={1000} in>
-               <Box sx={styles.titleWrapper}>
-                  <Typography variant="h5" align="center" sx={styles.title}>
-                     Thank you!
+               <Box>
+                  <Typography variant="h6" align="center">
+                     Thanks for registering!
                   </Typography>
                </Box>
             </Grow>
          </DialogContent>
          <DialogActions>
-            <Stack divider={<Divider />} spacing={2} sx={styles.actionsWrapper}>
-               <ReferralPrompt
-                  subtitle={
-                     "You have successfully completed your first step towards " +
-                     "becoming a member of the community. You can share the event " +
-                     "with your network!"
-                  }
-                  title={"Congratulations"}
-                  event={livestream}
-               />
+            <Stack spacing={2} sx={styles.actionsWrapper}>
+               <Box>
+                  <Typography
+                     variant="h6"
+                     align="center"
+                     sx={styles.shareMessage}
+                  >
+                     {!userStats?.hasRegisteredOnAnyLivestream
+                        ? "You have successfully completed your first step towards becoming a member of the community. You can share the live stream with your network!"
+                        : "That’s one more step as active member of this community. You can share the live stream with your network!"}
+                  </Typography>
+                  <ReferralWidget
+                     event={livestream}
+                     noBackgroundColor
+                     iconsColor={"primary"}
+                     justifyContent={"center"}
+                     iconStyle={{ height: "32px", padding: 0 }}
+                  />
+               </Box>
                <Box sx={styles.actions}>
-                  {promptOtherEventsOnFinal ? (
-                     <Button
-                        sx={styles.linkBtn}
-                        color="primary"
-                        onClick={async () => {
-                           handleFinish()
-                           push(handleUrl())
-                        }}
-                        variant="contained"
-                        size="large"
-                     >
-                        See all our events
-                     </Button>
-                  ) : (
-                     <Button
-                        variant="contained"
-                        size="large"
-                        onClick={handleFinish}
-                        color="primary"
-                        autoFocus
-                     >
-                        Finish
-                     </Button>
-                  )}
+                  <Typography
+                     variant="h5"
+                     align="center"
+                     sx={styles.actionMessage}
+                  >
+                     Did you know? <br />
+                     You can now check our <b>CareerFairy platform</b> to see
+                     more live streams like this
+                  </Typography>
+
+                  <Box sx={styles.actionButton}>
+                     {promptOtherEventsOnFinal ? (
+                        <Button
+                           sx={styles.linkBtn}
+                           color="secondary"
+                           onClick={async () => {
+                              handleFinish()
+                              await push("/next-livestreams")
+                           }}
+                           variant="contained"
+                           size="large"
+                        >
+                           {isMobile ? "See" : "Discover"} more live streams
+                        </Button>
+                     ) : (
+                        <Button
+                           variant="contained"
+                           size="large"
+                           onClick={handleFinish}
+                           color="secondary"
+                           autoFocus
+                        >
+                           Finish
+                        </Button>
+                     )}
+                  </Box>
                </Box>
             </Stack>
          </DialogActions>
-      </>
+      </PillsBackground>
    )
 }
 

@@ -32,7 +32,7 @@ const securityHeaders = [
          `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
             notProduction ? "localhost:*" : ""
          };` +
-         `frame-src blob: https://cdn.merge.dev https://go.crisp.chat https://optimize.google.com https://consentcdn.cookiebot.com https://vars.hotjar.com https://www.facebook.com ${
+         `frame-src blob: https://www.youtube.com https://cdn.merge.dev https://go.crisp.chat https://optimize.google.com https://consentcdn.cookiebot.com https://vars.hotjar.com https://www.facebook.com ${
             isVercelPreview ? "https://vercel.live" : ""
          };` +
          `font-src 'self' https://script.hotjar.com https://fonts.gstatic.com;`,
@@ -97,26 +97,7 @@ const moduleExports = {
       }
       return config
    },
-   webpack: (config, { dev }) => {
-      /**
-       * Reduce .next/cache folder size
-       *
-       * https://webpack.js.org/plugins/split-chunks-plugin/
-       * Taken from https://github.com/vercel/next.js/discussions/17218#discussioncomment-4381152
-       */
-      if (dev) {
-         config.optimization.splitChunks = {
-            cacheGroups: {
-               framework: {
-                  chunks: "all",
-                  test: /[\\/]node_modules[\\/]/,
-                  name: "framework",
-                  enforce: true,
-               },
-            },
-         }
-      }
-
+   webpack: (config) => {
       config.module.rules.push({
          test: /\.wav$/,
          loader: "file-loader",
