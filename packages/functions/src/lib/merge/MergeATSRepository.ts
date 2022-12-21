@@ -362,7 +362,7 @@ export class MergeATSRepository implements IATSRepository {
 
       // sort in place by Admins desc
       users.sort((a, b) => {
-         if (b.role.includes("ADMIN")) {
+         if (b?.role?.includes("ADMIN")) {
             return 1
          }
 
