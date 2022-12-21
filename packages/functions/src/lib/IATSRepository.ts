@@ -9,6 +9,7 @@ import {
    ATSPaginationOptions,
 } from "./merge/MergeATSRepository"
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean
@@ -24,10 +25,20 @@ export type ApplicationCreationOptions = {
    remoteUserId?: string
 }
 
+export interface RecruitersFilterOptions extends ATSPaginationOptions {
+   email?: string
+}
+
 export interface IATSRepository {
    getJobs(options?: ATSPaginationOptions): Promise<ATSPaginatedResults<Job>>
 
    getAllJobs(): Promise<Job[]>
+
+   getRecruiters(
+      options?: RecruitersFilterOptions
+   ): Promise<ATSPaginatedResults<Recruiter>>
+
+   getAllRecruiters(): Promise<Recruiter[]>
 
    getJob(id: string): Promise<Job>
 
