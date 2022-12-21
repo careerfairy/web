@@ -172,4 +172,4 @@ exports.periodicallyRemoveCachedDocument =
 exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
