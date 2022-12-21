@@ -14,6 +14,7 @@ import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
@@ -453,7 +454,7 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: recipientEmail,
-            TemplateModel: { action_url: link },
+            TemplateModel: { action_url: addUtmTagsToLink({ link: link }) },
          }
 
          const response = await client.sendEmailWithTemplate(email)

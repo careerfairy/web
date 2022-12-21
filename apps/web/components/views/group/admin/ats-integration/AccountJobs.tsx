@@ -193,19 +193,18 @@ type TableTitleProps = {
 
 export const TableTitle = ({ title, subtitle }: TableTitleProps) => {
    return (
-      <Box display="flex" alignItems="center">
-         <Typography variant="h6">{title}</Typography>
+      <>
+         <Box display="flex">
+            <Typography variant="h6">{title}</Typography>
+         </Box>
          {subtitle && (
-            <Typography
-               variant="subtitle1"
-               fontSize="0.8rem"
-               color="gray"
-               ml={1}
-            >
-               {subtitle}
-            </Typography>
+            <Box>
+               <Typography variant="subtitle1" fontSize="0.8rem" color="gray">
+                  {subtitle}
+               </Typography>
+            </Box>
          )}
-      </Box>
+      </>
    )
 }
 

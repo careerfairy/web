@@ -7,6 +7,7 @@ import { alpha } from "@mui/material/styles"
 import InfoIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
 import ReferralWidget from "../../common/ReferralWidget"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles: StylesProps = {
    root: {
@@ -26,6 +27,7 @@ const styles: StylesProps = {
    alert: {
       backgroundColor: (theme) => theme.palette.grey["200"],
       borderRadius: 2,
+      width: { xs: "70%", md: "100%" },
       "& svg": {
          color: (theme) => theme.palette.common.black,
       },
@@ -36,17 +38,22 @@ interface Props {
    event: LivestreamEvent
 }
 const Referral = ({ event }: Props) => {
+   const isMobile = useIsMobile()
+
    return (
       <Stack spacing={2} alignItems={"center"} sx={styles.root}>
          <Box sx={styles.sharePrompt}>
             <Typography variant="h6">SHARE</Typography>
          </Box>
-         <ReferralWidget
-            event={event}
-            noBackgroundColor
-            iconsColor={"grey"}
-            justifyContent={"center"}
-         />
+         <Box width={"100%"}>
+            <ReferralWidget
+               event={event}
+               noBackgroundColor
+               iconsColor={"grey"}
+               justifyContent={"center"}
+               iconStyle={{ height: isMobile ? "32px" : "unset", padding: 0 }}
+            />
+         </Box>
          <Alert sx={styles.alert} icon={<InfoIcon />} severity="info">
             Share the event with your network! Your questions will be shown on
             top and answered first!

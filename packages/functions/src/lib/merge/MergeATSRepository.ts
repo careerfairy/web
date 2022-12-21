@@ -31,6 +31,7 @@ import {
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 const MERGE_DEFAULT_PAGE_SIZE = "100"
+const SOURCE = "CareerFairy"
 
 /**
  * Merge.dev HTTP API
@@ -172,6 +173,7 @@ export class MergeATSRepository implements IATSRepository {
          model.applications = [
             {
                job: options.jobAssociation.id,
+               source: SOURCE,
             },
          ]
       }
@@ -233,7 +235,7 @@ export class MergeATSRepository implements IATSRepository {
       const model: MergeApplicationModel = {
          candidate: candidateId,
          job: jobId,
-         source: "CareerFairy",
+         source: SOURCE,
       }
 
       const body = createMergeModelBody(model, options.remoteUserId)
@@ -407,7 +409,11 @@ const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
 
 function createMergeAttachmentObject(user: UserData): MergeAttachmentModel {
    return {
-      file_name: `Resume - ${user.firstName} ${user.lastName} - CareerFairy`,
+      /**
+       * For Greenhouse its required to append the .pdf extension for the
+       * Resume Preview functionality to work
+       */
+      file_name: `Resume - ${user.firstName} ${user.lastName} - CareerFairy.pdf`,
       file_url: getResumeURL(user.userResume),
       attachment_type: "RESUME",
    }
