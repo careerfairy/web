@@ -141,7 +141,7 @@ const EventsOverview = ({ group, scrollRef }) => {
            }
    }
    const handlePublishStream = useCallback(
-      async (streamObj) => {
+      async (streamObj, promotion) => {
          try {
             setPublishingDraft(true)
             const newStream = { ...streamObj }
@@ -150,7 +150,8 @@ const EventsOverview = ({ group, scrollRef }) => {
             const publishedStreamId = await addLivestream(
                newStream,
                "livestreams",
-               author
+               author,
+               promotion
             )
             newStream.id = publishedStreamId
 
