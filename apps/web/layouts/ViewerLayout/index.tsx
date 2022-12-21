@@ -105,7 +105,7 @@ const ViewerLayout = (props) => {
    } = useRouter()
    const channelId = breakoutRoomId || livestreamId
    const dispatch = useDispatch()
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, userStats } = useAuth()
    const {
       breakpoints: { values },
    } = useTheme()
@@ -201,7 +201,11 @@ const ViewerLayout = (props) => {
             breakoutRoomId
          ) {
             console.log("-> SETTING PARTICIPATION")
-            void firebase.setUserIsParticipatingWithRef(streamRef, userData)
+            void firebase.setUserIsParticipatingWithRef(
+               streamRef,
+               userData,
+               userStats
+            )
          }
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -423,6 +427,7 @@ const ViewerLayout = (props) => {
                      mobile={mobile}
                   />
                   <LeftMenu
+                     streamFinished={currentStreamContextValue.presenter?.streamHasFinished()}
                      handRaiseActive={handRaiseActive}
                      setHandRaiseActive={setHandRaiseActive}
                      streamer={false}

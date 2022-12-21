@@ -4,6 +4,7 @@ import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserPublicData,
+   UserStats,
 } from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
@@ -224,6 +225,12 @@ export interface UserLivestreamData extends Identifiable {
    participated?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
+      // The initial snapshot of the user's data when they participated in the livestream for the first time
+      initialSnapshot?: {
+         userData: UserData
+         userStats: UserStats
+         date: firebase.firestore.Timestamp
+      }
    }
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails
