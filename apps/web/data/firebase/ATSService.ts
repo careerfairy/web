@@ -8,6 +8,7 @@ import {
    ATSDataPaginationOptions,
    ATSPaginatedResults,
 } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 export class ATSService {
    constructor(
@@ -25,7 +26,7 @@ export class ATSService {
    /**
     * Gets all the jobs for a given integration
     *
-    * This can fan out to several ats requests since'll need to go
+    * This can fan out to several ats requests since we'll need to go
     * through paginated responses
     * @param groupId
     * @param integrationId
@@ -43,6 +44,29 @@ export class ATSService {
          job.setIntegrationId(integrationId)
          return job
       })
+   }
+
+   /**
+    * Gets all the Recruiters for a given integration
+    *
+    * This can fan out to several ats requests since we'll need to go
+    * through paginated responses
+    * @param groupId
+    * @param integrationId
+    */
+   async getAllRecruiters(
+      groupId: string,
+      integrationId: string
+   ): Promise<Recruiter[]> {
+      const data = await this.firebaseFunctions.httpsCallable(
+         "fetchATSRecruiters"
+      )({
+         groupId,
+         integrationId,
+         all: true,
+      })
+
+      return data.data.map(Recruiter.createFromPlainObject)
    }
 
    /**
