@@ -145,13 +145,13 @@ const NewStreamModal = ({
       onClose()
    }
 
-   const handlePublishDraft = async (streamToPublish) => {
+   const handlePublishDraft = async (streamToPublish, promotion) => {
       if (canPublish) {
          try {
             formRef.current?.setSubmitting(true)
             const newStream = { ...streamToPublish }
             newStream.companyId = uuidv4()
-            await handlePublishStream(newStream)
+            await handlePublishStream(newStream, promotion)
          } catch (e) {
             console.log("-> e", e)
             enqueueSnackbar(GENERAL_ERROR, {
@@ -213,8 +213,11 @@ const NewStreamModal = ({
             livestream.jobs = selectedJobs
          }
 
+         // only save the promotions if the start date is after 30 days from now
+         const promotion = buildPromotionObj(values, livestream.id)
+
          if (publishDraft) {
-            await handlePublishDraft(livestream)
+            await handlePublishDraft(livestream, promotion)
             setPublishDraft(false)
             return
          }
@@ -222,9 +225,6 @@ const NewStreamModal = ({
          const targetCollection = isActualLivestream
             ? "livestreams"
             : "draftLivestreams"
-
-         // only save the promotions if the start date is after 30 days from now
-         const promotion = buildPromotionObj(values, livestream.id)
 
          if (updateMode) {
             id = livestream.id
