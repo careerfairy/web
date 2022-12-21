@@ -132,14 +132,18 @@ const EventsOverview = ({ group, scrollRef }) => {
       }
    }, [eventId])
 
-   const getAuthor = (livestream) => {
-      return livestream?.author?.email
-         ? livestream.author
-         : {
-              email: authenticatedUser.email,
-              ...(group?.id && { groupId: group.id }),
-           }
-   }
+   const getAuthor = useCallback(
+      (livestream) => {
+         return livestream?.author?.email
+            ? livestream.author
+            : {
+                 email: authenticatedUser.email,
+                 ...(group?.id && { groupId: group.id }),
+              }
+      },
+      [authenticatedUser.email, group.id]
+   )
+
    const handlePublishStream = useCallback(
       async (streamObj, promotion) => {
          try {
@@ -170,7 +174,7 @@ const EventsOverview = ({ group, scrollRef }) => {
                submitTime,
             })
             await deleteLivestream(streamObj.id, "draftLivestreams")
-            replace(
+            await replace(
                `/group/${group.id}/admin/events?eventId=${publishedStreamId}`
             )
          } catch (e) {
