@@ -55,7 +55,7 @@ const GenericDialog = ({
          open={true}
          onClose={onClose}
       >
-         <DialogTitle sx={titleOnCenter && { alignSelf: "center" }}>
+         <DialogTitle sx={titleOnCenter ? { alignSelf: "center" } : undefined}>
             <Typography sx={styles.title}>{title}</Typography>
          </DialogTitle>
          <DialogContent dividers>{children}</DialogContent>
