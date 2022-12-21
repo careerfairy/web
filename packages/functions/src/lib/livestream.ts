@@ -195,7 +195,7 @@ export const updateUnfinishedLivestreams = async () => {
          event.duration
       )
 
-      if (startDatePlusDuration <= dateNowLess4Hours) {
+      if (startDatePlusDuration <= new Date()) {
          batch.update(doc.ref, {
             hasStarted: false,
             hasEnded: true,
