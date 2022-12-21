@@ -38,14 +38,14 @@ const useBadgeStepProgress = (
          ? currentBadgeLevel.next.progress(userPresenter.model, userStats)
          : 0
 
-      const activeStep = currentBadgeLevel ? currentBadgeLevel.level : 0
+      const currentLevel = currentBadgeLevel?.level ?? 0
 
       return {
          steps,
-         currentBadgeLevel: currentBadgeLevel?.level,
+         currentBadgeLevel: currentLevel,
          activeStep: currentBadgeLevel ? currentBadgeLevel.level - 1 : 0,
          percentProgress: Math.round(
-            (activeStep / steps.length) * 100 + // current level
+            (currentLevel / steps.length) * 100 + // current level
                percentProgressToNextLevel / steps.length // Add the % progress to the next level
          ),
       }
