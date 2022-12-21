@@ -91,7 +91,7 @@ const CircularBadgeProgress = ({
 
    const { userPresenter, userStats } = useAuth()
 
-   const { percentProgress, activeStep } = useBadgeStepProgress(
+   const { percentProgress, currentBadgeLevel } = useBadgeStepProgress(
       badge,
       userStats,
       userPresenter
@@ -141,7 +141,7 @@ const CircularBadgeProgress = ({
                   component="div"
                   fontWeight={"bold"}
                >
-                  {`Level ${activeStep}`}
+                  {`Level ${currentBadgeLevel}`}
                </Typography>
             </Box>
          </Box>
