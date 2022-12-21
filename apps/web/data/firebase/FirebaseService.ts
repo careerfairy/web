@@ -2391,7 +2391,7 @@ class FirebaseService {
    }
 
    setUserIsParticipatingWithRef = async (
-      streamRef: ReturnType<typeof this.getStreamRef>,
+      streamRef: DocumentReference<LivestreamEvent>,
       userData: UserData,
       userStats: UserStats
    ) => {
