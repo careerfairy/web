@@ -39,9 +39,9 @@ const JobSelectorCategory = ({
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
 
-   // First sync should be complete to fetch the jobs
+   // First sync & Candidate test should be completed to fetch the jobs
    const filteredAccounts = useMemo(() => {
-      return accounts.filter((account) => account.firstSyncCompletedAt)
+      return accounts.filter((account) => account.isReady())
    }, [accounts])
 
    // Only display the selector if the Group has ATS accounts linked with first sync complete

@@ -32,4 +32,11 @@ export class GroupATSAccount {
    isApplicationTestComplete() {
       return Boolean(this.applicationTestCompletedAt)
    }
+
+   /**
+    * Check if this account is ready to be associated with a livestream
+    */
+   isReady() {
+      return this.isFirstSyncComplete() && this.isApplicationTestComplete()
+   }
 }
