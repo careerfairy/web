@@ -154,6 +154,7 @@ exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
 exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
 exports.fetchATSRecruiters = atsGroup.fetchATSRecruiters
 exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
+exports.candidateApplicationTest = atsGroup.candidateApplicationTest
 
 // User
 exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
