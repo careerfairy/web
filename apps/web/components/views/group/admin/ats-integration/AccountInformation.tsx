@@ -65,7 +65,7 @@ const DisplayATSContent = ({ atsAccount }: Props) => {
                onChange={switchTabHandler}
                aria-label="ats content tabs"
             >
-               {tabs.map((tab, _) => (
+               {tabs.map((tab) => (
                   <Tab key={tab.label} label={tab.label} />
                ))}
             </Tabs>
