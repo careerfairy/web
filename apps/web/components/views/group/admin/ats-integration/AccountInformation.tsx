@@ -1,5 +1,4 @@
 import Box from "@mui/material/Box"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import SyncStatusButtonDialog from "./SyncStatusButtonDialog"
 import RemoveLinkedAccountButton from "./RemoveLinkedAccountButton"
 import { Grid } from "@mui/material"
@@ -14,12 +13,10 @@ import AccountJobs from "./AccountJobs"
 import AccountApplications from "./AccountApplications"
 import WaitForFirstSyncStatus from "./WaitForFirstSyncStatus"
 import ApplicationTestButtonDialog from "./application-test/ApplicationTestButtonDialog"
+import { useATSAccount } from "./ATSAccountContextProvider"
 
-type Props = {
-   atsAccount: GroupATSAccount
-}
-
-const AccountInformation = ({ atsAccount }: Props) => {
+const AccountInformation = () => {
+   const { atsAccount } = useATSAccount()
    /**
     * The first sync can take a couple of minutes or hours
     * We display a loading state while it's not finished
@@ -28,28 +25,26 @@ const AccountInformation = ({ atsAccount }: Props) => {
     * otherwise we'll fetch incomplete data that will be cached
     */
    if (!atsAccount.isFirstSyncComplete()) {
-      return <WaitForFirstSyncStatus atsAccount={atsAccount} />
+      return <WaitForFirstSyncStatus />
    }
 
-   return <DisplayATSContent atsAccount={atsAccount} />
+   return <DisplayATSContent />
 }
 
 const tabs = [
    {
       label: "Jobs",
-      component: (atsAccount: GroupATSAccount) => (
-         <AccountJobs atsAccount={atsAccount} />
-      ),
+      component: () => <AccountJobs />,
    },
    {
       label: "Applications",
-      component: (atsAccount: GroupATSAccount) => (
-         <AccountApplications atsAccount={atsAccount} />
-      ),
+      component: () => <AccountApplications />,
    },
 ]
 
-const DisplayATSContent = ({ atsAccount }: Props) => {
+const DisplayATSContent = () => {
+   const { atsAccount } = useATSAccount()
+
    // Tabs behaviour
    const [activeTabIndex, setActiveTabIndex] = useState(0)
    const switchTabHandler = useCallback((...args) => {
@@ -80,19 +75,13 @@ const DisplayATSContent = ({ atsAccount }: Props) => {
             >
                {!atsAccount.isApplicationTestComplete() && (
                   <Box mr={1}>
-                     <ApplicationTestButtonDialog
-                        groupId={atsAccount.groupId}
-                        integrationId={atsAccount.id}
-                     />
+                     <ApplicationTestButtonDialog />
                   </Box>
                )}
                <Box mr={1}>
-                  <SyncStatusButtonDialog
-                     groupId={atsAccount.groupId}
-                     integrationId={atsAccount.id}
-                  />
+                  <SyncStatusButtonDialog />
                </Box>
-               <RemoveLinkedAccountButton atsAccount={atsAccount} />
+               <RemoveLinkedAccountButton />
             </Box>
          </Grid>
          <Grid item xs={12}>
@@ -115,7 +104,7 @@ const DisplayATSContent = ({ atsAccount }: Props) => {
                               />
                            }
                         >
-                           {tab.component(atsAccount)}
+                           {tab.component()}
                         </SuspenseWithBoundary>
                      </SwipeablePanel>
                   ))}

@@ -12,13 +12,9 @@ import {
 } from "@mui/material"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import Paper from "@mui/material/Paper"
+import { useATSAccount } from "./ATSAccountContextProvider"
 
-type Props = {
-   groupId: string
-   integrationId: string
-}
-
-const SyncStatusButtonDialog = ({ groupId, integrationId }: Props) => {
+const SyncStatusButtonDialog = () => {
    const [isOpen, setOpen] = useState(false)
 
    const onClose = useCallback(() => {
@@ -37,7 +33,7 @@ const SyncStatusButtonDialog = ({ groupId, integrationId }: Props) => {
          {isOpen && (
             <GenericDialog title={"Sync Status"} onClose={onClose}>
                <SuspenseWithBoundary>
-                  <DialogBody groupId={groupId} integrationId={integrationId} />
+                  <DialogBody />
                </SuspenseWithBoundary>
             </GenericDialog>
          )}
@@ -45,8 +41,12 @@ const SyncStatusButtonDialog = ({ groupId, integrationId }: Props) => {
    )
 }
 
-const DialogBody = ({ groupId, integrationId }: Props) => {
-   const { data: syncStatus } = useGroupATSSyncStatus(groupId, integrationId)
+const DialogBody = () => {
+   const { atsAccount } = useATSAccount()
+   const { data: syncStatus } = useGroupATSSyncStatus(
+      atsAccount.groupId,
+      atsAccount.id
+   )
 
    return (
       <TableContainer component={Paper}>
