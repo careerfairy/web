@@ -9,7 +9,6 @@ import useUserLivestreamDataWithRef from "../../../custom-hook/useUserLivestream
 import useStreamRef from "../../../custom-hook/useStreamRef"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import Skeleton from "@mui/material/Skeleton"
-import { useTheme } from "@mui/material/styles"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const ProgressIndicators = () => {
@@ -25,7 +24,7 @@ const ProgressIndicators = () => {
 
    return (
       <>
-         <Typography align={"center"}>
+         <Typography variant={"h6"} align={"center"}>
             Congrats! You are one step closer to land the job you’ll love 🚀
          </Typography>
          <Stack
@@ -73,12 +72,15 @@ export const ProgressIndicatorsLoader = () => {
 
    return (
       <Stack alignItems={"center"} spacing={4} justifyContent={"center"}>
-         <Skeleton width={"37%"} />
+         <Skeleton width={isMobile ? 300 : "45%"} />
          <Stack
             direction={"row"}
             alignItems={"center"}
             justifyContent={"center"}
-            spacing={5}
+            spacing={{
+               xs: 6,
+               sm: 9,
+            }}
          >
             {Array.from({ length: numLoadingSkeletons }).map((_, index) => (
                <Stack alignItems={"center"} spacing={2} key={index}>

@@ -23,16 +23,16 @@ import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 const styles = sxStyles({
    root: {
       bgcolor: "background.default",
-      py: 2,
+      py: 5,
       height: "inherit",
       alignItems: "center",
       overflow: "auto",
       width: "100%",
    },
    divider: {
-      width: 150,
+      width: 100,
       mx: "auto !important",
-      borderWidth: 1,
+      borderColor: "text.secondary",
    },
    ctas: {
       display: "inline-flex",
@@ -57,31 +57,34 @@ const EndOfStreamView = () => {
       <Box sx={styles.root}>
          <Container sx={styles.container}>
             <Stack
-               spacing={{
-                  xs: 2,
-                  sm: 4,
-               }}
+               spacing={2}
                justifyContent={"space-between"}
                sx={styles.stack}
             >
-               <Typography align={"center"}>Thanks for watching!</Typography>
+               <Typography variant={"h6"} fontWeight={400} align={"center"}>
+                  Thanks for watching!
+               </Typography>
                {currentLivestream.title && (
-                  <Typography
-                     variant={"h4"}
-                     fontWeight={"bolder"}
-                     align={"center"}
-                  >
-                     {currentLivestream.title}
-                  </Typography>
+                  <Box pb={1}>
+                     <Typography
+                        variant={"h3"}
+                        fontWeight={"bolder"}
+                        align={"center"}
+                     >
+                        {currentLivestream.title}
+                     </Typography>
+                  </Box>
                )}
                {userPresenter && (
                   <SuspenseWithBoundary fallback={<ProgressIndicatorsLoader />}>
                      <ProgressIndicators />
                   </SuspenseWithBoundary>
                )}
-               <Divider sx={styles.divider} variant="middle" />
+               <Box py={1}>
+                  <Divider sx={styles.divider} variant="middle" />
+               </Box>
                <Box>
-                  <Typography variant={"h6"} align={"center"}>
+                  <Typography gutterBottom variant={"h6"} align={"center"}>
                      Recommended livestreams for you
                   </Typography>
                   <RecommendedEvents hideTitle />
