@@ -10,6 +10,8 @@ import {
    MergeCandidateModel,
    MergeJob,
    MergeLinkTokenResponse,
+   MergeMetaEntities,
+   MergeMetaResponse,
    MergeModelResponseWrapper,
    MergeOffice,
    MergePaginatedResponse,
@@ -64,10 +66,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Jobs
-   |--------------------------------------------------------------------------
-   */
+     |--------------------------------------------------------------------------
+     | Jobs
+     |--------------------------------------------------------------------------
+     */
    async getJobs(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Job>> {
@@ -109,10 +111,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Offices
-   |--------------------------------------------------------------------------
-   */
+     |--------------------------------------------------------------------------
+     | Offices
+     |--------------------------------------------------------------------------
+     */
    async getOffices(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Office>> {
@@ -129,10 +131,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Candidates
-   |--------------------------------------------------------------------------
-   */
+     |--------------------------------------------------------------------------
+     | Candidates
+     |--------------------------------------------------------------------------
+     */
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
          .get<MergeCandidate>(
@@ -194,10 +196,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Applications
-   |--------------------------------------------------------------------------
-   */
+     |--------------------------------------------------------------------------
+     | Applications
+     |--------------------------------------------------------------------------
+     */
    async getApplications(
       options?: ATSApplicationOptions
    ): Promise<ATSPaginatedResults<Application>> {
@@ -245,10 +247,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-   |--------------------------------------------------------------------------
-   | Sync Status & Others
-   |--------------------------------------------------------------------------
-   */
+     |--------------------------------------------------------------------------
+     | Sync Status & Others
+     |--------------------------------------------------------------------------
+     */
    async getSyncStatus(): Promise<SyncStatus[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeSyncStatus>
@@ -389,6 +391,23 @@ export class MergeATSRepository implements IATSRepository {
          data,
          Recruiter.createFromMerge
       )
+   }
+
+   /**
+    * Get the Meta for a given model
+    *
+    * Useful for us to build the request programmatically
+    * Not exposed int the ATSRepository interface because it's an
+    * implementation detail of Merge
+    *
+    * @param model
+    */
+   async getMetaCreation(model: MergeMetaEntities): Promise<MergeMetaResponse> {
+      const path = this.buildPath(`/${model}/meta/post`)
+
+      const { data } = await this.axios.get<MergeMetaResponse>(path)
+
+      return data
    }
 
    private async getAllPages<T>(

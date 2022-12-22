@@ -149,6 +149,7 @@ exports.createMarketingUser = marketing.createMarketingUser
 // Group
 exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
 exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
+exports.mergeMetaEndpoint = atsGroup.mergeMetaEndpoint
 exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
 exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
 exports.fetchATSRecruiters = atsGroup.fetchATSRecruiters
