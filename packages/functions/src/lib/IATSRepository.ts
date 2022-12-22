@@ -10,19 +10,20 @@ import {
 } from "./merge/MergeATSRepository"
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
 import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+import { MergeExtraRequiredData } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean
    jobAssociation?: Job
-   extraRequiredData?: ExtraRequiredData
+   extraRequiredData?: MergeExtraRequiredData
 }
 
 export type AttachmentCreationOptions = {
-   extraRequiredData?: ExtraRequiredData
+   extraRequiredData?: MergeExtraRequiredData
 }
 
 export type ApplicationCreationOptions = {
-   extraRequiredData?: ExtraRequiredData
+   extraRequiredData?: MergeExtraRequiredData
 }
 
 export interface RecruitersFilterOptions extends ATSPaginationOptions {

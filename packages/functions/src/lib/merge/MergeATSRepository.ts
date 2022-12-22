@@ -8,6 +8,7 @@ import {
    MergeAttachmentModel,
    MergeCandidate,
    MergeCandidateModel,
+   MergeExtraRequiredData,
    MergeJob,
    MergeLinkTokenResponse,
    MergeMetaEntities,
@@ -29,7 +30,6 @@ import {
    ApplicationCreationOptions,
    AttachmentCreationOptions,
    CandidateCreationOptions,
-   ExtraRequiredData,
    IATSRepository,
    RecruitersFilterOptions,
 } from "../IATSRepository"
@@ -38,6 +38,8 @@ import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 const MERGE_DEFAULT_PAGE_SIZE = "100"
 const SOURCE = "CareerFairy"
+export const TEST_CV =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/development%2Fsample.pdf?alt=media&token=37d5f709-29e4-44d9-8400-f35629de64b6"
 
 /**
  * Merge.dev HTTP API
@@ -501,8 +503,7 @@ function getResumeURL(resumeUrl: string): string {
    // this is only used during local development
    if (res.indexOf("http://localhost:9199") !== -1) {
       // use a remote test CV file
-      res =
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/development%2Fsample.pdf?alt=media&token=37d5f709-29e4-44d9-8400-f35629de64b6"
+      res = TEST_CV
    }
 
    return res
@@ -532,7 +533,7 @@ const emptyResponseWhenNotFound = (e: AxiosError) => {
  */
 function createMergeModelBody(
    data: any,
-   extraRequiredFields?: ExtraRequiredData
+   extraRequiredFields?: MergeExtraRequiredData
 ) {
    const body: any = {
       model: data,

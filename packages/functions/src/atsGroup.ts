@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { boolean, string } from "yup"
+import { boolean, object, string } from "yup"
 import { atsRepo, groupRepo } from "./api/repositories"
 import {
    logAxiosErrorAndThrow,
@@ -10,10 +10,15 @@ import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
    atsRequestValidation,
    atsRequestValidationWithAccountToken,
+   createJobApplication,
 } from "./lib/ats"
-import { MergeATSRepository } from "./lib/merge/MergeATSRepository"
+import { MergeATSRepository, TEST_CV } from "./lib/merge/MergeATSRepository"
 import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
-import { MergeMetaEntities } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import {
+   MergeExtraRequiredData,
+   MergeMetaEntities,
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
 
 /*
 |--------------------------------------------------------------------------
@@ -177,6 +182,62 @@ export const fetchATSJobs = functions
                pageSize: requestData?.pageSize + "",
             })
             .then(serializePaginatedModels)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the account jobs",
+            e,
+            requestData
+         )
+      }
+   })
+
+export const candidateApplicationTest = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken<{
+         mergeExtraRequiredData: MergeExtraRequiredData
+         jobId: string
+      }>({
+         data,
+         context,
+         requiredData: {
+            jobId: string().required(),
+            mergeExtraRequiredData: object().required(),
+         },
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         const [atsAccount, job] = await Promise.all([
+            groupRepo.getATSIntegration(
+               requestData.groupId,
+               requestData.integrationId
+            ),
+            atsRepository.getJob(requestData.jobId),
+         ])
+
+         // Dummy candidate that we'll create
+         const userData = {
+            firstName: "Max",
+            lastName: "CareerFairy",
+            userResume: TEST_CV,
+         } as UserData
+
+         let relations: UserATSRelations = {}
+
+         relations = await createJobApplication(
+            job,
+            userData,
+            atsRepository,
+            atsAccount,
+            relations
+         )
+
+         return relations.jobApplications[job.id]
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to fetch the account jobs",
