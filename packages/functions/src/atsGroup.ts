@@ -13,6 +13,7 @@ import {
 } from "./lib/ats"
 import { MergeATSRepository } from "./lib/merge/MergeATSRepository"
 import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { MergeMetaEntities } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 
 /*
 |--------------------------------------------------------------------------
@@ -106,6 +107,36 @@ export const mergeGetAccountToken = functions
       } catch (e) {
          return logAxiosErrorAndThrow(
             "Failed to exchange the public token with the account token",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
+ * Fetch the Meta information for a certain entity
+ * This is used to show the form fields for the ATS integration
+ */
+export const mergeMetaEndpoint = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidation<{
+         entity: MergeMetaEntities
+      }>({
+         data,
+         context,
+         requiredData: {
+            entity: string().required(),
+         },
+      })
+
+      try {
+         const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
+
+         return await mergeATS.getMetaCreation(requestData.entity)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the meta information for the entity",
             e,
             requestData
          )
