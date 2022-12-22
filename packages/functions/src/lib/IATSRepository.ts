@@ -14,15 +14,15 @@ import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean
    jobAssociation?: Job
-   remoteUserId?: string
+   extraRequiredData?: ExtraRequiredData
 }
 
 export type AttachmentCreationOptions = {
-   remoteUserId?: string
+   extraRequiredData?: ExtraRequiredData
 }
 
 export type ApplicationCreationOptions = {
-   remoteUserId?: string
+   extraRequiredData?: ExtraRequiredData
 }
 
 export interface RecruitersFilterOptions extends ATSPaginationOptions {
