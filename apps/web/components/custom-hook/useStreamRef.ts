@@ -9,7 +9,7 @@ import { useRouter } from "next/router"
 const useStreamRef = () => {
    const router = useRouter()
    const { getStreamRef } = useFirebaseService()
-   return useMemo(() => getStreamRef(router), [router])
+   return useMemo(() => getStreamRef(router), [getStreamRef, router])
 }
 
 export default useStreamRef

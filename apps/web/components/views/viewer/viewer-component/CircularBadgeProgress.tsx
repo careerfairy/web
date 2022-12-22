@@ -25,6 +25,12 @@ import { useTimeoutFn } from "react-use"
 
 const styles = sxStyles({
    root: {
+      width: {
+         xs: 100,
+         sm: 120,
+      },
+   },
+   progress: {
       position: "relative",
       display: "inline-flex",
       textDecoration: "none",
@@ -112,14 +118,18 @@ const CircularBadgeProgress = ({
 
    useTimeoutFn(updateProgress, delay) // call updateProgress after delay on mount
 
-   const animatedProgressValue = useAnimatedNumber(progressValue, 500)
+   const animatedProgressValue = useAnimatedNumber(progressValue, 100)
 
    const size = isMobile ? 64 : 90
-   const thickness = isMobile ? 4 : 5
+   const thickness = 4
 
    return (
-      <Stack justifyContent={"center"} alignItems={"center"}>
-         <Box component={Link} href={"/profile/career-skills"} sx={styles.root}>
+      <Stack sx={styles.root} justifyContent={"center"} alignItems={"center"}>
+         <Box
+            component={Link}
+            href={"/profile/career-skills"}
+            sx={styles.progress}
+         >
             <CircularProgress
                variant="determinate"
                sx={styles.backgroundCircle}

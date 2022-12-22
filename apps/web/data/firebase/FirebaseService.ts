@@ -374,7 +374,7 @@ class FirebaseService {
 
    // *** Firestore API ***
 
-   getStreamRef = (router) => {
+   getStreamRef = (router): DocumentReference<LivestreamEvent> => {
       const {
          query: { breakoutRoomId, livestreamId },
       } = router

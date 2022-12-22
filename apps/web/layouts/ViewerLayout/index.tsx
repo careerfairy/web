@@ -200,7 +200,6 @@ const ViewerLayout = (props) => {
             (livestreamId && hasAnsweredLivestreamGroupQuestions) ||
             breakoutRoomId
          ) {
-            console.log("-> SETTING PARTICIPATION")
             void firebase.setUserIsParticipatingWithRef(
                streamRef,
                userData,
