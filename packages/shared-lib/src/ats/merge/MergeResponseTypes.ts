@@ -1,6 +1,14 @@
 export type MergeMetaEntities = "candidates" | "applications" | "attachments"
 
 /**
+ * Some integrations require extra data to be sent to the ATS
+ */
+export type MergeExtraRequiredData = {
+   // greenhouse
+   remote_user_id?: string
+}
+
+/**
  * Integrations that we know and have a custom behaviour
  */
 export type MergeATSAccountSlug = "teamtailor" | "greenhouse" | "workable"
