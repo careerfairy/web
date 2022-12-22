@@ -29,6 +29,7 @@ import {
    ApplicationCreationOptions,
    AttachmentCreationOptions,
    CandidateCreationOptions,
+   ExtraRequiredData,
    IATSRepository,
    RecruitersFilterOptions,
 } from "../IATSRepository"
@@ -66,10 +67,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-     |--------------------------------------------------------------------------
-     | Jobs
-     |--------------------------------------------------------------------------
-     */
+      |--------------------------------------------------------------------------
+      | Jobs
+      |--------------------------------------------------------------------------
+      */
    async getJobs(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Job>> {
@@ -111,10 +112,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-     |--------------------------------------------------------------------------
-     | Offices
-     |--------------------------------------------------------------------------
-     */
+      |--------------------------------------------------------------------------
+      | Offices
+      |--------------------------------------------------------------------------
+      */
    async getOffices(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Office>> {
@@ -131,10 +132,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-     |--------------------------------------------------------------------------
-     | Candidates
-     |--------------------------------------------------------------------------
-     */
+      |--------------------------------------------------------------------------
+      | Candidates
+      |--------------------------------------------------------------------------
+      */
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
          .get<MergeCandidate>(
@@ -168,7 +169,7 @@ export class MergeATSRepository implements IATSRepository {
          ]
       }
 
-      const body = createMergeModelBody(model, options.remoteUserId)
+      const body = createMergeModelBody(model, options?.extraRequiredData)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeCandidate>
       >("/candidates", body)
@@ -187,7 +188,7 @@ export class MergeATSRepository implements IATSRepository {
          id: candidateId,
       }
 
-      const body = createMergeModelBody(model, options.remoteUserId)
+      const body = createMergeModelBody(model, options?.extraRequiredData)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeAttachment>
       >("/attachments", body)
@@ -196,10 +197,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-     |--------------------------------------------------------------------------
-     | Applications
-     |--------------------------------------------------------------------------
-     */
+      |--------------------------------------------------------------------------
+      | Applications
+      |--------------------------------------------------------------------------
+      */
    async getApplications(
       options?: ATSApplicationOptions
    ): Promise<ATSPaginatedResults<Application>> {
@@ -228,7 +229,7 @@ export class MergeATSRepository implements IATSRepository {
          source: SOURCE,
       }
 
-      const body = createMergeModelBody(model, options.remoteUserId)
+      const body = createMergeModelBody(model, options?.extraRequiredData)
       const { data } = await this.axios.post<
          MergeModelResponseWrapper<MergeApplicationModel>
       >("/applications", body)
@@ -247,10 +248,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-     |--------------------------------------------------------------------------
-     | Sync Status & Others
-     |--------------------------------------------------------------------------
-     */
+      |--------------------------------------------------------------------------
+      | Sync Status & Others
+      |--------------------------------------------------------------------------
+      */
    async getSyncStatus(): Promise<SyncStatus[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeSyncStatus>
@@ -525,17 +526,17 @@ const emptyResponseWhenNotFound = (e: AxiosError) => {
 
 /**
  * Creates a Merge POST body object
- * It will include the remote_user_id if existent
+ * It will include the extra required fields (e.g. remote_user_id) if existent
  * @param data
- * @param remoteUserId
+ * @param extraRequiredFields
  */
-function createMergeModelBody(data: any, remoteUserId) {
+function createMergeModelBody(
+   data: any,
+   extraRequiredFields?: ExtraRequiredData
+) {
    const body: any = {
       model: data,
-   }
-
-   if (remoteUserId) {
-      body.remote_user_id = remoteUserId
+      ...extraRequiredFields,
    }
 
    return body
