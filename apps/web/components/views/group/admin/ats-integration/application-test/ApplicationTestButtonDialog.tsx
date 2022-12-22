@@ -41,13 +41,16 @@ const DialogBody = ({ groupId, integrationId }: Props) => {
    return (
       <Box>
          <Typography>
-            To be sure everything is working fine with your integration, we{"'"}
-            ll try to a apply a Candidate to a Job. You should delete the dummy
-            Candidate created in your ATS system after this test is complete.
+            To finalise the ATS integration, you need to create a sample
+            application from the CareerFairy platform in your ATS system. Click
+            on {'"Next"'} to start the guided test application.
+            <br />
+            At the end of this process, you can delete the sample Candidate
+            created in your ATS system.
             <p>
                <strong>
-                  This is required so that you can associate Jobs with Live
-                  Streams.
+                  This validation is required to be able to associate Jobs to
+                  your Live Streams.
                </strong>
             </p>
          </Typography>
