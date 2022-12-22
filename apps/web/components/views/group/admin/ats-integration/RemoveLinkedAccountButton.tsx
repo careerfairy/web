@@ -1,16 +1,13 @@
 import { Button } from "@mui/material"
 import { useCallback, useState } from "react"
 import AreYouSureModal from "../../../../../materialUI/GlobalModals/AreYouSureModal"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { useMountedState } from "react-use"
+import { useATSAccount } from "./ATSAccountContextProvider"
 
-type Props = {
-   atsAccount: GroupATSAccount
-}
-
-const RemoveLinkedAccountButton = ({ atsAccount }: Props) => {
+const RemoveLinkedAccountButton = () => {
+   const { atsAccount } = useATSAccount()
    const [isOpen, setOpen] = useState(false)
    const [isLoading, setIsLoading] = useState(false)
    const isMounted = useMountedState()

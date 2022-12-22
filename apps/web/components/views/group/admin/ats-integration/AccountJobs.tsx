@@ -7,17 +7,13 @@ import MaterialTable, {
    QueryResult,
 } from "@material-table/core"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import Box from "@mui/material/Box"
 import SanitizedHTML from "../../../../util/SanitizedHTML"
 import { Typography } from "@mui/material"
 import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
 import { sxStyles } from "../../../../../types/commonTypes"
-
-type Props = {
-   atsAccount: GroupATSAccount
-}
+import { useATSAccount } from "./ATSAccountContextProvider"
 
 const perPage = 7
 
@@ -43,7 +39,9 @@ const styles = sxStyles({
    },
 })
 
-const AccountJobs = ({ atsAccount }: Props) => {
+const AccountJobs = () => {
+   const { atsAccount } = useATSAccount()
+
    // keep track of previous page
    let pageHistory = useRef<PageData[]>([
       {
