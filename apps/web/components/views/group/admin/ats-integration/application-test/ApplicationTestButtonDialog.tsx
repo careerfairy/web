@@ -1,8 +1,11 @@
-import { Box, Button, Typography } from "@mui/material"
+import { Button, Typography } from "@mui/material"
 import GenericDialog from "components/views/common/GenericDialog"
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 import { useToggle } from "react-use"
 import Pulse from "@stahl.luke/react-reveal/Pulse"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
+import { ApplicationTest } from "./ApplicationTest"
+import CircularLoader from "../../../../loader/CircularLoader"
 
 const ApplicationTestButtonDialog = () => {
    const [isOpen, toggleOpen] = useToggle(false)
@@ -22,6 +25,7 @@ const ApplicationTestButtonDialog = () => {
          </Pulse>
          {isOpen && (
             <GenericDialog
+               showCloseBtn={false}
                title={"Test Candidate Application"}
                onClose={toggleOpen}
             >
@@ -34,22 +38,26 @@ const ApplicationTestButtonDialog = () => {
 
 const DialogBody = () => {
    return (
-      <Box>
-         <Typography>
+      <>
+         <Typography mb={2}>
             To finalise the ATS integration, you need to create a sample
-            application from the CareerFairy platform in your ATS system. Click
-            on {'"Next"'} to start the guided test application.
+            application from the CareerFairy platform in your ATS system.
             <br />
             At the end of this process, you can delete the sample Candidate
             created in your ATS system.
-            <p>
-               <strong>
-                  This validation is required to be able to associate Jobs to
-                  your Live Streams.
-               </strong>
-            </p>
          </Typography>
-      </Box>
+
+         <Typography mb={3}>
+            <strong>
+               This validation is required to be able to associate Jobs to your
+               Live Streams.
+            </strong>
+         </Typography>
+
+         <SuspenseWithBoundary fallback={<CircularLoader />}>
+            <ApplicationTest />
+         </SuspenseWithBoundary>
+      </>
    )
 }
 
