@@ -3,6 +3,9 @@ import GenericDialog from "components/views/common/GenericDialog"
 import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 import { useToggle } from "react-use"
 import Pulse from "@stahl.luke/react-reveal/Pulse"
+import { SuspenseWithBoundary } from "components/ErrorBoundary"
+import { ApplicationTest } from "./ApplicationTest"
+import CircularLoader from "components/views/loader/CircularLoader"
 
 const ApplicationTestButtonDialog = () => {
    const [isOpen, toggleOpen] = useToggle(false)
@@ -50,6 +53,10 @@ const DialogBody = () => {
                Live Streams.
             </strong>
          </Typography>
+
+         <SuspenseWithBoundary fallback={<CircularLoader />}>
+            <ApplicationTest />
+         </SuspenseWithBoundary>
       </>
    )
 }
