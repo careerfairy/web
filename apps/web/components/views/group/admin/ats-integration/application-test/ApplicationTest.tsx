@@ -39,7 +39,7 @@ export const stateMachine = createSlice({
       selectJob: (state, action: PayloadAction<Job>) => {
          state.job = action.payload
 
-         state.readyToTest = state.dataIsComplete && state.job !== null
+         updateStateIfDataComplete(state)
       },
       setData: (
          state,
@@ -47,11 +47,7 @@ export const stateMachine = createSlice({
       ) => {
          state.data = { ...state.data, ...action.payload }
 
-         state.dataIsComplete =
-            Object.keys(state.data).length === state.requiredFields.length &&
-            allValuesTruthy(state.data)
-
-         state.readyToTest = state.dataIsComplete && state.job !== null
+         updateStateIfDataComplete(state)
       },
       submit: (state) => {
          state.testedSuccessfully = null // loading state
@@ -204,4 +200,11 @@ function filterMapWithKeys(map: object, keys: string[]) {
 
       return acc
    }, {})
+}
+
+function updateStateIfDataComplete(state: State) {
+   state.dataIsComplete =
+      Object.keys(state.data).length === state.requiredFields.length &&
+      allValuesTruthy(state.data)
+   state.readyToTest = state.dataIsComplete && Boolean(state.job)
 }
