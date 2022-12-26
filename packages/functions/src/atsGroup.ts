@@ -13,12 +13,19 @@ import {
    createJobApplication,
 } from "./lib/ats"
 import { MergeATSRepository, TEST_CV } from "./lib/merge/MergeATSRepository"
-import { ATSDataPaginationOptions } from "@careerfairy/shared-lib/dist/ats/Functions"
+import {
+   ATSDataPaginationOptions,
+   ATSPaginatedResults,
+   RecruitersFunctionCallOptions,
+} from "@careerfairy/shared-lib/dist/ats/Functions"
 import {
    MergeExtraRequiredData,
    MergeMetaEntities,
 } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
+import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import * as process from "process"
 
 /*
 |--------------------------------------------------------------------------
@@ -125,7 +132,7 @@ export const mergeGetAccountToken = functions
 export const mergeMetaEndpoint = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const requestData = await atsRequestValidation<{
+      const requestData = await atsRequestValidationWithAccountToken<{
          entity: MergeMetaEntities
       }>({
          data,
@@ -136,7 +143,10 @@ export const mergeMetaEndpoint = functions
       })
 
       try {
-         const mergeATS = new MergeATSRepository(process.env.MERGE_ACCESS_KEY)
+         const mergeATS = new MergeATSRepository(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
 
          return await mergeATS.getMetaCreation(requestData.entity)
       } catch (e) {
@@ -173,7 +183,11 @@ export const fetchATSJobs = functions
          )
 
          if (requestData.allJobs) {
-            return await atsRepository.getAllJobs().then(serializeModels)
+            return {
+               next: null,
+               previous: null,
+               results: await atsRepository.getAllJobs().then(serializeModels),
+            } as ATSPaginatedResults<Job>
          }
 
          return await atsRepository
@@ -220,11 +234,15 @@ export const candidateApplicationTest = functions
             atsRepository.getJob(requestData.jobId),
          ])
 
+         // @ts-ignore Set the extra data received
+         atsAccount.extraRequiredData = requestData.mergeExtraRequiredData
+
          // Dummy candidate that we'll create
          const userData = {
-            firstName: "Max",
+            firstName: "User",
             lastName: "CareerFairy",
             userResume: TEST_CV,
+            userEmail: "application-test@careerfairy.io",
          } as UserData
 
          let relations: UserATSRelations = {}
@@ -240,7 +258,7 @@ export const candidateApplicationTest = functions
          return relations.jobApplications[job.id]
       } catch (e) {
          return logAxiosErrorAndThrow(
-            "Failed to fetch the account jobs",
+            "Failed to create the test application",
             e,
             requestData
          )
@@ -253,18 +271,19 @@ export const candidateApplicationTest = functions
 export const fetchATSRecruiters = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const requestData = await atsRequestValidationWithAccountToken<
-         ATSDataPaginationOptions & { all?: boolean; email?: string }
-      >({
-         data,
-         context,
-         requiredData: {
-            cursor: string().optional().nullable(),
-            pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
-            all: boolean().optional().nullable(),
-            email: string().optional().nullable(),
-         },
-      })
+      const requestData =
+         await atsRequestValidationWithAccountToken<RecruitersFunctionCallOptions>(
+            {
+               data,
+               context,
+               requiredData: {
+                  cursor: string().optional().nullable(),
+                  pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
+                  all: boolean().optional().nullable(),
+                  email: string().optional().nullable(),
+               },
+            }
+         )
 
       try {
          const atsRepository = atsRepo(
@@ -273,7 +292,13 @@ export const fetchATSRecruiters = functions
          )
 
          if (requestData.all) {
-            return await atsRepository.getAllRecruiters().then(serializeModels)
+            return {
+               next: null,
+               previous: null,
+               results: await atsRepository
+                  .getAllRecruiters()
+                  .then(serializeModels),
+            } as ATSPaginatedResults<Recruiter>
          }
 
          return await atsRepository
