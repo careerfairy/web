@@ -31,9 +31,12 @@ import {
    AttachmentCreationOptions,
    CandidateCreationOptions,
    IATSRepository,
-   RecruitersFilterOptions,
 } from "../IATSRepository"
-import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
+import {
+   ATSPaginatedResults,
+   ATSPaginationOptions,
+   RecruitersFilterOptions,
+} from "@careerfairy/shared-lib/dist/ats/Functions"
 import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 const MERGE_DEFAULT_PAGE_SIZE = "100"
@@ -444,10 +447,6 @@ export class MergeATSRepository implements IATSRepository {
 | Utility interfaces
 |--------------------------------------------------------------------------
 */
-export interface ATSPaginationOptions {
-   cursor?: string
-   pageSize?: string
-}
 
 export interface ATSApplicationOptions extends ATSPaginationOptions {
    /**
