@@ -16,6 +16,10 @@ export class Recruiter extends ATSModel {
    }
 
    public getName() {
+      if (!this.firstName && !this.lastName) {
+         return this.email
+      }
+
       return `${this.firstName} ${this.lastName}`
    }
 
