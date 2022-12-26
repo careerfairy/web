@@ -27,10 +27,6 @@ class GreenhouseIntegration extends DefaultIntegration {
    candidateCVAsANestedWrite = true
 }
 
-class TeamtailorIntegration extends DefaultIntegration {
-   candidateCVAsANestedWrite = true
-}
-
 /**
  * All integration specifics
  *
@@ -38,7 +34,6 @@ class TeamtailorIntegration extends DefaultIntegration {
  */
 const map: Record<string, IntegrationSpecifics> = {
    greenhouse: new GreenhouseIntegration(),
-   teamtailor: new TeamtailorIntegration(),
    default: new DefaultIntegration(),
 }
 
