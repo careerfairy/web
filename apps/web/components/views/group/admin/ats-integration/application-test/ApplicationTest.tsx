@@ -14,6 +14,7 @@ import Typography from "@mui/material/Typography"
 import { atsServiceInstance } from "../../../../../../data/firebase/ATSService"
 import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
+import { getIntegrationSpecifics } from "@careerfairy/shared-lib/dist/ats/IntegrationSpecifics"
 
 type State = {
    job: Job | null // selected job
@@ -67,10 +68,13 @@ const { selectJob, setData, submit, successResult, errorResult } =
 
 export const ApplicationTest = () => {
    const { atsAccount } = useATSAccount()
+   const specifics = getIntegrationSpecifics(atsAccount)
    const meta = useMergeMetaEndpoint(
       atsAccount.groupId,
       atsAccount.id,
-      "applications"
+      // when doing a nested write, we check the requirements for the applications model
+      // otherwise, we check the requirements for the candidates
+      specifics.candidateCVAsANestedWrite ? "applications" : "candidates"
    )
 
    const { successNotification } = useSnackbarNotifications()
