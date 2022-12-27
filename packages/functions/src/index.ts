@@ -153,6 +153,7 @@ exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
 exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
 exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
 exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
+exports.fetchATSRecruiters = atsGroup.fetchATSRecruiters
 exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
 
 // User

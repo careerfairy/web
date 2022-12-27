@@ -8,7 +8,8 @@ export class GroupATSAccount {
       public readonly image?: string,
       public readonly slug?: string,
       public readonly lastFetchedAt?: Date,
-      public readonly firstSyncCompletedAt?: Date
+      public readonly firstSyncCompletedAt?: Date,
+      public readonly applicationTestCompletedAt?: Date
    ) {}
 
    static createFromDocument(account: GroupATSAccountDocument) {
@@ -19,11 +20,23 @@ export class GroupATSAccount {
          account.merge.image,
          account.merge.slug,
          account.merge.lastFetchedAt?.toDate(),
-         account.merge.firstSyncCompletedAt?.toDate()
+         account.merge.firstSyncCompletedAt?.toDate(),
+         account.merge.applicationTestCompletedAt?.toDate()
       )
    }
 
    isFirstSyncComplete() {
       return Boolean(this.firstSyncCompletedAt)
+   }
+
+   isApplicationTestComplete() {
+      return Boolean(this.applicationTestCompletedAt)
+   }
+
+   /**
+    * Check if this account is ready to be associated with a livestream
+    */
+   isReady() {
+      return this.isFirstSyncComplete() && this.isApplicationTestComplete()
    }
 }

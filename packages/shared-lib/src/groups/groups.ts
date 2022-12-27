@@ -108,6 +108,9 @@ export interface GroupATSAccountDocument extends Identifiable {
       slug?: string
       // used to confirm if the first sync is complete for the integration
       firstSyncCompletedAt?: firebase.firestore.Timestamp
+      // confirm the application test was completed
+      // required to be able to associate jobs with livestreams
+      applicationTestCompletedAt?: firebase.firestore.Timestamp
       lastFetchedAt?: firebase.firestore.Timestamp
    }
    createdAt: firebase.firestore.Timestamp

@@ -50,7 +50,8 @@ export interface MergeRemoteUser {
 
 export type MergeUserRole =
    | "SUPER_ADMIN"
-   | "ADMIN TEAM_MEMBER"
+   | "ADMIN"
+   | "TEAM_MEMBER"
    | "LIMITED_TEAM_MEMBER"
    | "INTERVIEWER"
 
