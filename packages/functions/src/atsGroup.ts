@@ -156,6 +156,51 @@ export const fetchATSJobs = functions
    })
 
 /**
+ * Fetch Recruiters
+ */
+export const fetchATSRecruiters = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken<
+         ATSDataPaginationOptions & { all?: boolean; email?: string }
+      >({
+         data,
+         context,
+         requiredData: {
+            cursor: string().optional().nullable(),
+            pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
+            all: boolean().optional().nullable(),
+            email: string().optional().nullable(),
+         },
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         if (requestData.all) {
+            return await atsRepository.getAllRecruiters().then(serializeModels)
+         }
+
+         return await atsRepository
+            .getRecruiters({
+               cursor: requestData?.cursor,
+               pageSize: requestData?.pageSize + "",
+               email: requestData?.email,
+            })
+            .then(serializePaginatedModels)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the recruiters",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
  * Sync Status for the multiple entities
  */
 export const fetchATSSyncStatus = functions

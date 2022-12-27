@@ -13,6 +13,7 @@ import {
    MergeModelResponseWrapper,
    MergeOffice,
    MergePaginatedResponse,
+   MergeRemoteUser,
    MergeSyncStatus,
 } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
@@ -27,8 +28,10 @@ import {
    AttachmentCreationOptions,
    CandidateCreationOptions,
    IATSRepository,
+   RecruitersFilterOptions,
 } from "../IATSRepository"
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 const MERGE_DEFAULT_PAGE_SIZE = "100"
 const SOURCE = "CareerFairy"
@@ -61,10 +64,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-|--------------------------------------------------------------------------
-| Jobs
-|--------------------------------------------------------------------------
-*/
+   |--------------------------------------------------------------------------
+   | Jobs
+   |--------------------------------------------------------------------------
+   */
    async getJobs(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Job>> {
@@ -91,24 +94,9 @@ export class MergeATSRepository implements IATSRepository {
     * Goes through all pages sequentially
     */
    async getAllJobs(): Promise<Job[]> {
-      let jobs: Job[] = []
-      let cursor: string = null
-      let counter = 0
-
-      do {
-         try {
-            console.log(`Fetching page ${++counter}`)
-            const pageResults = await this.getJobs({ cursor })
-
-            jobs = jobs.concat(pageResults.results)
-            cursor = pageResults.next
-         } catch (e) {
-            console.error(e)
-            cursor = null // we don't have a next page to fetch
-         }
-      } while (cursor !== null)
-
-      console.log(`Total jobs: ${jobs.length}`)
+      const jobs = await this.getAllPages<Job>((cursor) =>
+         this.getJobs({ cursor })
+      )
 
       return jobs.sort(sortJobsDesc)
    }
@@ -121,10 +109,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-|--------------------------------------------------------------------------
-| Offices
-|--------------------------------------------------------------------------
-*/
+   |--------------------------------------------------------------------------
+   | Offices
+   |--------------------------------------------------------------------------
+   */
    async getOffices(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Office>> {
@@ -141,10 +129,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-|--------------------------------------------------------------------------
-| Candidates
-|--------------------------------------------------------------------------
-*/
+   |--------------------------------------------------------------------------
+   | Candidates
+   |--------------------------------------------------------------------------
+   */
    async getCandidate(id: string): Promise<Candidate> {
       const { data } = await this.axios
          .get<MergeCandidate>(
@@ -206,10 +194,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-|--------------------------------------------------------------------------
-| Applications
-|--------------------------------------------------------------------------
-*/
+   |--------------------------------------------------------------------------
+   | Applications
+   |--------------------------------------------------------------------------
+   */
    async getApplications(
       options?: ATSApplicationOptions
    ): Promise<ATSPaginatedResults<Application>> {
@@ -257,10 +245,10 @@ export class MergeATSRepository implements IATSRepository {
    }
 
    /*
-|--------------------------------------------------------------------------
-| Sync Status & Others
-|--------------------------------------------------------------------------
-*/
+   |--------------------------------------------------------------------------
+   | Sync Status & Others
+   |--------------------------------------------------------------------------
+   */
    async getSyncStatus(): Promise<SyncStatus[]> {
       const { data } = await this.axios.get<
          MergePaginatedResponse<MergeSyncStatus>
@@ -360,6 +348,72 @@ export class MergeATSRepository implements IATSRepository {
       }
 
       return path
+   }
+
+   /**
+    * Fetches all Recruiters
+    *
+    * Goes through all pages sequentially
+    */
+   async getAllRecruiters(): Promise<Recruiter[]> {
+      const users = await this.getAllPages<Recruiter>((cursor) =>
+         this.getRecruiters({ cursor })
+      )
+
+      // sort in place by Admins desc
+      users.sort((a, b) => {
+         if (b?.role?.includes("ADMIN")) {
+            return 1
+         }
+
+         return 0
+      })
+
+      return users
+   }
+
+   async getRecruiters(
+      options?: RecruitersFilterOptions
+   ): Promise<ATSPaginatedResults<Recruiter>> {
+      const path = this.buildPath("/users", {
+         email: options?.email, // filter by email if provided
+         cursor: options?.cursor,
+         page_size: options?.pageSize ?? MERGE_DEFAULT_PAGE_SIZE,
+      })
+
+      const { data } = await this.axios.get<
+         MergePaginatedResponse<MergeRemoteUser>
+      >(path)
+
+      return this.mapPaginatedResults<Recruiter>(
+         data,
+         Recruiter.createFromMerge
+      )
+   }
+
+   private async getAllPages<T>(
+      pageFetcher: (cursor: string) => Promise<ATSPaginatedResults<T>>
+   ) {
+      let data: T[] = []
+      let cursor: string = null
+      let counter = 0
+
+      do {
+         try {
+            console.log(`Fetching page ${++counter}`)
+            const pageResults = await pageFetcher(cursor)
+
+            data = data.concat(pageResults.results)
+            cursor = pageResults.next
+         } catch (e) {
+            console.error(e)
+            cursor = null // we don't have a next page to fetch
+         }
+      } while (cursor !== null)
+
+      console.log(`Total entries: ${data.length}`)
+
+      return data
    }
 }
 
