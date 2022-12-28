@@ -7,35 +7,147 @@ const { withSentryConfig } = require("@sentry/nextjs")
 const notProduction = process.env.NODE_ENV !== "production"
 const isVercelPreview = process.env.VERCEL_ENV === "preview"
 
+const csp = {
+   "default-src": [
+      "'self'",
+      "*.calendly.com",
+      "*.cookiebot.com",
+      "*.crisp.chat",
+      "*.crisp.help",
+      "*.facebook.com",
+      "*.g.doubleclick.net",
+      "*.google-analytics.com",
+      "*.googleapis.com",
+      "*.graphassets.com",
+      "*.graphcms.com",
+      "*.gstatic.com",
+      "*.hotjar.com",
+      "*.js.hs-scripts",
+      "*.kozco.com",
+      "*.merge.dev",
+      "*.tiktok.com",
+      "*.vitals.vercel-insights.com",
+      "*.youtube.com",
+      "blob:",
+      "careerfairy-e1fd9.firebaseapp.com",
+   ],
+   "script-src": [
+      "'self'",
+      "'unsafe-eval'",
+      "'unsafe-inline'",
+      "*.cookiebot.com",
+      "*.facebook.net",
+      "*.google-analytics.com",
+      "*.googleapis.com",
+      "*.googletagmanager.com",
+      "*.hotjar.com",
+      "*.merge.dev",
+      "*.tiktok.com",
+      "*.vitals.vercel-insights.com",
+      "*.youtube.com",
+      "apis.google.com",
+      "blob:",
+      "cdnjs.cloudflare.com",
+      "client.crisp.chat",
+      "https://optimize.google.com",
+      "https://www.google-analytics.com",
+      "https://www.googleanalytics.com",
+      "https://www.googleoptimize.com",
+      "js.hs-analytics.net",
+      "js.hs-banner.com",
+      "js.hs-scripts.com",
+      "js.hsadspixel.net",
+      "snap.licdn.com",
+   ],
+   "style-src": [
+      "'self'",
+      "https://optimize.google.com",
+      "https://fonts.googleapis.com",
+      "*.vitals.vercel-insights.com",
+      "*.googletagmanager.com",
+      "*.googleapis.com",
+      "'unsafe-inline'",
+      "client.crisp.chat",
+   ],
+   "connect-src": [
+      "'self'",
+      "*.agora.io:*",
+      "*.algolia.net",
+      "*.algolianet.com",
+      "*.analytics.google.com",
+      "*.careerfairy.io",
+      "*.cloudfunctions.net",
+      "*.cookiebot.com",
+      "*.facebook.com",
+      "*.g.doubleclick.net",
+      "*.google-analytics.com",
+      "*.googleapis.com",
+      "*.gstatic.com",
+      "*.hotjar.com",
+      "*.hotjar.io",
+      "*.hubapi.com",
+      "*.linkedin.oribi.io",
+      "*.sd-rtn.com:*",
+      "*.sentry.io",
+      "*.tiktok.com",
+      "data:",
+      "js.hs-banner.com",
+      "*.crisp.chat",
+      "vitals.vercel-insights.com",
+      "ws:",
+      "wss:",
+   ],
+   "img-src": [
+      "'self'",
+      "*.ads.linkedin.com",
+      "*.calendly.com",
+      "*.googleapis.com",
+      "blob:",
+      "data:",
+      "https:",
+   ],
+   "frame-src": [
+      "blob:",
+      "https://cdn.merge.dev",
+      "https://consentcdn.cookiebot.com",
+      "https://go.crisp.chat",
+      "https://optimize.google.com",
+      "https://vars.hotjar.com",
+      "https://www.facebook.com",
+      "https://www.youtube.com",
+   ],
+   "font-src": [
+      "'self'",
+      "https://fonts.gstatic.com",
+      "https://script.hotjar.com",
+   ],
+}
+
+if (notProduction) {
+   csp["default-src"].push("localhost:*")
+   csp["connect-src"].push("localhost:*")
+   csp["img-src"].push("localhost:*")
+}
+
+if (isVercelPreview) {
+   csp["default-src"].push("https://vercel.live", "https://assets.vercel.com")
+   csp["script-src"].push("https://vercel.live")
+   csp["connect-src"].push("https://vercel.live")
+   csp["frame-src"].push("https://vercel.live")
+}
+
 const securityHeaders = [
-   // {
-   //    key: "X-Frame-Options",
-   //    value: "SAMEORIGIN",
-   // },
+   {
+      // prevent careerfairy from being iframed
+      key: "X-Frame-Options",
+      value: "SAMEORIGIN",
+   },
    {
       key: "Content-Security-Policy",
       value:
-         `default-src blob: 'self' careerfairy-e1fd9.firebaseapp.com go.crisp.chat careerfairy-support.crisp.help streaming.crisp.help client.crisp.chat *.merge.dev *.graphassets.com *.graphcms.com *.js.hs-scripts *.hotjar.com *.vitals.vercel-insights.com *.googleapis.com calendly.com *.calendly.com *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.kozco.com *.facebook.com *.tiktok.com *.cookiebot.com *.youtube.com ${
-            notProduction ? "localhost:*" : ""
-         } ${
-            isVercelPreview
-               ? "https://vercel.live https://assets.vercel.com"
-               : ""
-         }; ` +
-         `script-src blob: 'self' https://optimize.google.com https://www.googleanalytics.com https://www.google-analytics.com https://www.googleoptimize.com *.merge.dev js.hs-banner.com js.hsadspixel.net js.hs-analytics.net js.hs-scripts.com *.hotjar.com *.vitals.vercel-insights.com snap.licdn.com *.googleapis.com *.googletagmanager.com *.cookiebot.com *.google-analytics.com *.facebook.net 'unsafe-inline' 'unsafe-eval' cdnjs.cloudflare.com *.tiktok.com *.youtube.com apis.google.com client.crisp.chat ${
-            isVercelPreview ? "https://vercel.live" : ""
-         };` +
-         "style-src 'self' https://optimize.google.com https://fonts.googleapis.com *.vitals.vercel-insights.com *.googletagmanager.com *.googleapis.com 'unsafe-inline' client.crisp.chat; " +
-         `connect-src data: *.analytics.google.com *.facebook.com *.linkedin.oribi.io *.algolia.net *.algolianet.com js.hs-banner.com *.hotjar.io *.hotjar.com vitals.vercel-insights.com *.careerfairy.io ws: wss: 'self' *.googleapis.com localhost:* *.gstatic.com *.google-analytics.com *.g.doubleclick.net *.cloudfunctions.net *.agora.io:* *.sd-rtn.com:* *.sentry.io *.tiktok.com *.cookiebot.com *.hubapi.com storage.crisp.chat client.crisp.chat ${
-            isVercelPreview ? "https://vercel.live" : ""
-         };` +
-         `img-src https: blob: data: 'self' *.googleapis.com *.calendly.com *.ads.linkedin.com ${
-            notProduction ? "localhost:*" : ""
-         };` +
-         `frame-src blob: https://www.youtube.com https://cdn.merge.dev https://go.crisp.chat https://optimize.google.com https://consentcdn.cookiebot.com https://vars.hotjar.com https://www.facebook.com ${
-            isVercelPreview ? "https://vercel.live" : ""
-         };` +
-         `font-src 'self' https://script.hotjar.com https://fonts.gstatic.com;`,
+         Object.entries(csp)
+            .map(([key, value]) => `${key} ${value.join(" ")}`)
+            .join("; ") + ";",
    },
    {
       key: "Referrer-Policy",
@@ -44,13 +156,6 @@ const securityHeaders = [
    {
       key: "X-Content-Type-Options",
       value: "nosniff",
-   },
-]
-
-const iFrameSecurityHeaders = [
-   {
-      key: "X-Frame-Options",
-      value: "",
    },
 ]
 
@@ -78,7 +183,13 @@ const moduleExports = {
          },
          {
             source: "/next-livestreams/:groupId/embed",
-            headers: iFrameSecurityHeaders,
+            // allow embedding iframes on this path
+            headers: [
+               {
+                  key: "X-Frame-Options",
+                  value: "",
+               },
+            ],
          },
       ]
    },
