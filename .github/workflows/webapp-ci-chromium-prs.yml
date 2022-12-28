@@ -82,6 +82,10 @@ jobs:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
 
+         # will build shared-lib & seed-data
+         - name: build Web App dependencies
+           run: npx turbo run build --filter=@careerfairy/webapp^...
+
          - name: Run Jest Unit Tests
            run: npm run test
 
@@ -125,6 +129,10 @@ jobs:
 
          - name: Install Playwright's dependencies
            run: npx playwright install --with-deps
+
+         # will build shared-lib & seed-data
+         - name: build Web App dependencies
+           run: npx turbo run build --filter=@careerfairy/webapp^...
 
          - name: Run Playwright End to End tests
            env:
