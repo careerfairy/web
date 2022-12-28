@@ -37,6 +37,7 @@ jobs:
       name: "Pre-install dependencies for tests"
       runs-on: ubuntu-latest
       timeout-minutes: 10
+      needs: [should_skip]
       # only run if there are changes on the webapp & shared lib
       if: |
          needs.should_skip.outputs.webapp == 'true' ||
