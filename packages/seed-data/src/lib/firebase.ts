@@ -10,6 +10,7 @@ export const projectId = "careerfairy-e1fd9"
  * Force the existence of the env variables even if they don't exist
  */
 process.env["FIREBASE_AUTH_EMULATOR_HOST"] = "localhost:9099"
+process.env["FIREBASE_STORAGE_EMULATOR_HOST"] = "localhost:9199"
 process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 
 const app: App = initializeApp({ projectId })

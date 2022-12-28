@@ -4,7 +4,6 @@
    "private": true,
    "scripts": {
       "dev": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next",
-      "start:emulators": "cross-env NODE_OPTIONS=--max_old_space_size=8192 NEXT_PUBLIC_FIREBASE_EMULATORS=true next start",
       "build": "next build --debug",
       "start": "next start",
       "lint": "next lint",
