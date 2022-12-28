@@ -92,9 +92,6 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
 
-         - name: Build
-           run: npm run build
-
          - name: Run Jest Unit Tests
            run: npm run test
 
@@ -142,23 +139,7 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
 
-         # Cache playwright deps install
-         # taken from https://github.com/microsoft/playwright/issues/7249
-         - name: Get installed Playwright version
-           id: playwright-version
-           run: echo -n "::set-output name=version::$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@careerfairy/webapp"].dependencies["@playwright/test"].version')"
-
-         - uses: actions/cache@v3
-           id: playwright-cache
-           with:
-              path: "~/.cache/ms-playwright"
-              key: "${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}"
-              restore-keys: |
-                 ${{ runner.os }}-playwright-
-
-         - name:
-              Install Playwright's dependencies
-              #           if: steps.playwright-cache.outputs.cache-hit != 'true'
+         - name: Install Playwright's dependencies
            run: npx playwright install --with-deps
 
          - name: Run Playwright End to End tests
