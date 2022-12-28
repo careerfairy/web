@@ -34,14 +34,14 @@ jobs:
                    - 'packages/shared-lib/**'
 
    install_deps:
-      name: "Pre-build cache for tests"
+      name: "Pre-install dependencies for tests"
       runs-on: ubuntu-latest
       timeout-minutes: 10
       # only run if there are changes on the webapp & shared lib
       if: |
-         needs.build_app_for_tests.outputs.webapp == 'true' ||
-         needs.build_app_for_tests.outputs.shared-lib == 'true' ||
-         needs.build_app_for_tests.outputs.workflow == 'true'
+         needs.should_skip.outputs.webapp == 'true' ||
+         needs.should_skip.outputs.shared-lib == 'true' ||
+         needs.should_skip.outputs.workflow == 'true'
       steps:
          - uses: actions/checkout@v3
          - uses: actions/setup-node@v3
