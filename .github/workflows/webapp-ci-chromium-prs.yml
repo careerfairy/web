@@ -2,6 +2,7 @@ name: "Build, Test and Deploy - Pull Requests"
 on:
    # Triggers on all pull requests, limited pipeline that runs faster
    pull_request:
+      types: [opened, synchronize, reopened]
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
@@ -173,6 +174,7 @@ jobs:
               VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
               VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
+              PR_LABELS: false
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
