@@ -170,11 +170,15 @@ const PollCategory = ({ livestream, setSelectedState }) => {
                setHasVoted(querySnapshot.exists)
             }
          )
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            // switch the left menu to the questions after a poll is done
+            setSelectedState("questions")
+         }
       } else {
          setHasVoted(false)
       }
-   }, [currentPoll?.id, authEmail])
+   }, [currentPoll?.id, authEmail, setSelectedState])
 
    useEffect(() => {
       if (!Boolean(currentPoll && authEmail)) {
