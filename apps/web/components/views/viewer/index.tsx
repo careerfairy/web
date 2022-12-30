@@ -89,6 +89,8 @@ const ViewerOverview = ({
       dispatch(actions.unmuteMutedRemoteVideosAfterFail())
    }, [dispatch])
 
+   const enableEmotions = isRecordingWindow || !focusModeEnabled
+
    return (
       <Fragment>
          <div className={classes.blackFrame}>
@@ -117,7 +119,7 @@ const ViewerOverview = ({
                />
             )}
          </div>
-         {!focusModeEnabled && (
+         {enableEmotions && (
             <IconsContainer className={classes.iconsContainer} />
          )}
          {currentLivestream && !currentLivestream.hasNoRatings && (
