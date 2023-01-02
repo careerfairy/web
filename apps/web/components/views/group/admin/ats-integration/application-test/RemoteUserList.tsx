@@ -7,7 +7,6 @@ import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 import TextField from "@mui/material/TextField"
 import Autocomplete from "@mui/material/Autocomplete"
 import Typography from "@mui/material/Typography"
-import { MergeMetaResponse } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { OnChangeHandler } from "./RequiredFields"
 
 const options: RecruitersFunctionCallOptions = {
@@ -15,7 +14,6 @@ const options: RecruitersFunctionCallOptions = {
 }
 
 type Props = {
-   meta: MergeMetaResponse
    onChange: OnChangeHandler<Recruiter["id"]>
    disabled?: boolean
 }
