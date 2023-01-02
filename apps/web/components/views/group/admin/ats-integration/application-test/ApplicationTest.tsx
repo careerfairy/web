@@ -1,5 +1,9 @@
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { MergeExtraRequiredData } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import {
+   MergeExtraRequiredData,
+   MergeMetaEntities,
+   MergeMetaResponse,
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { useATSAccount } from "../ATSAccountContextProvider"
 import useMergeMetaEndpoint from "../../../../../custom-hook/ats/useMergeMetaEndpoint"
 import { useCallback, useMemo, useReducer } from "react"
@@ -20,7 +24,7 @@ type State = {
    job: Job | null // selected job
    data: MergeExtraRequiredData
    dataIsComplete: boolean
-   requiredFields: string[]
+   requiredFieldsCount: number
    readyToTest: boolean
    testedSuccessfully: boolean
 }
@@ -29,7 +33,7 @@ const initialState = {
    job: null,
    data: {},
    dataIsComplete: false,
-   requiredFields: [],
+   requiredFieldsCount: 0,
    readyToTest: false,
    testedSuccessfully: undefined,
 } as State
@@ -69,19 +73,26 @@ const { selectJob, setData, submit, successResult, errorResult } =
 export const ApplicationTest = () => {
    const { atsAccount } = useATSAccount()
    const specifics = getIntegrationSpecifics(atsAccount)
-   const meta = useMergeMetaEndpoint(
+
+   const metasToFetch: MergeMetaEntities[] = useMemo(() => {
+      // when doing a nested write, we check the requirements for the applications model
+      // otherwise, we check the requirements for the candidates + attachments
+      return specifics.candidateCVAsANestedWrite
+         ? ["applications"]
+         : ["candidates", "attachments"]
+   }, [specifics.candidateCVAsANestedWrite])
+
+   const metas = useMergeMetaEndpoint(
       atsAccount.groupId,
       atsAccount.id,
-      // when doing a nested write, we check the requirements for the applications model
-      // otherwise, we check the requirements for the candidates
-      specifics.candidateCVAsANestedWrite ? "applications" : "candidates"
+      metasToFetch
    )
 
    const { successNotification } = useSnackbarNotifications()
 
    const requiredFields: string[] = useMemo(
-      () => meta?.request_schema?.required ?? [],
-      [meta?.request_schema?.required]
+      () => extractRequiredFieldsFromMetas(metas),
+      [metas]
    )
 
    // Map of components the user needs to act on
@@ -92,7 +103,7 @@ export const ApplicationTest = () => {
 
    const [state, dispatch] = useReducer(stateMachine.reducer, {
       ...initialState,
-      requiredFields,
+      requiredFieldsCount: Object.keys(components).length,
    })
 
    const onSubmit = useCallback(() => {
@@ -145,13 +156,9 @@ export const ApplicationTest = () => {
                   fallback={<CircularLoader />}
                   key={`suspense-${requiredField}`}
                >
-                  {component(
-                     meta,
-                     (value) => {
-                        dispatch(setData({ [requiredField]: value }))
-                     },
-                     isLoading
-                  )}
+                  {component((value) => {
+                     dispatch(setData({ [requiredField]: value }))
+                  }, isLoading)}
                </SuspenseWithBoundary>
             ))}
 
@@ -208,7 +215,19 @@ function filterMapWithKeys(map: object, keys: string[]) {
 
 function updateStateIfDataComplete(state: State) {
    state.dataIsComplete =
-      Object.keys(state.data).length === state.requiredFields.length &&
+      Object.keys(state.data).length === state.requiredFieldsCount &&
       allValuesTruthy(state.data)
    state.readyToTest = state.dataIsComplete && Boolean(state.job)
+}
+
+function extractRequiredFieldsFromMetas(metas: MergeMetaResponse[]) {
+   let requiredFields: Set<string> = new Set()
+
+   metas
+      .map((m) => m?.request_schema?.required)
+      .flat()
+      .filter((f) => f)
+      .forEach((f) => requiredFields.add(f))
+
+   return Array.from(requiredFields)
 }
