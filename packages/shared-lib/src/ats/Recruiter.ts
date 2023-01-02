@@ -20,7 +20,7 @@ export class Recruiter extends ATSModel {
          return this.email
       }
 
-      return `${this.firstName} ${this.lastName}`
+      return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim()
    }
 
    static createFromMerge(user: MergeRemoteUser) {
