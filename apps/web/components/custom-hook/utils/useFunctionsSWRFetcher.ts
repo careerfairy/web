@@ -3,6 +3,11 @@ import { useCallback } from "react"
 import { httpsCallable } from "firebase/functions"
 import { SWRConfiguration } from "swr"
 
+// tuple type
+// string = function name
+// object = function arguments
+type FunctionCallArgumentFetcher = [string, object]
+
 /**
  * SWR fetcher that calls Firebase cloud functions
  * The args should be an array with two values
@@ -12,13 +17,32 @@ function useFunctionsSWRFetcher<ResponseType>() {
    const functionsInstance = useFunctions() // provided at _app.tsx
 
    return useCallback(
-      (...args) => {
-         const [functionName, dataArgument] = args
+      (...args: FunctionCallArgumentFetcher[]) => {
+         if (typeof args[0] === "string") {
+            // wrap in array if only one call
+            args = [args] as FunctionCallArgumentFetcher[]
+         }
 
-         return httpsCallable<unknown, ResponseType>(
-            functionsInstance,
-            functionName
-         )(dataArgument).then((res) => res.data)
+         let promises = []
+
+         for (let arg of args) {
+            let [functionName, dataArguments] = arg
+
+            let callable = httpsCallable<unknown, ResponseType>(
+               functionsInstance,
+               functionName
+            )
+
+            promises.push(callable(dataArguments).then((res) => res.data))
+         }
+
+         if (promises.length === 1) {
+            // return a single value if we only have one promise
+            // keeps the contract used until now
+            return promises[0]
+         }
+
+         return Promise.all(promises)
       },
       [functionsInstance]
    )

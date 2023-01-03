@@ -6,28 +6,43 @@ import {
 import useFunctionsSWRFetcher, {
    reducedRemoteCallsOptions,
 } from "../utils/useFunctionsSWRFetcher"
+import { useMemo } from "react"
 
+/**
+ * Fetch a single or multiple entities meta information from Merge
+ * @param groupId
+ * @param integrationId
+ * @param entity
+ */
 const useMergeMetaEndpoint = (
    groupId: string,
    integrationId: string,
-   entity: MergeMetaEntities
-): MergeMetaResponse => {
+   entity: MergeMetaEntities[]
+): MergeMetaResponse[] => {
    const fetcher = useFunctionsSWRFetcher<MergeMetaResponse>()
 
-   const { data } = useSWR(
-      [
+   const calls = useMemo(() => {
+      return entity.map((entity) => [
          "mergeMetaEndpoint",
          {
             groupId,
             integrationId,
             entity,
          },
-      ],
+      ])
+   }, [entity, groupId, integrationId])
+
+   const { data } = useSWR<MergeMetaResponse | MergeMetaResponse[]>(
+      calls,
       fetcher,
       reducedRemoteCallsOptions
    )
 
-   return data
+   if (Array.isArray(data)) {
+      return data
+   }
+
+   return [data]
 }
 
 export default useMergeMetaEndpoint
