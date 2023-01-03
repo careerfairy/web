@@ -4,12 +4,7 @@ import ErrorOutlineIcon from "@mui/icons-material/ErrorOutline"
 import { useToggle } from "react-use"
 import Pulse from "@stahl.luke/react-reveal/Pulse"
 
-type Props = {
-   groupId: string
-   integrationId: string
-}
-
-const ApplicationTestButtonDialog = ({ groupId, integrationId }: Props) => {
+const ApplicationTestButtonDialog = () => {
    const [isOpen, toggleOpen] = useToggle(false)
 
    return (
@@ -30,14 +25,14 @@ const ApplicationTestButtonDialog = ({ groupId, integrationId }: Props) => {
                title={"Test Candidate Application"}
                onClose={toggleOpen}
             >
-               <DialogBody groupId={groupId} integrationId={integrationId} />
+               <DialogBody />
             </GenericDialog>
          )}
       </>
    )
 }
 
-const DialogBody = ({ groupId, integrationId }: Props) => {
+const DialogBody = () => {
    return (
       <Box>
          <Typography>

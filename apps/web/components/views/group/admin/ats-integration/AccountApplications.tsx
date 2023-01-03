@@ -1,6 +1,5 @@
 import React, { useMemo } from "react"
 import MaterialTable from "@material-table/core"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import useGroupATSApplications from "../../../../custom-hook/useGroupATSApplications"
 import { TableTitle } from "./AccountJobs"
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
@@ -8,6 +7,7 @@ import Box from "@mui/material/Box"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { LINKEDIN_COLOR } from "../../../../util/colors"
 import { makeExternalLink } from "../../../../helperFunctions/HelperFunctions"
+import { useATSAccount } from "./ATSAccountContextProvider"
 
 const columns = [
    {
@@ -32,11 +32,8 @@ const columns = [
    },
 ]
 
-type Props = {
-   atsAccount: GroupATSAccount
-}
-
-const AccountApplications = ({ atsAccount }: Props) => {
+const AccountApplications = () => {
+   const { atsAccount } = useATSAccount()
    const data = useGroupATSApplications(atsAccount.groupId, atsAccount.id)
 
    const applicationsToRows = useMemo(() => {

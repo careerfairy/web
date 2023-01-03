@@ -1,4 +1,3 @@
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import useGroupATSSyncStatus from "../../../../custom-hook/useGroupATSSyncStatus"
 import Paper from "@mui/material/Paper"
 import {
@@ -24,12 +23,10 @@ import { useEffect, useMemo } from "react"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import { timeAgo } from "../../../../helperFunctions/HelperFunctions"
 import { atsServiceInstance } from "../../../../../data/firebase/ATSService"
+import { useATSAccount } from "./ATSAccountContextProvider"
 
-type Props = {
-   atsAccount: GroupATSAccount
-}
-
-const WaitForFirstSyncStatus = ({ atsAccount }: Props) => {
+const WaitForFirstSyncStatus = () => {
+   const { atsAccount } = useATSAccount()
    const { errorNotification } = useSnackbarNotifications()
 
    // fetched every 3s
