@@ -25,7 +25,6 @@ import {
 import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
 import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import * as process from "process"
 
 /*
 |--------------------------------------------------------------------------
