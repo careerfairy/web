@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material"
+import { Alert, Box, Grid, Typography } from "@mui/material"
 import React, { Dispatch, useEffect, useMemo } from "react"
 import MultiListSelect from "../../common/MultiListSelect"
 import FormGroup from "../FormGroup"
@@ -39,9 +39,9 @@ const JobSelectorCategory = ({
 }: Props) => {
    const { data: accounts } = useGroupATSAccounts(groupId)
 
-   // First sync & Candidate test should be completed to fetch the jobs
+   // First sync should be complete to fetch the jobs
    const filteredAccounts = useMemo(() => {
-      return accounts.filter((account) => account.isReady())
+      return accounts.filter((account) => account.firstSyncCompletedAt)
    }, [accounts])
 
    // Only display the selector if the Group has ATS accounts linked with first sync complete
@@ -86,16 +86,13 @@ const FormSection = ({
       }
    }, [setShowJobSection, showJobSection])
 
-   const jobs = useGroupATSJobsAllIntegrations(accounts)
-
-   const allValues: LivestreamJobAssociation[] = useMemo(() => {
-      return jobs.map((job) => ({
-         groupId: groupId,
-         integrationId: job.integrationId,
-         jobId: job.id,
-         name: job.name,
-      }))
-   }, [jobs, groupId])
+   /**
+    * An account is fully ready if it has first sync completed and
+    * application test completed, if the application test is missing we display an error message instead
+    */
+   const accountsNotReady: GroupATSAccount[] = useMemo(() => {
+      return accounts.filter((a) => !a.applicationTestCompletedAt)
+   }, [accounts])
 
    return (
       <>
@@ -106,27 +103,73 @@ const FormSection = ({
             Select a job that related to this event
          </Typography>
 
-         <FormGroup container boxShadow={0}>
-            <Grid xs={12} item>
-               <MultiListSelect
-                  inputName="jobIds"
-                  selectedItems={selectedItems}
-                  onSelectItems={onSelectItems}
-                  allValues={allValues}
-                  limit={1}
-                  getKeyFn={(value) => value.jobId}
-                  inputProps={{
-                     label: "Select Job",
-                     placeholder: "Select one job",
-                  }}
-                  chipProps={{
-                     variant: "contained",
-                     color: "secondary",
-                  }}
-               />
-            </Grid>
-         </FormGroup>
+         {accountsNotReady.length > 0 && (
+            <Box my={2}>
+               <Alert color="error">
+                  You need to complete the Application Test for{" "}
+                  {accountsNotReady.map((a) => a.name).join(", ")} before you
+                  can associate Jobs to your Live Stream.
+               </Alert>
+            </Box>
+         )}
+
+         {accountsNotReady.length === 0 && (
+            <JobSelector
+               groupId={groupId}
+               accounts={accounts}
+               selectedItems={selectedItems}
+               onSelectItems={onSelectItems}
+            />
+         )}
       </>
    )
 }
+
+type JobSelectorProps = {
+   groupId: FormSectionProps["groupId"]
+   accounts: FormSectionProps["accounts"]
+   onSelectItems: FormSectionProps["onSelectItems"]
+   selectedItems: FormSectionProps["selectedItems"]
+}
+
+const JobSelector = ({
+   groupId,
+   accounts,
+   selectedItems,
+   onSelectItems,
+}: JobSelectorProps) => {
+   const jobs = useGroupATSJobsAllIntegrations(accounts)
+   const allValues: LivestreamJobAssociation[] = useMemo(() => {
+      return jobs.map((job) => ({
+         groupId: groupId,
+         integrationId: job.integrationId,
+         jobId: job.id,
+         name: job.name,
+      }))
+   }, [jobs, groupId])
+
+   return (
+      <FormGroup container boxShadow={0}>
+         <Grid xs={12} item>
+            <MultiListSelect
+               inputName="jobIds"
+               selectedItems={selectedItems}
+               onSelectItems={onSelectItems}
+               allValues={allValues}
+               limit={1}
+               getKeyFn={(value) => value.jobId}
+               inputProps={{
+                  label: "Select Job",
+                  placeholder: "Select one job",
+               }}
+               chipProps={{
+                  variant: "contained",
+                  color: "secondary",
+               }}
+            />
+         </Grid>
+      </FormGroup>
+   )
+}
+
 export default JobSelectorCategory
