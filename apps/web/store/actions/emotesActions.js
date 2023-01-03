@@ -59,7 +59,7 @@ export const clearAllEmotes = () => async (dispatch) => {
    })
 }
 
-function isRecordingWindow() {
+const isRecordingWindow = () => {
    // confirm we're running client side
    if (typeof window !== "undefined") {
       const params = new URLSearchParams(window.location?.search)
