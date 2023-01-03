@@ -1,4 +1,5 @@
 import { GroupATSAccountDocument } from "./groups"
+import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
 
 export class GroupATSAccount {
    constructor(
@@ -9,7 +10,8 @@ export class GroupATSAccount {
       public readonly slug?: string,
       public readonly lastFetchedAt?: Date,
       public readonly firstSyncCompletedAt?: Date,
-      public readonly applicationTestCompletedAt?: Date
+      public readonly applicationTestCompletedAt?: Date,
+      public readonly extraRequiredData?: MergeExtraRequiredData
    ) {}
 
    static createFromDocument(account: GroupATSAccountDocument) {
@@ -21,7 +23,8 @@ export class GroupATSAccount {
          account.merge.slug,
          account.merge.lastFetchedAt?.toDate(),
          account.merge.firstSyncCompletedAt?.toDate(),
-         account.merge.applicationTestCompletedAt?.toDate()
+         account.merge.applicationTestCompletedAt?.toDate(),
+         account.merge.extraRequiredData
       )
    }
 

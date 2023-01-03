@@ -13,6 +13,11 @@ import {
 import { groupRepo } from "../api/repositories"
 import { auth } from "firebase-admin"
 import DecodedIdToken = auth.DecodedIdToken
+import { IATSRepository } from "./IATSRepository"
+import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
+import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 
 type AlwaysPresentData = {
    groupId: string
@@ -95,4 +100,76 @@ export async function atsRequestValidationWithAccountToken<T extends object>(
       ...data,
       tokens: accountTokens,
    }
+}
+
+/**
+ * Creates a Job Application for the given User / Job
+ *
+ * Returns an object with all the related ATS ids created
+ * @param job
+ * @param userData
+ * @param atsRepository
+ * @param atsAccount
+ * @param relations this object is mutated in place
+ */
+export async function createJobApplication(
+   job: Job,
+   userData: UserData,
+   atsRepository: IATSRepository,
+   atsAccount: GroupATSAccount,
+   relations: UserATSRelations
+): Promise<UserATSRelations> {
+   // Fetch or create a Candidate object
+   let candidate: Candidate
+   if (relations.candidateId) {
+      candidate = await atsRepository.getCandidate(relations.candidateId)
+   } else {
+      if (["teamtailor", "greenhouse"].includes(atsAccount.slug)) {
+         // Some accounts do not support nested writes atm
+         // We need to make separated requests
+
+         candidate = await atsRepository.createCandidate(userData, {
+            jobAssociation: job,
+            extraRequiredData: atsAccount.extraRequiredData,
+         })
+
+         relations["candidateId"] = candidate.id ?? null
+
+         const attachmentId = await atsRepository.candidateAddCVAttachment(
+            candidate.id,
+            userData,
+            {
+               extraRequiredData: atsAccount.extraRequiredData,
+            }
+         )
+         relations["cvAttachmentId"] = attachmentId ?? null
+      } else {
+         candidate = await atsRepository.createCandidate(userData, {
+            jobAssociation: job,
+            nestedWriteCV: true,
+            extraRequiredData: atsAccount.extraRequiredData,
+         })
+
+         relations["candidateId"] = candidate.id ?? null
+      }
+   }
+
+   // Create the application if needed
+   if (candidate.applications.length === 0) {
+      relations.jobApplications = {
+         // Create the application
+         [job.id]: await atsRepository.createApplication(candidate.id, job.id, {
+            extraRequiredData: atsAccount.extraRequiredData,
+         }),
+      }
+   } else {
+      // application already in the candidate model
+      const application = candidate.applications[0]
+      relations.jobApplications = {
+         [job.id]:
+            typeof application === "string" ? application : application.id,
+      }
+   }
+
+   return relations
 }

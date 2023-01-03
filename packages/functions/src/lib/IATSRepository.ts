@@ -4,29 +4,27 @@ import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
 import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+import { ATSApplicationOptions } from "./merge/MergeATSRepository"
 import {
-   ATSApplicationOptions,
+   ATSPaginatedResults,
    ATSPaginationOptions,
-} from "./merge/MergeATSRepository"
-import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
+   RecruitersFilterOptions,
+} from "@careerfairy/shared-lib/dist/ats/Functions"
 import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+import { MergeExtraRequiredData } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean
    jobAssociation?: Job
-   remoteUserId?: string
+   extraRequiredData?: MergeExtraRequiredData
 }
 
 export type AttachmentCreationOptions = {
-   remoteUserId?: string
+   extraRequiredData?: MergeExtraRequiredData
 }
 
 export type ApplicationCreationOptions = {
-   remoteUserId?: string
-}
-
-export interface RecruitersFilterOptions extends ATSPaginationOptions {
-   email?: string
+   extraRequiredData?: MergeExtraRequiredData
 }
 
 export interface IATSRepository {

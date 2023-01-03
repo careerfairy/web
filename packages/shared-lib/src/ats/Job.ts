@@ -30,7 +30,9 @@ export class Job extends ATSModel {
       public readonly updatedAt: Date
    ) {
       super()
-      this.descriptionStripped = description?.replace(/<[^>]*>?/gm, "")
+      this.descriptionStripped = description
+         ?.replace(/<[^>]*>?/gm, "")
+         ?.replace(/&nbsp;/g, " ")
    }
 
    /**

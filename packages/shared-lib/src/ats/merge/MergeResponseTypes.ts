@@ -1,3 +1,13 @@
+export type MergeMetaEntities = "candidates" | "applications" | "attachments"
+
+/**
+ * Some integrations require extra data to be sent to the ATS
+ */
+export type MergeExtraRequiredData = {
+   // greenhouse
+   remote_user_id?: string
+}
+
 /**
  * Integrations that we know and have a custom behaviour
  */
@@ -216,6 +226,27 @@ export interface MergeCandidateModel {
 export interface MergeCandidateApplications {
    job: string
    source?: string
+}
+
+// https://docs.merge.dev/ats/candidates/#candidates_meta_post_retrieve
+export interface MergeMetaResponse {
+   request_schema: MergeRequestSchema
+   status: {
+      linked_account_status: string
+      can_make_request: boolean
+   }
+   has_conditional_params: boolean
+   has_required_linked_account_params: boolean
+}
+
+interface MergeRequestSchema {
+   type: "object" | "array" | "string" | "any"
+   title?: string
+   description?: string
+   required: string[]
+   format?: "date-time" | "uuid"
+   items?: MergeRequestSchema
+   properties: { [index: string]: MergeRequestSchema } // recursive
 }
 
 /*
