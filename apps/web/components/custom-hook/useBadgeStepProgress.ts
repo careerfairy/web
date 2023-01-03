@@ -6,6 +6,10 @@ import { useMemo } from "react"
 type Result = {
    steps: Badge[]
    activeStep: number
+   /**
+    * The current level of the badge, e.g. 1 for level 1, 2 for level 2 etc.
+    * */
+   currentBadgeLevel: number
    /*
     * How close you are to completing the entire badge chain (0-100)
     * */
