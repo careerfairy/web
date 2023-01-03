@@ -171,7 +171,7 @@ export const ApplicationTest = () => {
 
             {state.testedSuccessfully === false && (
                <Typography color="error" align="center" p={2}>
-                  The Test Application failed with an error. We&apos;ll analyze
+                  The Test Application failed with an error. We&apos;ll analyse
                   it and will get back to you soon.
                </Typography>
             )}
