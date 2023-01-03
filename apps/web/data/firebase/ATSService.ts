@@ -1,14 +1,16 @@
 import firebaseInstance, { FieldValue } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { v4 as uuidv4 } from "uuid"
-import { MergeLinkTokenResponse } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import {
+   MergeExtraRequiredData,
+   MergeLinkTokenResponse,
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
    ATSDataPaginationOptions,
    ATSPaginatedResults,
 } from "@careerfairy/shared-lib/dist/ats/Functions"
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
 
 export class ATSService {
    constructor(
@@ -40,33 +42,12 @@ export class ATSService {
          allJobs: true,
       })
 
-      return data.data.map(Job.createFromPlainObject).map((job: Job) => {
-         job.setIntegrationId(integrationId)
-         return job
-      })
-   }
-
-   /**
-    * Gets all the Recruiters for a given integration
-    *
-    * This can fan out to several ats requests since we'll need to go
-    * through paginated responses
-    * @param groupId
-    * @param integrationId
-    */
-   async getAllRecruiters(
-      groupId: string,
-      integrationId: string
-   ): Promise<Recruiter[]> {
-      const data = await this.firebaseFunctions.httpsCallable(
-         "fetchATSRecruiters"
-      )({
-         groupId,
-         integrationId,
-         all: true,
-      })
-
-      return data.data.map(Recruiter.createFromPlainObject)
+      return data.data.results
+         .map(Job.createFromPlainObject)
+         .map((job: Job) => {
+            job.setIntegrationId(integrationId)
+            return job
+         })
    }
 
    /**
@@ -107,6 +88,32 @@ export class ATSService {
          ...data.data,
          results: mappedData,
       }
+   }
+
+   /**
+    * Create a test application for a job
+    *
+    * @param groupId
+    * @param integrationId
+    * @param jobId
+    * @param mergeExtraRequiredData
+    */
+   async candidateApplicationTest(
+      groupId: string,
+      integrationId: string,
+      jobId: string,
+      mergeExtraRequiredData?: MergeExtraRequiredData
+   ): Promise<void> {
+      const data = await this.firebaseFunctions.httpsCallable(
+         "candidateApplicationTest"
+      )({
+         groupId,
+         integrationId,
+         jobId,
+         mergeExtraRequiredData,
+      })
+
+      return data.data
    }
 
    async linkCompanyWithATS(
@@ -166,6 +173,27 @@ export class ATSService {
       const toUpdate: Partial<GroupATSAccountDocument> = {}
       // update a nested object property
       toUpdate["merge.firstSyncCompletedAt"] = FieldValue.serverTimestamp()
+
+      await docRef.update(toUpdate)
+   }
+
+   async setAccountCandidateTestComplete(
+      groupId: string,
+      integrationId: string,
+      extraData?: MergeExtraRequiredData
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("ats")
+         .doc(integrationId)
+
+      const toUpdate: Partial<GroupATSAccountDocument> = {}
+
+      // update a nested object property
+      toUpdate["merge.applicationTestCompletedAt"] =
+         FieldValue.serverTimestamp()
+      toUpdate["merge.extraRequiredData"] = extraData ?? null
 
       await docRef.update(toUpdate)
    }

@@ -18,6 +18,7 @@ import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
 import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+import { getIntegrationSpecifics } from "@careerfairy/shared-lib/dist/ats/IntegrationSpecifics"
 
 type AlwaysPresentData = {
    groupId: string
@@ -124,10 +125,10 @@ export async function createJobApplication(
    if (relations.candidateId) {
       candidate = await atsRepository.getCandidate(relations.candidateId)
    } else {
-      if (["teamtailor", "greenhouse"].includes(atsAccount.slug)) {
+      const specifics = getIntegrationSpecifics(atsAccount)
+      if (!specifics.candidateCVAsANestedWrite) {
          // Some accounts do not support nested writes atm
          // We need to make separated requests
-
          candidate = await atsRepository.createCandidate(userData, {
             jobAssociation: job,
             extraRequiredData: atsAccount.extraRequiredData,
@@ -144,6 +145,7 @@ export async function createJobApplication(
          )
          relations["cvAttachmentId"] = attachmentId ?? null
       } else {
+         // candidate + cv attachment in the same request
          candidate = await atsRepository.createCandidate(userData, {
             jobAssociation: job,
             nestedWriteCV: true,

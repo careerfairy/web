@@ -226,7 +226,7 @@ export const atsUserApplyToJob = functions
 
          let associationsToSave: Partial<UserATSRelations> = {
             // set the candidateId to avoid creating a new candidate
-            candidateId: atsRelations?.candidateId,
+            candidateId: atsRelations?.candidateId ?? null,
          }
 
          try {
