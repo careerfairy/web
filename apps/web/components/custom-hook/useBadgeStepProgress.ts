@@ -16,9 +16,8 @@ type Result = {
  * Returns the steps of a badge, the active step and the percent progress
  * This hook is designed to provide information about the progress a user has made in earning a specific badge.
  *
- *
  * @param userPresenter The user presenter
- * @param userStats The user presenter
+ * @param userStats The user stats
  * @param badge The badge we wish to get the progress of
  *
  * @returns The total steps of a badge, the currently active step the user is on and the overall percent progress to completion of all the badges in the chain
@@ -46,7 +45,9 @@ const useBadgeStepProgress = (
          activeStep: currentBadgeLevel ? currentBadgeLevel.level - 1 : 0,
          percentProgress: Math.round(
             (currentLevel / steps.length) * 100 + // current level
-               percentProgressToNextLevel / steps.length // Add the % progress to the next level
+               // Add the % progress to the next level to give a more accurate representation of the overall progress.
+               // E.g. if you are on level (1/3) and 50% of the way to level (2/3), then the overall progress is 33.33% + 16.66% = 50% total progress to level (3/3)
+               percentProgressToNextLevel / steps.length
          ),
       }
    }, [badge, userPresenter?.badges, userPresenter?.model, userStats])
