@@ -1,6 +1,5 @@
 import * as actions from "./actionTypes"
 import { EMOTE_MESSAGE_TEXT_TYPE } from "../../components/util/constants"
-import { func } from "prop-types"
 
 const tempId = new Date().getTime()
 const buildEmoteAction = (message, memberId) => {
