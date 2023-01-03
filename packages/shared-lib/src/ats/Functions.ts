@@ -15,3 +15,22 @@ export type ATSPaginatedResults<Model> = {
    previous: string | null
    results: Model[]
 }
+
+/**
+ * ATS Pagination Options
+ */
+export interface ATSPaginationOptions {
+   cursor?: string
+   pageSize?: string
+}
+
+/**
+ * ATS Recruiters Options
+ */
+export interface RecruitersFilterOptions extends ATSPaginationOptions {
+   email?: string
+}
+
+export type RecruitersFunctionCallOptions = RecruitersFilterOptions & {
+   all?: boolean
+}
