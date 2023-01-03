@@ -9,7 +9,9 @@ function globalTearDown() {
    if (process.platform === "darwin") {
       try {
          // Find pid of the firebase emulators suite
-         const pids = exec("lsof -t -i:5000 -i:5001 -i:8080 -i:9099 || true")
+         const pids = exec(
+            "lsof -t -i:5000 -i:5001 -i:8080 -i:9099 -i:9199 || true"
+         )
             .toString()
             .trim()
             .split("\n")
