@@ -71,7 +71,7 @@ const ViewerOverview = ({
    const {
       query: { isRecordingWindow },
    } = useRouter()
-   const { currentLivestream, isMobile: mobile } = useCurrentStream()
+   const { currentLivestream, isMobile: mobile, presenter } = useCurrentStream()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
       (state: RootState) => state.stream.streaming
@@ -101,15 +101,15 @@ const ViewerOverview = ({
             />
             {!isRecordingWindow && (
                <ButtonComponent
-                  selectedState={selectedState}
-                  showMenu={showMenu}
-                  isMobile={mobile}
-                  handleStateChange={handleStateChange}
-                  streamer={false}
-                  includeJobs={currentLivestream.jobs?.length > 0}
-                  questionsAreDisabled={currentLivestream.questionsDisabled}
-               />
-            )}
+                  streamFinished={presenter?.streamHasFinished()}
+               selectedState={selectedState}
+               showMenu={showMenu}
+               isMobile={mobile}
+               handleStateChange={handleStateChange}
+               streamer={false}
+               includeJobs={currentLivestream.jobs?.length > 0}
+               questionsAreDisabled={currentLivestream.questionsDisabled}
+            />)}
             <ViewerComponent
                showMenu={showMenu}
                handRaiseActive={handRaiseActive}
