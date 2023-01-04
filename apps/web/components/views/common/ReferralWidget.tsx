@@ -24,7 +24,7 @@ const styles: StylesProps = {
       }),
    },
    icon: {
-      fontSize: "4rem",
+      fontSize: { xs: "2rem", md: "4rem" },
    },
    iconButton: {
       "&:hover": {

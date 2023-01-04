@@ -27,7 +27,7 @@ const styles: StylesProps = {
    alert: {
       backgroundColor: (theme) => theme.palette.grey["200"],
       borderRadius: 2,
-      width: { xs: "70%", md: "100%" },
+      width: "100%",
       "& svg": {
          color: (theme) => theme.palette.common.black,
       },
