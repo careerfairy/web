@@ -1,11 +1,12 @@
 import React from "react"
-import { darken } from "@mui/material/styles"
+import { alpha, darken } from "@mui/material/styles"
 import {
    Avatar,
    Box,
    Container,
    Grid,
    Hidden,
+   IconButton,
    Paper,
    Typography,
 } from "@mui/material"
@@ -23,6 +24,8 @@ import Image from "next/image"
 import JobApply from "./JobApply"
 import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
+import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles = {
    root: (theme) => ({
@@ -143,6 +146,27 @@ const styles = {
       },
       borderRadius: theme.spacing(1),
    }),
+   scrollButtonWrapper: {
+      position: "inherit",
+      zIndex: 99,
+      display: "flex",
+      justifyContent: "center",
+      alignContent: "end",
+      alignItems: "self-end",
+      height: "100%",
+   },
+   scrollButton: (theme) => ({
+      background: alpha(theme.palette.common.white, 0.2),
+      backdropFilter: "blur(5px)",
+      borderRadius: "8px 8px 0 0",
+      width: "70px",
+      padding: "5px 0",
+      fontSize: "30px",
+
+      "&:hover": {
+         fontSize: "35px",
+      },
+   }),
 }
 
 const HeroSection = ({
@@ -157,7 +181,11 @@ const HeroSection = ({
    eventInterests,
    streamAboutToStart,
    streamLanguage,
+   showScrollButton = false,
+   handleScrollButton,
 }) => {
+   const isMobile = useIsMobile()
+
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
          stream.maxRegistrants ||
@@ -273,6 +301,20 @@ const HeroSection = ({
                </Grid>
             </Container>
          </Box>
+         {showScrollButton && !isMobile ? (
+            <Box sx={styles.scrollButtonWrapper}>
+               <IconButton
+                  sx={{ pb: 0, background: "unset !important" }}
+                  size="large"
+                  onClick={handleScrollButton}
+               >
+                  <KeyboardDoubleArrowDownIcon
+                     sx={styles.scrollButton}
+                     color={"info"}
+                  />
+               </IconButton>
+            </Box>
+         ) : null}
       </Box>
    )
 }
