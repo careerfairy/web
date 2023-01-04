@@ -48,9 +48,9 @@ const useStyles = makeStyles((theme) => ({
             ? theme.palette.common.black
             : theme.palette.background.paper,
       zIndex: 999,
-      display: "flex",
       justifyContent: "center",
       alignItems: "center",
+      display: "flex",
    },
    waitingText: {
       fontSize: "1.1em",

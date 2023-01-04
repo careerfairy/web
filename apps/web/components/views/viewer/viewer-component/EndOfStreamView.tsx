@@ -6,10 +6,6 @@ import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
 import React from "react"
 
-import { ResearchBadge } from "@careerfairy/shared-lib/dist/badges/ResearchBadges"
-import { NetworkerBadge } from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
-import { EngageBadge } from "@careerfairy/shared-lib/dist/badges/EngageBadges"
-
 import { sxStyles } from "../../../../types/commonTypes"
 import { makeReferralUrl } from "../../../../util/makeUrls"
 
@@ -17,23 +13,26 @@ import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 
 import RecommendedEvents from "../../portal/events-preview/RecommendedEvents"
-import { CircularBadgeProgress } from "./CircularBadgeProgress"
 import ShareLinkButton from "../../common/ShareLinkButton"
 import Link from "../../common/Link"
+import ProgressIndicators, {
+   ProgressIndicatorsLoader,
+} from "./ProgressIndicators"
+import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 
 const styles = sxStyles({
    root: {
       bgcolor: "background.default",
-      py: 2,
+      py: 5,
       height: "inherit",
       alignItems: "center",
       overflow: "auto",
       width: "100%",
    },
    divider: {
-      width: 150,
+      width: 100,
       mx: "auto !important",
-      borderWidth: 1,
+      borderColor: "text.secondary",
    },
    ctas: {
       display: "inline-flex",
@@ -58,66 +57,34 @@ const EndOfStreamView = () => {
       <Box sx={styles.root}>
          <Container sx={styles.container}>
             <Stack
-               spacing={{
-                  xs: 2,
-                  sm: 4,
-               }}
+               spacing={2}
                justifyContent={"space-between"}
                sx={styles.stack}
             >
-               <Typography align={"center"}>Thanks for watching!</Typography>
+               <Typography variant={"h6"} fontWeight={400} align={"center"}>
+                  Thanks for watching!
+               </Typography>
                {currentLivestream.title && (
-                  <Typography
-                     variant={"h4"}
-                     fontWeight={"bolder"}
-                     align={"center"}
-                  >
-                     {currentLivestream.title}
-                  </Typography>
+                  <Box pb={1}>
+                     <Typography
+                        variant={"h3"}
+                        fontWeight={"bolder"}
+                        align={"center"}
+                     >
+                        {currentLivestream.title}
+                     </Typography>
+                  </Box>
                )}
                {userPresenter && (
-                  <>
-                     <Typography align={"center"}>
-                        Congrats! You are one step closer to land the job you’ll
-                        love 🚀
-                     </Typography>
-                     <Stack
-                        direction={"row"}
-                        alignItems={"center"}
-                        justifyContent={"center"}
-                        spacing={{
-                           xs: 2,
-                           sm: 5,
-                        }}
-                     >
-                        <CircularBadgeProgress
-                           badge={ResearchBadge}
-                           label={"Research"}
-                           helperText={
-                              "The more you progress through these levels, the more exclusive content you'll have access to."
-                           }
-                        />
-                        <CircularBadgeProgress
-                           badge={NetworkerBadge}
-                           helperText={
-                              "The more you progress through these levels, the easier it will be for you to increase your network."
-                           }
-                           label={"Network"}
-                        />
-                        <CircularBadgeProgress
-                           label={"Engagement"}
-                           badge={EngageBadge}
-                           helperText={
-                              "The more you progress through these levels, the easier it will be for you to engage with company recruiters."
-                           }
-                        />
-                     </Stack>
-                  </>
+                  <SuspenseWithBoundary fallback={<ProgressIndicatorsLoader />}>
+                     <ProgressIndicators />
+                  </SuspenseWithBoundary>
                )}
-
-               <Divider sx={styles.divider} variant="middle" />
+               <Box py={1}>
+                  <Divider sx={styles.divider} variant="middle" />
+               </Box>
                <Box>
-                  <Typography variant={"h6"} align={"center"}>
+                  <Typography gutterBottom variant={"h6"} align={"center"}>
                      Recommended livestreams for you
                   </Typography>
                   <RecommendedEvents hideTitle />

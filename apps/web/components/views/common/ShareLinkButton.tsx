@@ -42,12 +42,15 @@ const styles = sxStyles({
       maxWidth: 200,
       borderBottomLeftRadius: 0,
       borderTopLeftRadius: 0,
+      textTransform: "none",
+      fontWeight: "normal",
+      color: "text.secondary",
    },
    ButtonText: {
       overflow: "hidden",
       textOverflow: "ellipsis",
       whiteSpace: "nowrap",
-      fontSize: "0.815rem",
+      fontSize: "0.915rem",
    },
    hoveredContent: {
       display: "flex",

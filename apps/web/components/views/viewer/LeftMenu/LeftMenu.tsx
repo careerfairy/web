@@ -72,6 +72,7 @@ const LeftMenu = ({
    selectedState,
    livestream,
    isMobile,
+   streamFinished,
 }: LeftMenuProps) => {
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const showMenu = useSelector(leftMenuOpenSelector)
@@ -122,32 +123,38 @@ const LeftMenu = ({
             selectedState={selectedState}
          />
       ),
-      <PollCategory
-         key={"polls-category-tab"}
-         livestream={livestream}
-         //@ts-ignore
-         selectedState={selectedState}
-         setSelectedState={setSelectedState}
-         streamer={streamer}
-         user={user}
-         userData={userData}
-      />,
-      <HandRaiseCategory
-         key={"handraise-category-tab"}
-         // @ts-ignore
-         streamer={streamer}
-         // @ts-ignore
-         livestream={livestream}
-         selectedState={selectedState}
-         user={user}
-         isMobile={isMobile}
-         userData={userData}
-         handRaiseActive={handRaiseActive}
-         setHandRaiseActive={setHandRaiseActive}
-      />,
    ]
+   if (!streamFinished) {
+      views.unshift(
+         <PollCategory
+            key={"polls-category-tab"}
+            livestream={livestream}
+            //@ts-ignore
+            selectedState={selectedState}
+            setSelectedState={setSelectedState}
+            streamer={streamer}
+            user={user}
+            userData={userData}
+         />
+      )
 
-   if (showMenu && (isMobile || focusModeEnabled)) {
+      views.unshift(
+         <HandRaiseCategory
+            key={"handraise-category-tab"}
+            // @ts-ignore
+            streamer={streamer}
+            // @ts-ignore
+            livestream={livestream}
+            selectedState={selectedState}
+            user={user}
+            isMobile={isMobile}
+            userData={userData}
+            handRaiseActive={handRaiseActive}
+            setHandRaiseActive={setHandRaiseActive}
+         />
+      )
+   }
+   if (showMenu && (isMobile || focusModeEnabled) && !streamFinished) {
       views.push(<ChatCategory />)
    }
 
@@ -254,6 +261,7 @@ type LeftMenuProps = {
    selectedState: CurrentStreamContextInterface["selectedState"]
    livestream: LivestreamEvent
    isMobile: boolean
+   streamFinished: boolean
 }
 
 export default LeftMenu
