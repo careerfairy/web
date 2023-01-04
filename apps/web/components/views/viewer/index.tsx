@@ -99,9 +99,8 @@ const ViewerOverview = ({
                audienceDrawerOpen={audienceDrawerOpen}
                isStreamer={false}
             />
-            {!isRecordingWindow && (
-               <ButtonComponent
-                  streamFinished={presenter?.streamHasFinished()}
+            {!isRecordingWindow && (<ButtonComponent
+               streamFinished={presenter?.streamHasFinished()}
                selectedState={selectedState}
                showMenu={showMenu}
                isMobile={mobile}

@@ -1,10 +1,11 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import Typography from "@mui/material/Typography"
-import { alpha } from "@mui/material/styles"
 import Tooltip from "@mui/material/Tooltip"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
-import React from "react"
+
+import React, { memo, useCallback, useState } from "react"
+import { alpha } from "@mui/material/styles"
 import CircularProgress, {
    circularProgressClasses,
 } from "@mui/material/CircularProgress"
@@ -14,11 +15,22 @@ import { sxStyles } from "../../../../types/commonTypes"
 import Link from "../../common/Link"
 
 import useBadgeStepProgress from "../../../custom-hook/useBadgeStepProgress"
+import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+
+import useAnimatedNumber from "../../../custom-hook/useAnimatedNumber"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import { useTimeoutFn } from "react-use"
 
 const styles = sxStyles({
    root: {
+      width: {
+         xs: 100,
+         sm: 120,
+      },
+   },
+   progress: {
       position: "relative",
       display: "inline-flex",
       textDecoration: "none",
@@ -71,27 +83,53 @@ type ProgressProps = {
    badge: Badge
 
    helperText?: string
+   initialSnapshot?: UserLivestreamData["participated"]["initialSnapshot"]
 }
-export const CircularBadgeProgress = ({
+
+const delay = 1000
+const CircularBadgeProgress = ({
    label,
    badge,
    helperText,
+   initialSnapshot,
 }: ProgressProps) => {
-   const { userPresenter } = useAuth()
-
    const isMobile = useIsMobile()
 
-   const { percentProgress, activeStep } = useBadgeStepProgress(
-      userPresenter,
-      badge
+   const { userPresenter, userStats } = useAuth()
+
+   const { percentProgress, currentBadgeLevel } = useBadgeStepProgress(
+      badge,
+      userStats,
+      userPresenter
    )
 
+   const { percentProgress: initialPercentProgress } = useBadgeStepProgress(
+      badge,
+      initialSnapshot?.userStats,
+      initialSnapshot?.userData
+         ? new UserPresenter(initialSnapshot.userData)
+         : null
+   )
+   const [progressValue, setProgressValue] = useState(initialPercentProgress)
+
+   const updateProgress = useCallback(() => {
+      setProgressValue(percentProgress)
+   }, [percentProgress])
+
+   useTimeoutFn(updateProgress, delay) // call updateProgress after delay on mount
+
+   const animatedProgressValue = useAnimatedNumber(progressValue, 100)
+
    const size = isMobile ? 64 : 90
-   const thickness = isMobile ? 4 : 5
+   const thickness = 4
 
    return (
-      <Stack justifyContent={"center"} alignItems={"center"}>
-         <Box component={Link} href={"/profile/career-skills"} sx={styles.root}>
+      <Stack sx={styles.root} justifyContent={"center"} alignItems={"center"}>
+         <Box
+            component={Link}
+            href={"/profile/career-skills"}
+            sx={styles.progress}
+         >
             <CircularProgress
                variant="determinate"
                sx={styles.backgroundCircle}
@@ -100,12 +138,12 @@ export const CircularBadgeProgress = ({
                value={100}
             />
             <CircularProgress
+               value={animatedProgressValue}
                color={"secondary"}
                variant="determinate"
                thickness={thickness}
                size={size}
                sx={styles.progressCircle}
-               value={percentProgress}
             />
             <Box sx={styles.middleTextWrapper}>
                <Typography
@@ -113,7 +151,7 @@ export const CircularBadgeProgress = ({
                   component="div"
                   fontWeight={"bold"}
                >
-                  {`Level ${activeStep}`}
+                  {`Level ${currentBadgeLevel}`}
                </Typography>
             </Box>
          </Box>
@@ -131,3 +169,5 @@ export const CircularBadgeProgress = ({
       </Stack>
    )
 }
+
+export default memo(CircularBadgeProgress) // Memoize to prevent re-rendering due to useAnimatedNumber hook causing re-renders
