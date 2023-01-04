@@ -85,7 +85,6 @@ const LeftMenu = ({
    const [value, setValue] = useState(0)
    const dispatch = useDispatch()
 
-   // const eventHasJobs = false
    const eventHasJobs = Boolean(livestream?.jobs?.length > 0)
 
    const handleCloseLeftMenu = useCallback(() => {
