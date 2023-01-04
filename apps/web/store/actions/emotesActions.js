@@ -45,8 +45,8 @@ export const createEmote = (emoteType) => (dispatch, getState) => {
 // set an emote received from the channel socket listener
 export const setEmote = (message, memberId) => async (dispatch, getState) => {
    const focusModeEnabled = getState().stream.layout.focusModeEnabled
-   // Dont bother sending or storing emotes in redux when focus mode is enabled
-   if (focusModeEnabled) return
+   // Don't bother sending or storing emotes in redux when focus mode is enabled
+   if (focusModeEnabled && !isRecordingWindow()) return
    const emoteAction = buildEmoteAction(message, memberId)
    dispatch(emoteAction)
    return emoteAction
@@ -56,4 +56,15 @@ export const clearAllEmotes = () => async (dispatch) => {
    return dispatch({
       type: actions.CLEAR_ALL_EMOTES,
    })
+}
+
+const isRecordingWindow = () => {
+   // confirm we're running client side
+   if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location?.search)
+
+      return params.has("isRecordingWindow")
+   }
+
+   return false
 }

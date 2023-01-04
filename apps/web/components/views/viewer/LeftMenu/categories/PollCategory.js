@@ -19,6 +19,7 @@ import useStreamRef from "../../../../custom-hook/useStreamRef"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { v4 as uuidv4 } from "uuid"
+import { useRouter } from "next/router"
 
 const usePollWrapperStyles = makeStyles((theme) => ({
    root: {
@@ -128,6 +129,10 @@ const PollCategory = ({ livestream, setSelectedState }) => {
    const [voting, setVoting] = useState(false)
    const [hasVoted, setHasVoted] = useState(false)
    const [value, setValue] = useState(0)
+   const {
+      query: { isRecordingWindow },
+   } = useRouter()
+
    let authEmail =
       authenticatedUser &&
       authenticatedUser.email &&
@@ -170,23 +175,27 @@ const PollCategory = ({ livestream, setSelectedState }) => {
                setHasVoted(querySnapshot.exists)
             }
          )
-         return () => unsubscribe()
+         return () => {
+            unsubscribe()
+            // switch the left menu to the questions after a poll is done
+            setSelectedState("questions")
+         }
       } else {
          setHasVoted(false)
       }
-   }, [currentPoll?.id, authEmail])
+   }, [currentPoll?.id, authEmail, setSelectedState])
 
    useEffect(() => {
       if (!Boolean(currentPoll && authEmail)) {
          setValue(0)
-      } else if (!hasVoted) {
+      } else if (!hasVoted && !isRecordingWindow) {
          setValue(1)
-      } else if (hasVoted) {
+      } else if (hasVoted || isRecordingWindow) {
          setValue(2)
       } else {
          setValue(0)
       }
-   }, [currentPoll, authEmail, hasVoted])
+   }, [currentPoll, authEmail, hasVoted, isRecordingWindow])
 
    /**
     * @param {string} optionId - Id of the option you wish to vote for
