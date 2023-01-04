@@ -81,7 +81,7 @@ const StreamerOverview = ({
    hideAudience,
    audienceDrawerOpen,
 }) => {
-   const { currentLivestream, isStreamer } = useCurrentStream()
+   const { currentLivestream } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
    const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
@@ -172,6 +172,7 @@ const StreamerOverview = ({
                openSupportInLeftMenu={openSupportInLeftMenu}
             />
             <ButtonComponent
+               streamFinished={false}
                isMobile={undefined}
                streamer={true}
                selectedState={selectedState}

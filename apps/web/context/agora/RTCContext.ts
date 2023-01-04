@@ -83,6 +83,8 @@ export interface RtcPropsInterface {
     * - desktop: A user's screen is currently being shared
     */
    streamMode?: LivestreamEvent["mode"]
+
+   children: React.ReactNode | null
 }
 
 /**

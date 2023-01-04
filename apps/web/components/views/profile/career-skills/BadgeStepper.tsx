@@ -24,6 +24,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import CheckIcon from "@mui/icons-material/Check"
 import CelebrationIcon from "@mui/icons-material/Celebration"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import useBadgeStepProgress from "../../../custom-hook/useBadgeStepProgress"
 
 const styles = createStyles({
    step: {
@@ -77,16 +78,10 @@ const styles = createStyles({
 })
 
 export const BadgeStepper = ({ badge }: { badge: Badge }) => {
-   const steps = badge.getBadgesArray()
    const { userPresenter } = useAuth()
 
-   const currentBadgeLevel =
-      userPresenter.badges?.getCurrentBadgeLevelForBadgeType(badge)
+   const { activeStep, steps } = useBadgeStepProgress(userPresenter, badge)
 
-   let activeStep = 0
-   if (currentBadgeLevel) {
-      activeStep = currentBadgeLevel.level - 1
-   }
    return (
       <Stepper
          nonLinear

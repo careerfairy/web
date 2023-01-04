@@ -26,7 +26,6 @@ import WifiIndicator from "../../streaming/video-container/WifiIndicator"
 import StreamPublishingModal from "../../../../components/views/streaming/modal/StreamPublishingModal"
 import StreamStoppedOverlay from "./overlay/StreamStoppedOverlay"
 import useHandRaiseState from "../../../../components/custom-hook/useHandRaiseState"
-import RecommendedEventsOverlay from "./overlay/RecommendedEventsOverlay"
 import RTMContext from "../../../../context/agora/RTMContext"
 import AgoraStateHandler from "../../streaming/modal/AgoraStateModal/AgoraStateHandler"
 import { focusModeEnabledSelector } from "../../../../store/selectors/streamSelectors"
@@ -35,6 +34,7 @@ import RootState from "../../../../store/reducers"
 import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { HandRaiseState } from "../../../../types/handraise"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import EndOfStreamView from "./EndOfStreamView"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -72,6 +72,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       streamerId,
       isMobile: mobile,
       isBreakout,
+      presenter,
    } = useCurrentStream()
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const spyModeEnabled = useSelector(
@@ -87,7 +88,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       useHandRaiseState()
 
    const {
-      query: { livestreamId },
+      query: { livestreamId, isRecordingWindow },
    } = useRouter()
 
    const { userData } = useAuth()
@@ -282,6 +283,15 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       return null
    }
 
+   if (
+      presenter?.streamHasFinished() &&
+      !isRecordingWindow &&
+      userData &&
+      !spyModeEnabled
+   ) {
+      return <EndOfStreamView />
+   }
+
    return (
       <React.Fragment>
          {!Boolean(mobile && handRaiseActive) && !focusModeEnabled && (
@@ -402,11 +412,6 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                      students
                   </Typography>
                </div>
-            ) : currentLivestream.recommendedEventIds?.length ? (
-               <RecommendedEventsOverlay
-                  recommendedEventIds={currentLivestream.recommendedEventIds}
-                  mobile={mobile}
-               />
             ) : (
                <StreamStoppedOverlay />
             ))}
