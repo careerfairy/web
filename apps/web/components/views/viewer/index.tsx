@@ -89,6 +89,8 @@ const ViewerOverview = ({
       dispatch(actions.unmuteMutedRemoteVideosAfterFail())
    }, [dispatch])
 
+   const enableEmotions = isRecordingWindow || !focusModeEnabled
+
    return (
       <Fragment>
          <div className={classes.blackFrame}>
@@ -97,15 +99,17 @@ const ViewerOverview = ({
                audienceDrawerOpen={audienceDrawerOpen}
                isStreamer={false}
             />
-            <ButtonComponent
-               selectedState={selectedState}
-               showMenu={showMenu}
-               isMobile={mobile}
-               handleStateChange={handleStateChange}
-               streamer={false}
-               includeJobs={currentLivestream.jobs?.length > 0}
-               questionsAreDisabled={currentLivestream.questionsDisabled}
-            />
+            {!isRecordingWindow && (
+               <ButtonComponent
+                  selectedState={selectedState}
+                  showMenu={showMenu}
+                  isMobile={mobile}
+                  handleStateChange={handleStateChange}
+                  streamer={false}
+                  includeJobs={currentLivestream.jobs?.length > 0}
+                  questionsAreDisabled={currentLivestream.questionsDisabled}
+               />
+            )}
             <ViewerComponent
                showMenu={showMenu}
                handRaiseActive={handRaiseActive}
@@ -117,7 +121,7 @@ const ViewerOverview = ({
                />
             )}
          </div>
-         {!focusModeEnabled && (
+         {enableEmotions && (
             <IconsContainer className={classes.iconsContainer} />
          )}
          {currentLivestream && !currentLivestream.hasNoRatings && (
