@@ -149,7 +149,6 @@ const styles = {
    }),
    scrollButtonWrapper: {
       position: "inherit",
-      zIndex: 99,
       display: "flex",
       justifyContent: "center",
       alignContent: "end",
@@ -157,6 +156,7 @@ const styles = {
       height: "100%",
    },
    scrollButton: (theme) => ({
+      zIndex: 99,
       background: alpha(theme.palette.common.white, 0.2),
       backdropFilter: "blur(5px)",
       borderRadius: "8px 8px 0 0",
@@ -307,7 +307,7 @@ const HeroSection = ({
          {showScrollButton && !isMobile ? (
             <Box sx={styles.scrollButtonWrapper}>
                <IconButton
-                  sx={{ pb: 0, background: "unset !important" }}
+                  sx={{ p: 0 }}
                   size="large"
                   onClick={handleScrollButton}
                >
