@@ -411,7 +411,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    }, [startRegistrationProcess])
 
    const handleScrollButton = useCallback(() => {
-      window.scrollTo(0, 1000)
+      window.scrollTo(0, 800)
    }, [])
 
    return (
