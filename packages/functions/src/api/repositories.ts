@@ -1,6 +1,4 @@
 import { admin } from "./firestoreAdmin"
-import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { IATSRepository } from "@careerfairy/shared-lib/src/ats/IATSRepository"
 import {
    FirebaseUserRepository,
    IUserRepository,
@@ -27,6 +25,8 @@ import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
 } from "../lib/GroupFunctionsRepository"
+import { IATSRepository } from "../lib/IATSRepository"
+import { MergeATSRepository } from "../lib/merge/MergeATSRepository"
 
 const firestoreInstance = admin.firestore() as any
 const authInstance = admin.auth()

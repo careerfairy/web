@@ -21,6 +21,7 @@ import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
 import { LEFT_MENU_WIDTH } from "../../../../constants/streams"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { CurrentStreamContextInterface } from "../../../../context/stream/StreamContext"
 
 const useStyles = makeStyles((theme) => ({
    viewRoot: {
@@ -61,7 +62,10 @@ const useStyles = makeStyles((theme) => ({
    }),
 }))
 
-const states = ["questions", "polls", "hand", "chat", "jobs"]
+type ViewEntry = {
+   state: CurrentStreamContextInterface["selectedState"]
+   component: JSX.Element
+}
 
 const LeftMenu = ({
    handRaiseActive,
@@ -71,6 +75,7 @@ const LeftMenu = ({
    selectedState,
    livestream,
    isMobile,
+   streamFinished,
 }: LeftMenuProps) => {
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const showMenu = useSelector(leftMenuOpenSelector)
@@ -80,6 +85,16 @@ const LeftMenu = ({
    const [value, setValue] = useState(0)
    const dispatch = useDispatch()
 
+   const eventHasJobs = Boolean(livestream?.jobs?.length > 0)
+
+   const handleCloseLeftMenu = useCallback(() => {
+      return dispatch(actions.closeLeftMenu())
+   }, [dispatch])
+
+   const handleOpenLeftMenu = useCallback(() => {
+      return dispatch(actions.openLeftMenu())
+   }, [dispatch])
+
    useEffect(() => {
       if (
          selectedState === "chat" &&
@@ -88,103 +103,141 @@ const LeftMenu = ({
          !focusModeEnabled
       ) {
          setSelectedState("questions")
-         setValue(0)
       }
    }, [selectedState, showMenu, isMobile, focusModeEnabled, setSelectedState])
 
+   useEffect(() => {
+      if (!streamFinished) return
+
+      if (eventHasJobs) {
+         void handleOpenLeftMenu()
+         setSelectedState("jobs")
+         return
+      }
+
+      void handleCloseLeftMenu()
+   }, [
+      eventHasJobs,
+      handleCloseLeftMenu,
+      handleOpenLeftMenu,
+      setSelectedState,
+      streamFinished,
+   ])
+
+   const views = useMemo(() => {
+      const data: ViewEntry[] = []
+
+      if (!streamFinished) {
+         data.unshift({
+            state: "hand",
+            component: (
+               <HandRaiseCategory
+                  key={"handraise-category-tab"}
+                  // @ts-ignore
+                  streamer={streamer}
+                  // @ts-ignore
+                  livestream={livestream}
+                  selectedState={selectedState}
+                  user={user}
+                  isMobile={isMobile}
+                  userData={userData}
+                  handRaiseActive={handRaiseActive}
+                  setHandRaiseActive={setHandRaiseActive}
+               />
+            ),
+         })
+
+         if (showMenu && (isMobile || focusModeEnabled) && !streamFinished) {
+            data.push({
+               state: "chat",
+               component: <ChatCategory key={"chat-category-tab"} />,
+            })
+         }
+
+         data.unshift({
+            state: "polls",
+            component: (
+               <PollCategory
+                  key={"polls-category-tab"}
+                  livestream={livestream}
+                  //@ts-ignore
+                  selectedState={selectedState}
+                  setSelectedState={setSelectedState}
+                  streamer={streamer}
+                  user={user}
+                  userData={userData}
+               />
+            ),
+         })
+      }
+
+      if (eventHasJobs) {
+         data.push({
+            state: "jobs",
+            component: (
+               <JobsCategory
+                  key={"jobs-category-tab"}
+                  selectedState={selectedState}
+                  livestream={livestream}
+                  showMenu={showMenu}
+               />
+            ),
+         })
+      }
+
+      data.unshift({
+         state: "questions",
+         component: livestream.questionsDisabled ? (
+            <GenericCategoryInactive
+               title={"No Q&A Today"}
+               subtitle={"The Q&A is disabled for this live stream."}
+            />
+         ) : (
+            <QuestionCategory
+               key={"questions-category-tab"}
+               showMenu={showMenu}
+               streamer={streamer}
+               isMobile={isMobile}
+               selectedState={selectedState}
+            />
+         ),
+      })
+
+      return data
+   }, [
+      eventHasJobs,
+      focusModeEnabled,
+      handRaiseActive,
+      isMobile,
+      livestream,
+      selectedState,
+      setHandRaiseActive,
+      setSelectedState,
+      showMenu,
+      streamFinished,
+      streamer,
+      user,
+      userData,
+   ])
+
    const handleChange = useCallback(
-      (event, newValue) => {
-         setValue(newValue)
-         const state = states[newValue]
+      (newIndex, _, meta) => {
+         if (meta?.reason !== "swipe") return
+         const state = views[newIndex].state
          setSelectedState(state)
          dataLayerEvent("livestream_viewer_select_" + state)
       },
-      [setSelectedState]
+      [views, setSelectedState]
    )
 
-   const handleClose = useCallback(() => {
-      dispatch(actions.closeLeftMenu())
-   }, [dispatch])
-
-   const views = [
-      livestream.questionsDisabled ? (
-         <GenericCategoryInactive
-            title={"No Q&A Today"}
-            subtitle={"The Q&A is disabled for this live stream."}
-         />
-      ) : (
-         <QuestionCategory
-            key={"questions-category-tab"}
-            showMenu={showMenu}
-            streamer={streamer}
-            livestream={livestream}
-            isMobile={isMobile}
-            selectedState={selectedState}
-            user={user}
-            userData={userData}
-         />
-      ),
-      <PollCategory
-         key={"polls-category-tab"}
-         livestream={livestream}
-         //@ts-ignore
-         selectedState={selectedState}
-         setSelectedState={setSelectedState}
-         streamer={streamer}
-         user={user}
-         userData={userData}
-      />,
-      <HandRaiseCategory
-         key={"handraise-category-tab"}
-         // @ts-ignore
-         streamer={streamer}
-         // @ts-ignore
-         livestream={livestream}
-         selectedState={selectedState}
-         user={user}
-         isMobile={isMobile}
-         userData={userData}
-         handRaiseActive={handRaiseActive}
-         setHandRaiseActive={setHandRaiseActive}
-      />,
-   ]
-
-   if (showMenu && (isMobile || focusModeEnabled)) {
-      views.push(
-         <ChatCategory
-            livestream={livestream}
-            selectedState={selectedState}
-            // @ts-ignore
-            user={user}
-            userData={userData}
-            isStreamer={false}
-         />
-      )
-   }
-
-   if (livestream?.jobs?.length > 0) {
-      views.push(
-         <JobsCategory
-            key={"jobs-category-tab"}
-            selectedState={selectedState}
-            livestream={livestream}
-            showMenu={showMenu}
-         />
-      )
-   }
-
    useEffect(() => {
-      let newSelectedIndex = states.indexOf(selectedState)
-
-      if (selectedState === "jobs" && views.length !== states.length) {
-         // chat view might be missing, we need to go to the previous tab
-         --newSelectedIndex
-      }
-
-      if (value !== newSelectedIndex) {
+      let newSelectedIndex = views.findIndex(
+         (item) => item.state === selectedState
+      )
+      if (value !== newSelectedIndex && newSelectedIndex !== -1) {
          setValue(newSelectedIndex)
       }
-   }, [selectedState, value, views.length])
+   }, [eventHasJobs, selectedState, views, value])
 
    const toggleLeftMenu = useCallback(
       () => dispatch(actions.toggleLeftMenu()),
@@ -213,7 +266,7 @@ const LeftMenu = ({
             className={classes.viewRoot}
             onChangeIndex={handleChange}
          >
-            {views}
+            {views.map((item) => item.component)}
          </SwipeableViews>
       </>
    )
@@ -234,7 +287,7 @@ const LeftMenu = ({
             <Drawer
                anchor="left"
                classes={mobileDrawerClasses}
-               onClose={handleClose}
+               onClose={handleCloseLeftMenu}
                open={showMenu}
                variant="persistent"
             >
@@ -262,9 +315,10 @@ type LeftMenuProps = {
    setHandRaiseActive: (args) => any
    streamer: any
    setSelectedState: (args) => any
-   selectedState: string
+   selectedState: CurrentStreamContextInterface["selectedState"]
    livestream: LivestreamEvent
    isMobile: boolean
+   streamFinished: boolean
 }
 
 export default LeftMenu

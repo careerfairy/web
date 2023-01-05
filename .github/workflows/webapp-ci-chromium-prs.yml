@@ -1,24 +1,25 @@
-name: "Build, Test and Deploy - Develop"
+name: "Build, Test and Deploy - Pull Requests"
 on:
-   # Trigger on pushes targeting all branches but main
-   push:
-      branches-ignore:
-         - main
+   # Triggers on all pull requests, limited pipeline that runs faster
+   pull_request:
+      types: [opened, synchronize, reopened]
 
 # Ensures that only one deploy task per branch will run at a time (cancels old commit runs)
 concurrency:
    group: ${{ github.head_ref || github.ref_name }}
    cancel-in-progress: true
 
+# Variables shared by all jobs
+env:
+   # https://turborepo.org/docs/guides/continuous-integration
+   TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
+   TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
+
 jobs:
    build_app_for_tests:
       name: "Pre-build cache for tests"
       runs-on: ubuntu-latest
       timeout-minutes: 10
-      env:
-         # https://turborepo.org/docs/guides/continuous-integration
-         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       outputs:
          webapp: ${{ steps.changes.outputs.webapp }}
          shared-lib: ${{ steps.changes.outputs.shared-lib }}
@@ -37,6 +38,15 @@ jobs:
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
+
+         - name: Cache .next/cache folder
+           uses: actions/cache@v3
+           with:
+              path: ${{ github.workspace }}/apps/web/.next/cache
+              key: ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-${{ hashFiles('**.[jt]s', '**.[jt]sx') }}
+              # If source files changed but packages didn't, rebuild from a prior cache.
+              restore-keys: |
+                 ${{ runner.os }}-nextjs-${{ hashFiles('**/package-lock.json') }}-
 
          - name: Build
            run: npm run build
@@ -71,8 +81,6 @@ jobs:
       runs-on: ubuntu-latest
       timeout-minutes: 10
       env:
-         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
          NODE_ENV: test
       steps:
@@ -90,55 +98,41 @@ jobs:
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
 
-         - name: Build
-           run: npm run build
-
          - name: Run Jest Unit Tests
            run: npm run test
 
    # Run E2E Tests
    e2e_tests:
-      name: E2E Tests for Chromium
+      name: E2E Tests for Chromium - ${{ matrix.shard }}/${{ matrix.total }}m
       needs: [build_app_for_tests]
       # only run if there are changes on the webapp & shared lib
       if: |
          needs.build_app_for_tests.outputs.webapp == 'true' ||
          needs.build_app_for_tests.outputs.shared-lib == 'true' ||
          needs.build_app_for_tests.outputs.workflow == 'true'
+      strategy:
+         fail-fast: false
+         matrix:
+            shard: [1, 2, 3]
+            total: [3]
       runs-on: ubuntu-20.04
       timeout-minutes: 25
-      env:
-         # https://turborepo.org/docs/guides/continuous-integration
-         TURBO_TOKEN: ${{ secrets.TURBO_TOKEN }}
-         TURBO_TEAM: ${{ secrets.TURBO_TEAM }}
       steps:
          - uses: actions/checkout@v3
          - uses: actions/setup-node@v3
            with:
               node-version: "16"
+
          - name: Cache node modules
            id: cache-nodemodules
            uses: actions/cache@v3
            with:
               path: "**/node_modules"
               key: ${{ runner.os }}-modules-${{ hashFiles('**/package-lock.json') }}
+
          - name: Install Dependencies
            if: steps.cache-nodemodules.outputs.cache-hit != 'true'
            run: npm ci --ignore-scripts
-
-         # Cache playwright deps install
-         # taken from https://github.com/microsoft/playwright/issues/7249
-         - name: Get installed Playwright version
-           id: playwright-version
-           run: echo -n "::set-output name=version::$(npm ls @playwright/test --json | jq --raw-output '.dependencies["@careerfairy/webapp"].dependencies["@playwright/test"].version')"
-
-         - uses: actions/cache@v3
-           id: playwright-cache
-           with:
-              path: "~/.cache/ms-playwright"
-              key: "${{ runner.os }}-playwright-${{ steps.playwright-version.outputs.version }}"
-              restore-keys: |
-                 ${{ runner.os }}-playwright-
 
          - name: Install Playwright's dependencies
            run: npx playwright install --with-deps
@@ -147,21 +141,22 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- -- --project=chromium
+           run: npm run test:e2e-webapp -- -- --project=chromium --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: chromium-playwright-report
+              name: ${{ matrix.shard }}-chromium-playwright-report
               path: apps/web/playwright-report
 
          - name: Upload debug logs
            if: ${{ failure() }}
            uses: actions/upload-artifact@v3
            with:
-              name: chromium-debug-logs
+              name: ${{ matrix.shard }}-chromium-debug-logs
               path: firebase-debug.log
+
    # Deploy
    deploy:
       name: "Deploy"
@@ -170,14 +165,16 @@ jobs:
       timeout-minutes: 20
       steps:
          - uses: actions/checkout@v3
-         - uses: amondnet/vercel-action@v25.1.0 #deploy
-           id: vercel-action
+         - name: Deploy to Vercel
+           uses: BetaHuhn/deploy-to-vercel-action@v1
+           id: vercel-deploy
            with:
-              vercel-token: ${{ secrets.VERCEL_TOKEN }} # Required
-              github-token: ${{ secrets.GITHUB_TOKEN }} #Optional
-              vercel-org-id: ${{ secrets.VERCEL_ORG_ID}} #Required
-              vercel-project-id: ${{ secrets.VERCEL_PROJECT_ID}} #Required
-              vercel-args: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && '--prod' || '' }}
+              GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+              VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+              VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
+              VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
+              PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
+              PR_LABELS: false
          - name: preview-url
            run: |
-              echo ${{ steps.vercel-action.outputs.preview-url }}
+              echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}

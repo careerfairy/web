@@ -14,6 +14,7 @@ import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
@@ -312,7 +313,8 @@ export const resendPostmarkEmailVerificationEmailWithPin_v2 =
       }
    })
 
-export const validateUserEmailWithPin = functions
+// eslint-disable-next-line camelcase
+export const validateUserEmailWithPin_v2 = functions
    .runWith({
       minInstances: 1,
    })
@@ -353,6 +355,39 @@ export const validateUserEmailWithPin = functions
                )
 
                functions.logger.log("Updated User Record", updatedUserRecord)
+
+               // after pin confirmation send welcome email
+               functions.logger.log(
+                  `Starting sending welcome email to  ${recipientEmail}`
+               )
+               const email = {
+                  TemplateId: process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL,
+                  From: "CareerFairy <noreply@careerfairy.io>",
+                  To: recipientEmail,
+                  TemplateModel: {
+                     user_name: `${user.firstName || ""} ${
+                        user.lastName || ""
+                     }`,
+                  },
+               }
+
+               try {
+                  const response = await client.sendEmailWithTemplate(email)
+
+                  if (response.ErrorCode) {
+                     functions.logger.error(
+                        `An error has occurred sending welcome email to ${recipientEmail}`
+                     )
+                  } else {
+                     functions.logger.log(
+                        `The welcome email was sent successfully to ${recipientEmail}`
+                     )
+                  }
+               } catch (error) {
+                  functions.logger.error(
+                     `An error has occurred sending welcome email to ${recipientEmail}`
+                  )
+               }
 
                return updatedUserRecord
             } else {
@@ -419,7 +454,7 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
             From: "CareerFairy <noreply@careerfairy.io>",
             To: recipientEmail,
-            TemplateModel: { action_url: link },
+            TemplateModel: { action_url: addUtmTagsToLink({ link: link }) },
          }
 
          const response = await client.sendEmailWithTemplate(email)

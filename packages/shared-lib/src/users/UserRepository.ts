@@ -113,6 +113,11 @@ export interface IUserRepository {
    ): Promise<void>
 
    unsubscribeUser(userEmail: string): Promise<void>
+
+   updateUserHasRegisteredToAnyLivestreamEver(
+      userEmail: string,
+      hasRegistered: boolean
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -526,6 +531,25 @@ export class FirebaseUserRepository
          .doc(reminderIdentifier)
 
       return ref.delete()
+   }
+
+   updateUserHasRegisteredToAnyLivestreamEver(
+      userEmail,
+      hasRegistered
+   ): Promise<void> {
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("stats")
+         .doc("stats")
+
+      return docRef.set(
+         {
+            userId: userEmail,
+            hasRegisteredOnAnyLivestream: hasRegistered,
+         },
+         { merge: true }
+      )
    }
 }
 

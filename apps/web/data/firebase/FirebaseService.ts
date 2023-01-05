@@ -14,10 +14,12 @@ import {
 } from "../../util/CommonUtil"
 import {
    EventRating,
+   LivestreamChatEntry,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamImpression,
    LivestreamPromotions,
+   LivestreamQuestion,
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -34,13 +36,18 @@ import {
    getLivestreamGroupQuestionAnswers,
    UserData,
    UserLivestreamGroupQuestionAnswers,
+   UserStats,
 } from "@careerfairy/shared-lib/dist/users"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
-import DocumentReference = firebase.firestore.DocumentReference
 import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
 import { makeUrls } from "../../util/makeUrls"
+import {
+   createCompatGenericConverter,
+   OnSnapshotCallback,
+} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import DocumentReference = firebase.firestore.DocumentReference
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -147,7 +154,7 @@ class FirebaseService {
 
    validateUserEmailWithPin = async (userInfo) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin"
+         "validateUserEmailWithPin_v2"
       )
       return validateUserEmailWithPin({ userInfo })
    }
@@ -367,14 +374,23 @@ class FirebaseService {
 
    // *** Firestore API ***
 
-   getStreamRef = (router): firebase.firestore.DocumentReference => {
+   getStreamRef = (router): DocumentReference<LivestreamEvent> => {
       const {
          query: { breakoutRoomId, livestreamId },
       } = router
       if (!livestreamId) return null
-      let ref = this.firestore.collection("livestreams").doc(livestreamId)
+
+      const streamConverter = createCompatGenericConverter<LivestreamEvent>()
+
+      let ref = this.firestore
+         .collection("livestreams")
+         .withConverter(streamConverter)
+         .doc(livestreamId)
       if (breakoutRoomId) {
-         ref = ref.collection("breakoutRooms").doc(breakoutRoomId)
+         ref = ref
+            .collection("breakoutRooms")
+            .withConverter(streamConverter)
+            .doc(breakoutRoomId)
       }
       return ref
    }
@@ -1074,6 +1090,13 @@ class FirebaseService {
       return streamRef.collection("questions").where("type", "==", "done")
    }
 
+   deleteLivestreamQuestion = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      questionId: string
+   ) => {
+      return streamRef.collection("questions").doc(questionId).delete()
+   }
+
    listenToLivestreamQuestions = (livestreamId, callback) => {
       let ref = this.firestore
          .collection("livestreams")
@@ -1196,10 +1219,16 @@ class FirebaseService {
       return ref.add(question)
    }
 
-   addLivestreamQuestion = (streamRef, question) => {
-      question.timestamp = firebase.firestore.Timestamp.fromDate(new Date())
-      let ref = streamRef.collection("questions")
-      return ref.add(question)
+   addLivestreamQuestion = (
+      streamRef,
+      question: Omit<LivestreamQuestion, "id" | "timestamp">
+   ) => {
+      const ref = streamRef.collection("questions")
+      const addQuestionData: Omit<LivestreamQuestion, "id"> = {
+         ...question,
+         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+      }
+      return ref.add(addQuestionData)
    }
 
    upvoteLivestreamQuestion = (livestreamId, question, userEmail) => {
@@ -1232,12 +1261,36 @@ class FirebaseService {
       return ref.add(comment)
    }
 
-   listenToChatEntries = (streamRef, limit, callback) => {
+   listenToChatEntries = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      limit: number,
+      callback: OnSnapshotCallback<LivestreamChatEntry>
+   ) => {
       let ref = streamRef
          .collection("chatEntries")
          .limit(limit)
          .orderBy("timestamp", "desc")
       return ref.onSnapshot(callback)
+   }
+
+   deleteChatEntry = (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>,
+      chatEntryId: string
+   ) => {
+      let ref = streamRef.collection("chatEntries").doc(chatEntryId)
+      return ref.delete()
+   }
+
+   deleteAllChatEntries = async (
+      streamRef: DocumentReference<firebase.firestore.DocumentData>
+   ) => {
+      const snaps = await streamRef.collection("chatEntries").get()
+
+      return Promise.allSettled(
+         snaps.docs.map((doc) => {
+            return doc.ref.delete().catch(console.error)
+         })
+      )
    }
 
    putChatEntry = (streamRef, chatEntry) => {
@@ -2337,10 +2390,14 @@ class FirebaseService {
       return userTalentPoolRef.onSnapshot(callback)
    }
 
-   setUserIsParticipatingWithRef = (streamRef, userData: UserData) => {
-      let batch = this.firestore.batch()
+   setUserIsParticipatingWithRef = async (
+      streamRef: DocumentReference<LivestreamEvent>,
+      userData: UserData,
+      userStats: UserStats
+   ) => {
       let participantsRef = streamRef
          .collection("userLivestreamData")
+         .withConverter(createCompatGenericConverter<UserLivestreamData>())
          .doc(userData.userEmail)
 
       const data: UserLivestreamData = {
@@ -2353,14 +2410,39 @@ class FirebaseService {
             date: this.getServerTimestamp(),
          },
       }
+      return this.firestore.runTransaction((transaction) => {
+         return transaction
+            .get(participantsRef)
+            .then((userLivestreamDataSnap) => {
+               if (userLivestreamDataSnap.exists) {
+                  const userLivestreamData = userLivestreamDataSnap.data()
 
-      batch.set(participantsRef, data, { merge: true })
-      batch.update(streamRef, {
-         participatingStudents: firebase.firestore.FieldValue.arrayUnion(
-            userData.userEmail
-         ),
+                  const isFirstParticipation =
+                     !userLivestreamData.participated?.date
+
+                  // If this is the first time the user is participating, we store the user stats
+                  if (isFirstParticipation) {
+                     data.participated.initialSnapshot = {
+                        userData: userData || null,
+                        userStats: userStats || null,
+                        // @ts-ignore
+                        date: this.getServerTimestamp(),
+                     }
+                  }
+
+                  // Set the user Participating data in the userLivestreamData collection
+                  transaction.set(participantsRef, data, { merge: true })
+
+                  // Set the user's email in the participants array of the livestream document
+                  transaction.update(streamRef, {
+                     participatingStudents:
+                        firebase.firestore.FieldValue.arrayUnion(
+                           userData.userEmail
+                        ),
+                  })
+               }
+            })
       })
-      return batch.commit()
    }
 
    checkIfUserAgreedToGroupPolicy = async (groupId, userEmail) => {

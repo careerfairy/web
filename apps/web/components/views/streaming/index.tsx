@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import VideoContainer from "./video-container/VideoContainer"
 import NotificationsContainer from "./notifications-container/NotificationsContainer"
-import MiniChatContainer from "./LeftMenu/categories/chat/MiniChatContainer"
+import MiniChatContainer from "./sharedComponents/chat/MiniChatContainer"
 import IconsContainer from "./icons-container/IconsContainer"
 import { useCurrentStream } from "../../../context/stream/StreamContext"
 import StreamNotifications from "./sharedComponents/StreamNotifications"
@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
       right: 40,
       width: "20%",
       minWidth: 250,
-      zIndex: 1,
+      zIndex: 2,
    },
    iconsContainer: {
       position: "absolute",
@@ -81,7 +81,7 @@ const StreamerOverview = ({
    hideAudience,
    audienceDrawerOpen,
 }) => {
-   const { currentLivestream, isStreamer } = useCurrentStream()
+   const { currentLivestream } = useCurrentStream()
    const [mounted, setMounted] = useState(false)
    const [showTapHint, setShowTapHint] = useState(smallScreen)
    const classes = useStyles()
@@ -172,6 +172,7 @@ const StreamerOverview = ({
                openSupportInLeftMenu={openSupportInLeftMenu}
             />
             <ButtonComponent
+               streamFinished={false}
                isMobile={undefined}
                streamer={true}
                selectedState={selectedState}
@@ -192,11 +193,7 @@ const StreamerOverview = ({
          <NotificationsContainer handRaiseMenuOpen={selectedState === "hand"} />
          <StreamNotifications isStreamer={true} />
          <HandRaiseNotifier />
-         <MiniChatContainer
-            className={classes.miniChatContainer}
-            livestream={currentLivestream}
-            isStreamer={isStreamer}
-         />
+         <MiniChatContainer className={classes.miniChatContainer} />
 
          <IconsContainer className={classes.iconsContainer} />
          <Backdrop

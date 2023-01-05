@@ -14,6 +14,7 @@ import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { SkeletonStackMultiple } from "../../../../util/Skeletons"
 import useGroupFromState from "../../../../custom-hook/useGroupFromState"
 import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+import ATSAccountContextProvider from "./ATSAccountContextProvider"
 
 const styles = sxStyles({
    indicator: {
@@ -91,7 +92,9 @@ const AtsIntegrationContent = () => {
                         <SkeletonStackMultiple quantity={1} height={150} />
                      }
                   >
-                     <AccountInformation atsAccount={entry} />
+                     <ATSAccountContextProvider account={entry}>
+                        <AccountInformation />
+                     </ATSAccountContextProvider>
                   </SuspenseWithBoundary>
                </SwipeablePanel>
             ))}

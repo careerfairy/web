@@ -19,6 +19,7 @@ import {
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
+import { livestreamRepo, userRepo } from "data/RepositoryInstances"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -177,7 +178,7 @@ export function RegistrationContextProvider({
       registerToLivestream,
       livestreamQuestionsQuery,
    } = useFirebaseService()
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, userStats } = useAuth()
    const [sliding, setSliding] = useState(false)
    const [gettingPolicyStatus, setGettingPolicyStatus] = useState(false)
    const [questionSortType, setQuestionSortType] = useState("timestamp")
@@ -191,6 +192,32 @@ export function RegistrationContextProvider({
       hasAgreedToAll: false,
       totalSteps: 0,
    })
+
+   useEffect(() => {
+      if (userData?.authId && !userStats?.hasRegisteredOnAnyLivestream) {
+         ;(async () => {
+            try {
+               const isUserRegisterOnAnyLivestream =
+                  await livestreamRepo.isUserRegisterOnAnyLivestream(
+                     userData.authId
+                  )
+               await userRepo.updateUserHasRegisteredToAnyLivestreamEver(
+                  userData.userEmail,
+                  isUserRegisterOnAnyLivestream
+               )
+            } catch (error) {
+               errorLogAndNotify(error, {
+                  message: `Not able to very if ${userData.userEmail} has registered to any Livestream`,
+               })
+            }
+         })()
+      }
+   }, [
+      userData?.authId,
+      userData?.userEmail,
+      userStats?.hasRegisteredOnAnyLivestream,
+   ])
+
    const questionsQuery = useMemo(() => {
       // prevent an extra query for the questions if they are disabled
       if (livestream?.questionsDisabled) {
@@ -200,7 +227,7 @@ export function RegistrationContextProvider({
       return (
          livestream && livestreamQuestionsQuery(livestream.id, questionSortType)
       )
-   }, [livestream?.id, livestream?.questionsDisabled, questionSortType])
+   }, [livestream, livestreamQuestionsQuery, questionSortType])
 
    const {
       docs,
@@ -362,6 +389,7 @@ export function RegistrationContextProvider({
          groupsWithPolicies,
          handleClose,
          handleSendConfirmEmail,
+         isRecommended,
          livestream,
          registerToLivestream,
       ]
@@ -422,6 +450,7 @@ export function RegistrationContextProvider({
       onQuestionsAnswered,
       promptOtherEventsOnFinal,
       questionSortType,
+      setTotalSteps,
       sliding,
       totalSteps,
    ])

@@ -1,6 +1,6 @@
 import PropTypes from "prop-types"
-import { useCurrentStream } from "../../../../../../../context/stream/StreamContext"
-import { useAuth } from "../../../../../../../HOCs/AuthProvider"
+import { useCurrentStream } from "../../../../../../context/stream/StreamContext"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useDispatch } from "react-redux"
 import {
    heartPng,
@@ -9,13 +9,13 @@ import {
    thumbsUpPng,
    wowPng,
 } from "../EmotesModal/utils"
-import * as actions from "../../../../../../../store/actions"
+import * as actions from "../../../../../../store/actions"
 import React, { Fragment } from "react"
 import { IconButton } from "@mui/material"
 import clsx from "clsx"
 import makeStyles from "@mui/styles/makeStyles"
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
-import useStreamRef from "../../../../../../custom-hook/useStreamRef"
+import useStreamRef from "../../../../../custom-hook/useStreamRef"
 
 const useStyles = makeStyles((theme) => ({
    emoteImg: {

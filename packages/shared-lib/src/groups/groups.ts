@@ -3,6 +3,7 @@ import { convertDictToDocArray } from "../BaseFirebaseRepository"
 import { dynamicSort } from "../utils"
 import firebase from "firebase/compat/app"
 import { UserData } from "../users"
+import { MergeExtraRequiredData } from "../ats/merge/MergeResponseTypes"
 
 // CareerCenterData collection
 export interface Group extends Identifiable {
@@ -108,7 +109,11 @@ export interface GroupATSAccountDocument extends Identifiable {
       slug?: string
       // used to confirm if the first sync is complete for the integration
       firstSyncCompletedAt?: firebase.firestore.Timestamp
+      // confirm the application test was completed
+      // required to be able to associate jobs with livestreams
+      applicationTestCompletedAt?: firebase.firestore.Timestamp
       lastFetchedAt?: firebase.firestore.Timestamp
+      extraRequiredData?: MergeExtraRequiredData
    }
    createdAt: firebase.firestore.Timestamp
    updatedAt: firebase.firestore.Timestamp

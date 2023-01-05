@@ -44,7 +44,7 @@ const useScreenShareRtc = agoraServiceInstance.createClient({
    codec: "vp8",
 })
 
-const RTCProvider: React.FC<RtcPropsInterface> = ({
+const RTCProvider = ({
    children,
    appId,
    isStreamer,
@@ -53,7 +53,7 @@ const RTCProvider: React.FC<RtcPropsInterface> = ({
    channel,
    screenSharerId,
    streamMode,
-}) => {
+}: RtcPropsInterface) => {
    const streamRef = useStreamRef()
    const router = useRouter()
    const rtcClient = useRtcClient()

@@ -2,6 +2,7 @@ import firebase from "firebase/compat/app"
 import { Identifiable } from "./commonTypes"
 import QuerySnapshot = firebase.firestore.QuerySnapshot
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
+import { FirestoreDataConverter } from "firebase/firestore"
 
 /**
  * Utility methods for Firebase based repositories
@@ -106,3 +107,55 @@ export function removeDuplicateDocuments<T extends Identifiable>(
 
 // max of 10 events to allow for firestore query limit
 export type FirebaseInArrayLimit = 1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10
+
+/*
+ This is a function that returns a Firestore data converter object.
+ The data converter is used to specify how documents in a Firestore
+ collection should be converted to and from objects in your application at runtime.
+*
+ We could also create a livestreamPresenterConverter object and use it
+ and have all its business logic methods
+ when we call doc.data().
+
+[Official docs example](https://firebase.google.com/docs/reference/js/v8/firebase.firestore.FirestoreDataConverter)
+
+@example
+ const livestreamConverter = createGenericConverter<LivestreamEvent>()
+ const livestreamSnap = firestore.collection('livestreams')
+                         .doc("livestreamId")
+                        .withConverter(userConverter)
+
+ const livestream = livestreamSnap.data();
+ if (livestream !== undefined) {
+    livestream.title; // string
+    livestream.start.toDate(); // returns a Date object
+    livestream.someNonExistentProperty; // TS error
+ }
+ */
+export const createGenericConverter = <
+   T extends Identifiable
+>(): FirestoreDataConverter<T> => ({
+   toFirestore(modelObject: T) {
+      return modelObject
+   },
+
+   fromFirestore(snapshot, options): T {
+      return {
+         ...snapshot.data(options),
+         id: snapshot.id,
+      } as T
+   },
+})
+export const createCompatGenericConverter = <
+   T extends Identifiable
+>(): firebase.firestore.FirestoreDataConverter<T> => ({
+   toFirestore(modelObject: T) {
+      return modelObject
+   },
+   fromFirestore(snapshot, options): T {
+      return {
+         ...snapshot.data(options),
+         id: snapshot.id,
+      } as T
+   },
+})

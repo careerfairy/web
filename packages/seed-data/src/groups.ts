@@ -1,8 +1,8 @@
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { v4 as uuidv4 } from "uuid"
 import { faker } from "@faker-js/faker"
 import { firestore } from "./lib/firebase"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
+import { generateId } from "./utils/utils"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -11,7 +11,7 @@ interface GroupSeed {
 class GroupFirebaseSeed implements GroupSeed {
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
       const batch = firestore.batch()
-      const id = uuidv4()
+      const id = generateId()
       let data: Group = {
          id,
          groupId: id,
@@ -39,7 +39,7 @@ class GroupFirebaseSeed implements GroupSeed {
    }
 }
 const generateQuestionOption = (generatorFn) => ({
-   id: uuidv4(),
+   id: generateId(),
    name: generatorFn(),
 })
 
@@ -47,7 +47,7 @@ export const generateQuestion = (
    name,
    generatorFn
 ): LivestreamGroupQuestion => ({
-   id: uuidv4(),
+   id: generateId(),
    questionType: "custom",
    hidden: false,
    name,

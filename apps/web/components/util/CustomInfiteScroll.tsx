@@ -1,9 +1,12 @@
-import React, { FC } from "react"
+import React, { FC, ReactNode } from "react"
 import InfiniteScroll, { Props } from "react-infinite-scroll-component"
 
 import { Typography, CircularProgress } from "@mui/material"
 
-const CustomInfiniteScroll: FC<Props> = ({
+type CustomInfiniteScrollProps = Omit<Props, "loader"> & {
+   loader?: ReactNode
+}
+const CustomInfiniteScroll: FC<CustomInfiniteScrollProps> = ({
    children,
    loader = <CircularProgress />,
    ...props

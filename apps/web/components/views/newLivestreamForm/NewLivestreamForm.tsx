@@ -311,6 +311,7 @@ const NewLivestreamForm = () => {
 
          if (selectedJobs.length) {
             livestream.jobs = selectedJobs
+            livestream.hasJobs = selectedJobs.length > 0
          }
 
          let id

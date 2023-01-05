@@ -4,6 +4,7 @@ import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserPublicData,
+   UserStats,
 } from "../users"
 import firebase from "firebase/compat"
 import { FieldOfStudy } from "../fieldOfStudy"
@@ -127,6 +128,10 @@ export interface LivestreamEvent extends Identifiable {
     * During livestream creating, jobs can be associated with the livestream
     */
    jobs?: LivestreamJobAssociation[]
+   /**
+    * Firestore has limitations when querying for jobs != []
+    */
+   hasJobs?: boolean
 
    /*
     * True if the event is also taking place in person
@@ -220,6 +225,12 @@ export interface UserLivestreamData extends Identifiable {
    participated?: {
       // if the date is March 17, 2020 03:24:00 it as a fallbackDate
       date: firebase.firestore.Timestamp
+      // The initial snapshot of the user's data when they participated in the livestream for the first time
+      initialSnapshot?: {
+         userData: UserData
+         userStats: UserStats
+         date: firebase.firestore.Timestamp
+      }
    }
    jobApplications?: {
       [jobId: string]: LivestreamJobApplicationDetails
@@ -228,6 +239,7 @@ export interface UserLivestreamData extends Identifiable {
 
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
    date: firebase.firestore.Timestamp
+   applicationId?: string
    job: Partial<Job>
 }
 
@@ -326,6 +338,22 @@ export interface LivestreamQuestion extends Identifiable {
    title: string
    type: "new" | "current"
    votes: number
+   emailOfVoters?: string[]
+   /**
+    * We store the most recent comment to the question on the question document
+    * */
+   firstComment?: LivestreamQuestion
+   /*
+    * The number of comments on the question
+    * */
+   numberOfComments?: number
+
+   /*
+    * The number of badges the question has
+    * */
+   badges: string[]
+
+   displayName?: string
 }
 
 export interface LivestreamPoll extends Identifiable {
@@ -344,6 +372,28 @@ export interface LivestreamChatEntry extends Identifiable {
    authorName: string
    message: string
    timestamp: firebase.firestore.Timestamp
+
+   type?: // used to identify a chat entry that was sent by a host to all breakout rooms (only used in the UI)
+   | "broadcast"
+      // used to identify a chat entry that was sent by a host (only used in the UI)
+      | "streamer"
+
+   /*
+    * Array of userIds who reacted with 😮
+    * */
+   wow: string[]
+   /*
+    * Array of userIds who reacted with  ❤
+    */
+   heart: string[]
+   /*
+    * Array of userIds who reacted with  👍
+    */
+   thumbsUp: string[]
+   /*
+    * Array of userIds who reacted with 😂
+    */
+   laughing: string[]
 }
 
 export interface LivestreamIcon extends Identifiable {
@@ -416,6 +466,30 @@ export interface LivestreamImpression extends Identifiable, DocumentData {
    isRecommended: boolean
    location: Location
    asPath: string
+}
+
+// Collection Path: livestreams/{livestreamId}/participatingStats/{userId}
+export interface UserParticipatingStats extends DocumentData, Identifiable {
+   /**
+    *  The ID of the livestream document
+    * */
+   livestreamId: string
+   /**
+    * The total amount of minutes the user has participated in the livestream
+    * */
+   totalMinutes: number
+   /**
+    * An array of minutes the user has participated in the livestream (e.g. [5, 6, 7] means the user was present at minute 5, 6 and 7)
+    */
+   minutes: string[]
+   /**
+    * Snapshot of the livestream document at the time the user last participated
+    */
+   livestream: LivestreamEventPublicData
+   /**
+    * Snapshot of the user document at the time the user last participated
+    */
+   user: UserPublicData
 }
 
 export enum ImpressionLocation {

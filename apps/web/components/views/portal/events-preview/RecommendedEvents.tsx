@@ -4,7 +4,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import useRecommendedEvents from "../../../custom-hook/useRecommendedEvents"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
-const RecommendedEvents = ({ limit }: Props) => {
+const RecommendedEvents = ({ limit = 10, hideTitle }: Props) => {
    const { authenticatedUser } = useAuth()
 
    const options = useMemo(
@@ -23,7 +23,7 @@ const RecommendedEvents = ({ limit }: Props) => {
    return (
       <EventsPreview
          limit={limit}
-         title={"RECOMMENDED FOR YOU"}
+         title={!hideTitle && "RECOMMENDED FOR YOU"}
          events={events}
          type={EventsTypes.recommended}
          loading={loading}
@@ -34,6 +34,7 @@ const RecommendedEvents = ({ limit }: Props) => {
 
 interface Props {
    limit?: FirebaseInArrayLimit
+   hideTitle?: boolean
 }
 
 export default RecommendedEvents

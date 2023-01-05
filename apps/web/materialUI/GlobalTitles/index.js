@@ -36,7 +36,7 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-export const GreyPermanentMarker = ({ className, ...props }) => {
+export const GreyPermanentMarker = ({ className = undefined, ...props }) => {
    const classes = useStyles()
    return (
       <Typography

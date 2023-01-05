@@ -10,6 +10,7 @@ import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
@@ -77,7 +78,11 @@ export const sendReminderEmailAboutApplicationLink = functions
          To: data.recipient,
          TemplateModel: {
             recipient_name: data.recipient_name,
-            application_link: data.application_link,
+            application_link: addUtmTagsToLink({
+               link: data.application_link,
+               campaign: "jobApplication",
+               content: data.position_name,
+            }),
             position_name: data.position_name,
          },
       } as TemplatedMessage

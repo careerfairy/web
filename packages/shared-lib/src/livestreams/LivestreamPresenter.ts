@@ -18,6 +18,7 @@ import {
    dateFromFirebaseTimestamp,
    dateToFirebaseTimestamp,
 } from "../utils/firebaseSerializerMethods"
+import { AdminGroupsClaim } from "../users"
 
 /**
  * Livestream class
@@ -123,6 +124,14 @@ export class LivestreamPresenter extends BaseModel {
 
    getMainStreamId(): string {
       return this.parentLivestream?.id || this.id
+   }
+
+   isStreamAdmin(userGroupAdminClaims: AdminGroupsClaim): boolean {
+      return this.groupIds.some((groupId) => userGroupAdminClaims?.[groupId])
+   }
+
+   streamHasFinished(): boolean {
+      return this.hasEnded && this.hasStarted === false
    }
 
    isPast(): boolean {

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useState } from "react"
 import ForumOutlinedIcon from "@mui/icons-material/ForumOutlined"
 import HelpIcon from "@mui/icons-material/Help"
 import BarChartIcon from "@mui/icons-material/BarChart"
@@ -124,6 +124,7 @@ const ButtonComponent = ({
    streamer,
    includeJobs,
    questionsAreDisabled,
+   streamFinished,
 }) => {
    const focusModeEnabled = useSelector(focusModeEnabledSelector)
    const DELAY = 3000 //3 seconds
@@ -159,7 +160,7 @@ const ButtonComponent = ({
       focusModeEnabled,
    })
 
-   const handleMouseEnter = (event) => {
+   const handleMouseEnter = () => {
       clearTimeout(delayHandler)
       handleOpen()
    }
@@ -184,22 +185,11 @@ const ButtonComponent = ({
       setOpen(false)
    }
 
-   if (isMobile && showMenu) {
-      return null
-   }
-
-   const getActions = () => {
+   const getActions = useCallback(() => {
       if (!hasMounted || !showActionButtons) {
          return []
       }
       const actions = [
-         {
-            icon: <BarChartIcon fontSize="large" />,
-            name: "Polls",
-            disabled: showMenu && selectedState === "polls",
-            onClick: () => handleStateChange("polls"),
-            tutorialNum: 3,
-         },
          {
             icon: <HelpIcon fontSize="large" />,
             name: questionsAreDisabled ? "Q&A (Disabled)" : "Q&A",
@@ -211,7 +201,17 @@ const ButtonComponent = ({
          },
       ]
 
-      if (isMobile || focusModeEnabled) {
+      if (!streamFinished) {
+         actions.unshift({
+            icon: <BarChartIcon fontSize="large" />,
+            name: "Polls",
+            disabled: showMenu && selectedState === "polls",
+            onClick: () => handleStateChange("polls"),
+            tutorialNum: 3,
+         })
+      }
+
+      if ((isMobile || focusModeEnabled) && !streamFinished) {
          actions.unshift({
             icon: <ForumOutlinedIcon fontSize="large" />,
             name: "Chat",
@@ -220,7 +220,8 @@ const ButtonComponent = ({
             tutorialNum: 234,
          })
       }
-      if (!isMobile) {
+
+      if (!isMobile && !streamFinished) {
          actions.unshift({
             icon: <PanToolOutlinedIcon />,
             name: "Hand Raise",
@@ -234,7 +235,7 @@ const ButtonComponent = ({
          actions.unshift({
             icon: <WorkRoundedIcon fontSize="large" />,
             name: "Jobs",
-            disabled: false,
+            disabled: selectedState === "jobs",
             onClick: () => handleStateChange("jobs"),
             tutorialNum: 999999,
          })
@@ -251,6 +252,23 @@ const ButtonComponent = ({
       }
 
       return actions
+   }, [
+      hasMounted,
+      showActionButtons,
+      showMenu,
+      selectedState,
+      handleStateChange,
+      isMobile,
+      focusModeEnabled,
+      streamer,
+      includeJobs,
+      questionsAreDisabled,
+      streamFinished,
+      dispatch,
+   ])
+
+   if (isMobile && showMenu) {
+      return null
    }
 
    return (

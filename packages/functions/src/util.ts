@@ -10,6 +10,8 @@ import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -138,6 +140,10 @@ const createRecipientVariables = (
       let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
       formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
 
+      const upcomingStreamLink = externalEventLink
+         ? externalEventLink
+         : getStreamLink(streamId)
+
       const emailData = {
          timeMessage: timeMessage,
          companyName: company,
@@ -145,9 +151,11 @@ const createRecipientVariables = (
          streamTitle: title,
          formattedDateTime: formattedDate,
          formattedSpeaker: `${speakerFirstName} ${speakerLastName}, ${speakerPosition}`,
-         upcomingStreamLink: externalEventLink
-            ? externalEventLink
-            : getStreamLink(streamId),
+         upcomingStreamLink: addUtmTagsToLink({
+            link: upcomingStreamLink,
+            campaign: "eventReminders",
+            content: title,
+         }),
          german: language?.code === "DE",
       }
 
@@ -160,6 +168,10 @@ const createRecipientVariables = (
 
 export const addMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() + minutes * 60000)
+}
+
+export const removeMinutesDate = (date: Date, minutes: number): Date => {
+   return new Date(date.getTime() - minutes * 60000)
 }
 
 export const getArrayDifference = (array1, array2) => {
@@ -291,6 +303,7 @@ export const partition = <T>(
 export const isLocalEnvironment = () => {
    return (
       process.env.FIREBASE_AUTH_EMULATOR_HOST ||
+      process.env.FIREBASE_STORAGE_EMULATOR_HOST ||
       process.env.FIRESTORE_EMULATOR_HOST ||
       process.env.FUNCTIONS_EMULATOR ||
       process.env.NODE_ENV === "development" ||
@@ -406,6 +419,19 @@ export const onCallWrapper = (handler: onCallFnHandler): onCallFnHandler => {
  */
 export function serializeModels<T extends BaseModel>(result: T[]) {
    return result.map((entry) => entry.serializeToPlainObject())
+}
+
+/**
+ * Convert business models into plain objects (arrays)
+ * @param result
+ */
+export function serializePaginatedModels<T extends BaseModel>(
+   result: ATSPaginatedResults<T>
+): ATSPaginatedResults<object> {
+   return {
+      ...result,
+      results: result?.results?.map((e) => e.serializeToPlainObject()),
+   }
 }
 
 /**
