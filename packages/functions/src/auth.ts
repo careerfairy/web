@@ -365,9 +365,7 @@ export const validateUserEmailWithPin_v2 = functions
                   From: "CareerFairy <noreply@careerfairy.io>",
                   To: recipientEmail,
                   TemplateModel: {
-                     user_name: `${user.firstName || ""} ${
-                        user.lastName || ""
-                     }`,
+                     user_name: user.firstName,
                   },
                }
 
