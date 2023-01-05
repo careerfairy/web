@@ -30,7 +30,7 @@ import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles = {
    root: (theme, smallVerticalScreen) => ({
-      minHeight: smallVerticalScreen ? "160vh !important" : "auto",
+      minHeight: smallVerticalScreen ? "190vh !important" : "auto",
       height: "auto",
       position: "relative",
       backgroundSize: "cover",
