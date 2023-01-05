@@ -1,6 +1,6 @@
-import { MergeRemoteUser, MergeUserRole } from "./MergeResponseTypes"
 import { fromSerializedDate } from "../BaseModel"
 import { ATSModel, fromMergeDate } from "./ATSModel"
+import { MergeRemoteUser, MergeUserRole } from "./merge/MergeResponseTypes"
 
 export class Recruiter extends ATSModel {
    constructor(
@@ -16,7 +16,11 @@ export class Recruiter extends ATSModel {
    }
 
    public getName() {
-      return `${this.firstName} ${this.lastName}`
+      if (!this.firstName && !this.lastName) {
+         return this.email
+      }
+
+      return `${this.firstName ?? ""} ${this.lastName ?? ""}`.trim()
    }
 
    static createFromMerge(user: MergeRemoteUser) {

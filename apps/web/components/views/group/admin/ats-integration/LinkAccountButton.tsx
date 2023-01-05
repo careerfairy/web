@@ -110,7 +110,7 @@ const MergeDialogConnector = ({
             )
          }
       },
-      [groupId, integrationId]
+      [dispatch, errorNotification, groupId, integrationId]
    )
 
    const { open, isReady, error } = useMergeLink({
@@ -131,12 +131,12 @@ const MergeDialogConnector = ({
       if (isReady && linkToken && groupId && integrationId) {
          open()
       }
-   }, [linkToken, groupId, isReady, integrationId])
+   }, [linkToken, groupId, isReady, integrationId, open])
 
    // Propagate to parent the readiness of MergeLink
    useEffect(() => {
       dispatch(mergeLinkReady(isReady))
-   }, [isReady])
+   }, [dispatch, isReady])
 
    return null
 }

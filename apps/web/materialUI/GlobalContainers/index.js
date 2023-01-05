@@ -75,7 +75,10 @@ export const CategoryContainerTopAligned = ({
    )
 }
 
-export const QuestionContainerHeader = ({ className, ...props }) => {
+export const QuestionContainerHeader = ({
+   className = undefined,
+   ...props
+}) => {
    const classes = useStyles()
    return (
       <Box

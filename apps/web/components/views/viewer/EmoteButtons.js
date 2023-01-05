@@ -9,7 +9,7 @@ import ClappingSVG from "../../util/CustomSVGs"
 import { useCurrentStream } from "../../../context/stream/StreamContext"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { TEST_EMAIL } from "../streaming/LeftMenu/categories/chat/EmotesModal/utils"
+import { TEST_EMAIL } from "../streaming/sharedComponents/chat/EmotesModal/utils"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 
 const useStyles = makeStyles((theme) => ({

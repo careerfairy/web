@@ -64,8 +64,8 @@ const useStyles = makeStyles((theme) => ({
 export const PlayIconButton = ({
    addNewComment,
    disabled,
-   IconProps,
-   IconButtonProps,
+   IconProps = {},
+   IconButtonProps = {},
    ...props
 }) => {
    const classes = useStyles({ disabled })

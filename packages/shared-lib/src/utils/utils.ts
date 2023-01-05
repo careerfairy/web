@@ -76,3 +76,54 @@ export const sortLivestreamsDesc = (
 
    return 0
 }
+
+/**
+ * To slugify any string
+ */
+const slugify = (text: string): string => {
+   return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, "")
+      .replace(/[\s_-]+/g, "-")
+      .replace(/^-+|-+$/g, "")
+}
+
+type AddUtmTagsToLinkProps = {
+   link: string
+   source?: string
+   medium?: string
+   campaign?: string
+   content?: string
+}
+
+/**
+ * To add UTM tags to any link
+ */
+export const addUtmTagsToLink = ({
+   link,
+   source = "careerfairy",
+   medium = "email",
+   campaign,
+   content,
+}: AddUtmTagsToLinkProps): string => {
+   const url = new URL(link)
+   const params = new URLSearchParams(url.search)
+
+   if (!params.get("utm_source")) {
+      params.set("utm_source", slugify(source))
+   }
+   if (!params.get("utm_medium")) {
+      params.set("utm_medium", slugify(medium))
+   }
+   if (!params.get("utm_campaign") && campaign) {
+      params.set("utm_campaign", slugify(campaign))
+   }
+   if (!params.get("utm_content") && content) {
+      params.set("utm_content", slugify(content))
+   }
+
+   url.search = params.toString()
+
+   return url.toString()
+}

@@ -14,9 +14,11 @@ import {
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    UserLivestreamData,
+   UserParticipatingStats,
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
+import { chunkArray } from "../utils"
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -124,18 +126,44 @@ export interface ILivestreamRepository {
     * @param userId
     * @param jobIdentifier
     * @param job
+    * @param applicationId
     */
    saveJobApplication(
       livestreamId: string,
       userId: string,
       jobIdentifier: JobIdentifier,
-      job: Job
+      job: Job,
+      applicationId: string
    ): Promise<void>
+
+   /**
+    * Fetches the userLivestreamData documents that contains job applications for the given
+    * livestreams
+    *
+    * Accepts an array of Livestream IDs, it will create chunks of 10 requests and fetch all
+    * documents
+    * @param livestreamIds
+    */
+   getApplications(livestreamIds: string[]): Promise<UserLivestreamData[]>
+
+   /**
+    * Fetches livestreams from a group that have jobs associated
+    * @param groupId
+    */
+   getLivestreamsWithJobs(groupId): Promise<LivestreamEvent[] | null>
 
    getLivestreamUser(
       eventId: string,
       userId: string
    ): Promise<UserLivestreamData>
+
+   isUserRegisterOnAnyLivestream(userId: string): Promise<boolean>
+
+   /*
+    * Get a maximum of 10 livestreams via their IDs
+    * @param ids - the IDs of the livestreams to get (max 10). If more than 10 are provided, only the first 10 will be used
+    * */
+   getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -187,11 +215,11 @@ export class FirebaseLivestreamRepository
       userData: UserPublicData,
       elapsedMinutes: number
    ): Promise<void> {
-      const data = {
+      const data: UserParticipatingStats = {
          id: userData.id,
          livestreamId: livestream.id,
-         totalMinutes: this.fieldValue.increment(1),
-         minutes: this.fieldValue.arrayUnion(elapsedMinutes),
+         totalMinutes: this.fieldValue.increment(1) as any,
+         minutes: this.fieldValue.arrayUnion(elapsedMinutes) as any,
          livestream,
          user: userData,
       }
@@ -538,7 +566,8 @@ export class FirebaseLivestreamRepository
       livestreamId: string,
       userId: string,
       jobIdentifier: JobIdentifier,
-      job: Job
+      job: Job,
+      applicationId
    ): Promise<void> {
       // should already exist since the user registered & participated
       const docRef = this.firestore
@@ -553,6 +582,7 @@ export class FirebaseLivestreamRepository
          integrationId: jobIdentifier.integrationId,
          // @ts-ignore
          date: this.fieldValue.serverTimestamp(),
+         applicatonId: applicationId,
          job: job.serializeToPlainObject(),
       }
 
@@ -561,6 +591,71 @@ export class FirebaseLivestreamRepository
       }
 
       return docRef.update(toUpdate)
+   }
+
+   async getLivestreamsWithJobs(
+      groupId: any
+   ): Promise<LivestreamEvent[] | null> {
+      let docs = await this.firestore
+         .collection("livestreams")
+         .where("groupIds", "array-contains", groupId)
+         .where("hasJobs", "==", true)
+         .get()
+
+      return mapFirestoreDocuments(docs)
+   }
+
+   async getApplications(
+      livestreamIds: string[]
+   ): Promise<UserLivestreamData[]> {
+      let chunks = chunkArray(livestreamIds, 10)
+      let promises = []
+
+      for (let chunk of chunks) {
+         promises.push(
+            this.firestore
+               .collectionGroup("userLivestreamData")
+               .where("jobApplications", "!=", null)
+               .where("livestreamId", "in", chunk)
+               .get()
+               .then(mapFirestoreDocuments)
+         )
+      }
+
+      let responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<UserLivestreamData[]>).value)
+         .flat()
+   }
+
+   async isUserRegisterOnAnyLivestream(authUid: string): Promise<boolean> {
+      const snaps = await this.firestore
+         .collectionGroup("userLivestreamData")
+         .where("userId", "==", authUid)
+         .where(`registered.date`, "!=", null)
+         .limit(1)
+         .get()
+
+      return !snaps.empty
+   }
+
+   async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .where("id", "in", ids.slice(0, 10))
+         .get()
+      return mapFirestoreDocuments<LivestreamEvent>(snaps)
    }
 }
 

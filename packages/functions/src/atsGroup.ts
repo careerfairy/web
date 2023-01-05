@@ -1,13 +1,30 @@
 import functions = require("firebase-functions")
-import { string } from "yup"
+import { boolean, object, string } from "yup"
 import { atsRepo, groupRepo } from "./api/repositories"
-import { MergeATSRepository } from "@careerfairy/shared-lib/dist/ats/MergeATSRepository"
-import { logAxiosErrorAndThrow, serializeModels } from "./util"
+import {
+   logAxiosErrorAndThrow,
+   serializeModels,
+   serializePaginatedModels,
+} from "./util"
 import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
 import {
    atsRequestValidation,
    atsRequestValidationWithAccountToken,
+   createJobApplication,
 } from "./lib/ats"
+import { MergeATSRepository, TEST_CV } from "./lib/merge/MergeATSRepository"
+import {
+   ATSDataPaginationOptions,
+   ATSPaginatedResults,
+   RecruitersFunctionCallOptions,
+} from "@careerfairy/shared-lib/dist/ats/Functions"
+import {
+   MergeExtraRequiredData,
+   MergeMetaEntities,
+} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
+import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 
 /*
 |--------------------------------------------------------------------------
@@ -108,27 +125,32 @@ export const mergeGetAccountToken = functions
    })
 
 /**
- * Fetch Jobs
+ * Fetch the Meta information for a certain entity
+ * This is used to show the form fields for the ATS integration
  */
-export const fetchATSJobs = functions
+export const mergeMetaEndpoint = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const requestData = await atsRequestValidationWithAccountToken({
+      const requestData = await atsRequestValidationWithAccountToken<{
+         entity: MergeMetaEntities
+      }>({
          data,
          context,
-         requiredData: {},
+         requiredData: {
+            entity: string().required(),
+         },
       })
 
       try {
-         const atsRepository = atsRepo(
+         const mergeATS = new MergeATSRepository(
             process.env.MERGE_ACCESS_KEY,
             requestData.tokens.merge.account_token
          )
 
-         return await atsRepository.getJobs().then(serializeModels)
+         return await mergeATS.getMetaCreation(requestData.entity)
       } catch (e) {
          return logAxiosErrorAndThrow(
-            "Failed to fetch the account jobs",
+            "Failed to fetch the meta information for the entity",
             e,
             requestData
          )
@@ -136,19 +158,20 @@ export const fetchATSJobs = functions
    })
 
 /**
- * Fetch Job Applications
- * Possibility to filter by job id
+ * Fetch Jobs
  */
-export const fetchATSApplications = functions
+export const fetchATSJobs = functions
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
-      const requestData = await atsRequestValidationWithAccountToken<{
-         jobId?: string
-      }>({
+      const requestData = await atsRequestValidationWithAccountToken<
+         ATSDataPaginationOptions & { allJobs?: boolean }
+      >({
          data,
          context,
          requiredData: {
-            jobId: string().optional().nullable(),
+            cursor: string().optional().nullable(),
+            pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
+            allJobs: boolean().optional().nullable(),
          },
       })
 
@@ -158,12 +181,135 @@ export const fetchATSApplications = functions
             requestData.tokens.merge.account_token
          )
 
+         if (requestData.allJobs) {
+            return {
+               next: null,
+               previous: null,
+               results: await atsRepository.getAllJobs().then(serializeModels),
+            } as ATSPaginatedResults<Job>
+         }
+
          return await atsRepository
-            .getApplications(requestData.jobId)
-            .then(serializeModels)
+            .getJobs({
+               cursor: requestData?.cursor,
+               pageSize: requestData?.pageSize + "",
+            })
+            .then(serializePaginatedModels)
       } catch (e) {
          return logAxiosErrorAndThrow(
-            "Failed to fetch the account applications",
+            "Failed to fetch the account jobs",
+            e,
+            requestData
+         )
+      }
+   })
+
+export const candidateApplicationTest = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData = await atsRequestValidationWithAccountToken<{
+         mergeExtraRequiredData: MergeExtraRequiredData
+         jobId: string
+      }>({
+         data,
+         context,
+         requiredData: {
+            jobId: string().required(),
+            mergeExtraRequiredData: object().required(),
+         },
+      })
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         const [atsAccount, job] = await Promise.all([
+            groupRepo.getATSIntegration(
+               requestData.groupId,
+               requestData.integrationId
+            ),
+            atsRepository.getJob(requestData.jobId),
+         ])
+
+         // @ts-ignore Set the extra data received
+         atsAccount.extraRequiredData = requestData.mergeExtraRequiredData
+
+         // Dummy candidate that we'll create
+         const userData = {
+            firstName: "User",
+            lastName: "CareerFairy",
+            userResume: TEST_CV,
+            userEmail: "application-test@careerfairy.io",
+         } as UserData
+
+         let relations: UserATSRelations = {}
+
+         relations = await createJobApplication(
+            job,
+            userData,
+            atsRepository,
+            atsAccount,
+            relations
+         )
+
+         return relations.jobApplications[job.id]
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to create the test application",
+            e,
+            requestData
+         )
+      }
+   })
+
+/**
+ * Fetch Recruiters
+ */
+export const fetchATSRecruiters = functions
+   .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
+   .https.onCall(async (data, context) => {
+      const requestData =
+         await atsRequestValidationWithAccountToken<RecruitersFunctionCallOptions>(
+            {
+               data,
+               context,
+               requiredData: {
+                  cursor: string().optional().nullable(),
+                  pageSize: string().optional().nullable(), // if it's a number, it should be cast to string
+                  all: boolean().optional().nullable(),
+                  email: string().optional().nullable(),
+               },
+            }
+         )
+
+      try {
+         const atsRepository = atsRepo(
+            process.env.MERGE_ACCESS_KEY,
+            requestData.tokens.merge.account_token
+         )
+
+         if (requestData.all) {
+            return {
+               next: null,
+               previous: null,
+               results: await atsRepository
+                  .getAllRecruiters()
+                  .then(serializeModels),
+            } as ATSPaginatedResults<Recruiter>
+         }
+
+         return await atsRepository
+            .getRecruiters({
+               cursor: requestData?.cursor,
+               pageSize: requestData?.pageSize + "",
+               email: requestData?.email,
+            })
+            .then(serializePaginatedModels)
+      } catch (e) {
+         return logAxiosErrorAndThrow(
+            "Failed to fetch the recruiters",
             e,
             requestData
          )

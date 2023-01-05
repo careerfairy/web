@@ -1,7 +1,7 @@
 import React, { Fragment, useCallback } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import ViewerComponent from "./viewer-component/ViewerComponent"
-import MiniChatContainer from "../streaming/LeftMenu/categories/chat/MiniChatContainer"
+import MiniChatContainer from "../streaming/sharedComponents/chat/MiniChatContainer"
 import IconsContainer from "../streaming/icons-container/IconsContainer"
 import RatingContainer from "./rating-container/RatingContainer"
 import { Backdrop } from "@mui/material"
@@ -71,7 +71,7 @@ const ViewerOverview = ({
    const {
       query: { isRecordingWindow },
    } = useRouter()
-   const { currentLivestream, isMobile: mobile } = useCurrentStream()
+   const { currentLivestream, isMobile: mobile, presenter } = useCurrentStream()
    const dispatch = useDispatch()
    const { videoIsMuted, videoIsPaused } = useSelector(
       (state: RootState) => state.stream.streaming
@@ -89,6 +89,8 @@ const ViewerOverview = ({
       dispatch(actions.unmuteMutedRemoteVideosAfterFail())
    }, [dispatch])
 
+   const enableEmotions = isRecordingWindow || !focusModeEnabled
+
    return (
       <Fragment>
          <div className={classes.blackFrame}>
@@ -97,7 +99,8 @@ const ViewerOverview = ({
                audienceDrawerOpen={audienceDrawerOpen}
                isStreamer={false}
             />
-            <ButtonComponent
+            {!isRecordingWindow && (<ButtonComponent
+               streamFinished={presenter?.streamHasFinished()}
                selectedState={selectedState}
                showMenu={showMenu}
                isMobile={mobile}
@@ -105,7 +108,7 @@ const ViewerOverview = ({
                streamer={false}
                includeJobs={currentLivestream.jobs?.length > 0}
                questionsAreDisabled={currentLivestream.questionsDisabled}
-            />
+            />)}
             <ViewerComponent
                showMenu={showMenu}
                handRaiseActive={handRaiseActive}
@@ -114,12 +117,10 @@ const ViewerOverview = ({
                <MiniChatContainer
                   mobile={mobile}
                   className={classes.miniChatContainer}
-                  livestream={currentLivestream}
-                  isStreamer={false}
                />
             )}
          </div>
-         {!focusModeEnabled && (
+         {enableEmotions && (
             <IconsContainer className={classes.iconsContainer} />
          )}
          {currentLivestream && !currentLivestream.hasNoRatings && (

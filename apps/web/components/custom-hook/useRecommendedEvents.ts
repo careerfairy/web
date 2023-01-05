@@ -22,7 +22,7 @@ const useRecommendedEvents = (
 
    const { data: eventIds } = useSWR<string[]>(
       [
-         "getRecommendedEvents",
+         "getRecommendedEvents_v2",
          {
             limit: config.limit,
          },

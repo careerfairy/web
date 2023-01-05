@@ -3,6 +3,8 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import { addMinutesDate, removeMinutesDate } from "../util"
+import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 
 export const livestreamGetById = async (id) => {
    const documentSnap = await admin
@@ -163,4 +165,44 @@ export const updateLiveStreamsWithEmailSent = (
          [`reminderEmailsSent.${reminderKey}`]: chunks,
       })
    })
+}
+
+/**
+ * Update livestreams that have started but have not finished after 4 hours
+ */
+export const updateUnfinishedLivestreams = async () => {
+   const dateNowLess4Hours = removeMinutesDate(
+      new Date(),
+      60 * MAX_RECORDING_HOURS
+   )
+
+   const batch = admin.firestore().batch()
+
+   const collection = await admin
+      .firestore()
+      .collection("livestreams")
+      .where("hasStarted", "==", true)
+      .where("hasEnded", "==", false)
+      .where("test", "==", false)
+      .where("start", "<=", dateNowLess4Hours)
+      .get()
+
+   collection.docs?.forEach((doc) => {
+      const event = doc.data() as LivestreamEvent
+
+      const startDatePlusDuration = addMinutesDate(
+         event.start.toDate(),
+         event.duration
+      )
+
+      if (startDatePlusDuration <= new Date()) {
+         batch.update(doc.ref, {
+            hasStarted: false,
+            hasEnded: true,
+            isRecording: false,
+         })
+      }
+   })
+
+   return batch.commit()
 }

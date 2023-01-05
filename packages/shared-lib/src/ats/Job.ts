@@ -1,9 +1,9 @@
-import { JobStatus, MergeJob } from "./MergeResponseTypes"
 import { fromSerializedDate, mapIfObject } from "../BaseModel"
 import { Office } from "./Office"
 import { Recruiter } from "./Recruiter"
 import { Department } from "./Department"
 import { ATSModel, fromMergeDate } from "./ATSModel"
+import { JobStatus, MergeJob } from "./merge/MergeResponseTypes"
 
 /**
  * Job class
@@ -30,7 +30,9 @@ export class Job extends ATSModel {
       public readonly updatedAt: Date
    ) {
       super()
-      this.descriptionStripped = description?.replace(/<[^>]*>?/gm, "")
+      this.descriptionStripped = description
+         ?.replace(/<[^>]*>?/gm, "")
+         ?.replace(/&nbsp;/g, " ")
    }
 
    /**

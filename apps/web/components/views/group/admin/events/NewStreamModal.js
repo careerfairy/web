@@ -211,6 +211,7 @@ const NewStreamModal = ({
 
          if (selectedJobs) {
             livestream.jobs = selectedJobs
+            livestream.hasJobs = selectedJobs.length > 0
          }
 
          // only save the promotions if the start date is after 30 days from now

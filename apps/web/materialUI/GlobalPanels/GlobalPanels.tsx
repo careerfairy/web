@@ -1,6 +1,7 @@
 import React, { FC } from "react"
 import * as PropTypes from "prop-types"
-import { Box } from "@mui/material"
+import { Box, SxProps } from "@mui/material"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 type StyledBoxPanelProps = {
    hidden?: boolean
@@ -10,13 +11,19 @@ type StyledBoxPanelProps = {
    children: JSX.Element
    height?: string
    value?: number
+   sx?: SxProps<DefaultTheme>
 }
 
 export const StyledBox = ({
    children,
    className = undefined,
+   sx,
 }: StyledBoxPanelProps) => {
-   return <Box className={className}>{children}</Box>
+   return (
+      <Box sx={sx} className={className}>
+         {children}
+      </Box>
+   )
 }
 
 interface TabPanelProps {

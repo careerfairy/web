@@ -42,7 +42,7 @@ exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData = auth.backfillUserData
 exports.updateFakeUser = auth.updateFakeUser
-exports.validateUserEmailWithPin = auth.validateUserEmailWithPin
+exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin_v2
 exports.sendPostmarkResetPasswordEmail_v2 =
    auth.sendPostmarkResetPasswordEmail_v2
 exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
@@ -121,6 +121,8 @@ exports.stopRecordingLivestream_v2 = recording.stopRecordingLivestream
 exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
 exports.automaticallyRecordLivestreamBreakoutRoom =
    recording.automaticallyRecordLivestreamBreakoutRoom
+exports.checkForUnfinishedLivestreamsAndStopRecording =
+   recording.checkForUnfinishedLivestreamsAndStopRecording
 
 // Breakout Rooms
 exports.updateBreakoutRoomStatusOnWrite =
@@ -149,10 +151,12 @@ exports.createMarketingUser = marketing.createMarketingUser
 // Group
 exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
 exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
+exports.mergeMetaEndpoint = atsGroup.mergeMetaEndpoint
 exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
-exports.fetchATSJobs = atsGroup.fetchATSJobs
+exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
+exports.fetchATSRecruiters = atsGroup.fetchATSRecruiters
 exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
-exports.fetchATSApplications = atsGroup.fetchATSApplications
+exports.candidateApplicationTest = atsGroup.candidateApplicationTest
 
 // User
 exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
@@ -173,4 +177,4 @@ exports.periodicallyRemoveCachedDocument =
 exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents

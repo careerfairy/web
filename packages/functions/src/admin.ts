@@ -9,6 +9,7 @@ import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
@@ -108,11 +109,13 @@ export const sendBasicTemplateEmail = functions
             illustrationImageUrl,
             userEmail: email,
             subject,
-            newsLetterUnsubscribeLink: getNewsletterUnsubscribeLink(
-               email,
-               process.env.SIGNATURE_SECRET,
-               context?.rawRequest?.headers?.origin
-            ),
+            newsLetterUnsubscribeLink: addUtmTagsToLink({
+               link: getNewsletterUnsubscribeLink(
+                  email,
+                  process.env.SIGNATURE_SECRET,
+                  context?.rawRequest?.headers?.origin
+               ),
+            }),
          },
       }))
 
