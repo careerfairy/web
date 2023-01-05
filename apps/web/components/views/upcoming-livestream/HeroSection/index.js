@@ -1,5 +1,5 @@
 import React from "react"
-import { alpha, darken } from "@mui/material/styles"
+import { alpha, darken, useTheme } from "@mui/material/styles"
 import {
    Avatar,
    Box,
@@ -9,6 +9,7 @@ import {
    IconButton,
    Paper,
    Typography,
+   useMediaQuery,
 } from "@mui/material"
 import CountDown from "./CountDown"
 import HeroSpeakers from "./HeroSpeakers"
@@ -28,8 +29,8 @@ import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrow
 import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles = {
-   root: (theme) => ({
-      minHeight: "auto",
+   root: (theme, smallVerticalScreen) => ({
+      minHeight: smallVerticalScreen ? "160vh !important" : "auto",
       height: "auto",
       position: "relative",
       backgroundSize: "cover",
@@ -184,7 +185,9 @@ const HeroSection = ({
    showScrollButton = false,
    handleScrollButton,
 }) => {
+   const theme = useTheme()
    const isMobile = useIsMobile()
+   const smallVerticalScreen = useMediaQuery("(max-height:500px)")
 
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
@@ -193,7 +196,7 @@ const HeroSection = ({
          eventInterests?.length
    )
    return (
-      <Box sx={styles.root}>
+      <Box sx={styles.root(theme, smallVerticalScreen)}>
          <Image
             src={backgroundImage}
             alt={stream.title}
