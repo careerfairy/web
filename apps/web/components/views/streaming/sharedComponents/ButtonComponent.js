@@ -235,7 +235,7 @@ const ButtonComponent = ({
          actions.unshift({
             icon: <WorkRoundedIcon fontSize="large" />,
             name: "Jobs",
-            disabled: false,
+            disabled: selectedState === "jobs",
             onClick: () => handleStateChange("jobs"),
             tutorialNum: 999999,
          })
