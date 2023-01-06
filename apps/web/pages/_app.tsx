@@ -39,6 +39,8 @@ import {
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
+import Script from "next/script"
+import { useRouter } from "next/router"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -74,9 +76,22 @@ function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
+   const {
+      query: { useUsercentricsDraftVersion },
+   } = useRouter()
 
    return (
       <CacheProvider value={emotionCache}>
+         {/* Script will be inject in the <head> tag  */}
+         <Script
+            id="usercentrics-cmp"
+            src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
+            data-settings-id="T4NAUxIvE2tGD2"
+            strategy="beforeInteractive"
+            // by default uses the live version
+            data-version={useUsercentricsDraftVersion ? "preview" : undefined}
+            async
+         ></Script>
          <Head>
             <meta
                name="viewport"
