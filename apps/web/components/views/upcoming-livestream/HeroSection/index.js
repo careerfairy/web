@@ -157,15 +157,16 @@ const styles = {
    },
    scrollButton: (theme) => ({
       zIndex: 99,
-      background: alpha(theme.palette.common.white, 0.2),
+      background: `${alpha(theme.palette.common.white, 0.2)} !important`,
       backdropFilter: "blur(5px)",
       borderRadius: "8px 8px 0 0",
       width: "70px",
       padding: "5px 0",
-      fontSize: "30px",
+      height: "35px",
 
-      "&:hover": {
-         fontSize: "35px",
+      "&:hover svg": {
+         fontSize: "32px",
+         backgroundColor: "unset",
       },
    }),
 }
@@ -183,7 +184,6 @@ const HeroSection = ({
    streamAboutToStart,
    streamLanguage,
    showScrollButton = false,
-   handleScrollButton,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -307,14 +307,11 @@ const HeroSection = ({
          {showScrollButton && !isMobile ? (
             <Box sx={styles.scrollButtonWrapper}>
                <IconButton
-                  sx={{ p: 0 }}
+                  sx={styles.scrollButton}
                   size="large"
-                  onClick={handleScrollButton}
+                  href={"#about"}
                >
-                  <KeyboardDoubleArrowDownIcon
-                     sx={styles.scrollButton}
-                     color={"info"}
-                  />
+                  <KeyboardDoubleArrowDownIcon fontSize="25px" color={"info"} />
                </IconButton>
             </Box>
          ) : null}

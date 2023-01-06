@@ -57,16 +57,16 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const { authenticatedUser, userData, isLoggedOut, isLoggedIn } = useAuth()
 
    const registered = useMemo(() => {
-      return (
+      return Boolean(
          authenticatedUser &&
-         stream?.registeredUsers?.includes(authenticatedUser.email)
+            stream?.registeredUsers?.includes(authenticatedUser.email)
       )
    }, [stream, authenticatedUser])
 
    const participated = useMemo(() => {
-      return (
+      return Boolean(
          authenticatedUser &&
-         stream?.participatingStudents?.includes(authenticatedUser.email)
+            stream?.participatingStudents?.includes(authenticatedUser.email)
       )
    }, [stream, authenticatedUser])
 
@@ -410,10 +410,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       await startRegistrationProcess(true)
    }, [startRegistrationProcess])
 
-   const handleScrollButton = useCallback(() => {
-      window.scrollTo(0, 800)
-   }, [])
-
    return (
       <>
          <UpcomingLayout>
@@ -432,7 +428,6 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                hosts={filteredGroups}
                onRegisterClick={handleRegisterClick}
                showScrollButton={true}
-               handleScrollButton={handleScrollButton}
             />
             <Navigation
                aboutRef={aboutRef}
