@@ -257,6 +257,10 @@ export default class UserEventRecommendationService
          .map((stats) => stats.livestreamId)
          .filter(Boolean)
 
+      if (!livestreamIds.length) {
+         return []
+      }
+
       return this.livestreamRepo.getLivestreamsByIds(livestreamIds)
    }
 
