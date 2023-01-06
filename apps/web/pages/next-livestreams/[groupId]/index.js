@@ -72,6 +72,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
             .getPastEventsFrom({
                fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
                filterByGroupId: currentGroup.groupId,
+               showHidden: true,
             })
             .then((data) => {
                setPastLivestreams(data ?? [])
