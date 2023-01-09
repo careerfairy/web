@@ -98,6 +98,12 @@ interface GeneralLayoutState {
    }
 }
 
+interface GroupDashboardState {
+   layout: {
+      leftDrawerOpen: boolean
+   }
+}
+
 // Optional: You can define the schema of your Firebase Redux store.
 // This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
 interface Schema {
@@ -113,4 +119,5 @@ export default interface RootState extends DefaultRootState {
    firestore: FirestoreReducer.Reducer<{}, Schema>
    analyticsReducer: GroupAnalyticsReducer
    userDataSet: UserDataSetReducer
+   groupDashboard: GroupDashboardState
 }

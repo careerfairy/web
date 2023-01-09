@@ -1,0 +1,160 @@
+import React, { useEffect } from "react"
+
+// material-ui
+import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
+import { alpha, useTheme } from "@mui/material/styles"
+import Drawer from "@mui/material/Drawer"
+
+// project imports
+import useIsMobile from "../components/custom-hook/useIsMobile"
+import { DRAWER_WIDTH } from "../constants/layout"
+import { sxStyles } from "../types/commonTypes"
+
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      minHeight: "100vh",
+   },
+   inner: {
+      flexGrow: 1,
+      display: "flex",
+      flexDirection: "column",
+   },
+   main: {
+      flexGrow: 1,
+   },
+   animateWidth: {
+      transition: (theme) => theme.transitions.create("width"),
+   },
+   appBar: {
+      bgcolor: (theme) => alpha(theme.palette.background.default, 0.9),
+      backdropFilter: "blur(5px)",
+   },
+   toolbar: {
+      backgroundColor: "none",
+   },
+   drawerWrapper: {
+      flexShrink: { md: 0 },
+   },
+   drawer: {
+      "& .MuiDrawer-paper": {
+         width: DRAWER_WIDTH,
+         background: "white",
+         borderRight: "none",
+      },
+   },
+   drawerWrapperOpen: {
+      width: {
+         xs: "auto",
+         md: DRAWER_WIDTH,
+      },
+   },
+   drawerWrapperClosed: {
+      width: 0,
+   },
+})
+
+// ==============================|| MAIN LAYOUT ||============================== //
+
+type Props = {
+   children: React.ReactNode
+   drawerContent: React.ReactNode
+   headerContent: React.ReactNode
+   drawerOpen: boolean
+   setDrawer: (open: boolean) => void
+   toggleDrawer: () => void
+}
+const GenericLayout: React.FC<Props> = ({
+   children,
+   drawerContent,
+   headerContent,
+   drawerOpen,
+   setDrawer,
+   toggleDrawer,
+}) => {
+   const theme = useTheme()
+   const matchDownMd = useMediaQuery(theme.breakpoints.down("lg"))
+
+   useEffect(() => {
+      // Dynamically set drawerOpen based on screen size
+      setDrawer(!matchDownMd)
+   }, [matchDownMd, setDrawer])
+
+   return (
+      <Box sx={styles.root}>
+         {/* drawer */}
+         <DrawerComponent drawerOpen={drawerOpen} drawerToggle={toggleDrawer}>
+            {drawerContent}
+         </DrawerComponent>
+
+         <Box sx={[styles.inner, styles.animateWidth]}>
+            {/* header */}
+            <HeaderComponent drawerOpen={drawerOpen}>
+               {headerContent}
+            </HeaderComponent>
+            {/* main content */}
+            <Box component={"main"} sx={styles.main}>
+               {children}
+            </Box>
+         </Box>
+      </Box>
+   )
+}
+
+type DrawerProps = {
+   drawerOpen: boolean
+   drawerToggle: () => void
+   children: React.ReactNode
+}
+const DrawerComponent = ({
+   drawerOpen,
+   drawerToggle,
+   children,
+}: DrawerProps) => {
+   const isMobile = useIsMobile()
+   return (
+      <Box
+         component="nav"
+         sx={[
+            styles.drawerWrapper,
+            styles.animateWidth,
+            drawerOpen ? styles.drawerWrapperOpen : styles.drawerWrapperClosed,
+         ]}
+         aria-label="page links"
+      >
+         <Drawer
+            variant={isMobile ? "temporary" : "persistent"}
+            anchor="left"
+            open={drawerOpen}
+            onClose={drawerToggle}
+            sx={styles.drawer}
+            ModalProps={{ keepMounted: true }}
+            color="inherit"
+         >
+            {children}
+         </Drawer>
+      </Box>
+   )
+}
+
+type HeaderProps = {
+   drawerOpen: boolean
+   children: React.ReactNode
+}
+const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
+   return (
+      <AppBar
+         enableColorOnDark
+         position="sticky"
+         color="inherit"
+         elevation={0}
+         sx={[styles.appBar, drawerOpen && styles.animateWidth]}
+      >
+         <Toolbar sx={styles.toolbar} disableGutters>
+            {children}
+         </Toolbar>
+      </AppBar>
+   )
+}
+
+export default GenericLayout

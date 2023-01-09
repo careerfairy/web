@@ -80,8 +80,6 @@ export {
    openNavDrawer,
    closeNavDrawer,
    toggleNavDrawer,
-   outOfLandingPage,
-   inLandingPage,
 } from "./generalLayoutActions"
 export {
    clearStreamsFromTimeframeAndFuture,
@@ -89,3 +87,5 @@ export {
    selectVisibleStreams,
    clearHiddenStreamIds,
 } from "./groupAnalyticsActions"
+
+export { setGroupDashboardDrawer } from "./groupDashboardActions"
