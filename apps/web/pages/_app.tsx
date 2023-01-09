@@ -27,7 +27,6 @@ import firebaseApp, {
 import "../util/FirebaseUtils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
-import GoogleTagManager from "../HOCs/GoogleTagManager"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
 import TutorialProvider from "../HOCs/TutorialProvider"
 import ErrorProvider from "../HOCs/ErrorProvider"
@@ -41,6 +40,7 @@ import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
 import Script from "next/script"
 import { useRouter } from "next/router"
+import { Usercentrics } from "components/Usercentrics"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -76,22 +76,10 @@ function MyApp(props) {
    const { Component, emotionCache = clientSideEmotionCache, pageProps } = props
    useStoreReferralQueryParams()
    useStoreUTMQueryParams()
-   const {
-      query: { useUsercentricsDraftVersion },
-   } = useRouter()
 
    return (
       <CacheProvider value={emotionCache}>
-         {/* Script will be inject in the <head> tag  */}
-         <Script
-            id="usercentrics-cmp"
-            src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
-            data-settings-id="T4NAUxIvE2tGD2"
-            strategy="beforeInteractive"
-            // by default uses the live version
-            data-version={useUsercentricsDraftVersion ? "preview" : undefined}
-            async
-         ></Script>
+         <Usercentrics />
          <Head>
             <meta
                name="viewport"
@@ -109,26 +97,24 @@ function MyApp(props) {
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
-                           <GoogleTagManager>
-                              <ThemeProviderWrapper>
-                                 <FirebaseServiceContext.Provider
-                                    value={firebaseServiceInstance}
+                           <ThemeProviderWrapper>
+                              <FirebaseServiceContext.Provider
+                                 value={firebaseServiceInstance}
+                              >
+                                 <LocalizationProvider
+                                    dateAdapter={AdapterDateFns}
                                  >
-                                    <LocalizationProvider
-                                       dateAdapter={AdapterDateFns}
-                                    >
-                                       <UserReminderProvider>
-                                          <ErrorProvider>
-                                             <UserRewardsNotifications>
-                                                <Component {...pageProps} />
-                                             </UserRewardsNotifications>
-                                             <Notifier />
-                                          </ErrorProvider>
-                                       </UserReminderProvider>
-                                    </LocalizationProvider>
-                                 </FirebaseServiceContext.Provider>
-                              </ThemeProviderWrapper>
-                           </GoogleTagManager>
+                                    <UserReminderProvider>
+                                       <ErrorProvider>
+                                          <UserRewardsNotifications>
+                                             <Component {...pageProps} />
+                                          </UserRewardsNotifications>
+                                          <Notifier />
+                                       </ErrorProvider>
+                                    </UserReminderProvider>
+                                 </LocalizationProvider>
+                              </FirebaseServiceContext.Provider>
+                           </ThemeProviderWrapper>
                         </AuthProvider>
                      </TutorialProvider>
                   </FeatureFlagsProvider>
