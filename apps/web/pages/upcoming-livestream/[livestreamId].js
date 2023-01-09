@@ -434,9 +434,10 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                speakersRef={speakersRef}
                questionsRef={questionsRef}
             />
-            {stream.summary && (
+            {(stream.summary || stream.reasonsToJoinLivestream) && (
                <AboutSection
                   summary={stream.summary}
+                  reasonsToJoinLivestream={stream.reasonsToJoinLivestream}
                   sectionRef={aboutRef}
                   sectionId="about"
                   title={`${stream.company}`}
