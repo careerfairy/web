@@ -5,7 +5,7 @@ import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHea
 
 const RolesPage = ({ groupId }) => {
    return (
-      <GroupDashboardLayout pageDisplayName={"Roles"} groupId={groupId}>
+      <GroupDashboardLayout pageDisplayName={"Team Members"} groupId={groupId}>
          <DashboardHead title="CareerFairy | Member Roles of" />
          <RolesOverview />
       </GroupDashboardLayout>
