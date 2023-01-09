@@ -56,6 +56,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, pageDisplayName } = props
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
+   const dispatch = useDispatch()
+
    const { replace, push } = useRouter()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
@@ -150,8 +152,6 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       ]
    )
 
-   const dispatch = useDispatch()
-
    // Handle left drawer
    const leftDrawerOpened = useSelector(leftMenuSelector)
 
@@ -167,6 +167,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    }, [leftDrawerOpened, setDrawer])
 
    const loading = Boolean(loadingGroup || !isAdmin || !isCorrectGroup)
+
+   const empty = isEmpty(group)
 
    return (
       <GroupContext.Provider value={contextValues}>
@@ -189,18 +191,33 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
             setDrawer={setDrawer}
             toggleDrawer={handleLeftDrawerToggle}
          >
-            {loading ? (
-               <CircularProgress sx={{ margin: "auto" }} />
-            ) : isEmpty(group) ? (
-               <Typography variant={"h6"} sx={{ margin: "auto" }}>
-                  Group not found
-               </Typography>
-            ) : (
-               children
-            )}
+            <Outlet empty={empty} loading={loading}>
+               {children}
+            </Outlet>
          </GenericLayout>
       </GroupContext.Provider>
    )
+}
+
+type OutletProps = {
+   children: React.ReactNode
+   loading?: boolean
+   empty?: boolean
+}
+const Outlet = ({ children, empty, loading }: OutletProps) => {
+   if (loading) {
+      return <CircularProgress sx={{ margin: "auto" }} />
+   }
+
+   if (empty) {
+      return (
+         <Typography variant={"h6"} sx={{ margin: "auto" }}>
+            Group not found
+         </Typography>
+      )
+   }
+
+   return <>{children}</>
 }
 
 export const useGroup = () => useContext<GroupAdminContext>(GroupContext)
