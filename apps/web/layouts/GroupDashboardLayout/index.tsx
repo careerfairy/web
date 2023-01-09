@@ -176,6 +176,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
             headerContent={
                <TopBar
                   title={pageDisplayName}
+                  drawerOpened={leftDrawerOpened}
                   handleLeftDrawerToggle={handleLeftDrawerToggle}
                />
             }

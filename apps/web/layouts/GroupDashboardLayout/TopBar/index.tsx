@@ -37,6 +37,7 @@ const styles = sxStyles({
       overflow: "hidden",
    },
    title: {
+      fontSize: "36px !important",
       ...getMaxLineStyles(1),
    },
    floatingButton: {
@@ -49,23 +50,28 @@ const styles = sxStyles({
 type Props = {
    handleLeftDrawerToggle: () => void
    title: string
+   drawerOpened: boolean
 }
 
-const TopBar = ({ handleLeftDrawerToggle, title }: Props) => {
+const TopBar = ({ handleLeftDrawerToggle, title, drawerOpened }: Props) => {
    const isMobile = useIsMobile()
+
+   const drawerPresent = !isMobile && drawerOpened
 
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
          <Box sx={styles.leftSection}>
-            <Box sx={styles.btnWrapper}>
-               <IconButton
-                  onClick={handleLeftDrawerToggle}
-                  sx={styles.menuButton}
-               >
-                  <MenuRoundedIcon />
-               </IconButton>
-            </Box>
+            {!drawerPresent && (
+               <Box sx={styles.btnWrapper}>
+                  <IconButton
+                     onClick={handleLeftDrawerToggle}
+                     sx={styles.menuButton}
+                  >
+                     <MenuRoundedIcon />
+                  </IconButton>
+               </Box>
+            )}
             {!isMobile && (
                <Typography variant="h3" fontWeight={600} sx={styles.title}>
                   {title}
@@ -73,7 +79,14 @@ const TopBar = ({ handleLeftDrawerToggle, title }: Props) => {
             )}
          </Box>
          <Box sx={{ flexGrow: 1 }} />
-         <Stack direction="row" alignItems="center" spacing={2}>
+         <Stack
+            direction="row"
+            alignItems="center"
+            spacing={{
+               xs: 1,
+               md: 3,
+            }}
+         >
             {/* TODO: ADD OPENING OF STREAM CREATION DIALOG */}
             {/*<Button size={"small"} variant={"outlined"} color={"secondary"}>*/}
             {/*   Create Live Stream*/}

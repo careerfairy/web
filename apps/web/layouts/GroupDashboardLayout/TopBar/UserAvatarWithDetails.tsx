@@ -24,6 +24,7 @@ import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import { useGroup } from "../index"
 
 const styles = sxStyles({
    root: {
@@ -53,13 +54,15 @@ const UserAvatarWithDetails = () => {
 
    const { userData, signOut, userPresenter } = useAuth()
 
+   const { group } = useGroup()
+
    const isMobile = useIsMobile()
 
    const { push } = useRouter()
 
    return (
       <>
-         <Stack direction={"row"} spacing={2}>
+         <Stack direction={"row"} spacing={1}>
             <Tooltip title="Account settings">
                <IconButton
                   onClick={handleClick}
@@ -87,9 +90,9 @@ const UserAvatarWithDetails = () => {
                   <Typography
                      sx={styles.maxOneLine}
                      color={"text.secondary"}
-                     variant={"subtitle2"}
+                     variant={"subtitle1"}
                   >
-                     {userData?.userEmail}
+                     {group?.universityName}
                   </Typography>
                </Box>
             )}
