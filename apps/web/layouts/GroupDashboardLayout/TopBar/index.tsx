@@ -9,6 +9,7 @@ import { sxStyles } from "../../../types/commonTypes"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import UserAvatarWithDetails from "./UserAvatarWithDetails"
 import NotificationsButton from "./NotificationsButton"
+import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -35,7 +36,9 @@ const styles = sxStyles({
       borderRadius: 3,
       overflow: "hidden",
    },
-   title: {},
+   title: {
+      ...getMaxLineStyles(1),
+   },
    floatingButton: {
       position: "fixed",
       bottom: 20,

@@ -100,8 +100,8 @@ const UserAvatarWithDetails = () => {
             open={open}
             onClose={handleClose}
             onClick={handleClose}
-            transformOrigin={{ horizontal: "right", vertical: "top" }}
-            anchorOrigin={{ horizontal: "right", vertical: "bottom" }}
+            transformOrigin={transformOrigin}
+            anchorOrigin={anchorOrigin}
          >
             <MenuItem onClick={() => push("/profile")}>
                <ListItemIcon>
@@ -127,5 +127,8 @@ const UserAvatarWithDetails = () => {
       </>
    )
 }
+
+const transformOrigin = { horizontal: "right", vertical: "top" } as const
+const anchorOrigin = { horizontal: "right", vertical: "bottom" } as const
 
 export default UserAvatarWithDetails
