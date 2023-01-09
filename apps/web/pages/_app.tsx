@@ -38,8 +38,6 @@ import {
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
-import Script from "next/script"
-import { useRouter } from "next/router"
 import { Usercentrics } from "components/Usercentrics"
 
 // Client-side cache, shared for the whole session of the user in the browser.
