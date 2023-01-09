@@ -1,44 +1,35 @@
 import React, {
    createContext,
    FC,
+   useCallback,
    useContext,
    useEffect,
    useMemo,
-   useRef,
    useState,
 } from "react"
 import NavBar from "./NavBar"
 import { useRouter } from "next/router"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { isEmpty, isLoaded } from "react-redux-firebase"
-import { useSelector } from "react-redux"
-import TopBar from "./TopBar"
+import { useDispatch, useSelector } from "react-redux"
 import useAdminGroup from "../../components/custom-hook/useAdminGroup"
 import useDashboardLinks from "../../components/custom-hook/useDashboardLinks"
 import { CircularProgress, Typography } from "@mui/material"
-import Page, {
-   PageChildrenWrapper,
-   PageContentWrapper,
-} from "../../components/views/common/Page"
-import useIsDesktop from "../../components/custom-hook/useIsDesktop"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupOption,
    GroupQuestion,
 } from "@careerfairy/shared-lib/dist/groups"
-import RootState from "../../store/reducers"
 import GroupsUtil from "../../data/util/GroupsUtil"
 import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
-
-const styles = {
-   childrenWrapperResponsive: {
-      width: (theme) => `calc(100% - ${theme.drawerWidth.small})`,
-   },
-}
+import { leftMenuSelector } from "../../store/selectors/groupDashboardSelectors"
+import * as actions from "../../store/actions"
+import GenericLayout from "../GenericLayout"
+import TopBar from "./TopBar"
 
 type GroupAdminContext = {
    group: Group
@@ -58,18 +49,15 @@ const GroupContext = createContext<GroupAdminContext>({
 
 type GroupDashboardLayoutProps = {
    groupId: string
+   pageDisplayName: string
+   children: React.ReactNode
 }
 const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
-   const { children, groupId } = props
-   const scrollRef = useRef(null)
+   const { children, groupId, pageDisplayName } = props
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
-   const isDesktop = useIsDesktop()
    const { replace, push } = useRouter()
    const { userData, adminGroups, isLoggedOut } = useAuth()
-   const notifications = useSelector(
-      ({ firestore }: RootState) => firestore.ordered.notifications || []
-   )
 
    const group = useAdminGroup(groupId)
 
@@ -162,44 +150,55 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       ]
    )
 
+   const dispatch = useDispatch()
+
+   // Handle left drawer
+   const leftDrawerOpened = useSelector(leftMenuSelector)
+
+   const setDrawer = useCallback(
+      (open: boolean) => {
+         dispatch(actions.setGroupDashboardDrawer(open))
+      },
+      [dispatch]
+   )
+
+   const handleLeftDrawerToggle = useCallback(() => {
+      setDrawer(!leftDrawerOpened)
+   }, [leftDrawerOpened, setDrawer])
+
+   const loading = Boolean(loadingGroup || !isAdmin || !isCorrectGroup)
+
    return (
       <GroupContext.Provider value={contextValues}>
-         <Page>
-            <TopBar notifications={notifications} />
-            <PageContentWrapper>
-               {isLoaded(group) && !isEmpty(group) && (
-                  <NavBar
-                     drawerTopLinks={drawerTopLinks}
-                     drawerBottomLinks={drawerBottomLinks}
-                     headerLinks={headerLinks}
-                     group={group}
-                     isDesktop={isDesktop}
-                  />
-               )}
-               <PageChildrenWrapper
-                  sx={[isDesktop && styles.childrenWrapperResponsive]}
-               >
-                  {loadingGroup || !isAdmin || !isCorrectGroup ? (
-                     <CircularProgress sx={{ margin: "auto" }} />
-                  ) : isEmpty(group) ? (
-                     <Typography variant={"h6"} sx={{ margin: "auto" }}>
-                        Group not found
-                     </Typography>
-                  ) : (
-                     React.Children.map(children, (child) =>
-                        // @ts-ignore
-                        React.cloneElement(child, {
-                           notifications,
-                           isAdmin,
-                           scrollRef,
-                           group,
-                           ...props,
-                        })
-                     )
-                  )}
-               </PageChildrenWrapper>
-            </PageContentWrapper>
-         </Page>
+         <GenericLayout
+            headerContent={
+               <TopBar
+                  title={pageDisplayName}
+                  handleLeftDrawerToggle={handleLeftDrawerToggle}
+               />
+            }
+            drawerContent={
+               <NavBar
+                  drawerTopLinks={drawerTopLinks}
+                  drawerBottomLinks={drawerBottomLinks}
+                  headerLinks={headerLinks}
+                  group={group}
+               />
+            }
+            drawerOpen={leftDrawerOpened}
+            setDrawer={setDrawer}
+            toggleDrawer={handleLeftDrawerToggle}
+         >
+            {loading ? (
+               <CircularProgress sx={{ margin: "auto" }} />
+            ) : isEmpty(group) ? (
+               <Typography variant={"h6"} sx={{ margin: "auto" }}>
+                  Group not found
+               </Typography>
+            ) : (
+               children
+            )}
+         </GenericLayout>
       </GroupContext.Provider>
    )
 }

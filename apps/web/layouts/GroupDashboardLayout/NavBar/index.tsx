@@ -3,7 +3,6 @@ import { Avatar, Box, Divider, Hidden, List, Typography } from "@mui/material"
 import { LogOut as LogoutIcon } from "react-feather"
 import * as actions from "../../../store/actions"
 import { useDispatch } from "react-redux"
-import PersistentGenericDrawer from "../../../components/views/navbar/PersistentGenericDrawer"
 import NavElement from "../../../components/views/navbar/NavElement"
 import { StylesProps } from "../../../types/commonTypes"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
@@ -35,14 +34,12 @@ interface Props {
    drawerTopLinks: PageLinkProps[]
    headerLinks: PageLinkProps[]
    drawerBottomLinks: PageLinkProps[]
-   isDesktop: boolean
 }
 const NavBar = ({
    group,
    drawerTopLinks,
    headerLinks,
    drawerBottomLinks,
-   isDesktop,
 }: Props) => {
    const dispatch = useDispatch()
    const { isLoggedIn } = useAuth()
@@ -51,7 +48,11 @@ const NavBar = ({
       dispatch(actions.signOut())
    }
 
-   const content = (
+   if (!group) {
+      return null
+   }
+
+   return (
       <Box height="100%" display="flex" flexDirection="column">
          <Box alignItems="center" display="flex" flexDirection="column" p={2}>
             <Avatar sx={styles.avatar} src={group.logoUrl} variant="rounded" />
@@ -102,12 +103,6 @@ const NavBar = ({
             </List>
          </Box>
       </Box>
-   )
-
-   return (
-      <PersistentGenericDrawer isPersistent={isDesktop}>
-         {content}
-      </PersistentGenericDrawer>
    )
 }
 

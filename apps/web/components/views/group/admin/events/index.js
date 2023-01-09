@@ -18,6 +18,7 @@ import { v4 as uuidv4 } from "uuid"
 import * as actions from "store/actions"
 import { useDispatch } from "react-redux"
 import { StreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const useStyles = makeStyles((theme) => ({
    containerRoot: {
@@ -43,7 +44,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const EventsOverview = ({ group, scrollRef }) => {
+const EventsOverview = () => {
+   const { group } = useGroup()
    const classes = useStyles()
    const dispatch = useDispatch()
    const { userData, authenticatedUser } = useAuth()
@@ -225,7 +227,6 @@ const EventsOverview = ({ group, scrollRef }) => {
          <AppBar className={classes.appBar} position="sticky" color="default">
             <Box className={classes.title}>
                <Header
-                  scrollRef={scrollRef}
                   group={group}
                   handleOpenNewStreamModal={handleOpenNewStreamModal}
                   isDraft={tabValue === "draft"}

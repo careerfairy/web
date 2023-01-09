@@ -1,5 +1,7 @@
 import React from "react"
-import { useAuth } from "../../HOCs/AuthProvider"
+import { useRouter } from "next/router"
+
+// material-ui
 import {
    Box,
    Divider,
@@ -8,17 +10,20 @@ import {
    MenuItem,
    Typography,
 } from "@mui/material"
-import Stack from "@mui/material/Stack"
-import { sxStyles } from "../../types/commonTypes"
 import Tooltip from "@mui/material/Tooltip"
+import Stack from "@mui/material/Stack"
 import IconButton from "@mui/material/IconButton"
-import ColorizedAvatar from "../../components/views/common/ColorizedAvatar"
-import useMenuState from "../../components/custom-hook/useMenuState"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
 import ChangeGroupIcon from "@mui/icons-material/LoopOutlined"
 import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
-import { useRouter } from "next/router"
-import useIsMobile from "../../components/custom-hook/useIsMobile"
+
+// project imports
+import { sxStyles } from "../../../types/commonTypes"
+import { useAuth } from "../../../HOCs/AuthProvider"
+import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
+import useMenuState from "../../../components/custom-hook/useMenuState"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -32,6 +37,15 @@ const styles = sxStyles({
       width: 50,
       height: 50,
       lineHeight: 0,
+   },
+   details: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      justifyContent: "center",
+   },
+   maxOneLine: {
+      ...getMaxLineStyles(1),
    },
 })
 const UserAvatarWithDetails = () => {
@@ -62,11 +76,19 @@ const UserAvatarWithDetails = () => {
                </IconButton>
             </Tooltip>
             {!isMobile && (
-               <Box>
-                  <Typography variant={"h6"} fontWeight={600}>
+               <Box sx={styles.details}>
+                  <Typography
+                     sx={styles.maxOneLine}
+                     variant={"h6"}
+                     fontWeight={600}
+                  >
                      {userPresenter?.getDisplayName()}
                   </Typography>
-                  <Typography variant={"subtitle2"}>
+                  <Typography
+                     sx={styles.maxOneLine}
+                     color={"text.secondary"}
+                     variant={"subtitle2"}
+                  >
                      {userData?.userEmail}
                   </Typography>
                </Box>

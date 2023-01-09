@@ -5,7 +5,7 @@ import EventsOverview from "../../../../components/views/group/admin/events"
 
 const EventsPage = ({ groupId }) => {
    return (
-      <GroupDashboardLayout groupId={groupId}>
+      <GroupDashboardLayout pageDisplayName={"Live Streams"} groupId={groupId}>
          <DashboardHead title="CareerFairy | Admin Upcoming Streams of" />
          <EventsOverview />
       </GroupDashboardLayout>

@@ -1,10 +1,13 @@
-import { Box, Button, Typography } from "@mui/material"
+// material-ui
+import { Box, Typography } from "@mui/material"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
-import { sxStyles } from "../../types/commonTypes"
-import useIsMobile from "../../components/custom-hook/useIsMobile"
 import IconButton from "@mui/material/IconButton"
-import UserAvatarWithDetails from "./UserAvatarWithDetails"
 import Stack from "@mui/material/Stack"
+
+// project imports
+import { sxStyles } from "../../../types/commonTypes"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import UserAvatarWithDetails from "./UserAvatarWithDetails"
 import NotificationsButton from "./NotificationsButton"
 
 const styles = sxStyles({
@@ -20,20 +23,19 @@ const styles = sxStyles({
       },
    },
    leftSection: {
-      width: {
-         xs: "auto",
-         md: 228,
-      },
       display: "flex",
+   },
+   btnWrapper: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      mr: 1,
    },
    menuButton: {
       borderRadius: 3,
       overflow: "hidden",
    },
-   title: {
-      fontSize: "2.6rem !important",
-      fontFamily: "Poppins !important",
-   },
+   title: {},
    floatingButton: {
       position: "fixed",
       bottom: 20,
@@ -42,31 +44,25 @@ const styles = sxStyles({
 })
 
 type Props = {
-   drawerOpen: boolean
    handleLeftDrawerToggle: () => void
    title: string
 }
 
-const HeaderContent = ({
-   handleLeftDrawerToggle,
-   drawerOpen,
-   title,
-}: Props) => {
+const TopBar = ({ handleLeftDrawerToggle, title }: Props) => {
    const isMobile = useIsMobile()
+
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
          <Box sx={styles.leftSection}>
-            {!drawerOpen && (
-               <Box>
-                  <IconButton
-                     onClick={handleLeftDrawerToggle}
-                     sx={styles.menuButton}
-                  >
-                     <MenuRoundedIcon />
-                  </IconButton>
-               </Box>
-            )}
+            <Box sx={styles.btnWrapper}>
+               <IconButton
+                  onClick={handleLeftDrawerToggle}
+                  sx={styles.menuButton}
+               >
+                  <MenuRoundedIcon />
+               </IconButton>
+            </Box>
             {!isMobile && (
                <Typography variant="h3" fontWeight={600} sx={styles.title}>
                   {title}
@@ -74,11 +70,12 @@ const HeaderContent = ({
             )}
          </Box>
          <Box sx={{ flexGrow: 1 }} />
-         <Box sx={{ flexGrow: 1 }} />
          <Stack direction="row" alignItems="center" spacing={2}>
-            <Button size={"small"} variant={"outlined"} color={"secondary"}>
-               Create Live Stream
-            </Button>
+            {/* TODO: ADD OPENING OF STREAM CREATION DIALOG */}
+            {/*<Button size={"small"} variant={"outlined"} color={"secondary"}>*/}
+            {/*   Create Live Stream*/}
+            {/*</Button>*/}
+
             {/* notification & profile */}
             <UserAvatarWithDetails />
 
@@ -88,4 +85,4 @@ const HeaderContent = ({
    )
 }
 
-export default HeaderContent
+export default TopBar

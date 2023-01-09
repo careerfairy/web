@@ -7,7 +7,7 @@ import Drawer from "@mui/material/Drawer"
 
 // project imports
 import useIsMobile from "../components/custom-hook/useIsMobile"
-import { DRAWER_WIDTH } from "../constants/layout"
+import { DRAWER_WIDTH, NICE_SCROLLBAR_STYLES } from "../constants/layout"
 import { sxStyles } from "../types/commonTypes"
 
 const styles = sxStyles({
@@ -19,16 +19,19 @@ const styles = sxStyles({
       flexGrow: 1,
       display: "flex",
       flexDirection: "column",
+      maxWidth: "fill-available",
    },
    main: {
       flexGrow: 1,
+      display: "flex",
+      flexDirection: "column",
    },
    animateWidth: {
       transition: (theme) => theme.transitions.create("width"),
    },
    appBar: {
       bgcolor: (theme) => alpha(theme.palette.background.default, 0.9),
-      backdropFilter: "blur(5px)",
+      backdropFilter: "blur(8px)",
    },
    toolbar: {
       backgroundColor: "none",
@@ -42,6 +45,7 @@ const styles = sxStyles({
          background: "white",
          borderRight: "none",
       },
+      ...NICE_SCROLLBAR_STYLES,
    },
    drawerWrapperOpen: {
       width: {
@@ -73,12 +77,12 @@ const GenericLayout: React.FC<Props> = ({
    toggleDrawer,
 }) => {
    const theme = useTheme()
-   const matchDownMd = useMediaQuery(theme.breakpoints.down("lg"))
+   const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
 
    useEffect(() => {
       // Dynamically set drawerOpen based on screen size
-      setDrawer(!matchDownMd)
-   }, [matchDownMd, setDrawer])
+      setDrawer(!matchDownLg)
+   }, [matchDownLg, setDrawer])
 
    return (
       <Box sx={styles.root}>
@@ -129,7 +133,6 @@ const DrawerComponent = ({
             onClose={drawerToggle}
             sx={styles.drawer}
             ModalProps={{ keepMounted: true }}
-            color="inherit"
          >
             {children}
          </Drawer>
