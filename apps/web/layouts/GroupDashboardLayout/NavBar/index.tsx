@@ -4,21 +4,34 @@ import { LogOut as LogoutIcon } from "react-feather"
 import * as actions from "../../../store/actions"
 import { useDispatch } from "react-redux"
 import NavElement from "../../../components/views/navbar/NavElement"
-import { StylesProps } from "../../../types/commonTypes"
+import { sxStyles } from "../../../types/commonTypes"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import type { INavItem } from "../../../types/layout"
+import { NavGroup, NavLink } from "../../common/NavElement"
+import { useRouter } from "next/router"
+import Stack from "@mui/material/Stack"
+import Link from "../../../components/views/common/Link"
 import useDashboardLinks from "../../../components/custom-hook/useDashboardLinks"
 import { useGroup } from "../index"
 
-const styles: StylesProps = {
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+   },
    avatar: {
       padding: 1,
       cursor: "pointer",
       background: "white",
-      height: 100,
-      width: "100%",
+      width: "80%",
+      height: 150,
       "& img": {
          objectFit: "contain",
       },
+   },
+   list: {
+      width: "100%",
    },
    name: {
       marginTop: 1,
@@ -27,7 +40,7 @@ const styles: StylesProps = {
    description: {
       whiteSpace: "pre-line",
    },
-}
+})
 
 const NavBar = () => {
    const { group } = useGroup()
@@ -35,10 +48,36 @@ const NavBar = () => {
       useDashboardLinks(group)
    const dispatch = useDispatch()
    const { isLoggedIn } = useAuth()
+   const { pathname } = useRouter()
 
    const signOut = () => {
       dispatch(actions.signOut())
    }
+
+   return (
+      <Box sx={styles.root}>
+         <Avatar
+            component={Link}
+            href={`/group/${group.id}/admin/edit`}
+            sx={styles.avatar}
+            src={group.logoUrl}
+            variant="rounded"
+         />
+         <Stack sx={styles.list} spacing={3} component={List}>
+            {mainLinks.map((navItem) =>
+               navItem.type === "collapse" ? (
+                  <NavGroup key={navItem.id} item={navItem} />
+               ) : (
+                  <NavLink
+                     isActive={pathname === navItem.pathName}
+                     key={navItem.id}
+                     item={navItem}
+                  />
+               )
+            )}
+         </Stack>
+      </Box>
+   )
 
    return (
       <Box height="100%" display="flex" flexDirection="column">

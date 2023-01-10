@@ -10,6 +10,7 @@ import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import UserAvatarWithDetails from "./UserAvatarWithDetails"
 import NotificationsButton from "./NotificationsButton"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import { alpha } from "@mui/material/styles"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 
 const styles = sxStyles({
@@ -17,11 +18,15 @@ const styles = sxStyles({
       display: "flex",
       flex: 1,
       alignItems: "center",
-      borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-      px: 2,
+      borderBottom: (theme) =>
+         `2px solid ${alpha(theme.palette.divider, 0.03)}`,
+      px: {
+         xs: 2,
+         sm: 5,
+      },
       py: {
          xs: 1,
-         md: 2,
+         md: 3.2,
       },
    },
    leftSection: {
@@ -70,7 +75,7 @@ const TopBar = ({ title }: Props) => {
                </Box>
             )}
             {!isMobile && (
-               <Typography variant="h3" fontWeight={600} sx={styles.title}>
+               <Typography fontWeight={600} sx={styles.title}>
                   {title}
                </Typography>
             )}

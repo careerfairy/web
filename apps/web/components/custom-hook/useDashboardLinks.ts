@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import { useEffect, useMemo, useState } from "react"
 import { isEmpty, isLoaded } from "react-redux-firebase"
 import {
    BarChart2 as AnalyticsIcon,
@@ -7,9 +7,15 @@ import {
    Share2,
    User as ProfileIcon,
    Users as RolesIcon,
+   Home as HomeIcon,
+   Radio as LiveStreamsIcon,
+   Sliders as ATSIcon,
 } from "react-feather"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import type { Group } from "@careerfairy/shared-lib/dist/groups"
+
 import useFeatureFlags from "./useFeatureFlags"
+import { INavItem } from "../../types/layout"
 
 const initialHeaderLinks = [
    {
@@ -36,15 +42,77 @@ const initialDrawerBottomLinks = [
       basePath: "/about-us",
    },
 ]
-const useDashboardLinks = (group) => {
+
+type Return = {
+   drawerBottomLinks: any[]
+   drawerTopLinks: any[]
+   headerLinks: any[]
+   mainLinks: INavItem[]
+}
+const baseHrefPath = "group"
+const baseParam = "[groupId]"
+const useDashboardLinks = (group?: Group): Return => {
    const firebase = useFirebaseService()
    const featureFlags = useFeatureFlags()
 
-   const [headerLinks, setHeaderLinks] = useState(initialHeaderLinks)
-   const [drawerBottomLinks, setDrawerBottomLinks] = useState(
+   const [headerLinks, setHeaderLinks] = useState<any[]>(initialHeaderLinks)
+   const [drawerBottomLinks, setDrawerBottomLinks] = useState<any[]>(
       initialDrawerBottomLinks
    )
    const [drawerTopLinks, setDrawerTopLinks] = useState([])
+
+   const groupDashboardMainLinks = useMemo(() => {
+      if (!group) return []
+
+      const links: INavItem[] = [
+         {
+            id: "main-page",
+            href: `/${baseHrefPath}/${group.id}/admin`,
+            pathName: `/${baseHrefPath}/${baseParam}/admin`,
+            Icon: HomeIcon,
+            title: "Main page",
+            type: "item",
+         },
+         {
+            id: "live-streams",
+            type: "item",
+            title: "Live streams",
+            Icon: LiveStreamsIcon,
+            href: `/${baseHrefPath}/${group.id}/admin/events`,
+            pathName: `/${baseHrefPath}/${baseParam}/admin/events`,
+         },
+         {
+            id: "analytics",
+            href: `/${baseHrefPath}/${group.id}/admin/analytics`,
+            pathName: `/${baseHrefPath}/${baseParam}/admin/analytics`,
+            Icon: AnalyticsIcon,
+            type: "item",
+            title: "Analytics",
+         },
+         {
+            id: "edit-group",
+            Icon: EditGroupIcon,
+            title: "Edit",
+            type: "item",
+            href: `/${baseHrefPath}/${group.id}/admin/edit`,
+            pathName: `/${baseHrefPath}/${baseParam}/admin/edit`,
+         },
+      ]
+
+      if (featureFlags.atsAdminPageFlag || group.atsAdminPageFlag) {
+         links.push({
+            id: "ats",
+            href: `/${baseHrefPath}/${group.id}/admin/ats`,
+            pathName: `/${baseHrefPath}/${baseParam}/admin/ats`,
+            type: "item",
+            Icon: ATSIcon,
+            title: "ATS integration",
+         })
+      }
+
+      return links
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [featureFlags.atsAdminPageFlag, group?.atsAdminPageFlag, group?.id])
 
    useEffect(() => {
       if (firebase.auth?.currentUser?.emailVerified) {
@@ -112,9 +180,17 @@ const useDashboardLinks = (group) => {
       } else {
          setDrawerTopLinks([])
       }
-   }, [group?.id, featureFlags.atsAdminPageFlag])
+   }, [group?.id, featureFlags.atsAdminPageFlag, group])
 
-   return { drawerBottomLinks, drawerTopLinks, headerLinks }
+   return useMemo(
+      () => ({
+         drawerBottomLinks,
+         drawerTopLinks,
+         headerLinks,
+         mainLinks: groupDashboardMainLinks,
+      }),
+      [drawerBottomLinks, drawerTopLinks, groupDashboardMainLinks, headerLinks]
+   )
 }
 
 export default useDashboardLinks

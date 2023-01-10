@@ -2,7 +2,7 @@ import React, { memo, useEffect } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
-import { alpha, useTheme } from "@mui/material/styles"
+import { useTheme } from "@mui/material/styles"
 import Drawer from "@mui/material/Drawer"
 
 // project imports
@@ -30,7 +30,7 @@ const styles = sxStyles({
       transition: (theme) => theme.transitions.create("width"),
    },
    appBar: {
-      bgcolor: (theme) => alpha(theme.palette.background.default, 0.9),
+      bgcolor: "transparent",
       backdropFilter: "blur(8px)",
    },
    toolbar: {
@@ -67,6 +67,7 @@ type Props = {
    drawerOpen: boolean
    setDrawer: (open: boolean) => void
    toggleDrawer: () => void
+   bgColor?: string
 }
 const AdminGenericLayout: React.FC<Props> = ({
    children,
@@ -75,6 +76,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    drawerOpen,
    setDrawer,
    toggleDrawer,
+   bgColor,
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
@@ -85,7 +87,14 @@ const AdminGenericLayout: React.FC<Props> = ({
    }, [matchDownLg, setDrawer])
 
    return (
-      <Box sx={styles.root}>
+      <Box
+         sx={[
+            styles.root,
+            {
+               bgcolor: bgColor ? bgColor : "background.default",
+            },
+         ]}
+      >
          {/* drawer */}
          <DrawerComponent drawerOpen={drawerOpen} drawerToggle={toggleDrawer}>
             {drawerContent}

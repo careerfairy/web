@@ -5,7 +5,7 @@ import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHea
 
 const EditGroupProfile = ({ groupId }) => {
    return (
-      <GroupDashboardLayout pageDisplayName={"Main Page"} groupId={groupId}>
+      <GroupDashboardLayout pageDisplayName={"Live Streams"} groupId={groupId}>
          <DashboardHead title="CareerFairy | Admin Edit Details of" />
          <EditOverview />
       </GroupDashboardLayout>
