@@ -3,7 +3,7 @@ import type { Config } from "@jest/types"
 
 const path = require("path")
 
-const fromRoot = (d) => path.join(__dirname, d)
+const fromRoot = (d: string) => path.join(__dirname, d)
 
 const config: Config.InitialOptions = {
    roots: [
@@ -39,6 +39,6 @@ const config: Config.InitialOptions = {
       "/node_modules/",
       "^.+\\.module\\.(css|sass|scss)$",
    ],
-   coverageThreshold: null,
+   // coverageThreshold: null,
 }
 export default config
