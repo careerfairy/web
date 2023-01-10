@@ -115,6 +115,12 @@ export default class MyDocument extends Document {
                   type="text/css"
                   rel="stylesheet"
                />
+               {/* 
+                  Define the dataLayer array early in the page so that by the time
+                  react components run client side, this array is already set
+                  Even if we don't load GTM, its okay to have this variable
+                 */}
+               <script dangerouslySetInnerHTML={dataLayerObj}></script>
                {/* Inject MUI styles first to match with the prepend: true configuration. */}
                {this.props.emotionStyleTags}
             </Head>
@@ -183,4 +189,11 @@ MyDocument.getInitialProps = async (ctx) => {
       ...initialProps,
       emotionStyleTags,
    }
+}
+
+/**
+ * Memoized object
+ */
+const dataLayerObj = {
+   __html: `window.dataLayer = window.dataLayer || []; `,
 }
