@@ -1,6 +1,7 @@
 import { useRouter } from "next/router"
 import Script from "next/script"
 import React from "react"
+import { shouldUseEmulators } from "util/CommonUtil"
 import { isEmbedded, isGroupAdminPath } from "util/PathUtils"
 
 /**
@@ -12,6 +13,13 @@ export const Usercentrics = () => {
       query: { useUsercentricsDraftVersion, isRecordingWindow },
       pathname,
    } = useRouter()
+
+   /**
+    * Don't run when developing / tests
+    */
+   if (shouldUseEmulators()) {
+      return null
+   }
 
    /**
     * Don't run usercentrics on recording sessions & embedded pages
