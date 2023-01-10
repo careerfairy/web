@@ -101,6 +101,7 @@ const csp = {
       "*.ads.linkedin.com",
       "*.calendly.com",
       "*.googleapis.com",
+      "*.usercentrics.eu",
       "blob:",
       "data:",
       "https:",
