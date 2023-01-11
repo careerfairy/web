@@ -1,22 +1,19 @@
-import React from "react"
-import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import EditOverview from "../../../../components/views/group/admin/edit"
-import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
-
-const EditGroupProfile = ({ groupId }) => {
-   return (
-      <GroupDashboardLayout pageDisplayName={"Main Page"} groupId={groupId}>
-         <DashboardHead title="CareerFairy | Admin Edit Details of" />
-         <EditOverview />
-      </GroupDashboardLayout>
-   )
+import { GetServerSidePropsContext } from "next"
+const AdminPage = () => {
+   return null // legacy page
 }
-export async function getServerSideProps(context) {
-   const { groupId } = context.params
+
+export const getServerSideProps = async (
+   context: GetServerSidePropsContext
+) => {
+   const groupId = context.params.groupId as string
+
+   // redirect to analytics page
    return {
-      props: {
-         groupId,
+      redirect: {
+         destination: `/group/${groupId}/admin/analytics`,
       },
    }
 }
-export default EditGroupProfile
+
+export default AdminPage

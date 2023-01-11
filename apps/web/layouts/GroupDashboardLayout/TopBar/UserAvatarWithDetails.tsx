@@ -25,6 +25,7 @@ import useMenuState from "../../../components/custom-hook/useMenuState"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { useGroup } from "../index"
+import { alpha } from "@mui/material/styles"
 
 const styles = sxStyles({
    root: {
@@ -47,6 +48,10 @@ const styles = sxStyles({
    },
    maxOneLine: {
       ...getMaxLineStyles(1),
+   },
+   companyText: {
+      // fontSize: 12,
+      color: (theme) => alpha(theme.palette.text.secondary, 0.4),
    },
 })
 const UserAvatarWithDetails = () => {
@@ -83,12 +88,12 @@ const UserAvatarWithDetails = () => {
                   <Typography
                      sx={styles.maxOneLine}
                      variant={"h6"}
-                     fontWeight={600}
+                     fontWeight={500}
                   >
                      {userPresenter?.getDisplayName()}
                   </Typography>
                   <Typography
-                     sx={styles.maxOneLine}
+                     sx={[styles.maxOneLine, styles.companyText]}
                      color={"text.secondary"}
                      variant={"subtitle1"}
                   >
