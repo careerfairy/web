@@ -9,6 +9,13 @@ export default class MyDocument extends Document {
       return (
          <Html>
             <Head>
+               <link rel="preconnect" href="//app.usercentrics.eu" />
+               <link rel="preconnect" href="//api.usercentrics.eu" />
+               <link
+                  rel="preload"
+                  href="//app.usercentrics.eu/browser-ui/latest/loader.js"
+                  as="script"
+               />
                <link
                   rel="apple-touch-icon-precomposed"
                   sizes="57x57"
