@@ -89,7 +89,7 @@ const TopBar = ({ title }: Props) => {
                md: 3,
             }}
          >
-            {/* TODO: ADD OPENING OF STREAM CREATION DIALOG */}
+            {/* TODO: RENDER THIS BUTTON FOR THE LANDING PAGE */}
             {/*<Button size={"small"} variant={"outlined"} color={"secondary"}>*/}
             {/*   Create Live Stream*/}
             {/*</Button>*/}
