@@ -272,13 +272,7 @@ export interface IEmailSent {
 
 export interface LiveStreamEventWithUsersLivestreamData
    extends LivestreamEvent {
-   usersLivestreamData: IUserLivestreamData[]
-}
-
-export interface IUserLivestreamData {
-   livestreamId?: string
-   userId?: string
-   user?: UserData
+   usersLivestreamData: UserLivestreamData[]
 }
 
 export interface Speaker extends Identifiable {
