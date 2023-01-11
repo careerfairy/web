@@ -3,13 +3,20 @@ import { withFirebase } from "../context/firebase/FirebaseServiceContext"
 import Head from "next/head"
 import { Button, Container } from "@mui/material"
 import GeneralLayout from "../layouts/GeneralLayout"
-import { Cookies } from "react-cookie-consent"
-//
+import { useEffect } from "react"
+import { getWindow } from "../util/PathUtils"
+
 const PrivacyPolicy = () => {
    const resetCookieConsent = () => {
-      Cookies.remove("CookieConsent")
-      window.location.reload()
+      getWindow()?.UC_UI?.showSecondLayer()
    }
+
+   useEffect(() => {
+      // Refresh Usercentrics Privacy UI
+      // There is a race condition where this page loads after the UC script
+      // We need to request UC to redraw again
+      getWindow()?.UC_UI?.restartEmbeddings()
+   }, [])
 
    return (
       <>
@@ -337,7 +344,7 @@ const PrivacyPolicy = () => {
                      variant="contained"
                      onClick={resetCookieConsent}
                   >
-                     Reset Cookie Permissions
+                     Update Privacy Settings
                   </Button>
 
                   <h4>Other applications</h4>
@@ -827,6 +834,8 @@ const PrivacyPolicy = () => {
                      children. If you are under the age of 18, please do not
                      create an account on the CareerFairy Website.
                   </p>
+                  <h2>Usercentrics Legal Data</h2>
+                  <div className="uc-embed" uc-data="all"></div>
                </Container>
             </div>
             <style jsx>{`
