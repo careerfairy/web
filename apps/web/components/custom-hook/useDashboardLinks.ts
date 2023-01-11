@@ -3,9 +3,9 @@ import { useMemo } from "react"
 // react feather
 import {
    BarChart2 as AnalyticsIcon,
-   Edit as EditGroupIcon,
    Radio as LiveStreamsIcon,
    Sliders as ATSIcon,
+   Users as RolesIcon,
 } from "react-feather"
 
 // project imports
@@ -44,11 +44,11 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
             title: "Analytics",
          },
          {
-            id: "edit-group",
-            Icon: EditGroupIcon,
-            title: "Edit",
-            href: `/${baseHrefPath}/${group.id}/admin/edit`,
-            pathname: `/${baseHrefPath}/${baseParam}/admin/edit`,
+            id: "roles",
+            href: `/${baseHrefPath}/${group.id}/admin/roles`,
+            Icon: RolesIcon,
+            pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
+            title: "Roles",
          },
       ]
 
