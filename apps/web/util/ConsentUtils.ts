@@ -1,3 +1,4 @@
+import { errorLogAndNotify } from "./CommonUtil"
 import { getWindow } from "./PathUtils"
 
 declare global {
@@ -7,15 +8,16 @@ declare global {
 }
 
 interface UC_UI {
-   getServicesBaseInfo(): [{ name: string; consent: { status: boolean } }]
+   getServicesBaseInfo(): [
+      { name: string; id: string; consent: { status: boolean } }
+   ]
+   acceptService(id: string): Promise<void>
 }
 
 /**
  * Name of the services on UC
- *
- * Union
  */
-export const UC_SERVICES = "Sentry Error Monitoring"
+type UC_SERVICES = "Sentry Error Monitoring" | "Crisp Chat"
 
 /**
  * Checks if a given service name has consent enabled
@@ -23,7 +25,7 @@ export const UC_SERVICES = "Sentry Error Monitoring"
  * Uses the usercentrics global variable UC_UI to look for consents
  * On server side, the consent is always enabled (for now)
  */
-export const isConsentEnabled = (name: typeof UC_SERVICES): boolean => {
+export const isConsentEnabled = (name: UC_SERVICES): boolean => {
    try {
       const data = getWindow()?.UC_UI?.getServicesBaseInfo()
 
@@ -38,4 +40,22 @@ export const isConsentEnabled = (name: typeof UC_SERVICES): boolean => {
    }
 
    return false
+}
+
+/**
+ * Give consent to a given service name
+ */
+export const enableConsentFor = (name: UC_SERVICES): Promise<void> => {
+   const uc = getWindow()?.UC_UI
+
+   if (!uc) {
+      return Promise.reject("window.UC_UI not found")
+   }
+
+   const service = uc.getServicesBaseInfo().find((s) => s.name === name)
+
+   if (!service)
+      return Promise.reject(`${name} not found in the usercentrics list`)
+
+   return uc.acceptService(service.id)
 }
