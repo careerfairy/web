@@ -39,6 +39,5 @@ const config: Config.InitialOptions = {
       "/node_modules/",
       "^.+\\.module\\.(css|sass|scss)$",
    ],
-   // coverageThreshold: null,
 }
 export default config
