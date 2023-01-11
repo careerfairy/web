@@ -114,7 +114,6 @@ BookADemoSection.propTypes = {
    backgroundImageOpacity: PropTypes.any,
    big: PropTypes.any,
    color: PropTypes.any,
-   handleOpenCalendly: PropTypes.func,
    subtitle: PropTypes.any,
    title: PropTypes.any,
 }
