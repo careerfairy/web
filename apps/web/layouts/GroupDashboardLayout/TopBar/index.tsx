@@ -66,14 +66,18 @@ const TopBar = ({ title }: Props) => {
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
+         {!drawerPresent && (
+            <Box sx={styles.btnWrapper}>
+               <IconButton
+                  onClick={toggleLeftDrawer}
+                  sx={styles.menuButton}
+                  edge={"start"}
+               >
+                  <MenuRoundedIcon />
+               </IconButton>
+            </Box>
+         )}
          <Box sx={styles.leftSection}>
-            {!drawerPresent && (
-               <Box sx={styles.btnWrapper}>
-                  <IconButton onClick={toggleLeftDrawer} sx={styles.menuButton}>
-                     <MenuRoundedIcon />
-                  </IconButton>
-               </Box>
-            )}
             {!isMobile && (
                <Typography fontWeight={600} sx={styles.title}>
                   {title}

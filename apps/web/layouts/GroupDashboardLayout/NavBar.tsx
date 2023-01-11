@@ -1,11 +1,15 @@
 import React from "react"
+
+// material-ui
 import { Avatar, Box } from "@mui/material"
-import { sxStyles } from "../../../types/commonTypes"
-import NavList from "../../common/NavList"
-import Link from "../../../components/views/common/Link"
-import { useGroup } from "../index"
-import useDashboardLinks from "../../../components/custom-hook/useDashboardLinks"
-import BottomLinks from "../../common/BottomLinks"
+
+// project imports
+import useDashboardLinks from "../../components/custom-hook/useDashboardLinks"
+import Link from "../../components/views/common/Link"
+import { sxStyles } from "../../types/commonTypes"
+import BottomLinks from "../common/BottomLinks"
+import NavList from "../common/NavList"
+import { useGroup } from "./index"
 
 const styles = sxStyles({
    root: {
