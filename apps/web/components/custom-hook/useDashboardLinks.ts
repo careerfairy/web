@@ -38,6 +38,15 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
             Icon: LiveStreamsIcon,
             href: `/${baseHrefPath}/${group.id}/admin/events`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/events`,
+            childLinks: [
+               {
+                  id: "all-live-streams",
+                  href: `/${baseHrefPath}/${group.id}/admin/events/all`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/events/all`,
+                  Icon: AllLiveStreamsIcon,
+                  title: "All live streams on CareerFairy",
+               },
+            ],
          },
          {
             id: "analytics",

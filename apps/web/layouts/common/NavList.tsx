@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import { useRouter } from "next/router"
 
 // material-ui
@@ -19,20 +19,24 @@ import { sxStyles } from "../../types/commonTypes"
 import type { INavLink } from "../types"
 import Collapse from "@mui/material/Collapse"
 
+const leftPadding = 5
+const iconSize = 24
 const styles = sxStyles({
    icon: {
-      fontSize: 24,
+      fontSize: iconSize,
+      width: iconSize,
+      height: iconSize,
    },
    navLink: {
       backgroundColor: "transparent !important",
       mb: 0.5,
       alignItems: "flex-start",
       py: 0.5,
-      pl: "24px",
       color: (theme) => alpha(theme.palette.text.secondary, 0.3),
       fontWeight: 500,
       fontSize: "15px",
-      px: 5,
+      pl: leftPadding,
+      pr: 1,
       transition: (theme) =>
          theme.transitions.create(["color", "border-right"]),
       "&:hover": {
@@ -41,7 +45,7 @@ const styles = sxStyles({
    },
    navLinkNested: {
       py: 1,
-      pl: "48px",
+      pl: 7,
    },
    textActive: {
       color: "text.primary",
@@ -97,8 +101,8 @@ export const NavLink = ({
    const childLinkActive = useMemo(() => {
       if (!isNavLinkGroup) return false
 
-      return childLinks.some((child) => child.pathname === pathname)
-   }, [childLinks, isNavLinkGroup, pathname])
+      return childLinks.some((child) => child.pathname === routerPathname)
+   }, [childLinks, isNavLinkGroup, routerPathname])
 
    const isActivePath = pathname === routerPathname
 

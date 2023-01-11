@@ -1,20 +1,20 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Box, Grid, LinearProgress, Typography } from "@mui/material"
 import LazyLoad from "react-lazyload"
-import useInfiniteScrollClientWithHandlers from "../../../custom-hook/useInfiniteScrollClientWithHandlers"
-import ShareLivestreamModal from "../../common/ShareLivestreamModal"
-import EventPreviewCard from "../../common/stream-cards/EventPreviewCard"
-import RegistrationModal from "../../common/registration-modal"
+import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers"
+import ShareLivestreamModal from "../../ShareLivestreamModal"
+import EventPreviewCard from "../../stream-cards/EventPreviewCard"
+import RegistrationModal from "../../registration-modal"
 import { useRouter } from "next/router"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import { useInterests } from "../../../custom-hook/useCollection"
+import useRegistrationModal from "../../../../custom-hook/useRegistrationModal"
+import { useInterests } from "../../../../custom-hook/useCollection"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { sxStyles } from "../../../../types/commonTypes"
+import { sxStyles } from "../../../../../types/commonTypes"
 import {
    LivestreamEvent,
    ImpressionLocation,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import { isEmptyObject } from "../../../helperFunctions/HelperFunctions"
+import { isEmptyObject } from "../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    emptyMessage: {

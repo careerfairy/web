@@ -1,10 +1,10 @@
 import React, { useMemo } from "react"
 import { AppBar, Tabs } from "@mui/material"
-import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
-import { sxStyles } from "../../../../types/commonTypes"
-import Filter, { FilterEnum } from "../../common/filter/Filter"
+import SimpleTab from "../../../../../materialUI/GlobalTabs/SimpleTab"
+import { sxStyles } from "../../../../../types/commonTypes"
+import Filter, { FilterEnum } from "../../filter/Filter"
 import Box from "@mui/material/Box"
-import useIsMobile from "../../../custom-hook/useIsMobile"
+import useIsMobile from "../../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    indicator: {

@@ -1,7 +1,7 @@
 import React from "react"
 import { Avatar, Container, Paper } from "@mui/material"
-import SectionHeader from "../../common/SectionHeader"
-import Section from "../../common/Section"
+import SectionHeader from "../../SectionHeader"
+import Section from "../../Section"
 import StreamsTab from "../StreamsTab"
 import GroupBio from "./groupBio"
 

@@ -1,9 +1,9 @@
 import React from "react"
-import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
-import { SuspenseWithBoundary } from "../../../../components/ErrorBoundary"
-import { SkeletonAdminPage } from "../../../../components/util/Skeletons"
-import AllEventsContent from "../../../../components/views/group/admin/all-events"
+import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import { SuspenseWithBoundary } from "../../../../../components/ErrorBoundary"
+import { SkeletonAdminPage } from "../../../../../components/util/Skeletons"
+import AllEventsContent from "../../../../../components/views/group/admin/all-events"
 
 const AllEventsPage = ({ groupId }) => (
    <GroupDashboardLayout pageDisplayName={"All Live Streams"} groupId={groupId}>

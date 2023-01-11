@@ -2,7 +2,7 @@ import React, { useEffect } from "react"
 import { Box, Drawer, Typography } from "@mui/material"
 import CategoryCard from "../GroupCategories/CategoryCard"
 import { useDispatch, useSelector } from "react-redux"
-import * as actions from "../../../../store/actions"
+import * as actions from "../../../../../store/actions"
 import IconButton from "@mui/material/IconButton"
 import CloseDrawerIcon from "@mui/icons-material/ExpandMore"
 

@@ -3,7 +3,7 @@ import { useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import DesktopFeed from "./DesktopFeed/DesktopFeed"
 import { useRouter } from "next/router"
-import { getServerSideRouterQuery } from "../../helperFunctions/HelperFunctions"
+import { getServerSideRouterQuery } from "../../../helperFunctions/HelperFunctions"
 import MobileFeed from "./MobileFeed"
 
 const NextLivestreams = ({
