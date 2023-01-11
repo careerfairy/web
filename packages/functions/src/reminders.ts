@@ -151,7 +151,7 @@ const Reminder24Hours: ReminderData = {
 }
 
 const ReminderNextDayMorning: ReminderData = {
-   template: "reminderforrecording",
+   template: "reminder_for_recording",
    key: "reminderNextDayMorning",
 }
 
