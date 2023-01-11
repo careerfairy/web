@@ -1,11 +1,10 @@
 import { Button, Container } from "@mui/material"
-import { Cookies } from "react-cookie-consent"
 import GeneralLayout from "layouts/GeneralLayout"
+import { getWindow } from "../util/PathUtils"
 
-function CookiePolicy(props) {
+function CookiePolicy() {
    const resetCookieConsent = () => {
-      Cookies.remove("CookieConsent")
-      window.location.reload()
+      getWindow()?.UC_UI?.showSecondLayer()
    }
 
    return (
@@ -161,7 +160,7 @@ function CookiePolicy(props) {
                   variant="contained"
                   onClick={resetCookieConsent}
                >
-                  Reset Cookie Permissions
+                  Update Privacy Settings
                </Button>
                <h3>More Information</h3>
                <p>
