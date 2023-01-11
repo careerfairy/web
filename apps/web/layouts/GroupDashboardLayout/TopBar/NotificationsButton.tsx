@@ -8,7 +8,7 @@ import NotificationsNoneRoundedIcon from "@mui/icons-material/NotificationsNoneR
 // project imports
 import Notifications from "./Notifications"
 import useMenuState from "../../../components/custom-hook/useMenuState"
-import { notificationsSelector } from "../../../store/selectors/groupSelectors"
+import { notificationsSelector } from "../../../store/selectors/groupDashboardSelectors"
 import { maybePluralize } from "../../../components/helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../types/commonTypes"
 
