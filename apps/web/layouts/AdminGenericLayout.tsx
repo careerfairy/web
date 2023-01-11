@@ -68,7 +68,7 @@ type Props = {
    setDrawer: (open: boolean) => void
    toggleDrawer: () => void
 }
-const GenericLayout: React.FC<Props> = ({
+const AdminGenericLayout: React.FC<Props> = ({
    children,
    drawerContent,
    headerContent,
@@ -160,4 +160,4 @@ const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
    )
 }
 
-export default GenericLayout
+export default AdminGenericLayout

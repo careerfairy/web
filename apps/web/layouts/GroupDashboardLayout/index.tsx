@@ -1,19 +1,15 @@
 import React, {
    createContext,
    FC,
-   useCallback,
    useContext,
    useEffect,
    useMemo,
    useState,
 } from "react"
-import NavBar from "./NavBar"
 import { useRouter } from "next/router"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { isEmpty, isLoaded } from "react-redux-firebase"
-import { useDispatch, useSelector } from "react-redux"
 import useAdminGroup from "../../components/custom-hook/useAdminGroup"
-import useDashboardLinks from "../../components/custom-hook/useDashboardLinks"
 import { CircularProgress, Typography } from "@mui/material"
 import {
    Group,
@@ -26,10 +22,7 @@ import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresent
 import { groupRepo } from "../../data/RepositoryInstances"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
-import { leftMenuSelector } from "../../store/selectors/groupDashboardSelectors"
-import * as actions from "../../store/actions"
-import GenericLayout from "../GenericLayout"
-import TopBar from "./TopBar"
+import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
 
 type GroupAdminContext = {
    group: Group
@@ -56,8 +49,6 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { children, groupId, pageDisplayName } = props
    const [groupQuestions, setGroupQuestions] = useState<GroupQuestion[]>([])
 
-   const dispatch = useDispatch()
-
    const { replace, push } = useRouter()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
@@ -70,8 +61,6 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const flattenedGroupOptions = useMemo<GroupOption[]>(() => {
       return group ? GroupsUtil.handleFlattenOptions(group) : []
    }, [group])
-   const { headerLinks, drawerTopLinks, drawerBottomLinks } =
-      useDashboardLinks(group)
 
    const isAdmin = useMemo(
       () => userData?.isAdmin || adminGroups[group?.id],
@@ -152,50 +141,17 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       ]
    )
 
-   // Handle left drawer
-   const leftDrawerOpened = useSelector(leftMenuSelector)
-
-   const setDrawer = useCallback(
-      (open: boolean) => {
-         dispatch(actions.setGroupDashboardDrawer(open))
-      },
-      [dispatch]
-   )
-
-   const handleLeftDrawerToggle = useCallback(() => {
-      setDrawer(!leftDrawerOpened)
-   }, [leftDrawerOpened, setDrawer])
-
    const loading = Boolean(loadingGroup || !isAdmin || !isCorrectGroup)
 
    const empty = isEmpty(group)
 
    return (
       <GroupContext.Provider value={contextValues}>
-         <GenericLayout
-            headerContent={
-               <TopBar
-                  title={pageDisplayName}
-                  drawerOpened={leftDrawerOpened}
-                  handleLeftDrawerToggle={handleLeftDrawerToggle}
-               />
-            }
-            drawerContent={
-               <NavBar
-                  drawerTopLinks={drawerTopLinks}
-                  drawerBottomLinks={drawerBottomLinks}
-                  headerLinks={headerLinks}
-                  group={group}
-               />
-            }
-            drawerOpen={leftDrawerOpened}
-            setDrawer={setDrawer}
-            toggleDrawer={handleLeftDrawerToggle}
-         >
+         <GroupDashboardLayoutProvider pageDisplayName={pageDisplayName}>
             <Outlet empty={empty} loading={loading}>
                {children}
             </Outlet>
-         </GenericLayout>
+         </GroupDashboardLayoutProvider>
       </GroupContext.Provider>
    )
 }

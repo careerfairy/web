@@ -5,9 +5,9 @@ import * as actions from "../../../store/actions"
 import { useDispatch } from "react-redux"
 import NavElement from "../../../components/views/navbar/NavElement"
 import { StylesProps } from "../../../types/commonTypes"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { PageLinkProps } from "../../../components/custom-hook/useGeneralLinks"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import useDashboardLinks from "../../../components/custom-hook/useDashboardLinks"
+import { useGroup } from "../index"
 
 const styles: StylesProps = {
    avatar: {
@@ -29,18 +29,10 @@ const styles: StylesProps = {
    },
 }
 
-interface Props {
-   group: Group
-   drawerTopLinks: PageLinkProps[]
-   headerLinks: PageLinkProps[]
-   drawerBottomLinks: PageLinkProps[]
-}
-const NavBar = ({
-   group,
-   drawerTopLinks,
-   headerLinks,
-   drawerBottomLinks,
-}: Props) => {
+const NavBar = () => {
+   const { group } = useGroup()
+   const { headerLinks, drawerTopLinks, drawerBottomLinks } =
+      useDashboardLinks(group)
    const dispatch = useDispatch()
    const { isLoggedIn } = useAuth()
 
