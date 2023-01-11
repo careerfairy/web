@@ -111,11 +111,6 @@ function Footer(props) {
                               <a>Privacy Policy</a>
                            </Link>
                         </div>
-                        <div>
-                           <Link href="/cookies">
-                              <a>Cookie Policy</a>
-                           </Link>
-                        </div>
                      </div>
                   </div>
                </Grid>
