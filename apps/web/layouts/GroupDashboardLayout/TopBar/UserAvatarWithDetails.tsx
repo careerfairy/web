@@ -50,7 +50,6 @@ const styles = sxStyles({
       ...getMaxLineStyles(1),
    },
    companyText: {
-      // fontSize: 12,
       color: (theme) => alpha(theme.palette.text.secondary, 0.4),
    },
 })
