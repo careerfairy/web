@@ -8,9 +8,9 @@ export default [
       },
    },
    {
-      name: "Ferrari",
+      name: "BMW",
       logo: {
-         url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fcompany-logos%2Fferrari.webp?alt=media&token=eb5cd68c-f71c-48c1-b6b1-d8ddecb039a6",
+         url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FBMW_logo.png?alt=media&token=8c011636-4ad5-4c3b-a436-79a9436c3e70",
       },
    },
    {
