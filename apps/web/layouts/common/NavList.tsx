@@ -15,14 +15,14 @@ import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 
 // project imports
-import type { INavLink } from "../../types/layout"
 import { sxStyles } from "../../types/commonTypes"
+import type { INavLink } from "../types"
 
 const styles = sxStyles({
    icon: {
       fontSize: 24,
    },
-   navElement: {
+   navLink: {
       backgroundColor: "transparent !important",
       mb: 0.5,
       alignItems: "flex-start",
@@ -32,12 +32,13 @@ const styles = sxStyles({
       fontWeight: 500,
       fontSize: "15px",
       px: 5,
-      transition: (theme) => theme.transitions.create(["color"]),
+      transition: (theme) =>
+         theme.transitions.create(["color", "border-right"]),
       "&:hover": {
          color: "text.primary",
       },
    },
-   navElementActive: {
+   navLinkActive: {
       color: "text.primary",
       borderRight: (theme) => `5px solid ${theme.palette.primary.main}`,
    },
@@ -89,8 +90,8 @@ export const NavLink = ({
    return (
       <ListItemButton
          sx={[
-            styles.navElement,
-            isActive && styles.navElementActive,
+            styles.navLink,
+            isActive && styles.navLinkActive,
             baseTextColor && { color: baseTextColor },
          ]}
          target={external ? "_blank" : undefined}

@@ -11,7 +11,7 @@ import {
 // project imports
 import type { Group } from "@careerfairy/shared-lib/dist/groups"
 import useFeatureFlags from "./useFeatureFlags"
-import { INavLink } from "../../types/layout"
+import type { INavLink } from "../../layouts/types"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
@@ -19,7 +19,7 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
    const featureFlags = useFeatureFlags()
 
    return useMemo(() => {
-      if (!group) return []
+      if (!group?.id) return []
 
       const links: INavLink[] = [
          // {
@@ -55,15 +55,14 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
       if (featureFlags.atsAdminPageFlag || group.atsAdminPageFlag) {
          links.push({
             id: "ats",
-            href: `/${baseHrefPath}/${group.id}/admin/ats`,
-            pathname: `/${baseHrefPath}/${baseParam}/admin/ats`,
+            href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
+            pathname: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             Icon: ATSIcon,
             title: "ATS integration",
          })
       }
 
       return links
-      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [featureFlags.atsAdminPageFlag, group?.atsAdminPageFlag, group?.id])
 }
 
