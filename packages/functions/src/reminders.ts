@@ -1,10 +1,21 @@
 import functions = require("firebase-functions")
+import config = require("./config")
 import { client } from "./api/postmark"
 import { admin } from "./api/firestoreAdmin"
-import { addMinutesDate, generateReminderEmailData, setHeaders } from "./util"
+import {
+   addMinutesDate,
+   generateNonAttendeesReminder,
+   generateReminderEmailData,
+   IGenerateEmailDataProps,
+   setHeaders,
+} from "./util"
 import { sendMessage } from "./api/mailgun"
 import { TemplatedMessage } from "postmark"
-import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   LivestreamEvent,
+   LiveStreamEventWithUsersLivestreamData,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import {
    getStreamsByDateWithRegisteredStudents,
@@ -108,9 +119,13 @@ const reminderScheduleRange = 20
 const emailMaxChunkSize = 950
 
 export type ReminderData = {
-   timeMessage: string
-   minutesBefore: number
-   key: "reminder5Minutes" | "reminder1Hour" | "reminder24Hours"
+   timeMessage?: string
+   minutesBefore?: number
+   key:
+      | "reminder5Minutes"
+      | "reminder1Hour"
+      | "reminder24Hours"
+      | "reminderNextDayMorning"
    template: string
 }
 
@@ -133,6 +148,11 @@ const Reminder24Hours: ReminderData = {
    timeMessage: "TOMORROW",
    minutesBefore: 1440,
    key: "reminder24Hours",
+}
+
+const ReminderNextDayMorning: ReminderData = {
+   template: "reminderforrecording",
+   key: "reminderNextDayMorning",
 }
 
 /**
@@ -213,6 +233,65 @@ export const scheduleReminderEmails = functions
    })
 
 /**
+ * When a livestreams ends we should schedule a reminder for the next day at 11 AM to all the non attendees
+ */
+exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
+   .region(config.region)
+   .firestore.document("livestreams/{livestreamId}")
+   .onUpdate(async (change) => {
+      const previousValue = change.before.data() as LivestreamEvent
+      const newValue = change.after.data() as LivestreamEvent
+
+      if (
+         !newValue.test &&
+         previousValue.hasStarted &&
+         !previousValue.hasEnded &&
+         !newValue.hasStarted &&
+         newValue.hasEnded
+      ) {
+         functions.logger.log("Detected the livestream has ended")
+
+         try {
+            const querySnapshot = await admin
+               .firestore()
+               .collectionGroup("userLivestreamData")
+               .where("livestreamId", "==", newValue.id)
+               .where("registered", "==", null)
+               .where("participated", "!=", null)
+               .get()
+
+            if (!querySnapshot.empty) {
+               // get all the non attendees users
+               const nonAttendeesUsers = querySnapshot.docs?.map(
+                  (doc) => doc.data() as UserLivestreamData
+               )
+
+               // join the stream info with all the non attendees
+               const livestreamWithNonAttendees = {
+                  ...(newValue as LivestreamEvent),
+                  usersLivestreamData:
+                     nonAttendeesUsers as UserLivestreamData[],
+               } as LiveStreamEventWithUsersLivestreamData
+
+               await handleSendEmail(
+                  [livestreamWithNonAttendees],
+                  ReminderNextDayMorning,
+                  generateNonAttendeesReminder
+               )
+            }
+         } catch (error) {
+            functions.logger.error(
+               "error in sending reminder to non attendees when livestreams ends",
+               error
+            )
+            throw new functions.https.HttpsError("unknown", error)
+         }
+      } else {
+         functions.logger.log("The livestream has not ended yet")
+      }
+   })
+
+/**
  * Search for a stream that will start between {filterStartDate} and {filterEndDate} + {reminderScheduleRange} minutes and schedule the reminder.
  *
  */
@@ -228,7 +307,11 @@ const handleReminder = async (
          filterEndDate
       )
 
-      const emailsToSave = await handleSendEmail(streams, reminder)
+      const emailsToSave = await handleSendEmail(
+         streams,
+         reminder,
+         generateReminderEmailData
+      )
 
       if (emailsToSave) {
          // update batch with all the successfully sent reminders on the DB
@@ -249,7 +332,10 @@ const handleReminder = async (
  */
 const handleSendEmail = (
    streams: LiveStreamEventWithUsersLivestreamData[],
-   reminder: ReminderData
+   reminder: ReminderData,
+   handleGenerateEmailData: (
+      props: IGenerateEmailDataProps
+   ) => MailgunMessageData[]
 ) => {
    const promiseArrayToSendMessages = []
    const { minutesBefore } = reminder
@@ -262,12 +348,12 @@ const handleSendEmail = (
             `Livestream with ${company} is F2F, no reminder email sent out`
          )
       } else {
-         const emailsData = generateReminderEmailData(
+         const emailsData = handleGenerateEmailData({
             stream,
             reminder,
             minutesBefore,
-            emailMaxChunkSize
-         )
+            emailMaxChunkSize,
+         })
 
          emailsData.forEach((emailData, index) => {
             const currentChunk = `${index + 1}of${emailsData.length}`
