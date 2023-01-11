@@ -104,7 +104,7 @@ export const generateNonAttendeesReminder = ({
    emailMaxChunkSize,
    reminder,
 }: IGenerateEmailDataProps): MailgunMessageData[] => {
-   const { timezone, usersLivestreamData } = stream
+   const { timezone, usersLivestreamData, company } = stream
 
    const tomorrowAt11 = new Date()
    tomorrowAt11.setDate(tomorrowAt11.getDate() + 1)
@@ -133,7 +133,7 @@ export const generateNonAttendeesReminder = ({
       return {
          from: "CareerFairy <noreply@careerfairy.io>",
          to: nonAttendeesChunk,
-         subject: "Reminder for recording",
+         subject: `🤫 ${company} : 4 days limited access to live stream recording!`,
          template: reminder.template,
          "recipient-variables": JSON.stringify(templateData),
          "o:deliverytime": dateToDelivery.toRFC2822(),
@@ -223,7 +223,7 @@ const createRecipientVariables = (
 const createNonAttendeesEmailData = (
    stream: LiveStreamEventWithUsersLivestreamData
 ) => {
-   const { usersLivestreamData, title, company } = stream
+   const { usersLivestreamData, title, company, companyLogoUrl } = stream
 
    return usersLivestreamData.reduce((acc, userLivestreamData) => {
       const {
@@ -233,13 +233,14 @@ const createNonAttendeesEmailData = (
 
       const emailData = {
          firstName,
-         recordingLnk: addUtmTagsToLink({
+         recordingLink: addUtmTagsToLink({
             link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
             campaign: "reminderForRecording",
             content: title,
          }),
          companyName: company,
          livestreamTitle: title,
+         imageUrl: companyLogoUrl,
       }
 
       return {
