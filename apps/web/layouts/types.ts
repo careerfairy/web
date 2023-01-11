@@ -13,4 +13,8 @@ export type INavLink = {
     * */
    pathname?: string
    Icon?: IconComponent
+   /**
+    * The children of the link. If this is set, the link will also be a dropdown.
+    * */
+   childLinks?: INavLink[]
 }

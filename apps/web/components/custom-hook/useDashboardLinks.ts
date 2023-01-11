@@ -1,5 +1,8 @@
 import { useMemo } from "react"
 
+// material-ui
+import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+
 // react feather
 import {
    BarChart2 as AnalyticsIcon,
