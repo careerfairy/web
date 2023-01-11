@@ -11,7 +11,6 @@ import UserAvatarWithDetails from "./UserAvatarWithDetails"
 import NotificationsButton from "./NotificationsButton"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { alpha } from "@mui/material/styles"
-import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 
 const styles = sxStyles({
    root: {
@@ -54,14 +53,15 @@ const styles = sxStyles({
 })
 
 type Props = {
+   handleLeftDrawerToggle: () => void
    title: string
+   drawerOpened: boolean
 }
 
-const TopBar = ({ title }: Props) => {
+const TopBar = ({ handleLeftDrawerToggle, title, drawerOpened }: Props) => {
    const isMobile = useIsMobile()
 
-   const { toggleLeftDrawer, layout } = useGroupDashboard()
-   const drawerPresent = !isMobile && layout.leftDrawerOpen
+   const drawerPresent = !isMobile && drawerOpened
 
    return (
       <Box sx={styles.root}>
@@ -69,7 +69,7 @@ const TopBar = ({ title }: Props) => {
          {!drawerPresent && (
             <Box sx={styles.btnWrapper}>
                <IconButton
-                  onClick={toggleLeftDrawer}
+                  onClick={handleLeftDrawerToggle}
                   sx={styles.menuButton}
                   edge={"start"}
                >

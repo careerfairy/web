@@ -87,3 +87,5 @@ export {
    selectVisibleStreams,
    clearHiddenStreamIds,
 } from "./groupAnalyticsActions"
+
+export { setGroupDashboardDrawer } from "./groupDashboardActions"

@@ -4,6 +4,7 @@ import { FirebaseReducer, FirestoreReducer } from "react-redux-firebase"
 import { HandRaise } from "../../types/handraise"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { IGroupDashboardState } from "./groupDashboardReducer"
 
 interface AuthReducer {
    error: null | string
@@ -113,4 +114,5 @@ export default interface RootState extends DefaultRootState {
    firestore: FirestoreReducer.Reducer<{}, Schema>
    analyticsReducer: GroupAnalyticsReducer
    userDataSet: UserDataSetReducer
+   groupDashboard: IGroupDashboardState
 }
