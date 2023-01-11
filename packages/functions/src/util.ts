@@ -30,16 +30,24 @@ export const getStreamLink = (streamId) => {
    return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
+export type IGenerateEmailDataProps = {
+   stream: LiveStreamEventWithUsersLivestreamData
+   reminder?: ReminderData
+   minutesBefore?: number
+   emailMaxChunkSize: number
+   minutesToRemindBefore?: number
+}
+
 /**
  * Generate a dynamic reminder email using a stream and user registered data
  *
  */
-export const generateReminderEmailData = (
-   stream: LiveStreamEventWithUsersLivestreamData,
-   reminder: ReminderData,
-   minutesToRemindBefore: number,
-   emailMaxChunkSize: number
-): MailgunMessageData[] => {
+export const generateReminderEmailData = ({
+   stream,
+   reminder,
+   minutesToRemindBefore,
+   emailMaxChunkSize,
+}: IGenerateEmailDataProps): MailgunMessageData[] => {
    const { company, start, registeredUsers, timezone } = stream
 
    if (!start || !registeredUsers?.length) {
@@ -75,6 +83,7 @@ export const generateReminderEmailData = (
       reminder1Hour: `🔥 Reminder: Meet ${company} in 1 hour!`,
       reminder24Hours: `🔥 Reminder: Meet ${company} tomorrow!`,
       fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
+      reminderNextDayMorning: "",
    }
 
    // create email data for all the registered users chunks
@@ -86,6 +95,48 @@ export const generateReminderEmailData = (
          template: reminder.template,
          "recipient-variables": JSON.stringify(templateData),
          "o:deliverytime": dateToDelivery,
+      }
+   })
+}
+
+export const generateNonAttendeesReminder = ({
+   stream,
+   emailMaxChunkSize,
+   reminder,
+}: IGenerateEmailDataProps): MailgunMessageData[] => {
+   const { timezone, usersLivestreamData } = stream
+
+   const tomorrowAt11 = new Date()
+   tomorrowAt11.setDate(tomorrowAt11.getDate() + 1)
+   tomorrowAt11.setHours(11, 0, 0)
+
+   // date to delivery should be next day at 11 AM
+   const dateToDelivery = DateTime.fromJSDate(tomorrowAt11, {
+      zone: timezone || "Europe/Zurich",
+   })
+
+   const nonAttendeesEmails = usersLivestreamData.map(
+      ({ user }) => user.userEmail
+   )
+
+   const templateData = createNonAttendeesEmailData(stream)
+
+   // Mailgun has a maximum of 1k emails per bulk email
+   // So we will slice our registered users on chunks of 950 and send more than one bulk email if needed
+   const nonAttendeesChunks = getRegisteredUsersIntoChunks(
+      nonAttendeesEmails,
+      emailMaxChunkSize
+   )
+
+   // create email data for all the non attendees users chunks
+   return nonAttendeesChunks.map((nonAttendeesChunk) => {
+      return {
+         from: "CareerFairy <noreply@careerfairy.io>",
+         to: nonAttendeesChunk,
+         subject: "Reminder for recording",
+         template: reminder.template,
+         "recipient-variables": JSON.stringify(templateData),
+         "o:deliverytime": dateToDelivery.toRFC2822(),
       }
    })
 }
@@ -162,6 +213,38 @@ const createRecipientVariables = (
       return {
          ...acc,
          [studentEmail]: emailData,
+      }
+   }, {})
+}
+
+/**
+ * Create all the email template variables needed for the non attendees email data
+ */
+const createNonAttendeesEmailData = (
+   stream: LiveStreamEventWithUsersLivestreamData
+) => {
+   const { usersLivestreamData, title, company } = stream
+
+   return usersLivestreamData.reduce((acc, userLivestreamData) => {
+      const {
+         livestreamId,
+         user: { firstName, userEmail },
+      } = userLivestreamData
+
+      const emailData = {
+         firstName,
+         recordingLnk: addUtmTagsToLink({
+            link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
+            campaign: "reminderForRecording",
+            content: title,
+         }),
+         companyName: company,
+         livestreamTitle: title,
+      }
+
+      return {
+         ...acc,
+         [userEmail]: emailData,
       }
    }, {})
 }
