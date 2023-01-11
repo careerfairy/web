@@ -12,7 +12,6 @@ import streamReducer from "./streamReducer"
 import generalLayoutReducer from "./generalLayoutReducer"
 import groupAnalyticsReducer from "./groupAnalyticsReducer"
 import streamAdminReducer from "./streamAdminReducer"
-import groupDashboardReducer from "./groupDashboardReducer"
 
 export default combineReducers({
    auth: authReducer,
@@ -27,5 +26,4 @@ export default combineReducers({
    analyticsReducer: groupAnalyticsReducer,
    stream: streamReducer,
    streamAdmin: streamAdminReducer,
-   groupDashboard: groupDashboardReducer,
 })
