@@ -56,11 +56,11 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
             title: "Analytics",
          },
          {
-            id: "roles",
+            id: "team-members",
             href: `/${baseHrefPath}/${group.id}/admin/roles`,
             Icon: RolesIcon,
             pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
-            title: "Roles",
+            title: "Team members",
          },
       ]
 
