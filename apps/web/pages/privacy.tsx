@@ -1381,7 +1381,9 @@ const TextContent = () => {
 
             <ul>
                <li>
-                  <p>Form-related cookies&nbsp;</p>
+                  <p>
+                     <strong>Form-related cookies</strong>
+                  </p>
                </li>
             </ul>
 
