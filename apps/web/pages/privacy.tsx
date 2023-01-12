@@ -1502,13 +1502,25 @@ const TextContent = () => {
                      controllers with Facebook Ireland Ltd., Dublin, Ireland. As
                      part of page insights, statistics are created about the
                      actions visitors perform on our site (comment on posts,
-                     share content, etc.). This is explained at
-                     www.facebook.com/legal/terms/information_about_page_insights_data.
+                     share content, etc.). This is explained at{" "}
+                     <a
+                        rel="noreferrer noopener"
+                        target="_blank"
+                        href="www.facebook.com/legal/terms/information_about_page_insights_data"
+                     >
+                        Facebook Insights Data.
+                     </a>
                      It helps us understand how our page is used and how to
                      improve it. We receive only anonymous, aggregated data. We
                      have agreed our data protection responsibilities according
-                     to the information on
-                     www.facebook.com/legal/terms/page_controller_addendum.&nbsp;
+                     to the information on{" "}
+                     <a
+                        rel="noreferrer noopener"
+                        target="_blank"
+                        href="www.facebook.com/legal/terms/page_controller_addendum"
+                     >
+                        Facebook Page Controller.
+                     </a>
                   </p>
                </li>
             </ul>
