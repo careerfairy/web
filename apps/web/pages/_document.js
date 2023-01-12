@@ -9,6 +9,21 @@ export default class MyDocument extends Document {
       return (
          <Html>
             <Head>
+               <link rel="preconnect" href="//app.usercentrics.eu" />
+               <link rel="preconnect" href="//api.usercentrics.eu" />
+               <link
+                  rel="preload"
+                  href="//app.usercentrics.eu/browser-ui/latest/loader.js"
+                  as="script"
+               />
+               <link
+                  rel="preload"
+                  href="/fonts/subset-Poppins-Regular.woff2"
+                  as="font"
+                  type="font/woff2"
+                  crossOrigin=""
+               />
+
                <link
                   rel="apple-touch-icon-precomposed"
                   sizes="57x57"
@@ -110,11 +125,12 @@ export default class MyDocument extends Document {
                   name="msapplication-square310x310logo"
                   content="/mstile-310x310.png"
                />
-               <link
-                  href="https://fonts.googleapis.com/css?family=Poppins:400,400i,500,500i,700, 700i|Roboto+Slab|Permanent+Marker"
-                  type="text/css"
-                  rel="stylesheet"
-               />
+               {/* 
+                  Define the dataLayer array early in the page so that by the time
+                  react components run client side, this array is already set
+                  Even if we don't load GTM, its okay to have this variable
+                 */}
+               <script dangerouslySetInnerHTML={dataLayerObj}></script>
                {/* Inject MUI styles first to match with the prepend: true configuration. */}
                {this.props.emotionStyleTags}
             </Head>
@@ -183,4 +199,11 @@ MyDocument.getInitialProps = async (ctx) => {
       ...initialProps,
       emotionStyleTags,
    }
+}
+
+/**
+ * Memoized object
+ */
+const dataLayerObj = {
+   __html: `window.dataLayer = window.dataLayer || []; `,
 }

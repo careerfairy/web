@@ -1,6 +1,4 @@
-import TagManager from "react-gtm-module"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { errorLogAndNotify } from "./CommonUtil"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 /**
@@ -11,10 +9,8 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
  */
 export const dataLayerEvent = (eventName: string, optionalVariables = {}) => {
    dataLayerWrapper({
-      dataLayer: {
-         event: eventName,
-         ...optionalVariables,
-      },
+      event: eventName,
+      ...optionalVariables,
    })
 }
 
@@ -26,18 +22,18 @@ export const dataLayerUser = (userData: UserData) => {
    if (!userData) return
 
    dataLayerWrapper({
-      dataLayer: {
-         user_id: userData.authId,
-         isAdmin: userData.isAdmin === true,
-      },
+      user_id: userData.authId,
+      isAdmin: userData.isAdmin === true,
    })
 }
 
-const dataLayerWrapper = (...args) => {
+const dataLayerWrapper = (event: object) => {
+   if (typeof window === "undefined") return
+
    try {
-      TagManager.dataLayer(...args)
+      window["dataLayer"].push(event)
    } catch (e) {
-      errorLogAndNotify(e)
+      console.error(e)
    }
 }
 

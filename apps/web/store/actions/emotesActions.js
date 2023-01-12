@@ -1,5 +1,6 @@
 import * as actions from "./actionTypes"
 import { EMOTE_MESSAGE_TEXT_TYPE } from "../../components/util/constants"
+import { isRecordingWindow } from "../../util/PathUtils"
 
 const tempId = new Date().getTime()
 const buildEmoteAction = (message, memberId) => {
@@ -56,15 +57,4 @@ export const clearAllEmotes = () => async (dispatch) => {
    return dispatch({
       type: actions.CLEAR_ALL_EMOTES,
    })
-}
-
-const isRecordingWindow = () => {
-   // confirm we're running client side
-   if (typeof window !== "undefined") {
-      const params = new URLSearchParams(window.location?.search)
-
-      return params.has("isRecordingWindow")
-   }
-
-   return false
 }
