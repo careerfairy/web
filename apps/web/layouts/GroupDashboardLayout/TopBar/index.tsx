@@ -43,7 +43,10 @@ const styles = sxStyles({
       overflow: "hidden",
    },
    title: {
-      fontSize: "36px !important",
+      fontSize: {
+         xs: "1.2rem",
+         sm: "2rem",
+      },
       ...getMaxLineStyles(1),
    },
    floatingButton: {
@@ -78,11 +81,9 @@ const TopBar = ({ title }: Props) => {
             </Box>
          )}
          <Box sx={styles.leftSection}>
-            {!isMobile && (
-               <Typography fontWeight={600} sx={styles.title}>
-                  {title}
-               </Typography>
-            )}
+            <Typography fontWeight={600} sx={styles.title}>
+               {title}
+            </Typography>
          </Box>
          <Box sx={{ flexGrow: 1 }} />
          <Stack

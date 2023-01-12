@@ -96,6 +96,7 @@ export const NavLink = ({
    childLinks,
    external = false,
    baseTextColor,
+   rightElement,
    isNested = false,
 }: NavLinkProps) => {
    const { pathname: routerPathname } = useRouter()
@@ -147,6 +148,7 @@ export const NavLink = ({
                   </Typography>
                }
             />
+            <Box my="auto">{rightElement}</Box>
          </ListItemButton>
          {isNavLinkGroup && (
             <Collapse in={isOpen} timeout="auto" unmountOnExit>

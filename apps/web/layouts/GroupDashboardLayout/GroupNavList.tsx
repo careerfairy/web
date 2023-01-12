@@ -1,7 +1,4 @@
-import { useMemo } from "react"
-
-// material-ui
-import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+import React, { useMemo } from "react"
 
 // react feather
 import {
@@ -11,19 +8,28 @@ import {
    Users as RolesIcon,
 } from "react-feather"
 
+// material-ui
+import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+
 // project imports
-import type { Group } from "@careerfairy/shared-lib/dist/groups"
-import useFeatureFlags from "./useFeatureFlags"
-import type { INavLink } from "../../layouts/types"
+import { INavLink } from "../types"
+import { useGroup } from "./index"
+import NavList from "../common/NavList"
+import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
+import useGroupATSAccounts from "../../components/custom-hook/useGroupATSAccounts"
+import ATSStatus from "./ATSStatus"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
-const useDashboardLinks = (group?: Group): INavLink[] => {
+
+const GroupNavList = () => {
+   const { group } = useGroup()
+
    const featureFlags = useFeatureFlags()
 
-   return useMemo(() => {
-      if (!group?.id) return []
+   const { data: accounts } = useGroupATSAccounts(group.id)
 
+   const navLinks = useMemo(() => {
       const links: INavLink[] = [
          // {
          //    id: "main-page",
@@ -71,11 +77,19 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
             pathname: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             Icon: ATSIcon,
             title: "ATS integration",
+            rightElement: <ATSStatus accounts={accounts} />,
          })
       }
 
       return links
-   }, [featureFlags.atsAdminPageFlag, group?.atsAdminPageFlag, group?.id])
+   }, [
+      accounts,
+      featureFlags.atsAdminPageFlag,
+      group.atsAdminPageFlag,
+      group.id,
+   ])
+
+   return <NavList links={navLinks} />
 }
 
-export default useDashboardLinks
+export default GroupNavList
