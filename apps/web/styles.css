@@ -1,15 +1,5 @@
 @font-face {
    font-family: "Poppins";
-   src: url("/fonts/subset-Poppins-SemiBold.woff2") format("woff2"),
-      url("/fonts/subset-Poppins-SemiBold.woff") format("woff"),
-      url("/fonts/subset-Poppins-SemiBold.ttf") format("truetype");
-   font-weight: 600;
-   font-style: normal;
-   font-display: swap;
-}
-
-@font-face {
-   font-family: "Poppins";
    src: url("/fonts/subset-Poppins-Bold.woff2") format("woff2"),
       url("/fonts/subset-Poppins-Bold.woff") format("woff"),
       url("/fonts/subset-Poppins-Bold.ttf") format("truetype");
@@ -30,41 +20,11 @@
 
 @font-face {
    font-family: "Poppins";
-   src: url("/fonts/subset-Poppins-Light.woff2") format("woff2"),
-      url("/fonts/subset-Poppins-Light.woff") format("woff"),
-      url("/fonts/subset-Poppins-Light.ttf") format("truetype");
-   font-weight: 300;
-   font-style: normal;
-   font-display: swap;
-}
-
-@font-face {
-   font-family: "Poppins";
    src: url("/fonts/subset-Poppins-Regular.woff2") format("woff2"),
       url("/fonts/subset-Poppins-Regular.woff") format("woff"),
       url("/fonts/subset-Poppins-Regular.ttf") format("truetype");
    font-weight: normal;
    font-style: normal;
-   font-display: swap;
-}
-
-@font-face {
-   font-family: "Poppins";
-   src: url("/fonts/subset-Poppins-SemiBoldItalic.woff2") format("woff2"),
-      url("/fonts/subset-Poppins-SemiBoldItalic.woff") format("woff"),
-      url("/fonts/subset-Poppins-SemiBoldItalic.ttf") format("truetype");
-   font-weight: 600;
-   font-style: italic;
-   font-display: swap;
-}
-
-@font-face {
-   font-family: "Poppins";
-   src: url("/fonts/subset-Poppins-MediumItalic.woff2") format("woff2"),
-      url("/fonts/subset-Poppins-MediumItalic.woff") format("woff"),
-      url("/fonts/subset-Poppins-MediumItalic.ttf") format("truetype");
-   font-weight: 500;
-   font-style: italic;
    font-display: swap;
 }
 
@@ -90,10 +50,9 @@
 
 @font-face {
    font-family: "Poppins";
-   src: url("/fonts/subset-Poppins-LightItalic.woff2") format("woff2"),
-      url("/fonts/subset-Poppins-LightItalic.woff") format("woff"),
-      url("/fonts/subset-Poppins-LightItalic.ttf") format("truetype");
-   font-weight: 300;
+   src: url("/fonts/subset-Poppins-MediumItalic.woff2") format("woff2"),
+      url("/fonts/subset-Poppins-MediumItalic.woff") format("woff");
+   font-weight: 500;
    font-style: italic;
    font-display: swap;
 }
