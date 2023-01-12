@@ -1,4 +1,3 @@
-import { errorLogAndNotify } from "./CommonUtil"
 import { getWindow } from "./PathUtils"
 
 declare global {
@@ -12,6 +11,8 @@ interface UC_UI {
       { name: string; id: string; consent: { status: boolean } }
    ]
    acceptService(id: string): Promise<void>
+   showSecondLayer(): void
+   restartEmbeddings(): void
 }
 
 /**
