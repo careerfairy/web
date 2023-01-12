@@ -22,6 +22,7 @@ import {
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
@@ -240,14 +241,17 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
    .firestore.document("livestreams/{livestreamId}")
    .onUpdate(async (change) => {
       const previousValue = change.before.data() as LivestreamEvent
+      const previousLivestreamPresenter =
+         LivestreamPresenter.createFromDocument(previousValue)
+
       const newValue = change.after.data() as LivestreamEvent
+      const newLivestreamPresenter =
+         LivestreamPresenter.createFromDocument(newValue)
 
       if (
-         !newValue.test &&
-         previousValue.hasStarted &&
-         !previousValue.hasEnded &&
-         !newValue.hasStarted &&
-         newValue.hasEnded
+         !newLivestreamPresenter.isTest() &&
+         previousLivestreamPresenter.isLive() &&
+         newLivestreamPresenter.streamHasFinished()
       ) {
          functions.logger.log("Detected the livestream has ended")
 
@@ -256,8 +260,8 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
                .firestore()
                .collectionGroup("userLivestreamData")
                .where("livestreamId", "==", newValue.id)
-               .where("registered", "==", null)
-               .where("participated", "!=", null)
+               .where("registered", "!=", null)
+               .where("participated", "==", null)
                .get()
 
             if (!querySnapshot.empty) {
