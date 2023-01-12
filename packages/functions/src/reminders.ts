@@ -18,6 +18,7 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import {
+   getStreamNonAttendees,
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
@@ -256,25 +257,13 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
          functions.logger.log("Detected the livestream has ended")
 
          try {
-            const querySnapshot = await admin
-               .firestore()
-               .collectionGroup("userLivestreamData")
-               .where("livestreamId", "==", newValue.id)
-               .where("registered", "!=", null)
-               .where("participated", "==", null)
-               .get()
+            const nonAttendees = await getStreamNonAttendees(newValue.id)
 
-            if (!querySnapshot.empty) {
-               // get all the non attendees users
-               const nonAttendeesUsers = querySnapshot.docs?.map(
-                  (doc) => doc.data() as UserLivestreamData
-               )
-
+            if (nonAttendees) {
                // join the stream info with all the non attendees
                const livestreamWithNonAttendees = {
                   ...(newValue as LivestreamEvent),
-                  usersLivestreamData:
-                     nonAttendeesUsers as UserLivestreamData[],
+                  usersLivestreamData: nonAttendees as UserLivestreamData[],
                } as LiveStreamEventWithUsersLivestreamData
 
                await handleSendEmail(
