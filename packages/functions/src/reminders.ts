@@ -18,12 +18,12 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import {
-   getStreamNonAttendees,
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { livestreamsRepo } from "./api/repositories"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
@@ -250,6 +250,7 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
          LivestreamPresenter.createFromDocument(newValue)
 
       if (
+         newLivestreamPresenter.isAbleToRecord() &&
          !newLivestreamPresenter.isTest() &&
          previousLivestreamPresenter.isLive() &&
          newLivestreamPresenter.streamHasFinished()
@@ -257,7 +258,9 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
          functions.logger.log("Detected the livestream has ended")
 
          try {
-            const nonAttendees = await getStreamNonAttendees(newValue.id)
+            const nonAttendees = await livestreamsRepo.getStreamNonAttendees(
+               newValue.id
+            )
 
             if (nonAttendees) {
                // join the stream info with all the non attendees
