@@ -2223,6 +2223,7 @@ class FirebaseService {
                      isRecommended: true,
                   }),
                },
+               participated: null,
             }
 
             transaction.set(userLivestreamDataRef, data, { merge: true })
