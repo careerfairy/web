@@ -21,7 +21,7 @@ export default class MyDocument extends Document {
                   href="/fonts/subset-Poppins-Regular.woff2"
                   as="font"
                   type="font/woff2"
-                  crossOrigin
+                  crossOrigin=""
                />
 
                <link
