@@ -2,7 +2,6 @@ import { admin } from "../api/firestoreAdmin"
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
-   UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { addMinutesDate, removeMinutesDate } from "../util"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
@@ -124,27 +123,6 @@ export const getStreamsByDateWithRegisteredStudents = (
 
          return addUsersDataOnStreams(streams)
       })
-}
-
-export const getStreamNonAttendees = async (
-   livestreamId: string
-): Promise<UserLivestreamData[]> => {
-   const querySnapshot = await admin
-      .firestore()
-      .collectionGroup("userLivestreamData")
-      .where("livestreamId", "==", livestreamId)
-      .where("registered", "!=", null)
-      .where("participated", "==", null)
-      .get()
-
-   if (!querySnapshot.empty) {
-      const nonAttendeesUsers = querySnapshot.docs?.map(
-         (doc) => doc.data() as UserLivestreamData
-      )
-      return nonAttendeesUsers
-   }
-
-   return []
 }
 
 /**
