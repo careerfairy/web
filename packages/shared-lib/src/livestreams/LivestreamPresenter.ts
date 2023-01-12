@@ -67,6 +67,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly isFaceToFace: boolean,
       public readonly isHybrid: boolean,
       public readonly address: string,
+      public readonly denyRecording: boolean,
 
       // ATS Jobs
       /**
@@ -120,6 +121,10 @@ export class LivestreamPresenter extends BaseModel {
 
    isTest(): boolean {
       return this.test
+   }
+
+   isAbleToRecord(): boolean {
+      return !this.denyRecording
    }
 
    getMainStreamId(): string {
@@ -202,6 +207,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.isFaceToFace ?? false,
          livestream.isHybrid ?? false,
          livestream.address ?? "",
+         livestream.denyRecording ?? false,
 
          livestream.jobs ?? [],
          livestream.targetFieldsOfStudy ?? [],
@@ -263,6 +269,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.isFaceToFace,
          livestream.isHybrid,
          livestream.address,
+         livestream.denyRecording,
          livestream.jobs,
          livestream.targetFieldsOfStudy,
          livestream.targetLevelsOfStudy,
@@ -358,6 +365,7 @@ export class LivestreamPresenter extends BaseModel {
          author: this.author,
          index: this.index,
          parentLivestream: this.parentLivestream,
+         denyRecording: this.denyRecording,
       }
    }
 }

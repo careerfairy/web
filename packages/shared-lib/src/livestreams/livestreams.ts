@@ -124,6 +124,11 @@ export interface LivestreamEvent extends Identifiable {
    universities?: any[]
    questionsDisabled?: boolean
 
+   /**
+    * To deny livestream recordings
+    */
+   denyRecording?: boolean
+
    // ATS Jobs
    /**
     * During livestream creating, jobs can be associated with the livestream

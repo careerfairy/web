@@ -3,6 +3,7 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { admin } from "../api/firestoreAdmin"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -12,6 +13,12 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getRegisteredUsersMultipleEvents(
       livestreamIds: string[]
    ): Promise<UserLivestreamData[]>
+
+   /**
+    * Get all the Non Attendees users for a specific livestream
+    * @param livestreamId
+    */
+   getStreamNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
 }
 
 export class LivestreamFunctionsRepository
@@ -48,5 +55,26 @@ export class LivestreamFunctionsRepository
             .filter((user) => user)
             .flatMap((array) => array)
       )
+   }
+
+   async getStreamNonAttendees(
+      livestreamId: string
+   ): Promise<UserLivestreamData[]> {
+      const querySnapshot = await admin
+         .firestore()
+         .collectionGroup("userLivestreamData")
+         .where("livestreamId", "==", livestreamId)
+         .where("registered", "!=", null)
+         .where("participated", "==", null)
+         .get()
+
+      if (!querySnapshot.empty) {
+         const nonAttendeesUsers = querySnapshot.docs?.map(
+            (doc) => doc.data() as UserLivestreamData
+         )
+         return nonAttendeesUsers
+      }
+
+      return []
    }
 }
