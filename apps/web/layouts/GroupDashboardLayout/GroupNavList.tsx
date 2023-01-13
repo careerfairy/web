@@ -10,14 +10,15 @@ import {
 
 // material-ui
 import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+import Skeleton from "@mui/material/Skeleton"
 
 // project imports
 import { INavLink } from "../types"
 import { useGroup } from "./index"
 import NavList from "../common/NavList"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
-import useGroupATSAccounts from "../../components/custom-hook/useGroupATSAccounts"
 import ATSStatus from "./ATSStatus"
+import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
@@ -26,8 +27,6 @@ const GroupNavList = () => {
    const { group } = useGroup()
 
    const featureFlags = useFeatureFlags()
-
-   const { data: accounts } = useGroupATSAccounts(group.id)
 
    const navLinks = useMemo(() => {
       const links: INavLink[] = [
@@ -77,19 +76,31 @@ const GroupNavList = () => {
             pathname: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             Icon: ATSIcon,
             title: "ATS integration",
-            rightElement: <ATSStatus accounts={accounts} />,
+            rightElement: <SuspensefulATSStatus groupId={group.id} />,
          })
       }
 
       return links
-   }, [
-      accounts,
-      featureFlags.atsAdminPageFlag,
-      group.atsAdminPageFlag,
-      group.id,
-   ])
+   }, [featureFlags.atsAdminPageFlag, group.atsAdminPageFlag, group.id])
 
    return <NavList links={navLinks} />
 }
 
+const SuspensefulATSStatus = ({ groupId }: { groupId: string }) => {
+   return (
+      <SuspenseWithBoundary
+         fallback={
+            <Skeleton
+               variant="circular"
+               animation="pulse"
+               width={8}
+               height={8}
+            />
+         }
+         hide
+      >
+         <ATSStatus groupId={groupId} />
+      </SuspenseWithBoundary>
+   )
+}
 export default GroupNavList

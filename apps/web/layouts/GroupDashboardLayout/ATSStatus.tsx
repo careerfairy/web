@@ -4,9 +4,9 @@ import React, { memo } from "react"
 import { Box, Tooltip } from "@mui/material"
 
 // project imports
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { sxStyles } from "../../types/commonTypes"
 import { useTheme } from "@mui/styles"
+import useGroupATSAccounts from "../../components/custom-hook/useGroupATSAccounts"
 
 const styles = sxStyles({
    statusRoot: (theme) => ({
@@ -18,16 +18,20 @@ const styles = sxStyles({
 })
 
 type Props = {
-   accounts: GroupATSAccount[]
+   groupId: string
 }
-const ATSStatus = ({ accounts }: Props) => {
+const ATSStatus = ({ groupId }: Props) => {
+   const { data: accounts } = useGroupATSAccounts(groupId)
+
    if (accounts.length === 0) {
       // no ATS accounts, so no status
       return null
    }
 
    // If an account has not completed the application test yet, then we show a warning
-   if (accounts.some((account) => account.isApplicationTestComplete()!)) {
+   if (
+      accounts.some((account) => account.isApplicationTestComplete() === false)
+   ) {
       return (
          <Status
             message={"ATS application test is not complete"}
@@ -37,7 +41,7 @@ const ATSStatus = ({ accounts }: Props) => {
    }
 
    // If an account has not completed it's first sync yet, we show a warning
-   if (accounts.some((account) => account.isFirstSyncComplete()!)) {
+   if (accounts.some((account) => account.isFirstSyncComplete() === false)) {
       return (
          <Status message={"ATS first sync is not complete"} color={"warning"} />
       )
@@ -60,7 +64,7 @@ type StatusProps = {
    message: string
    color: "primary" | "secondary" | "success" | "error" | "warning" | "info"
 }
-const Status = ({ color, message }: StatusProps) => {
+export const Status = ({ color, message }: StatusProps) => {
    const theme = useTheme()
    const targetColor = theme.palette[color].main
 
