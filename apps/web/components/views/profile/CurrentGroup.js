@@ -228,13 +228,15 @@ const CurrentGroup = ({
                         </Link>
                      )}
                      {isAdmin && (
-                        <Link href={`/group/${localGroup.id}/admin/analytics`}>
-                           <a>
-                              <Button fullWidth size="large" color="primary">
-                                 View Admin Page
-                              </Button>
-                           </a>
-                        </Link>
+                        <a
+                           // Not using nextjs/Link on purpose, we want to trigger a full page
+                           // refresh, to ensure we disable gtm completely
+                           href={`/group/${localGroup.id}/admin/analytics`}
+                        >
+                           <Button fullWidth size="large" color="primary">
+                              View Admin Page
+                           </Button>
+                        </a>
                      )}
                      <Menu
                         id="simple-menu"
