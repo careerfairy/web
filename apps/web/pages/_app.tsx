@@ -27,7 +27,6 @@ import firebaseApp, {
 import "../util/FirebaseUtils"
 import useStoreReferralQueryParams from "../components/custom-hook/useStoreReferralQueryParams"
 import UserRewardsNotifications from "../HOCs/UserRewardsNotifications"
-import GoogleTagManager from "../HOCs/GoogleTagManager"
 import useStoreUTMQueryParams from "../components/custom-hook/useStoreUTMQueryParams"
 import TutorialProvider from "../HOCs/TutorialProvider"
 import ErrorProvider from "../HOCs/ErrorProvider"
@@ -39,6 +38,7 @@ import {
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
+import { Usercentrics } from "components/Usercentrics"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -77,6 +77,7 @@ function MyApp(props) {
 
    return (
       <CacheProvider value={emotionCache}>
+         <Usercentrics />
          <Head>
             <meta
                name="viewport"
@@ -94,26 +95,24 @@ function MyApp(props) {
                   <FeatureFlagsProvider>
                      <TutorialProvider>
                         <AuthProvider>
-                           <GoogleTagManager>
-                              <ThemeProviderWrapper>
-                                 <FirebaseServiceContext.Provider
-                                    value={firebaseServiceInstance}
+                           <ThemeProviderWrapper>
+                              <FirebaseServiceContext.Provider
+                                 value={firebaseServiceInstance}
+                              >
+                                 <LocalizationProvider
+                                    dateAdapter={AdapterDateFns}
                                  >
-                                    <LocalizationProvider
-                                       dateAdapter={AdapterDateFns}
-                                    >
-                                       <UserReminderProvider>
-                                          <ErrorProvider>
-                                             <UserRewardsNotifications>
-                                                <Component {...pageProps} />
-                                             </UserRewardsNotifications>
-                                             <Notifier />
-                                          </ErrorProvider>
-                                       </UserReminderProvider>
-                                    </LocalizationProvider>
-                                 </FirebaseServiceContext.Provider>
-                              </ThemeProviderWrapper>
-                           </GoogleTagManager>
+                                    <UserReminderProvider>
+                                       <ErrorProvider>
+                                          <UserRewardsNotifications>
+                                             <Component {...pageProps} />
+                                          </UserRewardsNotifications>
+                                          <Notifier />
+                                       </ErrorProvider>
+                                    </UserReminderProvider>
+                                 </LocalizationProvider>
+                              </FirebaseServiceContext.Provider>
+                           </ThemeProviderWrapper>
                         </AuthProvider>
                      </TutorialProvider>
                   </FeatureFlagsProvider>
