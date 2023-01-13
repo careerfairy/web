@@ -3,7 +3,6 @@ import { useTheme } from "@mui/material/styles"
 import LandingLayout from "../layouts/LandingLayout"
 import BookADemoSection from "../components/views/landing/BookADemoSection"
 import CompaniesSection from "../components/views/landing/CompaniesSection"
-import CalendlyModal from "../components/views/landing/CalendlyModal"
 import ScrollToTop from "../components/views/common/ScrollToTop"
 import {
    alternateStudentBackground,
@@ -33,13 +32,6 @@ const StudentLandingPage = ({}) => {
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
    const handleOpenJoinModal = ({ groups }) => setJoinGroupModalData({ groups })
-   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false)
-
-   const handleOpenCalendly = () => {
-      setCalendlyModalOpen(true)
-   }
-
-   const handleCloseCalendly = () => setCalendlyModalOpen(false)
 
    const studentBenefitsData = [
       {
@@ -179,17 +171,12 @@ const StudentLandingPage = ({}) => {
                big
                goToNextLivestreams
                goTo={userData ? "/next-livestreams" : "/signup"}
-               handleOpenCalendly={handleOpenCalendly}
                title={
                   userData
                      ? "Register for your first event today"
                      : "Start finding your dream job today!"
                }
                dividerColor={secondary.light}
-            />
-            <CalendlyModal
-               open={calendlyModalOpen}
-               onClose={handleCloseCalendly}
             />
             <ScrollToTop />
             <RegistrationModal

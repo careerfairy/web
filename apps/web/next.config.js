@@ -10,7 +10,6 @@ const isVercelPreview = process.env.VERCEL_ENV === "preview"
 const csp = {
    "default-src": [
       "'self'",
-      "*.calendly.com",
       "*.crisp.chat",
       "*.crisp.help",
       "*.facebook.com",
@@ -99,7 +98,6 @@ const csp = {
    "img-src": [
       "'self'",
       "*.ads.linkedin.com",
-      "*.calendly.com",
       "*.googleapis.com",
       "*.usercentrics.eu",
       "blob:",
