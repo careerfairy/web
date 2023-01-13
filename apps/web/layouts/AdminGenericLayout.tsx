@@ -1,4 +1,4 @@
-import React, { useEffect } from "react"
+import React, { memo, useEffect } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
@@ -160,4 +160,4 @@ const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
    )
 }
 
-export default AdminGenericLayout
+export default memo(AdminGenericLayout)

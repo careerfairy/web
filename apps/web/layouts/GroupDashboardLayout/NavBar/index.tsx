@@ -40,10 +40,6 @@ const NavBar = () => {
       dispatch(actions.signOut())
    }
 
-   if (!group) {
-      return null
-   }
-
    return (
       <Box height="100%" display="flex" flexDirection="column">
          <Box alignItems="center" display="flex" flexDirection="column" p={2}>

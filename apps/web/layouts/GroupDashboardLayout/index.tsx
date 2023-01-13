@@ -146,13 +146,13 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const empty = isEmpty(group)
 
    return (
-      <GroupContext.Provider value={contextValues}>
-         <GroupDashboardLayoutProvider pageDisplayName={pageDisplayName}>
-            <Outlet empty={empty} loading={loading}>
+      <Outlet empty={empty} loading={loading}>
+         <GroupContext.Provider value={contextValues}>
+            <GroupDashboardLayoutProvider pageDisplayName={pageDisplayName}>
                {children}
-            </Outlet>
-         </GroupDashboardLayoutProvider>
-      </GroupContext.Provider>
+            </GroupDashboardLayoutProvider>
+         </GroupContext.Provider>
+      </Outlet>
    )
 }
 

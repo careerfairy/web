@@ -123,11 +123,12 @@ const GroupDashboardLayoutProvider = ({ children, pageDisplayName }: Props) => {
 }
 
 export const useGroupDashboard = () => {
-   if (!GroupDashboardContext) {
+   const context = useContext(GroupDashboardContext)
+   if (context === undefined) {
       throw new Error(
          "useGroupDashboard must be used within a GroupDashboardContextProvider"
       )
    }
-   return useContext(GroupDashboardContext)
+   return context
 }
 export default GroupDashboardLayoutProvider
