@@ -66,12 +66,7 @@ const RockstarTextTalent = () => {
       </div>
    )
 }
-const GeneralHeroMessage = ({
-   handleOpenCalendly,
-   title,
-   buttons,
-   subTitle,
-}) => {
+const GeneralHeroMessage = ({ title, buttons, subTitle }) => {
    return (
       <Box sx={styles.heroContent}>
          <Typography variant="h2">
@@ -124,7 +119,6 @@ const GeneralHeroMessage = ({
 }
 
 GeneralHeroMessage.propTypes = {
-   handleOpenCalendly: PropTypes.func,
    title: PropTypes.any,
 }
 

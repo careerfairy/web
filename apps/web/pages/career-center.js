@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { useTheme } from "@mui/material/styles"
 import LandingLayout from "../layouts/LandingLayout"
 import BookADemoSection from "../components/views/landing/BookADemoSection"
@@ -7,7 +7,6 @@ import UniversitySection from "../components/views/landing/UniversitySection"
 import BenefitsSection from "../components/views/landing/BenefitsSection"
 import CompaniesSection from "../components/views/landing/CompaniesSection"
 import HeroSection from "../components/views/landing/HeroSection"
-import CalendlyModal from "../components/views/landing/CalendlyModal"
 import ScrollToTop from "../components/views/common/ScrollToTop"
 import {
    alternateBackground,
@@ -25,14 +24,6 @@ const CareerCenterLandingPage = ({}) => {
    const {
       palette: { secondary, common, grey },
    } = useTheme()
-
-   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false)
-
-   const handleOpenCalendly = () => {
-      setCalendlyModalOpen(true)
-   }
-
-   const handleCloseCalendly = () => setCalendlyModalOpen(false)
 
    const careerCenterBenefitsData = [
       {
@@ -111,7 +102,6 @@ const CareerCenterLandingPage = ({}) => {
                </div>
             }
             big
-            handleOpenCalendly={handleOpenCalendly}
          />
          <BenefitsSection
             title={"Why join CareerFairy?"}
@@ -121,7 +111,7 @@ const CareerCenterLandingPage = ({}) => {
             subtitle=""
             title="Some of the universities we work with"
          />
-         <ExperienceSection handleOpenCalendly={handleOpenCalendly} />
+         <ExperienceSection />
          <BenefitsSection
             title={"Simple setup"}
             benefits={careerCenterBenefitsData2}
@@ -135,13 +125,8 @@ const CareerCenterLandingPage = ({}) => {
             backgroundColor={`linear-gradient(-8deg, ${secondary.main} 1%, ${secondary.light} 100%)`}
             color={common.white}
             big
-            handleOpenCalendly={handleOpenCalendly}
             bookingWhite
             title={"Have a chat with us"}
-         />
-         <CalendlyModal
-            open={calendlyModalOpen}
-            onClose={handleCloseCalendly}
          />
          <ScrollToTop />
       </LandingLayout>
