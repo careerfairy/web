@@ -3,6 +3,9 @@ import { getWindow } from "./PathUtils"
 declare global {
    interface Window {
       UC_UI: UC_UI
+      // google tag manager & google analytics globals
+      ga: () => void
+      gtag: () => void
    }
 }
 

@@ -2,7 +2,12 @@ import { useRouter } from "next/router"
 import Script from "next/script"
 import React from "react"
 import { shouldUseEmulators } from "util/CommonUtil"
-import { isEmbedded, isGroupAdminPath } from "util/PathUtils"
+import {
+   getWindow,
+   isEmbedded,
+   isGroupAdminPath,
+   isStreamingPath,
+} from "util/PathUtils"
 
 /**
  * Load Usercentrics scripts & Google Tag Manager when
@@ -30,9 +35,9 @@ export const Usercentrics = () => {
    }
 
    /**
-    * We don't wan't to run GTM for group admin journeys
+    * We don't want to run GTM for group admin journeys or livestreams
     */
-   const isGroupAdminJourney = isGroupAdminPath(pathname)
+   const isGTMDisabled = isGroupAdminPath(pathname) || isStreamingPath(pathname)
 
    return (
       <>
@@ -46,7 +51,7 @@ export const Usercentrics = () => {
             data-version={useUsercentricsDraftVersion ? "preview" : undefined}
          ></Script>
 
-         {!isGroupAdminJourney && (
+         {isGTMDisabled === false && (
             <Script
                id="google-analytics"
                strategy="beforeInteractive"
