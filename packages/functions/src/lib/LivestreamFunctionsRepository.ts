@@ -3,7 +3,6 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
-import { admin } from "../api/firestoreAdmin"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -60,8 +59,7 @@ export class LivestreamFunctionsRepository
    async getStreamNonAttendees(
       livestreamId: string
    ): Promise<UserLivestreamData[]> {
-      const querySnapshot = await admin
-         .firestore()
+      const querySnapshot = await this.firestore
          .collectionGroup("userLivestreamData")
          .where("livestreamId", "==", livestreamId)
          .where("registered", "!=", null)
