@@ -7,7 +7,7 @@ import Fade from "@stahl.luke/react-reveal/Fade"
 import HeroButton from "../HeroSection/HeroButton"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { Box, Typography } from "@mui/material"
-import { hubSpotFunnelLink } from "../../../../constants/links"
+import { hubSpotFunnelLinkCareerCenter } from "../../../../constants/links"
 
 const styles = {
    streamerImage: {
@@ -81,7 +81,7 @@ const ExperienceSection = (props) => {
                   fullWidth
                   withGradient
                   target="_blank"
-                  href={hubSpotFunnelLink}
+                  href={hubSpotFunnelLinkCareerCenter}
                   iconUrl={calendarIcon}
                   variant="contained"
                >
