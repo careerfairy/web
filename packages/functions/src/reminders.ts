@@ -250,7 +250,7 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
          LivestreamPresenter.createFromDocument(newValue)
 
       if (
-         newLivestreamPresenter.isAbleToRecord() &&
+         newLivestreamPresenter.isAbleToAccessRecording() &&
          !newLivestreamPresenter.isTest() &&
          previousLivestreamPresenter.isLive() &&
          newLivestreamPresenter.streamHasFinished()
@@ -258,14 +258,14 @@ exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
          functions.logger.log("Detected the livestream has ended")
 
          try {
-            const nonAttendees = await livestreamsRepo.getStreamNonAttendees(
+            const nonAttendees = await livestreamsRepo.getNonAttendees(
                newValue.id
             )
 
             if (nonAttendees) {
                // join the stream info with all the non attendees
                const livestreamWithNonAttendees = {
-                  ...(newValue as LivestreamEvent),
+                  ...newValue,
                   usersLivestreamData: nonAttendees as UserLivestreamData[],
                } as LiveStreamEventWithUsersLivestreamData
 

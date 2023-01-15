@@ -17,7 +17,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * Get all the Non Attendees users for a specific livestream
     * @param livestreamId
     */
-   getStreamNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
+   getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
 }
 
 export class LivestreamFunctionsRepository
@@ -56,9 +56,7 @@ export class LivestreamFunctionsRepository
       )
    }
 
-   async getStreamNonAttendees(
-      livestreamId: string
-   ): Promise<UserLivestreamData[]> {
+   async getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]> {
       const querySnapshot = await this.firestore
          .collectionGroup("userLivestreamData")
          .where("livestreamId", "==", livestreamId)

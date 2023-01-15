@@ -2223,6 +2223,7 @@ class FirebaseService {
                      isRecommended: true,
                   }),
                },
+               // to allow queries for users that didn't participate
                participated: null,
             }
 
