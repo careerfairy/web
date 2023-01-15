@@ -125,9 +125,9 @@ export interface LivestreamEvent extends Identifiable {
    questionsDisabled?: boolean
 
    /**
-    * To deny livestream recordings
+    * To deny access to the livestream recording after its end
     */
-   denyRecording?: boolean
+   denyRecordingAccess?: boolean
 
    // ATS Jobs
    /**
