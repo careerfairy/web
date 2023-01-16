@@ -529,6 +529,14 @@ const getComponents = (theme: DefaultTheme): Components => ({
          },
       },
    },
+   MuiFab: {
+      styleOverrides: {
+         root: {
+            filter: theme.dropShadows.dark_6_12_12,
+            boxShadow: "none",
+         },
+      },
+   },
 })
 
 export const getTheme = (rootThemeObj: DefaultTheme) => {

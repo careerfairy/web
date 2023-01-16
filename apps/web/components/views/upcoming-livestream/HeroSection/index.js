@@ -18,7 +18,7 @@ import HeroHosts from "./HeroHosts"
 import {
    InPersonEventBadge,
    LimitedRegistrationsBadge,
-} from "../../NextLivestreams/GroupStreams/groupStreamCard/badges"
+} from "../../common/NextLivestreams/GroupStreams/groupStreamCard/badges"
 import WhiteTagChip from "../../common/chips/TagChip"
 import LanguageIcon from "@mui/icons-material/Language"
 import Image from "next/image"

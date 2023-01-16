@@ -34,7 +34,7 @@ const styles = sxStyles({
    },
    appBar: {
       boxShadow: "none",
-      background: (theme) => theme.palette.common.white,
+      background: "none",
       borderBottom: (theme) =>
          `1px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
       top: 64,

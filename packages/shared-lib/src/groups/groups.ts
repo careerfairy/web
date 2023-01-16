@@ -25,6 +25,7 @@ export interface Group extends Identifiable {
    privacyPolicyUrl?: string
    inActive?: boolean
    bannerImageUrl?: string
+   atsAdminPageFlag?: boolean
 
    /*
     * Deprecated
