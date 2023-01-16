@@ -6,7 +6,7 @@ import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHea
 const EditGroupProfile = ({ groupId }) => {
    return (
       <GroupDashboardLayout
-         pageDisplayName={"Edit Group Profile"}
+         pageDisplayName={"Company Information"}
          groupId={groupId}
       >
          <DashboardHead title="CareerFairy | Admin Edit Details of" />

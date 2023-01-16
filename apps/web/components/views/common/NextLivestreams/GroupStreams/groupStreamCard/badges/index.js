@@ -3,7 +3,7 @@ import WhatshotIcon from "@mui/icons-material/Whatshot"
 import EmojiPeopleIcon from "@mui/icons-material/EmojiPeople"
 import LanguageIcon from "@mui/icons-material/Language"
 import { Chip, Tooltip } from "@mui/material"
-import ConditionalWrapper from "../../../../common/ConditionalWrapper"
+import ConditionalWrapper from "../../../../ConditionalWrapper"
 
 const styles = {
    warningChip: {

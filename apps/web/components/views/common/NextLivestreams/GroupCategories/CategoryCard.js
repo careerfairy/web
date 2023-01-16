@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { Autocomplete, Box, Chip, TextField } from "@mui/material"
-import { convertArrayOfObjectsToDictionaryByProp } from "../../../../data/util/AnalyticsUtil"
+import { convertArrayOfObjectsToDictionaryByProp } from "../../../../../data/util/AnalyticsUtil"
 
 const styles = {
    inputWrapper: {

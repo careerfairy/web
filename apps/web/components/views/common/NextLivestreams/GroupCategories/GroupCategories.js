@@ -3,7 +3,7 @@ import { Box, Button, Collapse, Divider, Grid } from "@mui/material"
 import CategoryCard from "./CategoryCard"
 import FilterIcon from "@mui/icons-material/Tune"
 import { useDispatch, useSelector } from "react-redux"
-import * as actions from "../../../../store/actions"
+import * as actions from "../../../../../store/actions"
 
 const styles = {
    actions: {

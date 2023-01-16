@@ -271,8 +271,20 @@ const FilterMenu = ({
    )
 
    const handleClearQueries = useCallback(() => {
-      void push({ pathname, query: {} }, undefined, { shallow: true })
-   }, [pathname, push])
+      const newQuery = { ...query }
+      /**
+       * We must only delete the query params that are being used as filters,
+       * if not we could break some pages that use the query params for their slug
+       * */
+      filtersToShow.forEach((filter) => {
+         delete newQuery[filter]
+      })
+
+      // Always reset the page to 0
+      delete newQuery.page
+
+      return push({ pathname, query: newQuery }, undefined, { shallow: true })
+   }, [pathname, push, filtersToShow, query])
 
    const isSelected = useCallback(
       (interestId) => query.interests?.includes(interestId),

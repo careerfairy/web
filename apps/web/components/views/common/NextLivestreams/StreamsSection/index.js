@@ -1,11 +1,11 @@
-import { SwipeablePanel } from "../../../../materialUI/GlobalPanels/GlobalPanels"
+import { SwipeablePanel } from "../../../../../materialUI/GlobalPanels/GlobalPanels"
 import { isLoaded } from "react-redux-firebase"
 import NextLivestreams from "../NextLivestreams"
 import { Box, CircularProgress } from "@mui/material"
 import * as PropTypes from "prop-types"
 import React, { useEffect } from "react"
 import { forceCheck } from "react-lazyload"
-import { formatLivestreamsEvents } from "../../portal/events-preview/utils"
+import { formatLivestreamsEvents } from "../../../portal/events-preview/utils"
 
 const styles = {
    loaderWrapper: {

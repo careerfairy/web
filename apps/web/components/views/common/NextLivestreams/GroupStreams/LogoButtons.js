@@ -1,8 +1,8 @@
 import React, { useContext, useEffect, useState } from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { ButtonBase, Typography } from "@mui/material"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import { RegistrationContext } from "../../../../context/registration/RegistrationContext"
+import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
+import { RegistrationContext } from "../../../../../context/registration/RegistrationContext"
 
 const useStyles = makeStyles((theme) => ({
    root: {
