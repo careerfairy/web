@@ -1,6 +1,6 @@
 import { App, initializeApp } from "firebase-admin/app"
-import { getAuth } from "firebase-admin/auth"
-import { getFirestore } from "firebase-admin/firestore"
+import { Auth, getAuth } from "firebase-admin/auth"
+import { Firestore, getFirestore } from "firebase-admin/firestore"
 
 export const projectId = "careerfairy-e1fd9"
 
@@ -15,5 +15,5 @@ process.env["FIRESTORE_EMULATOR_HOST"] = "localhost:8080"
 
 const app: App = initializeApp({ projectId })
 
-export const auth = getAuth(app)
-export const firestore = getFirestore(app)
+export const auth: Auth = getAuth(app)
+export const firestore: Firestore = getFirestore(app)
