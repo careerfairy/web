@@ -106,6 +106,7 @@ export class LivestreamFunctionsRepository
             transaction.set(statsRef, statsDoc)
          }
 
+         // We have to use an update method here because the set method does not support nested updates/operations
          transaction.update(statsRef, operationsToMake)
       })
    }
