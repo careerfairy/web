@@ -531,14 +531,34 @@ export interface LiveStreamStats extends Identifiable {
    }
 }
 
-type Stats = {
+export const createLiveStreamStatsDoc = <T extends string>(
+   livestreamId: string,
+   docId: string
+): LiveStreamStats => {
+   return {
+      id: docId,
+      livestreamId: livestreamId,
+      numberOfRatings: 0,
+      averageRating: 0,
+      generalStats: {
+         numberOfApplicants: 0,
+         numberOfParticipants: 0,
+         numberOfPeopleReached: 0,
+         numberOfRegistrations: 0,
+         numberOfTalentPoolProfiles: 0,
+      },
+      universityStats: {},
+   }
+}
+
+export type Stats = {
    // Total number of views across all live stream details pages
    numberOfPeopleReached: number
    // Total number of registrations across all live streams
    numberOfRegistrations: number
    // Total number of people who have participated in the live stream
    numberOfParticipants: number
-   // Total number of unique profiles that joined a company talent pool
+   // Total number of unique profiles that joined the talent pool
    numberOfTalentPoolProfiles: number
    // Total number of applications that came in through the ATS integration
    numberOfApplicants: number
