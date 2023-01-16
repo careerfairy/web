@@ -243,6 +243,11 @@ export interface UserLivestreamData extends Identifiable {
    }
 }
 
+export interface RecordingToken extends Identifiable {
+   recourseId: string
+   sid: string
+}
+
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
    date: firebase.firestore.Timestamp
    applicationId?: string

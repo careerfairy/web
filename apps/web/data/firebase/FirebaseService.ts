@@ -933,15 +933,6 @@ class FirebaseService {
       })
    }
 
-   getLivestreamRecordingSid = (livestreamId) => {
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("recordingToken")
-         .doc("token")
-      return ref.get()
-   }
-
    increaseLivestreamPresentationPageNumber = (livestreamId) => {
       let ref = this.firestore
          .collection("livestreams")
