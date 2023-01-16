@@ -10,6 +10,7 @@ import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import UserAvatarWithDetails from "./UserAvatarWithDetails"
 import NotificationsButton from "./NotificationsButton"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
+import { alpha } from "@mui/material/styles"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
 
 const styles = sxStyles({
@@ -17,11 +18,15 @@ const styles = sxStyles({
       display: "flex",
       flex: 1,
       alignItems: "center",
-      borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
-      px: 2,
+      borderBottom: (theme) =>
+         `2px solid ${alpha(theme.palette.divider, 0.03)}`,
+      px: {
+         xs: 2,
+         sm: 5,
+      },
       py: {
          xs: 1,
-         md: 2,
+         md: 3.2,
       },
    },
    leftSection: {
@@ -38,7 +43,10 @@ const styles = sxStyles({
       overflow: "hidden",
    },
    title: {
-      fontSize: "36px !important",
+      fontSize: {
+         xs: "1.2rem",
+         sm: "2rem",
+      },
       ...getMaxLineStyles(1),
    },
    floatingButton: {
@@ -61,19 +69,21 @@ const TopBar = ({ title }: Props) => {
    return (
       <Box sx={styles.root}>
          {/* toggler button */}
+         {!drawerPresent && (
+            <Box sx={styles.btnWrapper}>
+               <IconButton
+                  onClick={toggleLeftDrawer}
+                  sx={styles.menuButton}
+                  edge={"start"}
+               >
+                  <MenuRoundedIcon />
+               </IconButton>
+            </Box>
+         )}
          <Box sx={styles.leftSection}>
-            {!drawerPresent && (
-               <Box sx={styles.btnWrapper}>
-                  <IconButton onClick={toggleLeftDrawer} sx={styles.menuButton}>
-                     <MenuRoundedIcon />
-                  </IconButton>
-               </Box>
-            )}
-            {!isMobile && (
-               <Typography variant="h3" fontWeight={600} sx={styles.title}>
-                  {title}
-               </Typography>
-            )}
+            <Typography fontWeight={600} sx={styles.title}>
+               {title}
+            </Typography>
          </Box>
          <Box sx={{ flexGrow: 1 }} />
          <Stack
@@ -84,7 +94,7 @@ const TopBar = ({ title }: Props) => {
                md: 3,
             }}
          >
-            {/* TODO: ADD OPENING OF STREAM CREATION DIALOG */}
+            {/* TODO: RENDER THIS BUTTON FOR THE LANDING PAGE */}
             {/*<Button size={"small"} variant={"outlined"} color={"secondary"}>*/}
             {/*   Create Live Stream*/}
             {/*</Button>*/}

@@ -21,14 +21,12 @@ import { StreamCreationProvider } from "../../../draftStreamForm/StreamForm/Stre
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const useStyles = makeStyles((theme) => ({
-   containerRoot: {
-      // padding: theme.spacing(3),
-   },
+   containerRoot: {},
    streamCard: {},
    highlighted: {},
    appBar: {
       boxShadow: "none",
-      background: theme.palette.common.white,
+      background: "none",
       borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
       top: 64,
    },
@@ -38,9 +36,6 @@ const useStyles = makeStyles((theme) => ({
    indicator: {
       height: theme.spacing(0.8),
       padding: theme.spacing(0, 0.5),
-   },
-   title: {
-      background: theme.palette.common.white,
    },
 }))
 
@@ -225,7 +220,7 @@ const EventsOverview = () => {
    return (
       <Fragment>
          <AppBar className={classes.appBar} position="sticky" color="default">
-            <Box className={classes.title}>
+            <Box>
                <Header
                   group={group}
                   handleOpenNewStreamModal={handleOpenNewStreamModal}

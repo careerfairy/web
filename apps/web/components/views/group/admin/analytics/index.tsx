@@ -48,11 +48,8 @@ const useStyles = makeStyles((theme) => ({
    },
    appBar: {
       boxShadow: "none",
-      background: theme.palette.common.white,
       borderBottom: `1px solid ${alpha(theme.palette.text.secondary, 0.3)}`,
-   },
-   title: {
-      background: theme.palette.common.white,
+      background: "transparent",
    },
    slide: {
       // background: `linear-gradient(45deg, ${theme.palette.primary.main} 45%, ${alpha(theme.palette.secondary.main, 1)} 75%)`
@@ -584,7 +581,7 @@ const AnalyticsOverview = () => {
    return (
       <Fragment>
          <AppBar className={classes.appBar} position="static" color="default">
-            <Box className={classes.title}>
+            <Box>
                <Title
                   setGlobalTimeFrame={setGlobalTimeFrame}
                   userDataSets={userDataSets}
