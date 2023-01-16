@@ -1,4 +1,4 @@
-import type { FC } from "react"
+import type { FC, ReactNode } from "react"
 import type { SvgIconProps } from "@mui/material"
 import type { Icon } from "react-feather"
 
@@ -17,4 +17,5 @@ export type INavLink = {
     * The children of the link. If this is set, the link will also be a dropdown.
     * */
    childLinks?: INavLink[]
+   rightElement?: ReactNode
 }

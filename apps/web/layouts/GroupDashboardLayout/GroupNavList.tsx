@@ -1,7 +1,4 @@
-import { useMemo } from "react"
-
-// material-ui
-import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+import React, { useMemo } from "react"
 
 // react feather
 import {
@@ -11,19 +8,27 @@ import {
    Users as RolesIcon,
 } from "react-feather"
 
+// material-ui
+import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+import Skeleton from "@mui/material/Skeleton"
+
 // project imports
-import type { Group } from "@careerfairy/shared-lib/dist/groups"
-import useFeatureFlags from "./useFeatureFlags"
-import type { INavLink } from "../../layouts/types"
+import { INavLink } from "../types"
+import { useGroup } from "./index"
+import NavList from "../common/NavList"
+import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
+import ATSStatus from "./ATSStatus"
+import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
-const useDashboardLinks = (group?: Group): INavLink[] => {
+
+const GroupNavList = () => {
+   const { group } = useGroup()
+
    const featureFlags = useFeatureFlags()
 
-   return useMemo(() => {
-      if (!group?.id) return []
-
+   const navLinks = useMemo(() => {
       const links: INavLink[] = [
          // {
          //    id: "main-page",
@@ -56,11 +61,11 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
             title: "Analytics",
          },
          {
-            id: "roles",
+            id: "team-members",
             href: `/${baseHrefPath}/${group.id}/admin/roles`,
             Icon: RolesIcon,
             pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
-            title: "Roles",
+            title: "Team members",
          },
       ]
 
@@ -71,11 +76,31 @@ const useDashboardLinks = (group?: Group): INavLink[] => {
             pathname: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             Icon: ATSIcon,
             title: "ATS integration",
+            rightElement: <SuspensefulATSStatus groupId={group.id} />,
          })
       }
 
       return links
-   }, [featureFlags.atsAdminPageFlag, group?.atsAdminPageFlag, group?.id])
+   }, [featureFlags.atsAdminPageFlag, group.atsAdminPageFlag, group.id])
+
+   return <NavList links={navLinks} />
 }
 
-export default useDashboardLinks
+const SuspensefulATSStatus = ({ groupId }: { groupId: string }) => {
+   return (
+      <SuspenseWithBoundary
+         fallback={
+            <Skeleton
+               variant="circular"
+               animation="pulse"
+               width={8}
+               height={8}
+            />
+         }
+         hide
+      >
+         <ATSStatus groupId={groupId} />
+      </SuspenseWithBoundary>
+   )
+}
+export default GroupNavList

@@ -38,9 +38,13 @@ const styles = sxStyles({
       pl: leftPadding,
       pr: 1,
       transition: (theme) =>
-         theme.transitions.create(["color", "border-right"]),
-      "&:hover": {
+         theme.transitions.create(["color", "border-right"], {
+            duration: theme.transitions.duration.shortest,
+         }),
+      "&:hover , &:focus": {
          color: "text.primary",
+         borderRight: (theme) =>
+            `5px solid ${alpha(theme.palette.primary.main, 0.5)}`,
       },
    },
    navLinkNested: {
@@ -92,6 +96,7 @@ export const NavLink = ({
    childLinks,
    external = false,
    baseTextColor,
+   rightElement,
    isNested = false,
 }: NavLinkProps) => {
    const { pathname: routerPathname } = useRouter()
@@ -143,6 +148,7 @@ export const NavLink = ({
                   </Typography>
                }
             />
+            <Box my="auto">{rightElement}</Box>
          </ListItemButton>
          {isNavLinkGroup && (
             <Collapse in={isOpen} timeout="auto" unmountOnExit>
