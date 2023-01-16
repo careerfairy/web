@@ -28,6 +28,7 @@ import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
 import crisp = require("./crisp")
 import recommendation = require("./recommendation")
+import stats = require("./stats")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -179,3 +180,6 @@ exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
 exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
+
+// Stats
+exports.updateLiveStreamStats = stats.updateLiveStreamStats
