@@ -2,7 +2,14 @@ import {
    FirebaseLivestreamRepository,
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   createLiveStreamStatsDoc,
+   LiveStreamStats,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import type { OperationsToMake } from "./stats"
+
+import { createCompatGenericConverter } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository" // Not imported at runtime (only used for types)
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -18,6 +25,11 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     * @param livestreamId
     */
    getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
+
+   updateLiveStreamStats(
+      livestreamId: string,
+      operationsToMake: OperationsToMake
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -72,5 +84,29 @@ export class LivestreamFunctionsRepository
       }
 
       return []
+   }
+
+   async updateLiveStreamStats(
+      livestreamId: string,
+      operationsToMake: OperationsToMake
+   ): Promise<void> {
+      const statsRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("stats")
+         .doc("liveStreamStats")
+         .withConverter(createCompatGenericConverter<LiveStreamStats>())
+
+      return this.firestore.runTransaction(async (transaction) => {
+         const statsDoc = await transaction.get(statsRef)
+         const livestreamId = statsRef.parent.parent.id
+         if (!statsDoc.exists) {
+            // Create the stats document
+            const statsDoc = createLiveStreamStatsDoc(livestreamId, statsRef.id)
+            transaction.set(statsRef, statsDoc)
+         }
+
+         transaction.update(statsRef, operationsToMake)
+      })
    }
 }
