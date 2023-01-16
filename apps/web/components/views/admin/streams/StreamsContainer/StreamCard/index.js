@@ -108,8 +108,9 @@ const StreamCard = ({ isUpcoming, stream }) => {
    useEffect(() => {
       const fetchLivestreamRecordingSid = async () => {
          if (stream?.id) {
-            const tokenDoc = await firebase.getLivestreamRecordingSid(stream.id)
-            const recordingSid = tokenDoc.data()?.sid
+            const recordingToken =
+               await livestreamRepo.getLivestreamRecordingToken(stream.id)
+            const recordingSid = recordingToken?.sid
             if (recordingSid) {
                setRecordingSid(recordingSid)
             }
@@ -246,14 +247,16 @@ const StreamCard = ({ isUpcoming, stream }) => {
                               </MenuItem>
                            </>
                         )}
-                        {!isUpcoming && !stream.hasEnded && stream.isRecording && (
-                           <MenuItem
-                              disabled={recordingRequestOngoing}
-                              onClick={handleOpenConfirmRecordingDialog}
-                           >
-                              Stop recording stream
-                           </MenuItem>
-                        )}
+                        {!isUpcoming &&
+                           !stream.hasEnded &&
+                           stream.isRecording && (
+                              <MenuItem
+                                 disabled={recordingRequestOngoing}
+                                 onClick={handleOpenConfirmRecordingDialog}
+                              >
+                                 Stop recording stream
+                              </MenuItem>
+                           )}
                         {!isUpcoming && recordingSid && (
                            <MenuItem
                               component="a"

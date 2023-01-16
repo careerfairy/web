@@ -1,3 +1,4 @@
+// eslint-disable-next-line react/jsx-no-leaked-render
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
 import {
    Alert,
@@ -68,22 +69,9 @@ const styles = {
    },
 }
 
+// eslint-disable-next-line react/display-name
 const TimerText = memo(({ time }) => {
-   const calculateTimeLeft = () => {
-      const difference = time - new Date()
-      let timeLeft = {}
-
-      if (difference > 0) {
-         timeLeft = {
-            Days: Math.floor(difference / (1000 * 60 * 60 * 24)),
-            Hours: Math.floor((difference / (1000 * 60 * 60)) % 24),
-            Minutes: Math.floor((difference / 1000 / 60) % 60),
-            Seconds: Math.floor((difference / 1000) % 60),
-         }
-      }
-
-      return timeLeft
-   }
+   const calculateTimeLeft = () => DateUtil.calculateTimeLeft(time)
 
    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
 
@@ -132,7 +120,7 @@ const CountDown = ({
          location: "Hosted virtually on CareerFairy (link in the description)",
          startsAt: new Date(time).toISOString(),
          endsAt: new Date(
-            new Date(time).getTime() + 1 * (stream.duration || 45) * 60 * 1000
+            new Date(time).getTime() + (stream.duration || 45) * 60 * 1000
          ).toISOString(),
       }
    }, [livestreamId, groupId, stream.title, stream.duration, time])

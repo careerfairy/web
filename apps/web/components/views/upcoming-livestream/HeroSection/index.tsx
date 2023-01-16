@@ -1,4 +1,4 @@
-import React from "react"
+import { useCallback, useState } from "react"
 import { alpha, darken, useTheme } from "@mui/material/styles"
 import {
    Avatar,
@@ -27,6 +27,7 @@ import { SuspenseWithBoundary } from "../../../ErrorBoundary"
 import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import RecordingPlayer from "../RecordingPlayer"
 
 const styles = {
    root: (theme, smallVerticalScreen) => ({
@@ -184,10 +185,14 @@ const HeroSection = ({
    streamAboutToStart,
    streamLanguage,
    showScrollButton = false,
+   showRecording = false,
+   maxDaysToShowRecording,
+   recordingSid = "",
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const smallVerticalScreen = useMediaQuery("(max-height:500px)")
+   const [showBigVideoPlayer, setShowBigVideoPlayer] = useState(false)
 
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
@@ -195,6 +200,113 @@ const HeroSection = ({
          streamLanguage ||
          eventInterests?.length
    )
+
+   const renderDefaultContent = useCallback(
+      () => (
+         <Grid container spacing={2}>
+            <Grid item xs={12}>
+               <Box display="flex">
+                  <Avatar
+                     title={stream.company}
+                     src={getResizedUrl(stream.companyLogoUrl, "md")}
+                     sx={styles.companyLogo}
+                  />
+               </Box>
+            </Grid>
+            <Grid item xs={12}>
+               <Box sx={styles.timerWrapper}>
+                  <Paper sx={styles.countdown}>
+                     <CountDown
+                        registerButtonLabel={registerButtonLabel}
+                        time={stream.start?.toDate?.() || null}
+                        stream={stream}
+                        streamAboutToStart={streamAboutToStart}
+                        onRegisterClick={onRegisterClick}
+                        disabled={disabled}
+                        registered={registered}
+                     />
+                     {stream?.jobs?.length > 0 && (
+                        <EnsureUserIsLoggedIn>
+                           <SuspenseWithBoundary hide fallback="">
+                              <JobApply livestream={stream} />
+                           </SuspenseWithBoundary>
+                        </EnsureUserIsLoggedIn>
+                     )}
+                  </Paper>
+               </Box>
+            </Grid>
+            {!!hosts.length && (
+               <Grid item xs={12}>
+                  <HeroHosts hosts={hosts} />
+               </Grid>
+            )}
+         </Grid>
+      ),
+      [
+         disabled,
+         hosts,
+         onRegisterClick,
+         registerButtonLabel,
+         registered,
+         stream,
+         streamAboutToStart,
+      ]
+   )
+
+   const handleRecordingPlay = useCallback(() => {
+      // clicked on the preview mode
+      setShowBigVideoPlayer(true)
+   }, [])
+
+   const renderRecordingVideo = useCallback(
+      () => (
+         <Box pt={1}>
+            <RecordingPlayer
+               handlePlay={handleRecordingPlay}
+               stream={stream}
+               showBigVideoPlayer={showBigVideoPlayer}
+               maxDaysToShowRecording={maxDaysToShowRecording}
+               recordingSid={recordingSid}
+            />
+         </Box>
+      ),
+      [
+         handleRecordingPlay,
+         maxDaysToShowRecording,
+         recordingSid,
+         showBigVideoPlayer,
+         stream,
+      ]
+   )
+
+   const renderHostedByInfo = useCallback(
+      () => (
+         <Box
+            display="flex"
+            mt={4}
+            alignItems="center"
+            flexDirection={isMobile ? "column" : "row"}
+         >
+            <Avatar
+               title={stream.company}
+               src={getResizedUrl(stream.companyLogoUrl, "md")}
+               sx={{ ...styles.companyLogo, maxWidth: "250px" }}
+            />
+            <Box ml={2}>
+               <Typography variant={"subtitle1"}>Hosted by</Typography>
+               <Typography
+                  variant={stream?.company?.length > 20 ? "h6" : "h5"}
+                  fontWeight="bold"
+                  component="h1"
+               >
+                  {stream.company}
+               </Typography>
+            </Box>
+         </Box>
+      ),
+      [isMobile, stream.company, stream.companyLogoUrl]
+   )
+
    return (
       <Box sx={styles.root(theme, smallVerticalScreen)}>
          <Image
@@ -207,7 +319,15 @@ const HeroSection = ({
          <Box sx={styles.containerWrapper}>
             <Container sx={styles.container}>
                <Grid sx={styles.gridContainer} spacing={2} container>
-                  <Grid sx={styles.leftGridItem} item xs={12} md={6}>
+                  <Grid
+                     sx={{
+                        ...styles.leftGridItem,
+                        display: showBigVideoPlayer ? "none" : "inherit",
+                     }}
+                     item
+                     xs={12}
+                     md={6}
+                  >
                      <Typography
                         variant={stream?.title?.length > 120 ? "h4" : "h2"}
                         component="h1"
@@ -257,50 +377,24 @@ const HeroSection = ({
                            </Box>
                         </Hidden>
                      )}
+                     {showRecording && !isMobile && renderHostedByInfo()}
                   </Grid>
-                  <Grid item xs={12} md={6}>
-                     <Grid container spacing={2}>
-                        <Grid item xs={12}>
-                           <Box display="flex">
-                              <Avatar
-                                 title={stream.company}
-                                 src={getResizedUrl(
-                                    stream.companyLogoUrl,
-                                    "md"
-                                 )}
-                                 sx={styles.companyLogo}
-                              />
-                           </Box>
-                        </Grid>
-                        <Grid item xs={12}>
-                           <Box sx={styles.timerWrapper}>
-                              <Paper sx={styles.countdown}>
-                                 <CountDown
-                                    registerButtonLabel={registerButtonLabel}
-                                    time={stream.start?.toDate?.() || null}
-                                    stream={stream}
-                                    streamAboutToStart={streamAboutToStart}
-                                    onRegisterClick={onRegisterClick}
-                                    disabled={disabled}
-                                    registered={registered}
-                                 />
-                                 {stream?.jobs?.length > 0 && (
-                                    <EnsureUserIsLoggedIn>
-                                       <SuspenseWithBoundary hide fallback="">
-                                          <JobApply livestream={stream} />
-                                       </SuspenseWithBoundary>
-                                    </EnsureUserIsLoggedIn>
-                                 )}
-                              </Paper>
-                           </Box>
-                        </Grid>
-                        {!!hosts.length && (
-                           <Grid item xs={12}>
-                              <HeroHosts hosts={hosts} />
-                           </Grid>
-                        )}
-                     </Grid>
+                  <Grid
+                     item
+                     xs={12}
+                     md={showBigVideoPlayer ? 12 : 6}
+                     style={{
+                        transition: theme.transitions.create("all", {
+                           easing: theme.transitions.easing.sharp,
+                           duration: 1500,
+                        }),
+                     }}
+                  >
+                     {showRecording
+                        ? renderRecordingVideo()
+                        : renderDefaultContent()}
                   </Grid>
+                  {showRecording && isMobile && renderHostedByInfo()}
                </Grid>
             </Container>
          </Box>
@@ -311,7 +405,10 @@ const HeroSection = ({
                   size="large"
                   href={"#about"}
                >
-                  <KeyboardDoubleArrowDownIcon fontSize="25px" color={"info"} />
+                  <KeyboardDoubleArrowDownIcon
+                     sx={{ fontSize: "25px" }}
+                     color={"info"}
+                  />
                </IconButton>
             </Box>
          ) : null}
