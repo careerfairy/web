@@ -156,7 +156,7 @@ async function removeExistingSubCollection(collection: string) {
    const batchSize = 500
    const query = await firestore.collectionGroup(collection).get()
    const totalDocs = query.docs.length
-   debug("Start deleting " + totalDocs + " impressions")
+   debug(`Start deleting ${totalDocs} ${collection} docs`)
 
    for (let i = 0; i < totalDocs; i += batchSize) {
       const batch = firestore.batch()
@@ -164,7 +164,7 @@ async function removeExistingSubCollection(collection: string) {
 
       docs.forEach((doc) => batch.delete(doc.ref))
       await batch.commit()
-      debug(`Deleted ${i + docs.length} out of ${totalDocs} impressions`)
+      debug(`Deleted ${i + docs.length} out of ${totalDocs} ${collection}`)
    }
    debug("FINISHED DELETE")
 }
