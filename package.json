@@ -20,6 +20,7 @@
       "format": "prettier --write --ignore-unknown .",
       "prepare": "husky install",
       "build:functions": "turbo run build --filter=@careerfairy/functions",
+      "build:fetch-firestore-data": "turbo run build --filter=@careerfairy/fetch-firestore-data",
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",
       "deploy:rules": "firebase deploy --only firestore:rules",
