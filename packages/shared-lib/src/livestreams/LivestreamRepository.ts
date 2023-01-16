@@ -13,6 +13,7 @@ import {
    LivestreamJobApplicationDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
+   RecordingToken,
    UserLivestreamData,
    UserParticipatingStats,
 } from "./livestreams"
@@ -164,6 +165,8 @@ export interface ILivestreamRepository {
     * @param ids - the IDs of the livestreams to get (max 10). If more than 10 are provided, only the first 10 will be used
     * */
    getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
+
+   getLivestreamRecordingToken(livestreamId: string): Promise<RecordingToken>
 }
 
 export class FirebaseLivestreamRepository
@@ -656,6 +659,20 @@ export class FirebaseLivestreamRepository
          .where("id", "in", ids.slice(0, 10))
          .get()
       return mapFirestoreDocuments<LivestreamEvent>(snaps)
+   }
+
+   async getLivestreamRecordingToken(livestreamId): Promise<RecordingToken> {
+      let snap = await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("recordingToken")
+         .doc("token")
+         .get()
+
+      if (snap.exists) {
+         return snap.data() as RecordingToken
+      }
+      return null
    }
 }
 

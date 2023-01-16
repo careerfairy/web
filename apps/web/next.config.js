@@ -26,6 +26,7 @@ const csp = {
       "*.tiktok.com",
       "*.vitals.vercel-insights.com",
       "*.youtube.com",
+      "*.amazonaws.com",
       "blob:",
       "careerfairy-e1fd9.firebaseapp.com",
    ],

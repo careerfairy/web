@@ -31,8 +31,11 @@ import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchem
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
+import { livestreamRepo } from "../../data/RepositoryInstances"
 
-const UpcomingLivestreamPage = ({ serverStream }) => {
+const MAX_DAYS_TO_SHOW_RECORDING = 5
+
+const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
@@ -410,6 +413,35 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       await startRegistrationProcess(true)
    }, [startRegistrationProcess])
 
+   /**
+    * Show recording if user is registered, the event is in the past, the event was recorded and did not pass the { MAX_DAYS_TO_SHOW_RECORDING }
+    */
+   const showRecording = useMemo(() => {
+      if (
+         registered &&
+         isPastEvent &&
+         !stream.denyRecordingAccess &&
+         recordingSid.length > 0
+      ) {
+         const streamDate = stream?.start.toDate()
+
+         const maxDateToShowRecording = streamDate
+         maxDateToShowRecording.setDate(
+            streamDate.getDate() + MAX_DAYS_TO_SHOW_RECORDING
+         )
+
+         return new Date() <= maxDateToShowRecording
+      }
+
+      return false
+   }, [
+      isPastEvent,
+      recordingSid,
+      registered,
+      stream.denyRecordingAccess,
+      stream?.start,
+   ])
+
    return (
       <>
          <UpcomingLayout>
@@ -428,6 +460,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                hosts={filteredGroups}
                onRegisterClick={handleRegisterClick}
                showScrollButton={true}
+               showRecording={showRecording}
+               recordingSid={recordingSid}
+               maxDaysToShowRecording={MAX_DAYS_TO_SHOW_RECORDING}
             />
             <Navigation
                aboutRef={aboutRef}
@@ -516,6 +551,8 @@ export async function getServerSideProps({
    query: { groupId },
 }) {
    const serverStream = await getServerSideStream(livestreamId)
+   const streamRecordingToken =
+      await livestreamRepo.getLivestreamRecordingToken(livestreamId)
 
    if (!serverStream) {
       return {
@@ -525,7 +562,11 @@ export async function getServerSideProps({
 
    // TODO check if groupId is part of stream.groupIds
    return {
-      props: { serverStream, groupId: groupId || null }, // will be passed to the page component as props
+      props: {
+         serverStream,
+         groupId: groupId || null,
+         recordingSid: streamRecordingToken?.sid || "",
+      }, // will be passed to the page component as props
    }
 }
 
