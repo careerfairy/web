@@ -1,11 +1,29 @@
 import functions = require("firebase-functions")
 import {
-   createLiveStreamStatsDoc,
+   LiveStreamStats,
+   Stats,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import { admin } from "./api/firestoreAdmin"
 import { isEmpty } from "lodash"
+import {
+   addOperationWithBooleanCheck,
+   addOperationWithNumberCheck,
+   OperationsToMake,
+} from "./lib/stats"
+import { livestreamsRepo } from "./api/repositories"
 
+/*
+ * The `updateLiveStreamStats` function listens for changes in the `userLivestreamData` subcollection of the `livestreams` collection,
+ * and updates a `stats` subcollection document named `liveStreamStats`.
+ *
+ * The function uses the `change.before.data()` and `change.after.data()`
+ * to get the old and new data of the modified document respectively. It uses `addOperations()` function to check which fields of the newData and
+ * oldData are different and updates the liveStreamStatsToUpdate accordingly.
+ *
+ * The function also checks if the university code has been changed, if it has, the function decrements the old university data and increments the new university data.
+ * In the end, it checks if there are any updates to liveStreamStats, if there are updates, it performs a Firestore transaction to update liveStreamStats and logs a message to indicate the
+ * liveStreamStats have been updated.
+ * */
 export const updateLiveStreamStats = functions.firestore
    .document("livestreams/{livestreamId}/userLivestreamData/{userId}")
    .onWrite(async (change, context) => {
@@ -14,234 +32,170 @@ export const updateLiveStreamStats = functions.firestore
       const oldUserLivestreamData = change.before.data() as UserLivestreamData
       const newUserLivestreamData = change.after.data() as UserLivestreamData
 
-      const statsRef = admin
-         .firestore()
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("stats")
-         .doc("liveStreamStats")
+      const livestreamStatsDocOperationsToMake: OperationsToMake = {} // An empty object to store the update operations for the firestore UPDATE operation
 
-      const liveStreamStatsToUpdate: {
-         [key: string]: admin.firestore.FieldValue
-      } = {}
-
-      handleUpdate(
+      // Add operations for the general stats
+      addOperations(
          newUserLivestreamData,
          oldUserLivestreamData,
-         liveStreamStatsToUpdate
+         livestreamStatsDocOperationsToMake
       )
 
       const newUniversityCode = newUserLivestreamData?.user?.university?.code
       const oldUniversityCode = oldUserLivestreamData?.user?.university?.code
 
+      // Check if the university code has been changed
       const universityChanged = newUniversityCode !== oldUniversityCode
 
       if (universityChanged) {
          if (oldUniversityCode) {
             // Decrement all the truthy fields of the oldUserLivestreamData
-            decrementOldUniversityData(
+            addOperationsToDecrementOldUniversityStats(
                oldUniversityCode,
                oldUserLivestreamData,
-               liveStreamStatsToUpdate
+               livestreamStatsDocOperationsToMake
             )
          }
 
          if (newUniversityCode) {
             // Increment all the truthy fields of newUserLivestreamData like participated.date, registered.date, talentPool.date, etc...
-            incrementNewUniversityData(
+            addOperationsToIncrementNewUniversityStats(
                newUniversityCode,
                newUserLivestreamData,
-               liveStreamStatsToUpdate
+               livestreamStatsDocOperationsToMake
             )
          }
       } else {
-         handleUpdate(
+         // If the university code has not been changed, then increment/decrement the fields that have changed for the user's university
+         addOperations(
             newUserLivestreamData,
             oldUserLivestreamData,
-            liveStreamStatsToUpdate,
+            livestreamStatsDocOperationsToMake,
             newUniversityCode
          )
       }
 
-      if (isEmpty(liveStreamStatsToUpdate)) {
+      // Check if there are any updates to liveStreamStats
+      if (isEmpty(livestreamStatsDocOperationsToMake)) {
          functions.logger.info("No changes to livestream stats", {
             livestreamId,
-            liveStreamStatsToUpdate,
+            liveStreamStatsToUpdate: livestreamStatsDocOperationsToMake,
          })
       } else {
-         await admin.firestore().runTransaction(async (transaction) => {
-            const statsDoc = await transaction.get(statsRef)
-            if (!statsDoc.exists) {
-               // Create the stats document
-               const statsDoc = createLiveStreamStatsDoc(
-                  livestreamId,
-                  statsRef.id
-               )
-               transaction.set(statsRef, statsDoc)
-            }
-
-            transaction.update(statsRef, liveStreamStatsToUpdate)
-         })
-
-         functions.logger.info("Updated livestream stats", {
+         // Perform a Firestore transaction to update liveStreamStats
+         await livestreamsRepo.updateLiveStreamStats(
             livestreamId,
-            liveStreamStatsToUpdate,
-         })
-      }
+            livestreamStatsDocOperationsToMake
+         )
 
-      return
+         functions.logger.info(
+            "Updated livestream stats with the following operations",
+            {
+               livestreamId,
+               livestreamStatsDocOperationsToMake,
+            }
+         )
+      }
    })
 
-const handleUpdate = (
+/**
+ * This function checks which fields of the newData and oldData are different and updates the operationsToMakeObject accordingly.
+ * If the universityCode argument is provided, the function will only update the operationsToMakeObject for the universityCode provided.
+ *
+ * @param newData The new data of the document
+ * @param oldData The old data of the document
+ * @param operationsToMakeObject The object that will be updated with the operations to make
+ * @param universityCode The university code to update the operationsToMakeObject for
+ * */
+const addOperations = (
    newData: UserLivestreamData,
    oldData: UserLivestreamData,
-   statsToUpdate: StatsToUpdate,
+   operationsToMakeObject: OperationsToMake,
    universityCode?: string
 ) => {
-   handleUpdateByBooleanCheck(
+   addOperationWithBooleanCheck(
       Boolean(newData?.participated?.date),
       Boolean(oldData?.participated?.date),
-      statsToUpdate,
-      "numberOfParticipants",
-      universityCode
+      operationsToMakeObject,
+      getPropertyToUpdate("numberOfParticipants", universityCode)
    )
 
-   handleUpdateByBooleanCheck(
+   // Check if the user has registered
+   addOperationWithBooleanCheck(
       Boolean(newData?.registered?.date),
       Boolean(oldData?.registered?.date),
-      statsToUpdate,
-      "numberOfRegistrations",
-      universityCode
+      operationsToMakeObject,
+      getPropertyToUpdate("numberOfRegistrations", universityCode)
    )
 
-   handleUpdateByBooleanCheck(
+   // Check if the user talent pool status has changed
+   addOperationWithBooleanCheck(
       Boolean(newData?.talentPool?.date),
-      Boolean(newData?.talentPool?.date),
-      statsToUpdate,
-      "numberOfTalentPoolProfiles",
-      universityCode
+      Boolean(oldData?.talentPool?.date),
+      operationsToMakeObject,
+      getPropertyToUpdate("numberOfTalentPoolProfiles", universityCode)
    )
 
-   handleUpdateByNumberCheck(
+   addOperationWithNumberCheck(
       Object.keys(newData?.jobApplications || {}).length,
       Object.keys(oldData?.jobApplications || {}).length,
-      statsToUpdate,
-      "numberOfApplicants",
-      universityCode
+      operationsToMakeObject,
+      getPropertyToUpdate("numberOfApplicants", universityCode)
    )
 }
 
-const decrementOldUniversityData = (
+const addOperationsToDecrementOldUniversityStats = (
    oldUniversityCode: string,
    oldUserLivestreamData: UserLivestreamData,
-   liveStreamStatsToUpdate: StatsToUpdate
+   operationsToMakeObject: OperationsToMake
 ) => {
-   handleUpdateByBooleanCheck(
-      false,
-      Boolean(oldUserLivestreamData?.participated?.date),
-      liveStreamStatsToUpdate,
-      "numberOfParticipants",
+   // Since the function is only decrementing the fields, it uses null as the new data argument,
+   // and oldUserLivestreamData as the old data argument. This way the function will decrement all
+   // the fields that are truthy in the old data but not in the new data, which in this case is null.
+   addOperations(
+      null,
+      oldUserLivestreamData,
+      operationsToMakeObject,
       oldUniversityCode
-   )
-   handleUpdateByBooleanCheck(
-      false,
-      Boolean(oldUserLivestreamData?.registered?.date),
-      liveStreamStatsToUpdate,
-      "numberOfRegistrations",
-      oldUniversityCode
-   )
-   handleUpdateByBooleanCheck(
-      false,
-      Boolean(oldUserLivestreamData?.talentPool?.date),
-      liveStreamStatsToUpdate,
-      "numberOfTalentPoolProfiles",
-      oldUniversityCode
-   )
-   handleUpdateByNumberCheck(
-      0,
-      Object.keys(oldUserLivestreamData?.jobApplications || {}).length,
-      liveStreamStatsToUpdate,
-      "numberOfApplicants"
    )
 }
 
-const incrementNewUniversityData = (
+const addOperationsToIncrementNewUniversityStats = (
    newUniversityCode: string,
    newUserLivestreamData: UserLivestreamData,
-   liveStreamStatsToUpdate: StatsToUpdate
+   operationsToMakeObject: OperationsToMake
 ) => {
-   handleUpdateByBooleanCheck(
-      Boolean(newUserLivestreamData?.participated?.date),
-      false,
-      liveStreamStatsToUpdate,
-      "numberOfParticipants",
+   // Since the function is only incrementing the fields, it uses newUserLivestreamData as the new data argument,
+   // and null as the old data argument. This way the function will increment all the fields that are truthy in
+   // the new data but not in the old data, which in this case is null.
+   addOperations(
+      newUserLivestreamData,
+      null,
+      operationsToMakeObject,
       newUniversityCode
    )
-   handleUpdateByBooleanCheck(
-      Boolean(newUserLivestreamData?.registered?.date),
-      false,
-      liveStreamStatsToUpdate,
-      "numberOfRegistrations",
-      newUniversityCode
-   )
-   handleUpdateByBooleanCheck(
-      Boolean(newUserLivestreamData?.talentPool?.date),
-      false,
-      liveStreamStatsToUpdate,
-      "numberOfTalentPoolProfiles",
-      newUniversityCode
-   )
-   handleUpdateByNumberCheck(
-      Object.keys(newUserLivestreamData?.jobApplications || {}).length,
-      0,
-      liveStreamStatsToUpdate,
-      "numberOfApplicants"
-   )
 }
 
-type StatsToUpdate = {
-   [key: string]: admin.firestore.FieldValue
+type GeneralStatsKey = keyof Pick<LiveStreamStats, "generalStats">
+
+type UniversityStatsKey = keyof Pick<LiveStreamStats, "universityStats">
+
+/**
+ * A helper to build a typesafe property path to update based on the field and the universityCode for the firestore UPDATE operation
+ * @param field The field to update
+ * @param universityCode The university code to update
+ * @returns The string path in dot notation to the field to update Example: universityStats.${universityCode}.numberOfRegistrations or generalStats.numberOfRegistrations
+ * */
+const getPropertyToUpdate = <
+   TField extends keyof Stats,
+   TUniversityCode extends string | undefined
+>(
+   field: TField,
+   universityCode?: TUniversityCode
+):
+   | `${GeneralStatsKey}.${TField}`
+   | `${UniversityStatsKey}.${TUniversityCode}.${TField}` => {
+   return universityCode
+      ? `universityStats.${universityCode}.${field}`
+      : `generalStats.${field}`
 }
-
-const handleUpdateByBooleanCheck = <IStats>(
-   newBool: boolean,
-   oldBool: boolean,
-   statsToUpdate: StatsToUpdate,
-   field: Extract<keyof IStats, string>,
-   universityCode?: string
-) => {
-   if (newBool !== oldBool) {
-      const propertyToUpdate = getPropertyToUpdate(field, universityCode)
-      if (newBool) {
-         statsToUpdate[propertyToUpdate] = increment()
-      } else {
-         statsToUpdate[propertyToUpdate] = decrement()
-      }
-   }
-}
-
-const getPropertyToUpdate = (field: string, universityCode?: string) =>
-   universityCode
-      ? `universityStats.${universityCode}.${String(field)}`
-      : `generalStats.${String(field)}`
-
-const handleUpdateByNumberCheck = <IStats extends object>(
-   newNumber: number,
-   oldNumber: number,
-   statsToUpdate: object,
-   field: Extract<keyof IStats, string>,
-   universityCode?: string
-) => {
-   if (newNumber !== oldNumber) {
-      const propertyToUpdate = getPropertyToUpdate(field, universityCode)
-
-      if (newNumber > oldNumber) {
-         statsToUpdate[propertyToUpdate] = increment(newNumber - oldNumber)
-      } else {
-         statsToUpdate[propertyToUpdate] = decrement(oldNumber - newNumber)
-      }
-   }
-}
-
-const increment = (amount = 1) => admin.firestore.FieldValue.increment(amount)
-const decrement = (amount = 1) => admin.firestore.FieldValue.increment(-amount)
