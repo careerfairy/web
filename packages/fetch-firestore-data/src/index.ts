@@ -7,6 +7,7 @@ import axios from "axios"
 import { readFile } from "fs/promises"
 import { existsSync, mkdirSync, rmSync } from "fs"
 import UserSeed from "@careerfairy/seed-data/dist/users"
+import { firestore } from "@careerfairy/seed-data/dist/lib/firebase"
 import config from "./config"
 import * as spawn from "cross-spawn"
 
@@ -24,6 +25,31 @@ let currentRunningProcess: ChildProcessWithoutNullStreams
 const INCLUDE_USERDATA = process.env.INCLUDE_USERDATA === "true"
 
 /**
+ * Collections that will be removed
+ * To improve performance / gdpr reasons
+ */
+const COLLECTIONS_TO_REMOVE = [
+   "users", // old collection not being used,
+   "cache",
+   "_firebase_ext_",
+]
+
+/**
+ * Sub collections that will be removed
+ * To improve performance / gdpr reasons
+ */
+const SUBCOLLECTIONS_TO_REMOVE = [
+   "icons", // livestream emotions
+   "impressions", // livestream impressions
+]
+
+// Remove documents containing user data
+if (!INCLUDE_USERDATA) {
+   COLLECTIONS_TO_REMOVE.push("userData")
+   SUBCOLLECTIONS_TO_REMOVE.push("userLivestreamData", "participatingStats")
+}
+
+/**
  * Main logic
  *
  * Not catching exceptions on purpose, we should look into the error and fix it
@@ -36,13 +62,14 @@ async function run(): Promise<void> {
    emulatorsProcess = await runEmulatorsInBackground()
    h1Text(`Emulators ready to receive commands`)
 
-   // gdpr, delete production user data
-   const collectionsToRemove = INCLUDE_USERDATA
-      ? ["users"]
-      : ["users", "userData"]
+   h1Text(`Removing collections: ${COLLECTIONS_TO_REMOVE.join(",")}`)
+   await removeExistingCollections(COLLECTIONS_TO_REMOVE)
 
-   h1Text(`Removing collections: ${collectionsToRemove.join(",")}`)
-   await removeExistingCollections(collectionsToRemove)
+   h1Text(`Remove subCollections: ${SUBCOLLECTIONS_TO_REMOVE.join(",")}`)
+   const promises = SUBCOLLECTIONS_TO_REMOVE.map((c) =>
+      removeExistingSubCollection(c)
+   )
+   await Promise.allSettled(promises)
 
    h1Text(`Deleting Auth`)
    await deleteAuth()
@@ -125,6 +152,23 @@ async function removeExistingCollections(collections: string[]) {
    }
 }
 
+async function removeExistingSubCollection(collection: string) {
+   const batchSize = 500
+   const query = await firestore.collectionGroup(collection).get()
+   const totalDocs = query.docs.length
+   debug(`Start deleting ${totalDocs} ${collection} docs`)
+
+   for (let i = 0; i < totalDocs; i += batchSize) {
+      const batch = firestore.batch()
+      const docs = query.docs.slice(i, i + batchSize)
+
+      docs.forEach((doc) => batch.delete(doc.ref))
+      await batch.commit()
+      debug(`Deleted ${i + docs.length} out of ${totalDocs} ${collection}`)
+   }
+   debug("FINISHED DELETE")
+}
+
 async function deleteAuth() {
    const rcFile = await readFirebaseRcFile()
    const project = rcFile.projects.default
@@ -135,10 +179,11 @@ async function deleteAuth() {
    )
 }
 
-function readFirebaseRcFile() {
-   return readFile(path.join(config.rootFolder, ".firebaserc"), {
+async function readFirebaseRcFile() {
+   const text = await readFile(path.join(config.rootFolder, ".firebaserc"), {
       encoding: "utf-8",
-   }).then(JSON.parse)
+   })
+   return JSON.parse(text)
 }
 
 /**
@@ -200,7 +245,7 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
 // listen to CTRL+c signals
 process.on("SIGINT", gracefulShutdown)
 
-function gracefulShutdown(signal) {
+function gracefulShutdown(signal: string) {
    log(`${signal} signal received, trying to clear resources.`)
    emulatorsProcess?.kill()
    currentRunningProcess?.kill()
@@ -316,7 +361,7 @@ function execute(
          process.stderr.write(data)
       })
 
-      childProcess.on("close", (code) => {
+      childProcess.on("close", (code: number) => {
          if (code === 0) {
             resolve({ code, stdout, stderr })
          } else {
@@ -331,11 +376,11 @@ function h1Text(text: string) {
    console.log("\x1b[36m%s\x1b[0m", `# ${text}`)
 }
 
-function log(...args) {
+function log(...args: unknown[]) {
    console.log(...args)
 }
 
-function debug(...args) {
+function debug(...args: unknown[]) {
    if (DEBUG) {
       console.log(...args)
    }
