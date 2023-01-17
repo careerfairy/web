@@ -46,7 +46,9 @@ const RecordingPlayer = ({
    const saveTimeLeft = (maxDateToShowRecording: Date) => {
       const timeLeft = DateUtil.calculateTimeLeft(maxDateToShowRecording)
       setCountDown(
-         `${timeLeft.Days}d ${timeLeft.Hours}h ${timeLeft.Minutes}min ${timeLeft.Seconds}sec`
+         `${timeLeft.Days || 0}d ${timeLeft.Hours || 0}h ${
+            timeLeft.Minutes || 0
+         }min ${timeLeft.Seconds || 0}sec`
       )
    }
 
@@ -101,7 +103,15 @@ const RecordingPlayer = ({
                className="react-player"
                playIcon={<PlayIcon sx={styles.icon} />}
                width="100%"
-               height={showBigVideoPlayer ? "700px" : "400px"}
+               height={
+                  showBigVideoPlayer
+                     ? isMobile
+                        ? "400px"
+                        : "700px"
+                     : isMobile
+                     ? "200px"
+                     : "400px"
+               }
                controls={true}
                url={downloadLinkWithDate(
                   stream.start.toDate(),
