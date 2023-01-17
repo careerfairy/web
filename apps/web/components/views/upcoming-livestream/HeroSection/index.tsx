@@ -255,8 +255,11 @@ const HeroSection = ({
 
    const handleRecordingPlay = useCallback(() => {
       // clicked on the preview mode
-      setShowBigVideoPlayer(true)
-   }, [])
+      if (!isMobile) {
+         // update to a bigger screen on desktop
+         setShowBigVideoPlayer(true)
+      }
+   }, [isMobile])
 
    const renderRecordingVideo = useCallback(
       () => (
