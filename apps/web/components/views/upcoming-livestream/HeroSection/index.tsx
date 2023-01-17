@@ -284,16 +284,17 @@ const HeroSection = ({
          <Box
             display="flex"
             mt={4}
-            alignItems="center"
-            flexDirection={isMobile ? "column" : "row"}
+            pl={{ xs: 2, md: 0 }}
+            alignItems={"start"}
+            flexDirection={{ xs: "column", lg: "row" }}
          >
             <Avatar
                title={stream.company}
                src={getResizedUrl(stream.companyLogoUrl, "md")}
                sx={{ ...styles.companyLogo, maxWidth: "250px" }}
             />
-            <Box ml={2}>
-               <Typography variant={"subtitle1"}>Hosted by</Typography>
+            <Box ml={{ xs: 0, lg: 2 }} mt={{ xs: 1, lg: 0 }}>
+               <Typography variant={"body1"}>Hosted by</Typography>
                <Typography
                   variant={stream?.company?.length > 20 ? "h6" : "h5"}
                   fontWeight="bold"
@@ -304,7 +305,7 @@ const HeroSection = ({
             </Box>
          </Box>
       ),
-      [isMobile, stream.company, stream.companyLogoUrl]
+      [stream.company, stream.companyLogoUrl]
    )
 
    return (
@@ -384,7 +385,10 @@ const HeroSection = ({
                         ? renderRecordingVideo()
                         : renderDefaultContent()}
                   </Grid>
-                  {showRecording && isMobile && renderHostedByInfo()}
+                  {showRecording &&
+                     isMobile &&
+                     !showBigVideoPlayer &&
+                     renderHostedByInfo()}
                </Grid>
             </Container>
          </Box>
