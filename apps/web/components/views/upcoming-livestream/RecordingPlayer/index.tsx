@@ -71,28 +71,30 @@ const RecordingPlayer = ({
 
    return (
       <Box>
-         <Slide direction="left" timeout={1000} in={!showBigVideoPlayer}>
-            <Box>
-               {isMobile ? null : (
-                  <Typography variant="h4" fontWeight="bold">
-                     Live stream recording
-                  </Typography>
-               )}
+         {showBigVideoPlayer ? null : (
+            <Slide direction="left" timeout={1000} in={!showBigVideoPlayer}>
+               <Box>
+                  {isMobile ? null : (
+                     <Typography variant="h4" fontWeight="bold">
+                        Live stream recording
+                     </Typography>
+                  )}
 
-               <Typography variant="h5" mt={1}>
-                  Only{" "}
-                  <Typography
-                     variant="h5"
-                     display="inline"
-                     fontWeight="bold"
-                     color="primary"
-                  >
-                     {countdown}
-                  </Typography>{" "}
-                  left to rewatch the live stream!
-               </Typography>
-            </Box>
-         </Slide>
+                  <Typography variant="h5" mt={1}>
+                     Only{" "}
+                     <Typography
+                        variant="h5"
+                        display="inline"
+                        fontWeight="bold"
+                        color="primary"
+                     >
+                        {countdown}
+                     </Typography>{" "}
+                     left to rewatch the live stream!
+                  </Typography>
+               </Box>
+            </Slide>
+         )}
 
          <Box mt={4}>
             <ReactPlayer
