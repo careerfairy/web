@@ -74,6 +74,12 @@ export interface UserData extends Identifiable {
     * User groups now live under a subcollection named userGroups
     */
    registeredGroups?: RegisteredGroup[]
+
+   /**
+    * Last user activity on any device
+    */
+   lastActivityAt: firebase.firestore.Timestamp
+   createdAt: firebase.firestore.Timestamp
 }
 
 /*
