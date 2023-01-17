@@ -28,7 +28,7 @@ On the `package.json` `start:emulators` task, we set the environment variable `J
 ## Run
 
 ```sh
-npm run build -w @careerfairy/fetch-firestore-data
+npm run build:fetch-firestore-data
 npm run start -w @careerfairy/fetch-firestore-data
 ```
 
