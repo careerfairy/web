@@ -82,10 +82,14 @@ const RecordingPlayer = ({
                      </Typography>
                   )}
 
-                  <Typography variant="h5" mt={1}>
+                  <Typography
+                     variant={isMobile ? "h4" : "h5"}
+                     mt={1}
+                     fontWeight={isMobile ? "bold" : "unset"}
+                  >
                      Only{" "}
                      <Typography
-                        variant="h5"
+                        variant="inherit"
                         display="inline"
                         fontWeight="bold"
                         color="primary"
