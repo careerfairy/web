@@ -550,9 +550,16 @@ export async function getServerSideProps({
    params: { livestreamId },
    query: { groupId },
 }) {
-   const serverStream = await getServerSideStream(livestreamId)
-   const streamRecordingToken =
-      await livestreamRepo.getLivestreamRecordingToken(livestreamId)
+   const promises = []
+   promises.push(
+      getServerSideStream(livestreamId),
+      livestreamRepo.getLivestreamRecordingToken(livestreamId)
+   )
+
+   const promisesResults = await Promise.allSettled(promises)
+   const [serverStream, streamRecordingToken] = promisesResults.map(
+      (result) => result.value
+   )
 
    if (!serverStream) {
       return {
