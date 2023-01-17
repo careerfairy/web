@@ -110,6 +110,7 @@ run().catch(console.error)
  */
 async function createUser(email: string, superAdmin: boolean = false) {
    try {
+      await UserSeed.deleteUser(email) // ensure the user doesn't exist already
       return await UserSeed.createUser(email, { isAdmin: superAdmin })
    } catch (e) {
       if (e.errorInfo?.code === "auth/email-already-exists") {
