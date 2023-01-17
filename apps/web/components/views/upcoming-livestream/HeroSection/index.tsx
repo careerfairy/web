@@ -379,17 +379,7 @@ const HeroSection = ({
                      )}
                      {showRecording && !isMobile && renderHostedByInfo()}
                   </Grid>
-                  <Grid
-                     item
-                     xs={12}
-                     md={showBigVideoPlayer ? 12 : 6}
-                     style={{
-                        transition: theme.transitions.create("all", {
-                           easing: theme.transitions.easing.sharp,
-                           duration: 1500,
-                        }),
-                     }}
-                  >
+                  <Grid item xs={12} md={showBigVideoPlayer ? 12 : 6}>
                      {showRecording
                         ? renderRecordingVideo()
                         : renderDefaultContent()}
