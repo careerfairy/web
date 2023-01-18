@@ -1,7 +1,7 @@
 import { admin } from "../api/firestoreAdmin"
 
 export type OperationsToMake = {
-   // The operations to make to the nested properties on the liveStreamStats document
+   // The operations to make to the nested properties on the livestreamStats document
    [stringToPropertyInDotNotation: string]: admin.firestore.FieldValue
 }
 

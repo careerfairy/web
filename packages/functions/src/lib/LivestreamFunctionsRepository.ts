@@ -3,13 +3,17 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import {
-   createLiveStreamStatsDoc,
-   LiveStreamStats,
+   LivestreamEvent,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import type { OperationsToMake } from "./stats"
 
-import { createCompatGenericConverter } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository" // Not imported at runtime (only used for types)
+import { createCompatGenericConverter } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+
+import {
+   createLiveStreamStatsDoc,
+   LiveStreamStats,
+} from "@careerfairy/shared-lib/dist/livestreams/stats" // Not imported at runtime (only used for types)
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -90,19 +94,31 @@ export class LivestreamFunctionsRepository
       livestreamId: string,
       operationsToMake: OperationsToMake
    ): Promise<void> {
-      const statsRef = this.firestore
+      const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
+         .withConverter(createCompatGenericConverter<LivestreamEvent>())
+
+      const statsRef = livestreamRef
          .collection("stats")
-         .doc("liveStreamStats")
+         .doc("livestreamStats")
          .withConverter(createCompatGenericConverter<LiveStreamStats>())
 
       return this.firestore.runTransaction(async (transaction) => {
          const statsDoc = await transaction.get(statsRef)
-         const livestreamId = statsRef.parent.parent.id
+
+         const livestreamDoc = await transaction.get(livestreamRef)
+
+         if (!livestreamDoc.exists) {
+            throw new Error("Livestream does not exist")
+         }
+
          if (!statsDoc.exists) {
             // Create the stats document
-            const statsDoc = createLiveStreamStatsDoc(livestreamId, statsRef.id)
+            const statsDoc = createLiveStreamStatsDoc(
+               livestreamDoc.data(),
+               statsRef.id
+            )
             transaction.set(statsRef, statsDoc)
          }
 
