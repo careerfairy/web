@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../HOCs/AuthProvider"
@@ -38,7 +38,7 @@ const useJoinTalentPool = () => {
          }
       } else if (livestreamId && userData?.userEmail) {
          const unsubscribe = listenToUserInTalentPool(
-            livestreamId,
+            livestreamId as string,
             userData.userEmail,
             (querySnapshot) => {
                setUserIsInTalentPool(querySnapshot.exists)
@@ -78,10 +78,7 @@ const useJoinTalentPool = () => {
                   currentLivestream
                )
                await joinCompanyTalentPool(companyId, userData, livestreamId)
-               dataLayerLivestreamEvent(
-                  "talent_pool_joined",
-                  currentLivestream,
-               )
+               dataLayerLivestreamEvent("talent_pool_joined", currentLivestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
@@ -103,10 +100,7 @@ const useJoinTalentPool = () => {
                )
 
                await leaveCompanyTalentPool(companyId, userData, livestreamId)
-               dataLayerLivestreamEvent(
-                  "talent_pool_leave",
-                  currentLivestream,
-               )
+               dataLayerLivestreamEvent("talent_pool_leave", currentLivestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
@@ -121,12 +115,16 @@ const useJoinTalentPool = () => {
          isBreakout,
          currentLivestream.companyId,
          currentLivestream.title,
+         dispatch,
+         joinCompanyTalentPool,
+         leaveCompanyTalentPool,
+         push,
       ]
    )
 
    const getCompanyId = useCallback(
       async (isBreakout, livestreamId, currentLivestream) => {
-         let companyId
+         let companyId: string
          if (isBreakout) {
             companyId = await getLivestreamCompanyId(livestreamId)
          } else {
@@ -134,7 +132,7 @@ const useJoinTalentPool = () => {
          }
          return companyId
       },
-      []
+      [getLivestreamCompanyId]
    )
 
    return { handlers, userIsInTalentPool, loading }

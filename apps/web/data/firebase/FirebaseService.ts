@@ -48,6 +48,8 @@ import {
    OnSnapshotCallback,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
+import DocumentData = firebase.firestore.DocumentData
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2394,7 +2396,11 @@ class FirebaseService {
       })
    }
 
-   listenToUserInTalentPool = (livestreamId, userId, callback) => {
+   listenToUserInTalentPool = (
+      livestreamId: string,
+      userId: string,
+      callback: (snapshot: DocumentSnapshot<DocumentData>) => void
+   ) => {
       const userTalentPoolRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
