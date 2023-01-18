@@ -330,6 +330,10 @@ export interface LivestreamEventPublicData {
    start?: firebase.firestore.Timestamp
    companyLogoUrl?: string
    test?: boolean
+   groupIds?: string[]
+   interestsIds?: string[]
+   targetFieldsOfStudy?: FieldOfStudy[]
+   targetLevelsOfStudy?: FieldOfStudy[]
 }
 
 export interface LivestreamQuestion extends Identifiable {
@@ -420,6 +424,10 @@ export const pickPublicDataFromLivestream = (
       start: livestreamData.start ?? null,
       companyLogoUrl: livestreamData.companyLogoUrl ?? null,
       test: livestreamData.test ?? false,
+      groupIds: livestreamData.groupIds ?? [],
+      interestsIds: livestreamData.interestsIds ?? [],
+      targetFieldsOfStudy: livestreamData.targetFieldsOfStudy ?? [],
+      targetLevelsOfStudy: livestreamData.targetLevelsOfStudy ?? [],
    }
 }
 
