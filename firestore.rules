@@ -255,6 +255,19 @@ service cloud.firestore {
                 allow read: if true;
                 allow write: if false; // created by admin sdk
             }
+            match /detailPageViews/{visitorId} {
+                allow read; allow create;
+            }
+            match /stats/{liveStreamStats} {
+                function allowIncrementGeneralStatsField(statKey) {
+                    return resource == null && request.resource.data["generalStats"][statKey] == 1 // If the resource is null, then this is a new document, so the stat should be 1
+                           || request.resource.data["generalStats"][statKey] == resource.data["generalStats"][statKey] + 1; // If the resource is not null, then the stat should be 1 more than the previous value
+                }
+                // Allow to increment only the 'generalStats' or 'universityStats' field and only by 1.
+                match /_counter_shards_/{shardId} {
+                    allow write: if allowIncrementGeneralStatsField("numberOfPeopleReached");
+                }
+            }
 
             match /icons/{icon} {
                 allow read: if true;

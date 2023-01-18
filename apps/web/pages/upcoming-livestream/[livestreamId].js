@@ -31,11 +31,14 @@ import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchem
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
+import useTrackDetailPageView from "../../components/custom-hook/useTrackDetailPageView"
 
 const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
+
+   const viewRef = useTrackDetailPageView(serverStream.id)
 
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -412,7 +415,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    return (
       <>
-         <UpcomingLayout>
+         <UpcomingLayout viewRef={viewRef}>
             <EventSEOSchemaScriptTag event={stream} />
             <SEO {...getStreamMetaInfo(stream)} />
             <HeroSection

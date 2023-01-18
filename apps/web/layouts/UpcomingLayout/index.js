@@ -8,10 +8,10 @@ import Page, {
    PageContentWrapper,
 } from "../../components/views/common/Page"
 
-const UpcomingLayout = ({ children }) => {
+const UpcomingLayout = ({ children, viewRef = undefined }) => {
    const theme = useTheme()
    return (
-      <Page>
+      <Page viewRef={viewRef}>
          <TopBar />
          <PageContentWrapper>
             <GeneralNavDrawer />

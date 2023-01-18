@@ -3084,6 +3084,42 @@ class FirebaseService {
       }
    }
 
+   trackDetailPageView = async (eventId: string, visitorId: string) => {
+      const pageViewCollRef = this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("detailPageViews")
+
+      const livestreamStatsRef = this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("stats")
+         .doc("liveStreamStats")
+
+      const pageViewRef = pageViewCollRef.doc(visitorId)
+
+      const pageViewVisitorSnap = await pageViewRef.get()
+
+      const hasViewed = pageViewVisitorSnap.exists
+
+      if (!hasViewed) {
+         const generalStatsFieldPath = "generalStats.numberOfPeopleReached"
+
+         const generalDetailPageViewCounter = new Counter(
+            livestreamStatsRef,
+            generalStatsFieldPath
+         )
+
+         generalDetailPageViewCounter.incrementBy(1).catch(console.error)
+
+         return pageViewRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      } else {
+         return
+      }
+   }
+
    // Backfill user data
    backfillUserData = async ({ timezone }) => {
       return this.functions.httpsCallable("backfillUserData")({ timezone })
