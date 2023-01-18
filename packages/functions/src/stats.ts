@@ -1,9 +1,5 @@
 import functions = require("firebase-functions")
-import {
-   LiveStreamStats,
-   Stats,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
 import { isEmpty } from "lodash"
 import {
    addOperationWithBooleanCheck,
@@ -11,18 +7,19 @@ import {
    OperationsToMake,
 } from "./lib/stats"
 import { livestreamsRepo } from "./api/repositories"
+import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 /*
  * The `updateLiveStreamStats` function listens for changes in the `userLivestreamData` subcollection of the `livestreams` collection,
- * and updates a `stats` subcollection document named `liveStreamStats`.
+ * and updates a `stats` subcollection document named `livestreamStats`.
  *
  * The function uses the `change.before.data()` and `change.after.data()`
  * to get the old and new data of the modified document respectively. It uses `addOperations()` function to check which fields of the newData and
- * oldData are different and updates the liveStreamStatsToUpdate accordingly.
+ * oldData are different and updates the livestreamStatsToUpdate accordingly.
  *
  * The function also checks if the university code has been changed, if it has, the function decrements the old university data and increments the new university data.
- * In the end, it checks if there are any updates to liveStreamStats, if there are updates, it performs a Firestore transaction to update liveStreamStats and logs a message to indicate the
- * liveStreamStats have been updated.
+ * In the end, it checks if there are any updates to livestreamStats, if there are updates, it performs a Firestore transaction to update liveStreamStats and logs a message to indicate the
+ * livestreamStats have been updated.
  * */
 export const updateLiveStreamStats = functions.firestore
    .document("livestreams/{livestreamId}/userLivestreamData/{userId}")
@@ -75,14 +72,14 @@ export const updateLiveStreamStats = functions.firestore
          )
       }
 
-      // Check if there are any updates to liveStreamStats
+      // Check if there are any updates to livestreamStats
       if (isEmpty(livestreamStatsDocOperationsToMake)) {
          functions.logger.info("No changes to livestream stats", {
             livestreamId,
             liveStreamStatsToUpdate: livestreamStatsDocOperationsToMake,
          })
       } else {
-         // Perform a Firestore transaction to update liveStreamStats
+         // Perform a Firestore transaction to update livestreamStats
          await livestreamsRepo.updateLiveStreamStats(
             livestreamId,
             livestreamStatsDocOperationsToMake
@@ -174,28 +171,4 @@ const addOperationsToIncrementNewUniversityStats = (
       operationsToMakeObject,
       newUniversityCode
    )
-}
-
-type GeneralStatsKey = keyof Pick<LiveStreamStats, "generalStats">
-
-type UniversityStatsKey = keyof Pick<LiveStreamStats, "universityStats">
-
-/**
- * A helper to build a typesafe property path to update based on the field and the universityCode for the firestore UPDATE operation
- * @param field The field to update
- * @param universityCode The university code to update
- * @returns The string path in dot notation to the field to update Example: universityStats.${universityCode}.numberOfRegistrations or generalStats.numberOfRegistrations
- * */
-const getPropertyToUpdate = <
-   TField extends keyof Stats,
-   TUniversityCode extends string | undefined
->(
-   field: TField,
-   universityCode?: TUniversityCode
-):
-   | `${GeneralStatsKey}.${TField}`
-   | `${UniversityStatsKey}.${TUniversityCode}.${TField}` => {
-   return universityCode
-      ? `universityStats.${universityCode}.${field}`
-      : `generalStats.${field}`
 }
