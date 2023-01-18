@@ -3094,7 +3094,7 @@ class FirebaseService {
          .collection("livestreams")
          .doc(eventId)
          .collection("stats")
-         .doc("liveStreamStats")
+         .doc("livestreamStats")
 
       const pageViewRef = pageViewCollRef.doc(visitorId)
 

@@ -258,7 +258,7 @@ service cloud.firestore {
             match /detailPageViews/{visitorId} {
                 allow read; allow create;
             }
-            match /stats/{liveStreamStats} {
+            match /stats/{livestreamStats} {
                 function allowIncrementGeneralStatsField(statKey) {
                     return resource == null && request.resource.data["generalStats"][statKey] == 1 // If the resource is null, then this is a new document, so the stat should be 1
                            || request.resource.data["generalStats"][statKey] == resource.data["generalStats"][statKey] + 1; // If the resource is not null, then the stat should be 1 more than the previous value

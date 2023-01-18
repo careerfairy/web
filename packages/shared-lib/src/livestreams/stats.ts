@@ -23,7 +23,8 @@ export interface LiveStreamStats extends Identifiable {
     * */
    generalStats: Stats
    universityStats: {
-      [universityCode: string]: Stats
+      // The key is the university code, and the value is the stats for that university. We exclude numberOfPeopleReached because it is not relevant for the university stats
+      [universityCode: string]: Omit<Stats, "numberOfPeopleReached">
    }
 }
 

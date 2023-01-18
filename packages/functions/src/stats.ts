@@ -18,7 +18,7 @@ import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/livestreams/st
  * oldData are different and updates the livestreamStatsToUpdate accordingly.
  *
  * The function also checks if the university code has been changed, if it has, the function decrements the old university data and increments the new university data.
- * In the end, it checks if there are any updates to livestreamStats, if there are updates, it performs a Firestore transaction to update liveStreamStats and logs a message to indicate the
+ * In the end, it checks if there are any updates to livestreamStats, if there are updates, it performs a Firestore transaction to update livestreamStats and logs a message to indicate the
  * livestreamStats have been updated.
  * */
 export const updateLiveStreamStats = functions.firestore
