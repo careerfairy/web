@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React from "react"
 import { useTheme } from "@mui/material/styles"
 import LandingLayout from "../../layouts/LandingLayout"
 import BookADemoSection from "../../components/views/landing/BookADemoSection"
@@ -9,15 +9,14 @@ import UniversitySection from "../../components/views/landing/UniversitySection"
 import BenefitsSection from "../../components/views/landing/BenefitsSection"
 import CompaniesSection from "../../components/views/landing/CompaniesSection"
 import HeroSection from "../../components/views/landing/HeroSection"
-import CalendlyModal from "../../components/views/landing/CalendlyModal"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import {
-   rectangle1,
-   mainBackground,
    engageShape,
-   reachShape,
-   measureShape,
    landingBottomBackground,
+   mainBackground,
+   measureShape,
+   reachShape,
+   rectangle1,
 } from "../../constants/images"
 import HeadWithMeta from "../../components/page/HeadWithMeta"
 
@@ -25,14 +24,6 @@ const CompanyLandingPage = () => {
    const {
       palette: { secondary, common, grey },
    } = useTheme()
-
-   const [calendlyModalOpen, setCalendlyModalOpen] = useState(false)
-
-   const handleOpenCalendly = () => {
-      setCalendlyModalOpen(true)
-   }
-
-   const handleCloseCalendly = () => setCalendlyModalOpen(false)
 
    const companyBenefitsData = [
       {
@@ -73,7 +64,7 @@ const CompanyLandingPage = () => {
             bottomImage={landingBottomBackground}
             topImage={mainBackground}
          >
-            <HeroSection big handleOpenCalendly={handleOpenCalendly} />
+            <HeroSection big />
             <CompaniesSection overheadText="Over 200+ happy customers" />
             <BenefitsSection
                title={"Why CareerFairy?"}
@@ -112,12 +103,7 @@ const CompanyLandingPage = () => {
                color={common.white}
                big
                bookingWhite
-               handleOpenCalendly={handleOpenCalendly}
                title={"Join the ranks of leading organisations today"}
-            />
-            <CalendlyModal
-               open={calendlyModalOpen}
-               onClose={handleCloseCalendly}
             />
             <ScrollToTop />
          </LandingLayout>
