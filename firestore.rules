@@ -251,6 +251,11 @@ service cloud.firestore {
                 allow read, write: if true;
             }
 
+            match /participatingStats/{userId} {
+                allow read: if isCFAdmin();
+                allow write: if isSignedInAndIsSameUser(userId);
+            }
+
             match /recordingToken/{token} {
                 allow read: if true;
                 allow write: if false; // created by admin sdk
