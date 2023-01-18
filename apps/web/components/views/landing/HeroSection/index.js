@@ -28,7 +28,6 @@ const HeroSection = ({
    backgroundImageOpacity,
    big,
    color,
-   handleOpenCalendly,
    buttons,
    title,
    subTitle,
@@ -50,7 +49,6 @@ const HeroSection = ({
                         title={title}
                         subTitle={subTitle}
                         buttons={buttons}
-                        handleOpenCalendly={handleOpenCalendly}
                      />
                   </Grid>
                </Slide>
@@ -76,7 +74,6 @@ HeroSection.propTypes = {
    backgroundImageOpacity: PropTypes.any,
    big: PropTypes.any,
    color: PropTypes.any,
-   handleOpenCalendly: PropTypes.func,
    subtitle: PropTypes.any,
    title: PropTypes.any,
 }

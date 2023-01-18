@@ -39,8 +39,8 @@ export const VALID_SOURCES: RegistrationSource[] = [
          "User registered through a campaign inside our Platform.",
       color: "#FFC34F",
       match: (utms) => {
-         const matchSource = /^email$/i.test(utms?.utm_source)
-         const matchMedium = /^careerfairy$/i.test(utms?.utm_medium)
+         const matchSource = /^careerfairy$/i.test(utms?.utm_source)
+         const matchMedium = /^email$/i.test(utms?.utm_medium)
 
          return matchSource && matchMedium
       },
