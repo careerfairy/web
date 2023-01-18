@@ -48,6 +48,7 @@ import {
    OnSnapshotCallback,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
+import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -3085,10 +3086,11 @@ class FirebaseService {
    }
 
    trackDetailPageView = async (eventId: string, visitorId: string) => {
-      const pageViewCollRef = this.firestore
+      const pageViewRef = this.firestore
          .collection("livestreams")
          .doc(eventId)
          .collection("detailPageViews")
+         .doc(visitorId)
 
       const livestreamStatsRef = this.firestore
          .collection("livestreams")
@@ -3096,14 +3098,14 @@ class FirebaseService {
          .collection("stats")
          .doc("livestreamStats")
 
-      const pageViewRef = pageViewCollRef.doc(visitorId)
-
       const pageViewVisitorSnap = await pageViewRef.get()
 
       const hasViewed = pageViewVisitorSnap.exists
 
       if (!hasViewed) {
-         const generalStatsFieldPath = "generalStats.numberOfPeopleReached"
+         const generalStatsFieldPath = getPropertyToUpdate(
+            "numberOfPeopleReached"
+         )
 
          const generalDetailPageViewCounter = new Counter(
             livestreamStatsRef,
