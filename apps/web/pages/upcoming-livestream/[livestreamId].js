@@ -301,9 +301,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
       return Boolean(
          !isPastEvent &&
             !stream?.isFaceToFace &&
-            dateIsInUnder24Hours(stream?.startDate)
+            dateIsInUnder24Hours(stream?.start?.toDate?.())
       )
-   }, [isPastEvent, stream?.isFaceToFace, stream?.startDate])
+   }, [isPastEvent, stream?.isFaceToFace, stream?.start])
 
    const startRegistrationProcess = useCallback(
       async (fromFooterButton = false) => {
