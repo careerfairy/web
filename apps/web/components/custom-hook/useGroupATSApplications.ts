@@ -29,7 +29,7 @@ const useGroupATSApplications = (
                stream.jobs.some((job) => job.integrationId === integrationId)
             )
 
-            if (filteredLivestreams?.length === 0) {
+            if (!filteredLivestreams || filteredLivestreams?.length === 0) {
                return []
             }
 
