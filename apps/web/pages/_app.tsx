@@ -38,7 +38,6 @@ import {
 } from "reactfire"
 import FeatureFlagsProvider from "../HOCs/FeatureFlagsProvider"
 import UserReminderProvider from "../HOCs/UserReminderProvider"
-import { Usercentrics } from "components/Usercentrics"
 
 // Client-side cache, shared for the whole session of the user in the browser.
 const clientSideEmotionCache = createEmotionCache()
@@ -77,7 +76,6 @@ function MyApp(props) {
 
    return (
       <CacheProvider value={emotionCache}>
-         <Usercentrics />
          <Head>
             <meta
                name="viewport"
