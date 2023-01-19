@@ -77,7 +77,11 @@ const useJoinTalentPool = () => {
                   livestreamId,
                   currentLivestream
                )
-               await joinCompanyTalentPool(companyId, userData, livestreamId)
+               await joinCompanyTalentPool(
+                  companyId,
+                  userData,
+                  currentLivestream
+               )
                dataLayerLivestreamEvent("talent_pool_joined", currentLivestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))

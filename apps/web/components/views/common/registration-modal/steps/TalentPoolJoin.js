@@ -61,11 +61,7 @@ const TalentPoolJoin = () => {
    const joinTalentPool = async () => {
       try {
          setJoiningTalentPool(true)
-         await joinCompanyTalentPool(
-            livestream.companyId,
-            userData,
-            livestream.id
-         )
+         await joinCompanyTalentPool(livestream.companyId, userData, livestream)
          handleNext()
       } catch (e) {}
       setJoiningTalentPool(false)
