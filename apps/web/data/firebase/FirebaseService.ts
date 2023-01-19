@@ -34,6 +34,7 @@ import {
 } from "@careerfairy/shared-lib/dist/groups"
 import {
    getLivestreamGroupQuestionAnswers,
+   TalentProfile,
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserStats,
@@ -2334,6 +2335,24 @@ class FirebaseService {
                   ),
                })
 
+               // insert related talent profiles (for each group id)
+               if (livestream.groupIds) {
+                  for (const groupId of livestream.groupIds) {
+                     const groupTalentEntryRef = userRef
+                        .collection("talentProfiles")
+                        .doc(groupId)
+                     const data: TalentProfile = {
+                        id: groupId,
+                        groupId,
+                        userId: userData.authId,
+                        userEmail: userData.userEmail,
+                        user: userData,
+                        joinedAt: this.getServerTimestamp() as any,
+                     }
+                     transaction.set(groupTalentEntryRef, data, { merge: true })
+                  }
+               }
+
                const data: UserLivestreamData = {
                   userId: userData.authId,
                   livestreamId: livestream.id,
@@ -2364,14 +2383,20 @@ class FirebaseService {
       return streamData.companyId
    }
 
-   leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
+   leaveCompanyTalentPool = (
+      companyId: string,
+      userData: UserData,
+      livestream: LivestreamEvent
+   ) => {
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
+      let streamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestream.id)
       let userLivestreamDataRef = this.firestore
          .collection("livestreams")
-         .doc(livestreamId)
+         .doc(livestream.id)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
 
@@ -2384,6 +2409,15 @@ class FirebaseService {
                      talentPool: null,
                   }
                   transaction.update(userLivestreamDataRef, data)
+               }
+               if (livestream.groupIds) {
+                  for (const groupId of livestream.groupIds) {
+                     const groupTalentEntryRef = userRef
+                        .collection("talentProfiles")
+                        .doc(groupId)
+
+                     transaction.delete(groupTalentEntryRef)
+                  }
                }
                transaction.update(userRef, {
                   talentPools:
