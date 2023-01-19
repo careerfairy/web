@@ -68,9 +68,6 @@ interface Props {
 }
 
 const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
-   // prefetch recommended events
-   usePreFetchRecommendedEvents()
-
    const {
       currentLivestream,
       streamerId,
@@ -177,6 +174,9 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
          void handleLeaveAsHandRaiser()
       }
    }, [handRaiseActive, handRaiseState])
+
+   // prefetch recommended events
+   usePreFetchRecommendedEvents()
 
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false)
