@@ -103,7 +103,11 @@ const useJoinTalentPool = () => {
                   currentLivestream
                )
 
-               await leaveCompanyTalentPool(companyId, userData, livestreamId)
+               await leaveCompanyTalentPool(
+                  companyId,
+                  userData,
+                  currentLivestream
+               )
                dataLayerLivestreamEvent("talent_pool_leave", currentLivestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))

@@ -142,7 +142,7 @@ const TalentPoolSection = memo((props) => {
          await leaveCompanyTalentPool(
             props.stream.companyId,
             userData,
-            props.stream.id
+            props.stream
          )
       } catch (e) {}
       setLeavingTalentPool(false)

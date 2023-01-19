@@ -150,6 +150,20 @@ export interface SavedRecruiter extends Identifiable {
 }
 
 /**
+ * Document that sets the user as part of a talent pool for a group
+ * Mainly used for the group analytics
+ *
+ * /userData/:id/talentProfiles/:groupId
+ */
+export interface TalentProfile extends Identifiable {
+   groupId: string
+   userId: string
+   userEmail: string
+   user: UserData
+   joinedAt: firebase.firestore.Timestamp
+}
+
+/**
  * Document /userData/{id}/ats/ats
  *
  * Will store the user ATS existent relationships
