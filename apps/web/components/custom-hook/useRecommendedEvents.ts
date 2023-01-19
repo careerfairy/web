@@ -7,6 +7,7 @@ import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import { collection, query, where } from "firebase/firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 type Config = {
    limit: FirebaseInArrayLimit
@@ -70,18 +71,24 @@ export const usePreFetchRecommendedEvents = (
       limit: 10,
    }
 ) => {
+   const { isLoggedIn } = useAuth()
+
    const fetcher = useFunctionsSWR<string[]>()
+
    useEffect(() => {
-      preload(
-         [
-            functionName,
-            {
-               limit: config.limit,
-            },
-         ],
-         fetcher
-      )
-   }, [config.limit, fetcher])
+      // Only preload if the user is logged in, otherwise the function will throw a not authed error
+      if (isLoggedIn) {
+         preload(
+            [
+               functionName,
+               {
+                  limit: config.limit,
+               },
+            ],
+            fetcher
+         )
+      }
+   }, [config.limit, fetcher, isLoggedIn])
 
    return null
 }
