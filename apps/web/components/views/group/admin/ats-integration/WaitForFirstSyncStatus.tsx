@@ -135,9 +135,9 @@ const SyncStatusRow = ({ data }: { data: SyncStatus }) => {
  * @param entitiesStatus
  */
 const isFirstSyncComplete = (entitiesStatus: SyncStatus[]) => {
-   const incomplete = entitiesStatus.filter(
-      (model) => model.isInitialSync && model.status === "SYNCING"
-   )
+   const incomplete = entitiesStatus
+      .filter((s) => s.model !== "JobInterviewStage") // some companies don't provide API access to this
+      .filter((model) => model.isInitialSync && model.status === "SYNCING")
 
    // only complete if we don't have any still syncing
    return incomplete.length === 0
