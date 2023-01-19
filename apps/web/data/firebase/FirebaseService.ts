@@ -2303,15 +2303,17 @@ class FirebaseService {
    joinCompanyTalentPool = (
       companyId: string,
       userData: UserData,
-      mainStreamId
+      livestream: LivestreamEvent
    ) => {
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      let streamRef = this.firestore.collection("livestreams").doc(mainStreamId)
-      const userLivestreamData = this.firestore
+      let streamRef = this.firestore
          .collection("livestreams")
-         .doc(mainStreamId)
+         .doc(livestream.id)
+      const userLivestreamDataRef = this.firestore
+         .collection("livestreams")
+         .doc(livestream.id)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
 
@@ -2334,7 +2336,7 @@ class FirebaseService {
 
                const data: UserLivestreamData = {
                   userId: userData.authId,
-                  livestreamId: mainStreamId,
+                  livestreamId: livestream.id,
                   user: {
                      ...userData,
                   },
@@ -2344,7 +2346,7 @@ class FirebaseService {
                      date: this.getServerTimestamp(),
                   },
                }
-               transaction.set(userLivestreamData, data, { merge: true })
+               transaction.set(userLivestreamDataRef, data, { merge: true })
             }
          })
       })

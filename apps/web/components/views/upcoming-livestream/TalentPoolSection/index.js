@@ -116,7 +116,7 @@ const TalentPoolSection = memo((props) => {
          await joinCompanyTalentPool(
             props.stream.companyId,
             userData,
-            props.stream.id
+            props.stream
          )
       } catch (e) {}
       setJoiningTalentPool(false)
