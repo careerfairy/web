@@ -2,12 +2,7 @@ import { useRouter } from "next/router"
 import Script from "next/script"
 import React from "react"
 import { shouldUseEmulators } from "util/CommonUtil"
-import {
-   getWindow,
-   isEmbedded,
-   isGroupAdminPath,
-   isStreamingPath,
-} from "util/PathUtils"
+import { isEmbedded, isGroupAdminPath, isStreamingPath } from "util/PathUtils"
 
 /**
  * Load Usercentrics scripts & Google Tag Manager when
@@ -18,6 +13,14 @@ export const Usercentrics = () => {
       query: { useUsercentricsDraftVersion, isRecordingWindow },
       pathname,
    } = useRouter()
+
+   /**
+    * During the first run on the server side, the query string values will be undefined
+    * Wait for the client re-hydration to have the correct values
+    */
+   if (typeof window === "undefined") {
+      return null
+   }
 
    /**
     * Don't run when developing / tests
