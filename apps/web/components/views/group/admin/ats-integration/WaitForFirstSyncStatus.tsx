@@ -135,9 +135,10 @@ const SyncStatusRow = ({ data }: { data: SyncStatus }) => {
  * @param entitiesStatus
  */
 const isFirstSyncComplete = (entitiesStatus: SyncStatus[]) => {
-   const incomplete = entitiesStatus.filter(
-      (model) => model.isInitialSync && model.status === "SYNCING"
-   )
+   const waitForEntities = ["Department", "Job", "Office", "RemoteUser", "Tag"]
+   const incomplete = entitiesStatus
+      .filter((s) => waitForEntities.includes(s.model))
+      .filter((model) => model.isInitialSync && model.status === "SYNCING")
 
    // only complete if we don't have any still syncing
    return incomplete.length === 0
