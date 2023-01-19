@@ -36,7 +36,6 @@ export default function MyDocument(props: DocumentProps) {
                      id="usercentrics-cmp"
                      src="https://app.usercentrics.eu/browser-ui/latest/loader.js"
                      data-settings-id="T4NAUxIvE2tGD2"
-                     // strategy="beforeInteractive"
                      // by default uses the live version
                      data-version={
                         props.usercentricsPreviewMode ? "preview" : undefined
