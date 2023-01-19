@@ -13,7 +13,10 @@ import { createCompatGenericConverter } from "@careerfairy/shared-lib/dist/BaseF
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
-} from "@careerfairy/shared-lib/dist/livestreams/stats" // Not imported at runtime (only used for types)
+} from "@careerfairy/shared-lib/dist/livestreams/stats"
+import type { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -33,6 +36,10 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateLiveStreamStats(
       livestreamId: string,
       operationsToMake: OperationsToMake
+   ): Promise<void>
+
+   syncLiveStreamStatsWithLivestream(
+      snapshotChange: Change<DocumentSnapshot>
    ): Promise<void>
 }
 
@@ -112,7 +119,7 @@ export class LivestreamFunctionsRepository
             const livestreamDoc = await transaction.get(livestreamRef)
 
             if (!livestreamDoc.exists) {
-               throw new Error("Livestream does not exist")
+               return // Livestream was deleted, no need to update the stats
             }
 
             const statsDoc = createLiveStreamStatsDoc(
@@ -124,6 +131,45 @@ export class LivestreamFunctionsRepository
 
          // We have to use an update method here because the set method does not support nested updates/operations
          transaction.update(statsRef, operationsToMake)
+      })
+   }
+
+   syncLiveStreamStatsWithLivestream(
+      snapshotChange: Change<DocumentSnapshot>
+   ): Promise<void> {
+      const latestLivestreamDoc = snapshotChange.after
+
+      return this.firestore.runTransaction(async (transaction) => {
+         const statsRef = this.firestore
+            .collection("livestreams")
+            .doc(latestLivestreamDoc.id)
+            .collection("stats")
+            .doc("livestreamStats")
+            .withConverter(createCompatGenericConverter<LiveStreamStats>())
+
+         if (!latestLivestreamDoc.exists) {
+            // Livestream was deleted, delete the stats document
+            transaction.delete(statsRef)
+            return
+         }
+
+         const statsDoc = await transaction.get(statsRef)
+
+         const livestream = this.addIdToDoc<LivestreamEvent>(
+            latestLivestreamDoc as any
+         )
+
+         if (!statsDoc.exists) {
+            // Create the stats document
+            const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
+            transaction.set(statsRef, statsDoc)
+         } else {
+            const toUpdate: Pick<LiveStreamStats, "livestream"> = {
+               livestream: livestream,
+            }
+
+            transaction.update(statsRef, toUpdate)
+         }
       })
    }
 }

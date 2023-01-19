@@ -322,18 +322,24 @@ export interface EventRatingAnswer extends Identifiable {
    timestamp?: firebase.firestore.Timestamp
 }
 
-export interface LivestreamEventPublicData {
-   summary?: string
-   company?: string
-   title?: string
-   id: string
-   start?: firebase.firestore.Timestamp
-   companyLogoUrl?: string
-   test?: boolean
-   groupIds?: string[]
-   interestsIds?: string[]
-   targetFieldsOfStudy?: FieldOfStudy[]
-   targetLevelsOfStudy?: FieldOfStudy[]
+export type LivestreamEventPublicData = Partial<
+   Pick<
+      LivestreamEvent,
+      | "summary"
+      | "company"
+      | "title"
+      | "start"
+      | "companyLogoUrl"
+      | "test"
+      | "groupIds"
+      | "interestsIds"
+      | "targetFieldsOfStudy"
+      | "targetLevelsOfStudy"
+      | "created"
+      | "impressions"
+   >
+> & {
+   id: LivestreamEvent["id"]
 }
 
 export interface LivestreamQuestion extends Identifiable {
@@ -428,6 +434,8 @@ export const pickPublicDataFromLivestream = (
       interestsIds: livestreamData.interestsIds ?? [],
       targetFieldsOfStudy: livestreamData.targetFieldsOfStudy ?? [],
       targetLevelsOfStudy: livestreamData.targetLevelsOfStudy ?? [],
+      impressions: livestreamData.impressions ?? 0,
+      created: livestreamData.created ?? null,
    }
 }
 

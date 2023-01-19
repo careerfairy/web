@@ -29,6 +29,7 @@ import cacheClear = require("./cacheClear")
 import crisp = require("./crisp")
 import recommendation = require("./recommendation")
 import stats = require("./stats")
+import sync = require("./sync")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -182,3 +183,6 @@ exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
 
 // Stats
 exports.updateLiveStreamStats = stats.updateLiveStreamStats
+
+// Syncing Collections
+exports.syncLivestreamsOnWrite = sync.syncLivestreamsOnWrite
