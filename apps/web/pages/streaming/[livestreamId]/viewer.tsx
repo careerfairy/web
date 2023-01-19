@@ -40,19 +40,23 @@ const ViewerPage = () => {
 const useCloseUsercentrics = () => {
    const { query } = useRouter()
    useEffect(() => {
-      let timeout: NodeJS.Timeout
+      let interval: NodeJS.Timeout
       if (query.isRecordingWindow) {
          closePrivacyWall()
 
+         let tries = 7
          // just to be completely sure there isn't a race condition anywhere
          // try to close the dialog after some seconds as well
-         timeout = setTimeout(() => {
+         interval = setInterval(() => {
             closePrivacyWall()
-         }, 4000)
+            if (--tries <= 0) {
+               clearInterval(interval)
+            }
+         }, 1000)
       }
 
       return () => {
-         clearTimeout(timeout)
+         clearInterval(interval)
       }
    }, [query.isRecordingWindow])
 }
