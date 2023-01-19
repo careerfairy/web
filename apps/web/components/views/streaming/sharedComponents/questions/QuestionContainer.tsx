@@ -144,7 +144,7 @@ const styles = sxStyles({
    },
    questionCommentActive: {
       background: "common.white",
-      color: "common.black",
+      color: "text.primary",
    },
    questionButton: {
       borderRadius: "0 0 5px 5px",
