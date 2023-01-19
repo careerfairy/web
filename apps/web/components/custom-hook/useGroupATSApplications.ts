@@ -25,7 +25,7 @@ const useGroupATSApplications = (
          livestreamRepo.getLivestreamsWithJobs(groupId).then((livestreams) => {
             // we're only interested in the livestreams that have jobs for the given integration id
             // the livestream can belong to multiple groups (groupIds[]) and may have jobs with from different ats integrations
-            const filteredLivestreams = livestreams.filter((stream) =>
+            const filteredLivestreams = livestreams?.filter((stream) =>
                stream.jobs.some((job) => job.integrationId === integrationId)
             )
 
