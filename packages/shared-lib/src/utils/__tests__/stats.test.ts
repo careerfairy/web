@@ -10,10 +10,11 @@ describe("getPropertyToUpdate", () => {
 
    it("should return the correct property path for a university stat", () => {
       const field = "numberOfRegistrations"
-      const universityCode = "ucl"
+      const universityCode = "12345"
       const result = getAValidGroupStatsUpdateField(field, universityCode)
-      expect(result).toEqual("universityStats.ucl.numberOfRegistrations")
+      expect(result).toEqual("universityStats.12345.numberOfRegistrations")
    })
+
    it("Expect typescript error for invalid Live Stream Stats field key", () => {
       const field = "invalidField"
       const universityCode = "ucl"
@@ -22,6 +23,7 @@ describe("getPropertyToUpdate", () => {
 
       expect(result).toEqual("universityStats.ucl.invalidField")
    })
+
    it("Expect typescript error for invalid Group Stats field key", () => {
       const field = "invalidField"
       const universityCode = "ucl"
