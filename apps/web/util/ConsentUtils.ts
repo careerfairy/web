@@ -13,6 +13,7 @@ interface UC_UI {
    acceptService(id: string): Promise<void>
    showSecondLayer(): void
    restartEmbeddings(): void
+   closeCMP(): void
 }
 
 /**
@@ -59,4 +60,11 @@ export const enableConsentFor = (name: UC_SERVICES): Promise<void> => {
       return Promise.reject(`${name} not found in the usercentrics list`)
 
    return uc.acceptService(service.id)
+}
+
+/**
+ * Programmatically close the UC privacy wall dialog
+ */
+export const closePrivacyWall = () => {
+   getWindow()?.UC_UI?.closeCMP()
 }
