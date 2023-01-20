@@ -28,6 +28,7 @@ import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import RecordingPlayer from "../RecordingPlayer"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const styles = {
    root: (theme, smallVerticalScreen) => ({
@@ -187,7 +188,7 @@ const HeroSection = ({
    showScrollButton = false,
    showRecording = false,
    maxDaysToShowRecording,
-   recordingSid = "",
+   recordingSid = null,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -261,12 +262,17 @@ const HeroSection = ({
       }
    }, [isMobile])
 
+   const handleCloseRecordingPlayer = useCallback(() => {
+      setShowBigVideoPlayer(false)
+   }, [])
+
    const renderRecordingVideo = useCallback(
       () => (
          <Box pt={1}>
             <RecordingPlayer
                handlePlay={handleRecordingPlay}
-               stream={stream}
+               handleClosePlayer={handleCloseRecordingPlayer}
+               stream={LivestreamPresenter.createFromDocument(stream)}
                showBigVideoPlayer={showBigVideoPlayer}
                maxDaysToShowRecording={maxDaysToShowRecording}
                recordingSid={recordingSid}
@@ -274,6 +280,7 @@ const HeroSection = ({
          </Box>
       ),
       [
+         handleCloseRecordingPlayer,
          handleRecordingPlay,
          maxDaysToShowRecording,
          recordingSid,

@@ -20,6 +20,7 @@ import {
 } from "../utils/firebaseSerializerMethods"
 import { AdminGroupsClaim } from "../users"
 
+export const MAX_DAYS_TO_SHOW_RECORDING = 5
 /**
  * Livestream class
  *
@@ -147,6 +148,17 @@ export class LivestreamPresenter extends BaseModel {
                Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
             )
       )
+   }
+
+   recordingAccessTimeLeftMs(): Date {
+      const streamDate = this.start
+
+      const maxDateToShowRecording = streamDate
+      maxDateToShowRecording.setDate(
+         streamDate.getDate() + MAX_DAYS_TO_SHOW_RECORDING
+      )
+
+      return maxDateToShowRecording
    }
 
    /**

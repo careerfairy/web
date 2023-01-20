@@ -662,7 +662,7 @@ export class FirebaseLivestreamRepository
    }
 
    async getLivestreamRecordingToken(livestreamId): Promise<RecordingToken> {
-      let snap = await this.firestore
+      const snap = await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("recordingToken")

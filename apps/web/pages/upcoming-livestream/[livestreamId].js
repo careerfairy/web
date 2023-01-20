@@ -29,11 +29,12 @@ import ReferralSection from "../../components/views/upcoming-livestream/Referral
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import {
+   LivestreamPresenter,
+   MAX_DAYS_TO_SHOW_RECORDING,
+} from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
 import { livestreamRepo } from "../../data/RepositoryInstances"
-
-const MAX_DAYS_TO_SHOW_RECORDING = 5
 
 const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
@@ -53,7 +54,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const [targetGroupId, setTargetGroupId] = useState("")
    const [questionSortType, setQuestionSortType] = useState("timestamp")
    const { data: totalInterests } = useInterests()
-   const [eventInterests, setSetEventInterests] = useState([])
+   const [eventInterests, setEventInterests] = useState([])
 
    const [unfilteredGroups, setUnfilteredGroups] = useState([])
 
@@ -116,7 +117,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
 
    useEffect(() => {
       if (totalInterests) {
-         setSetEventInterests(
+         setEventInterests(
             totalInterests.filter((interest) =>
                stream?.interestsIds?.includes(interest.id)
             )
@@ -421,26 +422,18 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
          registered &&
          isPastEvent &&
          !stream.denyRecordingAccess &&
-         recordingSid.length > 0
+         recordingSid?.length > 0
       ) {
-         const streamDate = stream?.start.toDate()
-
-         const maxDateToShowRecording = streamDate
-         maxDateToShowRecording.setDate(
-            streamDate.getDate() + MAX_DAYS_TO_SHOW_RECORDING
-         )
+         const maxDateToShowRecording =
+            LivestreamPresenter.createFromDocument(
+               stream
+            ).recordingAccessTimeLeftMs()
 
          return new Date() <= maxDateToShowRecording
       }
 
       return false
-   }, [
-      isPastEvent,
-      recordingSid,
-      registered,
-      stream.denyRecordingAccess,
-      stream?.start,
-   ])
+   }, [isPastEvent, recordingSid?.length, registered, stream])
 
    return (
       <>
@@ -572,7 +565,7 @@ export async function getServerSideProps({
       props: {
          serverStream,
          groupId: groupId || null,
-         recordingSid: streamRecordingToken?.sid || "",
+         recordingSid: streamRecordingToken?.sid || null,
       }, // will be passed to the page component as props
    }
 }
