@@ -2,7 +2,6 @@ import functions = require("firebase-functions")
 import { livestreamsRepo } from "./api/repositories"
 import { getChangeTypes } from "./util"
 import { RuntimeOptions } from "firebase-functions/lib/function-configuration"
-import { updateLiveStreamStats } from "./lib/stats"
 
 const syncRunTimeConfig: RuntimeOptions = {
    // Ensure that the function has enough time to finish all side effects
@@ -62,30 +61,19 @@ export const syncUserLivestreamDataOnWrite = functions
          message: "syncUserLivestreamDataOnWrite",
       })
 
-      const { isUpdate, isDelete, isCreate } = changeTypes
-
-      const {
-         livestreamId,
-         // userId
-      } = context.params
+      const { livestreamId } = context.params
 
       // An array of promise side effects to be executed in parallel
       const sideEffectPromises: Promise<unknown>[] = []
 
-      if (isCreate) {
-         // Run side effects for new userLivestreamData creations
-      }
-
-      if (isUpdate) {
-         // Run side effects for userLivestreamData updates
-      }
-
-      if (isDelete) {
-         // Run side effects for userLivestreamData deletions
-      }
-
       // Run side effects for all userLivestreamData changes
-      sideEffectPromises.push(updateLiveStreamStats(change, livestreamId))
+      sideEffectPromises.push(
+         livestreamsRepo.addOperationsToLiveStreamStats(
+            change,
+            livestreamId,
+            functions.logger.info
+         )
+      )
 
       return handleSideEffects(sideEffectPromises)
    })
