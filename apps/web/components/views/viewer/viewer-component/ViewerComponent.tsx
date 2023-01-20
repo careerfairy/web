@@ -35,6 +35,7 @@ import { useCurrentStream } from "../../../../context/stream/StreamContext"
 import { HandRaiseState } from "../../../../types/handraise"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
 import EndOfStreamView from "./EndOfStreamView"
+import { usePreFetchRecommendedEvents } from "../../../custom-hook/useRecommendedEvents"
 
 const useStyles = makeStyles((theme) => ({
    waitingOverlay: {
@@ -173,6 +174,9 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
          void handleLeaveAsHandRaiser()
       }
    }, [handRaiseActive, handRaiseState])
+
+   // prefetch recommended events
+   usePreFetchRecommendedEvents()
 
    const handleCloseScreenShareModal = useCallback(() => {
       setShowScreenShareModal(false)
