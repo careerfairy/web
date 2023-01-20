@@ -1,6 +1,6 @@
 import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import { addOperationWithNumberCheck, OperationsToMake } from "./util"
-import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/groups/stats"
+import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/dist/groups/stats"
 
 /**
  *
@@ -28,7 +28,7 @@ export const addGroupStatsOperations = (
       newStatsObject?.numberOfPeopleReached || 0,
       oldStatsObject?.numberOfPeopleReached || 0,
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfPeopleReached", universityCode)
+      getAValidGroupStatsUpdateField("numberOfRegistrations", universityCode)
    )
 
    // Add operations for registrations
@@ -36,7 +36,7 @@ export const addGroupStatsOperations = (
       newStatsObject?.numberOfRegistrations || 0,
       oldStatsObject?.numberOfRegistrations || 0,
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfRegistrations", universityCode)
+      getAValidGroupStatsUpdateField("numberOfRegistrations", universityCode)
    )
 
    // Add operations participants
@@ -44,7 +44,7 @@ export const addGroupStatsOperations = (
       newStatsObject?.numberOfParticipants || 0,
       oldStatsObject?.numberOfParticipants || 0,
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfParticipants", universityCode)
+      getAValidGroupStatsUpdateField("numberOfParticipants", universityCode)
    )
 
    if (!universityCode) {

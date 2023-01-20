@@ -1,10 +1,10 @@
 import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
-import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import {
    addOperationWithBooleanCheck,
    addOperationWithNumberCheck,
    OperationsToMake,
 } from "./util"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 /**
  * This function checks which fields of the newData and oldData are different and updates the operationsToMakeObject accordingly.
@@ -25,7 +25,10 @@ export const addOperations = (
       Boolean(newData?.participated?.date),
       Boolean(oldData?.participated?.date),
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfParticipants", universityCode)
+      getAValidLivestreamStatsUpdateField(
+         "numberOfParticipants",
+         universityCode
+      )
    )
 
    // Check if the user has registered
@@ -33,7 +36,10 @@ export const addOperations = (
       Boolean(newData?.registered?.date),
       Boolean(oldData?.registered?.date),
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfRegistrations", universityCode)
+      getAValidLivestreamStatsUpdateField(
+         "numberOfRegistrations",
+         universityCode
+      )
    )
 
    // Check if the user talent pool status has changed
@@ -41,14 +47,17 @@ export const addOperations = (
       Boolean(newData?.talentPool?.date),
       Boolean(oldData?.talentPool?.date),
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfTalentPoolProfiles", universityCode)
+      getAValidLivestreamStatsUpdateField(
+         "numberOfTalentPoolProfiles",
+         universityCode
+      )
    )
 
    addOperationWithNumberCheck(
       Object.keys(newData?.jobApplications || {}).length,
       Object.keys(oldData?.jobApplications || {}).length,
       operationsToMakeObject,
-      getPropertyToUpdate("numberOfApplicants", universityCode)
+      getAValidLivestreamStatsUpdateField("numberOfApplicants", universityCode)
    )
 }
 

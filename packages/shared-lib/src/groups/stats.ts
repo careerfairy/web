@@ -10,7 +10,7 @@ export interface GroupStats extends Identifiable {
    generalStats: GroupStatsMap
    universityStats: {
       // The key is the university code, and the value is the stats for that university. We exclude numberOfPeopleReached because it is not relevant for the university stats
-      [universityCode: string]: Omit<GroupStatsMap, "numberOfPeopleReached">
+      [universityCode: string]: GroupStatsMap
    }
 }
 
@@ -39,35 +39,15 @@ export type GroupStatsMap = {
    numberOfParticipants: number
 }
 
-type GeneralStatsKey = keyof Pick<GroupStats, "generalStats">
-
-type UniversityStatsKey = keyof Pick<GroupStats, "universityStats">
-
-export function getPropertyToUpdate<TField extends keyof GroupStatsMap>(
-   field: TField
-): `${GeneralStatsKey}.${TField}`
-export function getPropertyToUpdate<
-   TField extends keyof GroupStatsMap,
-   TUniversityCode extends string
->(
-   field: TField,
-   universityCode: TUniversityCode
-): `${UniversityStatsKey}.${TUniversityCode}.${TField}`
-/**
- * A helper to build a typesafe property path to update based on the field and the universityCode for the firestore UPDATE operation
- * @param field The field to update
- * @param universityCode The university code to update
- * @returns The string path in dot notation to the field to update Example: universityStats.${universityCode}.numberOfRegistrations or generalStats.numberOfRegistrations
- * */
-export function getPropertyToUpdate<
-   TField extends keyof GroupStatsMap,
-   TUniversityCode extends string | undefined
->(
-   field: TField,
-   universityCode?: TUniversityCode
+export const getAValidGroupStatsUpdateField = <TUniCode extends string>(
+   field: keyof GroupStatsMap,
+   universityCode?: TUniCode
 ):
-   | `${UniversityStatsKey}.${TUniversityCode}.${TField}`
-   | `${GeneralStatsKey}.${TField}` {
+   | `${keyof Pick<
+        GroupStats,
+        "universityStats"
+     >}.${TUniCode}.${keyof GroupStatsMap}`
+   | `${keyof Pick<GroupStats, "generalStats">}.${keyof GroupStatsMap}` => {
    if (universityCode) {
       return `universityStats.${universityCode}.${field}` as const
    }

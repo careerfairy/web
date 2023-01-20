@@ -48,7 +48,7 @@ import {
    OnSnapshotCallback,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
-import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -3109,7 +3109,7 @@ class FirebaseService {
       const hasViewed = pageViewVisitorSnap.exists
 
       if (!hasViewed) {
-         const generalStatsFieldPath = getPropertyToUpdate(
+         const generalStatsFieldPath = getAValidLivestreamStatsUpdateField(
             "numberOfPeopleReached"
          )
 

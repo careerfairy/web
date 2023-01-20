@@ -62,35 +62,18 @@ export type LivestreamStatsMap = {
    numberOfApplicants: number
 }
 
-type GeneralStatsKey = keyof Pick<LiveStreamStats, "generalStats">
-
-type UniversityStatsKey = keyof Pick<LiveStreamStats, "universityStats">
-
-export function getPropertyToUpdate<TField extends keyof LivestreamStatsMap>(
-   field: TField
-): `${GeneralStatsKey}.${TField}`
-export function getPropertyToUpdate<
-   TField extends keyof LivestreamStatsMap,
-   TUniversityCode extends string
->(
-   field: TField,
-   universityCode: TUniversityCode
-): `${UniversityStatsKey}.${TUniversityCode}.${TField}`
-/**
- * A helper to build a typesafe property path to update based on the field and the universityCode for the firestore UPDATE operation
- * @param field The field to update
- * @param universityCode The university code to update
- * @returns The string path in dot notation to the field to update Example: universityStats.${universityCode}.numberOfRegistrations or generalStats.numberOfRegistrations
- * */
-export function getPropertyToUpdate<
-   TField extends keyof LivestreamStatsMap,
-   TUniversityCode extends string | undefined
->(
-   field: TField,
-   universityCode?: TUniversityCode
+export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
+   field: keyof LivestreamStatsMap,
+   universityCode?: TUniCode
 ):
-   | `${UniversityStatsKey}.${TUniversityCode}.${TField}`
-   | `${GeneralStatsKey}.${TField}` {
+   | `${keyof Pick<
+        LiveStreamStats,
+        "universityStats"
+     >}.${TUniCode}.${keyof LivestreamStatsMap}`
+   | `${keyof Pick<
+        LiveStreamStats,
+        "generalStats"
+     >}.${keyof LivestreamStatsMap}` => {
    if (universityCode) {
       return `universityStats.${universityCode}.${field}` as const
    }
