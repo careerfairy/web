@@ -23,6 +23,8 @@ import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import { usePreviousDistinct } from "react-use"
 import DateUtil from "../util/DateUtil"
 import { dataLayerUser } from "../util/analyticsUtils"
+import { updateUserActivity } from "./user/trackActivity"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -155,7 +157,7 @@ const AuthProvider = ({ children }) => {
                console.error(e)
             })
       }
-   }, [userData])
+   }, [userData, firebaseService])
 
    const refetchClaims = useCallback(async () => {
       if (!firebaseService.auth.currentUser) return null
@@ -207,11 +209,15 @@ const AuthProvider = ({ children }) => {
             setClaims(tokenResult.claims)
 
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
+
+            updateUserActivity(user.email, firebaseService).catch(
+               errorLogAndNotify
+            )
          }
       })
 
       return () => unsub()
-   }, [firebaseService.auth])
+   }, [firebaseService.auth, firebaseService])
 
    // update GTM user variables, useful to keep the values updated after login/logout/etc
    useEffect(() => {

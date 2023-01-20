@@ -83,6 +83,9 @@ export const createNewUserAccount_v4 = functions.https.onCall(
                      fieldOfStudy,
                      levelOfStudy,
                      isStudent: true,
+                     lastActivityAt:
+                        admin.firestore.FieldValue.serverTimestamp(),
+                     createdAt: admin.firestore.FieldValue.serverTimestamp(),
                   })
                )
                .then(async () => {
@@ -222,6 +225,8 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             userEmail: recipientEmail,
             unsubscribed: !subscribed,
             referralCode: generateReferralCode(),
+            lastActivityAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
          }
          // create the user in firestore, if it fails, delete the user from firebase auth
          await admin
