@@ -5,12 +5,14 @@ import React, { useEffect, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import DateUtil from "../../../../util/DateUtil"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
 
 type Props = {
-   stream: LivestreamEvent
+   stream: LivestreamPresenter
    handlePlay?: () => void
+   handleClosePlayer?: () => void
    showBigVideoPlayer?: boolean
    maxDaysToShowRecording?: number
    recordingSid?: string
@@ -31,16 +33,29 @@ const styles = sxStyles({
          border: (theme) => `3px solid ${theme.palette.primary.main}`,
       },
    },
+   backButton: {
+      display: "flex",
+      width: "fit-content",
+      cursor: "pointer",
+      alignItems: "center",
+      fontSize: "14px",
+      height: "20px",
+
+      "&:hover": {
+         fontSize: "15px",
+      },
+   },
 })
 
 const RecordingPlayer = ({
    stream,
    handlePlay,
+   handleClosePlayer,
    showBigVideoPlayer,
    maxDaysToShowRecording,
    recordingSid,
 }: Props) => {
-   const [countdown, setCountDown] = useState("")
+   const [countDown, setCountDown] = useState("")
    const isMobile = useIsMobile()
 
    const saveTimeLeft = (maxDateToShowRecording: Date) => {
@@ -53,12 +68,7 @@ const RecordingPlayer = ({
    }
 
    useEffect(() => {
-      const streamDate = stream?.start.toDate()
-
-      const maxDateToShowRecording = streamDate
-      maxDateToShowRecording.setDate(
-         streamDate.getDate() + maxDaysToShowRecording
-      )
+      const maxDateToShowRecording = stream.recordingAccessTimeLeftMs()
 
       // This calculates the remaining time to access to the recording on the mount
       saveTimeLeft(maxDateToShowRecording)
@@ -69,11 +79,22 @@ const RecordingPlayer = ({
       }, 1000)
 
       return () => clearTimeout(interval)
-   }, [maxDaysToShowRecording, stream?.start])
+   }, [maxDaysToShowRecording, stream])
 
    return (
       <Box>
-         {showBigVideoPlayer ? null : (
+         {showBigVideoPlayer ? (
+            <>
+               {!isMobile && (
+                  <Box sx={styles.backButton} onClick={handleClosePlayer}>
+                     <BackToMainRoomIcon fontSize="inherit" />
+                     <Typography variant="inherit" fontWeight="bold">
+                        Back
+                     </Typography>
+                  </Box>
+               )}
+            </>
+         ) : (
             <Slide direction="left" timeout={1000} in={!showBigVideoPlayer}>
                <Box>
                   {isMobile ? null : (
@@ -94,7 +115,7 @@ const RecordingPlayer = ({
                         fontWeight="bold"
                         color="primary"
                      >
-                        {countdown}
+                        {countDown}
                      </Typography>{" "}
                      left to rewatch the live stream!
                   </Typography>
@@ -117,11 +138,8 @@ const RecordingPlayer = ({
                      : "400px"
                }
                controls={true}
-               url={downloadLinkWithDate(
-                  stream.start.toDate(),
-                  stream.id,
-                  recordingSid
-               )}
+               url={downloadLinkWithDate(stream.start, stream.id, recordingSid)}
+               onPlay={handlePlay}
                playing={true}
                config={{ file: { attributes: { controlsList: "nodownload" } } }}
                light={stream.backgroundImageUrl}
