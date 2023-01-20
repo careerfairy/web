@@ -1,17 +1,19 @@
-import useSWR from "swr"
+import useSWR, { preload } from "swr"
 import useFunctionsSWR, {
    reducedRemoteCallsOptions,
 } from "./utils/useFunctionsSWRFetcher"
-import { useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"
 import { collection, query, where } from "firebase/firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { FirebaseInArrayLimit } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 type Config = {
    limit: FirebaseInArrayLimit
 }
 
+const functionName = "getRecommendedEvents_v2"
 const useRecommendedEvents = (
    config: Config = {
       limit: 10,
@@ -22,7 +24,7 @@ const useRecommendedEvents = (
 
    const { data: eventIds } = useSWR<string[]>(
       [
-         "getRecommendedEvents_v2",
+         functionName,
          {
             limit: config.limit,
          },
@@ -59,6 +61,36 @@ const useRecommendedEvents = (
       }),
       [events, status]
    )
+}
+
+/*
+ * Hook to preload the recommended eventIds and store them in the SWR cache
+ * */
+export const usePreFetchRecommendedEvents = (
+   config: Config = {
+      limit: 10,
+   }
+) => {
+   const { isLoggedIn } = useAuth()
+
+   const fetcher = useFunctionsSWR<string[]>()
+
+   useEffect(() => {
+      // Only preload if the user is logged in, otherwise the function will throw a not authed error
+      if (isLoggedIn) {
+         preload(
+            [
+               functionName,
+               {
+                  limit: config.limit,
+               },
+            ],
+            fetcher
+         )
+      }
+   }, [config.limit, fetcher, isLoggedIn])
+
+   return null
 }
 
 export default useRecommendedEvents
