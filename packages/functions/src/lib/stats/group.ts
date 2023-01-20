@@ -28,7 +28,7 @@ export const addGroupStatsOperations = (
       newStatsObject?.numberOfPeopleReached || 0,
       oldStatsObject?.numberOfPeopleReached || 0,
       operationsToMakeObject,
-      getAValidGroupStatsUpdateField("numberOfRegistrations", universityCode)
+      getAValidGroupStatsUpdateField("numberOfPeopleReached", universityCode)
    )
 
    // Add operations for registrations
