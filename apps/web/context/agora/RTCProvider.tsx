@@ -140,7 +140,8 @@ const RTCProvider = ({
             streamDocumentPath: streamRef.path,
          })
          if (sessionShouldUseCloudProxy) {
-            rtcClient.startProxyServer(3)
+            const mode = Boolean(router.query.withTCPProxy) ? 5 : 3
+            rtcClient.startProxyServer(mode)
          }
          logStatus("JOIN", false, sessionShouldUseCloudProxy)
 
@@ -163,6 +164,7 @@ const RTCProvider = ({
          handleRtcError,
          streamRef.path,
          router.query.token,
+         router.query.withTCPProxy,
       ]
    )
    const joinAgoraRoomWithPrimaryClient = useCallback(
