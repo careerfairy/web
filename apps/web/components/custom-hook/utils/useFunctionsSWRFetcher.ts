@@ -26,7 +26,9 @@ function useFunctionsSWRFetcher<ResponseType>() {
          let promises = []
 
          for (let arg of args) {
-            let [functionName, dataArguments] = arg
+            // sometimes the the args have an extra wrapper array..
+            let functionName = Array.isArray(arg[0]) ? arg[0][0] : arg[0]
+            let dataArguments = Array.isArray(arg[0]) ? arg[0][1] : arg[1]
 
             let callable = httpsCallable<unknown, ResponseType>(
                functionsInstance,
