@@ -23,6 +23,7 @@ import {
    addOperationsToIncrementNewUniversityStats,
 } from "./stats/livestream"
 import DocumentSnapshot = firestore.DocumentSnapshot
+import type { FunctionsLogger } from "../util"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -63,7 +64,7 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    addOperationsToLiveStreamStats(
       change: Change<DocumentSnapshot>,
       livestreamId: string,
-      logger: (...args: any[]) => void
+      logger: FunctionsLogger
    ): Promise<void>
 }
 
@@ -200,7 +201,7 @@ export class LivestreamFunctionsRepository
    async addOperationsToLiveStreamStats(
       change: Change<DocumentSnapshot>,
       livestreamId: string,
-      logger: (...args: any[]) => void
+      logger: FunctionsLogger
    ): Promise<void> {
       const oldUserLivestreamData = change.before.data() as UserLivestreamData
       const newUserLivestreamData = change.after.data() as UserLivestreamData
@@ -250,7 +251,7 @@ export class LivestreamFunctionsRepository
 
       // Check if there are any updates to livestreamStats
       if (isEmpty(livestreamStatsDocOperationsToMake)) {
-         logger("No changes to livestream stats", {
+         logger.info("No changes to livestream stats", {
             livestreamId,
             liveStreamStatsToUpdate: livestreamStatsDocOperationsToMake,
          })
@@ -261,7 +262,7 @@ export class LivestreamFunctionsRepository
             livestreamStatsDocOperationsToMake
          )
 
-         logger("Updated livestream stats with the following operations", {
+         logger.info("Updated livestream stats with the following operations", {
             livestreamId,
             livestreamStatsDocOperationsToMake,
          })

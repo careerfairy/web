@@ -21,10 +21,11 @@ export interface LiveStreamStats extends Identifiable {
    /**
     * The overall stats of the event
     * */
-   generalStats: Stats
+   generalStats: LivestreamStatsMap
    universityStats: {
-      // The key is the university code, and the value is the stats for that university. We exclude numberOfPeopleReached because it is not relevant for the university stats
-      [universityCode: string]: Omit<Stats, "numberOfPeopleReached">
+      // The key is the university code, and the value is the stats for that university.
+      // The numberOfPeopleReached will be zero because it is not relevant for the university stats
+      [universityCode: string]: LivestreamStatsMap
    }
 }
 
@@ -48,7 +49,7 @@ export const createLiveStreamStatsDoc = <T extends string>(
    }
 }
 
-export type Stats = {
+export type LivestreamStatsMap = {
    // Total number of views across all live stream details pages
    numberOfPeopleReached: number
    // Total number of registrations across all live streams
@@ -65,11 +66,11 @@ type GeneralStatsKey = keyof Pick<LiveStreamStats, "generalStats">
 
 type UniversityStatsKey = keyof Pick<LiveStreamStats, "universityStats">
 
-export function getPropertyToUpdate<TField extends keyof Stats>(
+export function getPropertyToUpdate<TField extends keyof LivestreamStatsMap>(
    field: TField
 ): `${GeneralStatsKey}.${TField}`
 export function getPropertyToUpdate<
-   TField extends keyof Stats,
+   TField extends keyof LivestreamStatsMap,
    TUniversityCode extends string
 >(
    field: TField,
@@ -82,7 +83,7 @@ export function getPropertyToUpdate<
  * @returns The string path in dot notation to the field to update Example: universityStats.${universityCode}.numberOfRegistrations or generalStats.numberOfRegistrations
  * */
 export function getPropertyToUpdate<
-   TField extends keyof Stats,
+   TField extends keyof LivestreamStatsMap,
    TUniversityCode extends string | undefined
 >(
    field: TField,

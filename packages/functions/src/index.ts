@@ -183,3 +183,4 @@ exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
+exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
