@@ -24,12 +24,14 @@ const JobList = ({ onChange, disabled = false }: Props) => {
    )
 
    const handleChange = useCallback(
-      (event, value) => {
+      (_, value) => {
          setSelected(value)
          onChange(jobs.find((j) => j.id === value?.id))
       },
       [jobs, onChange]
    )
+
+   const isLoading = data.length === 0
 
    return (
       <>
@@ -40,6 +42,7 @@ const JobList = ({ onChange, disabled = false }: Props) => {
          <Autocomplete
             disabled={disabled}
             value={selected}
+            loading={isLoading}
             onChange={handleChange}
             options={data}
             getOptionLabel={(option) => option.name}
@@ -47,7 +50,7 @@ const JobList = ({ onChange, disabled = false }: Props) => {
             renderInput={(params) => (
                <TextField
                   {...params}
-                  label="Select Job"
+                  label={isLoading ? "Loading Jobs.." : "Select Job"}
                   variant="outlined"
                   fullWidth
                />
