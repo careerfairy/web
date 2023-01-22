@@ -70,6 +70,10 @@ service cloud.firestore {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
 
+            match /talentProfiles/{userGroup} {
+                allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+            }
+
             match /userAdminGroups/{userAdminGroup} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
