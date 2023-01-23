@@ -107,14 +107,14 @@ export class LivestreamFunctionsRepository
       return this.firestore.runTransaction(async (transaction) => {
          const statsDoc = await transaction.get(statsRef)
 
-         const livestreamDoc = await transaction.get(livestreamRef)
-
-         if (!livestreamDoc.exists) {
-            throw new Error("Livestream does not exist")
-         }
-
          if (!statsDoc.exists) {
             // Create the stats document
+            const livestreamDoc = await transaction.get(livestreamRef)
+
+            if (!livestreamDoc.exists) {
+               throw new Error("Livestream does not exist")
+            }
+
             const statsDoc = createLiveStreamStatsDoc(
                livestreamDoc.data(),
                statsRef.id
