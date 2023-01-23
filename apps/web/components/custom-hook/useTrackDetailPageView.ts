@@ -11,10 +11,10 @@ const useTrackDetailPageView = (eventId: string): InViewHookResponse["ref"] => {
    const { ref } = useInView({
       triggerOnce: true, // only ever trigger once per element
       delay: 1000, // Element must be at least visible for 1 second before triggering
-      skip: visitorId === undefined,
+      skip: visitorId === undefined, // Will only start tracking view when visitorId is available/loaded
       onChange: (inView) => {
          if (inView && visitorId) {
-            return trackDetailPageView(eventId, visitorId)
+            trackDetailPageView(eventId, visitorId).then(console.error)
          }
       },
    })
