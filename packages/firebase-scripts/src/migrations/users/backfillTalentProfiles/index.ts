@@ -8,6 +8,7 @@ import Counter from "../../../lib/Counter"
 import counterConstants from "../../../lib/Counter/constants"
 import * as cliProgress from "cli-progress"
 import { getCLIBarOptions } from "../../../util/misc"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/dist/utils"
 
 const counter = new Counter()
 const bar = new cliProgress.SingleBar(
@@ -30,8 +31,12 @@ let bulkWriter: BulkWriter
 export async function run() {
    bulkWriter = firestore.bulkWriter()
 
+   // sorted asc to make sure the talent pool doc has the most recent livestream obj
    const livestreams = await logAction(
-      () => livestreamRepo.getAllLivestreams(),
+      () =>
+         livestreamRepo
+            .getAllLivestreams()
+            .then((livestreams) => livestreams.sort(sortAsc)),
       "Fetching all livestreams"
    )
 
@@ -100,7 +105,7 @@ function addTalentProfilesToUser(
          userId: userData.authId,
          userEmail: userData.userEmail,
          user: userData,
-         livestream: livestream,
+         mostRecentLivestream: livestream,
          joinedAt: livestream.start,
       }
 
@@ -123,4 +128,8 @@ function addTalentProfilesToUser(
             bar.increment()
          })
    }
+}
+
+function sortAsc(a: LivestreamEvent, b: LivestreamEvent) {
+   return sortLivestreamsDesc(a, b, true)
 }
