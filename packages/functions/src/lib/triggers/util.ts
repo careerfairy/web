@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
 
 import { getChangeTypes } from "../../util"
-import { RuntimeOptions } from "firebase-functions/lib/function-configuration"
+import { RuntimeOptions } from "firebase-functions"
 
 export const defaultTriggerRunTimeConfig: RuntimeOptions = {
    // Ensure that the function has enough time to finish all side effects
