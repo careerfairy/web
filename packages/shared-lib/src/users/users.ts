@@ -160,7 +160,7 @@ export interface TalentProfile extends Identifiable {
    userId: string
    userEmail: string
    user: UserData
-   livestream: LivestreamEvent
+   mostRecentLivestream: LivestreamEvent
    joinedAt: firebase.firestore.Timestamp
 }
 
