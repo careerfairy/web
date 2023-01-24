@@ -100,6 +100,7 @@ function addTalentProfilesToUser(
          userId: userData.authId,
          userEmail: userData.userEmail,
          user: userData,
+         livestream: livestream,
          joinedAt: livestream.start,
       }
 
