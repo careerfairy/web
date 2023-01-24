@@ -2347,6 +2347,7 @@ class FirebaseService {
                         userId: userData.authId,
                         userEmail: userData.userEmail,
                         user: userData,
+                        livestream: livestream,
                         joinedAt: this.getServerTimestamp() as any,
                      }
                      transaction.set(groupTalentEntryRef, data, { merge: true })
