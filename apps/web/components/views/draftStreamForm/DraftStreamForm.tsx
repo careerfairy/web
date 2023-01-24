@@ -373,6 +373,7 @@ const DraftStreamForm = ({
          const arrayOfActualGroupIds = selectedGroups.map(
             (groupObj) => groupObj.id
          )
+         console.log(`setting form data in handleSetGroupIds`, newFormData)
          setFormData({ ...newFormData, groupIds: arrayOfActualGroupIds })
       }
    }

@@ -2,6 +2,7 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
+   GroupAdmin,
 } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
@@ -44,16 +45,37 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 const { client } = require("./api/postmark")
 
 export const sendDraftApprovalRequestEmail = functions.https.onCall(
-   async (data) => {
+   async (data, context) => {
       try {
          const {
-            adminsInfo,
             senderName,
             livestream,
             submitTime,
             // TODO Update the cloud function to send the sender an email of the draft they submitted
             // senderEmail,
          } = data
+
+         let admins: GroupAdmin[]
+
+         if (livestream.groupIds) {
+            admins = await Promise.all(
+               livestream.groupIds.map((groupId) =>
+                  groupRepo.getGroupAdmins(groupId)
+               )
+            )
+         }
+
+         const origin =
+            context?.rawRequest?.headers?.origin || "https://careerfairy.io"
+
+         const adminsInfo = admins.map((admin) => {
+            return {
+               groupId: admin.groupId,
+               email: admin.email,
+               eventDashboardLink: `${origin}/group/${admin.groupId}/admin/events?eventId=${livestream.id}`,
+               nextLivestreamsLink: `${origin}/next-livestreams/${admin.groupId}?livestreamId=${livestream.id}`,
+            }
+         })
 
          functions.logger.log("admins Info in approval request", adminsInfo)
 
