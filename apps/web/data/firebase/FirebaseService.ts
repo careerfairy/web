@@ -147,7 +147,7 @@ class FirebaseService {
    }
    sendDraftApprovalRequestEmail = async (data) => {
       const sendDraftApprovalRequestEmail = this.functions.httpsCallable(
-         "sendDraftApprovalRequestEmail"
+         "sendDraftApprovalRequestEmail_v2"
       )
       return sendDraftApprovalRequestEmail(data)
    }
