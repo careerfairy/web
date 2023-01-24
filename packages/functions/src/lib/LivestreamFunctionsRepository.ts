@@ -8,8 +8,6 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import type { OperationsToMake } from "./stats/util"
 
-import { createCompatGenericConverter } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
@@ -129,17 +127,13 @@ export class LivestreamFunctionsRepository
       const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
-         .withConverter(createCompatGenericConverter<LivestreamEvent>())
 
-      const statsRef = livestreamRef
-         .collection("stats")
-         .doc("livestreamStats")
-         .withConverter(createCompatGenericConverter<LiveStreamStats>())
+      const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
 
       return this.firestore.runTransaction(async (transaction) => {
-         const statsDoc = await transaction.get(statsRef)
+         const statsSnap = await transaction.get(statsRef)
 
-         if (!statsDoc.exists) {
+         if (!statsSnap.exists) {
             // Create the stats document
             const livestreamDoc = await transaction.get(livestreamRef)
 
@@ -148,7 +142,7 @@ export class LivestreamFunctionsRepository
             }
 
             const statsDoc = createLiveStreamStatsDoc(
-               livestreamDoc.data(),
+               this.addIdToDoc<LivestreamEvent>(livestreamDoc),
                statsRef.id
             )
             transaction.set(statsRef, statsDoc)
@@ -170,7 +164,6 @@ export class LivestreamFunctionsRepository
             .doc(latestLivestreamDoc.id)
             .collection("stats")
             .doc("livestreamStats")
-            .withConverter(createCompatGenericConverter<LiveStreamStats>())
 
          if (!latestLivestreamDoc.exists) {
             // Livestream was deleted, delete the stats document
@@ -178,13 +171,13 @@ export class LivestreamFunctionsRepository
             return
          }
 
-         const statsDoc = await transaction.get(statsRef)
+         const statsSnap = await transaction.get(statsRef)
 
          const livestream = this.addIdToDoc<LivestreamEvent>(
             latestLivestreamDoc as any
          )
 
-         if (!statsDoc.exists) {
+         if (!statsSnap.exists) {
             // Create the stats document
             const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
             transaction.set(statsRef, statsDoc)

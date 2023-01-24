@@ -11,28 +11,22 @@ import {
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import firebase from "firebase/compat"
-import {
-   createCompatGenericConverter,
-   mapFirestoreDocuments,
-} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
 import { OperationsToMake } from "./stats/util"
-import {
-   createGroupStatsDoc,
-   GroupStats,
-} from "@careerfairy/shared-lib/dist/groups/stats"
-import { isEmpty, cloneDeep, union } from "lodash"
+import { createGroupStatsDoc } from "@careerfairy/shared-lib/dist/groups/stats"
+import { cloneDeep, isEmpty, union } from "lodash"
 import {
    addGroupStatsOperations,
    addOperationsToDecrementGroupStatsOperations,
    addOperationsToOnlyIncrementGroupStatsOperations,
 } from "./stats/group"
-import admin = require("firebase-admin")
-import DocumentSnapshot = firestore.DocumentSnapshot
 import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import type { FunctionsLogger } from "../util"
+import admin = require("firebase-admin")
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -360,12 +354,8 @@ export class GroupFunctionsRepository
       const groupRef = this.firestore
          .collection("careerCenterData")
          .doc(groupId)
-         .withConverter(createCompatGenericConverter<Group>())
 
-      const groupStatsRef = groupRef
-         .collection("stats")
-         .doc("groupStats")
-         .withConverter(createCompatGenericConverter<GroupStats>())
+      const groupStatsRef = groupRef.collection("stats").doc("groupStats")
 
       return this.firestore.runTransaction(async (transaction) => {
          const groupDoc = await transaction.get(groupRef)
@@ -374,12 +364,12 @@ export class GroupFunctionsRepository
             return // Group was deleted, no need to update the stats
          }
 
-         const statsDoc = await transaction.get(groupStatsRef)
+         const statsSnap = await transaction.get(groupStatsRef)
 
-         if (!statsDoc.exists) {
+         if (!statsSnap.exists) {
             // Create the stats document
             const statsDoc = createGroupStatsDoc(
-               groupDoc.data(),
+               this.addIdToDoc<Group>(groupDoc),
                groupStatsRef.id
             )
             transaction.set(groupStatsRef, statsDoc)
