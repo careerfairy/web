@@ -614,3 +614,5 @@ export const getChangeTypes = (
 
    return { isCreate, isUpdate, isDelete }
 }
+
+export type FunctionsLogger = typeof functions.logger

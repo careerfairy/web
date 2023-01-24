@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { livestreamsRepo } from "./api/repositories"
+import { groupRepo, livestreamsRepo } from "./api/repositories"
 import { getChangeTypes } from "./util"
 import {
    handleSideEffects,
@@ -52,8 +52,31 @@ export const syncUserLivestreamData = functions
          livestreamsRepo.addOperationsToLiveStreamStats(
             change,
             livestreamId,
-            functions.logger.info
+            functions.logger
          )
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const syncLivestreamStats = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .firestore.document("livestreams/{livestreamId}/stats/livestreamStats") // Listens to a single document https://firebase.google.com/docs/functions/firestore-events#specific-documents
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncLivestreamStatsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all livestreamStats changes
+      sideEffectPromises.push(
+         groupRepo.addOperationsToGroupStats(change, functions.logger)
       )
 
       return handleSideEffects(sideEffectPromises)

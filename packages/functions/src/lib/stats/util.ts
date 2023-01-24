@@ -46,20 +46,11 @@ export const addOperationWithNumberCheck = (
 ) => {
    // Check if the number in the new data is different from the number in the old data
    if (newNumber !== oldNumber) {
-      // Check if the new number is greater than the old number, if so, we know that the field has been incremented
-      if (newNumber > oldNumber) {
-         // Increment the field by the difference between new and old number,
-         // as it represents the amount by which the field has increased
-         operationsToMakeObject[propertyToUpdate] = increment(
-            newNumber - oldNumber
-         )
-      } else {
-         // Decrement the field by the difference between old and new number,
-         // as it represents the amount by which the field has decreased
-         operationsToMakeObject[propertyToUpdate] = increment(
-            oldNumber - newNumber
-         )
-      }
+      // Get the difference between the new number and the old number
+      const difference = newNumber - oldNumber
+
+      // Increment/decrement the field by the difference, if the difference is positive, we increment, if the difference is negative, we decrement
+      operationsToMakeObject[propertyToUpdate] = increment(difference)
    }
 }
 
