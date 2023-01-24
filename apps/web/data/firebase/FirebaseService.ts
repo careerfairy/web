@@ -48,7 +48,7 @@ import {
    OnSnapshotCallback,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
-import { getPropertyToUpdate } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2260,8 +2260,8 @@ class FirebaseService {
       })
    }
 
-   deregisterFromLivestream = (livestreamId, authenticatedUser) => {
-      const { email } = authenticatedUser
+   deregisterFromLivestream = (livestreamId: string, userData: UserData) => {
+      const { userEmail } = userData
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -2269,7 +2269,7 @@ class FirebaseService {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("userLivestreamData")
-         .doc(email)
+         .doc(userEmail)
 
       return this.firestore.runTransaction((transaction) => {
          return transaction
@@ -2278,11 +2278,12 @@ class FirebaseService {
                if (userLivestreamDataDoc.exists) {
                   transaction.update(userLivestreamDataRef, {
                      registered: null,
+                     user: userData,
                   } as UserLivestreamData)
                }
                transaction.update(livestreamRef, {
                   registeredUsers:
-                     firebase.firestore.FieldValue.arrayRemove(email),
+                     firebase.firestore.FieldValue.arrayRemove(userEmail),
                })
             })
       })
@@ -2350,7 +2351,11 @@ class FirebaseService {
       return streamData.companyId
    }
 
-   leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
+   leaveCompanyTalentPool = (
+      companyId: string,
+      userData: UserData,
+      livestreamId: string
+   ) => {
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
@@ -2368,6 +2373,7 @@ class FirebaseService {
                if (userLivestreamDataDoc.exists) {
                   const data: Partial<UserLivestreamData> = {
                      talentPool: null,
+                     user: userData,
                   }
                   transaction.update(userLivestreamDataRef, data)
                }
@@ -3103,7 +3109,7 @@ class FirebaseService {
       const hasViewed = pageViewVisitorSnap.exists
 
       if (!hasViewed) {
-         const generalStatsFieldPath = getPropertyToUpdate(
+         const generalStatsFieldPath = getAValidLivestreamStatsUpdateField(
             "numberOfPeopleReached"
          )
 

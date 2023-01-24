@@ -78,10 +78,7 @@ const useJoinTalentPool = () => {
                   currentLivestream
                )
                await joinCompanyTalentPool(companyId, userData, livestreamId)
-               dataLayerLivestreamEvent(
-                  "talent_pool_joined",
-                  currentLivestream,
-               )
+               dataLayerLivestreamEvent("talent_pool_joined", currentLivestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
@@ -103,10 +100,7 @@ const useJoinTalentPool = () => {
                )
 
                await leaveCompanyTalentPool(companyId, userData, livestreamId)
-               dataLayerLivestreamEvent(
-                  "talent_pool_leave",
-                  currentLivestream,
-               )
+               dataLayerLivestreamEvent("talent_pool_leave", currentLivestream)
             } catch (e) {
                dispatch(actions.sendGeneralError(e))
             }
@@ -115,7 +109,7 @@ const useJoinTalentPool = () => {
       }),
       [
          livestreamId,
-         userData?.userEmail,
+         userData,
          loading,
          asPath,
          isBreakout,

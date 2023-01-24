@@ -28,7 +28,7 @@ import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
 import crisp = require("./crisp")
 import recommendation = require("./recommendation")
-import stats = require("./stats")
+import onWriteTriggers = require("./onWriteTriggers")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -180,5 +180,7 @@ exports.getCrispSignature = crisp.getCrispSignature
 // Recommendations
 exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
 
-// Stats
-exports.updateLiveStreamStats = stats.updateLiveStreamStats
+// On Write Triggers for all collections
+exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
+exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats

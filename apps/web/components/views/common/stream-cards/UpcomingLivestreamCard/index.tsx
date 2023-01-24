@@ -389,10 +389,7 @@ const UpcomingLivestreamCard = ({
             })
          }
 
-         return await deregisterFromLivestream(
-            livestream?.id,
-            authenticatedUser
-         )
+         return await deregisterFromLivestream(livestream?.id, userData)
       } catch (e) {}
    }
 
