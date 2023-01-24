@@ -153,14 +153,9 @@ const DraftStream = () => {
 
          if (status === SUBMIT_FOR_APPROVAL) {
             const submitTime = prettyLocalizedDate(new Date())
-            const adminsInfo = await firebaseService.getAllGroupAdminInfo(
-               livestream.groupIds || [],
-               id
-            )
             const senderName = userInfo.name
             const senderEmail = userInfo.email
             await firebaseService.sendDraftApprovalRequestEmail({
-               adminsInfo,
                senderName,
                livestream,
                submitTime,

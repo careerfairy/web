@@ -65,7 +65,8 @@ exports.unsubscribeFromMarketingEmails = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
 exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
-exports.sendDraftApprovalRequestEmail = groupAdmin.sendDraftApprovalRequestEmail
+exports.sendDraftApprovalRequestEmail_v2 =
+   groupAdmin.sendDraftApprovalRequestEmail
 exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
 exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
 exports.joinGroupDashboard_v2 = groupAdmin.joinGroupDashboard_v2
