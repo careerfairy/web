@@ -22,7 +22,7 @@ const useRegistrationModal = (
       query: { groupId },
       asPath,
    } = useRouter()
-   const { authenticatedUser, isLoggedIn } = useAuth()
+   const { isLoggedIn, userData } = useAuth()
    const { forceShowReminder } = useUserReminders()
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const handleCloseJoinModal = useCallback(
@@ -51,10 +51,7 @@ const useRegistrationModal = (
          dataLayerLivestreamEvent("event_registration_started", event)
          try {
             if (hasRegistered) {
-               await firebase.deregisterFromLivestream(
-                  event.id,
-                  authenticatedUser
-               )
+               await firebase.deregisterFromLivestream(event.id, userData)
                dataLayerLivestreamEvent("event_registration_removed", event)
             } else {
                const emailVerified = firebase.auth?.currentUser?.emailVerified
@@ -85,7 +82,7 @@ const useRegistrationModal = (
       },
       [
          firebase,
-         authenticatedUser,
+         userData,
          isLoggedIn,
          forceShowReminder,
          handleOpenJoinModal,
