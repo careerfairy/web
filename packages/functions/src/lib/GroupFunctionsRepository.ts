@@ -10,7 +10,6 @@ import {
 } from "@careerfairy/shared-lib/dist/groups"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
-import firebase from "firebase/compat"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
 import { Change } from "firebase-functions"
@@ -25,7 +24,8 @@ import {
 } from "./stats/group"
 import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import type { FunctionsLogger } from "../util"
-import admin = require("firebase-admin")
+import { admin } from "../api/firestoreAdmin"
+
 import DocumentSnapshot = firestore.DocumentSnapshot
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
@@ -103,14 +103,6 @@ export class GroupFunctionsRepository
    extends FirebaseGroupRepository
    implements IGroupFunctionsRepository
 {
-   constructor(
-      protected readonly firestore: firebase.firestore.Firestore,
-      protected readonly fieldValue: typeof firebase.firestore.FieldValue,
-      protected readonly auth: admin.auth.Auth
-   ) {
-      super(firestore, fieldValue)
-   }
-
    async checkIfUserIsGroupAdmin(
       groupId: string,
       userEmail: string
@@ -125,7 +117,7 @@ export class GroupFunctionsRepository
       }
 
       const group = this.addIdToDoc<Group>(groupDoc)
-      const user = await this.auth.getUserByEmail(userEmail)
+      const user = await admin.auth().getUserByEmail(userEmail)
 
       const userRole = user.customClaims?.adminGroups?.[group.id]?.role
 
@@ -149,7 +141,7 @@ export class GroupFunctionsRepository
 
       const userData = this.addIdToDoc<UserData>(userSnap)
 
-      const user = await this.auth.getUserByEmail(targetEmail)
+      const user = await admin.auth().getUserByEmail(targetEmail)
 
       // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER FOR EVERY GROUP AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
@@ -170,7 +162,7 @@ export class GroupFunctionsRepository
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            this.auth.setCustomUserClaims(user.uid, user.customClaims)
+            admin.auth().setCustomUserClaims(user.uid, user.customClaims)
             throw error
          }
       )
@@ -204,7 +196,7 @@ export class GroupFunctionsRepository
          }
       }
 
-      return this.auth.setCustomUserClaims(authUser.uid, newClaims)
+      return admin.auth().setCustomUserClaims(authUser.uid, newClaims)
    }
 
    async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
