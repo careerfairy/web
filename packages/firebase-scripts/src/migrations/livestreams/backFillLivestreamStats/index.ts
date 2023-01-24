@@ -53,8 +53,8 @@ export async function run() {
 }
 
 const createStatsDictionary = (
-   users: DataWithRef<true, UserLivestreamData>[],
-   livestreamsDict: Record<string, DataWithRef<true, LivestreamEvent>>
+   users: UserLivestreamDataWithRef[],
+   livestreamsDict: Record<string, LivestreamWithRef>
 ): Record<string, LiveStreamStats> => {
    const statsDict: Record<
       string, // livestreamId
@@ -136,7 +136,7 @@ const createStatsDictionary = (
 
 const handleSaveLivestreamStatsInFirestore = async (
    stats: Record<string, LiveStreamStats>,
-   livestreamsDict: Record<string, LivestreamEvent>
+   livestreamsDict: Record<string, LivestreamWithRef>
 ) => {
    let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
 
@@ -154,7 +154,7 @@ const handleSaveLivestreamStatsInFirestore = async (
          writeProgressBar.increment() // Increment progress bar
 
          const livestreamRef = livestreamsDict[eventId]
-            ?._ref as unknown as FirebaseFirestore.DocumentReference // Get livestream ref from livestreamsDict
+            ._ref as unknown as FirebaseFirestore.DocumentReference // Get livestream ref from livestreamsDict
 
          const statsRef = livestreamRef.collection("stats").doc(stats.id) // Get stats ref from livestream ref
 
@@ -180,3 +180,6 @@ const createEmptyUniversityStats = (): LivestreamStatsMap => {
       numberOfPeopleReached: 0,
    }
 }
+
+type LivestreamWithRef = DataWithRef<true, LivestreamEvent>
+type UserLivestreamDataWithRef = DataWithRef<true, UserLivestreamData>
