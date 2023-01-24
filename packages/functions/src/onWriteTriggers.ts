@@ -6,9 +6,11 @@ import {
    logStart,
    defaultTriggerRunTimeConfig,
 } from "./lib/triggers/util"
+import config = require("./config")
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
@@ -32,6 +34,7 @@ export const syncLivestreams = functions
 
 export const syncUserLivestreamData = functions
    .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
    .firestore.document("livestreams/{livestreamId}/userLivestreamData/{userId}")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
@@ -61,6 +64,7 @@ export const syncUserLivestreamData = functions
 
 export const syncLivestreamStats = functions
    .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
    .firestore.document("livestreams/{livestreamId}/stats/livestreamStats") // Listens to a single document https://firebase.google.com/docs/functions/firestore-events#specific-documents
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
