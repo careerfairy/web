@@ -21,9 +21,11 @@ export interface LiveStreamStats extends Identifiable {
    /**
     * The overall stats of the event
     * */
-   generalStats: Stats
+   generalStats: LivestreamStatsMap
    universityStats: {
-      [universityCode: string]: Stats
+      // The key is the university code, and the value is the stats for that university.
+      // The numberOfPeopleReached will be zero because it is not relevant for the university stats
+      [universityCode: string]: LivestreamStatsMap
    }
 }
 
@@ -47,7 +49,7 @@ export const createLiveStreamStatsDoc = <T extends string>(
    }
 }
 
-export type Stats = {
+export type LivestreamStatsMap = {
    // Total number of views across all live stream details pages
    numberOfPeopleReached: number
    // Total number of registrations across all live streams
@@ -60,26 +62,20 @@ export type Stats = {
    numberOfApplicants: number
 }
 
-type GeneralStatsKey = keyof Pick<LiveStreamStats, "generalStats">
-
-type UniversityStatsKey = keyof Pick<LiveStreamStats, "universityStats">
-
-/**
- * A helper to build a typesafe property path to update based on the field and the universityCode for the firestore UPDATE operation
- * @param field The field to update
- * @param universityCode The university code to update
- * @returns The string path in dot notation to the field to update Example: universityStats.${universityCode}.numberOfRegistrations or generalStats.numberOfRegistrations
- * */
-export const getPropertyToUpdate = <
-   TField extends keyof Stats,
-   TUniversityCode extends string | undefined
->(
-   field: TField,
-   universityCode?: TUniversityCode
+export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
+   field: keyof LivestreamStatsMap,
+   universityCode?: TUniCode
 ):
-   | `${GeneralStatsKey}.${TField}`
-   | `${UniversityStatsKey}.${TUniversityCode}.${TField}` => {
-   return universityCode
-      ? `universityStats.${universityCode}.${field}`
-      : `generalStats.${field}`
+   | `${keyof Pick<
+        LiveStreamStats,
+        "universityStats"
+     >}.${TUniCode}.${keyof LivestreamStatsMap}`
+   | `${keyof Pick<
+        LiveStreamStats,
+        "generalStats"
+     >}.${keyof LivestreamStatsMap}` => {
+   if (universityCode) {
+      return `universityStats.${universityCode}.${field}` as const
+   }
+   return `generalStats.${field}` as const
 }

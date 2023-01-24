@@ -6,14 +6,24 @@ import {
    LivestreamEvent,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
-import type { OperationsToMake } from "./stats"
+import type { OperationsToMake } from "./stats/util"
 
 import { createCompatGenericConverter } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
-} from "@careerfairy/shared-lib/dist/livestreams/stats" // Not imported at runtime (only used for types)
+} from "@careerfairy/shared-lib/dist/livestreams/stats"
+import type { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import { isEmpty } from "lodash"
+import {
+   addOperations,
+   addOperationsToDecrementOldUniversityStats,
+   addOperationsToIncrementNewUniversityStats,
+} from "./stats/livestream"
+import DocumentSnapshot = firestore.DocumentSnapshot
+import type { FunctionsLogger } from "../util"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -33,6 +43,28 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    updateLiveStreamStats(
       livestreamId: string,
       operationsToMake: OperationsToMake
+   ): Promise<void>
+
+   syncLiveStreamStatsWithLivestream(
+      snapshotChange: Change<DocumentSnapshot>
+   ): Promise<void>
+
+   /*
+    * The `updateLiveStreamStats` function listens for changes in the `userLivestreamData` subcollection of the `livestreams` collection,
+    * and updates a `stats` subcollection document named `livestreamStats`.
+    *
+    * The function uses the `change.before.data()` and `change.after.data()`
+    * to get the old and new data of the modified document respectively. It uses `addOperations()` function to check which fields of the newData and
+    * oldData are different and updates the livestreamStatsToUpdate accordingly.
+    *
+    * The function also checks if the university code has been changed, if it has, the function decrements the old university data and increments the new university data.
+    * In the end, it checks if there are any updates to livestreamStats, if there are updates, it performs a Firestore transaction to update livestreamStats and logs a message to indicate the
+    * livestreamStats have been updated.
+    * */
+   addOperationsToLiveStreamStats(
+      change: Change<DocumentSnapshot>,
+      livestreamId: string,
+      logger: FunctionsLogger
    ): Promise<void>
 }
 
@@ -112,7 +144,7 @@ export class LivestreamFunctionsRepository
             const livestreamDoc = await transaction.get(livestreamRef)
 
             if (!livestreamDoc.exists) {
-               throw new Error("Livestream does not exist")
+               return // Livestream was deleted, no need to update the stats
             }
 
             const statsDoc = createLiveStreamStatsDoc(
@@ -125,5 +157,115 @@ export class LivestreamFunctionsRepository
          // We have to use an update method here because the set method does not support nested updates/operations
          transaction.update(statsRef, operationsToMake)
       })
+   }
+
+   syncLiveStreamStatsWithLivestream(
+      snapshotChange: Change<DocumentSnapshot>
+   ): Promise<void> {
+      const latestLivestreamDoc = snapshotChange.after
+
+      return this.firestore.runTransaction(async (transaction) => {
+         const statsRef = this.firestore
+            .collection("livestreams")
+            .doc(latestLivestreamDoc.id)
+            .collection("stats")
+            .doc("livestreamStats")
+            .withConverter(createCompatGenericConverter<LiveStreamStats>())
+
+         if (!latestLivestreamDoc.exists) {
+            // Livestream was deleted, delete the stats document
+            transaction.delete(statsRef)
+            return
+         }
+
+         const statsDoc = await transaction.get(statsRef)
+
+         const livestream = this.addIdToDoc<LivestreamEvent>(
+            latestLivestreamDoc as any
+         )
+
+         if (!statsDoc.exists) {
+            // Create the stats document
+            const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
+            transaction.set(statsRef, statsDoc)
+         } else {
+            const toUpdate: Pick<LiveStreamStats, "livestream"> = {
+               livestream: livestream,
+            }
+
+            transaction.update(statsRef, toUpdate)
+         }
+      })
+   }
+
+   async addOperationsToLiveStreamStats(
+      change: Change<DocumentSnapshot>,
+      livestreamId: string,
+      logger: FunctionsLogger
+   ): Promise<void> {
+      const oldUserLivestreamData = change.before.data() as UserLivestreamData
+      const newUserLivestreamData = change.after.data() as UserLivestreamData
+
+      const livestreamStatsDocOperationsToMake: OperationsToMake = {} // An empty object to store the update operations for the firestore UPDATE operation
+
+      // Add operations for the general stats
+      addOperations(
+         newUserLivestreamData,
+         oldUserLivestreamData,
+         livestreamStatsDocOperationsToMake
+      )
+
+      const newUniversityCode = newUserLivestreamData?.user?.university?.code
+      const oldUniversityCode = oldUserLivestreamData?.user?.university?.code
+
+      // Check if the university code has been changed
+      const universityChanged = newUniversityCode !== oldUniversityCode
+
+      if (universityChanged) {
+         if (oldUniversityCode) {
+            // Decrement all the truthy fields of the oldUserLivestreamData
+            addOperationsToDecrementOldUniversityStats(
+               oldUniversityCode,
+               oldUserLivestreamData,
+               livestreamStatsDocOperationsToMake
+            )
+         }
+
+         if (newUniversityCode) {
+            // Increment all the truthy fields of newUserLivestreamData like participated.date, registered.date, talentPool.date, etc...
+            addOperationsToIncrementNewUniversityStats(
+               newUniversityCode,
+               newUserLivestreamData,
+               livestreamStatsDocOperationsToMake
+            )
+         }
+      } else {
+         // If the university code has not been changed, then increment/decrement the fields that have changed for the user's university
+         addOperations(
+            newUserLivestreamData,
+            oldUserLivestreamData,
+            livestreamStatsDocOperationsToMake,
+            newUniversityCode
+         )
+      }
+
+      // Check if there are any updates to livestreamStats
+      if (isEmpty(livestreamStatsDocOperationsToMake)) {
+         logger.info("No changes to livestream stats", {
+            livestreamId,
+            liveStreamStatsToUpdate: livestreamStatsDocOperationsToMake,
+         })
+      } else {
+         // Perform a Firestore transaction to update livestreamStats
+         await this.updateLiveStreamStats(
+            livestreamId,
+            livestreamStatsDocOperationsToMake
+         )
+
+         logger.info("Updated livestream stats with the following operations", {
+            livestreamId,
+            livestreamStatsDocOperationsToMake,
+         })
+      }
    }
 }
