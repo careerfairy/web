@@ -55,14 +55,15 @@ export const sendDraftApprovalRequestEmail = functions.https.onCall(
             // senderEmail,
          } = data
 
-         let admins: GroupAdmin[]
+         const admins: GroupAdmin[] = []
 
          if (livestream.groupIds) {
-            admins = await Promise.all(
-               livestream.groupIds.map((groupId) =>
-                  groupRepo.getGroupAdmins(groupId)
-               )
-            )
+            for (const groupId of livestream.groupIds) {
+               const newAdmins = await groupRepo.getGroupAdmins(groupId)
+               if (newAdmins) {
+                  admins.push(...newAdmins)
+               }
+            }
          }
 
          const origin =
