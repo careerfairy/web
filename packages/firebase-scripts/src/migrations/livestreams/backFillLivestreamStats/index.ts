@@ -36,14 +36,6 @@ export async function run() {
       const stats = createStatsDictionary(userLivestreamData, livestreamsDict)
 
       await handleSaveLivestreamStatsInFirestore(stats, livestreamsDict)
-
-      Counter.log("All batches committed! :)")
-      /*
-       * Commits all enqueued writes and marks the BulkWriter instance as closed.
-       * After calling close(), calling any method will throw an error.
-       * Any retries scheduled as part of an onWriteError() handler will
-       * be run before the close() promise resolves.
-       * */
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -167,8 +159,7 @@ const handleSaveLivestreamStatsInFirestore = async (
    }
 
    writeProgressBar.stop()
-
-   Counter.log("Started committing all batches...")
+   Counter.log("All batches committed! :)")
 }
 
 const createEmptyUniversityStats = (): LivestreamStatsMap => {
