@@ -12,8 +12,9 @@ import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
-import { Change } from "firebase-functions/lib/common/change"
-import { DocumentSnapshot } from "firebase-functions/lib/providers/firestore"
+import type { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
