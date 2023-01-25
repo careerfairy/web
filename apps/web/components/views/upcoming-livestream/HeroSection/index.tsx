@@ -187,7 +187,6 @@ const HeroSection = ({
    streamLanguage,
    showScrollButton = false,
    showRecording = false,
-   maxDaysToShowRecording,
    recordingSid = null,
 }) => {
    const theme = useTheme()
@@ -274,7 +273,6 @@ const HeroSection = ({
                handleClosePlayer={handleCloseRecordingPlayer}
                stream={LivestreamPresenter.createFromDocument(stream)}
                showBigVideoPlayer={showBigVideoPlayer}
-               maxDaysToShowRecording={maxDaysToShowRecording}
                recordingSid={recordingSid}
             />
          </Box>
@@ -282,7 +280,6 @@ const HeroSection = ({
       [
          handleCloseRecordingPlayer,
          handleRecordingPlay,
-         maxDaysToShowRecording,
          recordingSid,
          showBigVideoPlayer,
          stream,
@@ -346,19 +343,19 @@ const HeroSection = ({
                      >
                         {stream.title}
                      </Typography>
-                     {renderTagsContainer && (
+                     {renderTagsContainer ? (
                         <Box sx={styles.tagsWrapper}>
-                           {stream.isFaceToFace && (
+                           {stream.isFaceToFace ? (
                               <InPersonEventBadge sx={styles.chip} white />
-                           )}
-                           {stream.maxRegistrants && (
+                           ) : null}
+                           {stream.maxRegistrants ? (
                               <LimitedRegistrationsBadge
                                  sx={styles.chip}
                                  white
                                  numberOfSpotsRemaining={numberOfSpotsRemaining}
                               />
-                           )}
-                           {streamLanguage && (
+                           ) : null}
+                           {streamLanguage ? (
                               <WhiteTagChip
                                  sx={styles.chip}
                                  icon={<LanguageIcon />}
@@ -366,7 +363,7 @@ const HeroSection = ({
                                  tooltipText={`This event is in ${streamLanguage.name}`}
                                  label={streamLanguage.code.toUpperCase()}
                               />
-                           )}
+                           ) : null}
                            {eventInterests.map((interest) => (
                               <WhiteTagChip
                                  key={interest.id}
@@ -376,7 +373,7 @@ const HeroSection = ({
                               />
                            ))}
                         </Box>
-                     )}
+                     ) : null}
                      {!!stream?.speakers?.length && (
                         <Hidden smDown>
                            <Box
@@ -388,17 +385,16 @@ const HeroSection = ({
                            </Box>
                         </Hidden>
                      )}
-                     {showRecording && !isMobile && renderHostedByInfo()}
+                     {showRecording && !isMobile ? renderHostedByInfo() : null}
                   </Grid>
                   <Grid item xs={12} md={showBigVideoPlayer ? 12 : 6}>
                      {showRecording
                         ? renderRecordingVideo()
                         : renderDefaultContent()}
                   </Grid>
-                  {showRecording &&
-                     isMobile &&
-                     !showBigVideoPlayer &&
-                     renderHostedByInfo()}
+                  {showRecording && isMobile && !showBigVideoPlayer
+                     ? renderHostedByInfo()
+                     : null}
                </Grid>
             </Container>
          </Box>

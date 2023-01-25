@@ -29,10 +29,7 @@ import ReferralSection from "../../components/views/upcoming-livestream/Referral
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import {
-   LivestreamPresenter,
-   MAX_DAYS_TO_SHOW_RECORDING,
-} from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 
@@ -47,6 +44,11 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const [stream, setStream] = useState(
       LivestreamPresenter.parseDocument(serverStream)
    )
+   const streamPresenter = useMemo(
+      () => LivestreamPresenter.createFromDocument(stream),
+      [stream]
+   )
+
    const { push, asPath, query, pathname, replace } = useRouter()
    const [currentGroup, setCurrentGroup] = useState(null)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
@@ -417,23 +419,16 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    /**
     * Show recording if user is registered, the event is in the past, the event was recorded and did not pass the { MAX_DAYS_TO_SHOW_RECORDING }
     */
-   const showRecording = useMemo(() => {
-      if (
-         registered &&
-         isPastEvent &&
-         !stream.denyRecordingAccess &&
-         recordingSid?.length > 0
-      ) {
-         const maxDateToShowRecording =
-            LivestreamPresenter.createFromDocument(
-               stream
-            ).recordingAccessTimeLeftMs()
-
-         return new Date() <= maxDateToShowRecording
-      }
-
-      return false
-   }, [isPastEvent, recordingSid?.length, registered, stream])
+   const showRecording = useMemo(
+      () =>
+         Boolean(
+            streamPresenter.isAbleToShowRecording(
+               authenticatedUser?.email,
+               recordingSid
+            )
+         ),
+      [authenticatedUser?.email, recordingSid, streamPresenter]
+   )
 
    return (
       <>
@@ -455,14 +450,13 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                showScrollButton={true}
                showRecording={showRecording}
                recordingSid={recordingSid}
-               maxDaysToShowRecording={MAX_DAYS_TO_SHOW_RECORDING}
             />
             <Navigation
                aboutRef={aboutRef}
                speakersRef={speakersRef}
                questionsRef={questionsRef}
             />
-            {(stream.summary || stream.reasonsToJoinLivestream) && (
+            {stream.summary || stream.reasonsToJoinLivestream ? (
                <AboutSection
                   summary={stream.summary}
                   reasonsToJoinLivestream={stream.reasonsToJoinLivestream}
@@ -473,7 +467,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                   big
                   overheadText={"ABOUT"}
                />
-            )}
+            ) : null}
             {!!stream?.speakers?.length && (
                <SpeakersSection
                   overheadText={"OUR SPEAKERS"}
@@ -529,12 +523,12 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                groups={joinGroupModalData?.groups}
             />
          </UpcomingLayout>
-         {mobile && !isRegistrationDisabled && !registered && (
+         {mobile && !isRegistrationDisabled && !registered ? (
             <FooterButton
                handleClick={handleFooterAttendButtonClick}
                buttonMessage={"Attend Event"}
             />
-         )}
+         ) : null}
       </>
    )
 }
@@ -543,30 +537,29 @@ export async function getServerSideProps({
    params: { livestreamId },
    query: { groupId },
 }) {
-   const promises = []
-   promises.push(
-      getServerSideStream(livestreamId),
-      livestreamRepo.getLivestreamRecordingToken(livestreamId)
-   )
+   const serverStream = await getServerSideStream(livestreamId)
 
-   const promisesResults = await Promise.allSettled(promises)
-   const [serverStream, streamRecordingToken] = promisesResults.map(
-      (result) => result.value
-   )
+   if (serverStream) {
+      const streamPresenter =
+         LivestreamPresenter.createFromDocument(serverStream)
+      let streamRecordingToken
 
-   if (!serverStream) {
+      if (streamPresenter.recordingAccessTimeLeft()) {
+         streamRecordingToken =
+            await livestreamRepo.getLivestreamRecordingToken(livestreamId)
+      }
+
+      return {
+         props: {
+            serverStream,
+            groupId: groupId || null,
+            recordingSid: streamRecordingToken?.sid || null,
+         }, // will be passed to the page component as props
+      }
+   } else {
       return {
          notFound: true,
       }
-   }
-
-   // TODO check if groupId is part of stream.groupIds
-   return {
-      props: {
-         serverStream,
-         groupId: groupId || null,
-         recordingSid: streamRecordingToken?.sid || null,
-      }, // will be passed to the page component as props
    }
 }
 
