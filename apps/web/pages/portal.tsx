@@ -49,6 +49,11 @@ const PortalPage = ({
             title={"CareerFairy | Portal"}
          />
          <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
+            {recordedEvents?.length > 0 && (
+               <RecordedEventsCarousel
+                  livestreams={mapFromServerSide(recordedEvents)}
+               />
+            )}
             <Container disableGutters>
                <WidgetsWrapper>
                   {recordedEvents?.length === 0 && (
