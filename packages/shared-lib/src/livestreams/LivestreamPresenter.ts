@@ -171,7 +171,7 @@ export class LivestreamPresenter extends BaseModel {
          this.isPast() &&
          this.isAbleToAccessRecording() &&
          this.isUserRegistered(userEmail) &&
-         recordingSid.length > 0 &&
+         recordingSid?.length > 0 &&
          new Date() <= this.recordingAccessTimeLeft()
       )
    }
