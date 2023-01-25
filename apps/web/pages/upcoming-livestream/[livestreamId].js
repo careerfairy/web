@@ -540,8 +540,8 @@ export async function getServerSideProps({
    const serverStream = await getServerSideStream(livestreamId)
 
    if (serverStream) {
-      const streamPresenter =
-         LivestreamPresenter.createFromDocument(serverStream)
+      const livestream = LivestreamPresenter.parseDocument(serverStream)
+      const streamPresenter = LivestreamPresenter.createFromDocument(livestream)
       let streamRecordingToken
 
       if (new Date() <= streamPresenter.recordingAccessTimeLeft()) {
