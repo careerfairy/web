@@ -1,20 +1,19 @@
 import { Box, Slide, Typography } from "@mui/material"
 import ReactPlayer from "react-player"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import DateUtil from "../../../../util/DateUtil"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
+import CountDown from "./CountDown"
 
 type Props = {
    stream: LivestreamPresenter
    handlePlay?: () => void
    handleClosePlayer?: () => void
    showBigVideoPlayer?: boolean
-   maxDaysToShowRecording?: number
    recordingSid?: string
 }
 
@@ -52,34 +51,9 @@ const RecordingPlayer = ({
    handlePlay,
    handleClosePlayer,
    showBigVideoPlayer,
-   maxDaysToShowRecording,
    recordingSid,
 }: Props) => {
-   const [countDown, setCountDown] = useState("")
    const isMobile = useIsMobile()
-
-   const saveTimeLeft = (maxDateToShowRecording: Date) => {
-      const timeLeft = DateUtil.calculateTimeLeft(maxDateToShowRecording)
-      setCountDown(
-         `${timeLeft.Days || 0}d ${timeLeft.Hours || 0}h ${
-            timeLeft.Minutes || 0
-         }min ${timeLeft.Seconds || 0}sec`
-      )
-   }
-
-   useEffect(() => {
-      const maxDateToShowRecording = stream.recordingAccessTimeLeftMs()
-
-      // This calculates the remaining time to access to the recording on the mount
-      saveTimeLeft(maxDateToShowRecording)
-
-      const interval = setInterval(() => {
-         // This calculates every second the remaining time to access to the recording
-         saveTimeLeft(maxDateToShowRecording)
-      }, 1000)
-
-      return () => clearTimeout(interval)
-   }, [maxDaysToShowRecording, stream])
 
    return (
       <Box>
@@ -108,16 +82,8 @@ const RecordingPlayer = ({
                      mt={1}
                      fontWeight={isMobile ? "bold" : "unset"}
                   >
-                     Only{" "}
-                     <Typography
-                        variant="inherit"
-                        display="inline"
-                        fontWeight="bold"
-                        color="primary"
-                     >
-                        {countDown}
-                     </Typography>{" "}
-                     left to rewatch the live stream!
+                     Only <CountDown stream={stream} /> left to rewatch the live
+                     stream!
                   </Typography>
                </Box>
             </Slide>

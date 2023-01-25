@@ -150,7 +150,7 @@ export class LivestreamPresenter extends BaseModel {
       )
    }
 
-   recordingAccessTimeLeftMs(): Date {
+   recordingAccessTimeLeft(): Date {
       const streamDate = this.start
 
       const maxDateToShowRecording = streamDate
@@ -159,6 +159,19 @@ export class LivestreamPresenter extends BaseModel {
       )
 
       return maxDateToShowRecording
+   }
+   isUserRegistered(userEmail: string): boolean {
+      return this.registeredUsers.includes(userEmail)
+   }
+
+   isAbleToShowRecording(userEmail: string, recordingSid: string): boolean {
+      return (
+         this.isPast() &&
+         this.isAbleToAccessRecording() &&
+         this.isUserRegistered(userEmail) &&
+         recordingSid.length > 0 &&
+         new Date() <= this.recordingAccessTimeLeft()
+      )
    }
 
    /**
