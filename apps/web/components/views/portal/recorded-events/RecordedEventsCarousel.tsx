@@ -267,10 +267,7 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
 
          {videoUrl ? (
             <HighlightVideoDialog
-               videoUrl={
-                  "https://agora-cf-cloud-recordings.s3.eu-central-1.amazonaws.com/livestreams/hZ85y9XGpVQdpNhfB1h3/cb28a5142243be1517e98a846e5ed321_hZ85y9XGpVQdpNhfB1h3_0.mp4"
-               }
-               // videoUrl={videoUrl}
+               videoUrl={videoUrl}
                handleClose={handleCloseVideoDialog}
                handlePauseVideo={pauseCounting}
                handlePlayVideo={startCounting}
