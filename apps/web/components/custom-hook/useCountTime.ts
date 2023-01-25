@@ -46,6 +46,7 @@ const useCountTime = (
    }, [])
 
    const resetMinutes = useCallback(() => {
+      setCounting(false)
       setCountedSeconds(0)
       setTimeWatched(0)
    }, [])
