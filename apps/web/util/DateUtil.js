@@ -219,7 +219,7 @@ export default class DateUtil {
    }
 
    static calculateTimeLeft(time) {
-      const difference = time - new Date()
+      const difference = Math.abs(time - new Date())
       let timeLeft = {}
 
       if (difference > 0) {
@@ -232,5 +232,12 @@ export default class DateUtil {
       }
 
       return timeLeft
+   }
+
+   static addDaysToDate(date, numberOfDays) {
+      const result = date
+      result.setDate(date.getDate() + numberOfDays)
+
+      return result
    }
 }
