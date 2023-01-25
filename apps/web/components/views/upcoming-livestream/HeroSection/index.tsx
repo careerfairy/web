@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { alpha, darken, useTheme } from "@mui/material/styles"
 import {
    Avatar,
@@ -29,6 +29,9 @@ import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrow
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import RecordingPlayer from "../RecordingPlayer"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import useCountTime from "../../../custom-hook/useCountTime"
 
 const styles = {
    root: (theme, smallVerticalScreen) => ({
@@ -192,13 +195,85 @@ const HeroSection = ({
    const theme = useTheme()
    const isMobile = useIsMobile()
    const smallVerticalScreen = useMediaQuery("(max-height:500px)")
+   const { userData } = useAuth()
+   const {
+      timeWatched: minutesWatched,
+      startCounting,
+      pauseCounting,
+   } = useCountTime()
+
    const [showBigVideoPlayer, setShowBigVideoPlayer] = useState(false)
+
+   /**
+    * Each minute watched the field minutesWatched will be increased and we need do increment it on our DB
+    */
+   useEffect(() => {
+      if (minutesWatched > 0) {
+         debugger
+         void livestreamRepo.updateRecordingStats({
+            livestreamId: stream.id,
+            minutesWatched: 1,
+            onlyIncrementMinutes: true,
+         })
+      }
+   }, [minutesWatched])
 
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
          stream.maxRegistrants ||
          streamLanguage ||
          eventInterests?.length
+   )
+
+   // handle play recording click
+   const handleRecordingPlay = useCallback(() => {
+      startCounting()
+
+      if (!isMobile) {
+         // update to a bigger screen on desktop
+         setShowBigVideoPlayer(true)
+      }
+   }, [isMobile, startCounting])
+
+   // handle preview play icon click
+   const handlePreviewPlay = useCallback(() => {
+      // update recording stats
+      void livestreamRepo.updateRecordingStats({
+         livestreamId: stream.id,
+         userId: userData.userEmail,
+      })
+
+      // play recording
+      handleRecordingPlay()
+   }, [handleRecordingPlay, stream.id, userData?.userEmail])
+
+   const handleCloseRecordingPlayer = useCallback(() => {
+      setShowBigVideoPlayer(false)
+   }, [])
+
+   const renderRecordingVideo = useCallback(
+      () => (
+         <Box pt={1}>
+            <RecordingPlayer
+               handlePlay={handleRecordingPlay}
+               handlePause={pauseCounting}
+               handleClosePlayer={handleCloseRecordingPlayer}
+               stream={LivestreamPresenter.createFromDocument(stream)}
+               showBigVideoPlayer={showBigVideoPlayer}
+               recordingSid={recordingSid}
+               handlePreviewPlay={handlePreviewPlay}
+            />
+         </Box>
+      ),
+      [
+         handleCloseRecordingPlayer,
+         handlePreviewPlay,
+         handleRecordingPlay,
+         pauseCounting,
+         recordingSid,
+         showBigVideoPlayer,
+         stream,
+      ]
    )
 
    const renderDefaultContent = useCallback(
@@ -250,39 +325,6 @@ const HeroSection = ({
          registered,
          stream,
          streamAboutToStart,
-      ]
-   )
-
-   const handleRecordingPlay = useCallback(() => {
-      // clicked on the preview mode
-      if (!isMobile) {
-         // update to a bigger screen on desktop
-         setShowBigVideoPlayer(true)
-      }
-   }, [isMobile])
-
-   const handleCloseRecordingPlayer = useCallback(() => {
-      setShowBigVideoPlayer(false)
-   }, [])
-
-   const renderRecordingVideo = useCallback(
-      () => (
-         <Box pt={1}>
-            <RecordingPlayer
-               handlePlay={handleRecordingPlay}
-               handleClosePlayer={handleCloseRecordingPlayer}
-               stream={LivestreamPresenter.createFromDocument(stream)}
-               showBigVideoPlayer={showBigVideoPlayer}
-               recordingSid={recordingSid}
-            />
-         </Box>
-      ),
-      [
-         handleCloseRecordingPlayer,
-         handleRecordingPlay,
-         recordingSid,
-         showBigVideoPlayer,
-         stream,
       ]
    )
 
