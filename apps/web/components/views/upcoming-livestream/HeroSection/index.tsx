@@ -33,10 +33,20 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
 
+const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
+   if (showBigVideoPlayer) {
+      if (smallVerticalScreen) {
+         return "800px !important"
+      }
+   }
+   if (smallVerticalScreen) {
+      return "190vh !important"
+   }
+   return "auto"
+}
 const styles = {
-   root: (theme, smallVerticalScreen) => ({
-      minHeight: smallVerticalScreen ? "190vh !important" : "auto",
-      height: "auto",
+   root: (theme, smallVerticalScreen, showBigVideoPlayer) => ({
+      minHeight: getMinHeight(smallVerticalScreen, showBigVideoPlayer),
       position: "relative",
       backgroundSize: "cover",
       zIndex: 2,
@@ -194,7 +204,7 @@ const HeroSection = ({
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
-   const smallVerticalScreen = useMediaQuery("(max-height:500px)")
+   const smallVerticalScreen = useMediaQuery("(max-height:700px)")
    const { userData } = useAuth()
    const {
       timeWatched: minutesWatched,
@@ -209,7 +219,6 @@ const HeroSection = ({
     */
    useEffect(() => {
       if (minutesWatched > 0) {
-         debugger
          void livestreamRepo.updateRecordingStats({
             livestreamId: stream.id,
             minutesWatched: 1,
@@ -358,7 +367,7 @@ const HeroSection = ({
    )
 
    return (
-      <Box sx={styles.root(theme, smallVerticalScreen)}>
+      <Box sx={styles.root(theme, smallVerticalScreen, showBigVideoPlayer)}>
          <Image
             src={backgroundImage}
             alt={stream.title}
