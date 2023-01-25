@@ -47,7 +47,7 @@
       "dompurify": "^2.4.1",
       "file-loader": "^6.2.0",
       "filefy": "^0.1.10",
-      "firebase": "^9.9.0",
+      "firebase": "^9.15.0",
       "formik": "^2.1.2",
       "global": "^4.4.0",
       "graphql": "^16.6.0",
