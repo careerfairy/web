@@ -99,7 +99,6 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
     */
    useEffect(() => {
       if (videoUrl && minutesWatched > 0) {
-         debugger
          void livestreamRepo.updateRecordingStats({
             livestreamId: livestreams[activeStep].id,
             minutesWatched: 1,

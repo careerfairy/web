@@ -93,7 +93,7 @@ const RecordingPlayer = ({
             </Slide>
          )}
 
-         <Box mt={4}>
+         <Box mt={1}>
             <ReactPlayer
                className="react-player"
                playIcon={<PlayIcon sx={styles.icon} />}
@@ -102,7 +102,7 @@ const RecordingPlayer = ({
                   showBigVideoPlayer
                      ? isMobile
                         ? "400px"
-                        : "700px"
+                        : "600px"
                      : isMobile
                      ? "200px"
                      : "400px"
