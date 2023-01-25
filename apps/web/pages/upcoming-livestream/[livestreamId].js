@@ -544,7 +544,7 @@ export async function getServerSideProps({
          LivestreamPresenter.createFromDocument(serverStream)
       let streamRecordingToken
 
-      if (streamPresenter.recordingAccessTimeLeft()) {
+      if (new Date() <= streamPresenter.recordingAccessTimeLeft()) {
          streamRecordingToken =
             await livestreamRepo.getLivestreamRecordingToken(livestreamId)
       }
