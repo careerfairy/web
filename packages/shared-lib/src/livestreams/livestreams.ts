@@ -260,6 +260,12 @@ export interface LivestreamJobApplicationDetails extends JobIdentifier {
    job: Partial<Job>
 }
 
+export interface LivestreamRecordingDetails extends DocumentData {
+   minutesWatched?: number
+   viewers: string[]
+   views: number
+}
+
 export type LivestreamGroupQuestionsMap = Record<
    Group["id"],
    LivestreamGroupQuestions

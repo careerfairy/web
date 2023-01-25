@@ -11,6 +11,7 @@ import {
    LivestreamEventPublicData,
    LivestreamEventSerialized,
    LivestreamJobApplicationDetails,
+   LivestreamRecordingDetails,
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    RecordingToken,
@@ -20,6 +21,13 @@ import {
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import { chunkArray } from "../utils"
+
+type UpdateRecordingStatsProps = {
+   livestreamId: string
+   minutesWatched?: number
+   userId?: string
+   onlyIncrementMinutes?: boolean
+}
 
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
@@ -167,6 +175,18 @@ export interface ILivestreamRepository {
    getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]>
 
    getLivestreamRecordingToken(livestreamId: string): Promise<RecordingToken>
+
+   getRecordedEventsByUserId(
+      userId: string,
+      dateLimit: Date
+   ): Promise<LivestreamEvent[]>
+
+   updateRecordingStats({
+      livestreamId,
+      minutesWatched,
+      userId,
+      onlyIncrementMinutes,
+   }: UpdateRecordingStatsProps): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -673,6 +693,49 @@ export class FirebaseLivestreamRepository
          return snap.data() as RecordingToken
       }
       return null
+   }
+
+   async getRecordedEventsByUserId(
+      userId,
+      dateLimit
+   ): Promise<LivestreamEvent[]> {
+      const snap = await this.firestore
+         .collection("livestreams")
+         .where("test", "==", false)
+         .where("registeredUsers", "array-contains", userId)
+         .where("start", ">=", dateLimit)
+         .where("hasEnded", "==", true)
+         .orderBy("start", "asc")
+         .get()
+
+      return mapFirestoreDocuments<LivestreamEvent>(snap)
+   }
+
+   async updateRecordingStats({
+      livestreamId,
+      minutesWatched = 0,
+      userId,
+      onlyIncrementMinutes = false,
+   }: UpdateRecordingStatsProps): Promise<void> {
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("recordingStats")
+         .doc("stats")
+
+      const details: LivestreamRecordingDetails = {
+         minutesWatched: this.fieldValue.increment(minutesWatched) as any,
+         viewers: this.fieldValue.arrayUnion(userId) as any,
+         views: this.fieldValue.increment(1) as any,
+      }
+
+      // when we want only to increment the minutes watch of a specific recording
+      if (onlyIncrementMinutes) {
+         delete details.views
+         delete details.viewers
+      }
+
+      return docRef.set(details, { merge: true })
    }
 }
 

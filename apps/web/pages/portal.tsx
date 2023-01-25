@@ -7,14 +7,19 @@ import ComingUpNextEvents from "../components/views/portal/events-preview/Coming
 import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents"
 import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
-import { InferGetServerSidePropsType } from "next"
+import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import SEO from "../components/util/SEO"
 import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
 import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import nookies from "nookies"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import RecordedEventsCarousel from "../components/views/portal/recorded-events/RecordedEventsCarousel"
+import DateUtil from "../util/DateUtil"
+import { parseJwtServerSide } from "../util/serverUtil"
 import { mapFromServerSide } from "util/serverUtil"
 
 const PortalPage = ({
@@ -22,6 +27,7 @@ const PortalPage = ({
    comingUpNextEvents,
    showHighlights,
    pastEvents,
+   recordedEvents,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const hasInterests = Boolean(
@@ -45,10 +51,12 @@ const PortalPage = ({
          <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
             <Container disableGutters>
                <WidgetsWrapper>
-                  <HighlightsCarousel
-                     showHighlights={showHighlights}
-                     serverSideHighlights={highlights}
-                  />
+                  {recordedEvents?.length === 0 && (
+                     <HighlightsCarousel
+                        showHighlights={showHighlights}
+                        serverSideHighlights={highlights}
+                     />
+                  )}
                   {hasInterests ? <RecommendedEvents limit={10} /> : null}
                   <ComingUpNextEvents
                      serverSideEvents={comingUpNext}
@@ -71,18 +79,41 @@ const PortalPage = ({
    )
 }
 
-export const getServerSideProps = async () => {
-   const [showHighlights, highlights, comingUpNextEvents, pastEvents] =
-      await Promise.all([
-         highlightRepo.shouldShowHighlightsCarousel(),
-         highlightRepo.getHighlights(5),
-         livestreamRepo.getUpcomingEvents(20),
-         livestreamRepo.getPastEventsFrom({
-            fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
-            limit: 6,
-         }),
-      ])
-   // Parse
+export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
+   const cookies = nookies.get(ctx)
+   const token = parseJwtServerSide(cookies.token)
+   const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
+
+   const promises = []
+   promises.push(
+      highlightRepo.shouldShowHighlightsCarousel(),
+      highlightRepo.getHighlights(5),
+      livestreamRepo.getUpcomingEvents(20),
+      livestreamRepo.getPastEventsFrom({
+         fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
+         limit: 6,
+      })
+   )
+
+   // only adds recording request if token as email
+   if (token?.email) {
+      promises.push(
+         livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days)
+      )
+   }
+
+   const [
+      showHighlights,
+      highlights,
+      comingUpNextEvents,
+      pastEvents,
+      recordedEvents,
+   ] = await Promise.all(promises)
+
+   const recordedEventsToShare = recordedEvents?.filter(
+      (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
+   )
+
    return {
       props: {
          showHighlights,
@@ -95,6 +126,9 @@ export const getServerSideProps = async () => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
+         recordedEvents:
+            recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
+            [],
       },
    }
 }
