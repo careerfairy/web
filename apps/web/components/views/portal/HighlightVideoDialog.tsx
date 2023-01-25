@@ -30,6 +30,8 @@ const styles = {
 const HighlightVideoDialog = ({
    videoUrl,
    handleClose,
+   handlePlayVideo,
+   handlePauseVideo,
 }: HighlightVideoDialogProps) => {
    const [video, state, controls] = useVideo(
       <Box
@@ -41,6 +43,9 @@ const HighlightVideoDialog = ({
          component="video"
          controls
          src={videoUrl}
+         onPlay={handlePlayVideo}
+         onPause={handlePauseVideo}
+         controlsList="nodownload"
       />
    )
    const onClose = () => {
@@ -78,6 +83,8 @@ const HighlightVideoDialog = ({
 interface HighlightVideoDialogProps {
    videoUrl?: string
    handleClose: () => void
+   handlePlayVideo?: () => void
+   handlePauseVideo?: () => void
 }
 
 export default HighlightVideoDialog

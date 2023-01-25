@@ -12,6 +12,8 @@ import CountDown from "./CountDown"
 type Props = {
    stream: LivestreamPresenter
    handlePlay?: () => void
+   handlePause?: () => void
+   handlePreviewPlay?: () => void
    handleClosePlayer?: () => void
    showBigVideoPlayer?: boolean
    recordingSid?: string
@@ -50,6 +52,8 @@ const RecordingPlayer = ({
    stream,
    handlePlay,
    handleClosePlayer,
+   handlePreviewPlay,
+   handlePause,
    showBigVideoPlayer,
    recordingSid,
 }: Props) => {
@@ -106,10 +110,11 @@ const RecordingPlayer = ({
                controls={true}
                url={downloadLinkWithDate(stream.start, stream.id, recordingSid)}
                onPlay={handlePlay}
+               onPause={handlePause}
                playing={true}
                config={{ file: { attributes: { controlsList: "nodownload" } } }}
                light={stream.backgroundImageUrl}
-               onClickPreview={handlePlay}
+               onClickPreview={handlePreviewPlay}
             />
          </Box>
       </Box>
