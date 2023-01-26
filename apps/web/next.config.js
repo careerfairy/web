@@ -191,6 +191,9 @@ const moduleExports = {
          },
       ]
    },
+   experimental: {
+      externalDir: true,
+   },
    images: {
       domains: [
          "firebasestorage.googleapis.com",

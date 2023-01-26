@@ -16,7 +16,10 @@
       "resolveJsonModule": true,
       "isolatedModules": true,
       "jsx": "preserve",
-      "downlevelIteration": true
+      "downlevelIteration": true,
+      "paths": {
+         "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"]
+      }
    },
    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
    "exclude": ["node_modules"]
