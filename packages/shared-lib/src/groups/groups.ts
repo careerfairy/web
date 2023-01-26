@@ -26,7 +26,9 @@ export interface Group extends Identifiable {
    inActive?: boolean
    bannerImageUrl?: string
    atsAdminPageFlag?: boolean
-
+   companyCountryCode?: string
+   companyIndustryCode?: string
+   companySize?: string
    /*
     * Deprecated
     * */

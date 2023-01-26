@@ -272,6 +272,10 @@ export class GroupFunctionsRepository
          logoUrl: group.logoUrl || "",
          universityName: group.universityName || "",
          universityCode: group.universityCode || "",
+         atsAdminPageFlag: group.atsAdminPageFlag || false,
+         companyCountryCode: group.companyCountryCode || "",
+         companyIndustryCode: group.companyIndustryCode || "",
+         companySize: group.companySize || "",
          test: false,
       }
 

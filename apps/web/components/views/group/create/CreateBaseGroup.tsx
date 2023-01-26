@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import PublishIcon from "@mui/icons-material/Publish"
 import { Form as UiForm, Formik } from "formik"
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer"
@@ -25,6 +25,7 @@ import VirtualizedAutocomplete from "../../common/VirtualizedAutocomplete"
 import Stack from "@mui/material/Stack"
 import { BaseGroupInfo } from "../../../../pages/group/create"
 import Checkbox from "@mui/material/Checkbox"
+import CompanyMetadata from "./CompanyMetadata"
 
 const placeholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -83,6 +84,19 @@ interface CreateGroupProps {
    handleSkipNext: () => void
 }
 
+const initialValues = {
+   logoUrl: "",
+   logoFileObj: null,
+   universityName: "",
+   description: "",
+   university: null,
+   isUniversity: false,
+   companySize: "",
+   companyIndustry: null,
+   companyCountry: null,
+   isATSEnabled: false,
+}
+
 const CreateBaseGroup = ({
    handleNext,
    setBaseGroupInfo,
@@ -118,39 +132,41 @@ const CreateBaseGroup = ({
       })()
    }, [])
 
+   const handleSubmit = useCallback(
+      (values, { setSubmitting }) => {
+         let careerCenter: BaseGroupInfo = {
+            logoUrl: values.logoUrl,
+            logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
+            description: values.description,
+            test: false,
+            universityName: values.universityName,
+            isUniversity: values.isUniversity,
+            university: values.university,
+            companySize: values.companySize,
+            companyIndustry: values.companyIndustry,
+            companyCountry: values.companyCountry,
+            isATSEnabled: values.isATSEnabled,
+         }
+         setBaseGroupInfo(careerCenter)
+         setSubmitting(false)
+         if (values.isUniversity) {
+            handleNext()
+         } else {
+            handleSkipNext() // skip the field and level of study questions step
+         }
+      },
+      [baseGroupInfo?.logoFileObj, handleNext, handleSkipNext, setBaseGroupInfo]
+   )
+
    return (
       <Container maxWidth={"sm"} className={classes.root}>
          <Typography align="center" className={classes.title} variant="h1">
             Create a Career Group
          </Typography>
          <Formik
-            initialValues={{
-               logoUrl: baseGroupInfo.logoUrl || "",
-               logoFileObj: baseGroupInfo.logoFileObj || null,
-               universityName: baseGroupInfo.universityName || "",
-               description: baseGroupInfo.description || "",
-               university: baseGroupInfo.university || null,
-               isUniversity: baseGroupInfo.isUniversity || false,
-            }}
+            initialValues={initialValues}
             validationSchema={schema}
-            onSubmit={(values, { setSubmitting }) => {
-               let careerCenter: BaseGroupInfo = {
-                  logoUrl: values.logoUrl,
-                  logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
-                  description: values.description,
-                  test: false,
-                  universityName: values.universityName,
-                  isUniversity: values.isUniversity,
-                  university: values.university,
-               }
-               setBaseGroupInfo(careerCenter)
-               setSubmitting(false)
-               if (values.isUniversity) {
-                  handleNext()
-               } else {
-                  handleSkipNext() // skip the field and level of study questions step
-               }
-            }}
+            onSubmit={handleSubmit}
          >
             {({
                values,
@@ -212,9 +228,9 @@ const CreateBaseGroup = ({
                            </Button>
                         </FilePickerContainer>
                         <FormHelperText>
-                           {touched.logoFileObj &&
-                              errors.logoFileObj &&
-                              errors.logoFileObj}
+                           {touched.logoFileObj && errors.logoFileObj
+                              ? errors.logoFileObj
+                              : null}
                         </FormHelperText>
                      </FormControl>
                      <TextField
@@ -228,7 +244,7 @@ const CreateBaseGroup = ({
                         onBlur={handleBlur}
                         disabled={isSubmitting}
                         helperText={
-                           touched.universityName && errors.universityName
+                           touched.universityName ? errors.universityName : null
                         }
                         label="Group Name"
                         name="universityName"
@@ -244,12 +260,40 @@ const CreateBaseGroup = ({
                         inputProps={{ maxLength: 60 }}
                         placeholder="Please describe the purpose of your group"
                         onBlur={handleBlur}
-                        helperText={touched.description && errors.description}
+                        helperText={
+                           touched.description ? errors.description : null
+                        }
                         disabled={isSubmitting}
                         name="description"
                         fullWidth
                      />
+                     <CompanyMetadata
+                        handleChange={handleChange}
+                        values={values}
+                        errors={errors}
+                        handleBlur={handleBlur}
+                        touched={touched}
+                        isSubmitting={isSubmitting}
+                     />
+
                      <FormControlLabel
+                        control={
+                           <Checkbox
+                              value={values.isATSEnabled}
+                              checked={values.isATSEnabled}
+                              onChange={(event) => {
+                                 setFieldValue(
+                                    "isATSEnabled",
+                                    event.target.checked
+                                 )
+                              }}
+                           />
+                        }
+                        label="ATS integration enabled"
+                     />
+
+                     <FormControlLabel
+                        style={{ marginTop: 0 }}
                         control={
                            <Checkbox
                               value={values.isUniversity}
@@ -294,7 +338,9 @@ const CreateBaseGroup = ({
                                     touched.university && errors.university
                                  )}
                                  helperText={
-                                    touched.university && errors.university
+                                    touched.university
+                                       ? errors.university
+                                       : null
                                  }
                               />
                            )}
