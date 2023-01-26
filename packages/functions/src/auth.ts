@@ -1,6 +1,5 @@
 import functions = require("firebase-functions")
 
-import config = require("./config")
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
@@ -15,6 +14,7 @@ import {
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import config from "./config"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {

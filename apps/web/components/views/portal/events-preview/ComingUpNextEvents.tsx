@@ -8,6 +8,7 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { fromDate } from "data/firebase/FirebaseInstance"
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedIn } = useAuth()
@@ -16,7 +17,9 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    } = useRouter()
 
    const [localEvents, setLocalEvents] = useState<LivestreamEvent[]>(
-      serverSideEvents?.map(LivestreamPresenter.parseDocument) || []
+      serverSideEvents?.map((e) =>
+         LivestreamPresenter.parseDocument(e as any, fromDate)
+      ) || []
    )
    const [eventFromQuery, setEventFromQuery] = useState(null)
 

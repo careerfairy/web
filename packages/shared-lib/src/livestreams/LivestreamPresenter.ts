@@ -14,13 +14,15 @@ import {
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
-import {
-   dateFromFirebaseTimestamp,
-   dateToFirebaseTimestamp,
-} from "../utils/firebaseSerializerMethods"
 import { AdminGroupsClaim } from "../users"
+import {
+   fromDateConverter,
+   fromDateFirestoreFn,
+   toDate,
+} from "../firebaseTypes"
 
 export const MAX_DAYS_TO_SHOW_RECORDING = 5
+
 /**
  * Livestream class
  *
@@ -184,7 +186,7 @@ export class LivestreamPresenter extends BaseModel {
       let start = this.start
       if (this.parentLivestream) {
          // breakout room support
-         start = dateFromFirebaseTimestamp(this["parentLivestream"].start)
+         start = toDate(this["parentLivestream"].start)
       }
       return Math.floor((Date.now() - start?.getTime()) / 1000 / 60)
    }
@@ -201,9 +203,8 @@ export class LivestreamPresenter extends BaseModel {
          livestream.participatingStudents ?? [],
 
          livestream.companyLogoUrl || "",
-         dateFromFirebaseTimestamp(livestream.created),
-         dateFromFirebaseTimestamp(livestream.start) ||
-            new Date(livestream.startDate),
+         toDate(livestream.created),
+         toDate(livestream.start) || new Date(livestream.startDate),
          livestream.currentSpeakerId || "",
          livestream.handRaiseActive ?? false,
          livestream.withResume ?? false,
@@ -225,7 +226,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.targetCategories ?? [],
          livestream.mode ?? "default",
          livestream.screenSharerId ?? "",
-         dateFromFirebaseTimestamp(livestream.lastUpdated),
+         toDate(livestream.lastUpdated),
          livestream.questionsDisabled ?? false,
          livestream.externalEventLink ?? "",
          livestream.timezone ?? "",
@@ -326,13 +327,16 @@ export class LivestreamPresenter extends BaseModel {
       ).serializeToPlainObject()
    }
 
-   static parseDocument(livestream: LivestreamPresenter) {
+   static parseDocument(
+      livestream: LivestreamPresenter,
+      fromDate: fromDateFirestoreFn
+   ) {
       return LivestreamPresenter.createFromPlainObject(
          livestream
-      ).convertToDocument()
+      ).convertToDocument(fromDate)
    }
 
-   convertToDocument(): LivestreamEvent {
+   convertToDocument(fromDate: fromDateFirestoreFn): LivestreamEvent {
       return {
          id: this.id,
          title: this.title,
@@ -343,8 +347,8 @@ export class LivestreamPresenter extends BaseModel {
          participants: this.participants,
          participatingStudents: this.participatingStudents,
          companyLogoUrl: this.companyLogoUrl,
-         created: dateToFirebaseTimestamp(this.created),
-         start: dateToFirebaseTimestamp(this.start),
+         created: fromDateConverter(this.created, fromDate),
+         start: fromDateConverter(this.start, fromDate),
          currentSpeakerId: this.currentSpeakerId,
          handRaiseActive: this.handRaiseActive,
          withResume: this.withResume,
@@ -368,7 +372,7 @@ export class LivestreamPresenter extends BaseModel {
          targetCategories: this.targetCategories,
          mode: this.mode,
          screenSharerId: this.screenSharerId,
-         lastUpdated: dateToFirebaseTimestamp(this.lastUpdated),
+         lastUpdated: fromDateConverter(this.lastUpdated, fromDate),
          questionsDisabled: this.questionsDisabled,
          externalEventLink: this.externalEventLink,
          timezone: this.timezone,

@@ -5,6 +5,7 @@ import "firebase/compat/storage"
 import "firebase/compat/functions"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import { shouldUseEmulators } from "../../util/CommonUtil"
+import { fromDateFirestoreFn } from "@careerfairy/shared-lib/dist/firebaseTypes"
 
 export const firebaseConfig = {
    apiKey: process.env.REACT_APP_FIREBASE_API_KEY,
@@ -74,5 +75,6 @@ export const FunctionsInstance = firebaseApp.functions()
 
 export const FieldValue = firebase.firestore.FieldValue
 export const Timestamp = firebase.firestore.Timestamp
+export const fromDate: fromDateFirestoreFn = Timestamp.fromDate
 
 export default firebaseApp

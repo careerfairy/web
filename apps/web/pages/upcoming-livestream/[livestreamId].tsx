@@ -33,6 +33,12 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/Li
 import FooterButton from "../../components/views/common/FooterButton"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import useTrackDetailPageView from "../../components/custom-hook/useTrackDetailPageView"
+import {
+   LivestreamEvent,
+   RecordingToken,
+} from "@careerfairy/shared-lib/dist/livestreams"
+import { omit } from "lodash"
+import { fromDate } from "data/firebase/FirebaseInstance"
 
 const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
@@ -45,7 +51,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
 
    const [stream, setStream] = useState(
-      LivestreamPresenter.parseDocument(serverStream)
+      LivestreamPresenter.parseDocument(serverStream, fromDate)
    )
    const streamPresenter = useMemo(
       () => LivestreamPresenter.createFromDocument(stream),
@@ -473,6 +479,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
             ) : null}
             {!!stream?.speakers?.length && (
                <SpeakersSection
+                  // @ts-ignore
                   overheadText={"OUR SPEAKERS"}
                   sectionRef={speakersRef}
                   backgroundColor={theme.palette.common.white}
@@ -483,6 +490,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
             )}
 
             <QuestionsSection
+               // @ts-ignore
                livestreamId={stream.id}
                title={
                   isPastEvent
@@ -507,12 +515,16 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
 
             {!stream.hasNoTalentPool && (
                <TalentPoolSection
+                  // @ts-ignore
                   handleOpenJoinModal={handleOpenJoinModal}
                   registered={registered}
                   stream={stream}
                />
             )}
-            <ReferralSection event={stream} />
+            <ReferralSection
+               // @ts-ignore
+               event={stream}
+            />
             <ContactSection
                backgroundColor={theme.palette.common.white}
                subtitle={"Any problem or question ? We want to hear from you"}
@@ -543,9 +555,9 @@ export async function getServerSideProps({
    const serverStream = await getServerSideStream(livestreamId)
 
    if (serverStream) {
-      const livestream = LivestreamPresenter.parseDocument(serverStream)
-      const streamPresenter = LivestreamPresenter.createFromDocument(livestream)
-      let streamRecordingToken
+      const streamPresenter =
+         LivestreamPresenter.createFromDocument(serverStream)
+      let streamRecordingToken: RecordingToken
 
       if (new Date() <= streamPresenter.recordingAccessTimeLeft()) {
          streamRecordingToken =
@@ -554,7 +566,7 @@ export async function getServerSideProps({
 
       return {
          props: {
-            serverStream,
+            serverStream: serializeLivestream(serverStream),
             groupId: groupId || null,
             recordingSid: streamRecordingToken?.sid || null,
          }, // will be passed to the page component as props
@@ -564,6 +576,19 @@ export async function getServerSideProps({
          notFound: true,
       }
    }
+}
+
+const serializeLivestream = (stream: LivestreamEvent): object => {
+   const serverSideStream = LivestreamPresenter.serializeDocument(stream)
+
+   return omit(serverSideStream, [
+      "registeredUsers",
+      "talentPool",
+      "participatingStudents",
+      "participants",
+      "liveSpeakers",
+      "author",
+   ])
 }
 
 export default UpcomingLivestreamPage
