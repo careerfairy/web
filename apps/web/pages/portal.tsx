@@ -14,8 +14,8 @@ import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants
 import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 const PortalPage = ({
    highlights,
