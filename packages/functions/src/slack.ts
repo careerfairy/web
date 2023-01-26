@@ -1,5 +1,5 @@
-const functions = require("firebase-functions")
-const config = require("./config")
+import config from "./config"
+import * as functions from "firebase-functions"
 
 /**
  * Handle Slack Buttons interactions
@@ -7,14 +7,21 @@ const config = require("./config")
  *
  * Only accept POST requests
  */
-exports.slackHandleInteractions = functions
+export const slackHandleInteractions = functions
    .region(config.region)
    .https.onRequest(async (req, res) => {
       if (req.method !== "POST") {
-         return res.status(401).end()
+         res.status(401).end()
+         return
       }
 
       // We just need to send a 200 response for now
       // Our current buttons only open an url, they don't need a response
       res.status(200).end()
+   })
+
+export const dummyHttp = functions
+   .region(config.region)
+   .https.onRequest(async (req, res) => {
+      res.send("hello!")
    })

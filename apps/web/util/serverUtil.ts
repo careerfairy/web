@@ -1,9 +1,9 @@
 import { store } from "../pages/_app"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { omit } from "lodash"
 
-export const getServerSideStream = async (livestreamId) => {
+export const getServerSideStream = async (
+   livestreamId: string
+): Promise<LivestreamEvent> => {
    let serverSideStream = null
    if (livestreamId) {
       // @ts-ignore
@@ -12,28 +12,16 @@ export const getServerSideStream = async (livestreamId) => {
          doc: livestreamId,
       })
       if (livestreamSnap.exists) {
-         const livestreamEvent = {
+         serverSideStream = {
             id: livestreamSnap.id,
             ...livestreamSnap.data(),
          } as LivestreamEvent
-
-         serverSideStream =
-            LivestreamPresenter.serializeDocument(livestreamEvent)
-
-         return omit(serverSideStream, [
-            "registeredUsers",
-            "talentPool",
-            "participatingStudents",
-            "participants",
-            "liveSpeakers",
-            "author",
-         ])
       }
    }
    return serverSideStream
 }
 
-export const getServerSideGroup = async (groupId) => {
+export const getServerSideGroup = async (groupId: string) => {
    let serverSideGroup = {}
    // @ts-ignore
    const snap = await store.firestore.get({
