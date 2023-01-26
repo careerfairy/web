@@ -185,4 +185,3 @@ exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
-exports.dummy = slack.dummyHttp

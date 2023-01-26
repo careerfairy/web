@@ -19,9 +19,3 @@ export const slackHandleInteractions = functions
       // Our current buttons only open an url, they don't need a response
       res.status(200).end()
    })
-
-export const dummyHttp = functions
-   .region(config.region)
-   .https.onRequest(async (req, res) => {
-      res.send("hello!")
-   })
