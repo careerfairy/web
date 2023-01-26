@@ -25,6 +25,7 @@ import DateUtil from "../util/DateUtil"
 import { dataLayerUser } from "../util/analyticsUtils"
 import { updateUserActivity } from "./user/trackActivity"
 import { errorLogAndNotify } from "util/CommonUtil"
+import CookiesUtil from "../util/CookiesUtil"
 
 const Loader = dynamic(() => import("../components/views/loader/Loader"), {
    ssr: false,
@@ -170,7 +171,9 @@ const AuthProvider = ({ children }) => {
    useEffect(() => {
       // get claims from auth
 
-      const decodedToken = parseJwt(auth.stsTokenManager?.accessToken)
+      const decodedToken = CookiesUtil.parseJwt({
+         token: auth.stsTokenManager?.accessToken,
+      })
 
       const issuedAt = decodedToken?.iat // time in seconds
 
@@ -272,20 +275,3 @@ const AuthProvider = ({ children }) => {
 const useAuth = () => useContext<DefaultContext>(AuthContext)
 
 export { AuthProvider, useAuth }
-
-function parseJwt(token?: string) {
-   if (!token || typeof window === "undefined") return null
-   let base64Url = token.split(".")[1]
-   let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
-   let jsonPayload = decodeURIComponent(
-      window
-         .atob(base64)
-         .split("")
-         .map(function (c) {
-            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
-         })
-         .join("")
-   )
-
-   return JSON.parse(jsonPayload)
-}
