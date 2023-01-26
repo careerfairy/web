@@ -219,7 +219,7 @@ export default class DateUtil {
    }
 
    static calculateTimeLeft(time) {
-      const difference = Math.abs(time - new Date())
+      const difference = time - new Date()
       let timeLeft = {}
 
       if (difference > 0) {
