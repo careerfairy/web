@@ -106,6 +106,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days)
       )
    }
+   const results = await Promise.allSettled(promises)
 
    const [
       showHighlights,
@@ -113,7 +114,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       comingUpNextEvents,
       pastEvents,
       recordedEvents,
-   ] = await Promise.all(promises)
+   ] = results
+      .filter((result) => result.status === "fulfilled")
+      .map((result) => (result as PromiseFulfilledResult<any>).value)
 
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
