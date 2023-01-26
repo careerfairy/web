@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * During compilation we have access to the client sdk
  *
@@ -45,6 +46,11 @@ export const toDate = (
 }
 
 /**
+=======
+import type firebase from "firebase/compat"
+
+/**
+>>>>>>> 18ba66e9e (feat: added firestore types to a common file)
  * Consolidate the firebase types required by this lib
  * on this file
  *
