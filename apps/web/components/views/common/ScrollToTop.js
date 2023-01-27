@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react"
 import { Fab, Grow } from "@mui/material"
 import ScrollToTopIcon from "@mui/icons-material/ExpandLessRounded"
 import { sxStyles } from "../../../types/commonTypes"
+import { scrollTop } from "../../../util/CommonUtil"
 
 const styles = sxStyles({
    scrollTop: {
@@ -37,10 +38,6 @@ const ScrollToTop = ({ fontSize = "large", size }) => {
       } else if (showScroll && window.pageYOffset <= 400) {
          setShowScroll(false)
       }
-   }
-
-   const scrollTop = () => {
-      window.scrollTo({ top: 0, behavior: "smooth" })
    }
 
    return (
