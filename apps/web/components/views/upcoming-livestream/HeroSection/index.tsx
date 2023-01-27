@@ -204,7 +204,7 @@ const HeroSection = ({
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
-   const smallVerticalScreen = useMediaQuery("(max-height:700px)")
+   const smallVerticalScreen = useMediaQuery("(max-height:700px)") && !isMobile
    const { userData } = useAuth()
    const {
       timeWatched: minutesWatched,
