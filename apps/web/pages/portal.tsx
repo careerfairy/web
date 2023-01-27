@@ -19,7 +19,8 @@ import nookies from "nookies"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import RecordedEventsCarousel from "../components/views/portal/recorded-events/RecordedEventsCarousel"
 import DateUtil from "../util/DateUtil"
-import { parseJwtServerSide } from "../util/serverUtil"
+import CookiesUtil from "../util/CookiesUtil"
+import { Box } from "@mui/material"
 import { mapFromServerSide } from "util/serverUtil"
 
 const PortalPage = ({
@@ -50,9 +51,11 @@ const PortalPage = ({
          />
          <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
             {recordedEvents?.length > 0 && (
-               <RecordedEventsCarousel
-                  livestreams={mapFromServerSide(recordedEvents)}
-               />
+               <Box mb={4}>
+                  <RecordedEventsCarousel
+                     livestreams={mapFromServerSide(recordedEvents)}
+                  />
+               </Box>
             )}
             <Container disableGutters>
                <WidgetsWrapper>
@@ -86,7 +89,10 @@ const PortalPage = ({
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const cookies = nookies.get(ctx)
-   const token = parseJwtServerSide(cookies.token)
+   const token = CookiesUtil.parseJwt({
+      token: cookies.token,
+      isServerSide: true,
+   })
    const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
 
    const promises = []
