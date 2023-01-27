@@ -10,7 +10,7 @@ import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import React, { useCallback, useEffect, useState } from "react"
 import { autoPlay } from "react-swipeable-views-utils"
 import SwipeableViews from "react-swipeable-views"
-import { useTheme } from "@mui/material/styles"
+import { darken, useTheme } from "@mui/material/styles"
 import HighlightVideoDialog from "../HighlightVideoDialog"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
@@ -29,6 +29,16 @@ const styles: StylesProps = {
       width: "100%",
       height: { xs: "50vh", md: "40vh" },
       minHeight: "400px",
+   },
+   image: {
+      "&:after": {
+         position: "absolute",
+         height: "100%",
+         width: "100%",
+         content: '" "',
+         backgroundColor: (theme) => darken(theme.palette.navyBlue.main, 0.5),
+         opacity: 0.7,
+      },
    },
    content: {
       position: "relative",
@@ -188,7 +198,10 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
          >
             {livestreams.map((livestream) => (
                <Box sx={styles.wrapper} key={livestream.id}>
-                  <Box sx={styles.wrapper} position={"absolute"}>
+                  <Box
+                     sx={[styles.wrapper, styles.image]}
+                     position={"absolute"}
+                  >
                      <Image
                         src={getResizedUrl(livestream.backgroundImageUrl, "lg")}
                         alt={livestream.title}
@@ -213,7 +226,7 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
                               fontWeight="bold"
                               component="h2"
                               color={"white"}
-                              mt={1}
+                              mt={2}
                               maxWidth={{ xs: "100%", md: "60%" }}
                            >
                               {livestream.title}
@@ -221,6 +234,7 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
                            <Typography
                               variant={"h6"}
                               component="h2"
+                              fontWeight={"400"}
                               color={"white"}
                               mt={1}
                            >
