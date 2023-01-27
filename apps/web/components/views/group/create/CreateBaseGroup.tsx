@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import PublishIcon from "@mui/icons-material/Publish"
 import { Form as UiForm, Formik } from "formik"
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer"
@@ -84,19 +84,6 @@ interface CreateGroupProps {
    handleSkipNext: () => void
 }
 
-const initialValues = {
-   logoUrl: "",
-   logoFileObj: null,
-   universityName: "",
-   description: "",
-   university: null,
-   isUniversity: false,
-   companySize: "",
-   companyIndustry: null,
-   companyCountry: null,
-   isATSEnabled: false,
-}
-
 const CreateBaseGroup = ({
    handleNext,
    setBaseGroupInfo,
@@ -131,6 +118,33 @@ const CreateBaseGroup = ({
          )
       })()
    }, [])
+
+   const initialValues = useMemo(
+      () => ({
+         logoUrl: baseGroupInfo.logoUrl || "",
+         logoFileObj: baseGroupInfo.logoFileObj || null,
+         universityName: baseGroupInfo.universityName || "",
+         description: baseGroupInfo.description || "",
+         university: baseGroupInfo.university || null,
+         isUniversity: baseGroupInfo.isUniversity || false,
+         companySize: baseGroupInfo.companySize || "",
+         companyIndustry: baseGroupInfo.companyIndustry || null,
+         companyCountry: baseGroupInfo.companyCountry || null,
+         isATSEnabled: baseGroupInfo.isATSEnabled || false,
+      }),
+      [
+         baseGroupInfo.companyCountry,
+         baseGroupInfo.companyIndustry,
+         baseGroupInfo.companySize,
+         baseGroupInfo.description,
+         baseGroupInfo.isATSEnabled,
+         baseGroupInfo.isUniversity,
+         baseGroupInfo.logoFileObj,
+         baseGroupInfo.logoUrl,
+         baseGroupInfo.university,
+         baseGroupInfo.universityName,
+      ]
+   )
 
    const handleSubmit = useCallback(
       (values, { setSubmitting }) => {
@@ -181,7 +195,7 @@ const CreateBaseGroup = ({
                /* and other goodies */
             }) => (
                <UiForm className={classes.form} onSubmit={handleSubmit}>
-                  <Stack spacing={2}>
+                  <Stack spacing={2} minWidth={"90%"}>
                      <FormControl
                         className={classes.form}
                         error={Boolean(

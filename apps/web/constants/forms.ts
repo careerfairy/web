@@ -1391,144 +1391,144 @@ export const CompanySizesCodes = [
 
 export const CompanyIndustryValues = [
    {
-      code: "Accounting",
+      id: "Accounting",
       name: "Accounting",
    },
    {
-      code: "Aerospace&Defence",
+      id: "Aerospace&Defence",
       name: "Aerospace & Defence",
    },
    {
-      code: "Agriculture",
+      id: "Agriculture",
       name: "Agriculture",
    },
    {
-      code: "Architecture&Planning",
+      id: "Architecture&Planning",
       name: "Architecture & Planning",
    },
    {
-      code: "Arts&Culture",
+      id: "Arts&Culture",
       name: "Arts & Culture",
    },
    {
-      code: "Automotive",
+      id: "Automotive",
       name: "Automotive",
    },
    {
-      code: "Chemical",
+      id: "Chemical",
       name: "Chemical",
    },
    {
-      code: "Construction",
+      id: "Construction",
       name: "Construction",
    },
    {
-      code: "Design",
+      id: "Design",
       name: "Design",
    },
    {
-      code: "Education",
+      id: "Education",
       name: "Education",
    },
    {
-      code: "Energy",
+      id: "Energy",
       name: "Energy",
    },
    {
-      code: "Engineering",
+      id: "Engineering",
       name: "Engineering",
    },
    {
-      code: "Entertainment",
+      id: "Entertainment",
       name: "Entertainment",
    },
    {
-      code: "Finance&Banking",
+      id: "Finance&Banking",
       name: "Finance & Banking",
    },
    {
-      code: "FMCG",
+      id: "FMCG",
       name: "FMCG",
    },
    {
-      code: "Healthcare",
+      id: "Healthcare",
       name: "Healthcare",
    },
    {
-      code: "Hospitality",
+      id: "Hospitality",
       name: "Hospitality",
    },
    {
-      code: "Insurance",
+      id: "Insurance",
       name: "Insurance",
    },
    {
-      code: "Legal",
+      id: "Legal",
       name: "Legal",
    },
    {
-      code: "Leisure,Travel&Tourism",
+      id: "Leisure,Travel&Tourism",
       name: "Leisure, Travel & Tourism",
    },
    {
-      code: "Logistics",
+      id: "Logistics",
       name: "Logistics",
    },
    {
-      code: "ManagementConsulting",
+      id: "ManagementConsulting",
       name: "Management Consulting",
    },
    {
-      code: "Manufacturing",
+      id: "Manufacturing",
       name: "Manufacturing",
    },
    {
-      code: "Marketing&Communication",
+      id: "Marketing&Communication",
       name: "Marketing & Communication",
    },
    {
-      code: "Media",
+      id: "Media",
       name: "Media",
    },
    {
-      code: "Non-profit&Charity",
+      id: "Non-profit&Charity",
       name: "Non-profit & Charity",
    },
    {
-      code: "Other",
+      id: "Other",
       name: "Other",
    },
    {
-      code: "Pharmaceutical",
+      id: "Pharmaceutical",
       name: "Pharmaceutical",
    },
    {
-      code: "PublicSector",
+      id: "PublicSector",
       name: "Public Sector",
    },
    {
-      code: "RealEstate",
+      id: "RealEstate",
       name: "Real Estate",
    },
    {
-      code: "Retail",
+      id: "Retail",
       name: "Retail",
    },
    {
-      code: "Technology&IT",
+      id: "Technology&IT",
       name: "Technology & IT",
    },
    {
-      code: "Telecommunications",
+      id: "Telecommunications",
       name: "Telecommunications",
    },
    {
-      code: "VentureCapital&PrivateEquity",
+      id: "VentureCapital&PrivateEquity",
       name: "Venture Capital & Private Equity",
    },
-]
+] as OptionGroup[]
 
 export const CompanyCountryValues = countriesOptionCodes.map((country) => ({
-   code: country.id,
+   id: country.id,
    name: country.name,
-}))
+})) as OptionGroup[]

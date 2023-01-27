@@ -273,8 +273,8 @@ export class GroupFunctionsRepository
          universityName: group.universityName || "",
          universityCode: group.universityCode || "",
          atsAdminPageFlag: group.atsAdminPageFlag || false,
-         companyCountryCode: group.companyCountryCode || "",
-         companyIndustryCode: group.companyIndustryCode || "",
+         companyCountry: group.companyCountry || null,
+         companyIndustry: group.companyIndustry || null,
          companySize: group.companySize || "",
          test: false,
       }
