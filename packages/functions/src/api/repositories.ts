@@ -29,14 +29,9 @@ import { IATSRepository } from "../lib/IATSRepository"
 import { MergeATSRepository } from "../lib/merge/MergeATSRepository"
 
 const firestoreInstance = admin.firestore() as any
-const authInstance = admin.auth()
 
 export const groupRepo: IGroupFunctionsRepository =
-   new GroupFunctionsRepository(
-      firestoreInstance,
-      admin.firestore.FieldValue,
-      authInstance
-   )
+   new GroupFunctionsRepository(firestoreInstance, admin.firestore.FieldValue)
 
 export const userRepo: IUserRepository = new FirebaseUserRepository(
    firestoreInstance,

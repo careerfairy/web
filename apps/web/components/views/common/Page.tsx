@@ -26,8 +26,9 @@ interface Props {
    children: React.ReactNode
    sx?: SxProps<DefaultTheme>
    backgroundColor?: string
+   viewRef?: React.RefObject<HTMLDivElement>
 }
-const Page: FC<Props> = ({ sx, backgroundColor, ...props }) => {
+const Page: FC<Props> = ({ sx, backgroundColor, viewRef, ...props }) => {
    return (
       <Box
          sx={[
@@ -36,6 +37,7 @@ const Page: FC<Props> = ({ sx, backgroundColor, ...props }) => {
             ...(Array.isArray(sx) ? sx : [sx]),
          ]}
          {...props}
+         ref={viewRef}
       />
    )
 }

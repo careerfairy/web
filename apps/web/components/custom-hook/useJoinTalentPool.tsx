@@ -117,7 +117,7 @@ const useJoinTalentPool = () => {
       }),
       [
          livestreamId,
-         userData?.userEmail,
+         userData,
          loading,
          asPath,
          isBreakout,

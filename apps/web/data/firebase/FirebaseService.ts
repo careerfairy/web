@@ -51,6 +51,7 @@ import {
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2264,8 +2265,8 @@ class FirebaseService {
       })
    }
 
-   deregisterFromLivestream = (livestreamId, authenticatedUser) => {
-      const { email } = authenticatedUser
+   deregisterFromLivestream = (livestreamId: string, userData: UserData) => {
+      const { userEmail } = userData
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -2273,7 +2274,7 @@ class FirebaseService {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("userLivestreamData")
-         .doc(email)
+         .doc(userEmail)
 
       return this.firestore.runTransaction((transaction) => {
          return transaction
@@ -2282,11 +2283,12 @@ class FirebaseService {
                if (userLivestreamDataDoc.exists) {
                   transaction.update(userLivestreamDataRef, {
                      registered: null,
+                     user: userData,
                   } as UserLivestreamData)
                }
                transaction.update(livestreamRef, {
                   registeredUsers:
-                     firebase.firestore.FieldValue.arrayRemove(email),
+                     firebase.firestore.FieldValue.arrayRemove(userEmail),
                })
             })
       })
@@ -2399,6 +2401,7 @@ class FirebaseService {
                if (userLivestreamDataDoc.exists) {
                   const data: Partial<UserLivestreamData> = {
                      talentPool: null,
+                     user: userData,
                   }
                   transaction.update(userLivestreamDataRef, data)
                }
@@ -3125,6 +3128,43 @@ class FirebaseService {
             // If the impression is recommended, increment the recommended impressions counter
             recommendedImpressionsCounter.incrementBy(1).catch(console.error)
          }
+         return
+      }
+   }
+
+   trackDetailPageView = async (eventId: string, visitorId: string) => {
+      const pageViewRef = this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("detailPageViews")
+         .doc(visitorId)
+
+      const livestreamStatsRef = this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("stats")
+         .doc("livestreamStats")
+
+      const pageViewVisitorSnap = await pageViewRef.get()
+
+      const hasViewed = pageViewVisitorSnap.exists
+
+      if (!hasViewed) {
+         const generalStatsFieldPath = getAValidLivestreamStatsUpdateField(
+            "numberOfPeopleReached"
+         )
+
+         const generalDetailPageViewCounter = new Counter(
+            livestreamStatsRef,
+            generalStatsFieldPath
+         )
+
+         generalDetailPageViewCounter.incrementBy(1).catch(console.error)
+
+         return pageViewRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      } else {
          return
       }
    }

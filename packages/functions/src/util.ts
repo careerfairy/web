@@ -12,6 +12,9 @@ import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
 import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
+import type { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -591,3 +594,26 @@ export const dateFormatOffset = (dateString: string) => {
 
    return dateString
 }
+
+export const getChangeTypes = (
+   change: Change<DocumentSnapshot>
+): {
+   // Is a new document creation
+   isCreate: boolean
+   // Is a document update where the document still exists before and after the update
+   isUpdate: boolean
+   // Is a document deletion
+   isDelete: boolean
+} => {
+   const { before, after } = change
+   // check if the document did not exist before but exists now
+   const isCreate = !before.exists && after.exists
+   // check if the document existed before and still exists now
+   const isUpdate = before.exists && after.exists
+   // check if the document existed before but does not exist now
+   const isDelete = before.exists && !after.exists
+
+   return { isCreate, isUpdate, isDelete }
+}
+
+export type FunctionsLogger = typeof functions.logger
