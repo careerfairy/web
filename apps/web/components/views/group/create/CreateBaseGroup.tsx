@@ -26,6 +26,7 @@ import Stack from "@mui/material/Stack"
 import { BaseGroupInfo } from "../../../../pages/group/create"
 import Checkbox from "@mui/material/Checkbox"
 import CompanyMetadata from "./CompanyMetadata"
+import { scrollTop } from "../../../../util/CommonUtil"
 
 const placeholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -163,6 +164,7 @@ const CreateBaseGroup = ({
          }
          setBaseGroupInfo(careerCenter)
          setSubmitting(false)
+         scrollTop()
          if (values.isUniversity) {
             handleNext()
          } else {

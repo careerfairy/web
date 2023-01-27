@@ -259,3 +259,10 @@ export const isMobileBrowser = () => {
       return navigator?.userAgent?.match(toMatchItem)
    })
 }
+
+/**
+ * To scroll to the top of the page
+ */
+export const scrollTop = () => {
+   window.scrollTo({ top: 0, behavior: "smooth" })
+}
