@@ -192,8 +192,8 @@ const CreateGroup = () => {
                universityCode: baseGroupInfo.university.id,
             }),
             atsAdminPageFlag: baseGroupInfo.isATSEnabled,
-            companyCountryCode: baseGroupInfo.companyCountry?.code,
-            companyIndustryCode: baseGroupInfo.companyIndustry?.code,
+            companyCountry: baseGroupInfo.companyCountry,
+            companyIndustry: baseGroupInfo.companyIndustry,
             companySize: baseGroupInfo.companySize,
          }
 
