@@ -17,6 +17,7 @@ import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import GroupLogo from "../../common/GroupLogo"
 import QuestionVotingContainer from "../../../QuestionVotingContainer"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const questionsContainerHeight = 400
 const mobileQuestionsContainerHeight = 300
@@ -63,7 +64,7 @@ const QuestionUpvote = () => {
    const { upvoteLivestreamQuestion } = useFirebaseService()
 
    const { push } = useRouter()
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
 
    const handleUpvote = async (question) => {
       if (!authenticatedUser) {
@@ -74,6 +75,15 @@ const QuestionUpvote = () => {
             livestream.id,
             question,
             authenticatedUser.email
+         )
+
+         recommendationServiceInstance.addPopularityEvent(
+            "UPVOTED_QUESTION",
+            livestream,
+            {
+               user: userData,
+               customId: userData?.authId,
+            }
          )
 
          handleClientSideQuestionUpdate(question.id, {
@@ -101,11 +111,15 @@ const QuestionUpvote = () => {
                <GroupLogo logoUrl={livestream.companyLogoUrl} />
             </Hidden>
          </Box>
-         <DialogTitle align="center">
+         <DialogTitle
+            // @ts-ignore
+            align="center"
+         >
             WHICH QUESTIONS SHOULD THE SPEAKER ANSWER?
          </DialogTitle>
          <DialogContent className={classes.content}>
             <Collapse in={Boolean(questions.length && !sliding && show)}>
+               {/* @ts-ignore */}
                <QuestionVotingContainer
                   questions={questions}
                   handleChangeQuestionSortType={handleChangeQuestionSortType}

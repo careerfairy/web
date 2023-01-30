@@ -21,6 +21,7 @@ import {
    minQuestionLength,
 } from "../../../../../constants/forms"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -98,6 +99,16 @@ const QuestionCreateForm = () => {
             rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
+
+            recommendationServiceInstance.addPopularityEvent(
+               "CREATED_QUESTION",
+               livestream,
+               {
+                  user: userData,
+                  customId: userData?.authId,
+               }
+            )
+
             customHandleNext()
 
             dataLayerLivestreamEvent(
@@ -107,7 +118,7 @@ const QuestionCreateForm = () => {
          } catch (e) {}
       },
       validate: (values) => {
-         let errors = {}
+         let errors: { questionTitle?: string } = {}
          if (!values.questionTitle) {
             errors.questionTitle = "Please enter a title"
          }
@@ -145,6 +156,7 @@ const QuestionCreateForm = () => {
          >
             <Grid className={classes.details} item xs={12} sm={8}>
                <GroupLogo logoUrl={livestream?.companyLogoUrl} />
+               {/* @ts-ignore */}
                <DialogTitle align="center">
                   ASK YOUR QUESTION. GET THE ANSWER DURING THE LIVE STREAM.
                </DialogTitle>
@@ -156,6 +168,7 @@ const QuestionCreateForm = () => {
                      label="Your Question"
                      value={values.questionTitle}
                      placeholder={"What would like to ask our speaker?"}
+                     // @ts-ignore
                      maxLength="170"
                      error={
                         touched.questionTitle && Boolean(errors.questionTitle)
@@ -179,6 +192,7 @@ const QuestionCreateForm = () => {
                   >
                      Skip
                   </Button>
+                  {/* @ts-ignore */}
                   <Button
                      variant="contained"
                      size="large"
