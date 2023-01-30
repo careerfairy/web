@@ -16,6 +16,7 @@ import { useFirebaseService } from "../../../../../context/firebase/FirebaseServ
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { connectedIcon } from "../../../../../constants/svgs"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -62,6 +63,16 @@ const TalentPoolJoin = () => {
       try {
          setJoiningTalentPool(true)
          await joinCompanyTalentPool(livestream.companyId, userData, livestream)
+
+         recommendationServiceInstance.addPopularityEvent(
+            "JOINED_TALENT_POOL",
+            livestream,
+            {
+               user: userData,
+               customId: userData?.authId,
+            }
+         )
+
          handleNext()
       } catch (e) {}
       setJoiningTalentPool(false)
@@ -77,7 +88,12 @@ const TalentPoolJoin = () => {
             container
          >
             <Grid className={classes.imgGrid} item sm={4}>
-               <Grow timeout={1000} direction="right" in>
+               <Grow
+                  timeout={1000}
+                  // @ts-ignore
+                  direction="right"
+                  in
+               >
                   <div className={classes.imgWrapper}>
                      <img src={connectedIcon} alt="talent pool illustration" />
                   </div>
@@ -85,17 +101,20 @@ const TalentPoolJoin = () => {
             </Grid>
             <Grid className={classes.details} item xs={12} sm={8}>
                <GroupLogo logoUrl={livestream.companyLogoUrl} />
-               <DialogTitle align="center">
+               <DialogTitle
+                  // @ts-ignore
+                  align="center"
+               >
                   Join the {livestream.company} Talent Pool
                </DialogTitle>
                <DialogContent>
                   <DialogContentText align="center">
-                     Join {livestream.company}'s Talent Pool and be contacted
-                     directly in case any relevant opportunity arises for you at{" "}
-                     {livestream.company} in the future. By joining the Talent
-                     Pool, you agree that your profile data will be shared with{" "}
-                     {livestream.company}. Don't worry, you can leave a Talent
-                     Pool at any time.
+                     Join {livestream.company}&apos;s Talent Pool and be
+                     contacted directly in case any relevant opportunity arises
+                     for you at {livestream.company} in the future. By joining
+                     the Talent Pool, you agree that your profile data will be
+                     shared with {livestream.company}. Don&apos;t worry, you can
+                     leave a Talent Pool at any time.
                   </DialogContentText>
                </DialogContent>
                <DialogActions className={classes.actions}>
@@ -122,9 +141,9 @@ const TalentPoolJoin = () => {
                      color="primary"
                      autoFocus
                      startIcon={
-                        joiningTalentPool && (
+                        joiningTalentPool ? (
                            <CircularProgress size={10} color="inherit" />
-                        )
+                        ) : null
                      }
                      disabled={joiningTalentPool}
                   >
