@@ -132,3 +132,11 @@ export const addUtmTagsToLink = ({
 
    return url.toString()
 }
+
+/**
+ * Round a number and limit the decimal places
+ */
+export const round = (num: number, decimalPlaces: number): number => {
+   let f = Math.pow(10, decimalPlaces)
+   return Math.round((num + Number.EPSILON) * f) / f
+}
