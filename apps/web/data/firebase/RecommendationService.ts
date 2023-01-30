@@ -4,7 +4,14 @@ import {
    PopularityEventData,
    PopularityEventTypes,
 } from "@careerfairy/shared-lib/livestreams/popularity"
-import { doc, Firestore, serverTimestamp, setDoc } from "firebase/firestore"
+import {
+   addDoc,
+   collection,
+   doc,
+   Firestore,
+   serverTimestamp,
+   setDoc,
+} from "firebase/firestore"
 import { FirestoreInstance } from "./FirebaseInstance"
 import {
    LivestreamEvent,
@@ -48,12 +55,13 @@ export class RecommendationService {
          // we have a document id to use
          docSegments.push(this.docId(type, options.customId))
          const docRef = doc(this.firestore, "livestreams", ...docSegments)
-         setDoc(docRef, data, { merge: true }).catch(console.error)
+         setDoc(docRef, data).catch(console.error)
       } else {
          // let firestore generate a document id
-         setDoc(doc(this.firestore, "livestreams", ...docSegments), data).catch(
-            console.error
-         )
+         addDoc(
+            collection(this.firestore, "livestreams", ...docSegments),
+            data
+         ).catch(console.error)
       }
    }
 
