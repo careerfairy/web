@@ -6,6 +6,10 @@ import {
    LivestreamEvent,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   getPopularityPoints,
+   PopularityEventData,
+} from "@careerfairy/shared-lib/livestreams/popularity"
 import type { OperationsToMake } from "./stats/util"
 
 import {
@@ -21,6 +25,7 @@ import {
    addOperationsToIncrementNewUniversityStats,
 } from "./stats/livestream"
 import DocumentSnapshot = firestore.DocumentSnapshot
+import FieldValue = firestore.FieldValue
 import type { FunctionsLogger } from "../util"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
@@ -64,12 +69,31 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       livestreamId: string,
       logger: FunctionsLogger
    ): Promise<void>
+
+   /**
+    * Update the livestream popularity field when a popularity event is created
+    */
+   updateLivestreamPopularity(popularityDoc: PopularityEventData): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
    extends FirebaseLivestreamRepository
    implements ILivestreamFunctionsRepository
 {
+   updateLivestreamPopularity(
+      popularityDoc: PopularityEventData
+   ): Promise<void> {
+      const livestreamRef = this.firestore
+         .collection("livestreams")
+         .doc(popularityDoc.livestreamId)
+
+      const points = getPopularityPoints(popularityDoc)
+
+      return livestreamRef.update({
+         popularity: FieldValue.increment(points),
+      })
+   }
+
    async getRegisteredUsersMultipleEvents(
       livestreamIds: string[]
    ): Promise<UserLivestreamData[]> {
