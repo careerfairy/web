@@ -2,7 +2,7 @@ import { object, string } from "yup"
 import {
    Group,
    GroupATSIntegrationTokensDocument,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
 import {
    logAndThrow,
@@ -14,11 +14,11 @@ import { groupRepo } from "../api/repositories"
 import { auth } from "firebase-admin"
 import DecodedIdToken = auth.DecodedIdToken
 import { IATSRepository } from "./IATSRepository"
-import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
-import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { getIntegrationSpecifics } from "@careerfairy/shared-lib/dist/ats/IntegrationSpecifics"
+import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
+import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { getIntegrationSpecifics } from "@careerfairy/shared-lib/ats/IntegrationSpecifics"
 
 type AlwaysPresentData = {
    groupId: string

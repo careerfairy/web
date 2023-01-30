@@ -1,11 +1,11 @@
 import {
    FirebaseLivestreamRepository,
    ILivestreamRepository,
-} from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+} from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import {
    LivestreamEvent,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import {
    getPopularityPoints,
    PopularityEventData,
@@ -15,7 +15,7 @@ import type { OperationsToMake } from "./stats/util"
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
-} from "@careerfairy/shared-lib/dist/livestreams/stats"
+} from "@careerfairy/shared-lib/livestreams/stats"
 import type { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
 import { isEmpty } from "lodash"
@@ -71,9 +71,12 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    ): Promise<void>
 
    /**
-    * Update the livestream popularity field when a popularity event is created
+    * Update the livestream popularity field when a popularity event is created/deleted
     */
-   updateLivestreamPopularity(popularityDoc: PopularityEventData): Promise<void>
+   updateLivestreamPopularity(
+      popularityDoc: PopularityEventData,
+      deleted?: boolean
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
@@ -81,13 +84,19 @@ export class LivestreamFunctionsRepository
    implements ILivestreamFunctionsRepository
 {
    updateLivestreamPopularity(
-      popularityDoc: PopularityEventData
+      popularityDoc: PopularityEventData,
+      deleted = false
    ): Promise<void> {
       const livestreamRef = this.firestore
          .collection("livestreams")
          .doc(popularityDoc.livestreamId)
 
-      const points = getPopularityPoints(popularityDoc)
+      let points = getPopularityPoints(popularityDoc)
+
+      if (deleted) {
+         // negative to decrease
+         points *= -1
+      }
 
       return livestreamRef.update({
          popularity: FieldValue.increment(points),

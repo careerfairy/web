@@ -2,9 +2,9 @@ import { admin } from "../api/firestoreAdmin"
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { addMinutesDate, removeMinutesDate } from "../util"
-import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 
 export const livestreamGetById = async (id) => {
    const documentSnap = await admin

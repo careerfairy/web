@@ -1,7 +1,7 @@
 import { admin } from "../api/firestoreAdmin"
-import { RewardActions, RewardDoc } from "@careerfairy/shared-lib/dist/rewards"
+import { RewardActions, RewardDoc } from "@careerfairy/shared-lib/rewards"
 import pick = require("lodash/pick")
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 export const rewardCreateReferralSignUpLeader = (
    leaderId,

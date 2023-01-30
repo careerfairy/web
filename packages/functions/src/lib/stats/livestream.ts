@@ -1,10 +1,10 @@
-import { UserLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import {
    addOperationWithBooleanCheck,
    addOperationWithNumberCheck,
    OperationsToMake,
 } from "./util"
-import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 
 /**
  * This function checks which fields of the newData and oldData are different and updates the operationsToMakeObject accordingly.

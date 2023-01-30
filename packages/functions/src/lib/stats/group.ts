@@ -1,6 +1,6 @@
-import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { addOperationWithNumberCheck, OperationsToMake } from "./util"
-import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/dist/groups/stats"
+import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 
 /**
  *

@@ -2,7 +2,7 @@ import { BigQuery } from "@google-cloud/bigquery"
 import {
    BigQueryUserResponse,
    GetUserFilters,
-} from "@careerfairy/shared-lib/dist/bigQuery/types"
+} from "@careerfairy/shared-lib/bigQuery/types"
 
 export const bigQueryClient = new BigQuery({
    projectId: "careerfairy-e1fd9",

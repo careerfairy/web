@@ -1,6 +1,6 @@
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import { groupRepo } from "../api/repositories"
-import { UserJobApplicationDocument } from "@careerfairy/shared-lib/dist/users"
+import { UserJobApplicationDocument } from "@careerfairy/shared-lib/users"
 
 /**
  * Get the Linked Account secret tokens
