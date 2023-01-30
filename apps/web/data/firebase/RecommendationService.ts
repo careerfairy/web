@@ -71,7 +71,7 @@ type AddPopularityEventOptions = {
    user?: UserData
 }
 
-export const RecommendationServiceInstance = new RecommendationService(
+export const recommendationServiceInstance = new RecommendationService(
    FirestoreInstance as any
 )
 
