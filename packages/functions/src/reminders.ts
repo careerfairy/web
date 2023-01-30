@@ -132,21 +132,21 @@ export type ReminderData = {
 }
 
 const Reminder5Min: ReminderData = {
-   template: "variable_message_title",
+   template: "5-min-reminder",
    timeMessage: "NOW",
    minutesBefore: 5,
    key: "reminder5Minutes",
 }
 
 const Reminder1Hour: ReminderData = {
-   template: "variable_message_title",
+   template: "1-h-reminder",
    timeMessage: "in 1 hour",
    minutesBefore: 60,
    key: "reminder1Hour",
 }
 
 const Reminder24Hours: ReminderData = {
-   template: "variable_message_title",
+   template: "24-h-reminder",
    timeMessage: "TOMORROW",
    minutesBefore: 1440,
    key: "reminder24Hours",
