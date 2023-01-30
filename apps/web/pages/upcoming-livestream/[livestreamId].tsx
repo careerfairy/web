@@ -9,7 +9,11 @@ import {
 } from "../../components/helperFunctions/HelperFunctions"
 import HeroSection from "../../components/views/upcoming-livestream/HeroSection"
 import { useAuth } from "../../HOCs/AuthProvider"
-import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
+import {
+   dateIsInUnder24Hours,
+   getReferralInformation,
+   streamIsOld,
+} from "../../util/CommonUtil"
 import UserUtil from "../../data/util/UserUtil"
 import { useRouter } from "next/router"
 import RegistrationModal from "../../components/views/common/registration-modal"
@@ -39,13 +43,15 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { omit } from "lodash"
 import { fromDate } from "data/firebase/FirebaseInstance"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { PopularityEventType } from "@careerfairy/shared-lib/livestreams/popularity"
 
 const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
 
-   const viewRef = useTrackDetailPageView(serverStream.id)
+   const viewRef = useTrackDetailPageView(serverStream)
 
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -395,6 +401,15 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                authenticatedUser.email
             )
 
+            recommendationServiceInstance.addPopularityEvent(
+               "UPVOTED_QUESTION",
+               stream,
+               {
+                  user: userData,
+                  customId: userData?.authId,
+               }
+            )
+
             handlers.handleClientUpdate(question.id, {
                votes: question.votes + 1 || 1,
                emailOfVoters: question.emailOfVoters?.concat(
@@ -409,7 +424,8 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
          handlers,
          isLoggedOut,
          push,
-         stream.id,
+         stream,
+         userData,
          upvoteLivestreamQuestion,
       ]
    )
@@ -491,7 +507,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
 
             <QuestionsSection
                // @ts-ignore
-               livestreamId={stream.id}
+               livestream={stream}
                title={
                   isPastEvent
                      ? "Questions that were asked"
