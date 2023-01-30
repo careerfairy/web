@@ -1,6 +1,7 @@
 import { Identifiable } from "../commonTypes"
 import { Timestamp } from "../firebaseTypes"
 import { UserPublicData } from "../users"
+import { round } from "../utils"
 import { LivestreamEventPublicData } from "./livestreams"
 
 /**
@@ -18,6 +19,17 @@ export const PopularityEventTypes = {
 } as const
 
 export type PopularityEventType = keyof typeof PopularityEventTypes
+
+export const getPopularityPoints = (doc: PopularityEventData) => {
+   let points = PopularityEventTypes[doc.type]
+
+   let multiplier = 1
+   if (doc.livestream.hasJobs) {
+      multiplier += 0.2
+   }
+
+   return round(points * multiplier, 2)
+}
 
 /**
  * Firestore type for Popularity Events doc
