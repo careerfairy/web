@@ -12,14 +12,14 @@ import {
    userRepo,
 } from "./api/repositories"
 import { logAxiosError, onCallWrapper, serializeModels } from "./util"
-import { Job, JobIdentifier } from "@careerfairy/shared-lib/dist/ats/Job"
+import { Job, JobIdentifier } from "@careerfairy/shared-lib/ats/Job"
 import {
    userAlreadyAppliedForJob,
    UserATSRelations,
-} from "@careerfairy/shared-lib/dist/users"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/users"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { getATSTokens } from "./lib/groups"
-import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
+import { Application } from "@careerfairy/shared-lib/ats/Application"
 import { userSetHasJobApplications } from "./lib/user"
 import { createJobApplication } from "./lib/ats"
 

@@ -10,7 +10,7 @@ import {
 } from "./middlewares/validations"
 import { array, string } from "yup"
 import { livestreamsRepo } from "./api/repositories"
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
+import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 
 /*
 |--------------------------------------------------------------------------

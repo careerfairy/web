@@ -1,16 +1,16 @@
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { UserData } from "@careerfairy/shared-lib/users"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
-} from "@careerfairy/shared-lib/dist/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { GroupPresenter } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
+} from "@careerfairy/shared-lib/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import {
    getPdfCategoryChartData,
    PdfCategoryChartData,
    PdfReportData,
-} from "@careerfairy/shared-lib/dist/groups/pdf-report"
+} from "@careerfairy/shared-lib/groups/pdf-report"
 import {
    fieldOfStudyRepo,
    groupRepo,
@@ -34,12 +34,12 @@ import {
 import {
    GroupDashboardInvite,
    WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
-} from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+} from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { array, boolean, mixed, object, string } from "yup"
 import { auth } from "firebase-admin"
 import functions = require("firebase-functions")
 import UserRecord = auth.UserRecord
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")

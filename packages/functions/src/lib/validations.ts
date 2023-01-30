@@ -1,11 +1,8 @@
 import functions = require("firebase-functions")
 import { groupRepo, userRepo } from "../api/repositories"
 import { CallableContext } from "firebase-functions/lib/common/providers/https"
-import {
-   Group,
-   GROUP_DASHBOARD_ROLE,
-} from "@careerfairy/shared-lib/dist/groups"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
+import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
 import ObjectSchema, { ObjectShape } from "yup/lib/object"
 import { InferType } from "yup"
 

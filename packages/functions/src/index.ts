@@ -1,3 +1,15 @@
+import * as ModuleAlias from "module-alias"
+
+/**
+ * Fix runtime import of local packages
+ * Required to avoid importing from the /dist folder
+ *
+ * https://stackoverflow.com/a/56584739
+ */
+ModuleAlias.addAliases({
+   "@careerfairy/shared-lib": __dirname + "/../../shared-lib/src",
+})
+
 import dotenv = require("dotenv")
 
 // load values from the .env file in this directory into process.env

@@ -1,6 +1,6 @@
 import functions = require("firebase-functions")
 import config from "./config"
-import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
+import { Rating, Wish } from "@careerfairy/shared-lib/wishes"
 import { admin } from "./api/firestoreAdmin"
 
 // Listen for changes in all documents in the 'users' collection

@@ -1,4 +1,4 @@
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import { bigQueryRepo, userRepo } from "./api/repositories"
 import {
    logAndThrow,
@@ -9,7 +9,7 @@ import { createNestedArrayOfTemplates, generateSignature } from "./util"
 import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
