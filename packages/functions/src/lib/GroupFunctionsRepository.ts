@@ -353,27 +353,25 @@ export class GroupFunctionsRepository
 
       const groupStatsRef = groupRef.collection("stats").doc("groupStats")
 
-      return this.firestore.runTransaction(async (transaction) => {
-         const groupDoc = await transaction.get(groupRef)
+      const groupDoc = await groupRef.get()
 
-         if (!groupDoc.exists) {
-            return // Group was deleted, no need to update the stats
-         }
+      if (!groupDoc.exists) {
+         return // Group was deleted, no need to update the stats
+      }
 
-         const statsSnap = await transaction.get(groupStatsRef)
+      const statsSnap = await groupStatsRef.get()
 
-         if (!statsSnap.exists) {
-            // Create the stats document
-            const statsDoc = createGroupStatsDoc(
-               this.addIdToDoc<Group>(groupDoc),
-               groupStatsRef.id
-            )
-            transaction.set(groupStatsRef, statsDoc)
-         }
+      if (!statsSnap.exists) {
+         // Create the stats document
+         const statsDoc = createGroupStatsDoc(
+            this.addIdToDoc<Group>(groupDoc),
+            groupStatsRef.id
+         )
+         await groupStatsRef.set(statsDoc)
+      }
 
-         // We have to use an update method here because the set method does not support nested updates/operations
-         transaction.update(groupStatsRef, operationsToMake)
-      })
+      // We have to use an update method here because the set method does not support nested updates/operations
+      return groupStatsRef.update(operationsToMake)
    }
 
    async addOperationsToGroupStats(
