@@ -87,6 +87,7 @@ export const buildLivestreamObject = (
       hidden: values.hidden,
       universities: [],
       summary: values.summary,
+      reasonsToJoinLivestream: values.reasonsToJoinLivestream,
       speakers: buildSpeakersArray(values),
       language: values.language,
       lastUpdated: firebase.getServerTimestamp(),
@@ -191,6 +192,12 @@ export const validateStreamForm = (
    }
    if (!values.title) {
       errors.title = "Required"
+   }
+   if (!values.summary) {
+      errors.summary = "Required"
+   }
+   if (!values.reasonsToJoinLivestream) {
+      errors.reasonsToJoinLivestream = "Required"
    }
 
    const now = new Date()

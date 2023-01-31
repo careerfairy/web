@@ -80,8 +80,6 @@ export {
    openNavDrawer,
    closeNavDrawer,
    toggleNavDrawer,
-   outOfLandingPage,
-   inLandingPage,
 } from "./generalLayoutActions"
 export {
    clearStreamsFromTimeframeAndFuture,

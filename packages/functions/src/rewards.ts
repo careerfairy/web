@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import config = require("./config")
+import config from "./config"
 import {
    userGetByReferralCode,
    userGetByEmail,
@@ -7,7 +7,7 @@ import {
    userIncrementField,
    userUpdateFields,
 } from "./lib/user"
-import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
+import { RewardActions } from "@careerfairy/shared-lib/rewards"
 import {
    rewardCreateReferralSignUpLeader,
    rewardCreateLivestream,
@@ -19,7 +19,7 @@ import { livestreamGetById } from "./lib/livestream"
 import {
    LivestreamEvent,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 
 /**
  * Everytime there is a new reward document, apply the reward depending on the action

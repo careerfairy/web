@@ -1,5 +1,7 @@
 import { parseCookies, setCookie } from "nookies"
 
+type ParseJwtProps = { token?: string; isServerSide?: boolean }
+
 export default class CookiesUtil {
    static setUTMParams = (value: object) => {
       return setCookie(null, "utm_params", JSON.stringify(value), {
@@ -11,5 +13,27 @@ export default class CookiesUtil {
    static getUTMParams = () => {
       const existing = parseCookies(null)["utm_params"]
       return existing ? JSON.parse(existing) : null
+   }
+
+   static parseJwt = ({ token, isServerSide = false }: ParseJwtProps) => {
+      if (!token || (!isServerSide && typeof window === "undefined"))
+         return null
+      let base64Url = token.split(".")[1]
+      let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+
+      const decoded64 = isServerSide
+         ? Buffer.from(base64, "base64").toString()
+         : window.atob(base64)
+
+      const jsonPayload = decodeURIComponent(
+         decoded64
+            .split("")
+            .map(function (c) {
+               return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+            })
+            .join("")
+      )
+
+      return JSON.parse(jsonPayload)
    }
 }

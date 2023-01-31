@@ -1,19 +1,32 @@
 import {
    FirebaseGroupRepository,
    IGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+} from "@careerfairy/shared-lib/groups/GroupRepository"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import firebase from "firebase/compat"
-import admin = require("firebase-admin")
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
+} from "@careerfairy/shared-lib/groups"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
+import { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import { OperationsToMake } from "./stats/util"
+import { createGroupStatsDoc } from "@careerfairy/shared-lib/groups/stats"
+import { cloneDeep, isEmpty, union } from "lodash"
+import {
+   addGroupStatsOperations,
+   addOperationsToDecrementGroupStatsOperations,
+   addOperationsToOnlyIncrementGroupStatsOperations,
+} from "./stats/group"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import type { FunctionsLogger } from "../util"
+import { admin } from "../api/firestoreAdmin"
+
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -79,20 +92,17 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       groupId: string,
       integrationId: string
    ): Promise<GroupATSAccount>
+
+   addOperationsToGroupStats(
+      change: Change<DocumentSnapshot>,
+      logger: FunctionsLogger
+   ): Promise<void>
 }
 
 export class GroupFunctionsRepository
    extends FirebaseGroupRepository
    implements IGroupFunctionsRepository
 {
-   constructor(
-      protected readonly firestore: firebase.firestore.Firestore,
-      protected readonly fieldValue: typeof firebase.firestore.FieldValue,
-      protected readonly auth: admin.auth.Auth
-   ) {
-      super(firestore, fieldValue)
-   }
-
    async checkIfUserIsGroupAdmin(
       groupId: string,
       userEmail: string
@@ -107,7 +117,7 @@ export class GroupFunctionsRepository
       }
 
       const group = this.addIdToDoc<Group>(groupDoc)
-      const user = await this.auth.getUserByEmail(userEmail)
+      const user = await admin.auth().getUserByEmail(userEmail)
 
       const userRole = user.customClaims?.adminGroups?.[group.id]?.role
 
@@ -131,7 +141,7 @@ export class GroupFunctionsRepository
 
       const userData = this.addIdToDoc<UserData>(userSnap)
 
-      const user = await this.auth.getUserByEmail(targetEmail)
+      const user = await admin.auth().getUserByEmail(targetEmail)
 
       // MAKE SURE THERE IS ALWAYS AT LEAST ONE OWNER FOR EVERY GROUP AT THE END OF THIS OPERATION
       const thereWillBeAtLeastOneOwner =
@@ -152,7 +162,7 @@ export class GroupFunctionsRepository
       return this.setGroupAdminRoleInFirestore(group, userData, newRole).catch(
          (error) => {
             // if there was an error, revert the custom claims
-            this.auth.setCustomUserClaims(user.uid, user.customClaims)
+            admin.auth().setCustomUserClaims(user.uid, user.customClaims)
             throw error
          }
       )
@@ -186,7 +196,7 @@ export class GroupFunctionsRepository
          }
       }
 
-      return this.auth.setCustomUserClaims(authUser.uid, newClaims)
+      return admin.auth().setCustomUserClaims(authUser.uid, newClaims)
    }
 
    async getGroupAdmins(groupId: string): Promise<GroupAdmin[]> {
@@ -272,6 +282,10 @@ export class GroupFunctionsRepository
          logoUrl: group.logoUrl || "",
          universityName: group.universityName || "",
          universityCode: group.universityCode || "",
+         atsAdminPageFlag: group.atsAdminPageFlag || false,
+         companyCountry: group.companyCountry || null,
+         companyIndustry: group.companyIndustry || null,
+         companySize: group.companySize || "",
          test: false,
       }
 
@@ -327,6 +341,122 @@ export class GroupFunctionsRepository
          ...doc.data(),
          id: integrationId,
       } as any)
+   }
+
+   async updateGroupStats(
+      groupId: string,
+      operationsToMake: OperationsToMake
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const groupStatsRef = groupRef.collection("stats").doc("groupStats")
+
+      const groupDoc = await groupRef.get()
+
+      if (!groupDoc.exists) {
+         return // Group was deleted, no need to update the stats
+      }
+
+      const statsSnap = await groupStatsRef.get()
+
+      if (!statsSnap.exists) {
+         // Create the stats document
+         const statsDoc = createGroupStatsDoc(
+            this.addIdToDoc<Group>(groupDoc),
+            groupStatsRef.id
+         )
+         await groupStatsRef.set(statsDoc)
+      }
+
+      // We have to use an update method here because the set method does not support nested updates/operations
+      return groupStatsRef.update(operationsToMake)
+   }
+
+   async addOperationsToGroupStats(
+      change: Change<DocumentSnapshot>,
+      logger: FunctionsLogger
+   ): Promise<void> {
+      const newLivestreamStats = change.after.data() as LiveStreamStats
+      const oldLivestreamStats = change.before.data() as LiveStreamStats
+
+      const operationsToMake: OperationsToMake = {} // An empty object to store the update operations for the firestore UPDATE operation
+
+      // Add operations for the general stats
+      addGroupStatsOperations(
+         newLivestreamStats,
+         oldLivestreamStats,
+         operationsToMake
+      )
+
+      const allPossibleGroupIds = union(
+         newLivestreamStats?.livestream?.groupIds,
+         oldLivestreamStats?.livestream?.groupIds
+      )
+
+      const promises = []
+
+      for (const groupId of allPossibleGroupIds) {
+         const groupOperationsToMake: OperationsToMake =
+            cloneDeep(operationsToMake)
+
+         const groupHasBeenRemovedFromLivestream =
+            !newLivestreamStats?.livestream?.groupIds?.includes(groupId)
+
+         const groupHasBeenAddedToLivestream =
+            !oldLivestreamStats?.livestream?.groupIds?.includes(groupId)
+
+         if (groupHasBeenRemovedFromLivestream) {
+            addOperationsToDecrementGroupStatsOperations(
+               newLivestreamStats,
+               oldLivestreamStats,
+               groupOperationsToMake
+            )
+         }
+
+         if (groupHasBeenAddedToLivestream) {
+            addOperationsToOnlyIncrementGroupStatsOperations(
+               newLivestreamStats,
+               oldLivestreamStats,
+               groupOperationsToMake
+            )
+         }
+
+         // Check if there are any updates to livestreamStats
+         if (isEmpty(groupOperationsToMake)) {
+            logger.info(`No changes to group stats ${groupId}`, {
+               groupId,
+               groupOperationsToMake,
+            })
+         } else {
+            promises.push(
+               // Perform a Firestore transaction to update group stats
+               this.updateGroupStats(groupId, groupOperationsToMake).then(
+                  () => {
+                     logger.info(
+                        "Updated group stats with the following operations",
+                        {
+                           groupId,
+                           groupOperationsToMake,
+                        }
+                     )
+                  }
+               )
+            )
+         }
+      }
+
+      return Promise.allSettled(promises).then((results) => {
+         results.forEach((result) => {
+            if (result.status === "rejected") {
+               logger.error("Error updating group stats", {
+                  error: result.reason,
+                  result: result,
+               })
+            }
+         })
+      })
    }
 }
 

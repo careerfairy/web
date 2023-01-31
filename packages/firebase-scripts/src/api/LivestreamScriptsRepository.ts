@@ -16,6 +16,7 @@ import {
    DocRef,
    mapFirestoreDocuments,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { DataWithRef } from "../util/types"
 
 export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllRegisteredStudents(withRef?: boolean): Promise<RegisteredStudent[]>
@@ -31,7 +32,9 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       userType: LivestreamUserAction
    ): Promise<UserLivestreamData[]>
 
-   getAllUserLivestreamData(withRef: boolean): Promise<UserLivestreamData[]>
+   getAllUserLivestreamData<T extends boolean>(
+      withRef: T
+   ): Promise<DataWithRef<T, UserLivestreamData>[]>
 
    getAllLivestreamUsersByType(
       userType: LivestreamUserAction,
@@ -42,7 +45,10 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       eventId: string
    ): Promise<(UserLivestreamData & DocRef)[]>
 
-   getAllLivestreams(withTest?: boolean): Promise<LivestreamEvent[]>
+   getAllLivestreams<T extends boolean>(
+      withTest?: boolean,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]>
 }
 
 export class LivestreamScriptsRepository
@@ -89,7 +95,7 @@ export class LivestreamScriptsRepository
     * */
    async getAllUserLivestreamData<T extends boolean>(
       withRef?: T
-   ): Promise<UserLivestreamData[]> {
+   ): Promise<DataWithRef<T, UserLivestreamData>[]> {
       const snaps = await this.firestore
          .collectionGroup("userLivestreamData")
          .get()
@@ -132,9 +138,10 @@ export class LivestreamScriptsRepository
       return mapFirestoreDocuments<UserLivestreamData, true>(snaps, true)
    }
 
-   async getAllLivestreams(
-      withTest: boolean = false
-   ): Promise<LivestreamEvent[]> {
+   async getAllLivestreams<T extends boolean>(
+      withTest: boolean = false,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]> {
       let snaps
       if (withTest) {
          snaps = await this.firestore.collection("livestreams").get()
@@ -144,6 +151,6 @@ export class LivestreamScriptsRepository
             .where("test", "==", false)
             .get()
       }
-      return mapFirestoreDocuments<LivestreamEvent>(snaps)
+      return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
    }
 }

@@ -18,6 +18,7 @@ export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
 export interface LivestreamEvent extends Identifiable {
    author?: AuthorInfo
    summary?: string
+   reasonsToJoinLivestream?: string
    backgroundImageUrl?: string
    company?: string
    companyId?: string
@@ -123,6 +124,11 @@ export interface LivestreamEvent extends Identifiable {
    universities?: any[]
    questionsDisabled?: boolean
 
+   /**
+    * To deny access to the livestream recording after its end
+    */
+   denyRecordingAccess?: boolean
+
    // ATS Jobs
    /**
     * During livestream creating, jobs can be associated with the livestream
@@ -152,6 +158,12 @@ export interface LivestreamEvent extends Identifiable {
     * */
    index?: number
    parentLivestream?: LivestreamEventPublicData
+
+   /**
+    * Incremented on certain popularityEvents
+    * Updated via functions onCreate trigger
+    */
+   popularity?: number
 }
 
 /**
@@ -237,10 +249,21 @@ export interface UserLivestreamData extends Identifiable {
    }
 }
 
+export interface RecordingToken extends Identifiable {
+   recourseId: string
+   sid: string
+}
+
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
    date: firebase.firestore.Timestamp
    applicationId?: string
    job: Partial<Job>
+}
+
+export interface LivestreamRecordingDetails extends DocumentData {
+   minutesWatched?: number
+   viewers: string[]
+   views: number
 }
 
 export type LivestreamGroupQuestionsMap = Record<
@@ -272,13 +295,7 @@ export interface IEmailSent {
 
 export interface LiveStreamEventWithUsersLivestreamData
    extends LivestreamEvent {
-   usersLivestreamData: IUserLivestreamData[]
-}
-
-export interface IUserLivestreamData {
-   livestreamId?: string
-   userId?: string
-   user?: UserData
+   usersLivestreamData: UserLivestreamData[]
 }
 
 export interface Speaker extends Identifiable {
@@ -322,14 +339,25 @@ export interface EventRatingAnswer extends Identifiable {
    timestamp?: firebase.firestore.Timestamp
 }
 
-export interface LivestreamEventPublicData {
-   summary?: string
-   company?: string
-   title?: string
-   id: string
-   start?: firebase.firestore.Timestamp
-   companyLogoUrl?: string
-   test?: boolean
+export type LivestreamEventPublicData = Partial<
+   Pick<
+      LivestreamEvent,
+      | "summary"
+      | "company"
+      | "title"
+      | "start"
+      | "companyLogoUrl"
+      | "test"
+      | "groupIds"
+      | "interestsIds"
+      | "targetFieldsOfStudy"
+      | "targetLevelsOfStudy"
+      | "created"
+      | "impressions"
+      | "hasJobs"
+   >
+> & {
+   id: LivestreamEvent["id"]
 }
 
 export interface LivestreamQuestion extends Identifiable {
@@ -420,6 +448,13 @@ export const pickPublicDataFromLivestream = (
       start: livestreamData.start ?? null,
       companyLogoUrl: livestreamData.companyLogoUrl ?? null,
       test: livestreamData.test ?? false,
+      groupIds: livestreamData.groupIds ?? [],
+      interestsIds: livestreamData.interestsIds ?? [],
+      targetFieldsOfStudy: livestreamData.targetFieldsOfStudy ?? [],
+      targetLevelsOfStudy: livestreamData.targetLevelsOfStudy ?? [],
+      impressions: livestreamData.impressions ?? 0,
+      created: livestreamData.created ?? null,
+      hasJobs: livestreamData.hasJobs ?? false,
    }
 }
 

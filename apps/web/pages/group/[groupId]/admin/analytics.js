@@ -6,7 +6,7 @@ import { GroupAnalyticsProvider } from "../../../../HOCs/GroupAnalyticsProvider"
 
 const AnalyticsPage = ({ groupId }) => {
    return (
-      <GroupDashboardLayout groupId={groupId}>
+      <GroupDashboardLayout pageDisplayName={"Analytics"} groupId={groupId}>
          <DashboardHead title="CareerFairy | Admin Analytics of" />
          <GroupAnalyticsProvider>
             <AnalyticsOverview />

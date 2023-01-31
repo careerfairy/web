@@ -1,7 +1,7 @@
 import functions = require("firebase-functions")
 import { bigQueryRepo } from "./api/repositories"
 import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 
 /**
  * Get Users

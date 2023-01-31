@@ -8,6 +8,7 @@ import ProfileCategories from "./ProfileCategories"
 import ProfilePrivacyPolicy from "./ProfilePrivacyPolicy"
 import { withFirebase } from "../../../../../context/firebase/FirebaseServiceContext"
 import ProfileBanner from "./ProfileBanner"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -18,7 +19,8 @@ const useStyles = makeStyles((theme) => ({
    },
 }))
 
-const EditOverview = ({ firebase, group }) => {
+const EditOverview = ({ firebase }) => {
+   const { group } = useGroup()
    const classes = useStyles()
 
    return (

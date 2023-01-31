@@ -63,4 +63,10 @@ export default class UserPresenter extends BasePresenter<UserData> {
    static watchAllHighlightsRequiredBadge(): Badge {
       return ResearchBadgeLevel2
    }
+
+   getDisplayName(): string {
+      return [this.model.firstName, this.model.lastName]
+         .filter(Boolean)
+         .join(" ")
+   }
 }

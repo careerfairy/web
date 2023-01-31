@@ -1365,3 +1365,170 @@ export const channelOptionCodes = [
       name: "Tik Tok",
    },
 ]
+
+export const CompanySizesCodes = [
+   {
+      id: "1-20",
+      value: "1-20",
+      label: "1-20 employees",
+   },
+   {
+      id: "21-100",
+      value: "21-100",
+      label: "21-100 employees",
+   },
+   {
+      id: "101-1000",
+      value: "101-1000",
+      label: "101-1000 employees",
+   },
+   {
+      id: "1001+",
+      value: "1001+",
+      label: "1001+ employees",
+   },
+] as DropdownItem[]
+
+export const CompanyIndustryValues = [
+   {
+      id: "Accounting",
+      name: "Accounting",
+   },
+   {
+      id: "Aerospace&Defence",
+      name: "Aerospace & Defence",
+   },
+   {
+      id: "Agriculture",
+      name: "Agriculture",
+   },
+   {
+      id: "Architecture&Planning",
+      name: "Architecture & Planning",
+   },
+   {
+      id: "Arts&Culture",
+      name: "Arts & Culture",
+   },
+   {
+      id: "Automotive",
+      name: "Automotive",
+   },
+   {
+      id: "Chemical",
+      name: "Chemical",
+   },
+   {
+      id: "Construction",
+      name: "Construction",
+   },
+   {
+      id: "Design",
+      name: "Design",
+   },
+   {
+      id: "Education",
+      name: "Education",
+   },
+   {
+      id: "Energy",
+      name: "Energy",
+   },
+   {
+      id: "Engineering",
+      name: "Engineering",
+   },
+   {
+      id: "Entertainment",
+      name: "Entertainment",
+   },
+   {
+      id: "Finance&Banking",
+      name: "Finance & Banking",
+   },
+   {
+      id: "FMCG",
+      name: "FMCG",
+   },
+   {
+      id: "Healthcare",
+      name: "Healthcare",
+   },
+   {
+      id: "Hospitality",
+      name: "Hospitality",
+   },
+   {
+      id: "Insurance",
+      name: "Insurance",
+   },
+   {
+      id: "Legal",
+      name: "Legal",
+   },
+   {
+      id: "Leisure,Travel&Tourism",
+      name: "Leisure, Travel & Tourism",
+   },
+   {
+      id: "Logistics",
+      name: "Logistics",
+   },
+   {
+      id: "ManagementConsulting",
+      name: "Management Consulting",
+   },
+   {
+      id: "Manufacturing",
+      name: "Manufacturing",
+   },
+   {
+      id: "Marketing&Communication",
+      name: "Marketing & Communication",
+   },
+   {
+      id: "Media",
+      name: "Media",
+   },
+   {
+      id: "Non-profit&Charity",
+      name: "Non-profit & Charity",
+   },
+   {
+      id: "Other",
+      name: "Other",
+   },
+   {
+      id: "Pharmaceutical",
+      name: "Pharmaceutical",
+   },
+   {
+      id: "PublicSector",
+      name: "Public Sector",
+   },
+   {
+      id: "RealEstate",
+      name: "Real Estate",
+   },
+   {
+      id: "Retail",
+      name: "Retail",
+   },
+   {
+      id: "Technology&IT",
+      name: "Technology & IT",
+   },
+   {
+      id: "Telecommunications",
+      name: "Telecommunications",
+   },
+   {
+      id: "VentureCapital&PrivateEquity",
+      name: "Venture Capital & Private Equity",
+   },
+] as OptionGroup[]
+
+export const CompanyCountryValues = countriesOptionCodes.map((country) => ({
+   id: country.id,
+   name: country.name,
+})) as OptionGroup[]

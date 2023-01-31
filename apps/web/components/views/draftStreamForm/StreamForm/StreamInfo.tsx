@@ -392,7 +392,7 @@ const StreamInfo = ({
                      fullWidth
                      multiline
                      id="summary"
-                     label="Summary"
+                     label="What Is the Live Stream About?"
                      maxRows={10}
                      inputProps={{ maxLength: 5000 }}
                      onBlur={handleBlur}
@@ -400,7 +400,12 @@ const StreamInfo = ({
                      disabled={isSubmitting}
                      error={Boolean(errors.summary && touched.summary)}
                      onChange={handleChange}
-                     placeholder="Write something about this stream"
+                     placeholder={
+                        "Describe your live stream\n" +
+                        "  - [Company] is one of the leading companies in the [industry]. We have [XYZ] employees globally...\n" +
+                        "  - We are going to present how a day in the life of our consultants looks like\n" +
+                        "  - Agenda: 30 minutes presentation and 30 minutes Q&A"
+                     }
                      sx={{ minHeight: "100px", textAlign: "start" }}
                   />
                   <Collapse
@@ -408,6 +413,46 @@ const StreamInfo = ({
                      in={Boolean(errors.summary && touched.summary)}
                   >
                      {errors.summary}
+                  </Collapse>
+               </FormControl>
+            </Grid>
+
+            <Grid xs={12} item>
+               <FormControl fullWidth>
+                  <TextField
+                     className="multiLineInput"
+                     name="reasonsToJoinLivestream"
+                     variant="outlined"
+                     fullWidth
+                     multiline
+                     id="reasonsToJoinLivestream"
+                     label="3 Reasons Why Talent Should Join Your Live Stream"
+                     maxRows={10}
+                     inputProps={{ maxLength: 5000 }}
+                     onBlur={handleBlur}
+                     value={values.reasonsToJoinLivestream}
+                     disabled={isSubmitting}
+                     error={Boolean(
+                        errors.reasonsToJoinLivestream &&
+                           touched.reasonsToJoinLivestream
+                     )}
+                     onChange={handleChange}
+                     placeholder={
+                        "Provide three bullet points describing why young talent should join your live stream:\n" +
+                        "  - Find out, which job benefits await you as a [title of open position/program]\n" +
+                        "  - Learn what skills from your studies you can apply in this working environment\n" +
+                        "  - Start job application process in-stream and skip first round of interviews"
+                     }
+                     sx={{ minHeight: "100px", textAlign: "start" }}
+                  />
+                  <Collapse
+                     className={classes.errorMessage}
+                     in={Boolean(
+                        errors.reasonsToJoinLivestream &&
+                           touched.reasonsToJoinLivestream
+                     )}
+                  >
+                     {errors.reasonsToJoinLivestream}
                   </Collapse>
                </FormControl>
             </Grid>

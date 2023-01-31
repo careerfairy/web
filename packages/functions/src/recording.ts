@@ -12,9 +12,9 @@ import {
    downloadLink,
    S3_ROOT_PATH,
    MAX_RECORDING_HOURS,
-} from "@careerfairy/shared-lib/dist/livestreams/recordings"
-import config = require("./config")
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams/recordings"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import config from "./config"
 
 /**
  * Automatically record a livestream

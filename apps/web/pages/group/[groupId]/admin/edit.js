@@ -5,7 +5,10 @@ import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHea
 
 const EditGroupProfile = ({ groupId }) => {
    return (
-      <GroupDashboardLayout groupId={groupId}>
+      <GroupDashboardLayout
+         pageDisplayName={"Company Information"}
+         groupId={groupId}
+      >
          <DashboardHead title="CareerFairy | Admin Edit Details of" />
          <EditOverview />
       </GroupDashboardLayout>

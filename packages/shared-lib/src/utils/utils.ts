@@ -60,18 +60,23 @@ export const chunkArray = <T>(list: T[], chunk: number): T[][] => {
  * Sort Livestreams from more recent to oldest
  * @param a
  * @param b
+ * @param reverse ascending ordering
  */
 export const sortLivestreamsDesc = (
    a: LivestreamEvent,
-   b: LivestreamEvent
+   b: LivestreamEvent,
+   reverse = false
 ): number => {
-   if (a.start instanceof Date && b.start instanceof Date) {
-      return b.start.getTime() - a.start.getTime()
+   let aa = reverse ? b : a
+   let bb = reverse ? a : b
+
+   if (aa.start instanceof Date && bb.start instanceof Date) {
+      return bb.start.getTime() - aa.start.getTime()
    }
 
-   if (a.start["toDate"] && b.start["toDate"]) {
+   if (aa.start?.["toDate"] && bb.start?.["toDate"]) {
       // convert from firebase timestamp type
-      return b.start.toDate().getTime() - a.start.toDate().getTime()
+      return bb.start.toDate().getTime() - aa.start.toDate().getTime()
    }
 
    return 0
@@ -126,4 +131,12 @@ export const addUtmTagsToLink = ({
    url.search = params.toString()
 
    return url.toString()
+}
+
+/**
+ * Round a number and limit the decimal places
+ */
+export const round = (num: number, decimalPlaces: number): number => {
+   let f = Math.pow(10, decimalPlaces)
+   return Math.round((num + Number.EPSILON) * f) / f
 }

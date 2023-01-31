@@ -74,6 +74,12 @@ export interface UserData extends Identifiable {
     * User groups now live under a subcollection named userGroups
     */
    registeredGroups?: RegisteredGroup[]
+
+   /**
+    * Last user activity on any device
+    */
+   lastActivityAt: firebase.firestore.Timestamp
+   createdAt: firebase.firestore.Timestamp
 }
 
 /*
@@ -144,6 +150,21 @@ export interface SavedRecruiter extends Identifiable {
 }
 
 /**
+ * Document that sets the user as part of a talent pool for a group
+ * Mainly used for the group analytics
+ *
+ * /userData/:id/talentProfiles/:groupId
+ */
+export interface TalentProfile extends Identifiable {
+   groupId: string
+   userId: string
+   userEmail: string
+   user: UserData
+   mostRecentLivestream: LivestreamEvent
+   joinedAt: firebase.firestore.Timestamp
+}
+
+/**
  * Document /userData/{id}/ats/ats
  *
  * Will store the user ATS existent relationships
@@ -192,6 +213,7 @@ export interface TalentPoolStudent extends UserData {
 
 export interface UserPublicData {
    id: string
+   authId: string
    firstName: string
    lastName: string
    badges?: string[]
@@ -233,6 +255,7 @@ export interface UserJobApplicationDocument extends Identifiable {
 export const pickPublicDataFromUser = (userData: UserData): UserPublicData => {
    return {
       id: userData.id,
+      authId: userData.authId,
       firstName: userData.firstName,
       lastName: userData.lastName,
       badges: userData.badges || [],

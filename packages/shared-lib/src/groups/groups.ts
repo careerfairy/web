@@ -25,7 +25,10 @@ export interface Group extends Identifiable {
    privacyPolicyUrl?: string
    inActive?: boolean
    bannerImageUrl?: string
-
+   atsAdminPageFlag?: boolean
+   companyCountry?: GroupOption
+   companyIndustry?: GroupOption
+   companySize?: string
    /*
     * Deprecated
     * */
@@ -183,3 +186,14 @@ export type PublicGroup = Pick<
    | "universityName"
    | "universityCode"
 >
+
+export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
+   return {
+      id: group.id,
+      description: group.description ?? null,
+      logoUrl: group.logoUrl ?? null,
+      extraInfo: group.extraInfo ?? null,
+      universityName: group.universityName ?? null,
+      universityCode: group.universityCode ?? null,
+   }
+}
