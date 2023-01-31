@@ -2,11 +2,11 @@ import { admin } from "./firestoreAdmin"
 import {
    FirebaseUserRepository,
    IUserRepository,
-} from "@careerfairy/shared-lib/dist/users/UserRepository"
+} from "@careerfairy/shared-lib/users/UserRepository"
 import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
-} from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
+} from "@careerfairy/shared-lib/fieldOfStudy/FieldOfStudyRepository"
 import {
    bigQueryClient,
    BigQueryRepository,
@@ -15,7 +15,7 @@ import {
 import {
    FirebaseMarketingUsersRepository,
    IMarketingUsersRepository,
-} from "@careerfairy/shared-lib/dist/marketing/MarketingRepo"
+} from "@careerfairy/shared-lib/marketing/MarketingRepo"
 import {
    ILivestreamFunctionsRepository,
    LivestreamFunctionsRepository,

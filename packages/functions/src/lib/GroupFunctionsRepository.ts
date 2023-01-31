@@ -1,28 +1,28 @@
 import {
    FirebaseGroupRepository,
    IGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+} from "@careerfairy/shared-lib/groups/GroupRepository"
 import {
    Group,
    GROUP_DASHBOARD_ROLE,
    GroupAdmin,
    GroupQuestion,
-} from "@careerfairy/shared-lib/dist/groups"
-import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { GroupATSAccount } from "@careerfairy/shared-lib/dist/groups/GroupATSAccount"
+} from "@careerfairy/shared-lib/groups"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
 import { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
 import { OperationsToMake } from "./stats/util"
-import { createGroupStatsDoc } from "@careerfairy/shared-lib/dist/groups/stats"
+import { createGroupStatsDoc } from "@careerfairy/shared-lib/groups/stats"
 import { cloneDeep, isEmpty, union } from "lodash"
 import {
    addGroupStatsOperations,
    addOperationsToDecrementGroupStatsOperations,
    addOperationsToOnlyIncrementGroupStatsOperations,
 } from "./stats/group"
-import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import type { FunctionsLogger } from "../util"
 import { admin } from "../api/firestoreAdmin"
 

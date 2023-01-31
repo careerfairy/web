@@ -6,7 +6,7 @@ import {
 } from "./lib/validations"
 import { marketingUsersRepo, userRepo } from "./api/repositories"
 import { object, string } from "yup"
-import { MarketingUserCreationFields } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
+import { MarketingUserCreationFields } from "@careerfairy/shared-lib/marketing/MarketingUser"
 
 /**
  * Creates a user in the marketingUsers collection
