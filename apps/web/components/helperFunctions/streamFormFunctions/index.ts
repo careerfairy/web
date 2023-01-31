@@ -193,6 +193,12 @@ export const validateStreamForm = (
    if (!values.title) {
       errors.title = "Required"
    }
+   if (!values.summary) {
+      errors.summary = "Required"
+   }
+   if (!values.reasonsToJoinLivestream) {
+      errors.reasonsToJoinLivestream = "Required"
+   }
 
    const now = new Date()
 
