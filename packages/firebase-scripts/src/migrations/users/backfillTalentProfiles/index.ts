@@ -44,8 +44,7 @@ export async function run() {
 
    bar.start(users.length, 0)
 
-   //
-   processLivestreams(livestreams)
+   await processLivestreams(livestreams)
 
    await bulkWriter.close()
    bar.stop()
@@ -56,15 +55,18 @@ export async function run() {
  * Check the users in the talentPool for the livestreams
  */
 const processLivestreams = async (livestreams: LivestreamEvent[]) => {
+   let count = 0
    for (const livestream of livestreams) {
       if (!livestream.talentPool) continue
 
       for (const userEmail of livestream.talentPool) {
          addTalentProfilesToUser(userEmail, livestream)
+         if (++count % 80 === 0) {
+            await bulkWriter.flush()
+         }
       }
-
-      await bulkWriter.flush()
    }
+   await bulkWriter.flush()
 }
 
 /**
@@ -102,11 +104,11 @@ function addTalentProfilesToUser(
       const data: TalentProfile = {
          id: groupId,
          groupId,
-         userId: userData.authId,
-         userEmail: userData.userEmail,
-         user: userData,
-         mostRecentLivestream: livestream,
-         joinedAt: livestream.start,
+         userId: userData.authId ?? null,
+         userEmail: userData.userEmail ?? null,
+         user: userData ?? null,
+         mostRecentLivestream: livestream ?? null,
+         joinedAt: livestream.start ?? null,
       }
 
       bulkWriter
@@ -115,13 +117,7 @@ function addTalentProfilesToUser(
             counter.writeIncrement()
          })
          .catch((error) => {
-            console.error(
-               "bulkWriter.set failed",
-               error,
-               userData,
-               data,
-               livestream
-            )
+            console.error("bulkWriter.set failed", error)
             counter.addToCustomCount(counterConstants.numFailedWrites, 1)
          })
          .finally(() => {
