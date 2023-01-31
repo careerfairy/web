@@ -2,11 +2,11 @@ import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
 import {
    PopularityEventType,
    PopularityEventData,
-   PopularityEventTypes,
 } from "@careerfairy/shared-lib/livestreams/popularity"
 import {
    addDoc,
    collection,
+   deleteDoc,
    doc,
    Firestore,
    serverTimestamp,
@@ -17,9 +17,79 @@ import {
    LivestreamEvent,
    pickPublicDataFromLivestream,
 } from "@careerfairy/shared-lib/livestreams"
+import { getReferralInformation } from "util/CommonUtil"
 
 export class RecommendationService {
    constructor(private readonly firestore: Firestore) {}
+
+   createdQuestion(livestream: LivestreamEvent, userData: UserData) {
+      if (!userData) return
+
+      this.addPopularityEvent("CREATED_QUESTION", livestream, {
+         user: userData,
+         customId: userData.authId,
+      })
+   }
+
+   joinTalentPool(livestream: LivestreamEvent, userData: UserData) {
+      if (!userData) return
+
+      this.addPopularityEvent("JOINED_TALENT_POOL", livestream, {
+         user: userData,
+         customId: userData.authId,
+      })
+   }
+
+   leaveTalentPool(livestreamId: string, authId: string) {
+      this.removePopularityEvent("JOINED_TALENT_POOL", livestreamId, authId)
+   }
+
+   visitDetailPage(livestream: LivestreamEvent, visitorId: string) {
+      let type: PopularityEventType = "VISITED_DETAIL_PAGE"
+      if (getReferralInformation()?.referralCode) {
+         type = "VISITED_DETAIL_PAGE_FROM_SHARED_LINK"
+      }
+
+      this.addPopularityEvent(type, livestream, {
+         customId: visitorId,
+      })
+   }
+
+   upvoteQuestion(livestream: LivestreamEvent, userData: UserData) {
+      if (!userData) return
+
+      this.addPopularityEvent("UPVOTED_QUESTION", livestream, {
+         user: userData,
+         customId: userData.authId,
+      })
+   }
+
+   registerEvent(livestream: LivestreamEvent, userData: UserData) {
+      if (!userData) return
+
+      let type: PopularityEventType = "SUCCESSFULLY_REGISTERED_TO_EVENT"
+      if (getReferralInformation()?.referralCode) {
+         type = "SUCCESSFULLY_REGISTERED_TO_EVENT_FROM_SHARED_LINK"
+      }
+
+      this.addPopularityEvent(type, livestream, {
+         user: userData,
+         customId: userData.authId,
+      })
+   }
+
+   unRegisterEvent(livestreamId: string, authId: string) {
+      this.removePopularityEvent(
+         "SUCCESSFULLY_REGISTERED_TO_EVENT",
+         livestreamId,
+         authId
+      )
+      this.removePopularityEvent(
+         "SUCCESSFULLY_REGISTERED_TO_EVENT_FROM_SHARED_LINK",
+         livestreamId,
+         authId
+      )
+   }
 
    /**
     * Adds a popularity event to the database
@@ -29,7 +99,7 @@ export class RecommendationService {
     * @param livestream - Livestream object
     * @param type - Popularity event type
     */
-   addPopularityEvent(
+   private addPopularityEvent(
       type: PopularityEventType,
       livestream: LivestreamEvent,
       options?: AddPopularityEventOptions
@@ -40,8 +110,6 @@ export class RecommendationService {
 
          livestreamId: livestream.id,
          livestream: pickPublicDataFromLivestream(livestream),
-
-         points: this.getPoints(type),
       }
 
       if (options?.user) {
@@ -55,7 +123,15 @@ export class RecommendationService {
          // we have a document id to use
          docSegments.push(this.docId(type, options.customId))
          const docRef = doc(this.firestore, "livestreams", ...docSegments)
-         setDoc(docRef, data).catch(console.error)
+         setDoc(docRef, data).catch((e) => {
+            // rules don't allow document updates to save costs
+            // ignore error
+            if (e?.message?.includes("PERMISSION_DENIED")) {
+               return
+            }
+
+            console.error(e)
+         })
       } else {
          // let firestore generate a document id
          addDoc(
@@ -65,8 +141,24 @@ export class RecommendationService {
       }
    }
 
-   private getPoints(type: PopularityEventType) {
-      return PopularityEventTypes[type]
+   /**
+    * Remove a popularity event document
+    * Will trigger a function that decreases the livestream popularity field
+    */
+   private removePopularityEvent(
+      type: PopularityEventType,
+      livestreamId: string,
+      docId: string
+   ) {
+      deleteDoc(
+         doc(
+            this.firestore,
+            "livestreams",
+            livestreamId,
+            "popularityEvents",
+            this.docId(type, docId)
+         )
+      ).catch(console.error)
    }
 
    private docId(type: PopularityEventType, customId: string) {

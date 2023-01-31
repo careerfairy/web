@@ -100,14 +100,7 @@ const QuestionCreateForm = () => {
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
 
-            recommendationServiceInstance.addPopularityEvent(
-               "CREATED_QUESTION",
-               livestream,
-               {
-                  user: userData,
-                  customId: userData?.authId,
-               }
-            )
+            recommendationServiceInstance.createdQuestion(livestream, userData)
 
             customHandleNext()
 

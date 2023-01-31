@@ -64,15 +64,6 @@ const TalentPoolJoin = () => {
          setJoiningTalentPool(true)
          await joinCompanyTalentPool(livestream.companyId, userData, livestream)
 
-         recommendationServiceInstance.addPopularityEvent(
-            "JOINED_TALENT_POOL",
-            livestream,
-            {
-               user: userData,
-               customId: userData?.authId,
-            }
-         )
-
          handleNext()
       } catch (e) {}
       setJoiningTalentPool(false)

@@ -448,7 +448,7 @@ export const pickPublicDataFromLivestream = (
       targetLevelsOfStudy: livestreamData.targetLevelsOfStudy ?? [],
       impressions: livestreamData.impressions ?? 0,
       created: livestreamData.created ?? null,
-      hasJobs: livestreamData.hasJobs,
+      hasJobs: livestreamData.hasJobs ?? false,
    }
 }
 
