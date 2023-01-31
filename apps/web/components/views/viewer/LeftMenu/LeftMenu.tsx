@@ -16,7 +16,7 @@ import {
    focusModeEnabledSelector,
    leftMenuOpenSelector,
 } from "../../../../store/selectors/streamSelectors"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import JobsCategory from "../../streaming/LeftMenu/categories/JobsCategory"
 import GenericCategoryInactive from "../../streaming/sharedComponents/GenericCategoryInactive"
 import { LEFT_MENU_WIDTH } from "../../../../constants/streams"

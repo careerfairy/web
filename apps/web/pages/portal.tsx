@@ -14,8 +14,8 @@ import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants
 import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { fromDate } from "data/firebase/FirebaseInstance"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { mapFromServerSide } from "util/serverUtil"
 
 const PortalPage = ({
    highlights,
@@ -28,6 +28,10 @@ const PortalPage = ({
       authenticatedUser.email || userData?.interestsIds
    )
    const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
+   const comingUpNext = useMemo(
+      () => mapFromServerSide(comingUpNextEvents),
+      [comingUpNextEvents]
+   )
 
    return (
       <>
@@ -47,7 +51,7 @@ const PortalPage = ({
                   />
                   {hasInterests ? <RecommendedEvents limit={10} /> : null}
                   <ComingUpNextEvents
-                     serverSideEvents={comingUpNextEvents}
+                     serverSideEvents={comingUpNext}
                      limit={20}
                   />
                   <MyNextEvents limit={20} />
@@ -93,15 +97,6 @@ export const getServerSideProps = async () => {
          }),
       },
    }
-}
-
-/**
- * To parse the events coming from server side
- */
-const mapFromServerSide = (events: { [p: string]: any }[]) => {
-   return events.map((e) =>
-      LivestreamPresenter.parseDocument(e as any, fromDate)
-   )
 }
 
 export default PortalPage

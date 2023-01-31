@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React, { memo, useEffect, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import Section from "components/views/common/Section"
@@ -21,6 +20,8 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
 import { connectedIcon } from "../../../../constants/svgs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const styles = {
    header: {
@@ -61,7 +62,22 @@ const styles = {
    },
 }
 
-const TalentPoolSection = memo((props) => {
+type Props = {
+   backgroundColor?: string
+   backgroundImage?: string
+   backgroundImageClassName?: string
+   backgroundImageOpacity?: number
+   big?: any
+   color?: string
+   subtitle?: string
+   title?: string
+   stream: LivestreamEvent
+   registered: any
+   handleOpenJoinModal: any
+   overheadText?: any
+}
+
+const TalentPoolSection = (props: Props) => {
    const theme = useTheme()
 
    const { joinCompanyTalentPool, leaveCompanyTalentPool } =
@@ -117,6 +133,15 @@ const TalentPoolSection = memo((props) => {
             props.stream.companyId,
             userData,
             props.stream
+         )
+
+         recommendationServiceInstance.addPopularityEvent(
+            "JOINED_TALENT_POOL",
+            props.stream,
+            {
+               user: userData,
+               customId: userData?.authId,
+            }
          )
       } catch (e) {}
       setJoiningTalentPool(false)
@@ -184,11 +209,11 @@ const TalentPoolSection = memo((props) => {
                            <Typography sx={{ color }} variant="body1">
                               We want to make it easy for students and young
                               pros to find the right company for them. To help
-                              you let companies know that you're interested in
-                              potentially joining - now or in the future -,
-                              we've invented the Talent Pool. By joining its
-                              talent pool, the company can contact you at any
-                              time with a relevant opportunity.
+                              you let companies know that you&apos;re interested
+                              in potentially joining - now or in the future -,
+                              we&apos;ve invented the Talent Pool. By joining
+                              its talent pool, the company can contact you at
+                              any time with a relevant opportunity.
                            </Typography>
                         </Box>
                         <Box
@@ -252,17 +277,6 @@ const TalentPoolSection = memo((props) => {
          </SectionContainer>
       </Section>
    )
-})
-
-export default TalentPoolSection
-
-TalentPoolSection.propTypes = {
-   backgroundColor: PropTypes.any,
-   backgroundImage: PropTypes.any,
-   backgroundImageClassName: PropTypes.any,
-   backgroundImageOpacity: PropTypes.any,
-   big: PropTypes.any,
-   color: PropTypes.any,
-   subtitle: PropTypes.any,
-   title: PropTypes.any,
 }
+
+export default memo(TalentPoolSection)

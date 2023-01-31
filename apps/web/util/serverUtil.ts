@@ -1,5 +1,7 @@
 import { store } from "../pages/_app"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { fromDate } from "data/firebase/FirebaseInstance"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -37,4 +39,14 @@ export const getServerSideGroup = async (groupId: string) => {
       serverSideGroup.id = snap.id
    }
    return serverSideGroup
+}
+
+/**
+ * To parse the events coming from server side
+ */
+export const mapFromServerSide = (events: { [p: string]: any }[]) => {
+   if (!events) return []
+   return events.map((e) =>
+      LivestreamPresenter.parseDocument(e as any, fromDate)
+   )
 }
