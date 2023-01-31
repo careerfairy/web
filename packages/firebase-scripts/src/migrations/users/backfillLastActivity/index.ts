@@ -7,7 +7,7 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import counterConstants from "../../../lib/Counter/constants"
 import { getCLIBarOptions } from "../../../util/misc"
 
-const USER_CHUNKS = 1000
+const USER_CHUNKS = 100
 const counter = new Counter()
 const bar = new cliProgress.SingleBar(
    {
