@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import GeneralLayout from "layouts/GeneralLayout"
 import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
@@ -15,6 +15,7 @@ import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { fromDate } from "data/firebase/FirebaseInstance"
 
 const PortalPage = ({
    highlights,
@@ -26,6 +27,7 @@ const PortalPage = ({
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
+   const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
 
    return (
       <>
@@ -43,7 +45,7 @@ const PortalPage = ({
                      showHighlights={showHighlights}
                      serverSideHighlights={highlights}
                   />
-                  {hasInterests && <RecommendedEvents limit={10} />}
+                  {hasInterests ? <RecommendedEvents limit={10} /> : null}
                   <ComingUpNextEvents
                      serverSideEvents={comingUpNextEvents}
                      limit={20}
@@ -53,7 +55,7 @@ const PortalPage = ({
                      id={"past-events"}
                      title={"PAST EVENTS"}
                      type={EventsTypes.pastEvents}
-                     events={mapFromServerSide(pastEvents)}
+                     events={events}
                      seeMoreLink={"/next-livestreams?type=pastEvents"}
                      // No need to show loading as these events have already been queried server side
                      loading={false}
@@ -97,7 +99,9 @@ export const getServerSideProps = async () => {
  * To parse the events coming from server side
  */
 const mapFromServerSide = (events: { [p: string]: any }[]) => {
-   return events.map(LivestreamPresenter.parseDocument)
+   return events.map((e) =>
+      LivestreamPresenter.parseDocument(e as any, fromDate)
+   )
 }
 
 export default PortalPage

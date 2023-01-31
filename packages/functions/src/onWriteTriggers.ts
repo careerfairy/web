@@ -6,7 +6,7 @@ import {
    logStart,
    defaultTriggerRunTimeConfig,
 } from "./lib/triggers/util"
-import config = require("./config")
+import config from "./config"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
