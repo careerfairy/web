@@ -106,7 +106,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       })
    )
 
-   // only adds recording request if token as email
+   // only adds recording request if token has email
    if (token?.email) {
       promises.push(
          livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days)
