@@ -163,7 +163,7 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
 
          return timeLeft?.Days === 0
             ? "Last day to rewatch"
-            : `${timeLeft.Days} days to rewatch`
+            : `${timeLeft.Days} days left to rewatch`
       },
       []
    )
