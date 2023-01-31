@@ -167,65 +167,60 @@ export class LivestreamFunctionsRepository
 
       const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
 
-      return this.firestore.runTransaction(async (transaction) => {
-         const statsSnap = await transaction.get(statsRef)
+      const statsSnap = await statsRef.get()
 
-         if (!statsSnap.exists) {
-            // Create the stats document
-            const livestreamDoc = await transaction.get(livestreamRef)
+      if (!statsSnap.exists) {
+         // Create the stats document
+         const livestreamDoc = await livestreamRef.get()
 
-            if (!livestreamDoc.exists) {
-               return // Livestream was deleted, no need to update the stats
-            }
-
-            const statsDoc = createLiveStreamStatsDoc(
-               this.addIdToDoc<LivestreamEvent>(livestreamDoc),
-               statsRef.id
-            )
-            transaction.set(statsRef, statsDoc)
+         if (!livestreamDoc.exists) {
+            return // Livestream was deleted, no need to update the stats
          }
 
-         // We have to use an update method here because the set method does not support nested updates/operations
-         transaction.update(statsRef, operationsToMake)
-      })
+         const statsDoc = createLiveStreamStatsDoc(
+            this.addIdToDoc<LivestreamEvent>(livestreamDoc),
+            statsRef.id
+         )
+         await statsRef.set(statsDoc)
+      }
+
+      // We have to use an update method here because the set method does not support nested updates/operations
+      return statsRef.update(operationsToMake)
    }
 
-   syncLiveStreamStatsWithLivestream(
+   async syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
    ): Promise<void> {
       const latestLivestreamDoc = snapshotChange.after
 
-      return this.firestore.runTransaction(async (transaction) => {
-         const statsRef = this.firestore
-            .collection("livestreams")
-            .doc(latestLivestreamDoc.id)
-            .collection("stats")
-            .doc("livestreamStats")
+      const statsRef = this.firestore
+         .collection("livestreams")
+         .doc(latestLivestreamDoc.id)
+         .collection("stats")
+         .doc("livestreamStats")
 
-         if (!latestLivestreamDoc.exists) {
-            // Livestream was deleted, delete the stats document
-            transaction.delete(statsRef)
-            return
+      if (!latestLivestreamDoc.exists) {
+         // Livestream was deleted, delete the stats document
+         return statsRef.delete()
+      }
+
+      const statsSnap = await statsRef.get()
+
+      const livestream = this.addIdToDoc<LivestreamEvent>(
+         latestLivestreamDoc as any
+      )
+
+      if (!statsSnap.exists) {
+         // Create the stats document
+         const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
+         return statsRef.set(statsDoc)
+      } else {
+         const toUpdate: Pick<LiveStreamStats, "livestream"> = {
+            livestream: livestream,
          }
 
-         const statsSnap = await transaction.get(statsRef)
-
-         const livestream = this.addIdToDoc<LivestreamEvent>(
-            latestLivestreamDoc as any
-         )
-
-         if (!statsSnap.exists) {
-            // Create the stats document
-            const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
-            transaction.set(statsRef, statsDoc)
-         } else {
-            const toUpdate: Pick<LiveStreamStats, "livestream"> = {
-               livestream: livestream,
-            }
-
-            transaction.update(statsRef, toUpdate)
-         }
-      })
+         return statsRef.update(toUpdate)
+      }
    }
 
    async addOperationsToLiveStreamStats(
@@ -286,7 +281,7 @@ export class LivestreamFunctionsRepository
             liveStreamStatsToUpdate: livestreamStatsDocOperationsToMake,
          })
       } else {
-         // Perform a Firestore transaction to update livestreamStats
+         // Update livestreamStats
          await this.updateLiveStreamStats(
             livestreamId,
             livestreamStatsDocOperationsToMake
