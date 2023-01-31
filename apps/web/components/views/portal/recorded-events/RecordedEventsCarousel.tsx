@@ -1,8 +1,5 @@
 import { Box, Container, IconButton, Typography } from "@mui/material"
-import {
-   LivestreamEvent,
-   RecordingToken,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { StylesProps } from "../../../../types/commonTypes"
 import Image from "next/image"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
@@ -133,21 +130,10 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
     */
    const handleBannerPlayRecording = useCallback(
       async (livestream: LivestreamEvent) => {
-         const promises = []
-         promises.push(
-            livestreamRepo.getLivestreamRecordingToken(livestream.id),
-            livestreamRepo.updateRecordingStats({
-               livestreamId: livestream.id,
-               userId: userData?.userEmail,
-            })
-         )
-
-         const promisesResults = await Promise.allSettled(promises)
-
-         const [recordingToken] = promisesResults
-            .filter((result) => result.status === "fulfilled")
-            .map(
-               (result: PromiseFulfilledResult<RecordingToken>) => result.value
+         const recordingToken =
+            await livestreamRepo.getLivestreamRecordingTokenAndIncrementViewStat(
+               livestream.id,
+               userData?.userEmail
             )
 
          setVideoUrl(
