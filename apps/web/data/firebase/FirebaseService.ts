@@ -306,6 +306,7 @@ class FirebaseService {
          livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
+         company_background_image_url: livestream.backgroundImageUrl,
          livestream_title: livestream.title,
          livestream_link: linkToLivestream,
       })
