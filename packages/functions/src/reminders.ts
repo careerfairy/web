@@ -237,7 +237,7 @@ export const scheduleReminderEmails = functions
 /**
  * When a livestreams ends we should schedule a reminder for the next day at 11 AM to all the non attendees
  */
-exports.sendReminderToNonAttendeesWhenLivestreamsEnds = functions
+export const sendReminderToNonAttendeesWhenLivestreamsEnds = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onUpdate(async (change) => {
