@@ -187,6 +187,11 @@ export interface ILivestreamRepository {
       userId,
       onlyIncrementMinutes,
    }: UpdateRecordingStatsProps): Promise<void>
+
+   getLivestreamRecordingTokenAndIncrementViewStat(
+      livestreamId: string,
+      userId: string
+   ): Promise<RecordingToken>
 }
 
 export class FirebaseLivestreamRepository
@@ -736,6 +741,28 @@ export class FirebaseLivestreamRepository
       }
 
       return docRef.set(details, { merge: true })
+   }
+
+   async getLivestreamRecordingTokenAndIncrementViewStat(
+      livestreamId: string,
+      userId: string
+   ): Promise<RecordingToken> {
+      const promises = []
+      promises.push(
+         this.getLivestreamRecordingToken(livestreamId),
+         this.updateRecordingStats({
+            livestreamId: livestreamId,
+            userId: userId,
+         })
+      )
+
+      const promisesResults = await Promise.allSettled(promises)
+
+      const [recordingToken] = promisesResults
+         .filter((result) => result.status === "fulfilled")
+         .map((result: PromiseFulfilledResult<RecordingToken>) => result.value)
+
+      return recordingToken
    }
 }
 
