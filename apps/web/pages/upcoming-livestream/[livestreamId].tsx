@@ -9,11 +9,7 @@ import {
 } from "../../components/helperFunctions/HelperFunctions"
 import HeroSection from "../../components/views/upcoming-livestream/HeroSection"
 import { useAuth } from "../../HOCs/AuthProvider"
-import {
-   dateIsInUnder24Hours,
-   getReferralInformation,
-   streamIsOld,
-} from "../../util/CommonUtil"
+import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
 import UserUtil from "../../data/util/UserUtil"
 import { useRouter } from "next/router"
 import RegistrationModal from "../../components/views/common/registration-modal"
@@ -44,7 +40,6 @@ import {
 import { omit } from "lodash"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
-import { PopularityEventType } from "@careerfairy/shared-lib/livestreams/popularity"
 
 const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
@@ -401,14 +396,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                authenticatedUser.email
             )
 
-            recommendationServiceInstance.addPopularityEvent(
-               "UPVOTED_QUESTION",
-               stream,
-               {
-                  user: userData,
-                  customId: userData?.authId,
-               }
-            )
+            recommendationServiceInstance.upvoteQuestion(stream, userData)
 
             handlers.handleClientUpdate(question.id, {
                votes: question.votes + 1 || 1,

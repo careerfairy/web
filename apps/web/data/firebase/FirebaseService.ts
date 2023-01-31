@@ -52,6 +52,7 @@ import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { recommendationServiceInstance } from "./RecommendationService"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2311,6 +2312,8 @@ class FirebaseService {
          .collection("userLivestreamData")
          .doc(userData.userEmail)
 
+      recommendationServiceInstance.joinTalentPool(livestream, userData)
+
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userSnap) => {
             if (userSnap.exists) {
@@ -2393,6 +2396,11 @@ class FirebaseService {
          .doc(livestream.id)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
+
+      recommendationServiceInstance.leaveTalentPool(
+         livestream.id,
+         userData.authId
+      )
 
       return this.firestore.runTransaction((transaction) => {
          return transaction
