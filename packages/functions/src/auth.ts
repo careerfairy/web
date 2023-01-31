@@ -4,7 +4,7 @@ import functions = require("firebase-functions")
 const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
 
-import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
@@ -12,8 +12,8 @@ import { logAndThrow } from "./lib/validations"
 import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
-} from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+} from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import config from "./config"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 

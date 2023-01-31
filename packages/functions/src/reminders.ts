@@ -15,14 +15,14 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import {
    getStreamsByDateWithRegisteredStudents,
    updateLiveStreamsWithEmailSent,
 } from "./lib/livestream"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { livestreamsRepo } from "./api/repositories"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(

@@ -6,7 +6,7 @@ import {
    serializeModels,
    serializePaginatedModels,
 } from "./util"
-import { GroupATSAccountDocument } from "@careerfairy/shared-lib/dist/groups"
+import { GroupATSAccountDocument } from "@careerfairy/shared-lib/groups"
 import {
    atsRequestValidation,
    atsRequestValidationWithAccountToken,
@@ -17,14 +17,14 @@ import {
    ATSDataPaginationOptions,
    ATSPaginatedResults,
    RecruitersFunctionCallOptions,
-} from "@careerfairy/shared-lib/dist/ats/Functions"
+} from "@careerfairy/shared-lib/ats/Functions"
 import {
    MergeExtraRequiredData,
    MergeMetaEntities,
-} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
-import { UserATSRelations, UserData } from "@careerfairy/shared-lib/dist/users"
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
+} from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
+import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
 
 /*
 |--------------------------------------------------------------------------

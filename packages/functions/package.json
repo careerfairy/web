@@ -1,7 +1,7 @@
 {
    "name": "@careerfairy/functions",
    "private": true,
-   "main": "dist/index.js",
+   "main": "dist/functions/src/index.js",
    "scripts": {
       "lint": "eslint --ext .ts .",
       "build": "npm run clean && npm run copy-files && tsc",
@@ -9,7 +9,7 @@
       "start:emulators": "cross-env JAVA_TOOL_OPTIONS=-Xmx15g FIREBASE_STORAGE_EMULATOR_HOST=localhost:9199 FIREBASE_AUTH_EMULATOR_HOST=localhost:9099 FIRESTORE_EMULATOR_HOST=localhost:8080 firebase emulators:start --only auth,firestore,functions,storage --export-on-exit --import ../../emulatorData/fetched",
       "test": "jest",
       "watch": "npm run clean && npm run copy-files && tsc --watch",
-      "copy-files": "cpx \"src/**/*.{json,html}\" dist/",
+      "copy-files": "cpx \"src/**/*.{json,html}\" dist/functions/src",
       "kill-emulators": "npx kill-port 8080 9099 4000 5001 9199 4000",
       "clean": "rimraf dist/",
       "logs": "firebase functions:log"
@@ -33,6 +33,7 @@
       "lodash": "^4.17.20",
       "luxon": "^1.22.0",
       "mailgun.js": "^8.0.1",
+      "module-alias": "^2.2.2",
       "nanoid": "^3.3.1",
       "postmark": "^2.3.5",
       "yup": "^0.32.11"

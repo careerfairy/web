@@ -18,5 +18,10 @@ export default {
       https://jestjs.io/docs/webpack#handling-static-assets */
       "^.+\\.(jpg|jpeg|png|gif|webp|avif|svg)$":
          "<rootDir>/tests/__mocks__/fileMock.js",
+
+      "@careerfairy/shared-lib/dist/(.*)":
+         "<rootDir>/../../packages/shared-lib/dist/$1",
+      "@careerfairy/shared-lib/(.*)":
+         "<rootDir>/../../packages/shared-lib/src/$1",
    },
 }
