@@ -42,6 +42,7 @@ import crisp = require("./crisp")
 import recommendation = require("./recommendation")
 import onWriteTriggers = require("./onWriteTriggers")
 import onCreateTriggers = require("./onCreateTriggers")
+import onDeleteTriggers = require("./onDeleteTriggers")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -202,3 +203,7 @@ exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
+
+// On Delete Triggers for all collections
+exports.onDeleteLivestreamPopularityEvents =
+   onDeleteTriggers.onDeleteLivestreamPopularityEvents

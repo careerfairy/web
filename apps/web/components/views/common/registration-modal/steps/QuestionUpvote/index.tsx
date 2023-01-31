@@ -77,14 +77,7 @@ const QuestionUpvote = () => {
             authenticatedUser.email
          )
 
-         recommendationServiceInstance.addPopularityEvent(
-            "UPVOTED_QUESTION",
-            livestream,
-            {
-               user: userData,
-               customId: userData?.authId,
-            }
-         )
+         recommendationServiceInstance.upvoteQuestion(livestream, userData)
 
          handleClientSideQuestionUpdate(question.id, {
             votes: question.votes + 1 || 1,
