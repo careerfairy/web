@@ -75,20 +75,20 @@ export default function useAgoraClientConfig(
          }
          dispatch(actions.setSessionIsUsingCloudProxy(Boolean(isUsingProxy)))
       })
-      rtcClient.on("user-joined", async (remoteUser) => {
-         setRemoteStreams((prevRemoteStreams) => {
-            let cleanedRemoteStreams = removeStreamFromList(
-               remoteUser.uid,
-               prevRemoteStreams
-            )
-            return [...cleanedRemoteStreams, { uid: remoteUser.uid }]
-         })
-      })
-      rtcClient.on("user-left", async (remoteUser) => {
-         setRemoteStreams((prevRemoteStreams) => {
-            return removeStreamFromList(remoteUser.uid, prevRemoteStreams)
-         })
-      })
+      // rtcClient.on("user-joined", async (remoteUser) => {
+      //    setRemoteStreams((prevRemoteStreams) => {
+      //       let cleanedRemoteStreams = removeStreamFromList(
+      //          remoteUser.uid,
+      //          prevRemoteStreams
+      //       )
+      //       return [...cleanedRemoteStreams, { uid: remoteUser.uid }]
+      //    })
+      // })
+      // rtcClient.on("user-left", async (remoteUser) => {
+      //    setRemoteStreams((prevRemoteStreams) => {
+      //       return removeStreamFromList(remoteUser.uid, prevRemoteStreams)
+      //    })
+      // })
 
       rtcClient.on("connection-state-change", (curState, prevState, reason) => {
          dispatch(
@@ -96,75 +96,75 @@ export default function useAgoraClientConfig(
          )
       })
 
-      rtcClient.on("user-published", async (remoteUser, mediaType) => {
-         return rtcClient
-            .subscribe(remoteUser, mediaType)
-            .then(() => {
-               setRemoteStreams((prevRemoteStreams) => {
-                  return prevRemoteStreams.map((user) => {
-                     if (user.uid === remoteUser.uid) {
-                        if (mediaType === "audio") {
-                           user.audioTrack = remoteUser.audioTrack
-                           user.audioMuted = false
-                           try {
-                              // We don't play the audiotrack for the screen share track if its being shared by the local
-                              // client, else it echoes with the sound of the original media player.
-                              if (user.uid !== `${streamerId}screen`) {
-                                 remoteUser?.audioTrack?.play?.()
-                              }
-                           } catch (e) {
-                              dispatch(actions.sendGeneralError(e))
-                           }
-                        } else if (mediaType === "video") {
-                           user.videoTrack = remoteUser.videoTrack
-                           user.videoMuted = false
-                        }
-                     }
-                     return user
-                  })
-               })
-
-               /**
-                * To benefit from the dual streams feature (on the sender)
-                * Set a stream fallback option to automatically switch remote video quality when network conditions degrade
-                *
-                * https://github.com/AgoraIO-Community/AgoraWebSDK-NG/blob/eb8a5b2ef2/Docs/en/stream_fallback.md
-                */
-               rtcClient
-                  .setStreamFallbackOption(remoteUser.uid, 1) // 1 - fallback to low quality video
-                  .catch((e) => {
-                     console.error(
-                        "Failed to set setStreamFallbackOption",
-                        remoteUser,
-                        e
-                     )
-                     errorLogAndNotify(e)
-                  })
-            })
-            .catch(handleRtcError)
-      })
-
-      rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
-         rtcClient
-            .unsubscribe(remoteUser, mediaType)
-            .then(() => {
-               setRemoteStreams((prevRemoteStreams) => {
-                  return prevRemoteStreams.map((user) => {
-                     if (user.uid === remoteUser.uid) {
-                        if (mediaType === "audio") {
-                           user.audioTrack = null
-                           user.audioMuted = true
-                        } else if (mediaType === "video") {
-                           user.videoTrack = null
-                           user.videoMuted = true
-                        }
-                     }
-                     return user
-                  })
-               })
-            })
-            .catch(handleRtcError)
-      )
+      // rtcClient.on("user-published", async (remoteUser, mediaType) => {
+      //    return rtcClient
+      //       .subscribe(remoteUser, mediaType)
+      //       .then(() => {
+      //          setRemoteStreams((prevRemoteStreams) => {
+      //             return prevRemoteStreams.map((user) => {
+      //                if (user.uid === remoteUser.uid) {
+      //                   if (mediaType === "audio") {
+      //                      user.audioTrack = remoteUser.audioTrack
+      //                      user.audioMuted = false
+      //                      try {
+      //                         // We don't play the audiotrack for the screen share track if its being shared by the local
+      //                         // client, else it echoes with the sound of the original media player.
+      //                         if (user.uid !== `${streamerId}screen`) {
+      //                            remoteUser?.audioTrack?.play?.()
+      //                         }
+      //                      } catch (e) {
+      //                         dispatch(actions.sendGeneralError(e))
+      //                      }
+      //                   } else if (mediaType === "video") {
+      //                      user.videoTrack = remoteUser.videoTrack
+      //                      user.videoMuted = false
+      //                   }
+      //                }
+      //                return user
+      //             })
+      //          })
+      //
+      //          /**
+      //           * To benefit from the dual streams feature (on the sender)
+      //           * Set a stream fallback option to automatically switch remote video quality when network conditions degrade
+      //           *
+      //           * https://github.com/AgoraIO-Community/AgoraWebSDK-NG/blob/eb8a5b2ef2/Docs/en/stream_fallback.md
+      //           */
+      //          rtcClient
+      //             .setStreamFallbackOption(remoteUser.uid, 1) // 1 - fallback to low quality video
+      //             .catch((e) => {
+      //                console.error(
+      //                   "Failed to set setStreamFallbackOption",
+      //                   remoteUser,
+      //                   e
+      //                )
+      //                errorLogAndNotify(e)
+      //             })
+      //       })
+      //       .catch(handleRtcError)
+      // })
+      //
+      // rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
+      //    rtcClient
+      //       .unsubscribe(remoteUser, mediaType)
+      //       .then(() => {
+      //          setRemoteStreams((prevRemoteStreams) => {
+      //             return prevRemoteStreams.map((user) => {
+      //                if (user.uid === remoteUser.uid) {
+      //                   if (mediaType === "audio") {
+      //                      user.audioTrack = null
+      //                      user.audioMuted = true
+      //                   } else if (mediaType === "video") {
+      //                      user.videoTrack = null
+      //                      user.videoMuted = true
+      //                   }
+      //                }
+      //                return user
+      //             })
+      //          })
+      //       })
+      //       .catch(handleRtcError)
+      // )
 
       rtcClient.on("network-quality", (networkStats) => {
          const isEqualToCurrentValue =
