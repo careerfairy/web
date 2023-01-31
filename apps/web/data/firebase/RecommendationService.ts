@@ -104,7 +104,6 @@ export class RecommendationService {
       livestream: LivestreamEvent,
       options?: AddPopularityEventOptions
    ): void {
-      debugger
       const data: Omit<PopularityEventData, "id"> = {
          type,
          createdAt: serverTimestamp() as any,
@@ -124,7 +123,15 @@ export class RecommendationService {
          // we have a document id to use
          docSegments.push(this.docId(type, options.customId))
          const docRef = doc(this.firestore, "livestreams", ...docSegments)
-         setDoc(docRef, data).catch(console.error)
+         setDoc(docRef, data).catch((e) => {
+            // rules don't allow document updates to save costs
+            // ignore error
+            if (e?.message?.includes("PERMISSION_DENIED")) {
+               return
+            }
+
+            console.error(e)
+         })
       } else {
          // let firestore generate a document id
          addDoc(

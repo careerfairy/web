@@ -25,7 +25,7 @@ const useTrackDetailPageView = (
       skip: visitorId === undefined, // Will only start tracking view when visitorId is available/loaded
       onChange: (inView) => {
          if (inView && visitorId) {
-            trackDetailPageView(stream.id, visitorId).then(console.error)
+            trackDetailPageView(stream.id, visitorId).catch(console.error)
 
             // increase event popularity
             recommendationServiceInstance.visitDetailPage(stream, visitorId)

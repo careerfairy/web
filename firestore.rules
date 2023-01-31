@@ -271,7 +271,11 @@ service cloud.firestore {
 
             match /popularityEvents/{eventId} {
                 allow read: if true;
-                allow write: if true; 
+                // only allow creations to save costs
+                // this way we don't need to read before write
+                allow create: if true;
+                allow write: if false;
+                allow delete: if true;
             }
 
             match /stats/{livestreamStats} {
