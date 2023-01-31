@@ -22,4 +22,4 @@ if (process.env.NODE_ENV !== "production") {
    config.slackWebhooks.livestreamCreated = testSlackIntegrationsChannel
 }
 
-module.exports = config
+export default config

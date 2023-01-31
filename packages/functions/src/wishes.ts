@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import config = require("./config")
+import config from "./config"
 import { Rating, Wish } from "@careerfairy/shared-lib/dist/wishes"
 import { admin } from "./api/firestoreAdmin"
 

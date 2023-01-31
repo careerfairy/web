@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import config = require("./config")
+import config from "./config"
 import {
    userGetByReferralCode,
    userGetByEmail,
