@@ -18,8 +18,13 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { errorLogAndNotify } from "../../util/CommonUtil"
+import {
+   errorLogAndNotify,
+   getReferralInformation,
+} from "../../util/CommonUtil"
 import { livestreamRepo, userRepo } from "data/RepositoryInstances"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { PopularityEventType } from "@careerfairy/shared-lib/livestreams/popularity"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -361,6 +366,22 @@ export function RegistrationContextProvider({
                dataLayerLivestreamEvent(
                   "event_registration_complete",
                   livestream
+               )
+
+               // Increase livestream popularity
+               let type: PopularityEventType =
+                  "SUCCESSFULLY_REGISTERED_TO_EVENT"
+               if (getReferralInformation()?.referralCode) {
+                  type = "SUCCESSFULLY_REGISTERED_TO_EVENT_FROM_SHARED_LINK"
+               }
+
+               recommendationServiceInstance.addPopularityEvent(
+                  type,
+                  livestream,
+                  {
+                     user: userData,
+                     customId: userData?.authId,
+                  }
                )
             }
             handleSendConfirmEmail().catch((e) =>

@@ -264,9 +264,16 @@ service cloud.firestore {
                 allow read: if true;
                 allow write: if false; // created by admin sdk
             }
+
             match /detailPageViews/{visitorId} {
                 allow read; allow create;
             }
+
+            match /popularityEvents/{eventId} {
+                allow read: if true;
+                allow write: if true; 
+            }
+
             match /stats/{livestreamStats} {
                 function allowIncrementGeneralStatsField(statKey) {
                     return resource == null && request.resource.data["generalStats"][statKey] == 1 // If the resource is null, then this is a new document, so the stat should be 1

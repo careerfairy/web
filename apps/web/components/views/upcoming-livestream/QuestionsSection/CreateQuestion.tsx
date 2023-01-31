@@ -11,6 +11,7 @@ import { Box, Button, CircularProgress, TextField } from "@mui/material"
 import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const styles = {
    root: {
@@ -18,9 +19,9 @@ const styles = {
       padding: (theme) => theme.spacing(1, 2),
    },
 }
-const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
+const CreateQuestion = ({ livestream, reFetchQuestions }) => {
    const { putLivestreamQuestion } = useFirebaseService()
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, userData } = useAuth()
    const dispatch = useDispatch()
    const { replace, asPath } = useRouter()
    const {
@@ -49,7 +50,7 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
                type: "new",
                author: authenticatedUser.email,
             }
-            await putLivestreamQuestion(livestreamId, newQuestion)
+            await putLivestreamQuestion(livestream.id, newQuestion)
             dispatch(
                actions.sendSuccessMessage(
                   "Thanks, your question has successfully been submitted!"
@@ -58,8 +59,16 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
             reFetchQuestions()
             resetForm()
             dataLayerEvent("event_question_submit", {
-               livestreamId,
+               livestreamId: livestream.id,
             })
+            recommendationServiceInstance.addPopularityEvent(
+               "CREATED_QUESTION",
+               livestream,
+               {
+                  user: userData,
+                  customId: userData?.authId,
+               }
+            )
          } catch (e) {
             setFieldError(
                "questionTitle",
@@ -68,7 +77,7 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
          }
       },
       validate: (values) => {
-         let errors = {}
+         let errors: { questionTitle?: string } = {}
          if (!values.questionTitle) {
             errors.questionTitle = "Please enter a title"
          }
@@ -90,6 +99,7 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
             label="Your Question"
             value={values.questionTitle}
             placeholder={"What would like to ask our speaker?"}
+            // @ts-ignore
             maxLength="170"
             error={touched.questionTitle && Boolean(errors.questionTitle)}
             helperText={touched.questionTitle && errors.questionTitle}
@@ -106,6 +116,7 @@ const CreateQuestion = ({ livestreamId, reFetchQuestions }) => {
                justifyContent: "flex-start",
             }}
          >
+            {/* @ts-ignore */}
             <Button
                variant="contained"
                onClick={handleSubmit}

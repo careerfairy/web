@@ -158,6 +158,12 @@ export interface LivestreamEvent extends Identifiable {
     * */
    index?: number
    parentLivestream?: LivestreamEventPublicData
+
+   /**
+    * Incremented on certain popularityEvents
+    * Updated via functions onCreate trigger
+    */
+   popularity?: number
 }
 
 /**
@@ -342,6 +348,7 @@ export type LivestreamEventPublicData = Partial<
       | "targetLevelsOfStudy"
       | "created"
       | "impressions"
+      | "hasJobs"
    >
 > & {
    id: LivestreamEvent["id"]
@@ -441,6 +448,7 @@ export const pickPublicDataFromLivestream = (
       targetLevelsOfStudy: livestreamData.targetLevelsOfStudy ?? [],
       impressions: livestreamData.impressions ?? 0,
       created: livestreamData.created ?? null,
+      hasJobs: livestreamData.hasJobs,
    }
 }
 

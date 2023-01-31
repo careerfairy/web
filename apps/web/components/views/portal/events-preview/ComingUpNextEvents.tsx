@@ -5,10 +5,8 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
-import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+import { LivestreamsDataParser } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { formatLivestreamsEvents } from "./utils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { fromDate } from "data/firebase/FirebaseInstance"
 
 const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
    const { isLoggedIn } = useAuth()
@@ -16,11 +14,8 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
       query: { livestreamId },
    } = useRouter()
 
-   const [localEvents, setLocalEvents] = useState<LivestreamEvent[]>(
-      serverSideEvents?.map((e) =>
-         LivestreamPresenter.parseDocument(e as any, fromDate)
-      ) || []
-   )
+   const [localEvents, setLocalEvents] =
+      useState<LivestreamEvent[]>(serverSideEvents)
    const [eventFromQuery, setEventFromQuery] = useState(null)
 
    const query = useMemo(() => {
@@ -81,7 +76,7 @@ const ComingUpNextEvents = ({ limit, serverSideEvents }: Props) => {
 
 interface Props {
    limit?: number
-   serverSideEvents?: { [p: string]: any }[]
+   serverSideEvents?: LivestreamEvent[]
 }
 
 export default ComingUpNextEvents

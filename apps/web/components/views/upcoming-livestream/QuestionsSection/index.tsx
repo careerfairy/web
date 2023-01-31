@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React from "react"
 import Section from "components/views/common/Section"
 import SectionContainer from "../../common/Section/Container"
@@ -9,6 +8,7 @@ import CreateQuestion from "./CreateQuestion"
 import QuestionVotingContainer from "../../common/QuestionVotingContainer"
 import { Grid, Hidden } from "@mui/material"
 import { questionIcon } from "../../../../constants/svgs"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 const styles = {
    header: {
@@ -44,7 +44,32 @@ const styles = {
    },
 }
 
-const QuestionsSection = (props) => {
+type Props = {
+   backgroundColor?: string
+   backgroundImage?: string
+   backgroundImageClassName?: string
+   backgroundImageOpacity?: number
+   isPastEvent: boolean
+   reFetchQuestions: any
+   livestream: LivestreamEvent
+   big: boolean
+   color?: string
+   subtitle?: string
+   title: string
+   questionsAreDisabled: boolean
+   sectionRef: any
+   sectionId: string
+   questions: any
+   loadingInitialQuestions: any
+   hasVoted: any
+   hasMore: any
+   handleUpvote: any
+   questionSortType: any
+   getMore: any
+   handleChangeQuestionSortType: any
+}
+
+const QuestionsSection = (props: Props) => {
    return (
       <Section
          big={props.big}
@@ -95,10 +120,11 @@ const QuestionsSection = (props) => {
                                  {!props.isPastEvent && (
                                     <CreateQuestion
                                        reFetchQuestions={props.reFetchQuestions}
-                                       livestreamId={props.livestreamId}
+                                       livestream={props.livestream}
                                     />
                                  )}
                                  {!!props.questions.length && (
+                                    // @ts-ignore
                                     <QuestionVotingContainer
                                        loadingInitialQuestions={
                                           props.loadingInitialQuestions
@@ -135,15 +161,3 @@ const QuestionsSection = (props) => {
 }
 
 export default QuestionsSection
-
-QuestionsSection.propTypes = {
-   backgroundColor: PropTypes.any,
-   backgroundImage: PropTypes.any,
-   backgroundImageClassName: PropTypes.any,
-   backgroundImageOpacity: PropTypes.any,
-   big: PropTypes.any,
-   color: PropTypes.any,
-   subtitle: PropTypes.any,
-   title: PropTypes.any,
-   questionsAreDisabled: PropTypes.bool,
-}
