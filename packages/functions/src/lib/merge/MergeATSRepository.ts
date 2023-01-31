@@ -18,13 +18,13 @@ import {
    MergePaginatedResponse,
    MergeRemoteUser,
    MergeSyncStatus,
-} from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { Office } from "@careerfairy/shared-lib/dist/ats/Office"
-import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
-import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+} from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { Office } from "@careerfairy/shared-lib/ats/Office"
+import { SyncStatus } from "@careerfairy/shared-lib/ats/SyncStatus"
+import { Application } from "@careerfairy/shared-lib/ats/Application"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
 import firebase from "firebase/compat"
 import {
    ApplicationCreationOptions,
@@ -36,8 +36,8 @@ import {
    ATSPaginatedResults,
    ATSPaginationOptions,
    RecruitersFilterOptions,
-} from "@careerfairy/shared-lib/dist/ats/Functions"
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
+} from "@careerfairy/shared-lib/ats/Functions"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 
 const MERGE_DEFAULT_PAGE_SIZE = "100"
 const SOURCE = "CareerFairy"

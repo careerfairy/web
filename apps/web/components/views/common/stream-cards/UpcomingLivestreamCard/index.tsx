@@ -30,6 +30,7 @@ import {
    ImpressionLocation,
    LivestreamEvent,
 } from "@careerfairy/shared-lib/dist/livestreams"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const backgroundImageHeight = 200
 const cardBorderRadius = 6
@@ -389,9 +390,10 @@ const UpcomingLivestreamCard = ({
             })
          }
 
-         return await deregisterFromLivestream(
-            livestream?.id,
-            authenticatedUser
+         await deregisterFromLivestream(livestream?.id, userData)
+         recommendationServiceInstance.unRegisterEvent(
+            livestream.id,
+            authenticatedUser.uid
          )
       } catch (e) {}
    }

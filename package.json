@@ -8,7 +8,6 @@
    ],
    "scripts": {
       "build": "turbo run build",
-      "build:packages": "turbo run build --ignore=\"apps/**/*\" --no-deps",
       "dev": "turbo run dev --parallel",
       "test": "turbo run test",
       "clean": "turbo run clean",
@@ -19,9 +18,13 @@
       "lint": "turbo run lint --parallel",
       "format": "prettier --write --ignore-unknown .",
       "prepare": "husky install",
+      "build:packages": "turbo run build --ignore=\"apps/**/*\" --no-deps",
       "build:functions": "turbo run build --filter=@careerfairy/functions",
-      "lint:functions": "turbo run lint --filter=@careerfairy/functions",
+      "build:shared-lib": "turbo run build --filter=@careerfairy/shared-lib",
+      "build:fetch-firestore-data": "turbo run build --filter=@careerfairy/fetch-firestore-data",
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",
+      "build:shared-lib": "turbo run build --filter=@careerfairy/shared-lib",
+      "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
       "start:webapp": "npx firebase emulators:exec \"npm run start -w @careerfairy/webapp\" --ui --only auth,firestore,functions"

@@ -1,9 +1,11 @@
 import { store } from "../pages/_app"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { omit } from "lodash"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { fromDate } from "data/firebase/FirebaseInstance"
 
-export const getServerSideStream = async (livestreamId) => {
+export const getServerSideStream = async (
+   livestreamId: string
+): Promise<LivestreamEvent> => {
    let serverSideStream = null
    if (livestreamId) {
       // @ts-ignore
@@ -12,28 +14,16 @@ export const getServerSideStream = async (livestreamId) => {
          doc: livestreamId,
       })
       if (livestreamSnap.exists) {
-         const livestreamEvent = {
+         serverSideStream = {
             id: livestreamSnap.id,
             ...livestreamSnap.data(),
          } as LivestreamEvent
-
-         serverSideStream =
-            LivestreamPresenter.serializeDocument(livestreamEvent)
-
-         return omit(serverSideStream, [
-            "registeredUsers",
-            "talentPool",
-            "participatingStudents",
-            "participants",
-            "liveSpeakers",
-            "author",
-         ])
       }
    }
    return serverSideStream
 }
 
-export const getServerSideGroup = async (groupId) => {
+export const getServerSideGroup = async (groupId: string) => {
    let serverSideGroup = {}
    // @ts-ignore
    const snap = await store.firestore.get({
@@ -49,4 +39,30 @@ export const getServerSideGroup = async (groupId) => {
       serverSideGroup.id = snap.id
    }
    return serverSideGroup
+}
+
+/**
+ * To parse the events coming from server side
+ */
+export const mapFromServerSide = (events: { [p: string]: any }[]) => {
+   if (!events) return []
+   return events.map((e) =>
+      LivestreamPresenter.parseDocument(e as any, fromDate)
+   )
+}
+
+export const parseJwtServerSide = (token?: string) => {
+   if (!token) return null
+   let base64Url = token.split(".")[1]
+   let base64 = base64Url.replace(/-/g, "+").replace(/_/g, "/")
+   let jsonPayload = decodeURIComponent(
+      atob(base64)
+         .split("")
+         .map(function (c) {
+            return "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2)
+         })
+         .join("")
+   )
+
+   return JSON.parse(jsonPayload)
 }

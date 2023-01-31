@@ -20,6 +20,7 @@ import { Group, GroupWithPolicy } from "@careerfairy/shared-lib/dist/groups"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { livestreamRepo, userRepo } from "data/RepositoryInstances"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 type Variants = "standard"
 type Margins = "normal"
@@ -362,6 +363,9 @@ export function RegistrationContextProvider({
                   "event_registration_complete",
                   livestream
                )
+
+               // Increase livestream popularity
+               recommendationServiceInstance.registerEvent(livestream, userData)
             }
             handleSendConfirmEmail().catch((e) =>
                errorLogAndNotify(e, {
@@ -392,6 +396,7 @@ export function RegistrationContextProvider({
          isRecommended,
          livestream,
          registerToLivestream,
+         userData,
       ]
    )
 

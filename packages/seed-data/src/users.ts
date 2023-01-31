@@ -1,5 +1,5 @@
 import { auth, firestore } from "./lib/firebase"
-import { CreateRequest } from "firebase-admin/auth"
+import { CreateRequest, UserImportRecord } from "firebase-admin/auth"
 import { v4 as uuidv4 } from "uuid"
 import * as admin from "firebase-admin"
 
@@ -35,16 +35,6 @@ interface UserSeed {
       user: UserData,
       recruiterDetails?: Partial<SavedRecruiter>
    ): Promise<SavedRecruiter>
-
-   /*
-    * This method is meant for development purposes only
-    * It creates a user on firebase auth (already verified) from a userData document
-    * As we are unable to import the prod auth in our dev environment, we need to re-create
-    * it from the userData document
-    * */
-   createAuthUserFromUserData(
-      userData: UserData
-   ): Promise<admin.auth.UserRecord>
 
    createAuthUsersFromUserData(): Promise<void>
 }
@@ -166,15 +156,13 @@ class UserFirebaseSeed implements UserSeed {
          : null
    }
 
-   async createAuthUserFromUserData(
-      userData: UserData
-   ): Promise<admin.auth.UserRecord> {
-      return auth.createUser({
+   createAuthUserFromUserData(userData: UserData): UserImportRecord {
+      return {
          uid: userData.authId,
          email: userData.userEmail,
-         password: "password",
+         passwordHash: Buffer.from("5f4dcc3b5aa765d61d8327deb882cf99"), // md5: password
          emailVerified: true,
-      })
+      }
    }
 
    async createAuthUsersFromUserData(): Promise<void> {
@@ -182,7 +170,7 @@ class UserFirebaseSeed implements UserSeed {
 
       const allUserDocs = allUserSnaps.docs.map((doc) => doc.data() as UserData) // Get all user docs
 
-      const userChunks = chunkArray(allUserDocs, 3000) // Chunk the user docs into "n" users per chunk, to avoid hitting the node concurrent promise limit
+      const userChunks = chunkArray(allUserDocs, 1000) // importUsers() limits to 1000 at a time
 
       for (const [index, userChunk] of userChunks.entries()) {
          console.log(
@@ -191,16 +179,18 @@ class UserFirebaseSeed implements UserSeed {
             }`
          ) // Log the progress
 
-         const promises = userChunk.map((user) =>
-            this.createAuthUserFromUserData(user).catch((e) => {
-               console.log(
-                  `Error creating user ${user.userEmail} with uid ${user.authId}`, // Catch and log errors
-                  e
-               )
-            })
-         )
+         const userRecords = userChunk.map(this.createAuthUserFromUserData)
 
-         await Promise.all(promises) // Wait for all promises to resolve
+         try {
+            await auth.importUsers(userRecords, {
+               hash: {
+                  algorithm: "MD5",
+                  rounds: 1,
+               },
+            })
+         } catch (error) {
+            console.error(error)
+         }
       }
 
       return

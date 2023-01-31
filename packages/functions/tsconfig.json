@@ -1,5 +1,6 @@
 {
    "compilerOptions": {
+      "baseUrl": ".",
       "module": "commonjs",
       "noImplicitReturns": true,
       "noUnusedLocals": true,
@@ -8,8 +9,12 @@
       "strict": false,
       "target": "es2020",
       "allowJs": true,
-      "experimentalDecorators": true
+      "experimentalDecorators": true,
+      "paths": {
+         "@careerfairy/shared-lib/*": ["../shared-lib/src/*"]
+      }
    },
    "compileOnSave": true,
-   "include": ["src"]
+   "include": ["src"],
+   "exclude": ["dist"]
 }

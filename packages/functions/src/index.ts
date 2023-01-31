@@ -1,3 +1,15 @@
+import * as ModuleAlias from "module-alias"
+
+/**
+ * Fix runtime import of local packages
+ * Required to avoid importing from the /dist folder
+ *
+ * https://stackoverflow.com/a/56584739
+ */
+ModuleAlias.addAliases({
+   "@careerfairy/shared-lib": __dirname + "/../../shared-lib/src",
+})
+
 import dotenv = require("dotenv")
 
 // load values from the .env file in this directory into process.env
@@ -28,6 +40,9 @@ import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
 import crisp = require("./crisp")
 import recommendation = require("./recommendation")
+import onWriteTriggers = require("./onWriteTriggers")
+import onCreateTriggers = require("./onCreateTriggers")
+import onDeleteTriggers = require("./onDeleteTriggers")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -179,3 +194,16 @@ exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
 exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
+
+// On Write Triggers for all collections
+exports.syncLivestreams = onWriteTriggers.syncLivestreams
+exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
+exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
+
+// On Create Triggers for all collections
+exports.onCreateLivestreamPopularityEvents =
+   onCreateTriggers.onCreateLivestreamPopularityEvents
+
+// On Delete Triggers for all collections
+exports.onDeleteLivestreamPopularityEvents =
+   onDeleteTriggers.onDeleteLivestreamPopularityEvents

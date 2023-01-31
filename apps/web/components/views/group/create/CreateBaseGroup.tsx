@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import PublishIcon from "@mui/icons-material/Publish"
 import { Form as UiForm, Formik } from "formik"
 import FilePickerContainer from "../../../../components/ssr/FilePickerContainer"
@@ -25,6 +25,8 @@ import VirtualizedAutocomplete from "../../common/VirtualizedAutocomplete"
 import Stack from "@mui/material/Stack"
 import { BaseGroupInfo } from "../../../../pages/group/create"
 import Checkbox from "@mui/material/Checkbox"
+import CompanyMetadata from "./CompanyMetadata"
+import { scrollTop } from "../../../../util/CommonUtil"
 
 const placeholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
@@ -118,39 +120,69 @@ const CreateBaseGroup = ({
       })()
    }, [])
 
+   const initialValues = useMemo(
+      () => ({
+         logoUrl: baseGroupInfo.logoUrl || "",
+         logoFileObj: baseGroupInfo.logoFileObj || null,
+         universityName: baseGroupInfo.universityName || "",
+         description: baseGroupInfo.description || "",
+         university: baseGroupInfo.university || null,
+         isUniversity: baseGroupInfo.isUniversity || false,
+         companySize: baseGroupInfo.companySize || "",
+         companyIndustry: baseGroupInfo.companyIndustry || null,
+         companyCountry: baseGroupInfo.companyCountry || null,
+         isATSEnabled: baseGroupInfo.isATSEnabled || false,
+      }),
+      [
+         baseGroupInfo.companyCountry,
+         baseGroupInfo.companyIndustry,
+         baseGroupInfo.companySize,
+         baseGroupInfo.description,
+         baseGroupInfo.isATSEnabled,
+         baseGroupInfo.isUniversity,
+         baseGroupInfo.logoFileObj,
+         baseGroupInfo.logoUrl,
+         baseGroupInfo.university,
+         baseGroupInfo.universityName,
+      ]
+   )
+
+   const handleSubmit = useCallback(
+      (values, { setSubmitting }) => {
+         let careerCenter: BaseGroupInfo = {
+            logoUrl: values.logoUrl,
+            logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
+            description: values.description,
+            test: false,
+            universityName: values.universityName,
+            isUniversity: values.isUniversity,
+            university: values.university,
+            companySize: values.companySize,
+            companyIndustry: values.companyIndustry,
+            companyCountry: values.companyCountry,
+            isATSEnabled: values.isATSEnabled,
+         }
+         setBaseGroupInfo(careerCenter)
+         setSubmitting(false)
+         scrollTop()
+         if (values.isUniversity) {
+            handleNext()
+         } else {
+            handleSkipNext() // skip the field and level of study questions step
+         }
+      },
+      [baseGroupInfo?.logoFileObj, handleNext, handleSkipNext, setBaseGroupInfo]
+   )
+
    return (
       <Container maxWidth={"sm"} className={classes.root}>
          <Typography align="center" className={classes.title} variant="h1">
             Create a Career Group
          </Typography>
          <Formik
-            initialValues={{
-               logoUrl: baseGroupInfo.logoUrl || "",
-               logoFileObj: baseGroupInfo.logoFileObj || null,
-               universityName: baseGroupInfo.universityName || "",
-               description: baseGroupInfo.description || "",
-               university: baseGroupInfo.university || null,
-               isUniversity: baseGroupInfo.isUniversity || false,
-            }}
+            initialValues={initialValues}
             validationSchema={schema}
-            onSubmit={(values, { setSubmitting }) => {
-               let careerCenter: BaseGroupInfo = {
-                  logoUrl: values.logoUrl,
-                  logoFileObj: values.logoFileObj || baseGroupInfo.logoFileObj,
-                  description: values.description,
-                  test: false,
-                  universityName: values.universityName,
-                  isUniversity: values.isUniversity,
-                  university: values.university,
-               }
-               setBaseGroupInfo(careerCenter)
-               setSubmitting(false)
-               if (values.isUniversity) {
-                  handleNext()
-               } else {
-                  handleSkipNext() // skip the field and level of study questions step
-               }
-            }}
+            onSubmit={handleSubmit}
          >
             {({
                values,
@@ -165,7 +197,7 @@ const CreateBaseGroup = ({
                /* and other goodies */
             }) => (
                <UiForm className={classes.form} onSubmit={handleSubmit}>
-                  <Stack spacing={2}>
+                  <Stack spacing={2} minWidth={"90%"}>
                      <FormControl
                         className={classes.form}
                         error={Boolean(
@@ -212,9 +244,9 @@ const CreateBaseGroup = ({
                            </Button>
                         </FilePickerContainer>
                         <FormHelperText>
-                           {touched.logoFileObj &&
-                              errors.logoFileObj &&
-                              errors.logoFileObj}
+                           {touched.logoFileObj && errors.logoFileObj
+                              ? errors.logoFileObj
+                              : null}
                         </FormHelperText>
                      </FormControl>
                      <TextField
@@ -228,7 +260,7 @@ const CreateBaseGroup = ({
                         onBlur={handleBlur}
                         disabled={isSubmitting}
                         helperText={
-                           touched.universityName && errors.universityName
+                           touched.universityName ? errors.universityName : null
                         }
                         label="Group Name"
                         name="universityName"
@@ -244,12 +276,40 @@ const CreateBaseGroup = ({
                         inputProps={{ maxLength: 60 }}
                         placeholder="Please describe the purpose of your group"
                         onBlur={handleBlur}
-                        helperText={touched.description && errors.description}
+                        helperText={
+                           touched.description ? errors.description : null
+                        }
                         disabled={isSubmitting}
                         name="description"
                         fullWidth
                      />
+                     <CompanyMetadata
+                        handleChange={handleChange}
+                        values={values}
+                        errors={errors}
+                        handleBlur={handleBlur}
+                        touched={touched}
+                        isSubmitting={isSubmitting}
+                     />
+
                      <FormControlLabel
+                        control={
+                           <Checkbox
+                              value={values.isATSEnabled}
+                              checked={values.isATSEnabled}
+                              onChange={(event) => {
+                                 setFieldValue(
+                                    "isATSEnabled",
+                                    event.target.checked
+                                 )
+                              }}
+                           />
+                        }
+                        label="ATS integration enabled"
+                     />
+
+                     <FormControlLabel
+                        style={{ marginTop: 0 }}
                         control={
                            <Checkbox
                               value={values.isUniversity}
@@ -294,7 +354,9 @@ const CreateBaseGroup = ({
                                     touched.university && errors.university
                                  )}
                                  helperText={
-                                    touched.university && errors.university
+                                    touched.university
+                                       ? errors.university
+                                       : null
                                  }
                               />
                            )}

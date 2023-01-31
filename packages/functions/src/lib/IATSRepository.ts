@@ -1,17 +1,17 @@
-import { Office } from "@careerfairy/shared-lib/dist/ats/Office"
-import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
-import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
-import { Application } from "@careerfairy/shared-lib/dist/ats/Application"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { Candidate } from "@careerfairy/shared-lib/dist/ats/Candidate"
+import { Office } from "@careerfairy/shared-lib/ats/Office"
+import { Job } from "@careerfairy/shared-lib/ats/Job"
+import { SyncStatus } from "@careerfairy/shared-lib/ats/SyncStatus"
+import { Application } from "@careerfairy/shared-lib/ats/Application"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
 import { ATSApplicationOptions } from "./merge/MergeATSRepository"
 import {
    ATSPaginatedResults,
    ATSPaginationOptions,
    RecruitersFilterOptions,
-} from "@careerfairy/shared-lib/dist/ats/Functions"
-import { Recruiter } from "@careerfairy/shared-lib/dist/ats/Recruiter"
-import { MergeExtraRequiredData } from "@careerfairy/shared-lib/dist/ats/merge/MergeResponseTypes"
+} from "@careerfairy/shared-lib/ats/Functions"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
+import { MergeExtraRequiredData } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
 
 export type CandidateCreationOptions = {
    nestedWriteCV?: boolean

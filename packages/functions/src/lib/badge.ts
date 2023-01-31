@@ -2,21 +2,21 @@ import {
    NetworkerBadge,
    NetworkerBadgeLevel2,
    NetworkerBadgeLevel3,
-} from "@careerfairy/shared-lib/dist/badges/NetworkBadges"
+} from "@careerfairy/shared-lib/badges/NetworkBadges"
 import functions = require("firebase-functions")
 import { userGetByEmail, userUpdateFields } from "./user"
 import {
    ResearchBadge,
    ResearchBadgeLevel2,
    ResearchBadgeLevel3,
-} from "@careerfairy/shared-lib/dist/badges/ResearchBadges"
-import { Badge } from "@careerfairy/shared-lib/dist/badges/badges"
+} from "@careerfairy/shared-lib/badges/ResearchBadges"
+import { Badge } from "@careerfairy/shared-lib/badges/badges"
 import {
    EngageBadgeLevel3,
    EngageBadgeLevel2,
    EngageBadge,
-} from "@careerfairy/shared-lib/dist/badges/EngageBadges"
-import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+} from "@careerfairy/shared-lib/badges/EngageBadges"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 
 /**
  * Applies user badges based on the userData document

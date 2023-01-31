@@ -9,6 +9,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
 import { useUserReminders } from "HOCs/UserReminderProvider"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -22,7 +23,7 @@ const useRegistrationModal = (
       query: { groupId },
       asPath,
    } = useRouter()
-   const { authenticatedUser, isLoggedIn } = useAuth()
+   const { isLoggedIn, userData } = useAuth()
    const { forceShowReminder } = useUserReminders()
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const handleCloseJoinModal = useCallback(
@@ -51,9 +52,10 @@ const useRegistrationModal = (
          dataLayerLivestreamEvent("event_registration_started", event)
          try {
             if (hasRegistered) {
-               await firebase.deregisterFromLivestream(
+               await firebase.deregisterFromLivestream(event.id, userData)
+               recommendationServiceInstance.unRegisterEvent(
                   event.id,
-                  authenticatedUser
+                  userData.authId
                )
                dataLayerLivestreamEvent("event_registration_removed", event)
             } else {
@@ -85,7 +87,7 @@ const useRegistrationModal = (
       },
       [
          firebase,
-         authenticatedUser,
+         userData,
          isLoggedIn,
          forceShowReminder,
          handleOpenJoinModal,

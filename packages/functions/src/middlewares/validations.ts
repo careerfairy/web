@@ -6,8 +6,8 @@ import {
 import { OnCallMiddleware } from "./middlewares"
 import { ObjectShape } from "yup/lib/object"
 import { object } from "yup"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { Group } from "@careerfairy/shared-lib/groups"
 
 /**
  * Validate if the user is authed, is group admin or is cf admin

@@ -1,11 +1,10 @@
 import functions = require("firebase-functions")
 
-import config = require("./config")
 /* eslint-disable @typescript-eslint/no-var-requires */
 const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
 
-import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { generateReferralCode, setHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
@@ -13,8 +12,9 @@ import { logAndThrow } from "./lib/validations"
 import {
    GroupDashboardInvite,
    NO_EMAIL_ASSOCIATED_WITH_INVITE_ERROR_MESSAGE,
-} from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
+} from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import config from "./config"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
@@ -83,6 +83,9 @@ export const createNewUserAccount_v4 = functions.https.onCall(
                      fieldOfStudy,
                      levelOfStudy,
                      isStudent: true,
+                     lastActivityAt:
+                        admin.firestore.FieldValue.serverTimestamp(),
+                     createdAt: admin.firestore.FieldValue.serverTimestamp(),
                   })
                )
                .then(async () => {
@@ -222,6 +225,8 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
             userEmail: recipientEmail,
             unsubscribed: !subscribed,
             referralCode: generateReferralCode(),
+            lastActivityAt: admin.firestore.FieldValue.serverTimestamp(),
+            createdAt: admin.firestore.FieldValue.serverTimestamp(),
          }
          // create the user in firestore, if it fails, delete the user from firebase auth
          await admin

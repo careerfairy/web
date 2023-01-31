@@ -24,6 +24,7 @@ import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
 import { fieldOfStudyRepo } from "../../data/RepositoryInstances"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 function getSteps() {
    return [
@@ -41,6 +42,10 @@ export type BaseGroupInfo = {
    universityName?: string
    university?: GroupedUniversity
    isUniversity?: boolean
+   companySize?: string
+   companyIndustry?: OptionGroup
+   companyCountry?: OptionGroup
+   isATSEnabled?: boolean
 }
 const CreateGroup = () => {
    const firebase = useFirebaseService()
@@ -186,7 +191,12 @@ const CreateGroup = () => {
             ...(baseGroupInfo.university?.id && {
                universityCode: baseGroupInfo.university.id,
             }),
+            atsAdminPageFlag: baseGroupInfo.isATSEnabled,
+            companyCountry: baseGroupInfo.companyCountry,
+            companyIndustry: baseGroupInfo.companyIndustry,
+            companySize: baseGroupInfo.companySize,
          }
+
          const { data } = await firebase.createGroup({
             group: careerCenter,
             groupQuestions,

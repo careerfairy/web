@@ -1,13 +1,13 @@
 import functions = require("firebase-functions")
-import { UserData } from "@careerfairy/shared-lib/dist/users"
-import { IUserRepository } from "@careerfairy/shared-lib/dist/users/UserRepository"
-import { ILivestreamRepository } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
-import { removeDuplicateDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { UserData } from "@careerfairy/shared-lib/users"
+import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
+import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
+import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import {
    getEarliestEventBufferTime,
    LivestreamEvent,
    UserParticipatingStats,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 
 import RecommendationServiceCore, {
    IRecommendationService,
@@ -19,7 +19,7 @@ import {
    RankedLivestreamEvent,
    sortElementsByFrequency,
 } from "../util"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 
 type FirebaseAdmin = typeof import("firebase-admin") // This only imports the types at compile time and not the actual library at runtime
 

@@ -1,17 +1,20 @@
 import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
 import { https } from "firebase-functions"
-import { BaseModel } from "@careerfairy/shared-lib/dist/BaseModel"
+import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
 import { ClientError } from "graphql-request"
 import * as crypto from "crypto"
 import { promisify } from "util"
 import * as zlib from "zlib"
-import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/dist/livestreams"
+import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
-import { addUtmTagsToLink } from "@careerfairy/shared-lib/dist/utils"
-import { ATSPaginatedResults } from "@careerfairy/shared-lib/dist/ats/Functions"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
+import type { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export const setHeaders = (req, res) => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -30,16 +33,24 @@ export const getStreamLink = (streamId) => {
    return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
+export type IGenerateEmailDataProps = {
+   stream: LiveStreamEventWithUsersLivestreamData
+   reminder?: ReminderData
+   minutesBefore?: number
+   emailMaxChunkSize: number
+   minutesToRemindBefore?: number
+}
+
 /**
  * Generate a dynamic reminder email using a stream and user registered data
  *
  */
-export const generateReminderEmailData = (
-   stream: LiveStreamEventWithUsersLivestreamData,
-   reminder: ReminderData,
-   minutesToRemindBefore: number,
-   emailMaxChunkSize: number
-): MailgunMessageData[] => {
+export const generateReminderEmailData = ({
+   stream,
+   reminder,
+   minutesToRemindBefore,
+   emailMaxChunkSize,
+}: IGenerateEmailDataProps): MailgunMessageData[] => {
    const { company, start, registeredUsers, timezone } = stream
 
    if (!start || !registeredUsers?.length) {
@@ -75,6 +86,7 @@ export const generateReminderEmailData = (
       reminder1Hour: `🔥 Reminder: Meet ${company} in 1 hour!`,
       reminder24Hours: `🔥 Reminder: Meet ${company} tomorrow!`,
       fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
+      reminderNextDayMorning: "",
    }
 
    // create email data for all the registered users chunks
@@ -86,6 +98,48 @@ export const generateReminderEmailData = (
          template: reminder.template,
          "recipient-variables": JSON.stringify(templateData),
          "o:deliverytime": dateToDelivery,
+      }
+   })
+}
+
+export const generateNonAttendeesReminder = ({
+   stream,
+   emailMaxChunkSize,
+   reminder,
+}: IGenerateEmailDataProps): MailgunMessageData[] => {
+   const { timezone, usersLivestreamData, company } = stream
+
+   const tomorrowAt11 = new Date()
+   tomorrowAt11.setDate(tomorrowAt11.getDate() + 1)
+   tomorrowAt11.setHours(11, 0, 0)
+
+   // date to delivery should be next day at 11 AM
+   const dateToDelivery = DateTime.fromJSDate(tomorrowAt11, {
+      zone: timezone || "Europe/Zurich",
+   })
+
+   const nonAttendeesEmails = usersLivestreamData.map(
+      ({ user }) => user.userEmail
+   )
+
+   const templateData = createNonAttendeesEmailData(stream)
+
+   // Mailgun has a maximum of 1k emails per bulk email
+   // So we will slice our registered users on chunks of 950 and send more than one bulk email if needed
+   const nonAttendeesChunks = getRegisteredUsersIntoChunks(
+      nonAttendeesEmails,
+      emailMaxChunkSize
+   )
+
+   // create email data for all the non attendees users chunks
+   return nonAttendeesChunks.map((nonAttendeesChunk) => {
+      return {
+         from: "CareerFairy <noreply@careerfairy.io>",
+         to: nonAttendeesChunk,
+         subject: `🤫 ${company} : 4 days limited access to live stream recording!`,
+         template: reminder.template,
+         "recipient-variables": JSON.stringify(templateData),
+         "o:deliverytime": dateToDelivery.toRFC2822(),
       }
    })
 }
@@ -162,6 +216,39 @@ const createRecipientVariables = (
       return {
          ...acc,
          [studentEmail]: emailData,
+      }
+   }, {})
+}
+
+/**
+ * Create all the email template variables needed for the non attendees email data
+ */
+const createNonAttendeesEmailData = (
+   stream: LiveStreamEventWithUsersLivestreamData
+) => {
+   const { usersLivestreamData, title, company, companyLogoUrl } = stream
+
+   return usersLivestreamData.reduce((acc, userLivestreamData) => {
+      const {
+         livestreamId,
+         user: { firstName, userEmail },
+      } = userLivestreamData
+
+      const emailData = {
+         firstName,
+         recordingLink: addUtmTagsToLink({
+            link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
+            campaign: "reminderForRecording",
+            content: title,
+         }),
+         companyName: company,
+         livestreamTitle: title,
+         imageUrl: companyLogoUrl,
+      }
+
+      return {
+         ...acc,
+         [userEmail]: emailData,
       }
    }, {})
 }
@@ -507,3 +594,26 @@ export const dateFormatOffset = (dateString: string) => {
 
    return dateString
 }
+
+export const getChangeTypes = (
+   change: Change<DocumentSnapshot>
+): {
+   // Is a new document creation
+   isCreate: boolean
+   // Is a document update where the document still exists before and after the update
+   isUpdate: boolean
+   // Is a document deletion
+   isDelete: boolean
+} => {
+   const { before, after } = change
+   // check if the document did not exist before but exists now
+   const isCreate = !before.exists && after.exists
+   // check if the document existed before and still exists now
+   const isUpdate = before.exists && after.exists
+   // check if the document existed before but does not exist now
+   const isDelete = before.exists && !after.exists
+
+   return { isCreate, isUpdate, isDelete }
+}
+
+export type FunctionsLogger = typeof functions.logger

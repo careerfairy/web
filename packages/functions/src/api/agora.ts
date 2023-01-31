@@ -1,6 +1,6 @@
 import { RtcRole, RtcTokenBuilder } from "agora-access-token"
 import axios, { Method } from "axios"
-import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 import { isLocalEnvironment } from "../util"
 
 // Project: Production

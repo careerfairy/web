@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback, useMemo } from "react"
 import clsx from "clsx"
 import { Formik } from "formik"
 import PropTypes from "prop-types"
@@ -9,13 +9,14 @@ import {
    CardContent,
    CardHeader,
    Divider,
-   Grid,
    TextField,
    CircularProgress,
+   Stack,
 } from "@mui/material"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "../../../../util/constants"
 import makeStyles from "@mui/styles/makeStyles"
+import CompanyMetadata from "../../create/CompanyMetadata"
 
 const useStyles = makeStyles(() => ({
    root: {},
@@ -31,6 +32,9 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
             description: values.description,
             universityName: values.universityName,
             extraInfo: values.extraInfo,
+            companyCountry: values.companyCountry,
+            companyIndustry: values.companyIndustry,
+            companySize: values.companySize,
          })
          enqueueSnackbar("Your profile has been updated!", {
             variant: "success",
@@ -50,41 +54,60 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
       }
    }
 
+   const initialValues = useMemo(
+      () => ({
+         universityName: group.universityName || "",
+         description: group.description || "",
+         extraInfo: group.extraInfo || "",
+         companySize: group.companySize || "",
+         companyIndustry: group.companyIndustry || null,
+         companyCountry: group.companyCountry || null,
+         isATSEnabled: group.isATSEnabled || false,
+      }),
+      [
+         group.companyCountry,
+         group.companyIndustry,
+         group.companySize,
+         group.description,
+         group.extraInfo,
+         group.isATSEnabled,
+         group.universityName,
+      ]
+   )
+
+   const handleValidate = useCallback((values) => {
+      let errors = {}
+      const minDescCharLength = 10
+      const minGroupNameLength = 5
+      const extraInfoMaxLength = 700
+      const groupNameMaxLength = 60
+      if (!values.description) {
+         errors.description = "Please fill"
+      } else if (values.description.length < minDescCharLength) {
+         errors.description = `Must be at least ${minDescCharLength} characters`
+      }
+      if (values.extraInfo.length > extraInfoMaxLength) {
+         errors.extraInfo = `Cannot be more than ${extraInfoMaxLength} characters`
+      }
+
+      if (values.universityName.length > groupNameMaxLength) {
+         errors.universityName = `Cannot be more than ${groupNameMaxLength} characters`
+      }
+
+      if (!values.universityName) {
+         errors.universityName = "Please fill"
+      } else if (values.universityName < minGroupNameLength) {
+         errors.universityName = `Must be at least ${minGroupNameLength} characters`
+      }
+      return errors
+   }, [])
+
    return (
       <Formik
          autoComplete="off"
-         initialValues={{
-            universityName: group.universityName || "",
-            description: group.description || "",
-            extraInfo: group.extraInfo || "",
-         }}
+         initialValues={initialValues}
          enableReinitialize
-         validate={(values) => {
-            let errors = {}
-            const minDescCharLength = 10
-            const minGroupNameLength = 5
-            const extraInfoMaxLength = 700
-            const groupNameMaxLength = 60
-            if (!values.description) {
-               errors.description = "Please fill"
-            } else if (values.description.length < minDescCharLength) {
-               errors.description = `Must be at least ${minDescCharLength} characters`
-            }
-            if (values.extraInfo.length > extraInfoMaxLength) {
-               errors.extraInfo = `Cannot be more than ${extraInfoMaxLength} characters`
-            }
-
-            if (values.universityName.length > groupNameMaxLength) {
-               errors.universityName = `Cannot be more than ${groupNameMaxLength} characters`
-            }
-
-            if (!values.universityName) {
-               errors.universityName = "Please fill"
-            } else if (values.universityName < minGroupNameLength) {
-               errors.universityName = `Must be at least ${minGroupNameLength} characters`
-            }
-            return errors
-         }}
+         validate={handleValidate}
          onSubmit={handleSubmitForm}
          className={clsx(classes.root, className)}
          {...rest}
@@ -97,10 +120,7 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
             handleBlur,
             handleSubmit,
             isSubmitting,
-            setFieldValue,
-            setValues,
             dirty,
-            validateForm,
             /* and other goodies */
          }) => (
             <Card>
@@ -110,52 +130,54 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
                />
                <Divider />
                <CardContent>
-                  <Grid container spacing={3}>
-                     <Grid item md={12} xs={12}>
-                        <TextField
-                           fullWidth
-                           helperText={errors.universityName}
-                           label="Group Name"
-                           disabled={isSubmitting}
-                           name="universityName"
-                           onChange={handleChange}
-                           required
-                           error={Boolean(errors.universityName)}
-                           value={values.universityName}
-                           variant="outlined"
-                        />
-                     </Grid>
-                     <Grid item md={12} xs={12}>
-                        <TextField
-                           fullWidth
-                           multiline
-                           helperText={errors.description}
-                           label="About The group in a couple words"
-                           name="description"
-                           disabled={isSubmitting}
-                           onChange={handleChange}
-                           required
-                           error={Boolean(errors.description)}
-                           value={values.description}
-                           variant="outlined"
-                        />
-                     </Grid>
-                     <Grid item md={12} xs={12}>
-                        <TextField
-                           fullWidth
-                           multiline
-                           helperText={errors.extraInfo}
-                           label="Group Summary"
-                           name="extraInfo"
-                           disabled={isSubmitting}
-                           onChange={handleChange}
-                           required
-                           error={Boolean(errors.extraInfo)}
-                           value={values.extraInfo}
-                           variant="outlined"
-                        />
-                     </Grid>
-                  </Grid>
+                  <Stack spacing={3}>
+                     <TextField
+                        fullWidth
+                        helperText={errors.universityName}
+                        label="Group Name"
+                        disabled={isSubmitting}
+                        name="universityName"
+                        onChange={handleChange}
+                        required
+                        error={Boolean(errors.universityName)}
+                        value={values.universityName}
+                        variant="outlined"
+                     />
+                     <TextField
+                        fullWidth
+                        multiline
+                        helperText={errors.description}
+                        label="About The group in a couple words"
+                        name="description"
+                        disabled={isSubmitting}
+                        onChange={handleChange}
+                        required
+                        error={Boolean(errors.description)}
+                        value={values.description}
+                        variant="outlined"
+                     />
+                     <TextField
+                        fullWidth
+                        multiline
+                        helperText={errors.extraInfo}
+                        label="Group Summary"
+                        name="extraInfo"
+                        disabled={isSubmitting}
+                        onChange={handleChange}
+                        required
+                        error={Boolean(errors.extraInfo)}
+                        value={values.extraInfo}
+                        variant="outlined"
+                     />
+                     <CompanyMetadata
+                        handleChange={handleChange}
+                        values={values}
+                        errors={errors}
+                        handleBlur={handleBlur}
+                        touched={touched}
+                        isSubmitting={isSubmitting}
+                     />
+                  </Stack>
                </CardContent>
                <Divider />
                <Box display="flex" justifyContent="flex-end" p={2}>
@@ -165,9 +187,9 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
                      color="primary"
                      variant="contained"
                      endIcon={
-                        isSubmitting && (
+                        isSubmitting ? (
                            <CircularProgress size={20} color="inherit" />
-                        )
+                        ) : null
                      }
                   >
                      {isSubmitting ? "Updating" : "Save details"}

@@ -34,6 +34,7 @@ import {
 } from "@careerfairy/shared-lib/dist/groups"
 import {
    getLivestreamGroupQuestionAnswers,
+   TalentProfile,
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserStats,
@@ -48,6 +49,10 @@ import {
    OnSnapshotCallback,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
+import DocumentData = firebase.firestore.DocumentData
+import DocumentSnapshot = firebase.firestore.DocumentSnapshot
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { recommendationServiceInstance } from "./RecommendationService"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -435,6 +440,17 @@ class FirebaseService {
       let ref = this.firestore.collection("userData").doc(userEmail)
       return ref.update({
          unsubscribed: true,
+      })
+   }
+
+   /**
+    * Update user lastActivityAt
+    * Uses the server timestamp to prevent the user from setting a custom date
+    */
+   updateUserLastActivity = (userEmail: string) => {
+      let ref = this.firestore.collection("userData").doc(userEmail)
+      return ref.update({
+         lastActivityAt: this.getServerTimestamp(),
       })
    }
 
@@ -917,15 +933,6 @@ class FirebaseService {
          downloadUrl: downloadUrl,
          page: 1,
       })
-   }
-
-   getLivestreamRecordingSid = (livestreamId) => {
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("recordingToken")
-         .doc("token")
-      return ref.get()
    }
 
    increaseLivestreamPresentationPageNumber = (livestreamId) => {
@@ -2223,6 +2230,8 @@ class FirebaseService {
                      isRecommended: true,
                   }),
                },
+               // to allow queries for users that didn't participate
+               participated: null,
             }
 
             transaction.set(userLivestreamDataRef, data, { merge: true })
@@ -2257,8 +2266,8 @@ class FirebaseService {
       })
    }
 
-   deregisterFromLivestream = (livestreamId, authenticatedUser) => {
-      const { email } = authenticatedUser
+   deregisterFromLivestream = (livestreamId: string, userData: UserData) => {
+      const { userEmail } = userData
       let livestreamRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -2266,7 +2275,7 @@ class FirebaseService {
          .collection("livestreams")
          .doc(livestreamId)
          .collection("userLivestreamData")
-         .doc(email)
+         .doc(userEmail)
 
       return this.firestore.runTransaction((transaction) => {
          return transaction
@@ -2275,11 +2284,12 @@ class FirebaseService {
                if (userLivestreamDataDoc.exists) {
                   transaction.update(userLivestreamDataRef, {
                      registered: null,
+                     user: userData,
                   } as UserLivestreamData)
                }
                transaction.update(livestreamRef, {
                   registeredUsers:
-                     firebase.firestore.FieldValue.arrayRemove(email),
+                     firebase.firestore.FieldValue.arrayRemove(userEmail),
                })
             })
       })
@@ -2288,17 +2298,21 @@ class FirebaseService {
    joinCompanyTalentPool = (
       companyId: string,
       userData: UserData,
-      mainStreamId
+      livestream: LivestreamEvent
    ) => {
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      let streamRef = this.firestore.collection("livestreams").doc(mainStreamId)
-      const userLivestreamData = this.firestore
+      let streamRef = this.firestore
          .collection("livestreams")
-         .doc(mainStreamId)
+         .doc(livestream.id)
+      const userLivestreamDataRef = this.firestore
+         .collection("livestreams")
+         .doc(livestream.id)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
+
+      recommendationServiceInstance.joinTalentPool(livestream, userData)
 
       return this.firestore.runTransaction((transaction) => {
          return transaction.get(userRef).then((userSnap) => {
@@ -2317,9 +2331,28 @@ class FirebaseService {
                   ),
                })
 
+               // insert related talent profiles (for each group id)
+               if (livestream.groupIds) {
+                  for (const groupId of livestream.groupIds) {
+                     const groupTalentEntryRef = userRef
+                        .collection("talentProfiles")
+                        .doc(groupId)
+                     const data: TalentProfile = {
+                        id: groupId,
+                        groupId,
+                        userId: userData.authId,
+                        userEmail: userData.userEmail,
+                        user: userData,
+                        mostRecentLivestream: livestream,
+                        joinedAt: this.getServerTimestamp() as any,
+                     }
+                     transaction.set(groupTalentEntryRef, data, { merge: true })
+                  }
+               }
+
                const data: UserLivestreamData = {
                   userId: userData.authId,
-                  livestreamId: mainStreamId,
+                  livestreamId: livestream.id,
                   user: {
                      ...userData,
                   },
@@ -2329,7 +2362,7 @@ class FirebaseService {
                      date: this.getServerTimestamp(),
                   },
                }
-               transaction.set(userLivestreamData, data, { merge: true })
+               transaction.set(userLivestreamDataRef, data, { merge: true })
             }
          })
       })
@@ -2347,16 +2380,27 @@ class FirebaseService {
       return streamData.companyId
    }
 
-   leaveCompanyTalentPool = (companyId, userData, livestreamId) => {
+   leaveCompanyTalentPool = (
+      companyId: string,
+      userData: UserData,
+      livestream: LivestreamEvent
+   ) => {
       let userRef = this.firestore
          .collection("userData")
          .doc(userData.userEmail)
-      let streamRef = this.firestore.collection("livestreams").doc(livestreamId)
+      let streamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestream.id)
       let userLivestreamDataRef = this.firestore
          .collection("livestreams")
-         .doc(livestreamId)
+         .doc(livestream.id)
          .collection("userLivestreamData")
          .doc(userData.userEmail)
+
+      recommendationServiceInstance.leaveTalentPool(
+         livestream.id,
+         userData.authId
+      )
 
       return this.firestore.runTransaction((transaction) => {
          return transaction
@@ -2365,8 +2409,18 @@ class FirebaseService {
                if (userLivestreamDataDoc.exists) {
                   const data: Partial<UserLivestreamData> = {
                      talentPool: null,
+                     user: userData,
                   }
                   transaction.update(userLivestreamDataRef, data)
+               }
+               if (livestream.groupIds) {
+                  for (const groupId of livestream.groupIds) {
+                     const groupTalentEntryRef = userRef
+                        .collection("talentProfiles")
+                        .doc(groupId)
+
+                     transaction.delete(groupTalentEntryRef)
+                  }
                }
                transaction.update(userRef, {
                   talentPools:
@@ -2381,7 +2435,11 @@ class FirebaseService {
       })
    }
 
-   listenToUserInTalentPool = (livestreamId, userId, callback) => {
+   listenToUserInTalentPool = (
+      livestreamId: string,
+      userId: string,
+      callback: (snapshot: DocumentSnapshot<DocumentData>) => void
+   ) => {
       const userTalentPoolRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -3078,6 +3136,43 @@ class FirebaseService {
             // If the impression is recommended, increment the recommended impressions counter
             recommendedImpressionsCounter.incrementBy(1).catch(console.error)
          }
+         return
+      }
+   }
+
+   trackDetailPageView = async (eventId: string, visitorId: string) => {
+      const pageViewRef = this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("detailPageViews")
+         .doc(visitorId)
+
+      const livestreamStatsRef = this.firestore
+         .collection("livestreams")
+         .doc(eventId)
+         .collection("stats")
+         .doc("livestreamStats")
+
+      const pageViewVisitorSnap = await pageViewRef.get()
+
+      const hasViewed = pageViewVisitorSnap.exists
+
+      if (!hasViewed) {
+         const generalStatsFieldPath = getAValidLivestreamStatsUpdateField(
+            "numberOfPeopleReached"
+         )
+
+         const generalDetailPageViewCounter = new Counter(
+            livestreamStatsRef,
+            generalStatsFieldPath
+         )
+
+         generalDetailPageViewCounter.incrementBy(1).catch(console.error)
+
+         return pageViewRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      } else {
          return
       }
    }
