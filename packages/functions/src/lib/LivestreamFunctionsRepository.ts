@@ -11,7 +11,7 @@ import {
    PopularityEventData,
 } from "@careerfairy/shared-lib/livestreams/popularity"
 import type { OperationsToMake } from "./stats/util"
-
+import * as functions from "firebase-functions"
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
@@ -97,6 +97,10 @@ export class LivestreamFunctionsRepository
          // negative to decrease
          points *= -1
       }
+
+      functions.logger.info(
+         `Increasing livestream popularity by ${points} points.`
+      )
 
       return livestreamRef.update({
          popularity: FieldValue.increment(points),
