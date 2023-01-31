@@ -46,10 +46,4 @@ export interface PopularityEventData extends Identifiable {
 
    livestreamId: string
    livestream: LivestreamEventPublicData
-
-   /**
-    * Total points to be added to the popularity field
-    * (includes multiplier bonus)
-    */
-   points: number
 }

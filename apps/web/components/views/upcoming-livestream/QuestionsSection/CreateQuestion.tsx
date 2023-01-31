@@ -61,14 +61,8 @@ const CreateQuestion = ({ livestream, reFetchQuestions }) => {
             dataLayerEvent("event_question_submit", {
                livestreamId: livestream.id,
             })
-            recommendationServiceInstance.addPopularityEvent(
-               "CREATED_QUESTION",
-               livestream,
-               {
-                  user: userData,
-                  customId: userData?.authId,
-               }
-            )
+
+            recommendationServiceInstance.createdQuestion(livestream, userData)
          } catch (e) {
             setFieldError(
                "questionTitle",

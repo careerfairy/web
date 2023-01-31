@@ -213,6 +213,7 @@ export interface TalentPoolStudent extends UserData {
 
 export interface UserPublicData {
    id: string
+   authId: string
    firstName: string
    lastName: string
    badges?: string[]
@@ -254,6 +255,7 @@ export interface UserJobApplicationDocument extends Identifiable {
 export const pickPublicDataFromUser = (userData: UserData): UserPublicData => {
    return {
       id: userData.id,
+      authId: userData.authId,
       firstName: userData.firstName,
       lastName: userData.lastName,
       badges: userData.badges || [],

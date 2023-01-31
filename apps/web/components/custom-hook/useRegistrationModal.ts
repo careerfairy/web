@@ -9,6 +9,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { UserReminderType } from "@careerfairy/shared-lib/dist/users"
 import { useUserReminders } from "HOCs/UserReminderProvider"
+import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 const useRegistrationModal = (
    // if redirected to signup when clicking
@@ -52,6 +53,10 @@ const useRegistrationModal = (
          try {
             if (hasRegistered) {
                await firebase.deregisterFromLivestream(event.id, userData)
+               recommendationServiceInstance.unRegisterEvent(
+                  event.id,
+                  userData.authId
+               )
                dataLayerLivestreamEvent("event_registration_removed", event)
             } else {
                const emailVerified = firebase.auth?.currentUser?.emailVerified

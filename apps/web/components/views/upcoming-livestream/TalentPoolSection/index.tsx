@@ -134,15 +134,6 @@ const TalentPoolSection = (props: Props) => {
             userData,
             props.stream
          )
-
-         recommendationServiceInstance.addPopularityEvent(
-            "JOINED_TALENT_POOL",
-            props.stream,
-            {
-               user: userData,
-               customId: userData?.authId,
-            }
-         )
       } catch (e) {}
       setJoiningTalentPool(false)
    }
@@ -168,6 +159,10 @@ const TalentPoolSection = (props: Props) => {
             props.stream.companyId,
             userData,
             props.stream
+         )
+         recommendationServiceInstance.leaveTalentPool(
+            props.stream.id,
+            userData.authId
          )
       } catch (e) {}
       setLeavingTalentPool(false)
