@@ -126,7 +126,10 @@ export class RecommendationService {
          setDoc(docRef, data).catch((e) => {
             // rules don't allow document updates to save costs
             // ignore error
-            if (e?.message?.includes("PERMISSION_DENIED")) {
+            if (
+               e?.message?.includes("PERMISSION_DENIED") ||
+               e?.message?.includes("Missing or insufficient permissions")
+            ) {
                return
             }
 
