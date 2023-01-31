@@ -10,7 +10,6 @@
       "target": "es2020",
       "allowJs": true,
       "experimentalDecorators": true,
-      "resolveJsonModule": true,
       "paths": {
          "@careerfairy/shared-lib/*": ["../shared-lib/src/*"]
       }
