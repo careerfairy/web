@@ -101,6 +101,7 @@ exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
             livestream_date: data.livestream_date,
             company_name: data.company_name,
             company_logo_url: data.company_logo_url,
+            company_background_image_url: data.company_background_image_url,
             livestream_title: data.livestream_title,
             livestream_link: addUtmTagsToLink({
                link: data.livestream_link,
