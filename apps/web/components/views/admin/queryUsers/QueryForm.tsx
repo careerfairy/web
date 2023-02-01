@@ -19,6 +19,7 @@ const QueryForm = () => {
          universityName: "",
          fieldOfStudyIds: [],
          levelOfStudyIds: [],
+         countriesOfInterest: [],
       },
       page: 0,
       orderBy: "firstName",
