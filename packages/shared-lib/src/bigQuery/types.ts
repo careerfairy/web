@@ -9,6 +9,7 @@ export interface BigQueryUserResponse {
    levelOfStudyName: string
    levelOfStudyId: string
    universityCountryCode: string
+   countriesOfInterest: string
    universityCode: string
    universityName: string
    linkedinUrl: string
@@ -27,4 +28,5 @@ export interface GetUserFilters {
    universityCodes?: string[]
    fieldOfStudyIds?: string[]
    levelOfStudyIds?: string[]
+   countriesOfInterest?: string[]
 }

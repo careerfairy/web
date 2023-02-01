@@ -22,6 +22,7 @@ import { University } from "@careerfairy/shared-lib/dist/universities"
 import UniversityCountriesFilter from "./UniversityCountriesFilter"
 import UniversitiesFilter from "./UniversitiesFilter"
 import GenericFilterSelector from "./GenericFilterSelector"
+import { countriesOptionCodes } from "../../../../constants/forms"
 
 interface UserTableProps {
    users: BigQueryUserResponse[]
@@ -87,6 +88,24 @@ const AdminUsersTable = ({
       )
       return { universityOptions, universityOptionsLookup }
    }, [universityCountries, queryOptions.filters.universityCountryCodes])
+
+   const getCountryOfInterestToShow = useCallback(
+      ({ countriesOfInterest: countryOfInterestIds }) => {
+         if (countryOfInterestIds?.length > 0) {
+            const countriesToShow = countriesOptionCodes.reduce((acc, curr) => {
+               if (countryOfInterestIds.includes(curr.id)) {
+                  acc.push(curr.name)
+               }
+               return acc
+            }, [])
+
+            return countriesToShow.join(", ")
+         }
+
+         return ""
+      },
+      []
+   )
 
    const levelsOfStudyLookup = useMemo(() => {
       return allLevelsOfStudy?.reduce((acc, levelOfStudy) => {
@@ -197,6 +216,24 @@ const AdminUsersTable = ({
             },
          },
          {
+            field: "countriesOfInterest",
+            title: "Countries of Interest",
+            render: getCountryOfInterestToShow,
+            filterComponent: () => {
+               return (
+                  <GenericFilterSelector
+                     entries={countriesOptionCodes}
+                     fieldName={"countriesOfInterest"}
+                     noOptionsText={"All Countries of Interest"}
+                     inputPlaceholderText={"Countries of Interest"}
+                     setOptions={setOptions}
+                     queryOptions={queryOptions}
+                     sx={{ minWidth: 200 }}
+                  />
+               )
+            },
+         },
+         {
             field: "userEmail",
             title: "Email",
             filtering: false,
@@ -218,7 +255,10 @@ const AdminUsersTable = ({
          },
       ],
       [
+         allFieldsOfStudy,
+         allLevelsOfStudy,
          fieldsOfStudyLookup,
+         getCountryOfInterestToShow,
          levelsOfStudyLookup,
          queryOptions,
          setOptions,
