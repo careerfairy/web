@@ -44,6 +44,7 @@ export class BigQueryRepository implements IBigQueryRepository {
          universityName: "",
          fieldOfStudyIds: [],
          levelOfStudyIds: [],
+         countriesOfInterest: [],
       }
    ): Promise<BigQueryUserResponse[]> {
       const universityCodesString = filters.universityCodes
@@ -58,6 +59,11 @@ export class BigQueryRepository implements IBigQueryRepository {
       const levelOfStudyIdsString = filters.levelOfStudyIds
          ?.map((a) => `"${a}"`)
          .join(",")
+      const countriesOfInterestString = filters.countriesOfInterest
+         ?.map((a) => `"${a}"`)
+         .join(",")
+
+      console.log("FILTERS -> ", filters)
 
       const whereQueries = []
       if (filters.universityName) {
@@ -85,6 +91,16 @@ export class BigQueryRepository implements IBigQueryRepository {
             `JSON_VALUE(DATA, "$.levelOfStudy.id") IN (${levelOfStudyIdsString})`
          )
       }
+      if (countriesOfInterestString.length > 0) {
+         // whereQueries.push(
+         //    `JSON_QUERY(DATA, "$.countriesOfInterest") IN (${countriesOfInterestString})`
+         // )
+         // whereQueries.push(
+         //    `ARRAY_CONTAINS(JSON_QUERY(DATA, "$.countriesOfInterest"), ${countriesOfInterestString[0]})`
+         // )
+      }
+
+      console.log("Queries -> ", whereQueries)
       const query = `SELECT
                COUNT(*) OVER () as totalHits,
                JSON_VALUE(DATA, "$.firstName") AS firstName,
@@ -99,6 +115,7 @@ export class BigQueryRepository implements IBigQueryRepository {
                JSON_VALUE(DATA, "$.fieldOfStudy.id") AS fieldOfStudyId,
                JSON_VALUE(DATA, "$.levelOfStudy.name") AS levelOfStudyName,
                JSON_VALUE(DATA, "$.levelOfStudy.id") AS levelOfStudyId,
+               JSON_QUERY(DATA, "$.countriesOfInterest") AS countriesOfInterest,
 
                FROM ${this.userDataTable}
                WHERE
@@ -117,6 +134,9 @@ export class BigQueryRepository implements IBigQueryRepository {
       }
 
       const [rows] = await this.client.query(options)
+
+      console.log("RESULT -> ", rows[0])
+
       return rows as BigQueryUserResponse[]
    }
 }
