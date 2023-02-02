@@ -9,6 +9,7 @@ import {
 } from "@careerfairy/shared-lib/dist/users"
 import {
    LivestreamEvent,
+   LiveStreamEventWithUsersLivestreamData,
    LivestreamUserAction,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
@@ -49,6 +50,11 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       withTest?: boolean,
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]>
+
+   getAllLivestreamsWithUserLivestreamDataAfterRelease<T extends boolean>(
+      withTest?: boolean,
+      withRef?: T
+   ): Promise<DataWithRef<T, LiveStreamEventWithUsersLivestreamData>[]>
 }
 
 export class LivestreamScriptsRepository
@@ -152,5 +158,33 @@ export class LivestreamScriptsRepository
             .get()
       }
       return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+   }
+
+   async getAllLivestreamsWithUserLivestreamDataAfterRelease<T extends boolean>(
+      withTest: boolean = false,
+      withRef?: T
+   ): Promise<DataWithRef<T, LiveStreamEventWithUsersLivestreamData>[]> {
+      const snaps = await this.firestore
+         .collection("livestreams")
+         .where("start", ">=", new Date())
+         .orderBy("start", "asc")
+         .get()
+
+      const streams = mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+
+      const formattedStreams = []
+      for (const stream of streams) {
+         const collection = await this.firestore
+            .collection("livestreams")
+            .doc(stream.id)
+            .collection("userLivestreamData")
+            .get()
+
+         const usersLivestreamData = collection.docs?.map((doc) => doc.data())
+
+         formattedStreams.push({ ...stream, usersLivestreamData })
+      }
+
+      return formattedStreams
    }
 }
