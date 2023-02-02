@@ -87,6 +87,7 @@ export const generateReminderEmailData = ({
       reminder24Hours: `🔥 Reminder: Meet ${company} tomorrow!`,
       fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
       reminderNextDayMorning: "",
+      reminderRecordingNow: "",
    }
 
    // create email data for all the registered users chunks
@@ -108,6 +109,8 @@ export const generateNonAttendeesReminder = ({
    reminder,
 }: IGenerateEmailDataProps): MailgunMessageData[] => {
    const { timezone, usersLivestreamData, company } = stream
+
+   const sendReminderNow = reminder.key === "reminderRecordingNow"
 
    const tomorrowAt11 = new Date()
    tomorrowAt11.setDate(tomorrowAt11.getDate() + 1)
@@ -139,7 +142,7 @@ export const generateNonAttendeesReminder = ({
          subject: `🤫 ${company} : 4 days limited access to live stream recording!`,
          template: reminder.template,
          "recipient-variables": JSON.stringify(templateData),
-         "o:deliverytime": dateToDelivery.toRFC2822(),
+         "o:deliverytime": sendReminderNow ? 0 : dateToDelivery.toRFC2822(),
       }
    })
 }

@@ -128,6 +128,7 @@ export type ReminderData = {
       | "reminder1Hour"
       | "reminder24Hours"
       | "reminderNextDayMorning"
+      | "reminderRecordingNow"
    template: string
 }
 
@@ -155,6 +156,10 @@ const Reminder24Hours: ReminderData = {
 const ReminderNextDayMorning: ReminderData = {
    template: "reminder_for_recording",
    key: "reminderNextDayMorning",
+}
+const ReminderRecordingNow: ReminderData = {
+   template: "reminder_for_recording",
+   key: "reminderRecordingNow",
 }
 
 /**
@@ -284,6 +289,63 @@ export const sendReminderToNonAttendeesWhenLivestreamsEnds = functions
          }
       } else {
          functions.logger.log("The livestream has not ended yet")
+      }
+   })
+
+/**
+ * Trigger to send reminders for all the nonAttendees by stream id
+ */
+export const sendReminderForNonAttendeesByStreamId = functions
+   .region(config.region)
+   .https.onRequest(async (req, res) => {
+      setHeaders(req, res)
+      const livestreamId = req.query.eventId as string
+
+      if (livestreamId) {
+         try {
+            const livestream = await livestreamsRepo.getById(livestreamId)
+            const livestreamPresenter =
+               LivestreamPresenter.createFromDocument(livestream)
+
+            if (
+               !livestreamPresenter.isLive() &&
+               livestreamPresenter.streamHasFinished()
+            ) {
+               const nonAttendees = await livestreamsRepo.getNonAttendees(
+                  livestreamId
+               )
+               if (nonAttendees.length) {
+                  const livestreamWithNonAttendees = {
+                     ...livestream,
+                     usersLivestreamData: nonAttendees as UserLivestreamData[],
+                  } as LiveStreamEventWithUsersLivestreamData
+
+                  await handleSendEmail(
+                     [livestreamWithNonAttendees],
+                     ReminderRecordingNow,
+                     generateNonAttendeesReminder
+                  )
+                  res.sendStatus(200)
+               } else {
+                  functions.logger.log("No nonAttendees were found")
+                  res.sendStatus(404)
+               }
+            } else {
+               functions.logger.log("The livestream has not ended yet")
+               res.sendStatus(404)
+            }
+         } catch (error) {
+            functions.logger.error(
+               "error in sending reminder to non attendees when triggered",
+               error
+            )
+            throw new functions.https.HttpsError("unknown", error)
+         }
+      } else {
+         functions.logger.log(
+            "The livestream has not ended yet or does not exist"
+         )
+         res.sendStatus(404)
       }
    })
 
