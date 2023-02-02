@@ -166,7 +166,7 @@ export class LivestreamScriptsRepository
    ): Promise<DataWithRef<T, LiveStreamEventWithUsersLivestreamData>[]> {
       const snaps = await this.firestore
          .collection("livestreams")
-         .where("start", ">=", new Date())
+         .where("start", ">=", new Date(2023, 0, 31))
          .orderBy("start", "asc")
          .get()
 
