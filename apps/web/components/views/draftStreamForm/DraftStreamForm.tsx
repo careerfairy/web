@@ -232,7 +232,7 @@ const DraftStreamForm = ({
    const streamInfoRef = useRef(null)
    const speakersInfoRef = useRef(null)
    const targetStudentsRef = useRef(null)
-   const promotionInfoRef = useRef(null)
+   // const promotionInfoRef = useRef(null)
    const questionsInfoRef = useRef(null)
    const eventCategoriesInfoRef = useRef(null)
    const jobInfoRef = useRef(null)
@@ -244,7 +244,7 @@ const DraftStreamForm = ({
             { label: "Stream Info", ref: streamInfoRef },
             { label: "Speakers", ref: speakersInfoRef },
             { label: "Target Students", ref: targetStudentsRef },
-            { label: "Promotion", ref: promotionInfoRef },
+            // { label: "Promotion", ref: promotionInfoRef },
             { label: "Event Categories", ref: eventCategoriesInfoRef },
          ] as IStreamFormNavigatorSteps[],
       []
@@ -866,21 +866,21 @@ const DraftStreamForm = ({
                                     sectionRef={targetStudentsRef}
                                  />
 
-                                 <PromotionInfo
-                                    setFieldValue={setFieldValue}
-                                    promotionChannelsCodes={
-                                       values.promotionChannelsCodes
-                                    }
-                                    promotionCountriesCodes={
-                                       values.promotionCountriesCodes
-                                    }
-                                    promotionUniversitiesCodes={
-                                       values.promotionUniversitiesCodes
-                                    }
-                                    classes={classes}
-                                    sectionRef={promotionInfoRef}
-                                    isPastStream={isPastStream}
-                                 />
+                                 {/* <PromotionInfo */}
+                                 {/*    setFieldValue={setFieldValue} */}
+                                 {/*    promotionChannelsCodes={ */}
+                                 {/*       values.promotionChannelsCodes */}
+                                 {/*    } */}
+                                 {/*    promotionCountriesCodes={ */}
+                                 {/*       values.promotionCountriesCodes */}
+                                 {/*    } */}
+                                 {/*    promotionUniversitiesCodes={ */}
+                                 {/*       values.promotionUniversitiesCodes */}
+                                 {/*    } */}
+                                 {/*    classes={classes} */}
+                                 {/*    sectionRef={promotionInfoRef} */}
+                                 {/*    isPastStream={isPastStream} */}
+                                 {/* /> */}
 
                                  <SuspenseWithBoundary hide expected>
                                     {values.groupIds.length > 0 && (
