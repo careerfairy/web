@@ -291,37 +291,48 @@ const StreamInfo = ({
                   inputFormat={"dd/MM/yyyy HH:mm"}
                   disablePast
                   ampm={false}
+                  // renderInput={(params) => (
+                  //    <Tooltip
+                  //       placement="top"
+                  //       arrow
+                  //       open={showStartTooltip && !startDatePickerOpen}
+                  //       title={
+                  //          <Box display="flex">
+                  //             <Typography>
+                  //                Promotion won’t available if the event happens
+                  //                within 30 days
+                  //             </Typography>
+                  //             <IconButton
+                  //                onClick={() => setShowStartToolTip(false)}
+                  //                size="small"
+                  //                color="info"
+                  //             >
+                  //                <CloseIcon />
+                  //             </IconButton>
+                  //          </Box>
+                  //       }
+                  //    >
+                  //       <TextField
+                  //          fullWidth
+                  //          {...params}
+                  //          id="start"
+                  //          onBlur={handleBlur}
+                  //          sx={{ svg: { color: palette.secondary.main } }}
+                  //          error={Boolean(errors.start && touched.start)}
+                  //          disabled={disableStartDatePicker}
+                  //       />
+                  //    </Tooltip>
+                  // )}
                   renderInput={(params) => (
-                     <Tooltip
-                        placement="top"
-                        arrow
-                        open={showStartTooltip && !startDatePickerOpen}
-                        title={
-                           <Box display="flex">
-                              <Typography>
-                                 Promotion won’t available if the event happens
-                                 within 30 days
-                              </Typography>
-                              <IconButton
-                                 onClick={() => setShowStartToolTip(false)}
-                                 size="small"
-                                 color="info"
-                              >
-                                 <CloseIcon />
-                              </IconButton>
-                           </Box>
-                        }
-                     >
-                        <TextField
-                           fullWidth
-                           {...params}
-                           id="start"
-                           onBlur={handleBlur}
-                           sx={{ svg: { color: palette.secondary.main } }}
-                           error={Boolean(errors.start && touched.start)}
-                           disabled={disableStartDatePicker}
-                        />
-                     </Tooltip>
+                     <TextField
+                        fullWidth
+                        {...params}
+                        id="start"
+                        onBlur={handleBlur}
+                        sx={{ svg: { color: palette.secondary.main } }}
+                        error={Boolean(errors.start && touched.start)}
+                        disabled={disableStartDatePicker}
+                     />
                   )}
                   disabled={isSubmitting || disableStartDatePicker}
                   label="Live Stream Start Date"
