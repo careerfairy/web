@@ -72,7 +72,7 @@ const people = [
       avatar:
          "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FLisa.jpg?alt=media&token=e95898ed-fa21-42a4-9874-443b331f4de8",
       name: "Lisa Brandenberger",
-      role: "Sales and Marketing Intern",
+      role: "Talent Growth Manager",
       bio:
          "Lisa is about to finish her Bachelor’s degree in Applied Linguistics at ZHAW. Her passion for languages has led her to gain a toehold in an international start up. Besides work, she loves spending time with her family and friends or pursuing her interests in photography, social media and fashion trends.\n" +
          "In addition to her commitment to ESN Winterthur, Lisa also tries to keep up to date with the latest political developments.\n",
@@ -91,7 +91,7 @@ const people = [
    },
    {
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fcarlos.jpg?alt=media&token=be83b56c-a848-4028-8a2f-a1a293a80c62",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fcarlos.jpg?alt=media&token=f10c6234-f719-4cef-8b39-cd15f279f0ff",
       name: "Carlos Florêncio",
       role: "Software Engineer",
       bio:
@@ -109,6 +109,17 @@ const people = [
          "After obtaining the Swiss Federal Marketing Diploma as a generalist, Linda gained her digital marketing scars on the front lines of Swiss Digital Agencies. Passionate about B2B sector and communication, she never stops learning and has found that Content Management for startup growth is her playground of choice.\n\n" +
          "When she is not reading marketing blogs or testing new martech tools, she makes memories in the company of her colourful ‘family of friends’ discovering new wine varieties.",
       linkedinUrl: "https://www.linkedin.com/in/lindafairgrieve/",
+   },
+   {
+      avatar:
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FBruno.jpg?alt=media&token=70a7c99f-d9f7-4d75-8b6b-c9a3d6eaa0a2",
+      name: "Bruno Flütsch",
+      role: "Marketing and Localisation Manager",
+      bio:
+         "After completing his bachelor's degree in business administration from the University of St. Gallen (HSG), Bruno worked in both partner management and direct sales development at a European leader in meeting management software. Afterwards, Bruno joined CareerFairy as a Marketing Manager and is passionate about students finding the career path they will love!\n" +
+         "\n" +
+         "In his free time, he enjoys sports and music.",
+      linkedinUrl: "https://www.linkedin.com/in/bruno-fl%C3%BCtsch/",
    },
    {
       avatar:
@@ -157,7 +168,7 @@ const people = [
    },
    {
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FSimone.jpg?alt=media&token=983cb018-a6ed-4670-be1a-fe5cbeb1ecc0",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FSimone2.jpg?alt=media&token=7aad8889-afc5-40c4-be02-065e95ae1ec1",
       name: "Simone Angeloni",
       role: "Product Manager",
       bio:
@@ -169,7 +180,7 @@ const people = [
    },
    {
       avatar:
-         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2Fdaniel.jpeg?alt=media&token=b2f8164d-a9fd-4112-b548-de4649c1e38a",
+         "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/team-pics%2FDaniel.jpg?alt=media&token=b1747e73-8ffc-4526-b453-fe2f473db42b",
       name: "Daniel Butt",
       role: "Marketing Manager",
       bio:
