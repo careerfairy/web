@@ -133,6 +133,16 @@ export default class DateUtil {
       )
    }
 
+   static getPrettyDateWithoutHour(JSDate) {
+      return (
+         JSDate.getDate() +
+         " " +
+         DateUtil.getMonth(JSDate.getMonth()) +
+         " " +
+         JSDate.getYear()
+      )
+   }
+
    static getPrettyDateShort(JSDate) {
       return (
          JSDate.getDate() +
