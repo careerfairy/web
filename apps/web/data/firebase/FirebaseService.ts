@@ -303,7 +303,9 @@ class FirebaseService {
          timezone: userData.timezone,
          regular_date: livestream.start.toDate().toString(),
          duration_date: livestream.duration,
-         livestream_date: DateUtil.getPrettyDate(livestream.start.toDate()),
+         livestream_date: DateUtil.getPrettyDateWithoutHour(
+            livestream.start.toDate()
+         ),
          company_name: livestream.company,
          company_logo_url: livestream.companyLogoUrl,
          company_background_image_url: livestream.backgroundImageUrl,
@@ -320,7 +322,7 @@ class FirebaseService {
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         event_date: DateUtil.getPrettyDateWithoutHour(event.start.toDate()),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
@@ -336,7 +338,7 @@ class FirebaseService {
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
          user_first_name: userData.firstName,
-         event_date: DateUtil.getPrettyDate(event.start.toDate()),
+         event_date: DateUtil.getPrettyDateWithoutHour(event.start.toDate()),
          company_name: event.company,
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
