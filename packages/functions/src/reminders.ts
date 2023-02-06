@@ -112,10 +112,10 @@ export const sendReminderEmailAboutApplicationLink = functions
    })
 
 // delay to be sure that the reminder is sent at the time
-const reminderDateDelay = 20
+const reminderDateDelay = 0
 
 // range to how many minutes we will search
-const reminderScheduleRange = 20
+const reminderScheduleRange = 0
 
 // Maximum size of each email chunk
 const emailMaxChunkSize = 950
@@ -365,6 +365,8 @@ const handleReminder = async (
          filterEndDate
       )
 
+      console.log("STREAM NUMBER -> ", streams.length)
+
       const emailsToSave = await handleSendEmail(
          streams,
          reminder,
@@ -398,6 +400,7 @@ const handleSendEmail = (
    const promiseArrayToSendMessages = []
    const { minutesBefore } = reminder
 
+   console.log("HANDLE SEND EMAIL minutes before -> ", minutesBefore)
    streams.forEach((stream) => {
       const { isFaceToFace, company } = stream
 
@@ -504,3 +507,66 @@ const wasEmailChunkNotYetSent = (
 
    return true
 }
+
+export const reminderTest = functions.https.onCall(async (req, res) => {
+   const batch = admin.firestore().batch()
+
+   const dateStart = addMinutesDate(new Date(), reminderDateDelay)
+   const dateEndFor5Minutes = addMinutesDate(dateStart, reminderScheduleRange)
+
+   const dateStartFor1Hour = addMinutesDate(
+      dateStart,
+      Reminder1Hour.minutesBefore
+   )
+   const dateEndFor1Hour = addMinutesDate(
+      dateStartFor1Hour,
+      reminderScheduleRange
+   )
+
+   const dateStartFor24Hours = addMinutesDate(
+      dateStart,
+      Reminder24Hours.minutesBefore
+   )
+   const dateEndFor24Hours = addMinutesDate(
+      dateStartFor24Hours,
+      reminderScheduleRange
+   )
+
+   const reminder5MinutesPromise = handleReminder(
+      batch,
+      dateStart,
+      dateEndFor5Minutes,
+      Reminder5Min
+   )
+
+   const reminder1HourPromise = handleReminder(
+      batch,
+      dateStartFor1Hour,
+      dateEndFor1Hour,
+      Reminder1Hour
+   )
+
+   const reminder24HoursPromise = handleReminder(
+      batch,
+      dateStartFor24Hours,
+      dateEndFor24Hours,
+      Reminder24Hours
+   )
+
+   // Promise.allSettled([reminder5MinutesPromise]).then((results) => {
+   Promise.allSettled([
+      reminder5MinutesPromise,
+      reminder1HourPromise,
+      reminder24HoursPromise,
+   ]).then(async (results) => {
+      await batch.commit()
+
+      const rejectedPromises = results.filter(
+         ({ status }) => status === "rejected"
+      )
+      rejectedPromises.length &&
+         functions.logger.error(
+            `${rejectedPromises.length} reminders were not sent`
+         )
+   })
+})

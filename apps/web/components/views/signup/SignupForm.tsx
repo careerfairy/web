@@ -216,6 +216,9 @@ const SignupForm = () => {
             subTitle={steps[currentStep].subTitle}
          />
          <Container maxWidth="md">
+            <Button onClick={() => firebase.reminderTest().then()}>
+               TEST reminder
+            </Button>
             <Box data-testid={"signup-page-form"} p={3} mt={3}>
                <Box mb={4}>
                   <GenericStepper steps={steps} currentStep={currentStep} />

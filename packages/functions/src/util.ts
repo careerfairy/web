@@ -68,6 +68,7 @@ export const generateReminderEmailData = ({
       ? luxonStartDate.minus({ minutes: minutesToRemindBefore }).toRFC2822()
       : 0
 
+   console.log("DATE TO DELIVERY -> ", dateToDelivery)
    const templateData = createRecipientVariables(
       stream,
       start.toDate(),

@@ -3215,6 +3215,10 @@ class FirebaseService {
             id: doc.id,
          })) as { id: string; name: string }[]
    }
+
+   reminderTest = async () => {
+      return this.functions.httpsCallable("reminderTest")()
+   }
 }
 
 /**

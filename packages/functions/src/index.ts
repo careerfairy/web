@@ -97,10 +97,7 @@ exports.sendReminderEmailToRegistrants =
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails = reminders.scheduleReminderEmails
-exports.sendReminderToNonAttendeesWhenLivestreamsEnds =
-   reminders.sendReminderToNonAttendeesWhenLivestreamsEnds
-exports.sendReminderForNonAttendeesByStreamId =
-   reminders.sendReminderForNonAttendeesByStreamId
+exports.reminderTest = reminders.reminderTest
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =
