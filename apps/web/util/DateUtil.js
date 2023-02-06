@@ -139,7 +139,7 @@ export default class DateUtil {
          " " +
          DateUtil.getMonth(JSDate.getMonth()) +
          " " +
-         JSDate.getYear()
+         JSDate.getFullYear()
       )
    }
 
