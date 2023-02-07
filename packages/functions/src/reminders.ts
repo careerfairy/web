@@ -409,7 +409,7 @@ const handleSendEmail = (
          const emailsData = handleGenerateEmailData({
             stream,
             reminder,
-            minutesBefore,
+            minutesToRemindBefore: minutesBefore,
             emailMaxChunkSize,
          })
 
