@@ -111,12 +111,12 @@ export const generateNonAttendeesReminder = ({
 
    const sendReminderNow = reminder.key === "reminderRecordingNow"
 
-   const tomorrowAt11 = new Date()
-   tomorrowAt11.setDate(tomorrowAt11.getDate() + 1)
-   tomorrowAt11.setHours(11, 0, 0)
+   const tomorrowAt10UTC = new Date()
+   tomorrowAt10UTC.setDate(tomorrowAt10UTC.getDate() + 1)
+   tomorrowAt10UTC.setHours(10, 0, 0)
 
-   // date to delivery should be next day at 11 AM
-   const dateToDelivery = DateTime.fromJSDate(tomorrowAt11, {
+   // date to delivery should be next day at 11 AM Zurich time by default
+   const dateToDelivery = DateTime.fromJSDate(tomorrowAt10UTC, {
       zone: timezone || "Europe/Zurich",
    })
 
