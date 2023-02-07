@@ -36,7 +36,6 @@ export const getStreamLink = (streamId) => {
 export type IGenerateEmailDataProps = {
    stream: LiveStreamEventWithUsersLivestreamData
    reminder?: ReminderData
-   minutesBefore?: number
    emailMaxChunkSize: number
    minutesToRemindBefore?: number
 }
