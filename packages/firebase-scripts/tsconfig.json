@@ -4,9 +4,10 @@
       "noUnusedLocals": true,
       "outDir": "dist",
       "sourceMap": true,
+      "module": "CommonJS",
       "strict": false,
-      "target": "es5",
-      "lib": ["es6", "esnext", "dom"],
+      "target": "ES2021",
+      "lib": ["ES2021"],
       "allowJs": false,
       "declaration": true,
       "resolveJsonModule": true
