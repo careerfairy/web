@@ -33,6 +33,18 @@ npm run production:export -w @careerfairy/fetch-firestore-data
 npm run start -w @careerfairy/fetch-firestore-data
 ```
 
+By default, the existing users data will not be exported / imported. If you want to include it (e.g to have correct analytics), you need to set an environment variable:
+
+```sh
+# bash & zsh shells (set's the environment for the current shell lifetime only)
+export INCLUDE_USERDATA=true
+# fish shell: set -x INCLUDE_USERDATA true
+
+# Run the script commands that read the environment variables
+npm run production:export -w @careerfairy/fetch-firestore-data
+npm run start -w @careerfairy/fetch-firestore-data
+```
+
 ### Java Heap Memory Increase (15GB)
 
 The firebase emulators are a java app, since they will need to import the data into memory, we need to increase the available heap for the JVM to work fine.
