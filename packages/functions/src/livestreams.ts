@@ -7,7 +7,7 @@ import { setHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
-exports.scheduleTestLivestreamDeletion = functions.pubsub
+export const scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
    .timeZone("Europe/Zurich")
    .onRun(() => {
@@ -31,7 +31,7 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
          })
    })
 
-exports.getLivestreamICalendarEvent = functions.https.onRequest(
+export const getLivestreamICalendarEvent = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res)
       const livestreamId = req.query.eventId as string
@@ -86,8 +86,9 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
    }
 )
 
-exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
-   async (data) => {
+// eslint-disable-next-line camelcase
+export const sendLivestreamRegistrationConfirmationEmail_v2 =
+   functions.https.onCall(async (data) => {
       const email: any = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
@@ -128,11 +129,10 @@ exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
             return { status: 500, error: error }
          }
       )
-   }
-)
+   })
 
-exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
-   async (data) => {
+export const sendPhysicalEventRegistrationConfirmationEmail =
+   functions.https.onCall(async (data) => {
       const email: any = {
          TemplateId: process.env.POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION,
          From: "CareerFairy <noreply@careerfairy.io>",
@@ -156,11 +156,10 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
             return { status: 500, error: error }
          }
       )
-   }
-)
+   })
 
-exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
-   async (data) => {
+export const sendHybridEventRegistrationConfirmationEmail =
+   functions.https.onCall(async (data) => {
       console.log("Starting")
       const email: any = {
          TemplateId:
@@ -197,10 +196,9 @@ exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
             return { status: 500, error: error }
          }
       )
-   }
-)
+   })
 
-exports.setFirstCommentOfQuestionOnCreate = functions.firestore
+export const setFirstCommentOfQuestionOnCreate = functions.firestore
    .document("livestreams/{livestream}/questions/{question}/comments/{comment}")
    .onCreate(async (commentSnap) => {
       try {
@@ -230,7 +228,7 @@ exports.setFirstCommentOfQuestionOnCreate = functions.firestore
       }
    })
 
-exports.notifySlackWhenALivestreamStarts = functions
+export const notifySlackWhenALivestreamStarts = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onUpdate(async (change) => {
@@ -262,7 +260,7 @@ exports.notifySlackWhenALivestreamStarts = functions
       }
    })
 
-exports.notifySlackWhenALivestreamIsCreated = functions
+export const notifySlackWhenALivestreamIsCreated = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
    .onCreate(async (snap) => {
