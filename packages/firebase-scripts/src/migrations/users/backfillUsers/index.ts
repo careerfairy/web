@@ -635,7 +635,7 @@ const setUserLivestreamData = (
    // if is userData document just update user
    if (documentType === "userData") {
       bulkWriter
-         .update(userRef, updateData)
+         .update(userRef, updateData as any)
          .then(() => handleBulkWriterSuccess(counter))
          .catch((err) => handleBulkWriterError(err, counter))
       return
