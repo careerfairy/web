@@ -3,7 +3,7 @@ import { execute } from "./lib/executor"
 import { debug, h1Text, log } from "./lib/util"
 
 /**
- * Export Firestore collections into a Bucket `manual-export`
+ * Export Firestore collections into a Bucket `fetched`
  * Can take around 5 minutes to complete
  */
 async function exportCollections() {
@@ -24,7 +24,7 @@ async function exportCollections() {
    try {
       h1Text(`Clearing existing bucket ${bucket} contents`)
 
-      // await execute("gsutil", ["-m", "rm", "-r", `gs://${bucket}`])
+      await execute("gsutil", ["-m", "rm", "-r", `gs://${bucket}`])
    } catch (e) {
       debug(e)
       log("No tmp folder to clear")
@@ -36,12 +36,12 @@ async function exportCollections() {
 
    log("This operation can take 5 minutes..")
 
-   // await execute("gcloud", [
-   //    "firestore",
-   //    "export",
-   //    `gs://${bucket}`,
-   //    `--collection-ids=${collections.join(",")}`,
-   // ])
+   await execute("gcloud", [
+      "firestore",
+      "export",
+      `gs://${bucket}`,
+      `--collection-ids=${collections.join(",")}`,
+   ])
 
    h1Text("Export completed with success!")
    log(
