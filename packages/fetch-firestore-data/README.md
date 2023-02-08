@@ -18,26 +18,32 @@ These binaries should be on your shell PATH:
 -  `gsutil` (with login, careerfairy project selected)
    -  [Install instructions](https://cloud.google.com/storage/docs/gsutil_install)
 
-### Java Heap Memory Increase (10GB)
+## Run
+
+```sh
+# Build
+npm run build:fetch-firestore-data
+
+# Start a Production export of certain collections, do this every now and then to have an
+# updated data set, only one member of the team needs to run this. The export will be
+# present at the `fetched` bucket. This task generates lots of document reads
+npm run production:export -w @careerfairy/fetch-firestore-data
+
+# Fetches the `fetched` bucket, starts the emulators and imports the data
+npm run start -w @careerfairy/fetch-firestore-data
+```
+
+### Java Heap Memory Increase (15GB)
 
 The firebase emulators are a java app, since they will need to import the data into memory, we need to increase the available heap for the JVM to work fine.
 If the JVM doesn't have enough heap size, it will crash or be very slow because it needs to do a lot of GC's to free memory.
 
-On the `package.json` `start:emulators` task, we set the environment variable `JAVA_TOOL_OPTIONS=-Xmx10g` to increase the JVM Heap size to 10GB, make sure your system has enough memory.
+On the `package.json` `start:emulators` task, we set the environment variable `JAVA_TOOL_OPTIONS=-Xmx15g` to increase the JVM Heap size to 15GB, make sure your system has enough memory.
 
-## Run
-
-```sh
-npm run build:fetch-firestore-data
-npm run start -w @careerfairy/fetch-firestore-data
-```
-
-## Update data
-
-Update the `config.ts` file, `BUCKET_FOLDER` with a more recent backup folder.
+## All backup exports
 
 You can get the latest backups times in these ways:
 
--  Check the most recent job on the [Google Cloud Dashboard](https://console.cloud.google.com/firestore/import-export?authuser=1&project=careerfairy-e1fd9)
+-  [Google Cloud Dashboard](https://console.cloud.google.com/firestore/import-export?authuser=1&project=careerfairy-e1fd9)
 -  `gsutil ls "gs://careerfairy-backup/Thu Mar 03 2022*"`: Find the most recent backup folder
    -  Modify the date to your current time
