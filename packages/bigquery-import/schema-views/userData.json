@@ -37,6 +37,14 @@
          "type": "boolean"
       },
       {
+         "name": "lastActivityAt",
+         "type": "timestamp"
+      },
+      {
+         "name": "createdAt",
+         "type": "timestamp"
+      },
+      {
          "fields": [
             {
                "name": "code",
@@ -48,6 +56,24 @@
             }
          ],
          "name": "university",
+         "type": "map"
+      },
+      {
+         "fields": [
+            {
+               "name": "name",
+               "type": "string"
+            },
+            {
+               "name": "uuid",
+               "type": "string"
+            },
+            {
+               "name": "referralCode",
+               "type": "string"
+            }
+         ],
+         "name": "referredBy",
          "type": "map"
       }
    ]
