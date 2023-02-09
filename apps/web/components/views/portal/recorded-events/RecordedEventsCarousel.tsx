@@ -133,6 +133,7 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
          const recordingToken =
             await livestreamRepo.getLivestreamRecordingTokenAndIncrementViewStat(
                livestream.id,
+               livestream.start,
                userData?.userEmail
             )
 
