@@ -36,7 +36,7 @@ const UserReminderProvider = ({ children }) => {
    const forceShowReminder = useCallback(
       async (reminderType) => {
          // If the user has subscribed already do nothing
-         if (userData.unsubscribed === false) {
+         if (userData?.unsubscribed === false) {
             return
          }
 
