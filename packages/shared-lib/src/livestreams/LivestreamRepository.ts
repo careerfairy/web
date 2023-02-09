@@ -734,7 +734,7 @@ export class FirebaseLivestreamRepository
 
       const details: LivestreamRecordingDetails = {
          livestreamId,
-         livestreamStartDate,
+         livestreamStartDate: livestreamStartDate ?? null,
          minutesWatched: this.fieldValue.increment(minutesWatched) as any,
          viewers: this.fieldValue.arrayUnion(userId) as any,
          views: this.fieldValue.increment(1) as any,
