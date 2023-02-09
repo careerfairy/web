@@ -97,7 +97,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          isServerSide: true,
       })
    } catch (e) {
-      console.error("Failed to parse cookie.token", e)
+      console.error("Failed to parse cookie.token", e, cookies.token)
    }
 
    const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
