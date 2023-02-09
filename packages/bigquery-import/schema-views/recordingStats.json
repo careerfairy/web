@@ -1,0 +1,24 @@
+{
+   "fields": [
+      {
+         "name": "minutesWatched",
+         "type": "number"
+      },
+      {
+         "name": "livestreamId",
+         "type": "string"
+      },
+      {
+         "name": "viewers",
+         "type": "stringified_map"
+      },
+      {
+         "name": "views",
+         "type": "number"
+      },
+      {
+         "name": "livestreamStartDate",
+         "type": "timestamp"
+      }
+   ]
+}
