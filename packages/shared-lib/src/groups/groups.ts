@@ -35,6 +35,7 @@ export interface Group extends Identifiable {
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+   publicProfile?: boolean
 }
 
 export interface GroupWithPolicy extends Group {
