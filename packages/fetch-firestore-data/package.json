@@ -17,7 +17,7 @@
    },
    "dependencies": {
       "@careerfairy/seed-data": "*",
-      "axios": "^0.19.2",
+      "axios": "^0.27.2",
       "cross-spawn": "^7.0.3"
    }
 }
