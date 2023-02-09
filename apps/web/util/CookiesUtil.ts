@@ -25,6 +25,11 @@ export default class CookiesUtil {
          ? Buffer.from(base64, "base64").toString()
          : window.atob(base64)
 
+      if (isServerSide) {
+         return JSON.parse(decoded64)
+      }
+
+      // TODO: confirm if this is really needed, causing errors for some server side tokens
       const jsonPayload = decodeURIComponent(
          decoded64
             .split("")
