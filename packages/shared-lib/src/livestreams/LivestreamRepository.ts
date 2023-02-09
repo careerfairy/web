@@ -24,6 +24,7 @@ import { chunkArray } from "../utils"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
+   livestreamStartDate?: firebase.firestore.Timestamp
    minutesWatched?: number
    userId?: string
    onlyIncrementMinutes?: boolean
@@ -183,6 +184,7 @@ export interface ILivestreamRepository {
 
    updateRecordingStats({
       livestreamId,
+      livestreamStartDate,
       minutesWatched,
       userId,
       onlyIncrementMinutes,
@@ -190,6 +192,7 @@ export interface ILivestreamRepository {
 
    getLivestreamRecordingTokenAndIncrementViewStat(
       livestreamId: string,
+      livestreamStartDate: firebase.firestore.Timestamp,
       userId: string
    ): Promise<RecordingToken>
 }
@@ -718,6 +721,7 @@ export class FirebaseLivestreamRepository
 
    async updateRecordingStats({
       livestreamId,
+      livestreamStartDate,
       minutesWatched = 0,
       userId,
       onlyIncrementMinutes = false,
@@ -730,6 +734,7 @@ export class FirebaseLivestreamRepository
 
       const details: LivestreamRecordingDetails = {
          livestreamId,
+         livestreamStartDate,
          minutesWatched: this.fieldValue.increment(minutesWatched) as any,
          viewers: this.fieldValue.arrayUnion(userId) as any,
          views: this.fieldValue.increment(1) as any,
@@ -746,14 +751,16 @@ export class FirebaseLivestreamRepository
 
    async getLivestreamRecordingTokenAndIncrementViewStat(
       livestreamId: string,
+      livestreamStartDate: firebase.firestore.Timestamp,
       userId: string
    ): Promise<RecordingToken> {
       const promises = []
       promises.push(
          this.getLivestreamRecordingToken(livestreamId),
          this.updateRecordingStats({
-            livestreamId: livestreamId,
-            userId: userId,
+            livestreamId,
+            livestreamStartDate,
+            userId,
          })
       )
 

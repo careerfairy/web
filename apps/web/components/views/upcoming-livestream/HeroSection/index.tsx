@@ -250,11 +250,12 @@ const HeroSection = ({
       void livestreamRepo.updateRecordingStats({
          livestreamId: stream.id,
          userId: userData.userEmail,
+         livestreamStartDate: stream.start,
       })
 
       // play recording
       handleRecordingPlay()
-   }, [handleRecordingPlay, stream.id, userData?.userEmail])
+   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
