@@ -89,10 +89,17 @@ const PortalPage = ({
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const cookies = nookies.get(ctx)
-   const token = CookiesUtil.parseJwt({
-      token: cookies.token,
-      isServerSide: true,
-   })
+
+   let token: { email: string } | null = null
+   try {
+      token = CookiesUtil.parseJwt({
+         token: cookies.token,
+         isServerSide: true,
+      })
+   } catch (e) {
+      console.error("Failed to parse cookie.token", e)
+   }
+
    const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
 
    const promises = []
