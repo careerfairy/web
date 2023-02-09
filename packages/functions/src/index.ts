@@ -5,9 +5,10 @@ import * as ModuleAlias from "module-alias"
  * Required to avoid importing from the /dist folder
  *
  * https://stackoverflow.com/a/56584739
+ * https://github.com/firebase/firebase-tools/issues/986
  */
 ModuleAlias.addAliases({
-   "@careerfairy/shared-lib": __dirname + "/../../shared-lib/src",
+   "@careerfairy/shared-lib": __dirname + "../../../shared-lib/src",
 })
 
 import dotenv = require("dotenv")
