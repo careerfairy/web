@@ -23,7 +23,6 @@
       "build:shared-lib": "turbo run build --filter=@careerfairy/shared-lib",
       "build:fetch-firestore-data": "turbo run build --filter=@careerfairy/fetch-firestore-data",
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",
-      "build:shared-lib": "turbo run build --filter=@careerfairy/shared-lib",
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",
       "deploy:rules": "firebase deploy --only firestore:rules",
       "prepare:manual": "if [[ $NODE_ENVIRONMENT != \"production\" ]]; then husky install; fi",
@@ -32,7 +31,7 @@
    "devDependencies": {
       "@rxdi/firelink": "^0.9.1",
       "cross-env": "^7.0.3",
-      "firebase-tools": "^11.18.0",
+      "firebase-tools": "^11.22.0",
       "husky": "^7.0.4",
       "lint-staged": "^12.4.1",
       "prettier": "^2.8.1",

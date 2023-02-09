@@ -1,53 +1,15 @@
 import * as path from "path"
-import {
-   ChildProcessWithoutNullStreams,
-   SpawnOptionsWithoutStdio,
-} from "child_process"
 import axios from "axios"
 import { readFile } from "fs/promises"
 import { existsSync, mkdirSync, rmSync } from "fs"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import { firestore } from "@careerfairy/seed-data/dist/lib/firebase"
 import config from "./config"
-import * as spawn from "cross-spawn"
-
-const DEBUG = process.env.DEBUG
-const DRY_RUN = process.env.DRY_RUN
+import { debug, h1Text, log } from "./lib/util"
+import UserSeed from "@careerfairy/seed-data/dist/users"
+import { ChildProcessWithoutNullStreams } from "child_process"
+import { CommandOutput, currentRunningProcess, execute } from "./lib/executor"
 
 // save global reference for the emulators so that we can close them on CTRL+C
 let emulatorsProcess: ChildProcessWithoutNullStreams
-let currentRunningProcess: ChildProcessWithoutNullStreams
-
-/*
- * Only set this to true if you want to fetch the user data from the production database,
- * but be sure to delete the downloaded backup when done testing because of GDPR
- * */
-const INCLUDE_USERDATA = process.env.INCLUDE_USERDATA === "true"
-
-/**
- * Collections that will be removed
- * To improve performance / gdpr reasons
- */
-const COLLECTIONS_TO_REMOVE = [
-   "users", // old collection not being used,
-   "cache",
-   "_firebase_ext_",
-]
-
-/**
- * Sub collections that will be removed
- * To improve performance / gdpr reasons
- */
-const SUBCOLLECTIONS_TO_REMOVE = [
-   "icons", // livestream emotions
-   "impressions", // livestream impressions
-]
-
-// Remove documents containing user data
-if (!INCLUDE_USERDATA) {
-   COLLECTIONS_TO_REMOVE.push("userData")
-   SUBCOLLECTIONS_TO_REMOVE.push("userLivestreamData", "participatingStats")
-}
 
 /**
  * Main logic
@@ -62,21 +24,12 @@ async function run(): Promise<void> {
    emulatorsProcess = await runEmulatorsInBackground()
    h1Text(`Emulators ready to receive commands`)
 
-   h1Text(`Removing collections: ${COLLECTIONS_TO_REMOVE.join(",")}`)
-   await removeExistingCollections(COLLECTIONS_TO_REMOVE)
-
-   h1Text(`Remove subCollections: ${SUBCOLLECTIONS_TO_REMOVE.join(",")}`)
-   const promises = SUBCOLLECTIONS_TO_REMOVE.map((c) =>
-      removeExistingSubCollection(c)
-   )
-   await Promise.allSettled(promises)
-
    h1Text(`Deleting Auth`)
    await deleteAuth()
 
    h1Text(`Seeding data`)
 
-   if (INCLUDE_USERDATA) {
+   if (config.INCLUDE_USERDATA) {
       h1Text("Re-creating auth users")
       await createAuthUsers()
    }
@@ -86,17 +39,17 @@ async function run(): Promise<void> {
    await createUser("maximilian@careerfairy.io")
    await createUser("goncalo@careerfairy.io")
 
-   await emulatorExport()
-
    emulatorsProcess.on("exit", () => {
       h1Text(
-         `The data is ready to be used! Start your emulators with the arg --import "./${config.LOCAL_FOLDER}/${config.finalBackupFolder}".`
+         `The data is ready to be used! Start your emulators with the arg --import "./${config.LOCAL_FOLDER}/${config.BUCKET_FOLDER}".`
       )
 
       if (process.platform === "win32") {
          h1Text(`Type CTRL+C to quit, ignore further errors.`)
       }
    })
+
+   await emulatorExport()
 
    emulatorsProcess.kill()
 }
@@ -133,41 +86,6 @@ async function createAuthUsers() {
       h1Text(e)
       throw e
    }
-}
-
-/**
- * Deletes collections from the emulators
- * This may take a while for big collections! (the emulators are slow)
- *
- * @param collections
- */
-async function removeExistingCollections(collections: string[]) {
-   const rcFile = await readFirebaseRcFile()
-   const project = rcFile.projects.default
-
-   for (let i = 0; i < collections.length; i++) {
-      debug("Starting deleting collection request", project, collections[i])
-      await axios.delete(
-         `http://localhost:8080/emulator/v1/projects/${project}/databases/(default)/documents/${collections[i]}`
-      )
-   }
-}
-
-async function removeExistingSubCollection(collection: string) {
-   const batchSize = 500
-   const query = await firestore.collectionGroup(collection).get()
-   const totalDocs = query.docs.length
-   debug(`Start deleting ${totalDocs} ${collection} docs`)
-
-   for (let i = 0; i < totalDocs; i += batchSize) {
-      const batch = firestore.batch()
-      const docs = query.docs.slice(i, i + batchSize)
-
-      docs.forEach((doc) => batch.delete(doc.ref))
-      await batch.commit()
-      debug(`Deleted ${i + docs.length} out of ${totalDocs} ${collection}`)
-   }
-   debug("FINISHED DELETE")
 }
 
 async function deleteAuth() {
@@ -228,14 +146,14 @@ async function runEmulatorsInBackground(): Promise<ChildProcessWithoutNullStream
             "--only",
             "firestore,auth",
             "--import",
-            `./${config.LOCAL_FOLDER}/${config.finalBackupFolder}`,
+            `./${config.LOCAL_FOLDER}/${config.BUCKET_FOLDER}`,
          ],
          {
             cwd: config.rootFolder,
             env: {
                ...process.env,
                // emulators need a big heap to load the data
-               JAVA_TOOL_OPTIONS: process.env.JAVA_TOOL_OPTIONS ?? "-Xmx25g",
+               JAVA_TOOL_OPTIONS: process.env.JAVA_TOOL_OPTIONS ?? "-Xmx15g",
             },
          },
          handleProcess
@@ -256,7 +174,7 @@ function emulatorExport() {
    const fullPath = path.join(
       config.rootFolder,
       config.LOCAL_FOLDER,
-      config.finalBackupFolder
+      config.BUCKET_FOLDER
    )
    return axios.post("http://localhost:4400/_admin/export", {
       path: fullPath,
@@ -281,108 +199,12 @@ async function downloadRemoteBucket(): Promise<CommandOutput> {
       mkdirSync(localDstFolder)
    }
 
-   // clear temp folder
-   try {
-      await execute("gsutil", [
-         "-m",
-         "rm",
-         "-r",
-         `gs://${config.BUCKET}/${config.finalBackupFolder}`,
-      ])
-   } catch (e) {
-      debug(e)
-      log("No tmp folder to clear")
-   }
-
-   // copy remote folder into the tmp folder
-   await execute("gsutil", [
-      "-m",
-      "cp",
-      "-r",
-      `gs://${config.BUCKET}/${config.BUCKET_FOLDER}`,
-      `gs://${config.BUCKET}/${config.finalBackupFolder}`,
-   ])
-
-   // rename backup file
-   await execute("gsutil", [
-      "mv",
-      `gs://${config.BUCKET}/${config.finalBackupFolder}/${config.BUCKET_FOLDER}.overall_export_metadata`,
-      `gs://${config.BUCKET}/${config.finalBackupFolder}/backup.overall_export_metadata`,
-   ])
-
    // download remote folder
    return execute("gsutil", [
       "-m",
       "cp",
       "-r",
-      `gs://${config.BUCKET}/${config.finalBackupFolder}`,
+      `gs://${config.BUCKET}/${config.BUCKET_FOLDER}`,
       localDstFolder,
    ])
-}
-
-type CommandOutput = { code: number | null; stdout: string; stderr: string }
-
-function execute(
-   command: string,
-   args: string[] = [],
-   opts: SpawnOptionsWithoutStdio = { cwd: config.rootFolder },
-   processListenerFn?: (childProcess: ChildProcessWithoutNullStreams) => void
-): Promise<CommandOutput> {
-   return new Promise((resolve, reject) => {
-      if (DRY_RUN) {
-         log(command, args)
-         return resolve({
-            code: 0,
-            stdout: "dry run stdout",
-            stderr: "dry run stderr",
-         })
-      }
-
-      const childProcess = spawn(command, args, opts)
-      currentRunningProcess = childProcess
-
-      if (processListenerFn) {
-         // let outsiders send signals and listen to this process events
-         processListenerFn(childProcess)
-      }
-
-      let stdout: string = ""
-      let stderr: string = ""
-
-      childProcess.stdout?.on("data", (data: any) => {
-         try {
-            stdout += data.toString()
-         } catch (e) {}
-         process.stdout.write(data)
-      })
-      childProcess.stderr?.on("data", (data: any) => {
-         try {
-            stderr += data.toString()
-         } catch (e) {}
-         process.stderr.write(data)
-      })
-
-      childProcess.on("close", (code: number) => {
-         if (code === 0) {
-            resolve({ code, stdout, stderr })
-         } else {
-            reject({ code, stdout, stderr })
-         }
-      })
-   })
-}
-
-function h1Text(text: string) {
-   // cyan color
-   console.log("\x1b[36m%s\x1b[0m", `# ${text}`)
-}
-
-function log(...args: unknown[]) {
-   console.log(...args)
-}
-
-function debug(...args: unknown[]) {
-   if (DEBUG) {
-      console.log(...args)
-   }
 }
