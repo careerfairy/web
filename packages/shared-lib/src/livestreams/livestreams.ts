@@ -261,6 +261,8 @@ export interface LivestreamJobApplicationDetails extends JobIdentifier {
 }
 
 export interface LivestreamRecordingDetails extends DocumentData {
+   livestreamId: string
+   livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched?: number
    viewers: string[]
    views: number
