@@ -12,7 +12,6 @@ import {
 import { sendMessage } from "./api/mailgun"
 import { TemplatedMessage } from "postmark"
 import {
-   LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
@@ -127,7 +126,7 @@ export type ReminderData = {
       | "reminder5Minutes"
       | "reminder1Hour"
       | "reminder24Hours"
-      | "reminderNextDayMorning"
+      | "reminderTodayMorning"
       | "reminderRecordingNow"
    template: string
 }
@@ -153,9 +152,9 @@ const Reminder24Hours: ReminderData = {
    key: "reminder24Hours",
 }
 
-const ReminderNextDayMorning: ReminderData = {
+const ReminderTodayMorning: ReminderData = {
    template: "reminder_for_recording",
-   key: "reminderNextDayMorning",
+   key: "reminderTodayMorning",
 }
 const ReminderRecordingNow: ReminderData = {
    template: "reminder_for_recording",
@@ -240,55 +239,82 @@ export const scheduleReminderEmails = functions
    })
 
 /**
- * When a livestreams ends we should schedule a reminder for the next day at 11 AM to all the non attendees
+ * Every day at 9 AM, check all the livestreams that ended the day before and send a reminder to all the non-attendees at 11 AM.
  */
-export const sendReminderToNonAttendeesWhenLivestreamsEnds = functions
+export const sendReminderToNonAttendees = functions
    .region(config.region)
-   .firestore.document("livestreams/{livestreamId}")
-   .onUpdate(async (change) => {
-      const previousValue = change.before.data() as LivestreamEvent
-      const previousLivestreamPresenter =
-         LivestreamPresenter.createFromDocument(previousValue)
+   .runWith({
+      // when sending large batches, this function can take a while to finish
+      timeoutSeconds: 300,
+   })
+   .pubsub.schedule("0 9 * * *")
+   .timeZone("Europe/Zurich")
+   .onRun(async () => {
+      try {
+         const yesterdayLivestreams =
+            await livestreamsRepo.getYesterdayLivestreams()
 
-      const newValue = change.after.data() as LivestreamEvent
-      const newLivestreamPresenter =
-         LivestreamPresenter.createFromDocument(newValue)
+         if (yesterdayLivestreams.length) {
+            const livestreamsToRemind = await yesterdayLivestreams.reduce(
+               async (acc, livestream) => {
+                  const livestreamPresenter =
+                     LivestreamPresenter.createFromDocument(livestream)
 
-      if (
-         newLivestreamPresenter.isAbleToAccessRecording() &&
-         !newLivestreamPresenter.isTest() &&
-         previousLivestreamPresenter.isLive() &&
-         newLivestreamPresenter.streamHasFinished()
-      ) {
-         functions.logger.log("Detected the livestream has ended")
+                  if (
+                     livestreamPresenter.isAbleToAccessRecording() &&
+                     !livestreamPresenter.isTest() &&
+                     !livestreamPresenter.isLive() &&
+                     livestreamPresenter.streamHasFinished()
+                  ) {
+                     functions.logger.log(
+                        `Detected livestream ${livestreamPresenter.title} has ended yesterday`
+                     )
 
-         try {
-            const nonAttendees = await livestreamsRepo.getNonAttendees(
-               newValue.id
+                     const nonAttendees = await livestreamsRepo.getNonAttendees(
+                        livestream.id
+                     )
+
+                     if (nonAttendees.length) {
+                        const livestreamWithNonAttendees = {
+                           ...livestream,
+                           usersLivestreamData:
+                              nonAttendees as UserLivestreamData[],
+                        } as LiveStreamEventWithUsersLivestreamData
+
+                        functions.logger.log(
+                           `Will send the reminder to ${nonAttendees.length} users related to the Livestream ${livestreamPresenter.title}`
+                        )
+
+                        return [...(await acc), livestreamWithNonAttendees]
+                     } else {
+                        functions.logger.log(
+                           `No nonAttendees were found on ${livestreamPresenter.title}`
+                        )
+                     }
+                  } else {
+                     functions.logger.log(
+                        `The livestream ${livestreamPresenter.title} has not ended yet`
+                     )
+                  }
+                  return acc
+               },
+               Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
             )
 
-            if (nonAttendees) {
-               // join the stream info with all the non attendees
-               const livestreamWithNonAttendees = {
-                  ...newValue,
-                  usersLivestreamData: nonAttendees as UserLivestreamData[],
-               } as LiveStreamEventWithUsersLivestreamData
-
-               await handleSendEmail(
-                  [livestreamWithNonAttendees],
-                  ReminderNextDayMorning,
-                  generateNonAttendeesReminder
-               )
-            }
-         } catch (error) {
-            functions.logger.error(
-               "error in sending reminder to non attendees when livestreams ends",
-               error
+            await handleSendEmail(
+               livestreamsToRemind,
+               ReminderTodayMorning,
+               generateNonAttendeesReminder
             )
-            throw new functions.https.HttpsError("unknown", error)
+         } else {
+            functions.logger.log("No livestream has ended yesterday")
          }
-      } else {
-         functions.logger.log("The livestream has not ended yet")
+      } catch (error) {
+         functions.logger.error(
+            "error in sending reminder to non attendees when livestreams ends",
+            error
+         )
+         throw new functions.https.HttpsError("unknown", error)
       }
    })
 
