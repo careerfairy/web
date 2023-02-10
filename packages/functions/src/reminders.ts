@@ -296,7 +296,7 @@ export const sendReminderToNonAttendees = functions
                         `The livestream ${livestreamPresenter.title} has not ended yet`
                      )
                   }
-                  return acc
+                  return await acc
                },
                Promise.resolve([] as LiveStreamEventWithUsersLivestreamData[])
             )
