@@ -59,7 +59,11 @@ export function useLivestreamCsvData({
                   )
                   // We only filter out the users if the group is a university group and the usertype is not talent pool
                   // This is because we want to show all the users in the talent pool no matter what kind of group they are (request from sales)
-                  if (group.universityCode && userType !== "talentPool") {
+                  if (
+                     group.universityCode &&
+                     userType !== "talentPool" &&
+                     users
+                  ) {
                      users = users.filter((data) =>
                         groupPresenter.isUniversityStudent(data.user)
                      )
