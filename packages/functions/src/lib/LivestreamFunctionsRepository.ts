@@ -43,6 +43,8 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
     */
    getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
 
+   getYesterdayLivestreams(): Promise<LivestreamEvent[]>
+
    updateLiveStreamStats(
       livestreamId: string,
       operationsToMake: OperationsToMake
@@ -152,6 +154,28 @@ export class LivestreamFunctionsRepository
             (doc) => doc.data() as UserLivestreamData
          )
          return nonAttendeesUsers
+      }
+
+      return []
+   }
+
+   async getYesterdayLivestreams(): Promise<LivestreamEvent[]> {
+      const yesterdayStartOfTheDay = new Date()
+      yesterdayStartOfTheDay.setDate(yesterdayStartOfTheDay.getDate() - 1)
+      yesterdayStartOfTheDay.setHours(0, 0, 0)
+
+      const todayStartOfDay = new Date()
+      todayStartOfDay.getDate()
+      todayStartOfDay.setHours(0, 0, 0)
+
+      const querySnapshot = await this.firestore
+         .collection("livestreams")
+         .where("start", ">", yesterdayStartOfTheDay)
+         .where("start", "<", todayStartOfDay)
+         .get()
+
+      if (!querySnapshot.empty) {
+         return querySnapshot.docs?.map((doc) => doc.data() as LivestreamEvent)
       }
 
       return []
