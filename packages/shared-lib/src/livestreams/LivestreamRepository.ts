@@ -744,6 +744,7 @@ export class FirebaseLivestreamRepository
       if (onlyIncrementMinutes) {
          delete details.views
          delete details.viewers
+         delete details.livestreamStartDate
       }
 
       return docRef.set(details, { merge: true })
