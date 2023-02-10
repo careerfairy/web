@@ -85,7 +85,7 @@ export const generateReminderEmailData = ({
       reminder1Hour: `🔥 Reminder: Meet ${company} in 1 hour!`,
       reminder24Hours: `🔥 Reminder: Meet ${company} tomorrow!`,
       fallback: `🔥 Reminder: Live Stream with ${company} at ${formattedDate}`,
-      reminderNextDayMorning: "",
+      reminderTodayMorning: "",
       reminderRecordingNow: "",
    }
 
@@ -111,12 +111,11 @@ export const generateNonAttendeesReminder = ({
 
    const sendReminderNow = reminder.key === "reminderRecordingNow"
 
-   const tomorrowAt10UTC = new Date()
-   tomorrowAt10UTC.setDate(tomorrowAt10UTC.getDate() + 1)
-   tomorrowAt10UTC.setHours(10, 0, 0)
+   const todayAt10UTC = new Date()
+   todayAt10UTC.setHours(10, 0, 0)
 
-   // date to delivery should be next day at 11 AM Zurich time by default
-   const dateToDelivery = DateTime.fromJSDate(tomorrowAt10UTC, {
+   // date to delivery should be today at 11 AM Zurich time by default
+   const dateToDelivery = DateTime.fromJSDate(todayAt10UTC, {
       zone: timezone || "Europe/Zurich",
    })
 
