@@ -24,6 +24,7 @@ import {
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
+import { normalizeRating } from "@careerfairy/shared-lib/livestreams/ratings"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
@@ -54,6 +55,7 @@ import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
+import { livestreamRepo } from "data/RepositoryInstances"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -1888,19 +1890,41 @@ class FirebaseService {
       )
    }
 
-   rateLivestream = (
+   rateLivestream = async (
       livestreamId: string,
       userEmail: string,
       rating: Pick<EventRatingAnswer, "message" | "rating">,
       ratingDoc: EventRating
    ) => {
-      let ref = this.firestore
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
          .doc(ratingDoc.id)
          .collection("voters")
          .doc(userEmail)
+
+      // also update the livestream aggregated rating
+      const normalizedRating = normalizeRating(ratingDoc, rating)
+
+      if (normalizedRating && normalizedRating >= 1 && normalizedRating <= 5) {
+         await livestreamRepo.updateLiveStreamStats(
+            livestreamId,
+            (existingStats) => {
+               const newNumRatings = existingStats.numberOfRatings + 1
+               const newAvg =
+                  existingStats.averageRating +
+                  (normalizedRating - existingStats.averageRating) /
+                     newNumRatings
+
+               // will use firestore.update() behind the scenes
+               return {
+                  averageRating: newAvg,
+                  numberOfRatings: newNumRatings,
+               }
+            }
+         )
+      }
 
       return ref.set({
          ...rating,
