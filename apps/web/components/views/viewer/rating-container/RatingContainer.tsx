@@ -85,7 +85,7 @@ const ActionComponent = ({
                livestreamId,
                email,
                newValues,
-               rating.id
+               rating
             )
          } catch (e) {}
          setSubmitting(false)
