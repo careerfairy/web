@@ -8,6 +8,7 @@ import {
 // Document Path: livestreams/{livestreamId}/stats/livestreamStats
 export interface LiveStreamStats extends Identifiable {
    livestream: LivestreamEventPublicData
+
    /**
     * Number of users who have rated the event
     * */
@@ -15,6 +16,9 @@ export interface LiveStreamStats extends Identifiable {
 
    /**
     * The average aggregate rating of the event
+    * This value is between 1 and 5
+    *
+    * Includes normal & sentiment rantings
     * */
    averageRating: number
 
@@ -22,6 +26,7 @@ export interface LiveStreamStats extends Identifiable {
     * The overall stats of the event
     * */
    generalStats: LivestreamStatsMap
+
    universityStats: {
       // The key is the university code, and the value is the stats for that university.
       // The numberOfPeopleReached will be zero because it is not relevant for the university stats
@@ -29,7 +34,7 @@ export interface LiveStreamStats extends Identifiable {
    }
 }
 
-export const createLiveStreamStatsDoc = <T extends string>(
+export const createLiveStreamStatsDoc = (
    livestream: LivestreamEvent,
    docId: string
 ): LiveStreamStats => {
