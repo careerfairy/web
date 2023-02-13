@@ -45,11 +45,6 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
 
    getYesterdayLivestreams(): Promise<LivestreamEvent[]>
 
-   updateLiveStreamStats(
-      livestreamId: string,
-      operationsToMake: OperationsToMake
-   ): Promise<void>
-
    syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
    ): Promise<void>
@@ -181,37 +176,6 @@ export class LivestreamFunctionsRepository
       return []
    }
 
-   async updateLiveStreamStats(
-      livestreamId: string,
-      operationsToMake: OperationsToMake
-   ): Promise<void> {
-      const livestreamRef = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-
-      const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
-
-      const statsSnap = await statsRef.get()
-
-      if (!statsSnap.exists) {
-         // Create the stats document
-         const livestreamDoc = await livestreamRef.get()
-
-         if (!livestreamDoc.exists) {
-            return // Livestream was deleted, no need to update the stats
-         }
-
-         const statsDoc = createLiveStreamStatsDoc(
-            this.addIdToDoc<LivestreamEvent>(livestreamDoc),
-            statsRef.id
-         )
-         await statsRef.set(statsDoc)
-      }
-
-      // We have to use an update method here because the set method does not support nested updates/operations
-      return statsRef.update(operationsToMake)
-   }
-
    async syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
    ): Promise<void> {
@@ -306,9 +270,9 @@ export class LivestreamFunctionsRepository
          })
       } else {
          // Update livestreamStats
-         await this.updateLiveStreamStats(
+         await this.updateLiveStreamStats<OperationsToMake>(
             livestreamId,
-            livestreamStatsDocOperationsToMake
+            () => livestreamStatsDocOperationsToMake
          )
 
          logger.info("Updated livestream stats with the following operations", {

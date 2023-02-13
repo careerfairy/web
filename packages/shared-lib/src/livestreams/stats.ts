@@ -84,3 +84,8 @@ export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
    }
    return `generalStats.${field}` as const
 }
+
+export type LivestreamStatsToUpdate = {
+   // The operations to make to the nested properties on the livestreamStats document
+   [stringToPropertyInDotNotation: string]: unknown
+}

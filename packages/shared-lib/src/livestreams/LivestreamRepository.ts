@@ -21,6 +21,11 @@ import {
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import { chunkArray } from "../utils"
+import {
+   createLiveStreamStatsDoc,
+   LiveStreamStats,
+   LivestreamStatsToUpdate,
+} from "./stats"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -160,7 +165,7 @@ export interface ILivestreamRepository {
     * Fetches livestreams from a group that have jobs associated
     * @param groupId
     */
-   getLivestreamsWithJobs(groupId): Promise<LivestreamEvent[] | null>
+   getLivestreamsWithJobs(groupId: string): Promise<LivestreamEvent[] | null>
 
    getLivestreamUser(
       eventId: string,
@@ -195,6 +200,11 @@ export interface ILivestreamRepository {
       livestreamStartDate: firebase.firestore.Timestamp,
       userId: string
    ): Promise<RecordingToken>
+
+   updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
+      livestreamId: string,
+      operationsToMake: (existingStats: LiveStreamStats) => T
+   ): Promise<void>
 }
 
 export class FirebaseLivestreamRepository
@@ -206,6 +216,41 @@ export class FirebaseLivestreamRepository
       readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
+      livestreamId: string,
+      operationsToMake: (existingStats: LiveStreamStats) => T
+   ): Promise<void> {
+      const livestreamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
+
+      const statsSnap = await statsRef.get()
+      let existingStats: LiveStreamStats
+
+      if (!statsSnap.exists) {
+         // Create the stats document
+         const livestreamDoc = await livestreamRef.get()
+
+         if (!livestreamDoc.exists) {
+            return // Livestream was deleted, no need to update the stats
+         }
+
+         existingStats = createLiveStreamStatsDoc(
+            this.addIdToDoc<LivestreamEvent>(livestreamDoc),
+            statsRef.id
+         )
+
+         await statsRef.set(existingStats)
+      } else {
+         existingStats = this.addIdToDoc<LiveStreamStats>(statsSnap)
+      }
+
+      // We have to use an update method here because the set method does not support nested updates/operations
+      return statsRef.update(operationsToMake(existingStats))
    }
 
    async getLivestreamUser(
@@ -342,8 +387,8 @@ export class FirebaseLivestreamRepository
    ): Promise<LivestreamEvent[] | null> {
       // convert fieldsOfStudy to array of chunks of 10
       let livestreams = []
-      let i,
-         j,
+      let i: number,
+         j: number,
          tempArray: FieldOfStudy[] = [],
          chunk = 10
       /*
@@ -352,7 +397,7 @@ export class FirebaseLivestreamRepository
        * */
       for (i = 0, j = fieldsOfStudy.length; i < j; i += chunk) {
          tempArray = fieldsOfStudy.slice(i, i + chunk)
-         let ref = await this.firestore
+         let ref = this.firestore
             .collection("livestreams")
             .where("start", ">", getEarliestEventBufferTime())
             .where("targetFieldsOfStudy", "array-contains-any", tempArray)
@@ -598,7 +643,7 @@ export class FirebaseLivestreamRepository
       userId: string,
       jobIdentifier: JobIdentifier,
       job: Job,
-      applicationId
+      applicationId: string
    ): Promise<void> {
       // should already exist since the user registered & participated
       const docRef = this.firestore
@@ -689,7 +734,9 @@ export class FirebaseLivestreamRepository
       return mapFirestoreDocuments<LivestreamEvent>(snaps)
    }
 
-   async getLivestreamRecordingToken(livestreamId): Promise<RecordingToken> {
+   async getLivestreamRecordingToken(
+      livestreamId: string
+   ): Promise<RecordingToken> {
       const snap = await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -704,8 +751,8 @@ export class FirebaseLivestreamRepository
    }
 
    async getRecordedEventsByUserId(
-      userId,
-      dateLimit
+      userId: string,
+      dateLimit: Date
    ): Promise<LivestreamEvent[]> {
       const snap = await this.firestore
          .collection("livestreams")
