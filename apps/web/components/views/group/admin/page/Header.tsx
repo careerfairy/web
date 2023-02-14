@@ -1,29 +1,177 @@
-import { useCompanyPage } from "./index"
-import { Box } from "@mui/material"
+import { TabValue, useCompanyPage } from "./index"
+import { Avatar, Box, darken, Tabs, Typography } from "@mui/material"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import Image from "next/image"
 import { StylesProps } from "../../../../../types/commonTypes"
+import {
+   companyLogoPlaceholder,
+   placeholderBanner,
+} from "../../../../../constants/images"
+import BackgroundImage from "components/views/common/BackgroundImage"
+import SimpleTab from "../../../../../materialUI/GlobalTabs/SimpleTab"
+import React, { useCallback } from "react"
+import { useTheme } from "@mui/material/styles"
 
 const styles: StylesProps = {
    imageWrapper: {
       width: "100%",
-      height: "300px",
+      height: { xs: "250px", md: "300px" },
       position: "relative",
+   },
+   logo: {
+      width: { xs: 112, md: 160 },
+      height: { xs: 112, md: 160 },
+      borderRadius: "12px",
+      marginRight: "-5px",
+      background: (theme) => theme.palette.common.white,
+      boxShadow: (theme) => theme.shadows[2],
+      "& img": {
+         objectFit: "contain",
+         maxWidth: "90%",
+         maxHeight: "90%",
+      },
+      marginLeft: { xs: "20px", md: "80px" },
+   },
+   navigatorWrapper: {
+      position: "absolute",
+      top: { xs: "250px", md: "310px" },
+      display: "flex",
+      width: "-webkit-fill-available",
+      flexDirection: { xs: "column", md: "row" },
+   },
+   navigatorInfoWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      width: "100%",
+   },
+   companyName: {
+      display: "flex",
+      alignItems: "center",
+      height: "100px",
+   },
+   navigatorTabs: {
+      display: "flex",
+      alignItems: "center",
+      backgroundColor: darken("#EFF5F8", 0.1),
+      width: "100%",
+      height: "60px",
+      overflowX: "scroll",
+   },
+   indicator: {
+      height: (theme) => theme.spacing(0.4),
+      borderRadius: (theme) => theme.spacing(1, 1, 0.3, 0.3),
+      backgroundColor: (theme) => theme.palette.secondary.main,
+   },
+   tab: {
+      fontWeight: (theme) => theme.typography.fontWeightBold,
+      fontSize: "16px",
+      marginRight: { xs: "10px", md: "40px" },
+      textTransform: "none",
    },
 }
 
 const Header = () => {
-   const { group } = useCompanyPage()
+   const { group, tabValue, changeTabValue } = useCompanyPage()
+   const theme = useTheme()
+   const { bannerImageUrl, logoUrl, universityName } = group
+
+   const handleChangeTab = useCallback(
+      (event, value) => {
+         changeTabValue(value)
+      },
+      [changeTabValue]
+   )
 
    return (
       <>
          <Box sx={styles.imageWrapper}>
-            <Image
-               src={getResizedUrl(group?.bannerImageUrl, "lg")}
-               alt={group.universityName}
-               layout="fill"
-               objectFit="cover"
+            <BackgroundImage
+               image={getResizedUrl(bannerImageUrl, "lg") || placeholderBanner}
+               opacity={0.8}
+               repeat={false}
+               className={undefined}
+               backgroundImageSx={undefined}
             />
+         </Box>
+         <Box sx={styles.navigatorWrapper}>
+            <Avatar
+               variant="square"
+               sx={styles.logo}
+               alt={`${universityName} logo`}
+               src={getResizedUrl(logoUrl, "sm") || companyLogoPlaceholder}
+            />
+            <Box sx={styles.navigatorInfoWrapper}>
+               <Box sx={styles.companyName}>
+                  <Typography
+                     variant={"h3"}
+                     fontWeight={"600"}
+                     color={{ xs: "black", md: "white" }}
+                     ml={"28px"}
+                  >
+                     {universityName}
+                  </Typography>
+               </Box>
+               <Box sx={styles.navigatorTabs}>
+                  <Box ml={{ xs: "none", md: "50px" }}>
+                     <Tabs
+                        value={tabValue}
+                        onChange={handleChangeTab}
+                        textColor="inherit"
+                        TabIndicatorProps={{ sx: styles.indicator } as any}
+                        variant={"fullWidth"}
+                        sx={{ width: "100%", minWidth: "fit-content" }}
+                     >
+                        <SimpleTab
+                           sx={{
+                              ...styles.tab,
+                              minWidth: "100px",
+                              color:
+                                 tabValue === TabValue.profile &&
+                                 theme.palette.secondary.main,
+                           }}
+                           label="Profile"
+                           value={TabValue.profile}
+                           index={0}
+                        />
+                        <SimpleTab
+                           sx={{
+                              ...styles.tab,
+                              minWidth: "100px",
+                              color:
+                                 tabValue === TabValue.videos &&
+                                 theme.palette.secondary.main,
+                           }}
+                           label="Videos"
+                           value={TabValue.videos}
+                           index={1}
+                        />
+                        <SimpleTab
+                           sx={{
+                              ...styles.tab,
+                              minWidth: "150px",
+                              color:
+                                 tabValue === TabValue.testimonials &&
+                                 theme.palette.secondary.main,
+                           }}
+                           label="Testimonials"
+                           value={TabValue.testimonials}
+                           index={2}
+                        />
+                        <SimpleTab
+                           sx={{
+                              ...styles.tab,
+                              minWidth: "150px",
+                              color:
+                                 tabValue === TabValue.livesStreams &&
+                                 theme.palette.secondary.main,
+                           }}
+                           label="Live streams"
+                           value={TabValue.livesStreams}
+                           index={3}
+                        />
+                     </Tabs>
+                  </Box>
+               </Box>
+            </Box>
          </Box>
       </>
    )
