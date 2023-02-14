@@ -21,7 +21,6 @@ import NavList from "../common/NavList"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
 import ATSStatus from "./ATSStatus"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
-import { slugify } from "@careerfairy/shared-lib/utils"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
@@ -32,7 +31,7 @@ const GroupNavList = () => {
    const featureFlags = useFeatureFlags()
 
    const navLinks = useMemo(() => {
-      const { id, atsAdminPageFlag, universityName } = group
+      const { id, atsAdminPageFlag } = group
       const links: INavLink[] = [
          {
             id: "main-page",
@@ -61,28 +60,24 @@ const GroupNavList = () => {
             id: "company",
             title: "Company",
             Icon: DomainIcon,
-            href: `/${baseHrefPath}/${id}/admin/page`,
-            // pathname: `/${baseHrefPath}/${baseParam}/admin/page`,
+            href: `/${baseHrefPath}/${id}/admin/edit`,
             childLinks: [
                {
                   id: "general",
-                  href: `/${baseHrefPath}/${id}/admin/page`,
-                  pathname: `/${baseHrefPath}/${baseParam}/admin/page`,
-                  // Icon: AllLiveStreamsIcon,
+                  href: `/${baseHrefPath}/${id}/admin/edit`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/edit`,
                   title: "General",
                },
                {
                   id: "team-members",
-                  href: ``,
-                  pathname: ``,
-                  // Icon: AllLiveStreamsIcon,
+                  href: `/${baseHrefPath}/${id}/admin/roles`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
                   title: "Team members",
                },
                {
                   id: "page",
-                  href: `/company/${slugify(universityName)}`,
-                  pathname: `/company/${slugify(universityName)}`,
-                  // Icon: AllLiveStreamsIcon,
+                  href: `/${baseHrefPath}/${id}/admin/page`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/page`,
                   title: "Company page",
                },
             ],
@@ -93,13 +88,6 @@ const GroupNavList = () => {
             pathname: `/${baseHrefPath}/${baseParam}/admin/analytics`,
             Icon: AnalyticsIcon,
             title: "Analytics",
-         },
-         {
-            id: "team-members",
-            href: `/${baseHrefPath}/${id}/admin/roles`,
-            Icon: RolesIcon,
-            pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
-            title: "Team members",
          },
       ]
 
