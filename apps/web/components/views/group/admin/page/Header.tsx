@@ -45,7 +45,7 @@ const styles: StylesProps = {
    companyName: {
       display: "flex",
       alignItems: "center",
-      height: "100px",
+      height: { xs: "60px", md: "100px" },
    },
    navigatorTabs: {
       display: "flex",
@@ -105,6 +105,7 @@ const Header = () => {
                      fontWeight={"600"}
                      color={{ xs: "black", md: "white" }}
                      ml={"28px"}
+                     zIndex={1}
                   >
                      {universityName}
                   </Typography>
