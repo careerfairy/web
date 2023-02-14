@@ -32,8 +32,7 @@ const styles: StylesProps = {
       marginLeft: { xs: "20px", md: "80px" },
    },
    navigatorWrapper: {
-      position: "absolute",
-      top: { xs: "250px", md: "310px" },
+      marginTop: { xs: "-80px", md: "-100px" },
       display: "flex",
       width: "-webkit-fill-available",
       flexDirection: { xs: "column", md: "row" },
