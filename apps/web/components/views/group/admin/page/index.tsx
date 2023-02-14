@@ -15,6 +15,7 @@ import MediaSection from "./MediaSection"
 
 type Props = {
    group: Group
+   editMode: boolean
 }
 
 export enum TabValue {
@@ -28,15 +29,17 @@ type ICompanyPageContext = {
    group: Group
    tabValue: TabValue
    changeTabValue: (tabValues: TabValue) => void
+   editMode: boolean
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
    group: null,
    tabValue: TabValue.profile,
    changeTabValue: () => {},
+   editMode: false,
 })
 
-const CompanyPageOverview = ({ group }: Props) => {
+const CompanyPageOverview = ({ group, editMode }: Props) => {
    const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
 
    const handleChangeTabValue = useCallback((tabValue) => {
@@ -47,9 +50,10 @@ const CompanyPageOverview = ({ group }: Props) => {
       () => ({
          group,
          tabValue,
+         editMode,
          changeTabValue: handleChangeTabValue,
       }),
-      [group, handleChangeTabValue, tabValue]
+      [editMode, group, handleChangeTabValue, tabValue]
    )
 
    return (
@@ -57,7 +61,6 @@ const CompanyPageOverview = ({ group }: Props) => {
          <Box height={{ xs: "550px", md: "400px" }}>
             <Header />
          </Box>
-
          <Grow in>
             <Container
                maxWidth="lg"
@@ -73,6 +76,7 @@ const CompanyPageOverview = ({ group }: Props) => {
                   <Grid item xs={6}>
                      <MediaSection />
                   </Grid>
+                  {`EDIT MODE ${editMode ? "ON" : "OFF"}`}
                </Grid>
             </Container>
          </Grow>

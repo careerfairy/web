@@ -94,6 +94,20 @@ export const slugify = (text: string): string => {
       .replace(/^-+|-+$/g, "")
 }
 
+export const companyNameSlugify = (text: string): string => {
+   return text
+      .trim()
+      .replace(/-/g, "*") // Replace all "-" with "--"
+      .replace(/ /g, "-") // Replace all " " with "-"
+}
+
+export const companyNameUnSlugify = (text: string): string => {
+   return text
+      .trim()
+      .replace(/-/g, " ") // Replace all "-" with " "
+      .replace(/\*/g, "-") // Replace all "*" with "-"
+}
+
 type AddUtmTagsToLinkProps = {
    link: string
    source?: string
