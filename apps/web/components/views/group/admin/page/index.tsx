@@ -58,7 +58,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box height={{ xs: "550px", md: "400px" }}>
+         <Box mb={{ xs: 4, md: 10 }}>
             <Header />
          </Box>
          <Grow in>
