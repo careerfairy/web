@@ -5,19 +5,11 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import CompanyPageOverview from "../../../../../components/views/group/admin/page"
 
 const CompanyPage = ({ serverSideGroup }) => {
-   const {
-      groupId,
-      universityName,
-      publicProfile = true,
-   } = serverSideGroup as Group
+   const { groupId, universityName } = serverSideGroup as Group
    return (
       <GroupDashboardLayout pageDisplayName={"Company Page"} groupId={groupId}>
          <DashboardHead title={`CareerFairy | ${universityName}`} />
-         {publicProfile ? (
-            <CompanyPageOverview group={serverSideGroup} />
-         ) : (
-            <> PROFILE NOT PUBLIC </>
-         )}
+         <CompanyPageOverview group={serverSideGroup} editMode={true} />
       </GroupDashboardLayout>
    )
 }

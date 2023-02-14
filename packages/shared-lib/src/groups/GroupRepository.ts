@@ -120,6 +120,8 @@ export interface IGroupRepository {
     * Gets the admins of a group document
     * */
    getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
+
+   getGroupByGroupName(groupName: string): Promise<Group>
 }
 
 export class FirebaseGroupRepository
@@ -658,6 +660,15 @@ export class FirebaseGroupRepository
          .get()
 
       return mapFirestoreDocuments(adminsSnap)
+   }
+   async getGroupByGroupName(groupName: string): Promise<Group> {
+      const adminsSnap = await this.firestore
+         .collection("careerCenterData")
+         .where("universityName", "==", groupName)
+         .limit(1)
+         .get()
+
+      return mapFirestoreDocuments<Group>(adminsSnap)?.[0]
    }
 }
 
