@@ -1,5 +1,5 @@
 import { TabValue, useCompanyPage } from "./index"
-import { Avatar, Box, darken, Tabs, Typography } from "@mui/material"
+import { AppBar, Avatar, Box, Tabs, Typography } from "@mui/material"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { StylesProps } from "../../../../../types/commonTypes"
 import {
@@ -52,7 +52,7 @@ const styles: StylesProps = {
       alignItems: "center",
       backgroundColor: "#EFF5F8",
       width: "100%",
-      height: "60px",
+      height: { xs: "50px", md: "60px" },
       overflowX: "scroll",
    },
    indicator: {
@@ -60,12 +60,20 @@ const styles: StylesProps = {
       borderRadius: (theme) => theme.spacing(1, 1, 0.3, 0.3),
       backgroundColor: (theme) => theme.palette.secondary.main,
    },
+   tabWrapper: {
+      height: "100%",
+      alignItems: { xs: "unset", md: "end" },
+      ml: { xs: "none", md: "50px" },
+   },
    tab: {
       fontWeight: (theme) => theme.typography.fontWeightBold,
       fontSize: { xs: "14px", md: "16px" },
-      marginRight: { xs: "10px", md: "40px" },
+      marginRight: { xs: "none", md: "40px" },
       textTransform: "none",
       minWidth: "auto",
+      height: "100%",
+      opacity: "1",
+      color: (theme) => theme.palette.common.black,
    },
 }
 
@@ -112,14 +120,20 @@ const Header = () => {
                   </Typography>
                </Box>
                <Box sx={styles.navigatorTabs}>
-                  <Box ml={{ xs: "none", md: "50px" }}>
+                  <AppBar
+                     position="static"
+                     color="transparent"
+                     sx={{ height: "100%" }}
+                  >
                      <Tabs
                         value={tabValue}
+                        variant={"scrollable"}
                         onChange={handleChangeTab}
+                        selectionFollowsFocus
+                        allowScrollButtonsMobile
                         textColor="inherit"
                         TabIndicatorProps={{ sx: styles.indicator } as any}
-                        variant={"fullWidth"}
-                        sx={{ width: "100%", minWidth: "fit-content" }}
+                        sx={styles.tabWrapper}
                      >
                         <SimpleTab
                            sx={{
@@ -146,7 +160,7 @@ const Header = () => {
                         <SimpleTab
                            sx={{
                               ...styles.tab,
-                              minWidth: "150px",
+                              minWidth: { xs: "100px", md: "150px" },
                               color:
                                  tabValue === TabValue.testimonials &&
                                  theme.palette.secondary.main,
@@ -158,7 +172,7 @@ const Header = () => {
                         <SimpleTab
                            sx={{
                               ...styles.tab,
-                              minWidth: "150px",
+                              minWidth: { xs: "100px", md: "150px" },
                               color:
                                  tabValue === TabValue.livesStreams &&
                                  theme.palette.secondary.main,
@@ -168,7 +182,7 @@ const Header = () => {
                            index={3}
                         />
                      </Tabs>
-                  </Box>
+                  </AppBar>
                </Box>
             </Box>
          </Box>
