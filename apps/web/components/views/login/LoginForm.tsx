@@ -19,6 +19,7 @@ import CircularProgress from "@mui/material/CircularProgress"
 import Grid from "@mui/material/Grid"
 import Link from "next/link"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const styles = {
    box: {
@@ -133,6 +134,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                   "submitError",
                   "An error occurred while logging in to your account."
                )
+               errorLogAndNotify(error)
          }
          dataLayerEvent("login_failed")
       }
