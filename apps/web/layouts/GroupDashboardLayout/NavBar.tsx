@@ -18,7 +18,7 @@ const NavBar = () => {
    }
 
    return (
-      <Stack flex={1} alignItems={"center"}>
+      <Stack flex={1} alignItems={"center"} borderRight={"1px solid #EDE7FD"}>
          <EditGroupLogo />
          <GroupNavList />
          <Box flexGrow={1} />

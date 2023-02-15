@@ -20,7 +20,7 @@ type Props = {
 
 export enum TabValue {
    profile = "profile",
-   videos = "videos",
+   media = "media",
    testimonials = "testimonials",
    livesStreams = "livesStreams",
 }

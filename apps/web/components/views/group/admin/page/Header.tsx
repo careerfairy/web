@@ -45,12 +45,12 @@ const styles: StylesProps = {
    companyName: {
       display: "flex",
       alignItems: "center",
-      height: { xs: "60px", md: "100px" },
+      height: { xs: "80px", md: "100px" },
    },
    navigatorTabs: {
       display: "flex",
       alignItems: "center",
-      backgroundColor: darken("#EFF5F8", 0.1),
+      backgroundColor: "#EFF5F8",
       width: "100%",
       height: "60px",
       overflowX: "scroll",
@@ -62,9 +62,10 @@ const styles: StylesProps = {
    },
    tab: {
       fontWeight: (theme) => theme.typography.fontWeightBold,
-      fontSize: "16px",
+      fontSize: { xs: "14px", md: "16px" },
       marginRight: { xs: "10px", md: "40px" },
       textTransform: "none",
+      minWidth: "auto",
    },
 }
 
@@ -123,7 +124,6 @@ const Header = () => {
                         <SimpleTab
                            sx={{
                               ...styles.tab,
-                              minWidth: "100px",
                               color:
                                  tabValue === TabValue.profile &&
                                  theme.palette.secondary.main,
@@ -135,13 +135,12 @@ const Header = () => {
                         <SimpleTab
                            sx={{
                               ...styles.tab,
-                              minWidth: "100px",
                               color:
-                                 tabValue === TabValue.videos &&
+                                 tabValue === TabValue.media &&
                                  theme.palette.secondary.main,
                            }}
-                           label="Videos"
-                           value={TabValue.videos}
+                           label="Media"
+                           value={TabValue.media}
                            index={1}
                         />
                         <SimpleTab
