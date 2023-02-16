@@ -1,13 +1,13 @@
 import { TabValue, useCompanyPage } from "./index"
 import { AppBar, Avatar, Box, Tabs, Typography } from "@mui/material"
-import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
-import { StylesProps } from "../../../../../types/commonTypes"
+import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
+import { StylesProps } from "../../../types/commonTypes"
 import {
    companyLogoPlaceholder,
    placeholderBanner,
-} from "../../../../../constants/images"
+} from "../../../constants/images"
 import BackgroundImage from "components/views/common/BackgroundImage"
-import SimpleTab from "../../../../../materialUI/GlobalTabs/SimpleTab"
+import SimpleTab from "../../../materialUI/GlobalTabs/SimpleTab"
 import React, { useCallback } from "react"
 import { useTheme } from "@mui/material/styles"
 

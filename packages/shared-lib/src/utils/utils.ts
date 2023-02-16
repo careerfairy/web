@@ -95,17 +95,15 @@ export const slugify = (text: string): string => {
 }
 
 export const companyNameSlugify = (text: string): string => {
-   return text
-      .trim()
-      .replace(/-/g, "*") // Replace all "-" with "--"
-      .replace(/ /g, "-") // Replace all " " with "-"
+   return encodeURIComponent(
+      text.trim().replace(/ /g, "_") // Replace all " " with "_"
+   )
 }
 
 export const companyNameUnSlugify = (text: string): string => {
-   return text
-      .trim()
-      .replace(/-/g, " ") // Replace all "-" with " "
-      .replace(/\*/g, "-") // Replace all "*" with "-"
+   return decodeURIComponent(
+      text.trim().replace(/_/g, " ") // Replace all "_" with " "
+   )
 }
 
 type AddUtmTagsToLinkProps = {
