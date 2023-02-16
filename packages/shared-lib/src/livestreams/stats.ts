@@ -10,17 +10,11 @@ export interface LiveStreamStats extends Identifiable {
    livestream: LivestreamEventPublicData
 
    /**
-    * Number of users who have rated the event
-    * */
-   numberOfRatings: number
-
-   /**
-    * The average aggregate rating of the event
-    * This value is between 1 and 5
-    *
-    * Includes normal & sentiment rantings
-    * */
-   averageRating: number
+    * Map with the aggregated ratings for each rating question
+    */
+   ratings?: {
+      [ratingId: string]: LivestreamStatsRatingMap
+   }
 
    /**
     * The overall stats of the event
@@ -41,8 +35,6 @@ export const createLiveStreamStatsDoc = (
    return {
       id: docId,
       livestream: pickPublicDataFromLivestream(livestream),
-      numberOfRatings: 0,
-      averageRating: 0,
       generalStats: {
          numberOfApplicants: 0,
          numberOfParticipants: 0,
@@ -65,6 +57,21 @@ export type LivestreamStatsMap = {
    numberOfTalentPoolProfiles: number
    // Total number of applications that came in through the ATS integration
    numberOfApplicants: number
+}
+
+export type LivestreamStatsRatingMap = {
+   /**
+    * Number of users who have rated the event
+    * */
+   numberOfRatings: number
+
+   /**
+    * The average aggregate rating of the event
+    * This value is between 1 and 5
+    *
+    * Includes normal & sentiment rantings
+    * */
+   averageRating: number
 }
 
 export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(

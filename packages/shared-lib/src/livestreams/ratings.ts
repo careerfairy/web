@@ -1,4 +1,6 @@
+import { round } from "../utils"
 import { EventRating, EventRatingAnswer } from "./livestreams"
+import { LiveStreamStats } from "./stats"
 
 /**
  * Given a livestream rating answer, calculates the rating that
@@ -21,4 +23,24 @@ export function normalizeRating(
    }
 
    return answer?.rating ?? null
+}
+
+/**
+ * Adds a new rating to an existing calculated average
+ *
+ * Rounded to 1 decimal place
+ */
+export function calculateNewAverage(
+   existingStats: LiveStreamStats,
+   ratingId: string,
+   newValue: number
+) {
+   const existingNumOfRatings =
+      existingStats.ratings?.[ratingId]?.numberOfRatings ?? 0
+   const existingAvg = existingStats.ratings?.[ratingId]?.averageRating ?? 0
+
+   const newNumRatings = existingNumOfRatings + 1
+   const newAvg = existingAvg + (newValue - existingAvg) / newNumRatings
+
+   return round(newAvg, 1)
 }
