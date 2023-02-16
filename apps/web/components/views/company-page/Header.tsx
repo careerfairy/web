@@ -113,7 +113,7 @@ const Header = () => {
                      variant={universityName.length > 20 ? "h4" : "h3"}
                      fontWeight={"600"}
                      color={{ xs: "black", md: "white" }}
-                     ml={"28px"}
+                     ml={{ xs: "20px", md: "30px" }}
                      zIndex={1}
                   >
                      {universityName}
