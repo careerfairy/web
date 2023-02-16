@@ -2,7 +2,7 @@ import DashboardHead from "../../../../../layouts/GroupDashboardLayout/Dashboard
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import { getServerSideGroup } from "../../../../../util/serverUtil"
 import { Group } from "@careerfairy/shared-lib/groups"
-import CompanyPageOverview from "../../../../../components/views/group/admin/page"
+import CompanyPageOverview from "../../../../../components/views/company-page"
 
 const CompanyPage = ({ serverSideGroup }) => {
    const { groupId, universityName } = serverSideGroup as Group

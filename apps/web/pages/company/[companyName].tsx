@@ -1,5 +1,5 @@
 import DashboardHead from "../../layouts/GroupDashboardLayout/DashboardHead"
-import CompanyPageOverview from "../../components/views/group/admin/page"
+import CompanyPageOverview from "../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
