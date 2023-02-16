@@ -20,7 +20,7 @@ const bar = new cliProgress.SingleBar(
    {
       clearOnComplete: false,
       hideCursor: true,
-      ...getCLIBarOptions("Writing user batch", "Writes"),
+      ...getCLIBarOptions("Writing livestream stats batch", "Writes"),
    },
    cliProgress.Presets.shades_grey
 )
@@ -202,5 +202,3 @@ function updateLivestreamStats(
          bar.increment()
       })
 }
-
-// run().catch(console.error)
