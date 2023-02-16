@@ -13,6 +13,7 @@ import { EventRating } from "@careerfairy/shared-lib/src/livestreams"
 import NormalRating from "./NormalRating"
 import SentimentRating from "./SentimentRating"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({
    snackbar: {
@@ -87,7 +88,9 @@ const ActionComponent = ({
                newValues,
                rating
             )
-         } catch (e) {}
+         } catch (e) {
+            errorLogAndNotify(e)
+         }
          setSubmitting(false)
          closeSnackbar(rating.id)
       },
