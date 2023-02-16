@@ -91,5 +91,6 @@ export default {
       "videos",
       "wishes",
       "wishList",
+      "voters",
    ],
 }
