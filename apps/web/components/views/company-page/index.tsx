@@ -7,7 +7,7 @@ import {
    useMemo,
    useState,
 } from "react"
-import { Box, Container, Grid, Grow } from "@mui/material"
+import { Box, Container, Grid, Grow, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
 import TestimonialsSection from "./TestimonialsSection"
 import StreamSection from "./StreamSection"
@@ -62,18 +62,16 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
             <Header />
          </Box>
          <Grow in>
-            <Container
-               maxWidth="lg"
-               disableGutters
-               sx={{ flex: 1, display: "flex" }}
-            >
-               <Grid container>
-                  <Grid item xs={6}>
-                     <AboutSection />
-                     <TestimonialsSection />
-                     <StreamSection />
+            <Container maxWidth="lg">
+               <Grid container spacing={4}>
+                  <Grid item xs={12} md={6}>
+                     <Stack spacing={{ xs: 4, md: 8 }}>
+                        <AboutSection />
+                        <TestimonialsSection />
+                        <StreamSection />
+                     </Stack>
                   </Grid>
-                  <Grid item xs={6}>
+                  <Grid item xs={12} md={6}>
                      <MediaSection />
                   </Grid>
                   {`EDIT MODE ${editMode ? "ON" : "OFF"}`}
