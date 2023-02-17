@@ -1396,22 +1396,6 @@ const TextContent = () => {
             <p>&nbsp;</p>
 
             <p>
-               In addition to marketing cookies, we use other technologies to
-               control online advertising on other websites and thereby reduce
-               advertising wastage. For example, we may transmit the e-mail
-               addresses of our users, customers and other persons to whom we
-               wish to display advertisements to operators of advertising
-               platforms (for example social media). If these persons are
-               registered with them with the same e-mail address (which the
-               advertising platforms determine by a matching process), the
-               providers display our advertisements specifically to these
-               persons. The providers do not receive personal e-mail addresses
-               of persons who are not already known to them. In case of known
-               e-mail addresses, however, they learn that these persons are in
-               contact with us and the content they have accessed.&nbsp;&nbsp;
-            </p>
-
-            <p>
                We may also integrate additional third-party offers on our
                website, in particular from social media providers. These offers
                are deactivated by default. As soon as you activate them (for
@@ -1430,8 +1414,11 @@ const TextContent = () => {
 
             <div
                className="uc-embed"
+               // eslint-disable-next-line react/no-unknown-property
                uc-data="all"
+               // eslint-disable-next-line react/no-unknown-property
                uc-embedding-type="category"
+               // eslint-disable-next-line react/no-unknown-property
                uc-styling="true"
             ></div>
          </div>
