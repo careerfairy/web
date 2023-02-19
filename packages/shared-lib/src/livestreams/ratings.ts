@@ -44,3 +44,18 @@ export function calculateNewAverage(
 
    return round(newAvg, 1)
 }
+
+/**
+ * Calculates an average rating from all the multiple rating questions a
+ * livestream has, useful to display a single rating for a livestream
+ */
+export function getGlobalRatingAverage(statDoc: LiveStreamStats) {
+   if (!statDoc.ratings || Object.keys(statDoc.ratings).length === 0) return 0
+
+   let avg = 0
+   for (const rating in statDoc.ratings) {
+      avg += statDoc.ratings[rating].averageRating
+   }
+
+   return avg / Object.keys(statDoc.ratings).length
+}
