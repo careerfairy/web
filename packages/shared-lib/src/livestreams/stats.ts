@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import { sortLivestreamsDesc } from "../utils"
 import { LivestreamPresenter } from "./LivestreamPresenter"
 import {
    LivestreamEvent,
@@ -114,4 +115,20 @@ export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
 export type LivestreamStatsToUpdate = {
    // The operations to make to the nested properties on the livestreamStats document
    [stringToPropertyInDotNotation: string]: unknown
+}
+
+/**
+ * Sort the livestream stats by most recent livestreams
+ */
+export const sortStatsByMostRecentLivestreams = (
+   stats: LiveStreamStats[],
+   reverse = false
+) => {
+   return stats?.sort((a, b) => {
+      return sortLivestreamsDesc(
+         a?.livestream as LivestreamEvent,
+         b?.livestream as LivestreamEvent,
+         reverse
+      )
+   })
 }
