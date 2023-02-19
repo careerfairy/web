@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import { LivestreamPresenter } from "./LivestreamPresenter"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
@@ -28,7 +29,25 @@ export interface LiveStreamStats extends Identifiable {
    }
 }
 
-export const createLiveStreamStatsDoc = (
+export const serializeLiveStreamStats = (doc: LiveStreamStats) => {
+   return {
+      ...doc,
+      livestream: LivestreamPresenter.serializeDocument(
+         doc.livestream as LivestreamEvent
+      ),
+   }
+}
+
+export const deserializeLiveStreamStats = (doc: LiveStreamStats) => {
+   return {
+      ...doc,
+      livestream: LivestreamPresenter.createFromPlainObject(
+         doc.livestream as any // ignore ts compiler warning about this conversion
+      ),
+   }
+}
+
+export const createLiveStreamStatsDoc = <T extends string>(
    livestream: LivestreamEvent,
    docId: string
 ): LiveStreamStats => {
