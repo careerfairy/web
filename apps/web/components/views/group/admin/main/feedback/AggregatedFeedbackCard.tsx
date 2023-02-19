@@ -1,35 +1,28 @@
+import { getGlobalRatingAverage } from "@careerfairy/shared-lib/livestreams/ratings"
 import {
-   Button,
-   Card,
-   CardContent,
-   CardHeader,
-   Menu,
-   MenuItem,
-   Stack,
+   LiveStreamStats,
+   sortStatsByMostRecentLivestreams,
+} from "@careerfairy/shared-lib/livestreams/stats"
+import PaginationHelper from "@careerfairy/shared-lib/utils/pagination"
+import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
+import {
    Box,
-   Paper,
+   Link,
+   Pagination,
+   Rating,
    Table,
    TableBody,
    TableCell,
    TableContainer,
    TableRow,
-   Rating,
-   Link,
 } from "@mui/material"
-import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
-import { ChevronDown, ExternalLink } from "react-feather"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
+import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import CardCustom from "../CardCustom"
+import { useMainPageContext } from "../MainPageProvider"
 
 const styles = sxStyles({
-   dropdownButton: {
-      color: "black",
-      textTransform: "none",
-      paddingRight: (theme) => theme.spacing(2),
-   },
-   cardTitleTypographyProps: {
-      fontWeight: 500,
-   },
    tableBody: {
       ".MuiTableCell-root": {
          borderBottom: "1px solid #EDE7FD",
@@ -47,67 +40,118 @@ const styles = sxStyles({
       marginLeft: (theme) => theme.spacing(2),
       paddingLeft: 0,
    },
-   cardContent: {
-      paddingX: (theme) => theme.spacing(3),
-      paddingTop: 0,
-   },
-   cardHeader: {
-      paddingX: (theme) => theme.spacing(3),
-      paddingBottom: (theme) => theme.spacing(1),
+   pagination: {
+      "& .MuiPagination-ul li:last-child": {
+         marginLeft: (t) => t.spacing(1),
+      },
+      "& .MuiPagination-ul li:last-child button::before": {
+         content: "'Next'",
+         marginRight: (t) => t.spacing(1),
+      },
+      "& .MuiPagination-ul li:first-child": {
+         marginRight: (t) => t.spacing(1),
+      },
+      "& .MuiPagination-ul li:first-child button::after": {
+         content: "'Previous'",
+         marginLeft: (t) => t.spacing(1),
+      },
    },
 })
 
 const AggregatedFeedbackCard = () => {
+   const { livestreamStats } = useMainPageContext()
+
+   if (livestreamStats?.length > 0) {
+      return <SortedFeedbacks stats={livestreamStats} />
+   }
+
+   return <NoLivestreams />
+}
+
+const SortedFeedbacks = ({ stats }: { stats: LiveStreamStats[] }) => {
+   const [sortingMethod, setSortingMethod] = useState("Latest")
+
+   const sortedStats = useMemo(() => {
+      return sortStatsByMostRecentLivestreams(
+         stats,
+         sortingMethod === "Oldest"
+      )?.filter(pastLivestreams)
+   }, [stats, sortingMethod])
+
+   const optionsHandler = useCallback((option: string) => {
+      setSortingMethod(option)
+   }, [])
+
    return (
-      <Card>
-         <CardHeader
-            sx={styles.cardHeader}
-            title="Live Stream Feedback"
-            action={
-               <Options options={["Latest", "Oldest"]} handler={() => {}} />
-            }
-            titleTypographyProps={styles.cardTitleTypographyProps}
-         />
-         <CardContent sx={styles.cardContent}>
-            <FeedbackCardContent />
-         </CardContent>
-      </Card>
+      <CardCustom
+         title="Live Stream Feedback"
+         options={["Latest", "Oldest"]}
+         optionsHandler={optionsHandler}
+      >
+         <PaginatedFeedbacks stats={sortedStats} />
+      </CardCustom>
    )
 }
 
-const FeedbackCardContent = () => {
-   const data = [
-      {
-         title: "Psychology of Learning – The Basis Session",
-         rating: 4.5,
+const PAGE_SIZE = 3
+const PaginatedFeedbacks = ({ stats }: { stats: LiveStreamStats[] }) => {
+   const [currentPage, setCurrentPage] = useState(1)
+
+   const paginationHelper: PaginationHelper = useMemo(() => {
+      return new PaginationHelper(stats.length, PAGE_SIZE, currentPage)
+   }, [stats, currentPage])
+
+   const page: LiveStreamStats[] = useMemo(() => {
+      return stats.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+   }, [currentPage, stats])
+
+   const onPageChange = useCallback(
+      (_, page: number) => {
+         setCurrentPage(page)
       },
-      {
-         title: "Open House @ Voith | Automation Engineering - An Electrifying Profession",
-         rating: 3.1,
-      },
-      {
-         title: "Psychology of Learning – The Basis Session 2",
-         rating: 1,
-      },
-   ]
+      [paginationHelper]
+   )
+
+   const paginationElement =
+      paginationHelper.totalPages() > 1 ? (
+         <Pagination
+            count={paginationHelper.totalPages()}
+            page={currentPage}
+            color="secondary"
+            onChange={onPageChange}
+            size="small"
+            sx={styles.pagination}
+         />
+      ) : undefined
+
+   return <FeedbackCardContent stats={page} pagination={paginationElement} />
+}
+
+const FeedbackCardContent = ({
+   stats,
+   pagination,
+}: {
+   stats: LiveStreamStats[]
+   pagination: React.ReactNode
+}) => {
    return (
       <Box>
          <TableContainer>
             <Table>
                <TableBody sx={styles.tableBody}>
-                  {data.map((row) => (
-                     <TableRow key={row.title} sx={styles.tableRow}>
+                  {stats.map((row) => (
+                     <TableRow key={row.livestream.id} sx={styles.tableRow}>
                         <TableCell
                            component="th"
                            scope="row"
                            sx={styles.rowTitle}
                         >
-                           {row.title}
+                           {row.livestream.title}
                         </TableCell>
                         <TableCell align="right">
                            <Rating
                               name="read-only"
-                              value={row.rating}
+                              value={getGlobalRatingAverage(row)}
                               precision={0.5}
                               sx={styles.stars}
                               icon={<StarRateRoundedIcon />}
@@ -125,77 +169,24 @@ const FeedbackCardContent = () => {
                </TableBody>
             </Table>
          </TableContainer>
+
+         <Box mt={2} display="flex" justifyContent="flex-end">
+            {pagination}
+         </Box>
       </Box>
    )
 }
 
-const LivestreamFeedbackEntry = () => {
-   return <Box></Box>
+const NoLivestreams = () => {
+   return <div>No Livestreams</div>
 }
 
-type OptionsProps = {
-   options: string[]
-   handler: (option: string) => void
-}
+const pastLivestreams = (statDoc: LiveStreamStats) => {
+   if (statDoc?.livestream?.start && statDoc.livestream.start instanceof Date) {
+      return statDoc.livestream.start < new Date()
+   }
 
-const Options = ({ options, handler }: OptionsProps) => {
-   const [anchorEl, setAnchorEl] = useState(null)
-   const [selected, setSelected] = useState(options[0])
-   const open = Boolean(anchorEl)
-
-   const handleClick = useCallback((event) => {
-      setAnchorEl(event.currentTarget)
-   }, [])
-
-   const handleClose = useCallback(() => {
-      setAnchorEl(null)
-   }, [])
-
-   const handleSelect = useCallback(
-      (option: string) => {
-         return () => {
-            handler(option)
-            setSelected(option)
-            handleClose()
-         }
-      },
-      [handleClose, handler]
-   )
-
-   return (
-      <div>
-         <Button
-            aria-controls={open ? "basic-menu" : undefined}
-            aria-haspopup="true"
-            aria-expanded={open ? "true" : undefined}
-            onClick={handleClick}
-            endIcon={<ChevronDown width="16" height={16} />}
-            disableRipple={true}
-            sx={styles.dropdownButton}
-         >
-            {selected}
-         </Button>
-         <Menu
-            anchorEl={anchorEl}
-            open={open}
-            onClose={handleClose}
-            anchorOrigin={{
-               vertical: "bottom",
-               horizontal: "right",
-            }}
-            transformOrigin={{
-               vertical: "top",
-               horizontal: "right",
-            }}
-         >
-            {options.map((option) => (
-               <MenuItem key={option} onClick={handleSelect(option)}>
-                  {option}
-               </MenuItem>
-            ))}
-         </Menu>
-      </div>
-   )
+   return false
 }
 
 export default AggregatedFeedbackCard
