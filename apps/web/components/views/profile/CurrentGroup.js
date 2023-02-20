@@ -231,7 +231,7 @@ const CurrentGroup = ({
                         <a
                            // Not using nextjs/Link on purpose, we want to trigger a full page
                            // refresh, to ensure we disable gtm completely
-                           href={`/group/${localGroup.id}/admin/analytics`}
+                           href={`/group/${localGroup.id}/admin`}
                         >
                            <Button fullWidth size="large" color="primary">
                               View Admin Page
