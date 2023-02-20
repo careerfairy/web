@@ -4,6 +4,7 @@ import {
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { getBaseUrl } from "../components/helperFunctions/HelperFunctions"
+import { Group } from "@careerfairy/shared-lib/groups"
 
 const getDeviceKindLabel = (deviceKind: MediaDeviceInfo["kind"]) => {
    if (deviceKind === "audioinput") return "microphone"
@@ -74,7 +75,7 @@ export const getRelevantHosts = (
    targetHostGroupId: string,
    event: LivestreamEvent,
    // groups returned from fetching the group IDs array field on the livestream Document
-   groupList: any[]
+   groupList: Group[]
 ) => {
    if (!event) return []
    let targetGroupId = targetHostGroupId
