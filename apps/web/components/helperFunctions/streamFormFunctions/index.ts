@@ -8,6 +8,8 @@ import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
 import { FormikErrors } from "formik"
+import { Group } from "@careerfairy/shared-lib/groups"
+import _ from "lodash"
 
 export const speakerObj = {
    avatar: "",
@@ -307,4 +309,48 @@ export const getDownloadUrl = (fileElement) => {
       console.log("-> no fileElement", fileElement)
       return ""
    }
+}
+
+export const getMetaDataFromEventHosts = (eventHosts: Group[]) => {
+   const isOneOrMoreCompanies =
+      eventHosts?.filter((group) => !group.universityCode).length > 0
+
+   let groupsToGetMetadataFrom = eventHosts
+
+   if (isOneOrMoreCompanies) {
+      // if there is at least one company, we only want to get the metadata ONLY from the companies, not the universities
+      groupsToGetMetadataFrom = eventHosts.filter(
+         (group) => !group.universityCode
+      )
+   }
+
+   return groupsToGetMetadataFrom.reduce(
+      (acc, group) => {
+         if (group.companyCountry) {
+            acc.companyCountries = _.uniqBy(
+               // lodash function to remove duplicate objects by id from an array
+               [...acc.companyCountries, group.companyCountry],
+               "id"
+            )
+         }
+
+         if (group.companyIndustry) {
+            acc.companyIndustries = _.uniqBy(
+               [...acc.companyIndustries, group.companyIndustry],
+               "id"
+            )
+         }
+
+         if (group.companySize) {
+            acc.companySizes = _.uniq([...acc.companySizes, group.companySize])
+         }
+
+         return acc
+      },
+      {
+         companyCountries: [],
+         companyIndustries: [],
+         companySizes: [],
+      }
+   )
 }

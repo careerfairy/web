@@ -1,5 +1,5 @@
 import { Identifiable, OptionGroup } from "../commonTypes"
-import { Group, GroupQuestion } from "../groups"
+import { Group, GroupOption, GroupQuestion } from "../groups"
 import {
    UserData,
    UserLivestreamGroupQuestionAnswers,
@@ -164,6 +164,13 @@ export interface LivestreamEvent extends Identifiable {
     * Updated via functions onCreate trigger
     */
    popularity?: number
+
+   /**
+    * Metadata for the livestream based on hosts
+    */
+   companySizes?: string[] // ["1-20", "21-100", "101-1000", "1001+"]
+   companyIndustries?: GroupOption[] // [{id: "Accounting", name: "Accounting"}, {id: "Chemical", name: "Chemical"}, ...]
+   companyCountries?: GroupOption[] // [{id: "US", name: "United States of America"}, {id: "CH", name: "Switzerland"}, ...]
 }
 
 /**
