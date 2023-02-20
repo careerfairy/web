@@ -7,7 +7,7 @@ import {
    MenuItem,
 } from "@mui/material"
 import { Options } from "@sentry/types"
-import { useState, useCallback } from "react"
+import { useState, useCallback, useMemo } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -35,14 +35,29 @@ type Props = {
    children: React.ReactNode
    options?: OptionsProps["options"]
    optionsHandler?: OptionsProps["handler"]
+   minHeight?: string
 }
 
 /**
  * Card to be used on the Admin pages
  */
-const CardCustom = ({ title, options, optionsHandler, children }: Props) => {
+const CardCustom = ({
+   title,
+   options,
+   optionsHandler,
+   children,
+   minHeight,
+}: Props) => {
+   const sxProps = useMemo(() => {
+      return minHeight
+         ? {
+              minHeight,
+           }
+         : undefined
+   }, [minHeight])
+
    return (
-      <Card>
+      <Card sx={sxProps}>
          <CardHeader
             sx={styles.cardHeader}
             title={title}
@@ -61,7 +76,7 @@ const CardCustom = ({ title, options, optionsHandler, children }: Props) => {
    )
 }
 
-type OptionsProps = {
+export type OptionsProps = {
    options: string[]
    handler?: (option: string) => void
 }
