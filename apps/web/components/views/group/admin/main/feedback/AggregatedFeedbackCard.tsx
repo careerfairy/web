@@ -4,10 +4,11 @@ import {
    sortStatsByMostRecentLivestreams,
 } from "@careerfairy/shared-lib/livestreams/stats"
 import PaginationHelper from "@careerfairy/shared-lib/utils/pagination"
+import { useTheme } from "@emotion/react"
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
 import {
    Box,
-   Link,
+   Button,
    Pagination,
    Rating,
    Table,
@@ -15,11 +16,14 @@ import {
    TableCell,
    TableContainer,
    TableRow,
+   Typography,
 } from "@mui/material"
+import Link from "components/views/common/Link"
+import { useRouter } from "next/router"
 import { useCallback, useMemo, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import CardCustom from "../CardCustom"
+import CardCustom, { OptionsProps } from "../CardCustom"
 import { useMainPageContext } from "../MainPageProvider"
 
 const styles = sxStyles({
@@ -56,6 +60,7 @@ const styles = sxStyles({
          marginLeft: (t) => t.spacing(1),
       },
    },
+   noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
 })
 
 const AggregatedFeedbackCard = () => {
@@ -83,13 +88,9 @@ const SortedFeedbacks = ({ stats }: { stats: LiveStreamStats[] }) => {
    }, [])
 
    return (
-      <CardCustom
-         title="Live Stream Feedback"
-         options={["Latest", "Oldest"]}
-         optionsHandler={optionsHandler}
-      >
-         <PaginatedFeedbacks stats={sortedStats} />
-      </CardCustom>
+      <FeedbackCard optionsHandler={optionsHandler}>
+         <PaginatedFeedbacks key={sortingMethod} stats={sortedStats} />
+      </FeedbackCard>
    )
 }
 
@@ -105,12 +106,9 @@ const PaginatedFeedbacks = ({ stats }: { stats: LiveStreamStats[] }) => {
       return stats.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
    }, [currentPage, stats])
 
-   const onPageChange = useCallback(
-      (_, page: number) => {
-         setCurrentPage(page)
-      },
-      [paginationHelper]
-   )
+   const onPageChange = useCallback((_, page: number) => {
+      setCurrentPage(page)
+   }, [])
 
    const paginationElement =
       paginationHelper.totalPages() > 1 ? (
@@ -134,6 +132,10 @@ const FeedbackCardContent = ({
    stats: LiveStreamStats[]
    pagination: React.ReactNode
 }) => {
+   const {
+      query: { groupId },
+   } = useRouter()
+
    return (
       <Box>
          <TableContainer>
@@ -160,7 +162,11 @@ const FeedbackCardContent = ({
                            />
                         </TableCell>
                         <TableCell align="right" sx={{ paddingRight: 0 }}>
-                           <Link href="#" underline="none" color="secondary">
+                           <Link
+                              href={`/group/${groupId}/admin/analytics?section=2&subsection=2&livestreamId=${row.livestream.id}`}
+                              underline="none"
+                              color="secondary"
+                           >
                               <ExternalLink width="20" />
                            </Link>
                         </TableCell>
@@ -178,7 +184,41 @@ const FeedbackCardContent = ({
 }
 
 const NoLivestreams = () => {
-   return <div>No Livestreams</div>
+   return (
+      <FeedbackCard>
+         <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
+            You can check live stream feedback here.
+            <br />
+             Start creating new live stream to get feedbacks.
+         </Typography>
+
+         <Box mt={2} mb={3} display="flex" justifyContent="center">
+            <Button color="secondary" variant="contained">
+               Create New Live Stream
+            </Button>
+         </Box>
+      </FeedbackCard>
+   )
+}
+
+const CARD_OPTIONS = ["Latest", "Oldest"]
+
+const FeedbackCard = ({
+   children,
+   optionsHandler,
+}: {
+   children: React.ReactNode
+   optionsHandler?: OptionsProps["handler"]
+}) => {
+   return (
+      <CardCustom
+         title="Live Stream Feedback"
+         options={CARD_OPTIONS}
+         optionsHandler={optionsHandler}
+      >
+         {children}
+      </CardCustom>
+   )
 }
 
 const pastLivestreams = (statDoc: LiveStreamStats) => {
