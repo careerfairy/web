@@ -97,7 +97,7 @@ function SignUpAdminForm() {
          await firebase.auth.currentUser.reload()
 
          // Send them directly to the group admin dashboard
-         return replace(`/group/${group.id}/admin/analytics`).then(() => {
+         return replace(`/group/${group.id}/admin`).then(() => {
             successNotification(
                `Account created successfully and welcome to ${group.universityName}!`
             )

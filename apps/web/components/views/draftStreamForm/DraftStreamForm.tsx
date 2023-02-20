@@ -782,7 +782,6 @@ const DraftStreamForm = ({
                      <Formik
                         initialValues={formData}
                         innerRef={formRef}
-                        enableReinitialize
                         validate={handleValidate}
                         onSubmit={async (values, { setSubmitting }) => {
                            await onSubmit(
