@@ -9,6 +9,18 @@
          "type": "string"
       },
       {
+         "name": "linkedinUrl",
+         "type": "string"
+      },
+      {
+         "name": "userResume",
+         "type": "string"
+      },
+      {
+         "name": "universityCountryCode",
+         "type": "string"
+      },
+      {
          "name": "badges",
          "type": "stringified_map"
       },
