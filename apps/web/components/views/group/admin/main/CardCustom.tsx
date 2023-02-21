@@ -7,6 +7,7 @@ import {
    MenuItem,
 } from "@mui/material"
 import { Options } from "@sentry/types"
+import useMenuState from "components/custom-hook/useMenuState"
 import { useState, useCallback, useMemo } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -82,17 +83,8 @@ export type OptionsProps = {
 }
 
 const Options = ({ options, handler }: OptionsProps) => {
-   const [anchorEl, setAnchorEl] = useState(null)
    const [selected, setSelected] = useState(options[0])
-   const open = Boolean(anchorEl)
-
-   const handleClick = useCallback((event) => {
-      setAnchorEl(event.currentTarget)
-   }, [])
-
-   const handleClose = useCallback(() => {
-      setAnchorEl(null)
-   }, [])
+   const { handleClick, open, handleClose, anchorEl } = useMenuState()
 
    const handleSelect = useCallback(
       (option: string) => {
