@@ -1,19 +1,17 @@
-import { Box, Stack, TextField } from "@mui/material"
+import { Box, Button, Stack, TextField } from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik, FormikErrors, FormikValues } from "formik"
-import { MutableRefObject, useCallback, useMemo, useRef } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useCompanyPage } from "../index"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "components/util/constants"
 
 type Props = {
-   formRef: MutableRefObject<any>
    handleClose: () => void
 }
 
-// eslint-disable-next-line react-hooks/rules-of-hooks
-const AboutDialog = ({ formRef = useRef(), handleClose }: Props) => {
+const AboutDialog = ({ handleClose }: Props) => {
    const { group, changeIsSaving } = useCompanyPage()
    const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
@@ -61,7 +59,6 @@ const AboutDialog = ({ formRef = useRef(), handleClose }: Props) => {
             initialValues={initialValues}
             validate={handleValidation}
             onSubmit={handleSubmitForm}
-            innerRef={formRef}
          >
             {({
                values,
@@ -103,6 +100,16 @@ const AboutDialog = ({ formRef = useRef(), handleClose }: Props) => {
                         className="multiLineInput"
                      />
                   </Stack>
+                  <Box display="flex" justifyContent="end" mt={4}>
+                     <Button
+                        type={"submit"}
+                        variant="contained"
+                        color="secondary"
+                        disabled={isSubmitting}
+                     >
+                        Save & Close
+                     </Button>
+                  </Box>
                </form>
             )}
          </Formik>

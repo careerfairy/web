@@ -1,8 +1,6 @@
 import {
    AppBar,
-   Button,
    Dialog,
-   DialogActions,
    DialogContent,
    DialogTitle,
    Slide,
@@ -32,17 +30,10 @@ type Props = {
    open: boolean
    title: string
    handleClose: () => void
-   handleSubmit: () => void
    children: JSX.Element
 }
 
-const EditDialog = ({
-   open,
-   title,
-   handleClose,
-   handleSubmit,
-   children,
-}: Props) => {
+const EditDialog = ({ open, title, handleClose, children }: Props) => {
    return (
       <Dialog
          TransitionComponent={Slide}
@@ -62,16 +53,6 @@ const EditDialog = ({
             </IconButton>
          </AppBar>
          <DialogContent sx={styles.content}>{children}</DialogContent>
-
-         <DialogActions>
-            <Button
-               variant="contained"
-               color="secondary"
-               onClick={handleSubmit}
-            >
-               Save & Close
-            </Button>
-         </DialogActions>
       </Dialog>
    )
 }
