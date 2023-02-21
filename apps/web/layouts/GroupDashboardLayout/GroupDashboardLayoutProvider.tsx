@@ -110,7 +110,7 @@ const GroupDashboardLayoutProvider = ({ children, pageDisplayName }: Props) => {
    return (
       <GroupDashboardContext.Provider value={value}>
          <AdminGenericLayout
-            bgColor="white"
+            bgColor="#F7F8FC"
             headerContent={<TopBar title={pageDisplayName} />}
             drawerContent={<NavBar />}
             drawerOpen={state.layout.leftDrawerOpen}
