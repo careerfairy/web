@@ -1,6 +1,5 @@
 import { Identifiable } from "../commonTypes"
 import { sortLivestreamsDesc } from "../utils"
-import { LivestreamPresenter } from "./LivestreamPresenter"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
@@ -27,24 +26,6 @@ export interface LiveStreamStats extends Identifiable {
       // The key is the university code, and the value is the stats for that university.
       // The numberOfPeopleReached will be zero because it is not relevant for the university stats
       [universityCode: string]: LivestreamStatsMap
-   }
-}
-
-export const serializeLiveStreamStats = (doc: LiveStreamStats) => {
-   return {
-      ...doc,
-      livestream: LivestreamPresenter.serializeDocument(
-         doc.livestream as LivestreamEvent
-      ),
-   }
-}
-
-export const deserializeLiveStreamStats = (doc: LiveStreamStats) => {
-   return {
-      ...doc,
-      livestream: LivestreamPresenter.createFromPlainObject(
-         doc.livestream as any // ignore ts compiler warning about this conversion
-      ),
    }
 }
 

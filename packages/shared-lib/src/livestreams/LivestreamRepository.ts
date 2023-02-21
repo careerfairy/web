@@ -205,8 +205,6 @@ export interface ILivestreamRepository {
       livestreamId: string,
       operationsToMake: (existingStats: LiveStreamStats) => T
    ): Promise<void>
-
-   getLivestreamStatsForGroup(groupId: string): Promise<LiveStreamStats[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -253,19 +251,6 @@ export class FirebaseLivestreamRepository
 
       // We have to use an update method here because the set method does not support nested updates/operations
       return statsRef.update(operationsToMake(existingStats))
-   }
-
-   async getLivestreamStatsForGroup(
-      groupId: string
-   ): Promise<LiveStreamStats[]> {
-      const docs = await this.firestore
-         .collectionGroup("stats")
-         .where("id", "==", "livestreamStats")
-         .where("livestream.groupIds", "array-contains", groupId)
-         .where("livestream.test", "==", false)
-         .get()
-
-      return this.addIdToDocs<LiveStreamStats>(docs.docs)
    }
 
    async getLivestreamUser(

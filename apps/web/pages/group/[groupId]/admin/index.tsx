@@ -1,51 +1,23 @@
-import {
-   deserializeLiveStreamStats,
-   LiveStreamStats,
-   serializeLiveStreamStats,
-} from "@careerfairy/shared-lib/livestreams/stats"
 import MainPageContent from "components/views/group/admin/main"
-import { MainPageProvider } from "components/views/group/admin/main/MainPageProvider"
-import { livestreamRepo } from "data/RepositoryInstances"
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
-import { GetServerSideProps, InferGetServerSidePropsType } from "next"
-import { useMemo } from "react"
+import { useRouter } from "next/router"
 
-const MainPage = ({
-   groupId,
-   livestreamStats,
-}: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-   const stats = useMemo(() => {
-      return livestreamStats?.map(deserializeLiveStreamStats) ?? []
-   }, [livestreamStats])
+const MainPage = () => {
+   const {
+      query: { groupId },
+   } = useRouter()
 
    return (
-      <GroupDashboardLayout pageDisplayName={"Main Page"} groupId={groupId}>
+      <GroupDashboardLayout
+         pageDisplayName={"Main Page"}
+         groupId={groupId as string}
+      >
          <DashboardHead title="CareerFairy | Main Page of" />
 
-         <MainPageProvider livestreamStats={stats}>
-            <MainPageContent />
-         </MainPageProvider>
+         <MainPageContent />
       </GroupDashboardLayout>
    )
-}
-
-export const getServerSideProps: GetServerSideProps = async (context) => {
-   const { groupId } = context.params
-
-   let stats: LiveStreamStats[]
-   try {
-      stats = await livestreamRepo.getLivestreamStatsForGroup(groupId as string)
-   } catch (error) {
-      console.error(error)
-   }
-
-   return {
-      props: {
-         groupId,
-         livestreamStats: stats?.map(serializeLiveStreamStats),
-      },
-   }
 }
 
 export default MainPage
