@@ -4,10 +4,14 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
+import { GetStaticPaths, GetStaticProps } from "next"
 
 const CompanyPage = ({ serverSideGroup }) => {
-   const { universityName } = serverSideGroup as Group
+   if (!serverSideGroup) {
+      return null
+   }
 
+   const { universityName } = serverSideGroup as Group
    return (
       <>
          <DashboardHead title={`CareerFairy | ${universityName}`} />
@@ -18,24 +22,32 @@ const CompanyPage = ({ serverSideGroup }) => {
    )
 }
 
-export const getServerSideProps = async (context) => {
-   const { companyName: companyNameSlug } = context.params
-   const companyName = companyNameUnSlugify(companyNameSlug)
+export const getStaticProps: GetStaticProps = async ({ params }) => {
+   const { companyName: companyNameSlug } = params
+   const companyName = companyNameUnSlugify(companyNameSlug as string)
 
    if (companyName) {
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
-      if (serverSideGroup && serverSideGroup.publicProfile) {
+      // if (serverSideGroup && serverSideGroup.publicProfile) {
+      if (serverSideGroup) {
          return {
             props: {
                serverSideGroup,
             },
+            revalidate: 60,
          }
       }
-   }
-   return {
-      notFound: true,
+
+      return {
+         notFound: true,
+      }
    }
 }
+
+export const getStaticPaths: GetStaticPaths = () => ({
+   paths: [],
+   fallback: true,
+})
 
 export default CompanyPage

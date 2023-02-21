@@ -110,7 +110,7 @@ const Header = () => {
             <Box sx={styles.navigatorInfoWrapper}>
                <Box sx={styles.companyName}>
                   <Typography
-                     variant={"h3"}
+                     variant={universityName.length > 20 ? "h4" : "h3"}
                      fontWeight={"600"}
                      color={{ xs: "black", md: "white" }}
                      ml={"28px"}
