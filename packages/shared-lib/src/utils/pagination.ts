@@ -1,3 +1,6 @@
+/**
+ * Client side pagination helper methods
+ */
 export default class PaginationHelper {
    constructor(
       public total: number,
