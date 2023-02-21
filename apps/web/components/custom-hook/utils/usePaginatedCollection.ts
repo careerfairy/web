@@ -117,8 +117,6 @@ const usePaginatedCollection = <T = DocumentData>(
    }
 
    return {
-      // @ts-ignore
-      result: result,
       prevDisabled,
       nextDisabled,
       prev,
