@@ -6,6 +6,7 @@ import {
 import config from "./config"
 import { livestreamsRepo } from "./api/repositories"
 import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
+import { EventRatingAnswer } from "@careerfairy/shared-lib/livestreams"
 
 export const onCreateLivestreamPopularityEvents = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -25,6 +26,37 @@ export const onCreateLivestreamPopularityEvents = functions
       // Run side effects for all livestream changes
       sideEffectPromises.push(
          livestreamsRepo.updateLivestreamPopularity(popularityDoc)
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onCreateLivestreamRatingAnswer = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document(
+      "livestreams/{livestreamId}/rating/{ratingName}/voters/{userEmail}"
+   )
+   .onCreate(async (snapshot, context) => {
+      functions.logger.info(context.params)
+
+      const { livestreamId, ratingName } = context.params
+
+      const ratingDoc: EventRatingAnswer = {
+         ...(snapshot.data() as EventRatingAnswer),
+         id: snapshot.id,
+      }
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all livestream changes
+      sideEffectPromises.push(
+         livestreamsRepo.syncLiveStreamStatsNewRating(
+            livestreamId,
+            ratingName,
+            ratingDoc
+         )
       )
 
       return handleSideEffects(sideEffectPromises)

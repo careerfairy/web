@@ -3,9 +3,15 @@ import {
    ILivestreamRepository,
 } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import {
+   EventRating,
+   EventRatingAnswer,
    LivestreamEvent,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
+import {
+   calculateNewAverage,
+   normalizeRating,
+} from "@careerfairy/shared-lib/livestreams/ratings"
 import {
    getPopularityPoints,
    PopularityEventData,
@@ -74,12 +80,67 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
       popularityDoc: PopularityEventData,
       deleted?: boolean
    ): Promise<void>
+
+   syncLiveStreamStatsNewRating(
+      livestreamId: string,
+      ratingName: string,
+      newRating: EventRatingAnswer
+   ): Promise<void>
 }
 
 export class LivestreamFunctionsRepository
    extends FirebaseLivestreamRepository
    implements ILivestreamFunctionsRepository
 {
+   async syncLiveStreamStatsNewRating(
+      livestreamId: string,
+      ratingName: string,
+      newRating: EventRatingAnswer
+   ): Promise<void> {
+      const parentRatingDoc = await this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("rating")
+         .doc(ratingName)
+         .get()
+
+      if (!parentRatingDoc.exists) {
+         console.error(
+            "Parent rating document not found",
+            livestreamId,
+            ratingName,
+            newRating
+         )
+         return
+      }
+
+      const ratingDoc = parentRatingDoc.data() as EventRating
+
+      // also update the livestream aggregated rating
+      const normalizedRating = normalizeRating(ratingDoc, newRating)
+
+      if (normalizedRating && normalizedRating >= 1 && normalizedRating <= 5) {
+         await this.updateLiveStreamStats(livestreamId, (existingStats) => {
+            const existingNumOfRatings =
+               existingStats?.ratings?.[ratingName]?.numberOfRatings ?? 0
+
+            const newAvg = calculateNewAverage(
+               existingStats,
+               ratingName,
+               normalizedRating
+            )
+
+            // will use firestore.update() behind the scenes
+            const toUpdate = {}
+            toUpdate[`ratings.${ratingName}.averageRating`] = newAvg
+            toUpdate[`ratings.${ratingName}.numberOfRatings`] =
+               existingNumOfRatings + 1
+
+            return toUpdate
+         })
+      }
+   }
+
    updateLivestreamPopularity(
       popularityDoc: PopularityEventData,
       deleted = false
