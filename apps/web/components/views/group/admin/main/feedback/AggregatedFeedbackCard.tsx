@@ -21,7 +21,7 @@ import { useRouter } from "next/router"
 import { useCallback, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import CardCustom, { OptionsProps } from "../CardCustom"
+import CardCustom from "../CardCustom"
 import useGroupLivestreamStats from "./useGroupLivestreamStats"
 
 const styles = sxStyles({
@@ -73,6 +73,7 @@ const PAGE_SIZE = 3
 const CARD_OPTIONS = ["Latest", "Oldest"]
 
 const AggregatedFeedbackCard = () => {
+   const [hideOptions, setHideOptions] = useState(false)
    const [sortingMethod, setSortingMethod] =
       useState<typeof CARD_OPTIONS[number]>("Latest")
 
@@ -81,18 +82,28 @@ const AggregatedFeedbackCard = () => {
    }, [])
 
    return (
-      <FeedbackCard optionsHandler={optionsHandler}>
+      <CardCustom
+         title="Live Stream Feedback"
+         options={hideOptions ? undefined : CARD_OPTIONS}
+         optionsHandler={hideOptions ? undefined : optionsHandler}
+      >
          <ErrorBoundary>
-            <Content key={sortingMethod} sortingMethod={sortingMethod} />
+            <PaginatedFeedback
+               key={sortingMethod}
+               sortingMethod={sortingMethod}
+               setHideOptions={setHideOptions}
+            />
          </ErrorBoundary>
-      </FeedbackCard>
+      </CardCustom>
    )
 }
 
-const Content = ({
+const PaginatedFeedback = ({
    sortingMethod,
+   setHideOptions,
 }: {
    sortingMethod: typeof CARD_OPTIONS[number]
+   setHideOptions: React.Dispatch<boolean>
 }) => {
    const { group } = useGroup()
    const results = useGroupLivestreamStats(
@@ -121,6 +132,7 @@ const Content = ({
    }
 
    if (!results.data || results.data.length === 0) {
+      setHideOptions(true)
       return <NoLivestreams />
    }
 
@@ -216,24 +228,6 @@ const NoLivestreams = () => {
             </Button>
          </Box>
       </>
-   )
-}
-
-const FeedbackCard = ({
-   children,
-   optionsHandler,
-}: {
-   children: React.ReactNode
-   optionsHandler?: OptionsProps["handler"]
-}) => {
-   return (
-      <CardCustom
-         title="Live Stream Feedback"
-         options={CARD_OPTIONS}
-         optionsHandler={optionsHandler}
-      >
-         {children}
-      </CardCustom>
    )
 }
 
