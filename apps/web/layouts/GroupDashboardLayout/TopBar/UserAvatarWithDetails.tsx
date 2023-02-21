@@ -110,7 +110,7 @@ const UserAvatarWithDetails = () => {
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
          >
-            <MenuItem onClick={() => push("/profile")}>
+            <MenuItem onClick={() => push(`/group/${group?.id}/admin/profile`)}>
                <ListItemIcon>
                   <PersonOutlineOutlinedIcon fontSize="small" />
                </ListItemIcon>

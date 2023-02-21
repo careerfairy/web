@@ -21,6 +21,7 @@ export interface UserData extends Identifiable {
    authId: string
    firstName: string
    lastName: string
+   avatarId?: string
    fieldOfStudy?: FieldOfStudy
    levelOfStudy?: LevelOfStudy
    university: {

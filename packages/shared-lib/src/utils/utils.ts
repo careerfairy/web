@@ -140,3 +140,6 @@ export const round = (num: number, decimalPlaces: number): number => {
    let f = Math.pow(10, decimalPlaces)
    return Math.round((num + Number.EPSILON) * f) / f
 }
+export const removeSpecialChars = (str: string) => {
+   return str.replace(/[^a-zA-Z ]/g, "")
+}

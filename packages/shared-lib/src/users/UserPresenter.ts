@@ -5,6 +5,7 @@ import { Badge } from "../badges/badges"
 import { NetworkerBadgeLevel2 } from "../badges/NetworkBadges"
 import { EngageBadgeLevel2 } from "../badges/EngageBadges"
 import { ResearchBadgeLevel2 } from "../badges/ResearchBadges"
+import { removeSpecialChars } from "../utils"
 
 export default class UserPresenter extends BasePresenter<UserData> {
    public readonly badges: UserBadges
@@ -68,5 +69,25 @@ export default class UserPresenter extends BasePresenter<UserData> {
       return [this.model.firstName, this.model.lastName]
          .filter(Boolean)
          .join(" ")
+   }
+
+   getInitials(): string {
+      const displayName = this.getDisplayName()
+
+      return (
+         removeSpecialChars(displayName)
+            .match(/(^\S\S?|\s\S)?/g)
+            .map((v) => v.trim())
+            .join("")
+            .match(/(^\S|\S$)?/g)
+            .join("")
+            .toLocaleUpperCase() || "A"
+      ) // if no initials found, return A
+   }
+
+   getAvatar(): string {
+      return this.model.avatarId
+         ? `https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/user-avatars/${this.model.avatarId}.webp`
+         : ""
    }
 }
