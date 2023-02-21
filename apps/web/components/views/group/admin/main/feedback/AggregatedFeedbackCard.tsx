@@ -1,14 +1,10 @@
 import { getGlobalRatingAverage } from "@careerfairy/shared-lib/livestreams/ratings"
-import {
-   LiveStreamStats,
-   sortStatsByMostRecentLivestreams,
-} from "@careerfairy/shared-lib/livestreams/stats"
-import PaginationHelper from "@careerfairy/shared-lib/utils/pagination"
-import { useTheme } from "@emotion/react"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
 import {
    Box,
    Button,
+   CircularProgress,
    Pagination,
    Rating,
    Table,
@@ -18,13 +14,15 @@ import {
    TableRow,
    Typography,
 } from "@mui/material"
+import ErrorBoundary from "components/ErrorBoundary"
 import Link from "components/views/common/Link"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom, { OptionsProps } from "../CardCustom"
-import { useMainPageContext } from "../MainPageProvider"
+import useGroupLivestreamStats from "./useGroupLivestreamStats"
 
 const styles = sxStyles({
    tableBody: {
@@ -43,86 +41,106 @@ const styles = sxStyles({
       fontSize: "1rem",
       marginLeft: (theme) => theme.spacing(2),
       paddingLeft: 0,
+      width: "70%",
    },
    pagination: {
       "& .MuiPagination-ul li:last-child": {
-         marginLeft: (t) => t.spacing(1),
+         display: "block",
       },
       "& .MuiPagination-ul li:last-child button::before": {
          content: "'Next'",
          marginRight: (t) => t.spacing(1),
       },
       "& .MuiPagination-ul li:first-child": {
-         marginRight: (t) => t.spacing(1),
+         display: "block",
       },
       "& .MuiPagination-ul li:first-child button::after": {
          content: "'Previous'",
          marginLeft: (t) => t.spacing(1),
       },
+      "& .MuiPagination-ul li button": {
+         padding: (t) => t.spacing(2),
+         fontWeight: 500,
+      },
+      "& .MuiPagination-ul li": {
+         display: "none",
+      },
    },
    noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
 })
 
+const PAGE_SIZE = 3
+const CARD_OPTIONS = ["Latest", "Oldest"]
+
 const AggregatedFeedbackCard = () => {
-   const { livestreamStats } = useMainPageContext()
+   const [sortingMethod, setSortingMethod] =
+      useState<typeof CARD_OPTIONS[number]>("Latest")
 
-   if (livestreamStats?.length > 0) {
-      return <SortedFeedbacks stats={livestreamStats} />
-   }
-
-   return <NoLivestreams />
-}
-
-const SortedFeedbacks = ({ stats }: { stats: LiveStreamStats[] }) => {
-   const [sortingMethod, setSortingMethod] = useState("Latest")
-
-   const sortedStats = useMemo(() => {
-      return sortStatsByMostRecentLivestreams(
-         stats,
-         sortingMethod === "Oldest"
-      )?.filter(pastLivestreams)
-   }, [stats, sortingMethod])
-
-   const optionsHandler = useCallback((option: string) => {
+   const optionsHandler = useCallback((option: typeof CARD_OPTIONS[number]) => {
       setSortingMethod(option)
    }, [])
 
    return (
       <FeedbackCard optionsHandler={optionsHandler}>
-         <PaginatedFeedbacks key={sortingMethod} stats={sortedStats} />
+         <ErrorBoundary>
+            <Content key={sortingMethod} sortingMethod={sortingMethod} />
+         </ErrorBoundary>
       </FeedbackCard>
    )
 }
 
-const PAGE_SIZE = 3
-const PaginatedFeedbacks = ({ stats }: { stats: LiveStreamStats[] }) => {
-   const [currentPage, setCurrentPage] = useState(1)
+const Content = ({
+   sortingMethod,
+}: {
+   sortingMethod: typeof CARD_OPTIONS[number]
+}) => {
+   const { group } = useGroup()
+   const results = useGroupLivestreamStats(
+      group.id,
+      PAGE_SIZE,
+      sortingMethod === "Latest" ? "desc" : "asc"
+   )
 
-   const paginationHelper: PaginationHelper = useMemo(() => {
-      return new PaginationHelper(stats.length, PAGE_SIZE, currentPage)
-   }, [stats, currentPage])
+   const onPageChange = useCallback(
+      (_, page: number) => {
+         if (page > results.page) {
+            results.next()
+         } else {
+            results.prev()
+         }
+      },
+      [results]
+   )
 
-   const page: LiveStreamStats[] = useMemo(() => {
-      return stats.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
-   }, [currentPage, stats])
+   if (results.loading) {
+      return (
+         <Box m={3} display="flex" justifyContent="center">
+            <CircularProgress color="secondary" />
+         </Box>
+      )
+   }
 
-   const onPageChange = useCallback((_, page: number) => {
-      setCurrentPage(page)
-   }, [])
+   if (!results.data || results.data.length === 0) {
+      return <NoLivestreams />
+   }
 
-   const paginationElement =
-      paginationHelper.totalPages() > 1 ? (
-         <Pagination
-            count={paginationHelper.totalPages()}
-            page={currentPage}
-            color="secondary"
-            onChange={onPageChange}
-            size="small"
-            sx={styles.pagination}
-         />
-      ) : undefined
+   const paginationElement = (
+      <Pagination
+         count={results.nextDisabled ? results.page : results.page + 1}
+         page={results.page}
+         color="secondary"
+         onChange={onPageChange}
+         size="small"
+         sx={styles.pagination}
+      />
+   )
 
-   return <FeedbackCardContent stats={page} pagination={paginationElement} />
+   return (
+      <FeedbackCardContent
+         stats={results.data}
+         pagination={paginationElement}
+      />
+   )
 }
 
 const FeedbackCardContent = ({
@@ -185,7 +203,7 @@ const FeedbackCardContent = ({
 
 const NoLivestreams = () => {
    return (
-      <FeedbackCard>
+      <>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
             You can check live stream feedback here.
             <br />
@@ -197,11 +215,9 @@ const NoLivestreams = () => {
                Create New Live Stream
             </Button>
          </Box>
-      </FeedbackCard>
+      </>
    )
 }
-
-const CARD_OPTIONS = ["Latest", "Oldest"]
 
 const FeedbackCard = ({
    children,
@@ -219,14 +235,6 @@ const FeedbackCard = ({
          {children}
       </CardCustom>
    )
-}
-
-const pastLivestreams = (statDoc: LiveStreamStats) => {
-   if (statDoc?.livestream?.start && statDoc.livestream.start instanceof Date) {
-      return statDoc.livestream.start < new Date()
-   }
-
-   return false
 }
 
 export default AggregatedFeedbackCard

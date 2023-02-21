@@ -507,7 +507,8 @@ service cloud.firestore {
         }
 
         match /{somePath=**}/stats/{livestreamStats} {
-            allow read: if true;
+            allow list: if isSignedIn(); // we can't check the resource.data.livestream.groupIds when listing..
+            allow read: if request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(resource.data.livestream.groupIds) || isCFAdmin();
         }
 
     }
