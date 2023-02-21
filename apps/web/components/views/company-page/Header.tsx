@@ -1,7 +1,7 @@
 import { TabValue, useCompanyPage } from "./index"
 import { AppBar, Avatar, Box, Tabs, Typography } from "@mui/material"
 import { getResizedUrl } from "../../helperFunctions/HelperFunctions"
-import { StylesProps } from "../../../types/commonTypes"
+import { sxStyles } from "../../../types/commonTypes"
 import {
    companyLogoPlaceholder,
    placeholderBanner,
@@ -11,7 +11,7 @@ import SimpleTab from "../../../materialUI/GlobalTabs/SimpleTab"
 import React, { useCallback } from "react"
 import { useTheme } from "@mui/material/styles"
 
-const styles: StylesProps = {
+const styles = sxStyles({
    imageWrapper: {
       width: "100%",
       height: { xs: "250px", md: "300px" },
@@ -75,7 +75,7 @@ const styles: StylesProps = {
       opacity: "1",
       color: (theme) => theme.palette.common.black,
    },
-}
+})
 
 const Header = () => {
    const { group, tabValue, changeTabValue } = useCompanyPage()
@@ -136,47 +136,55 @@ const Header = () => {
                         sx={styles.tabWrapper}
                      >
                         <SimpleTab
-                           sx={{
-                              ...styles.tab,
-                              color:
-                                 tabValue === TabValue.profile &&
-                                 theme.palette.secondary.main,
-                           }}
+                           sx={[
+                              styles.tab,
+                              {
+                                 color:
+                                    tabValue === TabValue.profile &&
+                                    theme.palette.secondary.main,
+                              },
+                           ]}
                            label="Profile"
                            value={TabValue.profile}
                            index={0}
                         />
                         <SimpleTab
-                           sx={{
-                              ...styles.tab,
-                              color:
-                                 tabValue === TabValue.media &&
-                                 theme.palette.secondary.main,
-                           }}
+                           sx={[
+                              styles.tab,
+                              {
+                                 color:
+                                    tabValue === TabValue.media &&
+                                    theme.palette.secondary.main,
+                              },
+                           ]}
                            label="Media"
                            value={TabValue.media}
                            index={1}
                         />
                         <SimpleTab
-                           sx={{
-                              ...styles.tab,
-                              minWidth: { xs: "100px", md: "150px" },
-                              color:
-                                 tabValue === TabValue.testimonials &&
-                                 theme.palette.secondary.main,
-                           }}
+                           sx={[
+                              styles.tab,
+                              {
+                                 minWidth: { xs: "100px", md: "150px" },
+                                 color:
+                                    tabValue === TabValue.testimonials &&
+                                    theme.palette.secondary.main,
+                              },
+                           ]}
                            label="Testimonials"
                            value={TabValue.testimonials}
                            index={2}
                         />
                         <SimpleTab
-                           sx={{
-                              ...styles.tab,
-                              minWidth: { xs: "100px", md: "150px" },
-                              color:
-                                 tabValue === TabValue.livesStreams &&
-                                 theme.palette.secondary.main,
-                           }}
+                           sx={[
+                              styles.tab,
+                              {
+                                 minWidth: { xs: "100px", md: "150px" },
+                                 color:
+                                    tabValue === TabValue.livesStreams &&
+                                    theme.palette.secondary.main,
+                              },
+                           ]}
                            label="Live streams"
                            value={TabValue.livesStreams}
                            index={3}
