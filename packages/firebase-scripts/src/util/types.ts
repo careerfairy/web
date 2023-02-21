@@ -4,4 +4,4 @@ import { DocRef } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 export type DataWithRef<
    TWithRef extends boolean,
    TData extends Identifiable
-> = TWithRef extends true ? TData & DocRef<TData> : TData
+> = TWithRef extends true ? TData & DocRef : TData
