@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { useCompanyPage } from "../index"
 
@@ -38,7 +38,6 @@ const styles: StylesProps = {
 const AboutSection = () => {
    const { group, editMode } = useCompanyPage()
    const [openDialog, setOpenDialog] = useState(false)
-   const formRef = useRef()
 
    const { companyCountry, companyIndustry, companySize, description } = group
 
@@ -85,13 +84,6 @@ const AboutSection = () => {
       setOpenDialog(false)
    }, [])
 
-   const handleSubmitForm = useCallback(() => {
-      if (formRef.current) {
-         // @ts-ignore
-         formRef.current.handleSubmit()
-      }
-   }, [])
-
    return (
       <>
          <Box sx={styles.wrapper}>
@@ -126,9 +118,8 @@ const AboutSection = () => {
             open={openDialog}
             title={"About"}
             handleClose={handleCloseDialog}
-            handleSubmit={handleSubmitForm}
          >
-            <AboutDialog formRef={formRef} handleClose={handleCloseDialog} />
+            <AboutDialog handleClose={handleCloseDialog} />
          </EditDialog>
       </>
    )
