@@ -18,6 +18,8 @@
    },
    "dependencies": {
       "@careerfairy/shared-lib": "*",
+      "@dnd-kit/core": "^6.0.8",
+      "@dnd-kit/sortable": "^7.0.2",
       "@emotion/cache": "^11.7.1",
       "@emotion/react": "^11.7.1",
       "@emotion/server": "^11.4.0",
@@ -82,6 +84,7 @@
       "react-lazyload": "^3.2.0",
       "react-linkify": "^1.0.0-alpha",
       "react-pdf": "^5.6.0",
+      "react-photo-album": "^2.0.2",
       "react-player": "^2.10.0",
       "react-redux": "^7.2.3",
       "react-redux-firebase": "^3.10.0",
