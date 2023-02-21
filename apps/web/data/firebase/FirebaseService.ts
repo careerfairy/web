@@ -24,10 +24,6 @@ import {
    pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
-import {
-   calculateNewAverage,
-   normalizeRating,
-} from "@careerfairy/shared-lib/livestreams/ratings"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
@@ -58,7 +54,6 @@ import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
-import { livestreamRepo } from "data/RepositoryInstances"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -1906,33 +1901,6 @@ class FirebaseService {
          .doc(ratingDoc.id)
          .collection("voters")
          .doc(userEmail)
-
-      // also update the livestream aggregated rating
-      const normalizedRating = normalizeRating(ratingDoc, rating)
-
-      if (normalizedRating && normalizedRating >= 1 && normalizedRating <= 5) {
-         await livestreamRepo.updateLiveStreamStats(
-            livestreamId,
-            (existingStats) => {
-               const existingNumOfRatings =
-                  existingStats?.ratings?.[ratingDoc.id]?.numberOfRatings ?? 0
-
-               const newAvg = calculateNewAverage(
-                  existingStats,
-                  ratingDoc.id,
-                  normalizedRating
-               )
-
-               // will use firestore.update() behind the scenes
-               const toUpdate = {}
-               toUpdate[`ratings.${ratingDoc.id}.averageRating`] = newAvg
-               toUpdate[`ratings.${ratingDoc.id}.numberOfRatings`] =
-                  existingNumOfRatings + 1
-
-               return toUpdate
-            }
-         )
-      }
 
       return ref.set({
          ...rating,
