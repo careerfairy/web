@@ -88,8 +88,8 @@ export type OnSnapshotCallback<T> = (
 
 export type Unsubscribe = () => void
 
-export type DocRef = {
-   _ref: firebase.firestore.DocumentReference<firebase.firestore.DocumentData>
+export type DocRef<T = firebase.firestore.DocumentData> = {
+   _ref: firebase.firestore.DocumentReference<T>
 }
 
 /**
