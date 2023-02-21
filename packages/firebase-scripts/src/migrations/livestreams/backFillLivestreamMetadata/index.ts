@@ -21,7 +21,7 @@ let groupsDict: Record<string, Group>
 
 export async function run() {
    try {
-      Counter.log("Fetching all livestreams and user livestream data")
+      Counter.log("Fetching all livestreams and groups")
 
       const [livestreams, groups] = await Promise.all([
          livestreamRepo.getAllLivestreams(false, true),
@@ -80,16 +80,19 @@ const cascadeHostsMetaDataToLivestream = async (
                   "companyIndustries" | "companyCountries" | "companySizes"
                > = {
                   ...(!isEmpty(metadata.companyCountries) && {
+                     // only update if there is data
                      companyCountries: FieldValue.arrayUnion(
                         ...metadata.companyCountries
                      ) as any,
                   }),
                   ...(!isEmpty(metadata.companyIndustries) && {
+                     // only update if there is data
                      companyIndustries: FieldValue.arrayUnion(
                         ...metadata.companyIndustries
                      ) as any,
                   }),
                   ...(!isEmpty(metadata.companySizes) && {
+                     // only update if there is data
                      companySizes: FieldValue.arrayUnion(
                         ...metadata.companySizes
                      ) as any,
