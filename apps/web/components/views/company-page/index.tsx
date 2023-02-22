@@ -9,10 +9,10 @@ import {
 } from "react"
 import { Box, Container, Grid, Grow, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
-import Index from "./TestimonialSection"
 import StreamSection from "./StreamSection"
 import MediaSection from "./MediaSection"
 import { groupRepo } from "../../../data/RepositoryInstances"
+import TestimonialSection from "./TestimonialSection"
 
 type Props = {
    group: Group
@@ -75,7 +75,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box height={"100%"}>
+         <Box sx={{ backgroundColor: "white", height: "100%" }}>
             <Box mb={{ xs: 4, md: 10 }}>
                <Header />
             </Box>
@@ -85,7 +85,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
                      <Grid item xs={12} md={6}>
                         <Stack spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
-                           <Index />
+                           <TestimonialSection />
                            <StreamSection />
                         </Stack>
                      </Grid>

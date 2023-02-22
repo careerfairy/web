@@ -78,11 +78,19 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const handleSubmitForm = useCallback(
       async (values) => {
          try {
+            let testimonialsToUpdate = [
+               ...group.testimonials,
+               ...buildTestimonialsArray(values, group.id),
+            ]
+
+            if (testimonialToEdit) {
+               // TODO update testimonial
+               // testimonialsToUpdate = [
+               //    ...group.testimonials,
+               // ]
+            }
             await firebaseService.updateCareerCenter(group.id, {
-               testimonials: [
-                  ...group.testimonials,
-                  ...buildTestimonialsArray(values, group.id),
-               ],
+               testimonials: testimonialsToUpdate,
             })
             updateGroup()
             handleClose()
@@ -100,6 +108,7 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
          group.id,
          group.testimonials,
          handleClose,
+         testimonialToEdit,
          updateGroup,
       ]
    )
