@@ -29,6 +29,15 @@ export interface Group extends Identifiable {
    companyCountry?: GroupOption
    companyIndustry?: GroupOption
    companySize?: string
+
+   /*
+    * Photos that are displayed on the group company page
+    * */
+   photos?: GroupPhoto[]
+   /*
+    * Videos that are displayed on the group company page
+    * */
+   videos?: GroupVideo[]
    /*
     * Deprecated
     * */
@@ -46,6 +55,16 @@ export interface Testimonial extends Identifiable {
    testimonial: string
    avatar: string
    groupId: string
+}
+
+export interface GroupPhoto extends Identifiable {
+   url: string
+}
+
+export interface GroupVideo extends Identifiable {
+   url: string
+   title: string
+   description: string
 }
 
 export interface GroupWithPolicy extends Group {

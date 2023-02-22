@@ -97,3 +97,6 @@ export const safariLogo =
 
 export const registerIllustrationSvg =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fregister-icon.svg?alt=media&token=d0156136-682b-4d01-99de-80fde06d8eb1"
+
+export const imagePlaceholder =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fimage-placeholder.png?alt=media&token=0f796cfb-72e8-4965-aca0-043ed0781a6c"
