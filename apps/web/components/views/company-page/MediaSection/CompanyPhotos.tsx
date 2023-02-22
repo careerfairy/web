@@ -1,21 +1,21 @@
 import React from "react"
 import { useCompanyPage } from "../index"
-import { Button, Typography } from "@mui/material"
+import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import PhotoSortExample, { SortablePhoto } from "./PhotoSortExample"
+import PhotosGallery from "./PhotosGallery"
+import useGroupPhotos from "./useGroupPhotos"
+import PhotoUploadButton from "./PhotoUploadButton"
+import EditDialog from "../EditDialog"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 
-const photoSet: SortablePhoto[] = Array.from({ length: 20 }, (_, i) => ({
-   id: `${i}`,
-   src: `https://loremflickr.com/320/240?random=${i}`,
-   alt: `Photo ${i}`,
-   height: 240,
-   width: 320,
-   title: `Photo ${i}`,
-}))
 const CompanyPhotos = () => {
-   const { editMode } = useCompanyPage()
-   console.log("-> editMode", editMode)
+   const { editMode, group } = useCompanyPage()
+   const { updateSortablePhotos, photos, handleUploadPhotos, isUpdating } =
+      useGroupPhotos(group)
+   const [open, handleClose] = useDialogStateHandler()
+
+   if (!editMode && !group.photos?.length) return null
+
    return (
       <Stack spacing={2}>
          <Stack
@@ -27,17 +27,26 @@ const CompanyPhotos = () => {
             <Typography variant="h4" fontWeight={"600"} color="black">
                Photos
             </Typography>
-            <Button
-               startIcon={<AddCircleOutlineIcon />}
-               variant="text"
-               color="primary"
-            >
-               <Typography fontSize={"15px"} fontWeight={"600"}>
-                  ADD PHOTO
-               </Typography>
-            </Button>
+            {editMode ? (
+               <PhotoUploadButton
+                  handleUploadPhotos={handleUploadPhotos}
+                  isAddingPhotos={isUpdating}
+               />
+            ) : null}
          </Stack>
-         <PhotoSortExample draggable={editMode} photos={photoSet} />
+         <PhotosGallery
+            onPhotosChanged={updateSortablePhotos}
+            maxPhotos={6}
+            editable={editMode}
+            photos={photos}
+         />
+         <EditDialog open={open} title={"Photos"} handleClose={handleClose}>
+            <PhotosGallery
+               onPhotosChanged={updateSortablePhotos}
+               editable={editMode}
+               photos={photos}
+            />
+         </EditDialog>
       </Stack>
    )
 }
