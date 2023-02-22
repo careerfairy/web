@@ -236,7 +236,7 @@ const SpeakerForm = ({
                      isSubmitting
                   }
                   onClick={() =>
-                     handleAddSpeaker(values, setValues, speakerObj)
+                     handleAddSpeaker("speakers", values, setValues, speakerObj)
                   }
                   type="button"
                   color="secondary"

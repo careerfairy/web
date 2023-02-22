@@ -9,7 +9,7 @@ import {
 } from "react"
 import { Box, Container, Grid, Grow, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
-import TestimonialsSection from "./TestimonialsSection"
+import Index from "./TestimonialSection"
 import StreamSection from "./StreamSection"
 import MediaSection from "./MediaSection"
 import { groupRepo } from "../../../data/RepositoryInstances"
@@ -31,7 +31,7 @@ type ICompanyPageContext = {
    tabValue: TabValue
    changeTabValue: (tabValues: TabValue) => void
    editMode: boolean
-   changeIsSaving: () => void
+   updateGroup: () => void
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -39,7 +39,7 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    tabValue: TabValue.profile,
    changeTabValue: () => {},
    editMode: false,
-   changeIsSaving: async () => {},
+   updateGroup: async () => {},
 })
 
 const CompanyPageOverview = ({ group, editMode }: Props) => {
@@ -50,7 +50,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
       setTabValue(tabValue)
    }, [])
 
-   const handleChangeIsSaving = useCallback(async () => {
+   const handleUpdateGroup = useCallback(async () => {
       // Get updated group information and set it on context group
       const updatedGroup = await groupRepo.getGroupById(group.groupId)
       setContextGroup(updatedGroup)
@@ -62,12 +62,12 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
-         changeIsSaving: handleChangeIsSaving,
+         updateGroup: handleUpdateGroup,
       }),
       [
          contextGroup,
          editMode,
-         handleChangeIsSaving,
+         handleUpdateGroup,
          handleChangeTabValue,
          tabValue,
       ]
@@ -85,7 +85,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
                      <Grid item xs={12} md={6}>
                         <Stack spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
-                           <TestimonialsSection />
+                           <Index />
                            <StreamSection />
                         </Stack>
                      </Grid>
