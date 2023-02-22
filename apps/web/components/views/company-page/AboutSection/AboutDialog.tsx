@@ -1,4 +1,11 @@
-import { Box, Button, Stack, TextField, Typography } from "@mui/material"
+import {
+   Box,
+   Button,
+   Collapse,
+   Stack,
+   TextField,
+   Typography,
+} from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik, FormikErrors, FormikValues } from "formik"
 import React, { useCallback, useMemo } from "react"
@@ -102,21 +109,28 @@ const AboutDialog = ({ handleClose }: Props) => {
                         </Box>
                      )}
 
-                     <TextField
-                        fullWidth
-                        multiline
-                        helperText={errors.description}
-                        label="About"
-                        name="description"
-                        disabled={isSubmitting}
-                        onChange={handleChange}
-                        required
-                        error={Boolean(errors.description)}
-                        value={values.description}
-                        variant="outlined"
-                        sx={{ minHeight: "100px" }}
-                        className="multiLineInput"
-                     />
+                     <Box>
+                        <TextField
+                           fullWidth
+                           multiline
+                           label="About"
+                           name="description"
+                           disabled={isSubmitting}
+                           onChange={handleChange}
+                           required
+                           error={Boolean(errors.description)}
+                           value={values.description}
+                           variant="outlined"
+                           sx={{ minHeight: "100px" }}
+                           className="multiLineInput"
+                        />
+                        <Collapse
+                           in={Boolean(errors.description)}
+                           style={{ color: "red" }}
+                        >
+                           {errors.description}
+                        </Collapse>
+                     </Box>
                   </Stack>
                   <Box display="flex" justifyContent="end" mt={4}>
                      <Button

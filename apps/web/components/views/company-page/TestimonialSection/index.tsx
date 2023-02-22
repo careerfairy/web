@@ -6,6 +6,7 @@ import { Add } from "@mui/icons-material"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
 import TestimonialDialog from "./TestimonialDialog"
+import { Testimonial } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    titleSection: {
@@ -15,13 +16,23 @@ const styles = sxStyles({
    },
 })
 
-const Index = () => {
+const TestimonialSection = () => {
    const { group, editMode } = useCompanyPage()
    const [openDialog, setOpenDialog] = useState(false)
+   const [testimonialToEdit, setTestimonialToEdit] = useState(null)
 
    const handleCloseDialog = useCallback(() => {
       setOpenDialog(false)
+      setTestimonialToEdit(null)
    }, [])
+
+   const handleEditTestimonial = useCallback(
+      (selectedTestimonial: Testimonial) => {
+         setTestimonialToEdit(selectedTestimonial)
+         setOpenDialog(true)
+      },
+      []
+   )
 
    if (!group?.testimonials && !editMode) {
       return null
@@ -54,6 +65,7 @@ const Index = () => {
                         <TestimonialCard
                            key={testimonial.id}
                            testimonial={testimonial}
+                           handleEditTestimonial={handleEditTestimonial}
                         />
                      ))}
                   </>
@@ -75,10 +87,13 @@ const Index = () => {
             title={"Testimonials"}
             handleClose={handleCloseDialog}
          >
-            <TestimonialDialog handleClose={handleCloseDialog} />
+            <TestimonialDialog
+               handleClose={handleCloseDialog}
+               testimonialToEdit={testimonialToEdit}
+            />
          </EditDialog>
       </>
    )
 }
 
-export default Index
+export default TestimonialSection
