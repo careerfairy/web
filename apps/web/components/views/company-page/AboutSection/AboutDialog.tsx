@@ -1,4 +1,4 @@
-import { Box, Button, Stack, TextField } from "@mui/material"
+import { Box, Button, Stack, TextField, Typography } from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik, FormikErrors, FormikValues } from "formik"
 import React, { useCallback, useMemo } from "react"
@@ -6,6 +6,7 @@ import { useCompanyPage } from "../index"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "components/util/constants"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 type Props = {
    handleClose: () => void
@@ -15,6 +16,7 @@ const AboutDialog = ({ handleClose }: Props) => {
    const { group, changeIsSaving } = useCompanyPage()
    const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
+   const isMobile = useIsMobile()
 
    const initialValues = useMemo(
       () => ({
@@ -71,7 +73,11 @@ const AboutDialog = ({ handleClose }: Props) => {
             }) => (
                <form onSubmit={handleSubmit}>
                   <Stack spacing={4}>
-                     <Box display={"flex"} justifyContent={"space-between"}>
+                     <Typography variant="body2" color="textSecondary">
+                        * Indicates Required
+                     </Typography>
+
+                     {isMobile ? (
                         <CompanyMetadata
                            handleChange={handleChange}
                            values={values}
@@ -80,9 +86,21 @@ const AboutDialog = ({ handleClose }: Props) => {
                            touched={touched}
                            isSubmitting={isSubmitting}
                            inputsRequired={true}
-                           horizontalDirection={true}
                         />
-                     </Box>
+                     ) : (
+                        <Box display={"flex"} justifyContent={"space-between"}>
+                           <CompanyMetadata
+                              handleChange={handleChange}
+                              values={values}
+                              handleBlur={handleBlur}
+                              errors={errors}
+                              touched={touched}
+                              isSubmitting={isSubmitting}
+                              inputsRequired={true}
+                              horizontalDirection={true}
+                           />
+                        </Box>
+                     )}
 
                      <TextField
                         fullWidth
@@ -96,7 +114,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                         error={Boolean(errors.description)}
                         value={values.description}
                         variant="outlined"
-                        sx={{ minHeight: "110px" }}
+                        sx={{ minHeight: "100px" }}
                         className="multiLineInput"
                      />
                   </Stack>
