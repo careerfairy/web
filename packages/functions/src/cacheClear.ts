@@ -16,7 +16,7 @@ export const periodicallyRemoveCachedDocument = functions.pubsub
          // Remove cache/function/analytics documents older than 2 days
          removeExpiredCacheDocuments(
             "cache/functions/analytics",
-            2 * DAY_IN_SECONDS
+            7 * DAY_IN_SECONDS
          ),
          // Remove Merge cache older than 3 days
          removeExpiredCacheDocuments("cache/merge/getJobs", 3 * DAY_IN_SECONDS),
