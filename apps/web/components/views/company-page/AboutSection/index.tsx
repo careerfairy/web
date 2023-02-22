@@ -2,7 +2,7 @@ import { useCallback, useMemo, useState } from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { useCompanyPage } from "../index"
 
-import { StylesProps } from "../../../../types/commonTypes"
+import { sxStyles } from "../../../../types/commonTypes"
 // react feather
 import {
    MapPin as MapPinIcon,
@@ -13,7 +13,7 @@ import {
 import EditDialog from "../EditDialog"
 import AboutDialog from "./AboutDialog"
 
-const styles: StylesProps = {
+const styles = sxStyles({
    wrapper: {
       display: "flex",
       flexDirection: "column",
@@ -34,7 +34,8 @@ const styles: StylesProps = {
       ml: { md: 5 },
       mt: { xs: 1, md: "unset" },
    },
-}
+})
+
 const AboutSection = () => {
    const { group, editMode } = useCompanyPage()
    const [openDialog, setOpenDialog] = useState(false)
