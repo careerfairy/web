@@ -1,18 +1,23 @@
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import {
-   Card,
-   CardHeader,
-   CardContent,
    Button,
+   Card,
+   CardContent,
+   CardHeader,
    Menu,
    MenuItem,
+   styled,
+   SxProps,
+   Theme,
    Tooltip,
+   tooltipClasses,
+   TooltipProps,
 } from "@mui/material"
 import { Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
-import { useState, useCallback, useMemo } from "react"
+import { useCallback, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 
 const styles = sxStyles({
    dropdownButton: {
@@ -45,7 +50,7 @@ type Props = {
    options?: OptionsProps["options"]
    optionsHandler?: OptionsProps["handler"]
    helpTooltip?: string
-   minHeight?: string
+   sx?: SxProps<Theme>
 }
 
 /**
@@ -56,22 +61,14 @@ const CardCustom = ({
    options,
    optionsHandler,
    children,
-   minHeight,
    helpTooltip,
    subHeader,
+   sx,
 }: Props) => {
-   const sxProps = useMemo(() => {
-      return minHeight
-         ? {
-              minHeight,
-           }
-         : undefined
-   }, [minHeight])
-
    const action = helpTooltip ? (
-      <Tooltip title={helpTooltip} sx={styles.tooltip} arrow>
+      <CustomWidthTooltip title={helpTooltip} arrow>
          <InfoOutlinedIcon />
-      </Tooltip>
+      </CustomWidthTooltip>
    ) : options ? (
       <Options
          options={options}
@@ -80,7 +77,7 @@ const CardCustom = ({
    ) : undefined
 
    return (
-      <Card sx={sxProps}>
+      <Card sx={sx}>
          <CardHeader
             sx={styles.cardHeader}
             title={title}
@@ -92,6 +89,14 @@ const CardCustom = ({
       </Card>
    )
 }
+
+const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+   <Tooltip sx={styles.tooltip} {...props} classes={{ popper: className }} />
+))({
+   [`& .${tooltipClasses.tooltip}`]: {
+      maxWidth: 250,
+   },
+})
 
 export type OptionsProps = {
    options: string[]
