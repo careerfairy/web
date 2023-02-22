@@ -30,9 +30,9 @@ import {
    buildLivestreamObject,
    getDownloadUrl,
    getStreamSubCollectionSpeakers,
-   handleAddSpeaker,
-   handleDeleteSpeaker,
-   handleError,
+   handleAddSection,
+   handleDeleteSection,
+   handleErrorSection,
    handleFlattenOptions,
    languageCodes,
    validateStreamForm,
@@ -677,7 +677,8 @@ const NewLivestreamForm = () => {
                                        size="small"
                                        color="secondary"
                                        onClick={() =>
-                                          handleDeleteSpeaker(
+                                          handleDeleteSection(
+                                             "speakers",
                                              key,
                                              values,
                                              setValues
@@ -691,31 +692,34 @@ const NewLivestreamForm = () => {
                               <FormGroup>
                                  <SpeakerForm
                                     key={key}
-                                    handleDeleteSpeaker={handleDeleteSpeaker}
                                     setValues={setValues}
                                     speakerObj={speakerObj}
-                                    handleAddSpeaker={handleAddSpeaker}
+                                    handleAddSpeaker={handleAddSection}
                                     objectKey={key}
                                     index={index}
-                                    firstNameError={handleError(
+                                    firstNameError={handleErrorSection(
+                                       "speakers",
                                        key,
                                        "firstName",
                                        errors,
                                        touched
                                     )}
-                                    lastNameError={handleError(
+                                    lastNameError={handleErrorSection(
+                                       "speakers",
                                        key,
                                        "lastName",
                                        errors,
                                        touched
                                     )}
-                                    positionError={handleError(
+                                    positionError={handleErrorSection(
+                                       "speakers",
                                        key,
                                        "position",
                                        errors,
                                        touched
                                     )}
-                                    backgroundError={handleError(
+                                    backgroundError={handleErrorSection(
+                                       "speakers",
                                        key,
                                        "background",
                                        errors,

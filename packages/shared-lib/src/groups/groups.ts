@@ -36,6 +36,16 @@ export interface Group extends Identifiable {
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
    publicProfile?: boolean
+   testimonials?: Testimonial[]
+}
+
+export interface Testimonial extends Identifiable {
+   id: string // uuid
+   name: string
+   position: string
+   testimonial: string
+   avatar: string
+   groupId: string
 }
 
 export interface GroupWithPolicy extends Group {

@@ -13,7 +13,7 @@ type Props = {
 }
 
 const AboutDialog = ({ handleClose }: Props) => {
-   const { group, changeIsSaving } = useCompanyPage()
+   const { group, updateGroup } = useCompanyPage()
    const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
    const isMobile = useIsMobile()
@@ -42,7 +42,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                companyIndustry: values.companyIndustry,
                companySize: values.companySize,
             })
-            changeIsSaving()
+            updateGroup()
             handleClose()
          } catch (e) {
             console.log("error", e)
@@ -52,7 +52,7 @@ const AboutDialog = ({ handleClose }: Props) => {
             })
          }
       },
-      [changeIsSaving, enqueueSnackbar, firebaseService, group.id, handleClose]
+      [updateGroup, enqueueSnackbar, firebaseService, group.id, handleClose]
    )
 
    return (
@@ -124,6 +124,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                         variant="contained"
                         color="secondary"
                         disabled={isSubmitting}
+                        size={isMobile ? "small" : "large"}
                      >
                         Save & Close
                      </Button>
