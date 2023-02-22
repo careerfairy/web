@@ -20,9 +20,6 @@ const styles = sxStyles({
       width: "18px",
       marginLeft: "5px",
    },
-   card: {
-      width: "100%",
-   },
    gridItem: {
       display: "flex",
    },
@@ -98,12 +95,7 @@ export const CardAnalytic = ({
    ) : undefined
 
    return (
-      <CardCustom
-         sx={styles.card}
-         title={title}
-         helpTooltip={tooltip}
-         subHeader={subHeader}
-      >
+      <CardCustom title={title} helpTooltip={tooltip} subHeader={subHeader}>
          <Typography mt={1} sx={styles.value} align="right">
             {value}
          </Typography>
