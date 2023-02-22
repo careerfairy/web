@@ -56,7 +56,6 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
    const { group, stats } = useAdminGroup(groupId)
-   console.log("here", group, stats)
 
    const { errorNotification } = useSnackbarNotifications()
 

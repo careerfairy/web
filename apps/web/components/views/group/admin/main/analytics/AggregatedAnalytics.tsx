@@ -6,7 +6,7 @@ import { ChevronRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom from "../CardCustom"
 import { AggregatedTalentPoolValue } from "./AggregatedTalentPoolValue"
-import AverageRegistrationsCard from "./AverageRegistrationsCard"
+import AverageRegistrationsValue from "./AverageRegistrationsValue"
 
 const styles = sxStyles({
    value: {
@@ -59,7 +59,10 @@ const AggregatedAnalytics = () => {
                   link={`/group/${group.id}/admin/ats-integration?section=1`}
                />
             ) : (
-               <AverageRegistrationsCard />
+               <CardAnalytic
+                  title="Average registrations per stream"
+                  value={<AverageRegistrationsValue />}
+               />
             )}
          </Grid>
 
