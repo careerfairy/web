@@ -4,12 +4,15 @@ import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
 import { writeProgressBar } from "../../../util/bulkWriter"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import {
+   getMetaDataFromEventHosts,
+   LivestreamEvent,
+} from "@careerfairy/shared-lib/dist/livestreams"
 import { DataWithRef } from "../../../util/types"
 import { Group } from "@careerfairy/shared-lib/dist/groups/groups"
-import { isEmpty, uniq, uniqBy } from "lodash"
+import { isEmpty } from "lodash"
 import { FieldValue } from "firebase-admin/firestore"
-import { GroupOption } from "@careerfairy/shared-lib/dist/groups"
+import { logAction } from "../../../util/logger"
 
 const counter = new Counter()
 
@@ -23,10 +26,14 @@ export async function run() {
    try {
       Counter.log("Fetching all livestreams and groups")
 
-      const [livestreams, groups] = await Promise.all([
-         livestreamRepo.getAllLivestreams(false, true),
-         groupRepo.getAllGroups(),
-      ])
+      const [livestreams, groups] = await logAction(
+         () =>
+            Promise.all([
+               livestreamRepo.getAllLivestreams(false, true),
+               groupRepo.getAllGroups(),
+            ]),
+         "Fetching all livestreams and groups"
+      )
 
       Counter.log(
          `Fetched ${livestreams.length} livestreams and ${groups.length} groups`
@@ -73,7 +80,12 @@ const cascadeHostsMetaDataToLivestream = async (
             // get metadata from event hosts
             const metadata = getMetaDataFromEventHosts(eventHosts)
 
-            if (metadata) {
+            // Return metadata if there is at least ONE field that is not empty
+            const hasMetadataToUpdate = Object.values(metadata).some(
+               (field) => !isEmpty(field)
+            )
+
+            if (hasMetadataToUpdate) {
                // update livestream with metadata
                const toUpdate: Pick<
                   LivestreamEvent,
@@ -110,63 +122,4 @@ const cascadeHostsMetaDataToLivestream = async (
 
    writeProgressBar.stop()
    Counter.log("All batches committed! :)")
-}
-
-type Metadata = {
-   companyCountries: GroupOption[]
-   companyIndustries: GroupOption[]
-   companySizes: string[]
-}
-
-const getMetaDataFromEventHosts = (eventHosts: Group[]): Metadata => {
-   const isOneOrMoreCompanies =
-      eventHosts?.filter((group) => !group.universityCode).length > 0
-
-   let groupsToGetMetadataFrom = eventHosts
-
-   if (isOneOrMoreCompanies) {
-      // if there is at least one company, we only want to get the metadata ONLY from the companies, not the universities
-      groupsToGetMetadataFrom = eventHosts.filter(
-         (group) => !group.universityCode
-      )
-   }
-
-   const metaData = groupsToGetMetadataFrom.reduce<Metadata>(
-      (acc, group) => {
-         if (group.companyCountry) {
-            // aggregate all unique company countries (countries are unique by id)
-            acc.companyCountries = uniqBy(
-               [...acc.companyCountries, group.companyCountry],
-               "id"
-            )
-         }
-
-         if (group.companyIndustry) {
-            // aggregate all unique company industries (industries are unique by id)
-            acc.companyIndustries = uniqBy(
-               [...acc.companyIndustries, group.companyIndustry],
-               "id"
-            )
-         }
-
-         if (group.companySize) {
-            // aggregate all unique company sizes
-            acc.companySizes = uniq([...acc.companySizes, group.companySize])
-         }
-
-         return acc
-      },
-      {
-         companyCountries: [],
-         companyIndustries: [],
-         companySizes: [],
-      }
-   )
-
-   // Return metadata if there is at least ONE field that is not empty
-   if (Object.values(metaData).some((field) => !isEmpty(field))) {
-      return metaData
-   }
-
-   return null
 }
