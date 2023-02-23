@@ -79,7 +79,7 @@ const TestimonialForm = ({
    return (
       <>
          <Grid container>
-            <Grid item xs={4}>
+            <Grid item xs={12} md={4}>
                <ImageSelect
                   path="mentors-pictures"
                   getDownloadUrl={getDownloadUrl}
@@ -95,8 +95,8 @@ const TestimonialForm = ({
                   buttonCentered={true}
                />
             </Grid>
-            <Grid item xs={8} mt={4}>
-               <Stack spacing={2}>
+            <Grid item xs={12} md={8} mt={4}>
+               <Stack spacing={{ xs: 1, md: 2 }}>
                   <Grid item xs={12}>
                      <TextField
                         fullWidth
@@ -124,8 +124,8 @@ const TestimonialForm = ({
                         {testimonialError}
                      </Collapse>
                   </Grid>
-                  <Grid container xs={12}>
-                     <Grid item xs={6} pr={1}>
+                  <Grid container xs={12} rowSpacing={2}>
+                     <Grid item xs={12} md={6} pr={{ md: 1 }}>
                         <TextField
                            name={`testimonials.${objectKey}.name`}
                            id={`testimonials.${objectKey}.name`}
@@ -152,7 +152,7 @@ const TestimonialForm = ({
                            {nameError}
                         </Collapse>
                      </Grid>
-                     <Grid item xs={6} pl={1}>
+                     <Grid item xs={12} md={6} pl={{ md: 1 }}>
                         <TextField
                            name={`testimonials.${objectKey}.position`}
                            id={`testimonials.${objectKey}.position`}
