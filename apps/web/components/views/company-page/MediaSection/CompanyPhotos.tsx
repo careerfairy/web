@@ -47,6 +47,7 @@ const CompanyPhotos = () => {
          <PhotosDialog
             open={photosDialogOpen}
             handleClose={handleClosePhotosDialog}
+            onPhotosChanged={updateSortablePhotos}
             photos={photos}
             editable={editMode}
          />
