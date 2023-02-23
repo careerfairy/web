@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Typography } from "@mui/material"
+import { Avatar, Box, IconButton, Typography } from "@mui/material"
 import { Testimonial } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "../../../../types/commonTypes"
 import React from "react"
@@ -12,6 +12,10 @@ type Props = {
 }
 
 const styles = sxStyles({
+   wrapper: {
+      mb: 4,
+      position: "relative",
+   },
    titleSection: {
       display: "flex",
       flexDirection: "column",
@@ -19,11 +23,13 @@ const styles = sxStyles({
       background: "#F7F7F7",
       minHeight: "80px",
       px: 4,
+      borderRadius: "12px 12px 0 0",
    },
    testimonial: {
       p: 4,
       border: "1px solid #EDE7FD",
       borderTop: "none",
+      borderRadius: "0 0 12px 12px",
    },
    avatar: {
       width: (theme) => ({ xs: theme.spacing(8), md: theme.spacing(12) }),
@@ -49,6 +55,16 @@ const styles = sxStyles({
       padding: 0,
       minHeight: { xs: "25px", md: "30px" },
       minWidth: { xs: "25px", md: "30px" },
+      bgcolor: "rgba(0, 0, 0, 0.5)",
+
+      svg: {
+         color: "white",
+         fill: "white",
+      },
+
+      "&:hover": {
+         bgcolor: "rgba(0, 0, 0, 0.7)",
+      },
    },
 })
 
@@ -59,7 +75,7 @@ const TestimonialCard = ({ testimonial, handleEditTestimonial }: Props) => {
    const { avatar, name, position, testimonial: description } = testimonial
 
    return (
-      <Box mb={4} position={"relative"}>
+      <Box sx={styles.wrapper}>
          <Box sx={styles.titleSection}>
             <Typography variant={"h6"} fontWeight={"bold"}>
                {name}
@@ -70,16 +86,14 @@ const TestimonialCard = ({ testimonial, handleEditTestimonial }: Props) => {
          <Box sx={styles.avaWrapper}>
             {editMode ? (
                <Box sx={styles.editIconWrapper}>
-                  <Button
-                     variant="contained"
-                     color="secondary"
+                  <IconButton
                      sx={styles.editIconButton}
                      onClick={() => {
                         handleEditTestimonial(testimonial)
                      }}
                   >
                      <EditIcon size={isMobile ? 14 : 18} />
-                  </Button>
+                  </IconButton>
                </Box>
             ) : null}
             <Box sx={styles.avatarRing} boxShadow={3}>
