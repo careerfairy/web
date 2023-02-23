@@ -54,7 +54,7 @@ const TestimonialSection = () => {
             }
          }
       },
-      [group.testimonials.length, step]
+      [group?.testimonials?.length, step]
    )
 
    if (!group?.testimonials && !editMode) {
