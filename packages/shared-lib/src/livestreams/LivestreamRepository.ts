@@ -101,7 +101,7 @@ export interface ILivestreamRepository {
 
    getEventsOfGroup(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       options?: {
          limit?: number
          hideHidden?: boolean
@@ -344,34 +344,44 @@ export class FirebaseLivestreamRepository
 
    eventsOfGroupQuery(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       hideHidden?: boolean
    ) {
       let query = this.firestore
          .collection("livestreams")
          .where("groupIds", "array-contains", groupId)
          .where("test", "==", false)
+
       if (hideHidden) {
          query = query.where("hidden", "==", false)
       }
-      if (type === "upcoming") {
-         query = query.where("start", ">=", new Date()).orderBy("start", "asc")
-      } else {
-         query = query.where("start", "<", new Date()).orderBy("start", "desc")
+
+      if (type) {
+         if (type === "upcoming") {
+            query = query
+               .where("start", ">=", new Date())
+               .orderBy("start", "asc")
+         } else {
+            query = query
+               .where("start", "<", new Date())
+               .orderBy("start", "desc")
+         }
       }
+
       return query
    }
 
    async getEventsOfGroup(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       options?: {
          limit?: number
          hideHidden?: boolean
       }
    ): Promise<LivestreamEvent[] | null> {
       let query = this.eventsOfGroupQuery(groupId, type, options?.hideHidden)
-      if (options.limit) {
+
+      if (options?.limit) {
          query = query.limit(options.limit)
       }
       const snapshots = await query.get()
