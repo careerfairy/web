@@ -184,13 +184,14 @@ export const PlaceholderPhoto: FC<PlaceholderPhotoProps> = ({
       }}
    >
       <Box sx={styles.placeholderWrapper}>
-         <Image
-            width={100}
-            objectFit={"contain"}
-            height={100}
-            src={photo.src}
-            alt="placeholder"
-         />
+         <Box width={"80%"} position={"relative"} height={"80%"}>
+            <Image
+               layout={"fill"}
+               objectFit={"contain"}
+               src={photo.src}
+               alt="placeholder"
+            />
+         </Box>
       </Box>
    </Box>
 )
