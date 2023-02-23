@@ -20,7 +20,7 @@ type Props = {
 }
 
 const AboutDialog = ({ handleClose }: Props) => {
-   const { group, updateGroup } = useCompanyPage()
+   const { group } = useCompanyPage()
    const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
    const isMobile = useIsMobile()
@@ -49,7 +49,6 @@ const AboutDialog = ({ handleClose }: Props) => {
                companyIndustry: values.companyIndustry,
                companySize: values.companySize,
             })
-            updateGroup()
             handleClose()
          } catch (e) {
             console.log("error", e)
@@ -59,7 +58,7 @@ const AboutDialog = ({ handleClose }: Props) => {
             })
          }
       },
-      [updateGroup, enqueueSnackbar, firebaseService, group.id, handleClose]
+      [enqueueSnackbar, firebaseService, group.id, handleClose]
    )
 
    return (

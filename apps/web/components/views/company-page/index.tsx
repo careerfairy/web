@@ -11,8 +11,10 @@ import { Box, Container, Grid, Grow, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
 import StreamSection from "./StreamSection"
 import MediaSection from "./MediaSection"
-import { groupRepo } from "../../../data/RepositoryInstances"
 import TestimonialSection from "./TestimonialSection"
+import { useFirestore, useFirestoreDocData } from "reactfire"
+import { doc } from "firebase/firestore"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 
 type Props = {
    group: Group
@@ -31,7 +33,6 @@ type ICompanyPageContext = {
    tabValue: TabValue
    changeTabValue: (tabValues: TabValue) => void
    editMode: boolean
-   updateGroup: () => void
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -39,22 +40,24 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    tabValue: TabValue.profile,
    changeTabValue: () => {},
    editMode: false,
-   updateGroup: async () => {},
 })
 
 const CompanyPageOverview = ({ group, editMode }: Props) => {
    const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
-   const [contextGroup, setContextGroup] = useState(group as Group)
+
+   const groupRef = doc(
+      useFirestore(),
+      "careerCenterData",
+      group.id
+   ).withConverter(createGenericConverter<Group>())
+
+   const { data: contextGroup } = useFirestoreDocData(groupRef, {
+      initialData: group,
+   })
 
    const handleChangeTabValue = useCallback((tabValue) => {
       setTabValue(tabValue)
    }, [])
-
-   const handleUpdateGroup = useCallback(async () => {
-      // Get updated group information and set it on context group
-      const updatedGroup = await groupRepo.getGroupById(group.groupId)
-      setContextGroup(updatedGroup)
-   }, [group.groupId])
 
    const contextValue = useMemo(
       () => ({
@@ -62,15 +65,8 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
-         updateGroup: handleUpdateGroup,
       }),
-      [
-         contextGroup,
-         editMode,
-         handleUpdateGroup,
-         handleChangeTabValue,
-         tabValue,
-      ]
+      [contextGroup, editMode, handleChangeTabValue, tabValue]
    )
 
    return (
