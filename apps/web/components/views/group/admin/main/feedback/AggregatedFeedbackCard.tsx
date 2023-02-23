@@ -18,7 +18,7 @@ import ErrorBoundary from "components/ErrorBoundary"
 import Link from "components/views/common/Link"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
+import { useCallback, useMemo, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom from "../CardCustom"
@@ -28,6 +28,7 @@ const styles = sxStyles({
    tableBody: {
       ".MuiTableCell-root": {
          borderBottom: "1px solid #EDE7FD",
+         paddingBottom: (t) => t.spacing(3),
       },
    },
    tableRow: {
@@ -67,6 +68,14 @@ const styles = sxStyles({
       },
    },
    noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
+   cardEmpty: {
+      "& .MuiCardContent-root": {
+         height: "100%",
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "center",
+      },
+   },
 })
 
 const PAGE_SIZE = 3
@@ -86,6 +95,7 @@ const AggregatedFeedbackCard = () => {
          title="Live Stream Feedback"
          options={hideOptions ? undefined : CARD_OPTIONS}
          optionsHandler={hideOptions ? undefined : optionsHandler}
+         sx={hideOptions ? styles.cardEmpty : undefined}
       >
          <ErrorBoundary>
             <PaginatedFeedback
@@ -215,7 +225,7 @@ const FeedbackCardContent = ({
 
 const NoLivestreams = () => {
    return (
-      <>
+      <Box>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
             You can check live stream feedback here.
             <br />
@@ -227,7 +237,7 @@ const NoLivestreams = () => {
                Create New Live Stream
             </Button>
          </Box>
-      </>
+      </Box>
    )
 }
 
