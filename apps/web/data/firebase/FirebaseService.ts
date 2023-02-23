@@ -119,7 +119,7 @@ class FirebaseService {
    }
 
    getRegistrationSources = async (args: GetRegistrationSourcesFnArgs) => {
-      const fn = this.functions.httpsCallable("getRegistrationSources")
+      const fn = this.functions.httpsCallable("getRegistrationSources_v2")
       return await fn(args)
    }
 

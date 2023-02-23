@@ -187,7 +187,7 @@ exports.updateUserJobApplications = atsUser.updateUserJobApplications
 exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers_v2
 
 // Group Analytics
-exports.getRegistrationSources = groupAnalytics.getRegistrationSources
+exports.getRegistrationSources_v2 = groupAnalytics.getRegistrationSources
 
 // Clear cached documents
 exports.periodicallyRemoveCachedDocument =
