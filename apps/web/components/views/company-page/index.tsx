@@ -80,10 +80,10 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
                <Header />
             </Box>
             <Grow in>
-               <Container maxWidth="lg">
+               <Container disableGutters maxWidth="lg">
                   <Grid container spacing={4}>
                      <Grid item xs={12} md={6}>
-                        <Stack spacing={{ xs: 4, md: 8 }}>
+                        <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
                            <TestimonialSection />
                            <StreamSection />
