@@ -205,6 +205,11 @@ export interface ILivestreamRepository {
       livestreamId: string,
       operationsToMake: (existingStats: LiveStreamStats) => T
    ): Promise<void>
+
+   getFutureLivestreams(
+      groupId: string,
+      limit?: number
+   ): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -216,6 +221,23 @@ export class FirebaseLivestreamRepository
       readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   async getFutureLivestreams(
+      groupId: string,
+      limit = 1
+   ): Promise<LivestreamEvent[]> {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", new Date())
+         .where("test", "==", false)
+         .where("groupIds", "array-contains", groupId)
+         .limit(limit)
+         .orderBy("start", "asc")
+
+      return this.mapLivestreamCollections(await query.get())
+         .filterByNotEndedEvents()
+         .get()
    }
 
    async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
