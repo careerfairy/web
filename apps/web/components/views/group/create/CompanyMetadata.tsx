@@ -7,7 +7,7 @@ import {
    CompanyIndustryValues,
    CompanySizesCodes,
 } from "../../../../constants/forms"
-import { Autocomplete, Box, TextField } from "@mui/material"
+import { Autocomplete, Box, Collapse, TextField } from "@mui/material"
 
 type Props = {
    handleChange: (event) => void
@@ -51,8 +51,7 @@ const CompanyMetadata = ({
                renderInput={(params) => (
                   <TextField
                      {...params}
-                     label="Company location"
-                     required={inputsRequired}
+                     label={`Company location${inputsRequired ? " *" : ""}`}
                      variant="outlined"
                      error={Boolean(
                         errors.companyCountry && touched.companyCountry
@@ -62,7 +61,14 @@ const CompanyMetadata = ({
                   />
                )}
             />
+            <Collapse
+               in={Boolean(errors.companyCountry && touched.companyCountry)}
+               style={{ color: "red" }}
+            >
+               {errors.companyCountry}
+            </Collapse>
          </Box>
+
          <Box width={horizontalDirection ? "30%" : "100%"}>
             <Autocomplete
                id={"companyIndustry"}
@@ -77,10 +83,9 @@ const CompanyMetadata = ({
                renderInput={(params) => (
                   <TextField
                      {...params}
-                     label="Company industry"
+                     label={`Company industry${inputsRequired ? " *" : ""}`}
                      variant="outlined"
                      fullWidth
-                     required={inputsRequired}
                      error={Boolean(
                         errors.companyIndustry && touched.companyIndustry
                      )}
@@ -89,20 +94,32 @@ const CompanyMetadata = ({
                   />
                )}
             />
+            <Collapse
+               in={Boolean(errors.companyIndustry && touched.companyIndustry)}
+               style={{ color: "red" }}
+            >
+               {errors.companyIndustry}
+            </Collapse>
          </Box>
+
          <Box width={horizontalDirection ? "30%" : "100%"}>
             <GenericDropdown
                id="companySize-dropdown"
                name="companySize"
                onChange={handleChange}
                value={values.companySize}
-               label="Company size"
+               label={`Company size${inputsRequired ? " *" : ""}`}
                list={CompanySizesCodes}
-               required={inputsRequired}
                error={Boolean(errors.companySize && touched.companySize)}
                onBlur={handleBlur}
                disabled={isSubmitting}
             />
+            <Collapse
+               in={Boolean(errors.companySize && touched.companySize)}
+               style={{ color: "red" }}
+            >
+               {errors.companySize}
+            </Collapse>
          </Box>
       </>
    )

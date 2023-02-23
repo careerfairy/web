@@ -1,7 +1,7 @@
 import { Box, Button, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useCompanyPage } from "../index"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { Add } from "@mui/icons-material"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
@@ -28,6 +28,10 @@ const TestimonialSection = () => {
    const [openDialog, setOpenDialog] = useState(false)
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
    const [step, setStep] = useState(0)
+
+   useEffect(() => {
+      setStep(0)
+   }, [group?.testimonials])
 
    const handleCloseDialog = useCallback(() => {
       setOpenDialog(false)
@@ -79,28 +83,32 @@ const TestimonialSection = () => {
                      <Add fontSize={"large"} />
                   </Button>
                ) : (
-                  <Box>
-                     <Button
-                        variant="text"
-                        color="inherit"
-                        sx={styles.arrowIcon}
-                        onClick={() => {
-                           handleSteps()
-                        }}
-                     >
-                        <ArrowLeft fontSize={"large"} />
-                     </Button>
-                     <Button
-                        variant="text"
-                        color="inherit"
-                        sx={styles.arrowIcon}
-                        onClick={() => {
-                           handleSteps(true)
-                        }}
-                     >
-                        <ArrowRight fontSize={"large"} />
-                     </Button>
-                  </Box>
+                  <>
+                     {group?.testimonials?.length > 1 ? (
+                        <Box>
+                           <Button
+                              variant="text"
+                              color="inherit"
+                              sx={styles.arrowIcon}
+                              onClick={() => {
+                                 handleSteps()
+                              }}
+                           >
+                              <ArrowLeft fontSize={"large"} />
+                           </Button>
+                           <Button
+                              variant="text"
+                              color="inherit"
+                              sx={styles.arrowIcon}
+                              onClick={() => {
+                                 handleSteps(true)
+                              }}
+                           >
+                              <ArrowRight fontSize={"large"} />
+                           </Button>
+                        </Box>
+                     ) : null}
+                  </>
                )}
             </Box>
 
@@ -118,11 +126,15 @@ const TestimonialSection = () => {
                            ))}
                         </>
                      ) : (
-                        <TestimonialCard
-                           key={group.testimonials[step].id}
-                           testimonial={group.testimonials[step]}
-                           handleEditTestimonial={handleEditTestimonial}
-                        />
+                        <>
+                           {group?.testimonials?.[step] ? (
+                              <TestimonialCard
+                                 key={group.testimonials[step].id}
+                                 testimonial={group.testimonials[step]}
+                                 handleEditTestimonial={handleEditTestimonial}
+                              />
+                           ) : null}
+                        </>
                      )}
                   </>
                ) : (
