@@ -54,6 +54,7 @@ import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
+import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -115,6 +116,11 @@ class FirebaseService {
          "createNewUserAccount_v4"
       )
       return createUserInAuthAndFirebase({ userData })
+   }
+
+   getRegistrationSources = async (args: GetRegistrationSourcesFnArgs) => {
+      const fn = this.functions.httpsCallable("getRegistrationSources")
+      return await fn(args)
    }
 
    createGroupAdminUserInAuthAndFirebase = async (args: {
