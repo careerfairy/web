@@ -24,6 +24,10 @@ service cloud.firestore {
             return isSignedIn() && request.auth.token.email == userEmail;
         }
 
+        function isAnyGroupAdmin() {
+            return request.auth.token.adminGroups.keys().size() > 0 || isCFAdmin();
+        }
+
         //        function isLivestreamAdmin(livestreamId) {
         //            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
         //        }
@@ -57,6 +61,12 @@ service cloud.firestore {
             match /{document=**} {
                 allow read, write: if false;
             }
+        }
+
+        // allow group admins to fetch cached docs
+        // stale while revalidate method
+        match /cache/functions/analytics/{hash} {
+            allow read: if isAnyGroupAdmin();
         }
 
         match /analytics/userData {
