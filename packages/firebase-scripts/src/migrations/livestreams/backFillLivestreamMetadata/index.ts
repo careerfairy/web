@@ -4,15 +4,12 @@ import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
 import { writeProgressBar } from "../../../util/bulkWriter"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
-import {
-   getMetaDataFromEventHosts,
-   LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { DataWithRef } from "../../../util/types"
 import { Group } from "@careerfairy/shared-lib/dist/groups/groups"
 import { isEmpty } from "lodash"
-import { FieldValue } from "firebase-admin/firestore"
 import { logAction } from "../../../util/logger"
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/dist/livestreams/metadata"
 
 const counter = new Counter()
 
@@ -91,24 +88,9 @@ const cascadeHostsMetaDataToLivestream = async (
                   LivestreamEvent,
                   "companyIndustries" | "companyCountries" | "companySizes"
                > = {
-                  ...(!isEmpty(metadata.companyCountries) && {
-                     // only update if there is data
-                     companyCountries: FieldValue.arrayUnion(
-                        ...metadata.companyCountries
-                     ) as any,
-                  }),
-                  ...(!isEmpty(metadata.companyIndustries) && {
-                     // only update if there is data
-                     companyIndustries: FieldValue.arrayUnion(
-                        ...metadata.companyIndustries
-                     ) as any,
-                  }),
-                  ...(!isEmpty(metadata.companySizes) && {
-                     // only update if there is data
-                     companySizes: FieldValue.arrayUnion(
-                        ...metadata.companySizes
-                     ) as any,
-                  }),
+                  companyIndustries: metadata.companyIndustries,
+                  companyCountries: metadata.companyCountries,
+                  companySizes: metadata.companySizes,
                }
 
                batch.update(stream._ref as any, toUpdate)

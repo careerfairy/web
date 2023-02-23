@@ -11,7 +11,6 @@ import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import Timestamp = firebase.firestore.Timestamp
 import DocumentData = firebase.firestore.DocumentData
-const uniq = require("lodash.uniq")
 
 export const NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST =
    1000 * 60 * 60 * 12
@@ -558,56 +557,4 @@ export function getEarliestEventBufferTime() {
    return new Date(
       Date.now() - NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST
    )
-}
-
-type MetaData = Pick<
-   LivestreamEvent,
-   "companyCountries" | "companyIndustries" | "companySizes"
->
-export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
-   const companies = eventHosts?.filter((group) => !group.universityCode)
-
-   let groupsToGetMetadataFrom = eventHosts
-
-   if (companies?.length > 0) {
-      // if there is at least one company, we want to get the metadata ONLY from the companies, not the universities
-      groupsToGetMetadataFrom = companies
-   }
-
-   // Aggregate all the metadata from the groups
-   const meta = groupsToGetMetadataFrom.reduce<MetaData>(
-      (acc, group) => {
-         if (group.companyCountry?.id) {
-            acc.companyCountries = [
-               ...acc.companyCountries,
-               group.companyCountry.id,
-            ]
-         }
-
-         if (group.companyIndustry?.id) {
-            acc.companyIndustries = [
-               ...acc.companyIndustries,
-               group.companyIndustry.id,
-            ]
-         }
-
-         if (group.companySize) {
-            acc.companySizes = [...acc.companySizes, group.companySize]
-         }
-
-         return acc
-      },
-      {
-         companyCountries: [],
-         companyIndustries: [],
-         companySizes: [],
-      }
-   )
-
-   // remove duplicates
-   meta.companyCountries = uniq(meta.companyCountries ?? [])
-   meta.companyIndustries = uniq(meta.companyIndustries ?? [])
-   meta.companySizes = uniq(meta.companySizes ?? [])
-
-   return meta
 }

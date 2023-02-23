@@ -38,7 +38,6 @@ import { useInterests } from "../../custom-hook/useCollection"
 import { createStyles } from "@mui/styles"
 import JobSelectorCategory from "./JobSelector/JobSelectorCategory"
 import {
-   getMetaDataFromEventHosts,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
    LivestreamJobAssociation,
@@ -61,6 +60,7 @@ import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
