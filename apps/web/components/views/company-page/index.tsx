@@ -15,6 +15,7 @@ import TestimonialSection from "./TestimonialSection"
 import { useFirestore, useFirestoreDocData } from "reactfire"
 import { doc } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 type Props = {
    group: Group
@@ -30,6 +31,7 @@ export enum TabValue {
 
 type ICompanyPageContext = {
    group: Group
+   groupPresenter: GroupPresenter
    tabValue: TabValue
    changeTabValue: (tabValues: TabValue) => void
    editMode: boolean
@@ -37,6 +39,7 @@ type ICompanyPageContext = {
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
    group: null,
+   groupPresenter: null,
    tabValue: TabValue.profile,
    changeTabValue: () => {},
    editMode: false,
@@ -62,6 +65,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
    const contextValue = useMemo(
       () => ({
          group: contextGroup,
+         groupPresenter: GroupPresenter.createFromDocument(contextGroup),
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
