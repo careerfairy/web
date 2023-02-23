@@ -311,38 +311,39 @@ export const getDownloadUrl = (fileElement) => {
    }
 }
 
-export const getMetaDataFromEventHosts = (eventHosts: Group[]) => {
-   const isOneOrMoreCompanies =
-      eventHosts?.filter((group) => !group.universityCode).length > 0
+type MetaData = Pick<
+   LivestreamEvent,
+   "companyCountries" | "companyIndustries" | "companySizes"
+>
+export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
+   const companies = eventHosts?.filter((group) => !group.universityCode)
 
    let groupsToGetMetadataFrom = eventHosts
 
-   if (isOneOrMoreCompanies) {
-      // if there is at least one company, we only want to get the metadata ONLY from the companies, not the universities
-      groupsToGetMetadataFrom = eventHosts.filter(
-         (group) => !group.universityCode
-      )
+   if (companies?.length > 0) {
+      // if there is at least one company, we want to get the metadata ONLY from the companies, not the universities
+      groupsToGetMetadataFrom = companies
    }
 
-   return groupsToGetMetadataFrom.reduce(
+   // Aggregate all the metadata from the groups
+   const meta = groupsToGetMetadataFrom.reduce<MetaData>(
       (acc, group) => {
-         if (group.companyCountry) {
-            acc.companyCountries = _.uniqBy(
-               // lodash function to remove duplicate objects by id from an array
-               [...acc.companyCountries, group.companyCountry],
-               "id"
-            )
+         if (group.companyCountry.id) {
+            acc.companyCountries = [
+               ...acc.companyCountries,
+               group.companyCountry.id,
+            ]
          }
 
-         if (group.companyIndustry) {
-            acc.companyIndustries = _.uniqBy(
-               [...acc.companyIndustries, group.companyIndustry],
-               "id"
-            )
+         if (group.companyIndustry.id) {
+            acc.companyIndustries = [
+               ...acc.companyIndustries,
+               group.companyIndustry.id,
+            ]
          }
 
          if (group.companySize) {
-            acc.companySizes = _.uniq([...acc.companySizes, group.companySize])
+            acc.companySizes = [...acc.companySizes, group.companySize]
          }
 
          return acc
@@ -353,4 +354,11 @@ export const getMetaDataFromEventHosts = (eventHosts: Group[]) => {
          companySizes: [],
       }
    )
+
+   // remove duplicates
+   meta.companyCountries = _.uniq(meta.companyCountries)
+   meta.companyIndustries = _.uniq(meta.companyIndustries)
+   meta.companySizes = _.uniq(meta.companySizes)
+
+   return meta
 }

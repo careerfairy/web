@@ -46,7 +46,7 @@ import {
    Speaker,
 } from "@careerfairy/shared-lib/livestreams"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
-import { Group, GroupOption } from "@careerfairy/shared-lib/groups"
+import { Group } from "@careerfairy/shared-lib/groups"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import StreamInfo from "./StreamForm/StreamInfo"
 import SpeakersInfo from "./StreamForm/SpeakersInfo"
@@ -125,11 +125,10 @@ const useStyles = makeStyles((theme) =>
    })
 )
 
-type MetaData = {
-   companyCountries?: GroupOption[]
-   companyIndustries?: GroupOption[]
-   companySizes?: string[]
-}
+type MetaData = Pick<
+   LivestreamEvent,
+   "companyCountries" | "companyIndustries" | "companySizes"
+>
 
 export type ISpeakerObj = {
    avatar: string
