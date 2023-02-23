@@ -7,13 +7,14 @@ import {
    Typography,
 } from "@mui/material"
 import CompanyMetadata from "../../group/create/CompanyMetadata"
-import { Formik, FormikErrors, FormikValues } from "formik"
+import { Formik } from "formik"
 import React, { useCallback, useMemo } from "react"
 import { useCompanyPage } from "../index"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "components/util/constants"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
+import * as yup from "yup"
 
 type Props = {
    handleClose: () => void
@@ -26,7 +27,7 @@ const AboutDialog = ({ handleClose }: Props) => {
 
    const initialValues = useMemo(
       () => ({
-         description: group.description || "",
+         extraInfo: group.extraInfo || "",
          companySize: group.companySize || "",
          companyIndustry: group.companyIndustry || null,
          companyCountry: group.companyCountry || null,
@@ -35,7 +36,7 @@ const AboutDialog = ({ handleClose }: Props) => {
          group.companyCountry,
          group.companyIndustry,
          group.companySize,
-         group.description,
+         group.extraInfo,
       ]
    )
 
@@ -43,7 +44,7 @@ const AboutDialog = ({ handleClose }: Props) => {
       async (values) => {
          try {
             await groupRepo.updateGroupMetadata(group.id, {
-               description: values.description,
+               extraInfo: values.extraInfo,
                companyCountry: values.companyCountry,
                companyIndustry: values.companyIndustry,
                companySize: values.companySize,
@@ -64,7 +65,7 @@ const AboutDialog = ({ handleClose }: Props) => {
       <Box>
          <Formik
             initialValues={initialValues}
-            validate={handleValidation}
+            validationSchema={schema}
             onSubmit={handleSubmitForm}
          >
             {({
@@ -112,21 +113,21 @@ const AboutDialog = ({ handleClose }: Props) => {
                            fullWidth
                            multiline
                            label="About"
-                           name="description"
+                           name="extraInfo"
                            disabled={isSubmitting}
                            onChange={handleChange}
                            required
-                           error={Boolean(errors.description)}
-                           value={values.description}
+                           error={Boolean(errors.extraInfo)}
+                           value={values.extraInfo}
                            variant="outlined"
                            sx={{ minHeight: "100px" }}
                            className="multiLineInput"
                         />
                         <Collapse
-                           in={Boolean(errors.description)}
+                           in={Boolean(errors.extraInfo)}
                            style={{ color: "red" }}
                         >
-                           {errors.description}
+                           {errors.extraInfo}
                         </Collapse>
                      </Box>
                   </Stack>
@@ -148,27 +149,26 @@ const AboutDialog = ({ handleClose }: Props) => {
    )
 }
 
-const handleValidation = (values: FormikValues) => {
-   let errors = {} as FormikErrors<FormikValues>
-   const minDescCharLength = 10
-
-   if (!values.description) {
-      errors.description = "Please fill"
-   } else if (values.description.length < minDescCharLength) {
-      errors.description = `Must be at least ${minDescCharLength} characters`
-   }
-
-   if (!values.companySize) {
-      errors.companySize = "Please add the company size"
-   }
-   if (!values.companyIndustry) {
-      errors.companyIndustry = "Please add the company sector"
-   }
-   if (!values.companyCountry) {
-      errors.companyCountry = "Please add the company location"
-   }
-
-   return errors
-}
+const schema = yup.object().shape({
+   extraInfo: yup
+      .string()
+      .required("Please fill")
+      .min(10, `Must be at least 10 characters`),
+   companySize: yup.string().required("Please add the company size"),
+   companyIndustry: yup
+      .object()
+      .nullable()
+      .shape({
+         name: yup.string(),
+      })
+      .required("Please add the company industry"),
+   companyCountry: yup
+      .object()
+      .nullable()
+      .shape({
+         name: yup.string(),
+      })
+      .required("Please add the company location"),
+})
 
 export default AboutDialog
