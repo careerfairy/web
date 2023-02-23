@@ -10,10 +10,10 @@ import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik, FormikErrors, FormikValues } from "formik"
 import React, { useCallback, useMemo } from "react"
 import { useCompanyPage } from "../index"
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { useSnackbar } from "notistack"
 import { GENERAL_ERROR } from "components/util/constants"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import { groupRepo } from "../../../../data/RepositoryInstances"
 
 type Props = {
    handleClose: () => void
@@ -21,7 +21,6 @@ type Props = {
 
 const AboutDialog = ({ handleClose }: Props) => {
    const { group } = useCompanyPage()
-   const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
    const isMobile = useIsMobile()
 
@@ -43,7 +42,7 @@ const AboutDialog = ({ handleClose }: Props) => {
    const handleSubmitForm = useCallback(
       async (values) => {
          try {
-            await firebaseService.updateCareerCenter(group.id, {
+            await groupRepo.updateGroupMetadata(group.id, {
                description: values.description,
                companyCountry: values.companyCountry,
                companyIndustry: values.companyIndustry,
@@ -58,7 +57,7 @@ const AboutDialog = ({ handleClose }: Props) => {
             })
          }
       },
-      [enqueueSnackbar, firebaseService, group.id, handleClose]
+      [enqueueSnackbar, group.id, handleClose]
    )
 
    return (
