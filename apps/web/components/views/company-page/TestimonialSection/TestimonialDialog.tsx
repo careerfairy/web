@@ -50,12 +50,14 @@ type Props = {
    testimonialToEdit?: Testimonial
 }
 
-const testimonialObj = {
+const testimonialObj: Testimonial = {
+   id: "",
+   groupId: "",
    name: "",
    position: "",
    testimonial: "",
    avatar: "",
-} as Testimonial
+}
 
 const TESTIMONIAL_LIMIT = 10
 

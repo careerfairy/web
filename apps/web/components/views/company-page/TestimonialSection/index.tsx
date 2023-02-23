@@ -1,4 +1,4 @@
-import { Box, Button, Typography } from "@mui/material"
+import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useCompanyPage } from "../index"
 import { useCallback, useEffect, useState } from "react"
@@ -73,21 +73,19 @@ const TestimonialSection = () => {
                   Testimonial
                </Typography>
                {editMode ? (
-                  <Button
-                     variant="text"
+                  <IconButton
                      color="secondary"
                      onClick={() => {
                         setOpenDialog(true)
                      }}
                   >
                      <Add fontSize={"large"} />
-                  </Button>
+                  </IconButton>
                ) : (
                   <>
                      {group?.testimonials?.length > 1 ? (
                         <Box>
-                           <Button
-                              variant="text"
+                           <IconButton
                               color="inherit"
                               sx={styles.arrowIcon}
                               onClick={() => {
@@ -95,9 +93,8 @@ const TestimonialSection = () => {
                               }}
                            >
                               <ArrowLeft fontSize={"large"} />
-                           </Button>
-                           <Button
-                              variant="text"
+                           </IconButton>
+                           <IconButton
                               color="inherit"
                               sx={styles.arrowIcon}
                               onClick={() => {
@@ -105,7 +102,7 @@ const TestimonialSection = () => {
                               }}
                            >
                               <ArrowRight fontSize={"large"} />
-                           </Button>
+                           </IconButton>
                         </Box>
                      ) : null}
                   </>

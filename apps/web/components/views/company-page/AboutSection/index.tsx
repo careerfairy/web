@@ -40,7 +40,7 @@ const AboutSection = () => {
    const { group, editMode } = useCompanyPage()
    const [openDialog, setOpenDialog] = useState(false)
 
-   const { companyCountry, companyIndustry, companySize, description } = group
+   const { companyCountry, companyIndustry, companySize, extraInfo } = group
 
    const showIcons = useMemo(
       () => companySize || companyIndustry?.name || companyCountry?.name,
@@ -110,7 +110,7 @@ const AboutSection = () => {
             {showIcons ? renderIcons() : null}
             <Box mt={2}>
                <Typography variant="h6" fontWeight={"400"} color="black">
-                  {description}
+                  {extraInfo}
                </Typography>
             </Box>
          </Box>
