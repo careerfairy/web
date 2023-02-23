@@ -266,3 +266,21 @@ export const isMobileBrowser = () => {
 export const scrollTop = () => {
    window.scrollTo({ top: 0, behavior: "smooth" })
 }
+
+/**
+ * Calculate a sha1 hash using the Browser APIs
+ *
+ * Useful to generate cache keys used by our cloud functions
+ */
+export const sha1 = async (str: string) => {
+   const buffer = new TextEncoder().encode(str)
+   const hash = await crypto.subtle.digest("SHA-1", buffer)
+   const hexCodes = []
+   const view = new DataView(hash)
+   for (let i = 0; i < view.byteLength; i += 1) {
+      const byte = view.getUint8(i).toString(16).padStart(2, "0")
+      hexCodes.push(byte)
+   }
+
+   return hexCodes.join("")
+}
