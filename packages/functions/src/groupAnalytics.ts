@@ -46,9 +46,18 @@ export const getRegistrationSources = functions.https.onCall(
 
          let userLivestreamData: UserLivestreamData[] = []
          switch (type) {
-            case "ALL_LIVESTREAMS":
-               // TODO: implement this
+            case "ALL_LIVESTREAMS": {
+               const livestreams = await livestreamsRepo.getEventsOfGroup(
+                  data.groupId
+               )
+
+               userLivestreamData =
+                  await livestreamsRepo.getRegisteredUsersMultipleEvents(
+                     livestreams.map((l) => l.id)
+                  )
+
                break
+            }
 
             // fallback to livestreamIds
             default:
