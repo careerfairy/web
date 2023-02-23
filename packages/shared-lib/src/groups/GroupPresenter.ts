@@ -56,4 +56,8 @@ export class GroupPresenter {
          }
       })
    }
+
+   getCompanyPageImagePath(imageId: string) {
+      return `company-pages/${this.id}/photos/${imageId}`
+   }
 }

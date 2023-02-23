@@ -5,16 +5,19 @@ import Stack from "@mui/material/Stack"
 import PhotosGallery from "./PhotosGallery"
 import useGroupPhotos from "./useGroupPhotos"
 import PhotoUploadButton from "./PhotoUploadButton"
-import EditDialog from "../EditDialog"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import PhotosDialog from "./PhotosDialog"
 
 const CompanyPhotos = () => {
-   const { editMode, group } = useCompanyPage()
-   const { updateSortablePhotos, photos, handleUploadPhotos, isUpdating } =
-      useGroupPhotos(group)
-   const [open, handleClose] = useDialogStateHandler()
+   const { editMode, group, groupPresenter } = useCompanyPage()
 
-   if (!editMode && !group.photos?.length) return null
+   const { updateSortablePhotos, photos, handleUploadPhotos, isUpdating } =
+      useGroupPhotos(group, groupPresenter)
+
+   const [photosDialogOpen, handleOpenPhotosDialog, handleClosePhotosDialog] =
+      useDialogStateHandler()
+
+   if (!editMode && !group.photos?.length) return null // no photos to show and not in edit mode so hide this section
 
    return (
       <Stack spacing={2}>
@@ -39,14 +42,14 @@ const CompanyPhotos = () => {
             maxPhotos={6}
             editable={editMode}
             photos={photos}
+            onAdditionalImageCountOverlayClick={handleOpenPhotosDialog}
          />
-         <EditDialog open={open} title={"Photos"} handleClose={handleClose}>
-            <PhotosGallery
-               onPhotosChanged={updateSortablePhotos}
-               editable={editMode}
-               photos={photos}
-            />
-         </EditDialog>
+         <PhotosDialog
+            open={photosDialogOpen}
+            handleClose={handleClosePhotosDialog}
+            photos={photos}
+            editable={editMode}
+         />
       </Stack>
    )
 }

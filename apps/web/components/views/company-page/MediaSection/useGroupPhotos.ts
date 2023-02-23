@@ -7,6 +7,7 @@ import { Group, GroupPhoto } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import { getDownloadURL, getStorage, ref, uploadBytes } from "firebase/storage"
 import { v4 as uuidv4 } from "uuid"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 type Arguments = {
    newPhotos: GroupPhoto[]
@@ -20,7 +21,8 @@ const handleUpdatePhotos = (
 ) => groupRepo.updateGroupPhotos(groupId, newPhotos, type)
 
 const useGroupPhotos = (
-   group: Group
+   group: Group,
+   presenter: GroupPresenter
 ): {
    /*
     * Photos to be consumed by the PhotosGallery component
@@ -31,6 +33,7 @@ const useGroupPhotos = (
    isUpdating: boolean
 } => {
    const { successNotification, errorNotification } = useSnackbarNotifications()
+
    const { trigger, isMutating } = useSWRMutation(
       `update-group-${group.id}-photos`,
       handleUpdatePhotos,
@@ -47,7 +50,6 @@ const useGroupPhotos = (
 
    const updateSortablePhotos = useCallback(
       (newPhotos: SortablePhoto[]) => {
-         console.log("Changing photos")
          return trigger({
             newPhotos: newPhotos.map((photo) => ({
                id: photo.id,
@@ -67,7 +69,7 @@ const useGroupPhotos = (
             const photoId = uuidv4()
             const photoRef = ref(
                storage,
-               `company-pages/${group.id}/photos/${photoId}`
+               presenter.getCompanyPageImagePath(photoId)
             )
 
             const metaData = await uploadBytes(photoRef, photo)
@@ -87,11 +89,11 @@ const useGroupPhotos = (
             type: "add",
          })
       },
-      [group.id, trigger]
+      [group.id, presenter, trigger]
    )
 
    const photos = useMemo<SortablePhoto[]>(
-      () => mapGroupPhotos(group.photos),
+      () => mapGroupPhotos(group.photos ?? []),
       [group.photos]
    )
 
