@@ -36,3 +36,30 @@ export class RegistrationSourcesResponseItem {
       return Object.assign(new RegistrationSourcesResponseItem(), mapped)
    }
 }
+
+export const FETCH_TYPES = ["ALL_LIVESTREAMS"] as const
+
+export interface GetRegistrationSourcesFnArgs {
+   groupId: string
+
+   /**
+    * If provided, the livestreamIds array will be ignored
+    */
+   fetchType?: typeof FETCH_TYPES[number]
+
+   livestreamIds?: string[]
+}
+
+/**
+ * Generate cache key for the fn call
+ */
+export const registrationSourcesCacheKey = (
+   args: GetRegistrationSourcesFnArgs
+) => {
+   return [
+      "getRegistrationSources",
+      args.groupId,
+      args.fetchType,
+      args.livestreamIds,
+   ]
+}
