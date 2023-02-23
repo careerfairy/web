@@ -10,7 +10,12 @@ import {
 } from "./middlewares/validations"
 import { array, string } from "yup"
 import { livestreamsRepo } from "./api/repositories"
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import {
+   FETCH_TYPES,
+   registrationSourcesCacheKey,
+   RegistrationSourcesResponseItem,
+} from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 
 /*
 |--------------------------------------------------------------------------
@@ -29,28 +34,38 @@ export const getRegistrationSources = functions.https.onCall(
    middlewares(
       dataValidation({
          groupId: string().required(),
-         livestreamIds: array(string()).required(),
+         livestreamIds: array(string()).optional(),
+         fetchType: string()
+            .oneOf([...FETCH_TYPES])
+            .optional(),
       }),
       userShouldBeGroupAdmin(),
-      cache((data) => [
-         "getRegistrationSources",
-         data.groupId,
-         data.livestreamIds,
-      ]),
+      cache((data) => registrationSourcesCacheKey({ ...data })),
       async (data) => {
-         const allRegisteredUsers =
-            await livestreamsRepo.getRegisteredUsersMultipleEvents(
-               data.livestreamIds
-            )
+         const type: typeof FETCH_TYPES[number] = data.fetchType
+
+         let userLivestreamData: UserLivestreamData[] = []
+         switch (type) {
+            case "ALL_LIVESTREAMS":
+               // TODO: implement this
+               break
+
+            // fallback to livestreamIds
+            default:
+               userLivestreamData =
+                  await livestreamsRepo.getRegisteredUsersMultipleEvents(
+                     data.livestreamIds
+                  )
+         }
 
          functions.logger.info(
-            `Fetched ${allRegisteredUsers.length} userLivestreamData docs`
+            `Fetched ${userLivestreamData.length} userLivestreamData docs`
          )
 
          // remove unwanted fields to save bandwidth
          // (smaller responses are more likely to fit in cache due to the 1MB limit)
          const stats: RegistrationSourcesResponseItem[] =
-            allRegisteredUsers.map(RegistrationSourcesResponseItem.serialize)
+            userLivestreamData.map(RegistrationSourcesResponseItem.serialize)
 
          return stats
       }
