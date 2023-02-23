@@ -17,7 +17,6 @@ const useStaleWhileRevalidate = <T,>(
    cacheKeyValues: unknown[],
    functionCall?: () => Promise<T>
 ) => {
-   // cached or fn data
    const [fetchedCacheResult, setFetchedCacheResult] = useState<T>(undefined) // undefined => loading
    const [fetchedFnResult, setFetchedFnResult] = useState<T>(undefined) // undefined => loading
 
