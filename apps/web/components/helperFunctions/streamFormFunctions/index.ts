@@ -74,7 +74,7 @@ export const buildTestimonialsArray = (values, groupId) => {
    return Object.keys(values.testimonials).map((key) => {
       return {
          groupId,
-         id: key,
+         id: values.testimonials[key]?.id || key,
          avatar: values.testimonials[key].avatar,
          name: values.testimonials[key].name,
          position: values.testimonials[key].position,

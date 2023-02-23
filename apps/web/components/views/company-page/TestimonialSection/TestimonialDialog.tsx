@@ -42,7 +42,6 @@ const styles = sxStyles({
    deleteIcon: {
       display: "flex",
       justifyContent: "end",
-      mt: 8,
    },
 })
 
@@ -78,20 +77,35 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const handleSubmitForm = useCallback(
       async (values) => {
          try {
-            let testimonialsToUpdate = [
-               ...group.testimonials,
-               ...buildTestimonialsArray(values, group.id),
-            ]
+            let testimonialsToUpdate
 
             if (testimonialToEdit) {
-               // TODO update testimonial
-               // testimonialsToUpdate = [
-               //    ...group.testimonials,
-               // ]
+               // To update a single testimonial
+               const editedTestimonial = buildTestimonialsArray(
+                  values,
+                  group.id
+               )[0]
+               const updatedTestimonialIndex = group.testimonials.findIndex(
+                  ({ id }) => id === editedTestimonial.id
+               )
+
+               testimonialsToUpdate = [
+                  ...group.testimonials.slice(0, updatedTestimonialIndex),
+                  editedTestimonial,
+                  ...group.testimonials.slice(updatedTestimonialIndex + 1),
+               ]
+            } else {
+               // To add new testimonials
+               testimonialsToUpdate = [
+                  ...(group.testimonials ? group.testimonials : []),
+                  ...buildTestimonialsArray(values, group.id),
+               ]
             }
+
             await firebaseService.updateCareerCenter(group.id, {
                testimonials: testimonialsToUpdate,
             })
+
             updateGroup()
             handleClose()
          } catch (e) {
@@ -112,6 +126,36 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
          updateGroup,
       ]
    )
+
+   const handleDelete = useCallback(
+      async (key, values, setValues) => {
+         if (testimonialToEdit) {
+            // delete existing testimonial
+            const testimonialsToUpdate = group.testimonials.filter(
+               ({ id }) => id !== testimonialToEdit.id
+            )
+
+            await firebaseService.updateCareerCenter(group.id, {
+               testimonials: testimonialsToUpdate,
+            })
+
+            updateGroup()
+            handleClose()
+         } else {
+            // delete testimonial section
+            handleDeleteSection("testimonials", key, values, setValues)
+         }
+      },
+      [
+         firebaseService,
+         group.id,
+         group.testimonials,
+         handleClose,
+         testimonialToEdit,
+         updateGroup,
+      ]
+   )
+
    return (
       <Box>
          <Formik
@@ -132,24 +176,22 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                <form onSubmit={handleSubmit}>
                   {Object.keys(values.testimonials).map((key, index) => (
                      <Fragment key={key}>
-                        {!!index && (
-                           <Box sx={styles.deleteIcon}>
+                        {!!index || testimonialToEdit ? (
+                           <Box
+                              sx={styles.deleteIcon}
+                              mt={testimonialToEdit ? 0 : 8}
+                           >
                               <Fab
                                  size="small"
                                  color="secondary"
                                  onClick={() =>
-                                    handleDeleteSection(
-                                       "testimonials",
-                                       key,
-                                       values,
-                                       setValues
-                                    )
+                                    handleDelete(key, values, setValues)
                                  }
                               >
                                  <DeleteIcon />
                               </Fab>
                            </Box>
-                        )}
+                        ) : null}
                         <TestimonialForm
                            testimonialError={handleErrorSection(
                               "testimonials",

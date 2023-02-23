@@ -94,17 +94,14 @@ const TestimonialCard = ({ testimonial, handleEditTestimonial }: Props) => {
 
          <Box sx={styles.testimonial}>
             <Box width={"80%"} mb={2}>
-               <Typography variant={"h5"} fontWeight={600}>
-                  “An example for a punch line before starting the testimonial!”
+               <Typography
+                  variant={"body1"}
+                  fontWeight={400}
+                  color={"text.secondary"}
+               >
+                  {description}
                </Typography>
             </Box>
-            <Typography
-               variant={"body1"}
-               fontWeight={400}
-               color={"text.secondary"}
-            >
-               {description}
-            </Typography>
          </Box>
       </Box>
    )
