@@ -60,7 +60,7 @@ const testimonialObj = {
 const TESTIMONIAL_LIMIT = 10
 
 const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
-   const { group, updateGroup } = useCompanyPage()
+   const { group } = useCompanyPage()
    const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
    const isMobile = useIsMobile()
@@ -106,7 +106,6 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                testimonials: testimonialsToUpdate,
             })
 
-            updateGroup()
             handleClose()
          } catch (e) {
             console.log("error", e)
@@ -123,7 +122,6 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
          group.testimonials,
          handleClose,
          testimonialToEdit,
-         updateGroup,
       ]
    )
 
@@ -139,7 +137,6 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                testimonials: testimonialsToUpdate,
             })
 
-            updateGroup()
             handleClose()
          } else {
             // delete testimonial section
@@ -152,7 +149,6 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
          group.testimonials,
          handleClose,
          testimonialToEdit,
-         updateGroup,
       ]
    )
 
