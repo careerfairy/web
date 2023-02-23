@@ -22,18 +22,15 @@ const useStaleWhileRevalidate = <T,>(
    const [fetchedFnResult, setFetchedFnResult] = useState<T>(undefined) // undefined => loading
 
    useEffect(() => {
-      console.log("usestalewhile use effect")
       let mounted = true
 
       function updateCached(data: T) {
-         console.log("updatecached", data)
          if (mounted) {
             setFetchedCacheResult(data)
          }
       }
 
       function updateFinal(data: T) {
-         console.log("updatefinal", data)
          if (mounted) {
             setFetchedFnResult(data)
          }
