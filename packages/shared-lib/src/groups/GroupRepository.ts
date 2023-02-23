@@ -5,6 +5,7 @@ import {
    GroupATSAccountDocument,
    GroupATSIntegrationTokensDocument,
    GroupQuestion,
+   Testimonial,
    UserGroupData,
 } from "./groups"
 import BaseFirebaseRepository, {
@@ -122,6 +123,16 @@ export interface IGroupRepository {
    getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
 
    getGroupByGroupName(groupName: string): Promise<Group>
+
+   updateGroupMetadata(
+      groupId: string,
+      metadata: Pick<
+         Group,
+         "description" | "companySize" | "companyIndustry" | "companyCountry"
+      >
+   ): Promise<void>
+
+   updateGroupTestimonials(groupId: string, testimonials: Testimonial[])
 }
 
 export class FirebaseGroupRepository
@@ -669,6 +680,31 @@ export class FirebaseGroupRepository
          .get()
 
       return mapFirestoreDocuments<Group>(adminsSnap)?.[0]
+   }
+
+   updateGroupMetadata(
+      groupId: string,
+      metadata: Pick<
+         Group,
+         "description" | "companySize" | "companyIndustry" | "companyCountry"
+      >
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      return groupRef.set(metadata, { merge: true })
+   }
+
+   updateGroupTestimonials(
+      groupId: string,
+      testimonials: Testimonial[]
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      return groupRef.set({ testimonials }, { merge: true })
    }
 }
 

@@ -1,6 +1,5 @@
 import { useCompanyPage } from "../index"
 import { useSnackbar } from "notistack"
-import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import React, { Fragment, useCallback, useMemo } from "react"
 import { Box, Button, Fab } from "@mui/material"
 import { Formik, FormikErrors, FormikValues } from "formik"
@@ -18,6 +17,7 @@ import { v4 as uuidv4 } from "uuid"
 import DeleteIcon from "@mui/icons-material/Delete"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { GENERAL_ERROR } from "components/util/constants"
+import { groupRepo } from "../../../../data/RepositoryInstances"
 
 const styles = sxStyles({
    multiline: {
@@ -61,7 +61,6 @@ const TESTIMONIAL_LIMIT = 10
 
 const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const { group } = useCompanyPage()
-   const firebaseService = useFirebaseService()
    const { enqueueSnackbar } = useSnackbar()
    const isMobile = useIsMobile()
 
@@ -102,9 +101,10 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                ]
             }
 
-            await firebaseService.updateCareerCenter(group.id, {
-               testimonials: testimonialsToUpdate,
-            })
+            await groupRepo.updateGroupTestimonials(
+               group.id,
+               testimonialsToUpdate
+            )
 
             handleClose()
          } catch (e) {
@@ -117,7 +117,6 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
       },
       [
          enqueueSnackbar,
-         firebaseService,
          group.id,
          group.testimonials,
          handleClose,
@@ -133,9 +132,10 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                ({ id }) => id !== testimonialToEdit.id
             )
 
-            await firebaseService.updateCareerCenter(group.id, {
-               testimonials: testimonialsToUpdate,
-            })
+            await groupRepo.updateGroupTestimonials(
+               group.id,
+               testimonialsToUpdate
+            )
 
             handleClose()
          } else {
@@ -143,13 +143,7 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
             handleDeleteSection("testimonials", key, values, setValues)
          }
       },
-      [
-         firebaseService,
-         group.id,
-         group.testimonials,
-         handleClose,
-         testimonialToEdit,
-      ]
+      [group.id, group.testimonials, handleClose, testimonialToEdit]
    )
 
    return (
