@@ -61,4 +61,8 @@ export class GroupPresenter {
    getCompanyPageStorageImagePath(photoId: string) {
       return `company-pages/${this.id}/photos/${photoId}`
    }
+
+   getCompanyPageVideoPath() {
+      return `company-pages/${this.id}/videos`
+   }
 }

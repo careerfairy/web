@@ -100,3 +100,6 @@ export const registerIllustrationSvg =
 
 export const imagePlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fimage-placeholder.png?alt=media&token=0f796cfb-72e8-4965-aca0-043ed0781a6c"
+
+export const videoImagePlaceholder =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fvideo-image-placeholder.png?alt=media&token=26d10157-59f5-42c9-9a96-8df049c74677"

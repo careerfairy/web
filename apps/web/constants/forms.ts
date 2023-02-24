@@ -7,6 +7,9 @@ export const linkedInRegex = new RegExp(
    "^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/(pub|in|profile)\\/[\\w]"
 )
 
+export const videoUrlRegex: RegExp =
+   /^(https?:\/\/)?(www\.)?(youtube\.com|youtu\.be|vimeo\.com|dailymotion\.com|twitch\.tv|firebasestorage\.googleapis\.com|localhost)(:\d{1,5})?\/.*$/
+
 export const possibleGenders = [
    {
       id: "male-gender-selector",
