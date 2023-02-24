@@ -38,11 +38,9 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
             revalidate: 60,
          }
       }
-
-      return {
-         notFound: true,
-      }
    }
+
+   throw new Error("Company not found")
 }
 
 export const getStaticPaths: GetStaticPaths = () => ({
