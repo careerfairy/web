@@ -8,20 +8,19 @@ import {
 // Document Path: livestreams/{livestreamId}/stats/livestreamStats
 export interface LiveStreamStats extends Identifiable {
    livestream: LivestreamEventPublicData
-   /**
-    * Number of users who have rated the event
-    * */
-   numberOfRatings: number
 
    /**
-    * The average aggregate rating of the event
-    * */
-   averageRating: number
+    * Map with the aggregated ratings for each rating question
+    */
+   ratings?: {
+      [ratingId: string]: LivestreamStatsRatingMap
+   }
 
    /**
     * The overall stats of the event
     * */
    generalStats: LivestreamStatsMap
+
    universityStats: {
       // The key is the university code, and the value is the stats for that university.
       // The numberOfPeopleReached will be zero because it is not relevant for the university stats
@@ -29,15 +28,13 @@ export interface LiveStreamStats extends Identifiable {
    }
 }
 
-export const createLiveStreamStatsDoc = <T extends string>(
+export const createLiveStreamStatsDoc = (
    livestream: LivestreamEvent,
    docId: string
 ): LiveStreamStats => {
    return {
       id: docId,
       livestream: pickPublicDataFromLivestream(livestream),
-      numberOfRatings: 0,
-      averageRating: 0,
       generalStats: {
          numberOfApplicants: 0,
          numberOfParticipants: 0,
@@ -62,6 +59,21 @@ export type LivestreamStatsMap = {
    numberOfApplicants: number
 }
 
+export type LivestreamStatsRatingMap = {
+   /**
+    * Number of users who have rated the event
+    * */
+   numberOfRatings: number
+
+   /**
+    * The average aggregate rating of the event
+    * This value is between 1 and 5
+    *
+    * Includes normal & sentiment rantings
+    * */
+   averageRating: number
+}
+
 export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
    field: keyof LivestreamStatsMap,
    universityCode?: TUniCode
@@ -78,4 +90,9 @@ export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
       return `universityStats.${universityCode}.${field}` as const
    }
    return `generalStats.${field}` as const
+}
+
+export type LivestreamStatsToUpdate = {
+   // The operations to make to the nested properties on the livestreamStats document
+   [stringToPropertyInDotNotation: string]: unknown
 }

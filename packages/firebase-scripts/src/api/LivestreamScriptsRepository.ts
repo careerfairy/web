@@ -8,6 +8,8 @@ import {
    TalentPoolStudent,
 } from "@careerfairy/shared-lib/dist/users"
 import {
+   EventRating,
+   EventRatingAnswer,
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
    LivestreamUserAction,
@@ -55,12 +57,28 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       withTest?: boolean,
       withRef?: T
    ): Promise<DataWithRef<T, LiveStreamEventWithUsersLivestreamData>[]>
+
+   getAllRatings(): Promise<DataWithRef<true, EventRating>[]>
+
+   getAllVotes(): Promise<DataWithRef<true, EventRatingAnswer>[]>
 }
 
 export class LivestreamScriptsRepository
    extends FirebaseLivestreamRepository
    implements ILivestreamScriptsRepository
 {
+   async getAllRatings(): Promise<DataWithRef<true, EventRating>[]> {
+      const docs = await this.firestore.collectionGroup("rating").get()
+
+      return mapFirestoreDocuments<EventRating, true>(docs, true)
+   }
+
+   async getAllVotes(): Promise<DataWithRef<true, EventRatingAnswer>[]> {
+      const docs = await this.firestore.collectionGroup("voters").get()
+
+      return mapFirestoreDocuments<EventRatingAnswer, true>(docs, true)
+   }
+
    /*
     * Legacy Query for migration script only
     * */
