@@ -51,7 +51,7 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
          ...reducedRemoteCallsOptions,
          onSuccess: ({ id, universityName }) => {
             return refetchClaims().then(() =>
-               replace(`/group/${id}/admin/analytics`).then(() => {
+               replace(`/group/${id}/admin`).then(() => {
                   successNotification(
                      `You have successfully joined the ${universityName} group`
                   )

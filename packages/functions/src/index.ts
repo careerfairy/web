@@ -207,6 +207,8 @@ exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
+exports.onCreateLivestreamRatingAnswer =
+   onCreateTriggers.onCreateLivestreamRatingAnswer
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =
