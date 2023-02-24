@@ -58,6 +58,6 @@ export class GroupPresenter {
    }
 
    getCompanyPageImagePath() {
-      return `company-pages/${this.id}/photos}`
+      return `company-pages/${this.id}/photos`
    }
 }
