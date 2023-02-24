@@ -7,9 +7,9 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { useTheme } from "@mui/material/styles"
 import { Add } from "@mui/icons-material"
 import Link from "next/link"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import EventCarousel from "./EventCarousel"
 import { ArrowLeft, ArrowRight } from "react-feather"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 const styles = sxStyles({
    titleSection: {
@@ -38,13 +38,7 @@ const styles = sxStyles({
 })
 
 const EventSection = () => {
-   const { group } = useCompanyPage()
-   const upcomingLivestreams = [
-      { id: "1234", title: "title cenas" },
-      { id: "6789", title: "title cenas 2" },
-      { id: "14", title: "title cenas 3" },
-      { id: "1334", title: "title cenas 4" },
-   ] as LivestreamEvent[]
+   const { group, upcomingLivestreams } = useCompanyPage()
    const [openDialog, setOpenDialog] = useState(false)
    const [eventToEdit, setEventToEdit] = useState(null)
    const { spacing } = useTheme()
@@ -93,7 +87,7 @@ const EventSection = () => {
             ) : null}
          </Box>
          <Box mt={2}>
-            {upcomingLivestreams.length > 0 ? (
+            {upcomingLivestreams?.length > 0 ? (
                <Box>
                   <Typography
                      variant="h6"
@@ -103,9 +97,8 @@ const EventSection = () => {
                      Below are your published live streams, these will be shown
                      on your company page.
                   </Typography>
-                  <Grid container xs={12}>
+                  <Grid item xs={12}>
                      <EventCarousel
-                        events={upcomingLivestreams}
                         sliderRef={sliderRef}
                         handleOpenEvent={handleOpenEvent}
                      />
@@ -132,8 +125,8 @@ const EventSection = () => {
                group={group}
                typeOfStream={"upcoming"}
                open={openDialog}
-               handlePublishStream={() => {}}
-               handleResetCurrentStream={() => {}}
+               handlePublishStream={null}
+               handleResetCurrentStream={null}
                currentStream={eventToEdit}
                onClose={handleCloseDialog}
             />

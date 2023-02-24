@@ -1,10 +1,10 @@
 import { sxStyles } from "../../../../types/commonTypes"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Stack, Typography } from "@mui/material"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { placeholderBanner } from "../../../../constants/images"
 import React from "react"
-import { useCompanyPage } from "../index"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import DateUtil from "../../../../util/DateUtil"
 
 const styles = sxStyles({
    wrapper: {
@@ -44,15 +44,14 @@ type Props = {
 }
 
 const EventCard = ({ event, handleClick }: Props) => {
-   const { group } = useCompanyPage()
-
    return (
       <Box sx={styles.wrapper}>
          <Box
             component="img"
             sx={styles.backgroundImage}
             src={
-               getResizedUrl(group?.bannerImageUrl, "sm") || placeholderBanner
+               getResizedUrl(event?.backgroundImageUrl, "sm") ||
+               placeholderBanner
             }
             alt="thumbnail"
             loading="lazy"
@@ -64,12 +63,11 @@ const EventCard = ({ event, handleClick }: Props) => {
                   color={"text.secondary"}
                   fontSize={13}
                >
-                  December 8th, 13:00
+                  {DateUtil.eventPreviewDate(event?.startDate)}
                </Typography>
 
                <Typography fontWeight={600} fontSize={15}>
-                  MAHLE Trainee Talk - Discover our international trainee
-                  program
+                  {event?.title}
                </Typography>
 
                <Box sx={styles.button}>
