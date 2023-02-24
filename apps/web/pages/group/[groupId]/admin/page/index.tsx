@@ -8,7 +8,7 @@ import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 const CompanyPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = ({ serverSideGroup }) => {
-   const { groupId, universityName } = serverSideGroup as Group
+   const { groupId, universityName } = serverSideGroup
    return (
       <GroupDashboardLayout pageDisplayName={"Company Page"} groupId={groupId}>
          <DashboardHead title={`CareerFairy | ${universityName}`} />
@@ -18,7 +18,7 @@ const CompanyPage: NextPage<
 }
 
 export const getServerSideProps: GetServerSideProps<{
-   serverSideGroup?: Group
+   serverSideGroup: Group
 }> = async (context) => {
    const { groupId } = context.params
 
