@@ -14,7 +14,7 @@ import {
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
 }) => {
-   const { universityName } = serverSideGroup as Group
+   const { universityName } = serverSideGroup
    return (
       <>
          <DashboardHead title={`CareerFairy | ${universityName}`} />
@@ -34,7 +34,6 @@ export const getStaticProps: GetStaticProps<{
    if (companyName) {
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
-      // if (serverSideGroup && serverSideGroup.publicProfile) {
       if (serverSideGroup) {
          return {
             props: {
