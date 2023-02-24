@@ -47,7 +47,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
 
 export const getStaticPaths: GetStaticPaths = () => ({
    paths: [],
-   fallback: true,
+   fallback: "blocking",
 })
 
 export default CompanyPage
