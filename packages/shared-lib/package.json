@@ -12,6 +12,7 @@
    },
    "dependencies": {
       "lodash.clonedeep": "^4.5.0",
+      "lodash.uniq": "^4.5.0",
       "object-hash": "^3.0.0",
       "uuid": "^9.0.0"
    },
