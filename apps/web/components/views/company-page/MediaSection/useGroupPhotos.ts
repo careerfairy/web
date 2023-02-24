@@ -67,10 +67,10 @@ const useGroupPhotos = (
          const storage = getStorage()
          const promises = newPhotos.map(async (photo) => {
             const photoId = uuidv4()
-            const photoRef = ref(
-               storage,
-               presenter.getCompanyPageImagePath(photoId)
-            )
+
+            const path = `${presenter.getCompanyPageImagePath()}/${photoId}`
+
+            const photoRef = ref(storage, path)
 
             const metaData = await uploadBytes(photoRef, photo)
 
