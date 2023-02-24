@@ -4,13 +4,16 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
-import { GetStaticPaths, GetStaticProps } from "next"
+import {
+   GetStaticPaths,
+   GetStaticProps,
+   InferGetStaticPropsType,
+   NextPage,
+} from "next"
 
-const CompanyPage = ({ serverSideGroup }) => {
-   if (!serverSideGroup) {
-      return null
-   }
-
+const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+   serverSideGroup,
+}) => {
    const { universityName } = serverSideGroup as Group
    return (
       <>
@@ -22,7 +25,9 @@ const CompanyPage = ({ serverSideGroup }) => {
    )
 }
 
-export const getStaticProps: GetStaticProps = async ({ params }) => {
+export const getStaticProps: GetStaticProps<{
+   serverSideGroup: Group
+}> = async ({ params }) => {
    const { companyName: companyNameSlug } = params
    const companyName = companyNameUnSlugify(companyNameSlug as string)
 
