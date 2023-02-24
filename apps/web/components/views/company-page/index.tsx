@@ -9,9 +9,9 @@ import {
 } from "react"
 import { Box, Container, Grid, Grow, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
-import StreamSection from "./StreamSection"
 import MediaSection from "./MediaSection"
 import TestimonialSection from "./TestimonialSection"
+import EventSection from "./EventSection"
 import { useFirestoreDocData } from "reactfire"
 import { doc } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
@@ -89,7 +89,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
                         <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
                            <TestimonialSection />
-                           <StreamSection />
+                           <EventSection />
                         </Stack>
                      </Grid>
                      <Grid item xs={12} md={6}>
