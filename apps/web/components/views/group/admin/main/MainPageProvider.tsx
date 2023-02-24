@@ -3,7 +3,6 @@ import { livestreamRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { createContext, useContext, useEffect, useState } from "react"
 import { errorLogAndNotify } from "util/CommonUtil"
-import MainPageContent from "."
 
 type IMainPageContext = {
    /**
@@ -13,11 +12,13 @@ type IMainPageContext = {
     */
    nextLivestream: LivestreamEvent | null | undefined
    pastLivestream: LivestreamEvent | null | undefined
+   nextDraft: LivestreamEvent | null | undefined
 }
 
 const initialValues: IMainPageContext = {
    nextLivestream: undefined,
    pastLivestream: undefined,
+   nextDraft: undefined,
 }
 
 const MainPageContext = createContext<IMainPageContext>(initialValues)
@@ -35,9 +36,12 @@ export const MainPageProvider = ({ children }) => {
 
 const useFetchData = (groupId: string) => {
    const [results, setResults] =
-      useState<Pick<IMainPageContext, "nextLivestream" | "pastLivestream">>(
-         initialValues
-      )
+      useState<
+         Pick<
+            IMainPageContext,
+            "nextLivestream" | "pastLivestream" | "nextDraft"
+         >
+      >(initialValues)
 
    useEffect(() => {
       let mounted = true
@@ -46,14 +50,24 @@ const useFetchData = (groupId: string) => {
       const fromDate = new Date()
       fromDate.setFullYear(fromDate.getFullYear() - 10)
 
+      // let's keep showing the next livestream until 5min after it starts
+      // so late streamers can still see it and navigate to it
+      const date5MinAgo = new Date()
+      date5MinAgo.setMinutes(date5MinAgo.getMinutes() - 5)
+
       const promises = {
-         nextLivestream: livestreamRepo.getFutureLivestreams(groupId, 1),
+         nextLivestream: livestreamRepo.getFutureLivestreams(
+            groupId,
+            1,
+            date5MinAgo
+         ),
          pastLivestream: livestreamRepo.getPastEventsFrom({
             fromDate,
             filterByGroupId: groupId,
             limit: 1,
             showHidden: true,
          }),
+         nextDraft: livestreamRepo.getGroupFutureDraftLivestreams(groupId, 1),
       }
 
       function update(key: string, value: LivestreamEvent | null) {

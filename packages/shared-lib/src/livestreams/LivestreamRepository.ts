@@ -26,6 +26,7 @@ import {
    LiveStreamStats,
    LivestreamStatsToUpdate,
 } from "./stats"
+import { OrderByDirection } from "firebase/firestore"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -208,7 +209,14 @@ export interface ILivestreamRepository {
 
    getFutureLivestreams(
       groupId: string,
-      limit?: number
+      limit?: number,
+      fromDate?: Date
+   ): Promise<LivestreamEvent[]>
+
+   getGroupFutureDraftLivestreams(
+      groupId: string,
+      limit?: number,
+      order?: OrderByDirection
    ): Promise<LivestreamEvent[]>
 }
 
@@ -223,13 +231,34 @@ export class FirebaseLivestreamRepository
       super()
    }
 
+   async getGroupFutureDraftLivestreams(
+      groupId: string,
+      limit?: number,
+      order: OrderByDirection = "asc"
+   ): Promise<LivestreamEvent[]> {
+      let query = this.firestore
+         .collection("draftLivestreams")
+         .where("start", ">", new Date())
+         .where("groupIds", "array-contains", groupId)
+         .orderBy("start", order)
+
+      if (limit) {
+         query.limit(limit)
+      }
+
+      const docs = await query.get()
+
+      return this.mapLivestreamCollections(docs).get()
+   }
+
    async getFutureLivestreams(
       groupId: string,
-      limit = 1
+      limit = 1,
+      fromDate = new Date()
    ): Promise<LivestreamEvent[]> {
       let query = this.firestore
          .collection("livestreams")
-         .where("start", ">", new Date())
+         .where("start", ">", fromDate)
          .where("test", "==", false)
          .where("groupIds", "array-contains", groupId)
          .limit(limit)
