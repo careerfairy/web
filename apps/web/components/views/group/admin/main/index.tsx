@@ -1,5 +1,6 @@
-import { Card, CardContent, Container, Grid, Tooltip } from "@mui/material"
+import { Card, CardContent, Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
+import AggregatedFeedbackCard from "./feedback/AggregatedFeedbackCard"
 
 const MainPageContent = () => {
    return (
@@ -25,9 +26,7 @@ const MainPageContent = () => {
                </Grid>
 
                <Grid xs={12} md={6} item>
-                  <Card>
-                     <CardContent>Feedback</CardContent>
-                  </Card>
+                  <AggregatedFeedbackCard />
                </Grid>
             </Grid>
          </Container>
