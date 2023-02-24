@@ -10,16 +10,28 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
+import {
+   getServerSideUpcomingLivestreamsByGroupId,
+   mapFromServerSide,
+} from "../../util/serverUtil"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
+   serverSideUpcomingLivestreams,
 }) => {
    const { universityName } = serverSideGroup
    return (
       <>
          <DashboardHead title={`CareerFairy | ${universityName}`} />
          <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
-            <CompanyPageOverview group={serverSideGroup} editMode={false} />
+            <CompanyPageOverview
+               group={serverSideGroup}
+               upcomingLivestreams={mapFromServerSide(
+                  serverSideUpcomingLivestreams
+               )}
+               editMode={false}
+            />
          </Box>
       </>
    )
@@ -27,6 +39,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
 export const getStaticProps: GetStaticProps<{
    serverSideGroup: Group
+   serverSideUpcomingLivestreams: any[]
 }> = async ({ params }) => {
    const { companyName: companyNameSlug } = params
    const companyName = companyNameUnSlugify(companyNameSlug as string)
@@ -35,9 +48,18 @@ export const getStaticProps: GetStaticProps<{
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
       if (serverSideGroup) {
+         const serverSideUpcomingLivestreams =
+            await getServerSideUpcomingLivestreamsByGroupId(
+               serverSideGroup.groupId
+            )
+
          return {
             props: {
                serverSideGroup,
+               serverSideUpcomingLivestreams:
+                  serverSideUpcomingLivestreams?.map(
+                     LivestreamPresenter.serializeDocument
+                  ) || [],
             },
             revalidate: 60,
          }

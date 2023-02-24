@@ -14,13 +14,17 @@ import TestimonialSection from "./TestimonialSection"
 import EventSection from "./EventSection"
 import { useFirestoreDocData } from "reactfire"
 import { doc } from "firebase/firestore"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import {
+   createGenericConverter,
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 
 type Props = {
    group: Group
    editMode: boolean
+   upcomingLivestreams: LivestreamEvent[]
 }
 
 export enum TabValue {
@@ -36,6 +40,7 @@ type ICompanyPageContext = {
    tabValue: TabValue
    changeTabValue: (tabValues: TabValue) => void
    editMode: boolean
+   upcomingLivestreams: LivestreamEvent[]
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -44,9 +49,14 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    tabValue: TabValue.profile,
    changeTabValue: () => {},
    editMode: false,
+   upcomingLivestreams: [],
 })
 
-const CompanyPageOverview = ({ group, editMode }: Props) => {
+const CompanyPageOverview = ({
+   group,
+   editMode,
+   upcomingLivestreams,
+}: Props) => {
    const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
 
    const groupRef = useMemo(
@@ -72,8 +82,15 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
+         upcomingLivestreams,
       }),
-      [contextGroup, editMode, handleChangeTabValue, tabValue]
+      [
+         contextGroup,
+         editMode,
+         handleChangeTabValue,
+         tabValue,
+         upcomingLivestreams,
+      ]
    )
 
    return (
