@@ -14,6 +14,7 @@ import AccountApplications from "./AccountApplications"
 import WaitForFirstSyncStatus from "./WaitForFirstSyncStatus"
 import ApplicationTestButtonDialog from "./application-test/ApplicationTestButtonDialog"
 import { useATSAccount } from "./ATSAccountContextProvider"
+import { useRouter } from "next/router"
 
 const AccountInformation = () => {
    const { atsAccount } = useATSAccount()
@@ -44,9 +45,14 @@ const tabs = [
 
 const DisplayATSContent = () => {
    const { atsAccount } = useATSAccount()
+   const {
+      query: { section },
+   } = useRouter()
 
    // Tabs behaviour
-   const [activeTabIndex, setActiveTabIndex] = useState(0)
+   const [activeTabIndex, setActiveTabIndex] = useState(
+      section ? parseInt(section as string) : 0
+   )
    const switchTabHandler = useCallback((...args) => {
       // clicking tabs handler
       setActiveTabIndex(args[1])

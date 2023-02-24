@@ -23,9 +23,11 @@ import { groupRepo } from "../../data/RepositoryInstances"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
+import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 
 type GroupAdminContext = {
    group: Group
+   stats: GroupStats
    flattenedGroupOptions: GroupOption[]
    groupQuestions: GroupQuestion[]
    groupPresenter?: GroupPresenter
@@ -34,6 +36,7 @@ type GroupAdminContext = {
 
 const GroupContext = createContext<GroupAdminContext>({
    group: null,
+   stats: null,
    flattenedGroupOptions: [],
    groupQuestions: [],
    groupPresenter: undefined,
@@ -52,7 +55,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { replace, push } = useRouter()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
-   const group = useAdminGroup(groupId)
+   const { group, stats } = useAdminGroup(groupId)
 
    const { errorNotification } = useSnackbarNotifications()
 
@@ -67,7 +70,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       [userData?.isAdmin, adminGroups, group?.id]
    )
 
-   const loadingGroup = !isLoaded(group)
+   const loadingGroup = !isLoaded(group) || !isLoaded(stats)
 
    const isCorrectGroup = groupId === group?.id
 
@@ -127,6 +130,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const contextValues = useMemo(
       () => ({
          group,
+         stats,
          flattenedGroupOptions,
          groupQuestions,
          groupPresenter,
@@ -138,6 +142,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          group,
          groupPresenter,
          groupQuestions,
+         stats,
       ]
    )
 

@@ -51,10 +51,10 @@ const styles = sxStyles({
          content: "'Next'",
          marginRight: (t) => t.spacing(1),
       },
-      "& .MuiPagination-ul li:first-child": {
+      "& .MuiPagination-ul li:first-of-type": {
          display: "block",
       },
-      "& .MuiPagination-ul li:first-child button::after": {
+      "& .MuiPagination-ul li:first-of-type button::after": {
          content: "'Previous'",
          marginLeft: (t) => t.spacing(1),
       },
