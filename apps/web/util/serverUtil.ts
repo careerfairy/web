@@ -2,6 +2,7 @@ import { store } from "../pages/_app"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
+import { Group } from "@careerfairy/shared-lib/groups"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -23,7 +24,7 @@ export const getServerSideStream = async (
    return serverSideStream
 }
 
-export const getServerSideGroup = async (groupId: string) => {
+export const getServerSideGroup = async (groupId: string): Promise<Group> => {
    let serverSideGroup = {}
    // @ts-ignore
    const snap = await store.firestore.get({
@@ -38,7 +39,7 @@ export const getServerSideGroup = async (groupId: string) => {
       // @ts-ignore
       serverSideGroup.id = snap.id
    }
-   return serverSideGroup
+   return serverSideGroup as Group
 }
 
 /**
