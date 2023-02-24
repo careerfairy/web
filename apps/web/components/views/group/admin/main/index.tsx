@@ -3,9 +3,9 @@ import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
-import CardCustom from "./CardCustom"
 import AggregatedFeedbackCard from "./feedback/AggregatedFeedbackCard"
 import { MainPageProvider } from "./MainPageProvider"
+import { NextLivestreamCard } from "./next-livestream/NextLivestreamCard"
 import { AggregatedRegistrationSourcesCard } from "./registration-sources/AggregatedRegistrationSourcesCard"
 
 const styles = sxStyles({
@@ -28,7 +28,7 @@ const PageContent = () => {
          <Container maxWidth={false}>
             <Grid container spacing={3}>
                <Grid xs={12} md={6} item style={styles.gridItem}>
-                  <CardCustom title={""}>Next Livestream</CardCustom>
+                  <NextLivestreamCard />
                </Grid>
 
                <Grid xs={12} md={6} item style={styles.gridItem}>
