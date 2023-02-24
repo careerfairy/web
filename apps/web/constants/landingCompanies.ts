@@ -10,7 +10,7 @@ export default [
    {
       name: "BMW",
       logo: {
-         url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2FBMW_logo.png?alt=media&token=8c011636-4ad5-4c3b-a436-79a9436c3e70",
+         url: "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/company-logos%2Fbmw-logo.png?alt=media&token=214c9714-dd94-45f0-bd94-61f6625b6566",
       },
    },
    {
