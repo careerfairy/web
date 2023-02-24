@@ -20,6 +20,7 @@
       "prepare": "husky install",
       "build:packages": "turbo run build --ignore=\"apps/**/*\" --no-deps",
       "build:functions": "turbo run build --filter=@careerfairy/functions",
+      "build:scripts": "turbo run build --filter=@careerfairy/firebase-scripts",
       "build:shared-lib": "turbo run build --filter=@careerfairy/shared-lib",
       "build:fetch-firestore-data": "turbo run build --filter=@careerfairy/fetch-firestore-data",
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",

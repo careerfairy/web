@@ -5,7 +5,7 @@ import { Box } from "@mui/material"
 const styles = {
    root: (theme, { withZoom }) => ({
       maxWidth: "100%",
-      maxHeight: 50,
+      maxHeight: 60,
       transition: theme.transitions.create(["transform", "filter"], {
          duration: theme.transitions.duration.standard,
          easing: theme.transitions.easing.easeInOut,

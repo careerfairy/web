@@ -6,6 +6,8 @@ import {
    BarChart2 as AnalyticsIcon,
    Radio as LiveStreamsIcon,
    Sliders as ATSIcon,
+   Users as RolesIcon,
+   Home as HomeIcon,
 } from "react-feather"
 
 // material-ui
@@ -31,6 +33,13 @@ const GroupNavList = () => {
    const navLinks = useMemo(() => {
       const { id, atsAdminPageFlag } = group
       const links: INavLink[] = [
+         {
+            id: "main-page",
+            href: `/${baseHrefPath}/${group.id}/admin`,
+            pathname: `/${baseHrefPath}/${baseParam}/admin`,
+            Icon: HomeIcon,
+            title: "Main page",
+         },
          {
             id: "live-streams",
             title: "Live streams",

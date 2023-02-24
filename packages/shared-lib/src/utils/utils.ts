@@ -149,6 +149,8 @@ export const addUtmTagsToLink = ({
  * Round a number and limit the decimal places
  */
 export const round = (num: number, decimalPlaces: number): number => {
+   if (isNaN(num)) return num
+
    let f = Math.pow(10, decimalPlaces)
    return Math.round((num + Number.EPSILON) * f) / f
 }

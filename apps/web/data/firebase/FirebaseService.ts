@@ -14,6 +14,7 @@ import {
 } from "../../util/CommonUtil"
 import {
    EventRating,
+   EventRatingAnswer,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
@@ -22,7 +23,7 @@ import {
    LivestreamQuestion,
    pickPublicDataFromLivestream,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
@@ -31,27 +32,27 @@ import {
    GroupQuestion,
    GroupWithPolicy,
    UserGroupData,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
 import {
    getLivestreamGroupQuestionAnswers,
    TalentProfile,
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserStats,
-} from "@careerfairy/shared-lib/dist/users"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+} from "@careerfairy/shared-lib/users"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
-import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import { makeUrls } from "../../util/makeUrls"
 import {
    createCompatGenericConverter,
    OnSnapshotCallback,
-} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
 
 class FirebaseService {
@@ -1887,14 +1888,20 @@ class FirebaseService {
       )
    }
 
-   rateLivestream = (livestreamId, userEmail, rating, ratingId) => {
-      let ref = this.firestore
+   rateLivestream = async (
+      livestreamId: string,
+      userEmail: string,
+      rating: Pick<EventRatingAnswer, "message" | "rating">,
+      ratingDoc: EventRating
+   ) => {
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
-         .doc(ratingId)
+         .doc(ratingDoc.id)
          .collection("voters")
          .doc(userEmail)
+
       return ref.set({
          ...rating,
          timestamp: this.getServerTimestamp(),
