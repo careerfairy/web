@@ -517,13 +517,13 @@ service cloud.firestore {
         }
 
         match /{somePath=**}/stats/{livestreamStats} {
-            allow list: if isSignedIn(); // we can't check the resource.data.livestream.groupIds when listing..
+            allow list: if isAnyGroupAdmin(); // we can't check the resource.data.livestream.groupIds when listing..
             allow read: if request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(resource.data.livestream.groupIds) || isCFAdmin();
         }
 
         // Group Admin -> Aggregation Count query
         match /{somePath=**}/talentProfiles/{groupId} {
-            allow read: if isCFAdmin() || request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]);
+            allow read: if request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]) || isCFAdmin();
         }
     }
 }
