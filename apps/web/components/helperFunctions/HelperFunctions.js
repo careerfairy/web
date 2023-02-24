@@ -439,8 +439,8 @@ export const getMaxLineStyles = (maxLines = 2) => ({
    WebkitLineClamp: maxLines,
    overflow: "hidden",
    textOverflow: "ellipsis",
-   "-webkit-line-clamp": maxLines,
-   "-webkit-box-orient": "vertical",
+   WebKitBoxOrient: "vertical",
+   WebkitLineClamp: maxLines,
 })
 
 export const sleep = (ms) => {

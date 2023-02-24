@@ -1,14 +1,21 @@
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import {
-   Card,
-   CardHeader,
-   CardContent,
    Button,
+   Card,
+   CardContent,
+   CardHeader,
    Menu,
    MenuItem,
+   styled,
+   SxProps,
+   Theme,
+   Tooltip,
+   tooltipClasses,
+   TooltipProps,
 } from "@mui/material"
 import { Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
-import { useState, useCallback, useMemo } from "react"
+import { useCallback, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 
@@ -29,14 +36,21 @@ const styles = sxStyles({
       paddingX: (theme) => theme.spacing(3),
       paddingBottom: (theme) => theme.spacing(1),
    },
+   tooltip: {
+      marginTop: (theme) => theme.spacing(1),
+      marginRight: (theme) => theme.spacing(1),
+      cursor: "pointer",
+   },
 })
 
 type Props = {
    title: string
+   subHeader?: React.ReactNode
    children: React.ReactNode
    options?: OptionsProps["options"]
    optionsHandler?: OptionsProps["handler"]
-   minHeight?: string
+   helpTooltip?: string
+   sx?: SxProps<Theme>
 }
 
 /**
@@ -47,35 +61,42 @@ const CardCustom = ({
    options,
    optionsHandler,
    children,
-   minHeight,
+   helpTooltip,
+   subHeader,
+   sx,
 }: Props) => {
-   const sxProps = useMemo(() => {
-      return minHeight
-         ? {
-              minHeight,
-           }
-         : undefined
-   }, [minHeight])
+   const action = helpTooltip ? (
+      <CustomWidthTooltip title={helpTooltip} arrow>
+         <InfoOutlinedIcon />
+      </CustomWidthTooltip>
+   ) : options ? (
+      <Options
+         options={options}
+         handler={optionsHandler ? optionsHandler : undefined}
+      />
+   ) : undefined
 
    return (
-      <Card sx={sxProps}>
+      <Card sx={sx}>
          <CardHeader
             sx={styles.cardHeader}
             title={title}
-            action={
-               options ? (
-                  <Options
-                     options={options}
-                     handler={optionsHandler ? optionsHandler : undefined}
-                  />
-               ) : undefined
-            }
+            action={action}
             titleTypographyProps={styles.cardTitleTypographyProps}
+            subheader={subHeader}
          />
          <CardContent sx={styles.cardContent}>{children}</CardContent>
       </Card>
    )
 }
+
+const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+   <Tooltip sx={styles.tooltip} {...props} classes={{ popper: className }} />
+))({
+   [`& .${tooltipClasses.tooltip}`]: {
+      maxWidth: 250,
+   },
+})
 
 export type OptionsProps = {
    options: string[]
