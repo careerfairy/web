@@ -13,8 +13,11 @@ type Props = {
 
 const styles = sxStyles({
    wrapper: {
-      mb: 4,
       position: "relative",
+
+      "&:not(:last-child)": {
+         mb: 4,
+      },
    },
    titleSection: {
       display: "flex",
