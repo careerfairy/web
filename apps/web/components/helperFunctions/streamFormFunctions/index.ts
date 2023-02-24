@@ -8,8 +8,6 @@ import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
 import { FormikErrors } from "formik"
-import { Group } from "@careerfairy/shared-lib/groups"
-import _ from "lodash"
 
 export const speakerObj = {
    avatar: "",
@@ -309,56 +307,4 @@ export const getDownloadUrl = (fileElement) => {
       console.log("-> no fileElement", fileElement)
       return ""
    }
-}
-
-type MetaData = Pick<
-   LivestreamEvent,
-   "companyCountries" | "companyIndustries" | "companySizes"
->
-export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
-   const companies = eventHosts?.filter((group) => !group.universityCode)
-
-   let groupsToGetMetadataFrom = eventHosts
-
-   if (companies?.length > 0) {
-      // if there is at least one company, we want to get the metadata ONLY from the companies, not the universities
-      groupsToGetMetadataFrom = companies
-   }
-
-   // Aggregate all the metadata from the groups
-   const meta = groupsToGetMetadataFrom.reduce<MetaData>(
-      (acc, group) => {
-         if (group.companyCountry.id) {
-            acc.companyCountries = [
-               ...acc.companyCountries,
-               group.companyCountry.id,
-            ]
-         }
-
-         if (group.companyIndustry.id) {
-            acc.companyIndustries = [
-               ...acc.companyIndustries,
-               group.companyIndustry.id,
-            ]
-         }
-
-         if (group.companySize) {
-            acc.companySizes = [...acc.companySizes, group.companySize]
-         }
-
-         return acc
-      },
-      {
-         companyCountries: [],
-         companyIndustries: [],
-         companySizes: [],
-      }
-   )
-
-   // remove duplicates
-   meta.companyCountries = _.uniq(meta.companyCountries)
-   meta.companyIndustries = _.uniq(meta.companyIndustries)
-   meta.companySizes = _.uniq(meta.companySizes)
-
-   return meta
 }

@@ -21,7 +21,6 @@ import makeStyles from "@mui/styles/makeStyles"
 import { useRouter } from "next/router"
 import WarningIcon from "@mui/icons-material/Warning"
 import {
-   getMetaDataFromEventHosts,
    getStreamSubCollectionSpeakers,
    handleFlattenOptions,
    languageCodes,
@@ -61,6 +60,7 @@ import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
 import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
