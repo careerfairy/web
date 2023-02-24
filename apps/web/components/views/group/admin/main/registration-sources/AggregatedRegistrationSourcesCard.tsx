@@ -167,7 +167,7 @@ const SourcesProgress = ({ sources }: { sources: UTMsPercentage[] }) => {
             value: match ? match.total : 0,
             percent: match ? match.percent : 0,
          }
-      })
+      }).sort(sortSources)
    }, [sources])
 
    return (
@@ -196,12 +196,12 @@ type SourceEntryArgs = {
 const SourceEntry = ({ name, value, percent, help }: SourceEntryArgs) => {
    return (
       <>
-         <Grid item xs={6}>
+         <Grid item xs={9}>
             <Tooltip title={help} placement="top" followCursor>
                <Typography sx={styles.sourceText}>{name}</Typography>
             </Tooltip>
          </Grid>
-         <Grid item xs={6} textAlign="right">
+         <Grid item xs={3} textAlign="right">
             <Typography sx={styles.sourceText}>{value}</Typography>
          </Grid>
          <Grid mt={1} mb={2} item xs={12}>
@@ -226,3 +226,20 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
       backgroundColor: "primary",
    },
 }))
+
+function sortSources(a: SourceEntryArgs, b: SourceEntryArgs) {
+   const order = [
+      "Platform Registrations",
+      "Platform User Promo",
+      "Social",
+      "University Network Promo",
+      "Other",
+   ]
+
+   const idxFoundA = order.findIndex((o) => o === a.name)
+   const idxFoundB = order.findIndex((o) => o === b.name)
+
+   if (idxFoundA >= 0 && idxFoundB >= 0) return idxFoundA - idxFoundB
+
+   return 0
+}
