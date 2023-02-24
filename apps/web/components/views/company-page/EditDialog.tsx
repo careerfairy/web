@@ -1,10 +1,10 @@
 import {
    AppBar,
    Dialog,
+   DialogActions,
    DialogContent,
    DialogTitle,
    Slide,
-   Typography,
 } from "@mui/material"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
@@ -31,9 +31,16 @@ type Props = {
    title: string
    handleClose: () => void
    children: JSX.Element
+   dialogActionsContent?: JSX.Element
 }
 
-const EditDialog = ({ open, title, handleClose, children }: Props) => {
+const EditDialog = ({
+   open,
+   title,
+   handleClose,
+   children,
+   dialogActionsContent,
+}: Props) => {
    return (
       <Dialog
          TransitionComponent={Slide}
@@ -43,16 +50,20 @@ const EditDialog = ({ open, title, handleClose, children }: Props) => {
          fullWidth
       >
          <AppBar sx={styles.header} position="sticky">
-            <DialogTitle color="black">
-               <Typography variant={"h3"} fontWeight={"600"}>
-                  {title}
-               </Typography>
+            <DialogTitle
+               // @ts-ignore
+               variant={"h3"}
+               fontWeight={"600"}
+               color="black"
+            >
+               {title}
             </DialogTitle>
             <IconButton onClick={handleClose} sx={styles.dialogClose}>
                <CloseIcon fontSize="large" />
             </IconButton>
          </AppBar>
          <DialogContent sx={styles.content}>{children}</DialogContent>
+         <DialogActions>{dialogActionsContent}</DialogActions>
       </Dialog>
    )
 }
