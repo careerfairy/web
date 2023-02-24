@@ -72,7 +72,7 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
                color="textSecondary"
                variant="h6"
             >
-               {companyGroupData.description}
+               {companyGroupData.extraInfo}
             </Typography>
             {companyGroupData.publicProfile ? (
                <Box
