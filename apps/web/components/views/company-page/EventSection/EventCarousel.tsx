@@ -1,4 +1,3 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import React, { MutableRefObject } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import EventCard from "./EventCard"
@@ -8,9 +7,10 @@ import Box from "@mui/material/Box"
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useCompanyPage } from "../index"
 
 type Props = {
-   events: LivestreamEvent[]
    sliderRef: MutableRefObject<any>
    handleOpenEvent: (event: LivestreamEvent) => void
 }
@@ -32,7 +32,8 @@ const styles = sxStyles({
    },
 })
 
-const EventCarousel = ({ events, sliderRef, handleOpenEvent }: Props) => {
+const EventCarousel = ({ sliderRef, handleOpenEvent }: Props) => {
+   const { upcomingLivestreams } = useCompanyPage()
    const isMobile = useIsMobile()
 
    const slidesToShow = isMobile ? 1 : 2
@@ -52,7 +53,7 @@ const EventCarousel = ({ events, sliderRef, handleOpenEvent }: Props) => {
                infinite={false}
                sx={styles.carousel}
             >
-               {events.map((event) => (
+               {upcomingLivestreams.map((event) => (
                   <EventCard
                      key={event.id}
                      event={event}
