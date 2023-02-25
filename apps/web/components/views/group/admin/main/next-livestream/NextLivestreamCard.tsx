@@ -1,5 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Grid, Skeleton, Typography } from "@mui/material"
+import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
 import { CheckCircle } from "react-feather"
 import { sxStyles } from "types/commonTypes"
@@ -169,11 +170,22 @@ const LivestreamDetails = ({ livestream }: { livestream: LivestreamEvent }) => {
 
 const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
    const { isDraft, isCloseToLivestreamStart } = useNextLivestreamCardLogic()
+   const { livestreamDialog } = useGroup()
+
+   const onManageLivestream = useCallback(() => {
+      livestream.isDraft = isDraft()
+      livestreamDialog.handleEditStream(livestream)
+   }, [isDraft, livestream, livestreamDialog])
+
    return (
       <Grid item xs={12} mt={4}>
          <Box display="flex" justifyContent="right">
             {isDraft() ? (
-               <Button color="secondary" variant="contained">
+               <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={onManageLivestream}
+               >
                   Manage your live stream
                </Button>
             ) : isCloseToLivestreamStart() ? (
@@ -182,6 +194,7 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
                      color="secondary"
                      variant="outlined"
                      sx={styles.buttonManage}
+                     onClick={onManageLivestream}
                   >
                      Manage your live stream
                   </Button>
@@ -190,7 +203,11 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
                   </Button>
                </>
             ) : (
-               <Button color="secondary" variant="contained">
+               <Button
+                  color="secondary"
+                  variant="contained"
+                  onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+               >
                   Create New Live Stream
                </Button>
             )}

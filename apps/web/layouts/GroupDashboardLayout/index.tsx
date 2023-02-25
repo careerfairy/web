@@ -24,6 +24,7 @@ import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebase
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
+import { useLivestreamDialog } from "./useLivestreamDialog"
 
 type GroupAdminContext = {
    group: Group
@@ -32,6 +33,7 @@ type GroupAdminContext = {
    groupQuestions: GroupQuestion[]
    groupPresenter?: GroupPresenter
    role: GROUP_DASHBOARD_ROLE
+   livestreamDialog: ReturnType<typeof useLivestreamDialog>
 }
 
 const GroupContext = createContext<GroupAdminContext>({
@@ -41,6 +43,7 @@ const GroupContext = createContext<GroupAdminContext>({
    groupQuestions: [],
    groupPresenter: undefined,
    role: undefined,
+   livestreamDialog: undefined,
 })
 
 type GroupDashboardLayoutProps = {
@@ -127,6 +130,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       [group]
    )
 
+   const livestreamDialog = useLivestreamDialog(group)
+
    const contextValues = useMemo(
       () => ({
          group,
@@ -135,6 +140,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          groupQuestions,
          groupPresenter,
          role: adminGroups?.[group?.id]?.role,
+         livestreamDialog,
       }),
       [
          adminGroups,
@@ -142,6 +148,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          group,
          groupPresenter,
          groupQuestions,
+         livestreamDialog,
          stats,
       ]
    )
@@ -155,6 +162,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider pageDisplayName={pageDisplayName}>
                {children}
+               {livestreamDialog.StreamCreationDialog}
             </GroupDashboardLayoutProvider>
          </GroupContext.Provider>
       </Outlet>
