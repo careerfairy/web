@@ -267,6 +267,7 @@ const LoadingSkeleton = () => {
 }
 
 const NoLivestreams = () => {
+   const { livestreamDialog } = useGroup()
    return (
       <Box>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
@@ -276,7 +277,11 @@ const NoLivestreams = () => {
          </Typography>
 
          <Box mt={2} mb={3} display="flex" justifyContent="center">
-            <Button color="secondary" variant="contained">
+            <Button
+               color="secondary"
+               variant="contained"
+               onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+            >
                Create New Live Stream
             </Button>
          </Box>
