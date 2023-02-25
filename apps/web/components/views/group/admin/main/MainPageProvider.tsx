@@ -1,8 +1,10 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import useCollection, {
+   CollectionResponse,
+} from "components/custom-hook/useCollection"
 import { livestreamRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { createContext, useContext, useEffect, useState } from "react"
-import { errorLogAndNotify } from "util/CommonUtil"
+import { createContext, useContext, useMemo } from "react"
 
 type IMainPageContext = {
    /**
@@ -35,71 +37,75 @@ export const MainPageProvider = ({ children }) => {
 }
 
 const useFetchData = (groupId: string) => {
-   const [results, setResults] =
-      useState<
-         Pick<
-            IMainPageContext,
-            "nextLivestream" | "pastLivestream" | "nextDraft"
-         >
-      >(initialValues)
+   // fetch data & subscribe for realtime updates
+   // when the user updates the next livestream / draft
+   // we want to update the displayed data
+   const drafts = useDrafts(groupId)
+   const futureLivestreams = useFutureLivestreams(groupId)
+   const pastLivestreams = usePastLivestreams(groupId)
 
-   useEffect(() => {
-      let mounted = true
+   return useMemo(
+      () => ({
+         nextDraft: grabResult(drafts),
+         nextLivestream: grabResult(futureLivestreams),
+         pastLivestream: grabResult(pastLivestreams),
+      }),
+      [drafts, futureLivestreams, pastLivestreams]
+   )
+}
 
-      // Old date so that we can fetch all the past livestreams
-      const fromDate = new Date()
-      fromDate.setFullYear(fromDate.getFullYear() - 10)
+function grabResult<T = unknown>(response: CollectionResponse<T>) {
+   if (response.isLoading) {
+      return undefined
+   }
 
+   if (response.error) {
+      return null
+   }
+
+   if (response.data.length > 0) {
+      return response.data[0]
+   }
+
+   return null
+}
+
+const useDrafts = (groupId: string) => {
+   const query = useMemo(() => {
+      return livestreamRepo.getGroupDraftLivestreamsQuery(groupId, 1)
+   }, [groupId])
+
+   return useCollection<LivestreamEvent>(query, true)
+}
+
+const useFutureLivestreams = (groupId: string) => {
+   const query = useMemo(() => {
       // let's keep showing the next livestream until 5min after it starts
       // so late streamers can still see it and navigate to it
       const date5MinAgo = new Date()
       date5MinAgo.setMinutes(date5MinAgo.getMinutes() - 5)
 
-      const promises = {
-         nextLivestream: livestreamRepo.getFutureLivestreams(
-            groupId,
-            1,
-            date5MinAgo
-         ),
-         pastLivestream: livestreamRepo.getPastEventsFrom({
-            fromDate,
-            filterByGroupId: groupId,
-            limit: 1,
-            showHidden: true,
-         }),
-         nextDraft: livestreamRepo.getGroupFutureDraftLivestreams(groupId, 1),
-      }
-
-      function update(key: string, value: LivestreamEvent | null) {
-         if (mounted) {
-            setResults((prev) => ({
-               ...prev,
-               [key]: value,
-            }))
-         }
-      }
-
-      for (const key in promises) {
-         promises[key]
-            .then((result: LivestreamEvent[]) => {
-               if (result?.length > 0) {
-                  update(key, result[0])
-               } else {
-                  update(key, null)
-               }
-            })
-            .catch((e: Error) => {
-               errorLogAndNotify(e)
-               update(key, null)
-            })
-      }
-
-      return () => {
-         mounted = false
-      }
+      return livestreamRepo.getFutureLivestreamsQuery(groupId, 1, date5MinAgo)
    }, [groupId])
 
-   return results
+   return useCollection<LivestreamEvent>(query, true)
+}
+
+const usePastLivestreams = (groupId: string) => {
+   const query = useMemo(() => {
+      // Old date so that we can fetch all the past livestreams
+      const fromDate = new Date()
+      fromDate.setFullYear(fromDate.getFullYear() - 10)
+
+      return livestreamRepo.getPastEventsFromQuery({
+         fromDate,
+         filterByGroupId: groupId,
+         limit: 1,
+         showHidden: true,
+      })
+   }, [groupId])
+
+   return useCollection<LivestreamEvent>(query, true)
 }
 
 export const useMainPageContext = () => {
