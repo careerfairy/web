@@ -11,6 +11,9 @@ import * as actions from "store/actions"
 import { StreamCreationProvider } from "components/views/draftStreamForm/StreamForm/StreamCreationProvider"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 
+/**
+ * State & Actions for the Create/Edit livestream dialog form
+ */
 export const useLivestreamDialog = (group: Group) => {
    const [openNewStreamModal, setOpenNewStreamModal] = useState(false)
    const [isPublishing, setIsPublishing] = useState(false)

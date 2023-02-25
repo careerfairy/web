@@ -2,6 +2,9 @@ import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { doc } from "firebase/firestore"
 import { ReactFireOptions, useFirestore, useFirestoreDocData } from "reactfire"
 
+/**
+ * Subscribe a Firestore document for updates
+ */
 export const useFirestoreDocument = <T,>(
    collection: string,
    pathSegments: string[],
