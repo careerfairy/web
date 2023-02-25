@@ -25,7 +25,7 @@ export const LivestreamStats = ({
 
    if (isDraft()) {
       return (
-         <Grid item xs={12}>
+         <Grid item xs={12} mt={2}>
             {applications}
          </Grid>
       )

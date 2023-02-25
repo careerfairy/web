@@ -145,12 +145,16 @@ const LivestreamDetails = ({ livestream }: { livestream: LivestreamEvent }) => {
          <Grid container>
             <Grid item xs={12} mt={2}>
                <Typography sx={styles.date}>
-                  {DateUtil.eventPreviewDate(livestream.start.toDate())}
+                  {livestream.start
+                     ? DateUtil.eventPreviewDate(livestream.start.toDate())
+                     : "Future Date"}
                </Typography>
             </Grid>
             <Grid item xs={12} mt={1}>
                <Typography variant="h5" sx={styles.title}>
-                  {livestream.title}
+                  {livestream.title?.length > 0
+                     ? livestream.title
+                     : "Untitled Live Stream"}
                </Typography>
             </Grid>
 
