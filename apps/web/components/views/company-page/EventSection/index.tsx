@@ -10,10 +10,10 @@ import Link from "next/link"
 import EventCarousel from "./EventCarousel"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
 import EventCard from "./EventCard"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import RegistrationModal from "../../common/registration-modal"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    titleSection: {
@@ -42,10 +42,10 @@ const styles = sxStyles({
 })
 
 const EventSection = () => {
-   const { group, upcomingLivestreams } = useCompanyPage()
-   const { setSelectedEventId } = useMarketingLandingPage()
+   const { group, upcomingLivestreams, editMode } = useCompanyPage()
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
+   const isMobile = useIsMobile()
 
    const [openDialog, setOpenDialog] = useState(false)
    const [eventToEdit, setEventToEdit] = useState(null)
@@ -69,12 +69,9 @@ const EventSection = () => {
       setOpenDialog(true)
    }, [])
 
-   const handleDetailsClick = useCallback(
-      (eventId: string) => {
-         setSelectedEventId(eventId)
-      },
-      [setSelectedEventId]
-   )
+   if (!editMode && !upcomingLivestreams?.length) {
+      return null
+   }
 
    return (
       <Box minHeight={{ md: spacing(50) }}>
@@ -104,31 +101,31 @@ const EventSection = () => {
          <Box mt={2}>
             {upcomingLivestreams?.length > 0 ? (
                <Box>
-                  <Typography
-                     variant="h6"
-                     fontWeight={"400"}
-                     color="textSecondary"
-                  >
-                     Below are your published live streams, these will be shown
-                     on your company page.
-                  </Typography>
+                  {isMobile ? null : (
+                     <Typography
+                        variant="h6"
+                        fontWeight={"400"}
+                        color="textSecondary"
+                     >
+                        {editMode
+                           ? "Below are your published live streams, these will be shown on your company page."
+                           : "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."}
+                     </Typography>
+                  )}
                   <Grid item xs={12}>
                      <EventCarousel sliderRef={sliderRef}>
-                        <>
-                           {upcomingLivestreams.map((event) => (
-                              <EventCard
-                                 key={event.id}
-                                 event={event}
-                                 handleClick={handleOpenEvent}
-                                 handleSeeDetails={handleDetailsClick}
-                                 handleRegister={handleClickRegister}
-                              />
-                           ))}
-                        </>
+                        {upcomingLivestreams.map((event) => (
+                           <EventCard
+                              key={event.id}
+                              event={event}
+                              handleEditEvent={handleOpenEvent}
+                              handleRegister={handleClickRegister}
+                           />
+                        ))}
                      </EventCarousel>
                   </Grid>
                </Box>
-            ) : (
+            ) : editMode ? (
                <Link href={`/group/${group.id}/admin/events`}>
                   <a>
                      <Button color="secondary" sx={styles.addEvent}>
@@ -141,7 +138,7 @@ const EventSection = () => {
                      </Button>
                   </a>
                </Link>
-            )}
+            ) : null}
          </Box>
 
          <StreamCreationProvider>
