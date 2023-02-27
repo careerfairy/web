@@ -58,8 +58,7 @@ const styles = sxStyles({
 
 type Props = {
    event: LivestreamEvent
-   handleClick: (event: LivestreamEvent) => void
-   handleSeeDetails: (eventId: string) => void
+   handleEditEvent: (event: LivestreamEvent) => void
    handleRegister: (
       event: LivestreamEvent,
       targetGroupId: string,
@@ -68,12 +67,7 @@ type Props = {
    ) => any
 }
 
-const EventCard = ({
-   event,
-   handleClick,
-   handleSeeDetails,
-   handleRegister,
-}: Props) => {
+const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
    const { editMode, group } = useCompanyPage()
    const isMobile = useIsMobile()
    const { userData } = useAuth()
@@ -84,10 +78,6 @@ const EventCard = ({
       () => eventPresenter.isUserRegistered(userData?.userEmail),
       [eventPresenter, userData?.userEmail]
    )
-
-   const handleDetailsClick = useCallback(() => {
-      handleSeeDetails(event.id)
-   }, [event.id, handleSeeDetails])
 
    const handleRegisterClick = useCallback(async () => {
       const newHosts = await firebaseService.getCareerCentersByGroupId(
@@ -139,7 +129,7 @@ const EventCard = ({
                         size="small"
                         variant="contained"
                         color="primary"
-                        onClick={() => handleClick(event)}
+                        onClick={() => handleEditEvent(event)}
                      >
                         MANAGE LIVE STREAM
                      </Button>
@@ -154,7 +144,6 @@ const EventCard = ({
                         variant={"text"}
                         color={"primary"}
                         size={"small"}
-                        onClick={handleDetailsClick}
                      >
                         {isMobile ? "details" : "see details"}
                      </Button>

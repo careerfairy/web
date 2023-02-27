@@ -9,7 +9,7 @@ import "slick-carousel/slick/slick-theme.css"
 
 type Props = {
    sliderRef: MutableRefObject<any>
-   children: JSX.Element
+   children: JSX.Element[]
 }
 
 const styles = sxStyles({
