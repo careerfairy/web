@@ -3,10 +3,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { Group } from "@careerfairy/shared-lib/groups"
-import {
-   FORTY_FIVE_MINUTES_IN_MILLISECONDS,
-   UPCOMING_LIVESTREAMS_NAME,
-} from "../data/constants/streamContants"
+import { livestreamRepo } from "../data/RepositoryInstances"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -47,24 +44,14 @@ export const getServerSideGroup = async (groupId: string): Promise<Group> => {
 }
 
 export const getServerSideUpcomingLivestreamsByGroupId = async (
-   groupId: string
+   groupId: string,
+   limit = 10
 ): Promise<LivestreamEvent[]> => {
-   const currentTime = new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
-
-   // @ts-ignore
-   const snap = await store.firestore.get({
-      collection: "livestreams",
-      where: [
-         ["groupIds", "array-contains", groupId],
-         ["start", ">", currentTime],
-         ["test", "==", false],
-      ],
-      orderBy: ["start", "asc"],
-      storeAs: `${UPCOMING_LIVESTREAMS_NAME} of ${groupId}`,
-   })
-
-   const serverSideUpcomingLivestreams =
-      snap.docs?.map((doc) => doc.data()) || []
+   const serverSideUpcomingLivestreams = await livestreamRepo.getEventsOfGroup(
+      groupId,
+      "upcoming",
+      { limit }
+   )
 
    return serverSideUpcomingLivestreams as LivestreamEvent[]
 }
