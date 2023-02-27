@@ -51,13 +51,15 @@ type Props = {
    group: Group
    handleClose: () => void
 }
+
+const datalayerEntityName = "company_page"
 const ShareCompanyPageDialog: FC<Props> = ({ group, handleClose }) => {
    const { enqueueSnackbar } = useSnackbar()
 
    const socials = useSocials({
       title: group.universityName,
       url: makeGroupCompanyPageUrl(group),
-      dataLayerEntityName: "company_page",
+      dataLayerEntityName: datalayerEntityName,
       linkedinMessage: `Check out ${group.universityName}'s company page on CareerFairy!`,
       twitterMessage: `Check out ${group.universityName}'s company page on CareerFairy!`,
    })
@@ -72,7 +74,7 @@ const ShareCompanyPageDialog: FC<Props> = ({ group, handleClose }) => {
          variant: "success",
          preventDuplicate: true,
       })
-      dataLayerEvent("group_share", {
+      dataLayerEvent(datalayerEntityName, {
          medium: "Copy Link",
       })
    }
