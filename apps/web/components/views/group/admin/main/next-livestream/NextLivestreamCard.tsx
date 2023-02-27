@@ -206,9 +206,9 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
                <Button
                   color="secondary"
                   variant="contained"
-                  onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+                  onClick={onManageLivestream}
                >
-                  Create New Live Stream
+                  Manage your live stream
                </Button>
             )}
          </Box>
