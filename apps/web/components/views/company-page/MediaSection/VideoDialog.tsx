@@ -23,6 +23,7 @@ import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import ReactPlayer from "react-player"
 import { videoUrlRegex } from "../../../../constants/forms"
+import { GroupVideo } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
    videoUploadWrapper: {
@@ -73,6 +74,10 @@ const styles = sxStyles({
          overflow: "hidden",
       },
    },
+   hidden: {
+      display: "none",
+      visibility: "hidden",
+   },
 })
 
 type VideoFormData = {
@@ -102,7 +107,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
       initialValues: {
          title: initialVideo?.title || "",
          description: initialVideo?.description || "",
-         isEmbedded: !!initialVideo?.url,
+         isEmbedded: initialVideo?.isEmbedded || false,
          url: initialVideo?.url || "",
       },
 
@@ -123,7 +128,13 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                videoUrl = await uploadFile(file, path)
             }
 
-            const newVideo = { id: videoId, description, title, url: videoUrl }
+            const newVideo: GroupVideo = {
+               id: videoId,
+               description,
+               title,
+               url: videoUrl,
+               isEmbedded,
+            }
 
             // We only allow one video per group for now, but might change in the future
             await groupRepo.updateGroupVideos(group.id, [newVideo])
@@ -148,9 +159,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
    }, [formik.values.file])
 
    const videoPreview = useCallback(() => {
-      const videoUrl = formik.values.isEmbedded
-         ? !formik.errors.url && formik.values.url
-         : fileUrl
+      const videoUrl = fileUrl || formik.values.url
 
       if (videoUrl) {
          return <MemoizedVideoPlayer url={videoUrl} />
@@ -166,27 +175,30 @@ const VideoDialog = ({ handleClose, open }: Props) => {
             />
          </Box>
       )
-   }, [fileUrl, formik.errors.url, formik.values.isEmbedded, formik.values.url])
+   }, [fileUrl, formik.values.url])
+
+   const renderSaveButton = useCallback(() => {
+      return (
+         <Box display={"flex"} justifyContent={"flex-end"}>
+            <LoadingButton
+               loading={formik.isSubmitting}
+               disabled={formik.isSubmitting}
+               color="secondary"
+               type={"submit"}
+               variant={"contained"}
+               onClick={() => formik.handleSubmit()}
+            >
+               Save & Close
+            </LoadingButton>
+         </Box>
+      )
+   }, [formik])
+
+   console.log("-> formik.values", formik.values)
 
    return (
       <form onSubmit={formik.handleSubmit}>
-         <EditDialog
-            open={open}
-            title={"Videos"}
-            dialogActionsContent={
-               <LoadingButton
-                  loading={formik.isSubmitting}
-                  disabled={formik.isSubmitting}
-                  color="secondary"
-                  type={"submit"}
-                  variant={"contained"}
-                  onClick={() => formik.handleSubmit()}
-               >
-                  Save & Close
-               </LoadingButton>
-            }
-            handleClose={handleClose}
-         >
+         <EditDialog open={open} title={"Videos"} handleClose={handleClose}>
             <Grid spacing={2} container>
                <Grid item xs={12} sm={6} md={4}>
                   <Box
@@ -284,11 +296,8 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                                  checked={formik.values.isEmbedded}
                                  onChange={(e) => {
                                     // clear file if embedded is checked
-                                    if (e.target.checked) {
-                                       formik.setFieldValue("file", undefined)
-                                    } else {
-                                       formik.setFieldValue("url", "")
-                                    }
+                                    formik.setFieldValue("file", undefined)
+                                    formik.setFieldValue("url", "")
                                     formik.handleChange(e)
                                  }}
                                  onBlur={formik.handleBlur}
@@ -309,7 +318,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                            value={formik.values.url}
                            onChange={formik.handleChange}
                            onBlur={formik.handleBlur}
-                           label={"Copy video URL here"}
+                           label={"Paste video URL here"}
                            fullWidth
                            error={
                               formik.touched.url ? !!formik.errors.url : null
@@ -320,8 +329,15 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                                  : null
                            }
                         />
-                     ) : null}
+                     ) : (
+                        renderSaveButton()
+                     )}
                   </Grid>
+                  {formik.values.isEmbedded ? (
+                     <Grid item xs={12}>
+                        {renderSaveButton()}
+                     </Grid>
+                  ) : null}
                </Grid>
             </Grid>
          </EditDialog>
