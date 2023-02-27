@@ -1,18 +1,15 @@
 import React, { MutableRefObject } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import EventCard from "./EventCard"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { useCompanyPage } from "../index"
 
 type Props = {
    sliderRef: MutableRefObject<any>
-   handleOpenEvent: (event: LivestreamEvent) => void
+   children: JSX.Element
 }
 
 const styles = sxStyles({
@@ -32,8 +29,7 @@ const styles = sxStyles({
    },
 })
 
-const EventCarousel = ({ sliderRef, handleOpenEvent }: Props) => {
-   const { upcomingLivestreams } = useCompanyPage()
+const EventCarousel = ({ sliderRef, children }: Props) => {
    const isMobile = useIsMobile()
 
    const slidesToShow = isMobile ? 1 : 2
@@ -53,13 +49,7 @@ const EventCarousel = ({ sliderRef, handleOpenEvent }: Props) => {
                infinite={false}
                sx={styles.carousel}
             >
-               {upcomingLivestreams.map((event) => (
-                  <EventCard
-                     key={event.id}
-                     event={event}
-                     handleClick={handleOpenEvent}
-                  />
-               ))}
+               {children}
             </Box>
          </Grid>
       </Grid>

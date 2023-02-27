@@ -10,6 +10,10 @@ import Link from "next/link"
 import EventCarousel from "./EventCarousel"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
+import EventCard from "./EventCard"
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import RegistrationModal from "../../common/registration-modal"
 
 const styles = sxStyles({
    titleSection: {
@@ -39,6 +43,10 @@ const styles = sxStyles({
 
 const EventSection = () => {
    const { group, upcomingLivestreams } = useCompanyPage()
+   const { setSelectedEventId } = useMarketingLandingPage()
+   const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
+      useRegistrationModal()
+
    const [openDialog, setOpenDialog] = useState(false)
    const [eventToEdit, setEventToEdit] = useState(null)
    const { spacing } = useTheme()
@@ -60,6 +68,13 @@ const EventSection = () => {
       setEventToEdit(event)
       setOpenDialog(true)
    }, [])
+
+   const handleDetailsClick = useCallback(
+      (eventId: string) => {
+         setSelectedEventId(eventId)
+      },
+      [setSelectedEventId]
+   )
 
    return (
       <Box minHeight={{ md: spacing(50) }}>
@@ -98,10 +113,19 @@ const EventSection = () => {
                      on your company page.
                   </Typography>
                   <Grid item xs={12}>
-                     <EventCarousel
-                        sliderRef={sliderRef}
-                        handleOpenEvent={handleOpenEvent}
-                     />
+                     <EventCarousel sliderRef={sliderRef}>
+                        <>
+                           {upcomingLivestreams.map((event) => (
+                              <EventCard
+                                 key={event.id}
+                                 event={event}
+                                 handleClick={handleOpenEvent}
+                                 handleSeeDetails={handleDetailsClick}
+                                 handleRegister={handleClickRegister}
+                              />
+                           ))}
+                        </>
+                     </EventCarousel>
                   </Grid>
                </Box>
             ) : (
@@ -126,11 +150,21 @@ const EventSection = () => {
                typeOfStream={"upcoming"}
                open={openDialog}
                handlePublishStream={null}
-               handleResetCurrentStream={null}
+               handleResetCurrentStream={() => {}}
                currentStream={eventToEdit}
                onClose={handleCloseDialog}
             />
          </StreamCreationProvider>
+
+         <RegistrationModal
+            open={Boolean(joinGroupModalData)}
+            onFinish={handleCloseJoinModal}
+            promptOtherEventsOnFinal={!group?.id}
+            livestream={joinGroupModalData?.livestream}
+            groups={joinGroupModalData?.groups}
+            targetGroupId={joinGroupModalData?.targetGroupId}
+            handleClose={handleCloseJoinModal}
+         />
       </Box>
    )
 }

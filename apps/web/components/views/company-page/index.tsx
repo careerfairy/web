@@ -14,10 +14,9 @@ import TestimonialSection from "./TestimonialSection"
 import EventSection from "./EventSection"
 import { useFirestoreDocData } from "reactfire"
 import { doc } from "firebase/firestore"
-import {
-   createGenericConverter,
-} from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import useListenToUpcomingStreams from "../../custom-hook/useListenToUpcomingStreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 
@@ -71,6 +70,10 @@ const CompanyPageOverview = ({
       initialData: group,
    })
 
+   const contextUpcomingLivestream = useListenToUpcomingStreams({
+      filterByGroupId: group.groupId,
+   })
+
    const handleChangeTabValue = useCallback((tabValue) => {
       setTabValue(tabValue)
    }, [])
@@ -82,13 +85,14 @@ const CompanyPageOverview = ({
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
-         upcomingLivestreams,
+         upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
       }),
       [
          contextGroup,
+         tabValue,
          editMode,
          handleChangeTabValue,
-         tabValue,
+         contextUpcomingLivestream,
          upcomingLivestreams,
       ]
    )
