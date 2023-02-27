@@ -1,5 +1,7 @@
 import { getHost } from "../constants/domains"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 
 const makeDuration = function (event) {
    const minutes = Math.floor(
@@ -95,6 +97,10 @@ export const makeUrls = function (event) {
 
 export const makeLivestreamEventDetailsUrl = (livestreamId) => {
    return `${getHost()}/upcoming-livestream/${livestreamId}`
+}
+
+export const makeGroupCompanyPageUrl = (group: Group) => {
+   return `${getHost()}/company/${companyNameSlugify(group.universityName)}`
 }
 
 export const makeLivestreamEventDetailsInviteUrl = (

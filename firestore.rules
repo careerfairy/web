@@ -6,6 +6,10 @@ service cloud.firestore {
             return get(/databases/$(database)/documents/userData/$(request.auth.token.email)).data.isAdmin == true;
         }
 
+        function isAdminOfGroup(groupId) {
+            return isCFAdmin() || groupId in request.auth.token.adminGroups.keys();
+        }
+
         function isUnchanged(field) {
             return request.resource.data[field] == resource.data[field];
         }
@@ -65,6 +69,11 @@ service cloud.firestore {
         }
 
         match /userData/{userId} {
+
+            match /companies/{groupId} {
+                allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
+                allow list: if isAdminOfGroup(groupId);
+            }
 
             match /userGroups/{userGroup} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();

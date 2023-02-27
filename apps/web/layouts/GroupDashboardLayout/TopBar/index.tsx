@@ -25,7 +25,7 @@ const styles = sxStyles({
          sm: 5,
       },
       py: {
-         xs: 1,
+         xs: 0,
          md: 3.2,
       },
    },
