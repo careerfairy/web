@@ -65,6 +65,7 @@ export interface GroupVideo extends Identifiable {
    url: string
    title: string
    description: string
+   isEmbedded: boolean
 }
 
 export interface GroupWithPolicy extends Group {
