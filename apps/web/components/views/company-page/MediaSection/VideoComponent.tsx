@@ -2,7 +2,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { GroupVideo } from "@careerfairy/shared-lib/groups"
 import React, { FC, useState } from "react"
 import { Box, Button, IconButton, Typography } from "@mui/material"
-import ReactPlayer from "react-player"
+import ReactPlayer, { Config } from "react-player"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import EditIcon from "@mui/icons-material/Edit"
 import Image from "next/image"
@@ -100,6 +100,7 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
                id={"company-video-player"}
                controls={playVideo}
                playing={playVideo}
+               config={editMode ? undefined : config}
                width={"100%"}
                height={"100%"}
                url={video.url}
@@ -134,5 +135,7 @@ const VideoComponent: FC<Props> = ({ video, openVideoDialog, editMode }) => {
       </Box>
    )
 }
+
+const config: Config = { file: { attributes: { controlsList: "nodownload" } } }
 
 export default VideoComponent
