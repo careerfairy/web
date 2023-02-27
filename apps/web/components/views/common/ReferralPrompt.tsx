@@ -5,6 +5,7 @@ import { Typography } from "@mui/material"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import ReferralWidget from "./ReferralWidget"
 import useIsMobile from "../../custom-hook/useIsMobile"
+import useEventSocials from "../../custom-hook/useEventSocials"
 
 const styles: StylesProps = {
    root: {
@@ -19,6 +20,8 @@ interface Props {
 }
 const ReferralPrompt = ({ event, title, subtitle }: Props) => {
    const isMobile = useIsMobile()
+   const socials = useEventSocials(event)
+
    return (
       <Stack spacing={2} sx={styles.root}>
          {(title || subtitle) && (
@@ -28,7 +31,7 @@ const ReferralPrompt = ({ event, title, subtitle }: Props) => {
             </span>
          )}
          <ReferralWidget
-            event={event}
+            socials={socials}
             noBackgroundColor
             iconStyle={{ height: isMobile ? "32px" : "unset", padding: 0 }}
          />

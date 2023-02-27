@@ -7,6 +7,7 @@ import {
    GroupPhoto,
    GroupQuestion,
    GroupVideo,
+   pickPublicDataFromGroup,
    Testimonial,
    UserGroupData,
 } from "./groups"
@@ -16,7 +17,12 @@ import BaseFirebaseRepository, {
    Unsubscribe,
 } from "../BaseFirebaseRepository"
 import firebase from "firebase/compat/app"
-import { UserAdminGroup, UserData } from "../users"
+import {
+   CompanyFollowed,
+   pickPublicDataFromUser,
+   UserAdminGroup,
+   UserData,
+} from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
 import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
@@ -144,6 +150,10 @@ export interface IGroupRepository {
    ): Promise<void>
 
    updateGroupVideos(groupId: string, videos: GroupVideo[]): Promise<void>
+
+   followCompany(userData: UserData, group: Group): Promise<void>
+
+   unfollowCompany(userId: string, groupId: string): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -760,6 +770,34 @@ export class FirebaseGroupRepository
       }
 
       return groupRef.update(toUpdate)
+   }
+   followCompany(userData: UserData, group: Group): Promise<void> {
+      const followRef = this.firestore
+         .collection("userData")
+         .doc(userData.id)
+         .collection("companies")
+         .doc(group.id)
+
+      const followData: CompanyFollowed = {
+         groupId: group.id,
+         group: pickPublicDataFromGroup(group),
+         id: group.id,
+         createdAt: this.fieldValue.serverTimestamp() as any,
+         user: pickPublicDataFromUser(userData),
+         userId: userData.id,
+      }
+
+      return followRef.set(followData, { merge: true })
+   }
+
+   unfollowCompany(userId: string, groupId: string): Promise<void> {
+      const followRef = this.firestore
+         .collection("userData")
+         .doc(userId)
+         .collection("companies")
+         .doc(groupId)
+
+      return followRef.delete()
    }
 }
 
