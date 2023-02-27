@@ -193,6 +193,7 @@ const moduleExports = {
    },
    experimental: {
       externalDir: true,
+      esmExternals: false, // fixes issue with [firebase](https://github.com/FirebaseExtended/reactfire/issues/491)
    },
    images: {
       domains: [
