@@ -15,6 +15,7 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
@@ -23,12 +24,15 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    const { universityName } = serverSideGroup
 
    const { userData } = useAuth()
+
+   const showFollowButton = Boolean(userData?.id)
+
    return (
       <GeneralLayout
          backgroundColor={"#FFF"}
          fullScreen
          headerEndContent={
-            userData?.id ? (
+            showFollowButton ? (
                <Box px={0.5}>
                   <FollowButton group={serverSideGroup} />
                </Box>
@@ -60,22 +64,28 @@ export const getStaticProps: GetStaticProps<{
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
       if (serverSideGroup) {
-         const serverSideUpcomingLivestreams =
-            await livestreamRepo.getEventsOfGroup(
-               serverSideGroup?.groupId,
-               "upcoming",
-               { limit: 10 }
-            )
 
-         return {
-            props: {
-               serverSideGroup,
-               serverSideUpcomingLivestreams:
-                  serverSideUpcomingLivestreams?.map(
-                     LivestreamPresenter.serializeDocument
-                  ) || [],
-            },
-            revalidate: 60,
+         const presenter = GroupPresenter.createFromDocument(serverSideGroup)
+
+         if (presenter.companyPageIsReady()) {
+
+            const serverSideUpcomingLivestreams =
+                await livestreamRepo.getEventsOfGroup(
+                    serverSideGroup?.groupId,
+                    "upcoming",
+                    {limit: 10}
+                )
+
+            return {
+               props: {
+                  serverSideGroup,
+                  serverSideUpcomingLivestreams:
+                      serverSideUpcomingLivestreams?.map(
+                          LivestreamPresenter.serializeDocument
+                      ) || [],
+               },
+               revalidate: 60,
+            }
          }
       }
    }

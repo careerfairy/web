@@ -29,6 +29,7 @@ import { DefaultTheme } from "@mui/styles/defaultTheme"
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
 const DESKTOP_LOGO_SIZE = LOGO_SIZE * 1.5
+
 const styles = sxStyles({
    imageWrapper: {
       width: "100%",
@@ -327,12 +328,16 @@ const Header = () => {
 
 const Actions = () => {
    const { userData } = useAuth()
-   const { group } = useCompanyPage()
+   const { group, editMode, groupPresenter } = useCompanyPage()
+
+   const showFollowButton = Boolean(!editMode && userData?.id)
+
+   const showShareButton = groupPresenter.companyPageIsReady()
 
    return (
       <Stack spacing={1} direction={"row"}>
-         {userData?.id ? <FollowButton group={group} /> : null}
-         <ShareButton />
+         {showFollowButton ? <FollowButton group={group} /> : null}
+         {showShareButton ? <ShareButton /> : null}
       </Stack>
    )
 }
