@@ -118,9 +118,9 @@ class FirebaseService {
       return createUserInAuthAndFirebase({ userData })
    }
 
-   getRegistrationSources = async (args: GetRegistrationSourcesFnArgs) => {
+   getRegistrationSources = (args: GetRegistrationSourcesFnArgs) => {
       const fn = this.functions.httpsCallable("getRegistrationSources_v2")
-      return await fn(args)
+      return fn(args)
    }
 
    createGroupAdminUserInAuthAndFirebase = async (args: {
