@@ -6,7 +6,6 @@ import { facebookAppId } from "../../constants/links"
 import TwitterIcon from "@mui/icons-material/Twitter"
 import EmailIcon from "@mui/icons-material/Email"
 import ShareIcon from "@mui/icons-material/ShareOutlined"
-import { useAuth } from "../../HOCs/AuthProvider"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 
 export interface SocialIconProps {
