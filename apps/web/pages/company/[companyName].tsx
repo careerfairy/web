@@ -10,6 +10,9 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
+import GeneralLayout from "../../layouts/GeneralLayout"
+import { useAuth } from "../../HOCs/AuthProvider"
+import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
@@ -18,8 +21,20 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideUpcomingLivestreams,
 }) => {
    const { universityName } = serverSideGroup
+
+   const { userData } = useAuth()
    return (
-      <>
+      <GeneralLayout
+         backgroundColor={"#FFF"}
+         fullScreen
+         headerEndContent={
+            userData?.id ? (
+               <Box px={0.5}>
+                  <FollowButton group={serverSideGroup} />
+               </Box>
+            ) : null
+         }
+      >
          <DashboardHead title={`CareerFairy | ${universityName}`} />
          <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
             <CompanyPageOverview
@@ -30,7 +45,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                editMode={false}
             />
          </Box>
-      </>
+      </GeneralLayout>
    )
 }
 
