@@ -24,16 +24,12 @@ export const LivestreamStats = ({
    )
 
    if (isDraft()) {
-      return (
-         <Grid item xs={12} mt={2}>
-            {applications}
-         </Grid>
-      )
+      return <Box mt={2}>{applications}</Box>
    }
 
    return (
-      <>
-         <Grid item xs={5} mt={2}>
+      <Box display="flex" sx={{ flexWrap: "wrap" }}>
+         <Box mt={{ xs: 1, sm: 2 }} mr={4}>
             <Box display="flex" alignItems="center">
                <User />
                <Typography ml={2}>
@@ -43,11 +39,9 @@ export const LivestreamStats = ({
                   registered
                </Typography>
             </Box>
-         </Grid>
-         <Grid item xs={7} mt={2}>
-            {applications}
-         </Grid>
-      </>
+         </Box>
+         <Box mt={{ xs: 1, sm: 2 }}>{applications}</Box>
+      </Box>
    )
 }
 

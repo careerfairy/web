@@ -1,6 +1,6 @@
 import { Interest } from "@careerfairy/shared-lib/interests"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Grid, Skeleton, useMediaQuery, useTheme } from "@mui/material"
+import { Box, Skeleton, useMediaQuery, useTheme } from "@mui/material"
 import { useInterests } from "components/custom-hook/useCollection"
 import WhiteTagChip from "components/views/common/chips/TagChip"
 import { useMemo } from "react"
@@ -63,7 +63,7 @@ const ChipsLine = ({
    }, [xl, xs])
 
    return (
-      <Grid item xs={12} mt={2}>
+      <Box mt={{ xs: 1, sm: 2 }}>
          {livestream?.language?.code ? (
             <WhiteTagChip
                icon={<LanguageIcon />}
@@ -89,6 +89,6 @@ const ChipsLine = ({
                label={`+ ${eventInterests.length - 3}`}
             />
          )}
-      </Grid>
+      </Box>
    )
 }

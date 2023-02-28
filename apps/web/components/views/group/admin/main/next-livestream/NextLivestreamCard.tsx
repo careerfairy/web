@@ -27,6 +27,14 @@ const styles = sxStyles({
          justifyContent: "center",
       },
    },
+   cardCustom: {
+      ".MuiCardContent-root": {
+         height: "80%",
+         paddingBottom: 0,
+         display: "flex",
+         flexDirection: "column",
+      },
+   },
    cardTitleTypographyProps: {
       fontWeight: 500,
    },
@@ -134,7 +142,7 @@ export const NextLivestreamCard = () => {
    }
 
    return (
-      <CardCustom title={<TitleBar />}>
+      <CardCustom sx={styles.cardCustom} title={<TitleBar />}>
          <LivestreamDetails livestream={livestream} />
       </CardCustom>
    )
@@ -143,27 +151,28 @@ export const NextLivestreamCard = () => {
 const LivestreamDetails = ({ livestream }: { livestream: LivestreamEvent }) => {
    return (
       <>
-         <Grid container>
-            <Grid item xs={12} mt={2}>
+         <Box sx={{ flex: 1 }}>
+            <Box display="flex" mt={2}>
                <Typography sx={styles.date}>
                   {livestream.start
                      ? DateUtil.eventPreviewDate(livestream.start.toDate())
                      : "Future Date"}
                </Typography>
-            </Grid>
-            <Grid item xs={12} mt={1}>
+            </Box>
+            <Box mt={1}>
                <Typography variant="h5" sx={styles.title}>
                   {livestream.title?.length > 0
                      ? livestream.title
                      : "Untitled Live Stream"}
                </Typography>
-            </Grid>
+            </Box>
 
             <LivestreamStats livestream={livestream} />
             <LivestreamChips livestream={livestream} />
-
+         </Box>
+         <Box sx={{ flex: "none" }}>
             <Actions livestream={livestream} />
-         </Grid>
+         </Box>
       </>
    )
 }
@@ -178,41 +187,39 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
    }, [isDraft, livestream, livestreamDialog])
 
    return (
-      <Grid item xs={12} mt={4}>
-         <Box display="flex" justifyContent="right">
-            {isDraft() ? (
+      <Box textAlign="right" my={2}>
+         {isDraft() ? (
+            <Button
+               color="secondary"
+               variant="contained"
+               onClick={onManageLivestream}
+            >
+               Manage your live stream
+            </Button>
+         ) : isCloseToLivestreamStart() ? (
+            <>
                <Button
                   color="secondary"
-                  variant="contained"
+                  variant="outlined"
+                  sx={styles.buttonManage}
                   onClick={onManageLivestream}
                >
                   Manage your live stream
                </Button>
-            ) : isCloseToLivestreamStart() ? (
-               <>
-                  <Button
-                     color="secondary"
-                     variant="outlined"
-                     sx={styles.buttonManage}
-                     onClick={onManageLivestream}
-                  >
-                     Manage your live stream
-                  </Button>
-                  <Button color="secondary" variant="contained">
-                     Go to Live Stream
-                  </Button>
-               </>
-            ) : (
-               <Button
-                  color="secondary"
-                  variant="contained"
-                  onClick={onManageLivestream}
-               >
-                  Manage your live stream
+               <Button color="secondary" variant="contained">
+                  Go to Live Stream
                </Button>
-            )}
-         </Box>
-      </Grid>
+            </>
+         ) : (
+            <Button
+               color="secondary"
+               variant="contained"
+               onClick={onManageLivestream}
+            >
+               Manage your live stream
+            </Button>
+         )}
+      </Box>
    )
 }
 
