@@ -350,8 +350,9 @@ const videoFormSchema = object({
       .min(3, "Description must be at least 3 characters")
       .max(1000, "Description must be less than 1000 characters"),
    isEmbedded: boolean().required(),
-   file: mixed<File>().when("isEmbedded", {
-      is: false,
+   file: mixed<File>().when(["isEmbedded", "url"], {
+      // If isEmbedded is false and url is not provided, perform validation
+      is: (isEmbedded: boolean, url: string) => !isEmbedded && !url,
       then: mixed<File>()
          .required("File is required")
          .test("file-size", "File size too large", (value) => {
