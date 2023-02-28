@@ -1,6 +1,7 @@
 import * as actions from "./actionTypes"
 import { firebaseServiceInstance } from "../../data/firebase/FirebaseService"
 import { dataLayerEvent } from "../../util/analyticsUtils"
+import { clearFirestoreCache } from "../../data/util/authUtil"
 
 // Sign up action creator
 export const signUp =
@@ -36,6 +37,7 @@ export const signOut =
       const firebase = getFirebase()
       try {
          await firebase.auth().signOut()
+         clearFirestoreCache()
          dataLayerEvent("logout")
       } catch (err) {
          console.log(err.message)
@@ -133,6 +135,7 @@ export const deleteUser =
       try {
          await firebaseServiceInstance.deleteUserAccount()
          await firebase.auth().signOut()
+         clearFirestoreCache()
 
          dispatch({ type: actions.DELETE_USER_SUCCESS })
       } catch (err) {

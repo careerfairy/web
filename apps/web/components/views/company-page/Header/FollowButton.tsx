@@ -11,6 +11,9 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import LoadingButton from "@mui/lab/LoadingButton"
 import FollowedIcon from "@mui/icons-material/CheckRounded"
+import { Button, ButtonProps } from "@mui/material"
+import { useRouter } from "next/router"
+import Link from "../../common/Link"
 
 type Arguments = {
    arg: {
@@ -37,7 +40,7 @@ const toggleFollowCompany = (
 type Props = {
    group: Group
 }
-const FollowButton: FC<Props> = ({ group }) => {
+const AuthedFollowButton: FC<Props> = ({ group }) => {
    const { userData, authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -68,11 +71,11 @@ const FollowButton: FC<Props> = ({ group }) => {
          doc(
             firestore,
             "userData",
-            userData.id,
-            "companies",
+            authenticatedUser.email,
+            "companiesUserFollows",
             group.id
          ).withConverter(createGenericConverter<CompanyFollowed>()),
-      [firestore, group.id, userData.id]
+      [firestore, group.id, authenticatedUser.email]
    )
 
    const { data: companyFollowedData, status } = useFirestoreDocData(
@@ -98,15 +101,6 @@ const FollowButton: FC<Props> = ({ group }) => {
          loading={isMutating || status === "loading"}
          disabled={isMutating || status === "loading"}
          onClick={handleClick}
-         variant={"contained"}
-         size={"small"}
-         sx={{
-            fontSize: {
-               xs: "0.75rem",
-               md: "0.875rem",
-            },
-         }}
-         color={"primary"}
          startIcon={
             companyFollowedData ? (
                <FollowedIcon fontSize={"small"} />
@@ -114,10 +108,52 @@ const FollowButton: FC<Props> = ({ group }) => {
                <FollowIcon fontSize={"small"} />
             )
          }
+         {...buttonProps}
       >
-         {companyFollowedData ? "followed" : "Follow"}
+         {companyFollowedData ? "Followed" : "Follow"}
       </LoadingButton>
    )
+}
+
+const NonAuthedFollowButton = () => {
+   const { asPath } = useRouter()
+
+   return (
+      <Button
+         component={Link}
+         // @ts-ignore
+         href={{
+            pathname: "/signup",
+            query: {
+               absolutePath: asPath,
+            },
+         }}
+         {...buttonProps}
+      >
+         Follow
+      </Button>
+   )
+}
+
+const FollowButton: FC<Props> = ({ group }) => {
+   const { isLoggedIn } = useAuth()
+
+   if (isLoggedIn) {
+      return <AuthedFollowButton group={group} />
+   }
+   return <NonAuthedFollowButton />
+}
+
+const buttonProps: ButtonProps = {
+   sx: {
+      fontSize: {
+         xs: "0.75rem",
+         md: "0.875rem",
+      },
+   },
+   variant: "contained",
+   size: "small",
+   color: "primary",
 }
 
 export default FollowButton

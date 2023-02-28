@@ -7,7 +7,7 @@ service cloud.firestore {
         }
 
         function isAdminOfGroup(groupId) {
-            return isCFAdmin() || groupId in request.auth.token.adminGroups.keys();
+            return groupId in request.auth.token.adminGroups.keys() || isCFAdmin();
         }
 
         function isUnchanged(field) {
@@ -70,9 +70,8 @@ service cloud.firestore {
 
         match /userData/{userId} {
 
-            match /companies/{groupId} {
+            match /companiesUserFollows/{groupId} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
-                allow list: if isAdminOfGroup(groupId);
             }
 
             match /userGroups/{userGroup} {

@@ -6,7 +6,7 @@ import ShareCompanyPageDialog from "../../common/ShareCompanyPageDialog"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 
 const ShareButton = () => {
-   const { group } = useCompanyPage()
+   const { group, editMode } = useCompanyPage()
 
    const [
       shareCompanyDialogOpen,
@@ -35,6 +35,7 @@ const ShareButton = () => {
             <ShareCompanyPageDialog
                group={group}
                handleClose={handleCloseShareCompanyDialog}
+               isGroupAdmin={editMode}
             />
          ) : null}
       </>
