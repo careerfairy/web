@@ -70,19 +70,6 @@ export const handleErrorSection = (
    return baseError && baseTouched && baseError
 }
 
-export const buildTestimonialsArray = (values, groupId) => {
-   return Object.keys(values.testimonials).map((key) => {
-      return {
-         groupId,
-         id: values.testimonials[key]?.id || key,
-         avatar: values.testimonials[key].avatar,
-         name: values.testimonials[key].name,
-         position: values.testimonials[key].position,
-         testimonial: values.testimonials[key].testimonial,
-      }
-   })
-}
-
 export const buildLivestreamObject = (
    values: DraftFormValues,
    updateMode,

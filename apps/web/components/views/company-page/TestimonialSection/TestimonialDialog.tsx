@@ -1,12 +1,13 @@
 import { useCompanyPage } from "../index"
-import { useSnackbar } from "notistack"
 import React, { Fragment, useCallback, useMemo } from "react"
 import { Box, Button, Fab } from "@mui/material"
 import { Formik, FormikErrors, FormikValues } from "formik"
-import { Testimonial } from "@careerfairy/shared-lib/groups"
-import { sxStyles } from "../../../../types/commonTypes"
 import {
    buildTestimonialsArray,
+   Testimonial,
+} from "@careerfairy/shared-lib/groups"
+import { sxStyles } from "../../../../types/commonTypes"
+import {
    getDownloadUrl,
    handleAddSection,
    handleDeleteSection,
@@ -16,8 +17,8 @@ import TestimonialForm from "./TestimonialForm"
 import { v4 as uuidv4 } from "uuid"
 import DeleteIcon from "@mui/icons-material/Delete"
 import useIsMobile from "../../../custom-hook/useIsMobile"
-import { GENERAL_ERROR } from "components/util/constants"
 import { groupRepo } from "../../../../data/RepositoryInstances"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    multiline: {
@@ -63,7 +64,7 @@ const TESTIMONIAL_LIMIT = 10
 
 const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const { group } = useCompanyPage()
-   const { enqueueSnackbar } = useSnackbar()
+   const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
 
    const initialValues = useMemo(
@@ -78,7 +79,7 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
    const handleSubmitForm = useCallback(
       async (values) => {
          try {
-            let testimonialsToUpdate
+            let testimonialsToUpdate: Testimonial[]
 
             if (testimonialToEdit) {
                // To update a single testimonial
@@ -110,15 +111,11 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
 
             handleClose()
          } catch (e) {
-            console.log("error", e)
-            enqueueSnackbar(GENERAL_ERROR, {
-               variant: "error",
-               preventDuplicate: true,
-            })
+            errorNotification(e)
          }
       },
       [
-         enqueueSnackbar,
+         errorNotification,
          group.id,
          group.testimonials,
          handleClose,
