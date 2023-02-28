@@ -208,3 +208,16 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       universityCode: group.universityCode ?? null,
    }
 }
+
+export const buildTestimonialsArray = (values, groupId) => {
+   return Object.keys(values.testimonials).map((key) => {
+      return {
+         groupId,
+         id: values.testimonials[key]?.id || key,
+         avatar: values.testimonials[key].avatar,
+         name: values.testimonials[key].name,
+         position: values.testimonials[key].position,
+         testimonial: values.testimonials[key].testimonial,
+      }
+   })
+}

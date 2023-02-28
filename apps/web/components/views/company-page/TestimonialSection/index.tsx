@@ -8,6 +8,7 @@ import EditDialog from "../EditDialog"
 import TestimonialDialog from "./TestimonialDialog"
 import { Testimonial } from "@careerfairy/shared-lib/groups"
 import { ArrowLeft, ArrowRight } from "react-feather"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 
 const styles = sxStyles({
    titleSection: {
@@ -25,25 +26,26 @@ const styles = sxStyles({
 
 const TestimonialSection = () => {
    const { group, editMode } = useCompanyPage()
-   const [openDialog, setOpenDialog] = useState(false)
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
    const [step, setStep] = useState(0)
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
 
    useEffect(() => {
       setStep(0)
    }, [group?.testimonials])
 
-   const handleCloseDialog = useCallback(() => {
-      setOpenDialog(false)
+   const handleCloseDialogClick = useCallback(() => {
+      handleCloseDialog()
       setTestimonialToEdit(null)
-   }, [])
+   }, [handleCloseDialog])
 
    const handleEditTestimonial = useCallback(
       (selectedTestimonial: Testimonial) => {
          setTestimonialToEdit(selectedTestimonial)
-         setOpenDialog(true)
+         handleOpenDialog()
       },
-      []
+      [handleOpenDialog]
    )
 
    const handleSteps = useCallback(
@@ -73,12 +75,7 @@ const TestimonialSection = () => {
                   Testimonial
                </Typography>
                {editMode ? (
-                  <IconButton
-                     color="secondary"
-                     onClick={() => {
-                        setOpenDialog(true)
-                     }}
-                  >
+                  <IconButton color="secondary" onClick={handleOpenDialog}>
                      <Add fontSize={"large"} />
                   </IconButton>
                ) : (
@@ -147,16 +144,18 @@ const TestimonialSection = () => {
             </Box>
          </Box>
 
-         <EditDialog
-            open={openDialog}
-            title={"Testimonials"}
-            handleClose={handleCloseDialog}
-         >
-            <TestimonialDialog
-               handleClose={handleCloseDialog}
-               testimonialToEdit={testimonialToEdit}
-            />
-         </EditDialog>
+         {isDialogOpen ? (
+            <EditDialog
+               open={isDialogOpen}
+               title={"Testimonials"}
+               handleClose={handleCloseDialogClick}
+            >
+               <TestimonialDialog
+                  handleClose={handleCloseDialog}
+                  testimonialToEdit={testimonialToEdit}
+               />
+            </EditDialog>
+         ) : null}
       </>
    )
 }
