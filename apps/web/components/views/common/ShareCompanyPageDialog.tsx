@@ -2,6 +2,7 @@ import { useSnackbar } from "notistack"
 import { makeGroupCompanyPageUrl } from "../../../util/makeUrls"
 import {
    copyStringToClipboard,
+   getMaxLineStyles,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
 import {
@@ -44,6 +45,9 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
+   },
+   companyDescription: {
+      ...getMaxLineStyles(3),
    },
 })
 
@@ -124,8 +128,12 @@ const ShareCompanyPageDialog: FC<Props> = ({
                         <Typography fontWeight={800}>
                            {group.universityName}
                         </Typography>
-                        <Typography variant="body2" color={"text.secondary"}>
-                           {group.description}
+                        <Typography
+                           sx={styles.companyDescription}
+                           variant="body2"
+                           color={"text.secondary"}
+                        >
+                           {group.extraInfo}
                         </Typography>
                      </Box>
                   </Stack>
