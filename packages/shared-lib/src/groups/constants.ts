@@ -1,1 +1,0 @@
-export const MAX_GROUP_PHOTOS_COUNT = 15

@@ -16,7 +16,7 @@ type Arguments = {
 }
 
 const handleUpdatePhotos = (
-   key: string,
+   _: string,
    { arg: { newPhotos, groupId, type } }: { arg: Arguments }
 ) => groupRepo.updateGroupPhotos(groupId, newPhotos, type)
 
@@ -68,7 +68,7 @@ const useGroupPhotos = (
          const promises = newPhotos.map(async (photo) => {
             const photoId = uuidv4()
 
-            const path = `${presenter.getCompanyPageImagePath()}/${photoId}`
+            const path = `${presenter.getCompanyPageStorageImagePath(photoId)}`
 
             const photoRef = ref(storage, path)
 
