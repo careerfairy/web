@@ -17,7 +17,7 @@ const imageValidator: Validator = {
             ? res()
             : rej({ invalidFileType: true })
       ),
-   validateAfterParsing: async () => new Promise<void>((res) => res()),
+   validateAfterParsing: () => Promise.resolve(),
 }
 const PhotoUploadButton: FC<PhotoUploadButtonProps> = ({
    isAddingPhotos,
