@@ -1,7 +1,7 @@
 import DashboardHead from "../../layouts/GroupDashboardLayout/DashboardHead"
 import CompanyPageOverview from "../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { groupRepo } from "../../data/RepositoryInstances"
+import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import {
@@ -10,10 +10,7 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import {
-   getServerSideUpcomingLivestreamsByGroupId,
-   mapFromServerSide,
-} from "../../util/serverUtil"
+import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
@@ -49,8 +46,10 @@ export const getStaticProps: GetStaticProps<{
 
       if (serverSideGroup) {
          const serverSideUpcomingLivestreams =
-            await getServerSideUpcomingLivestreamsByGroupId(
-               serverSideGroup.groupId
+            await livestreamRepo.getEventsOfGroup(
+               serverSideGroup?.groupId,
+               "upcoming",
+               { limit: 10 }
             )
 
          return {
