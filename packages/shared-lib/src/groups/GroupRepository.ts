@@ -4,7 +4,10 @@ import {
    GroupAdmin,
    GroupATSAccountDocument,
    GroupATSIntegrationTokensDocument,
+   GroupPhoto,
    GroupQuestion,
+   GroupVideo,
+   Testimonial,
    UserGroupData,
 } from "./groups"
 import BaseFirebaseRepository, {
@@ -16,6 +19,7 @@ import firebase from "firebase/compat/app"
 import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
+import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -122,6 +126,24 @@ export interface IGroupRepository {
    getGroupAdmins(groupId: string): Promise<GroupAdmin[]>
 
    getGroupByGroupName(groupName: string): Promise<Group>
+
+   updateGroupMetadata(
+      groupId: string,
+      metadata: Pick<
+         Group,
+         "extraInfo" | "companySize" | "companyIndustry" | "companyCountry"
+      >
+   ): Promise<void>
+
+   updateGroupTestimonials(groupId: string, testimonials: Testimonial[])
+
+   updateGroupPhotos(
+      groupId: string,
+      newPhotos: GroupPhoto[],
+      type: "replace" | "add"
+   ): Promise<void>
+
+   updateGroupVideos(groupId: string, videos: GroupVideo[]): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -669,6 +691,75 @@ export class FirebaseGroupRepository
          .get()
 
       return mapFirestoreDocuments<Group>(adminsSnap)?.[0]
+   }
+
+   updateGroupMetadata(
+      groupId: string,
+      metadata: Pick<
+         Group,
+         "extraInfo" | "companySize" | "companyIndustry" | "companyCountry"
+      >
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      return groupRef.set(metadata, { merge: true })
+   }
+
+   updateGroupTestimonials(
+      groupId: string,
+      testimonials: Testimonial[]
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      return groupRef.set({ testimonials }, { merge: true })
+   }
+
+   updateGroupPhotos(
+      groupId: string,
+      photos: GroupPhoto[],
+      type: "replace" | "add"
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      if (photos.length > MAX_GROUP_PHOTOS_COUNT) {
+         throw new Error(`You can only have ${MAX_GROUP_PHOTOS_COUNT} photos`)
+      }
+
+      if (type === "add") {
+         // We must check if the new added photos will exceed the max count
+         return this.firestore.runTransaction(async (transaction) => {
+            const groupSnap = await transaction.get(groupRef)
+            const group = groupSnap.data() as Group
+            const newPhotos = [...(group.photos || []), ...photos]
+            if (newPhotos.length < MAX_GROUP_PHOTOS_COUNT) {
+               transaction.update(groupSnap.ref, { photos: newPhotos })
+            } else {
+               throw new Error(
+                  `You can only have ${MAX_GROUP_PHOTOS_COUNT} photos`
+               )
+            }
+         })
+      } else {
+         return groupRef.update({ photos })
+      }
+   }
+
+   updateGroupVideos(groupId: string, videos: GroupVideo[]): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "videos"> = {
+         videos: videos,
+      }
+
+      return groupRef.update(toUpdate)
    }
 }
 

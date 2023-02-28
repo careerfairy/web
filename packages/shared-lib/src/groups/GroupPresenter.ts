@@ -3,6 +3,7 @@ import { GroupATSAccount } from "./GroupATSAccount"
 import { UserData } from "../users"
 
 export const ATS_MAX_LINKED_ACCOUNTS = 1
+export const MAX_GROUP_PHOTOS_COUNT = 15
 
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
@@ -55,5 +56,13 @@ export class GroupPresenter {
             }, {}),
          }
       })
+   }
+
+   getCompanyPageStorageImagePath(photoId: string) {
+      return `company-pages/${this.id}/photos/${photoId}`
+   }
+
+   getCompanyPageStorageVideoPath(videoId: string) {
+      return `company-pages/${this.id}/videos/${videoId}`
    }
 }
