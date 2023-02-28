@@ -2,6 +2,7 @@ import { Box, Button, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import React from "react"
 import Image from "next/image"
+import { useCompanyPage } from "../index"
 
 const styles = sxStyles({
    wrapper: {
@@ -16,6 +17,8 @@ type Props = {
 }
 
 const StayUpToDateBanner = ({ handleFollow }: Props) => {
+   const { group } = useCompanyPage()
+
    return (
       <Box sx={styles.wrapper}>
          <Grid container>
@@ -37,9 +40,9 @@ const StayUpToDateBanner = ({ handleFollow }: Props) => {
                   </Grid>
                   <Grid item>
                      <Typography variant={"body1"} fontSize={14}>
-                        Atlassian Corporation does not have any upcoming live
+                        {`${group?.universityName} does not have any upcoming live
                         stream planned. Follow the company to show your interest
-                        and notified as soon as they publish a new stream.
+                        and notified as soon as they publish a new stream.`}
                      </Typography>
                   </Grid>
                   <Grid item>

@@ -3,7 +3,6 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { livestreamRepo } from "../data/RepositoryInstances"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -41,19 +40,6 @@ export const getServerSideGroup = async (groupId: string): Promise<Group> => {
       serverSideGroup.id = snap.id
    }
    return serverSideGroup as Group
-}
-
-export const getServerSideUpcomingLivestreamsByGroupId = async (
-   groupId: string,
-   limit = 10
-): Promise<LivestreamEvent[]> => {
-   const serverSideUpcomingLivestreams = await livestreamRepo.getEventsOfGroup(
-      groupId,
-      "upcoming",
-      { limit }
-   )
-
-   return serverSideUpcomingLivestreams as LivestreamEvent[]
 }
 
 /**
