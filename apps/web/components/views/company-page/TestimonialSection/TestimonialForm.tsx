@@ -81,7 +81,7 @@ const TestimonialForm = ({
          <Grid container>
             <Grid item xs={12} md={4}>
                <ImageSelect
-                  path="mentors-pictures"
+                  path="testimonial-avatars"
                   getDownloadUrl={getDownloadUrl}
                   formName={`testimonials.${objectKey}.avatar`}
                   label="Avatar"

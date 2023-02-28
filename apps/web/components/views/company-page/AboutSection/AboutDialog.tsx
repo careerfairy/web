@@ -10,11 +10,10 @@ import CompanyMetadata from "../../group/create/CompanyMetadata"
 import { Formik } from "formik"
 import React, { useCallback, useMemo } from "react"
 import { useCompanyPage } from "../index"
-import { useSnackbar } from "notistack"
-import { GENERAL_ERROR } from "components/util/constants"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { groupRepo } from "../../../../data/RepositoryInstances"
 import * as yup from "yup"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 
 type Props = {
    handleClose: () => void
@@ -22,7 +21,7 @@ type Props = {
 
 const AboutDialog = ({ handleClose }: Props) => {
    const { group } = useCompanyPage()
-   const { enqueueSnackbar } = useSnackbar()
+   const { errorNotification } = useSnackbarNotifications()
    const isMobile = useIsMobile()
 
    const initialValues = useMemo(
@@ -51,14 +50,10 @@ const AboutDialog = ({ handleClose }: Props) => {
             })
             handleClose()
          } catch (e) {
-            console.log("error", e)
-            enqueueSnackbar(GENERAL_ERROR, {
-               variant: "error",
-               preventDuplicate: true,
-            })
+            errorNotification(e)
          }
       },
-      [enqueueSnackbar, group.id, handleClose]
+      [errorNotification, group.id, handleClose]
    )
 
    return (

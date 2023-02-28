@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useState } from "react"
+import { useCallback, useMemo } from "react"
 import { Box, Button, Typography } from "@mui/material"
 import { useCompanyPage } from "../index"
 
@@ -12,6 +12,7 @@ import {
 } from "react-feather"
 import EditDialog from "../EditDialog"
 import AboutDialog from "./AboutDialog"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 
 const styles = sxStyles({
    wrapper: {
@@ -38,7 +39,8 @@ const styles = sxStyles({
 
 const AboutSection = () => {
    const { group, editMode } = useCompanyPage()
-   const [openDialog, setOpenDialog] = useState(false)
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
 
    const { companyCountry, companyIndustry, companySize, extraInfo } = group
 
@@ -81,10 +83,6 @@ const AboutSection = () => {
       [companyCountry?.name, companyIndustry?.name, companySize]
    )
 
-   const handleCloseDialog = useCallback(() => {
-      setOpenDialog(false)
-   }, [])
-
    return (
       <>
          <Box sx={styles.wrapper}>
@@ -97,9 +95,7 @@ const AboutSection = () => {
                      startIcon={<EditIcon size={18} />}
                      variant="text"
                      color="primary"
-                     onClick={() => {
-                        setOpenDialog(true)
-                     }}
+                     onClick={handleOpenDialog}
                   >
                      <Typography fontSize={"15px"} fontWeight={"600"}>
                         EDIT
@@ -115,13 +111,15 @@ const AboutSection = () => {
             </Box>
          </Box>
 
-         <EditDialog
-            open={openDialog}
-            title={"About"}
-            handleClose={handleCloseDialog}
-         >
-            <AboutDialog handleClose={handleCloseDialog} />
-         </EditDialog>
+         {isDialogOpen ? (
+            <EditDialog
+               open={isDialogOpen}
+               title={"About"}
+               handleClose={handleCloseDialog}
+            >
+               <AboutDialog handleClose={handleCloseDialog} />
+            </EditDialog>
+         ) : null}
       </>
    )
 }
