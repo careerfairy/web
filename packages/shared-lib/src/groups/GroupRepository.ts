@@ -18,7 +18,7 @@ import firebase from "firebase/compat/app"
 import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
-import { MAX_GROUP_PHOTOS_COUNT } from "./constants"
+import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
 
 const cloneDeep = require("lodash.clonedeep")
 
