@@ -6,6 +6,7 @@ import {
    GroupATSIntegrationTokensDocument,
    GroupPhoto,
    GroupQuestion,
+   GroupVideo,
    Testimonial,
    UserGroupData,
 } from "./groups"
@@ -141,6 +142,8 @@ export interface IGroupRepository {
       newPhotos: GroupPhoto[],
       type: "replace" | "add"
    ): Promise<void>
+
+   updateGroupVideos(groupId: string, videos: GroupVideo[]): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -745,6 +748,18 @@ export class FirebaseGroupRepository
       } else {
          return groupRef.update({ photos })
       }
+   }
+
+   updateGroupVideos(groupId: string, videos: GroupVideo[]): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "videos"> = {
+         videos: videos,
+      }
+
+      return groupRef.update(toUpdate)
    }
 }
 
