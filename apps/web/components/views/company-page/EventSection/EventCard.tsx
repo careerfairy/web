@@ -13,6 +13,7 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import { ChevronRight } from "@mui/icons-material"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { getRelevantHosts } from "../../../../util/streamUtil"
+import { getSubstringWithEllipsis } from "../../../../util/SeoUtil"
 
 const styles = sxStyles({
    wrapper: {
@@ -97,6 +98,10 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
       isRegistered,
    ])
 
+   const cardTitle = useMemo(() => {
+      return getSubstringWithEllipsis(event?.title, 30)
+   }, [event?.title])
+
    return (
       <Box sx={styles.wrapper}>
          <Box
@@ -120,7 +125,7 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
                </Typography>
 
                <Typography fontWeight={600} fontSize={15}>
-                  {event?.title}
+                  {cardTitle}
                </Typography>
 
                {editMode ? (
@@ -137,7 +142,7 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
                ) : (
                   <Box sx={styles.buttonsWrapper}>
                      <Button
-                        endIcon={<ChevronRight fontSize={"large"} />}
+                        endIcon={<ChevronRight sx={{ mb: "2px" }} />}
                         sx={styles.detailsButton}
                         component={Link}
                         href={`/upcoming-livestream/${event?.id}`}

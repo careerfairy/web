@@ -14,6 +14,7 @@ import EventCard from "./EventCard"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import RegistrationModal from "../../common/registration-modal"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import StayUpToDateBanner from "./StayUpToDateBanner"
 
 const styles = sxStyles({
    titleSection: {
@@ -68,10 +69,6 @@ const EventSection = () => {
       setEventToEdit(event)
       setOpenDialog(true)
    }, [])
-
-   if (!editMode && !upcomingLivestreams?.length) {
-      return null
-   }
 
    return (
       <Box minHeight={{ md: spacing(50) }}>
@@ -138,7 +135,20 @@ const EventSection = () => {
                      </Button>
                   </a>
                </Link>
-            ) : null}
+            ) : (
+               <>
+                  <Typography
+                     variant="h6"
+                     fontWeight={"400"}
+                     color="textSecondary"
+                     mb={2}
+                  >
+                     Watch live streams. Discover new career ideas, interesting
+                     jobs, internships and programmes for students. Get hired.
+                  </Typography>
+                  <StayUpToDateBanner handleFollow={() => {}} />
+               </>
+            )}
          </Box>
 
          <StreamCreationProvider>
@@ -153,15 +163,17 @@ const EventSection = () => {
             />
          </StreamCreationProvider>
 
-         <RegistrationModal
-            open={Boolean(joinGroupModalData)}
-            onFinish={handleCloseJoinModal}
-            promptOtherEventsOnFinal={!group?.id}
-            livestream={joinGroupModalData?.livestream}
-            groups={joinGroupModalData?.groups}
-            targetGroupId={joinGroupModalData?.targetGroupId}
-            handleClose={handleCloseJoinModal}
-         />
+         {Boolean(joinGroupModalData) ? (
+            <RegistrationModal
+               open={Boolean(joinGroupModalData)}
+               onFinish={handleCloseJoinModal}
+               promptOtherEventsOnFinal={!group?.id}
+               livestream={joinGroupModalData?.livestream}
+               groups={joinGroupModalData?.groups}
+               targetGroupId={joinGroupModalData?.targetGroupId}
+               handleClose={handleCloseJoinModal}
+            />
+         ) : null}
       </Box>
    )
 }
