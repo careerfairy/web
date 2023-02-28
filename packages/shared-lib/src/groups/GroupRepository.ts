@@ -4,6 +4,7 @@ import {
    GroupAdmin,
    GroupATSAccountDocument,
    GroupATSIntegrationTokensDocument,
+   GroupPhoto,
    GroupQuestion,
    Testimonial,
    UserGroupData,
@@ -17,6 +18,7 @@ import firebase from "firebase/compat/app"
 import { UserAdminGroup, UserData } from "../users"
 import { LivestreamEvent, LivestreamGroupQuestionsMap } from "../livestreams"
 import { GroupDashboardInvite } from "./GroupDashboardInvite"
+import { MAX_GROUP_PHOTOS_COUNT } from "./GroupPresenter"
 
 const cloneDeep = require("lodash.clonedeep")
 
@@ -133,6 +135,12 @@ export interface IGroupRepository {
    ): Promise<void>
 
    updateGroupTestimonials(groupId: string, testimonials: Testimonial[])
+
+   updateGroupPhotos(
+      groupId: string,
+      newPhotos: GroupPhoto[],
+      type: "replace" | "add"
+   ): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -705,6 +713,38 @@ export class FirebaseGroupRepository
          .doc(groupId)
 
       return groupRef.set({ testimonials }, { merge: true })
+   }
+
+   updateGroupPhotos(
+      groupId: string,
+      photos: GroupPhoto[],
+      type: "replace" | "add"
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      if (photos.length > MAX_GROUP_PHOTOS_COUNT) {
+         throw new Error(`You can only have ${MAX_GROUP_PHOTOS_COUNT} photos`)
+      }
+
+      if (type === "add") {
+         // We must check if the new added photos will exceed the max count
+         return this.firestore.runTransaction(async (transaction) => {
+            const groupSnap = await transaction.get(groupRef)
+            const group = groupSnap.data() as Group
+            const newPhotos = [...(group.photos || []), ...photos]
+            if (newPhotos.length < MAX_GROUP_PHOTOS_COUNT) {
+               transaction.update(groupSnap.ref, { photos: newPhotos })
+            } else {
+               throw new Error(
+                  `You can only have ${MAX_GROUP_PHOTOS_COUNT} photos`
+               )
+            }
+         })
+      } else {
+         return groupRef.update({ photos })
+      }
    }
 }
 

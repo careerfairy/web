@@ -12,9 +12,11 @@ import AboutSection from "./AboutSection"
 import StreamSection from "./StreamSection"
 import MediaSection from "./MediaSection"
 import TestimonialSection from "./TestimonialSection"
-import { useFirestore, useFirestoreDocData } from "reactfire"
+import { useFirestoreDocData } from "reactfire"
 import { doc } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 
 type Props = {
    group: Group
@@ -30,6 +32,7 @@ export enum TabValue {
 
 type ICompanyPageContext = {
    group: Group
+   groupPresenter: GroupPresenter
    tabValue: TabValue
    changeTabValue: (tabValues: TabValue) => void
    editMode: boolean
@@ -37,6 +40,7 @@ type ICompanyPageContext = {
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
    group: null,
+   groupPresenter: null,
    tabValue: TabValue.profile,
    changeTabValue: () => {},
    editMode: false,
@@ -45,11 +49,13 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
 const CompanyPageOverview = ({ group, editMode }: Props) => {
    const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
 
-   const groupRef = doc(
-      useFirestore(),
-      "careerCenterData",
-      group.id
-   ).withConverter(createGenericConverter<Group>())
+   const groupRef = useMemo(
+      () =>
+         doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
+            createGenericConverter<Group>()
+         ),
+      [group.id]
+   )
 
    const { data: contextGroup } = useFirestoreDocData(groupRef, {
       initialData: group,
@@ -62,6 +68,7 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
    const contextValue = useMemo(
       () => ({
          group: contextGroup,
+         groupPresenter: GroupPresenter.createFromDocument(contextGroup),
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
@@ -76,10 +83,10 @@ const CompanyPageOverview = ({ group, editMode }: Props) => {
                <Header />
             </Box>
             <Grow in>
-               <Container maxWidth="lg">
+               <Container disableGutters maxWidth="lg">
                   <Grid container spacing={4}>
                      <Grid item xs={12} md={6}>
-                        <Stack spacing={{ xs: 4, md: 8 }}>
+                        <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
                            <TestimonialSection />
                            <StreamSection />
