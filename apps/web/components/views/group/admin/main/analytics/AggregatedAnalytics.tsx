@@ -20,9 +20,6 @@ const styles = sxStyles({
       width: "18px",
       marginLeft: "5px",
    },
-   card: {
-      width: "100%",
-   },
    gridItem: {
       display: "flex",
    },
@@ -45,7 +42,7 @@ const AggregatedAnalytics = () => {
             <CardAnalytic
                title="Total registered users"
                tooltip="Total number of registrations to all your streams"
-               value={stats.generalStats.numberOfRegistrations}
+               value={stats?.generalStats?.numberOfRegistrations ?? 0}
             />
          </Grid>
 
@@ -54,7 +51,7 @@ const AggregatedAnalytics = () => {
                <CardAnalytic
                   title="Total applications"
                   // @ts-ignore TODO: remove this ignore when numberOfApplications field has been added
-                  value={stats.generalStats.numberOfApplications ?? 0}
+                  value={stats?.generalStats?.numberOfApplications ?? 0}
                   linkDescription={"Go to applicants"}
                   link={`/group/${group.id}/admin/ats-integration?section=1`}
                />
@@ -98,12 +95,7 @@ export const CardAnalytic = ({
    ) : undefined
 
    return (
-      <CardCustom
-         sx={styles.card}
-         title={title}
-         helpTooltip={tooltip}
-         subHeader={subHeader}
-      >
+      <CardCustom title={title} helpTooltip={tooltip} subHeader={subHeader}>
          <Typography mt={1} sx={styles.value} align="right">
             {value}
          </Typography>
@@ -129,6 +121,8 @@ const SubheaderLink = ({ link, title }: { link: string; title: string }) => {
  * some groups, lets sum it with the registrations until it catches up
  */
 function totalPeopleReached(stats: GroupStats) {
+   if (!stats) return 0
+
    if (
       stats.generalStats.numberOfPeopleReached <
       stats.generalStats.numberOfRegistrations

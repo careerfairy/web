@@ -3,19 +3,11 @@ import * as functions from "firebase-functions"
 import { https } from "firebase-functions"
 import { OnCallMiddleware } from "./middlewares"
 import { compress, decompress, sha1 } from "../util"
-
-interface CacheEntryDocument {
-   /** Hashed Cache key - will be the same as the document id */
-   key: string
-   /** Key before being hashed, might be useful for some debugging */
-   plainKey: string
-   /** Time data was cached, as a Cloud Firestore Timestamp object */
-   cachedAt: admin.firestore.Timestamp
-   /** Time data should no longer be considered fresh, as a Cloud Firestore Timestamp object */
-   expiresAt: admin.firestore.Timestamp
-   /** gzipped data stored as bytes */
-   data: Uint8Array
-}
+import {
+   CacheEntryDocument,
+   CacheKey,
+   generateCacheKey,
+} from "@careerfairy/shared-lib/functions/cache"
 
 /**
  * Function to extract the cache key from the request data/context
@@ -46,7 +38,7 @@ export const cacheOnCallValues = (
    ttlSeconds: number
 ): OnCallMiddleware => {
    return async (data, context, next) => {
-      const cacheKey = generateCacheKey(cacheKeyFn(data, context))
+      const cacheKey = await generateCacheKey(cacheKeyFn(data, context), sha1)
 
       // Try to fetch from cache
       const cachedDocument = await getFirestoreCacheDocument(
@@ -170,18 +162,4 @@ const isCacheEntryValid = (entry: CacheEntryDocument): boolean => {
    const expiresAt = entry.expiresAt.toMillis()
 
    return expiresAt > Date.now()
-}
-
-type CacheKey = {
-   plain: string
-   hashed: string
-}
-
-const generateCacheKey = (values: any[]): CacheKey => {
-   const serialized = JSON.stringify(values)
-
-   return {
-      plain: serialized,
-      hashed: sha1(serialized),
-   }
 }
