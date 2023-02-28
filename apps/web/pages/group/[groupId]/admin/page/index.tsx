@@ -2,13 +2,13 @@ import DashboardHead from "../../../../../layouts/GroupDashboardLayout/Dashboard
 import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
 import {
    getServerSideGroup,
-   getServerSideUpcomingLivestreamsByGroupId,
    mapFromServerSide,
 } from "../../../../../util/serverUtil"
 import { Group } from "@careerfairy/shared-lib/groups"
 import CompanyPageOverview from "../../../../../components/views/company-page"
 import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { livestreamRepo } from "../../../../../data/RepositoryInstances"
 
 const CompanyPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -43,8 +43,11 @@ export const getServerSideProps: GetServerSideProps<{
       }
    }
 
-   const serverSideUpcomingLivestreams =
-      await getServerSideUpcomingLivestreamsByGroupId(serverSideGroup.groupId)
+   const serverSideUpcomingLivestreams = await livestreamRepo.getEventsOfGroup(
+      serverSideGroup?.groupId,
+      "upcoming",
+      { limit: 10 }
+   )
 
    return {
       props: {
