@@ -97,9 +97,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
    const { errorNotification, successNotification } = useSnackbarNotifications()
    const { group, groupPresenter } = useCompanyPage()
 
-   const [uploadFile, uploadProgress] = useFirebaseUpload(
-      groupPresenter.getCompanyPageVideoPath()
-   )
+   const [uploadFile, uploadProgress] = useFirebaseUpload()
 
    const initialVideo = group.videos?.[0]
 
@@ -121,9 +119,8 @@ const VideoDialog = ({ handleClose, open }: Props) => {
             if (isEmbedded) {
                videoUrl = url as string
             } else {
-               const fileExtension = file.type.split("/")[1]
-
-               const path = `${groupPresenter.getCompanyPageVideoPath()}/${videoId}.${fileExtension}`
+               const path =
+                  groupPresenter.getCompanyPageStorageVideoPath(videoId)
 
                videoUrl = await uploadFile(file, path)
             }
@@ -193,8 +190,6 @@ const VideoDialog = ({ handleClose, open }: Props) => {
          </Box>
       )
    }, [formik])
-
-   console.log("-> formik.values", formik.values)
 
    return (
       <form onSubmit={formik.handleSubmit}>

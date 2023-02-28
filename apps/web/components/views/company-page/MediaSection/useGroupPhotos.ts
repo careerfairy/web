@@ -68,7 +68,7 @@ const useGroupPhotos = (
          const promises = newPhotos.map(async (photo) => {
             const photoId = uuidv4()
 
-            const path = `${presenter.getCompanyPageStorageImagePath(photoId)}`
+            const path = presenter.getCompanyPageStorageImagePath(photoId)
 
             const photoRef = ref(storage, path)
 

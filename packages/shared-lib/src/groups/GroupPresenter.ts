@@ -62,7 +62,7 @@ export class GroupPresenter {
       return `company-pages/${this.id}/photos/${photoId}`
    }
 
-   getCompanyPageVideoPath() {
-      return `company-pages/${this.id}/videos`
+   getCompanyPageStorageVideoPath(videoId: string) {
+      return `company-pages/${this.id}/videos/${videoId}`
    }
 }
