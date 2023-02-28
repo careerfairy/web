@@ -70,7 +70,7 @@ const useDataFromFunction = (
       livestreamIds.length == 0
          ? null
          : [
-              "getRegistrationSources",
+              "getRegistrationSources_v2",
               {
                  groupId,
                  livestreamIds,

@@ -94,10 +94,14 @@ export type UTMsPercentage = {
  * Aggregate sources for a given livestream
  */
 export const sourcesByLivestream = (
-   livestreamId: string,
-   data: RegistrationSourcesResponseItem[]
+   data: RegistrationSourcesResponseItem[],
+   filterByLivestreamId?: string
 ): UTMsPercentage[] => {
-   const filtered = data.filter((entry) => entry.livestreamId === livestreamId)
+   if (!data || data.length === 0) return []
+
+   const filtered = filterByLivestreamId
+      ? data.filter((entry) => entry.livestreamId === filterByLivestreamId)
+      : data
 
    const stats = sourcesByDate(filtered)
 

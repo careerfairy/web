@@ -24,6 +24,10 @@ service cloud.firestore {
             return isSignedIn() && request.auth.token.email == userEmail;
         }
 
+        function isAnyGroupAdmin() {
+            return request.auth.token.adminGroups.keys().size() > 0 || isCFAdmin();
+        }
+
         //        function isLivestreamAdmin(livestreamId) {
         //            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
         //        }
@@ -57,6 +61,12 @@ service cloud.firestore {
             match /{document=**} {
                 allow read, write: if false;
             }
+        }
+
+        // allow group admins to fetch cached docs
+        // stale while revalidate method
+        match /cache/functions/analytics/{hash} {
+            allow read: if isAnyGroupAdmin();
         }
 
         match /analytics/userData {
@@ -507,13 +517,13 @@ service cloud.firestore {
         }
 
         match /{somePath=**}/stats/{livestreamStats} {
-            allow list: if isSignedIn(); // we can't check the resource.data.livestream.groupIds when listing..
+            allow list: if isAnyGroupAdmin(); // we can't check the resource.data.livestream.groupIds when listing..
             allow read: if request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(resource.data.livestream.groupIds) || isCFAdmin();
         }
 
         // Group Admin -> Aggregation Count query
         match /{somePath=**}/talentProfiles/{groupId} {
-            allow read: if isCFAdmin() || request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]);
+            allow read: if request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]) || isCFAdmin();
         }
     }
 }

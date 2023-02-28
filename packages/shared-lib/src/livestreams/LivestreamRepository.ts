@@ -101,7 +101,7 @@ export interface ILivestreamRepository {
 
    getEventsOfGroup(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       options?: {
          limit?: number
          hideHidden?: boolean
@@ -205,6 +205,11 @@ export interface ILivestreamRepository {
       livestreamId: string,
       operationsToMake: (existingStats: LiveStreamStats) => T
    ): Promise<void>
+
+   getFutureLivestreams(
+      groupId: string,
+      limit?: number
+   ): Promise<LivestreamEvent[]>
 }
 
 export class FirebaseLivestreamRepository
@@ -216,6 +221,23 @@ export class FirebaseLivestreamRepository
       readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   async getFutureLivestreams(
+      groupId: string,
+      limit = 1
+   ): Promise<LivestreamEvent[]> {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", new Date())
+         .where("test", "==", false)
+         .where("groupIds", "array-contains", groupId)
+         .limit(limit)
+         .orderBy("start", "asc")
+
+      return this.mapLivestreamCollections(await query.get())
+         .filterByNotEndedEvents()
+         .get()
    }
 
    async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
@@ -322,34 +344,44 @@ export class FirebaseLivestreamRepository
 
    eventsOfGroupQuery(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       hideHidden?: boolean
    ) {
       let query = this.firestore
          .collection("livestreams")
          .where("groupIds", "array-contains", groupId)
          .where("test", "==", false)
+
       if (hideHidden) {
          query = query.where("hidden", "==", false)
       }
-      if (type === "upcoming") {
-         query = query.where("start", ">=", new Date()).orderBy("start", "asc")
-      } else {
-         query = query.where("start", "<", new Date()).orderBy("start", "desc")
+
+      if (type) {
+         if (type === "upcoming") {
+            query = query
+               .where("start", ">=", new Date())
+               .orderBy("start", "asc")
+         } else {
+            query = query
+               .where("start", "<", new Date())
+               .orderBy("start", "desc")
+         }
       }
+
       return query
    }
 
    async getEventsOfGroup(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       options?: {
          limit?: number
          hideHidden?: boolean
       }
    ): Promise<LivestreamEvent[] | null> {
       let query = this.eventsOfGroupQuery(groupId, type, options?.hideHidden)
-      if (options.limit) {
+
+      if (options?.limit) {
          query = query.limit(options.limit)
       }
       const snapshots = await query.get()

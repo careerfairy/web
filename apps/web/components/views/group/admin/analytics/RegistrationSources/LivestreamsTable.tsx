@@ -120,7 +120,7 @@ const tableStyles = sxStyles({
 
 const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
    const stats = useMemo(() => {
-      return sourcesByLivestream(livestreamId, utmData)
+      return sourcesByLivestream(utmData, livestreamId)
    }, [livestreamId, utmData])
 
    return (

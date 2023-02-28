@@ -18,7 +18,7 @@ import ErrorBoundary from "components/ErrorBoundary"
 import Link from "components/views/common/Link"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import CardCustom from "../CardCustom"
@@ -65,11 +65,36 @@ const styles = sxStyles({
       "& .MuiPagination-ul li": {
          display: "none",
       },
+      ".MuiPagination-ul": {
+         justifyContent: "end",
+      },
+      flex: "none",
+      marginTop: 0,
+      marginBottom: (t) => t.spacing(1),
    },
    noLivestreamCopy: { color: (theme) => theme.palette.grey[500] },
+   cardEmpty: {
+      "& .MuiCardContent-root": {
+         height: "100%",
+         display: "flex",
+         alignItems: "center",
+         justifyContent: "center",
+      },
+   },
+   cardList: {
+      "& .MuiCardContent-root": {
+         minHeight: "325px",
+         paddingBottom: 0,
+         display: "flex",
+         flexDirection: "column",
+      },
+   },
+   tableContainer: {
+      flex: 1,
+   },
 })
 
-const PAGE_SIZE = 3
+const PAGE_SIZE = 4
 const CARD_OPTIONS = ["Latest", "Oldest"]
 
 const AggregatedFeedbackCard = () => {
@@ -86,6 +111,7 @@ const AggregatedFeedbackCard = () => {
          title="Live Stream Feedback"
          options={hideOptions ? undefined : CARD_OPTIONS}
          optionsHandler={hideOptions ? undefined : optionsHandler}
+         sx={hideOptions ? styles.cardEmpty : styles.cardList}
       >
          <ErrorBoundary>
             <PaginatedFeedback
@@ -112,6 +138,12 @@ const PaginatedFeedback = ({
       sortingMethod === "Latest" ? "desc" : "asc"
    )
 
+   useEffect(() => {
+      if (!results.loading && (!results.data || results.data.length === 0)) {
+         setHideOptions(true)
+      }
+   }, [results.data, results.loading, setHideOptions])
+
    const onPageChange = useCallback(
       (_, page: number) => {
          if (page > results.page) {
@@ -132,7 +164,6 @@ const PaginatedFeedback = ({
    }
 
    if (!results.data || results.data.length === 0) {
-      setHideOptions(true)
       return <NoLivestreams />
    }
 
@@ -167,8 +198,8 @@ const FeedbackCardContent = ({
    } = useRouter()
 
    return (
-      <Box>
-         <TableContainer>
+      <>
+         <TableContainer sx={styles.tableContainer}>
             <Table>
                <TableBody sx={styles.tableBody}>
                   {stats.map((row) => (
@@ -206,16 +237,14 @@ const FeedbackCardContent = ({
             </Table>
          </TableContainer>
 
-         <Box mt={2} display="flex" justifyContent="flex-end">
-            {pagination}
-         </Box>
-      </Box>
+         {pagination}
+      </>
    )
 }
 
 const NoLivestreams = () => {
    return (
-      <>
+      <Box>
          <Typography mt={2} sx={styles.noLivestreamCopy} align="center">
             You can check live stream feedback here.
             <br />
@@ -227,7 +256,7 @@ const NoLivestreams = () => {
                Create New Live Stream
             </Button>
          </Box>
-      </>
+      </Box>
    )
 }
 

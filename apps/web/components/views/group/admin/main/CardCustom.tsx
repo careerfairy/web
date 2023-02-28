@@ -18,8 +18,12 @@ import useMenuState from "components/custom-hook/useMenuState"
 import { useCallback, useState } from "react"
 import { ChevronDown } from "react-feather"
 import { sxStyles } from "types/commonTypes"
+import { useMemo } from "react"
 
 const styles = sxStyles({
+   card: {
+      width: "100%",
+   },
    dropdownButton: {
       color: "black",
       textTransform: "none",
@@ -76,8 +80,16 @@ const CardCustom = ({
       />
    ) : undefined
 
+   const mergedSxProps = useMemo(
+      () => ({
+         ...sx,
+         ...styles.card,
+      }),
+      [sx]
+   )
+
    return (
-      <Card sx={sx}>
+      <Card sx={mergedSxProps}>
          <CardHeader
             sx={styles.cardHeader}
             title={title}
@@ -99,7 +111,7 @@ const CustomWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
 })
 
 export type OptionsProps = {
-   options: string[]
+   options: readonly string[]
    handler?: (option: string) => void
 }
 
