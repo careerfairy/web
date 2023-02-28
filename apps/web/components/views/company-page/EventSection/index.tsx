@@ -15,6 +15,7 @@ import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import RegistrationModal from "../../common/registration-modal"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import StayUpToDateBanner from "./StayUpToDateBanner"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 
 const styles = sxStyles({
    titleSection: {
@@ -48,7 +49,8 @@ const EventSection = () => {
       useRegistrationModal()
    const isMobile = useIsMobile()
 
-   const [openDialog, setOpenDialog] = useState(false)
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
    const { spacing } = useTheme()
    const sliderRef = useRef(null)
@@ -61,14 +63,13 @@ const EventSection = () => {
       sliderRef.current?.slickPrev()
    }, [])
 
-   const handleCloseDialog = useCallback(() => {
-      setOpenDialog(false)
-   }, [])
-
-   const handleOpenEvent = useCallback((event: LivestreamEvent) => {
-      setEventToEdit(event)
-      setOpenDialog(true)
-   }, [])
+   const handleOpenEvent = useCallback(
+      (event: LivestreamEvent) => {
+         setEventToEdit(event)
+         handleOpenDialog()
+      },
+      [handleOpenDialog]
+   )
 
    return (
       <Box minHeight={{ md: spacing(50) }}>
@@ -146,22 +147,28 @@ const EventSection = () => {
                      Watch live streams. Discover new career ideas, interesting
                      jobs, internships and programmes for students. Get hired.
                   </Typography>
-                  <StayUpToDateBanner handleFollow={() => {}} />
+                  <StayUpToDateBanner
+                     handleFollow={() => {
+                        // TODO Add Follow functionality
+                     }}
+                  />
                </>
             )}
          </Box>
 
-         <StreamCreationProvider>
-            <NewStreamModal
-               group={group}
-               typeOfStream={"upcoming"}
-               open={openDialog}
-               handlePublishStream={null}
-               handleResetCurrentStream={() => {}}
-               currentStream={eventToEdit}
-               onClose={handleCloseDialog}
-            />
-         </StreamCreationProvider>
+         {isDialogOpen ? (
+            <StreamCreationProvider>
+               <NewStreamModal
+                  group={group}
+                  typeOfStream={"upcoming"}
+                  open={isDialogOpen}
+                  handlePublishStream={null}
+                  handleResetCurrentStream={() => {}}
+                  currentStream={eventToEdit}
+                  onClose={handleCloseDialog}
+               />
+            </StreamCreationProvider>
+         ) : null}
 
          {Boolean(joinGroupModalData) ? (
             <RegistrationModal
