@@ -44,13 +44,15 @@ const CompanyPhotos = () => {
             photos={photos}
             onAdditionalImageCountOverlayClick={handleOpenPhotosDialog}
          />
-         <PhotosDialog
-            open={photosDialogOpen}
-            handleClose={handleClosePhotosDialog}
-            onPhotosChanged={updateSortablePhotos}
-            photos={photos}
-            editable={editMode}
-         />
+         {photosDialogOpen ? (
+            <PhotosDialog
+               open={photosDialogOpen}
+               handleClose={handleClosePhotosDialog}
+               onPhotosChanged={updateSortablePhotos}
+               photos={photos}
+               editable={editMode}
+            />
+         ) : null}
       </Stack>
    )
 }

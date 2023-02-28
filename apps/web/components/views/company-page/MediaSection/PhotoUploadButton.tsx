@@ -1,7 +1,7 @@
 import React, { FC, useEffect } from "react"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { useFilePicker } from "use-file-picker"
-import { MAX_GROUP_PHOTOS_COUNT } from "@careerfairy/shared-lib/groups/constants"
+import { MAX_GROUP_PHOTOS_COUNT } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import LoadingButton from "@mui/lab/LoadingButton"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
 import { Typography } from "@mui/material"
