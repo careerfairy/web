@@ -19,14 +19,13 @@ import {
    sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable"
 import { Box } from "@mui/material"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import { imagePlaceholder } from "../../../../constants/images"
 import ImagePreview from "../../common/ImagePreview"
 import {
    PhotoFrame,
    PlaceholderPhoto,
    SortablePhotoFrame,
 } from "../../common/photo-gallery/PhotoFrame"
+import { mapPlaceholderPhotos } from "./util"
 
 export interface SortablePhoto extends Photo {
    // @dnd-kit requires string 'id' on sortable elements
@@ -132,18 +131,9 @@ const PhotosGallery = ({
 
       // If there are less photos than maxPhotos, add placeholders. If not in edit mode, don't add placeholders
       if (maxPhotos && localPhotos.length < maxPhotos && editable) {
-         const emptyPhotos = Array.from(
-            { length: maxPhotos - localPhotos.length },
-            (_, i) => i
-         ).map((i) => ({
-            id: `placeholder-${i}`,
-            src: getResizedUrl(imagePlaceholder, "xs"),
-            alt: "placeholder",
-            title: "placeholder",
-            width: 116,
-            height: 116,
-            key: `placeholder-${i}`,
-         }))
+         const numberOfPlaceholders = maxPhotos - localPhotos.length
+         const emptyPhotos = mapPlaceholderPhotos(numberOfPlaceholders)
+
          return [...slicedPhotos, ...emptyPhotos]
       }
 
