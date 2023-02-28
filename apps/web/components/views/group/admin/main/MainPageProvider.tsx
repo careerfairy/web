@@ -46,7 +46,19 @@ const useFetchData = (groupId: string) => {
 
    return useMemo(
       () => ({
-         nextDraft: grabResult(drafts),
+         nextDraft: grabResult(drafts, (drafts) => {
+            const futureDrafts = drafts.filter(
+               (d) => d.start.toDate() > new Date()
+            )
+
+            // most recent future draft
+            if (futureDrafts.length > 0) {
+               return futureDrafts[0]
+            }
+
+            // past draft but is the more recent one
+            return drafts[drafts.length - 1]
+         }),
          nextLivestream: grabResult(futureLivestreams),
          pastLivestream: grabResult(pastLivestreams),
       }),
@@ -54,7 +66,10 @@ const useFetchData = (groupId: string) => {
    )
 }
 
-function grabResult<T = unknown>(response: CollectionResponse<T>) {
+function grabResult<T = unknown>(
+   response: CollectionResponse<T>,
+   pickerFn: (data: T[]) => T = (data) => data[0]
+) {
    if (response.isLoading) {
       return undefined
    }
@@ -64,7 +79,7 @@ function grabResult<T = unknown>(response: CollectionResponse<T>) {
    }
 
    if (response.data.length > 0) {
-      return response.data[0]
+      return pickerFn(response.data)
    }
 
    return null
@@ -72,7 +87,7 @@ function grabResult<T = unknown>(response: CollectionResponse<T>) {
 
 const useDrafts = (groupId: string) => {
    const query = useMemo(() => {
-      return livestreamRepo.getGroupDraftLivestreamsQuery(groupId, 1)
+      return livestreamRepo.getGroupDraftLivestreamsQuery(groupId)
    }, [groupId])
 
    return useCollection<LivestreamEvent>(query, true)

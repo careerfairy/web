@@ -68,7 +68,7 @@ const ChipsLine = ({
             <WhiteTagChip
                icon={<LanguageIcon />}
                variant="filled"
-               tooltipText={`This event is in ${livestream?.language.name}`}
+               tooltipText={`This stream is in ${livestream?.language.name}`}
                label={livestream?.language.code.toUpperCase()}
                sx={styles.chip}
             />

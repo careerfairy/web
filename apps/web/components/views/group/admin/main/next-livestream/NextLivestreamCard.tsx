@@ -1,5 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Grid, Skeleton, Typography } from "@mui/material"
+import Link from "components/views/common/Link"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
 import { CheckCircle } from "react-feather"
@@ -93,7 +94,19 @@ export const useNextLivestreamCardLogic = () => {
    }, [nextDraft, nextLivestream])
 
    const isDraft = useCallback(() => {
-      return nextDraft && !nextLivestream
+      if (nextDraft && !nextLivestream) {
+         return true
+      }
+
+      if (
+         nextDraft &&
+         nextDraft.start.toDate() > new Date() && // is a future date
+         nextDraft.start.toDate() < nextLivestream.start.toDate() // draft is sonner than the livestream
+      ) {
+         return true
+      }
+
+      return false
    }, [nextDraft, nextLivestream])
 
    const livestream = useMemo(() => {
@@ -206,7 +219,13 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
                >
                   Manage your live stream
                </Button>
-               <Button color="secondary" variant="contained">
+               <Button
+                  color="secondary"
+                  variant="contained"
+                  component={Link}
+                  target="_blank"
+                  href={`/upcoming-livestream/${livestream.id}`}
+               >
                   Go to Live Stream
                </Button>
             </>
