@@ -337,7 +337,7 @@ export enum UserReminderType {
 
 /*
  * the document id should be the group id
- * Path: /userData/{userId}/companies/{groupId}
+ * Path: /userData/{userId}/companiesUserFollows/{groupId}
  * */
 export interface CompanyFollowed extends Identifiable {
    createdAt: Timestamp

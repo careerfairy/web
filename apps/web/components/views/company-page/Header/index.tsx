@@ -21,7 +21,6 @@ import React, { useCallback } from "react"
 import { styled, useTheme } from "@mui/material/styles"
 import Stack from "@mui/material/Stack"
 import FollowButton from "./FollowButton"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import ShareButton from "./ShareButton"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
@@ -55,6 +54,9 @@ const styles = sxStyles({
          md: theme.darkTextShadow,
       }),
    },
+   companyTitleSticky: {
+      display: "none",
+   },
    stickyLogo: {
       width: STICKY_LOGO_SIZE,
       height: STICKY_LOGO_SIZE,
@@ -73,6 +75,13 @@ const styles = sxStyles({
       width: "-webkit-fill-available",
       flexDirection: { xs: "column", md: "row" },
    },
+   headerWrapperSticky: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      zIndex: (theme) => theme.zIndex.appBar,
+      width: "100%",
+   },
    navigatorInfoWrapper: {
       display: "flex",
       flexDirection: "column",
@@ -83,20 +92,18 @@ const styles = sxStyles({
       alignItems: "center",
       height: { xs: "80px", md: "100px" },
    },
+   companyNameSticky: {
+      height: {
+         xs: "60px",
+         md: "100px",
+      },
+   },
    navigatorTabs: {
       display: "flex",
       alignItems: "center",
       flex: 1,
       height: { xs: "50px", md: "60px" },
       backgroundColor: "#EFF5F8",
-   },
-   stickyNavigatorTabs: {
-      backgroundColor: "transparent",
-      flexDirection: "column",
-      position: "fixed",
-      top: 0,
-      width: "100%",
-      zIndex: (theme) => theme.zIndex.appBar,
    },
    indicator: {
       height: (theme) => theme.spacing(0.4),
@@ -137,6 +144,7 @@ const styles = sxStyles({
    },
    appBarSticky: {
       width: `calc(100% - ${STICKY_LOGO_SIZE}px) !important`,
+      height: "auto",
    },
    avatarAndTabsWrapper: {
       backgroundColor: "#EFF5F8",
@@ -147,17 +155,22 @@ const styles = sxStyles({
    avatarAndTabsWrapperSticky: {
       height: "auto",
    },
+   headerWrapper: {
+      border: "2px solid red",
+   },
 })
 
 const ToolbarOffset = styled("div")(({ theme }) => theme.mixins.toolbar)
 
 const Header = () => {
-   const [ref, elementIsTop] = useElementIsAtTopOfPage()
-
    const isMobile = useMediaQuery<DefaultTheme>((theme) =>
       theme.breakpoints.down("md")
    )
-   const { group, tabValue, changeTabValue } = useCompanyPage()
+   const [ref, elementIsTop] = useElementIsAtTopOfPage({
+      offset: isMobile ? -60 : 70,
+   })
+
+   const { group, tabValue, changeTabValue, editMode } = useCompanyPage()
    const theme = useTheme()
 
    const { bannerImageUrl, logoUrl, universityName } = group
@@ -169,7 +182,12 @@ const Header = () => {
       [changeTabValue]
    )
 
-   const isSticky = elementIsTop && isMobile
+   const isSticky =
+      elementIsTop &&
+      // Disabling sticky header in edit mode on desktop on the edit page, because it's not working properly
+      (!editMode || isMobile)
+
+   const headerHeight = isMobile ? 170 : 52
 
    return (
       <>
@@ -182,155 +200,183 @@ const Header = () => {
                backgroundImageSx={undefined}
             />
          </Box>
-         <Box display={"flex"}>
-            <Box flex={1} />
-            <Container
-               disableGutters
-               maxWidth="lg"
-               sx={styles.navigatorWrapper}
-            >
-               <Stack alignItems={"flex-end"} direction={"row"} spacing={2}>
-                  <Avatar
-                     variant="square"
-                     sx={styles.logo}
-                     alt={`${universityName} logo`}
-                     src={
-                        getResizedUrl(logoUrl, "sm") || companyLogoPlaceholder
-                     }
-                  />
-                  {isMobile ? (
-                     <span>
-                        <Actions />
-                     </span>
-                  ) : null}
-               </Stack>
-               <Box sx={styles.navigatorInfoWrapper}>
-                  <Box ref={ref} sx={styles.companyName}>
-                     <Typography
-                        sx={styles.companyTitle}
-                        variant={universityName.length > 20 ? "h4" : "h3"}
-                        fontWeight={"600"}
-                        color={{ xs: "black", md: "white" }}
-                        ml={{ xs: "20px", md: "30px" }}
-                        zIndex={1}
+         <span ref={ref} />
+         <Box height={isSticky ? headerHeight : 0} />
+         <Box
+            sx={[
+               styles.headerWrapper && isSticky && styles.headerWrapperSticky,
+            ]}
+         >
+            {isSticky ? <ToolbarOffset /> : null}
+
+            <Box display={"flex"}>
+               <Box bgcolor={isSticky ? "#EFF5F8" : "transparent"} flex={1} />
+               <Container
+                  disableGutters
+                  maxWidth="lg"
+                  sx={[styles.navigatorWrapper]}
+               >
+                  {isSticky ? null : (
+                     <Stack
+                        alignItems={"flex-end"}
+                        direction={"row"}
+                        spacing={2}
                      >
-                        {universityName}
-                     </Typography>
-                  </Box>
-                  <Box
-                     sx={[
-                        styles.navigatorTabs,
-                        isSticky && styles.stickyNavigatorTabs,
-                     ]}
-                  >
-                     {isSticky ? <ToolbarOffset /> : null}
-                     <Box
-                        sx={[
-                           styles.avatarAndTabsWrapper,
-                           isSticky && styles.avatarAndTabsWrapperSticky,
-                        ]}
-                     >
-                        <Slide unmountOnExit direction={"down"} in={isSticky}>
-                           <Avatar
-                              variant="square"
-                              sx={styles.stickyLogo}
-                              alt={`${universityName} logo`}
-                              src={
-                                 getResizedUrl(logoUrl, "sm") ||
-                                 companyLogoPlaceholder
-                              }
-                           />
-                        </Slide>
-                        <AppBar
-                           sx={[styles.appBar, isSticky && styles.appBarSticky]}
-                           position="static"
-                           elevation={0}
-                           color="transparent"
+                        <Avatar
+                           variant="square"
+                           sx={styles.logo}
+                           alt={`${universityName} logo`}
+                           src={
+                              getResizedUrl(logoUrl, "sm") ||
+                              companyLogoPlaceholder
+                           }
+                        />
+                        {isMobile ? (
+                           <span>
+                              <Actions />
+                           </span>
+                        ) : null}
+                     </Stack>
+                  )}
+                  <Box sx={styles.navigatorInfoWrapper}>
+                     <Box sx={[styles.companyName, styles.companyNameSticky]}>
+                        <Typography
+                           sx={[
+                              styles.companyTitle,
+                              isSticky && styles.companyTitleSticky,
+                           ]}
+                           variant={universityName.length > 20 ? "h4" : "h3"}
+                           fontWeight={"600"}
+                           color={{ xs: "black", md: "white" }}
+                           ml={{ xs: "20px", md: "30px" }}
+                           zIndex={1}
                         >
-                           <Tabs
-                              value={tabValue}
-                              variant={"scrollable"}
-                              onChange={handleChangeTab}
-                              selectionFollowsFocus
-                              allowScrollButtonsMobile
-                              textColor="inherit"
-                              TabIndicatorProps={
-                                 { sx: styles.indicator } as any
-                              }
-                              sx={styles.tabWrapper}
-                           >
-                              <SimpleTab
-                                 sx={[
-                                    styles.tab,
-                                    {
-                                       color:
-                                          tabValue === TabValue.profile &&
-                                          theme.palette.secondary.main,
-                                    },
-                                 ]}
-                                 label="Profile"
-                                 value={TabValue.profile}
-                                 index={0}
-                              />
-                              <SimpleTab
-                                 sx={[
-                                    styles.tab,
-                                    {
-                                       color:
-                                          tabValue === TabValue.media &&
-                                          theme.palette.secondary.main,
-                                    },
-                                 ]}
-                                 label="Media"
-                                 value={TabValue.media}
-                                 index={1}
-                              />
-                              <SimpleTab
-                                 sx={[
-                                    styles.tab,
-                                    {
-                                       minWidth: { xs: "100px", md: "150px" },
-                                       color:
-                                          tabValue === TabValue.testimonials &&
-                                          theme.palette.secondary.main,
-                                    },
-                                 ]}
-                                 label="Testimonials"
-                                 value={TabValue.testimonials}
-                                 index={2}
-                              />
-                              <SimpleTab
-                                 sx={[
-                                    styles.tab,
-                                    {
-                                       minWidth: { xs: "100px", md: "150px" },
-                                       color:
-                                          tabValue === TabValue.livesStreams &&
-                                          theme.palette.secondary.main,
-                                    },
-                                 ]}
-                                 label="Live streams"
-                                 value={TabValue.livesStreams}
-                                 index={3}
-                              />
-                           </Tabs>
-                        </AppBar>
+                           {universityName}
+                        </Typography>
                      </Box>
-                     {isMobile ? null : <Actions />}
+                     <Box sx={styles.navigatorTabs}>
+                        <Box
+                           sx={[
+                              styles.avatarAndTabsWrapper,
+                              isSticky && styles.avatarAndTabsWrapperSticky,
+                           ]}
+                        >
+                           <Slide
+                              unmountOnExit
+                              direction={"down"}
+                              in={isSticky}
+                           >
+                              <Avatar
+                                 variant="square"
+                                 sx={styles.stickyLogo}
+                                 alt={`${universityName} logo`}
+                                 src={
+                                    getResizedUrl(logoUrl, "sm") ||
+                                    companyLogoPlaceholder
+                                 }
+                              />
+                           </Slide>
+                           <AppBar
+                              sx={[
+                                 styles.appBar,
+                                 isSticky && styles.appBarSticky,
+                              ]}
+                              position="static"
+                              elevation={0}
+                              color="transparent"
+                           >
+                              <Tabs
+                                 value={tabValue}
+                                 variant={"scrollable"}
+                                 onChange={handleChangeTab}
+                                 selectionFollowsFocus
+                                 allowScrollButtonsMobile
+                                 textColor="inherit"
+                                 TabIndicatorProps={
+                                    { sx: styles.indicator } as any
+                                 }
+                                 sx={styles.tabWrapper}
+                              >
+                                 <SimpleTab
+                                    sx={[
+                                       styles.tab,
+                                       {
+                                          color:
+                                             tabValue === TabValue.profile &&
+                                             theme.palette.secondary.main,
+                                       },
+                                    ]}
+                                    label="Profile"
+                                    value={TabValue.profile}
+                                    index={0}
+                                 />
+                                 <SimpleTab
+                                    sx={[
+                                       styles.tab,
+                                       {
+                                          color:
+                                             tabValue === TabValue.media &&
+                                             theme.palette.secondary.main,
+                                       },
+                                    ]}
+                                    label="Media"
+                                    value={TabValue.media}
+                                    index={1}
+                                 />
+                                 <SimpleTab
+                                    sx={[
+                                       styles.tab,
+                                       {
+                                          minWidth: {
+                                             xs: "100px",
+                                             md: "150px",
+                                          },
+                                          color:
+                                             tabValue ===
+                                                TabValue.testimonials &&
+                                             theme.palette.secondary.main,
+                                       },
+                                    ]}
+                                    label="Testimonials"
+                                    value={TabValue.testimonials}
+                                    index={2}
+                                 />
+                                 <SimpleTab
+                                    sx={[
+                                       styles.tab,
+                                       {
+                                          minWidth: {
+                                             xs: "100px",
+                                             md: "150px",
+                                          },
+                                          color:
+                                             tabValue ===
+                                                TabValue.livesStreams &&
+                                             theme.palette.secondary.main,
+                                       },
+                                    ]}
+                                    label="Live streams"
+                                    value={TabValue.livesStreams}
+                                    index={3}
+                                 />
+                              </Tabs>
+                           </AppBar>
+                        </Box>
+                        {isMobile ? null : <Actions />}
+                     </Box>
                   </Box>
-               </Box>
-            </Container>
-            <Box flex={1} bgcolor="#EFF5F8" />
+               </Container>
+               <Box flex={1} bgcolor="#EFF5F8" />
+            </Box>
          </Box>
       </>
    )
 }
 
 const Actions = () => {
-   const { userData } = useAuth()
    const { group, editMode, groupPresenter } = useCompanyPage()
 
-   const showFollowButton = Boolean(!editMode && userData?.id)
+   const showFollowButton = Boolean(!editMode)
 
    const showShareButton = groupPresenter.companyPageIsReady()
 
