@@ -775,7 +775,7 @@ export class FirebaseGroupRepository
       const followRef = this.firestore
          .collection("userData")
          .doc(userData.id)
-         .collection("companies")
+         .collection("companiesUserFollows")
          .doc(group.id)
 
       const followData: CompanyFollowed = {
@@ -794,7 +794,7 @@ export class FirebaseGroupRepository
       const followRef = this.firestore
          .collection("userData")
          .doc(userId)
-         .collection("companies")
+         .collection("companiesUserFollows")
          .doc(groupId)
 
       return followRef.delete()

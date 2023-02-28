@@ -50,10 +50,15 @@ const styles = sxStyles({
 type Props = {
    group: Group
    handleClose: () => void
+   isGroupAdmin?: boolean
 }
 
 const datalayerEntityName = "company_page"
-const ShareCompanyPageDialog: FC<Props> = ({ group, handleClose }) => {
+const ShareCompanyPageDialog: FC<Props> = ({
+   group,
+   handleClose,
+   isGroupAdmin,
+}) => {
    const { enqueueSnackbar } = useSnackbar()
 
    const socials = useSocials({
@@ -92,13 +97,17 @@ const ShareCompanyPageDialog: FC<Props> = ({ group, handleClose }) => {
       >
          <DialogTitle>
             <Typography sx={styles.title}>
-               Share {group.universityName} Company Page
+               {isGroupAdmin
+                  ? `Share ${group.universityName} Company Page`
+                  : `Share ${group.universityName}'s Company Page`}
             </Typography>
          </DialogTitle>
          <DialogContent dividers>
             <Stack spacing={2}>
                <Typography sx={styles.body2} variant="body2" my={1}>
-                  Share this company page with your friends and classmates!
+                  {isGroupAdmin
+                     ? `Share your company page on your social media channels and with your network of young talent.`
+                     : `Share this company page with your friends and network!`}
                </Typography>
                <Box>
                   <Stack spacing={4} direction="row">

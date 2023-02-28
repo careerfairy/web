@@ -3,7 +3,7 @@ import CompanyPageOverview from "../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
-import { Box } from "@mui/material"
+import { Box, useMediaQuery } from "@mui/material"
 import {
    GetStaticPaths,
    GetStaticProps,
@@ -11,11 +11,11 @@ import {
    NextPage,
 } from "next"
 import GeneralLayout from "../../layouts/GeneralLayout"
-import { useAuth } from "../../HOCs/AuthProvider"
 import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
@@ -23,20 +23,22 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 }) => {
    const { universityName } = serverSideGroup
 
-   const { userData } = useAuth()
-
-   const showFollowButton = Boolean(userData?.id)
+   const isMobile = useMediaQuery<DefaultTheme>((theme) =>
+      theme.breakpoints.down("md")
+   )
 
    return (
       <GeneralLayout
          backgroundColor={"#FFF"}
          fullScreen
          headerEndContent={
-            showFollowButton ? (
-               <Box px={0.5}>
-                  <FollowButton group={serverSideGroup} />
-               </Box>
-            ) : null
+            <>
+               {isMobile ? (
+                  <Box px={0.5}>
+                     <FollowButton group={serverSideGroup} />
+                  </Box>
+               ) : null}
+            </>
          }
       >
          <DashboardHead title={`CareerFairy | ${universityName}`} />
@@ -87,10 +89,14 @@ export const getStaticProps: GetStaticProps<{
                revalidate: 60,
             }
          }
+
+         throw new Error(
+            `Company page ${companyName} for groupId ${serverSideGroup.id} is not ready yet`
+         )
       }
    }
 
-   throw new Error("Company not found")
+   throw new Error(`Company ${companyName} not found`)
 }
 
 export const getStaticPaths: GetStaticPaths = () => ({
