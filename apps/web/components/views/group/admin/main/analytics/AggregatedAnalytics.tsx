@@ -129,7 +129,8 @@ function totalPeopleReached(stats: GroupStats) {
    ) {
       return (
          stats.generalStats.numberOfPeopleReached +
-         stats.generalStats.numberOfRegistrations
+         stats.generalStats.numberOfRegistrations +
+         stats.generalStats.numberOfPeopleReachedCompanyPage
       )
    }
 
