@@ -4,6 +4,7 @@ import {
    createContext,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -19,6 +20,8 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useListenToUpcomingStreams from "../../custom-hook/useListenToUpcomingStreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import { groupRepo } from "../../../data/RepositoryInstances"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
 
 type Props = {
    group: Group
@@ -78,10 +81,35 @@ const CompanyPageOverview = ({
       setTabValue(tabValue)
    }, [])
 
+   const presenter = useMemo(
+      () => GroupPresenter.createFromDocument(contextGroup),
+      [contextGroup]
+   )
+
+   useEffect(() => {
+      const isPublicProfile = presenter.companyPageIsReady()
+
+      if (
+         editMode &&
+         contextGroup &&
+         isPublicProfile !== contextGroup.publicProfile
+      ) {
+         groupRepo
+            .updateGroupPublicProfileFlag(contextGroup.id, isPublicProfile)
+            .catch((e) => {
+               errorLogAndNotify(e, {
+                  message: "Failed to update public profile flag",
+                  description: e.message,
+                  contextGroup,
+               })
+            })
+      }
+   }, [contextGroup, editMode, presenter])
+
    const contextValue = useMemo(
       () => ({
          group: contextGroup,
-         groupPresenter: GroupPresenter.createFromDocument(contextGroup),
+         groupPresenter: presenter,
          tabValue,
          editMode,
          changeTabValue: handleChangeTabValue,
@@ -89,6 +117,7 @@ const CompanyPageOverview = ({
       }),
       [
          contextGroup,
+         presenter,
          tabValue,
          editMode,
          handleChangeTabValue,
