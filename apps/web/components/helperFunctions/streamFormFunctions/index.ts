@@ -46,21 +46,27 @@ export const getStreamSubCollectionSpeakers = (
    }
 }
 
-export const handleAddSpeaker = (values, setValues, speakerObj) => {
+export const handleAddSection = (objName, values, setValues, newSection) => {
    const newValues = { ...values }
-   newValues.speakers[uuidv4()] = speakerObj
+   newValues[objName][uuidv4()] = newSection
    setValues(newValues)
 }
 
-export const handleDeleteSpeaker = (key, values, setCallback) => {
+export const handleDeleteSection = (objName, key, values, setCallback) => {
    const newValues = { ...values }
-   delete newValues.speakers[key]
+   delete newValues[objName][key]
    setCallback(newValues)
 }
 
-export const handleError = (key, fieldName, errors, touched) => {
-   const baseError = errors?.speakers?.[key]?.[fieldName]
-   const baseTouched = touched?.speakers?.[key]?.[fieldName]
+export const handleErrorSection = (
+   objName,
+   key,
+   fieldName,
+   errors,
+   touched
+) => {
+   const baseError = errors?.[objName]?.[key]?.[fieldName]
+   const baseTouched = touched?.[objName]?.[key]?.[fieldName]
    return baseError && baseTouched && baseError
 }
 

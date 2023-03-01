@@ -36,8 +36,14 @@ const styles = sxStyles({
       backgroundColor: "background.paper",
    },
    ava: {
-      width: 50,
-      height: 50,
+      width: {
+         xs: 40,
+         sm: 50,
+      },
+      height: {
+         xs: 40,
+         sm: 50,
+      },
       lineHeight: 0,
    },
    details: {

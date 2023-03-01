@@ -14,6 +14,7 @@ interface Props {
    backgroundColor?: string
    hideNavOnScroll?: boolean
    persistent?: boolean
+   headerEndContent?: React.ReactNode
 }
 
 const GeneralLayout = ({
@@ -22,6 +23,7 @@ const GeneralLayout = ({
    backgroundColor = undefined,
    hideNavOnScroll = false,
    persistent = false,
+   headerEndContent,
 }: Props) => {
    const isDesktop = useIsDesktop()
 
@@ -31,7 +33,11 @@ const GeneralLayout = ({
             backgroundColor,
          }}
       >
-         <GenericHeader hideNavOnScroll={hideNavOnScroll} position={"sticky"} />
+         <GenericHeader
+            hideNavOnScroll={hideNavOnScroll}
+            position={"sticky"}
+            endContent={headerEndContent}
+         />
          <PageContentWrapper>
             <GeneralNavDrawer isPersistent={isDesktop && persistent} />
             <PageChildrenWrapper>

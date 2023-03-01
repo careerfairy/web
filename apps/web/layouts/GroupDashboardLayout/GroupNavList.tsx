@@ -1,4 +1,5 @@
 import React, { useMemo } from "react"
+import DomainIcon from "@mui/icons-material/Domain"
 
 // react feather
 import {
@@ -30,6 +31,7 @@ const GroupNavList = () => {
    const featureFlags = useFeatureFlags()
 
    const navLinks = useMemo(() => {
+      const { id, atsAdminPageFlag } = group
       const links: INavLink[] = [
          {
             id: "main-page",
@@ -42,12 +44,12 @@ const GroupNavList = () => {
             id: "live-streams",
             title: "Live streams",
             Icon: LiveStreamsIcon,
-            href: `/${baseHrefPath}/${group.id}/admin/events`,
+            href: `/${baseHrefPath}/${id}/admin/events`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/events`,
             childLinks: [
                {
                   id: "all-live-streams",
-                  href: `/${baseHrefPath}/${group.id}/admin/events/all`,
+                  href: `/${baseHrefPath}/${id}/admin/events/all`,
                   pathname: `/${baseHrefPath}/${baseParam}/admin/events/all`,
                   Icon: AllLiveStreamsIcon,
                   title: "All live streams on CareerFairy",
@@ -55,34 +57,53 @@ const GroupNavList = () => {
             ],
          },
          {
+            id: "company",
+            title: "Company",
+            Icon: DomainIcon,
+            href: `/${baseHrefPath}/${id}/admin/edit`,
+            childLinks: [
+               {
+                  id: "general",
+                  href: `/${baseHrefPath}/${id}/admin/edit`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/edit`,
+                  title: "General",
+               },
+               {
+                  id: "team-members",
+                  href: `/${baseHrefPath}/${id}/admin/roles`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
+                  title: "Team members",
+               },
+               {
+                  id: "page",
+                  href: `/${baseHrefPath}/${id}/admin/page`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/page`,
+                  title: "Company page",
+               },
+            ],
+         },
+         {
             id: "analytics",
-            href: `/${baseHrefPath}/${group.id}/admin/analytics`,
+            href: `/${baseHrefPath}/${id}/admin/analytics`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/analytics`,
             Icon: AnalyticsIcon,
             title: "Analytics",
          },
-         {
-            id: "team-members",
-            href: `/${baseHrefPath}/${group.id}/admin/roles`,
-            Icon: RolesIcon,
-            pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
-            title: "Team members",
-         },
       ]
 
-      if (featureFlags.atsAdminPageFlag || group.atsAdminPageFlag) {
+      if (featureFlags.atsAdminPageFlag || atsAdminPageFlag) {
          links.push({
             id: "ats",
-            href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
+            href: `/${baseHrefPath}/${id}/admin/ats-integration`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             Icon: ATSIcon,
             title: "ATS integration",
-            rightElement: <SuspensefulATSStatus groupId={group.id} />,
+            rightElement: <SuspensefulATSStatus groupId={id} />,
          })
       }
 
       return links
-   }, [featureFlags.atsAdminPageFlag, group.atsAdminPageFlag, group.id])
+   }, [featureFlags.atsAdminPageFlag, group])
 
    return <NavList links={navLinks} />
 }

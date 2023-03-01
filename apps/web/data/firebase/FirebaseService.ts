@@ -55,6 +55,7 @@ import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
 import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { clearFirestoreCache } from "../util/authUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -368,7 +369,7 @@ class FirebaseService {
       return this.auth.signInWithEmailAndPassword(email.trim(), password)
    }
 
-   doSignOut = () => this.auth.signOut()
+   doSignOut = () => this.auth.signOut().then(clearFirestoreCache)
 
    getUniversitiesFromCountryCode = (countryCode) => {
       let ref = this.firestore
@@ -1353,11 +1354,12 @@ class FirebaseService {
       return streamRef.update(data)
    }
 
-   getDetailLivestreamCareerCenters = (groupIds) => {
+   getDetailLivestreamCareerCenters = (groupIds: string[]) => {
       let ref = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
          .where("groupId", "in", groupIds)
+         .withConverter(createCompatGenericConverter<Group>())
       return ref.get()
    }
 
@@ -1420,17 +1422,18 @@ class FirebaseService {
       return ref.get()
    }
 
-   getCareerCentersByGroupId = async (arrayOfIds) => {
-      let groups = []
+   getCareerCentersByGroupId = async (
+      arrayOfIds: string[]
+   ): Promise<Group[]> => {
+      let groups: Group[] = []
       for (const id of arrayOfIds) {
          const snapshot = await this.firestore
             .collection("careerCenterData")
             .doc(id)
+            .withConverter(createCompatGenericConverter<Group>())
             .get()
          if (snapshot.exists) {
-            let group = snapshot.data()
-            group.id = snapshot.id
-            groups.push(group)
+            groups.push(snapshot.data())
          }
       }
       return groups

@@ -47,7 +47,7 @@ export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
    }
 }
 
-const getSubstringWithEllipsis = (text: string, maxLength: number) => {
+export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
    const ellipsis = "..."
    if (text.length <= maxLength) {
       return text

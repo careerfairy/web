@@ -29,12 +29,43 @@ export interface Group extends Identifiable {
    companyCountry?: GroupOption
    companyIndustry?: GroupOption
    companySize?: string
+
+   /*
+    * Photos that are displayed on the group company page
+    * */
+   photos?: GroupPhoto[]
+   /*
+    * Videos that are displayed on the group company page
+    * */
+   videos?: GroupVideo[]
    /*
     * Deprecated
     * */
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
+   publicProfile?: boolean
+   testimonials?: Testimonial[]
+}
+
+export interface Testimonial extends Identifiable {
+   id: string // uuid
+   name: string
+   position: string
+   testimonial: string
+   avatar: string
+   groupId: string
+}
+
+export interface GroupPhoto extends Identifiable {
+   url: string
+}
+
+export interface GroupVideo extends Identifiable {
+   url: string
+   title: string
+   description: string
+   isEmbedded: boolean
 }
 
 export interface GroupWithPolicy extends Group {
@@ -196,4 +227,17 @@ export const pickPublicDataFromGroup = (group: Group): PublicGroup => {
       universityName: group.universityName ?? null,
       universityCode: group.universityCode ?? null,
    }
+}
+
+export const buildTestimonialsArray = (values, groupId) => {
+   return Object.keys(values.testimonials).map((key) => {
+      return {
+         groupId,
+         id: values.testimonials[key]?.id || key,
+         avatar: values.testimonials[key].avatar,
+         name: values.testimonials[key].name,
+         position: values.testimonials[key].position,
+         testimonial: values.testimonials[key].testimonial,
+      }
+   })
 }

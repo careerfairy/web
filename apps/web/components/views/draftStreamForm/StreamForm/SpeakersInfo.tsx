@@ -2,9 +2,9 @@ import React, { Fragment } from "react"
 import { Box, Fab, Typography } from "@mui/material"
 import {
    getDownloadUrl,
-   handleAddSpeaker,
-   handleDeleteSpeaker,
-   handleError,
+   handleAddSection,
+   handleDeleteSection,
+   handleErrorSection,
 } from "../../../helperFunctions/streamFormFunctions"
 import DeleteIcon from "@mui/icons-material/Delete"
 import FormGroup from "../FormGroup"
@@ -89,7 +89,12 @@ const SpeakersInfo = ({
                            size="small"
                            color="secondary"
                            onClick={() =>
-                              handleDeleteSpeaker(key, values, setValues)
+                              handleDeleteSection(
+                                 "speakers",
+                                 key,
+                                 values,
+                                 setValues
+                              )
                            }
                         >
                            <DeleteIcon />
@@ -102,40 +107,51 @@ const SpeakersInfo = ({
                         speakerLimit={speakerLimit}
                         setValues={setValues}
                         speakerObj={speakerObj}
-                        handleAddSpeaker={handleAddSpeaker}
+                        handleAddSpeaker={handleAddSection}
                         objectKey={key}
                         index={index}
-                        firstNameError={handleError(
+                        firstNameError={handleErrorSection(
+                           "speakers",
                            key,
                            "firstName",
                            errors,
                            touched
                         )}
-                        lastNameError={handleError(
+                        lastNameError={handleErrorSection(
+                           "speakers",
                            key,
                            "lastName",
                            errors,
                            touched
                         )}
-                        positionError={handleError(
+                        positionError={handleErrorSection(
+                           "speakers",
                            key,
                            "position",
                            errors,
                            touched
                         )}
-                        backgroundError={handleError(
+                        backgroundError={handleErrorSection(
+                           "speakers",
                            key,
                            "background",
                            errors,
                            touched
                         )}
-                        avatarError={handleError(
+                        avatarError={handleErrorSection(
+                           "speakers",
                            key,
                            "avatar",
                            errors,
                            touched
                         )}
-                        emailError={handleError(key, "email", errors, touched)}
+                        emailError={handleErrorSection(
+                           "speakers",
+                           key,
+                           "email",
+                           errors,
+                           touched
+                        )}
                         getDownloadUrl={getDownloadUrl}
                         speaker={values.speakers[key]}
                         values={values}
