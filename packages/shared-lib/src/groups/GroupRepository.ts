@@ -154,6 +154,11 @@ export interface IGroupRepository {
    followCompany(userData: UserData, group: Group): Promise<void>
 
    unfollowCompany(userId: string, groupId: string): Promise<void>
+
+   updateGroupPublicProfileFlag(
+      groupId: string,
+      isPublic: boolean
+   ): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -798,6 +803,21 @@ export class FirebaseGroupRepository
          .doc(groupId)
 
       return followRef.delete()
+   }
+
+   updateGroupPublicProfileFlag(
+      groupId: string,
+      isPublic: boolean
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "publicProfile"> = {
+         publicProfile: isPublic,
+      }
+
+      return groupRef.update(toUpdate)
    }
 }
 
