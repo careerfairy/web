@@ -15,6 +15,7 @@ interface Props {
    hideNavOnScroll?: boolean
    persistent?: boolean
    headerEndContent?: React.ReactNode
+   viewRef?: React.RefObject<HTMLDivElement>
 }
 
 const GeneralLayout = ({
@@ -24,6 +25,7 @@ const GeneralLayout = ({
    hideNavOnScroll = false,
    persistent = false,
    headerEndContent,
+   viewRef,
 }: Props) => {
    const isDesktop = useIsDesktop()
 
@@ -32,6 +34,7 @@ const GeneralLayout = ({
          sx={{
             backgroundColor,
          }}
+         viewRef={viewRef}
       >
          <GenericHeader
             hideNavOnScroll={hideNavOnScroll}
@@ -39,7 +42,7 @@ const GeneralLayout = ({
             endContent={headerEndContent}
          />
          <PageContentWrapper>
-            <GeneralNavDrawer isPersistent={isDesktop && persistent} />
+            <GeneralNavDrawer isPersistent={isDesktop ? persistent : null} />
             <PageChildrenWrapper>
                {children}
                <FooterV2 bottom={fullScreen} />
