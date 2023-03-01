@@ -20,6 +20,11 @@ import useIsMobile from "../../components/custom-hook/useIsMobile"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 
+type TrackProps = {
+   id: string
+   visitorId: string
+}
+
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
@@ -30,7 +35,8 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
    const viewRef = useTrackPageView({
       trackDocumentId: id,
-      handleTrack: trackCompanyPageView,
+      handleTrack: ({ id, visitorId }: TrackProps) =>
+         trackCompanyPageView(id, visitorId),
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (

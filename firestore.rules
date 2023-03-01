@@ -224,10 +224,6 @@ service cloud.firestore {
                            || request.resource.data["generalStats"][statKey] == resource.data["generalStats"][statKey] + 1; // If the resource is not null, then the stat should be 1 more than the previous value
                 }
 
-                // when rating a livestream, we also update the livestream stats average rating on the client side
-                // since the field is a map stats.ratings[id].average, we can't whitelist the update to wildcard
-                // maps values yet :/
-                allow update: if isSignedIn();
                 allow write: if allowIncrementGeneralStatsField("numberOfPeopleReachedCompanyPage");
                 allow read: if true;
 
