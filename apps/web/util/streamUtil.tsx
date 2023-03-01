@@ -115,3 +115,15 @@ export const getLinkToStream = (
 
    return url.toString()
 }
+
+export const buildStreamerLink = (
+   variant: "joining-streamer" | "main-streamer",
+   livestreamId: string,
+   secureToken: string
+) => {
+   let baseUrl: string = "https://careerfairy.io"
+   if (window?.location?.origin) {
+      baseUrl = window.location.origin
+   }
+   return `${baseUrl}/streaming/${livestreamId}/${variant}?token=${secureToken}`
+}
