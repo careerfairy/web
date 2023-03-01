@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useMemo } from "react"
 import Box from "@mui/material/Box"
 import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
@@ -11,6 +11,8 @@ import {
 import Link from "../../common/Link"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "../../../../types/commonTypes"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 
 type Props = {
    companyGroupData: Group
@@ -25,6 +27,14 @@ const styles = sxStyles({
    },
 })
 const CompanyGroupInfo = ({ companyGroupData }: Props) => {
+   const showCompanyPageCta = useMemo(() => {
+      const presenter = GroupPresenter.createFromDocument(companyGroupData)
+
+      return Boolean(
+         companyGroupData.publicProfile && presenter.companyPageIsReady()
+      )
+   }, [companyGroupData])
+
    return (
       <Box>
          <Stack spacing={1}>
@@ -74,14 +84,13 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
             >
                {companyGroupData.extraInfo}
             </Typography>
-            {companyGroupData.publicProfile ? (
+            {showCompanyPageCta ? (
                <Box
                   display="flex"
                   component={Link}
-                  href={`#`} // TODO: add company profile link like below:
-                  // href={`/company/${companyNameSlugify(
-                  //    companyGroupData.universityName
-                  // )}`}
+                  href={`/company/${companyNameSlugify(
+                     companyGroupData.universityName
+                  )}`}
                   alignItems={"center"}
                   noLinkStyle
                   color={"secondary.main"}
