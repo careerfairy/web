@@ -1,3 +1,4 @@
+import React from "react"
 import DashboardHead from "../../layouts/GroupDashboardLayout/DashboardHead"
 import CompanyPageOverview from "../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
@@ -16,40 +17,55 @@ import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
+import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
+import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import SEO from "../../components/util/SEO"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
 }) => {
-   const { universityName } = serverSideGroup
-
    const isMobile = useIsMobile()
+   const { trackCompanyPageView } = useFirebaseService()
+   const { universityName, id } = serverSideGroup
+
+   const viewRef = useTrackPageView({
+      trackDocumentId: id,
+      handleTrack: trackCompanyPageView,
+   }) as unknown as React.RefObject<HTMLDivElement>
 
    return (
-      <GeneralLayout
-         backgroundColor={"#FFF"}
-         fullScreen
-         headerEndContent={
-            <>
-               {isMobile ? (
-                  <Box px={0.5}>
-                     <FollowButton group={serverSideGroup} />
-                  </Box>
-               ) : null}
-            </>
-         }
-      >
-         <DashboardHead title={`CareerFairy | ${universityName}`} />
-         <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
-            <CompanyPageOverview
-               group={serverSideGroup}
-               upcomingLivestreams={mapFromServerSide(
-                  serverSideUpcomingLivestreams
-               )}
-               editMode={false}
-            />
-         </Box>
-      </GeneralLayout>
+      <>
+         <SEO
+            id={`CareerFairy | ${universityName}`}
+            title={`CareerFairy | ${universityName}`}
+         />
+         <GeneralLayout
+            hideNavOnScroll
+            viewRef={viewRef}
+            fullScreen
+            headerEndContent={
+               <>
+                  {isMobile ? (
+                     <Box px={0.5}>
+                        <FollowButton group={serverSideGroup} />
+                     </Box>
+                  ) : null}
+               </>
+            }
+         >
+            <DashboardHead title={`CareerFairy | ${universityName}`} />
+            <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
+               <CompanyPageOverview
+                  group={serverSideGroup}
+                  upcomingLivestreams={mapFromServerSide(
+                     serverSideUpcomingLivestreams
+                  )}
+                  editMode={false}
+               />
+            </Box>
+         </GeneralLayout>
+      </>
    )
 }
 

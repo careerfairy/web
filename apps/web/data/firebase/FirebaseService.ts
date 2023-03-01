@@ -56,6 +56,7 @@ import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/liv
 import { recommendationServiceInstance } from "./RecommendationService"
 import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import { clearFirestoreCache } from "../util/authUtil"
+import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -3159,7 +3160,10 @@ class FirebaseService {
       }
    }
 
-   trackDetailPageView = async (eventId: string, visitorId: string) => {
+   trackDetailPageView = async (
+      eventId: string,
+      visitorId: string
+   ): Promise<void> => {
       const pageViewRef = this.firestore
          .collection("livestreams")
          .doc(eventId)
@@ -3188,6 +3192,45 @@ class FirebaseService {
 
          generalDetailPageViewCounter.incrementBy(1).catch(console.error)
 
+         return pageViewRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      } else {
+         return
+      }
+   }
+
+   trackCompanyPageView = async (
+      groupId: string,
+      visitorId: string
+   ): Promise<void> => {
+      const pageViewRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("companyPageViews")
+         .doc(visitorId)
+
+      const groupStatsRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("stats")
+         .doc("groupStats")
+
+      const pageViewVisitorSnap = await pageViewRef.get()
+
+      const hasViewed = pageViewVisitorSnap.exists
+
+      if (!hasViewed) {
+         const generalStatsFieldPath = getAValidGroupStatsUpdateField(
+            "numberOfPeopleReachedCompanyPage"
+         )
+
+         const generalDetailPageViewCounter = new Counter(
+            groupStatsRef,
+            generalStatsFieldPath
+         )
+
+         generalDetailPageViewCounter.incrementBy(1).catch(console.error)
          return pageViewRef.set({
             createdAt: this.getServerTimestamp(),
          })

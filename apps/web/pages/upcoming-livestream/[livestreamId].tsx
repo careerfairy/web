@@ -32,7 +32,7 @@ import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
 import { livestreamRepo } from "../../data/RepositoryInstances"
-import useTrackDetailPageView from "../../components/custom-hook/useTrackDetailPageView"
+import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import {
    LivestreamEvent,
    RecordingToken,
@@ -46,8 +46,13 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
+   const { trackDetailPageView } = useFirebaseService()
 
-   const viewRef = useTrackDetailPageView(serverStream)
+   const viewRef = useTrackPageView({
+      trackDocumentId: serverStream.id,
+      handleTrack: trackDetailPageView,
+      stream: serverStream,
+   })
 
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
