@@ -208,7 +208,6 @@ const Header = () => {
                         color:
                            value === TabValue[sectionId] &&
                            theme.palette.secondary.main,
-                        // minWidth: [].includes()
                      },
                   ]}
                   label={getTabLabel(sectionId)}
