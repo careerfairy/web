@@ -5,10 +5,7 @@ import NewsletterSnackbar from "../components/views/common/NewsletterSnackbar"
 import { useAuth } from "./AuthProvider"
 import { useCallback, useContext, useEffect, useMemo, useState } from "react"
 import { userRepo } from "../data/RepositoryInstances"
-import {
-   IUserReminder,
-   UserReminderType,
-} from "@careerfairy/shared-lib/dist/users"
+import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
 import { errorLogAndNotify } from "../util/CommonUtil"
 
 const UserReminderProvider = ({ children }) => {
