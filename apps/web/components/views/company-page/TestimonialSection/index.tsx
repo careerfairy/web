@@ -1,6 +1,6 @@
 import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
-import { useCompanyPage } from "../index"
+import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 import { useCallback, useEffect, useState } from "react"
 import { Add } from "@mui/icons-material"
 import TestimonialCard from "./TestimonialCard"
@@ -25,7 +25,11 @@ const styles = sxStyles({
 })
 
 const TestimonialSection = () => {
-   const { group, editMode } = useCompanyPage()
+   const {
+      group,
+      editMode,
+      sectionRefs: { testimonialSectionRef },
+   } = useCompanyPage()
    const [testimonialToEdit, setTestimonialToEdit] = useState(null)
    const [step, setStep] = useState(0)
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
@@ -70,6 +74,10 @@ const TestimonialSection = () => {
    return (
       <>
          <Box>
+            <SectionAnchor
+               ref={testimonialSectionRef}
+               tabValue={TabValue.testimonials}
+            />
             <Box sx={styles.titleSection}>
                <Typography variant="h4" fontWeight={"600"} color="black">
                   Testimonial

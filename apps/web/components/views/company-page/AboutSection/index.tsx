@@ -1,14 +1,14 @@
 import { useCallback, useMemo } from "react"
 import { Box, Button, Typography } from "@mui/material"
-import { useCompanyPage } from "../index"
+import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 
 import { sxStyles } from "../../../../types/commonTypes"
 // react feather
 import {
+   Edit2 as EditIcon,
    MapPin as MapPinIcon,
    Tag as TagIcon,
    Users as UsersIcon,
-   Edit2 as EditIcon,
 } from "react-feather"
 import EditDialog from "../EditDialog"
 import AboutDialog from "./AboutDialog"
@@ -38,7 +38,12 @@ const styles = sxStyles({
 })
 
 const AboutSection = () => {
-   const { group, editMode } = useCompanyPage()
+   const {
+      group,
+      editMode,
+      sectionRefs: { aboutSectionRef },
+   } = useCompanyPage()
+
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
@@ -86,6 +91,7 @@ const AboutSection = () => {
    return (
       <>
          <Box sx={styles.wrapper}>
+            <SectionAnchor ref={aboutSectionRef} tabValue={TabValue.profile} />
             <Box sx={styles.titleSection}>
                <Typography variant="h4" fontWeight={"600"} color="black">
                   About

@@ -2,10 +2,13 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import Header from "./Header"
 import {
    createContext,
+   forwardRef,
+   MutableRefObject,
    useCallback,
    useContext,
    useEffect,
    useMemo,
+   useRef,
    useState,
 } from "react"
 import { Box, Container, Grid, Grow, Stack } from "@mui/material"
@@ -29,20 +32,45 @@ type Props = {
    upcomingLivestreams: LivestreamEvent[]
 }
 
-export enum TabValue {
-   profile = "profile",
-   media = "media",
-   testimonials = "testimonials",
-   livesStreams = "livesStreams",
+export const TabValue = {
+   profile: "profile-section",
+   media: "media-section",
+   testimonials: "testimonials-section",
+   livesStreams: "livesStreams-section",
+} as const
+
+export type TabValueType = typeof TabValue[keyof typeof TabValue]
+
+export const getTabLabel = (tabId: TabValueType) => {
+   switch (tabId) {
+      case TabValue.profile:
+         return "About"
+      case TabValue.media:
+         return "Media"
+      case TabValue.testimonials:
+         return "Testimonials"
+      case TabValue.livesStreams:
+         return "Live Streams"
+      default:
+         return ""
+   }
+}
+
+export type SectionRefs = {
+   aboutSectionRef: MutableRefObject<HTMLElement>
+   testimonialSectionRef: MutableRefObject<HTMLElement>
+   eventSectionRef: MutableRefObject<HTMLElement>
+   mediaSectionRef: MutableRefObject<HTMLElement>
 }
 
 type ICompanyPageContext = {
    group: Group
    groupPresenter: GroupPresenter
-   tabValue: TabValue
-   changeTabValue: (tabValues: TabValue) => void
+   tabValue: TabValueType
+   changeTabValue: (tabValues: TabValueType) => void
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
+   sectionRefs: SectionRefs
 }
 
 const CompanyPageContext = createContext<ICompanyPageContext>({
@@ -52,6 +80,12 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    changeTabValue: () => {},
    editMode: false,
    upcomingLivestreams: [],
+   sectionRefs: {
+      aboutSectionRef: null,
+      eventSectionRef: null,
+      mediaSectionRef: null,
+      testimonialSectionRef: null,
+   },
 })
 
 const CompanyPageOverview = ({
@@ -59,7 +93,7 @@ const CompanyPageOverview = ({
    editMode,
    upcomingLivestreams,
 }: Props) => {
-   const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
+   const [tabValue, setTabValue] = useState(TabValue.profile as TabValueType)
 
    const groupRef = useMemo(
       () =>
@@ -106,7 +140,12 @@ const CompanyPageOverview = ({
       }
    }, [contextGroup, editMode, presenter])
 
-   const contextValue = useMemo(
+   const aboutSectionRef = useRef<HTMLElement>(null)
+   const testimonialSectionRef = useRef<HTMLElement>(null)
+   const eventSectionRef = useRef<HTMLElement>(null)
+   const mediaSectionRef = useRef<HTMLElement>(null)
+
+   const contextValue = useMemo<ICompanyPageContext>(
       () => ({
          group: contextGroup,
          groupPresenter: presenter,
@@ -114,6 +153,12 @@ const CompanyPageOverview = ({
          editMode,
          changeTabValue: handleChangeTabValue,
          upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
+         sectionRefs: {
+            aboutSectionRef,
+            testimonialSectionRef,
+            eventSectionRef,
+            mediaSectionRef,
+         },
       }),
       [
          contextGroup,
@@ -152,6 +197,30 @@ const CompanyPageOverview = ({
       </CompanyPageContext.Provider>
    )
 }
+
+type SectionAnchorProps = {
+   tabValue: TabValueType
+}
+/*
+ * Handles the anchor for each section with an offset to account for the header
+ * */
+export const SectionAnchor = forwardRef<HTMLElement, SectionAnchorProps>(
+   ({ tabValue }, ref) => {
+      return (
+         <Box
+            id={tabValue}
+            ref={ref}
+            display={"block"}
+            position={"relative"}
+            top={"-130px"}
+            visibility={"hidden"}
+            component={"span"}
+         />
+      )
+   }
+)
+
+SectionAnchor.displayName = "SectionAnchor"
 
 export const useCompanyPage = () =>
    useContext<ICompanyPageContext>(CompanyPageContext)
