@@ -19,7 +19,6 @@ import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import SEO from "../../components/util/SEO"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
@@ -35,37 +34,31 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (
-      <>
-         <SEO
-            id={`CareerFairy | ${universityName}`}
-            title={`CareerFairy | ${universityName}`}
-         />
-         <GeneralLayout
-            hideNavOnScroll
-            viewRef={viewRef}
-            fullScreen
-            headerEndContent={
-               <>
-                  {isMobile ? (
-                     <Box px={0.5}>
-                        <FollowButton group={serverSideGroup} />
-                     </Box>
-                  ) : null}
-               </>
-            }
-         >
-            <DashboardHead title={`CareerFairy | ${universityName}`} />
-            <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
-               <CompanyPageOverview
-                  group={serverSideGroup}
-                  upcomingLivestreams={mapFromServerSide(
-                     serverSideUpcomingLivestreams
-                  )}
-                  editMode={false}
-               />
-            </Box>
-         </GeneralLayout>
-      </>
+      <GeneralLayout
+         hideNavOnScroll
+         viewRef={viewRef}
+         fullScreen
+         headerEndContent={
+            <>
+               {isMobile ? (
+                  <Box px={0.5}>
+                     <FollowButton group={serverSideGroup} />
+                  </Box>
+               ) : null}
+            </>
+         }
+      >
+         <DashboardHead title={`CareerFairy | ${universityName}`} />
+         <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
+            <CompanyPageOverview
+               group={serverSideGroup}
+               upcomingLivestreams={mapFromServerSide(
+                  serverSideUpcomingLivestreams
+               )}
+               editMode={false}
+            />
+         </Box>
+      </GeneralLayout>
    )
 }
 
