@@ -1,6 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Box, Button, Grid, Skeleton, Typography } from "@mui/material"
-import Link from "components/views/common/Link"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useCallback, useMemo } from "react"
 import { CheckCircle } from "react-feather"
@@ -8,6 +7,7 @@ import { sxStyles } from "types/commonTypes"
 import DateUtil from "util/DateUtil"
 import CardCustom from "../CardCustom"
 import { useMainPageContext } from "../MainPageProvider"
+import { GoToLivestreamButton } from "./GoToLivestreamButton"
 import { LivestreamChips } from "./LivestreamChips"
 import { LivestreamStats } from "./LivestreamStats"
 
@@ -219,15 +219,7 @@ const Actions = ({ livestream }: { livestream: LivestreamEvent }) => {
                >
                   Manage your live stream
                </Button>
-               <Button
-                  color="secondary"
-                  variant="contained"
-                  component={Link}
-                  target="_blank"
-                  href={`/upcoming-livestream/${livestream.id}`}
-               >
-                  Go to Live Stream
-               </Button>
+               <GoToLivestreamButton livestreamId={livestream.id} />
             </>
          ) : (
             <Button
