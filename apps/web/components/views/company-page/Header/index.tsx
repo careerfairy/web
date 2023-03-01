@@ -7,7 +7,6 @@ import {
    Slide,
    Tabs,
    Typography,
-   useMediaQuery,
 } from "@mui/material"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -23,7 +22,7 @@ import Stack from "@mui/material/Stack"
 import FollowButton from "./FollowButton"
 import ShareButton from "./ShareButton"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
@@ -163,9 +162,8 @@ const styles = sxStyles({
 const ToolbarOffset = styled("div")(({ theme }) => theme.mixins.toolbar)
 
 const Header = () => {
-   const isMobile = useMediaQuery<DefaultTheme>((theme) =>
-      theme.breakpoints.down("md")
-   )
+   const isMobile = useIsMobile()
+
    const [ref, elementIsTop] = useElementIsAtTopOfPage({
       offset: isMobile ? -60 : 70,
    })

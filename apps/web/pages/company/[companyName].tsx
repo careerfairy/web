@@ -3,7 +3,7 @@ import CompanyPageOverview from "../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
-import { Box, useMediaQuery } from "@mui/material"
+import { Box } from "@mui/material"
 import {
    GetStaticPaths,
    GetStaticProps,
@@ -15,7 +15,7 @@ import FollowButton from "../../components/views/company-page/Header/FollowButto
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import { DefaultTheme } from "@mui/styles/defaultTheme"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
@@ -23,9 +23,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 }) => {
    const { universityName } = serverSideGroup
 
-   const isMobile = useMediaQuery<DefaultTheme>((theme) =>
-      theme.breakpoints.down("md")
-   )
+   const isMobile = useIsMobile()
 
    return (
       <GeneralLayout
@@ -66,25 +64,23 @@ export const getStaticProps: GetStaticProps<{
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
       if (serverSideGroup) {
-
          const presenter = GroupPresenter.createFromDocument(serverSideGroup)
 
          if (presenter.companyPageIsReady()) {
-
             const serverSideUpcomingLivestreams =
-                await livestreamRepo.getEventsOfGroup(
-                    serverSideGroup?.groupId,
-                    "upcoming",
-                    {limit: 10}
-                )
+               await livestreamRepo.getEventsOfGroup(
+                  serverSideGroup?.groupId,
+                  "upcoming",
+                  { limit: 10 }
+               )
 
             return {
                props: {
                   serverSideGroup,
                   serverSideUpcomingLivestreams:
-                      serverSideUpcomingLivestreams?.map(
-                          LivestreamPresenter.serializeDocument
-                      ) || [],
+                     serverSideUpcomingLivestreams?.map(
+                        LivestreamPresenter.serializeDocument
+                     ) || [],
                },
                revalidate: 60,
             }
