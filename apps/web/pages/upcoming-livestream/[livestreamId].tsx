@@ -42,16 +42,33 @@ import { fromDate } from "data/firebase/FirebaseInstance"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { Group } from "@careerfairy/shared-lib/groups"
 
+type TrackProps = {
+   id: string
+   visitorId: string
+   extraData: LivestreamEvent
+}
+
 const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
    const { trackDetailPageView } = useFirebaseService()
 
+   const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
+      if (stream) {
+         // increase event popularity
+         recommendationServiceInstance.visitDetailPage(
+            stream as LivestreamEvent,
+            visitorId
+         )
+      }
+      return trackDetailPageView(id, visitorId)
+   }
+
    const viewRef = useTrackPageView({
       trackDocumentId: serverStream.id,
-      handleTrack: trackDetailPageView,
-      stream: serverStream,
+      extraData: serverStream,
+      handleTrack,
    })
 
    const theme = useTheme()

@@ -2,13 +2,11 @@ import { InViewHookResponse, useInView } from "react-intersection-observer"
 
 // project imports
 import useFingerPrint from "./useFingerPrint"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 
 type Props = {
    trackDocumentId: string
-   handleTrack: (id: string, visitorId: string) => Promise<void>
-   stream?: LivestreamEvent
+   handleTrack: (props) => Promise<void>
+   extraData?: any
 }
 /**
  * Track page views
@@ -20,7 +18,7 @@ type Props = {
 const useTrackPageView = ({
    trackDocumentId,
    handleTrack,
-   stream,
+   extraData,
 }: Props): InViewHookResponse["ref"] => {
    const { data: visitorId } = useFingerPrint()
 
@@ -30,15 +28,9 @@ const useTrackPageView = ({
       skip: visitorId === undefined, // Will only start tracking view when visitorId is available/loaded
       onChange: (inView) => {
          if (inView && visitorId) {
-            handleTrack(trackDocumentId, visitorId).catch(console.error)
-
-            if (stream) {
-               // increase event popularity
-               recommendationServiceInstance.visitDetailPage(
-                  stream as LivestreamEvent,
-                  visitorId
-               )
-            }
+            handleTrack({ id: trackDocumentId, visitorId, extraData }).catch(
+               console.error
+            )
          }
       },
    })
