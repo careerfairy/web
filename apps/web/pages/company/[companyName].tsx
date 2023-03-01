@@ -10,16 +10,35 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
+import GeneralLayout from "../../layouts/GeneralLayout"
+import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import useIsMobile from "../../components/custom-hook/useIsMobile"
 
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
 }) => {
    const { universityName } = serverSideGroup
+
+   const isMobile = useIsMobile()
+
    return (
-      <>
+      <GeneralLayout
+         backgroundColor={"#FFF"}
+         fullScreen
+         headerEndContent={
+            <>
+               {isMobile ? (
+                  <Box px={0.5}>
+                     <FollowButton group={serverSideGroup} />
+                  </Box>
+               ) : null}
+            </>
+         }
+      >
          <DashboardHead title={`CareerFairy | ${universityName}`} />
          <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
             <CompanyPageOverview
@@ -30,7 +49,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                editMode={false}
             />
          </Box>
-      </>
+      </GeneralLayout>
    )
 }
 
@@ -45,27 +64,35 @@ export const getStaticProps: GetStaticProps<{
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
       if (serverSideGroup) {
-         const serverSideUpcomingLivestreams =
-            await livestreamRepo.getEventsOfGroup(
-               serverSideGroup?.groupId,
-               "upcoming",
-               { limit: 10 }
-            )
+         const presenter = GroupPresenter.createFromDocument(serverSideGroup)
 
-         return {
-            props: {
-               serverSideGroup,
-               serverSideUpcomingLivestreams:
-                  serverSideUpcomingLivestreams?.map(
-                     LivestreamPresenter.serializeDocument
-                  ) || [],
-            },
-            revalidate: 60,
+         if (presenter.companyPageIsReady()) {
+            const serverSideUpcomingLivestreams =
+               await livestreamRepo.getEventsOfGroup(
+                  serverSideGroup?.groupId,
+                  "upcoming",
+                  { limit: 10 }
+               )
+
+            return {
+               props: {
+                  serverSideGroup,
+                  serverSideUpcomingLivestreams:
+                     serverSideUpcomingLivestreams?.map(
+                        LivestreamPresenter.serializeDocument
+                     ) || [],
+               },
+               revalidate: 60,
+            }
          }
+
+         throw new Error(
+            `Company page ${companyName} for groupId ${serverSideGroup.id} is not ready yet`
+         )
       }
    }
 
-   throw new Error("Company not found")
+   throw new Error(`Company ${companyName} not found`)
 }
 
 export const getStaticPaths: GetStaticPaths = () => ({

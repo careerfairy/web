@@ -16,6 +16,7 @@ import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import confetti from "canvas-confetti"
 import { PillsBackground } from "materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import useEventSocials from "../../../../../custom-hook/useEventSocials"
 
 const styles: StylesProps = {
    root: {},
@@ -61,6 +62,7 @@ const RegistrationComplete = () => {
    const { userStats } = useAuth()
    const { push } = useRouter()
    const isMobile = useIsMobile()
+   const socials = useEventSocials(livestream)
 
    const handleFinish = () => {
       onFinish?.()
@@ -105,7 +107,7 @@ const RegistrationComplete = () => {
                         : "That’s one more step as active member of this community. You can share the live stream with your network!"}
                   </Typography>
                   <ReferralWidget
-                     event={livestream}
+                     socials={socials}
                      noBackgroundColor
                      iconsColor={"primary"}
                      justifyContent={"center"}

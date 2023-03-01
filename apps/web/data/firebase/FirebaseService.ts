@@ -54,6 +54,7 @@ import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
 import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
+import { clearFirestoreCache } from "../util/authUtil"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -362,7 +363,7 @@ class FirebaseService {
       return this.auth.signInWithEmailAndPassword(email.trim(), password)
    }
 
-   doSignOut = () => this.auth.signOut()
+   doSignOut = () => this.auth.signOut().then(clearFirestoreCache)
 
    getUniversitiesFromCountryCode = (countryCode) => {
       let ref = this.firestore

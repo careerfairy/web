@@ -334,3 +334,17 @@ export type IUserReminder = {
 export enum UserReminderType {
    NewsletterReminder = "NewsletterReminder",
 }
+
+/*
+ * the document id should be the group id
+ * Path: /userData/{userId}/companiesUserFollows/{groupId}
+ * */
+export interface CompanyFollowed extends Identifiable {
+   createdAt: Timestamp
+
+   groupId: string
+   group: PublicGroup
+
+   userId: string
+   user: UserPublicData
+}

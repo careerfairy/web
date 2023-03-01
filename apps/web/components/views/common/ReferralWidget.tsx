@@ -2,18 +2,19 @@ import React from "react"
 import Stack, { StackProps } from "@mui/material/Stack"
 import { alpha, useTheme } from "@mui/material/styles"
 import { IconButton, Tooltip, useMediaQuery } from "@mui/material"
-import useSocials from "../../custom-hook/useSocials"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { StylesProps } from "../../../types/commonTypes"
+import { StylesProps, sxStyles } from "../../../types/commonTypes"
+import { SocialIconProps } from "../../custom-hook/useSocials"
+
 const mobileProp = "sm"
 
 interface WidgetButtonProps extends StackProps {
-   event: LivestreamEvent
    iconsColor?: "grey" | "primary" | "secondary"
    noBackgroundColor?: boolean
    iconStyle?: any
+   socials: SocialIconProps[]
 }
-const styles: StylesProps = {
+
+const styles = sxStyles({
    socialIcons: {
       color: "secondary.main",
       width: "100%",
@@ -31,17 +32,17 @@ const styles: StylesProps = {
          backgroundColor: "transparent",
       },
    },
-}
+})
+
 export const ReferralWidget = ({
-   event,
    iconsColor = "secondary",
    noBackgroundColor,
    iconStyle,
+   socials,
    ...rest
 }: WidgetButtonProps) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down(mobileProp))
-   const socials = useSocials(event)
 
    return (
       <Stack
