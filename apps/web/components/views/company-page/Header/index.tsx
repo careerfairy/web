@@ -1,4 +1,4 @@
-import { TabValue, useCompanyPage } from "../"
+import { getTabLabel, TabValue, TabValueType, useCompanyPage } from "../"
 import {
    AppBar,
    Avatar,
@@ -16,13 +16,15 @@ import {
 } from "../../../../constants/images"
 import BackgroundImage from "components/views/common/BackgroundImage"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import { styled, useTheme } from "@mui/material/styles"
 import Stack from "@mui/material/Stack"
 import FollowButton from "./FollowButton"
 import ShareButton from "./ShareButton"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
+import Link from "../../common/Link"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
@@ -168,17 +170,10 @@ const Header = () => {
       offset: isMobile ? -60 : 70,
    })
 
-   const { group, tabValue, changeTabValue, editMode } = useCompanyPage()
+   const { group, editMode, sectionRefs } = useCompanyPage()
    const theme = useTheme()
 
    const { bannerImageUrl, logoUrl, universityName } = group
-
-   const handleChangeTab = useCallback(
-      (event, value) => {
-         changeTabValue(value)
-      },
-      [changeTabValue]
-   )
 
    const isSticky =
       elementIsTop &&
@@ -186,6 +181,49 @@ const Header = () => {
       (!editMode || isMobile)
 
    const headerHeight = isMobile ? 170 : 52
+
+   const sectionRefsArray = useMemo(
+      () => Object.values(sectionRefs).filter((ref) => ref.current?.id),
+      [sectionRefs]
+   )
+
+   const [value, handleChange] = useControlledTabNavigationOnScroll(
+      sectionRefsArray,
+      {
+         threshold: 0.8,
+         initialValue: TabValue.profile,
+      }
+   )
+
+   const renderTabs = useCallback(() => {
+      return sectionRefsArray
+         .filter((ref) =>
+            Object.values(TabValue).includes(ref.current?.id as TabValueType)
+         )
+         .map((ref, index) => {
+            const sectionId = ref.current.id as TabValueType
+
+            return (
+               <SimpleTab
+                  sx={[
+                     styles.tab,
+                     {
+                        color:
+                           value === TabValue[sectionId] &&
+                           theme.palette.secondary.main,
+                     },
+                  ]}
+                  label={getTabLabel(sectionId)}
+                  value={sectionId}
+                  key={sectionId}
+                  component={Link}
+                  href={`#${sectionId}`}
+                  id={`tab-${sectionId}`}
+                  index={index}
+               />
+            )
+         })
+   }, [sectionRefsArray, theme.palette.secondary.main, value])
 
    return (
       <>
@@ -231,7 +269,7 @@ const Header = () => {
                         />
                         {isMobile ? (
                            <span>
-                              <Actions />
+                              <ActionButtons />
                            </span>
                         ) : null}
                      </Stack>
@@ -284,9 +322,9 @@ const Header = () => {
                               color="transparent"
                            >
                               <Tabs
-                                 value={tabValue}
+                                 value={value}
                                  variant={"scrollable"}
-                                 onChange={handleChangeTab}
+                                 onChange={handleChange}
                                  selectionFollowsFocus
                                  allowScrollButtonsMobile
                                  textColor="inherit"
@@ -295,72 +333,11 @@ const Header = () => {
                                  }
                                  sx={styles.tabWrapper}
                               >
-                                 <SimpleTab
-                                    sx={[
-                                       styles.tab,
-                                       {
-                                          color:
-                                             tabValue === TabValue.profile &&
-                                             theme.palette.secondary.main,
-                                       },
-                                    ]}
-                                    label="Profile"
-                                    value={TabValue.profile}
-                                    index={0}
-                                 />
-                                 <SimpleTab
-                                    sx={[
-                                       styles.tab,
-                                       {
-                                          color:
-                                             tabValue === TabValue.media &&
-                                             theme.palette.secondary.main,
-                                       },
-                                    ]}
-                                    label="Media"
-                                    value={TabValue.media}
-                                    index={1}
-                                 />
-                                 <SimpleTab
-                                    sx={[
-                                       styles.tab,
-                                       {
-                                          minWidth: {
-                                             xs: "100px",
-                                             md: "150px",
-                                          },
-                                          color:
-                                             tabValue ===
-                                                TabValue.testimonials &&
-                                             theme.palette.secondary.main,
-                                       },
-                                    ]}
-                                    label="Testimonials"
-                                    value={TabValue.testimonials}
-                                    index={2}
-                                 />
-                                 <SimpleTab
-                                    sx={[
-                                       styles.tab,
-                                       {
-                                          minWidth: {
-                                             xs: "100px",
-                                             md: "150px",
-                                          },
-                                          color:
-                                             tabValue ===
-                                                TabValue.livesStreams &&
-                                             theme.palette.secondary.main,
-                                       },
-                                    ]}
-                                    label="Live streams"
-                                    value={TabValue.livesStreams}
-                                    index={3}
-                                 />
+                                 {renderTabs()}
                               </Tabs>
                            </AppBar>
                         </Box>
-                        {isMobile ? null : <Actions />}
+                        {isMobile ? null : <ActionButtons />}
                      </Box>
                   </Box>
                </Container>
@@ -371,7 +348,7 @@ const Header = () => {
    )
 }
 
-const Actions = () => {
+const ActionButtons = () => {
    const { group, editMode, groupPresenter } = useCompanyPage()
 
    const showFollowButton = Boolean(!editMode)
