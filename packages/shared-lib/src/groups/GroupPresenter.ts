@@ -11,6 +11,16 @@ import { UserData } from "../users"
 export const ATS_MAX_LINKED_ACCOUNTS = 1
 export const MAX_GROUP_PHOTOS_COUNT = 15
 
+export const BANNER_IMAGE_SPECS = {
+   minWidth: 864,
+   minHeight: 172,
+   maxWidth: 4300,
+   maxHeight: 900,
+   // In megabytes
+   maxSize: 5, // 5MB
+   allowedFormats: ["jpg", "jpeg", "png", "webp"],
+}
+
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
 
@@ -83,8 +93,8 @@ export class GroupPresenter {
       return `company-pages/${this.id}/videos/${videoId}`
    }
 
-   getCompanyPageVideoPath() {
-      return `company-pages/${this.id}/videos`
+   getGroupBannerStorageImagePath(bannerId: string) {
+      return `company-pages/${this.id}/banners/${bannerId}`
    }
 
    companyPageIsReady() {
