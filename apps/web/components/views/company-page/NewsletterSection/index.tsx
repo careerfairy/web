@@ -86,7 +86,7 @@ const NewsletterSection = () => {
                      color={"secondary"}
                      size={"large"}
                   >
-                     Join Carerrfairy
+                     Join CareerFairy
                   </Button>
                ) : (
                   <Button
