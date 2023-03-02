@@ -14,7 +14,7 @@ const MediaSection = () => {
    if (!editMode && !group.photos?.length && !group.videos?.length) return null // no photos to show and not in edit mode so hide this section
 
    return (
-      <Box>
+      <Box position={"relative"}>
          <SectionAnchor ref={mediaSectionRef} tabValue={TabValue.media} />
          <Stack
             borderRadius={{

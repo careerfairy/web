@@ -2,7 +2,7 @@ import { Box, IconButton, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 import { useCallback, useEffect, useState } from "react"
-import { Add } from "@mui/icons-material"
+import Add from "@mui/icons-material/Add"
 import TestimonialCard from "./TestimonialCard"
 import EditDialog from "../EditDialog"
 import TestimonialDialog from "./TestimonialDialog"
@@ -73,7 +73,7 @@ const TestimonialSection = () => {
 
    return (
       <>
-         <Box>
+         <Box position={"relative"}>
             <SectionAnchor
                ref={testimonialSectionRef}
                tabValue={TabValue.testimonials}

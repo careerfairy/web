@@ -4,12 +4,10 @@ import {
    createContext,
    forwardRef,
    MutableRefObject,
-   useCallback,
    useContext,
    useEffect,
    useMemo,
    useRef,
-   useState,
 } from "react"
 import { Box, Container, Grid, Grow, Stack } from "@mui/material"
 import AboutSection from "./AboutSection"
@@ -66,8 +64,6 @@ export type SectionRefs = {
 type ICompanyPageContext = {
    group: Group
    groupPresenter: GroupPresenter
-   tabValue: TabValueType
-   changeTabValue: (tabValues: TabValueType) => void
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
    sectionRefs: SectionRefs
@@ -76,8 +72,6 @@ type ICompanyPageContext = {
 const CompanyPageContext = createContext<ICompanyPageContext>({
    group: null,
    groupPresenter: null,
-   tabValue: TabValue.profile,
-   changeTabValue: () => {},
    editMode: false,
    upcomingLivestreams: [],
    sectionRefs: {
@@ -93,8 +87,6 @@ const CompanyPageOverview = ({
    editMode,
    upcomingLivestreams,
 }: Props) => {
-   const [tabValue, setTabValue] = useState(TabValue.profile as TabValueType)
-
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -110,10 +102,6 @@ const CompanyPageOverview = ({
    const contextUpcomingLivestream = useListenToUpcomingStreams({
       filterByGroupId: group.groupId,
    })
-
-   const handleChangeTabValue = useCallback((tabValue) => {
-      setTabValue(tabValue)
-   }, [])
 
    const presenter = useMemo(
       () => GroupPresenter.createFromDocument(contextGroup),
@@ -149,9 +137,7 @@ const CompanyPageOverview = ({
       () => ({
          group: contextGroup,
          groupPresenter: presenter,
-         tabValue,
          editMode,
-         changeTabValue: handleChangeTabValue,
          upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
          sectionRefs: {
             aboutSectionRef,
@@ -163,9 +149,7 @@ const CompanyPageOverview = ({
       [
          contextGroup,
          presenter,
-         tabValue,
          editMode,
-         handleChangeTabValue,
          contextUpcomingLivestream,
          upcomingLivestreams,
       ]
@@ -211,7 +195,12 @@ export const SectionAnchor = forwardRef<HTMLElement, SectionAnchorProps>(
             id={tabValue}
             ref={ref}
             display={"block"}
-            position={"relative"}
+            position={"absolute"}
+            bgcolor={"red"}
+            zIndex={10}
+            bottom={0}
+            left={0}
+            right={0}
             top={"-130px"}
             visibility={"hidden"}
             component={"span"}

@@ -5,7 +5,7 @@ import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import React, { useCallback, useRef, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useTheme } from "@mui/material/styles"
-import { Add } from "@mui/icons-material"
+import Add from "@mui/icons-material/Add"
 import Link from "next/link"
 import EventCarousel from "./EventCarousel"
 import { ArrowLeft, ArrowRight } from "react-feather"
@@ -77,7 +77,7 @@ const EventSection = () => {
    )
 
    return (
-      <Box minHeight={{ md: spacing(50) }}>
+      <Box position={"relative"} minHeight={{ md: spacing(50) }}>
          <SectionAnchor
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}

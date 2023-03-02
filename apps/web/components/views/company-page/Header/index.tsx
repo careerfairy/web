@@ -183,13 +183,16 @@ const Header = () => {
    const headerHeight = isMobile ? 170 : 52
 
    const sectionRefsArray = useMemo(
-      () => Object.values(sectionRefs),
+      () => Object.values(sectionRefs).filter((ref) => ref.current?.id),
       [sectionRefs]
    )
 
    const [value, handleChange] = useControlledTabNavigationOnScroll(
       sectionRefsArray,
-      TabValue.profile
+      {
+         threshold: 0.8,
+         initialValue: TabValue.profile,
+      }
    )
 
    const renderTabs = useCallback(() => {

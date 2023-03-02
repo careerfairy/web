@@ -6,14 +6,20 @@ import debounce from "lodash.debounce"
  * Returns ID of visible element and a debounced handleChange function to update state.
  *
  * @param refs - Array of React refs pointing to observed elements.
- * @param initialValue - Initial value of visible element ID.
+ * @param options
  * @returns Tuple with current value and handleChange function.
  */
 const useControlledTabNavigationOnScroll = (
    refs: RefObject<HTMLElement>[],
-   initialValue: string
+   options: {
+      initialValue: string
+      threshold?: number
+   } = {
+      initialValue: "",
+      threshold: 0.5,
+   }
 ) => {
-   const [value, setValue] = useState<string>(initialValue)
+   const [value, setValue] = useState<string>(options.initialValue)
 
    const handleChange = debounce((_, newValue) => {
       setValue(newValue)
@@ -28,24 +34,24 @@ const useControlledTabNavigationOnScroll = (
          }
 
          let observer
-         const availableRefs = refs.filter((ref) => ref.current)
 
-         if (availableRefs.length) {
-            const options = {
-               threshold: 0.5,
-            }
+         if (refs.length) {
+            observer = new IntersectionObserver(
+               (entries) => {
+                  entries.forEach((entry) => {
+                     const entryId = entry.target.id
+                     if (entry.isIntersecting) {
+                        // @ts-ignore
+                        handleChange(_, entryId)
+                     }
+                  })
+               },
+               {
+                  threshold: options.threshold,
+               }
+            )
 
-            observer = new IntersectionObserver((entries) => {
-               entries.forEach((entry) => {
-                  const entryId = entry.target.id
-                  if (entry.isIntersecting) {
-                     // @ts-ignore
-                     handleChange(_, entryId)
-                  }
-               })
-            }, options)
-
-            availableRefs.forEach((ref) => observer.observe(ref.current))
+            refs.forEach((ref) => observer.observe(ref.current))
          }
          return () => observer?.disconnect()
       },

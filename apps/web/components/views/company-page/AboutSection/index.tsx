@@ -19,6 +19,7 @@ const styles = sxStyles({
       display: "flex",
       flexDirection: "column",
       width: "100%",
+      position: "relative",
    },
    titleSection: {
       display: "flex",
