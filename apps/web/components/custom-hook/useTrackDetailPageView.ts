@@ -2,11 +2,18 @@ import { InViewHookResponse, useInView } from "react-intersection-observer"
 
 // project imports
 import useFingerPrint from "./useFingerPrint"
+import { errorLogAndNotify } from "../../util/CommonUtil"
+
+type TrackProps = {
+   id: string
+   visitorId: string
+   extraData?: unknown
+}
 
 type Props = {
    trackDocumentId: string
-   handleTrack: (props) => Promise<void>
-   extraData?: any
+   handleTrack: (props: TrackProps) => Promise<void>
+   extraData?: unknown
 }
 /**
  * Track page views
@@ -29,7 +36,7 @@ const useTrackPageView = ({
       onChange: (inView) => {
          if (inView && visitorId) {
             handleTrack({ id: trackDocumentId, visitorId, extraData }).catch(
-               console.error
+               errorLogAndNotify
             )
          }
       },

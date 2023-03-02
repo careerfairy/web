@@ -123,18 +123,17 @@ const SubheaderLink = ({ link, title }: { link: string; title: string }) => {
 function totalPeopleReached(stats: GroupStats) {
    if (!stats) return 0
 
-   if (
-      stats.generalStats.numberOfPeopleReached <
-      stats.generalStats.numberOfRegistrations
-   ) {
-      return (
-         stats.generalStats.numberOfPeopleReached +
-         stats.generalStats.numberOfRegistrations +
-         stats.generalStats.numberOfPeopleReachedCompanyPage
-      )
+   // livestream views + company page views
+   const totalReached =
+      stats.generalStats.numberOfPeopleReached +
+         stats.generalStats.numberOfPeopleReachedCompanyPage ?? 0
+
+   // # views are still low, sum with registrations
+   if (totalReached < stats.generalStats.numberOfRegistrations) {
+      return totalReached + stats.generalStats.numberOfRegistrations
    }
 
-   return stats.generalStats.numberOfPeopleReached
+   return totalReached
 }
 
 export default AggregatedAnalytics
