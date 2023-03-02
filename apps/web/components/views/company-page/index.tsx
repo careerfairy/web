@@ -25,6 +25,7 @@ import { groupRepo } from "../../../data/RepositoryInstances"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
 import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import NewsletterSection from "./NewsletterSection"
 
 type Props = {
    group: Group
@@ -186,6 +187,7 @@ const CompanyPageOverview = ({
                   </Grid>
                </Container>
             </Grow>
+            <NewsletterSection />
          </Box>
       </CompanyPageContext.Provider>
    )
