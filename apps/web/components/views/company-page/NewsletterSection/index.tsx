@@ -42,10 +42,12 @@ const NewsletterSection = () => {
             type: UserReminderType.NewsletterReminder,
          }
 
-         await userRepo.updateUserReminder(userData?.id, reminder)
-         await userRepo.updateAdditionalInformation(userData?.id, {
-            unsubscribed: false,
-         })
+         await Promise.allSettled([
+            userRepo.updateUserReminder(userData?.id, reminder),
+            userRepo.updateAdditionalInformation(userData?.id, {
+               unsubscribed: false,
+            }),
+         ])
       } catch (e) {
          errorNotification(e.message)
       }
