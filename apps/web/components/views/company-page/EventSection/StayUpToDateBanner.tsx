@@ -1,8 +1,9 @@
-import { Box, Button, Grid, Typography } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../../types/commonTypes"
 import React from "react"
 import Image from "next/image"
 import { useCompanyPage } from "../index"
+import FollowButton from "../Header/FollowButton"
 
 const styles = sxStyles({
    wrapper: {
@@ -12,11 +13,7 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   handleFollow: () => void
-}
-
-const StayUpToDateBanner = ({ handleFollow }: Props) => {
+const StayUpToDateBanner = () => {
    const { group } = useCompanyPage()
 
    return (
@@ -46,14 +43,7 @@ const StayUpToDateBanner = ({ handleFollow }: Props) => {
                      </Typography>
                   </Grid>
                   <Grid item>
-                     <Button
-                        onClick={handleFollow}
-                        variant={"contained"}
-                        color={"secondary"}
-                        size={"medium"}
-                     >
-                        Follow
-                     </Button>
+                     <FollowButton group={group} color={"secondary"} noIcon />
                   </Grid>
                </Grid>
             </Grid>

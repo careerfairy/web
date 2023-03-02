@@ -156,11 +156,7 @@ const EventSection = () => {
                      Watch live streams. Discover new career ideas, interesting
                      jobs, internships and programmes for students. Get hired.
                   </Typography>
-                  <StayUpToDateBanner
-                     handleFollow={() => {
-                        // TODO Add Follow functionality
-                     }}
-                  />
+                  <StayUpToDateBanner />
                </>
             )}
          </Box>
