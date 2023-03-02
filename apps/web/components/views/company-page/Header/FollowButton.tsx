@@ -119,19 +119,16 @@ const NonAuthedFollowButton = () => {
    const { asPath } = useRouter()
 
    return (
-      <Button
-         component={Link}
-         // @ts-ignore
+      <Link
          href={{
             pathname: "/signup",
             query: {
                absolutePath: asPath,
             },
          }}
-         {...buttonProps}
       >
-         Follow
-      </Button>
+         <Button {...buttonProps}>Follow</Button>
+      </Link>
    )
 }
 
