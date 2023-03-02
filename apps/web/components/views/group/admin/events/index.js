@@ -1,23 +1,15 @@
 import PropTypes from "prop-types"
-import React, { Fragment, useCallback, useEffect, useState } from "react"
+import React, { Fragment, useEffect, useState } from "react"
 import { alpha } from "@mui/material/styles"
 import makeStyles from "@mui/styles/makeStyles"
 import { AppBar, Box, CircularProgress, Tabs } from "@mui/material"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
-import NewStreamModal from "./NewStreamModal"
 import { useRouter } from "next/router"
-import {
-   prettyLocalizedDate,
-   repositionElement,
-} from "../../../../helperFunctions/HelperFunctions"
+import { repositionElement } from "../../../../helperFunctions/HelperFunctions"
 import Tab from "@mui/material/Tab"
 import Header from "./Header"
 import EventsTable from "./events-table/EventsTable"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
-import { v4 as uuidv4 } from "uuid"
-import * as actions from "store/actions"
-import { useDispatch } from "react-redux"
-import { StreamCreationProvider } from "../../../draftStreamForm/StreamForm/StreamCreationProvider"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const useStyles = makeStyles((theme) => ({
@@ -40,33 +32,24 @@ const useStyles = makeStyles((theme) => ({
 }))
 
 const EventsOverview = () => {
-   const { group } = useGroup()
+   const { group, livestreamDialog } = useGroup()
    const classes = useStyles()
-   const dispatch = useDispatch()
-   const { userData, authenticatedUser } = useAuth()
+   const { userData } = useAuth()
    const {
       listenToDraftLiveStreamsByGroupId,
       listenToUpcomingLiveStreamsByGroupId,
       listenToPastLiveStreamsByGroupId,
       findTargetEvent,
-      addLivestream,
-      deleteLivestream,
-      getAllGroupAdminInfo,
-      sendNewlyPublishedEventEmail,
    } = useFirebaseService()
    const [streams, setStreams] = useState([])
-   const [openNewStreamModal, setOpenNewStreamModal] = useState(false)
    const [tabValue, setTabValue] = useState("upcoming")
    const [fetching, setFetching] = useState(false)
-   const [currentStream, setCurrentStream] = useState(null)
    const [fetchingQueryEvent, setFetchingQueryEvent] = useState(false)
    const [triggered, setTriggered] = useState(false)
-   const [publishingDraft, setPublishingDraft] = useState(false)
    const [groupsDictionary, setGroupsDictionary] = useState({})
 
    const {
       query: { eventId },
-      replace,
    } = useRouter()
 
    useEffect(() => {
@@ -95,6 +78,7 @@ const EventsOverview = () => {
                rowID: doc.id,
                date: doc.data().start?.toDate?.(),
                ...doc.data(),
+               isDraft: tabValue === "draft",
             }))
 
             if (eventId) {
@@ -129,92 +113,8 @@ const EventsOverview = () => {
       }
    }, [eventId])
 
-   const getAuthor = useCallback(
-      (livestream) => {
-         return livestream?.author?.email
-            ? livestream.author
-            : {
-                 email: authenticatedUser.email,
-                 ...(group?.id && { groupId: group.id }),
-              }
-      },
-      [authenticatedUser.email, group.id]
-   )
-
-   const handlePublishStream = useCallback(
-      async (streamObj, promotion) => {
-         try {
-            setPublishingDraft(true)
-            const newStream = { ...streamObj }
-            newStream.companyId = uuidv4()
-            const author = getAuthor(newStream)
-            const publishedStreamId = await addLivestream(
-               newStream,
-               "livestreams",
-               author,
-               promotion
-            )
-            newStream.id = publishedStreamId
-
-            const submitTime = prettyLocalizedDate(new Date())
-            const adminsInfo = await getAllGroupAdminInfo(
-               newStream.groupIds || [],
-               streamObj.id
-            )
-
-            const senderName = `${userData.firstName} ${userData.lastName}`
-
-            await sendNewlyPublishedEventEmail({
-               adminsInfo: adminsInfo || [],
-               senderName,
-               stream: newStream,
-               submitTime,
-            })
-            await deleteLivestream(streamObj.id, "draftLivestreams")
-            await replace(
-               `/group/${group.id}/admin/events?eventId=${publishedStreamId}`
-            )
-         } catch (e) {
-            setPublishingDraft(false)
-            dispatch(actions.sendGeneralError(e))
-         }
-      },
-      [
-         getAuthor,
-         addLivestream,
-         getAllGroupAdminInfo,
-         userData?.firstName,
-         userData?.lastName,
-         sendNewlyPublishedEventEmail,
-         deleteLivestream,
-         replace,
-         group.id,
-         dispatch,
-      ]
-   )
-
    const handleChange = (event, newValue) => {
       setTabValue(newValue)
-   }
-
-   const handleOpenNewStreamModal = () => {
-      setOpenNewStreamModal(true)
-   }
-
-   const handleCloseNewStreamModal = () => {
-      handleResetCurrentStream()
-      setOpenNewStreamModal(false)
-   }
-
-   const handleResetCurrentStream = () => {
-      setCurrentStream(null)
-   }
-
-   const handleEditStream = (streamObj) => {
-      if (streamObj) {
-         setCurrentStream(streamObj)
-         handleOpenNewStreamModal()
-      }
    }
 
    return (
@@ -223,7 +123,9 @@ const EventsOverview = () => {
             <Box>
                <Header
                   group={group}
-                  handleOpenNewStreamModal={handleOpenNewStreamModal}
+                  handleOpenNewStreamModal={
+                     livestreamDialog.handleOpenNewStreamModal
+                  }
                   isDraft={tabValue === "draft"}
                />
             </Box>
@@ -253,11 +155,13 @@ const EventsOverview = () => {
                </Box>
             ) : (
                <EventsTable
-                  handleEditStream={handleEditStream}
+                  handleEditStream={livestreamDialog.handleEditStream}
                   isDraft={tabValue === "draft"}
                   isPast={tabValue === "past"}
                   streams={streams}
-                  handleOpenNewStreamModal={handleOpenNewStreamModal}
+                  handleOpenNewStreamModal={
+                     livestreamDialog.handleOpenNewStreamModal
+                  }
                   groupsDictionary={groupsDictionary}
                   group={group}
                   eventId={eventId}
@@ -268,23 +172,12 @@ const EventsOverview = () => {
                         group?.universityCode || group?.privacyPolicyActive
                      )
                   }
-                  handlePublishStream={handlePublishStream}
-                  publishingDraft={publishingDraft}
+                  handlePublishStream={livestreamDialog.handlePublishStream}
+                  publishingDraft={livestreamDialog.isPublishing}
                   disabled={fetchingQueryEvent || fetching}
                />
             )}
          </Box>
-         <StreamCreationProvider>
-            <NewStreamModal
-               group={group}
-               typeOfStream={tabValue}
-               open={openNewStreamModal}
-               handlePublishStream={handlePublishStream}
-               handleResetCurrentStream={handleResetCurrentStream}
-               currentStream={currentStream}
-               onClose={handleCloseNewStreamModal}
-            />
-         </StreamCreationProvider>
       </Fragment>
    )
 }

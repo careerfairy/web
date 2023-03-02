@@ -26,6 +26,7 @@ import {
    LiveStreamStats,
    LivestreamStatsToUpdate,
 } from "./stats"
+import { OrderByDirection } from "firebase/firestore"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -33,6 +34,13 @@ type UpdateRecordingStatsProps = {
    minutesWatched?: number
    userId?: string
    onlyIncrementMinutes?: boolean
+}
+
+export type PastEventsOptions = {
+   fromDate: Date
+   filterByGroupId?: string
+   limit?: number
+   showHidden?: boolean
 }
 
 export interface ILivestreamRepository {
@@ -67,12 +75,9 @@ export interface ILivestreamRepository {
       callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    )
 
-   getPastEventsFrom(props: {
-      fromDate: Date
-      filterByGroupId?: string
-      limit?: number
-      showHidden?: boolean
-   }): Promise<LivestreamEvent[]>
+   getPastEventsFrom(options: PastEventsOptions): Promise<LivestreamEvent[]>
+
+   getPastEventsFromQuery(options: PastEventsOptions): firebase.firestore.Query
 
    recommendEventsQuery(
       userInterestsIds?: string[]
@@ -206,10 +211,17 @@ export interface ILivestreamRepository {
       operationsToMake: (existingStats: LiveStreamStats) => T
    ): Promise<void>
 
-   getFutureLivestreams(
+   getFutureLivestreamsQuery(
       groupId: string,
-      limit?: number
-   ): Promise<LivestreamEvent[]>
+      limit?: number,
+      fromDate?: Date
+   ): firebase.firestore.Query
+
+   getGroupDraftLivestreamsQuery(
+      groupId: string,
+      limit?: number,
+      order?: OrderByDirection
+   ): firebase.firestore.Query
 }
 
 export class FirebaseLivestreamRepository
@@ -223,21 +235,37 @@ export class FirebaseLivestreamRepository
       super()
    }
 
-   async getFutureLivestreams(
+   getGroupDraftLivestreamsQuery(
       groupId: string,
-      limit = 1
-   ): Promise<LivestreamEvent[]> {
+      limit?: number,
+      order: OrderByDirection = "asc"
+   ): firebase.firestore.Query {
+      let query = this.firestore
+         .collection("draftLivestreams")
+         .where("groupIds", "array-contains", groupId)
+         .orderBy("start", order)
+
+      if (limit) {
+         query.limit(limit)
+      }
+
+      return query
+   }
+
+   getFutureLivestreamsQuery(
+      groupId: string,
+      limit = 1,
+      fromDate = new Date()
+   ): firebase.firestore.Query {
       let query = this.firestore
          .collection("livestreams")
-         .where("start", ">", new Date())
+         .where("start", ">", fromDate)
          .where("test", "==", false)
          .where("groupIds", "array-contains", groupId)
          .limit(limit)
          .orderBy("start", "asc")
 
-      return this.mapLivestreamCollections(await query.get())
-         .filterByNotEndedEvents()
-         .get()
+      return query
    }
 
    async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
@@ -457,28 +485,43 @@ export class FirebaseLivestreamRepository
       limit,
       showHidden = false,
    }) {
-      let query = this.firestore
-         .collection("livestreams")
-         .where("start", ">", fromDate)
-         .where("start", "<", new Date())
-         .where("test", "==", false)
-         .orderBy("start", "desc")
-
-      if (limit) {
-         query = query.limit(limit)
-      }
-
-      if (filterByGroupId) {
-         query = query.where("groupIds", "array-contains", filterByGroupId)
-      }
-
-      if (showHidden === false) {
-         query = query.where("hidden", "==", false)
-      }
+      let query = this.getPastEventsFromQuery({
+         fromDate,
+         filterByGroupId,
+         limit,
+         showHidden,
+      })
 
       return this.mapLivestreamCollections(await query.get())
          .filterByEndedEvents()
          .get()
+   }
+
+   getPastEventsFromQuery(options: PastEventsOptions) {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", options.fromDate)
+         .where("start", "<", new Date())
+         .where("test", "==", false)
+         .orderBy("start", "desc")
+
+      if (options.limit) {
+         query = query.limit(options.limit)
+      }
+
+      if (options.filterByGroupId) {
+         query = query.where(
+            "groupIds",
+            "array-contains",
+            options.filterByGroupId
+         )
+      }
+
+      if (options.showHidden === false) {
+         query = query.where("hidden", "==", false)
+      }
+
+      return query
    }
 
    registeredEventsQuery(userEmail: string) {

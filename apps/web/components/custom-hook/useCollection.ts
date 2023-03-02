@@ -67,7 +67,7 @@ type GetReferenceFn = (
    firestore: firebase.firestore.Firestore
 ) => firebase.firestore.Query
 
-interface CollectionResponse<T> {
+export interface CollectionResponse<T> {
    isLoading: boolean
    data: T[]
    error: Error | null

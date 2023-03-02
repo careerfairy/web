@@ -34,8 +34,8 @@ const styles = sxStyles({
 })
 
 const CARD_OPTIONS = [
-   "Next Live stream",
-   "Last Live stream",
+   "Next live stream",
+   "Last live stream",
    "All live streams",
 ] as const
 

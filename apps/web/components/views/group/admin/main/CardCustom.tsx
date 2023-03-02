@@ -48,13 +48,15 @@ const styles = sxStyles({
 })
 
 type Props = {
-   title: string
+   title: React.ReactNode
    subHeader?: React.ReactNode
    children: React.ReactNode
    options?: OptionsProps["options"]
    optionsHandler?: OptionsProps["handler"]
    helpTooltip?: string
    sx?: SxProps<Theme>
+   customAction?: React.ReactNode
+   disableTypography?: boolean
 }
 
 /**
@@ -68,6 +70,8 @@ const CardCustom = ({
    helpTooltip,
    subHeader,
    sx,
+   customAction,
+   disableTypography = false,
 }: Props) => {
    const action = helpTooltip ? (
       <CustomWidthTooltip title={helpTooltip} arrow>
@@ -78,6 +82,8 @@ const CardCustom = ({
          options={options}
          handler={optionsHandler ? optionsHandler : undefined}
       />
+   ) : customAction ? (
+      customAction
    ) : undefined
 
    const mergedSxProps = useMemo(
@@ -95,6 +101,7 @@ const CardCustom = ({
             title={title}
             action={action}
             titleTypographyProps={styles.cardTitleTypographyProps}
+            disableTypography={disableTypography}
             subheader={subHeader}
          />
          <CardContent sx={styles.cardContent}>{children}</CardContent>
