@@ -269,7 +269,7 @@ const Header = () => {
                         />
                         {isMobile ? (
                            <span>
-                              <Actions />
+                              <ActionButtons />
                            </span>
                         ) : null}
                      </Stack>
@@ -337,7 +337,7 @@ const Header = () => {
                               </Tabs>
                            </AppBar>
                         </Box>
-                        {isMobile ? null : <Actions />}
+                        {isMobile ? null : <ActionButtons />}
                      </Box>
                   </Box>
                </Container>
@@ -348,7 +348,7 @@ const Header = () => {
    )
 }
 
-const Actions = () => {
+const ActionButtons = () => {
    const { group, editMode, groupPresenter } = useCompanyPage()
 
    const showFollowButton = Boolean(!editMode)
