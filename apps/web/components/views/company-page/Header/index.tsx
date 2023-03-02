@@ -25,6 +25,7 @@ import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPag
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import useControlledTabNavigationOnScroll from "../../../custom-hook/useControlledTabNavigationOnScroll"
 import Link from "../../common/Link"
+import BannerIllustration from "./BannerIllustration"
 
 const LOGO_SIZE = 112
 const STICKY_LOGO_SIZE = 60
@@ -227,15 +228,7 @@ const Header = () => {
 
    return (
       <>
-         <Box sx={styles.imageWrapper}>
-            <BackgroundImage
-               image={getResizedUrl(bannerImageUrl, "lg") || placeholderBanner}
-               opacity={0.8}
-               repeat={false}
-               className={undefined}
-               backgroundImageSx={undefined}
-            />
-         </Box>
+         <BannerIllustration />
          <span ref={ref} />
          <Box height={isSticky ? headerHeight : 0} />
          <Box

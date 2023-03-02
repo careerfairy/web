@@ -159,6 +159,11 @@ export interface IGroupRepository {
       groupId: string,
       isPublic: boolean
    ): Promise<void>
+
+   updateGroupBannerPhoto(
+      groupId: string,
+      bannerImageUrl: string
+   ): Promise<void>
 }
 
 export class FirebaseGroupRepository
@@ -815,6 +820,21 @@ export class FirebaseGroupRepository
 
       const toUpdate: Pick<Group, "publicProfile"> = {
          publicProfile: isPublic,
+      }
+
+      return groupRef.update(toUpdate)
+   }
+
+   updateGroupBannerPhoto(
+      groupId: string,
+      bannerImageUrl: string
+   ): Promise<void> {
+      const groupRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+
+      const toUpdate: Pick<Group, "bannerImageUrl"> = {
+         bannerImageUrl,
       }
 
       return groupRef.update(toUpdate)
