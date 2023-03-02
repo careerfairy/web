@@ -116,3 +116,11 @@ export const getLinkToStream = (
 
    return url.toString()
 }
+
+export const buildStreamerLink = (
+   variant: "joining-streamer" | "main-streamer",
+   livestreamId: string,
+   secureToken: string
+) => {
+   return `${getBaseUrl()}/streaming/${livestreamId}/${variant}?token=${secureToken}`
+}
