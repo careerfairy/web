@@ -224,8 +224,7 @@ service cloud.firestore {
                            || request.resource.data["generalStats"][statKey] == resource.data["generalStats"][statKey] + 1; // If the resource is not null, then the stat should be 1 more than the previous value
                 }
 
-                allow write: if allowIncrementGeneralStatsField("numberOfPeopleReachedCompanyPage");
-                allow read: if true;
+                allow read: if isCareerCenterAdmin() || isCFAdmin();
 
                 // Allow to increment only the 'generalStats' by 1.
                 match /_counter_shards_/{shardId} {
