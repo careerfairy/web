@@ -90,7 +90,6 @@ const CompanyPageOverview = ({
    upcomingLivestreams,
 }: Props) => {
    const { isLoggedIn, isLoggedOut } = useAuth()
-   const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
 
    const groupRef = useMemo(
       () =>
