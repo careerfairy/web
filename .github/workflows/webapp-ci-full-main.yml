@@ -173,6 +173,7 @@ jobs:
            uses: BetaHuhn/deploy-to-vercel-action@v1
            id: vercel-deploy
            with:
+              VERCEL_SCOPE: careerfairy-ssr
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
