@@ -1,8 +1,5 @@
-import React, { FC, useMemo } from "react"
-import { useFirestore, useFirestoreDocData } from "reactfire"
-import { doc } from "firebase/firestore"
+import React, { FC } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import FollowIcon from "@mui/icons-material/AddRounded"
 import useSWRMutation from "swr/mutation"
@@ -14,6 +11,7 @@ import FollowedIcon from "@mui/icons-material/CheckRounded"
 import { Button, ButtonProps } from "@mui/material"
 import { useRouter } from "next/router"
 import Link from "../../common/Link"
+import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
 
 type Arguments = {
    arg: {
@@ -64,27 +62,15 @@ const AuthedFollowButton: FC<Props> = ({ group }) => {
       }
    )
 
-   const firestore = useFirestore()
-
-   const followRef = useMemo(
-      () =>
-         doc(
-            firestore,
-            "userData",
-            authenticatedUser.email,
-            "companiesUserFollows",
-            group.id
-         ).withConverter(createGenericConverter<CompanyFollowed>()),
-      [firestore, group.id, authenticatedUser.email]
-   )
-
-   const { data: companyFollowedData, status } = useFirestoreDocData(
-      followRef,
-      {
-         idField: "id",
-         suspense: false,
-      }
-   )
+   const { data: companyFollowedData, status } =
+      useFirestoreDocument<CompanyFollowed>(
+         "userData",
+         [authenticatedUser.email, "companiesUserFollows", group.id],
+         {
+            suspense: false,
+            idField: "id",
+         }
+      )
 
    const handleClick = () => {
       if (authenticatedUser) {
