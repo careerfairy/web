@@ -65,7 +65,7 @@ export const FollowCompany = () => {
    const { isLoggedIn, authenticatedUser } = useAuth()
 
    const query = useMemo(
-      () => userRepo.getCompaniesUserFollowsQuery(authenticatedUser.email, 2),
+      () => userRepo.getCompaniesUserFollowsQuery(authenticatedUser.email, 1),
       [authenticatedUser.email]
    )
 
