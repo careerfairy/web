@@ -58,12 +58,12 @@ const styles = {
       backgroundColor: "background.paper",
       height: "100%",
    },
-   pillsBackground: (isOnDialog = false) => ({
+   pillsBackground: (isOnDialog = false, smallBackground = false) => ({
       height: "100%",
       background: (theme) =>
          `url(${alternateStudentBackground}) top left no-repeat, ${theme.palette.common.white}`,
       backgroundSize: `auto ${
-         isOnDialog ? "60%" : "120vh"
+         isOnDialog ? "60vh" : smallBackground ? "40vh" : "120vh"
       }, auto 100vh !important`,
    }),
 }
@@ -98,7 +98,10 @@ export const PaperBackground = ({ ...props }) => {
 export const PillsBackground = ({ ...props }) => {
    return (
       <Box
-         sx={styles.pillsBackground(props?.isOnDialog || false)}
+         sx={[
+            styles.pillsBackground(props?.isOnDialog, props?.isSmallBackground),
+            props?.styles,
+         ]}
          minHeight={props?.minHeight || "100vh"}
          {...props}
       />
