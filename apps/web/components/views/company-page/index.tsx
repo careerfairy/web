@@ -23,6 +23,8 @@ import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../data/RepositoryInstances"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
+import { FollowCompany, SignUp } from "./ctas"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
 type Props = {
    group: Group
@@ -87,6 +89,9 @@ const CompanyPageOverview = ({
    editMode,
    upcomingLivestreams,
 }: Props) => {
+   const { isLoggedIn, isLoggedOut } = useAuth()
+   const [tabValue, setTabValue] = useState(TabValue.profile as TabValue)
+
    const groupRef = useMemo(
       () =>
          doc(FirestoreInstance, "careerCenterData", group.id).withConverter(
@@ -155,6 +160,9 @@ const CompanyPageOverview = ({
       ]
    )
 
+   const showFollowCompanyCta = isLoggedIn && !editMode
+   const showSignUpCta = isLoggedOut && !editMode
+
    return (
       <CompanyPageContext.Provider value={contextValue}>
          <Box sx={{ backgroundColor: "white", height: "100%" }}>
@@ -167,6 +175,8 @@ const CompanyPageOverview = ({
                      <Grid item xs={12} md={6}>
                         <Stack px={3} spacing={{ xs: 4, md: 8 }}>
                            <AboutSection />
+                           {showFollowCompanyCta ? <FollowCompany /> : null}
+                           {showSignUpCta ? <SignUp /> : null}
                            <TestimonialSection />
                            <EventSection />
                         </Stack>

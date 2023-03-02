@@ -1,5 +1,8 @@
-import BaseFirebaseRepository from "../BaseFirebaseRepository"
+import BaseFirebaseRepository, {
+   createCompatGenericConverter,
+} from "../BaseFirebaseRepository"
 import {
+   CompanyFollowed,
    IUserReminder,
    RegistrationStep,
    SavedRecruiter,
@@ -118,6 +121,11 @@ export interface IUserRepository {
       userEmail: string,
       hasRegistered: boolean
    ): Promise<void>
+
+   getCompaniesUserFollowsQuery(
+      userEmail: string,
+      limit: number
+   ): firebase.firestore.Query<CompanyFollowed>
 }
 
 export class FirebaseUserRepository
@@ -550,6 +558,18 @@ export class FirebaseUserRepository
          },
          { merge: true }
       )
+   }
+
+   getCompaniesUserFollowsQuery(
+      userEmail: string,
+      limit: number
+   ): firebase.firestore.Query<CompanyFollowed> {
+      return this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("companiesUserFollows")
+         .withConverter(createCompatGenericConverter<CompanyFollowed>())
+         .limit(limit)
    }
 }
 

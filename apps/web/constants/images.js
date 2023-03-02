@@ -103,3 +103,6 @@ export const imagePlaceholder =
 
 export const videoImagePlaceholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fvideo-image-placeholder.png?alt=media&token=26d10157-59f5-42c9-9a96-8df049c74677"
+
+export const placeholderAvatar =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fplacholder-avatar.png?alt=media&token=9437e9ee-722f-41dc-981e-b123f901b244"
