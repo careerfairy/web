@@ -9,6 +9,7 @@ import { userRepo } from "../../../../data/RepositoryInstances"
 import { IUserReminder, UserReminderType } from "@careerfairy/shared-lib/users"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { PillsBackground } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
+import { useCompanyPage } from "../index"
 
 const styles = sxStyles({
    wrapper: {
@@ -28,6 +29,7 @@ const styles = sxStyles({
 
 const NewsletterSection = () => {
    const { userData, isLoggedIn, isLoggedOut } = useAuth()
+   const { editMode } = useCompanyPage()
    const { asPath } = useRouter()
    const { errorNotification } = useSnackbarNotifications()
 
@@ -49,7 +51,7 @@ const NewsletterSection = () => {
       }
    }, [errorNotification, userData?.id])
 
-   if (isLoggedIn && !userData?.unsubscribed) {
+   if (editMode || (isLoggedIn && !userData?.unsubscribed)) {
       return null
    }
 
@@ -65,8 +67,9 @@ const NewsletterSection = () => {
                color="textSecondary"
                mt={2}
             >
-               Sign up for our weekly update and receive personalised
-               invitations to career live streams and job openings
+               {isLoggedOut
+                  ? "Create an account to receive personalised invitations to career live streams and job openings"
+                  : "Sign up for our weekly update and receive personalised invitations to career live streams and job openings"}
             </Typography>
             <Box mt={4}>
                {isLoggedOut ? (
@@ -83,7 +86,7 @@ const NewsletterSection = () => {
                      color={"secondary"}
                      size={"large"}
                   >
-                     SIGN ME UP
+                     Join Carerrfairy
                   </Button>
                ) : (
                   <Button
