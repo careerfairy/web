@@ -37,6 +37,7 @@ import { useFirebaseService } from "../../../../../context/firebase/FirebaseServ
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import RootState from "../../../../../store/reducers"
 import Sources from "./RegistrationSources"
+import { useRouter } from "next/router"
 
 const useStyles = makeStyles((theme) => ({
    indicator: {
@@ -196,14 +197,20 @@ const AnalyticsOverview = () => {
    const classes = useStyles()
    const breakdownRef = useRef(null)
    const theme = useTheme()
-   const [value, setValue] = useState(0)
+   const {
+      query: { section, subsection },
+   } = useRouter()
+   const [value, setValue] = useState(section ? parseInt(section as string) : 0)
    const { userData } = useAuth()
    const [globalTimeFrame, setGlobalTimeFrame] = useState(
       group.universityCode ? globalTimeFrames[2] : globalTimeFrames[0]
    )
    const [showBar, setShowBar] = useState(true)
    const [userType, setUserType] = useState(userTypes[0])
-   const [streamDataType, setStreamDataType] = useState(streamDataTypes[0])
+   const selectedSubsection = subsection ? parseInt(subsection as string) : 0
+   const [streamDataType, setStreamDataType] = useState(
+      streamDataTypes[selectedSubsection]
+   )
    const [currentStream, setCurrentStream] = useState(null)
    const [fetchingQuestions, setFetchingQuestions] = useState(false)
    const [streamFilterModalOpen, setStreamFilterModalOpen] = useState(false)

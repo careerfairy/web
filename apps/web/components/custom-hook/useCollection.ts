@@ -21,11 +21,11 @@ function useCollection<T extends Identifiable>(
 ): CollectionResponse<T> {
    const { firestore } = useFirebaseService()
    const [documents, setDocuments] = useState<T[]>([])
-   const [isLoading, setLoading] = useState(true)
+   const [isLoading, setIsLoading] = useState(true)
    const [error, setError] = useState(null)
 
    useEffect(() => {
-      setLoading(true)
+      setIsLoading(true)
 
       try {
          let ref
@@ -43,7 +43,7 @@ function useCollection<T extends Identifiable>(
             ref.get().then(updateLocal)
          }
       } catch (e) {
-         setLoading(false)
+         setIsLoading(false)
          setError(e)
       }
 
@@ -56,7 +56,7 @@ function useCollection<T extends Identifiable>(
             })
          })
          setDocuments(list)
-         setLoading(false)
+         setIsLoading(false)
       }
    }, [collection, realtime])
 
@@ -67,7 +67,7 @@ type GetReferenceFn = (
    firestore: firebase.firestore.Firestore
 ) => firebase.firestore.Query
 
-interface CollectionResponse<T> {
+export interface CollectionResponse<T> {
    isLoading: boolean
    data: T[]
    error: Error | null

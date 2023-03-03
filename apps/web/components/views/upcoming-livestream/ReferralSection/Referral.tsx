@@ -8,6 +8,7 @@ import InfoIcon from "@mui/icons-material/InfoOutlined"
 import Box from "@mui/material/Box"
 import ReferralWidget from "../../common/ReferralWidget"
 import useIsMobile from "../../../custom-hook/useIsMobile"
+import useEventSocials from "../../../custom-hook/useEventSocials"
 
 const styles: StylesProps = {
    root: {
@@ -39,6 +40,7 @@ interface Props {
 }
 const Referral = ({ event }: Props) => {
    const isMobile = useIsMobile()
+   const socials = useEventSocials(event)
 
    return (
       <Stack spacing={2} alignItems={"center"} sx={styles.root}>
@@ -47,7 +49,7 @@ const Referral = ({ event }: Props) => {
          </Box>
          <Box width={"100%"}>
             <ReferralWidget
-               event={event}
+               socials={socials}
                noBackgroundColor
                iconsColor={"grey"}
                justifyContent={"center"}

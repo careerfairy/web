@@ -1,10 +1,11 @@
+import { shouldUseEmulators } from "./CommonUtil"
 import SessionStorageUtil from "./SessionStorageUtil"
 
 /**
  * Patch console.error() function to listen for Firestore connectivity issues
  * https://github.com/firebase/firebase-js-sdk/issues/1674
  */
-if (typeof window !== "undefined") {
+if (typeof window !== "undefined" && shouldUseEmulators() === false) {
    const originalFn = console["error"]
    console["error"] = function (...args) {
       if (args.length === 2) {

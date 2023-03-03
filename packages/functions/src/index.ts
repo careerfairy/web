@@ -5,9 +5,10 @@ import * as ModuleAlias from "module-alias"
  * Required to avoid importing from the /dist folder
  *
  * https://stackoverflow.com/a/56584739
+ * https://github.com/firebase/firebase-tools/issues/986
  */
 ModuleAlias.addAliases({
-   "@careerfairy/shared-lib": __dirname + "/../../shared-lib/src",
+   "@careerfairy/shared-lib": __dirname + "../../../shared-lib/src",
 })
 
 import dotenv = require("dotenv")
@@ -186,7 +187,7 @@ exports.updateUserJobApplications = atsUser.updateUserJobApplications
 exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers_v2
 
 // Group Analytics
-exports.getRegistrationSources = groupAnalytics.getRegistrationSources
+exports.getRegistrationSources_v2 = groupAnalytics.getRegistrationSources
 
 // Clear cached documents
 exports.periodicallyRemoveCachedDocument =
@@ -206,6 +207,8 @@ exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
+exports.onCreateLivestreamRatingAnswer =
+   onCreateTriggers.onCreateLivestreamRatingAnswer
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =

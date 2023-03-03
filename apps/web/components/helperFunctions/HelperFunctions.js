@@ -377,6 +377,17 @@ export const getResizedUrl = (url, size = "sm") => {
       console.warn("provided wrong size, must be one of [xs, sm, md, lg]")
       return url
    }
+
+   // check if the url path has a file extension using URL
+   const parsedUrl = new URL(url)
+   const lastPathSegment = parsedUrl.pathname.split("/").pop()
+
+   if (lastPathSegment.indexOf(".") === -1) {
+      // no file extension, append the target size to the path
+      const newPath = `${parsedUrl.pathname}_${targetSize}`
+      return `${parsedUrl.origin}${newPath}${parsedUrl.search}`
+   }
+
    return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`)
 }
 
@@ -439,8 +450,7 @@ export const getMaxLineStyles = (maxLines = 2) => ({
    WebkitLineClamp: maxLines,
    overflow: "hidden",
    textOverflow: "ellipsis",
-   "-webkit-line-clamp": maxLines,
-   "-webkit-box-orient": "vertical",
+   WebkitBoxOrient: "vertical",
 })
 
 export const sleep = (ms) => {

@@ -1,34 +1,34 @@
 import {
    FirebaseHighlightRepository,
    IHighlightRepository,
-} from "@careerfairy/shared-lib/dist/highlights/HighlightRepository"
+} from "@careerfairy/shared-lib/highlights/HighlightRepository"
 import {
    FirebaseWishRepository,
    IWishRepository,
-} from "@careerfairy/shared-lib/dist/wishes/WishRepository"
+} from "@careerfairy/shared-lib/wishes/WishRepository"
 import {
    IUserRepository,
    FirebaseUserRepository,
-} from "@careerfairy/shared-lib/dist/users/UserRepository"
+} from "@careerfairy/shared-lib/users/UserRepository"
 import firebaseApp, { FieldValue, Timestamp } from "./firebase/FirebaseInstance"
 import {
    IGroupRepository,
    FirebaseGroupRepository,
-} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+} from "@careerfairy/shared-lib/groups/GroupRepository"
 import {
    ILivestreamRepository,
    FirebaseLivestreamRepository,
-} from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+} from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 
 import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
-} from "@careerfairy/shared-lib/dist/fieldOfStudy/FieldOfStudyRepository"
+} from "@careerfairy/shared-lib/fieldOfStudy/FieldOfStudyRepository"
 
 import {
    FirebaseUniversityRepository,
    IUniversityRepository,
-} from "@careerfairy/shared-lib/dist/universities/UniversityRepository"
+} from "@careerfairy/shared-lib/universities/UniversityRepository"
 
 const firestoreInstance = firebaseApp.firestore()
 

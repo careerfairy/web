@@ -32,6 +32,8 @@ export const alternateBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Falternate_background.webp?alt=media&token=8b374f95-ce1f-42d6-8b79-8d502ed218ac"
 export const alternateStudentBackground =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fstudent-main-background.webp?alt=media&token=f6597bc5-71df-4445-95c8-38134ad7be79"
+export const pillsBackgroundTransparent =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fpills-background-transparent.png?alt=media&token=7b32cabb-4ee3-4267-a72c-df450c2c9798"
 export const quoteBackgroundLightPink =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/landing%20photos%2Fquote_background_light_pink.png?alt=media&token=f6597bc5-71df-4445-95c8-38134ad7be79"
 export const landingBottomBackground =
@@ -97,3 +99,12 @@ export const safariLogo =
 
 export const registerIllustrationSvg =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/static_files%2Fregister-icon.svg?alt=media&token=d0156136-682b-4d01-99de-80fde06d8eb1"
+
+export const imagePlaceholder =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fimage-placeholder.png?alt=media&token=0f796cfb-72e8-4965-aca0-043ed0781a6c"
+
+export const videoImagePlaceholder =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fvideo-image-placeholder.png?alt=media&token=26d10157-59f5-42c9-9a96-8df049c74677"
+
+export const placeholderAvatar =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fplacholder-avatar.png?alt=media&token=9437e9ee-722f-41dc-981e-b123f901b244"

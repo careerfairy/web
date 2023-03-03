@@ -1,19 +1,23 @@
-import { GetServerSidePropsContext } from "next"
-const AdminPage = () => {
-   return null // legacy page
+import MainPageContent from "components/views/group/admin/main"
+import GroupDashboardLayout from "layouts/GroupDashboardLayout"
+import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
+import { useRouter } from "next/router"
+
+const MainPage = () => {
+   const {
+      query: { groupId },
+   } = useRouter()
+
+   return (
+      <GroupDashboardLayout
+         pageDisplayName={"Main Page"}
+         groupId={groupId as string}
+      >
+         <DashboardHead title="CareerFairy | Main Page of" />
+
+         <MainPageContent />
+      </GroupDashboardLayout>
+   )
 }
 
-export const getServerSideProps = async (
-   context: GetServerSidePropsContext
-) => {
-   const groupId = context.params.groupId as string
-
-   // redirect to analytics page
-   return {
-      redirect: {
-         destination: `/group/${groupId}/admin/analytics`,
-      },
-   }
-}
-
-export default AdminPage
+export default MainPage

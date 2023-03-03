@@ -21,6 +21,12 @@ import {
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
 import { chunkArray } from "../utils"
+import {
+   createLiveStreamStatsDoc,
+   LiveStreamStats,
+   LivestreamStatsToUpdate,
+} from "./stats"
+import { OrderByDirection } from "firebase/firestore"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -28,6 +34,13 @@ type UpdateRecordingStatsProps = {
    minutesWatched?: number
    userId?: string
    onlyIncrementMinutes?: boolean
+}
+
+export type PastEventsOptions = {
+   fromDate: Date
+   filterByGroupId?: string
+   limit?: number
+   showHidden?: boolean
 }
 
 export interface ILivestreamRepository {
@@ -62,12 +75,9 @@ export interface ILivestreamRepository {
       callback: (snapshot: firebase.firestore.QuerySnapshot) => void
    )
 
-   getPastEventsFrom(props: {
-      fromDate: Date
-      filterByGroupId?: string
-      limit?: number
-      showHidden?: boolean
-   }): Promise<LivestreamEvent[]>
+   getPastEventsFrom(options: PastEventsOptions): Promise<LivestreamEvent[]>
+
+   getPastEventsFromQuery(options: PastEventsOptions): firebase.firestore.Query
 
    recommendEventsQuery(
       userInterestsIds?: string[]
@@ -96,7 +106,7 @@ export interface ILivestreamRepository {
 
    getEventsOfGroup(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       options?: {
          limit?: number
          hideHidden?: boolean
@@ -160,7 +170,7 @@ export interface ILivestreamRepository {
     * Fetches livestreams from a group that have jobs associated
     * @param groupId
     */
-   getLivestreamsWithJobs(groupId): Promise<LivestreamEvent[] | null>
+   getLivestreamsWithJobs(groupId: string): Promise<LivestreamEvent[] | null>
 
    getLivestreamUser(
       eventId: string,
@@ -195,6 +205,23 @@ export interface ILivestreamRepository {
       livestreamStartDate: firebase.firestore.Timestamp,
       userId: string
    ): Promise<RecordingToken>
+
+   updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
+      livestreamId: string,
+      operationsToMake: (existingStats: LiveStreamStats) => T
+   ): Promise<void>
+
+   getFutureLivestreamsQuery(
+      groupId: string,
+      limit?: number,
+      fromDate?: Date
+   ): firebase.firestore.Query
+
+   getGroupDraftLivestreamsQuery(
+      groupId: string,
+      limit?: number,
+      order?: OrderByDirection
+   ): firebase.firestore.Query
 }
 
 export class FirebaseLivestreamRepository
@@ -206,6 +233,74 @@ export class FirebaseLivestreamRepository
       readonly fieldValue: typeof firebase.firestore.FieldValue
    ) {
       super()
+   }
+
+   getGroupDraftLivestreamsQuery(
+      groupId: string,
+      limit?: number,
+      order: OrderByDirection = "asc"
+   ): firebase.firestore.Query {
+      let query = this.firestore
+         .collection("draftLivestreams")
+         .where("groupIds", "array-contains", groupId)
+         .orderBy("start", order)
+
+      if (limit) {
+         query.limit(limit)
+      }
+
+      return query
+   }
+
+   getFutureLivestreamsQuery(
+      groupId: string,
+      limit = 1,
+      fromDate = new Date()
+   ): firebase.firestore.Query {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", fromDate)
+         .where("test", "==", false)
+         .where("groupIds", "array-contains", groupId)
+         .limit(limit)
+         .orderBy("start", "asc")
+
+      return query
+   }
+
+   async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
+      livestreamId: string,
+      operationsToMake: (existingStats: LiveStreamStats) => T
+   ): Promise<void> {
+      const livestreamRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      const statsRef = livestreamRef.collection("stats").doc("livestreamStats")
+
+      const statsSnap = await statsRef.get()
+      let existingStats: LiveStreamStats
+
+      if (!statsSnap.exists) {
+         // Create the stats document
+         const livestreamDoc = await livestreamRef.get()
+
+         if (!livestreamDoc.exists) {
+            return // Livestream was deleted, no need to update the stats
+         }
+
+         existingStats = createLiveStreamStatsDoc(
+            this.addIdToDoc<LivestreamEvent>(livestreamDoc),
+            statsRef.id
+         )
+
+         await statsRef.set(existingStats)
+      } else {
+         existingStats = this.addIdToDoc<LiveStreamStats>(statsSnap)
+      }
+
+      // We have to use an update method here because the set method does not support nested updates/operations
+      return statsRef.update(operationsToMake(existingStats))
    }
 
    async getLivestreamUser(
@@ -277,34 +372,44 @@ export class FirebaseLivestreamRepository
 
    eventsOfGroupQuery(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       hideHidden?: boolean
    ) {
       let query = this.firestore
          .collection("livestreams")
          .where("groupIds", "array-contains", groupId)
          .where("test", "==", false)
+
       if (hideHidden) {
          query = query.where("hidden", "==", false)
       }
-      if (type === "upcoming") {
-         query = query.where("start", ">=", new Date()).orderBy("start", "asc")
-      } else {
-         query = query.where("start", "<", new Date()).orderBy("start", "desc")
+
+      if (type) {
+         if (type === "upcoming") {
+            query = query
+               .where("start", ">=", new Date())
+               .orderBy("start", "asc")
+         } else {
+            query = query
+               .where("start", "<", new Date())
+               .orderBy("start", "desc")
+         }
       }
+
       return query
    }
 
    async getEventsOfGroup(
       groupId: string,
-      type: "upcoming" | "past",
+      type?: "upcoming" | "past",
       options?: {
          limit?: number
          hideHidden?: boolean
       }
    ): Promise<LivestreamEvent[] | null> {
       let query = this.eventsOfGroupQuery(groupId, type, options?.hideHidden)
-      if (options.limit) {
+
+      if (options?.limit) {
          query = query.limit(options.limit)
       }
       const snapshots = await query.get()
@@ -342,8 +447,8 @@ export class FirebaseLivestreamRepository
    ): Promise<LivestreamEvent[] | null> {
       // convert fieldsOfStudy to array of chunks of 10
       let livestreams = []
-      let i,
-         j,
+      let i: number,
+         j: number,
          tempArray: FieldOfStudy[] = [],
          chunk = 10
       /*
@@ -352,7 +457,7 @@ export class FirebaseLivestreamRepository
        * */
       for (i = 0, j = fieldsOfStudy.length; i < j; i += chunk) {
          tempArray = fieldsOfStudy.slice(i, i + chunk)
-         let ref = await this.firestore
+         let ref = this.firestore
             .collection("livestreams")
             .where("start", ">", getEarliestEventBufferTime())
             .where("targetFieldsOfStudy", "array-contains-any", tempArray)
@@ -380,28 +485,43 @@ export class FirebaseLivestreamRepository
       limit,
       showHidden = false,
    }) {
-      let query = this.firestore
-         .collection("livestreams")
-         .where("start", ">", fromDate)
-         .where("start", "<", new Date())
-         .where("test", "==", false)
-         .orderBy("start", "desc")
-
-      if (limit) {
-         query = query.limit(limit)
-      }
-
-      if (filterByGroupId) {
-         query = query.where("groupIds", "array-contains", filterByGroupId)
-      }
-
-      if (showHidden === false) {
-         query = query.where("hidden", "==", false)
-      }
+      let query = this.getPastEventsFromQuery({
+         fromDate,
+         filterByGroupId,
+         limit,
+         showHidden,
+      })
 
       return this.mapLivestreamCollections(await query.get())
          .filterByEndedEvents()
          .get()
+   }
+
+   getPastEventsFromQuery(options: PastEventsOptions) {
+      let query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", options.fromDate)
+         .where("start", "<", new Date())
+         .where("test", "==", false)
+         .orderBy("start", "desc")
+
+      if (options.limit) {
+         query = query.limit(options.limit)
+      }
+
+      if (options.filterByGroupId) {
+         query = query.where(
+            "groupIds",
+            "array-contains",
+            options.filterByGroupId
+         )
+      }
+
+      if (options.showHidden === false) {
+         query = query.where("hidden", "==", false)
+      }
+
+      return query
    }
 
    registeredEventsQuery(userEmail: string) {
@@ -598,7 +718,7 @@ export class FirebaseLivestreamRepository
       userId: string,
       jobIdentifier: JobIdentifier,
       job: Job,
-      applicationId
+      applicationId: string
    ): Promise<void> {
       // should already exist since the user registered & participated
       const docRef = this.firestore
@@ -689,7 +809,9 @@ export class FirebaseLivestreamRepository
       return mapFirestoreDocuments<LivestreamEvent>(snaps)
    }
 
-   async getLivestreamRecordingToken(livestreamId): Promise<RecordingToken> {
+   async getLivestreamRecordingToken(
+      livestreamId: string
+   ): Promise<RecordingToken> {
       const snap = await this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -704,8 +826,8 @@ export class FirebaseLivestreamRepository
    }
 
    async getRecordedEventsByUserId(
-      userId,
-      dateLimit
+      userId: string,
+      dateLimit: Date
    ): Promise<LivestreamEvent[]> {
       const snap = await this.firestore
          .collection("livestreams")

@@ -14,7 +14,7 @@ import {
    Grid,
    Typography,
 } from "@mui/material"
-import { Formik, FormikValues } from "formik"
+import { Formik, FormikHelpers, FormikValues } from "formik"
 import { v4 as uuidv4 } from "uuid"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import makeStyles from "@mui/styles/makeStyles"
@@ -43,15 +43,13 @@ import {
    LivestreamJobAssociation,
    LivestreamPromotions,
    Speaker,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
-import { FormikHelpers } from "formik/dist/types"
-import { FieldOfStudy } from "@careerfairy/shared-lib/dist/fieldOfStudy"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import StreamInfo from "./StreamForm/StreamInfo"
 import SpeakersInfo from "./StreamForm/SpeakersInfo"
 import TargetStudentsInfo from "./StreamForm/TargetStudentsInfo"
-import PromotionInfo from "./StreamForm/PromotionInfo"
 import EventCategoriesInfo from "./StreamForm/EventCategoriesInfo"
 import HostAndQuestionsInfo from "./StreamForm/HostAndQuestionsInfo"
 import StreamFormNavigator, {
@@ -61,7 +59,8 @@ import { useStreamCreationProvider } from "./StreamForm/StreamCreationProvider"
 import PublishIcon from "@mui/icons-material/Publish"
 import SaveIcon from "@mui/icons-material/Save"
 import _ from "lodash"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
+import { OptionGroup } from "@careerfairy/shared-lib/commonTypes"
+import { getMetaDataFromEventHosts } from "@careerfairy/shared-lib/livestreams/metadata"
 
 const useStyles = makeStyles((theme) =>
    createStyles({
@@ -126,6 +125,11 @@ const useStyles = makeStyles((theme) =>
    })
 )
 
+type MetaData = Pick<
+   LivestreamEvent,
+   "companyCountries" | "companyIndustries" | "companySizes"
+>
+
 export type ISpeakerObj = {
    avatar: string
    firstName: string
@@ -165,7 +169,8 @@ interface Props {
       setDraftId: (id: string) => void,
       status: string,
       setStatus: (status: string) => void,
-      selectedJobs: LivestreamJobAssociation[]
+      selectedJobs: LivestreamJobAssociation[],
+      metaData: MetaData
    ) => void
    isActualLivestream?: boolean
    formRef: MutableRefObject<any>
@@ -311,6 +316,11 @@ const DraftStreamForm = ({
       promotionUniversitiesCodes: [],
       questionsDisabled: false,
    })
+
+   const metaData = useMemo<MetaData>(
+      () => getMetaDataFromEventHosts(selectedGroups),
+      [selectedGroups]
+   )
 
    const [steps, setSteps] = useState(initialSteps)
    const isPastStream = useMemo(
@@ -793,7 +803,8 @@ const DraftStreamForm = ({
                               setDraftId,
                               status,
                               setStatus,
-                              selectedJobs
+                              selectedJobs,
+                              metaData
                            )
                         }}
                      >

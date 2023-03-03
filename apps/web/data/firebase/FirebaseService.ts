@@ -14,6 +14,7 @@ import {
 } from "../../util/CommonUtil"
 import {
    EventRating,
+   EventRatingAnswer,
    LivestreamChatEntry,
    LivestreamEvent,
    LivestreamGroupQuestionsMap,
@@ -22,7 +23,7 @@ import {
    LivestreamQuestion,
    pickPublicDataFromLivestream,
    UserLivestreamData,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import SessionStorageUtil from "../../util/SessionStorageUtil"
 import {
    Group,
@@ -31,28 +32,31 @@ import {
    GroupQuestion,
    GroupWithPolicy,
    UserGroupData,
-} from "@careerfairy/shared-lib/dist/groups"
+} from "@careerfairy/shared-lib/groups"
 import {
    getLivestreamGroupQuestionAnswers,
    TalentProfile,
    UserData,
    UserLivestreamGroupQuestionAnswers,
    UserStats,
-} from "@careerfairy/shared-lib/dist/users"
-import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/dist/bigQuery/types"
+} from "@careerfairy/shared-lib/users"
+import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
 import { IAdminUserCreateFormValues } from "../../components/views/signup/steps/SignUpAdminForm"
 import CookiesUtil from "../../util/CookiesUtil"
-import { Counter } from "@careerfairy/shared-lib/dist/FirestoreCounter"
+import { Counter } from "@careerfairy/shared-lib/FirestoreCounter"
 import { makeUrls } from "../../util/makeUrls"
 import {
    createCompatGenericConverter,
    OnSnapshotCallback,
-} from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+} from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import DocumentReference = firebase.firestore.DocumentReference
 import DocumentData = firebase.firestore.DocumentData
 import DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
 import { recommendationServiceInstance } from "./RecommendationService"
+import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
+import { clearFirestoreCache } from "../util/authUtil"
+import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -114,6 +118,11 @@ class FirebaseService {
          "createNewUserAccount_v4"
       )
       return createUserInAuthAndFirebase({ userData })
+   }
+
+   getRegistrationSources = (args: GetRegistrationSourcesFnArgs) => {
+      const fn = this.functions.httpsCallable("getRegistrationSources_v2")
+      return fn(args)
    }
 
    createGroupAdminUserInAuthAndFirebase = async (args: {
@@ -361,7 +370,7 @@ class FirebaseService {
       return this.auth.signInWithEmailAndPassword(email.trim(), password)
    }
 
-   doSignOut = () => this.auth.signOut()
+   doSignOut = () => this.auth.signOut().then(clearFirestoreCache)
 
    getUniversitiesFromCountryCode = (countryCode) => {
       let ref = this.firestore
@@ -1346,11 +1355,12 @@ class FirebaseService {
       return streamRef.update(data)
    }
 
-   getDetailLivestreamCareerCenters = (groupIds) => {
+   getDetailLivestreamCareerCenters = (groupIds: string[]) => {
       let ref = this.firestore
          .collection("careerCenterData")
          .where("test", "==", false)
          .where("groupId", "in", groupIds)
+         .withConverter(createCompatGenericConverter<Group>())
       return ref.get()
    }
 
@@ -1413,17 +1423,18 @@ class FirebaseService {
       return ref.get()
    }
 
-   getCareerCentersByGroupId = async (arrayOfIds) => {
-      let groups = []
+   getCareerCentersByGroupId = async (
+      arrayOfIds: string[]
+   ): Promise<Group[]> => {
+      let groups: Group[] = []
       for (const id of arrayOfIds) {
          const snapshot = await this.firestore
             .collection("careerCenterData")
             .doc(id)
+            .withConverter(createCompatGenericConverter<Group>())
             .get()
          if (snapshot.exists) {
-            let group = snapshot.data()
-            group.id = snapshot.id
-            groups.push(group)
+            groups.push(snapshot.data())
          }
       }
       return groups
@@ -1887,14 +1898,20 @@ class FirebaseService {
       )
    }
 
-   rateLivestream = (livestreamId, userEmail, rating, ratingId) => {
-      let ref = this.firestore
+   rateLivestream = async (
+      livestreamId: string,
+      userEmail: string,
+      rating: Pick<EventRatingAnswer, "message" | "rating">,
+      ratingDoc: EventRating
+   ) => {
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("rating")
-         .doc(ratingId)
+         .doc(ratingDoc.id)
          .collection("voters")
          .doc(userEmail)
+
       return ref.set({
          ...rating,
          timestamp: this.getServerTimestamp(),
@@ -3143,7 +3160,10 @@ class FirebaseService {
       }
    }
 
-   trackDetailPageView = async (eventId: string, visitorId: string) => {
+   trackDetailPageView = async (
+      eventId: string,
+      visitorId: string
+   ): Promise<void> => {
       const pageViewRef = this.firestore
          .collection("livestreams")
          .doc(eventId)
@@ -3172,6 +3192,45 @@ class FirebaseService {
 
          generalDetailPageViewCounter.incrementBy(1).catch(console.error)
 
+         return pageViewRef.set({
+            createdAt: this.getServerTimestamp(),
+         })
+      } else {
+         return
+      }
+   }
+
+   trackCompanyPageView = async (
+      groupId: string,
+      visitorId: string
+   ): Promise<void> => {
+      const pageViewRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("companyPageViews")
+         .doc(visitorId)
+
+      const groupStatsRef = this.firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .collection("stats")
+         .doc("groupStats")
+
+      const pageViewVisitorSnap = await pageViewRef.get()
+
+      const hasViewed = pageViewVisitorSnap.exists
+
+      if (!hasViewed) {
+         const generalStatsFieldPath = getAValidGroupStatsUpdateField(
+            "numberOfPeopleReachedCompanyPage"
+         )
+
+         const generalDetailPageViewCounter = new Counter(
+            groupStatsRef,
+            generalStatsFieldPath
+         )
+
+         generalDetailPageViewCounter.incrementBy(1).catch(console.error)
          return pageViewRef.set({
             createdAt: this.getServerTimestamp(),
          })

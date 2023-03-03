@@ -1,19 +1,16 @@
-const functions = require("firebase-functions")
-const { admin } = require("./api/firestoreAdmin")
-const { client } = require("./api/postmark")
-const config = require("./config")
-const {
-   notifyLivestreamStarting,
-   notifyLivestreamCreated,
-} = require("./api/slack")
-const { setHeaders, isLocalEnvironment } = require("./util")
-const ical = require("ical-generator")
-const { addUtmTagsToLink } = require("@careerfairy/shared-lib/utils")
+import * as functions from "firebase-functions"
+import { admin } from "./api/firestoreAdmin"
+import { client } from "./api/postmark"
+import config from "./config"
+import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
+import { setHeaders, isLocalEnvironment } from "./util"
+import ical from "ical-generator"
+import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
-exports.scheduleTestLivestreamDeletion = functions.pubsub
+export const scheduleTestLivestreamDeletion = functions.pubsub
    .schedule("every sunday 09:00")
    .timeZone("Europe/Zurich")
-   .onRun((context) => {
+   .onRun(() => {
       admin
          .firestore()
          .collection("livestreams")
@@ -34,10 +31,10 @@ exports.scheduleTestLivestreamDeletion = functions.pubsub
          })
    })
 
-exports.getLivestreamICalendarEvent = functions.https.onRequest(
+export const getLivestreamICalendarEvent = functions.https.onRequest(
    async (req, res) => {
       setHeaders(req, res)
-      const livestreamId = req.query.eventId
+      const livestreamId = req.query.eventId as string
 
       if (livestreamId) {
          try {
@@ -89,9 +86,10 @@ exports.getLivestreamICalendarEvent = functions.https.onRequest(
    }
 )
 
-exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
-   async (data, context) => {
-      const email = {
+// eslint-disable-next-line camelcase
+export const sendLivestreamRegistrationConfirmationEmail_v2 =
+   functions.https.onCall(async (data) => {
+      const email: any = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
          From: "CareerFairy <noreply@careerfairy.io>",
@@ -123,7 +121,7 @@ exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
       }
 
       client.sendEmailWithTemplate(email).then(
-         (response) => {
+         () => {
             return { status: 200 }
          },
          (error) => {
@@ -131,12 +129,11 @@ exports.sendLivestreamRegistrationConfirmationEmail_v2 = functions.https.onCall(
             return { status: 500, error: error }
          }
       )
-   }
-)
+   })
 
-exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
-   async (data, context) => {
-      const email = {
+export const sendPhysicalEventRegistrationConfirmationEmail =
+   functions.https.onCall(async (data) => {
+      const email: any = {
          TemplateId: process.env.POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION,
          From: "CareerFairy <noreply@careerfairy.io>",
          To: data.recipientEmail,
@@ -151,7 +148,7 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
       }
 
       client.sendEmailWithTemplate(email).then(
-         (response) => {
+         () => {
             return { status: 200 }
          },
          (error) => {
@@ -159,13 +156,12 @@ exports.sendPhysicalEventRegistrationConfirmationEmail = functions.https.onCall(
             return { status: 500, error: error }
          }
       )
-   }
-)
+   })
 
-exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
-   async (data, context) => {
+export const sendHybridEventRegistrationConfirmationEmail =
+   functions.https.onCall(async (data) => {
       console.log("Starting")
-      const email = {
+      const email: any = {
          TemplateId:
             process.env
                .POSTMARK_TEMPLATE_HYBRID_EVENT_REGISTRATION_CONFIRMATION,
@@ -192,7 +188,7 @@ exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
       }
 
       client.sendEmailWithTemplate(email).then(
-         (response) => {
+         () => {
             return { status: 200 }
          },
          (error) => {
@@ -200,10 +196,9 @@ exports.sendHybridEventRegistrationConfirmationEmail = functions.https.onCall(
             return { status: 500, error: error }
          }
       )
-   }
-)
+   })
 
-exports.setFirstCommentOfQuestionOnCreate = functions.firestore
+export const setFirstCommentOfQuestionOnCreate = functions.firestore
    .document("livestreams/{livestream}/questions/{question}/comments/{comment}")
    .onCreate(async (commentSnap) => {
       try {
@@ -212,7 +207,7 @@ exports.setFirstCommentOfQuestionOnCreate = functions.firestore
          const questionSnap = await questionRef.get()
          if (questionSnap.exists) {
             const questionData = questionSnap.data()
-            let questionDataToUpdate = {
+            const questionDataToUpdate: any = {
                numberOfComments: admin.firestore.FieldValue.increment(1),
             }
             if (!questionData.firstComment) {
@@ -233,10 +228,10 @@ exports.setFirstCommentOfQuestionOnCreate = functions.firestore
       }
    })
 
-exports.notifySlackWhenALivestreamStarts = functions
+export const notifySlackWhenALivestreamStarts = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
-   .onUpdate(async (change, context) => {
+   .onUpdate(async (change) => {
       const previousValue = change.before.data()
       const newValue = change.after.data()
 
@@ -265,10 +260,10 @@ exports.notifySlackWhenALivestreamStarts = functions
       }
    })
 
-exports.notifySlackWhenALivestreamIsCreated = functions
+export const notifySlackWhenALivestreamIsCreated = functions
    .region(config.region)
    .firestore.document("livestreams/{livestreamId}")
-   .onCreate(async (snap, context) => {
+   .onCreate(async (snap) => {
       const event = snap.data()
       let publisherEmailOrName = event.author?.email
 
@@ -292,7 +287,7 @@ exports.notifySlackWhenALivestreamIsCreated = functions
       try {
          // Fetch the author details
          if (publisherEmailOrName) {
-            let userDoc = await admin
+            const userDoc = await admin
                .firestore()
                .collection("userData")
                .doc(publisherEmailOrName)

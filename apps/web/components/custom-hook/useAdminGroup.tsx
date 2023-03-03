@@ -1,10 +1,14 @@
-import React, { useEffect, useMemo } from "react"
+import { useEffect, useMemo } from "react"
 import { useFirestoreConnect } from "react-redux-firebase"
 import { CAREER_CENTER_COLLECTION } from "../util/constants"
 import { shallowEqual, useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
+import { Group } from "@careerfairy/shared-lib/groups"
+import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
 
-const useAdminGroup = (groupId) => {
+const useAdminGroup = (
+   groupId: string
+): { group: Group; stats: GroupStats } => {
    const dispatch = useDispatch()
 
    useEffect(() => {
@@ -30,6 +34,12 @@ const useAdminGroup = (groupId) => {
                      ["open", "==", true],
                   ],
                },
+               {
+                  collection: CAREER_CENTER_COLLECTION,
+                  doc: groupId,
+                  subcollections: [{ collection: "stats", doc: "groupStats" }],
+                  storeAs: "groupStats",
+               },
             ]
          )
       }
@@ -38,14 +48,16 @@ const useAdminGroup = (groupId) => {
 
    useFirestoreConnect(queries)
 
-   return useSelector(
-      ({ firestore }) =>
-         firestore.data.group && {
+   //@ts-ignore
+   return useSelector(({ firestore }) => {
+      return {
+         group: firestore.data.group && {
             ...firestore.data.group,
             id: firestore.data.group.id || firestore.data.group.groupId, // TODO: run a script after migration to add the id field to all careerCenterData documents
          },
-      shallowEqual
-   )
+         stats: firestore.data.groupStats,
+      }
+   }, shallowEqual)
 }
 
 export default useAdminGroup

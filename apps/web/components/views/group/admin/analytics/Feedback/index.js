@@ -5,6 +5,7 @@ import makeStyles from "@mui/styles/makeStyles"
 import LatestEvents from "../common/LatestEvents"
 import FeedbackTable from "./FeedbackTable"
 import RatingSideTable from "./RatingSideTable"
+import { useRouter } from "next/router"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -42,6 +43,22 @@ const Feedback = ({
    const [currentPoll, setCurrentPoll] = useState(null)
    const [currentRating, setCurrentRating] = useState(null)
    const sideRef = useRef(null)
+   const {
+      query: { livestreamId },
+   } = useRouter()
+
+   // select livestream from query parameter
+   useEffect(() => {
+      if (!loading && livestreamId) {
+         const found = streamsFromTimeFrame.find((l) => l.id === livestreamId)
+
+         if (found) {
+            setCurrentStream(found)
+         }
+
+         // if not found, the livestream is probably older than 2 years
+      }
+   }, [loading, livestreamId, setCurrentStream, streamsFromTimeFrame])
 
    useEffect(() => {
       setCurrentPoll(null)

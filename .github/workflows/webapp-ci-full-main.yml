@@ -173,12 +173,14 @@ jobs:
            uses: BetaHuhn/deploy-to-vercel-action@v1
            id: vercel-deploy
            with:
+              VERCEL_SCOPE: careerfairy-ssr
               GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
               VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
               VERCEL_ORG_ID: ${{ secrets.VERCEL_ORG_ID }}
               VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
               PR_LABELS: false
+              ALIAS_DOMAINS: ${{ github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' }}
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}

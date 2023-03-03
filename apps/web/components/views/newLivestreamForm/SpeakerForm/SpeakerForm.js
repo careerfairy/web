@@ -33,7 +33,6 @@ const SpeakerForm = ({
    isSubmitting,
    loading,
    getDownloadUrl,
-   handleDeleteSpeaker,
    setValues,
    index,
    values,
@@ -173,7 +172,7 @@ const SpeakerForm = ({
                setFieldValue={setFieldValue}
             />
          </Collapse>
-         {isLast && (
+         {isLast ? (
             <Grid xs={12} sm={12} md={12} lg={12} xl={12} item>
                <Button
                   startIcon={<PersonAddIcon />}
@@ -181,7 +180,7 @@ const SpeakerForm = ({
                      Object.keys(values.speakers).length >= 3 || isSubmitting
                   }
                   onClick={() =>
-                     handleAddSpeaker(values, setValues, speakerObj)
+                     handleAddSpeaker("speakers", values, setValues, speakerObj)
                   }
                   type="button"
                   color="primary"
@@ -193,7 +192,7 @@ const SpeakerForm = ({
                      : "Add a Speaker"}
                </Button>
             </Grid>
-         )}
+         ) : null}
       </Fragment>
    )
 }

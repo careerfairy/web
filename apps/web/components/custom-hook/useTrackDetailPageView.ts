@@ -2,22 +2,32 @@ import { InViewHookResponse, useInView } from "react-intersection-observer"
 
 // project imports
 import useFingerPrint from "./useFingerPrint"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { errorLogAndNotify } from "../../util/CommonUtil"
 
+type TrackProps = {
+   id: string
+   visitorId: string
+   extraData?: unknown
+}
+
+type Props = {
+   trackDocumentId: string
+   handleTrack: (props: TrackProps) => Promise<void>
+   extraData?: unknown
+}
 /**
- * Track livestream page views
- *   Updates the livestream stats doc
- *   Updates the livestream popularity field
+ * Track page views
+ *   Updates the ${trackDocumentId} stats doc
+ *   Updates the livestream popularity field if does receive a stream
  *
  * Fingerprints the user
  */
-const useTrackDetailPageView = (
-   stream: LivestreamEvent
-): InViewHookResponse["ref"] => {
+const useTrackPageView = ({
+   trackDocumentId,
+   handleTrack,
+   extraData,
+}: Props): InViewHookResponse["ref"] => {
    const { data: visitorId } = useFingerPrint()
-   const { trackDetailPageView } = useFirebaseService()
 
    const { ref } = useInView({
       triggerOnce: true, // only ever trigger once per element
@@ -25,10 +35,9 @@ const useTrackDetailPageView = (
       skip: visitorId === undefined, // Will only start tracking view when visitorId is available/loaded
       onChange: (inView) => {
          if (inView && visitorId) {
-            trackDetailPageView(stream.id, visitorId).catch(console.error)
-
-            // increase event popularity
-            recommendationServiceInstance.visitDetailPage(stream, visitorId)
+            handleTrack({ id: trackDocumentId, visitorId, extraData }).catch(
+               errorLogAndNotify
+            )
          }
       },
    })
@@ -36,4 +45,4 @@ const useTrackDetailPageView = (
    return ref
 }
 
-export default useTrackDetailPageView
+export default useTrackPageView
