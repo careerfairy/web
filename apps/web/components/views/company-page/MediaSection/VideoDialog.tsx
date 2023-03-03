@@ -26,6 +26,11 @@ import { videoUrlRegex } from "../../../../constants/forms"
 import { GroupVideo } from "@careerfairy/shared-lib/groups"
 
 const styles = sxStyles({
+   root: {
+      "& .MuiFormHelperText-root": {
+         pl: 0,
+      },
+   },
    videoUploadWrapper: {
       position: "relative",
       width: "100%",
@@ -192,7 +197,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
    }, [formik])
 
    return (
-      <form onSubmit={formik.handleSubmit}>
+      <Box sx={styles.root} component={"form"} onSubmit={formik.handleSubmit}>
          <EditDialog open={open} title={"Videos"} handleClose={handleClose}>
             <Grid spacing={2} container>
                <Grid item xs={12} sm={6} md={4}>
@@ -336,7 +341,7 @@ const VideoDialog = ({ handleClose, open }: Props) => {
                </Grid>
             </Grid>
          </EditDialog>
-      </form>
+      </Box>
    )
 }
 
