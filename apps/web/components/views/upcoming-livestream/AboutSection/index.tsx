@@ -57,6 +57,12 @@ const AboutSection = ({
    reasonsToJoinLivestream,
    companyGroupData,
 }: Props) => {
+   const showCompanyPageData = Boolean(
+      companyGroupData?.extraInfo ||
+         (companyGroupData?.companyCountry &&
+            companyGroupData?.companyIndustry &&
+            companyGroupData?.companySize)
+   )
    return (
       <Section
          big={big}
@@ -132,7 +138,7 @@ const AboutSection = ({
                   </Fade>
                </Box>
             ) : null}
-            {companyGroupData ? (
+            {showCompanyPageData ? (
                <Box width={"100%"} mt={6}>
                   <Fade fraction={forceReveal ? 0 : 0.2} bottom>
                      <CompanyGroupInfo companyGroupData={companyGroupData} />
