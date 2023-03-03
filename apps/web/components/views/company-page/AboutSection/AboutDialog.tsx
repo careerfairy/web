@@ -115,7 +115,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                            error={Boolean(errors.extraInfo)}
                            value={values.extraInfo}
                            variant="outlined"
-                           sx={{ minHeight: "100px" }}
+                           minRows={4}
                            className="multiLineInput"
                         />
                         <Collapse
