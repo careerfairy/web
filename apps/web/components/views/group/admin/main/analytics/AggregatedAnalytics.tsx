@@ -134,7 +134,7 @@ function totalPeopleReached(stats: GroupStats) {
       return totalReached + stats.generalStats.numberOfRegistrations
    }
 
-   return totalReached
+   return totalReached ?? 0
 }
 
 export default AggregatedAnalytics
