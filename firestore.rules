@@ -550,7 +550,7 @@ service cloud.firestore {
 
         // Group Admin -> Aggregation Count query
         match /{somePath=**}/talentProfiles/{groupId} {
-            allow read: if request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]) || isCFAdmin();
+            allow read: if request.auth != null && request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]) || isCFAdmin();
         }
     }
 }
