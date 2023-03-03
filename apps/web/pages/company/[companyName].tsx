@@ -5,12 +5,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
-import {
-   GetStaticPaths,
-   GetStaticProps,
-   InferGetStaticPropsType,
-   NextPage,
-} from "next"
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import GeneralLayout from "../../layouts/GeneralLayout"
 import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
@@ -25,10 +20,9 @@ type TrackProps = {
    visitorId: string
 }
 
-const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
-   serverSideGroup,
-   serverSideUpcomingLivestreams,
-}) => {
+const CompanyPage: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = ({ serverSideGroup, serverSideUpcomingLivestreams }) => {
    const isMobile = useIsMobile()
    const { trackCompanyPageView } = useFirebaseService()
    const { universityName, id } = serverSideGroup
@@ -67,10 +61,25 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    )
 }
 
-export const getStaticProps: GetStaticProps<{
-   serverSideGroup: Group
-   serverSideUpcomingLivestreams: any[]
-}> = async ({ params }) => {
+export const getServerSideProps: GetServerSideProps<
+   {
+      serverSideGroup: Group
+      serverSideUpcomingLivestreams: any[]
+   },
+   { companyName: string }
+> = async ({ params, res }) => {
+   // This value is considered fresh for ten seconds (s-maxage=10).
+   // If a request is repeated within the next 10 seconds, the previously
+   // cached value will still be fresh. If the request is repeated before 59 seconds,
+   // the cached value will be stale but still render (stale-while-revalidate=59).
+   //
+   // In the background, a revalidation request will be made to populate the cache
+   // with a fresh value. If you refresh the page, you will see the new value. More info on caching GGSP can be found here: https://nextjs.org/docs/basic-features/data-fetching/get-server-side-props#caching-with-server-side-rendering-ssr
+   res.setHeader(
+      "Cache-Control",
+      "public, s-maxage=10, stale-while-revalidate=59"
+   )
+
    const { companyName: companyNameSlug } = params
    const companyName = companyNameUnSlugify(companyNameSlug as string)
 
@@ -96,7 +105,6 @@ export const getStaticProps: GetStaticProps<{
                         LivestreamPresenter.serializeDocument
                      ) || [],
                },
-               revalidate: 60,
             }
          }
 
@@ -108,10 +116,5 @@ export const getStaticProps: GetStaticProps<{
 
    throw new Error(`Company ${companyName} not found`)
 }
-
-export const getStaticPaths: GetStaticPaths = () => ({
-   paths: [],
-   fallback: "blocking",
-})
 
 export default CompanyPage
