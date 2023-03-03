@@ -191,7 +191,7 @@ const Header = () => {
    const [value, handleChange] = useControlledTabNavigationOnScroll(
       sectionRefsArray,
       {
-         threshold: 0.8,
+         threshold: 0.5,
          initialValue: TabValue.profile,
       }
    )

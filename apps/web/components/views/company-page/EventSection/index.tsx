@@ -4,7 +4,6 @@ import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamC
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
 import React, { useCallback, useRef, useState } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import { useTheme } from "@mui/material/styles"
 import Add from "@mui/icons-material/Add"
 import Link from "next/link"
 import EventCarousel from "./EventCarousel"
@@ -18,6 +17,10 @@ import StayUpToDateBanner from "./StayUpToDateBanner"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 
 const styles = sxStyles({
+   root: {
+      position: "relative",
+      minHeight: (theme) => theme.spacing(50),
+   },
    titleSection: {
       display: "flex",
       justifyContent: "space-between",
@@ -57,7 +60,6 @@ const EventSection = () => {
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
-   const { spacing } = useTheme()
    const sliderRef = useRef(null)
 
    const handleNext = useCallback(() => {
@@ -77,7 +79,7 @@ const EventSection = () => {
    )
 
    return (
-      <Box position={"relative"} minHeight={{ md: spacing(50) }}>
+      <Box sx={styles.root}>
          <SectionAnchor
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}

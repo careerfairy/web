@@ -9,6 +9,8 @@ import debounce from "lodash.debounce"
  * @param options
  * @returns Tuple with current value and handleChange function.
  */
+
+const CHANGE_DELAY = 700
 const useControlledTabNavigationOnScroll = (
    refs: RefObject<HTMLElement>[],
    options: {
@@ -20,15 +22,24 @@ const useControlledTabNavigationOnScroll = (
    }
 ) => {
    const [value, setValue] = useState<string>(options.initialValue)
+   const [updating, setUpdating] = useState<boolean>(false)
+
+   const handleChangeClick = (e, newValue: string) => {
+      setValue(newValue)
+      setUpdating(true)
+      setTimeout(() => {
+         setUpdating(false)
+      }, CHANGE_DELAY)
+   }
 
    const handleChange = debounce((_, newValue) => {
       setValue(newValue)
-   }, 700)
+   }, CHANGE_DELAY)
 
    useEffect(
       () => {
          // @ts-ignore
-         if (!"IntersectionObserver" in window) {
+         if (!"IntersectionObserver" in window || updating) {
             // this browser doesn't seem to support the IntersectionObserver API, do nothing
             return
          }
@@ -38,9 +49,15 @@ const useControlledTabNavigationOnScroll = (
          if (refs.length) {
             observer = new IntersectionObserver(
                (entries) => {
-                  entries.forEach((entry) => {
+                  entries.forEach((entry, index) => {
                      const entryId = entry.target.id
-                     if (entry.isIntersecting) {
+
+                     const diff = getDifference(
+                        index,
+                        entries.findIndex((entry) => entry.target.id === value)
+                     )
+
+                     if (entry.isIntersecting && diff === 1) {
                         // @ts-ignore
                         handleChange(_, entryId)
                      }
@@ -58,7 +75,11 @@ const useControlledTabNavigationOnScroll = (
       [refs] // eslint-disable-line react-hooks/exhaustive-deps
    )
 
-   return [value, handleChange] as const
+   return [value, handleChangeClick] as const
+}
+
+const getDifference = (a: number, b: number) => {
+   return Math.abs(a - b)
 }
 
 export default useControlledTabNavigationOnScroll
