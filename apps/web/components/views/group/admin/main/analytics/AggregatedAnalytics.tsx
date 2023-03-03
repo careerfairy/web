@@ -67,7 +67,7 @@ const AggregatedAnalytics = () => {
             <CardAnalytic
                title="Talent pool profiles"
                value={<AggregatedTalentPoolValue />}
-               linkDescription={"Go to talents"}
+               linkDescription={"Go to talent"}
                link={`/group/${group.id}/admin/analytics?section=1`}
             />
          </Grid>
