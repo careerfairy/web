@@ -46,6 +46,8 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "white",
       boxShadow: "none",
       borderBottom: `1px solid ${theme.palette.divider}`,
+      borderTopLeftRadius: "20px",
+      borderTopRightRadius: "20px",
    },
    content: {
       display: "flex",
