@@ -180,8 +180,7 @@ jobs:
               VERCEL_PROJECT_ID: ${{ secrets.VERCEL_PROJECT_ID }}
               PRODUCTION: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' && 'true' || 'false' }}
               PR_LABELS: false
-              if: github.event_name == 'push' && github.ref == 'refs/heads/develop'
-              ALIAS_DOMAINS: staging.careerfairy.io
+              ALIAS_DOMAINS: ${{ ( github.event_name == 'push' && github.ref == 'refs/heads/develop' && 'staging.careerfairy.io' ) || '' }}
          - name: preview-url
            run: |
               echo ${{ steps.vercel-deploy.outputs.PREVIEW_URL }}
