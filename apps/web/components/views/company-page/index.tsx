@@ -165,7 +165,7 @@ const CompanyPageOverview = ({
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box sx={{ backgroundColor: "white", height: "100%" }}>
+         <Box bgcolor={"white"} height={"100%"} pb={5}>
             <Box mb={{ xs: 4, md: 10 }}>
                <Header />
             </Box>

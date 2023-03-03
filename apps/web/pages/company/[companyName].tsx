@@ -41,7 +41,6 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 
    return (
       <GeneralLayout
-         hideNavOnScroll
          viewRef={viewRef}
          fullScreen
          headerEndContent={

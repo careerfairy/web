@@ -377,7 +377,7 @@ export const getResizedUrl = (url, size = "sm") => {
       console.warn("provided wrong size, must be one of [xs, sm, md, lg]")
       return url
    }
-   return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`)
+   return url.replace(/\.(?=[^/.]+\.[^/.]+$)/, `_${targetSize}.`)
 }
 
 /**
