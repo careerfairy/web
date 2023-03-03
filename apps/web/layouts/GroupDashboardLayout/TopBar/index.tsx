@@ -96,14 +96,16 @@ const TopBar = ({ title }: Props) => {
                md: 3,
             }}
          >
-            <Button
-               onClick={() => livestreamDialog.handleOpenNewStreamModal()}
-               size={"small"}
-               variant={"outlined"}
-               color={"secondary"}
-            >
-               Create New Live Stream
-            </Button>
+            {isMobile ? null : (
+               <Button
+                  onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+                  size={"small"}
+                  variant={"outlined"}
+                  color={"secondary"}
+               >
+                  Create New Live Stream
+               </Button>
+            )}
             {/* notification & profile */}
             <UserAvatarWithDetails />
             <NotificationsButton />

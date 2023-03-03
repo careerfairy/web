@@ -14,6 +14,7 @@ import { ChevronRight } from "@mui/icons-material"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { getRelevantHosts } from "../../../../util/streamUtil"
 import { getSubstringWithEllipsis } from "../../../../util/SeoUtil"
+import Image from "next/image"
 
 const styles = sxStyles({
    wrapper: {
@@ -22,16 +23,25 @@ const styles = sxStyles({
       borderRadius: "12px",
       pr: 1,
    },
-   backgroundImage: {
-      width: "100%",
+   backgroundImageWrapper: {
+      position: "relative",
       height: "158px",
-      transition: (theme) =>
-         theme.transitions.create(["height", "transform"], {
-            easing: theme.transitions.easing.easeInOut,
-            duration: theme.transitions.duration.standard,
-         }),
-      objectFit: "cover",
       borderRadius: "12px 12px 0 0",
+      overflow: "hidden",
+      "&:hover": {
+         "& $img": {
+            transform: "scale(1.1)",
+         },
+      },
+   },
+   backgroundImageDarkOverlay: {
+      position: "absolute",
+      top: 0,
+      left: 0,
+      width: "100%",
+      height: "100%",
+      background: "rgba(0,0,0,0.6)",
+      opacity: 0.2,
    },
    content: {
       border: "1px solid #EDE7FD",
@@ -104,16 +114,19 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
 
    return (
       <Box sx={styles.wrapper}>
-         <Box
-            component="img"
-            sx={styles.backgroundImage}
-            src={
-               getResizedUrl(event?.backgroundImageUrl, "sm") ||
-               placeholderBanner
-            }
-            alt={`event-${event?.title}-image`}
-            loading="lazy"
-         />
+         <Box sx={styles.backgroundImageWrapper}>
+            <Image
+               className={"backgroundImage"}
+               objectFit={"cover"}
+               layout={"fill"}
+               src={
+                  getResizedUrl(event?.backgroundImageUrl, "sm") ||
+                  placeholderBanner
+               }
+               alt={`event-${event?.title}-image`}
+            />
+            <Box sx={styles.backgroundImageDarkOverlay} />
+         </Box>
          <Box sx={styles.content}>
             <Stack spacing={1}>
                <Typography
