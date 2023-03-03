@@ -91,7 +91,8 @@ const DraftStream = () => {
       setDraftId,
       status,
       setStatus,
-      selectedJobs
+      selectedJobs,
+      metaData
    ) => {
       let livestream
 
@@ -117,6 +118,12 @@ const DraftStream = () => {
          if (selectedJobs) {
             livestream.jobs = selectedJobs
             livestream.hasJobs = selectedJobs.length > 0
+         }
+
+         if (metaData) {
+            livestream.companySizes = metaData.companySizes
+            livestream.companyIndustries = metaData.companyIndustries
+            livestream.companyCountries = metaData.companyCountries
          }
 
          const promotion = buildPromotionObj(values, livestream.id)

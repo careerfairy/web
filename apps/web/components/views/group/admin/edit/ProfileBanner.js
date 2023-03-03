@@ -34,6 +34,7 @@ import CloseRounded from "@mui/icons-material/CloseRounded"
 import Save from "@mui/icons-material/Save"
 import PreviewIcon from "@mui/icons-material/Preview"
 import { alpha } from "@mui/material/styles"
+import { BANNER_IMAGE_SPECS } from "@careerfairy/shared-lib/dist/groups/GroupPresenter"
 
 const styles = {
    root: {
@@ -93,26 +94,6 @@ const styles = {
    },
 }
 
-const LowerPreview = () => {
-   return (
-      <Box sx={styles.lowerPreview}>
-         <Grid sx={{ height: "100%" }} container spacing={1}>
-            <Grid xs={6} item>
-               <StreamCardSkeleton />
-            </Grid>
-            <Grid xs={6} item>
-               <StreamCardSkeleton />
-            </Grid>
-            <Grid xs={6} item>
-               <StreamCardSkeleton />
-            </Grid>
-            <Grid xs={6} item>
-               <StreamCardSkeleton />
-            </Grid>
-         </Grid>
-      </Box>
-   )
-}
 const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
    const imageUrl = bannerImageUrl || placeholderBanner
    const firebase = useFirebaseService()
@@ -131,7 +112,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
             "banner-images",
             editData.fileObj,
             firebase,
-            async (newUrl, fullPath) => {
+            async (newUrl) => {
                try {
                   await firebase.updateCareerCenter(id, {
                      bannerImageUrl: newUrl,
@@ -212,13 +193,13 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
          <CardActions disableSpacing sx={styles.actionsWrapper}>
             <ImagePickerContainer
                style={{ width: "100%" }}
-               extensions={["jpg", "jpeg", "png"]}
-               maxSize={5}
+               extensions={BANNER_IMAGE_SPECS.allowedFormats}
+               maxSize={BANNER_IMAGE_SPECS.maxSize}
                dims={{
-                  minWidth: 864,
-                  maxWidth: 4300,
-                  minHeight: 172,
-                  maxHeight: 900,
+                  minWidth: BANNER_IMAGE_SPECS.minWidth,
+                  maxWidth: BANNER_IMAGE_SPECS.maxWidth,
+                  minHeight: BANNER_IMAGE_SPECS.minHeight,
+                  maxHeight: BANNER_IMAGE_SPECS.maxHeight,
                }}
                onChange={(base64Img) => {
                   const fileObject = dataURLtoFile(base64Img, uuidv4())

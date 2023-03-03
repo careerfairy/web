@@ -12,6 +12,7 @@ import {
    TextField,
 } from "@mui/material"
 import CopyLinkButton from "components/views/common/CopyLinkButton"
+import { buildStreamerLink } from "util/streamUtil"
 
 const StreamerLinksDialogContent = ({
    livestreamId,
@@ -28,18 +29,6 @@ const StreamerLinksDialogContent = ({
          }
       })
    }, [])
-
-   const buildStreamerLink = (
-      variant: string,
-      livestreamId: string,
-      secureToken: string
-   ) => {
-      let baseUrl: string = "https://careerfairy.io"
-      if (window?.location?.origin) {
-         baseUrl = window.location.origin
-      }
-      return `${baseUrl}/streaming/${livestreamId}/${variant}?token=${secureToken}`
-   }
 
    const mainStreamerLink = useMemo(
       () => buildStreamerLink("main-streamer", livestreamId, secureToken),

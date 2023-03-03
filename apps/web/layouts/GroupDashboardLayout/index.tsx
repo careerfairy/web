@@ -23,21 +23,27 @@ import { groupRepo } from "../../data/RepositoryInstances"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import useSnackbarNotifications from "../../components/custom-hook/useSnackbarNotifications"
 import GroupDashboardLayoutProvider from "./GroupDashboardLayoutProvider"
+import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
+import { useLivestreamDialog } from "./useLivestreamDialog"
 
 type GroupAdminContext = {
    group: Group
+   stats: GroupStats
    flattenedGroupOptions: GroupOption[]
    groupQuestions: GroupQuestion[]
    groupPresenter?: GroupPresenter
    role: GROUP_DASHBOARD_ROLE
+   livestreamDialog: ReturnType<typeof useLivestreamDialog>
 }
 
 const GroupContext = createContext<GroupAdminContext>({
    group: null,
+   stats: null,
    flattenedGroupOptions: [],
    groupQuestions: [],
    groupPresenter: undefined,
    role: undefined,
+   livestreamDialog: undefined,
 })
 
 type GroupDashboardLayoutProps = {
@@ -52,7 +58,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
    const { replace, push } = useRouter()
    const { userData, adminGroups, isLoggedOut } = useAuth()
 
-   const group = useAdminGroup(groupId)
+   const { group, stats } = useAdminGroup(groupId)
 
    const { errorNotification } = useSnackbarNotifications()
 
@@ -67,7 +73,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       [userData?.isAdmin, adminGroups, group?.id]
    )
 
-   const loadingGroup = !isLoaded(group)
+   const loadingGroup = !isLoaded(group) || !isLoaded(stats)
 
    const isCorrectGroup = groupId === group?.id
 
@@ -124,13 +130,17 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
       [group]
    )
 
+   const livestreamDialog = useLivestreamDialog(group)
+
    const contextValues = useMemo(
       () => ({
          group,
+         stats,
          flattenedGroupOptions,
          groupQuestions,
          groupPresenter,
          role: adminGroups?.[group?.id]?.role,
+         livestreamDialog,
       }),
       [
          adminGroups,
@@ -138,6 +148,8 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          group,
          groupPresenter,
          groupQuestions,
+         livestreamDialog,
+         stats,
       ]
    )
 
@@ -150,6 +162,7 @@ const GroupDashboardLayout: FC<GroupDashboardLayoutProps> = (props) => {
          <GroupContext.Provider value={contextValues}>
             <GroupDashboardLayoutProvider pageDisplayName={pageDisplayName}>
                {children}
+               {livestreamDialog.StreamCreationDialog}
             </GroupDashboardLayoutProvider>
          </GroupContext.Provider>
       </Outlet>

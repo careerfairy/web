@@ -46,6 +46,8 @@ const useStyles = makeStyles((theme) => ({
       backgroundColor: "white",
       boxShadow: "none",
       borderBottom: `1px solid ${theme.palette.divider}`,
+      borderTopLeftRadius: "20px",
+      borderTopRightRadius: "20px",
    },
    content: {
       display: "flex",
@@ -185,7 +187,8 @@ const NewStreamModal = ({
       setDraftId,
       status,
       setStatus,
-      selectedJobs
+      selectedJobs,
+      metaData
    ) => {
       let livestream
 
@@ -212,6 +215,12 @@ const NewStreamModal = ({
          if (selectedJobs) {
             livestream.jobs = selectedJobs
             livestream.hasJobs = selectedJobs.length > 0
+         }
+
+         if (metaData) {
+            livestream.companySizes = metaData.companySizes
+            livestream.companyIndustries = metaData.companyIndustries
+            livestream.companyCountries = metaData.companyCountries
          }
 
          // only save the promotions if the start date is after 30 days from now

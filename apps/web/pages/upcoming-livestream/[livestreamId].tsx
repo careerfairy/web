@@ -29,24 +29,47 @@ import ReferralSection from "../../components/views/upcoming-livestream/Referral
 import SEO from "../../components/util/SEO"
 import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchemaScriptTag"
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
 import { livestreamRepo } from "../../data/RepositoryInstances"
-import useTrackDetailPageView from "../../components/custom-hook/useTrackDetailPageView"
+import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import {
    LivestreamEvent,
    RecordingToken,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { omit } from "lodash"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { Group } from "@careerfairy/shared-lib/groups"
+
+type TrackProps = {
+   id: string
+   visitorId: string
+   extraData: LivestreamEvent
+}
 
 const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
+   const { trackDetailPageView } = useFirebaseService()
 
-   const viewRef = useTrackDetailPageView(serverStream)
+   const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
+      if (stream) {
+         // increase event popularity
+         recommendationServiceInstance.visitDetailPage(
+            stream as LivestreamEvent,
+            visitorId
+         )
+      }
+      return trackDetailPageView(id, visitorId)
+   }
+
+   const viewRef = useTrackPageView({
+      trackDocumentId: serverStream.id,
+      extraData: serverStream,
+      handleTrack,
+   })
 
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("md"))
@@ -60,17 +83,33 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    )
 
    const { push, asPath, query, pathname, replace } = useRouter()
-   const [currentGroup, setCurrentGroup] = useState(null)
+   const [currentGroup, setCurrentGroup] = useState<Group>(null)
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
-   const [filteredGroups, setFilteredGroups] = useState([])
+   const [filteredGroups, setFilteredGroups] = useState<Group[]>([])
    const [targetGroupId, setTargetGroupId] = useState("")
-   const [questionSortType, setQuestionSortType] = useState("timestamp")
+   const [questionSortType, setQuestionSortType] = useState<
+      "timestamp" | "votes"
+   >("timestamp")
    const { data: totalInterests } = useInterests()
    const [eventInterests, setEventInterests] = useState([])
 
-   const [unfilteredGroups, setUnfilteredGroups] = useState([])
+   const [unfilteredGroups, setUnfilteredGroups] = useState<Group[]>([])
 
    const { authenticatedUser, userData, isLoggedOut, isLoggedIn } = useAuth()
+
+   const companyGroupData = useMemo<Group | null>(() => {
+      const companyGroups = unfilteredGroups?.filter(
+         (group) => !group.universityCode
+      )
+
+      const isSingleCompany = companyGroups?.length === 1
+
+      if (isSingleCompany) {
+         return companyGroups[0]
+      }
+
+      return null
+   }, [unfilteredGroups])
 
    const registered = useMemo(() => {
       return Boolean(
@@ -182,10 +221,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       if (stream?.groupIds?.length) {
          getDetailLivestreamCareerCenters(stream.groupIds).then(
             (querySnapshot) => {
-               const groupList = querySnapshot.docs.map((doc) => ({
-                  id: doc.id,
-                  ...doc.data(),
-               }))
+               const groupList = querySnapshot.docs.map((doc) => doc.data())
                const filteredHosts = getRelevantHosts(
                   currentGroup?.groupId,
                   stream,
@@ -479,6 +515,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                   forceReveal={mobile}
                   big
                   overheadText={"ABOUT"}
+                  companyGroupData={companyGroupData}
                />
             ) : null}
             {!!stream?.speakers?.length && (

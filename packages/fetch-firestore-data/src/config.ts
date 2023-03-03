@@ -3,11 +3,9 @@ import * as path from "path"
 export default {
    /**
     * Remote folder that we want to fetch
-    * Should be updated from time to time
+    * Should be updated from time to time using the export.ts script
     */
-   BUCKET_FOLDER:
-      process.env.BUCKET_FOLDER ??
-      "Mon Oct 17 2022-09:18:04 GMT+0000 (Coordinated Universal Time)",
+   BUCKET_FOLDER: "fetched",
 
    BUCKET: "careerfairy-backup",
 
@@ -16,6 +14,83 @@ export default {
     */
    LOCAL_FOLDER: "emulatorData",
 
-   finalBackupFolder: "fetched",
    rootFolder: path.join(__dirname, "../../../"),
+
+   /*
+    * Only set this to true if you want to fetch the user data from the production database,
+    * but be sure to delete the downloaded backup when done testing because of GDPR
+    *
+    * When false, during the export script, some collections with user data will not be exported
+    * */
+   INCLUDE_USERDATA: process.env.INCLUDE_USERDATA === "true",
+
+   /**
+    * The firestore collections that will be exported from production and
+    * imported to the emulators
+    *
+    * The collection id can be a parent collection or subcollection
+    * MAX of 60
+    */
+   COLLECTION_IDS: [
+      "admins",
+      "analytics",
+      "ats",
+      "atsRelations",
+      "authUsersInPolicy",
+      "breakoutRooms",
+      "breakoutRoomsSettings",
+      "careerCenterData",
+      "comments",
+      "companyData",
+      "currentPositions",
+      "draftLivestreams",
+      "fieldsOfStudy",
+      "filterGroups",
+      "groupAdmins",
+      "groupDashboardInvites",
+      "groupQuestions",
+      "handRaises",
+      "highlights",
+      "interests",
+      "jobApplications",
+      "levelsOfStudy",
+      "liveSpeakers",
+      "livestreamReferrals",
+      "livestreams",
+      "marketingUsers",
+      "nonVoters",
+      "notifications",
+      "participatingStats",
+      "polls",
+      "preferences",
+      "presentations",
+      "promotions",
+      "questions",
+      "rating",
+      "ratings",
+      "recommendedEvents",
+      "recordingToken",
+      "registeredGroups",
+      "rewards",
+      "roles",
+      "speakers",
+      "stats",
+      "support",
+      "tokens",
+      "universitiesByCountry",
+      "userAdminGroups",
+      "userData",
+      "userGroups",
+      "userInterface",
+      "userLivestreamData",
+      "userReminders",
+      "usersInPolicy",
+      "usersWhoClickedLink",
+      "usersWhoClicked",
+      "usersWhoDismissed",
+      "videos",
+      "wishes",
+      "wishList",
+      "voters",
+   ],
 }

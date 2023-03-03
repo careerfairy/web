@@ -7,9 +7,11 @@ import Box from "@mui/material/Box"
 import { Typography } from "@mui/material"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import LinkifyText from "../../../util/LinkifyText"
-import { IColors } from "../../../../types/commonTypes"
+import { IColors, sxStyles } from "../../../../types/commonTypes"
+import { Group } from "@careerfairy/shared-lib/groups"
+import CompanyGroupInfo from "./CompanyGroupInfo"
 
-const styles = {
+const styles = sxStyles({
    header: {
       "&:not(:last-child)": {
          marginBottom: (theme) => theme.spacing(1),
@@ -18,7 +20,7 @@ const styles = {
    title: {
       fontWeight: 600,
    },
-}
+})
 
 type Props = {
    backgroundColor?: IColors
@@ -35,6 +37,7 @@ type Props = {
    forceReveal: boolean
    summary?: string
    reasonsToJoinLivestream?: string
+   companyGroupData: Group | null
 }
 
 const AboutSection = ({
@@ -52,6 +55,7 @@ const AboutSection = ({
    forceReveal,
    summary,
    reasonsToJoinLivestream,
+   companyGroupData,
 }: Props) => {
    return (
       <Section
@@ -125,6 +129,13 @@ const AboutSection = ({
                            </Typography>
                         </LinkifyText>
                      </Box>
+                  </Fade>
+               </Box>
+            ) : null}
+            {companyGroupData ? (
+               <Box width={"100%"} mt={6}>
+                  <Fade fraction={forceReveal ? 0 : 0.2} bottom>
+                     <CompanyGroupInfo companyGroupData={companyGroupData} />
                   </Fade>
                </Box>
             ) : null}

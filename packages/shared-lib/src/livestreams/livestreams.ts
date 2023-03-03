@@ -164,6 +164,19 @@ export interface LivestreamEvent extends Identifiable {
     * Updated via functions onCreate trigger
     */
    popularity?: number
+
+   /**
+    * Metadata for the livestream based on hosts
+    */
+   companySizes?: string[] // ["1-20", "21-100", "101-1000", "1001+"]
+   companyIndustries?: string[] // ["Technology", "Finance", "Education", "Healthcare", "Other"]
+   companyCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
+
+   /**
+    * Flag to distinguish between a draft and a livetream
+    * (different collections), internal use
+    */
+   isDraft?: boolean
 }
 
 /**

@@ -6,6 +6,7 @@
    "scripts": {
       "build": "npm run clean && tsc",
       "start": "node ./dist/index.js",
+      "production:export": "node ./dist/export.js",
       "dev": "npm run clean && tsc --watch",
       "clean": "rimraf dist/"
    },
@@ -16,7 +17,7 @@
    },
    "dependencies": {
       "@careerfairy/seed-data": "*",
-      "axios": "^0.19.2",
+      "axios": "^0.27.2",
       "cross-spawn": "^7.0.3"
    }
 }

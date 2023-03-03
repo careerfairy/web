@@ -1,5 +1,5 @@
 // material-ui
-import { Box, Typography } from "@mui/material"
+import { Box, Button, Typography } from "@mui/material"
 import MenuRoundedIcon from "@mui/icons-material/MenuRounded"
 import IconButton from "@mui/material/IconButton"
 import Stack from "@mui/material/Stack"
@@ -12,6 +12,7 @@ import NotificationsButton from "./NotificationsButton"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { alpha } from "@mui/material/styles"
 import { useGroupDashboard } from "../GroupDashboardLayoutProvider"
+import { useGroup } from ".."
 
 const styles = sxStyles({
    root: {
@@ -25,7 +26,7 @@ const styles = sxStyles({
          sm: 5,
       },
       py: {
-         xs: 1,
+         xs: 0,
          md: 3.2,
       },
    },
@@ -61,6 +62,7 @@ type Props = {
 }
 
 const TopBar = ({ title }: Props) => {
+   const { livestreamDialog } = useGroup()
    const isMobile = useIsMobile()
 
    const { toggleLeftDrawer, layout } = useGroupDashboard()
@@ -94,14 +96,18 @@ const TopBar = ({ title }: Props) => {
                md: 3,
             }}
          >
-            {/* TODO: RENDER THIS BUTTON FOR THE LANDING PAGE */}
-            {/*<Button size={"small"} variant={"outlined"} color={"secondary"}>*/}
-            {/*   Create Live Stream*/}
-            {/*</Button>*/}
-
+            {isMobile ? null : (
+               <Button
+                  onClick={() => livestreamDialog.handleOpenNewStreamModal()}
+                  size={"small"}
+                  variant={"outlined"}
+                  color={"secondary"}
+               >
+                  Create New Live Stream
+               </Button>
+            )}
             {/* notification & profile */}
             <UserAvatarWithDetails />
-
             <NotificationsButton />
          </Stack>
       </Box>
