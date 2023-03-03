@@ -377,7 +377,18 @@ export const getResizedUrl = (url, size = "sm") => {
       console.warn("provided wrong size, must be one of [xs, sm, md, lg]")
       return url
    }
-   return url.replace(/\.(?=[^/.]+\.[^/.]+$)/, `_${targetSize}.`)
+
+   // check if the url path has a file extension using URL
+   const parsedUrl = new URL(url)
+   const lastPathSegment = parsedUrl.pathname.split("/").pop()
+
+   if (lastPathSegment.indexOf(".") === -1) {
+      // no file extension, append the target size to the path
+      const newPath = `${parsedUrl.pathname}_${targetSize}`
+      return `${parsedUrl.origin}${newPath}${parsedUrl.search}`
+   }
+
+   return url.replace(/.(?=[^.]*$)/, `_${targetSize}.`)
 }
 
 /**
