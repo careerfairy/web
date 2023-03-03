@@ -58,7 +58,11 @@ const NewsletterSection = () => {
    }
 
    return (
-      <PillsBackground styles={styles.wrapper} isSmallBackground={true}>
+      <PillsBackground
+         styles={styles.wrapper}
+         isSmallBackground={true}
+         bgColor={"#EFF5F8"}
+      >
          <Box sx={styles.content}>
             <Typography variant={"h3"} fontWeight={"600"} color="black">
                Stay up-to-date. Always.

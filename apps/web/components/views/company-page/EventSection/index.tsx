@@ -1,4 +1,4 @@
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material"
+import { Box, Button, IconButton, Typography } from "@mui/material"
 import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
 import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
 import { SectionAnchor, TabValue, useCompanyPage } from "../"
@@ -119,7 +119,7 @@ const EventSection = () => {
                            : "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."}
                      </Typography>
                   )}
-                  <Grid item xs={12} sx={{ background: "none" }}>
+                  <Box>
                      <EventCarousel sliderRef={sliderRef}>
                         {upcomingLivestreams.map((event) => (
                            <EventCard
@@ -130,7 +130,7 @@ const EventSection = () => {
                            />
                         ))}
                      </EventCarousel>
-                  </Grid>
+                  </Box>
                </Box>
             ) : editMode ? (
                <Link href={`/group/${group.id}/admin/events`}>
