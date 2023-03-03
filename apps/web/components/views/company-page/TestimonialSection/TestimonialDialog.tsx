@@ -254,7 +254,8 @@ const handleValidation = (values: FormikValues) => {
       errors.testimonials[key] = {}
 
       if (!values.testimonials[key].testimonial) {
-         errors.testimonials[key].testimonial = "Please fill"
+         errors.testimonials[key].testimonial =
+            "Please add the testimonial personal story"
       } else if (
          values.testimonials[key].testimonial.length < minDescCharLength
       ) {

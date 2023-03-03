@@ -119,7 +119,7 @@ const EventSection = () => {
                            : "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."}
                      </Typography>
                   )}
-                  <Grid item xs={12}>
+                  <Grid item xs={12} sx={{ background: "none" }}>
                      <EventCarousel sliderRef={sliderRef}>
                         {upcomingLivestreams.map((event) => (
                            <EventCard

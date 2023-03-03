@@ -68,6 +68,8 @@ const NewsletterSection = () => {
                fontWeight={"400"}
                color="textSecondary"
                mt={2}
+               textAlign="center"
+               mx={1}
             >
                {isLoggedOut
                   ? "Create an account to receive personalised invitations to career live streams and job openings"
