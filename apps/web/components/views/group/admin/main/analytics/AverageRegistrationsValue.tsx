@@ -38,7 +38,12 @@ function averageRegistrationsPerLivestream(
    stats: GroupStats,
    totalLivestreams: number
 ) {
-   if (!stats) return 0
+   if (
+      !stats ||
+      stats?.generalStats?.numberOfRegistrations === undefined ||
+      !totalLivestreams
+   )
+      return 0
 
    return Math.round(
       stats.generalStats.numberOfRegistrations / totalLivestreams
