@@ -58,7 +58,11 @@ const NewsletterSection = () => {
    }
 
    return (
-      <PillsBackground styles={styles.wrapper} isSmallBackground={true}>
+      <PillsBackground
+         styles={styles.wrapper}
+         isSmallBackground={true}
+         bgColor={"#EFF5F8"}
+      >
          <Box sx={styles.content}>
             <Typography variant={"h3"} fontWeight={"600"} color="black">
                Stay up-to-date. Always.
@@ -68,6 +72,8 @@ const NewsletterSection = () => {
                fontWeight={"400"}
                color="textSecondary"
                mt={2}
+               textAlign="center"
+               mx={1}
             >
                {isLoggedOut
                   ? "Create an account to receive personalised invitations to career live streams and job openings"
