@@ -147,7 +147,7 @@ const AboutDialog = ({ handleClose }: Props) => {
 const schema = yup.object().shape({
    extraInfo: yup
       .string()
-      .required("Please fill")
+      .required("Please describe your company")
       .min(10, `Must be at least 10 characters`),
    companySize: yup.string().required("Please add the company size"),
    companyIndustry: yup
