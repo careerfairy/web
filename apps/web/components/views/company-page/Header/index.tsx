@@ -49,7 +49,7 @@ const styles = sxStyles({
          maxWidth: "90%",
          maxHeight: "90%",
       },
-      marginLeft: { xs: "10px", md: 0 },
+      marginLeft: { xs: "10px", md: 3 },
    },
    companyTitle: {
       textShadow: (theme) => ({
@@ -115,7 +115,7 @@ const styles = sxStyles({
    tabWrapper: {
       height: "100%",
       alignItems: { xs: "unset", md: "end" },
-      ml: { md: 3 },
+      ml: { md: 1 },
       "& .MuiTabs-scroller": {
          height: "100%",
       },
