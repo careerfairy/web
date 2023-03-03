@@ -291,6 +291,11 @@ export class GroupFunctionsRepository
 
       batch.set(groupRef, newGroupData)
 
+      // create group stats
+      const groupStatsRef = groupRef.collection("stats").doc("groupStats")
+      const statsDoc = createGroupStatsDoc(newGroupData, newGroupData.id)
+      batch.set(groupStatsRef, statsDoc)
+
       await batch.commit().then(() =>
          this.setAdminRole(
             userEmail,
