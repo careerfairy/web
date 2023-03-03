@@ -16,6 +16,8 @@ const styles = sxStyles({
       backgroundColor: "white",
       boxShadow: "none",
       borderBottom: "1px solid #EDE7FD",
+      borderTopLeftRadius: "20px",
+      borderTopRightRadius: "20px",
    },
    dialogClose: {
       position: "absolute",
