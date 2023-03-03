@@ -20,6 +20,7 @@ const twoYears = new Date().setFullYear(new Date().getFullYear() - 2)
 const threeYears = new Date().setFullYear(new Date().getFullYear() - 3)
 const fourYears = new Date().setFullYear(new Date().getFullYear() - 4)
 const sixYears = new Date().setFullYear(new Date().getFullYear() - 6)
+const eightYears = new Date().setFullYear(new Date().getFullYear() - 8)
 
 export interface TimeFrame {
    name: string
@@ -48,6 +49,12 @@ export interface GlobalTimeFrame {
    double: number
 }
 const timeFrames: TimeFrame[] = [
+   {
+      name: "4 Years",
+      pastName: "4 years",
+      date: fourYears,
+      id: uuid(),
+   },
    {
       name: "2 Years",
       pastName: "2 years",
@@ -93,6 +100,13 @@ const timeFrames: TimeFrame[] = [
 ]
 
 const globalTimeFrames: GlobalTimeFrame[] = [
+   {
+      globalDate: fourYears,
+      timeFrames: timeFrames.filter((timeOb) => timeOb.date >= fourYears),
+      name: "4 years",
+      id: uuid(),
+      double: eightYears,
+   },
    {
       globalDate: twoYears,
       timeFrames: timeFrames.filter((timeOb) => timeOb.date >= twoYears),
