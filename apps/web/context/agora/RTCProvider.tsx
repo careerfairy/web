@@ -131,15 +131,10 @@ const RTCProvider = ({
             streamDocumentPath: streamRef.path,
          })
 
-         /**
-          * Accept via query string a proxy mode
-          */
-         if (router.query.withProxyMode) {
-            const parsed = parseInt(router.query.withProxyMode as string)
-            if (!isNaN(parsed) && parsed > 0) {
-               rtcClient.startProxyServer(parsed)
-            }
+         if (Boolean(forcedProxyMode)) {
+            rtcClient.startProxyServer(forcedProxyMode as number)
          }
+
          logStatus("JOIN", false, Boolean(forcedProxyMode))
 
          try {
@@ -154,7 +149,6 @@ const RTCProvider = ({
       },
       [
          router.query.token,
-         router.query.withProxyMode,
          fetchAgoraRtcToken,
          streamRef.path,
          appId,
