@@ -13,7 +13,7 @@ import {
    tooltipClasses,
    TooltipProps,
 } from "@mui/material"
-import { Options } from "@sentry/types"
+import { type Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
 import { useCallback, useState } from "react"
 import { ChevronDown } from "react-feather"
