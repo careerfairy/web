@@ -38,7 +38,7 @@ export default function useAgoraClientConfig(
          rtcClient.on("is-using-cloud-proxy", (isUsing) => {
             logRTCEvent("is-using-cloud-proxy", isUsing)
 
-            dispatch(actions.setSessionIsUsingCloudProxy(true))
+            dispatch(actions.setSessionIsUsingCloudProxy(isUsing))
          })
 
          /**
