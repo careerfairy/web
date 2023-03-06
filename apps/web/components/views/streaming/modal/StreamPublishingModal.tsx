@@ -31,6 +31,7 @@ import {
 import RootState from "store/reducers"
 import DeviceSelect from "../sharedComponents/DeviceSelect"
 import { rtcConnectionStateSelector } from "../../../../store/selectors/streamSelectors"
+import { useMountedState } from "react-use"
 
 const styles = {
    dialogTitle: {
@@ -84,6 +85,7 @@ const StreamPublishingModal = ({
 }: Props) => {
    const [publishingStream, setPublishingStream] = useState(false)
    const { storeNewMediaSources } = useLocalStorageMediaSources()
+   const isMounted = useMountedState()
    const dispatch = useDispatch()
 
    const agoraRtcConnectionState = useSelector(rtcConnectionStateSelector)
@@ -109,13 +111,16 @@ const StreamPublishingModal = ({
       } catch (e) {
          dispatch(actions.sendGeneralError(e))
       }
-      setPublishingStream(false)
+      if (isMounted()) {
+         setPublishingStream(false)
+      }
    }, [
       dispatch,
       mediaControls.audioSource,
       mediaControls.videoSource,
       onConfirmStream,
       storeNewMediaSources,
+      isMounted,
    ])
 
    const hasAudioTrack = useMemo(() => {
