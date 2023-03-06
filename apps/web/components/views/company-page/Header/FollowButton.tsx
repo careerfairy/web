@@ -1,4 +1,4 @@
-import React, { FC, useEffect, useState } from "react"
+import React, { FC } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import FollowIcon from "@mui/icons-material/AddRounded"
@@ -13,6 +13,7 @@ import { useRouter } from "next/router"
 import Link from "../../common/Link"
 import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
 import { IColors } from "../../../../types/commonTypes"
+import { useMountedState } from "react-use"
 
 type Arguments = {
    arg: {
@@ -108,11 +109,7 @@ const NonAuthedFollowButton: FC<{
    color?: Exclude<IColors, "inherit" | "action" | "disabled">
 }> = ({ color }) => {
    const { asPath } = useRouter()
-   const [mounted, setMounted] = useState(false)
-
-   useEffect(() => {
-      setMounted(true)
-   }, [])
+   const isMounted = useMountedState()
 
    return (
       <Link
@@ -120,7 +117,7 @@ const NonAuthedFollowButton: FC<{
             pathname: "/signup",
             query: {
                // To prevent a server mismatch error as hashes do not exist on serverside asPath
-               absolutePath: mounted ? asPath : asPath.split("#", 1)[0],
+               absolutePath: isMounted() ? asPath : asPath.split("#", 1)[0],
             },
          }}
       >
