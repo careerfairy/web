@@ -51,7 +51,7 @@ export default function useAgoraClientConfig(
             logRTCEvent("join-fallback-to-proxy", proxyServer)
 
             // sets the UI proxy indicator
-            dispatch(actions.setSessionShouldUseCloudProxy(true))
+            dispatch(actions.setSessionIsUsingCloudProxy(true))
          })
 
          /**
