@@ -60,8 +60,8 @@ export class BigQueryRepository implements IBigQueryRepository {
          ?.map((a) => `"${a}"`)
          .join(",")
       const countriesOfInterestString = filters.countriesOfInterest
-         ?.map((a) => `"${a}"`)
-         .join(",")
+         ?.map((a) => a)
+         .join("|")
 
       console.log("FILTERS -> ", filters)
 
@@ -92,12 +92,9 @@ export class BigQueryRepository implements IBigQueryRepository {
          )
       }
       if (countriesOfInterestString.length > 0) {
-         // whereQueries.push(
-         //    `JSON_QUERY(DATA, "$.countriesOfInterest") IN (${countriesOfInterestString})`
-         // )
-         // whereQueries.push(
-         //    `ARRAY_CONTAINS(JSON_QUERY(DATA, "$.countriesOfInterest"), ${countriesOfInterestString[0]})`
-         // )
+         whereQueries.push(
+            `REGEXP_CONTAINS(JSON_EXTRACT(DATA, "$.countriesOfInterest"),"${countriesOfInterestString}")`
+         )
       }
 
       console.log("Queries -> ", whereQueries)
