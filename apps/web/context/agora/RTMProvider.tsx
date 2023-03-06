@@ -9,7 +9,7 @@ import {
 import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import RTMContext, {
    AgoraRTMContextInterface,
    EmoteMessage,
@@ -17,8 +17,6 @@ import RTMContext, {
 } from "./RTMContext"
 import * as actions from "store/actions"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import { useSessionStorage } from "react-use"
-import { sessionIsUsingCloudProxySelector } from "../../store/selectors/streamSelectors"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 import { RTMStatus } from "../../types/streaming"
@@ -36,16 +34,6 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
 
    const [rtmStatus, setRtmStatus] = useState<RTMStatus>(null)
 
-   const sessionIsUsingCloudProxy = useSelector(
-      sessionIsUsingCloudProxySelector
-   )
-   const [sessionShouldUseCloudProxy] = useSessionStorage<boolean>(
-      "is-using-cloud-proxy",
-      false
-   )
-
-   const useProxy = sessionIsUsingCloudProxy || sessionShouldUseCloudProxy
-
    const { fetchAgoraRtmToken } = useFirebaseService()
    const dispatch = useDispatch()
 
@@ -53,7 +41,6 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
       try {
          rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
             logFilter: AgoraRTM.LOG_FILTER_INFO,
-            enableCloudProxy: useProxy,
          })
 
          rtmClient.current.on(
@@ -83,7 +70,7 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
          })
          throw error
       }
-   }, [useProxy, livestreamId])
+   }, [livestreamId])
 
    const onChannelMessage = useCallback(
       (message: RtmMessage, memberId: string) => {
@@ -135,7 +122,7 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
       if (roomId && userId) {
          void joinAgoraRtmChannel(roomId, userId).catch(errorLogAndNotify)
       }
-   }, [roomId, userId, joinAgoraRtmChannel, useProxy])
+   }, [roomId, userId, joinAgoraRtmChannel])
 
    const createEmote = useCallback(
       async (emoteType: EmoteType) => {
