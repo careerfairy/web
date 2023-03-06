@@ -15,6 +15,7 @@ import RegistrationModal from "../../common/registration-modal"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import StayUpToDateBanner from "./StayUpToDateBanner"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import { useMountedState } from "react-use"
 
 const styles = sxStyles({
    root: {
@@ -56,6 +57,7 @@ const EventSection = () => {
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
    const isMobile = useIsMobile()
+   const isMounted = useMountedState()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
@@ -78,7 +80,7 @@ const EventSection = () => {
       [handleOpenDialog]
    )
 
-   return (
+   return isMounted() ? (
       <Box sx={styles.root}>
          <SectionAnchor
             ref={eventSectionRef}
@@ -189,7 +191,7 @@ const EventSection = () => {
             />
          ) : null}
       </Box>
-   )
+   ) : null
 }
 
 export default EventSection

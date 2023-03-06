@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useEffect, useState } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import FollowIcon from "@mui/icons-material/AddRounded"
@@ -108,13 +108,19 @@ const NonAuthedFollowButton: FC<{
    color?: Exclude<IColors, "inherit" | "action" | "disabled">
 }> = ({ color }) => {
    const { asPath } = useRouter()
+   const [mounted, setMounted] = useState(false)
+
+   useEffect(() => {
+      setMounted(true)
+   }, [])
 
    return (
       <Link
          href={{
             pathname: "/signup",
             query: {
-               absolutePath: asPath,
+               // To prevent a server mismatch error as hashes do not exist on serverside asPath
+               absolutePath: mounted ? asPath : asPath.split("#", 1)[0],
             },
          }}
       >

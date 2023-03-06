@@ -22,13 +22,16 @@ const useControlledTabNavigationOnScroll = (
    }
 ) => {
    const [value, setValue] = useState<string>(options.initialValue)
-   const [updating, setUpdating] = useState<boolean>(false)
+   const [scrollingFromTabClicked, setScrollingFromTabClicked] =
+      useState<boolean>(false)
 
    const handleChangeClick = (e, newValue: string) => {
       setValue(newValue)
-      setUpdating(true)
+      setScrollingFromTabClicked(true) // prevent IntersectionObserver from updating state
+
       setTimeout(() => {
-         setUpdating(false)
+         // wait for the scroll to finish before setting updating to false
+         setScrollingFromTabClicked(false)
       }, CHANGE_DELAY)
    }
 
@@ -39,7 +42,7 @@ const useControlledTabNavigationOnScroll = (
    useEffect(
       () => {
          // @ts-ignore
-         if (!"IntersectionObserver" in window || updating) {
+         if (!"IntersectionObserver" in window || scrollingFromTabClicked) {
             // this browser doesn't seem to support the IntersectionObserver API, do nothing
             return
          }
@@ -49,19 +52,14 @@ const useControlledTabNavigationOnScroll = (
          if (refs.length) {
             observer = new IntersectionObserver(
                (entries) => {
-                  entries.forEach((entry, index) => {
-                     const entryId = entry.target.id
+                  const firstIntersecting = entries.find(
+                     (entry) => entry.isIntersecting
+                  )
 
-                     const diff = getDifference(
-                        index,
-                        entries.findIndex((entry) => entry.target.id === value)
-                     )
-
-                     if (entry.isIntersecting && diff === 1) {
-                        // @ts-ignore
-                        handleChange(_, entryId)
-                     }
-                  })
+                  const firstIntersectingId = firstIntersecting?.target?.id
+                  if (!firstIntersectingId) return
+                  // @ts-ignore
+                  handleChange(_, firstIntersectingId)
                },
                {
                   threshold: options.threshold,
@@ -76,10 +74,6 @@ const useControlledTabNavigationOnScroll = (
    )
 
    return [value, handleChangeClick] as const
-}
-
-const getDifference = (a: number, b: number) => {
-   return Math.abs(a - b)
 }
 
 export default useControlledTabNavigationOnScroll

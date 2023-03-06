@@ -10,11 +10,7 @@ import {
 } from "@mui/material"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { sxStyles } from "../../../../types/commonTypes"
-import {
-   companyLogoPlaceholder,
-   placeholderBanner,
-} from "../../../../constants/images"
-import BackgroundImage from "components/views/common/BackgroundImage"
+import { companyLogoPlaceholder } from "../../../../constants/images"
 import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
 import React, { useCallback, useMemo } from "react"
 import { styled, useTheme } from "@mui/material/styles"
@@ -174,7 +170,7 @@ const Header = () => {
    const { group, editMode, sectionRefs } = useCompanyPage()
    const theme = useTheme()
 
-   const { bannerImageUrl, logoUrl, universityName } = group
+   const { logoUrl, universityName } = group
 
    const isSticky =
       elementIsTop &&

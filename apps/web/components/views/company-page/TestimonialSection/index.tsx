@@ -9,6 +9,7 @@ import TestimonialDialog from "./TestimonialDialog"
 import { Testimonial } from "@careerfairy/shared-lib/groups"
 import { ArrowLeft, ArrowRight } from "react-feather"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import { useMountedState } from "react-use"
 
 const styles = sxStyles({
    titleSection: {
@@ -34,6 +35,8 @@ const TestimonialSection = () => {
    const [step, setStep] = useState(0)
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
+
+   const isMounted = useMountedState()
 
    useEffect(() => {
       setStep(0)
@@ -67,11 +70,11 @@ const TestimonialSection = () => {
       [group?.testimonials?.length, step]
    )
 
-   if (!group?.testimonials && !editMode) {
+   if (!group?.testimonials?.length && !editMode) {
       return null
    }
 
-   return (
+   return isMounted() ? (
       <>
          <Box position={"relative"}>
             <SectionAnchor
@@ -165,7 +168,7 @@ const TestimonialSection = () => {
             </EditDialog>
          ) : null}
       </>
-   )
+   ) : null
 }
 
 export default TestimonialSection
