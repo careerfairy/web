@@ -9,6 +9,8 @@ import debounce from "lodash.debounce"
  * @param options
  * @returns Tuple with current value and handleChange function.
  */
+
+const CHANGE_DELAY = 700
 const useControlledTabNavigationOnScroll = (
    refs: RefObject<HTMLElement>[],
    options: {
@@ -20,15 +22,27 @@ const useControlledTabNavigationOnScroll = (
    }
 ) => {
    const [value, setValue] = useState<string>(options.initialValue)
+   const [scrollingFromTabClicked, setScrollingFromTabClicked] =
+      useState<boolean>(false)
+
+   const handleChangeClick = (e, newValue: string) => {
+      setValue(newValue)
+      setScrollingFromTabClicked(true) // prevent IntersectionObserver from updating state
+
+      setTimeout(() => {
+         // wait for the scroll to finish before setting updating to false
+         setScrollingFromTabClicked(false)
+      }, CHANGE_DELAY)
+   }
 
    const handleChange = debounce((_, newValue) => {
       setValue(newValue)
-   }, 700)
+   }, CHANGE_DELAY)
 
    useEffect(
       () => {
          // @ts-ignore
-         if (!"IntersectionObserver" in window) {
+         if (!"IntersectionObserver" in window || scrollingFromTabClicked) {
             // this browser doesn't seem to support the IntersectionObserver API, do nothing
             return
          }
@@ -38,13 +52,14 @@ const useControlledTabNavigationOnScroll = (
          if (refs.length) {
             observer = new IntersectionObserver(
                (entries) => {
-                  entries.forEach((entry) => {
-                     const entryId = entry.target.id
-                     if (entry.isIntersecting) {
-                        // @ts-ignore
-                        handleChange(_, entryId)
-                     }
-                  })
+                  const firstIntersecting = entries.find(
+                     (entry) => entry.isIntersecting
+                  )
+
+                  const firstIntersectingId = firstIntersecting?.target?.id
+                  if (!firstIntersectingId) return
+                  // @ts-ignore
+                  handleChange(_, firstIntersectingId)
                },
                {
                   threshold: options.threshold,
@@ -58,7 +73,7 @@ const useControlledTabNavigationOnScroll = (
       [refs] // eslint-disable-line react-hooks/exhaustive-deps
    )
 
-   return [value, handleChange] as const
+   return [value, handleChangeClick] as const
 }
 
 export default useControlledTabNavigationOnScroll
