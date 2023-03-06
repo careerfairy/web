@@ -13,6 +13,7 @@ import { useRouter } from "next/router"
 import Link from "../../common/Link"
 import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
 import { IColors } from "../../../../types/commonTypes"
+import { useMountedState } from "react-use"
 
 type Arguments = {
    arg: {
@@ -108,13 +109,15 @@ const NonAuthedFollowButton: FC<{
    color?: Exclude<IColors, "inherit" | "action" | "disabled">
 }> = ({ color }) => {
    const { asPath } = useRouter()
+   const isMounted = useMountedState()
 
    return (
       <Link
          href={{
             pathname: "/signup",
             query: {
-               absolutePath: asPath,
+               // To prevent a server mismatch error as hashes do not exist on serverside asPath
+               absolutePath: isMounted() ? asPath : asPath.split("#", 1)[0],
             },
          }}
       >
