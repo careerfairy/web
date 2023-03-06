@@ -5,7 +5,12 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
-import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import {
+   GetStaticPaths,
+   GetStaticProps,
+   InferGetStaticPropsType,
+   NextPage,
+} from "next"
 import GeneralLayout from "../../layouts/GeneralLayout"
 import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
@@ -20,9 +25,10 @@ type TrackProps = {
    visitorId: string
 }
 
-const CompanyPage: NextPage<
-   InferGetServerSidePropsType<typeof getServerSideProps>
-> = ({ serverSideGroup, serverSideUpcomingLivestreams }) => {
+const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
+   serverSideGroup,
+   serverSideUpcomingLivestreams,
+}) => {
    const isMobile = useIsMobile()
    const { trackCompanyPageView } = useFirebaseService()
    const { universityName, id } = serverSideGroup
@@ -61,13 +67,10 @@ const CompanyPage: NextPage<
    )
 }
 
-export const getServerSideProps: GetServerSideProps<
-   {
-      serverSideGroup: Group
-      serverSideUpcomingLivestreams: any[]
-   },
-   { companyName: string }
-> = async ({ params }) => {
+export const getStaticProps: GetStaticProps<{
+   serverSideGroup: Group
+   serverSideUpcomingLivestreams: any[]
+}> = async ({ params }) => {
    const { companyName: companyNameSlug } = params
    const companyName = companyNameUnSlugify(companyNameSlug as string)
 
@@ -93,6 +96,7 @@ export const getServerSideProps: GetServerSideProps<
                         LivestreamPresenter.serializeDocument
                      ) || [],
                },
+               revalidate: 60,
             }
          }
 
@@ -104,5 +108,10 @@ export const getServerSideProps: GetServerSideProps<
 
    throw new Error(`Company ${companyName} not found`)
 }
+
+export const getStaticPaths: GetStaticPaths = () => ({
+   paths: [],
+   fallback: "blocking",
+})
 
 export default CompanyPage
