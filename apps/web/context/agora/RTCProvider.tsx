@@ -26,11 +26,7 @@ import useAgoraClientConfig from "../../components/custom-hook/useAgoraClientCon
 import * as actions from "../../store/actions"
 import useAgoraError from "../../components/custom-hook/useAgoraError"
 import { errorLogAndNotify, isMobileBrowser } from "../../util/CommonUtil"
-import {
-   sessionIsUsingCloudProxySelector,
-   sessionShouldUseCloudProxySelector,
-   streamerBreakoutRoomModalOpen,
-} from "../../store/selectors/streamSelectors"
+import { streamerBreakoutRoomModalOpen } from "../../store/selectors/streamSelectors"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { setVideoEffectsOff } from "store/actions/streamActions"
 
@@ -62,17 +58,17 @@ const RTCProvider = ({
    const screenShareRtcClient = useScreenShareRtc()
    const { handleRtcError, handleDeviceError, handleScreenShareDeniedError } =
       useAgoraError()
-   const sessionShouldUseCloudProxy = useSelector(
-      sessionShouldUseCloudProxySelector
-   )
 
-   // Due to the way we are using this hook, we need to know
-   // whether the sessionShouldUseCloudProxy, it's initial state is undefined
-   const shouldInit = initialize && sessionShouldUseCloudProxy !== undefined
+   const forcedProxyMode = useMemo(() => {
+      if (router.query.withProxyMode) {
+         const parsed = parseInt(router.query.withProxyMode as string)
+         if (!isNaN(parsed) && parsed > 0) {
+            return parsed
+         }
+      }
 
-   const sessionIsUsingCloudProxy = useSelector(
-      sessionIsUsingCloudProxySelector
-   )
+      return false
+   }, [router.query.withProxyMode])
 
    const [localStream, setLocalStream] = useState<LocalStream>({
       uid: uid,
@@ -82,7 +78,7 @@ const RTCProvider = ({
       videoTrack: null,
       audioTrack: null,
    })
-   const [rtcClientHost, setPrimaryRtcClientHost] = useState(false)
+   const [rtcClientHost, setRtcClientHost] = useState(false)
    const returnToAudience = useCallback(() => {
       return rtcClient.setClientRole("audience").catch(handleRtcError)
    }, [handleRtcError, rtcClient])
@@ -94,12 +90,9 @@ const RTCProvider = ({
    const { fetchAgoraRtcToken, setDesktopMode: setDesktopModeInstanceMethod } =
       useFirebaseService()
    const dispatch = useDispatch()
-   const [screenShareStream] = useState<
-      ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
-   >(null)
 
    const screenShareRtcClientRef = useRef(screenShareRtcClient)
-   const screenShareStreamRef = useRef(screenShareStream)
+   const screenShareStreamRef = useRef(null)
 
    useEffect(() => {
       AgoraRTC.onAutoplayFailed = () => {
@@ -112,7 +105,7 @@ const RTCProvider = ({
       try {
          if (rtcClient) {
             await rtcClient.leave()
-            if (sessionIsUsingCloudProxy) {
+            if (Boolean(forcedProxyMode)) {
                rtcClient.stopProxyServer()
             }
             rtcClient.removeAllListeners()
@@ -120,17 +113,15 @@ const RTCProvider = ({
       } catch (error) {
          errorLogAndNotify(error)
       }
-   }, [sessionIsUsingCloudProxy])
+   }, [forcedProxyMode, rtcClient])
 
    const joinAgoraRoom = useCallback(
       async (
          rtcClient: IAgoraRTCClient,
          roomId: string,
          userUid: UID,
-         isStreamer: boolean,
-         sessionShouldUseCloudProxy: boolean
+         isStreamer: boolean
       ) => {
-         let timeout
          const cfToken = router.query.token || ""
          const { data } = await fetchAgoraRtcToken({
             isStreamer: isStreamer,
@@ -139,43 +130,41 @@ const RTCProvider = ({
             channelName: roomId,
             streamDocumentPath: streamRef.path,
          })
-         if (sessionShouldUseCloudProxy) {
-            const mode = Boolean(router.query.withTCPProxy) ? 5 : 3
-            rtcClient.startProxyServer(mode)
+
+         /**
+          * Accept via query string a proxy mode
+          */
+         if (router.query.withProxyMode) {
+            const parsed = parseInt(router.query.withProxyMode as string)
+            if (!isNaN(parsed) && parsed > 0) {
+               rtcClient.startProxyServer(parsed)
+            }
          }
-         logStatus("JOIN", false, sessionShouldUseCloudProxy)
+         logStatus("JOIN", false, Boolean(forcedProxyMode))
 
          try {
             await rtcClient.join(appId, roomId, data.token.rtcToken, userUid)
          } catch (err) {
-            logStatus("JOIN", false, sessionShouldUseCloudProxy, err)
+            logStatus("JOIN", false, Boolean(forcedProxyMode), err)
             handleRtcError(err)
             throw err
          }
 
-         logStatus("JOIN", true, sessionShouldUseCloudProxy)
-         if (timeout) {
-            clearTimeout(timeout)
-         }
+         logStatus("JOIN", true, Boolean(forcedProxyMode))
       },
       [
-         appId,
-         fetchAgoraRtcToken,
-         handleRtcError,
-         streamRef.path,
          router.query.token,
-         router.query.withTCPProxy,
+         router.query.withProxyMode,
+         fetchAgoraRtcToken,
+         streamRef.path,
+         appId,
+         handleRtcError,
+         forcedProxyMode,
       ]
    )
    const joinAgoraRoomWithPrimaryClient = useCallback(
-      async (sessionShouldUseCloudProxy: boolean) =>
-         joinAgoraRoom(
-            rtcClient,
-            channel,
-            uid,
-            isStreamer,
-            sessionShouldUseCloudProxy
-         )
+      async () =>
+         joinAgoraRoom(rtcClient, channel, uid, isStreamer)
             .then(() => {
                dispatch(actions.setAgoraPrimaryClientJoined(true))
             })
@@ -189,17 +178,16 @@ const RTCProvider = ({
    const close = useCallback(async () => {
       return leaveAgoraRoom()
    }, [leaveAgoraRoom])
-   const init = useCallback(async () => {
-      return joinAgoraRoomWithPrimaryClient(sessionShouldUseCloudProxy)
-   }, [joinAgoraRoomWithPrimaryClient, sessionShouldUseCloudProxy])
+
    // @ts-ignore
    useEffect(() => {
-      if (shouldInit) {
-         void init()
+      if (initialize) {
+         joinAgoraRoomWithPrimaryClient()
+
          return () => close()
       }
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [shouldInit])
+   }, [initialize])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
@@ -245,7 +233,9 @@ const RTCProvider = ({
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [isStreamer, rtcClient])
 
-   const updateScreenShareRtcClient = (newScreenShareRtcClient) => {
+   const updateScreenShareRtcClient = (
+      newScreenShareRtcClient: IAgoraRTCClient
+   ) => {
       screenShareRtcClientRef.current = newScreenShareRtcClient
    }
 
@@ -352,7 +342,7 @@ const RTCProvider = ({
                   enableDualStream(client).catch(errorLogAndNotify)
                }
                await client.publish(tracks)
-               setPrimaryRtcClientHost(true)
+               setRtcClientHost(true)
             } catch (error) {
                handleRtcError(error)
                throw error
@@ -362,15 +352,16 @@ const RTCProvider = ({
       [handleRtcError, rtcClientHost]
    )
 
-   const publishLocalCameraTrack = useCallback(() => {
-      return publishTracks(rtcClient, [localStream.videoTrack], "video")
-         .then(() => {
-            setLocalStream((localStream) => ({
-               ...localStream,
-               isVideoPublished: true,
-            }))
-         })
-         .catch(errorLogAndNotify)
+   const publishLocalCameraTrack = useCallback(async () => {
+      try {
+         await publishTracks(rtcClient, [localStream.videoTrack], "video")
+         setLocalStream((localStream) => ({
+            ...localStream,
+            isVideoPublished: true,
+         }))
+      } catch (error) {
+         return errorLogAndNotify(error)
+      }
    }, [localStream.videoTrack, publishTracks, rtcClient])
 
    const closeLocalCameraTrack = useCallback(async () => {
@@ -394,21 +385,23 @@ const RTCProvider = ({
          handleRtcError(error)
       }
    }, [
+      dispatch,
       handleRtcError,
       localStream.isVideoPublished,
       localStream.videoTrack,
       rtcClient,
    ])
 
-   const publishLocalMicrophoneTrack = useCallback(() => {
-      return publishTracks(rtcClient, [localStream.audioTrack], "audio")
-         .then(() => {
-            setLocalStream((localStream) => ({
-               ...localStream,
-               isAudioPublished: true,
-            }))
-         })
-         .catch(errorLogAndNotify)
+   const publishLocalMicrophoneTrack = useCallback(async () => {
+      try {
+         await publishTracks(rtcClient, [localStream.audioTrack], "audio")
+         setLocalStream((localStream) => ({
+            ...localStream,
+            isAudioPublished: true,
+         }))
+      } catch (error) {
+         return errorLogAndNotify(error)
+      }
    }, [localStream.audioTrack, publishTracks, rtcClient])
 
    const closeLocalMicrophoneTrack = useCallback(async () => {
@@ -427,7 +420,7 @@ const RTCProvider = ({
                audioTrack: null,
                isAudioPublished: false,
             }))
-            setPrimaryRtcClientHost(false)
+            setRtcClientHost(false)
             localStream.audioTrack.close()
          }
       } catch (error) {
@@ -472,7 +465,8 @@ const RTCProvider = ({
 
    const publishScreenShareStream = useCallback(
       async (screenSharingMode, onScreenShareStopped) => {
-         let screenShareTracks
+         let screenShareTracks: Awaited<ReturnType<typeof getScreenShareStream>>
+
          try {
             const screenShareUid = `${uid}screen`
             screenShareTracks = await getScreenShareStream(
@@ -485,8 +479,7 @@ const RTCProvider = ({
                screenShareRtcClient,
                channel,
                screenShareUid,
-               true,
-               sessionShouldUseCloudProxy
+               true
             )
             await publishScreenShareTracks(
                screenShareTracks,
@@ -501,11 +494,9 @@ const RTCProvider = ({
 
             if (screenShareTracks) {
                if (Array.isArray(screenShareTracks)) {
-                  screenShareTracks.forEach((track) =>
-                     track.close().catch(errorLogAndNotify)
-                  )
+                  screenShareTracks.forEach((track) => track.close())
                } else {
-                  screenShareTracks.close().catch(errorLogAndNotify)
+                  screenShareTracks.close()
                }
                updateScreenShareStream(null)
             }
@@ -521,7 +512,6 @@ const RTCProvider = ({
          joinAgoraRoom,
          screenShareRtcClient,
          channel,
-         sessionShouldUseCloudProxy,
          publishScreenShareTracks,
       ]
    )
@@ -609,7 +599,7 @@ const RTCProvider = ({
          await publishLocalCameraTrack()
       }
 
-      await dispatch(actions.setStreamerIsPublished(true))
+      dispatch(actions.setStreamerIsPublished(true))
    }, [
       returnToHost,
       localStream.audioTrack,
@@ -665,7 +655,6 @@ const RTCProvider = ({
    const value = useMemo(
       () => ({
          localStream,
-         screenShareStream,
          rtcClient,
          screenShareRtcClient,
          localMediaHandlers,
@@ -684,7 +673,6 @@ const RTCProvider = ({
       }),
       [
          localStream,
-         screenShareStream,
          rtcClient,
          screenShareRtcClient,
          localMediaHandlers,
@@ -703,7 +691,7 @@ const RTCProvider = ({
    )
    return (
       <RTCContext.Provider value={value}>
-         {init ? children : null}
+         {initialize ? children : null}
       </RTCContext.Provider>
    )
 }
@@ -754,7 +742,7 @@ export function getVideoEncoderPreset(
 const useBeforeLeaveConfirmation = (enabled: boolean) => {
    useEffect(() => {
       if (!enabled) return
-      const beforeUnloadListener = (event) => {
+      const beforeUnloadListener = (event: BeforeUnloadEvent) => {
          event.preventDefault()
          return (event.returnValue = "Are you sure you want to leave?")
       }
