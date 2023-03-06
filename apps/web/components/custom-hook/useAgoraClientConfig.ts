@@ -232,11 +232,6 @@ export default function useAgoraClientConfig(
 
    useEffect(() => {
       if (rtcClient) {
-         console.log(
-            "here calling configureAgoraClient for ",
-            rtcClient,
-            streamerId
-         )
          configureAgoraClient(rtcClient, streamerId)
       }
    }, [configureAgoraClient, rtcClient, streamerId])
