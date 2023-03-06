@@ -16,7 +16,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   buttonText: string
+   buttonText?: string
    children: React.ReactNode
    hide?: boolean
    localStorageKey: string
