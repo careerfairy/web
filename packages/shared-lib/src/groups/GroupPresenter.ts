@@ -109,10 +109,9 @@ export class GroupPresenter {
       this.hasLivestream = hasLivestream
    }
    companyPageIsReady() {
-      const initialActions = this.getCompanyPageSteps().filter(
-         (action) => action.isInitial
-      )
-      return initialActions.every((action) => action.checkIsComplete())
+      return this.getCompanyPageSteps()
+         .filter((action) => action.isInitial)
+         .every((action) => action.checkIsComplete())
    }
 
    companyPageIsFullyReady() {
