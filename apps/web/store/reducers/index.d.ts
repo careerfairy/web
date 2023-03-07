@@ -61,6 +61,8 @@ interface StreamReducer {
       rtcError?: RTCError
       // The rtc client is successfully connected with the cloud proxy
       sessionIsUsingCloudProxy: boolean
+      // rtm probably has firewall issues
+      sessionRTMFailedToJoin: boolean
       primaryClientJoined: boolean
       screenSharePermissionDenied: boolean
       deviceErrors: {
