@@ -30,7 +30,7 @@ export default function useAgoraClientConfig(
    const configureAgoraClient = useCallback(
       (rtcClient: IAgoraRTCClient, streamerId: UID) => {
          /**
-          * Occurs when the SDK automatically switches to TCP/TLS 443.
+          * Occurs when the SDK automatically or manually switches to TCP/TLS 443.
           * This fires when the RTC is using the proxy mode (when automatically or manually enabled)
           *
           * https://api-ref.agora.io/en/video-sdk/web/4.x/interfaces/iagorartcclient.html#event_is_using_cloud_proxy
