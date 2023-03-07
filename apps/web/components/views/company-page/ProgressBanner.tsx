@@ -86,11 +86,12 @@ const sessionKey = "hasDismissedProgressBanner"
 const ProgressBanner = () => {
    const { groupPresenter, editMode } = useCompanyPage()
 
+   const [hasDismissedBanner, setHasDismissedBanner] =
+      useSessionStorage(sessionKey)
+
    const progress = useMemo(() => {
       return groupPresenter.getCompanyPageProgress()
    }, [groupPresenter])
-
-   const pageIsReady = groupPresenter.companyPageIsReady()
 
    const getSectionId = useCallback(
       (
@@ -118,25 +119,11 @@ const ProgressBanner = () => {
       [groupPresenter]
    )
 
-   const pointsToComplete = useMemo(() => {
-      const steps = groupPresenter.getCompanyPageSteps()
+   const handleDismiss = useCallback(() => {
+      setHasDismissedBanner("true")
+   }, [setHasDismissedBanner])
 
-      if (pageIsReady) {
-         return steps.filter(
-            (step) => !step.isInitial && !step.checkIsComplete()
-         )
-      }
-
-      return steps.filter((step) => step.isInitial && !step.checkIsComplete())
-   }, [groupPresenter, pageIsReady])
-
-   const [hasDismissed, setHasDismissed] = useSessionStorage(sessionKey)
-
-   const handleDismiss = () => {
-      setHasDismissed("true")
-   }
-
-   if (progress.isComplete || hasDismissed || !editMode) return null
+   if (progress.isComplete || hasDismissedBanner || !editMode) return null
 
    return (
       <Box sx={styles.root}>
@@ -145,7 +132,7 @@ const ProgressBanner = () => {
                <Grid item xs={12} md={6}>
                   <Stack px={3} py={3} spacing={2}>
                      <Typography fontWeight={600} variant={"h4"}>
-                        {pageIsReady
+                        {progress.isReady
                            ? "How Appealing Is Your Profile?"
                            : "Ready To Start?"}
                      </Typography>
@@ -153,7 +140,7 @@ const ProgressBanner = () => {
                         <LinearProgress
                            sx={[
                               styles.progress,
-                              !pageIsReady && styles.progressNotReady,
+                              !progress.isReady && styles.progressNotReady,
                            ]}
                            variant={"determinate"}
                            value={progress.percentage}
@@ -167,7 +154,7 @@ const ProgressBanner = () => {
                         young talent:
                      </Typography>
                      <Box sx={styles.list} component="ul">
-                        {pointsToComplete.map((point) => (
+                        {progress.currentSteps.map((point) => (
                            <Box
                               sx={styles.listItem}
                               component="li"

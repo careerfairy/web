@@ -181,18 +181,36 @@ export class GroupPresenter {
 
    getCompanyPageProgress() {
       const actions = this.getCompanyPageSteps()
+
       const completedActions = actions.filter((action) =>
          action.checkIsComplete()
       )
+
       const percentage = Math.round(
          (completedActions.length / actions.length) * 100
       )
 
+      let currentSteps = [...actions]
+
+      const isReady = this.companyPageIsReady()
+
+      if (isReady) {
+         currentSteps = currentSteps.filter(
+            // Only return the steps that are not completed of the post-initial steps
+            (step) => !step.isInitial && !step.checkIsComplete()
+         )
+      } else {
+         currentSteps = currentSteps.filter(
+            // Only return the steps that are not completed of the initial steps
+            (step) => step.isInitial && !step.checkIsComplete()
+         )
+      }
+
       return {
-         percentage,
-         completedActions,
-         actions,
-         isComplete: percentage === 100,
+         percentage, // Percentage of the steps that are completed (0-100)
+         currentSteps, // Only return the steps that are not completed
+         isComplete: percentage === 100, // Whether all the steps are completed
+         isReady, // Whether the company page is ready to be viewed by students
       }
    }
 }
