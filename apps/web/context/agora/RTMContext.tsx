@@ -22,6 +22,8 @@ export interface EmoteMessage {
    memberId: string
 }
 
+export type EmoteEntity = Omit<EmoteMessage, "memberId">
+
 // export interface messageStoreInterface {
 //    ts: string;
 //    uid: string;
