@@ -184,7 +184,7 @@ exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
 exports.updateUserJobApplications = atsUser.updateUserJobApplications
 
 // BigQuery
-exports.getBigQueryUsers_v2 = bigQuery.getBigQueryUsers_v2
+exports.getBigQueryUsers_v3 = bigQuery.getBigQueryUsers_v3
 
 // Group Analytics
 exports.getRegistrationSources_v2 = groupAnalytics.getRegistrationSources
