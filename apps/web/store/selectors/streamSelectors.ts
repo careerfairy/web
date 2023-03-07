@@ -27,3 +27,5 @@ export const streamerBreakoutRoomModalOpen = (state: RootState) =>
 
 export const videoOptionsSelector = (state: RootState) =>
    state.stream.videoOptions
+
+export const emotesSelector = (state: RootState) => state.emotes.emotesData
