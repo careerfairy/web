@@ -117,6 +117,7 @@ export class GroupPresenter {
    getCompanyPageSteps() {
       const numAdditionalPhotosRemaining =
          this.photos.length < 6 ? 6 - this.photos.length : 0
+
       return [
          {
             label: "Add company logo and banner",

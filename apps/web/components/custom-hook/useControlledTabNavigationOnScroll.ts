@@ -66,9 +66,7 @@ const useControlledTabNavigationOnScroll = (
                }
             )
 
-            refs.forEach((ref) => {
-               return observer.observe(ref.current)
-            })
+            refs.forEach((ref) => observer.observe(ref.current))
          }
          return () => observer?.disconnect()
       },
