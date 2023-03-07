@@ -57,6 +57,7 @@ import { recommendationServiceInstance } from "./RecommendationService"
 import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
+import { EmoteMessage } from "context/agora/RTMContext"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -2533,7 +2534,12 @@ class FirebaseService {
       return !userInPolicySnapshot.exists
    }
 
-   postIcon = (livestreamId, iconName, authorEmail) => {
+   postIcon = (
+      livestreamId: string,
+      iconName: EmoteMessage["emoteType"],
+      authorEmail: string,
+      streamerId: string
+   ) => {
       let ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -2542,16 +2548,26 @@ class FirebaseService {
          name: iconName,
          timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
          authorEmail: authorEmail,
+         streamerId: streamerId ?? null,
       })
    }
 
-   listenToTotalLivestreamIcons = (livestreamId, callback) => {
+   listenToFutureLivestreamIcons = (
+      livestreamId: string,
+      callback: (snapshot: firebase.firestore.QuerySnapshot) => void
+   ) => {
       let ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("icons")
+         .where("timestamp", ">", new Date())
          .orderBy("timestamp", "desc")
-      return ref.onSnapshot(callback)
+      return ref.onSnapshot(
+         {
+            includeMetadataChanges: true,
+         },
+         callback
+      )
    }
 
    listenToLivestreamOverallRatings = (livestreamId, callback) => {
