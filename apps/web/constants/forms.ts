@@ -3,6 +3,7 @@ import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 export const maxQuestionLength = 170
 export const minQuestionLength = 10
+export const maxCountriesOfInterestToShow = 10
 export const linkedInRegex = new RegExp(
    "^(http(s)?:\\/\\/)?([\\w]+\\.)?linkedin\\.com\\/(pub|in|profile)\\/[\\w]"
 )

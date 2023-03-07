@@ -22,7 +22,10 @@ import { University } from "@careerfairy/shared-lib/dist/universities"
 import UniversityCountriesFilter from "./UniversityCountriesFilter"
 import UniversitiesFilter from "./UniversitiesFilter"
 import GenericFilterSelector from "./GenericFilterSelector"
-import { countriesOptionCodes } from "../../../../constants/forms"
+import {
+   countriesOptionCodes,
+   maxCountriesOfInterestToShow,
+} from "../../../../constants/forms"
 
 interface UserTableProps {
    users: BigQueryUserResponse[]
@@ -99,7 +102,14 @@ const AdminUsersTable = ({
                return acc
             }, [])
 
-            return countriesToShow.join(", ")
+            // only show the first {maxCountriesOfInterestToShow} values, if there are more, it will show 3 points
+            return `${countriesToShow
+               .slice(0, maxCountriesOfInterestToShow)
+               .join(", ")}${
+               countryOfInterestIds?.length > maxCountriesOfInterestToShow
+                  ? " ..."
+                  : ""
+            }`
          }
 
          return ""
