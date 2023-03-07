@@ -63,8 +63,6 @@ export class BigQueryRepository implements IBigQueryRepository {
          ?.map((a) => a)
          .join("|")
 
-      console.log("FILTERS -> ", filters)
-
       const whereQueries = []
       if (filters.universityName) {
          whereQueries.push(
@@ -97,7 +95,6 @@ export class BigQueryRepository implements IBigQueryRepository {
          )
       }
 
-      console.log("Queries -> ", whereQueries)
       const query = `SELECT
                COUNT(*) OVER () as totalHits,
                JSON_VALUE(DATA, "$.firstName") AS firstName,
@@ -131,8 +128,6 @@ export class BigQueryRepository implements IBigQueryRepository {
       }
 
       const [rows] = await this.client.query(options)
-
-      console.log("RESULT -> ", rows[0])
 
       return rows as BigQueryUserResponse[]
    }
