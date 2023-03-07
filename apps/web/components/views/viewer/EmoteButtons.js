@@ -146,6 +146,7 @@ const EmoteButtons = ({ createEmote }) => {
 
    const {
       currentLivestream: { id: livestreamId },
+      streamerId,
    } = useCurrentStream()
    const { authenticatedUser, userData } = useAuth()
    const classes = useStyles({ handRaiseActive: false })
@@ -224,7 +225,8 @@ const EmoteButtons = ({ createEmote }) => {
             .postIcon(
                livestreamId,
                iconName,
-               authenticatedUser.email || TEST_EMAIL
+               authenticatedUser.email || TEST_EMAIL,
+               streamerId
             )
             .catch(console.error)
       }

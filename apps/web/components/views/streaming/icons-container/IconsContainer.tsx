@@ -21,6 +21,7 @@ import { sxStyles } from "types/commonTypes"
 import Box from "@mui/material/Box"
 import { emotesSelector } from "store/selectors/streamSelectors"
 import { EmoteEntity, EmoteMessage } from "context/agora/RTMContext"
+import { useFallbackEmotes } from "./useFallbackEmotes"
 
 const styles = ({ right, color, durationTransform, opacity, distance }) =>
    sxStyles({
@@ -101,9 +102,15 @@ const ActionButtonMemoized = memo(ActionButton)
 
 const emotes = ["clapping", "like", "heart"] as const
 
-function IconsContainer({ className }) {
+function IconsContainer({ className, livestreamId }) {
    const emotesData = useSelector(emotesSelector)
    const { showBubbles, setShowBubbles } = useContext(TutorialContext)
+
+   /**
+    * If the RTM fails to connect, will dispatch emotes from Firestore
+    */
+   useFallbackEmotes(livestreamId)
+
    const dispatch = useDispatch()
 
    const simulateEmotes = useCallback(() => {
