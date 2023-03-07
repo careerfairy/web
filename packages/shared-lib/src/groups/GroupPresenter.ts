@@ -1,5 +1,6 @@
 import {
    Group,
+   GroupOption,
    GroupPhoto,
    GroupQuestion,
    GroupVideo,
@@ -31,6 +32,9 @@ export class GroupPresenter {
       public readonly logoUrl: string,
       public readonly bannerImageUrl: string,
       public readonly extraInfo: string,
+      public readonly companyCountry: GroupOption,
+      public readonly companyIndustry: GroupOption,
+      public readonly companySize: string,
       public readonly videos: GroupVideo[],
       public readonly photos: GroupPhoto[],
       public readonly testimonials: Testimonial[],
@@ -53,6 +57,9 @@ export class GroupPresenter {
          group.logoUrl,
          group.bannerImageUrl,
          group.extraInfo,
+         group.companyCountry ?? null,
+         group.companyIndustry ?? null,
+         group.companySize ?? null,
          group.videos || [],
          group.photos || [],
          group.testimonials || [],
@@ -127,7 +134,13 @@ export class GroupPresenter {
          },
          {
             label: "Describe your company",
-            checkIsComplete: () => Boolean(this.extraInfo),
+            checkIsComplete: () =>
+               Boolean(
+                  this.extraInfo &&
+                     this.companySize &&
+                     this.companyIndustry &&
+                     this.companyCountry
+               ),
             isInitial: true,
             section: "profile",
          },

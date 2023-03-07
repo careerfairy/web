@@ -6,6 +6,7 @@ import {
    Grid,
    IconButton,
    LinearProgress,
+   linearProgressClasses,
    Stack,
    Typography,
 } from "@mui/material"
@@ -19,10 +20,19 @@ const styles = sxStyles({
       position: "relative",
    },
    progress: {
-      height: "0.5rem",
-      borderRadius: 1,
       flex: 1,
+      height: 10,
+      borderRadius: 5,
+      [`& .${linearProgressClasses.bar}`]: {
+         borderRadius: 5,
+      },
    },
+   progressNotReady: (theme) => ({
+      [`&.${linearProgressClasses.colorPrimary}`]: {
+         backgroundColor:
+            theme.palette.grey[theme.palette.mode === "light" ? 200 : 800],
+      },
+   }),
    progressContainer: {
       display: "flex",
       alignItems: "center",
@@ -80,7 +90,7 @@ const ProgressBanner = () => {
       return groupPresenter.getCompanyPageProgress()
    }, [groupPresenter])
 
-   const initialComplete = groupPresenter.companyPageIsReady()
+   const pageIsReady = groupPresenter.companyPageIsReady()
 
    const getSectionId = useCallback(
       (
@@ -111,14 +121,14 @@ const ProgressBanner = () => {
    const pointsToComplete = useMemo(() => {
       const steps = groupPresenter.getCompanyPageSteps()
 
-      if (initialComplete) {
+      if (pageIsReady) {
          return steps.filter(
             (step) => !step.isInitial && !step.checkIsComplete()
          )
       }
 
       return steps.filter((step) => step.isInitial && !step.checkIsComplete())
-   }, [groupPresenter, initialComplete])
+   }, [groupPresenter, pageIsReady])
 
    const [hasDismissed, setHasDismissed] = useSessionStorage(sessionKey)
 
@@ -135,13 +145,16 @@ const ProgressBanner = () => {
                <Grid item xs={12} md={6}>
                   <Stack px={3} py={3} spacing={2}>
                      <Typography fontWeight={600} variant={"h4"}>
-                        {initialComplete
+                        {pageIsReady
                            ? "How Appealing Is Your Profile?"
                            : "Ready To Start?"}
                      </Typography>
                      <Stack direction={"row"} alignItems={"center"} spacing={2}>
                         <LinearProgress
-                           sx={styles.progress}
+                           sx={[
+                              styles.progress,
+                              !pageIsReady && styles.progressNotReady,
+                           ]}
                            variant={"determinate"}
                            value={progress.percentage}
                         />
