@@ -23,6 +23,7 @@ export const BANNER_IMAGE_SPECS = {
 
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
+   public hasLivestream: boolean
 
    constructor(
       public readonly id: string,
@@ -97,13 +98,87 @@ export class GroupPresenter {
       return `company-pages/${this.id}/banners/${bannerId}`
    }
 
+   setHasLivestream(hasLivestream: boolean) {
+      this.hasLivestream = hasLivestream
+   }
    companyPageIsReady() {
-      return (
-         this.logoUrl &&
-         this.bannerImageUrl &&
-         this.extraInfo &&
-         this.photos.length >= 3 &&
-         this.videos.length > 0
+      const initialActions = this.getCompanyPageSteps().filter(
+         (action) => action.isInitial
       )
+      return initialActions.every((action) => action.checkIsComplete())
+   }
+
+   companyPageIsFullyReady() {
+      return this.getCompanyPageSteps().every((action) =>
+         action.checkIsComplete()
+      )
+   }
+
+   getCompanyPageSteps() {
+      const numAdditionalPhotosRemaining =
+         this.photos.length < 6 ? 6 - this.photos.length : 0
+      return [
+         {
+            label: "Add company logo and banner",
+            checkIsComplete: () => Boolean(this.logoUrl && this.bannerImageUrl),
+            isInitial: true,
+            section: "banner",
+         },
+         {
+            label: "Describe your company",
+            checkIsComplete: () => Boolean(this.extraInfo),
+            isInitial: true,
+            section: "profile",
+         },
+         {
+            label: "Add at least 3 pictures",
+            checkIsComplete: () => this.photos.length >= 3,
+            isInitial: true,
+            section: "photos",
+         },
+         {
+            label: "Upload a video",
+            checkIsComplete: () => this.videos.length > 0,
+            isInitial: true,
+            section: "videos",
+         },
+         {
+            label: "Share an employee’s story",
+            checkIsComplete: () => this.testimonials.length > 0,
+            isInitial: false,
+            section: "testimonials",
+         },
+         {
+            label: "Create a live stream",
+            checkIsComplete: () => this.hasLivestream,
+            isInitial: false,
+            section: "livestreams",
+         },
+         {
+            label: `Add ${numAdditionalPhotosRemaining} more picture${
+               numAdditionalPhotosRemaining > 1 ? "s" : ""
+            }`,
+            checkIsComplete: () => this.photos.length >= 6,
+            isInitial: false,
+            section: "photos",
+         },
+      ] as const
+   }
+
+   getCompanyPageProgress() {
+      const actions = this.getCompanyPageSteps()
+      const completedActions = actions.filter((action) =>
+         action.checkIsComplete()
+      )
+      const percentage = Math.round(
+         (completedActions.length / actions.length) * 100
+      )
+
+      return {
+         percentage,
+         completedActions,
+         actions,
+         isComplete: percentage === 100,
+      }
    }
 }

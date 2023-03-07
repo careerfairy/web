@@ -1,0 +1,189 @@
+import React, { useCallback, useMemo } from "react"
+import { TabValue, TabValueType, useCompanyPage } from "./index"
+import {
+   Box,
+   Container,
+   Grid,
+   IconButton,
+   LinearProgress,
+   Stack,
+   Typography,
+} from "@mui/material"
+import { sxStyles } from "../../../types/commonTypes"
+import CloseIcon from "@mui/icons-material/Close"
+import { useSessionStorage } from "react-use"
+import Arrow from "@mui/icons-material/ArrowForwardRounded"
+
+const styles = sxStyles({
+   root: {
+      position: "relative",
+   },
+   progress: {
+      height: "0.5rem",
+      borderRadius: 1,
+      flex: 1,
+   },
+   progressContainer: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "space-between",
+   },
+   list: {
+      listStyleType: "none",
+      pl: 0,
+   },
+   listItem: {
+      display: "list-item",
+      position: "relative",
+      paddingLeft: 3,
+      "&:not(:last-child)": {
+         mb: 1,
+      },
+      "&::before": {
+         content: "'\\2022'",
+         position: "absolute",
+         left: 0,
+         color: "primary.main",
+         fontSize: "2.5rem",
+         lineHeight: "1.3rem",
+      },
+   },
+
+   closeButtonWrapper: {
+      position: "absolute",
+      top: 0,
+      right: 0,
+      p: 1,
+   },
+   listItemContent: {
+      display: "flex",
+      alignItems: "center",
+      color: "text.primary",
+      "& .arrow": {
+         transition: (theme) => theme.transitions.create("all"),
+         ml: 1,
+      },
+      "&:hover": {
+         "& .arrow": {
+            opacity: 1,
+            ml: 2,
+         },
+      },
+   },
+})
+
+const sessionKey = "hasDismissedProgressBanner"
+const ProgressBanner = () => {
+   const { groupPresenter, editMode } = useCompanyPage()
+
+   const progress = useMemo(() => {
+      return groupPresenter.getCompanyPageProgress()
+   }, [groupPresenter])
+
+   const initialComplete = groupPresenter.companyPageIsReady()
+
+   const getSectionId = useCallback(
+      (
+         step: ReturnType<
+            typeof groupPresenter.getCompanyPageSteps
+         >[number]["section"]
+      ): TabValueType => {
+         switch (step) {
+            case "profile":
+               return TabValue.profile
+            case "banner":
+               return TabValue.banner
+            case "photos":
+               return TabValue.media
+            case "videos":
+               return TabValue.video
+            case "testimonials":
+               return TabValue.testimonials
+            case "livestreams":
+               return TabValue.livesStreams
+            default:
+               return TabValue.profile
+         }
+      },
+      [groupPresenter]
+   )
+
+   const pointsToComplete = useMemo(() => {
+      const steps = groupPresenter.getCompanyPageSteps()
+
+      if (initialComplete) {
+         return steps.filter(
+            (step) => !step.isInitial && !step.checkIsComplete()
+         )
+      }
+
+      return steps.filter((step) => step.isInitial && !step.checkIsComplete())
+   }, [groupPresenter, initialComplete])
+
+   const [hasDismissed, setHasDismissed] = useSessionStorage(sessionKey)
+
+   const handleDismiss = () => {
+      setHasDismissed("true")
+   }
+
+   if (progress.isComplete || hasDismissed || !editMode) return null
+
+   return (
+      <Box sx={styles.root}>
+         <Container disableGutters maxWidth="lg">
+            <Grid container>
+               <Grid item xs={12} md={6}>
+                  <Stack px={3} py={3} spacing={2}>
+                     <Typography fontWeight={600} variant={"h4"}>
+                        {initialComplete
+                           ? "How Appealing Is Your Profile?"
+                           : "Ready To Start?"}
+                     </Typography>
+                     <Stack direction={"row"} alignItems={"center"} spacing={2}>
+                        <LinearProgress
+                           sx={styles.progress}
+                           variant={"determinate"}
+                           value={progress.percentage}
+                        />
+                        <Typography variant={"body1"} fontWeight={500}>
+                           {progress.percentage}%
+                        </Typography>
+                     </Stack>
+                     <Typography variant={"body1"} fontWeight={500}>
+                        Add these to complete your company page and attract
+                        young talent:
+                     </Typography>
+                     <Box sx={styles.list} component="ul">
+                        {pointsToComplete.map((point) => (
+                           <Box
+                              sx={styles.listItem}
+                              component="li"
+                              key={point.label}
+                           >
+                              <Box
+                                 component={"a"}
+                                 href={`#${getSectionId(point.section)}`}
+                                 sx={styles.listItemContent}
+                              >
+                                 <Typography variant="body1" color="black">
+                                    {point.label}
+                                 </Typography>
+                                 <Arrow className={"arrow"} />
+                              </Box>
+                           </Box>
+                        ))}
+                     </Box>
+                  </Stack>
+               </Grid>
+            </Grid>
+         </Container>
+         <Box sx={styles.closeButtonWrapper}>
+            <IconButton onClick={handleDismiss}>
+               <CloseIcon />
+            </IconButton>
+         </Box>
+      </Box>
+   )
+}
+
+export default ProgressBanner
