@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import { useTheme } from "@mui/material/styles"
 import {
    AppBar,
@@ -41,6 +41,7 @@ import * as actions from "store/actions"
 import { TOP_BAR_HEIGHT } from "constants/streamLayout"
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
 import RootState from "../../../store/reducers"
+import { sessionRTMFailedToJoin } from "store/selectors/streamSelectors"
 
 const styles = {
    toolbar: {
@@ -80,9 +81,25 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("lg"))
    const { toggleTheme, themeMode } = useThemeToggle()
-   const numberOfViewers = useSelector((state: RootState) =>
+   const numberOfViewersRTM = useSelector((state: RootState) =>
       currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
    )
+   const rtmFailedToJoin = useSelector(sessionRTMFailedToJoin)
+
+   /**
+    * Fall back to the number of participants in the stream doc if RTM fails to join
+    */
+   const numberOfViewers = useMemo(() => {
+      if (rtmFailedToJoin) {
+         return currentLivestream?.participatingStudents?.length ?? 0
+      }
+
+      return numberOfViewersRTM
+   }, [
+      currentLivestream?.participatingStudents?.length,
+      numberOfViewersRTM,
+      rtmFailedToJoin,
+   ])
 
    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false)
    const [hideTooltip, setHideTooltip] = useState(false)
