@@ -75,7 +75,7 @@ const NewFeatureHint: FC<Props> = ({
          >
             <Box
                component={"span"}
-               onClick={handleSeen}
+               onClick={show ? handleSeen : undefined}
                sx={styles.elementWrapper}
             >
                {children}
