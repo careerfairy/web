@@ -150,8 +150,9 @@ const ProgressBanner = () => {
                         </Typography>
                      </Stack>
                      <Typography variant={"body1"} fontWeight={500}>
-                        Add these to complete your company page and attract
-                        young talent:
+                        {progress.isReady
+                           ? "Add the following to complete your company page and attract young talent:"
+                           : "The following information is missing to generate the company page:"}
                      </Typography>
                      <Box sx={styles.list} component="ul">
                         {progress.currentSteps.map((point) => (
