@@ -98,6 +98,7 @@ export const NavLink = ({
    baseTextColor,
    rightElement,
    isNested = false,
+   wrapper,
 }: NavLinkProps) => {
    const { pathname: routerPathname } = useRouter()
 
@@ -115,51 +116,55 @@ export const NavLink = ({
 
    const isTextActive = isOpen || isActivePath
 
+   const Wrapper = wrapper || React.Fragment
+
    return (
-      <span>
-         <ListItemButton
-            sx={[
-               styles.navLink,
-               isNested && styles.navLinkNested,
-               isTextActive && styles.textActive,
-               isActivePath && styles.borderActive,
-               baseTextColor && { color: baseTextColor },
-            ]}
-            target={external ? "_blank" : undefined}
-            component={Link}
-            href={href}
-            selected={isActivePath}
-            disableRipple
-         >
-            <ListItemIcon
-               sx={[styles.iconWrapper, !Icon && styles.iconWrapperEmpty]}
+      <Wrapper>
+         <span>
+            <ListItemButton
+               sx={[
+                  styles.navLink,
+                  isNested && styles.navLinkNested,
+                  isTextActive && styles.textActive,
+                  isActivePath && styles.borderActive,
+                  baseTextColor && { color: baseTextColor },
+               ]}
+               target={external ? "_blank" : undefined}
+               component={Link}
+               href={href}
+               selected={isActivePath}
+               disableRipple
             >
-               <Box sx={styles.icon} component={Icon} />
-            </ListItemIcon>
-            <ListItemText
-               primary={
-                  <Typography
-                     variant={"body1"}
-                     fontWeight={"inherit"}
-                     fontSize={"inherit"}
-                     color="inherit"
-                  >
-                     {title}
-                  </Typography>
-               }
-            />
-            <Box my="auto">{rightElement}</Box>
-         </ListItemButton>
-         {isNavLinkGroup && (
-            <Collapse in={isOpen} timeout="auto" unmountOnExit>
-               <List component="div" disablePadding>
-                  {childLinks?.map((link) => (
-                     <NavLink key={link.id} isNested {...link} />
-                  ))}
-               </List>
-            </Collapse>
-         )}
-      </span>
+               <ListItemIcon
+                  sx={[styles.iconWrapper, !Icon && styles.iconWrapperEmpty]}
+               >
+                  <Box sx={styles.icon} component={Icon} />
+               </ListItemIcon>
+               <ListItemText
+                  primary={
+                     <Typography
+                        variant={"body1"}
+                        fontWeight={"inherit"}
+                        fontSize={"inherit"}
+                        color="inherit"
+                     >
+                        {title}
+                     </Typography>
+                  }
+               />
+               <Box my="auto">{rightElement}</Box>
+            </ListItemButton>
+            {isNavLinkGroup && (
+               <Collapse in={isOpen} timeout="auto" unmountOnExit>
+                  <List component="div" disablePadding>
+                     {childLinks?.map((link) => (
+                        <NavLink key={link.id} isNested {...link} />
+                     ))}
+                  </List>
+               </Collapse>
+            )}
+         </span>
+      </Wrapper>
    )
 }
 
