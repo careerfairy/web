@@ -219,7 +219,6 @@ export const errorLogAndNotify = (error: Error, metadata?: any) => {
    console.error("error", error)
    Sentry.captureException(error, metadata)
 }
-
 /**
  * Check if the emulators are enabled or if we're running locally
  */
