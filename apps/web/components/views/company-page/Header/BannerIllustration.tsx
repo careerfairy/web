@@ -10,7 +10,6 @@ import { groupRepo } from "../../../../data/RepositoryInstances"
 import useSWRMutation from "swr/mutation"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { v4 as uuid } from "uuid"
-import React from "react"
 
 const styles = sxStyles({
    imageWrapper: {
