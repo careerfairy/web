@@ -19,8 +19,13 @@ export const focusModeEnabledSelector = (state: RootState) =>
 export const sessionIsUsingCloudProxySelector = (state: RootState) =>
    state.stream.agoraState.sessionIsUsingCloudProxy
 
+export const sessionRTMFailedToJoin = (state: RootState) =>
+   state.stream.agoraState.sessionRTMFailedToJoin
+
 export const streamerBreakoutRoomModalOpen = (state: RootState) =>
    state.stream.layout.streamerBreakoutRoomModalOpen
 
 export const videoOptionsSelector = (state: RootState) =>
    state.stream.videoOptions
+
+export const emotesSelector = (state: RootState) => state.emotes.emotesData

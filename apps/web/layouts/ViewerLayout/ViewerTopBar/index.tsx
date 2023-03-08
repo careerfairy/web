@@ -39,6 +39,7 @@ import { StylesProps } from "../../../types/commonTypes"
 import { Badge as BadgeType } from "@careerfairy/shared-lib/dist/badges/badges"
 import UserPresenter from "@careerfairy/shared-lib/dist/users/UserPresenter"
 import { focusModeEnabledSelector } from "../../../store/selectors/streamSelectors"
+import { useNumberOfViewers } from "context/stream/useNumberOfViewers"
 
 const styles: StylesProps = {
    appBar: {
@@ -97,9 +98,8 @@ const ViewerTopBar = ({
    const links = useStreamToken({ forStreamType: "mainLivestream" })
    const theme = useTheme()
    const { currentLivestream } = useCurrentStream()
-   const numberOfViewers = useSelector((state: any) =>
-      currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
-   )
+
+   const numberOfViewers = useNumberOfViewers(currentLivestream)
 
    const breakoutRoomOpen = useSelector((state: any) =>
       Boolean(

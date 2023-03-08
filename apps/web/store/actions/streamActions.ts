@@ -250,6 +250,11 @@ export const setSessionIsUsingCloudProxy =
       })
    }
 
+export const setSessionRTMFailedToJoin = (failed: boolean) => ({
+   type: actions.SET_SESSION_RTM_FAILED_TO_JOIN,
+   payload: failed,
+})
+
 // Action to set streamer state, this is to prevent feature hints to show up before the streamer has published
 export const setStreamerIsPublished = (isPublished) => async (dispatch) => {
    dispatch({
