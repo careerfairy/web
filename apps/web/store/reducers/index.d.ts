@@ -61,7 +61,8 @@ interface StreamReducer {
       rtcError?: RTCError
       // The rtc client is successfully connected with the cloud proxy
       sessionIsUsingCloudProxy: boolean
-      sessionShouldUseCloudProxy: boolean | undefined
+      // rtm probably has firewall issues
+      sessionRTMFailedToJoin: boolean
       primaryClientJoined: boolean
       screenSharePermissionDenied: boolean
       deviceErrors: {
@@ -98,6 +99,12 @@ interface GeneralLayoutState {
    }
 }
 
+interface EmoteReducer {
+   error: null | Error
+   loading: boolean
+   emotesData: EmoteEntity[]
+}
+
 // Optional: You can define the schema of your Firebase Redux store.
 // This will give you type-checking for state.firebase.data.livestreams and state.firebase.ordered.livestreams
 interface Schema {
@@ -113,4 +120,5 @@ export default interface RootState extends DefaultRootState {
    firestore: FirestoreReducer.Reducer<{}, Schema>
    analyticsReducer: GroupAnalyticsReducer
    userDataSet: UserDataSetReducer
+   emotes: EmoteReducer
 }

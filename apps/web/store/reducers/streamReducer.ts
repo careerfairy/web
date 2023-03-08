@@ -54,7 +54,7 @@ const initialState = {
       },
       screenSharePermissionDenied: false,
       sessionIsUsingCloudProxy: false,
-      sessionShouldUseCloudProxy: undefined, // undefined means we don't know yet
+      sessionRTMFailedToJoin: false,
       primaryClientJoined: false,
    },
 }
@@ -117,14 +117,15 @@ const streamReducer = (state = initialState, { type, payload }) => {
                sessionIsUsingCloudProxy: payload,
             },
          }
-      case actions.SET_SESSION_SHOULD_USE_CLOUD_PROXY:
+      case actions.SET_SESSION_RTM_FAILED_TO_JOIN:
          return {
             ...state,
             agoraState: {
                ...state.agoraState,
-               sessionShouldUseCloudProxy: payload,
+               sessionRTMFailedToJoin: payload,
             },
          }
+
       case actions.CLEAR_AGORA_RTC_ERROR:
          return {
             ...state,

@@ -99,16 +99,18 @@ const ViewerOverview = ({
                audienceDrawerOpen={audienceDrawerOpen}
                isStreamer={false}
             />
-            {!isRecordingWindow && (<ButtonComponent
-               streamFinished={presenter?.streamHasFinished()}
-               selectedState={selectedState}
-               showMenu={showMenu}
-               isMobile={mobile}
-               handleStateChange={handleStateChange}
-               streamer={false}
-               includeJobs={currentLivestream.jobs?.length > 0}
-               questionsAreDisabled={currentLivestream.questionsDisabled}
-            />)}
+            {!isRecordingWindow && (
+               <ButtonComponent
+                  streamFinished={presenter?.streamHasFinished()}
+                  selectedState={selectedState}
+                  showMenu={showMenu}
+                  isMobile={mobile}
+                  handleStateChange={handleStateChange}
+                  streamer={false}
+                  includeJobs={currentLivestream.jobs?.length > 0}
+                  questionsAreDisabled={currentLivestream.questionsDisabled}
+               />
+            )}
             <ViewerComponent
                showMenu={showMenu}
                handRaiseActive={handRaiseActive}
@@ -121,7 +123,10 @@ const ViewerOverview = ({
             )}
          </div>
          {enableEmotions && (
-            <IconsContainer className={classes.iconsContainer} />
+            <IconsContainer
+               className={classes.iconsContainer}
+               livestreamId={currentLivestream.id}
+            />
          )}
          {currentLivestream && !currentLivestream.hasNoRatings && (
             <RatingContainer

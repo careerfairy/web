@@ -41,6 +41,7 @@ import * as actions from "store/actions"
 import { TOP_BAR_HEIGHT } from "constants/streamLayout"
 import { localStorageAudienceDrawerKey } from "constants/localStorageKeys"
 import RootState from "../../../store/reducers"
+import { useNumberOfViewers } from "context/stream/useNumberOfViewers"
 
 const styles = {
    toolbar: {
@@ -80,9 +81,8 @@ const StreamerTopBar = ({ firebase, showAudience }) => {
    const theme = useTheme()
    const mobile = useMediaQuery(theme.breakpoints.down("lg"))
    const { toggleTheme, themeMode } = useThemeToggle()
-   const numberOfViewers = useSelector((state: RootState) =>
-      currentLivestream?.hasStarted ? state.stream.stats.numberOfViewers : 0
-   )
+
+   const numberOfViewers = useNumberOfViewers(currentLivestream)
 
    const [streamStartTimeIsNow, setStreamStartTimeIsNow] = useState(false)
    const [hideTooltip, setHideTooltip] = useState(false)
