@@ -26,6 +26,7 @@ import { errorLogAndNotify } from "../../../util/CommonUtil"
 import { FollowCompany, SignUp } from "./ctas"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import NewsletterSection from "./NewsletterSection"
+import ProgressBanner from "./ProgressBanner"
 
 type Props = {
    group: Group
@@ -38,6 +39,8 @@ export const TabValue = {
    media: "media-section",
    testimonials: "testimonials-section",
    livesStreams: "livesStreams-section",
+   banner: "banner-section",
+   video: "video-section",
 } as const
 
 export type TabValueType = typeof TabValue[keyof typeof TabValue]
@@ -108,10 +111,18 @@ const CompanyPageOverview = ({
       filterByGroupId: group.groupId,
    })
 
-   const presenter = useMemo(
-      () => GroupPresenter.createFromDocument(contextGroup),
-      [contextGroup]
-   )
+   const aboutSectionRef = useRef<HTMLElement>(null)
+   const testimonialSectionRef = useRef<HTMLElement>(null)
+   const eventSectionRef = useRef<HTMLElement>(null)
+   const mediaSectionRef = useRef<HTMLElement>(null)
+
+   const presenter = useMemo(() => {
+      const presenter = GroupPresenter.createFromDocument(contextGroup)
+      presenter.setHasLivestream(
+         Boolean((contextUpcomingLivestream || upcomingLivestreams)?.length > 0)
+      )
+      return presenter
+   }, [contextGroup, contextUpcomingLivestream, upcomingLivestreams])
 
    useEffect(() => {
       const isPublicProfile = presenter.companyPageIsReady()
@@ -132,11 +143,6 @@ const CompanyPageOverview = ({
             })
       }
    }, [contextGroup, editMode, presenter])
-
-   const aboutSectionRef = useRef<HTMLElement>(null)
-   const testimonialSectionRef = useRef<HTMLElement>(null)
-   const eventSectionRef = useRef<HTMLElement>(null)
-   const mediaSectionRef = useRef<HTMLElement>(null)
 
    const contextValue = useMemo<ICompanyPageContext>(
       () => ({
@@ -166,6 +172,7 @@ const CompanyPageOverview = ({
    return (
       <CompanyPageContext.Provider value={contextValue}>
          <Box bgcolor={"white"} height={"100%"} pb={5}>
+            {editMode ? <ProgressBanner /> : null}
             <Box mb={{ xs: 4, md: 10 }}>
                <Header />
             </Box>

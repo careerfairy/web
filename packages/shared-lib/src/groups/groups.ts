@@ -26,6 +26,9 @@ export interface Group extends Identifiable {
    inActive?: boolean
    bannerImageUrl?: string
    atsAdminPageFlag?: boolean
+   /*
+    * Metadata for the group
+    * */
    companyCountry?: GroupOption
    companyIndustry?: GroupOption
    companySize?: string
@@ -38,14 +41,14 @@ export interface Group extends Identifiable {
     * Videos that are displayed on the group company page
     * */
    videos?: GroupVideo[]
+   publicProfile?: boolean
+   testimonials?: Testimonial[]
    /*
     * Deprecated
     * */
    categories?: GroupCategory[] // deprecated
    adminEmails?: string[] // deprecated
    adminEmail?: string // deprecated
-   publicProfile?: boolean
-   testimonials?: Testimonial[]
 }
 
 export interface Testimonial extends Identifiable {
