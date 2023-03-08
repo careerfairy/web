@@ -195,7 +195,10 @@ const StreamerOverview = ({
          <HandRaiseNotifier />
          <MiniChatContainer className={classes.miniChatContainer} />
 
-         <IconsContainer className={classes.iconsContainer} />
+         <IconsContainer
+            className={classes.iconsContainer}
+            livestreamId={currentLivestream.id}
+         />
          <Backdrop
             open={videoIsMuted}
             className={classes.backdrop}

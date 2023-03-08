@@ -9,7 +9,7 @@ import {
 import AgoraRTM, { RtmMessage } from "agora-rtm-sdk"
 import { useFirebaseService } from "../firebase/FirebaseServiceContext"
 
-import { useDispatch, useSelector } from "react-redux"
+import { useDispatch } from "react-redux"
 import RTMContext, {
    AgoraRTMContextInterface,
    EmoteMessage,
@@ -17,11 +17,10 @@ import RTMContext, {
 } from "./RTMContext"
 import * as actions from "store/actions"
 import { agoraCredentials } from "../../data/agora/AgoraInstance"
-import { useSessionStorage } from "react-use"
-import { sessionIsUsingCloudProxySelector } from "../../store/selectors/streamSelectors"
 import { errorLogAndNotify } from "../../util/CommonUtil"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 import { RTMStatus } from "../../types/streaming"
+import { setSessionRTMFailedToJoin } from "store/actions/streamActions"
 
 interface Props {
    children: JSX.Element
@@ -36,16 +35,6 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
 
    const [rtmStatus, setRtmStatus] = useState<RTMStatus>(null)
 
-   const sessionIsUsingCloudProxy = useSelector(
-      sessionIsUsingCloudProxySelector
-   )
-   const [sessionShouldUseCloudProxy] = useSessionStorage<boolean>(
-      "is-using-cloud-proxy",
-      false
-   )
-
-   const useProxy = sessionIsUsingCloudProxy || sessionShouldUseCloudProxy
-
    const { fetchAgoraRtmToken } = useFirebaseService()
    const dispatch = useDispatch()
 
@@ -53,13 +42,27 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
       try {
          rtmClient.current = AgoraRTM.createInstance(agoraCredentials.appID, {
             logFilter: AgoraRTM.LOG_FILTER_INFO,
-            enableCloudProxy: useProxy,
          })
 
+         /**
+          * Occurs when the connection state changes between the SDK and the Agora RTM system.
+          */
          rtmClient.current.on(
             "ConnectionStateChanged",
-            (connectionState, reason) =>
+            (connectionState, reason) => {
+               logRTMEvent("ConnectionStateChanged", connectionState, reason)
                setRtmStatus({ connectionState, reason })
+            }
+         )
+
+         /**
+          * Occurs when the local user receives a peer-to-peer message from a remote user.
+          */
+         rtmClient.current.on(
+            "MessageFromPeer",
+            (message, uidSender, msgProperties) => {
+               logRTMEvent("MessageFromPeer", message, uidSender, msgProperties)
+            }
          )
 
          /**
@@ -83,7 +86,7 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
          })
          throw error
       }
-   }, [useProxy, livestreamId])
+   }, [livestreamId])
 
    const onChannelMessage = useCallback(
       (message: RtmMessage, memberId: string) => {
@@ -122,20 +125,22 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
             await channel.join()
             channel.on("MemberCountUpdated", onMemberCountUpdated)
             rtmChannel.current = channel
+            dispatch(setSessionRTMFailedToJoin(false))
          } catch (error) {
+            dispatch(setSessionRTMFailedToJoin(true))
             errorLogAndNotify(error, {
                message: "Failed to join Agora RTM channel",
             })
          }
       },
-      [fetchAgoraRtmToken, onChannelMessage, onMemberCountUpdated]
+      [dispatch, fetchAgoraRtmToken, onChannelMessage, onMemberCountUpdated]
    )
 
    useEffect(() => {
       if (roomId && userId) {
          void joinAgoraRtmChannel(roomId, userId).catch(errorLogAndNotify)
       }
-   }, [roomId, userId, joinAgoraRtmChannel, useProxy])
+   }, [roomId, userId, joinAgoraRtmChannel])
 
    const createEmote = useCallback(
       async (emoteType: EmoteType) => {
@@ -167,7 +172,7 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
             try {
                // Order taken from the Agora UI KIt Logout method, works properly without errors now
                await rtmClient.current.logout()
-               await rtmClient.current.removeAllListeners()
+               rtmClient.current.removeAllListeners()
             } catch (e) {
                errorLogAndNotify(e, {
                   message: "Failed to logout of Agora RTM",
@@ -265,6 +270,10 @@ export const useRTM = () => {
       throw new Error("useRTM must be used within a RTMProvider")
    }
    return context
+}
+
+function logRTMEvent(event: string, ...args: any[]) {
+   console.log(`RTM Event: ${event}`, ...args)
 }
 
 export default RTMProvider
