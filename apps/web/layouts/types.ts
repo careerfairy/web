@@ -18,4 +18,5 @@ export type INavLink = {
     * */
    childLinks?: INavLink[]
    rightElement?: ReactNode
+   wrapper?: FC
 }

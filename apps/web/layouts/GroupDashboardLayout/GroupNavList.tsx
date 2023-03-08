@@ -1,17 +1,17 @@
 import React, { useMemo } from "react"
-import DomainIcon from "@mui/icons-material/Domain"
+import { useRouter } from "next/router"
 
 // react feather
 import {
    BarChart2 as AnalyticsIcon,
    Radio as LiveStreamsIcon,
    Sliders as ATSIcon,
-   Users as RolesIcon,
    Home as HomeIcon,
 } from "react-feather"
 
 // material-ui
 import AllLiveStreamsIcon from "@mui/icons-material/HistoryToggleOff"
+import DomainIcon from "@mui/icons-material/Domain"
 import Skeleton from "@mui/material/Skeleton"
 
 // project imports
@@ -21,17 +21,35 @@ import NavList from "../common/NavList"
 import useFeatureFlags from "../../components/custom-hook/useFeatureFlags"
 import ATSStatus from "./ATSStatus"
 import { SuspenseWithBoundary } from "../../components/ErrorBoundary"
+import NewFeatureHint from "../../components/util/NewFeatureHint"
+import { useGroupDashboard } from "./GroupDashboardLayoutProvider"
 
 const baseHrefPath = "group"
 const baseParam = "[groupId]"
 
+// Declare pathnames here if you are using them in multiple places
+const companyPagePathName = `/${baseHrefPath}/${baseParam}/admin/page`
+
 const GroupNavList = () => {
-   const { group } = useGroup()
+   const { group, groupPresenter } = useGroup()
+
+   const { push, pathname } = useRouter()
+
+   const { layout } = useGroupDashboard()
 
    const featureFlags = useFeatureFlags()
 
+   const showCompanyPageCTA = Boolean(
+      !groupPresenter.companyPageIsReady() && // their company page is not ready yet
+         companyPagePathName !== pathname && // they are not on the company page
+         !group.universityCode && // they are not a university
+         !layout.leftDrawerOpen // they are not on mobile
+   )
+
    const navLinks = useMemo(() => {
-      const { id, atsAdminPageFlag } = group
+      // Declare hrefs here if you are using them in multiple places
+      const companyPageHref = `/${baseHrefPath}/${group.id}/admin/page`
+
       const links: INavLink[] = [
          {
             id: "main-page",
@@ -44,12 +62,12 @@ const GroupNavList = () => {
             id: "live-streams",
             title: "Live streams",
             Icon: LiveStreamsIcon,
-            href: `/${baseHrefPath}/${id}/admin/events`,
+            href: `/${baseHrefPath}/${group.id}/admin/events`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/events`,
             childLinks: [
                {
                   id: "all-live-streams",
-                  href: `/${baseHrefPath}/${id}/admin/events/all`,
+                  href: `/${baseHrefPath}/${group.id}/admin/events/all`,
                   pathname: `/${baseHrefPath}/${baseParam}/admin/events/all`,
                   Icon: AllLiveStreamsIcon,
                   title: "All live streams on CareerFairy",
@@ -60,50 +78,70 @@ const GroupNavList = () => {
             id: "company",
             title: "Company",
             Icon: DomainIcon,
-            href: `/${baseHrefPath}/${id}/admin/edit`,
+            href: `/${baseHrefPath}/${group.id}/admin/edit`,
+            wrapper: ({ children }) => (
+               <NewFeatureHint
+                  onClickConfirm={() => push(companyPageHref)}
+                  backDrop
+                  localStorageKey={"has-seen-company-page-cta"}
+                  tooltipTitle="🚀 New feature: Company page!"
+                  placement="right"
+                  hide={showCompanyPageCTA}
+                  tooltipText="We added company pages to CareerFairy. You can now create a dedicated page for your company and share it with your network of talent."
+                  buttonText={"Manage company page"}
+               >
+                  {children}
+               </NewFeatureHint>
+            ),
             childLinks: [
                {
                   id: "general",
-                  href: `/${baseHrefPath}/${id}/admin/edit`,
+                  href: `/${baseHrefPath}/${group.id}/admin/edit`,
                   pathname: `/${baseHrefPath}/${baseParam}/admin/edit`,
                   title: "General",
                },
                {
                   id: "team-members",
-                  href: `/${baseHrefPath}/${id}/admin/roles`,
+                  href: `/${baseHrefPath}/${group.id}/admin/roles`,
                   pathname: `/${baseHrefPath}/${baseParam}/admin/roles`,
                   title: "Team members",
                },
                {
                   id: "page",
-                  href: `/${baseHrefPath}/${id}/admin/page`,
-                  pathname: `/${baseHrefPath}/${baseParam}/admin/page`,
+                  href: companyPageHref,
+                  pathname: companyPagePathName,
                   title: "Company page",
                },
             ],
          },
          {
             id: "analytics",
-            href: `/${baseHrefPath}/${id}/admin/analytics`,
+            href: `/${baseHrefPath}/${group.id}/admin/analytics`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/analytics`,
             Icon: AnalyticsIcon,
             title: "Analytics",
          },
       ]
 
-      if (featureFlags.atsAdminPageFlag || atsAdminPageFlag) {
+      if (featureFlags.atsAdminPageFlag || group.atsAdminPageFlag) {
          links.push({
             id: "ats",
-            href: `/${baseHrefPath}/${id}/admin/ats-integration`,
+            href: `/${baseHrefPath}/${group.id}/admin/ats-integration`,
             pathname: `/${baseHrefPath}/${baseParam}/admin/ats-integration`,
             Icon: ATSIcon,
             title: "ATS integration",
-            rightElement: <SuspensefulATSStatus groupId={id} />,
+            rightElement: <SuspensefulATSStatus groupId={group.id} />,
          })
       }
 
       return links
-   }, [featureFlags.atsAdminPageFlag, group])
+   }, [
+      showCompanyPageCTA,
+      featureFlags.atsAdminPageFlag,
+      group.id,
+      group.atsAdminPageFlag,
+      push,
+   ])
 
    return <NavList links={navLinks} />
 }

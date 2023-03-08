@@ -1,6 +1,7 @@
 import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
 import { Button, Tooltip, Typography } from "@mui/material"
+import clsx from "clsx"
 
 const useStyles = makeStyles((theme) => {
    return {
@@ -42,6 +43,10 @@ const useStyles = makeStyles((theme) => {
          border: "5px solid transparent",
          animation: "$blink 0.7s linear infinite alternate",
       },
+      whiteBackground: {
+         backgroundColor: "white",
+         zIndex: theme.zIndex.tooltip,
+      },
    }
 })
 //
@@ -49,6 +54,7 @@ export const WhiteTooltip = ({
    title,
    children,
    open,
+   backdropEnabled = false,
    style = {},
    ...props
 }) => {
@@ -62,7 +68,13 @@ export const WhiteTooltip = ({
          classes={{ arrow: classes.arrow, tooltip: classes.tooltip }}
          title={title}
       >
-         <div style={style} className={open ? classes.highlight : {}}>
+         <div
+            style={style}
+            className={clsx({
+               [classes.highlight]: open,
+               [classes.whiteBackground]: backdropEnabled,
+            })}
+         >
             {children}
          </div>
       </Tooltip>
@@ -137,12 +149,14 @@ export const StyledTooltipWithButton = ({
    buttonText = "Ok",
    placement = "top",
    onConfirm = () => {},
+   backdropEnabled = false,
    ...rest
 }) => {
    return (
       <WhiteTooltip
          placement={placement}
          open={open}
+         backdropEnabled={backdropEnabled}
          {...rest}
          title={
             <React.Fragment>
