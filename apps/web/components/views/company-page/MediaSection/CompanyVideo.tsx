@@ -3,7 +3,7 @@ import Stack from "@mui/material/Stack"
 import { Typography } from "@mui/material"
 import LoadingButton from "@mui/lab/LoadingButton"
 import AddCircleOutlineIcon from "@mui/icons-material/AddCircleOutline"
-import { useCompanyPage } from "../index"
+import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
 import VideoDialog from "./VideoDialog"
 import VideoComponent from "./VideoComponent"
@@ -19,7 +19,8 @@ const CompanyVideo = () => {
    const hasVideo = !!group?.videos?.length
 
    return (
-      <Stack spacing={2}>
+      <Stack position={"relative"} spacing={2}>
+         <SectionAnchor tabValue={TabValue.video} />
          <Stack
             justifyContent={"space-between"}
             alignItems={"center"}
