@@ -1,5 +1,5 @@
 import { sxStyles } from "../../../../types/commonTypes"
-import { useCompanyPage } from "../index"
+import { SectionAnchor, TabValue, useCompanyPage } from "../index"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import { placeholderBanner } from "../../../../constants/images"
 import BackgroundImage from "../../../views/common/BackgroundImage"
@@ -60,6 +60,7 @@ const BannerIllustration = () => {
 
    return (
       <Box sx={styles.imageWrapper}>
+         <SectionAnchor tabValue={TabValue.banner} />
          {isUploading ? (
             <LinearProgress
                sx={styles.progress}

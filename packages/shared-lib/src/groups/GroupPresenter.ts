@@ -1,5 +1,6 @@
 import {
    Group,
+   GroupOption,
    GroupPhoto,
    GroupQuestion,
    GroupVideo,
@@ -23,6 +24,7 @@ export const BANNER_IMAGE_SPECS = {
 
 export class GroupPresenter {
    public atsAccounts: GroupATSAccount[]
+   public hasLivestream: boolean
 
    constructor(
       public readonly id: string,
@@ -30,6 +32,9 @@ export class GroupPresenter {
       public readonly logoUrl: string,
       public readonly bannerImageUrl: string,
       public readonly extraInfo: string,
+      public readonly companyCountry: GroupOption,
+      public readonly companyIndustry: GroupOption,
+      public readonly companySize: string,
       public readonly videos: GroupVideo[],
       public readonly photos: GroupPhoto[],
       public readonly testimonials: Testimonial[],
@@ -52,6 +57,9 @@ export class GroupPresenter {
          group.logoUrl,
          group.bannerImageUrl,
          group.extraInfo,
+         group.companyCountry ?? null,
+         group.companyIndustry ?? null,
+         group.companySize ?? null,
          group.videos || [],
          group.photos || [],
          group.testimonials || [],
@@ -97,13 +105,111 @@ export class GroupPresenter {
       return `company-pages/${this.id}/banners/${bannerId}`
    }
 
+   setHasLivestream(hasLivestream: boolean) {
+      this.hasLivestream = hasLivestream
+   }
    companyPageIsReady() {
-      return (
-         this.logoUrl &&
-         this.bannerImageUrl &&
-         this.extraInfo &&
-         this.photos.length >= 3 &&
-         this.videos.length > 0
+      return this.getCompanyPageSteps()
+         .filter((action) => action.isInitial)
+         .every((action) => action.checkIsComplete())
+   }
+
+   companyPageIsFullyReady() {
+      return this.getCompanyPageSteps().every((action) =>
+         action.checkIsComplete()
       )
+   }
+
+   getCompanyPageSteps() {
+      const numAdditionalPhotosRemaining =
+         this.photos.length < 6 ? 6 - this.photos.length : 0
+
+      return [
+         {
+            label: "Add company logo and banner",
+            checkIsComplete: () => Boolean(this.logoUrl && this.bannerImageUrl),
+            isInitial: true,
+            section: "banner",
+         },
+         {
+            label: "Describe your company",
+            checkIsComplete: () =>
+               Boolean(
+                  this.extraInfo &&
+                     this.companySize &&
+                     this.companyIndustry &&
+                     this.companyCountry
+               ),
+            isInitial: true,
+            section: "profile",
+         },
+         {
+            label: "Add at least 3 pictures",
+            checkIsComplete: () => this.photos.length >= 3,
+            isInitial: true,
+            section: "photos",
+         },
+         {
+            label: "Upload a video",
+            checkIsComplete: () => this.videos.length > 0,
+            isInitial: true,
+            section: "videos",
+         },
+         {
+            label: "Share an employee’s story",
+            checkIsComplete: () => this.testimonials.length > 0,
+            isInitial: false,
+            section: "testimonials",
+         },
+         {
+            label: "Create a live stream",
+            checkIsComplete: () => this.hasLivestream,
+            isInitial: false,
+            section: "livestreams",
+         },
+         {
+            label: `Add ${numAdditionalPhotosRemaining} more picture${
+               numAdditionalPhotosRemaining > 1 ? "s" : ""
+            }`,
+            checkIsComplete: () => this.photos.length >= 6,
+            isInitial: false,
+            section: "photos",
+         },
+      ] as const
+   }
+
+   getCompanyPageProgress() {
+      const actions = this.getCompanyPageSteps()
+
+      const completedActions = actions.filter((action) =>
+         action.checkIsComplete()
+      )
+
+      const percentage = Math.round(
+         (completedActions.length / actions.length) * 100
+      )
+
+      let currentSteps = [...actions]
+
+      const isReady = this.companyPageIsReady()
+
+      if (isReady) {
+         currentSteps = currentSteps.filter(
+            // Only return the steps that are not completed of the post-initial steps
+            (step) => !step.isInitial && !step.checkIsComplete()
+         )
+      } else {
+         currentSteps = currentSteps.filter(
+            // Only return the steps that are not completed of the initial steps
+            (step) => step.isInitial && !step.checkIsComplete()
+         )
+      }
+
+      return {
+         percentage, // Percentage of the steps that are completed (0-100)
+         currentSteps, // Only return the steps that are not completed
+         isComplete: percentage === 100, // Whether all the steps are completed
+         isReady, // Whether the company page is ready to be viewed by students
+      }
    }
 }
