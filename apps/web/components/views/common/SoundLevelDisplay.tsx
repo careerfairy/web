@@ -23,8 +23,8 @@ function SoundLevelDisplay({ localStream, showSoundMeter }) {
       localStream?.audioTrack?.getMediaStreamTrack()
    )
 
-   const isGreen = (threshHold) => {
-      return audioLevel > threshHold
+   const isGreen = (threshold) => {
+      return audioLevel > threshold
    }
 
    return (

@@ -9,7 +9,6 @@ import { IRemoteStream, LocalStream } from "../../types/streaming"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 
 export interface RtcContextInterface {
-   screenShareStream: ILocalVideoTrack | [ILocalVideoTrack, ILocalAudioTrack]
    remoteStreams: IRemoteStream[]
    demoStreamHandlers: {
       removeDemoStream: () => void
