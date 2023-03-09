@@ -176,7 +176,10 @@ const RTCProvider = ({
       joinAgoraRoomWithPrimaryClient()
 
       return () => void close()
-   }, [close, joinAgoraRoomWithPrimaryClient])
+      // we only want to join exactly once, adding the deps to this hook
+      // will cause the handraise functionality to fail
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
