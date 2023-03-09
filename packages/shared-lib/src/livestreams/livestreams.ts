@@ -267,6 +267,14 @@ export interface RecordingToken extends Identifiable {
    sid: string
 }
 
+export interface RecordingStats extends Identifiable {
+   livestreamId: string
+   livestreamStartDate: Date
+   minutesWatched: number
+   viewers: string[]
+   views: number
+}
+
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
    date: firebase.firestore.Timestamp
    applicationId?: string
