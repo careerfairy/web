@@ -45,7 +45,6 @@ const RTCProvider = ({
    appId,
    isStreamer,
    uid,
-   initialize,
    channel,
    screenSharerId,
    streamMode,
@@ -173,15 +172,11 @@ const RTCProvider = ({
       return leaveAgoraRoom()
    }, [leaveAgoraRoom])
 
-   // @ts-ignore
    useEffect(() => {
-      if (initialize) {
-         joinAgoraRoomWithPrimaryClient()
+      joinAgoraRoomWithPrimaryClient()
 
-         return () => close()
-      }
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [initialize])
+      return () => void close()
+   }, [close, joinAgoraRoomWithPrimaryClient])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
@@ -683,11 +678,7 @@ const RTCProvider = ({
          handleScreenShare,
       ]
    )
-   return (
-      <RTCContext.Provider value={value}>
-         {initialize ? children : null}
-      </RTCContext.Provider>
-   )
+   return <RTCContext.Provider value={value}>{children}</RTCContext.Provider>
 }
 
 export const useRtc = () => {
