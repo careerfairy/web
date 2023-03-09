@@ -11,6 +11,7 @@ import {
    CircularProgress,
    Dialog,
    DialogContent,
+   Grid,
    IconButton,
    List,
    ListItem,
@@ -44,6 +45,8 @@ import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 import Image from "next/image"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
+import { removeDuplicates } from "@careerfairy/firebase-scripts/dist/util/misc"
 
 const styles = sxStyles({
    root: {
@@ -91,6 +94,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
    const firebase = useFirebaseService()
    const dispatch = useDispatch()
    const [recordingSid, setRecordingSid] = useState(null)
+   const [recordingStats, setRecordingStats] = useState(null)
    const [confirmRecordingDialogOpen, setConfirmRecordingDialogOpen] =
       useState(false)
    const [anchorEl, setAnchorEl] = React.useState(null)
@@ -106,18 +110,28 @@ const StreamCard = ({ isUpcoming, stream }) => {
    }, [])
 
    useEffect(() => {
-      const fetchLivestreamRecordingSid = async () => {
+      const fetchLivestreamRecordingInformation = async () => {
          if (stream?.id) {
-            const recordingToken =
-               await livestreamRepo.getLivestreamRecordingToken(stream.id)
+            const results = await Promise.allSettled([
+               livestreamRepo.getLivestreamRecordingToken(stream.id),
+               livestreamRepo.getLivestreamRecordingStats(stream.id),
+            ])
+
+            const [recordingToken, recordingStats] = results
+               .filter((result) => result.status === "fulfilled")
+               .map((result) => result.value)
+
             const recordingSid = recordingToken?.sid
             if (recordingSid) {
                setRecordingSid(recordingSid)
             }
+            if (recordingStats) {
+               setRecordingStats(recordingStats)
+            }
          }
       }
 
-      fetchLivestreamRecordingSid().catch(console.error)
+      fetchLivestreamRecordingInformation().catch(errorLogAndNotify)
    }, [firebase, stream.id])
 
    const handleClick = useCallback((event) => {
@@ -228,7 +242,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                         <MenuItem onClick={handleRegisteredUsersDownload}>
                            Download Registered Users CSV
                         </MenuItem>
-                        {isUpcoming && (
+                        {isUpcoming ? (
                            <>
                               <MenuItem
                                  onClick={() =>
@@ -246,18 +260,18 @@ const StreamCard = ({ isUpcoming, stream }) => {
                                     : "Start recording stream"}
                               </MenuItem>
                            </>
-                        )}
+                        ) : null}
                         {!isUpcoming &&
-                           !stream.hasEnded &&
-                           stream.isRecording && (
-                              <MenuItem
-                                 disabled={recordingRequestOngoing}
-                                 onClick={handleOpenConfirmRecordingDialog}
-                              >
-                                 Stop recording stream
-                              </MenuItem>
-                           )}
-                        {!isUpcoming && recordingSid && (
+                        !stream.hasEnded &&
+                        stream.isRecording ? (
+                           <MenuItem
+                              disabled={recordingRequestOngoing}
+                              onClick={handleOpenConfirmRecordingDialog}
+                           >
+                              Stop recording stream
+                           </MenuItem>
+                        ) : null}
+                        {!isUpcoming && recordingSid ? (
                            <MenuItem
                               component="a"
                               target="_blank"
@@ -270,7 +284,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                            >
                               Download Recording
                            </MenuItem>
-                        )}
+                        ) : null}
                         {stream.isRecording ? (
                            <ConfirmRecordingDialog
                               confirmText="Are you sure that you want to stop recording this live stream?"
@@ -294,51 +308,99 @@ const StreamCard = ({ isUpcoming, stream }) => {
             }
          />
          <CardContent>
-            {(stream.isRecording || recordingSid) && (
+            {stream.isRecording || recordingSid ? (
                <Typography sx={styles.recording}>
                   {stream?.hasEnded ? "Recorded" : "Recording in progress"}
                </Typography>
-            )}
-            <List dense sx={styles.list}>
-               <ListItem>
-                  <ListItemAvatar>
-                     <Avatar>
-                        <RegistrationsIcon />
-                     </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                     primary="Registrations"
-                     secondary={stream.registeredUsers?.length || 0}
-                  />
-               </ListItem>
-               <ListItem>
-                  <ListItemAvatar>
-                     <Avatar>
-                        <ParticipationIcon />
-                     </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText
-                     primary="Participating"
-                     secondary={stream.participatingStudents?.length || 0}
-                  />
-               </ListItem>
-               {stream.hasEnded && (
-                  <ListItem>
-                     <ListItemAvatar>
-                        <Avatar>
-                           <PercentIcon />
-                        </Avatar>
-                     </ListItemAvatar>
-                     <ListItemText
-                        primary="No Show"
-                        secondary={calculateNoShowPercentage(stream) + "%"}
-                     />
-                  </ListItem>
-               )}
-            </List>
+            ) : null}
+            <Grid container>
+               <Grid item xs={6}>
+                  <List dense sx={styles.list}>
+                     <ListItem>
+                        <ListItemAvatar>
+                           <Avatar>
+                              <RegistrationsIcon />
+                           </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                           primary="Registrations"
+                           secondary={stream.registeredUsers?.length || 0}
+                        />
+                     </ListItem>
+                     <ListItem>
+                        <ListItemAvatar>
+                           <Avatar>
+                              <ParticipationIcon />
+                           </Avatar>
+                        </ListItemAvatar>
+                        <ListItemText
+                           primary="Participating"
+                           secondary={stream.participatingStudents?.length || 0}
+                        />
+                     </ListItem>
+                     {stream.hasEnded ? (
+                        <ListItem>
+                           <ListItemAvatar>
+                              <Avatar>
+                                 <PercentIcon />
+                              </Avatar>
+                           </ListItemAvatar>
+                           <ListItemText
+                              primary="No Show"
+                              secondary={
+                                 calculateNoShowPercentage(stream) + "%"
+                              }
+                           />
+                        </ListItem>
+                     ) : null}
+                  </List>
+               </Grid>
+               <Grid item xs={6}>
+                  {stream.hasEnded && recordingStats ? (
+                     <List dense sx={styles.list}>
+                        <ListItem>
+                           <ListItemAvatar>
+                              <Avatar>
+                                 <ParticipationIcon />
+                              </Avatar>
+                           </ListItemAvatar>
+                           <ListItemText
+                              primary="Recording views"
+                              secondary={recordingStats.views}
+                           />
+                        </ListItem>
+                        <ListItem>
+                           <ListItemAvatar>
+                              <Avatar>
+                                 <RegistrationsIcon />
+                              </Avatar>
+                           </ListItemAvatar>
+                           <ListItemText
+                              primary="Recording viewers"
+                              secondary={recordingStats.viewers.length}
+                           />
+                        </ListItem>
+                        <ListItem>
+                           <ListItemAvatar>
+                              <Avatar>
+                                 <PercentIcon />
+                              </Avatar>
+                           </ListItemAvatar>
+                           <ListItemText
+                              primary="Users Reached"
+                              secondary={
+                                 calculateReachedUsers(stream, recordingStats) +
+                                 "%"
+                              }
+                           />
+                        </ListItem>
+                     </List>
+                  ) : null}
+               </Grid>
+            </Grid>
          </CardContent>
          <CardActions>
-            {!stream.hasEnded && (
+            {!stream.hasEnded ? (
                <>
                   <Button
                      variant="contained"
@@ -361,7 +423,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                      Join as streamer
                   </Button>
                </>
-            )}
+            ) : null}
          </CardActions>
          <StreamerLinksDialog
             onClose={handleCloseStreamerLinksDialog}
@@ -425,12 +487,25 @@ function calculateNoShowPercentage(stream) {
    try {
       const noShowUsers =
          stream.registeredUsers?.length - stream.participatingStudents?.length
-      const number = (noShowUsers / stream.registeredUsers?.length) * 100
+      const number = (noShowUsers / stream.registeredUsers?.length) * 100 || 0
 
       return Math.round(number)
    } catch (e) {
       return 0
    }
+}
+
+function calculateReachedUsers(stream, recordingStats) {
+   const numOfRegisteredUsers = stream.registeredUsers?.length
+
+   const reachedUsers = removeDuplicates([
+      ...stream.participatingStudents,
+      ...recordingStats.viewers,
+   ])
+   const reachedUsersPercentage =
+      (reachedUsers.length / numOfRegisteredUsers) * 100 || 0
+
+   return Math.round(reachedUsersPercentage)
 }
 
 StreamCard.propTypes = {
