@@ -67,10 +67,6 @@ export interface RtcPropsInterface {
     * To see if the user can publish video, set this to true. (default: false)
     */
    isStreamer?: boolean
-   /**
-    * Weather or not to initialize the RTC SDK (default: false)
-    */
-   initialize: boolean
    /*
     * The identifier of the user who is currently sharing their screen
     * */
