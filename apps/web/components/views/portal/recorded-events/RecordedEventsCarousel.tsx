@@ -209,12 +209,14 @@ const RecordedEventsCarousel = ({ livestreams }: Props) => {
                               Watch again
                            </Typography>
                            <Typography
-                              variant={"h4"}
+                              variant={
+                                 livestream.title.length > 95 ? "h5" : "h4"
+                              }
                               fontWeight="bold"
                               component="h2"
                               color={"white"}
                               mt={2}
-                              maxWidth={{ xs: "100%", md: "60%" }}
+                              maxWidth={{ xs: "100%", md: "80%", lg: "60%" }}
                            >
                               {livestream.title}
                            </Typography>
