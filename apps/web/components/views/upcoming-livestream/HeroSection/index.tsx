@@ -389,7 +389,7 @@ const HeroSection = ({
                      md={6}
                   >
                      <Typography
-                        variant={stream?.title?.length > 120 ? "h4" : "h2"}
+                        variant={stream?.title?.length > 95 ? "h4" : "h2"}
                         component="h1"
                         sx={styles.title}
                      >
