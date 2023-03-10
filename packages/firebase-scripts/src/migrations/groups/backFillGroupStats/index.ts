@@ -7,9 +7,11 @@ import { DataWithRef } from "../../../util/types"
 import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import { DeepPartial } from "@careerfairy/shared-lib/dist/utils/types"
 import { logAction } from "../../../util/logger"
-import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
+import {
+   createGroupStatsDoc,
+   GroupStats,
+} from "@careerfairy/shared-lib/dist/groups/stats"
 import { merge } from "lodash"
-import { pickPublicDataFromGroup } from "@careerfairy/shared-lib/dist/groups"
 
 const counter = new Counter()
 
@@ -69,7 +71,7 @@ const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
             }
          }
 
-         // Sum up the number of participants and registrations for each group
+         // Sum up the number of participants, registrations and applications for each group
          statsToUpdateDict[groupId].generalStats.numberOfParticipants +=
             stat.generalStats.numberOfParticipants
          statsToUpdateDict[groupId].generalStats.numberOfRegistrations +=
@@ -138,23 +140,27 @@ const handleSaveGroupStatsInFirestore = async () => {
          counter.addToReadCount(2)
 
          if (!group) {
-            Counter.log(`Group with id ${groupId} does not exist`)
+            Counter.log(`Group with id ${groupId} does not exist, skipping...`)
             continue
          }
 
          if (groupStatsSnap.exists) {
-            const groupStats = {
+            const currentGroupStats = {
                ...groupStatsSnap.data(),
                id: groupStatsSnap.id,
             } as GroupStats
 
             // Perform a deep merge of the stats
-            const mergedStats = merge(groupStats, stats) // The stats that are not set by this script will not be overwritten by this merge :)
+            const mergedStats = merge(currentGroupStats, stats) // The stats that are not set by this script will not be overwritten by this merge :)
 
             batch.update(groupStatsRef, mergedStats) // Upsert the stats data
          } else {
-            stats.group = pickPublicDataFromGroup(group)
-            batch.set(groupStatsRef, stats) // Upsert the stats data
+            // Create a new group stats doc
+            const currentGroupStats = createGroupStatsDoc(group, groupStatsId)
+            // Merge the stats with the new group stats doc
+            const mergedStats = merge(currentGroupStats, stats)
+
+            batch.set(groupStatsRef, mergedStats) // Set the new stats data
          }
 
          counter.writeIncrement() // Increment write counter
