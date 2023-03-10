@@ -45,7 +45,6 @@ const RTCProvider = ({
    appId,
    isStreamer,
    uid,
-   initialize,
    channel,
    screenSharerId,
    streamMode,
@@ -173,15 +172,14 @@ const RTCProvider = ({
       return leaveAgoraRoom()
    }, [leaveAgoraRoom])
 
-   // @ts-ignore
    useEffect(() => {
-      if (initialize) {
-         joinAgoraRoomWithPrimaryClient()
+      joinAgoraRoomWithPrimaryClient()
 
-         return () => close()
-      }
+      return () => void close()
+      // we only want to join exactly once, adding the deps to this hook
+      // will cause the handraise functionality to fail
       // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [initialize])
+   }, [])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
@@ -296,7 +294,7 @@ const RTCProvider = ({
    const setLocalAudioEnabled = useCallback(
       async (value) =>
          localStream.audioTrack
-            .setEnabled(value)
+            .setMuted(!value)
             .then(() => {
                setLocalStream((localStream) => ({
                   ...localStream,
@@ -683,11 +681,7 @@ const RTCProvider = ({
          handleScreenShare,
       ]
    )
-   return (
-      <RTCContext.Provider value={value}>
-         {initialize ? children : null}
-      </RTCContext.Provider>
-   )
+   return <RTCContext.Provider value={value}>{children}</RTCContext.Provider>
 }
 
 export const useRtc = () => {
