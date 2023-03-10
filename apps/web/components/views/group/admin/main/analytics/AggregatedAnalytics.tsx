@@ -32,7 +32,7 @@ const AggregatedAnalytics = () => {
       <Grid container spacing={2}>
          <Grid item xs={6} style={styles.gridItem}>
             <CardAnalytic
-               title="Total people reached"
+               title="Talent reached"
                tooltip="Total number of people exposed to your company"
                value={totalPeopleReached(stats)}
             />
@@ -40,7 +40,7 @@ const AggregatedAnalytics = () => {
 
          <Grid item xs={6} style={styles.gridItem}>
             <CardAnalytic
-               title="Total registered users"
+               title="Total registrations"
                tooltip="Total number of registrations to all your streams"
                value={stats?.generalStats?.numberOfRegistrations ?? 0}
             />
@@ -50,7 +50,6 @@ const AggregatedAnalytics = () => {
             {group.atsAdminPageFlag ? (
                <CardAnalytic
                   title="Total applications"
-                  // @ts-ignore TODO: remove this ignore when numberOfApplications field has been added
                   value={stats?.generalStats?.numberOfApplications ?? 0}
                   linkDescription={"Go to applicants"}
                   link={`/group/${group.id}/admin/ats-integration?section=1`}
