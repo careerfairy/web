@@ -113,7 +113,8 @@ export default function useAgoraClientConfig(
           * https://api-ref.agora.io/en/video-sdk/web/4.x/interfaces/iagorartcclient.html#event_user_published
           */
          rtcClient.on("user-published", async (remoteUser, mediaType) => {
-            return rtcClient
+            logRTCEvent("user-published", { remoteUser, mediaType })
+            rtcClient
                .subscribe(remoteUser, mediaType)
                .then(() => {
                   setRemoteStreams((prevRemoteStreams) => {
@@ -165,27 +166,24 @@ export default function useAgoraClientConfig(
           *
           * https://api-ref.agora.io/en/video-sdk/web/4.x/interfaces/iagorartcclient.html#event_user_unpublished
           */
-         rtcClient.on("user-unpublished", async (remoteUser, mediaType) =>
-            rtcClient
-               .unsubscribe(remoteUser, mediaType)
-               .then(() => {
-                  setRemoteStreams((prevRemoteStreams) => {
-                     return prevRemoteStreams.map((user) => {
-                        if (user.uid === remoteUser.uid) {
-                           if (mediaType === "audio") {
-                              user.audioTrack = null
-                              user.audioMuted = true
-                           } else if (mediaType === "video") {
-                              user.videoTrack = null
-                              user.videoMuted = true
-                           }
-                        }
-                        return user
-                     })
-                  })
+         rtcClient.on("user-unpublished", async (remoteUser, mediaType) => {
+            logRTCEvent("user-unpublished", { remoteUser, mediaType })
+
+            setRemoteStreams((prevRemoteStreams) => {
+               return prevRemoteStreams.map((user) => {
+                  if (user.uid === remoteUser.uid) {
+                     if (mediaType === "audio") {
+                        // user.audioTrack = null
+                        user.audioMuted = true
+                     } else if (mediaType === "video") {
+                        user.videoTrack = null
+                        user.videoMuted = true
+                     }
+                  }
+                  return user
                })
-               .catch(handleRtcError)
-         )
+            })
+         })
 
          /**
           * Reports the network quality of the local user.
@@ -196,13 +194,14 @@ export default function useAgoraClientConfig(
           * https://api-ref.agora.io/en/video-sdk/web/4.x/interfaces/iagorartcclient.html#event_network_quality
           */
          rtcClient.on("network-quality", (networkStats) => {
-            const isEqualToCurrentValue =
-               JSON.stringify(networkStats) === JSON.stringify(networkQuality)
+            setNetworkQuality((prev) => {
+               const isEqualToCurrentValue =
+                  JSON.stringify(networkStats) === JSON.stringify(prev)
 
-            // prevent setting unnecessary a new value to avoid re-renders
-            if (!isEqualToCurrentValue) {
-               setNetworkQuality(getQualityObjectReference(networkStats))
-            }
+               logRTCEvent("network-quality inside set", isEqualToCurrentValue)
+               // prevent setting unnecessary a new value to avoid re-renders
+               return isEqualToCurrentValue ? prev : networkStats
+            })
          })
 
          /**
@@ -227,7 +226,7 @@ export default function useAgoraClientConfig(
             logRTCEvent("stream-fallback", { uid, isFallbackOrRecover })
          })
       },
-      [dispatch, handleRtcError, networkQuality]
+      [dispatch, handleRtcError]
    )
 
    useEffect(() => {
@@ -270,25 +269,4 @@ export default function useAgoraClientConfig(
 
 function logRTCEvent(event: string, ...args: any[]) {
    console.log(`RTC Event: ${event}`, ...args)
-}
-
-/**
- * Map that holds pointers to objects
- * By re-using the same object instance, we avoid re-renders
- *
- * The network quality event is always firing and the values switch a lot between 0 and 1
- * 0 => unknown
- * 1 => excellent
- */
-const mapQualityObjectReferences = {}
-
-const getQualityObjectReference = (currentReport: NetworkQuality) => {
-   const key = `${currentReport.downlinkNetworkQuality} - ${currentReport.uplinkNetworkQuality}`
-
-   if (mapQualityObjectReferences[key]) {
-      return mapQualityObjectReferences[key]
-   } else {
-      mapQualityObjectReferences[key] = currentReport
-      return currentReport
-   }
 }
