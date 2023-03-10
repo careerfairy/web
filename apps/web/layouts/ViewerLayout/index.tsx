@@ -140,10 +140,6 @@ const ViewerLayout = (props) => {
          ? "anonymous" + streamerId
          : authenticatedUser.email
 
-   const shouldInitializeAgora = Boolean(
-      currentLivestream?.hasStarted || (userData?.isAdmin && spyModeEnabled)
-   )
-
    useStreamerActiveHandRaisesConnect({ withAll: true })
 
    useEffect(() => {
@@ -407,7 +403,6 @@ const ViewerLayout = (props) => {
          uid={streamerId}
          channel={channelId.toString()}
          appId={agoraCredentials.appID}
-         initialize={shouldInitializeAgora}
          screenSharerId={currentLivestream?.screenSharerId}
          streamMode={currentLivestream?.mode}
          isStreamer={handRaiseActive}
