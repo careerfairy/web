@@ -20,6 +20,7 @@ import {
    mapFirestoreDocuments,
 } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { DataWithRef } from "../util/types"
+import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 
 export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllRegisteredStudents(withRef?: boolean): Promise<RegisteredStudent[]>
@@ -61,6 +62,10 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllRatings(): Promise<DataWithRef<true, EventRating>[]>
 
    getAllVotes(): Promise<DataWithRef<true, EventRatingAnswer>[]>
+
+   getAllLivestreamStats<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, LiveStreamStats>[]>
 }
 
 export class LivestreamScriptsRepository
@@ -204,5 +209,15 @@ export class LivestreamScriptsRepository
       }
 
       return formattedStreams
+   }
+
+   async getAllLivestreamStats(): Promise<
+      DataWithRef<true, LiveStreamStats>[]
+   > {
+      const snaps = await this.firestore
+         .collectionGroup("stats")
+         .where("id", "==", "livestreamStats")
+         .get()
+      return mapFirestoreDocuments<LiveStreamStats, true>(snaps, true)
    }
 }
