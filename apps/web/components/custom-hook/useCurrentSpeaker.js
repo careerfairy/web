@@ -20,6 +20,7 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
          speakerSwitchMode,
          id: streamId,
       },
+      isStreamer,
    } = useCurrentStream()
    const [audioCounter, setAudioCounter] = useState(0)
 
@@ -104,13 +105,13 @@ const useCurrentSpeaker = (localMediaStream, externalMediaStreams) => {
       }
    }, [firestoreCurrentSpeaker])
 
-   const handleChangeCurrentSpeakerId = useCallback(
-      (id, isFallback = false) => {
-         if (isFallback || !id) return setCurrentSpeakerId(id)
+   const handleChangeCurrentSpeakerId = (id, isFallback = false) => {
+      if (isFallback || !id) return setCurrentSpeakerId(id)
+
+      if (isStreamer && id !== firestoreCurrentSpeaker) {
          setLivestreamCurrentSpeakerId(streamRef, id)
-      },
-      [streamRef]
-   )
+      }
+   }
 
    return currentSpeakerId
 }
