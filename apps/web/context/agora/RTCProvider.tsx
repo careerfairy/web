@@ -294,7 +294,7 @@ const RTCProvider = ({
    const setLocalAudioEnabled = useCallback(
       async (value) =>
          localStream.audioTrack
-            .setEnabled(value)
+            .setMuted(!value)
             .then(() => {
                setLocalStream((localStream) => ({
                   ...localStream,

@@ -370,7 +370,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                   streamerId={streamerId}
                   isMainStreamer={false}
                   localStreamIsPublished={localStreamIsPublished}
-                  microphoneMuted={!Boolean(localStream.audioTrack?.enabled)}
+                  microphoneMuted={Boolean(localStream.audioTrack?.muted)}
                   cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
                   openPublishingModal={openPublishModal}
                   viewer={true}
