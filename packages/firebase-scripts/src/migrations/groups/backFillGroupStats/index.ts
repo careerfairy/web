@@ -3,8 +3,8 @@ import { throwMigrationError } from "../../../util/misc"
 import { firestore } from "../../../lib/firebase"
 import { groupRepo, livestreamRepo } from "../../../repositories"
 import { writeProgressBar } from "../../../util/bulkWriter"
-import { DataWithRef } from "../../../util/types"
 import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { DeepPartial } from "@careerfairy/shared-lib/dist/utils/types"
 import { logAction } from "../../../util/logger"
 import {
@@ -12,11 +12,11 @@ import {
    GroupStats,
 } from "@careerfairy/shared-lib/dist/groups/stats"
 import { merge } from "lodash"
+import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 
 const counter = new Counter()
 
 // types
-type LivestreamStatsWithRef = DataWithRef<true, LiveStreamStats>
 type GroupStatsToUpdate = DeepPartial<GroupStats>
 
 // cached globally
@@ -28,18 +28,35 @@ let statsToUpdateDict: Record<
    GroupStatsToUpdate
 > = {}
 const groupStatsId = "groupStats"
+
+let allGroupsDict: Record<string, Group> = {}
+let allGroupStatsDict: Record<string, GroupStats> = {}
+
 export async function run() {
    try {
-      Counter.log("Fetching all livestream stats")
-
-      const stats = await logAction(
-         () => livestreamRepo.getAllLivestreamStats(true),
-         "Fetching all livestream stats"
+      const [stats, groups, groupStats] = await logAction(
+         () =>
+            Promise.all([
+               livestreamRepo.getAllLivestreamStats(true),
+               groupRepo.getAllGroups(),
+               groupRepo.getAllGroupStats(true),
+            ]),
+         "Fetching all livestream stats, group stats and groups"
       )
 
-      Counter.log(`Fetched ${stats.length} livestream stats`)
+      Counter.log(
+         `Fetched ${stats.length} livestream stats, ${groups.length} groups and ${groupStats.length} group stats`
+      )
 
-      counter.addToReadCount(stats.length)
+      counter.addToReadCount(stats.length + groups.length + groupStats.length)
+
+      allGroupsDict = convertDocArrayToDict(groups)
+      allGroupStatsDict = groupStats.reduce((acc, groupStat) => {
+         const groupId = groupStat._ref.parent.parent.id
+         delete groupStat._ref
+         acc[groupId] = groupStat as GroupStats
+         return acc
+      }, {})
 
       sumUpStats(stats)
 
@@ -52,7 +69,7 @@ export async function run() {
    }
 }
 
-const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
+const sumUpStats = (livestreamStats: LiveStreamStats[]) => {
    livestreamStats.forEach((stat) => {
       const groupIds = stat.livestream?.groupIds || []
 
@@ -142,25 +159,16 @@ const handleSaveGroupStatsInFirestore = async () => {
             .collection("stats")
             .doc(groupStatsId)
 
-         // check if group stats exists
-         const [groupStatsSnap, group] = await Promise.all([
-            groupStatsRef.get(),
-            groupRepo.getGroupById(groupId),
-         ])
-
-         counter.addToReadCount(2)
+         const group = allGroupsDict[groupId]
 
          if (!group) {
             Counter.log(`Group with id ${groupId} does not exist, skipping...`)
             continue
          }
 
-         if (groupStatsSnap.exists) {
-            const currentGroupStats = {
-               ...groupStatsSnap.data(),
-               id: groupStatsSnap.id,
-            } as GroupStats
+         const currentGroupStats = allGroupStatsDict[groupId]
 
+         if (currentGroupStats) {
             // Perform a deep merge of the stats
             const mergedStats = merge(currentGroupStats, stats) // The stats that are not set by this script will not be overwritten by this merge :)
 

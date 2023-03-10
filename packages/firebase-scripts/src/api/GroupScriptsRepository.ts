@@ -14,6 +14,8 @@ import {
    FirebaseGroupRepository,
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+import { DataWithRef } from "../util/types"
+import { GroupStats } from "@careerfairy/shared-lib/dist/groups/stats"
 import admin = require("firebase-admin")
 
 export interface IGroupScriptsRepository extends IGroupRepository {
@@ -49,6 +51,10 @@ export interface IGroupScriptsRepository extends IGroupRepository {
       fallbackGroupId: string,
       group?: Group
    ): Promise<void>
+
+   getAllGroupStats<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, GroupStats>[]>
 }
 
 export class GroupScriptsRepository
@@ -176,5 +182,13 @@ export class GroupScriptsRepository
             throw error
          }
       )
+   }
+
+   async getAllGroupStats<T extends boolean>(withRef?: T) {
+      const groupStats = await this.firestore
+         .collectionGroup("stats")
+         .where("id", "==", "groupStats")
+         .get()
+      return mapFirestoreDocuments<GroupStats, T>(groupStats, withRef)
    }
 }
