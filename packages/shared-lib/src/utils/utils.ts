@@ -154,3 +154,11 @@ export const round = (num: number, decimalPlaces: number): number => {
    let f = Math.pow(10, decimalPlaces)
    return Math.round((num + Number.EPSILON) * f) / f
 }
+
+/**
+ * Remove duplicates values
+ * @param arr
+ */
+export const removeDuplicates = (arr: string[]) => {
+   return Array.from(new Set(arr))
+}
