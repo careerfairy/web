@@ -21,9 +21,9 @@ type GroupStatsToUpdate = DeepPartial<GroupStats>
 
 // cached globally
 let statsToUpdateDict: Record<
-   // livestreamId
+   // groupId
    string,
-   // the livestream stats we would like to update, we don't want to overwrite the stats that are not set by this script.
+   // the group stats we would like to update, we don't want to overwrite the stats that are not set by this script.
    // This will allow us to run this script multiple times without overwriting the stats that are already set
    GroupStatsToUpdate
 > = {}
@@ -36,8 +36,11 @@ export async function run() {
          () => livestreamRepo.getAllLivestreamStats(true),
          "Fetching all livestream stats"
       )
+
       Counter.log(`Fetched ${stats.length} livestream stats`)
+
       counter.addToReadCount(stats.length)
+
       sumUpStats(stats)
 
       await handleSaveGroupStatsInFirestore()
