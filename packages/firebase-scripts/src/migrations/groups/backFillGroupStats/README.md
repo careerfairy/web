@@ -1,16 +1,12 @@
-# Back-fill Live Stream Stats
+# Back-fill Group Stats
 
-Will fetch all the userLivestreamData and aggregate their stats in memory.
-Once aggregated in memory, it will SET the stats for each livestream in batches of 200.
-The script is designed to be run multiple times in case it fails or times out.
-It will only update the specific stats as opposed to overwriting the entire stats object.
+Will fetch all the livestream stats in memory, loop through all the connected groups and
+sum up the stats for each group. The stats that are not set by this script will not be overwritten by this merge :).
 
-### Stats that are updated (general and per university code):
+### Group Stats that are updated (general and per university code):
 
 -  numberOfParticipants
 -  numberOfRegistrations
--  numberOfTalentPoolProfiles
--  numberOfApplicants
 
 ## Run
 
