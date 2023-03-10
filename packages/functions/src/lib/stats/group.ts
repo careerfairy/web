@@ -47,6 +47,14 @@ export const addGroupStatsOperations = (
       getAValidGroupStatsUpdateField("numberOfParticipants", universityCode)
    )
 
+   // Add operations for applications to events
+   addOperationWithNumberCheck(
+      newStatsObject?.numberOfApplicants || 0,
+      oldStatsObject?.numberOfApplicants || 0,
+      operationsToMakeObject,
+      getAValidGroupStatsUpdateField("numberOfApplicants", universityCode)
+   )
+
    if (!universityCode) {
       const allPossibleUniversityCodes = Object.keys(
          Object.assign(

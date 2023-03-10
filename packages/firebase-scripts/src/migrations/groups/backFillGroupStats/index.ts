@@ -28,7 +28,7 @@ let statsToUpdateDict: Record<
 const groupStatsId = "groupStats"
 export async function run() {
    try {
-      Counter.log("Fetching all livestreams and user livestream data")
+      Counter.log("Fetching all livestream stats")
 
       const stats = await logAction(
          () => livestreamRepo.getAllLivestreamStats(true),
@@ -61,6 +61,7 @@ const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
                generalStats: {
                   numberOfParticipants: 0,
                   numberOfRegistrations: 0,
+                  numberOfApplicants: 0,
                   // numberOfPeopleReached: 0, - we don't want to overwrite this
                   // numberOfPeopleReachedCompanyPage: 0, - we don't want to overwrite this
                },
@@ -74,17 +75,21 @@ const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
          statsToUpdateDict[groupId].generalStats.numberOfRegistrations +=
             stat.generalStats.numberOfRegistrations
 
+         statsToUpdateDict[groupId].generalStats.numberOfApplicants +=
+            stat.generalStats.numberOfApplicants
+
          Object.keys(stat.universityStats).forEach((universityCode) => {
             if (!statsToUpdateDict[groupId].universityStats[universityCode]) {
                statsToUpdateDict[groupId].universityStats[universityCode] = {
                   numberOfRegistrations: 0,
                   numberOfParticipants: 0,
+                  numberOfApplicants: 0,
                   // numberOfPeopleReached: 0, - we don't want to overwrite this
                   // numberOfPeopleReachedCompanyPage: 0 - we don't want to overwrite this
                }
             }
 
-            // Sum up the number of participants and registrations for each university
+            // Sum up the number of participants, registrations, applications for each university
             statsToUpdateDict[groupId].universityStats[
                universityCode
             ].numberOfParticipants +=
@@ -93,6 +98,10 @@ const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
                universityCode
             ].numberOfRegistrations +=
                stat.universityStats[universityCode].numberOfRegistrations
+            statsToUpdateDict[groupId].universityStats[
+               universityCode
+            ].numberOfApplicants +=
+               stat.universityStats[universityCode].numberOfApplicants
          })
       })
    })
@@ -125,6 +134,8 @@ const handleSaveGroupStatsInFirestore = async () => {
             groupStatsRef.get(),
             groupRepo.getGroupById(groupId),
          ])
+
+         counter.addToReadCount(2)
 
          if (!group) {
             Counter.log(`Group with id ${groupId} does not exist`)

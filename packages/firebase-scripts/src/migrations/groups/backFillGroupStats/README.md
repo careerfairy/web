@@ -7,6 +7,7 @@ sum up the stats for each group. The stats that are not set by this script will 
 
 -  numberOfParticipants
 -  numberOfRegistrations
+-  numberOfApplications
 
 ## Run
 

@@ -50,8 +50,7 @@ const AggregatedAnalytics = () => {
             {group.atsAdminPageFlag ? (
                <CardAnalytic
                   title="Total applications"
-                  // @ts-ignore TODO: remove this ignore when numberOfApplications field has been added
-                  value={stats?.generalStats?.numberOfApplications ?? 0}
+                  value={stats?.generalStats?.numberOfApplicants ?? 0}
                   linkDescription={"Go to applicants"}
                   link={`/group/${group.id}/admin/ats-integration?section=1`}
                />
