@@ -77,7 +77,7 @@
                "type": "string"
             },
             {
-               "name": "uuid",
+               "name": "uid",
                "type": "string"
             },
             {

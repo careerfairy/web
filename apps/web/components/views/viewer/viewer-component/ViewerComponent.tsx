@@ -100,10 +100,6 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
       )
    )
 
-   const shouldInitializeAgora = Boolean(
-      currentLivestream.hasStarted || (userData?.isAdmin && spyModeEnabled)
-   )
-
    const {
       networkQuality,
       localStream,
@@ -321,7 +317,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
             livestreamId={currentLivestream.id}
             viewer
          />
-         {shouldInitializeAgora && <AgoraStateHandler />}
+         <AgoraStateHandler />
          {Boolean(showLocalStreamPublishingModal) && (
             <StreamPublishingModal
                showSoundMeter={Boolean(
@@ -374,7 +370,7 @@ const ViewerComponent = ({ handRaiseActive, showMenu }: Props) => {
                   streamerId={streamerId}
                   isMainStreamer={false}
                   localStreamIsPublished={localStreamIsPublished}
-                  microphoneMuted={!Boolean(localStream.audioTrack?.enabled)}
+                  microphoneMuted={Boolean(localStream.audioTrack?.muted)}
                   cameraInactive={!Boolean(localStream.videoTrack?.enabled)}
                   openPublishingModal={openPublishModal}
                   viewer={true}
