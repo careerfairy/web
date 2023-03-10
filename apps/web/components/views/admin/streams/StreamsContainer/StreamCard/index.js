@@ -42,11 +42,13 @@ import PercentIcon from "@mui/icons-material/Percent"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import { format } from "date-fns"
 import { livestreamRepo } from "../../../../../../data/RepositoryInstances"
-import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
+import {
+   dynamicSort,
+   removeDuplicates,
+} from "@careerfairy/shared-lib/dist/utils"
 import Image from "next/image"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { errorLogAndNotify } from "../../../../../../util/CommonUtil"
-import { removeDuplicates } from "@careerfairy/firebase-scripts/dist/util/misc"
 
 const styles = sxStyles({
    root: {
