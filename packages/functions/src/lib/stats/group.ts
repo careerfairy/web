@@ -52,7 +52,7 @@ export const addGroupStatsOperations = (
       newStatsObject?.numberOfApplicants || 0,
       oldStatsObject?.numberOfApplicants || 0,
       operationsToMakeObject,
-      getAValidGroupStatsUpdateField("numberOfApplicants", universityCode)
+      getAValidGroupStatsUpdateField("numberOfApplications", universityCode)
    )
 
    if (!universityCode) {

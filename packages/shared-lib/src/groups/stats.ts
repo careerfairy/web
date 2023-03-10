@@ -26,7 +26,7 @@ export const createGroupStatsDoc = <T extends string>(
          numberOfPeopleReached: 0,
          numberOfRegistrations: 0,
          numberOfPeopleReachedCompanyPage: 0,
-         numberOfApplicants: 0,
+         numberOfApplications: 0,
       },
       universityStats: {},
    }
@@ -41,8 +41,8 @@ export type GroupStatsMap = {
    numberOfParticipants: number
    // Total number of people reached by the company page of the group
    numberOfPeopleReachedCompanyPage: number
-   // Total number of people who have applied to events of the group
-   numberOfApplicants: number
+   // Total number of applications to events of the group
+   numberOfApplications: number
 }
 
 export const getAValidGroupStatsUpdateField = <TUniCode extends string>(

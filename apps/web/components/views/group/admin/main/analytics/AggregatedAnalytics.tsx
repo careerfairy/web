@@ -50,7 +50,7 @@ const AggregatedAnalytics = () => {
             {group.atsAdminPageFlag ? (
                <CardAnalytic
                   title="Total applications"
-                  value={stats?.generalStats?.numberOfApplicants ?? 0}
+                  value={stats?.generalStats?.numberOfApplications ?? 0}
                   linkDescription={"Go to applicants"}
                   link={`/group/${group.id}/admin/ats-integration?section=1`}
                />

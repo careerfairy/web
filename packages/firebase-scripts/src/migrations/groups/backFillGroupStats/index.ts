@@ -70,8 +70,8 @@ export async function run() {
 }
 
 const sumUpStats = (livestreamStats: LiveStreamStats[]) => {
-   livestreamStats.forEach((stat) => {
-      const groupIds = stat.livestream?.groupIds || []
+   livestreamStats.forEach((livestreamStat) => {
+      const groupIds = livestreamStat.livestream?.groupIds || []
 
       groupIds.forEach((groupId) => {
          if (!statsToUpdateDict[groupId]) {
@@ -83,7 +83,7 @@ const sumUpStats = (livestreamStats: LiveStreamStats[]) => {
                generalStats: {
                   numberOfParticipants: 0,
                   numberOfRegistrations: 0,
-                  numberOfApplicants: 0,
+                  numberOfApplications: 0,
                   numberOfPeopleReached: 0,
                   // numberOfPeopleReachedCompanyPage: 0, - we don't want to overwrite this
                },
@@ -93,46 +93,58 @@ const sumUpStats = (livestreamStats: LiveStreamStats[]) => {
 
          // Sum up the number of participants, registrations, applications and number of people reached  for each group
          statsToUpdateDict[groupId].generalStats.numberOfParticipants +=
-            stat.generalStats.numberOfParticipants
+            livestreamStat.generalStats.numberOfParticipants
          statsToUpdateDict[groupId].generalStats.numberOfRegistrations +=
-            stat.generalStats.numberOfRegistrations
-         statsToUpdateDict[groupId].generalStats.numberOfApplicants +=
-            stat.generalStats.numberOfApplicants
+            livestreamStat.generalStats.numberOfRegistrations
+         statsToUpdateDict[groupId].generalStats.numberOfApplications +=
+            livestreamStat.generalStats.numberOfApplicants
          statsToUpdateDict[groupId].generalStats.numberOfPeopleReached +=
-            stat.generalStats.numberOfPeopleReached
+            livestreamStat.generalStats.numberOfPeopleReached
 
-         Object.keys(stat.universityStats).forEach((universityCode) => {
-            if (!statsToUpdateDict[groupId].universityStats[universityCode]) {
-               statsToUpdateDict[groupId].universityStats[universityCode] = {
-                  numberOfRegistrations: 0,
-                  numberOfParticipants: 0,
-                  numberOfApplicants: 0,
-                  numberOfPeopleReached: 0,
-                  // numberOfPeopleReachedCompanyPage: 0 - we don't want to overwrite this
+         Object.keys(livestreamStat.universityStats).forEach(
+            (universityCode) => {
+               if (
+                  !statsToUpdateDict[groupId].universityStats[universityCode]
+               ) {
+                  statsToUpdateDict[groupId].universityStats[universityCode] = {
+                     numberOfRegistrations: 0,
+                     numberOfParticipants: 0,
+                     numberOfApplications: 0,
+                     numberOfPeopleReached: 0,
+                     // numberOfPeopleReachedCompanyPage: 0 - we don't want to overwrite this
+                  }
                }
+
+               // Sum up the number of participants, registrations, applications and number of people reached for each university
+               statsToUpdateDict[groupId].universityStats[
+                  universityCode
+               ].numberOfParticipants +=
+                  livestreamStat.universityStats[
+                     universityCode
+                  ].numberOfParticipants
+
+               statsToUpdateDict[groupId].universityStats[
+                  universityCode
+               ].numberOfRegistrations +=
+                  livestreamStat.universityStats[
+                     universityCode
+                  ].numberOfRegistrations
+
+               statsToUpdateDict[groupId].universityStats[
+                  universityCode
+               ].numberOfApplications +=
+                  livestreamStat.universityStats[
+                     universityCode
+                  ].numberOfApplicants
+
+               statsToUpdateDict[groupId].universityStats[
+                  universityCode
+               ].numberOfPeopleReached +=
+                  livestreamStat.universityStats[
+                     universityCode
+                  ].numberOfPeopleReached
             }
-
-            // Sum up the number of participants, registrations, applications and number of people reached for each university
-            statsToUpdateDict[groupId].universityStats[
-               universityCode
-            ].numberOfParticipants +=
-               stat.universityStats[universityCode].numberOfParticipants
-
-            statsToUpdateDict[groupId].universityStats[
-               universityCode
-            ].numberOfRegistrations +=
-               stat.universityStats[universityCode].numberOfRegistrations
-
-            statsToUpdateDict[groupId].universityStats[
-               universityCode
-            ].numberOfApplicants +=
-               stat.universityStats[universityCode].numberOfApplicants
-
-            statsToUpdateDict[groupId].universityStats[
-               universityCode
-            ].numberOfPeopleReached +=
-               stat.universityStats[universityCode].numberOfPeopleReached
-         })
+         )
       })
    })
 }
