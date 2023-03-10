@@ -501,8 +501,8 @@ function calculateReachedUsers(stream, recordingStats) {
    const numOfRegisteredUsers = stream.registeredUsers?.length
 
    const reachedUsers = removeDuplicates([
-      ...stream.participatingStudents,
-      ...recordingStats.viewers,
+      ...(stream?.participatingStudents || []),
+      ...(recordingStats?.viewers || []),
    ])
    const reachedUsersPercentage =
       (reachedUsers.length / numOfRegisteredUsers) * 100 || 0
