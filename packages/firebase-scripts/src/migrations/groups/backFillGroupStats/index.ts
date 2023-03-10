@@ -67,21 +67,22 @@ const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
                   numberOfParticipants: 0,
                   numberOfRegistrations: 0,
                   numberOfApplicants: 0,
-                  // numberOfPeopleReached: 0, - we don't want to overwrite this
+                  numberOfPeopleReached: 0,
                   // numberOfPeopleReachedCompanyPage: 0, - we don't want to overwrite this
                },
                universityStats: {},
             }
          }
 
-         // Sum up the number of participants, registrations and applications for each group
+         // Sum up the number of participants, registrations, applications and number of people reached  for each group
          statsToUpdateDict[groupId].generalStats.numberOfParticipants +=
             stat.generalStats.numberOfParticipants
          statsToUpdateDict[groupId].generalStats.numberOfRegistrations +=
             stat.generalStats.numberOfRegistrations
-
          statsToUpdateDict[groupId].generalStats.numberOfApplicants +=
             stat.generalStats.numberOfApplicants
+         statsToUpdateDict[groupId].generalStats.numberOfPeopleReached +=
+            stat.generalStats.numberOfPeopleReached
 
          Object.keys(stat.universityStats).forEach((universityCode) => {
             if (!statsToUpdateDict[groupId].universityStats[universityCode]) {
@@ -89,24 +90,31 @@ const sumUpStats = (livestreamStats: LivestreamStatsWithRef[]) => {
                   numberOfRegistrations: 0,
                   numberOfParticipants: 0,
                   numberOfApplicants: 0,
-                  // numberOfPeopleReached: 0, - we don't want to overwrite this
+                  numberOfPeopleReached: 0,
                   // numberOfPeopleReachedCompanyPage: 0 - we don't want to overwrite this
                }
             }
 
-            // Sum up the number of participants, registrations, applications for each university
+            // Sum up the number of participants, registrations, applications and number of people reached for each university
             statsToUpdateDict[groupId].universityStats[
                universityCode
             ].numberOfParticipants +=
                stat.universityStats[universityCode].numberOfParticipants
+
             statsToUpdateDict[groupId].universityStats[
                universityCode
             ].numberOfRegistrations +=
                stat.universityStats[universityCode].numberOfRegistrations
+
             statsToUpdateDict[groupId].universityStats[
                universityCode
             ].numberOfApplicants +=
                stat.universityStats[universityCode].numberOfApplicants
+
+            statsToUpdateDict[groupId].universityStats[
+               universityCode
+            ].numberOfPeopleReached +=
+               stat.universityStats[universityCode].numberOfPeopleReached
          })
       })
    })
