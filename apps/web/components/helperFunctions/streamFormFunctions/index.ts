@@ -202,8 +202,11 @@ export const validateStreamForm = (
    if (!values.summary) {
       errors.summary = "Required"
    }
-   if (!values.reasonsToJoinLivestream) {
-      errors.reasonsToJoinLivestream = "Required"
+   if (
+      !values.reasonsToJoinLivestream ||
+      values.reasonsToJoinLivestream.trim().length < 20
+   ) {
+      errors.reasonsToJoinLivestream = "Minimum of 20 characters"
    }
 
    const now = new Date()

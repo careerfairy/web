@@ -110,7 +110,7 @@ const AboutSection = ({
                </Fade>
             ) : null}
 
-            {reasonsToJoinLivestream?.length ? (
+            {reasonsToJoinLivestream?.trim()?.length ? (
                <Box width={"100%"} mt={6}>
                   <Fade fraction={forceReveal ? 0 : 0.2} bottom>
                      <Box>
