@@ -154,3 +154,10 @@ export const round = (num: number, decimalPlaces: number): number => {
    let f = Math.pow(10, decimalPlaces)
    return Math.round((num + Number.EPSILON) * f) / f
 }
+
+/**
+ * To check if some values of one array is contained in another
+ */
+export const containsAny = (source: string[], target: string[]): boolean => {
+   return source?.some((item) => target?.includes(item))
+}
