@@ -46,6 +46,9 @@ export enum FilterEnum {
    interests = "interests",
    jobCheck = "jobCheck",
    search = "search",
+   companyCountries = "companyCountries",
+   companySizes = "companySizes",
+   companyIndustries = "companyIndustries",
 }
 
 type Props = {
@@ -69,7 +72,10 @@ const Filter = ({ filtersToShow }: Props) => {
          query.interests ||
          query.date ||
          query.jobCheck ||
-         query.languages
+         query.languages ||
+         query.companyCountries ||
+         query.companySizes ||
+         query.companyIndustries
    )
    const handleOpenFilterMenu = (
       event: React.MouseEvent<HTMLButtonElement>
