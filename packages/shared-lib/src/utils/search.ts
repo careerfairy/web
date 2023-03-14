@@ -1,4 +1,4 @@
-import { LivestreamEvent } from "../livestreams"
+import { LivestreamEvent, LivestreamEventPublicData } from "../livestreams"
 
 /**
  * Generates a ngram array from a string for a given n
@@ -47,7 +47,7 @@ export const triGrams = (str: string | string[]): string[] => {
  * will be out of date and a migration is required to update them.
  */
 export const livestreamTriGrams = (
-   livestream: LivestreamEvent
+   livestream: LivestreamEvent | LivestreamEventPublicData
 ): Record<string, true> => {
    const ngrams = triGrams([livestream.title, livestream.company])
 
