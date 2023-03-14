@@ -1,3 +1,5 @@
+import { LivestreamEvent } from "../livestreams"
+
 /**
  * Generates a ngram array from a string for a given n
  * Will lowercase the characters and remove any non-alphanumeric characters
@@ -34,4 +36,23 @@ export const triGrams = (str: string | string[]): string[] => {
       .slice(0, 500)
 
    return ngrams(parsed, 3)
+}
+
+/**
+ * Generates a trigram map from a livestream event based on the it's title
+ * and company name.
+ *
+ * Caution: if you change the way the trigrams are calculated
+ * or concatenate a new field, all the existing trigrams (on the documents)
+ * will be out of date and a migration is required to update them.
+ */
+export const livestreamTriGrams = (
+   livestream: LivestreamEvent
+): Record<string, true> => {
+   const ngrams = triGrams([livestream.title, livestream.company])
+
+   return ngrams.reduce((acc, triGram) => {
+      acc[triGram] = true
+      return acc
+   }, {})
 }
