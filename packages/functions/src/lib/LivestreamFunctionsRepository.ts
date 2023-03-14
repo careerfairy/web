@@ -34,7 +34,6 @@ import {
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
 import type { FunctionsLogger } from "../util"
-import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**

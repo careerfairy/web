@@ -622,6 +622,7 @@ export class FirebaseLivestreamRepository
          language: event.language || null,
          type: event.type || null,
          universities: event.universities || [],
+         triGrams: event.triGrams || {},
       }
    }
 
