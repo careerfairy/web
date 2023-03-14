@@ -156,7 +156,7 @@ export const round = (num: number, decimalPlaces: number): number => {
 }
 
 /**
- * To check if some values of one array is contained in another
+ * To check if some values of one array are contained in another array
  */
 export const containsAny = (source: string[], target: string[]): boolean => {
    return source?.some((item) => target?.includes(item))
