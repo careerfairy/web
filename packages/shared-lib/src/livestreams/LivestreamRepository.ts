@@ -20,7 +20,7 @@ import {
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
-import { chunkArray } from "../utils"
+import { chunkArray, containsAny } from "../utils"
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
@@ -257,15 +257,13 @@ export class FirebaseLivestreamRepository
       limit = 1,
       fromDate = new Date()
    ): firebase.firestore.Query {
-      let query = this.firestore
+      return this.firestore
          .collection("livestreams")
          .where("start", ">", fromDate)
          .where("test", "==", false)
          .where("groupIds", "array-contains", groupId)
          .limit(limit)
          .orderBy("start", "asc")
-
-      return query
    }
 
    async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
@@ -937,6 +935,30 @@ export class LivestreamsDataParser {
       this.livestreams = this.livestreams?.filter(({ language }) =>
          languagesIds.includes(language.code)
       )
+      return this
+   }
+
+   filterByCompanyCountry(companyCountriesIds: string[]) {
+      this.livestreams = this.livestreams?.filter(({ companyCountries }) =>
+         containsAny(companyCountries, companyCountriesIds)
+      )
+
+      return this
+   }
+
+   filterByCompanyIndustry(companyIndustryIds: string[]) {
+      this.livestreams = this.livestreams?.filter(({ companyIndustries }) =>
+         containsAny(companyIndustries, companyIndustryIds)
+      )
+
+      return this
+   }
+
+   filterByCompanySize(companySize: string[]) {
+      this.livestreams = this.livestreams?.filter(({ companySizes }) =>
+         containsAny(companySizes, companySize)
+      )
+
       return this
    }
 

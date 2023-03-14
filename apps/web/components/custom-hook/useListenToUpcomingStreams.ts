@@ -9,10 +9,21 @@ type Props = {
    languagesIds?: string[]
    interestsIds?: string[]
    jobCheck?: boolean
+   companyCountriesIds?: string[]
+   companySizes?: string[]
+   companyIndustriesIds?: string[]
 }
 
 const useListenToUpcomingStreams = (props?: Props) => {
-   const { filterByGroupId, languagesIds, interestsIds, jobCheck } = props
+   const {
+      filterByGroupId,
+      languagesIds,
+      interestsIds,
+      jobCheck,
+      companyCountriesIds,
+      companySizes,
+      companyIndustriesIds,
+   } = props
 
    const upcomingEventsQuery = useMemo(() => {
       let query = livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
@@ -45,6 +56,19 @@ const useListenToUpcomingStreams = (props?: Props) => {
 
    if (jobCheck) {
       res = res.filterByHasJobs()
+   }
+
+   // needs to filter company metadata on client side since firebase can not do multiple "array-contains-any" on the same query
+   if (companyCountriesIds) {
+      res = res.filterByCompanyCountry(companyCountriesIds)
+   }
+
+   if (companyIndustriesIds) {
+      res = res.filterByCompanyIndustry(companyIndustriesIds)
+   }
+
+   if (companySizes) {
+      res = res.filterByCompanySize(companySizes)
    }
 
    // only do this filter on client side if any interests IDs filter
