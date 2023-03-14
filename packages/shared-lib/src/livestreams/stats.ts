@@ -4,6 +4,7 @@ import {
    LivestreamEventPublicData,
    pickPublicDataFromLivestream,
 } from "./livestreams"
+import { FlattenPaths } from "../utils/types"
 
 // Document Path: livestreams/{livestreamId}/stats/livestreamStats
 export interface LiveStreamStats extends Identifiable {
@@ -26,6 +27,14 @@ export interface LiveStreamStats extends Identifiable {
       // The numberOfPeopleReached will be zero because it is not relevant for the university stats
       [universityCode: string]: LivestreamStatsMap
    }
+   countryStats: {
+      // The key is the country code, and the value is the stats for that country
+      [countryCode: string]: LivestreamStatsMap
+   }
+   fieldOfStudyStats: {
+      // The key is the field of study, and the value is the stats for that field of study
+      [fieldOfStudyId: string]: LivestreamStatsMap
+   }
 }
 
 export const createLiveStreamStatsDoc = (
@@ -43,6 +52,8 @@ export const createLiveStreamStatsDoc = (
          numberOfTalentPoolProfiles: 0,
       },
       universityStats: {},
+      countryStats: {},
+      fieldOfStudyStats: {},
    }
 }
 
@@ -74,20 +85,37 @@ export type LivestreamStatsRatingMap = {
    averageRating: number
 }
 
-export const getAValidLivestreamStatsUpdateField = <TUniCode extends string>(
-   field: keyof LivestreamStatsMap,
-   universityCode?: TUniCode
-):
-   | `${keyof Pick<
-        LiveStreamStats,
-        "universityStats"
-     >}.${TUniCode}.${keyof LivestreamStatsMap}`
-   | `${keyof Pick<
-        LiveStreamStats,
-        "generalStats"
-     >}.${keyof LivestreamStatsMap}` => {
-   if (universityCode) {
-      return `universityStats.${universityCode}.${field}` as const
+export type NestedObjectOptions = {
+   statsObjectKey?: keyof Pick<
+      LiveStreamStats,
+      "universityStats" | "fieldOfStudyStats" | "countryStats"
+   >
+   statsObjectProperty?: string
+}
+
+/**
+ * The properties on the LiveStreamStats object that are maps of stats
+ */
+export type LivestreamStatsMapKey = keyof Pick<
+   LiveStreamStats,
+   "universityStats" | "fieldOfStudyStats" | "countryStats"
+>
+
+type AllPossibleLivestreamStatsPaths = FlattenPaths<LiveStreamStats> // "generalStats.numberOfPeopleReached" | "universityStats.123.numberOfPeopleReached"
+
+export type LivestreamStatsKey = keyof LivestreamStatsMap
+export const getAValidLivestreamStatsUpdateField = (
+   field: keyof LiveStreamStats[LivestreamStatsMapKey][string],
+   options?: NestedObjectOptions
+): Extract<
+   AllPossibleLivestreamStatsPaths,
+   | `universityStats.${string}.${LivestreamStatsKey}`
+   | `fieldOfStudyStats.${string}.${LivestreamStatsKey}`
+   | `countryStats.${string}.${LivestreamStatsKey}`
+   | `generalStats.${LivestreamStatsKey}`
+> => {
+   if (options) {
+      return `${options.statsObjectKey}.${options.statsObjectProperty}.${field}` as const
    }
    return `generalStats.${field}` as const
 }

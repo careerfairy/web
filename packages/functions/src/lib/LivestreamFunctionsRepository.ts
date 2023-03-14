@@ -17,22 +17,18 @@ import {
    PopularityEventData,
 } from "@careerfairy/shared-lib/livestreams/popularity"
 import type { OperationsToMake } from "./stats/util"
+import type { Change } from "firebase-functions"
 import * as functions from "firebase-functions"
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
 } from "@careerfairy/shared-lib/livestreams/stats"
-import type { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
 import { isEmpty } from "lodash"
-import {
-   addOperations,
-   addOperationsToDecrementOldUniversityStats,
-   addOperationsToIncrementNewUniversityStats,
-} from "./stats/livestream"
+import { addOperations } from "./stats/livestream"
+import type { FunctionsLogger } from "../util"
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
-import type { FunctionsLogger } from "../util"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -206,10 +202,9 @@ export class LivestreamFunctionsRepository
          .get()
 
       if (!querySnapshot.empty) {
-         const nonAttendeesUsers = querySnapshot.docs?.map(
+         return querySnapshot.docs?.map(
             (doc) => doc.data() as UserLivestreamData
          )
-         return nonAttendeesUsers
       }
 
       return []
@@ -288,40 +283,6 @@ export class LivestreamFunctionsRepository
          oldUserLivestreamData,
          livestreamStatsDocOperationsToMake
       )
-
-      const newUniversityCode = newUserLivestreamData?.user?.university?.code
-      const oldUniversityCode = oldUserLivestreamData?.user?.university?.code
-
-      // Check if the university code has been changed
-      const universityChanged = newUniversityCode !== oldUniversityCode
-
-      if (universityChanged) {
-         if (oldUniversityCode) {
-            // Decrement all the truthy fields of the oldUserLivestreamData
-            addOperationsToDecrementOldUniversityStats(
-               oldUniversityCode,
-               oldUserLivestreamData,
-               livestreamStatsDocOperationsToMake
-            )
-         }
-
-         if (newUniversityCode) {
-            // Increment all the truthy fields of newUserLivestreamData like participated.date, registered.date, talentPool.date, etc...
-            addOperationsToIncrementNewUniversityStats(
-               newUniversityCode,
-               newUserLivestreamData,
-               livestreamStatsDocOperationsToMake
-            )
-         }
-      } else {
-         // If the university code has not been changed, then increment/decrement the fields that have changed for the user's university
-         addOperations(
-            newUserLivestreamData,
-            oldUserLivestreamData,
-            livestreamStatsDocOperationsToMake,
-            newUniversityCode
-         )
-      }
 
       // Check if there are any updates to livestreamStats
       if (isEmpty(livestreamStatsDocOperationsToMake)) {

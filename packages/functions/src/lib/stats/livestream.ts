@@ -4,7 +4,11 @@ import {
    addOperationWithNumberCheck,
    OperationsToMake,
 } from "./util"
-import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/livestreams/stats"
+import {
+   getAValidLivestreamStatsUpdateField,
+   LivestreamStatsMapKey,
+   NestedObjectOptions,
+} from "@careerfairy/shared-lib/livestreams/stats"
 
 /**
  * This function checks which fields of the newData and oldData are different and updates the operationsToMakeObject accordingly.
@@ -13,13 +17,13 @@ import { getAValidLivestreamStatsUpdateField } from "@careerfairy/shared-lib/liv
  * @param newData The new data of the document
  * @param oldData The old data of the document
  * @param operationsToMakeObject The object that will be updated with the operations to make
- * @param universityCode The university code to update the operationsToMakeObject for
+ * @param nestedObjectOptions
  * */
 export const addOperations = (
    newData: UserLivestreamData,
    oldData: UserLivestreamData,
    operationsToMakeObject: OperationsToMake,
-   universityCode?: string
+   nestedObjectOptions?: NestedObjectOptions
 ) => {
    addOperationWithBooleanCheck(
       Boolean(newData?.participated?.date),
@@ -27,7 +31,7 @@ export const addOperations = (
       operationsToMakeObject,
       getAValidLivestreamStatsUpdateField(
          "numberOfParticipants",
-         universityCode
+         nestedObjectOptions
       )
    )
 
@@ -38,7 +42,7 @@ export const addOperations = (
       operationsToMakeObject,
       getAValidLivestreamStatsUpdateField(
          "numberOfRegistrations",
-         universityCode
+         nestedObjectOptions
       )
    )
 
@@ -49,7 +53,7 @@ export const addOperations = (
       operationsToMakeObject,
       getAValidLivestreamStatsUpdateField(
          "numberOfTalentPoolProfiles",
-         universityCode
+         nestedObjectOptions
       )
    )
 
@@ -57,38 +61,79 @@ export const addOperations = (
       Object.keys(newData?.jobApplications || {}).length,
       Object.keys(oldData?.jobApplications || {}).length,
       operationsToMakeObject,
-      getAValidLivestreamStatsUpdateField("numberOfApplicants", universityCode)
+      getAValidLivestreamStatsUpdateField(
+         "numberOfApplicants",
+         nestedObjectOptions
+      )
    )
+
+   // only call recursively if it's not a nested call
+   if (!nestedObjectOptions) {
+      handleNestedStatsObject(
+         // deals with the nested universityStats object
+         newData,
+         oldData,
+         newData?.user?.university?.code,
+         oldData?.user?.university?.code,
+         "universityStats",
+         operationsToMakeObject
+      )
+
+      handleNestedStatsObject(
+         // deals with the nested fieldOfStudyStats object
+         newData,
+         oldData,
+         newData?.user?.fieldOfStudy?.id,
+         oldData?.user?.fieldOfStudy?.id,
+         "fieldOfStudyStats",
+         operationsToMakeObject
+      )
+
+      handleNestedStatsObject(
+         // deals with the nested countryStats object
+         newData,
+         oldData,
+         newData?.user?.universityCountryCode,
+         oldData?.user?.universityCountryCode,
+         "countryStats",
+         operationsToMakeObject
+      )
+   }
 }
 
-export const addOperationsToDecrementOldUniversityStats = (
-   oldUniversityCode: string,
-   oldUserLivestreamData: UserLivestreamData,
+const handleNestedStatsObject = (
+   newData: UserLivestreamData,
+   oldData: UserLivestreamData,
+   newValueToCompare: string,
+   oldValueToCompare: string,
+   statsObjectKey: LivestreamStatsMapKey,
    operationsToMakeObject: OperationsToMake
 ) => {
-   // Since the function is only decrementing the fields, it uses null as the new data argument,
-   // and oldUserLivestreamData as the old data argument. This way the function will decrement all
-   // the fields that are truthy in the old data but not in the new data, which in this case is null.
-   addOperations(
-      null,
-      oldUserLivestreamData,
-      operationsToMakeObject,
-      oldUniversityCode
-   )
-}
+   const valueChanged = newValueToCompare !== oldValueToCompare
 
-export const addOperationsToIncrementNewUniversityStats = (
-   newUniversityCode: string,
-   newUserLivestreamData: UserLivestreamData,
-   operationsToMakeObject: OperationsToMake
-) => {
-   // Since the function is only incrementing the fields, it uses newUserLivestreamData as the new data argument,
-   // and null as the old data argument. This way the function will increment all the fields that are truthy in
-   // the new data but not in the old data, which in this case is null.
-   addOperations(
-      newUserLivestreamData,
-      null,
-      operationsToMakeObject,
-      newUniversityCode
-   )
+   if (valueChanged) {
+      if (oldValueToCompare) {
+         // If the old value is not null, we need to decrement the old nested value
+         addOperations(null, oldData, operationsToMakeObject, {
+            statsObjectKey,
+            statsObjectProperty: oldValueToCompare,
+         })
+      }
+
+      if (newValueToCompare) {
+         // If the new value is not null, we need to increment the new nested value
+         addOperations(newData, null, operationsToMakeObject, {
+            statsObjectKey,
+            statsObjectProperty: newValueToCompare,
+         })
+      }
+   } else {
+      if (!newValueToCompare) return // we don't want to set undefined values, eg. if the user has no university, we don't want "universityStats": { "undefined": { "numberOfParticipants": 1 } }
+
+      addOperations(newData, oldData, operationsToMakeObject, {
+         // We need to update the nested value with the new data
+         statsObjectKey,
+         statsObjectProperty: newValueToCompare,
+      })
+   }
 }
