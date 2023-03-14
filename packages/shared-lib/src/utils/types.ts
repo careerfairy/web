@@ -25,17 +25,16 @@ type FlattenObjectPathsHelper<T> = T extends Record<string, unknown>
 /**
  * This utility type recursively flattens all possible paths of an object as string dot notation.
  * @example
- * type Obj = {
- *   a: {
- *     b: {
- *       c: string;
- *     };
- *     d: number;
- *   };
- *   e: boolean;
+ * type Person = {
+ *   name: string;
+ *   age: number;
+ *   address: {
+ *   street: string;
+ *   city: string;
+ *
  * };
  * type Paths = FlattenObjectPaths<Obj>;
- * // type Paths = "a.b.c" | "a.d" | "e"
+ * // type Paths = "name" | "age" | "address.street" | "address.city"
  */
 export type FlattenPaths<T> = FlattenObjectPathsHelper<{
    [K in keyof T]: T[K] // This is to convert Interfaces to mapped types
