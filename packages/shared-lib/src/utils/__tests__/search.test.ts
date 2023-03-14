@@ -1,4 +1,5 @@
-import { ngrams, triGrams } from "../search"
+import { LivestreamEvent } from "../../livestreams"
+import { livestreamTriGrams, ngrams, triGrams } from "../search"
 
 describe("ngrams", () => {
    it("should return empty array when input string is null or undefined", () => {
@@ -104,5 +105,52 @@ describe("triGrams", () => {
 
       // Assert
       expect(result.join(" ").length).toBeLessThanOrEqual(500)
+   })
+})
+
+describe("livestreamTriGrams", () => {
+   it("should return an empty object when given livestream has no title and company", () => {
+      const livestream = {
+         title: "",
+         company: "",
+      } as LivestreamEvent
+
+      expect(livestreamTriGrams(livestream)).toEqual({})
+   })
+
+   it("should return the expected output when given livestream has title and company", () => {
+      const livestream = {
+         title: "Typescript coding",
+         company: "Company X",
+      } as LivestreamEvent
+
+      const result = livestreamTriGrams(livestream)
+
+      expect(result).toEqual({
+         " co": true,
+         any: true,
+         cod: true,
+         com: true,
+         cri: true,
+         din: true,
+         esc: true,
+         "g c": true,
+         ing: true,
+         ipt: true,
+         mpa: true,
+         "ng ": true,
+         "ny ": true,
+         odi: true,
+         omp: true,
+         pan: true,
+         pes: true,
+         "pt ": true,
+         rip: true,
+         scr: true,
+         "t c": true,
+         typ: true,
+         "y x": true,
+         ype: true,
+      })
    })
 })
