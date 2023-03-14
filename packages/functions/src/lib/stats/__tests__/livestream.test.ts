@@ -5,7 +5,7 @@ import {
    LivestreamStatsKey,
    LivestreamStatsMap,
 } from "@careerfairy/shared-lib/livestreams/stats"
-import { createNewAndOldUserLivestreamData } from "./helpers"
+import { createNewAndOldUserLivestreamData } from "../testHelpers"
 
 describe("Adding operations to livestream stats", () => {
    test("should not modify operationsToMakeObject when newUserLivestreamData and oldUserLivestreamData are identical", () => {
