@@ -183,11 +183,7 @@ const handleSaveLivestreamStatsInFirestore = async () => {
          counter.writeIncrement() // Increment write counter
       })
 
-      await batch.commit().catch((error) => {
-         const failedDocs = statsData.map(([eventId]) => eventId)
-         console.log(failedDocs)
-         throwMigrationError(error.message)
-      }) // Wait for batch to commit
+      await batch.commit()
    }
 
    writeProgressBar.stop()
