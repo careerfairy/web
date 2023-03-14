@@ -93,13 +93,13 @@ const sumUpStats = (livestreamStats: LiveStreamStats[]) => {
 
          // Sum up the number of participants, registrations, applications and number of people reached  for each group
          statsToUpdateDict[groupId].generalStats.numberOfParticipants +=
-            livestreamStat.generalStats.numberOfParticipants
+            livestreamStat.generalStats.numberOfParticipants || 0
          statsToUpdateDict[groupId].generalStats.numberOfRegistrations +=
-            livestreamStat.generalStats.numberOfRegistrations
+            livestreamStat.generalStats.numberOfRegistrations || 0
          statsToUpdateDict[groupId].generalStats.numberOfApplications +=
-            livestreamStat.generalStats.numberOfApplicants
+            livestreamStat.generalStats.numberOfApplicants || 0
          statsToUpdateDict[groupId].generalStats.numberOfPeopleReached +=
-            livestreamStat.generalStats.numberOfPeopleReached
+            livestreamStat.generalStats.numberOfPeopleReached || 0
 
          Object.keys(livestreamStat.universityStats).forEach(
             (universityCode) => {
@@ -119,30 +119,26 @@ const sumUpStats = (livestreamStats: LiveStreamStats[]) => {
                statsToUpdateDict[groupId].universityStats[
                   universityCode
                ].numberOfParticipants +=
-                  livestreamStat.universityStats[
-                     universityCode
-                  ].numberOfParticipants
+                  livestreamStat.universityStats[universityCode]
+                     .numberOfParticipants || 0
 
                statsToUpdateDict[groupId].universityStats[
                   universityCode
                ].numberOfRegistrations +=
-                  livestreamStat.universityStats[
-                     universityCode
-                  ].numberOfRegistrations
+                  livestreamStat.universityStats[universityCode]
+                     .numberOfRegistrations || 0
 
                statsToUpdateDict[groupId].universityStats[
                   universityCode
                ].numberOfApplications +=
-                  livestreamStat.universityStats[
-                     universityCode
-                  ].numberOfApplicants
+                  livestreamStat.universityStats[universityCode]
+                     .numberOfApplicants || 0
 
                statsToUpdateDict[groupId].universityStats[
                   universityCode
                ].numberOfPeopleReached +=
-                  livestreamStat.universityStats[
-                     universityCode
-                  ].numberOfPeopleReached
+                  livestreamStat.universityStats[universityCode]
+                     .numberOfPeopleReached || 0
             }
          )
       })
