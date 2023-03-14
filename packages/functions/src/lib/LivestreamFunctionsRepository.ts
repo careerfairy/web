@@ -6,6 +6,7 @@ import {
    EventRating,
    EventRatingAnswer,
    LivestreamEvent,
+   pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import {
@@ -33,6 +34,7 @@ import {
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
 import type { FunctionsLogger } from "../util"
+import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -264,8 +266,9 @@ export class LivestreamFunctionsRepository
          const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
          return statsRef.set(statsDoc)
       } else {
-         const toUpdate: Pick<LiveStreamStats, "livestream"> = {
-            livestream: livestream,
+         const toUpdate: Pick<LiveStreamStats, "livestream" | "triGrams"> = {
+            livestream: pickPublicDataFromLivestream(livestream),
+            triGrams: livestreamTriGrams(livestream),
          }
 
          return statsRef.update(toUpdate)

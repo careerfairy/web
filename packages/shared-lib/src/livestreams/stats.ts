@@ -1,4 +1,5 @@
 import { Identifiable } from "../commonTypes"
+import { livestreamTriGrams } from "../utils/search"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
@@ -49,7 +50,7 @@ export const createLiveStreamStatsDoc = (
          numberOfTalentPoolProfiles: 0,
       },
       universityStats: {},
-      triGrams: {},
+      triGrams: livestreamTriGrams(livestream),
    }
 }
 
