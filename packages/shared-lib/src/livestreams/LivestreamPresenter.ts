@@ -90,6 +90,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly targetLevelsOfStudy: FieldOfStudy[],
       public readonly speakers: Speaker[],
       public readonly liveSpeakers: LiveSpeaker[],
+      public readonly triGrams: LivestreamEvent["triGrams"],
 
       public readonly reminderEmailsSent?: IEmailSent,
       public readonly language?: LivestreamLanguage,
@@ -240,6 +241,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.targetLevelsOfStudy ?? [],
          livestream.speakers ?? [],
          livestream.liveSpeakers ?? [],
+         livestream.triGrams ?? {},
          livestream.reminderEmailsSent ?? null,
          livestream.language ?? null,
          livestream.type ?? "",
@@ -301,6 +303,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.targetLevelsOfStudy,
          livestream.speakers,
          livestream.liveSpeakers,
+         livestream.triGrams,
          livestream.reminderEmailsSent,
          livestream.language,
          livestream.type,
@@ -395,6 +398,7 @@ export class LivestreamPresenter extends BaseModel {
          index: this.index,
          parentLivestream: this.parentLivestream,
          denyRecordingAccess: this.denyRecordingAccess,
+         triGrams: this.triGrams,
       }
    }
 }
