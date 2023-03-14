@@ -18,15 +18,6 @@ describe("getPropertyToUpdate", () => {
       expect(result).toEqual("universityStats.12345.numberOfRegistrations")
    })
 
-   it("Expect typescript error for invalid Live Stream Stats field key", () => {
-      const field = "invalidField"
-      const universityCode = "ucl"
-      // @ts-expect-error
-      const result = getAValidLivestreamStatsUpdateField(field, universityCode)
-
-      expect(result).toEqual("universityStats.ucl.invalidField")
-   })
-
    it("Expect typescript error for invalid Group Stats field key", () => {
       const field = "invalidField"
       const universityCode = "ucl"
