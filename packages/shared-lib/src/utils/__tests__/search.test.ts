@@ -118,6 +118,15 @@ describe("livestreamTriGrams", () => {
       expect(livestreamTriGrams(livestream)).toEqual({})
    })
 
+   it("should return an empty object when given livestream has falsy values", () => {
+      const livestream = {
+         title: false,
+         company: undefined,
+      }
+
+      expect(livestreamTriGrams(livestream as any)).toEqual({})
+   })
+
    it("should return the expected output when given livestream has title and company", () => {
       const livestream = {
          title: "Typescript coding",
