@@ -101,14 +101,11 @@ const addUserStatsToDictionary = (users: UserLivestreamDataWithRef[]) => {
       }
 
       // Increment general stats
-      statsToUpdateDict[livestreamId].generalStats.numberOfParticipants +=
-         Number(isParticipant)
-      statsToUpdateDict[livestreamId].generalStats.numberOfRegistrations +=
-         Number(isRegistered)
-      statsToUpdateDict[livestreamId].generalStats.numberOfTalentPoolProfiles +=
-         Number(isInTalentPool)
-      statsToUpdateDict[livestreamId].generalStats.numberOfApplicants +=
-         numberOfApplications
+      const { generalStats } = statsToUpdateDict[livestreamId]
+      generalStats.numberOfParticipants += Number(isParticipant)
+      generalStats.numberOfRegistrations += Number(isRegistered)
+      generalStats.numberOfTalentPoolProfiles += Number(isInTalentPool)
+      generalStats.numberOfApplicants += numberOfApplications
 
       statsDictionaries.forEach(({ key, getStatId }) => {
          const statId = getStatId(user)
@@ -122,15 +119,12 @@ const addUserStatsToDictionary = (users: UserLivestreamDataWithRef[]) => {
          }
 
          // Increment stats for each dictionary
-         statsToUpdateDict[livestreamId][key][statId].numberOfParticipants +=
-            Number(isParticipant)
-         statsToUpdateDict[livestreamId][key][statId].numberOfRegistrations +=
-            Number(isRegistered)
-         statsToUpdateDict[livestreamId][key][
-            statId
-         ].numberOfTalentPoolProfiles += Number(isInTalentPool)
-         statsToUpdateDict[livestreamId][key][statId].numberOfApplicants +=
-            numberOfApplications
+         const stats = statsToUpdateDict[livestreamId][key][statId]
+
+         stats.numberOfParticipants += Number(isParticipant)
+         stats.numberOfRegistrations += Number(isRegistered)
+         stats.numberOfTalentPoolProfiles += Number(isInTalentPool)
+         stats.numberOfApplicants += numberOfApplications
       })
    }
 }
