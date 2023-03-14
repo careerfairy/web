@@ -1,4 +1,3 @@
-import { LivestreamEvent } from "../../livestreams"
 import { livestreamTriGrams, ngrams, triGrams } from "../search"
 
 describe("ngrams", () => {
@@ -110,30 +109,16 @@ describe("triGrams", () => {
 
 describe("livestreamTriGrams", () => {
    it("should return an empty object when given livestream has no title and company", () => {
-      const livestream = {
-         title: "",
-         company: "",
-      } as LivestreamEvent
-
-      expect(livestreamTriGrams(livestream)).toEqual({})
+      expect(livestreamTriGrams("", "")).toEqual({})
    })
 
    it("should return an empty object when given livestream has falsy values", () => {
-      const livestream = {
-         title: false,
-         company: undefined,
-      }
-
-      expect(livestreamTriGrams(livestream as any)).toEqual({})
+      expect(livestreamTriGrams(false as any, undefined)).toEqual({})
+      expect(livestreamTriGrams(null, undefined)).toEqual({})
    })
 
    it("should return the expected output when given livestream has title and company", () => {
-      const livestream = {
-         title: "Typescript coding",
-         company: "Company X",
-      } as LivestreamEvent
-
-      const result = livestreamTriGrams(livestream)
+      const result = livestreamTriGrams("Typescript coding", "Company X")
 
       expect(result).toEqual({
          " co": true,

@@ -266,9 +266,8 @@ export class LivestreamFunctionsRepository
          const statsDoc = createLiveStreamStatsDoc(livestream, statsRef.id)
          return statsRef.set(statsDoc)
       } else {
-         const toUpdate: Pick<LiveStreamStats, "livestream" | "triGrams"> = {
+         const toUpdate: Pick<LiveStreamStats, "livestream"> = {
             livestream: pickPublicDataFromLivestream(livestream),
-            triGrams: livestreamTriGrams(livestream),
          }
 
          return statsRef.update(toUpdate)

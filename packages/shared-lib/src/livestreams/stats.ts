@@ -1,5 +1,4 @@
 import { Identifiable } from "../commonTypes"
-import { livestreamTriGrams } from "../utils/search"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
@@ -27,12 +26,6 @@ export interface LiveStreamStats extends Identifiable {
       // The numberOfPeopleReached will be zero because it is not relevant for the university stats
       [universityCode: string]: LivestreamStatsMap
    }
-
-   /**
-    * A map of all the trigrams from joining the livestream title
-    * and the university name. Used for full text search
-    */
-   triGrams: Record<string, true>
 }
 
 export const createLiveStreamStatsDoc = (
@@ -50,7 +43,6 @@ export const createLiveStreamStatsDoc = (
          numberOfTalentPoolProfiles: 0,
       },
       universityStats: {},
-      triGrams: livestreamTriGrams(livestream),
    }
 }
 

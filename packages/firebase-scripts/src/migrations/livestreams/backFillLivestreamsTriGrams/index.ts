@@ -1,4 +1,3 @@
-import { LiveStreamStats } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import { livestreamTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 import Counter from "../../../lib/Counter"
 import { livestreamRepo } from "../../../repositories"
@@ -7,9 +6,10 @@ import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { firestore } from "../../../lib/firebase"
 import * as cliProgress from "cli-progress"
 import { DataWithRef } from "../../../util/types"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import counterConstants from "../../../lib/Counter/constants"
 
-const WRITE_BATCH = 100
+const WRITE_BATCH = 50
 const counter = new Counter()
 const bar = new cliProgress.SingleBar(
    {
@@ -20,24 +20,24 @@ const bar = new cliProgress.SingleBar(
    cliProgress.Presets.shades_grey
 )
 
-let livestreamStats: DataWithRef<true, LiveStreamStats>[]
+let livestreams: DataWithRef<true, LivestreamEvent>[]
 const bulkWriter = firestore.bulkWriter()
 
 export async function run() {
    try {
       Counter.log("Fetching all livestreams and groups")
 
-      livestreamStats = await logAction(
-         () => livestreamRepo.getAllLivestreamStats(true),
-         "Fetching all livestreams and groups"
+      livestreams = await logAction(
+         () => livestreamRepo.getAllLivestreams(false, true),
+         "Fetching all livestreams"
       )
-      counter.addToReadCount(livestreamStats.length)
+      counter.addToReadCount(livestreams.length)
+      bar.start(livestreams.length, 0)
 
-      await updateLivestreamStats()
+      await updateLivestreams()
 
       await bulkWriter.close()
       bar.stop()
-      counter.print()
    } catch (error) {
       console.error(error)
       throwMigrationError(error.message)
@@ -46,24 +46,33 @@ export async function run() {
    }
 }
 
-const updateLivestreamStats = async () => {
+const updateLivestreams = async () => {
    let idx = 0
-   for (const livestreamStat of livestreamStats) {
-      const toUpdate: Partial<LiveStreamStats> = {}
-      toUpdate.triGrams = livestreamTriGrams(livestreamStat.livestream)
+   for (const livestream of livestreams) {
+      const toUpdate: Pick<LivestreamEvent, "triGrams"> = {
+         // we override the entire map on the destination document
+         triGrams: livestreamTriGrams(livestream.title, livestream.company),
+      }
 
       if (Object.keys(toUpdate.triGrams).length === 0) {
-         // skip this update because there are no tri-grams
+         // skip this update because there are no trigrams, odd right?
+         counter.addToCustomCount(
+            "livestream without title and company, no trigrams generated",
+            1
+         )
+         bar.increment()
          continue
       }
 
+      const docRef = firestore.collection("livestreams").doc(livestream.id)
+
       bulkWriter
-         .set(livestreamStat._ref as any, toUpdate, { merge: true })
+         .set(docRef, toUpdate, { merge: true })
          .then(() => {
             counter.writeIncrement()
          })
          .catch((error) => {
-            console.error("bulkWriter.set failed", error, livestreamStat.id)
+            console.error("bulkWriter.set failed", error, livestream.id)
             counter.addToCustomCount(counterConstants.numFailedWrites, 1)
          })
          .finally(() => {
