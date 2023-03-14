@@ -1,7 +1,7 @@
-import { admin } from "../../../api/firestoreAdmin"
+import { admin } from "../../api/firestoreAdmin"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
-import { faker } from "@faker-js/faker"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { v4 as uuidv4 } from "uuid"
 
 type NewAndOldUserLivestreamDataOptions = {
    registered?: boolean
@@ -23,9 +23,9 @@ export const createNewAndOldUserLivestreamData = (
    newUserLivestreamData: UserLivestreamData
    oldUserLivestreamData: UserLivestreamData
 } => {
-   const email = faker.internet.email()
-   const authUid = faker.datatype.uuid()
-   const livestreamId = faker.datatype.uuid()
+   const email = "john@example.com"
+   const authUid = uuidv4()
+   const livestreamId = uuidv4()
 
    const newUser = generateUserData({
       email,
@@ -95,16 +95,16 @@ const generateUserData = (
    return {
       authId: options.authUid,
       backFills: [],
-      createdAt: timestampFromDate(faker.date.past()),
+      createdAt: timestampFromDate(pastDate),
       groupIds: [],
       id: options.email,
-      lastActivityAt: timestampFromDate(faker.date.past()),
+      lastActivityAt: timestampFromDate(pastDate),
       linkedinUrl: "",
       userEmail: options.email,
-      userResume: faker.internet.url(),
+      userResume: "www.resume.com",
       validationPin: 0,
-      firstName: faker.name.firstName(),
-      lastName: faker.name.lastName(),
+      firstName: "John",
+      lastName: "Doe",
       university: {
          name: options.universityData?.name,
          code: options.universityData?.code,
@@ -121,23 +121,20 @@ const generateUserData = (
 
 const generateRegistered = (): UserLivestreamData["registered"] => {
    return {
-      date: timestampFromDate(faker.date.past()),
-      utm: { source: faker.random.word() },
-      referrer: faker.internet.url(),
-      isRecommended: faker.datatype.boolean(),
+      date: timestampFromDate(pastDate),
    }
 }
 
 const generateTalentPool = (): UserLivestreamData["talentPool"] => {
    return {
-      date: timestampFromDate(faker.date.past()),
-      companyId: faker.datatype.uuid(),
+      date: timestampFromDate(pastDate),
+      companyId: uuidv4(),
    }
 }
 
 const generateParticipated = (): UserLivestreamData["participated"] => {
    return {
-      date: timestampFromDate(faker.date.past()),
+      date: timestampFromDate(pastDate),
    }
 }
 
@@ -149,15 +146,17 @@ const generateJobApplications = (
    if (!numberOfApplications) return jobApplications
 
    for (let i = 0; i < numberOfApplications; i++) {
-      const jobId = faker.datatype.uuid()
+      const jobId = uuidv4()
       jobApplications[jobId] = {
-         applicationId: faker.datatype.uuid(),
-         jobId: faker.datatype.uuid(),
+         applicationId: uuidv4(),
+         jobId: uuidv4(),
          job: {},
-         groupId: faker.datatype.uuid(),
-         integrationId: faker.datatype.uuid(),
-         date: timestampFromDate(faker.date.past()),
+         groupId: uuidv4(),
+         integrationId: uuidv4(),
+         date: timestampFromDate(pastDate),
       }
    }
    return jobApplications
 }
+
+const pastDate = new Date(new Date().valueOf() - 1000 * 60 * 60 * 24 * 2)
