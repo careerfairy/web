@@ -48,6 +48,7 @@ const RTCProvider = ({
    channel,
    screenSharerId,
    streamMode,
+   allowViewerToJoin,
 }: RtcPropsInterface) => {
    const streamRef = useStreamRef()
    const router = useRouter()
@@ -107,7 +108,6 @@ const RTCProvider = ({
             if (Boolean(forcedProxyMode)) {
                rtcClient.stopProxyServer()
             }
-            rtcClient.removeAllListeners()
          }
       } catch (error) {
          errorLogAndNotify(error)
@@ -168,18 +168,34 @@ const RTCProvider = ({
       [joinAgoraRoom, rtcClient, channel, uid, isStreamer, dispatch]
    )
 
-   const close = useCallback(async () => {
-      return leaveAgoraRoom()
-   }, [leaveAgoraRoom])
+   useEffect(() => {
+      if (isStreamer) {
+         // streamers are always allowed to join
+         joinAgoraRoomWithPrimaryClient()
+      }
+
+      if (!isStreamer) {
+         if (allowViewerToJoin) {
+            // alow the viewer to join, stream is live or he's spying
+            joinAgoraRoomWithPrimaryClient()
+         } else {
+            // make sure we leave the room if we are not allowed to join
+            leaveAgoraRoom()
+         }
+      }
+   }, [
+      allowViewerToJoin,
+      isStreamer,
+      joinAgoraRoomWithPrimaryClient,
+      leaveAgoraRoom,
+   ])
 
    useEffect(() => {
-      joinAgoraRoomWithPrimaryClient()
-
-      return () => void close()
-      // we only want to join exactly once, adding the deps to this hook
-      // will cause the handraise functionality to fail
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [])
+      return () => {
+         // unmounting the component, let's disconnect from agora
+         leaveAgoraRoom()
+      }
+   }, [leaveAgoraRoom])
 
    const closeAndUnpublishedLocalStream = useCallback(async () => {
       if (localStream) {
