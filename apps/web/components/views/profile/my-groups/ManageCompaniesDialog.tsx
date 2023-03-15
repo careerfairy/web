@@ -51,8 +51,7 @@ const ManageCompaniesDialog = ({
          {hideCloseDisabled ? null : (
             <IconButton
                onClick={handleClose}
-               sx={styles.closeBtn}
-               color={"default"}
+               sx={[styles.closeBtn, { color: "black" }]}
             >
                <CloseIcon fontSize="large" />
             </IconButton>
