@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "../livestreams"
+import { Identifiable } from "@careerfairy/webapp/types/commonTypes"
 
 /*
  *
@@ -168,4 +169,24 @@ export const containsAny = (source: string[], target: string[]): boolean => {
  */
 export const removeDuplicates = (arr: string[]) => {
    return Array.from(new Set(arr))
+}
+
+/**
+ * @description
+ * Creates a lookup object from an array of objects based on the given property name.
+ * The resulting object has the IDs of the objects as keys and the property value as values.
+ *
+ * @param  array - The array of objects to create the lookup from.
+ * @param  propertyName - The name of the property to use as the lookup value.
+ * @return The lookup object.
+ */
+export const createLookup = <T extends Identifiable>(
+   array: T[],
+   propertyName: keyof T
+): Record<string, T[keyof T]> => {
+   if (!array) return {}
+   return array.reduce((acc, curr) => {
+      acc[curr.id] = curr[propertyName]
+      return acc
+   }, {})
 }
