@@ -1,6 +1,6 @@
 import React from "react"
 import GroupDashboardLayout from "../../../../layouts/GroupDashboardLayout"
-import AnalyticsOverview from "../../../../components/views/group/admin/analytics"
+import AnalyticsOverview from "../../../../components/views/group/admin/analytics/index-old"
 import DashboardHead from "../../../../layouts/GroupDashboardLayout/DashboardHead"
 import { GroupAnalyticsProvider } from "../../../../HOCs/GroupAnalyticsProvider"
 

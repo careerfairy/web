@@ -20,7 +20,7 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { GlobalTimeFrame } from "../../../../../custom-hook/useTimeFrames"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserDataSet, UserType } from "../index"
+import { UserDataSet, UserType } from "../index-old"
 import RootState from "../../../../../../store/reducers"
 
 const styles = sxStyles({
