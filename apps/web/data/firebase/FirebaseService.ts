@@ -778,6 +778,7 @@ class FirebaseService {
          companyId: "CareerFairy",
          test: true,
          universities: [],
+         createdAt: this.getServerTimestamp(),
          start: firebase.firestore.Timestamp.fromDate(
             new Date("March 17, 2020 03:24:00")
          ),
