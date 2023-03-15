@@ -1,18 +1,10 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useCollection, {
-   CollectionResponse,
-   useFieldsOfStudy,
-   useLevelsOfStudy,
-} from "components/custom-hook/useCollection"
-import { livestreamRepo } from "data/RepositoryInstances"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { createContext, useContext, useMemo } from "react"
+import React, { createContext, useContext, useMemo, useState } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { Identifiable } from "../../../../../types/commonTypes"
-import { collection } from "firebase/firestore"
+import { collection, query, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../data/firebase/FirebaseInstance"
-import { useFirestoreCollectionData } from "reactfire"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { ReactFireOptions } from "reactfire"
 import {
    FieldOfStudy,
    LevelOfStudy,
@@ -29,12 +21,14 @@ type IAnalyticsPageContext = {
    fieldsOfStudyLookup: Record<string, string>
 
    levelsOfStudyLookup: Record<string, string>
+   setLivestreamStatsTimeFrame: React.Dispatch<typeof timeFrames[number]>
 }
 
 const initialValues: IAnalyticsPageContext = {
-   nextLivestream: undefined,
-   pastLivestream: undefined,
-   nextDraft: undefined,
+   livestreamStats: undefined,
+   fieldsOfStudyLookup: {},
+   levelsOfStudyLookup: {},
+   setLivestreamStatsTimeFrame: () => {},
 }
 
 const AnalyticsPageContext = createContext<IAnalyticsPageContext>(initialValues)
@@ -42,21 +36,31 @@ const AnalyticsPageContext = createContext<IAnalyticsPageContext>(initialValues)
 export const AnalyticsPageProvider = ({ children }) => {
    const { group } = useGroup()
 
+   const [livestreamStatsTimeFrame, setLivestreamStatsTimeFrame] =
+      useState<typeof timeFrames[number]>(defaultTimeFrame)
+
+   const livestreamStatsQuery = useMemo(() => {
+      return query(
+         collection(FirestoreInstance, "livestreamStats"),
+         where("livestream.groupIds", "array-contains", group.id),
+         where("livestream.start", ">=", livestreamStatsTimeFrame.start),
+         where("livestream.start", "<=", livestreamStatsTimeFrame.end)
+      )
+   }, [group.id, livestreamStatsTimeFrame])
+
+   const { data: livestreamStats } = useFirestoreCollection<LiveStreamStats>(
+      livestreamStatsQuery,
+      queryOptions
+   )
+
    const { data: fieldsOfStudy } = useFirestoreCollection<FieldOfStudy>(
       "fieldsOfStudy",
-      undefined,
-      {
-         suspense: true,
-         idField: "id",
-      }
+      queryOptions
    )
+
    const { data: levelsOfStudy } = useFirestoreCollection<LevelOfStudy>(
       "levelsOfStudy",
-      undefined,
-      {
-         suspense: true,
-         idField: "id",
-      }
+      queryOptions
    )
 
    const fieldsOfStudyLookup = useMemo(
@@ -72,10 +76,10 @@ export const AnalyticsPageProvider = ({ children }) => {
       return {
          fieldsOfStudyLookup,
          levelsOfStudyLookup,
-         fieldsOfStudy,
-         levelsOfStudy,
+         livestreamStats,
+         setLivestreamStatsTimeFrame,
       }
-   }, [fieldsOfStudyLookup, levelsOfStudyLookup, fieldsOfStudy, levelsOfStudy])
+   }, [fieldsOfStudyLookup, levelsOfStudyLookup, livestreamStats])
 
    return (
       <AnalyticsPageContext.Provider value={value}>
@@ -111,7 +115,7 @@ type TimeFrame = {
 }
 
 // Array of timeframes for the last month,6 months, 1 year, 2 years, all time
-const timeFrames: TimeFrame[] = [
+export const timeFrames = [
    {
       start: new Date(new Date().setDate(new Date().getDate() - 30)),
       end: new Date(),
@@ -137,4 +141,11 @@ const timeFrames: TimeFrame[] = [
       end: new Date(),
       name: "All time",
    },
-]
+] as const satisfies readonly TimeFrame[]
+
+const queryOptions = {
+   suspense: true,
+   idField: "id",
+} as const satisfies ReactFireOptions
+
+const defaultTimeFrame = timeFrames.find((t) => t.name === "Last 2 years")
