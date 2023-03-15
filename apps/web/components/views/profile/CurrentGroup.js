@@ -55,6 +55,7 @@ const CurrentGroup = ({
    group,
    isAdmin = false,
    groupId = undefined,
+   hideMenu = false,
 }) => {
    const { push } = useRouter()
    const firebase = useFirebaseService()
@@ -138,27 +139,27 @@ const CurrentGroup = ({
    if (!isAdmin) {
       menuItems.push(
          {
-            onClick: () =>
+            handleClick: () =>
                router.push(
                   `/next-livestreams?careerCenterId=${localGroup.groupId}`
                ),
             label: "Group Page",
          },
          {
-            onClick: () => setOpen(true),
+            handleClick: () => setOpen(true),
             label: "Leave Group",
-            onMouseEnter: () => setLeaveGroup(true),
+            handleMouseEnter: () => setLeaveGroup(true),
          }
       )
    }
    if (isAdmin) {
       menuItems.push(
          {
-            onClick: () => push(`/group/${localGroup.id}/admin`),
+            handleClick: () => push(`/group/${localGroup.id}/admin`),
             label: "Admin group",
          },
          {
-            onClick: () => {
+            handleClick: () => {
                setOpen(true)
                handleClose()
             },
@@ -210,13 +211,15 @@ const CurrentGroup = ({
                         {localGroup.description}
                      </Typography>
                   </CardContent>
-                  <IconButton
-                     style={{ position: "absolute", top: 10, right: 10 }}
-                     onClick={handleClick}
-                     size="small"
-                  >
-                     <MoreVertIcon />
-                  </IconButton>
+                  {hideMenu ? null : (
+                     <IconButton
+                        style={{ position: "absolute", top: 10, right: 10 }}
+                        onClick={handleClick}
+                        size="small"
+                     >
+                        <MoreVertIcon />
+                     </IconButton>
+                  )}
                   <CardActions className={classes.actions}>
                      {!isAdmin && (
                         <Link href={`/next-livestreams/${localGroup.groupId}`}>
@@ -227,7 +230,7 @@ const CurrentGroup = ({
                            </a>
                         </Link>
                      )}
-                     {isAdmin && (
+                     {isAdmin ? (
                         <a
                            // Not using nextjs/Link on purpose, we want to trigger a full page
                            // refresh, to ensure we disable gtm completely
@@ -237,26 +240,28 @@ const CurrentGroup = ({
                               View Admin Page
                            </Button>
                         </a>
+                     ) : null}
+                     {hideMenu ? null : (
+                        <Menu
+                           id="simple-menu"
+                           anchorEl={anchorEl}
+                           keepMounted
+                           open={Boolean(anchorEl)}
+                           onClose={handleClose}
+                        >
+                           {menuItems.map((item) => {
+                              return (
+                                 <MenuItem
+                                    key={item.label}
+                                    onMouseEnter={item.handleMouseEnter}
+                                    onClick={item.handleClick}
+                                 >
+                                    {item.label}
+                                 </MenuItem>
+                              )
+                           })}
+                        </Menu>
                      )}
-                     <Menu
-                        id="simple-menu"
-                        anchorEl={anchorEl}
-                        keepMounted
-                        open={Boolean(anchorEl)}
-                        onClose={handleClose}
-                     >
-                        {menuItems.map((item) => {
-                           return (
-                              <MenuItem
-                                 key={item.label}
-                                 onMouseEnter={item.onMouseEnter}
-                                 onClick={item.onClick}
-                              >
-                                 {item.label}
-                              </MenuItem>
-                           )
-                        })}
-                     </Menu>
                   </CardActions>
                </Card>
             </Fade>
