@@ -36,6 +36,8 @@ const useCountLivestreamAttendanceMinutes = (
    const { curState, reason } = agoraRtcConnectionStatus
 
    const intervalCallback = useCallback(() => {
+      if (!livestreamData) return // still loading
+
       // Don't record the minutes if the user is not logged in
       if (!isLoggedIn) {
          return
