@@ -15,7 +15,7 @@ const bar = new cliProgress.SingleBar(
    {
       clearOnComplete: false,
       hideCursor: true,
-      ...getCLIBarOptions("Writing livestream stats batch", "Writes"),
+      ...getCLIBarOptions("Writing livestreams batch", "Writes"),
    },
    cliProgress.Presets.shades_grey
 )
@@ -25,7 +25,7 @@ const bulkWriter = firestore.bulkWriter()
 
 export async function run() {
    try {
-      Counter.log("Fetching all livestreams and groups")
+      Counter.log("Fetching all livestreams")
 
       livestreams = await logAction(
          () => livestreamRepo.getAllLivestreams(false, true),
