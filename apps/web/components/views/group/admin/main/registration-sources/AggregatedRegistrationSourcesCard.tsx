@@ -6,11 +6,7 @@ import { sourcesByLivestream } from "../../analytics/RegistrationSources/transfo
 import CardCustom from "../../common/CardCustom"
 import { useMainPageContext } from "../MainPageProvider"
 import { useRegistrationSourcesData } from "./useRegistrationSourcesData"
-import {
-   sortSources,
-   SourceEntryArgs,
-   SourcesProgress,
-} from "../../common/SourcesProgress"
+import { SourceEntryArgs, SourcesProgress } from "../../common/SourcesProgress"
 
 const CARD_OPTIONS = [
    "Next live stream",
@@ -158,4 +154,21 @@ const LoadStaleWhileRevalidateStats = ({ groupId, livestream }) => {
          />
       </>
    )
+}
+
+function sortSources(a: SourceEntryArgs, b: SourceEntryArgs) {
+   const order = [
+      "Platform Registrations",
+      "Platform User Promo",
+      "Social",
+      "University Network Promo",
+      "Other",
+   ]
+
+   const idxFoundA = order.findIndex((o) => o === a.name)
+   const idxFoundB = order.findIndex((o) => o === b.name)
+
+   if (idxFoundA >= 0 && idxFoundB >= 0) return idxFoundA - idxFoundB
+
+   return 0
 }

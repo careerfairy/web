@@ -86,20 +86,3 @@ const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
       backgroundColor: "primary",
    },
 }))
-
-export function sortSources(a: SourceEntryArgs, b: SourceEntryArgs) {
-   const order = [
-      "Platform Registrations",
-      "Platform User Promo",
-      "Social",
-      "University Network Promo",
-      "Other",
-   ]
-
-   const idxFoundA = order.findIndex((o) => o === a.name)
-   const idxFoundB = order.findIndex((o) => o === b.name)
-
-   if (idxFoundA >= 0 && idxFoundB >= 0) return idxFoundA - idxFoundB
-
-   return 0
-}
