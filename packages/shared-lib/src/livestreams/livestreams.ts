@@ -173,10 +173,16 @@ export interface LivestreamEvent extends Identifiable {
    companyCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
 
    /**
-    * Flag to distinguish between a draft and a livetream
+    * Flag to distinguish between a draft and a livestream
     * (different collections), internal use
     */
    isDraft?: boolean
+
+   /**
+    * A map of all the trigrams from joining the livestream title
+    * and the company name. Used for full text search
+    */
+   triGrams: Record<string, true>
 }
 
 /**

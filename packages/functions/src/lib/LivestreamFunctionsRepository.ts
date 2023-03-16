@@ -6,6 +6,7 @@ import {
    EventRating,
    EventRatingAnswer,
    LivestreamEvent,
+   pickPublicDataFromLivestream,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import {
@@ -265,7 +266,7 @@ export class LivestreamFunctionsRepository
          return statsRef.set(statsDoc)
       } else {
          const toUpdate: Pick<LiveStreamStats, "livestream"> = {
-            livestream: livestream,
+            livestream: pickPublicDataFromLivestream(livestream),
          }
 
          return statsRef.update(toUpdate)
