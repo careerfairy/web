@@ -161,3 +161,11 @@ export const round = (num: number, decimalPlaces: number): number => {
 export const containsAny = (source: string[], target: string[]): boolean => {
    return source?.some((item) => target?.includes(item))
 }
+
+/**
+ * Remove duplicates values
+ * @param arr
+ */
+export const removeDuplicates = (arr: string[]) => {
+   return Array.from(new Set(arr))
+}
