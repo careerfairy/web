@@ -1,7 +1,12 @@
 import { useGroup } from "layouts/GroupDashboardLayout"
 import React, { createContext, FC, useContext, useMemo, useState } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { collectionGroup, query, where } from "firebase/firestore"
+import {
+   collectionGroup,
+   query,
+   where,
+   QueryConstraint,
+} from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../data/firebase/FirebaseInstance"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { useFirestoreCollection } from "../../../../custom-hook/utils/useFirestoreCollection"
@@ -18,27 +23,27 @@ type IAnalyticsPageContext = {
    setLivestreamStatsTimeFrame: React.Dispatch<React.SetStateAction<TimeFrame>>
    livestreamStatsTimeFrame: TimeFrame
 }
-const now = new Date()
+
 export const TimeFrames = {
    "Last 30 days": {
       start: new Date(new Date().setDate(new Date().getDate() - 30)),
-      end: now,
+      end: null, // null means we don't care about the end date
    },
    "Last 6 months": {
       start: new Date(new Date().setDate(new Date().getDate() - 180)),
-      end: now,
+      end: null,
    },
    "Last 1 year": {
       start: new Date(new Date().setDate(new Date().getDate() - 365)),
-      end: now,
+      end: null,
    },
    "Last 2 years": {
       start: new Date(new Date().setDate(new Date().getDate() - 730)),
-      end: now,
+      end: null,
    },
    "All time": {
       start: new Date(0),
-      end: now,
+      end: null,
    },
 } as const
 
@@ -61,19 +66,25 @@ export const AnalyticsPageProvider: FC = ({ children }) => {
 
    const livestreamStatsQuery = useMemo(() => {
       const timeFrame = TimeFrames[livestreamStatsTimeFrame]
-      return query(
-         collectionGroup(FirestoreInstance, "stats"),
+
+      const constraints: QueryConstraint[] = [
          where("id", "==", "livestreamStats"),
          where("livestream.groupIds", "array-contains", group.id),
          where("livestream.start", ">=", timeFrame.start),
-         where("livestream.start", "<=", timeFrame.end)
-      )
+      ]
+
+      if (timeFrame.end) {
+         constraints.unshift(where("livestream.start", "<=", timeFrame.end))
+      }
+
+      return query(collectionGroup(FirestoreInstance, "stats"), ...constraints)
    }, [group.id, livestreamStatsTimeFrame])
 
    const { data: livestreamStats } = useFirestoreCollection<LiveStreamStats>(
       livestreamStatsQuery,
       queryOptions
    )
+   console.log("-> livestreamStats", livestreamStats)
 
    const { data: fieldsOfStudy } = useFirestoreCollection<FieldOfStudy>(
       "fieldsOfStudy",
