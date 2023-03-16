@@ -1,23 +1,22 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsGeneralPageContent from "components/views/group/admin/analytics/general"
+import AnalyticsFeedbackPageContent from "components/views/group/admin/analytics/feedback"
 
-const GeneralPage = () => {
+const FeedbackPage = () => {
    const {
       query: { groupId },
    } = useRouter()
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"General"}
+         pageDisplayName={"Feedback"}
          groupId={groupId as string}
       >
-         <DashboardHead title="CareerFairy | General Page of" />
-
-         <AnalyticsGeneralPageContent />
+         <DashboardHead title="CareerFairy | Feedback of" />
+         <AnalyticsFeedbackPageContent />
       </GroupDashboardLayout>
    )
 }
 
-export default GeneralPage
+export default FeedbackPage
