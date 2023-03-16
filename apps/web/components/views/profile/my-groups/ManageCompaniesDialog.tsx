@@ -20,11 +20,18 @@ const styles = sxStyles({
       borderBottom: "1px solid #EDE7FD",
       borderTopLeftRadius: "20px",
       borderTopRightRadius: "20px",
+      p: "24px",
    },
    closeBtn: {
       position: "absolute",
       top: "11px",
       right: "5px",
+      color: "black",
+   },
+   portalBtn: {
+      position: "absolute",
+      top: "11px",
+      right: "20px",
    },
 })
 
@@ -42,23 +49,25 @@ const ManageCompaniesDialog = ({
    const isMobile = useIsMobile()
 
    return (
-      <Dialog open={open} fullWidth maxWidth="lg">
+      <Dialog
+         open={open}
+         fullWidth
+         maxWidth="lg"
+         onClose={hideCloseDisabled ? null : handleClose}
+      >
          <DialogTitle sx={styles.header}>
             <Typography variant={"h4"} fontWeight={"600"} color="black">
                Your Managed Companies
             </Typography>
          </DialogTitle>
          {hideCloseDisabled ? null : (
-            <IconButton
-               onClick={handleClose}
-               sx={[styles.closeBtn, { color: "black" }]}
-            >
+            <IconButton onClick={handleClose} sx={styles.closeBtn}>
                <CloseIcon fontSize="large" />
             </IconButton>
          )}
          {userData?.isAdmin && hideCloseDisabled ? (
             <Button
-               sx={styles.closeBtn}
+               sx={styles.portalBtn}
                color="primary"
                variant="contained"
                size="small"
