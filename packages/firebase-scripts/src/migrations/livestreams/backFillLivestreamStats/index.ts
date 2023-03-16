@@ -11,10 +11,14 @@ import {
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { DataWithRef } from "../../../util/types"
 import {
+   createLiveStreamStatsDoc,
    LiveStreamStats,
    LivestreamStatsMap,
+   LivestreamStatsMapKey,
 } from "@careerfairy/shared-lib/dist/livestreams/stats"
 import { DeepPartial } from "@careerfairy/shared-lib/dist/utils/types"
+import { logAction } from "../../../util/logger"
+import { merge } from "lodash"
 
 const counter = new Counter()
 
@@ -22,7 +26,6 @@ const counter = new Counter()
 type LivestreamWithRef = DataWithRef<true, LivestreamEvent>
 type UserLivestreamDataWithRef = DataWithRef<true, UserLivestreamData>
 type LivestreamStatsToUpdate = DeepPartial<LiveStreamStats>
-
 // cached globally
 let livestreamsDict: Record<string, LivestreamWithRef>
 let statsToUpdateDict: Record<
@@ -33,22 +36,43 @@ let statsToUpdateDict: Record<
    LivestreamStatsToUpdate
 > = {}
 
+let currentLivestreamStatsDict: Record<string, LiveStreamStats>
+
 export async function run() {
    try {
-      Counter.log("Fetching all livestreams and user livestream data")
-
-      const [livestreams, userLivestreamData] = await Promise.all([
-         livestreamRepo.getAllLivestreams(false, true),
-         livestreamRepo.getAllUserLivestreamData(true),
-      ])
+      const [livestreams, userLivestreamData, currentLivestreamStats] =
+         await logAction(
+            () =>
+               Promise.all([
+                  livestreamRepo.getAllLivestreams(false, true),
+                  livestreamRepo.getAllUserLivestreamData(true),
+                  livestreamRepo.getAllLivestreamStats(true),
+               ]),
+            "Fetching all livestreams, livestream stats and user livestream data"
+         )
 
       Counter.log(
-         `Fetched ${livestreams.length} livestreams and ${userLivestreamData.length} user livestream data`
+         `Fetched ${livestreams.length} livestreams, ${currentLivestreamStats.length} livestream stats and ${userLivestreamData.length} user livestream data`
       )
 
-      counter.addToReadCount(livestreams.length + userLivestreamData.length)
+      counter.addToReadCount(
+         livestreams.length +
+            userLivestreamData.length +
+            currentLivestreamStats.length
+      )
 
       livestreamsDict = convertDocArrayToDict(livestreams)
+
+      // add the livestream stats to the dictionary
+      currentLivestreamStatsDict = currentLivestreamStats.reduce(
+         (acc, stat) => {
+            const livestreamId = stat._ref.parent.parent.id
+            delete stat._ref // we don't need the ref anymore
+            acc[livestreamId] = stat as LiveStreamStats
+            return acc
+         },
+         {}
+      )
 
       addUserStatsToDictionary(userLivestreamData)
 
@@ -62,93 +86,55 @@ export async function run() {
 }
 
 const addUserStatsToDictionary = (users: UserLivestreamDataWithRef[]) => {
-   users.forEach((user) => {
-      const isParticipant = Boolean(user?.participated?.date)
-      const isRegistered = Boolean(user?.registered?.date)
-      const isInTalentPool = Boolean(user?.talentPool?.date)
-      const numberOfApplications = Object.keys(
-         user?.jobApplications || {}
-      ).length
-      const livestreamId = user._ref.parent?.parent?.id
-
-      const userUniversityCode = user.user?.university?.code
+   for (const user of users) {
+      const { participated, registered, talentPool, jobApplications, _ref } =
+         user
+      const isParticipant = Boolean(participated?.date)
+      const isRegistered = Boolean(registered?.date)
+      const isInTalentPool = Boolean(talentPool?.date)
+      const numberOfApplications = Object.keys(jobApplications || {}).length
+      const livestreamId = _ref?.parent?.parent?.id
 
       const livestream = livestreamsDict[livestreamId]
-
       if (!livestreamId || !livestream) {
-         return
+         continue
       }
 
       if (!statsToUpdateDict[livestreamId]) {
-         // If stats doc doesn't exist, create it
-
-         statsToUpdateDict[livestreamId] = {
-            // We create a partial object to update the stats, so we don't overwrite the stats that are not set by this script
-            generalStats: {
-               numberOfParticipants: 0,
-               numberOfRegistrations: 0,
-               numberOfTalentPoolProfiles: 0,
-               numberOfApplicants: 0,
-               // numberOfPeopleReached - we don't want to overwrite this value as it is not set by this script
-            },
-            id: "livestreamStats",
-            universityStats: {},
-            livestream: pickPublicDataFromLivestream(livestream),
-         }
+         statsToUpdateDict[livestreamId] = createEmptyStats(livestream)
       }
 
       // Increment general stats
-      if (isParticipant) {
-         statsToUpdateDict[livestreamId].generalStats.numberOfParticipants++
-      }
-      if (isRegistered) {
-         statsToUpdateDict[livestreamId].generalStats.numberOfRegistrations++
-      }
-      if (isInTalentPool) {
-         statsToUpdateDict[livestreamId].generalStats
-            .numberOfTalentPoolProfiles++
-      }
-      if (numberOfApplications) {
-         statsToUpdateDict[livestreamId].generalStats.numberOfApplicants +=
-            numberOfApplications
-      }
+      const { generalStats } = statsToUpdateDict[livestreamId]
+      generalStats.numberOfParticipants += Number(isParticipant)
+      generalStats.numberOfRegistrations += Number(isRegistered)
+      generalStats.numberOfTalentPoolProfiles += Number(isInTalentPool)
+      generalStats.numberOfApplicants += numberOfApplications
 
-      if (userUniversityCode) {
-         // If user has university code, increment university stats
+      statsDictionaries.forEach(({ key, getStatId }) => {
+         const statId = getStatId(user)
 
-         if (
-            !statsToUpdateDict[livestreamId].universityStats[userUniversityCode]
-         ) {
-            // If university stats don't exist, create it
-            statsToUpdateDict[livestreamId].universityStats[
-               userUniversityCode
-            ] = createEmptyUniversityStats()
+         if (!statId) {
+            return
          }
 
-         // Increment university stats
-         if (isParticipant) {
-            statsToUpdateDict[livestreamId].universityStats[userUniversityCode]
-               .numberOfParticipants++
+         if (!statsToUpdateDict[livestreamId][key][statId]) {
+            statsToUpdateDict[livestreamId][key][statId] = createEmptyStatsMap()
          }
-         if (isRegistered) {
-            statsToUpdateDict[livestreamId].universityStats[userUniversityCode]
-               .numberOfRegistrations++
-         }
-         if (isInTalentPool) {
-            statsToUpdateDict[livestreamId].universityStats[userUniversityCode]
-               .numberOfTalentPoolProfiles++
-         }
-         if (numberOfApplications) {
-            statsToUpdateDict[livestreamId].universityStats[
-               userUniversityCode
-            ].numberOfApplicants += numberOfApplications
-         }
-      }
-   })
+
+         // Increment stats for each dictionary
+         const stats = statsToUpdateDict[livestreamId][key][statId]
+
+         stats.numberOfParticipants += Number(isParticipant)
+         stats.numberOfRegistrations += Number(isRegistered)
+         stats.numberOfTalentPoolProfiles += Number(isInTalentPool)
+         stats.numberOfApplicants += numberOfApplications
+      })
+   }
 }
 
 const handleSaveLivestreamStatsInFirestore = async () => {
-   let batchSize = 200 // Batch size for firestore, 200 or fewer works consistently
+   let batchSize = 180 // Batch size for firestore, 200 or fewer works consistently
 
    const totalDocs = Object.entries(statsToUpdateDict)
    const totalNumDocs = totalDocs.length
@@ -163,29 +149,97 @@ const handleSaveLivestreamStatsInFirestore = async () => {
       statsData.forEach(([eventId, stats]) => {
          writeProgressBar.increment() // Increment progress bar
 
-         const livestreamRef = livestreamsDict[eventId]
-            ._ref as unknown as FirebaseFirestore.DocumentReference // Get livestream ref from livestreamsDict
+         const livestream = livestreamsDict[eventId]
+
+         if (!livestream) {
+            Counter.log(`Livestream with id ${eventId} not found, skipping...`)
+            return
+         }
+
+         const livestreamRef = firestore.collection("livestreams").doc(eventId) // Get livestream ref
 
          const statsRef = livestreamRef.collection("stats").doc(stats.id) // Get stats ref from livestream ref
 
-         batch.set(statsRef, stats, { merge: true }) // Upsert the stats data
+         const currentStats = currentLivestreamStatsDict[eventId]
+
+         if (currentStats) {
+            // If there are already stats, merge them with the new stats, so we don't overwrite the stats that are already set
+            const mergedStats = merge(currentStats, stats)
+
+            // update here since set(arg, {merge: true})  fails and we want to merge the stats not overwrite them
+            batch.update(statsRef, mergedStats)
+         } else {
+            const newStats = createLiveStreamStatsDoc(
+               livestream,
+               "liveStreamStats"
+            )
+
+            const mergedStats = merge(newStats, stats)
+
+            batch.set(statsRef, mergedStats)
+         }
 
          counter.writeIncrement() // Increment write counter
       })
 
-      await batch.commit() // Wait for batch to commit
+      await batch.commit()
    }
 
    writeProgressBar.stop()
    Counter.log("All batches committed! :)")
 }
 
-const createEmptyUniversityStats = (): LivestreamStatsMap => {
+const createEmptyStatsMap = (): Pick<
+   LivestreamStatsMap,
+   | "numberOfRegistrations"
+   | "numberOfParticipants"
+   | "numberOfApplicants"
+   | "numberOfTalentPoolProfiles"
+> => {
    return {
       numberOfParticipants: 0,
       numberOfRegistrations: 0,
       numberOfTalentPoolProfiles: 0,
       numberOfApplicants: 0,
-      numberOfPeopleReached: 0,
    }
 }
+
+const createEmptyStats = (
+   livestream: LivestreamEvent
+): LivestreamStatsToUpdate => {
+   return {
+      // We create a partial object to update the stats, so we don't overwrite the stats that are not set by this script
+      generalStats: {
+         numberOfParticipants: 0,
+         numberOfRegistrations: 0,
+         numberOfTalentPoolProfiles: 0,
+         numberOfApplicants: 0,
+         // numberOfPeopleReached - we don't want to overwrite this value as it is not set by this script
+      },
+      id: "livestreamStats",
+      universityStats: {},
+      countryStats: {},
+      fieldOfStudyStats: {},
+      livestream: pickPublicDataFromLivestream(livestream),
+   }
+}
+
+type DictVariable = {
+   key: LivestreamStatsMapKey
+   getStatId: (data: UserLivestreamDataWithRef) => string | undefined
+}
+
+const statsDictionaries: DictVariable[] = [
+   {
+      key: "countryStats",
+      getStatId: (data) => data.user?.universityCountryCode,
+   },
+   {
+      key: "universityStats",
+      getStatId: (data) => data.user?.university?.code,
+   },
+   {
+      key: "fieldOfStudyStats",
+      getStatId: (data) => data.user?.fieldOfStudy?.id,
+   },
+]
