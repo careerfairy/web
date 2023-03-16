@@ -4,6 +4,8 @@ import {
    Speaker,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
+
+import { livestreamTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 import { faker } from "@faker-js/faker"
 import { v4 as uuidv4 } from "uuid"
 import * as admin from "firebase-admin"
@@ -112,13 +114,15 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          () => faker.internet.email()
       )
       const groupId = uuidv4()
+      const title = faker.lorem.sentence()
+      const company = faker.company.companyName()
       let data: LivestreamEvent = {
          author: {
             email: faker.internet.email(),
             groupId: groupId,
          },
          backgroundImageUrl: faker.image.abstract(),
-         company: faker.company.companyName(),
+         company,
          companyId: uuidv4(),
          companyLogoUrl: faker.image.business(),
          created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
@@ -145,9 +149,10 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          ),
          start: admin.firestore.Timestamp.fromDate(faker.date.soon()),
          test: false,
-         title: faker.lorem.sentence(),
+         title,
          type: "upcoming",
          universities: [],
+         triGrams: livestreamTriGrams(title, company),
       }
 
       data = Object.assign(data, overrideFields)
