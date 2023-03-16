@@ -99,7 +99,12 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                   : signupPagePath
             )
          } else {
-            if (userData?.isAdmin || Object.keys(adminGroups).length > 1) {
+            if (absolutePath) {
+               void replace(absolutePath as string)
+            } else if (
+               userData?.isAdmin ||
+               Object.keys(adminGroups).length > 1
+            ) {
                // open manage company dialog
                setOpenManageCompaniesDialog(true)
             } else if (Object.keys(adminGroups).length === 1) {
@@ -108,7 +113,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
 
                void replace(`/group/${groupId}/admin`)
             } else {
-               void replace((absolutePath as string) || "/portal")
+               void replace("/portal")
             }
          }
       }
@@ -156,8 +161,8 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
 
    const handleAdminCloseDialog = useCallback(() => {
       setOpenManageCompaniesDialog(false)
-      void replace((absolutePath as string) || "/portal")
-   }, [absolutePath, replace])
+      void replace("/portal")
+   }, [replace])
 
    return (
       <>
