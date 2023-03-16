@@ -31,9 +31,9 @@ type FlattenObjectPathsHelper<T> = T extends Record<string, unknown>
  *   address: {
  *   street: string;
  *   city: string;
- *
  * };
- * type Paths = FlattenObjectPaths<Obj>;
+ *
+ * type Paths = FlattenObjectPaths<Person>;
  * // type Paths = "name" | "age" | "address.street" | "address.city"
  */
 export type FlattenPaths<T> = FlattenObjectPathsHelper<{

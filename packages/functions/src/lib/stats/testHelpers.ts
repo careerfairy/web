@@ -149,7 +149,7 @@ const generateJobApplications = (
       const jobId = uuidv4()
       jobApplications[jobId] = {
          applicationId: uuidv4(),
-         jobId: uuidv4(),
+         jobId,
          job: {},
          groupId: uuidv4(),
          integrationId: uuidv4(),
