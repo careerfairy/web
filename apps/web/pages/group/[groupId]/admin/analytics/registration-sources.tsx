@@ -1,7 +1,7 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsRegistrationSourcesPageContent from "components/views/group/admin/analytics/registration-sources"
+import AnalyticsRegistrationSourcesPageContent from "components/views/group/admin/analytics-new/registration-sources"
 
 const RegistrationSourcesPage = () => {
    const {
