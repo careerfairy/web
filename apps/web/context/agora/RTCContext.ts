@@ -79,6 +79,12 @@ export interface RtcPropsInterface {
     */
    streamMode?: LivestreamEvent["mode"]
 
+   /**
+    * Viewers should only join the RTC channel when the livestream is live or
+    * he's spying
+    */
+   allowViewerToJoin?: boolean
+
    children: React.ReactNode | null
 }
 

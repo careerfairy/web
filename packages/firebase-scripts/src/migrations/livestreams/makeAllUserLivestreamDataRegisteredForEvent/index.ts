@@ -6,6 +6,7 @@ import {
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { BigBatch } from "@qualdesk/firestore-big-batch"
+import { removeDuplicates } from "@careerfairy/shared-lib/dist/utils"
 
 const targetLivestreamId = "4Y7N5oAPpooemptigtE9"
 
@@ -81,10 +82,6 @@ export async function run() {
    } finally {
       counter.print()
    }
-}
-
-const removeDuplicates = (arr: any[]) => {
-   return arr.filter((item, index) => arr.indexOf(item) === index)
 }
 
 const throwMigrationError = (message: string) => {

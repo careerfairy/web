@@ -1,7 +1,3 @@
-export const removeDuplicates = (arr: string[]) => {
-   return Array.from(new Set(arr))
-}
-
 export const getCLIBarOptions = (
    title: string = "CLI Progress",
    operationName: string = "operations"

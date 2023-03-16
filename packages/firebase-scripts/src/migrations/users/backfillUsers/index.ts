@@ -20,7 +20,6 @@ import {
 import { RegisteredGroup } from "@careerfairy/shared-lib/dist/users/users"
 import {
    checkIfHasMatch,
-   removeDuplicates,
    throwMigrationError,
    trimAndLowerCase,
 } from "../../../util/misc"
@@ -48,6 +47,7 @@ import {
    writeProgressBar,
 } from "../../../util/bulkWriter"
 import counterConstants from "../../../lib/Counter/constants"
+import { removeDuplicates } from "@careerfairy/shared-lib/dist/utils"
 
 const customCountKeys = {
    numTotalUsers: "Total Users",

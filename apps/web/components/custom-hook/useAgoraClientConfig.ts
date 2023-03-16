@@ -97,6 +97,12 @@ export default function useAgoraClientConfig(
                   prevState,
                   reason,
                })
+
+               // user is leaving the channel
+               if (curState === "DISCONNECTED" && reason === "LEAVE") {
+                  setRemoteStreams([])
+               }
+
                dispatch(
                   actions.setAgoraRtcConnectionState({
                      curState,
