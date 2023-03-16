@@ -55,7 +55,11 @@ export async function run() {
          `Fetched ${livestreams.length} livestreams, ${currentLivestreamStats.length} livestream stats and ${userLivestreamData.length} user livestream data`
       )
 
-      counter.addToReadCount(livestreams.length + userLivestreamData.length)
+      counter.addToReadCount(
+         livestreams.length +
+            userLivestreamData.length +
+            currentLivestreamStats.length
+      )
 
       livestreamsDict = convertDocArrayToDict(livestreams)
 
@@ -162,6 +166,7 @@ const handleSaveLivestreamStatsInFirestore = async () => {
             // If there are already stats, merge them with the new stats, so we don't overwrite the stats that are already set
             const mergedStats = merge(currentStats, stats)
 
+            // update here since set(arg, {merge: true})  fails and we want to merge the stats not overwrite them
             batch.update(statsRef, mergedStats)
          } else {
             const newStats = createLiveStreamStatsDoc(
