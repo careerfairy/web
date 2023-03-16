@@ -1,7 +1,7 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsTalentPoolPageContent from "components/views/group/admin/analytics/talent-pool"
+import AnalyticsTalentPoolPageContent from "components/views/group/admin/analytics-new/talent-pool"
 
 const TalentPoolPage = () => {
    const {

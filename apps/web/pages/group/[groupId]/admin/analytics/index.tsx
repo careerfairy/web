@@ -1,7 +1,7 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsGeneralPageContent from "components/views/group/admin/analytics/general"
+import AnalyticsGeneralPageContent from "components/views/group/admin/analytics-new/general"
 
 const GeneralPage = () => {
    const {

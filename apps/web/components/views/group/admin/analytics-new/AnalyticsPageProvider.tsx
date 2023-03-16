@@ -18,26 +18,27 @@ type IAnalyticsPageContext = {
    setLivestreamStatsTimeFrame: React.Dispatch<React.SetStateAction<TimeFrame>>
    livestreamStatsTimeFrame: TimeFrame
 }
+const now = new Date()
 export const TimeFrames = {
    "Last 30 days": {
       start: new Date(new Date().setDate(new Date().getDate() - 30)),
-      end: new Date(),
+      end: now,
    },
    "Last 6 months": {
       start: new Date(new Date().setDate(new Date().getDate() - 180)),
-      end: new Date(),
+      end: now,
    },
    "Last 1 year": {
       start: new Date(new Date().setDate(new Date().getDate() - 365)),
-      end: new Date(),
+      end: now,
    },
    "Last 2 years": {
       start: new Date(new Date().setDate(new Date().getDate() - 730)),
-      end: new Date(),
+      end: now,
    },
    "All time": {
       start: new Date(0),
-      end: new Date(),
+      end: now,
    },
 } as const
 

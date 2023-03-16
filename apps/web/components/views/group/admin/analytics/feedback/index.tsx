@@ -2,7 +2,7 @@ import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { AnalyticsPageProvider } from "../AnalyticsPageProvider"
+import { AnalyticsPageProvider } from "../../analytics-new/AnalyticsPageProvider"
 import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import Loader from "../../../../loader/Loader"
 

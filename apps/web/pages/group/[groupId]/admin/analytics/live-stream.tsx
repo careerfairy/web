@@ -1,7 +1,7 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsLivestreamPageContent from "components/views/group/admin/analytics/live-stream"
+import AnalyticsLivestreamPageContent from "components/views/group/admin/analytics-new/live-stream"
 
 const LivestreamPage = () => {
    const {
