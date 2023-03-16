@@ -1,101 +1,191 @@
-import React, { useEffect, useMemo, useState } from "react"
-import {
-   collectionGroup,
-   query,
-   QueryConstraint,
-   where,
-} from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
+import {
+   Card,
+   Checkbox,
+   CircularProgress,
+   Divider,
+   ListItemIcon,
+   ListItemText,
+} from "@mui/material"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useTimeFramedLivestreamStats from "./useTimeFramedLivestreamStats"
+import Stack from "@mui/material/Stack"
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
+import useIsMobile from "../../../../../../custom-hook/useIsMobile"
+import {
+   prettyDate,
+   truncate,
+} from "../../../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
       display: "flex",
       flex: 1,
    },
+   wrapper: {
+      flex: 1,
+      p: 1,
+   },
+   livestreamStatSelect: {
+      flex: 1,
+   },
+   timeFrameSelect: {
+      minWidth: 350,
+   },
 })
 const GeneralSearchFilter = () => {
-   const { group } = useGroup()
-
    const { setLivestreamStats } = useAnalyticsPageContext()
+   const isMobile = useIsMobile()
+   const [selectedStatIds, setSelectedStatIds] = useState<string[]>([])
 
    const [livestreamStatsTimeFrame, setLivestreamStatsTimeFrame] =
       useState<TimeFrame>("Last 2 years")
 
-   const livestreamStatsQuery = useMemo(() => {
-      const timeFrame = TimeFrames[livestreamStatsTimeFrame]
-
-      const constraints: QueryConstraint[] = [
-         where("id", "==", "livestreamStats"),
-         where("livestream.groupIds", "array-contains", group.id),
-         where("livestream.start", ">=", timeFrame.start),
-      ]
-
-      if (timeFrame.end) {
-         constraints.unshift(where("livestream.start", "<=", timeFrame.end))
-      }
-
-      return query(collectionGroup(FirestoreInstance, "stats"), ...constraints)
-   }, [group.id, livestreamStatsTimeFrame])
-
-   const { data: livestreamStats } = useFirestoreCollection<LiveStreamStats>(
-      livestreamStatsQuery,
-      queryOptions
+   const { data: livestreamStats } = useTimeFramedLivestreamStats(
+      livestreamStatsTimeFrame
    )
 
-   const searchLivestreamsQuery = useMemo(() => {
-      const timeFrame = TimeFrames[livestreamStatsTimeFrame]
+   const noLivestreamStats = livestreamStats?.length === 0
 
-      const constraints: QueryConstraint[] = [
-         where("groupIds", "array-contains", group.id),
-         where("start", ">=", timeFrame.start),
-      ]
-
-      if (timeFrame.end) {
-         constraints.unshift(where("start", "<=", timeFrame.end))
-      }
-      return query(collection(FirestoreInstance, "livestreams"), ...constraints)
-   }, [group.id, livestreamStatsTimeFrame])
-
-   const { data: livestreams } = useFirestoreCollection<LivestreamEvent>(
-       searchLivestreamsQuery
-   )
-
-   console.log("-> livestreams", livestreams)
+   const isLoading = livestreamStats === undefined
 
    useEffect(() => {
-      setLivestreamStats(livestreamStats)
-   }, [livestreamStats, setLivestreamStats])
+      if (selectedStatIds.length === 0) {
+         setLivestreamStats(livestreamStats)
+      } else {
+         setLivestreamStats(
+            livestreamStats?.filter((stat) =>
+               selectedStatIds.includes(stat.livestream.id)
+            ) ?? []
+         )
+      }
+   }, [livestreamStats, selectedStatIds, setLivestreamStats])
+
+   const handleTimeframeChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+         setLivestreamStatsTimeFrame(event.target.value as TimeFrame)
+         setSelectedStatIds([])
+      },
+      [setLivestreamStatsTimeFrame]
+   )
+
+   const handleLivestreamStatChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+         const value = event.target.value
+
+         if (Array.isArray(value)) {
+            setSelectedStatIds(value)
+         } else {
+            setSelectedStatIds([])
+         }
+      },
+      [setSelectedStatIds]
+   )
+
+   const selectedStats = useMemo(
+      () =>
+         livestreamStats?.filter((stat) =>
+            selectedStatIds.includes(stat.livestream.id)
+         ) ?? [],
+      [livestreamStats, selectedStatIds]
+   )
+
+   const value = useMemo(
+      () =>
+         selectedStatIds.length === 0 ? ["All live streams"] : selectedStatIds,
+      [selectedStatIds]
+   )
+
+   const livestreamStatSelectProps = useMemo(
+      () => ({
+         multiple: true,
+         renderValue: () => {
+            if (isLoading)
+               return <CircularProgress color={"inherit"} size={15} />
+            if (!selectedStats.length) {
+               return noLivestreamStats ? "No live streams" : "All live streams"
+            } else {
+               const streamTitle = selectedStats[0]?.livestream?.title
+               const streamCount = selectedStats.length - 1
+               return `${streamTitle} ${streamCount ? `+ ${streamCount}` : ""}` // Eg. "Stream 1 + 2" or "Stream 1"
+            }
+         },
+      }),
+      [isLoading, selectedStats, noLivestreamStats]
+   )
 
    return (
-       <Card sx={styles.root}>
-          <MultiListSelect
-              inputName={"search-livestreams"}
-              selectedItems={[]}
-              allValues={[]}
-          />
-          <TextField
-              id="select-timeframe"
-              select
-              label="Select Timeframe"
-              helperText="Please select a timeframe"
-              value={livestreamStatsTimeFrame}
-              variant="filled"
-              onChange={(e) => {
-                 setLivestreamStatsTimeFrame(e.target.value as TimeFrame)
-              }}
-          >
-             {Object.keys(TimeFrames).map((timeframe) => (
-                 <MenuItem key={timeframe} value={timeframe}>
-                    {timeframe}
-                 </MenuItem>
-             ))}
-          </TextField>
-       </Card>
+      <Card sx={styles.root}>
+         <Stack
+            direction={isMobile ? "column" : "row"}
+            sx={styles.wrapper}
+            spacing={2}
+            component={Stack}
+            divider={
+               <Divider
+                  flexItem
+                  orientation={isMobile ? "horizontal" : "vertical"}
+               />
+            }
+         >
+            <StyledTextField
+               sx={styles.livestreamStatSelect}
+               id="select-livestream"
+               select
+               disabled={noLivestreamStats || isLoading}
+               fullWidth
+               SelectProps={livestreamStatSelectProps}
+               value={value}
+               variant="outlined"
+               onChange={handleLivestreamStatChange}
+            >
+               {livestreamStats?.map((stat) => (
+                  <StyledMenuItem
+                     value={stat.livestream.id}
+                     key={stat.livestream.id}
+                  >
+                     <ListItemText
+                        aria-label={stat.livestream.title}
+                        primary={truncate(stat.livestream.title, 80)}
+                        secondary={prettyDate(stat.livestream.start)}
+                     />
+                     <Checkbox
+                        checked={selectedStatIds.includes(stat.livestream.id)}
+                        color={"default"}
+                     />
+                  </StyledMenuItem>
+               )) ?? []}
+            </StyledTextField>
+            <StyledTextField
+               sx={styles.timeFrameSelect}
+               id="select-timeframe"
+               select
+               SelectProps={timeFrameSelectProps}
+               disabled={isLoading}
+               value={livestreamStatsTimeFrame}
+               variant="outlined"
+               onChange={handleTimeframeChange}
+            >
+               {Object.keys(TimeFrames).map((timeframe) => (
+                  <StyledMenuItem key={timeframe} value={timeframe}>
+                     <ListItemText primary={timeframe} />
+                     {timeframe === livestreamStatsTimeFrame ? (
+                        <ListItemIcon>
+                           <CheckRoundedIcon fontSize="small" />
+                        </ListItemIcon>
+                     ) : null}
+                  </StyledMenuItem>
+               ))}
+            </StyledTextField>
+         </Stack>
+      </Card>
    )
+}
+
+const timeFrameSelectProps = {
+   renderValue: (val) => val,
 }
 
 export const TimeFrames = {
@@ -119,11 +209,6 @@ export const TimeFrames = {
       start: new Date(0),
       end: null,
    },
-} as const
-
-const queryOptions = {
-   idField: "id",
-   suspense: false,
 } as const
 
 export type TimeFrame = keyof typeof TimeFrames
