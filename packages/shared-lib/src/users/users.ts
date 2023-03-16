@@ -366,6 +366,12 @@ export interface UserActivity extends Identifiable {
    date: Timestamp
 
    /**
+    * Can be populated if the activity type is related to a
+    * livestream
+    */
+   relatedLivestreamId?: string
+
+   /**
     * No real use atm for this field
     */
    type:

@@ -275,7 +275,7 @@ export interface RecordingToken extends Identifiable {
 
 export interface RecordingStats extends Identifiable {
    livestreamId: string
-   livestreamStartDate: Date
+   livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched: number
    viewers: string[]
    views: number
