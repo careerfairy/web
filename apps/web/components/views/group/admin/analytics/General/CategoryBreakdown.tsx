@@ -32,7 +32,7 @@ import RootState from "../../../../../../store/reducers"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { UserDataSet, UserType } from "../index-old"
+import { UserDataSet, UserType } from "../index"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import useUserBreakdownStats from "../../../../../custom-hook/useUserBreakdownStats"
 
