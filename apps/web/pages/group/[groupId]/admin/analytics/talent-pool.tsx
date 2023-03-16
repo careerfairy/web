@@ -1,23 +1,23 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsGeneralPageContent from "components/views/group/admin/analytics/general"
+import AnalyticsTalentPoolPageContent from "components/views/group/admin/analytics/talent-pool"
 
-const GeneralPage = () => {
+const TalentPoolPage = () => {
    const {
       query: { groupId },
    } = useRouter()
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"General"}
+         pageDisplayName={"Talent Pool"}
          groupId={groupId as string}
       >
-         <DashboardHead title="CareerFairy | General Page of" />
+         <DashboardHead title="CareerFairy | Talent Pool of" />
 
-         <AnalyticsGeneralPageContent />
+         <AnalyticsTalentPoolPageContent />
       </GroupDashboardLayout>
    )
 }
 
-export default GeneralPage
+export default TalentPoolPage

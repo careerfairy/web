@@ -1,23 +1,23 @@
 import GroupDashboardLayout from "layouts/GroupDashboardLayout"
 import DashboardHead from "layouts/GroupDashboardLayout/DashboardHead"
 import { useRouter } from "next/router"
-import AnalyticsGeneralPageContent from "components/views/group/admin/analytics/general"
+import AnalyticsLivestreamPageContent from "components/views/group/admin/analytics/live-stream"
 
-const GeneralPage = () => {
+const LivestreamPage = () => {
    const {
       query: { groupId },
    } = useRouter()
 
    return (
       <GroupDashboardLayout
-         pageDisplayName={"General"}
+         pageDisplayName={"Live Stream Analytics"}
          groupId={groupId as string}
       >
-         <DashboardHead title="CareerFairy | General Page of" />
+         <DashboardHead title="CareerFairy | Live Stream Analytics of" />
 
-         <AnalyticsGeneralPageContent />
+         <AnalyticsLivestreamPageContent />
       </GroupDashboardLayout>
    )
 }
 
-export default GeneralPage
+export default LivestreamPage
