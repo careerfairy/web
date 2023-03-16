@@ -5,7 +5,7 @@ import {
 } from "../../../common/SourcesProgress"
 import CardCustom from "../../../common/CardCustom"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
-import { useAnalyticsPageContext } from "../../AnalyticsPageProvider"
+import { useAnalyticsPageContext } from "../GeneralPageProvider"
 
 const LivestreamsKPIs = () => {
    const { livestreamStats } = useAnalyticsPageContext()

@@ -2,9 +2,7 @@ import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { AnalyticsPageProvider } from "../AnalyticsPageProvider"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import Loader from "../../../../loader/Loader"
+import { GeneralPageProvider } from "./GeneralPageProvider"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
 import CompanyPageCTA from "./company-page/CompanyPageCTA"
@@ -20,11 +18,9 @@ const styles = sxStyles({
 
 const AnalyticsGeneralPageContent = () => {
    return (
-      <SuspenseWithBoundary fallback={<Loader />}>
-         <AnalyticsPageProvider>
-            <MemoizedPageContent />
-         </AnalyticsPageProvider>
-      </SuspenseWithBoundary>
+      <GeneralPageProvider>
+         <MemoizedPageContent />
+      </GeneralPageProvider>
    )
 }
 
