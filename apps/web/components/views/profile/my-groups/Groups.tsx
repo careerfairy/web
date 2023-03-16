@@ -201,9 +201,9 @@ const Groups = ({ isOnDialog = false }: Props) => {
    )
 
    return (
-      <ContentCard>
-         <div className={classes.header}>
-            {isOnDialog ? null : (
+      <ContentCard sx={isOnDialog ? { px: 0 } : null}>
+         {isOnDialog ? null : (
+            <div className={classes.header}>
                <Tabs
                   value={value || "joined"}
                   onChange={handleChange}
@@ -221,8 +221,8 @@ const Groups = ({ isOnDialog = false }: Props) => {
                      />
                   ))}
                </Tabs>
-            )}
-         </div>
+            </div>
+         )}
          {showSearch ? (
             <Box>
                <Highlights
@@ -288,7 +288,7 @@ export const Highlights = ({
                <TextField
                   {...params}
                   style={{ backgroundColor: "white", margin: 0 }}
-                  placeholder="Join some groups"
+                  placeholder="Select company"
                   label="Company name"
                   fullWidth
                   variant="outlined"
