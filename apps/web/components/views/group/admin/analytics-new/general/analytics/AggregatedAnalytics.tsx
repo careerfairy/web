@@ -4,7 +4,7 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { CardAnalytic } from "../../../common/CardAnalytic"
 import { totalPeopleReached } from "../../../common/util"
-import { useAnalyticsPageContext } from "../../AnalyticsPageProvider"
+import { useAnalyticsPageContext } from "../GeneralPageProvider"
 
 const styles = sxStyles({
    gridItem: {

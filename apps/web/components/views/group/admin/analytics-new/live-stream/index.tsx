@@ -2,9 +2,6 @@ import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { AnalyticsPageProvider } from "../AnalyticsPageProvider"
-import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
-import Loader from "../../../../loader/Loader"
 
 const styles = sxStyles({
    gridItem: {
@@ -13,13 +10,8 @@ const styles = sxStyles({
 })
 
 const AnalyticsLivestreamPageContent = () => {
-   return (
-      <SuspenseWithBoundary fallback={<Loader />}>
-         <AnalyticsPageProvider>
-            <MemoizedPageContent />
-         </AnalyticsPageProvider>
-      </SuspenseWithBoundary>
-   )
+   // Add necessary providers here
+   return <MemoizedPageContent />
 }
 
 const PageContent = () => {
