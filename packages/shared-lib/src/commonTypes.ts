@@ -5,6 +5,12 @@ export interface Identifiable {
    id: string
 }
 
+/**
+ * Utility type when creating documents where the id
+ * field is auto generated
+ */
+export type Create<T extends Identifiable> = Omit<T, "id">
+
 export type UTMParams = {
    utm_source?: string
    utm_medium?: string
