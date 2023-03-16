@@ -11,6 +11,12 @@ import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useF
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      flex: 1,
+   },
+})
 const GeneralSearchFilter = () => {
    const { group } = useGroup()
 
@@ -40,11 +46,56 @@ const GeneralSearchFilter = () => {
       queryOptions
    )
 
+   const searchLivestreamsQuery = useMemo(() => {
+      const timeFrame = TimeFrames[livestreamStatsTimeFrame]
+
+      const constraints: QueryConstraint[] = [
+         where("groupIds", "array-contains", group.id),
+         where("start", ">=", timeFrame.start),
+      ]
+
+      if (timeFrame.end) {
+         constraints.unshift(where("start", "<=", timeFrame.end))
+      }
+      return query(collection(FirestoreInstance, "livestreams"), ...constraints)
+   }, [group.id, livestreamStatsTimeFrame])
+
+   const { data: livestreams } = useFirestoreCollection<LivestreamEvent>(
+       searchLivestreamsQuery
+   )
+
+   console.log("-> livestreams", livestreams)
+
    useEffect(() => {
       setLivestreamStats(livestreamStats)
    }, [livestreamStats, setLivestreamStats])
 
-   return <div>GeneralSearchFilter</div>
+   return (
+       <Card sx={styles.root}>
+          <MultiListSelect
+              inputName={"search-livestreams"}
+              selectedItems={[]}
+              allValues={[]}
+          />
+          <TextField
+              id="select-timeframe"
+              select
+              label="Select Timeframe"
+              helperText="Please select a timeframe"
+              value={livestreamStatsTimeFrame}
+              variant="filled"
+              onChange={(e) => {
+                 setLivestreamStatsTimeFrame(e.target.value as TimeFrame)
+              }}
+          >
+             {Object.keys(TimeFrames).map((timeframe) => (
+                 <MenuItem key={timeframe} value={timeframe}>
+                    {timeframe}
+                 </MenuItem>
+             ))}
+          </TextField>
+       </Card>
+   )
 }
 
 export const TimeFrames = {
