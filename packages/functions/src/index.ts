@@ -209,6 +209,7 @@ exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
+exports.onCreateUserData = onCreateTriggers.onCreateUserData
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =
