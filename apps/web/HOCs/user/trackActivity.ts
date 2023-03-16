@@ -1,5 +1,5 @@
 import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
-import { userServiceInstance } from "data/firebase/UserService"
+import { userRepo } from "data/RepositoryInstances"
 import SessionStorageUtil from "util/SessionStorageUtil"
 
 const SESSION_STORAGE_KEY = "lastActivityAt"
@@ -18,7 +18,7 @@ const MIN_UPDATE_INTERVAL_MS = 3_600_000 // 1h
  */
 export const updateUserActivity = async (user: UserData) => {
    if (needsToBeUpdated()) {
-      await userServiceInstance.createActivity(
+      await userRepo.createActivity(
          pickPublicDataFromUser(user),
          "tokenRefresh"
       )
