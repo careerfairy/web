@@ -110,6 +110,10 @@ service cloud.firestore {
                 allow write: if false;
             }
 
+            match /activities/{id} {
+                allow read, write: if isSignedInAndIsSameUser(userId);
+            }
+
             match /rewards/{rewardId} {
                 allow read: if isSignedInAndIsSameUser(userId);
                 allow update: if isSignedInAndIsSameUser(userId);
