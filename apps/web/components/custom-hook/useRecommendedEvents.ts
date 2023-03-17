@@ -21,6 +21,7 @@ const useRecommendedEvents = (
 ) => {
    const firestore = useFirestore()
    const fetcher = useFunctionsSWR<string[]>()
+   const { userData } = useAuth()
 
    const { data: eventIds } = useSWR<string[]>(
       [
@@ -54,14 +55,30 @@ const useRecommendedEvents = (
       }
    )
 
+   const filteredEvents = filterRegisteredOrPastEvents(
+      userData?.id,
+      events || []
+   )
+
    return useMemo(
       () => ({
-         events,
+         events: filteredEvents,
          loading: status === "loading",
       }),
-      [events, status]
+      [filteredEvents, status]
    )
 }
+
+/**
+ * Filter events that the user has registered for or that have already occurred
+ */
+const filterRegisteredOrPastEvents = (
+   userId: string,
+   events: LivestreamEvent[]
+): LivestreamEvent[] =>
+   events.filter(
+      (event) => !event.hasEnded && !event.registeredUsers?.includes(userId)
+   )
 
 /*
  * Hook to preload the recommended eventIds and store them in the SWR cache
