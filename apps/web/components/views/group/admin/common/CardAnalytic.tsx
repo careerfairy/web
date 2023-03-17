@@ -1,20 +1,10 @@
-import Link from "../../../common/Link"
-import { Box, Typography } from "@mui/material"
-import { ChevronRight } from "react-feather"
-import CardCustom from "./CardCustom"
+import { Typography } from "@mui/material"
+import CardCustom, { SubheaderLink } from "./CardCustom"
 import { sxStyles } from "../../../../../types/commonTypes"
 
 const styles = sxStyles({
    value: {
       fontSize: "3.43rem",
-   },
-   subheaderLink: {
-      textDecoration: "none",
-      fontWeight: 600,
-   },
-   subheaderIcon: {
-      width: "18px",
-      marginLeft: "5px",
    },
 })
 
@@ -42,21 +32,5 @@ export const CardAnalytic = ({
             {value}
          </Typography>
       </CardCustom>
-   )
-}
-export const SubheaderLink = ({
-   link,
-   title,
-}: {
-   link: string
-   title: string
-}) => {
-   return (
-      <Link href={link} color="secondary" sx={styles.subheaderLink}>
-         <Box display="flex" mt={1}>
-            <span>{title}</span>
-            <ChevronRight style={styles.subheaderIcon} />
-         </Box>
-      </Link>
    )
 }

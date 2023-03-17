@@ -1,5 +1,5 @@
 import React from "react"
-import CardCustom from "../../../common/CardCustom"
+import CardCustom, { SubheaderLink } from "../../../common/CardCustom"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import CircularProgress, {
    circularProgressClasses,
@@ -12,7 +12,6 @@ import Stack from "@mui/material/Stack"
 import BulletPoints from "../../../../../common/BulletPoints"
 import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 import Skeleton from "@mui/material/Skeleton"
-import { SubheaderLink } from "../../../common/CardAnalytic"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 
 const size = 130
@@ -112,12 +111,12 @@ const CompanyPageCTA = (props: Props) => {
       : "Create your company page to:"
 
    const ctaLink = (
-      <Typography fontWeight={"400"}>
+      <Box fontWeight={"400"}>
          <SubheaderLink
             title="Go to company page"
             link={`/group/${group.id}/admin/page`}
          />
-      </Typography>
+      </Box>
    )
 
    if (isLoading) {
@@ -127,6 +126,7 @@ const CompanyPageCTA = (props: Props) => {
    return (
       <CardCustom
          sx={styles.cardRoot}
+         disableTypography
          title={
             <Stack
                justifyContent={"space-between"}
