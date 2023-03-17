@@ -1,11 +1,8 @@
 import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
-import { memo, useMemo } from "react"
+import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import {
-   GeneralPageProvider,
-   useAnalyticsPageContext,
-} from "./GeneralPageProvider"
+import { GeneralPageProvider } from "./GeneralPageProvider"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
 import CompanyPageCTA from "./company-page/CompanyPageCTA"
@@ -29,7 +26,6 @@ const AnalyticsGeneralPageContent = () => {
 }
 
 const PageContent = () => {
-   const { livestreamStats } = useAnalyticsPageContext()
    const { group } = useGroup()
 
    const progress = useGroupCompanyPageProgress(group)
