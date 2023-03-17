@@ -2,22 +2,27 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 import {
    Card,
-   Checkbox,
    CircularProgress,
    Divider,
    ListItemIcon,
    ListItemText,
+   Typography,
 } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useTimeFramedLivestreamStats from "./useTimeFramedLivestreamStats"
 import Stack from "@mui/material/Stack"
-import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
+import {
+   StyledCheckbox,
+   StyledMenuItem,
+   StyledTextField,
+} from "../../../common/inputs"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import {
    prettyDate,
    truncate,
 } from "../../../../../../helperFunctions/HelperFunctions"
+import { TextFieldProps } from "@mui/material/TextField/TextField"
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 
 const styles = sxStyles({
    root: {
@@ -30,9 +35,20 @@ const styles = sxStyles({
    },
    livestreamStatSelect: {
       flex: 1,
+      minWidth: "auto !important",
+      "& .MuiInputBase-input": {
+         overflow: "hidden",
+         textOverflow: "ellipsis",
+      },
    },
    timeFrameSelect: {
-      minWidth: 350,
+      minWidth: {
+         sm: 350,
+      },
+   },
+   listIcon: {
+      display: "flex",
+      justifyContent: "flex-end",
    },
 })
 const GeneralSearchFilter = () => {
@@ -98,19 +114,27 @@ const GeneralSearchFilter = () => {
       [selectedStatIds]
    )
 
-   const livestreamStatSelectProps = useMemo(
+   const livestreamStatSelectProps = useMemo<TextFieldProps["SelectProps"]>(
       () => ({
          multiple: true,
          renderValue: () => {
             if (isLoading)
                return <CircularProgress color={"inherit"} size={15} />
+
+            let message
             if (!selectedStats.length) {
-               return noLivestreamStats ? "No live streams" : "All live streams"
+               message = noLivestreamStats
+                  ? "No live streams"
+                  : "All live streams"
             } else {
                const streamTitle = selectedStats[0]?.livestream?.title
                const streamCount = selectedStats.length - 1
-               return `${streamTitle} ${streamCount ? `+ ${streamCount}` : ""}` // Eg. "Stream 1 + 2" or "Stream 1"
+               message = `${streamTitle} ${
+                  streamCount ? `+ ${streamCount}` : ""
+               }` // Eg. "Stream 1 + 2" or "Stream 1"
             }
+
+            return <Typography whiteSpace="pre-line">{message}</Typography>
          },
       }),
       [isLoading, selectedStats, noLivestreamStats]
@@ -122,7 +146,6 @@ const GeneralSearchFilter = () => {
             direction={isMobile ? "column" : "row"}
             sx={styles.wrapper}
             spacing={2}
-            component={Stack}
             divider={
                <Divider
                   flexItem
@@ -148,12 +171,14 @@ const GeneralSearchFilter = () => {
                   >
                      <ListItemText
                         aria-label={stat.livestream.title}
-                        primary={truncate(stat.livestream.title, 80)}
+                        primary={truncate(stat.livestream.title, 150)}
+                        primaryTypographyProps={{
+                           whiteSpace: "pre-line",
+                        }}
                         secondary={prettyDate(stat.livestream.start)}
                      />
-                     <Checkbox
+                     <StyledCheckbox
                         checked={selectedStatIds.includes(stat.livestream.id)}
-                        color={"default"}
                      />
                   </StyledMenuItem>
                )) ?? []}
@@ -172,7 +197,7 @@ const GeneralSearchFilter = () => {
                   <StyledMenuItem key={timeframe} value={timeframe}>
                      <ListItemText primary={timeframe} />
                      {timeframe === livestreamStatsTimeFrame ? (
-                        <ListItemIcon>
+                        <ListItemIcon sx={styles.listIcon}>
                            <CheckRoundedIcon fontSize="small" />
                         </ListItemIcon>
                      ) : null}
@@ -189,25 +214,25 @@ const timeFrameSelectProps = {
 }
 
 export const TimeFrames = {
-   "Last 30 days": {
-      start: new Date(new Date().setDate(new Date().getDate() - 30)),
-      end: null, // null means we don't care about the end date
-   },
-   "Last 6 months": {
-      start: new Date(new Date().setDate(new Date().getDate() - 180)),
-      end: null,
-   },
-   "Last 1 year": {
-      start: new Date(new Date().setDate(new Date().getDate() - 365)),
+   "All time": {
+      start: new Date(0),
       end: null,
    },
    "Last 2 years": {
       start: new Date(new Date().setDate(new Date().getDate() - 730)),
       end: null,
    },
-   "All time": {
-      start: new Date(0),
+   "Last 1 year": {
+      start: new Date(new Date().setDate(new Date().getDate() - 365)),
       end: null,
+   },
+   "Last 6 months": {
+      start: new Date(new Date().setDate(new Date().getDate() - 180)),
+      end: null,
+   },
+   "Last month": {
+      start: new Date(new Date().setDate(new Date().getDate() - 30)),
+      end: null, // null means we don't care about the end date
    },
 } as const
 
