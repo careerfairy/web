@@ -1,9 +1,9 @@
 import { useTheme } from "@mui/material/styles"
-import { Breakpoint, useMediaQuery } from "@mui/material"
+import { useMediaQuery } from "@mui/material"
 
-const useIsMobile = (breakPoint: Breakpoint = "md"): boolean => {
+const useIsMobile = (): boolean => {
    const theme = useTheme()
-   return useMediaQuery(theme.breakpoints.down(breakPoint))
+   return useMediaQuery(theme.breakpoints.down("md"))
 }
 
 export default useIsMobile

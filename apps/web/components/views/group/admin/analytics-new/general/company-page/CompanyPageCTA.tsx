@@ -108,7 +108,7 @@ type Props = {
 const CompanyPageCTA = (props: Props) => {
    const { group } = useGroup()
 
-   const isMobile = useIsMobile("sm")
+   const isMobile = useIsMobile()
 
    const isLoading = props.progress === null
 
@@ -174,7 +174,7 @@ const CompanyPageCTA = (props: Props) => {
 }
 
 const LoadingCompanyPageCTA = () => {
-   const isMobile = useIsMobile("sm")
+   const isMobile = useIsMobile()
 
    const skeletonCtaLink = (
       <Typography variant={isMobile ? "h3" : "h4"} sx={styles.ctaLinkSkeleton}>
