@@ -91,17 +91,6 @@ export function getMostCommonFieldsOfStudies(
    )
 }
 
-export function getMostCommonInterestIds(
-   livestreams: LivestreamEvent[]
-): string[] {
-   // get all interest ids from livestreams
-   const interestIds = livestreams
-      .flatMap((livestream) => livestream.interestsIds)
-      .filter(Boolean)
-
-   return sortElementsByFrequency(interestIds)
-}
-
 export function getMostCommonArrayValues(
    livestreams: LivestreamEvent[],
    livestreamGetter: (livestream: LivestreamEvent) => string[]
