@@ -13,8 +13,9 @@ import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
 } from "../util"
-import { LivestreamBasedRecommendations } from "./LivestreamBasedRecommendations"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
+import { UserBasedRecommendationsBuilder } from "./UserBasedRecommendationsBuilder"
+import { LivestreamBasedRecommendationsBuilder } from "./LivestreamBasedRecommendationsBuilder"
 
 // This only imports the types at compile time and not the actual library at runtime
 type FirebaseAdmin = typeof import("firebase-admin")
@@ -106,48 +107,18 @@ export default class UserEventRecommendationService
       userData: UserData,
       limit: number
    ): Promise<RankedLivestreamEvent[]> {
-      const promises: Promise<RankedLivestreamEvent[]>[] = []
-
-      if (userData.interestsIds?.length) {
-         promises.push(
-            // Fetch recommended events based on the user's interests
-            this.rankedLivestreamRepo.getEventsBasedOnInterests(
-               userData.interestsIds,
-               limit
-            )
-         )
-      }
-
-      if (userData.fieldOfStudy?.id) {
-         promises.push(
-            // Fetch the top recommended events based on the user's field of study
-            this.rankedLivestreamRepo.getEventsBasedOnFieldOfStudies(
-               [userData.fieldOfStudy],
-               limit
-            )
-         )
-      }
-
-      if (userData.countriesOfInterest?.length > 0) {
-         promises.push(
-            // Fetch the top recommended events based on the user's field of study
-            this.rankedLivestreamRepo.getEventsBasedOnCountriesOfInterest(
-               userData.countriesOfInterest,
-               limit
-            )
-         )
-      }
-
-      const arrayOfRecommendedEventsBasedOnUserData =
-         await handlePromisesAllSettled(promises, this.log.error)
-
-      // Combine the results from the two queries above and remove duplicates
-      const uniqueResults = removeDuplicateDocuments(
-         arrayOfRecommendedEventsBasedOnUserData.filter(Boolean).flat()
+      const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
+         this.log,
+         limit,
+         userData,
+         this.rankedLivestreamRepo
       )
 
-      // Return the results sorted by points
-      return sortRankedLivestreamEventByPoints(uniqueResults)
+      return userRecommendationBuilder
+         .userInterests()
+         .userFieldsOfStudy()
+         .userCountriesOfInterest()
+         .get()
    }
 
    private async getRecommendedEventsBasedOnUserActions(
@@ -186,12 +157,13 @@ export default class UserEventRecommendationService
             limit
          )
 
-      const livestreamBasedRecommendations = new LivestreamBasedRecommendations(
-         mostRecentlyWatchedEvents,
-         limit,
-         this.rankedLivestreamRepo,
-         this.log
-      )
+      const livestreamBasedRecommendations =
+         new LivestreamBasedRecommendationsBuilder(
+            this.log,
+            limit,
+            mostRecentlyWatchedEvents,
+            this.rankedLivestreamRepo
+         )
 
       return livestreamBasedRecommendations
          .mostCommonInterests()
