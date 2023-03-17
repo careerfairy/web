@@ -5,7 +5,7 @@ import {
    UserParticipatingStats,
 } from "@careerfairy/shared-lib/livestreams"
 import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { mapFirestoreAdminSnapshots } from "src/util"
+import { mapFirestoreAdminSnapshots } from "../../../util"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
@@ -29,6 +29,7 @@ type RankEventsArgs = {
  */
 export class RankedLivestreamRepository {
    private readonly firestore: ReturnType<FirebaseAdmin["firestore"]>
+   private totalDocumentReads = 0
 
    private readonly pointsPerInterestMatch = 1
    private readonly pointsPerCountryMatch = 3
@@ -165,6 +166,16 @@ export class RankedLivestreamRepository {
       return this.livestreamRepo.getLivestreamsByIds(livestreamIds)
    }
 
+   public totalReads(): number {
+      return this.totalDocumentReads
+   }
+
+   // TODO: this should be private
+   public addReads(count: number): void {
+      // empty results counts as 1 read for firestore
+      this.totalDocumentReads += count === 0 ? 1 : count
+   }
+
    private getEventsFilteredByArrayField(
       field: keyof LivestreamEvent,
       values: unknown[],
@@ -192,6 +203,8 @@ export class RankedLivestreamRepository {
       query = filterQuery(query).orderBy("start", "asc").limit(limit)
 
       const snapshots = await query.get()
+
+      this.addReads(snapshots.docs.length)
 
       const events = mapFirestoreAdminSnapshots<LivestreamEvent>(snapshots).map(
          RankedLivestreamEvent.create
