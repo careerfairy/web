@@ -12,6 +12,7 @@ import CompanyPageCTA from "./company-page/CompanyPageCTA"
 import LivestreamsKPIs from "./livestreams-kpis/LivestreamsKPIs"
 import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
 import AggregatedBreakdown from "./breakdown/AggregatedBreakdown"
+import useGroupCompanyPageProgress from "../../../../../custom-hook/useGroupCompanyPageProgress"
 
 const styles = sxStyles({
    gridItem: {
@@ -29,9 +30,9 @@ const AnalyticsGeneralPageContent = () => {
 
 const PageContent = () => {
    const { livestreamStats } = useAnalyticsPageContext()
-   const { groupPresenter } = useGroup()
+   const { group } = useGroup()
 
-   const companyPageFullyReady = groupPresenter.companyPageIsFullyReady()
+   const progress = useGroupCompanyPageProgress(group)
 
    return (
       <Box py={2}>
@@ -49,9 +50,9 @@ const PageContent = () => {
                   spacing={spacing}
                   style={styles.gridItem}
                >
-                  {companyPageFullyReady ? null : (
+                  {progress?.isComplete ? null : (
                      <Grid xs={12} item style={styles.gridItem}>
-                        <CompanyPageCTA />
+                        <CompanyPageCTA progress={progress} />
                      </Grid>
                   )}
 
