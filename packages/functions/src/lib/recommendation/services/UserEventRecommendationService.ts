@@ -100,6 +100,10 @@ export default class UserEventRecommendationService
          }
       )
 
+      this.log.info(
+         `Total document reads: ${this.rankedLivestreamRepo.totalReads()}`
+      )
+
       return recommendedIds
    }
 
@@ -156,6 +160,9 @@ export default class UserEventRecommendationService
             userId,
             limit
          )
+
+      // TODO: temporary hack just to count these reads
+      this.rankedLivestreamRepo.addReads(mostRecentlyWatchedEvents.length)
 
       const livestreamBasedRecommendations =
          new LivestreamBasedRecommendationsBuilder(
