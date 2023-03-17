@@ -1,22 +1,18 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { Logger } from "../IRecommendationService"
-import {
-   RankedLivestreamEvent,
-   getMostCommonArrayValues,
-   getMostCommonFieldsOfStudies,
-   handlePromisesAllSettled,
-} from "../util"
+import { RecommendationsBuilder } from "../RecommendationsBuilder"
+import { getMostCommonArrayValues, getMostCommonFieldsOfStudies } from "../util"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 
-export class LivestreamBasedRecommendations {
-   private promises: Promise<RankedLivestreamEvent[]>[] = []
-
+export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilder {
    constructor(
+      log: Logger,
+      limit: number,
       private readonly livestreams: LivestreamEvent[],
-      private readonly limit: number,
-      private readonly rankedLivestreamRepo: RankedLivestreamRepository,
-      protected readonly log: Logger
-   ) {}
+      private readonly rankedLivestreamRepo: RankedLivestreamRepository
+   ) {
+      super(log, limit)
+   }
 
    public mostCommonInterests() {
       const mostCommonInterestIds = getMostCommonArrayValues(
@@ -105,13 +101,5 @@ export class LivestreamBasedRecommendations {
       }
 
       return this
-   }
-
-   public async get() {
-      // Get the resolved results from the promises
-      const recommendedEventsBasedOnPreviouslyWatchedEvents =
-         await handlePromisesAllSettled(this.promises, this.log.error)
-
-      return recommendedEventsBasedOnPreviouslyWatchedEvents.flat()
    }
 }
