@@ -1,3 +1,4 @@
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 export class RankedLivestreamEvent {
@@ -47,6 +48,14 @@ export class RankedLivestreamEvent {
    }
 }
 
+export function sortRankedLivestreamEventByPoints(
+   rankedLivestreamEvents: RankedLivestreamEvent[]
+): RankedLivestreamEvent[] {
+   return [...rankedLivestreamEvents].sort(
+      (a, b) => b.getPoints() - a.getPoints()
+   )
+}
+
 export const handlePromisesAllSettled = async <TPromiseResolve>(
    promises: Promise<TPromiseResolve>[],
    errorLogger: (...args: any[]) => void
@@ -62,6 +71,46 @@ export const handlePromisesAllSettled = async <TPromiseResolve>(
    })
 
    return resolvedResults
+}
+
+export function getMostCommonFieldsOfStudies(
+   livestreams: LivestreamEvent[]
+): FieldOfStudy[] {
+   // get all fields of study from livestreams
+   const fieldsOfStudy = livestreams
+      .flatMap((livestream) => livestream.targetFieldsOfStudy)
+      .filter(Boolean)
+
+   const sortedFieldOfStudyIds = sortElementsByFrequency(
+      fieldsOfStudy.map((fieldOfStudy) => fieldOfStudy.id)
+   )
+
+   // return the fields of study objects sorted by frequency
+   return sortedFieldOfStudyIds.map((fieldOfStudyId) =>
+      fieldsOfStudy.find((fieldOfStudy) => fieldOfStudy.id === fieldOfStudyId)
+   )
+}
+
+export function getMostCommonInterestIds(
+   livestreams: LivestreamEvent[]
+): string[] {
+   // get all interest ids from livestreams
+   const interestIds = livestreams
+      .flatMap((livestream) => livestream.interestsIds)
+      .filter(Boolean)
+
+   return sortElementsByFrequency(interestIds)
+}
+
+export function getMostCommonArrayValues(
+   livestreams: LivestreamEvent[],
+   livestreamGetter: (livestream: LivestreamEvent) => string[]
+): string[] {
+   const values = livestreams
+      .flatMap((livestream) => livestreamGetter(livestream))
+      .filter(Boolean)
+
+   return sortElementsByFrequency(values)
 }
 
 export const sortElementsByFrequency = (elements: string[]) => {
