@@ -15,11 +15,23 @@ export class RankedLivestreamEvent {
    }
 
    getFieldOfStudyIds(): string[] {
-      return this.model.targetFieldsOfStudy.map((e) => e.id)
+      return this.model.targetFieldsOfStudy.map((e) => e.id) || []
    }
 
    getInterestIds(): string[] {
       return this.model.interestsIds || []
+   }
+
+   getCompanyCountries(): string[] {
+      return this.model.companyCountries || []
+   }
+
+   getCompanyIndustries(): string[] {
+      return this.model.companyIndustries || []
+   }
+
+   getCompanySizes(): string[] {
+      return this.model.companySizes || []
    }
 
    addPoints(points: number) {

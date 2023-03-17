@@ -27,11 +27,8 @@ const serviceName = "user_event_recommendation_service"
 
 type RankEventsArgs = {
    rankedLivestreams: RankedLivestreamEvent[]
-   targetUserIds: string[]
-   targetLivestreamIdsGetter: keyof Pick<
-      RankedLivestreamEvent,
-      "getFieldOfStudyIds" | "getInterestIds"
-   >
+   targetUserIds: unknown[]
+   targetLivestreamIdsGetter: (stream: RankedLivestreamEvent) => unknown[]
    pointsPerMatch: number
 }
 export default class UserEventRecommendationService
@@ -39,6 +36,7 @@ export default class UserEventRecommendationService
    implements IRecommendationService
 {
    private readonly pointsPerInterestMatch = 1
+   private readonly pointsPerCountryMatch = 3
    private readonly pointsPerFieldOfStudyMatch = 1
    private readonly firestore: ReturnType<FirebaseAdmin["firestore"]>
 
@@ -87,12 +85,16 @@ export default class UserEventRecommendationService
             userId: userData?.id || "N/A",
             userInterestIds: userData?.interestsIds || [],
             userFieldOfStudyId: userData?.fieldOfStudy?.id || "N/A",
+            userCountriesOfInterest: userData?.countriesOfInterest || [],
          },
          eventMetaData: deDupedEvents.map((e) => ({
             id: e.id,
             numPoints: e.points,
             fieldsOfStudyIds: e.getFieldOfStudyIds(),
             interestIds: e.getInterestIds(),
+            companyCountries: e.getCompanyCountries(),
+            companyIndustries: e.getCompanyIndustries(),
+            companySizes: e.getCompanySizes(),
          })),
       })
 
@@ -133,8 +135,8 @@ export default class UserEventRecommendationService
       return this.rankEvents({
          pointsPerMatch: this.pointsPerInterestMatch,
          rankedLivestreams: events,
-         targetUserIds: interestIds.slice(0, 10),
-         targetLivestreamIdsGetter: "getInterestIds",
+         targetUserIds: interestIds,
+         targetLivestreamIdsGetter: (stream) => stream.getInterestIds(),
       })
    }
 
@@ -165,7 +167,38 @@ export default class UserEventRecommendationService
          pointsPerMatch: this.pointsPerFieldOfStudyMatch,
          rankedLivestreams: events,
          targetUserIds: fieldOfStudies.map((f) => f.id),
-         targetLivestreamIdsGetter: "getInterestIds",
+         targetLivestreamIdsGetter: (stream) => stream.getFieldOfStudyIds(),
+      })
+   }
+
+   private async getRecommendEventsBasedOnCountriesOfInterest(
+      countriesOfInterest: string[], // PT, CH, DE, etc.
+      limit = 10
+   ): Promise<RankedLivestreamEvent[]> {
+      const query = this.firestore
+         .collection("livestreams")
+         .where("start", ">", getEarliestEventBufferTime())
+         .where("test", "==", false)
+         .where("hidden", "==", false)
+         .where(
+            "companyCountries",
+            "array-contains-any",
+            countriesOfInterest.slice(0, 10)
+         )
+         .orderBy("start", "asc")
+         .limit(limit)
+
+      const snapshots = await query.get()
+
+      const events = mapFirestoreAdminSnapshots<LivestreamEvent>(snapshots).map(
+         RankedLivestreamEvent.create
+      )
+
+      return this.rankEvents({
+         pointsPerMatch: this.pointsPerCountryMatch,
+         rankedLivestreams: events,
+         targetUserIds: countriesOfInterest,
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
       })
    }
 
@@ -190,6 +223,16 @@ export default class UserEventRecommendationService
             // Fetch the top recommended events based on the user's field of study
             this.getRecommendEventsBasedOnFieldOfStudies(
                [userData.fieldOfStudy],
+               limit
+            )
+         )
+      }
+
+      if (userData.countriesOfInterest?.length > 0) {
+         promises.push(
+            // Fetch the top recommended events based on the user's field of study
+            this.getRecommendEventsBasedOnCountriesOfInterest(
+               userData.countriesOfInterest,
                limit
             )
          )
@@ -349,10 +392,8 @@ export default class UserEventRecommendationService
       targetUserIds,
    }: RankEventsArgs): RankedLivestreamEvent[] {
       rankedLivestreams.forEach((rankedLivestream) => {
-         const numMatches = rankedLivestream[
-            targetLivestreamIdsGetter
-         ]().filter((livestreamDataId) =>
-            targetUserIds.includes(livestreamDataId)
+         const numMatches = targetLivestreamIdsGetter(rankedLivestream).filter(
+            (livestreamDataId) => targetUserIds.includes(livestreamDataId)
          ).length // This is the number of matches between the user's interests or field Of Study and the event's interests or field Of Studies
 
          rankedLivestream.addPoints(numMatches * pointsPerMatch) // Add points to the event based on the number of matches
