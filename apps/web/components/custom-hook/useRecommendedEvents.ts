@@ -21,7 +21,7 @@ const useRecommendedEvents = (
 ) => {
    const firestore = useFirestore()
    const fetcher = useFunctionsSWR<string[]>()
-   const { userData } = useAuth()
+   const { authenticatedUser } = useAuth()
 
    const { data: eventIds } = useSWR<string[]>(
       [
@@ -56,7 +56,7 @@ const useRecommendedEvents = (
    )
 
    const filteredEvents = filterRegisteredOrPastEvents(
-      userData?.id,
+      authenticatedUser?.email,
       events || []
    )
 
@@ -77,7 +77,7 @@ const filterRegisteredOrPastEvents = (
    events: LivestreamEvent[]
 ): LivestreamEvent[] =>
    events.filter(
-      (event) => !event.hasEnded && !event.registeredUsers?.includes(userId)
+      (event) => !(event.hasEnded || event.registeredUsers?.includes(userId))
    )
 
 /*
