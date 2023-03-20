@@ -7,6 +7,7 @@ import CardCustom from "../../../common/CardCustom"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { totalPeopleReachedByLivestreamStat } from "../../../common/util"
 
 const LivestreamsKPIs = () => {
    const { livestreamStats } = useAnalyticsPageContext()
@@ -42,7 +43,7 @@ const getSourceStats = (
          totalRegistrations +=
             livestreamStat.generalStats?.numberOfRegistrations ?? 0
          totalTalentReached +=
-            livestreamStat.generalStats?.numberOfPeopleReached ?? 0
+            totalPeopleReachedByLivestreamStat(livestreamStat)
       })
    }
 
