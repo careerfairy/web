@@ -70,7 +70,7 @@ const UserAvatarWithDetails = () => {
    const [openManageCompaniesDialog, setOpenManageCompaniesDialog] =
       useState(false)
 
-   const handleManageCompaniesCloseDialog = useCallback(() => {
+   const handleCloseManageCompaniesDialog = useCallback(() => {
       setOpenManageCompaniesDialog(false)
    }, [])
 
@@ -153,7 +153,7 @@ const UserAvatarWithDetails = () => {
          {openManageCompaniesDialog ? (
             <ManageCompaniesDialog
                open={openManageCompaniesDialog}
-               handleClose={handleManageCompaniesCloseDialog}
+               handleClose={handleCloseManageCompaniesDialog}
             />
          ) : null}
       </>
