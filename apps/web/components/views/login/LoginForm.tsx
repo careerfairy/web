@@ -122,6 +122,7 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
       absolutePath,
       userData,
       firebase.auth?.currentUser?.emailVerified,
+      adminGroups,
    ])
 
    const handleSubmit = useCallback(
