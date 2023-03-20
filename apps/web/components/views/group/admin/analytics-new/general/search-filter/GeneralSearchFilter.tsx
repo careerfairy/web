@@ -117,7 +117,7 @@ const GeneralSearchFilter = () => {
 
    useEffect(() => {
       if (localSelectedStats.length > 0) {
-         // Sync live updates with local selected stats by filtering out the ones that are not in the new livestreamStats
+         // Sync live updates with local selected stats by replacing the livestream stats with the same livestream id
          setLocalSelectedStats((prev) => {
             return prev.map((prevStat) => {
                const newStat = livestreamStats?.find(
