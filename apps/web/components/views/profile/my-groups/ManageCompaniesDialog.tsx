@@ -47,6 +47,7 @@ const ManageCompaniesDialog = ({
 }: Props) => {
    const { userData } = useAuth()
    const isMobile = useIsMobile()
+   const ref = React.useRef<HTMLDivElement>(null)
 
    return (
       <Dialog
@@ -76,8 +77,8 @@ const ManageCompaniesDialog = ({
                {isMobile ? "Portal" : "Go to Portal"}
             </Button>
          ) : null}
-         <DialogContent>
-            <Groups isOnDialog={true} />
+         <DialogContent ref={ref}>
+            <Groups containerRef={ref} isOnDialog={true} />
          </DialogContent>
       </Dialog>
    )
