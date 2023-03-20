@@ -4,7 +4,8 @@ const initialTotal = []
 const useInfiniteScrollClientWithHandlers = (
    data,
    limit = 3,
-   loadAdditional = 0
+   loadAdditional = 0,
+   containerRef = null
 ) => {
    const [hasMore, setHasMore] = useState(true)
    const [totalItems, setTotalItems] = useState(data || initialTotal)
@@ -29,21 +30,23 @@ const useInfiniteScrollClientWithHandlers = (
    }, [totalItems?.length, items?.length])
 
    const handleScroll = () => {
+      const node = containerRef?.current || document.documentElement
       const bottom =
-         Math.ceil(window.innerHeight + window.scrollY) >=
-         document.documentElement.scrollHeight * 0.5
+         Math.ceil(node.clientHeight + node.scrollTop) >=
+         node.scrollHeight * 0.5
       if (bottom && hasMore) {
          getMore()
       }
    }
 
    useEffect(() => {
-      window.addEventListener("scroll", handleScroll, {})
+      const node = containerRef?.current || window
+      node.addEventListener("scroll", handleScroll)
 
       return () => {
-         window.removeEventListener("scroll", handleScroll)
+         node.removeEventListener("scroll", handleScroll)
       }
-   }, [totalItems, items])
+   }, [totalItems, items, containerRef])
 
    const getMore = () => {
       const stillMore = Boolean(totalItems.length > items.length)

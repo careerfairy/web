@@ -58,9 +58,10 @@ const adminTab = {
 
 type Props = {
    isOnDialog?: boolean
+   containerRef?: React.RefObject<HTMLDivElement>
 }
 
-const Groups = ({ isOnDialog = false }: Props) => {
+const Groups = ({ isOnDialog = false, containerRef }: Props) => {
    const classes = useStyles()
    const { userData, authenticatedUser, adminGroups } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
@@ -116,7 +117,8 @@ const Groups = ({ isOnDialog = false }: Props) => {
    const [slicedFilteredGroups] = useInfiniteScrollClientWithHandlers(
       filteredGroups,
       9,
-      6
+      6,
+      containerRef
    )
 
    useEffect(() => {
