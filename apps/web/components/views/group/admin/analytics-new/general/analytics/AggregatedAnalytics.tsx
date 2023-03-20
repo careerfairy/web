@@ -1,25 +1,43 @@
-import React, { useMemo } from "react"
+import React, { FC, useMemo } from "react"
 import { Grid } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { CardAnalytic } from "../../../common/CardAnalytic"
-import { totalPeopleReached } from "../../../common/util"
+import {
+   totalPeopleReached,
+   totalPeopleReachedByLivestreamStat,
+} from "../../../common/util"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import AggregatedCompanyFollowersValue from "./AggregatedCompanyFollowersValue"
+import useGroupATSAccounts from "../../../../../../custom-hook/useGroupATSAccounts"
+import Skeleton from "@mui/material/Skeleton"
+import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 
 const styles = sxStyles({
    gridItem: {
       display: "flex",
    },
+   skeletonStat: {
+      ml: "auto",
+   },
 })
-const AggregatedAnalytics = () => {
+
+type Props = {
+   progress: ReturnType<typeof useGroupCompanyPageProgress>
+}
+const AggregatedAnalytics: FC<Props> = ({ progress }) => {
    const { groupPresenter, group, stats } = useGroup()
    const { livestreamStats } = useAnalyticsPageContext()
 
-   const hasAts = groupPresenter.atsAccounts?.length > 0
+   const { data: accounts } = useGroupATSAccounts(
+      groupPresenter.id,
+      groupPresenter
+   )
 
-   const companyPageReady = groupPresenter.companyPageIsReady()
+   const hasAts = accounts.length > 0
+
+   const companyPageReady = progress?.isReady || true
 
    const summedResults = useMemo(
       () => sumStats(livestreamStats),
@@ -35,6 +53,15 @@ const AggregatedAnalytics = () => {
       [summedResults?.numberOfRegistrations, livestreamStats?.length]
    )
 
+   const talentPoolCard = (
+      <CardAnalytic
+         title="Talent Pool"
+         value={summedResults.numberOfTalentPoolProfiles}
+         linkDescription={"Go to applications"}
+         link={`/group/${group.id}/admin/analytics/talent-pool?section=1`} // Should go to
+      />
+   )
+
    return (
       <Grid container spacing={3}>
          {companyPageReady ? (
@@ -47,7 +74,6 @@ const AggregatedAnalytics = () => {
                   />
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Get number by doing a count query on the collection group companiesUserFollows, where groupId === current groupId*/}
                   <CardAnalytic
                      title="Followers"
                      tooltip="Total number of people who follow your company"
@@ -59,16 +85,11 @@ const AggregatedAnalytics = () => {
          {hasAts ? (
             <>
                <Grid xs={6} item style={styles.gridItem}>
-                  <CardAnalytic
-                     title="Talent Pool"
-                     value={summedResults.numberOfTalentPoolProfiles}
-                     linkDescription={"Go to talents"}
-                     link={`/group/${group.id}/admin/analytics/talent-pool?section=1`} // Should go to
-                  />
+                  {talentPoolCard}
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
                   <CardAnalytic
-                     title="Total applications"
+                     title="Applications generated through ATS"
                      value={summedResults.numberOfApplications}
                      linkDescription={"Go to applicants"}
                      link={`/group/${group.id}/admin/ats-integration?section=1`}
@@ -77,12 +98,18 @@ const AggregatedAnalytics = () => {
             </>
          ) : (
             <>
-               <Grid xs={6} item style={styles.gridItem}>
-                  <CardAnalytic
-                     title="Young talent reached"
-                     value={summedResults.numberOfPeopleReached}
-                  />
-               </Grid>
+               {companyPageReady ? (
+                  <Grid xs={6} item style={styles.gridItem}>
+                     <CardAnalytic
+                        title="Young talent reached"
+                        value={summedResults.numberOfPeopleReached}
+                     />
+                  </Grid>
+               ) : (
+                  <Grid xs={6} item style={styles.gridItem}>
+                     {talentPoolCard}
+                  </Grid>
+               )}
                <Grid xs={6} item style={styles.gridItem}>
                   <CardAnalytic
                      title="Average registrations per stream"
@@ -91,6 +118,37 @@ const AggregatedAnalytics = () => {
                </Grid>
             </>
          )}
+      </Grid>
+   )
+}
+
+export const SuspenseAggregatedAnalytics = () => {
+   return (
+      <Grid container spacing={3}>
+         <Grid xs={6} item style={styles.gridItem}>
+            <CardAnalytic
+               title={<Skeleton variant="text" width={120} />}
+               value={
+                  <Skeleton
+                     sx={styles.skeletonStat}
+                     variant="text"
+                     width={60}
+                  />
+               }
+            />
+         </Grid>
+         <Grid xs={6} item style={styles.gridItem}>
+            <CardAnalytic
+               title={<Skeleton variant="text" width={120} />}
+               value={
+                  <Skeleton
+                     sx={styles.skeletonStat}
+                     variant="text"
+                     width={50}
+                  />
+               }
+            />
+         </Grid>
       </Grid>
    )
 }
@@ -124,7 +182,7 @@ const sumStats = (stats?: LiveStreamStats[]): SumResult => {
             (generalStats?.numberOfRegistrations || 0),
          numberOfPeopleReached:
             acc.numberOfPeopleReached +
-            (generalStats?.numberOfPeopleReached || 0),
+            totalPeopleReachedByLivestreamStat(curr),
          numberOfTalentPoolProfiles:
             acc.numberOfTalentPoolProfiles +
             (generalStats?.numberOfTalentPoolProfiles || 0),

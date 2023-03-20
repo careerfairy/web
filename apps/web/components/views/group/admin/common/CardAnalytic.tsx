@@ -9,7 +9,7 @@ const styles = sxStyles({
 })
 
 type Props = {
-   title: string
+   title: React.ReactNode
    tooltip?: string
    value: React.ReactNode
    link?: string
