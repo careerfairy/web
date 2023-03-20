@@ -13,6 +13,7 @@ import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
    LivestreamUserAction,
+   RecordingStats,
    UserLivestreamData,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import {
@@ -66,12 +67,22 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
    getAllLivestreamStats<T extends boolean>(
       withRef?: T
    ): Promise<DataWithRef<T, LiveStreamStats>[]>
+
+   getAllLivestreamRecordingStats(): Promise<RecordingStats[]>
 }
 
 export class LivestreamScriptsRepository
    extends FirebaseLivestreamRepository
    implements ILivestreamScriptsRepository
 {
+   async getAllLivestreamRecordingStats(): Promise<
+      DataWithRef<true, RecordingStats>[]
+   > {
+      const docs = await this.firestore.collectionGroup("recordingStats").get()
+
+      return mapFirestoreDocuments<RecordingStats, true>(docs, true)
+   }
+
    async getAllRatings(): Promise<DataWithRef<true, EventRating>[]> {
       const docs = await this.firestore.collectionGroup("rating").get()
 
@@ -119,9 +130,6 @@ export class LivestreamScriptsRepository
       return mapFirestoreDocuments<TalentPoolStudent, T>(snaps, withRef)
    }
 
-   /*
-    * Legacy Query for migration script only
-    * */
    async getAllUserLivestreamData<T extends boolean>(
       withRef?: T
    ): Promise<DataWithRef<T, UserLivestreamData>[]> {
