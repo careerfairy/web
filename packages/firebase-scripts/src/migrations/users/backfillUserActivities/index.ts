@@ -52,7 +52,7 @@ export async function run() {
          ]),
       "Fetching users, userLivestreamData and recordingStats"
    )
-
+ counter.addToReadCount(Object.keys(users).length + userLivestreamData.length + recordingStats.length)
    processUsers(Object.values(users))
    processUserLivestreamData(userLivestreamData)
    processRecordingStats(recordingStats)
