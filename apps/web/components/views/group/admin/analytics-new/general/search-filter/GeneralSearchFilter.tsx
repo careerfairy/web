@@ -18,11 +18,17 @@ import {
 } from "../../../common/inputs"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import {
+   getMaxLineStyles,
    prettyDate,
-   truncate,
 } from "../../../../../../helperFunctions/HelperFunctions"
-import { TextFieldProps } from "@mui/material/TextField/TextField"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import VirtualizedAutocomplete from "../../../../../common/VirtualizedAutocomplete"
+import Box from "@mui/material/Box"
+import {
+   AutocompleteRenderInputParams,
+   AutocompleteRenderOptionState,
+} from "@mui/material/Autocomplete/Autocomplete"
 
 const styles = sxStyles({
    root: {
@@ -31,30 +37,53 @@ const styles = sxStyles({
    },
    wrapper: {
       flex: 1,
-      p: 1,
+      p: 2,
    },
-   livestreamStatSelect: {
+   livestreamStatSelect: (theme) => ({
+      borderRadius: 1,
       flex: 1,
       minWidth: "auto !important",
       "& .MuiInputBase-input": {
          overflow: "hidden",
          textOverflow: "ellipsis",
       },
+      [theme.breakpoints.down("sm")]: {
+         minWidth: "auto !important",
+      },
+   }),
+   listBox: {
+      "& li": {
+         backgroundColor: "transparent !important",
+         "&:hover": {
+            backgroundColor: (theme) =>
+               theme.palette.action.hover + " !important",
+         },
+      },
    },
    timeFrameSelect: {
       minWidth: {
          sm: 350,
       },
+      justifyContent: "center",
    },
    listIcon: {
       display: "flex",
       justifyContent: "flex-end",
    },
+   listItem: {
+      flex: 1,
+      display: "flex",
+   },
 })
+
 const GeneralSearchFilter = () => {
-   const { setLivestreamStats } = useAnalyticsPageContext()
    const isMobile = useIsMobile()
-   const [selectedStatIds, setSelectedStatIds] = useState<string[]>([])
+
+   const [localSelectedStats, setLocalSelectedStats] = useState<
+      LiveStreamStats[]
+   >([])
+   const { setLivestreamStats, livestreamStats: livestreamStatsContext } =
+      useAnalyticsPageContext()
 
    const [livestreamStatsTimeFrame, setLivestreamStatsTimeFrame] =
       useState<TimeFrame>("Last 2 years")
@@ -67,77 +96,93 @@ const GeneralSearchFilter = () => {
 
    const isLoading = livestreamStats === undefined
 
-   useEffect(() => {
-      if (selectedStatIds.length === 0) {
-         setLivestreamStats(livestreamStats)
-      } else {
-         setLivestreamStats(
-            livestreamStats?.filter((stat) =>
-               selectedStatIds.includes(stat.livestream.id)
-            ) ?? []
-         )
-      }
-   }, [livestreamStats, selectedStatIds, setLivestreamStats])
-
    const handleTimeframeChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
          setLivestreamStatsTimeFrame(event.target.value as TimeFrame)
-         setSelectedStatIds([])
+         setLocalSelectedStats([])
       },
       [setLivestreamStatsTimeFrame]
    )
 
-   const handleLivestreamStatChange = useCallback(
-      (event: React.ChangeEvent<HTMLInputElement>) => {
-         const value = event.target.value
+   useEffect(() => {
+      if (localSelectedStats.length === 0 && livestreamStats?.length > 0) {
+         setLivestreamStats(livestreamStats)
+      } else {
+         setLivestreamStats(localSelectedStats)
+      }
+   }, [livestreamStats, localSelectedStats, setLivestreamStats])
 
-         if (Array.isArray(value)) {
-            setSelectedStatIds(value)
-         } else {
-            setSelectedStatIds([])
+   useEffect(() => {
+      if (localSelectedStats.length > 0) {
+         // Sync live updates with local selected stats by filtering out the ones that are not in the new livestreamStats
+         setLocalSelectedStats((prev) => {
+            return prev.map((prevStat) => {
+               const newStat = livestreamStats?.find(
+                  (newStat) => newStat.livestream.id === prevStat.livestream.id
+               )
+               return newStat ?? prevStat
+            })
+         })
+      }
+   }, [livestreamStats, localSelectedStats.length])
+
+   const allLivestreamsSelected =
+      livestreamStatsContext?.length === livestreamStats?.length
+
+   const placeHolder = useMemo(() => {
+      if (isLoading) return "Loading..."
+
+      if (noLivestreamStats) {
+         return "No live streams"
+      }
+      if (allLivestreamsSelected) {
+         return "All live streams"
+      }
+
+      return ""
+   }, [allLivestreamsSelected, isLoading, noLivestreamStats])
+
+   const handleChange = useCallback(
+      (event: React.SyntheticEvent, value: LiveStreamStats[]) => {
+         if (value.length === livestreamStats?.length) {
+            setLocalSelectedStats([])
+            return
          }
+         setLocalSelectedStats(value)
       },
-      [setSelectedStatIds]
+      [livestreamStats?.length]
    )
 
-   const selectedStats = useMemo(
-      () =>
-         livestreamStats?.filter((stat) =>
-            selectedStatIds.includes(stat.livestream.id)
-         ) ?? [],
-      [livestreamStats, selectedStatIds]
+   const renderInput = useCallback(
+      (params: AutocompleteRenderInputParams) => {
+         return (
+            <StyledTextField
+               {...params}
+               sx={styles.livestreamStatSelect}
+               placeholder={placeHolder}
+               variant="outlined"
+            />
+         )
+      },
+      [placeHolder]
    )
 
-   const value = useMemo(
-      () =>
-         selectedStatIds.length === 0 ? ["All live streams"] : selectedStatIds,
-      [selectedStatIds]
-   )
+   const renderTags = useCallback(
+      (value: LiveStreamStats[]) => {
+         if (isLoading) return <CircularProgress color={"inherit"} size={15} />
 
-   const livestreamStatSelectProps = useMemo<TextFieldProps["SelectProps"]>(
-      () => ({
-         multiple: true,
-         renderValue: () => {
-            if (isLoading)
-               return <CircularProgress color={"inherit"} size={15} />
+         let message
+         if (!value?.length) {
+            message = noLivestreamStats ? "No live streams" : "All live streams"
+         } else {
+            const streamTitle = value[0]?.livestream?.title
+            const streamCount = value?.length - 1
+            message = `${streamTitle} ${streamCount ? `+ ${streamCount}` : ""}` // Eg. "Stream 1 + 2" or "Stream 1"
+         }
 
-            let message
-            if (!selectedStats.length) {
-               message = noLivestreamStats
-                  ? "No live streams"
-                  : "All live streams"
-            } else {
-               const streamTitle = selectedStats[0]?.livestream?.title
-               const streamCount = selectedStats.length - 1
-               message = `${streamTitle} ${
-                  streamCount ? `+ ${streamCount}` : ""
-               }` // Eg. "Stream 1 + 2" or "Stream 1"
-            }
-
-            return <Typography whiteSpace="pre-line">{message}</Typography>
-         },
-      }),
-      [isLoading, selectedStats, noLivestreamStats]
+         return <Typography whiteSpace="pre-line">{message}</Typography>
+      },
+      [isLoading, noLivestreamStats]
    )
 
    return (
@@ -153,36 +198,29 @@ const GeneralSearchFilter = () => {
                />
             }
          >
-            <StyledTextField
-               sx={styles.livestreamStatSelect}
+            <VirtualizedAutocomplete
+               multiple
                id="select-livestream"
-               select
+               options={livestreamStats ?? []}
+               disableCloseOnSelect
+               loading={isLoading}
+               limitTags={2}
                disabled={noLivestreamStats || isLoading}
                fullWidth
-               SelectProps={livestreamStatSelectProps}
-               value={value}
-               variant="outlined"
-               onChange={handleLivestreamStatChange}
-            >
-               {livestreamStats?.map((stat) => (
-                  <StyledMenuItem
-                     value={stat.livestream.id}
-                     key={stat.livestream.id}
-                  >
-                     <ListItemText
-                        aria-label={stat.livestream.title}
-                        primary={truncate(stat.livestream.title, 150)}
-                        primaryTypographyProps={{
-                           whiteSpace: "pre-line",
-                        }}
-                        secondary={prettyDate(stat.livestream.start)}
-                     />
-                     <StyledCheckbox
-                        checked={selectedStatIds.includes(stat.livestream.id)}
-                     />
-                  </StyledMenuItem>
-               )) ?? []}
-            </StyledTextField>
+               clearText={"All live streams"}
+               listBoxCustomProps={listBoxCustomProps}
+               noOptionsText={
+                  noLivestreamStats ? "No live streams" : "No results"
+               }
+               freeSolo={false}
+               onChange={handleChange}
+               value={localSelectedStats}
+               getOptionLabel={getLabelFn}
+               isOptionEqualToValue={isOptionEqualToValue}
+               renderOption={renderOption}
+               renderInput={renderInput}
+               renderTags={renderTags}
+            />
             <StyledTextField
                sx={styles.timeFrameSelect}
                id="select-timeframe"
@@ -209,8 +247,44 @@ const GeneralSearchFilter = () => {
    )
 }
 
+const renderOption = (
+   props: React.HTMLAttributes<HTMLLIElement>,
+   stat: LiveStreamStats,
+   { selected }: AutocompleteRenderOptionState
+) => [
+   props,
+   <Box sx={styles.listItem} key={stat.livestream.id}>
+      <ListItemText
+         aria-label={stat.livestream.title}
+         primary={stat.livestream.title}
+         primaryTypographyProps={{
+            whiteSpace: "pre-line",
+            sx: {
+               ...getMaxLineStyles(3),
+            },
+         }}
+         secondary={prettyDate(stat.livestream.start)}
+      />
+      <Box display={"flex"} alignItems={"center"}>
+         <StyledCheckbox checked={selected} />
+      </Box>
+   </Box>,
+]
+
+const isOptionEqualToValue = (
+   option: LiveStreamStats,
+   value: LiveStreamStats
+) => option.livestream.id === value.livestream.id
+
+const getLabelFn = (item: LiveStreamStats) => item.livestream.title
+
 const timeFrameSelectProps = {
    renderValue: (val) => val,
+}
+
+const listBoxCustomProps = {
+   listBoxSx: styles.listBox,
+   listBoxItemHeight: 80,
 }
 
 export const TimeFrames = {
