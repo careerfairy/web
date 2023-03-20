@@ -204,8 +204,11 @@ const AuthProvider = ({ children }) => {
       auth.stsTokenManager?.accessToken,
    ])
 
+   /**
+    * Listen for auth changes and update claims
+    */
    useEffect(() => {
-      const unsub = firebaseService.auth.onAuthStateChanged(async (user) => {
+      return firebaseService.auth.onAuthStateChanged(async (user) => {
          if (!user) {
             nookies.set(undefined, "token", "", { path: "/" })
          } else {
@@ -214,15 +217,19 @@ const AuthProvider = ({ children }) => {
             setClaims(tokenResult.claims)
 
             nookies.set(undefined, "token", tokenResult.token, { path: "/" })
-
-            updateUserActivity(user.email, firebaseService).catch(
-               errorLogAndNotify
-            )
          }
       })
+   }, [firebaseService.auth])
 
-      return () => unsub()
-   }, [firebaseService.auth, firebaseService])
+   /**
+    * Update user activity when there are new claims
+    */
+   useEffect(() => {
+      if (userData?.id && claims) {
+         updateUserActivity(userData).catch(errorLogAndNotify)
+      }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [userData?.id, claims])
 
    // update GTM user variables, useful to keep the values updated after login/logout/etc
    useEffect(() => {

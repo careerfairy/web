@@ -1,4 +1,5 @@
-import FirebaseService from "data/firebase/FirebaseService"
+import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
+import { userRepo } from "data/RepositoryInstances"
 import SessionStorageUtil from "util/SessionStorageUtil"
 
 const SESSION_STORAGE_KEY = "lastActivityAt"
@@ -15,12 +16,12 @@ const MIN_UPDATE_INTERVAL_MS = 3_600_000 // 1h
  * Update the user last activity at least every hour
  * Inserts a key on sessionStorage to reduce the number of writes
  */
-export const updateUserActivity = async (
-   userEmail: string,
-   firebaseService: FirebaseService
-) => {
+export const updateUserActivity = async (user: UserData) => {
    if (needsToBeUpdated()) {
-      await firebaseService.updateUserLastActivity(userEmail)
+      await userRepo.createActivity(
+         pickPublicDataFromUser(user),
+         "tokenRefresh"
+      )
       setLastUpdatedAt()
    }
 }
