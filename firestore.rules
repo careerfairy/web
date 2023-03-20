@@ -552,5 +552,9 @@ service cloud.firestore {
         match /{somePath=**}/talentProfiles/{groupId} {
             allow read: if request.auth != null && request.auth.token.adminGroups.keys().hasAny([resource.data.groupId]) || isCFAdmin();
         }
+        // Group Admin -> Company Followers Count query
+        match /{somePath=**}/companiesUserFollows/{groupId} {
+            allow read: if isAdminOfGroup(groupId);
+        }
     }
 }
