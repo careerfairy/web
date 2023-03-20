@@ -81,7 +81,8 @@ const GeneralSearchFilter = () => {
 
    const [localSelectedStats, setLocalSelectedStats] = useState<
       LiveStreamStats[]
-   >([])
+   >([]) // [] means all livestreams are selected
+
    const { setLivestreamStats, livestreamStats: livestreamStatsContext } =
       useAnalyticsPageContext()
 
@@ -99,15 +100,17 @@ const GeneralSearchFilter = () => {
    const handleTimeframeChange = useCallback(
       (event: React.ChangeEvent<HTMLInputElement>) => {
          setLivestreamStatsTimeFrame(event.target.value as TimeFrame)
-         setLocalSelectedStats([])
+         setLocalSelectedStats([]) // Reset selected livestreams to all livestreams
       },
       [setLivestreamStatsTimeFrame]
    )
 
    useEffect(() => {
-      if (localSelectedStats.length === 0 && livestreamStats?.length > 0) {
-         setLivestreamStats(livestreamStats)
+      if (localSelectedStats.length === 0) {
+         // If all livestreams are selected, set livestreamStats to all livestreams
+         setLivestreamStats(livestreamStats ?? [])
       } else {
+         // If not all livestreams are selected, set livestreamStats to the selected livestreams
          setLivestreamStats(localSelectedStats)
       }
    }, [livestreamStats, localSelectedStats, setLivestreamStats])
