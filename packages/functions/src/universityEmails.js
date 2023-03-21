@@ -3,12 +3,12 @@ const functions = require("firebase-functions")
 const { admin } = require("./api/firestoreAdmin")
 const { client } = require("./api/postmark")
 
-const { setHeaders } = require("./util")
+const { setCORSHeaders } = require("./util")
 const { emailsToRemove } = require("./misc/emailsToRemove")
 
 exports.sendEmailToStudentOfUniversityAndField = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
 
       const recipientsGroupsAndCategories =
          req.body.recipientsGroupsAndCategories
