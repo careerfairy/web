@@ -118,7 +118,7 @@ const EmptySourcesProgress = () => {
             <SourcesProgressTitle>Channel</SourcesProgressTitle>
          }
          rightHeaderComponent={
-            <SourcesProgressTitle>Users</SourcesProgressTitle>
+            <SourcesProgressTitle textAlign="right">Users</SourcesProgressTitle>
          }
          sources={emptySources}
       />
@@ -156,8 +156,14 @@ const LoadStaleWhileRevalidateStats = ({ groupId, livestream }) => {
          {/* @ts-ignore grey is a valid color */}
          {!livestream && !data.data && <LinearProgress color="grey" />}
          <SourcesProgress
-            leftHeaderComponent={"Channel"}
-            rightHeaderComponent={"Users"}
+            leftHeaderComponent={
+               <SourcesProgressTitle>Channel</SourcesProgressTitle>
+            }
+            rightHeaderComponent={
+               <SourcesProgressTitle textAlign="right">
+                  Users
+               </SourcesProgressTitle>
+            }
             sources={stats}
          />
       </>
