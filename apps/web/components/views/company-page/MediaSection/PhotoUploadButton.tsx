@@ -19,6 +19,14 @@ const imageValidator: Validator = {
       ),
    validateAfterParsing: () => Promise.resolve(),
 }
+const MAX_IMAGE_SIZE = 5 // in megabytes
+
+const accept = [".jpg", ".jpeg", ".png", ".webp"]
+
+const maxImagesErrorMessage = `You can only select up to ${MAX_GROUP_PHOTOS_COUNT} images`
+const maxImageSizeErrorMessage = `Max image size is ${MAX_IMAGE_SIZE}MB`
+const invalidFileTypeErrorMessage = `Only ${accept.join(", ")} are allowed`
+
 const PhotoUploadButton: FC<PhotoUploadButtonProps> = ({
    isAddingPhotos,
    handleUploadPhotos,
@@ -27,9 +35,9 @@ const PhotoUploadButton: FC<PhotoUploadButtonProps> = ({
    const [openFileSelector, { loading, errors, plainFiles, clear }] =
       useFilePicker({
          multiple: true,
-         accept: [".jpg", ".jpeg", ".png", ".webp"],
+         accept,
          limitFilesConfig: { min: 1, max: MAX_GROUP_PHOTOS_COUNT },
-         maxFileSize: 5, // in megabytes
+         maxFileSize: MAX_IMAGE_SIZE, // in megabytes
          validators: [imageValidator],
       })
 
@@ -37,12 +45,10 @@ const PhotoUploadButton: FC<PhotoUploadButtonProps> = ({
       const error = errors[0]
       if (!error) return
       if (error.maxLimitExceeded) {
-         errorNotification(
-            `You can only select up to ${MAX_GROUP_PHOTOS_COUNT} images`
-         )
+         errorNotification(maxImagesErrorMessage, maxImagesErrorMessage)
       }
       if (error.fileSizeToolarge) {
-         errorNotification(`Image size is too large`)
+         errorNotification(maxImageSizeErrorMessage, maxImageSizeErrorMessage)
       }
       if (error.readerError) {
          errorNotification(`Error reading image`)
@@ -50,7 +56,10 @@ const PhotoUploadButton: FC<PhotoUploadButtonProps> = ({
 
       // @ts-ignore - this is a custom error from our imageValidator
       if (error.invalidFileType) {
-         errorNotification(`Only images are allowed`)
+         errorNotification(
+            invalidFileTypeErrorMessage,
+            invalidFileTypeErrorMessage
+         )
       }
    }, [errorNotification, errors])
 
