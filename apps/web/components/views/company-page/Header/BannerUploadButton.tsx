@@ -47,7 +47,7 @@ const BannerUploadButton: FC<BannerPhotoUploadButtonProps> = ({
             const fileObject = dataURLtoFile(base64Img, uuidv4())
             return handleUploadBannerPhoto(fileObject)
          }}
-         onError={errorNotification}
+         onError={(err) => errorNotification(err, err)}
       >
          <Box flexDirection="column" display="flex" alignItems="center">
             <LoadingButton
