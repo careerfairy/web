@@ -9,7 +9,7 @@ import {
    Typography,
 } from "@mui/material"
 import { stepConnectorClasses } from "@mui/material/StepConnector"
-import { Check } from "@mui/icons-material"
+import Check from "@mui/icons-material/Check"
 import React from "react"
 import { MultiStepComponentType } from "./MultiStepWrapper"
 import useIsMobile from "../../custom-hook/useIsMobile"
