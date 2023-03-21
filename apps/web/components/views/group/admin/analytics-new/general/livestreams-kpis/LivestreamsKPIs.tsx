@@ -1,7 +1,9 @@
 import React, { useMemo } from "react"
 import {
+   LoadingSourcesProgress,
    SourceEntryArgs,
    SourcesProgress,
+   SourcesProgressTitle,
 } from "../../../common/SourcesProgress"
 import CardCustom from "../../../common/CardCustom"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
@@ -12,18 +14,43 @@ import { totalPeopleReachedByLivestreamStat } from "../../../common/util"
 const LivestreamsKPIs = () => {
    const { livestreamStats } = useAnalyticsPageContext()
 
+   const loading = livestreamStats === undefined
+
    const sources = useMemo<SourceEntryArgs[]>(
       () => getSourceStats(livestreamStats),
       [livestreamStats]
    )
 
+   if (loading) {
+      return (
+         <CardCustom title={"Live streams KPIs overview"}>
+            <LoadingSourcesProgress
+               leftHeaderComponent={
+                  <SourcesProgressTitle>KPI</SourcesProgressTitle>
+               }
+               rightHeaderComponent={
+                  <SourcesProgressTitle textAlign={"right"}>
+                     Users
+                  </SourcesProgressTitle>
+               }
+               numberOfSources={3}
+            />
+         </CardCustom>
+      )
+   }
+
    return (
       <CardCustom title={"Live streams KPIs overview"}>
          <SourcesProgress
-            leftHeaderTitle={"KPI"}
-            rightHeaderTitle={"Users"}
+            leftHeaderComponent={
+               <SourcesProgressTitle>KPI</SourcesProgressTitle>
+            }
+            rightHeaderComponent={
+               <SourcesProgressTitle textAlign={"right"}>
+                  Users
+               </SourcesProgressTitle>
+            }
             sources={sources}
-            loading={livestreamStats === undefined}
          />
       </CardCustom>
    )

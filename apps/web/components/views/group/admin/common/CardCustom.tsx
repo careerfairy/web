@@ -7,7 +7,7 @@ import {
    CardHeader,
    Menu,
    MenuItem,
-   styled,
+   Pagination,
    SxProps,
    Theme,
    Tooltip,
@@ -20,6 +20,7 @@ import { useCallback, useMemo, useState } from "react"
 import { ChevronDown, ChevronRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import Link from "../../../common/Link"
+import { styled } from "@mui/material/styles"
 
 const styles = sxStyles({
    card: {
@@ -187,13 +188,46 @@ export const SubheaderLink = ({
 }) => {
    return (
       <Link href={link} color="secondary" sx={styles.subheaderLink}>
-         <Box display="flex" mt={1}>
+         <Box display="flex" alignItems="center" mt={1}>
             <span>{title}</span>
             <ChevronRight style={styles.subheaderIcon} />
          </Box>
       </Link>
    )
 }
+
+export const StyledPagination = styled(Pagination)(({ theme }) => ({
+   "& .MuiPagination-ul li:last-child": {
+      display: "block",
+   },
+   "& .MuiPagination-ul li:last-child button::before": {
+      content: "'Next'",
+      marginRight: theme.spacing(1),
+   },
+   "& .MuiPagination-ul li:first-of-type": {
+      display: "block",
+   },
+   "& .MuiPagination-ul li:first-of-type button::after": {
+      content: "'Previous'",
+      marginLeft: theme.spacing(1),
+   },
+   "& .MuiPagination-ul li button": {
+      fontWeight: 500,
+      padding: theme.spacing(1, 2),
+      "&.MuiPaginationItem-page": {
+         margin: theme.spacing(0, 0.5),
+         padding: 0,
+      },
+   },
+   "& .MuiPaginationItem-ellipsis": {
+      display: "none",
+   },
+   ".MuiPagination-ul": {
+      justifyContent: "end",
+   },
+   flex: "none",
+   marginTop: 0,
+})) as typeof Pagination
 
 const anchorOrigin = {
    vertical: "bottom",
