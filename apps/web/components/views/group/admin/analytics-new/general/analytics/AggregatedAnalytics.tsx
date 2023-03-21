@@ -37,7 +37,7 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
 
    const hasAts = accounts.length > 0
 
-   const companyPageReady = progress?.isReady || true
+   const companyPageReady = progress?.isReady
 
    const summedResults = useMemo(
       () => sumStats(livestreamStats),

@@ -6,6 +6,11 @@ const styles = sxStyles({
    value: {
       fontSize: "3.43rem",
    },
+   root: {
+      "& .MuiCardContent-root": {
+         mt: "auto",
+      },
+   },
 })
 
 type Props = {
@@ -27,7 +32,12 @@ export const CardAnalytic = ({
    ) : undefined
 
    return (
-      <CardCustom title={title} helpTooltip={tooltip} subHeader={subHeader}>
+      <CardCustom
+         sx={styles.root}
+         title={title}
+         helpTooltip={tooltip}
+         subHeader={subHeader}
+      >
          <Typography mt={1} sx={styles.value} align="right">
             {value}
          </Typography>
