@@ -38,7 +38,6 @@ const styles = sxStyles({
    cardContent: {
       paddingX: (theme) => theme.spacing(3),
       paddingTop: 0,
-      mt: "auto",
    },
    cardHeader: {
       paddingX: (theme) => theme.spacing(3),
