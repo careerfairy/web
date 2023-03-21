@@ -35,12 +35,12 @@ export const TabsComponent: FC<Props> = ({ tabOptions, onChange, value }) => {
 
 const mobileTabHeight = 35
 const tabletTabHeight = 45
-
+const borderRadius = 5
 export const StyledTabs = styled(Tabs)(({ theme }) => ({
    [`& .${tabsClasses.indicator}`]: {
       top: 0,
       height: "100%",
-      borderRadius: theme.spacing(5),
+      borderRadius: theme.spacing(borderRadius),
       zIndex: 0,
       backgroundColor: theme.palette.secondary.main,
       [theme.breakpoints.down("lg")]: {
@@ -57,12 +57,11 @@ export const StyledTabs = styled(Tabs)(({ theme }) => ({
       flex: "0 1 auto",
       display: "inline-flex",
       overflow: "hidden",
-      borderRadius: theme.spacing(5),
+      borderRadius: theme.spacing(borderRadius),
       backgroundColor: theme.palette.tertiary.main,
    },
 })) as typeof Tabs
 
-const borderRadius = 5
 export const StyledTab = styled(Tab)(({ theme }) => ({
    zIndex: 1,
    transition: theme.transitions.create(["color", "background-color"]),
