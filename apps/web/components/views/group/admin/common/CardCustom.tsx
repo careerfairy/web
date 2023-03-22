@@ -203,6 +203,9 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
    "& .MuiPagination-ul li:last-child button::before": {
       content: "'Next'",
       marginRight: theme.spacing(1),
+      [theme.breakpoints.down("sm")]: {
+         content: "''",
+      },
    },
    "& .MuiPagination-ul li:first-of-type": {
       display: "block",
@@ -210,6 +213,9 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
    "& .MuiPagination-ul li:first-of-type button::after": {
       content: "'Previous'",
       marginLeft: theme.spacing(1),
+      [theme.breakpoints.down("sm")]: {
+         content: "''",
+      },
    },
    "& .MuiPagination-ul li button": {
       fontWeight: 500,
