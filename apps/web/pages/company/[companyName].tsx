@@ -19,6 +19,7 @@ import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import * as Sentry from "@sentry/nextjs"
 
 type TrackProps = {
    id: string
@@ -100,13 +101,38 @@ export const getStaticProps: GetStaticProps<{
             }
          }
 
-         throw new Error(
-            `Company page ${companyName} for groupId ${serverSideGroup.id} is not ready yet`
+         Sentry.captureException(
+            new Error(
+               `Company page ${companyName} for groupId ${serverSideGroup.id} is not ready yet`
+            ),
+            {
+               extra: {
+                  serverSideGroup,
+                  companyNameSlug,
+               },
+            }
          )
+
+         // The page is not ready, return notFound to trigger a 404
+         return {
+            notFound: true,
+            revalidate: 60, // <- ISR, interval in seconds between revalidations
+         }
       }
    }
 
-   throw new Error(`Company ${companyName} not found`)
+   Sentry.captureException(new Error(`Company ${companyName} not found`), {
+      extra: {
+         companyNameSlug,
+         companyName,
+      },
+   })
+
+   // The company is not found, return notFound to trigger a 404
+   return {
+      notFound: true,
+      revalidate: 60, // <- ISR, interval in seconds between revalidations
+   }
 }
 
 export const getStaticPaths: GetStaticPaths = () => ({
