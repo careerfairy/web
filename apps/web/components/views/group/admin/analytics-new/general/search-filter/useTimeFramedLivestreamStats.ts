@@ -9,8 +9,8 @@ import {
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { TimeFrame, TimeFrames } from "./GeneralSearchFilter"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { TimeFrame, TimeFrames } from "../GeneralPageProvider"
 
 const useTimeFramedLivestreamStats = (timeFrame: TimeFrame) => {
    const { group } = useGroup()
