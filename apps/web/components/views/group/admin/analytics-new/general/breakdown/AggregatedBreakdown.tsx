@@ -82,10 +82,39 @@ const AggregatedBreakdownChart = () => {
 
    const isEmpty = livestreamStats.length === 0
 
+   const handleLeftTabChange = useCallback(
+      (event: React.SyntheticEvent<Element, Event>, value: LeftTabValue) => {
+         setLeftTabsValue(value)
+      },
+      []
+   )
+
+   const handleRightTabChange = useCallback(
+      (event: React.SyntheticEvent<Element, Event>, value: RightTabValue) => {
+         setRightTabsValue(value)
+      },
+      []
+   )
+
+   const onPageChange = useCallback(
+      (event: React.ChangeEvent<unknown>, value: number) => {
+         setPage(value)
+      },
+      []
+   )
+
+   const resetTabs = useCallback(() => {
+      setLeftTabsValue(initialLeftTabValue)
+      setRightTabsValue(initialRightTabValue)
+   }, [])
+
+   const resetPage = useCallback(() => setPage(1), [])
+
    useEffect(() => {
-      resetTabs()
-      // eslint-disable-next-line react-hooks/exhaustive-deps
-   }, [isEmpty])
+      if (isEmpty) {
+         resetTabs()
+      }
+   }, [isEmpty, resetTabs])
 
    useEffect(() => {
       resetPage()
@@ -103,34 +132,6 @@ const AggregatedBreakdownChart = () => {
    const results = useMemo(
       () => getResults(breakDowns[breakDownsKey], page),
       [breakDowns, breakDownsKey, page]
-   )
-
-   const onPageChange = useCallback(
-      (event: React.ChangeEvent<unknown>, value: number) => {
-         setPage(value)
-      },
-      []
-   )
-
-   const resetPage = useCallback(() => setPage(1), [])
-
-   const resetTabs = useCallback(() => {
-      setLeftTabsValue(initialLeftTabValue)
-      setRightTabsValue(initialRightTabValue)
-   }, [])
-
-   const handleLeftTabChange = useCallback(
-      (event: React.SyntheticEvent<Element, Event>, value: LeftTabValue) => {
-         setLeftTabsValue(value)
-      },
-      []
-   )
-
-   const handleRightTabChange = useCallback(
-      (event: React.SyntheticEvent<Element, Event>, value: RightTabValue) => {
-         setRightTabsValue(value)
-      },
-      []
    )
 
    const title = useMemo(() => {
