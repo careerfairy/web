@@ -11,6 +11,8 @@ import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import LivestreamAutoComplete from "./LivestreamAutoComplete"
 import { DateTime } from "luxon"
 
+const spacing = 1
+
 const styles = sxStyles({
    root: {
       display: "flex",
@@ -18,7 +20,7 @@ const styles = sxStyles({
    },
    wrapper: {
       flex: 1,
-      p: 1,
+      p: spacing,
    },
    timeFrameSelect: {
       minWidth: {
@@ -94,7 +96,7 @@ const GeneralSearchFilter = () => {
          <Stack
             direction={isMobile ? "column" : "row"}
             sx={styles.wrapper}
-            spacing={1}
+            spacing={spacing}
             divider={
                <Divider
                   flexItem
