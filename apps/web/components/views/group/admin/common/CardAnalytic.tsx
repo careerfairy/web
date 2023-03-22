@@ -1,6 +1,8 @@
 import { Typography } from "@mui/material"
 import CardCustom, { SubheaderLink } from "./CardCustom"
 import { sxStyles } from "../../../../../types/commonTypes"
+import React, { FC } from "react"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 
 const styles = sxStyles({
    value: {
@@ -42,5 +44,20 @@ export const CardAnalytic = ({
             {value}
          </Typography>
       </CardCustom>
+   )
+}
+
+type ATSCardProps = {
+   value: number
+}
+export const ATSCard: FC<ATSCardProps> = ({ value }) => {
+   const { group } = useGroup()
+   return (
+      <CardAnalytic
+         title="In-stream applications"
+         value={value}
+         linkDescription={"Go to applicants"}
+         link={`/group/${group.id}/admin/ats-integration?section=1`}
+      />
    )
 }
