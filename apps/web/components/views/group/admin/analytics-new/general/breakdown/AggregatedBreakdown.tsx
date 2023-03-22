@@ -187,12 +187,10 @@ const AggregatedBreakdownChart = () => {
                   onChange={onPageChange}
                   size="small"
                />
-               <Box mt={2}>
-                  <SubheaderLink
-                     title="Go to streams analytics"
-                     link={`/group/${group?.id}/admin/analytics/live-stream`}
-                  />
-               </Box>
+               <SubheaderLink
+                  title="Go to streams analytics"
+                  link={`/group/${group?.id}/admin/analytics/live-stream`}
+               />
             </Stack>
          </Stack>
       </CardCustom>
