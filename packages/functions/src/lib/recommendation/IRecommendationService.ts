@@ -20,7 +20,7 @@ export interface IRecommendationService {
    ): Promise<Recommendations>
 }
 
-type Logger = {
+export type Logger = {
    debug: (...args: any[]) => void
    info: (...args: any[]) => void
    warn: (...args: any[]) => void

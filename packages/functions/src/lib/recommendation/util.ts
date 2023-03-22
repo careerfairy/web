@@ -1,3 +1,4 @@
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 export class RankedLivestreamEvent {
@@ -15,11 +16,23 @@ export class RankedLivestreamEvent {
    }
 
    getFieldOfStudyIds(): string[] {
-      return this.model.targetFieldsOfStudy.map((e) => e.id)
+      return this.model.targetFieldsOfStudy.map((e) => e.id) || []
    }
 
    getInterestIds(): string[] {
       return this.model.interestsIds || []
+   }
+
+   getCompanyCountries(): string[] {
+      return this.model.companyCountries || []
+   }
+
+   getCompanyIndustries(): string[] {
+      return this.model.companyIndustries || []
+   }
+
+   getCompanySizes(): string[] {
+      return this.model.companySizes || []
    }
 
    addPoints(points: number) {
@@ -33,6 +46,14 @@ export class RankedLivestreamEvent {
    getPoints() {
       return this.points
    }
+}
+
+export function sortRankedLivestreamEventByPoints(
+   rankedLivestreamEvents: RankedLivestreamEvent[]
+): RankedLivestreamEvent[] {
+   return [...rankedLivestreamEvents].sort(
+      (a, b) => b.getPoints() - a.getPoints()
+   )
 }
 
 export const handlePromisesAllSettled = async <TPromiseResolve>(
@@ -50,6 +71,35 @@ export const handlePromisesAllSettled = async <TPromiseResolve>(
    })
 
    return resolvedResults
+}
+
+export function getMostCommonFieldsOfStudies(
+   livestreams: LivestreamEvent[]
+): FieldOfStudy[] {
+   // get all fields of study from livestreams
+   const fieldsOfStudy = livestreams
+      .flatMap((livestream) => livestream.targetFieldsOfStudy)
+      .filter(Boolean)
+
+   const sortedFieldOfStudyIds = sortElementsByFrequency(
+      fieldsOfStudy.map((fieldOfStudy) => fieldOfStudy.id)
+   )
+
+   // return the fields of study objects sorted by frequency
+   return sortedFieldOfStudyIds.map((fieldOfStudyId) =>
+      fieldsOfStudy.find((fieldOfStudy) => fieldOfStudy.id === fieldOfStudyId)
+   )
+}
+
+export function getMostCommonArrayValues(
+   livestreams: LivestreamEvent[],
+   livestreamGetter: (livestream: LivestreamEvent) => string[]
+): string[] {
+   const values = livestreams
+      .flatMap((livestream) => livestreamGetter(livestream))
+      .filter(Boolean)
+
+   return sortElementsByFrequency(values)
 }
 
 export const sortElementsByFrequency = (elements: string[]) => {
