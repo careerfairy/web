@@ -1,6 +1,12 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
-import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
+import {
+   AutocompleteChangeReason,
+   Card,
+   Divider,
+   ListItemIcon,
+   ListItemText,
+} from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useTimeFramedLivestreamStats from "./useTimeFramedLivestreamStats"
 import Stack from "@mui/material/Stack"
@@ -9,6 +15,7 @@ import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import LivestreamAutoComplete from "./LivestreamAutoComplete"
+import { DateTime } from "luxon"
 
 const styles = sxStyles({
    root: {
@@ -17,7 +24,7 @@ const styles = sxStyles({
    },
    wrapper: {
       flex: 1,
-      p: 2,
+      p: 0.5,
    },
    timeFrameSelect: {
       minWidth: {
@@ -93,7 +100,7 @@ const GeneralSearchFilter = () => {
          <Stack
             direction={isMobile ? "column" : "row"}
             sx={styles.wrapper}
-            spacing={2}
+            spacing={0.5}
             divider={
                <Divider
                   flexItem
@@ -138,25 +145,25 @@ const timeFrameSelectProps = {
 }
 
 export const TimeFrames = {
-   "All time": {
-      start: new Date(0),
-      end: null,
+   "Last 30 days": {
+      start: DateTime.local().minus({ days: 30 }).toJSDate(),
+      end: null, // null means we don't care about the end date
    },
-   "Last 2 years": {
-      start: new Date(new Date().setDate(new Date().getDate() - 730)),
+   "Last 6 months": {
+      start: DateTime.local().minus({ months: 6 }).toJSDate(),
       end: null,
    },
    "Last 1 year": {
-      start: new Date(new Date().setDate(new Date().getDate() - 365)),
+      start: DateTime.local().minus({ years: 1 }).toJSDate(),
       end: null,
    },
-   "Last 6 months": {
-      start: new Date(new Date().setDate(new Date().getDate() - 180)),
+   "Last 2 years": {
+      start: DateTime.local().minus({ years: 2 }).toJSDate(),
       end: null,
    },
-   "Last month": {
-      start: new Date(new Date().setDate(new Date().getDate() - 30)),
-      end: null, // null means we don't care about the end date
+   "All time": {
+      start: new Date(0),
+      end: null,
    },
 } as const
 

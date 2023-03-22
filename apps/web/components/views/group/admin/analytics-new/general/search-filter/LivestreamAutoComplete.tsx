@@ -6,7 +6,12 @@ import {
    AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete/Autocomplete"
 import Box from "@mui/material/Box"
-import { CircularProgress, ListItemText, Typography } from "@mui/material"
+import {
+   AutocompleteChangeReason,
+   CircularProgress,
+   ListItemText,
+   Typography,
+} from "@mui/material"
 import {
    getMaxLineStyles,
    prettyDate,
@@ -46,8 +51,13 @@ type Props = {
    livestreamStats: LiveStreamStats[]
    localSelectedStats: LiveStreamStats[]
    loading: boolean
-   handleChange: (event: React.SyntheticEvent, value: LiveStreamStats[]) => void
+   handleChange: (
+      event: React.SyntheticEvent,
+      value: LiveStreamStats[],
+      reason: AutocompleteChangeReason
+   ) => void
 }
+
 const LivestreamAutoComplete: FC<Props> = ({
    livestreamStats,
    loading,
@@ -70,22 +80,33 @@ const LivestreamAutoComplete: FC<Props> = ({
       return ""
    }, [allLivestreamsSelected, loading, noLivestreamStats])
 
+   const getMessage = useCallback(
+      (value: LiveStreamStats[]): string => {
+         if (allLivestreamsSelected) {
+            return "All live streams"
+         }
+
+         if (value?.length === 0) {
+            return noLivestreamStats ? "No live streams" : "All live streams"
+         }
+         if (value?.length === 1) {
+            return value[0]?.livestream?.title
+         }
+
+         return `${value?.length} live streams selected`
+      },
+      [allLivestreamsSelected, noLivestreamStats]
+   )
+
    const renderTags = useCallback(
       (value: LiveStreamStats[]) => {
          if (loading) return <CircularProgress color={"inherit"} size={15} />
 
-         let message
-         if (!value?.length) {
-            message = noLivestreamStats ? "No live streams" : "All live streams"
-         } else {
-            const streamTitle = value[0]?.livestream?.title
-            const streamCount = value?.length - 1
-            message = `${streamTitle} ${streamCount ? `+ ${streamCount}` : ""}` // Eg. "Stream 1 + 2" or "Stream 1"
-         }
+         const message = getMessage(value)
 
          return <Typography whiteSpace="pre-line">{message}</Typography>
       },
-      [loading, noLivestreamStats]
+      [getMessage, loading]
    )
 
    const renderInput = useCallback(
@@ -94,7 +115,8 @@ const LivestreamAutoComplete: FC<Props> = ({
             <StyledTextField
                {...params}
                sx={styles.livestreamStatSelect}
-               placeholder={placeHolder}
+               placeholder={"Select live streams"}
+               label="All live streams"
                variant="outlined"
             />
          )
@@ -159,7 +181,7 @@ const getLabelFn = (item: LiveStreamStats) => item.livestream.title
 
 const listBoxCustomProps = {
    listBoxSx: styles.listBox,
-   listBoxItemHeight: 80,
+   listBoxItemHeight: 95,
 }
 
 export default LivestreamAutoComplete

@@ -25,7 +25,7 @@ const useTimeFramedLivestreamStats = (timeFrame: TimeFrame) => {
       ]
 
       if (timeFrameData.end) {
-         constraints.unshift(where("livestream.start", "<=", timeFrameData.end))
+         constraints.push(where("livestream.start", "<=", timeFrameData.end))
       }
 
       return query(collectionGroup(FirestoreInstance, "stats"), ...constraints)

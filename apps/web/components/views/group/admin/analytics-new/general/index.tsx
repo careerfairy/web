@@ -1,8 +1,11 @@
 import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
-import { memo } from "react"
+import { memo, useMemo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { GeneralPageProvider } from "./GeneralPageProvider"
+import {
+   GeneralPageProvider,
+   useAnalyticsPageContext,
+} from "./GeneralPageProvider"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
 import CompanyPageCTA from "./company-page/CompanyPageCTA"
@@ -25,10 +28,10 @@ const AnalyticsGeneralPageContent = () => {
 }
 
 const PageContent = () => {
+   const { livestreamStats } = useAnalyticsPageContext()
    const { groupPresenter } = useGroup()
 
-   const companyPageFullyReady =
-      groupPresenter.companyPageIsFullyReady() || true
+   const companyPageFullyReady = groupPresenter.companyPageIsFullyReady()
 
    return (
       <Box py={2}>

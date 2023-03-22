@@ -65,7 +65,7 @@ export const generateReminderEmailData = ({
 
    const dateToDelivery = minutesToRemindBefore
       ? luxonStartDate.minus({ minutes: minutesToRemindBefore }).toRFC2822()
-      : 0
+      : "0"
 
    const templateData = createRecipientVariables(
       stream,
@@ -140,7 +140,7 @@ export const generateNonAttendeesReminder = ({
          subject: `🤫 ${company} : 4 days limited access to live stream recording!`,
          template: reminder.template,
          "recipient-variables": JSON.stringify(templateData),
-         "o:deliverytime": sendReminderNow ? 0 : dateToDelivery.toRFC2822(),
+         "o:deliverytime": sendReminderNow ? "0" : dateToDelivery.toRFC2822(),
       }
    })
 }
