@@ -2,11 +2,7 @@ import React, { FC, useMemo } from "react"
 import { Grid } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { CardAnalytic } from "../../../common/CardAnalytic"
-import {
-   totalPeopleReached,
-   totalPeopleReachedByLivestreamStat,
-} from "../../../common/util"
+import { ATSCard, CardAnalytic } from "../../../common/CardAnalytic"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import AggregatedCompanyFollowersValue from "./AggregatedCompanyFollowersValue"
@@ -57,7 +53,7 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
       <CardAnalytic
          title="Talent Pool"
          value={summedResults.numberOfTalentPoolProfiles}
-         linkDescription={"Go to applications"}
+         linkDescription={"Go to talent pool"}
          link={`/group/${group.id}/admin/analytics/talent-pool?section=1`} // Should go to
       />
    )
@@ -68,15 +64,18 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
             <>
                <Grid xs={6} item style={styles.gridItem}>
                   <CardAnalytic
-                     title="Company Views"
-                     tooltip="Total number of people exposed to your company"
-                     value={totalPeopleReached(stats)}
+                     title="Company page views"
+                     tooltip="Total number of talent that viewed your company page"
+                     value={
+                        stats?.generalStats?.numberOfPeopleReachedCompanyPage ??
+                        0
+                     }
                   />
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
                   <CardAnalytic
                      title="Followers"
-                     tooltip="Total number of people who follow your company"
+                     tooltip="Total number of talent who follow your company"
                      value={<AggregatedCompanyFollowersValue />}
                   />
                </Grid>
@@ -88,28 +87,14 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
                   {talentPoolCard}
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
-                  <CardAnalytic
-                     title="Applications generated through ATS"
-                     value={summedResults.numberOfApplications}
-                     linkDescription={"Go to applicants"}
-                     link={`/group/${group.id}/admin/ats-integration?section=1`}
-                  />
+                  <ATSCard value={summedResults.numberOfApplications} />
                </Grid>
             </>
          ) : (
             <>
-               {companyPageReady ? (
-                  <Grid xs={6} item style={styles.gridItem}>
-                     <CardAnalytic
-                        title="Young talent reached"
-                        value={summedResults.numberOfPeopleReached}
-                     />
-                  </Grid>
-               ) : (
-                  <Grid xs={6} item style={styles.gridItem}>
-                     {talentPoolCard}
-                  </Grid>
-               )}
+               <Grid xs={6} item style={styles.gridItem}>
+                  {talentPoolCard}
+               </Grid>
                <Grid xs={6} item style={styles.gridItem}>
                   <CardAnalytic
                      title="Average registrations per stream"
@@ -180,9 +165,7 @@ const sumStats = (stats?: LiveStreamStats[]): SumResult => {
          numberOfRegistrations:
             acc.numberOfRegistrations +
             (generalStats?.numberOfRegistrations || 0),
-         numberOfPeopleReached:
-            acc.numberOfPeopleReached +
-            totalPeopleReachedByLivestreamStat(curr),
+         numberOfPeopleReached: 0,
          numberOfTalentPoolProfiles:
             acc.numberOfTalentPoolProfiles +
             (generalStats?.numberOfTalentPoolProfiles || 0),
