@@ -1,12 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
-import {
-   AutocompleteChangeReason,
-   Card,
-   Divider,
-   ListItemIcon,
-   ListItemText,
-} from "@mui/material"
+import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useTimeFramedLivestreamStats from "./useTimeFramedLivestreamStats"
 import Stack from "@mui/material/Stack"
@@ -24,7 +18,7 @@ const styles = sxStyles({
    },
    wrapper: {
       flex: 1,
-      p: 0.5,
+      p: 1,
    },
    timeFrameSelect: {
       minWidth: {
@@ -100,7 +94,7 @@ const GeneralSearchFilter = () => {
          <Stack
             direction={isMobile ? "column" : "row"}
             sx={styles.wrapper}
-            spacing={0.5}
+            spacing={1}
             divider={
                <Divider
                   flexItem

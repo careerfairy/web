@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, useCallback, useMemo, useState } from "react"
 import VirtualizedAutocomplete from "../../../../../common/VirtualizedAutocomplete"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
@@ -6,12 +6,7 @@ import {
    AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete/Autocomplete"
 import Box from "@mui/material/Box"
-import {
-   AutocompleteChangeReason,
-   CircularProgress,
-   ListItemText,
-   Typography,
-} from "@mui/material"
+import { CircularProgress, ListItemText, Typography } from "@mui/material"
 import {
    getMaxLineStyles,
    prettyDate,
@@ -30,6 +25,12 @@ const styles = sxStyles({
       },
       [theme.breakpoints.down("sm")]: {
          minWidth: "auto !important",
+      },
+      "& input": {
+         "&::placeholder": {
+            color: theme.palette.text.primary,
+            opacity: 1,
+         },
       },
    }),
    listBox: {
@@ -51,11 +52,7 @@ type Props = {
    livestreamStats: LiveStreamStats[]
    localSelectedStats: LiveStreamStats[]
    loading: boolean
-   handleChange: (
-      event: React.SyntheticEvent,
-      value: LiveStreamStats[],
-      reason: AutocompleteChangeReason
-   ) => void
+   handleChange: (event: React.SyntheticEvent, value: LiveStreamStats[]) => void
 }
 
 const LivestreamAutoComplete: FC<Props> = ({
@@ -64,26 +61,43 @@ const LivestreamAutoComplete: FC<Props> = ({
    localSelectedStats,
    handleChange,
 }) => {
+   const [open, setOpen] = useState(false)
    const noLivestreamStats = livestreamStats?.length === 0
    const allLivestreamsSelected = localSelectedStats?.length === 0
+   const livestreamsSelected = localSelectedStats?.length > 0
 
    const placeHolder = useMemo(() => {
       if (loading) return "Loading..."
 
+      if (livestreamsSelected) {
+         return ""
+      }
+
       if (noLivestreamStats) {
          return "No live streams"
       }
+
+      if (open) {
+         return "Select live streams"
+      }
+
       if (allLivestreamsSelected) {
          return "All live streams"
       }
 
-      return ""
-   }, [allLivestreamsSelected, loading, noLivestreamStats])
+      return "Select livestreams"
+   }, [
+      allLivestreamsSelected,
+      livestreamsSelected,
+      loading,
+      noLivestreamStats,
+      open,
+   ])
 
    const getMessage = useCallback(
       (value: LiveStreamStats[]): string => {
          if (allLivestreamsSelected) {
-            return "All live streams"
+            return ""
          }
 
          if (value?.length === 0) {
@@ -115,8 +129,7 @@ const LivestreamAutoComplete: FC<Props> = ({
             <StyledTextField
                {...params}
                sx={styles.livestreamStatSelect}
-               placeholder={"Select live streams"}
-               label="All live streams"
+               placeholder={placeHolder}
                variant="outlined"
             />
          )
@@ -124,16 +137,28 @@ const LivestreamAutoComplete: FC<Props> = ({
       [placeHolder]
    )
 
+   const closeSelect = useCallback(() => {
+      setOpen(false)
+   }, [])
+
+   const openSelect = useCallback(() => {
+      setOpen(true)
+   }, [])
+
    return (
       <VirtualizedAutocomplete
          multiple
+         clearOnBlur
+         open={open}
+         onOpen={openSelect}
+         onClose={closeSelect}
          id="select-livestream"
          options={livestreamStats ?? []}
          disableCloseOnSelect
          loading={loading}
          disabled={noLivestreamStats || loading}
          fullWidth
-         clearText={"All live streams"}
+         clearText={"Clear filter"}
          listBoxCustomProps={listBoxCustomProps}
          noOptionsText={noLivestreamStats ? "No live streams" : "No results"}
          freeSolo={false}
