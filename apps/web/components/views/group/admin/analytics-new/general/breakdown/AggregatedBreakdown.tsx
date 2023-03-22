@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    LoadingSourcesProgress,
@@ -16,28 +16,40 @@ import CardCustom, {
 import Stack from "@mui/material/Stack"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { Box } from "@mui/material"
 import { TabsComponent, TabsSkeleton } from "../../../common/Tabs"
-import { Box, Typography } from "@mui/material"
 
 const styles = sxStyles({
    root: {
       "& .MuiCardContent-root": {
          flex: 1,
       },
-      minHeight: 632,
+      minHeight: {
+         md: 632,
+      },
    },
 })
-const maxNumberOfSourcesToDisplay = 8
+const maxNumberOfSourcesToDisplay = 10
 
-const leftTabOptions = [
-   { value: "Country", label: "Country" },
-   { value: "FieldOfStudy", label: "Field of study" },
-] as const
+const leftTabOptions = {
+   Country: "Country",
+   FieldOfStudy: "Field of study",
+} as const
 
-const rightTabOptions = [
-   { value: "participants", label: "Participants" },
-   { value: "registrants", label: "Registrants" },
-] as const
+const leftTabOptionsArray = Object.keys(leftTabOptions).map((key) => ({
+   value: key,
+   label: leftTabOptions[key],
+}))
+
+const rightTabOptions = {
+   registrations: "Registrations",
+   participants: "Participants",
+} as const
+
+const rightTabOptionsArray = Object.keys(rightTabOptions).map((key) => ({
+   value: key,
+   label: rightTabOptions[key],
+}))
 
 const AggregatedBreakdown = () => {
    const { fieldsOfStudyLookup, livestreamStats } = useAnalyticsPageContext()
@@ -52,21 +64,36 @@ const AggregatedBreakdown = () => {
    return <AggregatedBreakdownChart />
 }
 
-type LeftTabValue = typeof leftTabOptions[number]["value"]
-type RightTabValue = typeof rightTabOptions[number]["value"]
+type LeftTabValue = keyof typeof leftTabOptions
+type RightTabValue = keyof typeof rightTabOptions
+
+const initialLeftTabValue: LeftTabValue = "Country"
+const initialRightTabValue: RightTabValue = "registrations"
 const AggregatedBreakdownChart = () => {
    const { group } = useGroup()
-   const { fieldsOfStudyLookup, livestreamStats } = useAnalyticsPageContext()
+   const { fieldsOfStudyLookup, livestreamStats, livestreamStatsTimeFrame } =
+      useAnalyticsPageContext()
 
    const [page, setPage] = useState(1)
-   const [leftTabsValue, setLeftTabsValue] = useState<LeftTabValue>("Country")
+   const [leftTabsValue, setLeftTabsValue] =
+      useState<LeftTabValue>(initialLeftTabValue)
    const [rightTabsValue, setRightTabsValue] =
-      useState<RightTabValue>("participants")
+      useState<RightTabValue>(initialRightTabValue)
+
+   const isEmpty = livestreamStats.length === 0
+
+   useEffect(() => {
+      resetTabs()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [isEmpty])
+
+   useEffect(() => {
+      resetPage()
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [leftTabsValue, rightTabsValue, livestreamStatsTimeFrame])
 
    const breakDownsKey: keyof ReturnType<typeof getBreakdowns> =
       `${rightTabsValue}By${leftTabsValue}` as const
-
-   const isEmpty = livestreamStats.length === 0
 
    const breakDowns = useMemo(
       () => getBreakdowns(livestreamStats ?? [], fieldsOfStudyLookup),
@@ -85,10 +112,16 @@ const AggregatedBreakdownChart = () => {
       []
    )
 
+   const resetPage = useCallback(() => setPage(1), [])
+
+   const resetTabs = useCallback(() => {
+      setLeftTabsValue(initialLeftTabValue)
+      setRightTabsValue(initialRightTabValue)
+   }, [])
+
    const handleLeftTabChange = useCallback(
       (event: React.SyntheticEvent<Element, Event>, value: LeftTabValue) => {
          setLeftTabsValue(value)
-         setPage(1)
       },
       []
    )
@@ -96,13 +129,17 @@ const AggregatedBreakdownChart = () => {
    const handleRightTabChange = useCallback(
       (event: React.SyntheticEvent<Element, Event>, value: RightTabValue) => {
          setRightTabsValue(value)
-         setPage(1)
       },
       []
    )
 
+   const title = useMemo(() => {
+      const str = `${rightTabOptions[rightTabsValue]} by ${leftTabOptions[leftTabsValue]}`
+      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+   }, [leftTabsValue, rightTabsValue])
+
    return (
-      <CardCustom sx={styles.root} title={"Live streams KPIs overview"}>
+      <CardCustom sx={styles.root} title={title}>
          <Stack
             height={"100%"}
             justifyContent={"space-between"}
@@ -110,40 +147,29 @@ const AggregatedBreakdownChart = () => {
             spacing={2}
             display={"flex"}
          >
-            {isEmpty ? (
-               <Box
-                  display="flex"
-                  justifyContent="center"
-                  alignItems="center"
-                  flex={1}
-               >
-                  <Typography variant="h6" color="textSecondary">
-                     No data available
-                  </Typography>
-               </Box>
-            ) : (
-               <SourcesProgress
-                  sources={results.pageData}
-                  leftHeaderComponent={
-                     <Box pb={2} display="flex" justifyContent="flex-start">
-                        <TabsComponent
-                           tabOptions={leftTabOptions}
-                           value={leftTabsValue}
-                           onChange={handleLeftTabChange}
-                        />
-                     </Box>
-                  }
-                  rightHeaderComponent={
-                     <Box display="flex" justifyContent="flex-end">
-                        <TabsComponent
-                           tabOptions={rightTabOptions}
-                           value={rightTabsValue}
-                           onChange={handleRightTabChange}
-                        />
-                     </Box>
-                  }
-               />
-            )}
+            <SourcesProgress
+               sources={isEmpty ? emptySources : results.pageData}
+               leftHeaderComponent={
+                  <Box pb={2} display="flex" justifyContent="flex-start">
+                     <TabsComponent
+                        tabOptions={leftTabOptionsArray}
+                        value={leftTabsValue}
+                        onChange={handleLeftTabChange}
+                        disabled={isEmpty}
+                     />
+                  </Box>
+               }
+               rightHeaderComponent={
+                  <Box display="flex" justifyContent="flex-end">
+                     <TabsComponent
+                        tabOptions={rightTabOptionsArray}
+                        value={rightTabsValue}
+                        onChange={handleRightTabChange}
+                        disabled={isEmpty}
+                     />
+                  </Box>
+               }
+            />
             <Stack
                direction={"row"}
                flexWrap={"wrap"}
@@ -161,10 +187,12 @@ const AggregatedBreakdownChart = () => {
                   onChange={onPageChange}
                   size="small"
                />
-               <SubheaderLink
-                  title="Go to streams analytics"
-                  link={`/group/${group?.id}/admin/analytics/live-stream`}
-               />
+               <Box mt={2}>
+                  <SubheaderLink
+                     title="Go to streams analytics"
+                     link={`/group/${group?.id}/admin/analytics/live-stream`}
+                  />
+               </Box>
             </Stack>
          </Stack>
       </CardCustom>
@@ -239,14 +267,14 @@ const getBreakdowns = (
    fieldsOfStudyLookup: Record<string, string>
 ): {
    participantsByCountry: SourceEntryArgs[]
-   registrantsByCountry: SourceEntryArgs[]
+   registrationsByCountry: SourceEntryArgs[]
    participantsByFieldOfStudy: SourceEntryArgs[]
-   registrantsByFieldOfStudy: SourceEntryArgs[]
+   registrationsByFieldOfStudy: SourceEntryArgs[]
 } => {
    const countriesByParticipants: SourceEntryArgs[] = []
-   const countriesByRegistrants: SourceEntryArgs[] = []
+   const countriesByRegistrations: SourceEntryArgs[] = []
    const fieldsOfStudyByParticipants: SourceEntryArgs[] = []
-   const fieldsOfStudyByRegistrants: SourceEntryArgs[] = []
+   const fieldsOfStudyByRegistrations: SourceEntryArgs[] = []
 
    stats.forEach((stat) => {
       const { fieldOfStudyStats, countryStats } = stat
@@ -265,10 +293,10 @@ const getBreakdowns = (
          )
 
          updateEntries(
-            countriesByRegistrants,
+            countriesByRegistrations,
             countryName,
             numberOfRegistrations,
-            `Number of registrants from ${countryName}`
+            `Number of registrations from ${countryName}`
          )
       })
 
@@ -285,14 +313,14 @@ const getBreakdowns = (
             fieldsOfStudyByParticipants,
             fieldOfStudyName,
             numberOfParticipants,
-            `Number of participants from ${fieldOfStudyName}`
+            `Number of participants with a background in ${fieldOfStudyName}`
          )
 
          updateEntries(
-            fieldsOfStudyByRegistrants,
+            fieldsOfStudyByRegistrations,
             fieldOfStudyName,
             numberOfRegistrations,
-            `Number of registrants from ${fieldOfStudyName}`
+            `Number of registrations with a background in ${fieldOfStudyName}`
          )
       })
    })
@@ -301,16 +329,27 @@ const getBreakdowns = (
       participantsByCountry: sortAndFilterAndCalculatePercentage(
          countriesByParticipants
       ),
-      registrantsByCountry: sortAndFilterAndCalculatePercentage(
-         countriesByRegistrants
+      registrationsByCountry: sortAndFilterAndCalculatePercentage(
+         countriesByRegistrations
       ),
       participantsByFieldOfStudy: sortAndFilterAndCalculatePercentage(
          fieldsOfStudyByParticipants
       ),
-      registrantsByFieldOfStudy: sortAndFilterAndCalculatePercentage(
-         fieldsOfStudyByRegistrants
+      registrationsByFieldOfStudy: sortAndFilterAndCalculatePercentage(
+         fieldsOfStudyByRegistrations
       ),
    }
 }
+
+const emptySources: SourceEntryArgs[] = Object.entries(universityCountriesMap)
+   .slice(0, maxNumberOfSourcesToDisplay)
+   .map(([key, value]) => ({
+      value: 0,
+      label: value,
+      id: key,
+      percent: 0,
+      help: `Number of participants from ${value}`,
+      name: value,
+   }))
 
 export default AggregatedBreakdown

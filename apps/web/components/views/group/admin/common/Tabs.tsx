@@ -11,14 +11,20 @@ type TabOption = {
 type Props = {
    tabOptions: TabOption[] | readonly TabOption[]
    value: string
-
+   disabled?: boolean
    onChange: (event: React.SyntheticEvent, value: string) => void
 }
-export const TabsComponent: FC<Props> = ({ tabOptions, onChange, value }) => {
+export const TabsComponent: FC<Props> = ({
+   tabOptions,
+   onChange,
+   value,
+   disabled,
+}) => {
    return (
       <StyledTabs
          value={value}
          onChange={onChange}
+         disabled={disabled}
          color={"secondary"}
          aria-label="basic tabs example"
       >
@@ -27,6 +33,7 @@ export const TabsComponent: FC<Props> = ({ tabOptions, onChange, value }) => {
                key={option.value}
                label={option.label}
                value={option.value}
+               disabled={disabled}
             />
          ))}
       </StyledTabs>
