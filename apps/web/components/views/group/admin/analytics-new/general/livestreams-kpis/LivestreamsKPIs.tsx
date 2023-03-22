@@ -55,7 +55,7 @@ const getSourceStats = (
 
    const sources: SourceEntryArgs[] = [
       {
-         name: "Talent Reached",
+         name: "Talent reached",
          value: totalTalentReached,
          help: "Talent reached",
          percent: 0,
