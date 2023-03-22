@@ -69,6 +69,7 @@ type RightTabValue = keyof typeof rightTabOptions
 
 const initialLeftTabValue: LeftTabValue = "Country"
 const initialRightTabValue: RightTabValue = "registrations"
+
 const AggregatedBreakdownChart = () => {
    const { group } = useGroup()
    const { fieldsOfStudyLookup, livestreamStats, livestreamStatsTimeFrame } =
@@ -237,6 +238,11 @@ const AggregatedBreakdownChartSkeleton = () => {
    )
 }
 
+/**
+ *  The Method client side paginates the given data based on the given current page
+ *  @param allData - data to paginate
+ *  @param currentPage - current page number
+ * */
 const getResults = (
    allData: SourceEntryArgs[],
    currentPage: number
@@ -261,6 +267,13 @@ const getResults = (
       pageData,
    }
 }
+
+/**
+ * Get breakdowns for the given stats
+ * @param stats - livestream stats array to get breakdowns from
+ * @param fieldsOfStudyLookup - fields of study lookup object gotten from the firebase
+ * @returns breakdowns object containing the breakdowns for the given stats based on the given fields of study , and the given countries
+ * */
 const getBreakdowns = (
    stats: LiveStreamStats[],
    fieldsOfStudyLookup: Record<string, string>

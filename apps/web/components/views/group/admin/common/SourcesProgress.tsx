@@ -183,6 +183,15 @@ export const updateEntries = (
       })
    }
 }
+
+/**
+ *  Sorts the entries by value in descending order
+ *  Filters out entries with value 0
+ *  Calculates the percentage of each entry
+ *  Returns the updated entries
+ *  @param entries - array of entries
+ *  @returns SourceEntryArgs[] - updated entries array with percentage
+ * */
 export const sortAndFilterAndCalculatePercentage = (
    entries: SourceEntryArgs[]
 ) => {
@@ -194,6 +203,13 @@ export const sortAndFilterAndCalculatePercentage = (
          return entry
       })
 }
+
+/**
+ *  Helper function to calculate percentage
+ *  @param entry - entry to calculate percentage for
+ *  @param highestValueByCategory - highest value in the category to calculate percentage for
+ *  @returns number - percentage
+ * */
 const calculatePercentage = (
    entry: SourceEntryArgs,
    highestValueByCategory = 0
