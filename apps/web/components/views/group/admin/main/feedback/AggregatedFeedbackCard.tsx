@@ -21,7 +21,7 @@ import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import CardCustom from "../CardCustom"
+import CardCustom from "../../common/CardCustom"
 import useGroupLivestreamStats from "./useGroupLivestreamStats"
 
 const styles = sxStyles({

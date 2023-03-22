@@ -75,7 +75,7 @@ type NavListProps = {
 }
 const NavList = ({ links }: NavListProps) => {
    return (
-      <Stack sx={styles.list} spacing={3} component={List}>
+      <Stack sx={styles.list} spacing={2} component={List}>
          {links.map((navItem) => (
             <NavLink key={navItem.id} {...navItem} />
          ))}
