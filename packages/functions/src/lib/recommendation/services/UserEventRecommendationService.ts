@@ -1,55 +1,43 @@
 import functions = require("firebase-functions")
+import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UserData } from "@careerfairy/shared-lib/users"
 import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
-import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import {
-   getEarliestEventBufferTime,
-   LivestreamEvent,
-   UserParticipatingStats,
-} from "@careerfairy/shared-lib/livestreams"
 
+import { userEventRecommendationService } from "../../../api/services"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "../IRecommendationService"
-import { mapFirestoreAdminSnapshots } from "../../../util"
-import { userEventRecommendationService } from "../../../api/services"
 import {
    handlePromisesAllSettled,
    RankedLivestreamEvent,
-   sortElementsByFrequency,
+   sortRankedLivestreamEventByPoints,
 } from "../util"
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
+import { UserBasedRecommendationsBuilder } from "./UserBasedRecommendationsBuilder"
+import { LivestreamBasedRecommendationsBuilder } from "./LivestreamBasedRecommendationsBuilder"
 
-type FirebaseAdmin = typeof import("firebase-admin") // This only imports the types at compile time and not the actual library at runtime
+// This only imports the types at compile time and not the actual library at runtime
+type FirebaseAdmin = typeof import("firebase-admin")
 
 const serviceName = "user_event_recommendation_service"
 
-type RankEventsArgs = {
-   rankedLivestreams: RankedLivestreamEvent[]
-   targetUserIds: string[]
-   targetLivestreamIdsGetter: keyof Pick<
-      RankedLivestreamEvent,
-      "getFieldOfStudyIds" | "getInterestIds"
-   >
-   pointsPerMatch: number
-}
 export default class UserEventRecommendationService
    extends RecommendationServiceCore
    implements IRecommendationService
 {
-   private readonly pointsPerInterestMatch = 1
-   private readonly pointsPerFieldOfStudyMatch = 1
-   private readonly firestore: ReturnType<FirebaseAdmin["firestore"]>
+   private readonly rankedLivestreamRepo: RankedLivestreamRepository
 
    constructor(
       firebaseAdmin: FirebaseAdmin,
-      private readonly userRepo: IUserRepository,
-      private readonly livestreamRepo: ILivestreamRepository
+      readonly userRepo: IUserRepository,
+      readonly livestreamRepo: ILivestreamRepository
    ) {
       super(serviceName, functions.logger)
-      this.firestore = firebaseAdmin.firestore()
-      this.userRepo = userRepo
+      this.rankedLivestreamRepo = new RankedLivestreamRepository(
+         firebaseAdmin,
+         livestreamRepo
+      )
    }
 
    async getRecommendations(userId: string, limit = 10): Promise<string[]> {
@@ -74,7 +62,7 @@ export default class UserEventRecommendationService
       )
 
       // Sort the results by points
-      const sortedResults = this.sortRankedLivestreamEventByPoints(
+      const sortedResults = sortRankedLivestreamEventByPoints(
          recommendedEvents.flat()
       )
 
@@ -87,12 +75,16 @@ export default class UserEventRecommendationService
             userId: userData?.id || "N/A",
             userInterestIds: userData?.interestsIds || [],
             userFieldOfStudyId: userData?.fieldOfStudy?.id || "N/A",
+            userCountriesOfInterest: userData?.countriesOfInterest || [],
          },
          eventMetaData: deDupedEvents.map((e) => ({
             id: e.id,
             numPoints: e.points,
             fieldsOfStudyIds: e.getFieldOfStudyIds(),
             interestIds: e.getInterestIds(),
+            companyCountries: e.getCompanyCountries(),
+            companyIndustries: e.getCompanyIndustries(),
+            companySizes: e.getCompanySizes(),
          })),
       })
 
@@ -108,103 +100,29 @@ export default class UserEventRecommendationService
          }
       )
 
+      this.log.info(
+         `Total document reads: ${this.rankedLivestreamRepo.totalReads()}`
+      )
+
       return recommendedIds
-   }
-
-   private async getRecommendEventsBasedOnInterests(
-      interestIds: string[],
-      limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const query = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("hidden", "==", false)
-         .where("interestsIds", "array-contains-any", interestIds.slice(0, 10))
-         .orderBy("start", "asc")
-         .limit(limit)
-
-      const snapshots = await query.get()
-
-      const events = mapFirestoreAdminSnapshots<LivestreamEvent>(snapshots).map(
-         RankedLivestreamEvent.create
-      )
-
-      return this.rankEvents({
-         pointsPerMatch: this.pointsPerInterestMatch,
-         rankedLivestreams: events,
-         targetUserIds: interestIds.slice(0, 10),
-         targetLivestreamIdsGetter: "getInterestIds",
-      })
-   }
-
-   private async getRecommendEventsBasedOnFieldOfStudies(
-      fieldOfStudies: FieldOfStudy[],
-      limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const query = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("hidden", "==", false)
-         .where(
-            "targetFieldsOfStudy",
-            "array-contains-any",
-            fieldOfStudies.slice(0, 10)
-         )
-         .orderBy("start", "asc")
-         .limit(limit)
-
-      const snapshots = await query.get()
-
-      const events = mapFirestoreAdminSnapshots<LivestreamEvent>(snapshots).map(
-         RankedLivestreamEvent.create
-      )
-
-      return this.rankEvents({
-         pointsPerMatch: this.pointsPerFieldOfStudyMatch,
-         rankedLivestreams: events,
-         targetUserIds: fieldOfStudies.map((f) => f.id),
-         targetLivestreamIdsGetter: "getInterestIds",
-      })
    }
 
    private async getRecommendedEventsBasedOnUserData(
       userData: UserData,
       limit: number
    ): Promise<RankedLivestreamEvent[]> {
-      const promises: Promise<RankedLivestreamEvent[]>[] = []
-
-      if (userData.interestsIds?.length) {
-         promises.push(
-            // Fetch recommended events based on the user's interests
-            this.getRecommendEventsBasedOnInterests(
-               userData.interestsIds,
-               limit
-            )
-         )
-      }
-
-      if (userData.fieldOfStudy?.id) {
-         promises.push(
-            // Fetch the top recommended events based on the user's field of study
-            this.getRecommendEventsBasedOnFieldOfStudies(
-               [userData.fieldOfStudy],
-               limit
-            )
-         )
-      }
-
-      const arrayOfRecommendedEventsBasedOnUserData =
-         await handlePromisesAllSettled(promises, this.log.error)
-
-      // Combine the results from the two queries above and remove duplicates
-      const uniqueResults = removeDuplicateDocuments(
-         arrayOfRecommendedEventsBasedOnUserData.filter(Boolean).flat()
+      const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
+         this.log,
+         limit,
+         userData,
+         this.rankedLivestreamRepo
       )
 
-      // Return the results sorted by points
-      return this.sortRankedLivestreamEventByPoints(uniqueResults)
+      return userRecommendationBuilder
+         .userInterests()
+         .userFieldsOfStudy()
+         .userCountriesOfInterest()
+         .get()
    }
 
    private async getRecommendedEventsBasedOnUserActions(
@@ -224,7 +142,7 @@ export default class UserEventRecommendationService
          await handlePromisesAllSettled(promises, this.log.error)
 
       // sort the results by points
-      const sortedResults = this.sortRankedLivestreamEventByPoints(
+      const sortedResults = sortRankedLivestreamEventByPoints(
          arrayOfRecommendedEventsBasedOnUserActions.flat()
       )
 
@@ -232,140 +150,34 @@ export default class UserEventRecommendationService
       return removeDuplicateDocuments(sortedResults)
    }
 
-   private async getMostRecentlyWatchedEvents(
-      userId: string,
-      limit: number
-   ): Promise<LivestreamEvent[]> {
-      // Get most recently watched event stats
-      const snaps = await this.firestore
-         .collectionGroup("participatingStats")
-         .where("id", "==", userId)
-         .orderBy("livestream.start", "desc")
-         .limit(limit)
-         .get()
-
-      const participatingStats =
-         mapFirestoreAdminSnapshots<UserParticipatingStats>(snaps)
-
-      // sort results by watch time
-      const sortedParticipatingStats = participatingStats.sort(
-         (a, b) => b.totalMinutes - a.totalMinutes
-      )
-
-      // Get the livestreams from the participating stats
-      const livestreamIds = sortedParticipatingStats
-         .map((stats) => stats.livestreamId)
-         .filter(Boolean)
-
-      if (!livestreamIds.length) {
-         return []
-      }
-
-      return this.livestreamRepo.getLivestreamsByIds(livestreamIds)
-   }
-
    private async getRecommendedEventsBasedOnPreviousWatchedEvents(
       userId: string,
       limit = 10
    ): Promise<RankedLivestreamEvent[]> {
       // Get most recently watched events
-      const mostRecentlyWatchedEvents = await this.getMostRecentlyWatchedEvents(
-         userId,
-         limit
-      )
-
-      // Get most common Interests from the most recently watched events
-      const mostCommonInterestIds = this.getMostCommonInterestIds(
-         mostRecentlyWatchedEvents
-      )
-
-      // Get most common Fields of Study from the most recently watched events
-      const mostCommonFieldsOfStudy = this.getMostCommonFieldsOfStudies(
-         mostRecentlyWatchedEvents
-      )
-
-      const promises: Promise<RankedLivestreamEvent[]>[] = []
-
-      if (mostCommonInterestIds.length) {
-         promises.push(
-            // Get recommended events based on most common interests
-            this.getRecommendEventsBasedOnInterests(
-               mostCommonInterestIds,
-               limit
-            )
+      const mostRecentlyWatchedEvents =
+         await this.rankedLivestreamRepo.getMostRecentlyWatchedEvents(
+            userId,
+            limit
          )
-      }
 
-      if (mostCommonFieldsOfStudy.length) {
-         promises.push(
-            // Get recommended events based on most common fields of study
-            this.getRecommendEventsBasedOnFieldOfStudies(
-               mostCommonFieldsOfStudy,
-               limit
-            )
+      // TODO: temporary hack just to count these reads
+      this.rankedLivestreamRepo.addReads(mostRecentlyWatchedEvents.length)
+
+      const livestreamBasedRecommendations =
+         new LivestreamBasedRecommendationsBuilder(
+            this.log,
+            limit,
+            mostRecentlyWatchedEvents,
+            this.rankedLivestreamRepo
          )
-      }
 
-      // Get the resolved results from the queries above
-      const recommendedEventsBasedOnPreviouslyWatchedEvents =
-         await handlePromisesAllSettled(promises, this.log.error)
-
-      return recommendedEventsBasedOnPreviouslyWatchedEvents.flat()
-   }
-
-   getMostCommonInterestIds(livestreams: LivestreamEvent[]): string[] {
-      // get all interest ids from livestreams
-      const interestIds = livestreams
-         .flatMap((livestream) => livestream.interestsIds)
-         .filter(Boolean)
-
-      return sortElementsByFrequency(interestIds)
-   }
-
-   getMostCommonFieldsOfStudies(
-      livestreams: LivestreamEvent[]
-   ): FieldOfStudy[] {
-      // get all fields of study from livestreams
-      const fieldsOfStudy = livestreams
-         .flatMap((livestream) => livestream.targetFieldsOfStudy)
-         .filter(Boolean)
-
-      const sortedFieldOfStudyIds = sortElementsByFrequency(
-         fieldsOfStudy.map((fieldOfStudy) => fieldOfStudy.id)
-      )
-
-      // return the fields of study objects sorted by frequency
-      return sortedFieldOfStudyIds.map((fieldOfStudyId) =>
-         fieldsOfStudy.find(
-            (fieldOfStudy) => fieldOfStudy.id === fieldOfStudyId
-         )
-      )
-   }
-
-   private rankEvents({
-      pointsPerMatch,
-      rankedLivestreams,
-      targetLivestreamIdsGetter,
-      targetUserIds,
-   }: RankEventsArgs): RankedLivestreamEvent[] {
-      rankedLivestreams.forEach((rankedLivestream) => {
-         const numMatches = rankedLivestream[
-            targetLivestreamIdsGetter
-         ]().filter((livestreamDataId) =>
-            targetUserIds.includes(livestreamDataId)
-         ).length // This is the number of matches between the user's interests or field Of Study and the event's interests or field Of Studies
-
-         rankedLivestream.addPoints(numMatches * pointsPerMatch) // Add points to the event based on the number of matches
-      })
-
-      return this.sortRankedLivestreamEventByPoints(rankedLivestreams) // Sort the events by points
-   }
-
-   private sortRankedLivestreamEventByPoints(
-      rankedLivestreamEvents: RankedLivestreamEvent[]
-   ): RankedLivestreamEvent[] {
-      return [...rankedLivestreamEvents].sort(
-         (a, b) => b.getPoints() - a.getPoints()
-      )
+      return livestreamBasedRecommendations
+         .mostCommonInterests()
+         .mostCommonFieldsOfStudy()
+         .mostCommonCountries()
+         .mostCommonIndustries()
+         .mostCommonCompanySizes()
+         .get()
    }
 }
