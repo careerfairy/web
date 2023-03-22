@@ -1,5 +1,6 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import {
+   Box,
    Button,
    Card,
    CardContent,
@@ -15,10 +16,10 @@ import {
 } from "@mui/material"
 import { type Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
-import { useCallback, useState } from "react"
-import { ChevronDown } from "react-feather"
+import { useCallback, useMemo, useState } from "react"
+import { ChevronDown, ChevronRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { useMemo } from "react"
+import Link from "../../../common/Link"
 
 const styles = sxStyles({
    card: {
@@ -44,6 +45,14 @@ const styles = sxStyles({
       marginTop: (theme) => theme.spacing(1),
       marginRight: (theme) => theme.spacing(1),
       cursor: "pointer",
+   },
+   subheaderLink: {
+      textDecoration: "none",
+      fontWeight: 600,
+   },
+   subheaderIcon: {
+      width: "18px",
+      marginLeft: "5px",
    },
 })
 
@@ -164,6 +173,23 @@ const Options = ({ options, handler }: OptionsProps) => {
             ))}
          </Menu>
       </div>
+   )
+}
+
+export const SubheaderLink = ({
+   link,
+   title,
+}: {
+   link: string
+   title: string
+}) => {
+   return (
+      <Link href={link} color="secondary" sx={styles.subheaderLink}>
+         <Box display="flex" mt={1}>
+            <span>{title}</span>
+            <ChevronRight style={styles.subheaderIcon} />
+         </Box>
+      </Link>
    )
 }
 
