@@ -18,6 +18,7 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Box } from "@mui/material"
 import { TabsComponent, TabsSkeleton } from "../../../common/Tabs"
+import useEmptySources from "./useEmptySources"
 
 const styles = sxStyles({
    root: {
@@ -64,8 +65,8 @@ const AggregatedBreakdown = () => {
    return <AggregatedBreakdownChart />
 }
 
-type LeftTabValue = keyof typeof leftTabOptions
-type RightTabValue = keyof typeof rightTabOptions
+export type LeftTabValue = keyof typeof leftTabOptions
+export type RightTabValue = keyof typeof rightTabOptions
 
 const initialLeftTabValue: LeftTabValue = "Country"
 const initialRightTabValue: RightTabValue = "registrations"
@@ -80,8 +81,6 @@ const AggregatedBreakdownChart = () => {
       useState<LeftTabValue>(initialLeftTabValue)
    const [rightTabsValue, setRightTabsValue] =
       useState<RightTabValue>(initialRightTabValue)
-
-   const isEmpty = livestreamStats.length === 0
 
    const handleLeftTabChange = useCallback(
       (event: React.SyntheticEvent<Element, Event>, value: LeftTabValue) => {
@@ -104,18 +103,7 @@ const AggregatedBreakdownChart = () => {
       []
    )
 
-   const resetTabs = useCallback(() => {
-      setLeftTabsValue(initialLeftTabValue)
-      setRightTabsValue(initialRightTabValue)
-   }, [])
-
    const resetPage = useCallback(() => setPage(1), [])
-
-   useEffect(() => {
-      if (isEmpty) {
-         resetTabs()
-      }
-   }, [isEmpty, resetTabs])
 
    useEffect(() => {
       resetPage()
@@ -130,9 +118,20 @@ const AggregatedBreakdownChart = () => {
       [livestreamStats, fieldsOfStudyLookup]
    )
 
+   // As the sources are sorted by the number of registrations/participants, we can just check if the first source has 0 registrations/participants
+   const allSourcesAreEmpty = !breakDowns[breakDownsKey][0]?.value
+
+   const isEmpty = livestreamStats.length === 0 || allSourcesAreEmpty
+
    const results = useMemo(
       () => getResults(breakDowns[breakDownsKey], page),
       [breakDowns, breakDownsKey, page]
+   )
+
+   const emptySources = useEmptySources(
+      leftTabsValue,
+      rightTabsValue,
+      maxNumberOfSourcesToDisplay
    )
 
    const title = useMemo(() => {
@@ -157,7 +156,6 @@ const AggregatedBreakdownChart = () => {
                         tabOptions={leftTabOptionsArray}
                         value={leftTabsValue}
                         onChange={handleLeftTabChange}
-                        disabled={isEmpty}
                      />
                   </Box>
                }
@@ -167,7 +165,6 @@ const AggregatedBreakdownChart = () => {
                         tabOptions={rightTabOptionsArray}
                         value={rightTabsValue}
                         onChange={handleRightTabChange}
-                        disabled={isEmpty}
                      />
                   </Box>
                }
@@ -352,16 +349,5 @@ const getBreakdowns = (
       ),
    }
 }
-
-const emptySources: SourceEntryArgs[] = Object.entries(universityCountriesMap)
-   .slice(0, maxNumberOfSourcesToDisplay)
-   .map(([key, value]) => ({
-      value: 0,
-      label: value,
-      id: key,
-      percent: 0,
-      help: `Number of participants from ${value}`,
-      name: value,
-   }))
 
 export default AggregatedBreakdown
