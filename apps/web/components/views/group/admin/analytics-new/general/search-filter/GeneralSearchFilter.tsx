@@ -1,78 +1,166 @@
-import React, { useEffect, useMemo, useState } from "react"
-import {
-   collectionGroup,
-   query,
-   QueryConstraint,
-   where,
-} from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import React, { useCallback, useEffect, useState } from "react"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
+import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
+import { sxStyles } from "../../../../../../../types/commonTypes"
+import useTimeFramedLivestreamStats from "./useTimeFramedLivestreamStats"
+import Stack from "@mui/material/Stack"
+import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
+import useIsMobile from "../../../../../../custom-hook/useIsMobile"
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import LivestreamAutoComplete from "./LivestreamAutoComplete"
+import { DateTime } from "luxon"
+
+const spacing = 1
+
+const styles = sxStyles({
+   root: {
+      display: "flex",
+      flex: 1,
+   },
+   wrapper: {
+      flex: 1,
+      p: spacing,
+   },
+   timeFrameSelect: {
+      minWidth: {
+         sm: 350,
+      },
+      justifyContent: "center",
+   },
+   listIcon: {
+      display: "flex",
+      justifyContent: "flex-end",
+   },
+})
 
 const GeneralSearchFilter = () => {
-   const { group } = useGroup()
+   const isMobile = useIsMobile()
+
+   const [localSelectedStats, setLocalSelectedStats] = useState<
+      LiveStreamStats[]
+   >([]) // [] means all livestreams are selected
 
    const { setLivestreamStats } = useAnalyticsPageContext()
 
    const [livestreamStatsTimeFrame, setLivestreamStatsTimeFrame] =
       useState<TimeFrame>("Last 2 years")
 
-   const livestreamStatsQuery = useMemo(() => {
-      const timeFrame = TimeFrames[livestreamStatsTimeFrame]
+   const { data: livestreamStats } = useTimeFramedLivestreamStats(
+      livestreamStatsTimeFrame
+   )
 
-      const constraints: QueryConstraint[] = [
-         where("id", "==", "livestreamStats"),
-         where("livestream.groupIds", "array-contains", group.id),
-         where("livestream.start", ">=", timeFrame.start),
-      ]
+   const isLoading = livestreamStats === undefined
 
-      if (timeFrame.end) {
-         constraints.unshift(where("livestream.start", "<=", timeFrame.end))
-      }
-
-      return query(collectionGroup(FirestoreInstance, "stats"), ...constraints)
-   }, [group.id, livestreamStatsTimeFrame])
-
-   const { data: livestreamStats } = useFirestoreCollection<LiveStreamStats>(
-      livestreamStatsQuery,
-      queryOptions
+   const handleTimeframeChange = useCallback(
+      (event: React.ChangeEvent<HTMLInputElement>) => {
+         setLivestreamStatsTimeFrame(event.target.value as TimeFrame)
+         setLocalSelectedStats([]) // Reset selected livestreams to all livestreams
+      },
+      [setLivestreamStatsTimeFrame]
    )
 
    useEffect(() => {
-      setLivestreamStats(livestreamStats)
-   }, [livestreamStats, setLivestreamStats])
+      if (localSelectedStats.length === 0) {
+         // If all livestreams are selected, set livestreamStats to all livestreams
+         setLivestreamStats(livestreamStats ?? [])
+      } else {
+         // If not all livestreams are selected, set livestreamStats to the selected livestreams
+         setLivestreamStats(localSelectedStats)
+      }
+   }, [livestreamStats, localSelectedStats, setLivestreamStats])
 
-   return <div>GeneralSearchFilter</div>
+   useEffect(() => {
+      if (localSelectedStats.length > 0) {
+         // Sync live updates with local selected stats by replacing the livestream stats with the same livestream id
+         setLocalSelectedStats((prev) => {
+            return prev.map((prevStat) => {
+               const newStat = livestreamStats?.find(
+                  (newStat) => newStat.livestream.id === prevStat.livestream.id
+               )
+               return newStat ?? prevStat
+            })
+         })
+      }
+   }, [livestreamStats, localSelectedStats.length])
+
+   const handleChange = useCallback(
+      (event: React.SyntheticEvent, value: LiveStreamStats[]) => {
+         setLocalSelectedStats(value)
+      },
+      []
+   )
+
+   return (
+      <Card sx={styles.root}>
+         <Stack
+            direction={isMobile ? "column" : "row"}
+            sx={styles.wrapper}
+            spacing={spacing}
+            divider={
+               <Divider
+                  flexItem
+                  orientation={isMobile ? "horizontal" : "vertical"}
+               />
+            }
+         >
+            <LivestreamAutoComplete
+               livestreamStats={livestreamStats}
+               localSelectedStats={localSelectedStats}
+               loading={isLoading}
+               handleChange={handleChange}
+            />
+            <StyledTextField
+               sx={styles.timeFrameSelect}
+               id="select-timeframe"
+               select
+               SelectProps={timeFrameSelectProps}
+               disabled={isLoading}
+               value={livestreamStatsTimeFrame}
+               variant="outlined"
+               onChange={handleTimeframeChange}
+            >
+               {Object.keys(TimeFrames).map((timeframe) => (
+                  <StyledMenuItem key={timeframe} value={timeframe}>
+                     <ListItemText primary={timeframe} />
+                     {timeframe === livestreamStatsTimeFrame ? (
+                        <ListItemIcon sx={styles.listIcon}>
+                           <CheckRoundedIcon fontSize="small" />
+                        </ListItemIcon>
+                     ) : null}
+                  </StyledMenuItem>
+               ))}
+            </StyledTextField>
+         </Stack>
+      </Card>
+   )
+}
+
+const timeFrameSelectProps = {
+   renderValue: (val) => val,
 }
 
 export const TimeFrames = {
    "Last 30 days": {
-      start: new Date(new Date().setDate(new Date().getDate() - 30)),
+      start: DateTime.local().minus({ days: 30 }).toJSDate(),
       end: null, // null means we don't care about the end date
    },
    "Last 6 months": {
-      start: new Date(new Date().setDate(new Date().getDate() - 180)),
+      start: DateTime.local().minus({ months: 6 }).toJSDate(),
       end: null,
    },
    "Last 1 year": {
-      start: new Date(new Date().setDate(new Date().getDate() - 365)),
+      start: DateTime.local().minus({ years: 1 }).toJSDate(),
       end: null,
    },
    "Last 2 years": {
-      start: new Date(new Date().setDate(new Date().getDate() - 730)),
+      start: DateTime.local().minus({ years: 2 }).toJSDate(),
       end: null,
    },
    "All time": {
       start: new Date(0),
       end: null,
    },
-} as const
-
-const queryOptions = {
-   idField: "id",
-   suspense: false,
 } as const
 
 export type TimeFrame = keyof typeof TimeFrames
