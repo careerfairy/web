@@ -1,30 +1,29 @@
-import functions = require("firebase-functions")
-import config from "./config"
-import { admin } from "./api/firestoreAdmin"
 import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
+import { Bundle, generateFunctionsFromBundles } from "./lib/bundleGenerator"
 
-export const bundleFutureLivestreams = functions
-   .region(config.region)
-   .https.onRequest(async (_, res) => {
-      const data = await admin
-         .firestore()
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .get()
+/**
+ * Each bundle in this array will be a separate function named:
+ * bundle-${bundle.name}
+ *
+ * Important:
+ * For each entry, make sure you create the required Firebase hosting
+ * mapping in firebase.json, this is required to cache the bundle response
+ * and for it to be available behind the CDN.
+ *
+ * You'll need to deploy both the new function, and the new hosting config.
+ */
+const bundles: Bundle[] = [
+   {
+      name: "allFutureLivestreams",
+      cacheControl: "public, max-age=900", // 15min
+      queries: {
+         "future-livestreams-query": (firestore) =>
+            firestore
+               .collection("livestreams")
+               .where("start", ">", getEarliestEventBufferTime())
+               .where("test", "==", false),
+      },
+   },
+]
 
-      console.log("Total reads: ", data.size)
-
-      // Build the bundle from the query results
-      const bundleBuffer = admin
-         .firestore()
-         .bundle("future-livestreams")
-         .add("future-livestreams-query", data)
-         .build()
-
-      // Cache the response for up to 5 minutes;
-      // see https://firebase.google.com/docs/hosting/manage-cache
-      res.set("Cache-Control", "public, max-age=300, s-maxage=600")
-
-      res.end(bundleBuffer)
-   })
+module.exports = generateFunctionsFromBundles(bundles)
