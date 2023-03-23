@@ -1,4 +1,4 @@
-import { normalize } from "@careerfairy/shared-lib/utils/search"
+import { normalizeAndRemoveNonAlphanumeric } from "@careerfairy/shared-lib/utils/search"
 import parse from "autosuggest-highlight/parse"
 
 /**
@@ -12,11 +12,14 @@ export const customMatch = (
    text: string,
    query: string
 ): [number, number][] => {
-   const regex = new RegExp(query, "gi")
+   const cleanedQuery = normalizeAndRemoveNonAlphanumeric(query)
+   const cleanedText = normalizeAndRemoveNonAlphanumeric(text)
+
+   const regex = new RegExp(cleanedQuery, "gi")
    const matches: [number, number][] = []
    let match
 
-   while ((match = regex.exec(normalize(text))) !== null) {
+   while ((match = regex.exec(cleanedText)) !== null) {
       matches.push([match.index, match.index + match[0].length])
 
       // Move the lastIndex forward to avoid infinite loops
