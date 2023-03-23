@@ -88,7 +88,7 @@ const styles = {
       "&:hover, &:focus-within": {
          "& .contentWrapper": {
             transform: "translateY(-70%)",
-            padding: 4,
+            padding: { xs: 3, md: 4 },
          },
          "& .flippedCardContent": {
             display: "flex",
@@ -107,13 +107,11 @@ const styles = {
                ...getMaxLineStyles(2),
             },
          }),
-         "& .summary": (theme) => ({
-            [theme.breakpoints.up("md")]: {
-               ...getMaxLineStyles(3),
-            },
+         "& .summary": {
+            ...getMaxLineStyles(3),
             color: "text.primary",
             marginTop: 1,
-         }),
+         },
          "& .chipsWrapper": {
             display: "none",
          },
