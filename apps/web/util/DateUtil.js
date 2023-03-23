@@ -32,6 +32,9 @@ export default class DateUtil {
       return dayjs(JSDate).format("MMMM Do, HH:mm")
    }
 
+   static eventPreviewHour(JSDate) {
+      return dayjs(JSDate).format("HH:mm")
+   }
    static getUpcomingDate(JSDate) {
       return dayjs(JSDate).format("dddd, MMM D, YYYY h:mm A")
    }
