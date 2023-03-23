@@ -3,6 +3,7 @@ import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamAnalyticsPageProvider } from "./LivestreamAnalyticsPageProvider"
+import LivestreamSearchNav from "./search/LivestreamSearchNav"
 
 const styles = sxStyles({
    gridItem: {
@@ -10,8 +11,7 @@ const styles = sxStyles({
    },
 })
 
-export const LivestreamAnalyticsPageContent = () => {
-   // Add necessary providers here
+const LivestreamAnalyticsPageContent = () => {
    return (
       <LivestreamAnalyticsPageProvider>
          <MemoizedPageContent />
@@ -24,7 +24,9 @@ const PageContent = () => {
       <Box py={2}>
          <Container maxWidth={false}>
             <Grid container spacing={spacing}>
-               livestream analytics page content
+               <Grid xs={12} item style={styles.gridItem}>
+                  <LivestreamSearchNav />
+               </Grid>
             </Grid>
          </Container>
       </Box>
@@ -33,3 +35,5 @@ const PageContent = () => {
 
 const spacing = 3
 const MemoizedPageContent = memo(PageContent)
+
+export default LivestreamAnalyticsPageContent

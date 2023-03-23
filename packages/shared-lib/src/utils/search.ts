@@ -27,16 +27,25 @@ export const triGrams = (str: string | string[]): string[] => {
    let text: string[] = Array.isArray(str) ? str : [str]
    let parsed = text
       .filter((i) => i)
-      // remove accents https://stackoverflow.com/a/37511463
-      .map((s) => s.normalize("NFKD").replace(/[\u0300-\u036f]/g, ""))
-      // remove non-alphanumeric characters (.,;:) etc
-      .map((s) => s.replace(/[^a-zA-Z0-9 ]/g, ""))
+      .map(normalize)
       .join(" ")
       .trim()
       .slice(0, 500)
 
    return ngrams(parsed, 3)
 }
+
+/**
+ * Normalize a string by removing accents/diacritics and non-alphanumeric characters.
+ * (.,;:) etc https://stackoverflow.com/a/37511463
+ * @param {string} str - The string to normalize.
+ * @returns {string} The normalized string.
+ */
+export const normalize = (str: string): string =>
+   str
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9 ]/g, "")
 
 /**
  * Generates a trigram map from a livestream event based on the it's title
