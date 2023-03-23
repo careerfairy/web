@@ -40,9 +40,9 @@ describe("customMatch", () => {
    })
 
    test("should handle special characters in the query", () => {
-      const text = "This is a $test$ string"
-      const query = "\\$test\\$"
+      const text = "This is a test string"
+      const query = "$test$"
       const result = customMatch(text, query)
-      expect(result).toEqual([[10, 16]])
+      expect(result).toEqual([[10, 14]])
    })
 })

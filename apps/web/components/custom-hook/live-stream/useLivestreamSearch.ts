@@ -1,7 +1,7 @@
 import { useMemo, useState } from "react"
 import { limit, QueryConstraint } from "@firebase/firestore"
 import { collection, query, where } from "firebase/firestore"
-import { ngrams, normalize } from "@careerfairy/shared-lib/utils/search"
+import { ngrams } from "@careerfairy/shared-lib/utils/search"
 import { useDebounce } from "react-use"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useFirestoreCollection } from "../utils/useFirestoreCollection"
@@ -47,8 +47,6 @@ export function useLivestreamSearch(
       const searchConstraints: QueryConstraint[] = []
 
       const ngGrams = ngrams(debouncedValue, 3)
-         .map(normalize)
-         .filter((gram) => gram.trim() !== "") // Filter out empty strings to prevent Firestore errors
 
       ngGrams.forEach((name) =>
          searchConstraints.push(where(`triGrams.${name}`, "==", true))
