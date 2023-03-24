@@ -56,7 +56,7 @@ const EventPreviewCardChipLabels = ({
       chipLabel = <Chip icon={<LiveIcon />} color="error" label={"LIVE"} />
    }
 
-   return chipLabel ? (
+   return chipLabel || hasJobToApply ? (
       <Box className="hideOnHoverContent" sx={styles.wrapper}>
          <Box>
             {hasJobToApply ? (
