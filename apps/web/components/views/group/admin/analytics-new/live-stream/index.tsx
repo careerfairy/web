@@ -1,8 +1,11 @@
-import { Container, Grid } from "@mui/material"
+import { Container, Grid, Typography } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
-import { LivestreamAnalyticsPageProvider } from "./LivestreamAnalyticsPageProvider"
+import {
+   LivestreamAnalyticsPageProvider,
+   useLivestreamsAnalyticsPageContext,
+} from "./LivestreamAnalyticsPageProvider"
 import LivestreamSearchNav from "./search/LivestreamSearchNav"
 import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
 import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
@@ -22,6 +25,8 @@ const LivestreamAnalyticsPageContent = () => {
 }
 
 const PageContent = () => {
+   const { isOnDetailsPage } = useLivestreamsAnalyticsPageContext()
+
    return (
       <Box py={2}>
          <Container maxWidth={false}>
@@ -29,14 +34,32 @@ const PageContent = () => {
                <Grid xs={12} item style={styles.gridItem}>
                   <LivestreamSearchNav />
                </Grid>
-               <Grid xs={12} item style={styles.gridItem}>
-                  <AggregatedAnalytics />
-               </Grid>
-               <Grid xs={12} item style={styles.gridItem}>
-                  <AggregatedUniversitySources />
-               </Grid>
+               {isOnDetailsPage ? ( // we don't fetch the document if we are not on the details page
+                  <>
+                     <Grid xs={12} item style={styles.gridItem}>
+                        <AggregatedAnalytics />
+                     </Grid>
+                     <Grid xs={12} item style={styles.gridItem}>
+                        <AggregatedUniversitySources />
+                     </Grid>
+                  </>
+               ) : (
+                  <Grid xs={12} item style={styles.gridItem}>
+                     <SearchPageContent />
+                  </Grid>
+               )}
             </Grid>
          </Container>
+      </Box>
+   )
+}
+
+const SearchPageContent = () => {
+   return (
+      <Box width="100%" py={7}>
+         <Typography align="center" variant="h6">
+            Create a live stream to collect analytics.
+         </Typography>
       </Box>
    )
 }
