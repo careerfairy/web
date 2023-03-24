@@ -35,6 +35,10 @@ export function generateFunctionsFromBundles(bundles: Record<string, Bundle>) {
 
       exports[bundleName] = functions
          .region(config.region)
+         .runWith({
+            // big bundles, require more memory to generate them faster
+            memory: "512MB",
+         })
          .https.onRequest(async (_, res) => {
             const firestore = admin.firestore()
 
