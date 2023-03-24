@@ -31,6 +31,9 @@ type ILivestreamAnalyticsPageContext = {
     *  null => no data
     */
    currentStreamStats: LiveStreamStats | undefined | null
+
+   // Since we are using a catch-all route, we need to check if we are on the details page
+   isOnDetailsPage: boolean
    userType: LivestreamUserType
    setUserType: Dispatch<SetStateAction<LivestreamUserType>>
    fieldsOfStudyLookup: Record<string, string>
@@ -44,6 +47,7 @@ const initialUserType: ILivestreamAnalyticsPageContext["userType"] =
 
 const initialValues: ILivestreamAnalyticsPageContext = {
    currentStreamStats: undefined,
+   isOnDetailsPage: false,
    userType: initialUserType,
    fieldsOfStudyLookup: {},
    setCurrentStreamStats: () => {},
@@ -77,6 +81,7 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const value = useMemo<ILivestreamAnalyticsPageContext>(() => {
       return {
          fieldsOfStudyLookup,
+         isOnDetailsPage: !!livestreamId,
          currentStreamStats: livestreamId && currentStreamStats, // Only return the current stream stats if we are on a /livestreamId page
          userType,
          setCurrentStreamStats,

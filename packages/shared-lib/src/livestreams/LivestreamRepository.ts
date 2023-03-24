@@ -871,7 +871,7 @@ export class FirebaseLivestreamRepository
          .collection("recordingStats")
          .doc("stats")
 
-      const details: LivestreamRecordingDetails = {
+      const details: Omit<LivestreamRecordingDetails, "id"> = {
          livestreamId,
          livestreamStartDate: livestreamStartDate ?? null,
          minutesWatched: this.fieldValue.increment(minutesWatched) as any,
