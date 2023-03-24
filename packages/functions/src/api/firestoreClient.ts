@@ -22,11 +22,11 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig)
 
 // Initialize Cloud Firestore and get a reference to the service
-export const firestore = getFirestore(app)
+export const firestoreClientSDK = getFirestore(app)
 
 // Connect to emulators
 if (isLocalEnvironment()) {
-   connectFirestoreEmulator(firestore, "localhost", 8080)
+   connectFirestoreEmulator(firestoreClientSDK, "localhost", 8080)
    console.log("Using Firestore Client connected to Emulators")
 } else {
    console.log("Using Firestore Client connected to Production")
