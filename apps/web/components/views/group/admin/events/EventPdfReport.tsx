@@ -594,11 +594,13 @@ const EventPdfReport = (props: PdfReportData) => {
                   <View wrap={false}>
                      <SubTitle>Hosts</SubTitle>
                      <PartnersWrapper>
-                        {props.hostsData.map((host) => (
-                           <PartnerItem key={host.id}>
-                              <PartnerLogo src={host.hostLogoUrl} />
-                           </PartnerItem>
-                        ))}
+                        {props.hostsData.map((host) =>
+                           host.hostLogoUrl ? (
+                              <PartnerItem key={host.id}>
+                                 <PartnerLogo src={host.hostLogoUrl} />
+                              </PartnerItem>
+                           ) : null
+                        )}
                      </PartnersWrapper>
                   </View>
                   <View break wrap={false}>
