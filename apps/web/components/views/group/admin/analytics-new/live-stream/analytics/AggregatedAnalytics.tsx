@@ -17,11 +17,7 @@ const styles = sxStyles({
 })
 
 const AggregatedAnalytics = () => {
-   const { currentStreamStats, isOnDetailsPage } =
-      useLivestreamsAnalyticsPageContext()
-
-   // we don't fetch the document if we are not on the details page
-   if (!isOnDetailsPage) return null
+   const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
 
    if (!currentStreamStats) return <LoadingAggregatedAnalytics />
 
