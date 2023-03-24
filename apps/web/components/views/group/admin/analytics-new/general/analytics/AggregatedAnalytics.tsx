@@ -1,41 +1,82 @@
-import React from "react"
+import React, { FC, useMemo } from "react"
 import { Grid } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { CardAnalytic } from "../../../common/CardAnalytic"
-import { totalPeopleReached } from "../../../common/util"
+import {
+   ATSCard,
+   AverageRegistrationsPerStreamCard,
+   CardAnalytic,
+   TalentPoolCard,
+} from "../../../common/CardAnalytic"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import AggregatedCompanyFollowersValue from "./AggregatedCompanyFollowersValue"
+import useGroupATSAccounts from "../../../../../../custom-hook/useGroupATSAccounts"
+import Skeleton from "@mui/material/Skeleton"
+import useGroupCompanyPageProgress from "../../../../../../custom-hook/useGroupCompanyPageProgress"
 
 const styles = sxStyles({
    gridItem: {
       display: "flex",
    },
+   skeletonStat: {
+      ml: "auto",
+   },
 })
-const AggregatedAnalytics = () => {
+
+type Props = {
+   progress: ReturnType<typeof useGroupCompanyPageProgress>
+}
+const AggregatedAnalytics: FC<Props> = ({ progress }) => {
    const { groupPresenter, group, stats } = useGroup()
    const { livestreamStats } = useAnalyticsPageContext()
 
-   const hasAts = groupPresenter.atsAccounts?.length > 0
-   const companyPageReady = groupPresenter.companyPageIsReady()
+   const { data: accounts } = useGroupATSAccounts(
+      groupPresenter.id,
+      groupPresenter
+   )
+
+   const hasAts = accounts.length > 0
+
+   const companyPageReady = progress?.isReady
+
+   const summedResults = useMemo(
+      () => sumStats(livestreamStats),
+      [livestreamStats]
+   )
+
+   const averageNumberOfRegistrations = useMemo(
+      () =>
+         getAverageNumberOfRegistrations(
+            summedResults?.numberOfRegistrations,
+            livestreamStats?.length
+         ),
+      [summedResults?.numberOfRegistrations, livestreamStats?.length]
+   )
+
+   const talentPoolCard = (
+      <TalentPoolCard value={summedResults.numberOfTalentPoolProfiles} />
+   )
 
    return (
       <Grid container spacing={3}>
          {companyPageReady ? (
             <>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Render Company Page Views*/}
                   <CardAnalytic
-                     title="Company Views"
-                     tooltip="Total number of people exposed to your company"
-                     value={totalPeopleReached(stats)}
+                     title="Company page views"
+                     tooltip="Total number of talent that viewed your company page"
+                     value={
+                        stats?.generalStats?.numberOfPeopleReachedCompanyPage ??
+                        0
+                     }
                   />
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Get number by doing a count query on the collection group companiesUserFollows, where groupId === current groupId*/}
                   <CardAnalytic
                      title="Followers"
-                     tooltip="Total number of people who follow your company"
-                     value={-1}
+                     tooltip="Total number of talent who follow your company"
+                     value={<AggregatedCompanyFollowersValue />}
                   />
                </Grid>
             </>
@@ -43,35 +84,20 @@ const AggregatedAnalytics = () => {
          {hasAts ? (
             <>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Get number by reducing the streamStats.numberOfTalentPoolProfiles*/}
-                  <CardAnalytic
-                     title="Talent Pool"
-                     value={-1}
-                     linkDescription={"Go to talents"}
-                     link={`/group/${group.id}/admin/analytics/talent-pool?section=1`} // Should go to
-                  />
+                  {talentPoolCard}
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Get number from reducing the streamStats.numberOfApplications*/}
-                  <CardAnalytic
-                     title="Total applications"
-                     value={-1}
-                     linkDescription={"Go to applicants"}
-                     link={`/group/${group.id}/admin/ats-integration?section=1`}
-                  />
+                  <ATSCard value={summedResults.numberOfApplications} />
                </Grid>
             </>
          ) : (
             <>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Get number by reducing streamStats.numberOfPeopleReached*/}
-                  <CardAnalytic title="Young talent reached" value={-1} />
+                  {talentPoolCard}
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
-                  {/*Get number by reducing the streamStats.numberOfRegistrations and dividing the sum by number of stream stats */}
-                  <CardAnalytic
-                     title="Average registrations per stream"
-                     value={-1}
+                  <AverageRegistrationsPerStreamCard
+                     value={averageNumberOfRegistrations}
                   />
                </Grid>
             </>
@@ -80,4 +106,84 @@ const AggregatedAnalytics = () => {
    )
 }
 
+export const SkeletonAggregatedAnalytics = () => {
+   return (
+      <Grid container spacing={3}>
+         <Grid xs={6} item style={styles.gridItem}>
+            <CardAnalytic
+               title={<Skeleton variant="text" width={120} />}
+               value={
+                  <Skeleton
+                     sx={styles.skeletonStat}
+                     variant="text"
+                     width={60}
+                  />
+               }
+            />
+         </Grid>
+         <Grid xs={6} item style={styles.gridItem}>
+            <CardAnalytic
+               title={<Skeleton variant="text" width={120} />}
+               value={
+                  <Skeleton
+                     sx={styles.skeletonStat}
+                     variant="text"
+                     width={50}
+                  />
+               }
+            />
+         </Grid>
+      </Grid>
+   )
+}
+
+type SumResult = {
+   numberOfApplications: number
+   numberOfRegistrations: number
+   numberOfPeopleReached: number
+   numberOfTalentPoolProfiles: number
+}
+const sumStats = (stats?: LiveStreamStats[]): SumResult => {
+   const initialValue: SumResult = {
+      numberOfApplications: 0,
+      numberOfRegistrations: 0,
+      numberOfPeopleReached: 0,
+      numberOfTalentPoolProfiles: 0,
+   }
+
+   if (!stats) {
+      return initialValue
+   }
+
+   return stats.reduce<SumResult>((acc, curr) => {
+      const generalStats = curr.generalStats
+
+      return {
+         numberOfApplications:
+            acc.numberOfApplications + (generalStats?.numberOfApplicants || 0),
+         numberOfRegistrations:
+            acc.numberOfRegistrations +
+            (generalStats?.numberOfRegistrations || 0),
+         numberOfPeopleReached: 0,
+         numberOfTalentPoolProfiles:
+            acc.numberOfTalentPoolProfiles +
+            (generalStats?.numberOfTalentPoolProfiles || 0),
+      }
+   }, initialValue)
+}
+
+const getAverageNumberOfRegistrations = (
+   numRegistrations?: number,
+   numStats?: number
+) => {
+   const numberOfRegistrations = numRegistrations ?? 0
+   const livestreamStatsLength = numStats ?? 0
+
+   // We don't want to divide by 0, so we return 0
+   if (numberOfRegistrations === 0 || livestreamStatsLength === 0) {
+      return 0
+   } else {
+      return Math.round(numberOfRegistrations / livestreamStatsLength)
+   }
+}
 export default AggregatedAnalytics
