@@ -2,7 +2,12 @@ import React, { FC, useMemo } from "react"
 import { Grid } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { ATSCard, CardAnalytic } from "../../../common/CardAnalytic"
+import {
+   ATSCard,
+   AverageRegistrationsPerStreamCard,
+   CardAnalytic,
+   TalentPoolCard,
+} from "../../../common/CardAnalytic"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import AggregatedCompanyFollowersValue from "./AggregatedCompanyFollowersValue"
@@ -50,12 +55,7 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
    )
 
    const talentPoolCard = (
-      <CardAnalytic
-         title="Talent Pool"
-         value={summedResults.numberOfTalentPoolProfiles}
-         linkDescription={"Go to talent pool"}
-         link={`/group/${group.id}/admin/analytics/talent-pool?section=1`} // Should go to
-      />
+      <TalentPoolCard value={summedResults.numberOfTalentPoolProfiles} />
    )
 
    return (
@@ -96,8 +96,7 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
                   {talentPoolCard}
                </Grid>
                <Grid xs={6} item style={styles.gridItem}>
-                  <CardAnalytic
-                     title="Average registrations per stream"
+                  <AverageRegistrationsPerStreamCard
                      value={averageNumberOfRegistrations}
                   />
                </Grid>
@@ -107,7 +106,7 @@ const AggregatedAnalytics: FC<Props> = ({ progress }) => {
    )
 }
 
-export const SuspenseAggregatedAnalytics = () => {
+export const SkeletonAggregatedAnalytics = () => {
    return (
       <Grid container spacing={3}>
          <Grid xs={6} item style={styles.gridItem}>

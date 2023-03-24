@@ -8,7 +8,7 @@ import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
 import CompanyPageCTA from "./company-page/CompanyPageCTA"
 import LivestreamsKPIs from "./livestreams-kpis/LivestreamsKPIs"
 import AggregatedAnalytics, {
-   SuspenseAggregatedAnalytics,
+   SkeletonAggregatedAnalytics,
 } from "./analytics/AggregatedAnalytics"
 import AggregatedBreakdown from "./breakdown/AggregatedBreakdown"
 import useGroupCompanyPageProgress from "../../../../../custom-hook/useGroupCompanyPageProgress"
@@ -60,7 +60,7 @@ const PageContent = () => {
                   </Grid>
                   <Grid xs={12} item style={styles.gridItem}>
                      <SuspenseWithBoundary
-                        fallback={<SuspenseAggregatedAnalytics />}
+                        fallback={<SkeletonAggregatedAnalytics />}
                      >
                         <AggregatedAnalytics progress={progress} />
                      </SuspenseWithBoundary>
