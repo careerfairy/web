@@ -49,7 +49,7 @@ const CustomButtonCarousel: FC<Props> = ({
    shouldCenter = true,
 }) => {
    const isMobile = useIsMobile()
-   const singleElement = useMemo(
+   const singleSlide = useMemo(
       () => Boolean(numChildren <= numSlides),
       [numChildren, numSlides]
    )
@@ -75,7 +75,7 @@ const CustomButtonCarousel: FC<Props> = ({
       >
          {isMobile ? null : (
             <Grid item xs={xsItem} sm={smItem} md={mdItem}>
-               {singleElement ? null : (
+               {singleSlide ? null : (
                   <Button
                      color={"grey"}
                      onClick={handlePrev}
@@ -96,7 +96,7 @@ const CustomButtonCarousel: FC<Props> = ({
                autoplay={false}
                infinite={true}
                centerMode={true}
-               slidesToShow={isMobile && !singleElement ? 1.1 : numSlides}
+               slidesToShow={isMobile && !singleSlide ? 1.1 : numSlides}
                slidesToScroll={numSlides}
                sx={carouselStyles}
                {...carouselProps}
@@ -106,7 +106,7 @@ const CustomButtonCarousel: FC<Props> = ({
          </Grid>
          {isMobile ? null : (
             <Grid item xs={xsItem} sm={smItem} md={mdItem}>
-               {singleElement ? null : (
+               {singleSlide ? null : (
                   <Button
                      color={"grey"}
                      onClick={handleNext}
