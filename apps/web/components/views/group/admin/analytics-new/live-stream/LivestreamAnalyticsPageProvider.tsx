@@ -55,6 +55,8 @@ const LivestreamAnalyticsPageContext =
 
 export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const router = useRouter()
+
+   // Since we are using a catch-all route, the livestreamId will be the first element of the array
    const livestreamId = router.query.livestreamId?.[0] as string
 
    const [currentStreamStats, setCurrentStreamStats] =
@@ -75,7 +77,7 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const value = useMemo<ILivestreamAnalyticsPageContext>(() => {
       return {
          fieldsOfStudyLookup,
-         currentStreamStats: livestreamId ? currentStreamStats : undefined,
+         currentStreamStats: livestreamId && currentStreamStats, // Only return the current stream stats if we are on a /livestreamId page
          userType,
          setCurrentStreamStats,
          setUserType,
@@ -112,7 +114,7 @@ const QueryLivestreamStats = ({ livestreamId }: { livestreamId: string }) => {
          where("id", "==", "livestreamStats"),
          where("livestream.groupIds", "array-contains", group.id),
          where("livestream.id", "==", livestreamId),
-         limit(1)
+         limit(1) // we only want the first result
       )
    }, [group.id, livestreamId])
 
@@ -129,27 +131,17 @@ const QueryLivestreamStats = ({ livestreamId }: { livestreamId: string }) => {
    )
 
    const isLoaded = status === "success"
-   const isEmpty = isLoaded && stats.length === 0
-   const isLoading = status === "loading"
 
    useEffect(() => {
-      if (isEmpty) {
+      // If there are no stats or the query is still loading, we don't want to set the current stream stats
+      if (!stats?.length || !isLoaded) {
          setCurrentStreamStats(undefined)
          return
       }
 
-      if (isLoading) {
-         setCurrentStreamStats(undefined)
-         return
-      }
-
-      if (isLoaded) {
-         setCurrentStreamStats(stats[0])
-         return
-      }
-
-      setCurrentStreamStats(undefined)
-   }, [isEmpty, isLoaded, isLoading, setCurrentStreamStats, stats])
+      // We only want the first result
+      setCurrentStreamStats(stats[0])
+   }, [isLoaded, setCurrentStreamStats, stats])
 
    return null
 }
