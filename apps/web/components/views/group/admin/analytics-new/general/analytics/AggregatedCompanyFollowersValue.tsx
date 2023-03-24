@@ -1,9 +1,9 @@
-import { CircularProgress } from "@mui/material"
 import useCountQuery from "components/custom-hook/useCountQuery"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collectionGroup, query, where } from "firebase/firestore"
 import { useMemo } from "react"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { RenderAsyncCount } from "../../../common/CardAnalytic"
 
 const AggregatedCompanyFollowersValue = () => {
    const { group } = useGroup()
@@ -15,17 +15,9 @@ const AggregatedCompanyFollowersValue = () => {
       )
    }, [group.id])
 
-   const { loading, count, error } = useCountQuery(q)
+   const res = useCountQuery(q)
 
-   if (loading) {
-      return <CircularProgress color="secondary" size={30} />
-   }
-
-   if (error) {
-      return <>0</>
-   }
-
-   return <>{count}</>
+   return <RenderAsyncCount {...res} />
 }
 
 export default AggregatedCompanyFollowersValue

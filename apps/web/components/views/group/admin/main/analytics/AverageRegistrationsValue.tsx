@@ -1,11 +1,11 @@
 import { GroupStats } from "@careerfairy/shared-lib/groups/stats"
-import { CircularProgress } from "@mui/material"
 import useCountQuery from "components/custom-hook/useCountQuery"
 import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection, query, where } from "firebase/firestore"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { useRouter } from "next/router"
 import { useMemo } from "react"
+import { RenderAsyncCount } from "../../common/CardAnalytic"
 
 const AverageRegistrationsValue = () => {
    const {
@@ -21,17 +21,14 @@ const AverageRegistrationsValue = () => {
       )
    }, [groupId])
 
-   const { loading, count, error } = useCountQuery(q)
+   const res = useCountQuery(q)
 
-   if (loading) {
-      return <CircularProgress color="secondary" size={30} />
-   }
-
-   if (error) {
-      return <>0</>
-   }
-
-   return <>{averageRegistrationsPerLivestream(stats, count)}</>
+   return (
+      <RenderAsyncCount
+         {...res}
+         count={averageRegistrationsPerLivestream(stats, res.count)}
+      />
+   )
 }
 
 function averageRegistrationsPerLivestream(
