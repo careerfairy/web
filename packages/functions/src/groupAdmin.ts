@@ -228,7 +228,9 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
          const livestreamData = {
             ...streamSnap.data(),
             id: streamSnap.id,
-            startDateString: getDateString(streamSnap.data()),
+            startDateString: getDateString(
+               streamSnap.data() as LivestreamEvent
+            ),
          } as unknown as LivestreamEvent
 
          const requestingGroupData = {

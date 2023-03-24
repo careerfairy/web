@@ -5,7 +5,7 @@ const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
 
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { generateReferralCode, setHeaders } from "./util"
+import { generateReferralCode, setCORSHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
@@ -481,7 +481,7 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
 
 export const sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
 
       const recipientEmail = req.body.recipientEmail.toLowercase()
       const recipientFirstName = req.body.firstName
@@ -536,7 +536,7 @@ export const sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
 
 export const sendPostmarkEmailUserDataAndUniWithName =
    functions.https.onRequest(async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
 
       const recipientEmail = req.body.recipientEmail
       const recipientFirstName = req.body.firstName
@@ -595,7 +595,7 @@ export const sendPostmarkEmailUserDataAndUniWithName =
    })
 
 export const updateFakeUser = functions.https.onRequest(async (req, res) => {
-   setHeaders(req, res)
+   setCORSHeaders(req, res)
 
    admin
       .auth()
