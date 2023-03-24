@@ -16,11 +16,10 @@ type Options = {
  * A custom React hook used for performing searches of livestream events in Firestore.
  *
  * @param {string} inputValue - The search string input by the user
- * @param {QueryConstraint[]} additionalConstraints - Additional search constraints to apply
+ * @param {QueryConstraint[]} additionalConstraints - Additional search constraints to apply. WARNING: Do not use any `orderby` QueryConstraint, as it would require an index for every possible trigram.
  * @param {Options} options - Additional options to apply to the search
  * @param {number} options.maxResults - The maximum number of results to return (default: 5)
  * @param {number} options.debounceMs - The number of milliseconds to debounce the search (default: 500)
- *
  */
 export function useLivestreamSearch(
    inputValue: string,
@@ -55,6 +54,7 @@ export function useLivestreamSearch(
       let constraints: QueryConstraint[] = [
          ...searchConstraints,
          ...additionalConstraints,
+         where("test", "==", false),
          limit(maxResults),
       ]
 
