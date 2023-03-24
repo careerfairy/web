@@ -1,9 +1,10 @@
-import { CircularProgress, Typography } from "@mui/material"
+import { CircularProgress, Skeleton, Typography } from "@mui/material"
 import CardCustom, { SubheaderLink } from "./CardCustom"
 import { sxStyles } from "../../../../../types/commonTypes"
 import React, { FC } from "react"
 import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import useCountQuery from "../../../../custom-hook/useCountQuery"
+import Stack from "@mui/material/Stack"
 
 const styles = sxStyles({
    value: {
@@ -13,6 +14,11 @@ const styles = sxStyles({
       "& .MuiCardContent-root": {
          mt: "auto",
       },
+   },
+   simpleAnalyticRoot: {
+      width: "100%",
+      display: "flex",
+      flexDirection: "column",
    },
 })
 
@@ -44,6 +50,40 @@ export const CardAnalytic = ({
          <Typography mt={1} sx={styles.value} align="right">
             {value}
          </Typography>
+      </CardCustom>
+   )
+}
+
+type SimpleCardAnalyticProps = Pick<Props, "title" | "value">
+export const SimpleCardAnalytic: FC<SimpleCardAnalyticProps> = ({
+   title,
+   value,
+}) => {
+   return (
+      <CardCustom sx={styles.simpleAnalyticRoot}>
+         <Stack direction="row" justifyContent="space-between" spacing={1}>
+            <Typography variant="h5" fontWeight={500}>
+               {title}
+            </Typography>
+            <Typography variant="h4" fontWeight={600}>
+               {value}
+            </Typography>
+         </Stack>
+      </CardCustom>
+   )
+}
+
+export const SimpleCardAnalyticSkeleton: FC = () => {
+   return (
+      <CardCustom sx={styles.simpleAnalyticRoot}>
+         <Stack direction="row" justifyContent="space-between" spacing={1}>
+            <Typography variant="h5" fontWeight={500}>
+               <Skeleton width={140} />
+            </Typography>
+            <Typography variant="h4" fontWeight={600}>
+               <Skeleton width={40} />
+            </Typography>
+         </Stack>
       </CardCustom>
    )
 }

@@ -4,6 +4,8 @@ import { memo } from "react"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamAnalyticsPageProvider } from "./LivestreamAnalyticsPageProvider"
 import LivestreamSearchNav from "./search/LivestreamSearchNav"
+import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
+import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
 
 const styles = sxStyles({
    gridItem: {
@@ -26,6 +28,12 @@ const PageContent = () => {
             <Grid container spacing={spacing}>
                <Grid xs={12} item style={styles.gridItem}>
                   <LivestreamSearchNav />
+               </Grid>
+               <Grid xs={12} item style={styles.gridItem}>
+                  <AggregatedAnalytics />
+               </Grid>
+               <Grid xs={12} item style={styles.gridItem}>
+                  <AggregatedUniversitySources />
                </Grid>
             </Grid>
          </Container>
