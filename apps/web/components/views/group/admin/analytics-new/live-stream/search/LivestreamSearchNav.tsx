@@ -18,6 +18,7 @@ const styles = sxStyles({
       width: "100%",
    },
 })
+
 const LivestreamSearchNav = () => {
    return (
       <Stack
