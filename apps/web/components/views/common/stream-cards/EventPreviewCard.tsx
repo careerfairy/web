@@ -75,6 +75,7 @@ const styles = {
       padding: 2,
       paddingTop: 5,
       transition: (theme: Theme) => theme.transitions.create("transform"),
+      background: "white",
    },
    title: {
       fontWeight: 700,
@@ -89,6 +90,7 @@ const styles = {
          "& .contentWrapper": {
             transform: "translateY(-70%)",
             padding: { xs: 3, md: 4 },
+            background: "unset",
          },
          "& .flippedCardContent": {
             display: "flex",
@@ -157,7 +159,7 @@ const styles = {
       width: "40%",
    },
    companyAvatar: {
-      padding: 0.5,
+      padding: 1,
       backgroundColor: "white",
       boxShadow: 3,
       border: "none !important",
@@ -553,7 +555,7 @@ const EventPreviewCard = ({
 
                   <Box
                      className="hideOnHoverContent"
-                     sx={styles.hideOnHoverContent}
+                     sx={[styles.hideOnHoverContent, { zIndex: 1 }]}
                   >
                      {isPlaceholderEvent ? null : (
                         <Box sx={{ display: "flex" }}>
