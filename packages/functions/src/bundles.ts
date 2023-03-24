@@ -1,5 +1,5 @@
 import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
-import { Bundle, generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { Bundle } from "./lib/bundleGenerator"
 
 /**
  * Each bundle in this array will be a separate function named:
@@ -12,8 +12,8 @@ import { Bundle, generateFunctionsFromBundles } from "./lib/bundleGenerator"
  *
  * You'll need to deploy both the new function, and the new hosting config.
  */
-const bundles: Bundle[] = [
-   {
+export const bundles = {
+   allFutureLivestreams: {
       name: "allFutureLivestreams",
       cacheControl: "public, max-age=900", // 15min
       queries: {
@@ -24,6 +24,6 @@ const bundles: Bundle[] = [
                .where("test", "==", false),
       },
    },
-]
+} satisfies { [key: string]: Bundle }
 
-module.exports = generateFunctionsFromBundles(bundles)
+export type BundleName = keyof typeof bundles
