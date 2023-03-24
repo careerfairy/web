@@ -2,7 +2,12 @@ import { Grid } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
 import { AggregatedTalentPoolValue } from "./AggregatedTalentPoolValue"
 import AverageRegistrationsValue from "./AverageRegistrationsValue"
-import { CardAnalytic } from "../../common/CardAnalytic"
+import {
+   ATSCard,
+   AverageRegistrationsPerStreamCard,
+   CardAnalytic,
+   TalentPoolCard,
+} from "../../common/CardAnalytic"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { totalPeopleReached } from "../../common/util"
 
@@ -20,7 +25,7 @@ const AggregatedAnalytics = () => {
          <Grid item xs={6} style={styles.gridItem}>
             <CardAnalytic
                title="Talent reached"
-               tooltip="Total number of people exposed to your company"
+               tooltip="Total number of talent exposed to your company"
                value={totalPeopleReached(stats)}
             />
          </Grid>
@@ -35,27 +40,18 @@ const AggregatedAnalytics = () => {
 
          <Grid item xs={6} style={styles.gridItem}>
             {group.atsAdminPageFlag ? (
-               <CardAnalytic
-                  title="Total applications"
+               <ATSCard
                   value={stats?.generalStats?.numberOfApplications ?? 0}
-                  linkDescription={"Go to applicants"}
-                  link={`/group/${group.id}/admin/ats-integration?section=1`}
                />
             ) : (
-               <CardAnalytic
-                  title="Average registrations per stream"
+               <AverageRegistrationsPerStreamCard
                   value={<AverageRegistrationsValue />}
                />
             )}
          </Grid>
 
          <Grid item xs={6} style={styles.gridItem}>
-            <CardAnalytic
-               title="Talent pool profiles"
-               value={<AggregatedTalentPoolValue />}
-               linkDescription={"Go to talent"}
-               link={`/group/${group.id}/admin/analytics?section=1`}
-            />
+            <TalentPoolCard value={<AggregatedTalentPoolValue />} />
          </Grid>
       </Grid>
    )

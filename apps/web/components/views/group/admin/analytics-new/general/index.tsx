@@ -7,9 +7,12 @@ import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import GeneralSearchFilter from "./search-filter/GeneralSearchFilter"
 import CompanyPageCTA from "./company-page/CompanyPageCTA"
 import LivestreamsKPIs from "./livestreams-kpis/LivestreamsKPIs"
-import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
+import AggregatedAnalytics, {
+   SkeletonAggregatedAnalytics,
+} from "./analytics/AggregatedAnalytics"
 import AggregatedBreakdown from "./breakdown/AggregatedBreakdown"
 import useGroupCompanyPageProgress from "../../../../../custom-hook/useGroupCompanyPageProgress"
+import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 
 const styles = sxStyles({
    gridItem: {
@@ -55,9 +58,12 @@ const PageContent = () => {
                   <Grid xs={12} item style={styles.gridItem}>
                      <LivestreamsKPIs />
                   </Grid>
-
                   <Grid xs={12} item style={styles.gridItem}>
-                     <AggregatedAnalytics />
+                     <SuspenseWithBoundary
+                        fallback={<SkeletonAggregatedAnalytics />}
+                     >
+                        <AggregatedAnalytics progress={progress} />
+                     </SuspenseWithBoundary>
                   </Grid>
                </Grid>
                {/* Vertical Middle of UI */}

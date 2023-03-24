@@ -24,6 +24,8 @@ import Link from "../../../common/Link"
 const styles = sxStyles({
    card: {
       width: "100%",
+      display: "flex",
+      flexDirection: "column",
    },
    dropdownButton: {
       color: "black",
