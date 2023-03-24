@@ -2,7 +2,7 @@ import React, { useCallback, useMemo, useState } from "react"
 import { StyledTextField } from "../../../common/inputs"
 import Autocomplete from "@mui/material/Autocomplete"
 import { Box, Card, Grid, Typography } from "@mui/material"
-import { orderBy, where } from "firebase/firestore"
+import { where } from "firebase/firestore"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { useLivestreamSearch } from "../../../../../../custom-hook/live-stream/useLivestreamSearch"
@@ -48,10 +48,7 @@ const LivestreamSearch = () => {
    const [inputValue, setInputValue] = useState("")
 
    const additionalConstraints = useMemo(
-      () => [
-         where("groupIds", "array-contains", group.id),
-         orderBy("start", "desc"),
-      ],
+      () => [where("groupIds", "array-contains", group.id)],
       [group.id]
    )
 
