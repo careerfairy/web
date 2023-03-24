@@ -56,6 +56,8 @@ const styles = sxStyles({
    subheaderIcon: {
       width: "18px",
       marginLeft: "5px",
+      // offset the icon a little lower
+      marginTop: "1px",
    },
 })
 
@@ -204,6 +206,7 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
       content: "'Next'",
       marginRight: theme.spacing(1),
       [theme.breakpoints.down("sm")]: {
+         marginRight: theme.spacing(0.1),
          content: "''",
       },
    },
@@ -214,12 +217,16 @@ export const StyledPagination = styled(Pagination)(({ theme }) => ({
       content: "'Previous'",
       marginLeft: theme.spacing(1),
       [theme.breakpoints.down("sm")]: {
+         marginLeft: theme.spacing(0.1),
          content: "''",
       },
    },
    "& .MuiPagination-ul li button": {
       fontWeight: 500,
       padding: theme.spacing(1, 2),
+      [theme.breakpoints.down("sm")]: {
+         padding: 0,
+      },
       "&.MuiPaginationItem-page": {
          margin: theme.spacing(0, 0.5),
          padding: 0,
