@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
+   getClientPaginatedSources,
    LoadingSourcesProgress,
    sortAndFilterAndCalculatePercentage,
    SourceEntryArgs,
@@ -18,7 +19,7 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Box } from "@mui/material"
 import { TabsComponent, TabsSkeleton } from "../../../common/Tabs"
-import useEmptySources from "./useEmptySources"
+import { sentenceCase } from "../../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -124,19 +125,30 @@ const AggregatedBreakdownChart = () => {
    const isEmpty = livestreamStats.length === 0 || allSourcesAreEmpty
 
    const results = useMemo(
-      () => getResults(breakDowns[breakDownsKey], page),
+      () =>
+         getClientPaginatedSources(
+            breakDowns[breakDownsKey],
+            page,
+            maxNumberOfSourcesToDisplay
+         ),
       [breakDowns, breakDownsKey, page]
    )
 
-   const emptySources = useEmptySources(
-      leftTabsValue,
-      rightTabsValue,
-      maxNumberOfSourcesToDisplay
+   const emptySources = useMemo(
+      () =>
+         getEmptySources(
+            leftTabsValue,
+            rightTabsValue,
+            maxNumberOfSourcesToDisplay,
+            fieldsOfStudyLookup
+         ),
+      [leftTabsValue, rightTabsValue, fieldsOfStudyLookup]
    )
 
    const title = useMemo(() => {
-      const str = `${rightTabOptions[rightTabsValue]} by ${leftTabOptions[leftTabsValue]}`
-      return str.charAt(0).toUpperCase() + str.slice(1).toLowerCase()
+      const str =
+         `${rightTabOptions[rightTabsValue]} by ${leftTabOptions[leftTabsValue]}` as const
+      return sentenceCase(str)
    }, [leftTabsValue, rightTabsValue])
 
    return (
@@ -236,36 +248,6 @@ const AggregatedBreakdownChartSkeleton = () => {
 }
 
 /**
- *  The Method client side paginates the given data based on the given current page
- *  @param allData - data to paginate
- *  @param currentPage - current page number
- * */
-const getResults = (
-   allData: SourceEntryArgs[],
-   currentPage: number
-): {
-   total: number // total number of sources
-   pageSize: number // number of sources to display per page
-   totalPages: number // total number of pages
-   pageData: SourceEntryArgs[] // data to display on the current page
-} => {
-   const total = allData.length
-   const pageSize = maxNumberOfSourcesToDisplay
-   const totalPages = Math.ceil(total / pageSize)
-   const pageData = allData.slice(
-      (currentPage - 1) * pageSize,
-      currentPage * pageSize
-   )
-
-   return {
-      total,
-      pageSize,
-      totalPages,
-      pageData,
-   }
-}
-
-/**
  * Get breakdowns for the given stats
  * @param stats - livestream stats array to get breakdowns from
  * @param fieldsOfStudyLookup - fields of study lookup object gotten from the firebase
@@ -348,6 +330,35 @@ const getBreakdowns = (
          fieldsOfStudyByRegistrations
       ),
    }
+}
+
+/**
+ * We need to create a list of empty sources to display in the chart depending on the breakdown type and the user type
+ *  @param {LeftTabValue} breakdownType - breakdown type
+ *  @param {RightTabValue} userType - user type
+ *  @param {number} maxNumberOfSourcesToDisplay - max number of sources to display
+ *  @param fieldsOfStudyLookup - fields of study lookup from the context/firestore
+ *  @returns {Array} - list of empty sources
+ * */
+const getEmptySources = (
+   breakdownType: LeftTabValue,
+   userType: RightTabValue,
+   maxNumberOfSourcesToDisplay: number,
+   fieldsOfStudyLookup: Record<string, string>
+): SourceEntryArgs[] => {
+   const targetLookup =
+      breakdownType === "Country" ? universityCountriesMap : fieldsOfStudyLookup
+
+   return Object.entries(targetLookup)
+      .slice(0, maxNumberOfSourcesToDisplay) // we only want to display the first x sources
+      .map(([key, value]) => ({
+         value: 0,
+         label: value,
+         id: key,
+         percent: 0,
+         help: `Number of ${userType} from ${value}`,
+         name: value,
+      }))
 }
 
 export default AggregatedBreakdown

@@ -40,7 +40,7 @@ export const TabsComponent: FC<Props> = ({
    )
 }
 
-const mobileTabHeight = 35
+const mobileTabHeight = 33
 const tabletTabHeight = 45
 const borderRadius = 5
 export const StyledTabs = styled(Tabs)(({ theme }) => ({
@@ -89,7 +89,7 @@ export const StyledTab = styled(Tab)(({ theme }) => ({
       // make tabs smaller on mobile
       minWidth: 0,
       minHeight: mobileTabHeight,
-      padding: theme.spacing(0.8, 1),
+      padding: theme.spacing(0.6, 0.7),
       fontSize: theme.typography.pxToRem(10),
    },
 })) as unknown as typeof Tab
