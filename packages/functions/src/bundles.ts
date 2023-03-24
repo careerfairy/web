@@ -1,4 +1,5 @@
 import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
+import { DateTime } from "luxon"
 import { Bundle } from "./lib/bundleGenerator"
 
 /**
@@ -21,6 +22,23 @@ export const bundles = {
             firestore
                .collection("livestreams")
                .where("start", ">", getEarliestEventBufferTime())
+               .where("test", "==", false),
+      },
+   },
+
+   pastYearLivestreams: {
+      name: "pastYearLivestreams",
+      cacheControl: "public, max-age=86400", // 1 day, this list is big
+      queries: {
+         "past-livestreams-query": (firestore) =>
+            firestore
+               .collection("livestreams")
+               .where(
+                  "start",
+                  ">",
+                  DateTime.local().minus({ year: 1 }).toJSDate()
+               )
+               .where("start", "<", new Date())
                .where("test", "==", false),
       },
    },
