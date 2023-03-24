@@ -3,7 +3,7 @@ import { admin } from "./api/firestoreAdmin"
 import { client } from "./api/postmark"
 import config from "./config"
 import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
-import { setHeaders, isLocalEnvironment } from "./util"
+import { setCORSHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
@@ -33,7 +33,7 @@ export const scheduleTestLivestreamDeletion = functions.pubsub
 
 export const getLivestreamICalendarEvent = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
 
       if (livestreamId) {

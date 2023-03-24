@@ -1,12 +1,15 @@
 import { DateTime } from "luxon"
 import { customAlphabet } from "nanoid"
-import { https } from "firebase-functions"
+import { https, Request, Response } from "firebase-functions"
 import { BaseModel } from "@careerfairy/shared-lib/BaseModel"
 import { ClientError } from "graphql-request"
 import * as crypto from "crypto"
 import { promisify } from "util"
 import * as zlib from "zlib"
-import { LiveStreamEventWithUsersLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   LiveStreamEventWithUsersLivestreamData,
+} from "@careerfairy/shared-lib/livestreams"
 import { MailgunMessageData } from "mailgun.js/interfaces/Messages"
 import { ReminderData } from "./reminders"
 import functions = require("firebase-functions")
@@ -15,8 +18,10 @@ import { ATSPaginatedResults } from "@careerfairy/shared-lib/ats/Functions"
 import type { Change } from "firebase-functions"
 import { firestore } from "firebase-admin"
 import DocumentSnapshot = firestore.DocumentSnapshot
+import { Group } from "@careerfairy/shared-lib/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
 
-export const setHeaders = (req, res) => {
+export const setCORSHeaders = (req: Request, res: Response): void => {
    res.set("Access-Control-Allow-Origin", "*")
    res.set("Access-Control-Allow-Credentials", "true")
 
@@ -25,11 +30,12 @@ export const setHeaders = (req, res) => {
       res.set("Access-Control-Allow-Methods", "GET")
       res.set("Access-Control-Allow-Headers", "Content-Type, Authorization")
       res.set("Access-Control-Max-Age", "3600")
-      return res.status(204).send("")
+      res.status(204).send("")
+      return
    }
 }
 
-export const getStreamLink = (streamId) => {
+export const getStreamLink = (streamId: string) => {
    return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
@@ -149,7 +155,10 @@ export const generateNonAttendeesReminder = ({
  * Slice Registered Users into chunks
  *
  */
-const getRegisteredUsersIntoChunks = (registeredUsers, chunkSize): string[] => {
+const getRegisteredUsersIntoChunks = (
+   registeredUsers: unknown[],
+   chunkSize: number
+): string[] => {
    const registeredUsersChunks = []
 
    for (let i = 0; i < registeredUsers.length; i += chunkSize) {
@@ -262,7 +271,7 @@ export const removeMinutesDate = (date: Date, minutes: number): Date => {
    return new Date(date.getTime() - minutes * 60000)
 }
 
-export const getArrayDifference = (array1, array2) => {
+export const getArrayDifference = (array1: unknown[], array2: unknown[]) => {
    return array2.filter((element) => {
       return !array1.includes(element)
    })
@@ -270,7 +279,7 @@ export const getArrayDifference = (array1, array2) => {
 
 export const makeRequestingGroupIdFirst = (
    arrayOfGroupIds = [],
-   requestingGroupId
+   requestingGroupId: string
 ) => {
    let newArray = [...arrayOfGroupIds]
    if (!requestingGroupId) return newArray
@@ -283,7 +292,7 @@ export const makeRequestingGroupIdFirst = (
    return newArray
 }
 
-export const studentBelongsToGroup = (student, group) => {
+export const studentBelongsToGroup = (student: UserData, group: Group) => {
    // return (
    //    student && student.groupIds && student.groupIds.includes(group.groupId)
    // );
@@ -307,7 +316,7 @@ export const convertPollOptionsObjectToArray = (pollOptionsObject) => {
    }))
 }
 
-export const stringMatches = (basString, stringsToMatch) => {
+export const stringMatches = (basString: string, stringsToMatch: string[]) => {
    return stringsToMatch.some(
       (stringToMatch) =>
          stringToMatch.toLowerCase().replace(/\s/g, "") ===
@@ -320,7 +329,7 @@ export const getRatingsAverage = (contentRatings) =>
       return a + b.rating || 0
    }, 0) / contentRatings.length
 
-export const getDateString = (streamData) => {
+export const getDateString = (streamData: LivestreamEvent) => {
    const dateString =
       streamData &&
       streamData.start &&
@@ -342,13 +351,13 @@ export const markStudentStatsInUse = (totalParticipants, groupData) => {
 }
 
 export const createNestedArrayOfTemplates = (
-   arrayOfTemplates,
+   arrayOfTemplates: unknown[],
    chunkSize = 500
 ) => {
    const nestedArrayOfTemplates = []
-   let i
-   let j
-   let tempArray
+   let i: number
+   let j: number
+   let tempArray: unknown[]
    for (i = 0, j = arrayOfTemplates.length; i < j; i += chunkSize) {
       tempArray = arrayOfTemplates.slice(i, i + chunkSize)
       nestedArrayOfTemplates.push(tempArray)
@@ -385,8 +394,6 @@ export const partition = <T>(
 
 /**
  * Detect if we're running the emulators
- *
- * @returns {string}
  */
 export const isLocalEnvironment = () => {
    return (
@@ -437,7 +444,7 @@ export const logAxiosError = (error: any) => {
 export const logAxiosErrorAndThrow = (
    message: string,
    error: any,
-   ...extraData
+   ...extraData: unknown[]
 ) => {
    functions.logger.error(message, extraData)
    logAxiosError(error)
@@ -452,7 +459,7 @@ export const logAxiosErrorAndThrow = (
 export const logGraphqlErrorAndThrow = (
    message: string,
    error: any,
-   ...extraData
+   ...extraData: unknown[]
 ) => {
    functions.logger.error(message, extraData)
    logGraphqlError(error)
