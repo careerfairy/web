@@ -16,6 +16,10 @@
          {
             "source": "/bundle-allFutureLivestreams",
             "function": "bundle-allFutureLivestreams"
+         },
+         {
+            "source": "/bundle-pastYearLivestreams",
+            "function": "bundle-pastYearLivestreams"
          }
       ]
    },
