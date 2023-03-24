@@ -117,7 +117,7 @@ const LivestreamSearch = () => {
    const onInputChange = useCallback(
       (event: any, newInputValue: string, reason: string) => {
          if (reason === "reset") {
-            return // don't update the input value when the user selects an option
+            return // don't update the input value when the user selects an option, better UX
          }
          setInputValue(newInputValue)
       },
@@ -129,17 +129,14 @@ const LivestreamSearch = () => {
          <Autocomplete
             id="livestream-search"
             fullWidth
-            getOptionLabel={(option) => option.title}
+            getOptionLabel={getOptionLabel}
             options={livestreamHits ?? []}
             autoComplete
             includeInputInList
             clearOnBlur
-            ListboxProps={{
-               // @ts-ignore
-               sx: styles.listBox,
-            }}
-            value={value || null}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            ListboxProps={listBoxProps}
+            value={value}
+            isOptionEqualToValue={isOptionEqualToValue}
             noOptionsText="No livestreams found"
             onChange={onChange}
             onInputChange={onInputChange}
@@ -156,4 +153,16 @@ const LivestreamSearch = () => {
    )
 }
 
+const listBoxProps: React.ComponentProps<typeof Autocomplete>["ListboxProps"] =
+   {
+      // @ts-ignore
+      sx: styles.listBox,
+   }
+
+const isOptionEqualToValue = (
+   option: LivestreamEvent,
+   value: LivestreamEvent
+) => option.id === value.id
+
+const getOptionLabel = (option: LivestreamEvent) => option.title
 export default LivestreamSearch

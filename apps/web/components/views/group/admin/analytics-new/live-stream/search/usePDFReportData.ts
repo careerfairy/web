@@ -8,12 +8,23 @@ type Options = {
    onSuccess?: (data: PdfReportData) => void
    onError?: (err: Error) => void
 }
+
+/**
+ * Custom hook to fetch PDF report data for a specific livestream based on given parameters.
+ * @param {string} targetGroupId - The ID of the target group for which the report data is being fetched.
+ * @param {string} targetStreamId - The ID of the target stream for which the report data is being fetched.
+ * @param {Options} options - Optional object containing onSuccess and onError callbacks.
+ * @param {function} options.onSuccess - Optional callback function to be called upon successful data fetch.
+ * @param {function} options.onError - Optional callback function to be called upon an error in data fetch.
+ * @returns {Object} - Response object containing data, error, and loading status.
+ */
 const usePDFReportData = (
    targetGroupId: string,
    targetStreamId: string,
    options: Options = {}
 ) => {
    const { userData } = useAuth()
+
    const key = `export-livestream-${targetStreamId}-pdf-report-for${targetGroupId}`
 
    const response = useSWRMutation<PdfReportData>(

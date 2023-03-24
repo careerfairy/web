@@ -22,7 +22,7 @@ export const userTypes = [
    { value: "participants", label: "Participants" },
 ] as const
 
-type UserType = typeof userTypes[number]["value"]
+export type LivestreamUserType = typeof userTypes[number]["value"]
 
 type ILivestreamAnalyticsPageContext = {
    /**
@@ -31,8 +31,8 @@ type ILivestreamAnalyticsPageContext = {
     *  null => no data
     */
    currentStreamStats: LiveStreamStats | undefined | null
-   userType: UserType
-   setUserType: Dispatch<SetStateAction<UserType>>
+   userType: LivestreamUserType
+   setUserType: Dispatch<SetStateAction<LivestreamUserType>>
    fieldsOfStudyLookup: Record<string, string>
    setCurrentStreamStats: Dispatch<
       SetStateAction<ILivestreamAnalyticsPageContext["currentStreamStats"]>
@@ -62,7 +62,7 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const [currentStreamStats, setCurrentStreamStats] =
       useState<ILivestreamAnalyticsPageContext["currentStreamStats"]>(undefined)
 
-   const [userType, setUserType] = useState<UserType>(initialUserType)
+   const [userType, setUserType] = useState<LivestreamUserType>(initialUserType)
 
    const { data: fieldsOfStudy } = useFirestoreCollection<FieldOfStudy>(
       "fieldsOfStudy",
@@ -86,6 +86,7 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
 
    return (
       <LivestreamAnalyticsPageContext.Provider value={value}>
+         {/*Only query the livestream stats if we are on a /livestreamId page*/}
          {livestreamId ? (
             <QueryLivestreamStats livestreamId={livestreamId} />
          ) : null}
