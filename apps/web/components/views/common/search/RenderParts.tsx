@@ -4,6 +4,13 @@ import { getParts } from "../../../util/search"
 
 type Matches = ReturnType<typeof getParts>
 
+/**
+ * Renders a list of search result parts with highlighted matches
+ *
+ * @param {Object} props - Component props
+ * @param {Array} props.parts - List of search result parts with highlight information
+ * @returns {JSX.Element} - Rendered list of search result parts wrapped in React Fragment
+ */
 const RenderParts: FC<{ parts: Matches }> = ({ parts }) => {
    return (
       <>
