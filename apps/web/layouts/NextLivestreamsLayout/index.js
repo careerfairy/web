@@ -1,5 +1,5 @@
 import PropTypes from "prop-types"
-import React, { useState } from "react"
+import React, { useCallback, useState } from "react"
 import NavBar from "./NavBar"
 import { styles } from "../../materialUI/styles/layoutStyles/nextLivestreamsLayoutStyles"
 import TopBar from "./TopBar"
@@ -13,13 +13,16 @@ const NextLivestreamsLayout = (props) => {
 
    const { mainLinks, secondaryLinks, eventLinks } = useGeneralLinks()
 
-   const [isMobileNavOpen, setMobileNavOpen] = useState(false)
-   const handleDrawerOpen = () => setMobileNavOpen(true)
-   const handleDrawerClose = () => setMobileNavOpen(false)
-   const handleDrawerToggle = () => setMobileNavOpen(!isMobileNavOpen)
+   const [isMobileNavOpen, setIsMobileNavOpen] = useState(false)
+   const handleDrawerOpen = useCallback(() => setIsMobileNavOpen(true), [])
+   const handleDrawerClose = useCallback(() => setIsMobileNavOpen(false), [])
+   const handleDrawerToggle = useCallback(
+      () => setIsMobileNavOpen(!isMobileNavOpen),
+      [isMobileNavOpen]
+   )
 
    return (
-      <Page>
+      <Page sx={{ backgroundColor: "white" }}>
          <TopBar
             links={mainLinks}
             currentGroup={currentGroup}
