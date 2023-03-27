@@ -40,7 +40,12 @@ type Props = {
 const spacing = 0.5
 export const SourcesProgress: FC<Props> = (props) => {
    return (
-      <Grid sx={styles.grid} alignItems="center" spacing={spacing} container>
+      <Grid
+         sx={styles.grid}
+         alignItems="center"
+         spacing={props.flat ? 0.5 : 1}
+         container
+      >
          {props.leftHeaderComponent ? (
             <Grid item xs={6}>
                {props.leftHeaderComponent}
@@ -64,7 +69,7 @@ type LoadingProps = Omit<Props, "sources"> & {
 }
 export const LoadingSourcesProgress: FC<LoadingProps> = (props) => {
    return (
-      <Grid mt={1} sx={styles.grid} spacing={spacing} container>
+      <Grid mt={1} sx={styles.grid} spacing={props.flat ? 0.5 : 1} container>
          {props.leftHeaderComponent ? (
             <Grid item xs={6}>
                {props.leftHeaderComponent}

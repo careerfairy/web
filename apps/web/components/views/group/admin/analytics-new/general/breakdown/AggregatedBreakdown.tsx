@@ -154,7 +154,7 @@ const AggregatedBreakdownChart = () => {
             <SourcesProgress
                sources={isEmpty ? emptySources : results}
                leftHeaderComponent={
-                  <Box pb={2} display="flex" justifyContent="flex-start">
+                  <Box display="flex" justifyContent="flex-start">
                      <TabsComponent
                         tabOptions={leftTabOptionsArray}
                         value={leftTabsValue}
