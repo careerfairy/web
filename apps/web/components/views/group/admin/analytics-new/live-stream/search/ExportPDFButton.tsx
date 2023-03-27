@@ -17,8 +17,8 @@ const ExportPdfButton = () => {
 
    const {
       data: reportData,
-      isMutating,
-      trigger,
+      isFetching,
+      fetchReportData,
    } = usePDFReportData(group.id, currentStreamStats?.livestream?.id, {
       onError: errorNotification,
       onSuccess: () => handleOpenPDFDialog(),
@@ -29,17 +29,13 @@ const ExportPdfButton = () => {
    }
 
    const handleClick = () => {
-      if (reportData) {
-         handleOpenPDFDialog()
-      } else {
-         void trigger()
-      }
+      void fetchReportData() // fetch report data on button click
    }
 
    return (
       <>
          <LoadingButton
-            loading={isMutating}
+            loading={isFetching}
             onClick={handleClick}
             disabled={!currentStreamStats}
             variant="outlined"
