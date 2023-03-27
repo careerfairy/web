@@ -1,7 +1,13 @@
 import React from "react"
+import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
 
 const AggregatedUniversitySources = () => {
-   return <div>AggregatedStats</div>
+   const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
+
+   if (!currentStreamStats)
+      return <div>Loading AggregatedUniversitySources</div>
+
+   return <div>AggregatedUniversitySources</div>
 }
 
 export default AggregatedUniversitySources
