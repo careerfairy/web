@@ -46,6 +46,7 @@ import onCreateTriggers = require("./onCreateTriggers")
 import onDeleteTriggers = require("./onDeleteTriggers")
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { bundles } from "./bundles"
+import newsletter = require("./newsletter")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -103,6 +104,8 @@ exports.scheduleReminderEmails = reminders.scheduleReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
 exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
+
+exports.newsletter = newsletter.newsletter
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =
