@@ -123,6 +123,13 @@ exports.getLivestreamICalendarEvent = livestreams.getLivestreamICalendarEvent
 exports.sendEmailToStudentOfUniversityAndField =
    universityEmails.sendEmailToStudentOfUniversityAndField
 
+// Deploy each bundle as a separate function
+// npx firelink deploy --only functions:bundle-allFutureLivestreams
+//
+// When adding new bundles, you probably also want to update the
+// Firebase Hosting mappings: npx firebase deploy --only hosting
+export * as bundle from "./bundles"
+
 // Algolia
 // exports.addToIndex = algolia.addToIndex
 // exports.updateIndex = algolia.updateIndex
