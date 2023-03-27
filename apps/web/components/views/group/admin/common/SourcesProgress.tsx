@@ -218,34 +218,3 @@ const calculatePercentage = (
       ? (entry.value / highestValueByCategory) * 100
       : 0
 }
-
-/**
- * Returns paginated sources data
- * @function
- * @param {Array.<SourceEntryArgs>} allData - The complete source data array
- * @param {number} currentPage - The current page number
- * @param {number} pageSize - The number of results to display per page
- * @returns {Object} - Returns object with paginated source data
- */
-export const getClientPaginatedSources = (
-   allData: SourceEntryArgs[],
-   currentPage: number,
-   pageSize: number
-): {
-   total: number // total number of sources
-   totalPages: number // total number of pages
-   pageData: SourceEntryArgs[] // data to display on the current page,
-} => {
-   const total = allData.length
-   const totalPages = Math.ceil(total / pageSize)
-   const pageData = allData.slice(
-      (currentPage - 1) * pageSize,
-      currentPage * pageSize
-   )
-
-   return {
-      total,
-      totalPages,
-      pageData,
-   }
-}

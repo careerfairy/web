@@ -215,7 +215,7 @@ export const capitalizeFirstLetter = (string: string) => {
    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
-export const sentenceCase = <T extends string>(string: T): T => {
+export const titleCase = <T extends string>(string: T): T => {
    if (!string) return string
    return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()) as T
 }
