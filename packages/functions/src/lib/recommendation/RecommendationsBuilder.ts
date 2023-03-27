@@ -2,24 +2,21 @@ import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRe
 import { Logger } from "./IRecommendationService"
 import {
    RankedLivestreamEvent,
-   handlePromisesAllSettled,
    sortRankedLivestreamEventByPoints,
 } from "./util"
 
 export class RecommendationsBuilder {
-   protected promises: Promise<RankedLivestreamEvent[]>[] = []
+   protected results: RankedLivestreamEvent[] = []
 
    constructor(protected readonly log: Logger, public limit: number) {}
 
-   public async get(): Promise<RankedLivestreamEvent[]> {
-      // Get the resolved results from the promises
-      const results = await handlePromisesAllSettled(
-         this.promises,
-         this.log.error
-      )
+   protected addResults(livestreams: RankedLivestreamEvent[]) {
+      this.results = this.results.concat(livestreams)
+   }
 
+   public get(): RankedLivestreamEvent[] {
       const uniqueEvents = removeDuplicateDocuments(
-         results.filter(Boolean).flat()
+         this.results.filter(Boolean).flat()
       )
 
       // return the list already sorted
