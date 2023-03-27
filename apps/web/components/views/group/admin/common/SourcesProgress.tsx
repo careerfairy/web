@@ -3,6 +3,7 @@ import {
    Grid,
    LinearProgress,
    linearProgressClasses,
+   LinearProgressProps,
    Skeleton,
    styled,
    Tooltip,
@@ -11,6 +12,7 @@ import {
 import { sxStyles } from "../../../../../types/commonTypes"
 import { FC, ReactNode } from "react"
 import { dynamicSort } from "@careerfairy/shared-lib/utils"
+import { getMaxLineStyles } from "../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    header: {
@@ -19,6 +21,7 @@ const styles = sxStyles({
    },
    sourceText: {
       fontSize: "1rem",
+      ...getMaxLineStyles(1),
    },
    grid: {
       "& .MuiGrid-item:last-child": {
@@ -27,55 +30,52 @@ const styles = sxStyles({
    },
 })
 type Props = {
-   leftHeaderComponent: ReactNode
-   rightHeaderComponent: ReactNode
+   leftHeaderComponent?: ReactNode
+   rightHeaderComponent?: ReactNode
 
    sources: SourceEntryArgs[]
+   flat?: boolean
 }
 
 const spacing = 0.5
-export const SourcesProgress = ({
-   sources,
-   rightHeaderComponent,
-   leftHeaderComponent,
-}: Props) => {
+export const SourcesProgress: FC<Props> = (props) => {
    return (
-      <Grid mt={1} sx={styles.grid} spacing={spacing} container>
+      <Grid sx={styles.grid} spacing={spacing} container>
          <Grid item xs={6}>
-            {leftHeaderComponent}
+            {props.leftHeaderComponent}
          </Grid>
          <Grid item xs={6}>
-            {rightHeaderComponent}
+            {props.rightHeaderComponent}
          </Grid>
 
-         {sources.map((s) => (
-            <SourceEntry key={s.name} {...s} />
+         {props.sources.map((s) => (
+            <SourceEntry flat={props.flat} key={s.name} {...s} />
          ))}
       </Grid>
    )
 }
 
-type LoadingProps = {
+type LoadingProps = Omit<Props, "sources"> & {
    numberOfSources: number
-   leftHeaderComponent?: ReactNode
-   rightHeaderComponent?: ReactNode
 }
-export const LoadingSourcesProgress: FC<LoadingProps> = ({
-   numberOfSources,
-   leftHeaderComponent,
-   rightHeaderComponent,
-}) => {
+export const LoadingSourcesProgress: FC<LoadingProps> = (props) => {
    return (
-      <Grid mt={1} sx={styles.grid} spacing={spacing} container>
+      <Grid
+         mt={1}
+         sx={styles.grid}
+         alignItems="center"
+         spacing={spacing}
+         container
+      >
          <Grid item xs={6}>
-            {leftHeaderComponent}
+            {props.leftHeaderComponent}
          </Grid>
          <Grid item xs={6}>
-            {rightHeaderComponent}
+            {props.rightHeaderComponent}
          </Grid>
 
-         {Array.from({ length: numberOfSources }).map((_, i) => (
-            <LoadingSourceEntry key={i} />
+         {Array.from({ length: props.numberOfSources }).map((_, i) => (
+            <LoadingSourceEntry flat={props.flat} key={i} />
          ))}
       </Grid>
    )
@@ -86,60 +86,148 @@ export type SourceEntryArgs = {
    help: string
    value: number
    percent: number
+   flat?: boolean
 }
-const SourceEntry = ({ name, value, percent, help }: SourceEntryArgs) => {
+
+const normalGridStyles = {
+   name: 9,
+   value: 3,
+   progress: 12,
+}
+
+const flatGridStyles = {
+   name: 2.5,
+   progress: 9,
+   value: 0.5,
+}
+const SourceEntry: FC<SourceEntryArgs> = ({
+   percent,
+   flat,
+   value,
+   name,
+   help,
+}) => {
+   const gridStyles = flat ? flatGridStyles : normalGridStyles
+
    return (
       <>
-         <Grid item xs={9}>
-            <Tooltip title={help} placement="top" followCursor>
-               <Typography sx={styles.sourceText}>{name}</Typography>
-            </Tooltip>
+         <Grid item xs={gridStyles.name}>
+            <SourceName name={name} help={help} />
          </Grid>
-         <Grid item xs={3} textAlign="right">
-            <Typography sx={styles.sourceText}>{value}</Typography>
-         </Grid>
-         <Grid mt={1} mb={2} item xs={12}>
-            <BorderLinearProgress
-               variant="determinate"
-               color="primary"
-               value={percent}
-            />
-         </Grid>
+         {!flat && (
+            <>
+               <Grid item xs={gridStyles.value} textAlign="right">
+                  <SourceValue value={value} />
+               </Grid>
+               <Grid mt={1} mb={2} item xs={gridStyles.progress}>
+                  <SourceProgress percent={percent} />
+               </Grid>
+            </>
+         )}
+         {flat ? (
+            <>
+               <Grid item xs={gridStyles.progress}>
+                  <SourceProgress flat={flat} percent={percent} />
+               </Grid>
+               <Grid item xs={gridStyles.value} textAlign="right">
+                  <SourceValue value={value} />
+               </Grid>
+            </>
+         ) : null}
       </>
    )
 }
 
-const LoadingSourceEntry = () => {
+const LoadingSourceEntry: FC<{
+   flat?: boolean
+}> = (props) => {
+   const { flat = false } = props
+
+   const gridStyles = flat ? flatGridStyles : normalGridStyles
+
    return (
       <>
-         <Grid item xs={9}>
-            <Typography sx={styles.sourceText}>
-               <Skeleton width={"5rem"} variant={"text"} />
-            </Typography>
-         </Grid>
-         <Grid item xs={3} textAlign="right">
-            <Typography sx={styles.sourceText}>
-               <Box
-                  ml={"auto"}
-                  component={Skeleton}
-                  width={"3rem"}
-                  variant={"text"}
-               />
-            </Typography>
-         </Grid>
-         <Grid mt={1} mb={2} item xs={12}>
-            <BorderLinearProgress
-               variant="determinate"
-               color="primary"
-               value={0}
+         <Grid item xs={gridStyles.name}>
+            <SourceName
+               name={<Skeleton width={flat ? "80%" : "5rem"} variant="text" />}
             />
          </Grid>
+         {!flat && (
+            <>
+               <Grid item xs={gridStyles.value} textAlign="right">
+                  <SourceValue
+                     value={
+                        <Box
+                           ml="auto"
+                           component={Skeleton}
+                           width="3rem"
+                           variant="text"
+                        />
+                     }
+                  />
+               </Grid>
+               <Grid mt={1} mb={2} item xs={gridStyles.progress}>
+                  <SourceProgress flat={flat} percent={0} />
+               </Grid>
+            </>
+         )}
+         {flat ? (
+            <>
+               <Grid item xs={gridStyles.progress}>
+                  <SourceProgress flat={flat} percent={0} />
+               </Grid>
+               <Grid item xs={gridStyles.value} textAlign="right">
+                  <SourceValue
+                     value={
+                        <Box
+                           ml="auto"
+                           component={Skeleton}
+                           width="3rem"
+                           variant="text"
+                        />
+                     }
+                  />
+               </Grid>
+            </>
+         ) : null}
       </>
    )
 }
 
-const BorderLinearProgress = styled(LinearProgress)(({ theme }) => ({
-   height: 12,
+const SourceName = ({ name, help }: { name: ReactNode; help?: string }) => (
+   <Tooltip title={help} placement="top" followCursor>
+      <Typography whiteSpace={"pre-line"} sx={styles.sourceText}>
+         {name}
+      </Typography>
+   </Tooltip>
+)
+
+const SourceProgress = ({
+   percent,
+   flat,
+}: {
+   percent: number
+   flat?: boolean
+}) => (
+   <BorderLinearProgress
+      variant="determinate"
+      color="primary"
+      flat={flat}
+      value={percent}
+   />
+)
+
+const SourceValue = ({ value }: { value: ReactNode }) => (
+   <Typography sx={styles.sourceText}>{value}</Typography>
+)
+
+interface StyledLinearProgressProps extends LinearProgressProps {
+   flat?: boolean
+}
+const BorderLinearProgress = styled(LinearProgress, {
+   shouldForwardProp: (prop) => prop !== "flat",
+})<StyledLinearProgressProps>(({ theme, flat }) => ({
+   height: flat ? 8 : 12,
    borderRadius: 5,
    [`&.${linearProgressClasses.colorPrimary}`]: {
       backgroundColor: theme.palette.tertiary.main,
