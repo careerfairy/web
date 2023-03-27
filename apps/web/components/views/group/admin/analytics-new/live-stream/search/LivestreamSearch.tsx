@@ -132,6 +132,7 @@ const LivestreamSearch = () => {
             getOptionLabel={getOptionLabel}
             options={livestreamHits ?? []}
             autoComplete
+            disableClearable
             includeInputInList
             clearOnBlur
             ListboxProps={listBoxProps}

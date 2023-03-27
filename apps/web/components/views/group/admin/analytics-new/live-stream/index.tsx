@@ -25,7 +25,9 @@ const LivestreamAnalyticsPageContent = () => {
 }
 
 const PageContent = () => {
-   const { isOnDetailsPage } = useLivestreamsAnalyticsPageContext()
+   const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
+
+   const noStreams = currentStreamStats === null
 
    return (
       <Box py={2}>
@@ -34,7 +36,11 @@ const PageContent = () => {
                <Grid xs={12} item style={styles.gridItem}>
                   <LivestreamSearchNav />
                </Grid>
-               {isOnDetailsPage ? ( // we don't fetch the document if we are not on the details page
+               {noStreams ? ( // we don't fetch the document if we are not on the details page
+                  <Grid xs={12} item style={styles.gridItem}>
+                     <SearchPageContent />
+                  </Grid>
+               ) : (
                   <>
                      <Grid xs={12} item style={styles.gridItem}>
                         <AggregatedAnalytics />
@@ -43,10 +49,6 @@ const PageContent = () => {
                         <AggregatedUniversitySources />
                      </Grid>
                   </>
-               ) : (
-                  <Grid xs={12} item style={styles.gridItem}>
-                     <SearchPageContent />
-                  </Grid>
                )}
             </Grid>
          </Container>
