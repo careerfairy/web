@@ -73,7 +73,7 @@ const PageContent = () => {
    )
 
    const isLoading = livestreamStats === undefined
-   const mappedEvents = useMemo(
+   const mappedEvents = useMemo<LivestreamEvent[]>(
       () =>
          livestreamStats?.map(
             (stream) => stream.livestream as LivestreamEvent
