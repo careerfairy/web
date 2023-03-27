@@ -40,13 +40,17 @@ type Props = {
 const spacing = 0.5
 export const SourcesProgress: FC<Props> = (props) => {
    return (
-      <Grid sx={styles.grid} spacing={spacing} container>
-         <Grid item xs={6}>
-            {props.leftHeaderComponent}
-         </Grid>
-         <Grid item xs={6}>
-            {props.rightHeaderComponent}
-         </Grid>
+      <Grid sx={styles.grid} alignItems="center" spacing={spacing} container>
+         {props.leftHeaderComponent ? (
+            <Grid item xs={6}>
+               {props.leftHeaderComponent}
+            </Grid>
+         ) : null}
+         {props.rightHeaderComponent ? (
+            <Grid item xs={6}>
+               {props.rightHeaderComponent}
+            </Grid>
+         ) : null}
 
          {props.sources.map((s) => (
             <SourceEntry flat={props.flat} key={s.name} {...s} />
@@ -60,19 +64,17 @@ type LoadingProps = Omit<Props, "sources"> & {
 }
 export const LoadingSourcesProgress: FC<LoadingProps> = (props) => {
    return (
-      <Grid
-         mt={1}
-         sx={styles.grid}
-         alignItems="center"
-         spacing={spacing}
-         container
-      >
-         <Grid item xs={6}>
-            {props.leftHeaderComponent}
-         </Grid>
-         <Grid item xs={6}>
-            {props.rightHeaderComponent}
-         </Grid>
+      <Grid mt={1} sx={styles.grid} spacing={spacing} container>
+         {props.leftHeaderComponent ? (
+            <Grid item xs={6}>
+               {props.leftHeaderComponent}
+            </Grid>
+         ) : null}
+         {props.rightHeaderComponent ? (
+            <Grid item xs={6}>
+               {props.rightHeaderComponent}
+            </Grid>
+         ) : null}
 
          {Array.from({ length: props.numberOfSources }).map((_, i) => (
             <LoadingSourceEntry flat={props.flat} key={i} />
@@ -114,16 +116,6 @@ const SourceEntry: FC<SourceEntryArgs> = ({
          <Grid item xs={gridStyles.name}>
             <SourceName name={name} help={help} />
          </Grid>
-         {!flat && (
-            <>
-               <Grid item xs={gridStyles.value} textAlign="right">
-                  <SourceValue value={value} />
-               </Grid>
-               <Grid mt={1} mb={2} item xs={gridStyles.progress}>
-                  <SourceProgress percent={percent} />
-               </Grid>
-            </>
-         )}
          {flat ? (
             <>
                <Grid item xs={gridStyles.progress}>
@@ -133,7 +125,16 @@ const SourceEntry: FC<SourceEntryArgs> = ({
                   <SourceValue value={value} />
                </Grid>
             </>
-         ) : null}
+         ) : (
+            <>
+               <Grid item xs={gridStyles.value} textAlign="right">
+                  <SourceValue value={value} />
+               </Grid>
+               <Grid item xs={gridStyles.progress}>
+                  <SourceProgress percent={percent} />
+               </Grid>
+            </>
+         )}
       </>
    )
 }
@@ -152,25 +153,6 @@ const LoadingSourceEntry: FC<{
                name={<Skeleton width={flat ? "80%" : "5rem"} variant="text" />}
             />
          </Grid>
-         {!flat && (
-            <>
-               <Grid item xs={gridStyles.value} textAlign="right">
-                  <SourceValue
-                     value={
-                        <Box
-                           ml="auto"
-                           component={Skeleton}
-                           width="3rem"
-                           variant="text"
-                        />
-                     }
-                  />
-               </Grid>
-               <Grid mt={1} mb={2} item xs={gridStyles.progress}>
-                  <SourceProgress flat={flat} percent={0} />
-               </Grid>
-            </>
-         )}
          {flat ? (
             <>
                <Grid item xs={gridStyles.progress}>
@@ -189,7 +171,25 @@ const LoadingSourceEntry: FC<{
                   />
                </Grid>
             </>
-         ) : null}
+         ) : (
+            <>
+               <Grid item xs={gridStyles.value} textAlign="right">
+                  <SourceValue
+                     value={
+                        <Box
+                           ml="auto"
+                           component={Skeleton}
+                           width="3rem"
+                           variant="text"
+                        />
+                     }
+                  />
+               </Grid>
+               <Grid item xs={gridStyles.progress}>
+                  <SourceProgress flat={flat} percent={0} />
+               </Grid>
+            </>
+         )}
       </>
    )
 }
