@@ -26,6 +26,7 @@ export const bundles = {
       },
    },
 
+   // Warning: may take ~20s to generate when not cached
    pastYearLivestreams: {
       name: "pastYearLivestreams",
       cacheControl: "public, max-age=86400", // 1 day, this list is big
