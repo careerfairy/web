@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
 import {
-   getClientPaginatedSources,
    LoadingSourcesProgress,
    SourcesProgress,
 } from "../../../common/SourcesProgress"
@@ -15,6 +14,7 @@ import {
    getBreakdownsTitle,
    getEmptySources,
 } from "../../../common/util"
+import useClientSidePagination from "../../../../../../custom-hook/utils/useClientSidePagination"
 
 const styles = sxStyles({
    root: {
@@ -64,7 +64,6 @@ const AggregatedUniversitySourcesChart = () => {
    const isMobile = useIsMobile()
 
    const [tab, setTab] = useState<SourcesTab>(initialTab)
-   const [page, setPage] = useState(1)
 
    const handleTabChange = (
       event: React.SyntheticEvent<Element, Event>,
@@ -72,18 +71,6 @@ const AggregatedUniversitySourcesChart = () => {
    ) => {
       setTab(value)
    }
-
-   const resetPage = useCallback(() => {
-      // reset page
-      setPage(1)
-   }, [])
-
-   const onPageChange = useCallback(
-      (event: React.ChangeEvent<unknown>, value: number) => {
-         setPage(value)
-      },
-      []
-   )
 
    const breakDownsKey: keyof ReturnType<typeof getBreakdowns> =
       `${userType}By${tab}` as const
@@ -97,14 +84,26 @@ const AggregatedUniversitySourcesChart = () => {
       [fieldsOfStudyLookup, currentStreamStats]
    )
 
-   const results = useMemo(
-      () =>
-         getClientPaginatedSources(
-            breakDowns[breakDownsKey],
-            page,
-            maxNumberOfSourcesToDisplay
-         ),
-      [breakDowns, breakDownsKey, page]
+   const {
+      currentPageData: results,
+      currentPage,
+      totalPages,
+      goToPage,
+   } = useClientSidePagination({
+      itemsPerPage: maxNumberOfSourcesToDisplay,
+      data: breakDowns[breakDownsKey],
+   })
+
+   const resetPage = useCallback(() => {
+      // reset page
+      goToPage(1)
+   }, [goToPage])
+
+   const onPageChange = useCallback(
+      (event: React.ChangeEvent<unknown>, value: number) => {
+         goToPage(value)
+      },
+      [goToPage]
    )
 
    const emptySources = useMemo(
@@ -159,7 +158,7 @@ const AggregatedUniversitySourcesChart = () => {
             display={"flex"}
          >
             <SourcesProgress
-               sources={isEmpty ? emptySources : results.pageData}
+               sources={isEmpty ? emptySources : results}
                flat={!isMobile}
             />
             <Stack
@@ -170,8 +169,8 @@ const AggregatedUniversitySourcesChart = () => {
                spacing={1}
             >
                <StyledPagination
-                  count={results.totalPages}
-                  page={page}
+                  count={totalPages}
+                  page={currentPage}
                   siblingCount={0}
                   boundaryCount={0}
                   shape="circular"
