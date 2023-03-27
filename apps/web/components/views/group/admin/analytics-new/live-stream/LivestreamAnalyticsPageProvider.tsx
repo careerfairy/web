@@ -16,6 +16,7 @@ import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import { collectionGroup, query, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../data/firebase/FirebaseInstance"
 import { limit } from "@firebase/firestore"
+import useClosestLivestreamStats from "./useClosestLivestreamStats"
 
 export const userTypes = [
    { value: "registrations", label: "Registrations" },
@@ -24,16 +25,16 @@ export const userTypes = [
 
 export type LivestreamUserType = typeof userTypes[number]["value"]
 
-type ILivestreamAnalyticsPageContext = {
-   /**
-    * Loading status:
-    *  undefined => still loading
-    *  null => no data
-    */
-   currentStreamStats: LiveStreamStats | undefined | null
+/**
+ * Loading status:
+ *  undefined => still loading
+ *  null => no data
+ */
+type CurrentStreamStats = LiveStreamStats | undefined | null
 
-   // Since we are using a catch-all route, we need to check if we are on the details page
-   isOnDetailsPage: boolean
+type ILivestreamAnalyticsPageContext = {
+   currentStreamStats: CurrentStreamStats
+
    userType: LivestreamUserType
    setUserType: Dispatch<SetStateAction<LivestreamUserType>>
    fieldsOfStudyLookup: Record<string, string>
@@ -47,7 +48,6 @@ const initialUserType: ILivestreamAnalyticsPageContext["userType"] =
 
 const initialValues: ILivestreamAnalyticsPageContext = {
    currentStreamStats: undefined,
-   isOnDetailsPage: false,
    userType: initialUserType,
    fieldsOfStudyLookup: {},
    setCurrentStreamStats: () => {},
@@ -58,15 +58,20 @@ const LivestreamAnalyticsPageContext =
    createContext<ILivestreamAnalyticsPageContext>(initialValues)
 
 export const LivestreamAnalyticsPageProvider = ({ children }) => {
+   const { group } = useGroup()
    const router = useRouter()
-
    // Since we are using a catch-all route, the livestreamId will be the first element of the array
    const livestreamId = router.query.livestreamId?.[0] as string
 
+   const isOnBasePage = !livestreamId
+
    const [currentStreamStats, setCurrentStreamStats] =
-      useState<ILivestreamAnalyticsPageContext["currentStreamStats"]>(undefined)
+      useState<CurrentStreamStats>(undefined)
 
    const [userType, setUserType] = useState<LivestreamUserType>(initialUserType)
+
+   const { isLoading: isClosestStreamLoading, closestLivestreamId } =
+      useClosestLivestreamStats(group.id, isOnBasePage)
 
    const { data: fieldsOfStudy } = useFirestoreCollection<FieldOfStudy>(
       "fieldsOfStudy",
@@ -78,16 +83,40 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
       [fieldsOfStudy]
    )
 
+   const stats = useMemo<CurrentStreamStats>(() => {
+      if (isOnBasePage) {
+         // If we are on the base page, we want to show the closest livestream stats
+
+         // If we are still loading the closest livestream stats,
+         // we want to return undefined so that the loading state is shown
+         if (isClosestStreamLoading) {
+            return undefined
+         }
+
+         // If we have no closest livestreamId, we want to return null
+         if (!closestLivestreamId) {
+            return null
+         }
+      } else {
+         // If we are on a /livestreamId page, we want to show the stats for that livestream
+         return currentStreamStats
+      }
+   }, [
+      closestLivestreamId,
+      currentStreamStats,
+      isClosestStreamLoading,
+      isOnBasePage,
+   ])
+
    const value = useMemo<ILivestreamAnalyticsPageContext>(() => {
       return {
          fieldsOfStudyLookup,
-         isOnDetailsPage: !!livestreamId,
-         currentStreamStats: livestreamId && currentStreamStats, // Only return the current stream stats if we are on a /livestreamId page
+         currentStreamStats: stats, // Only return the current stream stats if we are on a /livestreamId page
          userType,
          setCurrentStreamStats,
          setUserType,
       }
-   }, [currentStreamStats, fieldsOfStudyLookup, livestreamId, userType])
+   }, [fieldsOfStudyLookup, stats, userType])
 
    return (
       <LivestreamAnalyticsPageContext.Provider value={value}>
@@ -146,7 +175,11 @@ const QueryLivestreamStats = ({ livestreamId }: { livestreamId: string }) => {
       }
 
       // We only want the first result
-      setCurrentStreamStats(stats[0])
+      setCurrentStreamStats(stats[0] || null)
+
+      return () => {
+         setCurrentStreamStats(undefined)
+      }
    }, [isLoaded, setCurrentStreamStats, stats])
 
    return null
