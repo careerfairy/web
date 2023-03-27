@@ -1,7 +1,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
-   getClientPaginatedSources,
    LoadingSourcesProgress,
    sortAndFilterAndCalculatePercentage,
    SourceEntryArgs,
@@ -19,7 +18,8 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Box } from "@mui/material"
 import { TabsComponent, TabsSkeleton } from "../../../common/Tabs"
-import { sentenceCase } from "../../../../../../../util/CommonUtil"
+import { titleCase } from "../../../../../../../util/CommonUtil"
+import useClientSidePagination from "../../../../../../custom-hook/utils/useClientSidePagination"
 
 const styles = sxStyles({
    root: {
@@ -77,7 +77,6 @@ const AggregatedBreakdownChart = () => {
    const { fieldsOfStudyLookup, livestreamStats, livestreamStatsTimeFrame } =
       useAnalyticsPageContext()
 
-   const [page, setPage] = useState(1)
    const [leftTabsValue, setLeftTabsValue] =
       useState<LeftTabValue>(initialLeftTabValue)
    const [rightTabsValue, setRightTabsValue] =
@@ -96,43 +95,42 @@ const AggregatedBreakdownChart = () => {
       },
       []
    )
+   const breakDowns = useMemo(
+      () => getBreakdowns(livestreamStats ?? [], fieldsOfStudyLookup),
+      [livestreamStats, fieldsOfStudyLookup]
+   )
+
+   const breakDownsKey: keyof ReturnType<typeof getBreakdowns> =
+      `${rightTabsValue}By${leftTabsValue}` as const
+
+   const {
+      currentPageData: results,
+      currentPage,
+      totalPages,
+      goToPage,
+   } = useClientSidePagination({
+      itemsPerPage: maxNumberOfSourcesToDisplay,
+      data: breakDowns[breakDownsKey],
+   })
 
    const onPageChange = useCallback(
       (event: React.ChangeEvent<unknown>, value: number) => {
-         setPage(value)
+         goToPage(value)
       },
-      []
+      [goToPage]
    )
 
-   const resetPage = useCallback(() => setPage(1), [])
+   const resetPage = useCallback(() => goToPage(1), [goToPage])
 
    useEffect(() => {
       resetPage()
       // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [leftTabsValue, rightTabsValue, livestreamStatsTimeFrame])
 
-   const breakDownsKey: keyof ReturnType<typeof getBreakdowns> =
-      `${rightTabsValue}By${leftTabsValue}` as const
-
-   const breakDowns = useMemo(
-      () => getBreakdowns(livestreamStats ?? [], fieldsOfStudyLookup),
-      [livestreamStats, fieldsOfStudyLookup]
-   )
-
    // As the sources are sorted by the number of registrations/participants, we can just check if the first source has 0 registrations/participants
    const allSourcesAreEmpty = !breakDowns[breakDownsKey][0]?.value
 
    const isEmpty = livestreamStats.length === 0 || allSourcesAreEmpty
-
-   const results = useMemo(
-      () =>
-         getClientPaginatedSources(
-            breakDowns[breakDownsKey],
-            page,
-            maxNumberOfSourcesToDisplay
-         ),
-      [breakDowns, breakDownsKey, page]
-   )
 
    const emptySources = useMemo(
       () =>
@@ -148,7 +146,7 @@ const AggregatedBreakdownChart = () => {
    const title = useMemo(() => {
       const str =
          `${rightTabOptions[rightTabsValue]} by ${leftTabOptions[leftTabsValue]}` as const
-      return sentenceCase(str)
+      return titleCase(str)
    }, [leftTabsValue, rightTabsValue])
 
    return (
@@ -161,7 +159,7 @@ const AggregatedBreakdownChart = () => {
             display={"flex"}
          >
             <SourcesProgress
-               sources={isEmpty ? emptySources : results.pageData}
+               sources={isEmpty ? emptySources : results}
                leftHeaderComponent={
                   <Box pb={2} display="flex" justifyContent="flex-start">
                      <TabsComponent
@@ -189,8 +187,8 @@ const AggregatedBreakdownChart = () => {
                spacing={1}
             >
                <StyledPagination
-                  count={results.totalPages}
-                  page={page}
+                  count={totalPages}
+                  page={currentPage}
                   siblingCount={0}
                   boundaryCount={0}
                   shape="circular"
