@@ -1,10 +1,7 @@
 import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
 import { UserData } from "@careerfairy/shared-lib/users"
-import { IUserRepository } from "@careerfairy/shared-lib/users/UserRepository"
 
-import { userEventRecommendationService } from "../../../api/services"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "../IRecommendationService"
@@ -16,9 +13,8 @@ import {
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 import { UserBasedRecommendationsBuilder } from "./UserBasedRecommendationsBuilder"
 import { LivestreamBasedRecommendationsBuilder } from "./LivestreamBasedRecommendationsBuilder"
-
-// This only imports the types at compile time and not the actual library at runtime
-type FirebaseAdmin = typeof import("firebase-admin")
+import { IRecommendationDataFetcher } from "./DataFetcherRecommendations"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 const serviceName = "user_event_recommendation_service"
 
@@ -26,33 +22,23 @@ export default class UserEventRecommendationService
    extends RecommendationServiceCore
    implements IRecommendationService
 {
-   private readonly rankedLivestreamRepo: RankedLivestreamRepository
-
    constructor(
-      firebaseAdmin: FirebaseAdmin,
-      readonly userRepo: IUserRepository,
-      readonly livestreamRepo: ILivestreamRepository
+      private readonly user: UserData,
+      private readonly futureLivestreams: LivestreamEvent[],
+      private readonly pastLivestreams: LivestreamEvent[]
    ) {
-      super(serviceName, functions.logger)
-      this.rankedLivestreamRepo = new RankedLivestreamRepository(
-         firebaseAdmin,
-         livestreamRepo
-      )
+      super(functions.logger)
    }
 
-   async getRecommendations(userId: string, limit = 10): Promise<string[]> {
-      const userData = await this.userRepo.getUserDataById(userId)
-
+   async getRecommendations(limit = 10): Promise<string[]> {
       const promises: Promise<RankedLivestreamEvent[]>[] = []
 
-      if (userData) {
+      if (this.user) {
          // Fetch top {limit} recommended events based on the user's Metadata
-         promises.push(this.getRecommendedEventsBasedOnUserData(userData, 10))
+         promises.push(this.getRecommendedEventsBasedOnUserData(this.user, 10))
 
          // Fetch top {limit} recommended events based on the user actions, e.g. the events they have attended
-         promises.push(
-            this.getRecommendedEventsBasedOnUserActions(userData, 10)
-         )
+         promises.push(this.getRecommendedEventsBasedOnUserActions(10))
       }
 
       // Await all promises
@@ -72,10 +58,10 @@ export default class UserEventRecommendationService
       // Log some debug info
       this.log.info("Metadata", {
          userMetaData: {
-            userId: userData?.id || "N/A",
-            userInterestIds: userData?.interestsIds || [],
-            userFieldOfStudyId: userData?.fieldOfStudy?.id || "N/A",
-            userCountriesOfInterest: userData?.countriesOfInterest || [],
+            userId: this.user?.id || "N/A",
+            userInterestIds: this.user?.interestsIds || [],
+            userFieldOfStudyId: this.user?.fieldOfStudy?.id || "N/A",
+            userCountriesOfInterest: this.user?.countriesOfInterest || [],
          },
          eventMetaData: deDupedEvents.map((e) => ({
             id: e.id,
@@ -94,14 +80,10 @@ export default class UserEventRecommendationService
          .slice(0, limit)
 
       this.log.info(
-         `Recommended event IDs for user ${userId}: ${recommendedIds}`,
+         `Recommended event IDs for user ${this.user?.id}: ${recommendedIds}`,
          {
-            serviceName: userEventRecommendationService.serviceName,
+            serviceName: serviceName,
          }
-      )
-
-      this.log.info(
-         `Total document reads: ${this.rankedLivestreamRepo.totalReads()}`
       )
 
       return recommendedIds
@@ -115,7 +97,7 @@ export default class UserEventRecommendationService
          this.log,
          limit,
          userData,
-         this.rankedLivestreamRepo
+         new RankedLivestreamRepository(this.futureLivestreams)
       )
 
       return userRecommendationBuilder
@@ -126,15 +108,11 @@ export default class UserEventRecommendationService
    }
 
    private async getRecommendedEventsBasedOnUserActions(
-      userData: UserData,
       limit: number
    ): Promise<RankedLivestreamEvent[]> {
       const promises: Promise<RankedLivestreamEvent[]>[] = [
          // Get events based on the user's previously attended events
-         this.getRecommendedEventsBasedOnPreviousWatchedEvents(
-            userData.id,
-            limit
-         ),
+         this.getRecommendedEventsBasedOnPreviousWatchedEvents(limit),
       ]
 
       // Await all promises
@@ -151,25 +129,14 @@ export default class UserEventRecommendationService
    }
 
    private async getRecommendedEventsBasedOnPreviousWatchedEvents(
-      userId: string,
       limit = 10
    ): Promise<RankedLivestreamEvent[]> {
-      // Get most recently watched events
-      const mostRecentlyWatchedEvents =
-         await this.rankedLivestreamRepo.getMostRecentlyWatchedEvents(
-            userId,
-            limit
-         )
-
-      // TODO: temporary hack just to count these reads
-      this.rankedLivestreamRepo.addReads(mostRecentlyWatchedEvents.length)
-
       const livestreamBasedRecommendations =
          new LivestreamBasedRecommendationsBuilder(
             this.log,
             limit,
-            mostRecentlyWatchedEvents,
-            this.rankedLivestreamRepo
+            this.pastLivestreams,
+            new RankedLivestreamRepository(this.futureLivestreams)
          )
 
       return livestreamBasedRecommendations
@@ -179,5 +146,21 @@ export default class UserEventRecommendationService
          .mostCommonIndustries()
          .mostCommonCompanySizes()
          .get()
+   }
+
+   static async create(
+      dataFetcher: IRecommendationDataFetcher
+   ): Promise<IRecommendationService> {
+      const [user, futureLivestreams, pastLivestreams] = await Promise.all([
+         dataFetcher.getUser(),
+         dataFetcher.getFutureLivestreams(),
+         dataFetcher.getPastLivestreams(),
+      ])
+
+      return new UserEventRecommendationService(
+         user,
+         futureLivestreams,
+         pastLivestreams
+      )
    }
 }
