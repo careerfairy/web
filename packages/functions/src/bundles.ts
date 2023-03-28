@@ -25,6 +25,22 @@ export const bundles = {
                .where("test", "==", false),
       },
    },
+   futureLivestreamsNext15Days: {
+      name: "futureLivestreamsNext15Days",
+      cacheControl: "public, max-age=900", // 15min
+      queries: {
+         "future-livestreams-query": (firestore) =>
+            firestore
+               .collection("livestreams")
+               .where("start", ">", getEarliestEventBufferTime())
+               .where(
+                  "start",
+                  "<",
+                  DateTime.local().plus({ days: 15 }).toJSDate()
+               )
+               .where("test", "==", false),
+      },
+   },
 
    // Warning: may take ~20s to generate when not cached
    pastYearLivestreams: {
