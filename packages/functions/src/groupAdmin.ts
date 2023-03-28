@@ -354,7 +354,7 @@ export const getLivestreamReportData_v4 = functions.https.onCall(
                   livestreamData.id,
                   "participated"
                )
-            ).map((data) => data.user) || []
+            )?.map((data) => data.user) || []
 
          const groupPresenter =
             GroupPresenter.createFromDocument(requestingGroupData)
