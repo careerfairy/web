@@ -13,6 +13,7 @@ import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import LivestreamAutoComplete from "./LivestreamAutoComplete"
+import { OrderByDirection } from "@firebase/firestore"
 
 const spacing = 1
 
@@ -37,7 +38,11 @@ const styles = sxStyles({
    },
 })
 
-const GeneralSearchFilter = () => {
+type Props = {
+   order?: OrderByDirection
+}
+
+const GeneralSearchFilter = ({ order = "desc" }: Props) => {
    const isMobile = useIsMobile()
 
    const [localSelectedStats, setLocalSelectedStats] = useState<
@@ -50,9 +55,10 @@ const GeneralSearchFilter = () => {
       livestreamStatsTimeFrame,
    } = useAnalyticsPageContext()
 
-   const { data: livestreamStats } = useTimeFramedLivestreamStats(
-      livestreamStatsTimeFrame
-   )
+   const { data: livestreamStats } = useTimeFramedLivestreamStats({
+      timeFrame: livestreamStatsTimeFrame,
+      order,
+   })
 
    const isLoading = livestreamStats === undefined
 
