@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { useAnalyticsPageContext } from "../GeneralPageProvider"
+import {
+   TimeFrame,
+   TimeFrames,
+   useAnalyticsPageContext,
+} from "../GeneralPageProvider"
 import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import useTimeFramedLivestreamStats from "./useTimeFramedLivestreamStats"
@@ -9,7 +13,6 @@ import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import LivestreamAutoComplete from "./LivestreamAutoComplete"
-import { DateTime } from "luxon"
 
 const spacing = 1
 
@@ -41,10 +44,11 @@ const GeneralSearchFilter = () => {
       LiveStreamStats[]
    >([]) // [] means all livestreams are selected
 
-   const { setLivestreamStats } = useAnalyticsPageContext()
-
-   const [livestreamStatsTimeFrame, setLivestreamStatsTimeFrame] =
-      useState<TimeFrame>("Last 2 years")
+   const {
+      setLivestreamStats,
+      setLivestreamStatsTimeFrame,
+      livestreamStatsTimeFrame,
+   } = useAnalyticsPageContext()
 
    const { data: livestreamStats } = useTimeFramedLivestreamStats(
       livestreamStatsTimeFrame
@@ -139,30 +143,5 @@ const GeneralSearchFilter = () => {
 const timeFrameSelectProps = {
    renderValue: (val) => val,
 }
-
-export const TimeFrames = {
-   "Last 30 days": {
-      start: DateTime.local().minus({ days: 30 }).toJSDate(),
-      end: null, // null means we don't care about the end date
-   },
-   "Last 6 months": {
-      start: DateTime.local().minus({ months: 6 }).toJSDate(),
-      end: null,
-   },
-   "Last 1 year": {
-      start: DateTime.local().minus({ years: 1 }).toJSDate(),
-      end: null,
-   },
-   "Last 2 years": {
-      start: DateTime.local().minus({ years: 2 }).toJSDate(),
-      end: null,
-   },
-   "All time": {
-      start: new Date(0),
-      end: null,
-   },
-} as const
-
-export type TimeFrame = keyof typeof TimeFrames
 
 export default GeneralSearchFilter
