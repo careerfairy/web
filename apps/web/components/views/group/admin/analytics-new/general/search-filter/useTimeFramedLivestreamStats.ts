@@ -10,9 +10,13 @@ import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseIn
 import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useFirestoreCollection"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { OrderByDirection } from "@firebase/firestore"
 import { TimeFrame, TimeFrames } from "../GeneralPageProvider"
 
-const useTimeFramedLivestreamStats = (timeFrame: TimeFrame) => {
+const useTimeFramedLivestreamStats = (
+   timeFrame: TimeFrame,
+   order: OrderByDirection = "desc"
+) => {
    const { group } = useGroup()
    const livestreamStatsQuery = useMemo(() => {
       const timeFrameData = TimeFrames[timeFrame]
@@ -21,7 +25,7 @@ const useTimeFramedLivestreamStats = (timeFrame: TimeFrame) => {
          where("id", "==", "livestreamStats"),
          where("livestream.groupIds", "array-contains", group.id),
          where("livestream.start", ">=", timeFrameData.start),
-         orderBy("livestream.start", "desc"),
+         orderBy("livestream.start", order),
       ]
 
       if (timeFrameData.end) {
@@ -29,7 +33,7 @@ const useTimeFramedLivestreamStats = (timeFrame: TimeFrame) => {
       }
 
       return query(collectionGroup(FirestoreInstance, "stats"), ...constraints)
-   }, [group.id, timeFrame])
+   }, [group.id, order, timeFrame])
 
    return useFirestoreCollection<LiveStreamStats>(livestreamStatsQuery, {
       suspense: false,
