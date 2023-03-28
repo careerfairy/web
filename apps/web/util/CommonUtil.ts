@@ -215,6 +215,11 @@ export const capitalizeFirstLetter = (string: string) => {
    return string.charAt(0).toUpperCase() + string.slice(1)
 }
 
+export const titleCase = <T extends string>(string: T): T => {
+   if (!string) return string
+   return (string.charAt(0).toUpperCase() + string.slice(1).toLowerCase()) as T
+}
+
 export const errorLogAndNotify = (error: Error, metadata?: any) => {
    console.error("error", error)
    Sentry.captureException(error, metadata)

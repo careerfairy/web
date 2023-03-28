@@ -1,12 +1,16 @@
 import { LinearProgress } from "@mui/material"
 import { useGroup } from "layouts/GroupDashboardLayout"
-import { useCallback, useMemo, useState } from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { VALID_SOURCES } from "../../analytics/RegistrationSources/sources"
 import { sourcesByLivestream } from "../../analytics/RegistrationSources/transformations"
 import CardCustom from "../../common/CardCustom"
 import { useMainPageContext } from "../MainPageProvider"
 import { useRegistrationSourcesData } from "./useRegistrationSourcesData"
-import { SourceEntryArgs, SourcesProgress } from "../../common/SourcesProgress"
+import {
+   SourceEntryArgs,
+   SourcesProgress,
+   SourcesProgressTitle,
+} from "../../common/SourcesProgress"
 
 const CARD_OPTIONS = [
    "Next live stream",
@@ -110,8 +114,12 @@ const EmptySourcesProgress = () => {
    // Show all sources but with 0's
    return (
       <SourcesProgress
-         leftHeaderTitle={"Channel"}
-         rightHeaderTitle={"Users"}
+         leftHeaderComponent={
+            <SourcesProgressTitle>Channel</SourcesProgressTitle>
+         }
+         rightHeaderComponent={
+            <SourcesProgressTitle textAlign="right">Users</SourcesProgressTitle>
+         }
          sources={emptySources}
       />
    )
@@ -148,8 +156,14 @@ const LoadStaleWhileRevalidateStats = ({ groupId, livestream }) => {
          {/* @ts-ignore grey is a valid color */}
          {!livestream && !data.data && <LinearProgress color="grey" />}
          <SourcesProgress
-            leftHeaderTitle={"Channel"}
-            rightHeaderTitle={"Users"}
+            leftHeaderComponent={
+               <SourcesProgressTitle>Channel</SourcesProgressTitle>
+            }
+            rightHeaderComponent={
+               <SourcesProgressTitle textAlign="right">
+                  Users
+               </SourcesProgressTitle>
+            }
             sources={stats}
          />
       </>
