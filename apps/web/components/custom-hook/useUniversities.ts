@@ -4,27 +4,23 @@ import {
 } from "@careerfairy/shared-lib/dist/universities"
 import { useEffect, useState } from "react"
 import { errorLogAndNotify } from "../../util/CommonUtil"
-import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import { dynamicSort } from "@careerfairy/shared-lib/dist/utils"
 
 const useUniversitiesByCountryCodes = (
-   selectedCountryCodes: OptionGroup[]
+   selectedCountriesIds: string[]
 ): University[] => {
-   const [allUniversities, setAllUniversities] = useState([] as University[])
+   const [allUniversities, setAllUniversities] = useState<University[]>([])
    const firebase = useFirebaseService()
 
    // to get all the universities based on the selected countries sorted by alphabetic order
    useEffect(() => {
       ;(async () => {
-         if (selectedCountryCodes) {
-            if (selectedCountryCodes.length === 0) {
+         if (selectedCountriesIds) {
+            if (selectedCountriesIds.length === 0) {
                setAllUniversities([])
             } else {
                try {
-                  const selectedCountriesIds = selectedCountryCodes.map(
-                     (option) => option.id
-                  )
                   const universitiesSnapShot =
                      await firebase.getUniversitiesFromMultipleCountryCode(
                         selectedCountriesIds
@@ -45,7 +41,7 @@ const useUniversitiesByCountryCodes = (
             }
          }
       })()
-   }, [firebase, selectedCountryCodes])
+   }, [firebase, selectedCountriesIds])
 
    return allUniversities
 }

@@ -43,7 +43,7 @@ export const SourcesProgress: FC<Props> = (props) => {
       <Grid
          sx={styles.grid}
          alignItems="center"
-         spacing={props.flat ? 0.5 : 1}
+         spacing={props.flat ? spacing : 1}
          container
       >
          {props.leftHeaderComponent ? (
@@ -69,7 +69,12 @@ type LoadingProps = Omit<Props, "sources"> & {
 }
 export const LoadingSourcesProgress: FC<LoadingProps> = (props) => {
    return (
-      <Grid mt={1} sx={styles.grid} spacing={props.flat ? 0.5 : 1} container>
+      <Grid
+         mt={1}
+         sx={styles.grid}
+         spacing={props.flat ? spacing : 1}
+         container
+      >
          {props.leftHeaderComponent ? (
             <Grid item xs={6}>
                {props.leftHeaderComponent}
@@ -105,7 +110,7 @@ const normalGridStyles = {
 const flatGridStyles = {
    name: 2.5,
    progress: 9,
-   value: 0.5,
+   value: spacing,
 }
 const SourceEntry: FC<SourceEntryArgs> = ({
    percent,
@@ -200,7 +205,7 @@ const LoadingSourceEntry: FC<{
 }
 
 const SourceName = ({ name, help }: { name: ReactNode; help?: string }) => (
-   <Tooltip title={help} placement="top" followCursor>
+   <Tooltip title={help || ""} placement="top" followCursor>
       <Typography whiteSpace={"pre-line"} sx={styles.sourceText}>
          {name}
       </Typography>
