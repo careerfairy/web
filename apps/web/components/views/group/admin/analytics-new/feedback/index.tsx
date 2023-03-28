@@ -1,16 +1,19 @@
 import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo, useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { GeneralPageProvider } from "../general/GeneralPageProvider"
+import {
+   GeneralPageProvider,
+   useAnalyticsPageContext,
+} from "../general/GeneralPageProvider"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import Feedback from "../../analytics/Feedback"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useTimeFrames from "../../../../../custom-hook/useTimeFrames"
 import { UserType } from "../../analytics"
 import { useRouter } from "next/router"
-import useTimeFramedLivestreamStats from "../general/search-filter/useTimeFramedLivestreamStats"
 import { getCorrectPollOptionData } from "../../../../../../data/util/PollUtil"
 import { useFirebaseService } from "../../../../../../context/firebase/FirebaseServiceContext"
+import GeneralSearchFilter from "../general/search-filter/GeneralSearchFilter"
 
 const AnalyticsFeedbackPageContent = () => {
    return (
@@ -56,10 +59,7 @@ const streamDataTypes = [
 const PageContent = () => {
    const firebase = useFirebaseService()
    const { group } = useGroup()
-   const { data: livestreamStats } = useTimeFramedLivestreamStats(
-      "Last 1 year",
-      "asc"
-   )
+   const { livestreamStats } = useAnalyticsPageContext()
    const { globalTimeFrames } = useTimeFrames()
    const {
       query: { subsection },
@@ -223,6 +223,9 @@ const PageContent = () => {
       <Box py={2}>
          <Container maxWidth={false}>
             <Grid container spacing={spacing}>
+               <Grid xs={12} item>
+                  <GeneralSearchFilter order={"asc"} />
+               </Grid>
                <Feedback
                   group={group}
                   globalTimeFrame={globalTimeFrame}

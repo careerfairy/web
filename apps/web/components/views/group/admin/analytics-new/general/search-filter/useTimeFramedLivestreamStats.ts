@@ -13,10 +13,11 @@ import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { OrderByDirection } from "@firebase/firestore"
 import { TimeFrame, TimeFrames } from "../GeneralPageProvider"
 
-const useTimeFramedLivestreamStats = (
-   timeFrame: TimeFrame,
-   order: OrderByDirection = "desc"
-) => {
+type Props = {
+   timeFrame: TimeFrame
+   order?: OrderByDirection
+}
+const useTimeFramedLivestreamStats = ({ timeFrame, order = "desc" }: Props) => {
    const { group } = useGroup()
    const livestreamStatsQuery = useMemo(() => {
       const timeFrameData = TimeFrames[timeFrame]
