@@ -93,7 +93,8 @@ export class NewsletterService {
             const recommendationService = new UserEventRecommendationService(
                user,
                this.futureLivestreams,
-               this.pastLivestreams
+               this.pastLivestreams,
+               false
             )
 
             // no need to parallelize this, all the promises should be resolved
