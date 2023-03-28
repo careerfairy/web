@@ -94,6 +94,27 @@ export const StyledTab = styled(Tab)(({ theme }) => ({
    },
 })) as unknown as typeof Tab
 
+const rectangularTabsBorderRadius = 1
+
+export const StyledRectangularTabs = styled(StyledTabs)(({ theme }) => ({
+   [`& .${tabsClasses.flexContainer}`]: {
+      borderRadius: theme.spacing(rectangularTabsBorderRadius),
+      position: "relative",
+   },
+   [`& .${tabsClasses.scroller}`]: {
+      display: "inline-flex",
+   },
+   [`& .${tabsClasses.indicator}`]: {
+      marginTop: "auto",
+      marginBottom: "auto",
+      borderRadius: theme.spacing(rectangularTabsBorderRadius),
+      transform: "scale(0.85)",
+      [theme.breakpoints.down("sm")]: {
+         transform: "scale(0.9)",
+      },
+   },
+})) as typeof Tabs
+
 export const TabsSkeleton = styled(Skeleton)(({ theme }) => ({
    display: "inline-flex",
    borderRadius: theme.spacing(borderRadius),

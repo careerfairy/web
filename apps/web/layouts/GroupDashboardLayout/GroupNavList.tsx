@@ -135,7 +135,7 @@ const GroupNavList = () => {
                {
                   id: "live-stream",
                   href: `/${baseHrefPath}/${group.id}/admin/analytics/live-stream`,
-                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/live-stream`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/live-stream/[[...livestreamId]]`,
                   title: "Live stream analytics",
                },
                {

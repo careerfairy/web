@@ -18,21 +18,29 @@ const styles = sxStyles({
    },
 })
 
-export const StyledTextField: typeof TextField = styled(TextField)(() => ({
-   "& .MuiOutlinedInput-root": {
-      "& fieldset": {
+export const StyledTextField: typeof TextField = styled(TextField)(
+   ({ theme }) => ({
+      "& .MuiOutlinedInput-root": {
+         "& fieldset": {
+            borderColor: "transparent !important",
+         },
+      },
+      "& input": {
+         "&::placeholder": {
+            color: theme.palette.text.primary,
+            opacity: 1,
+         },
+      },
+      "& .MuiOutlinedInput-root.Mui-disabled": {
+         "& fieldset": {
+            borderColor: "transparent",
+         },
+      },
+      "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
          borderColor: "transparent",
       },
-   },
-   "& .MuiOutlinedInput-root.Mui-disabled": {
-      "& fieldset": {
-         borderColor: "transparent",
-      },
-   },
-   "& .MuiOutlinedInput-root.Mui-focused .MuiOutlinedInput-notchedOutline": {
-      borderColor: "transparent",
-   },
-})) as typeof TextField // https://mui.com/material-ui/guides/typescript/#complications-with-the-component-prop
+   })
+) as typeof TextField // https://mui.com/material-ui/guides/typescript/#complications-with-the-component-prop
 
 export const StyledMenuItem = styled(MenuItem)(({ theme }) => ({
    [theme.breakpoints.down("sm")]: {
