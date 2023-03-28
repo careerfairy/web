@@ -95,7 +95,7 @@ const LevelOfStudySelect = () => {
          renderOption={renderOption}
          listBoxCustomProps={listboxCustomProps}
          isOptionEqualToValue={isOptionEqualToValue}
-         value={filters.selectedFieldOfStudy?.id || null}
+         value={filters.selectedLevelOfStudy?.id || null}
          getOptionLabel={getOptionLabel}
          renderInput={(params) => (
             <StyledTextField
