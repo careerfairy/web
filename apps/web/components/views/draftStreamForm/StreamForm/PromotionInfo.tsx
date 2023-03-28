@@ -37,7 +37,7 @@ const PromotionInfo = ({
    isPastStream = false,
 }: Props) => {
    const allUniversities = useUniversitiesByCountryCodes(
-      promotionCountriesCodes
+      promotionCountriesCodes.map((item) => item.id)
    )
    const { showPromotionInputs, isPromotionInputsDisabled } =
       useStreamCreationProvider()
