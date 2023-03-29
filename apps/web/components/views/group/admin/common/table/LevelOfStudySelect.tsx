@@ -10,8 +10,7 @@ import { useUserDataTable } from "./UserDataTableProvider"
 
 const styles = sxStyles({
    root: {
-      minWidth: 150,
-      maxWidth: 150,
+      flex: 1,
    },
    optionRoot: {
       flex: 1,
