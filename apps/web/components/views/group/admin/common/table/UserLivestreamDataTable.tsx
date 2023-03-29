@@ -1,15 +1,18 @@
-import React, { FC, useCallback, useMemo, useState } from "react"
+import React, { FC, ReactNode, useCallback, useMemo, useState } from "react"
 import MaterialTable, {
    Column,
    Localization,
+   MTablePagination,
    Options,
 } from "@material-table/core"
 import { OrderByDirection } from "@firebase/firestore"
 import {
    Box,
+   Button,
    Divider,
    IconButton,
    Skeleton,
+   TablePagination,
    Tooltip,
    Typography,
 } from "@mui/material"
@@ -27,7 +30,10 @@ import UniversitySelect from "./UniversitySelect"
 import FieldOfStudySelect from "./FieldOfStudySelect"
 import LevelOfStudySelect from "./LevelOfStudySelect"
 import ResetFiltersIcon from "@mui/icons-material/RotateLeft"
+import CopyIcon from "@mui/icons-material/ContentCopy"
 import { useUserDataTable } from "./UserDataTableProvider"
+import ExportIcon from "@mui/icons-material/ListAltOutlined"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
 
 export type SortedTableColumn = {
    field: string
@@ -75,6 +81,12 @@ const styles = sxStyles({
    skeletonFilter: {
       borderRadius: 2,
       flex: 0.3,
+   },
+   actionsWrapper: {
+      "& button": {
+         padding: [0.5, 1],
+         borderRadius: 2,
+      },
    },
 })
 
@@ -282,13 +294,68 @@ const UserLivestreamDataTable = () => {
             page={results.page - 1}
             onPageChange={handlePageChange}
             onOrderChange={handleSortModelChange}
+            components={{
+               Pagination: (props) => (
+                  <Stack
+                     overflow="auto"
+                     px={4}
+                     justifyContent="space-between"
+                     direction={{ xs: "column", sm: "row" }}
+                  >
+                     <Stack
+                        divider={<Divider orientation="vertical" flexItem />}
+                        overflow="auto"
+                        direction="row"
+                        alignItems="center"
+                        spacing={2}
+                        sx={styles.actionsWrapper}
+                     >
+                        <Typography variant="body1" fontWeight={"500"}>
+                           {results.countQueryResponse.count} talents found
+                        </Typography>
+                        <ResponsiveButton
+                           text="Export All Users"
+                           icon={<ExportIcon />}
+                        />
+                        <ResponsiveButton
+                           text="Download All CVs"
+                           icon={<DownloadIcon />}
+                        />
+                        <ResponsiveButton
+                           text="Copy All Emails"
+                           icon={<CopyIcon />}
+                        />
+                     </Stack>
+                     <span>
+                        <TablePagination {...props} />
+                     </span>
+                  </Stack>
+               ),
+            }}
          />
       </Box>
    )
 }
 
-type ToolbarProps = {}
-const Toolbar: FC<ToolbarProps> = () => {
+type ResponsiveButtonProps = {
+   text: string
+   icon: ReactNode
+}
+const ResponsiveButton: FC<ResponsiveButtonProps> = ({ text, icon }) => {
+   const isMobile = useIsMobile()
+
+   return isMobile ? (
+      <Tooltip title={text} placement="top" color="primary" arrow>
+         <IconButton>{icon}</IconButton>
+      </Tooltip>
+   ) : (
+      <Button size="small" color="primary" variant="text" startIcon={icon}>
+         {text}
+      </Button>
+   )
+}
+
+const Toolbar: FC = () => {
    const { filters, resetFilters } = useUserDataTable()
 
    const filterActive = useMemo<boolean>(() => {
