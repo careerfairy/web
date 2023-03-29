@@ -27,9 +27,12 @@ export const CountriesSelect = () => {
 
    const handleChange = useCallback(
       (event: React.SyntheticEvent, value: string[]) => {
+         // If the user clears the input, it means they unselected all countries,
+         // therefore we must all reset the selectedUniversity
          if (!value.length) {
             setFilters((prev) => ({ ...prev, selectedUniversity: null }))
          }
+
          setFilters((prev) => ({ ...prev, selectedCountryCodes: value }))
       },
       [setFilters]
