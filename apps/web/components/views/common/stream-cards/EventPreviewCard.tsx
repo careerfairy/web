@@ -65,7 +65,8 @@ const styles = {
       height: "auto",
    },
    flippedCardContent: {
-      display: "none",
+      position: "absolute",
+      opacity: "0",
    },
    contentWrapper: {
       display: "flex",
@@ -93,6 +94,8 @@ const styles = {
             background: "unset",
          },
          "& .flippedCardContent": {
+            position: "unset",
+            opacity: "1",
             display: "flex",
             justifyContent: "center",
             mt: 6,
