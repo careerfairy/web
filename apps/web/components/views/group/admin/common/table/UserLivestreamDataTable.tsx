@@ -388,7 +388,7 @@ const Footer: FC<FooterProps> = ({
                      : `${totalUsers} talents found`}
                </Typography>
                <ResponsiveButton
-                  text="Export Users"
+                  text="Export Talents"
                   disabled={emptyQuery}
                   onClick={handleExportUsers}
                   loading={exportingUsers}
