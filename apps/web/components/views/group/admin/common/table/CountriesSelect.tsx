@@ -5,7 +5,7 @@ import { getMaxLineStyles } from "../../../../../helperFunctions/HelperFunctions
 import { StyledCheckbox, StyledTextField } from "../inputs"
 import VirtualizedAutocomplete from "../../../../common/VirtualizedAutocomplete"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { useUserLivestreamDataTableContext } from "./UserLivestreamDataTableProvider"
+import { useUserDataTableContext } from "./UserDataTableProvider"
 
 const styles = sxStyles({
    root: {
@@ -22,8 +22,7 @@ const styles = sxStyles({
    },
 })
 export const CountriesSelect = () => {
-   const { countriesLookup, filters, setFilters } =
-      useUserLivestreamDataTableContext()
+   const { countriesLookup, filters, setFilters } = useUserDataTableContext()
    const limit = 10
 
    const handleChange = useCallback(

@@ -6,7 +6,7 @@ import { StyledTextField } from "../inputs"
 import VirtualizedAutocomplete from "../../../../common/VirtualizedAutocomplete"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { useUserLivestreamDataTableContext } from "./UserLivestreamDataTableProvider"
+import { useUserDataTableContext } from "./UserDataTableProvider"
 
 const styles = sxStyles({
    root: {
@@ -34,7 +34,7 @@ const styles = sxStyles({
 })
 const FieldOfStudySelect = () => {
    const { setFilters, filters, fieldsOfStudyLookup } =
-      useUserLivestreamDataTableContext()
+      useUserDataTableContext()
 
    const handleChange = useCallback(
       (event: React.SyntheticEvent, value: string) => {

@@ -1,5 +1,4 @@
 import React, { FC, useCallback, useMemo, useState } from "react"
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import MaterialTable, {
    Column,
    Localization,
@@ -16,20 +15,19 @@ import {
 } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
-import usePaginatedLivestreamUsers from "../../analytics-new/live-stream/users/usePaginatedLivestreamUsers"
+import usePaginatedUsersCollection from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
 import Stack from "@mui/material/Stack"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { LINKEDIN_COLOR } from "../../../../../util/colors"
 import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
 import { LoadingButton } from "@mui/lab"
 import { useDownloadCV } from "./hooks"
-import { sanitizeUserLivestreamData } from "./util"
 import { CountriesSelect } from "./CountriesSelect"
 import UniversitySelect from "./UniversitySelect"
 import FieldOfStudySelect from "./FieldOfStudySelect"
 import LevelOfStudySelect from "./LevelOfStudySelect"
 import ResetFiltersIcon from "@mui/icons-material/RotateLeft"
-import { useUserLivestreamDataTableContext } from "./UserLivestreamDataTableProvider"
+import { useUserDataTableContext } from "./UserDataTableProvider"
 
 export type SortModel = {
    field: string
@@ -80,7 +78,19 @@ const styles = sxStyles({
    },
 })
 
-const baseOptions: Options<UserLivestreamData> = {
+export type UserDataEntry = {
+   firstName: string
+   lastName: string
+   email: string
+   universityCountryCode: string
+   universityName: string
+   fieldOfStudy: string
+   levelOfStudy: string
+   resumeUrl: string
+   linkedInUrl: string
+}
+
+const baseOptions: Options<UserDataEntry> = {
    pageSizeOptions: [5, 10, 25, 50, 100],
    padding: "dense",
    search: false,
@@ -98,13 +108,15 @@ const localization: Localization = {
 }
 
 const UserLivestreamDataTable = () => {
-   const { filters, livestreamId } = useUserLivestreamDataTableContext()
+   const { filters, documentPaths, converterFn, targetCollectionQuery } =
+      useUserDataTableContext()
 
    const [rowsPerPage, setRowsPerPage] = useState(10)
    const [sortModel, setSortModel] = useState<SortModel>(null)
 
-   const results = usePaginatedLivestreamUsers(
-      livestreamId,
+   const results = usePaginatedUsersCollection(
+      targetCollectionQuery,
+      documentPaths,
       rowsPerPage,
       sortModel,
       filters
@@ -121,6 +133,116 @@ const UserLivestreamDataTable = () => {
       [results]
    )
 
+   const data = useMemo(
+      () => results.data?.map(converterFn) || [],
+      [converterFn, results.data]
+   )
+
+   const options = useMemo<Options<UserDataEntry>>(
+      () => ({
+         ...baseOptions,
+         pageSize: rowsPerPage,
+      }),
+      [rowsPerPage]
+   )
+
+   const columns = useMemo<Column<UserDataEntry>[]>(
+      () => [
+         {
+            field: "firstName",
+            title: "Full Name & Email",
+            cellStyle: {
+               minWidth: 180,
+            },
+            render: RenderFullNameAndEmailColumn,
+            id: documentPaths.userFirstName,
+         },
+         {
+            field: "universityCountryCode",
+            title: "Country",
+            lookup: universityCountriesMap,
+            id: documentPaths.userUniversityCountryCode,
+         },
+         {
+            field: "universityName",
+            title: "University Name",
+            cellStyle: {
+               minWidth: 200,
+            },
+            id: documentPaths.userUniversityName,
+         },
+         {
+            title: "Field Of Study",
+            field: "fieldOfStudy",
+            cellStyle: {
+               minWidth: 200,
+            },
+            id: documentPaths.userFieldOfStudyName,
+         },
+         {
+            title: "Level Of Study",
+            field: "levelOfStudy",
+            cellStyle: {
+               minWidth: 100,
+            },
+            id: documentPaths.userFieldOfStudyName,
+         },
+         {
+            field: "resume",
+            title: "CV",
+            type: "boolean",
+            searchable: false,
+            render: CVColumn,
+            cellStyle: {
+               width: 300,
+            },
+            id: documentPaths.userResume,
+         },
+         {
+            render: RowActions,
+            sorting: false,
+            export: false,
+         },
+         {
+            field: "email",
+            title: "User Email",
+            cellStyle: {
+               minWidth: 150,
+            },
+            hidden: true,
+            id: documentPaths.userEmail,
+         },
+         {
+            field: "firstName",
+            title: "First Name",
+            hidden: true,
+            cellStyle: {
+               minWidth: 150,
+            },
+            id: documentPaths.userFirstName,
+         },
+         {
+            hidden: true,
+            field: "lastName",
+            title: "Last Name",
+
+            cellStyle: {
+               minWidth: 150,
+            },
+            id: documentPaths.userLastName,
+         },
+      ],
+      [
+         documentPaths.userFieldOfStudyName,
+         documentPaths.userFirstName,
+         documentPaths.userLastName,
+         documentPaths.userUniversityCountryCode,
+         documentPaths.userUniversityName,
+         documentPaths.userResume,
+         documentPaths.userEmail,
+      ]
+   )
+
    const handlePageSizeChange = useCallback((pageSize: number) => {
       setRowsPerPage(pageSize)
    }, [])
@@ -131,25 +253,15 @@ const UserLivestreamDataTable = () => {
             setSortModel(null)
             return
          }
-         const targetColumn = columns[columnIndex]
+         const targetPathKey = columns[columnIndex]
+            .id as keyof typeof documentPaths
+
          setSortModel({
-            field: targetColumn.field as string,
+            field: targetPathKey,
             sort: orderDirection,
          })
       },
-      []
-   )
-
-   const data = useMemo(
-      () => sanitizeUserLivestreamData(results.data),
-      [results.data]
-   )
-   const options = useMemo<Options<UserLivestreamData>>(
-      () => ({
-         ...baseOptions,
-         pageSize: rowsPerPage,
-      }),
-      [rowsPerPage]
+      [columns]
    )
 
    return (
@@ -171,33 +283,9 @@ const UserLivestreamDataTable = () => {
    )
 }
 
-export const TableSkeleton = () => {
-   return (
-      <Box sx={styles.root}>
-         <Stack width="100%" direction="row" spacing={2} p={2}>
-            {Array.from({ length: 4 }).map((_, index) => (
-               <Skeleton
-                  variant="rectangular"
-                  sx={styles.skeletonFilter}
-                  height={50}
-                  key={index}
-               />
-            ))}
-         </Stack>
-         <MaterialTable
-            data={[]}
-            options={{ ...baseOptions, showEmptyDataSourceMessage: false }}
-            isLoading
-            localization={localization}
-            columns={columns}
-         />
-      </Box>
-   )
-}
-
 type ToolbarProps = {}
 const Toolbar: FC<ToolbarProps> = () => {
-   const { filters, resetFilters } = useUserLivestreamDataTableContext()
+   const { filters, resetFilters } = useUserDataTableContext()
 
    const filterActive = useMemo<boolean>(() => {
       return Boolean(
@@ -239,24 +327,24 @@ const Toolbar: FC<ToolbarProps> = () => {
    )
 }
 
-const RenderFullNameAndEmailColumn = (rowData: UserLivestreamData) => {
+const RenderFullNameAndEmailColumn = (rowData: UserDataEntry) => {
    return (
       <Box>
          <Typography gutterBottom fontWeight={600} variant="body1">
-            {rowData.user.firstName} {rowData.user.lastName}
+            {rowData.firstName} {rowData.lastName}
          </Typography>
          <Typography variant="body2" color="textSecondary">
-            {rowData.user.userEmail}
+            {rowData.email}
          </Typography>
       </Box>
    )
 }
 
-const CVColumn = (rowData: UserLivestreamData) => {
-   const { handleDownloadCV, downloading } = useDownloadCV(rowData.user)
+const CVColumn = (rowData: UserDataEntry) => {
+   const { handleDownloadCV, downloading } = useDownloadCV(rowData)
 
-   return rowData.user.userResume ? (
-      <Tooltip title={`Download CV for ${rowData.user.firstName}`}>
+   return rowData.resumeUrl ? (
+      <Tooltip title={`Download CV for ${rowData.firstName}`}>
          <LoadingButton
             loading={downloading}
             onClick={handleDownloadCV}
@@ -273,14 +361,14 @@ const CVColumn = (rowData: UserLivestreamData) => {
 }
 
 const iconWidth = 40
-const RowActions = (rowData: UserLivestreamData) => {
+const RowActions = (rowData: UserDataEntry) => {
    return (
       <Stack alignItems="center" direction="row">
          <Box width={iconWidth}>
-            {rowData.user.linkedinUrl ? (
+            {rowData.linkedInUrl ? (
                <IconButton
                   component="a"
-                  href={rowData.user.linkedinUrl}
+                  href={rowData.linkedInUrl}
                   target="_blank"
                   sx={styles.linkedInIcon}
                >
@@ -292,9 +380,9 @@ const RowActions = (rowData: UserLivestreamData) => {
    )
 }
 
-const columns: Column<UserLivestreamData>[] = [
+const skeletonColumns: Column<UserDataEntry>[] = [
    {
-      field: "user.firstName",
+      field: "firstName",
       title: "Full Name & Email",
       cellStyle: {
          minWidth: 180,
@@ -302,12 +390,12 @@ const columns: Column<UserLivestreamData>[] = [
       render: RenderFullNameAndEmailColumn,
    },
    {
-      field: "user.universityCountryCode",
+      field: "universityCountryCode",
       title: "Country",
       lookup: universityCountriesMap,
    },
    {
-      field: "user.university.name",
+      field: "universityName",
       title: "University Name",
       cellStyle: {
          minWidth: 200,
@@ -315,20 +403,20 @@ const columns: Column<UserLivestreamData>[] = [
    },
    {
       title: "Field Of Study",
-      field: "user.fieldOfStudy.name",
+      field: "fieldOfStudy",
       cellStyle: {
          minWidth: 200,
       },
    },
    {
       title: "Level Of Study",
-      field: "user.levelOfStudy.name",
+      field: "levelOfStudy",
       cellStyle: {
          minWidth: 100,
       },
    },
    {
-      field: "user.userResume",
+      field: "resume",
       title: "CV",
       type: "boolean",
       searchable: false,
@@ -340,31 +428,30 @@ const columns: Column<UserLivestreamData>[] = [
    {
       render: RowActions,
    },
-   {
-      field: "user.userEmail",
-      title: "User Email",
-      cellStyle: {
-         minWidth: 150,
-      },
-      hidden: true,
-   },
-   {
-      field: "user.firstName",
-      title: "First Name",
-      hidden: true,
-      cellStyle: {
-         minWidth: 150,
-      },
-   },
-   {
-      hidden: true,
-      field: "user.lastName",
-      title: "Last Name",
-
-      cellStyle: {
-         minWidth: 150,
-      },
-   },
 ]
+
+export const TableSkeleton = () => {
+   return (
+      <Box sx={styles.root}>
+         <Stack width="100%" direction="row" spacing={2} p={2}>
+            {Array.from({ length: 4 }).map((_, index) => (
+               <Skeleton
+                  variant="rectangular"
+                  sx={styles.skeletonFilter}
+                  height={50}
+                  key={index}
+               />
+            ))}
+         </Stack>
+         <MaterialTable
+            data={[]}
+            options={{ ...baseOptions, showEmptyDataSourceMessage: false }}
+            isLoading
+            localization={localization}
+            columns={skeletonColumns}
+         />
+      </Box>
+   )
+}
 
 export default UserLivestreamDataTable
