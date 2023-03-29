@@ -10,18 +10,16 @@ export type DownloadData = {
 }
 
 export const handleDownloadPDF = async (url: string, fileName: string) => {
-   return fetch(url)
-      .then((resp) => resp.arrayBuffer())
-      .then((resp) => {
-         // set the blob type to final pdf
-         const file = new Blob([resp], { type: "application/pdf" })
-         // process to auto download it
-         const fileURL = URL.createObjectURL(file)
-         const link = document.createElement("a")
-         link.href = fileURL
-         link.download = fileName + new Date() + ".pdf"
-         link.click()
-      })
+   const resp = await fetch(url)
+   const blobParts: ArrayBuffer = await resp.arrayBuffer()
+   // set the blob type to final pdf
+   const file = new Blob([blobParts], { type: "application/pdf" })
+   // process to auto download it
+   const fileURL = URL.createObjectURL(file)
+   const link = document.createElement("a")
+   link.href = fileURL
+   link.download = fileName + new Date() + ".pdf"
+   link.click()
 }
 
 export const batchPDFDownload = async (
