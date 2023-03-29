@@ -224,7 +224,7 @@ const FeedbackCardContent = ({
                         </TableCell>
                         <TableCell align="right" sx={{ paddingRight: 0 }}>
                            <Link
-                              href={`/group/${groupId}/admin/analytics?section=2&subsection=2&livestreamId=${row.livestream.id}`}
+                              href={`/group/${groupId}/admin/analytics/feedback`}
                               underline="none"
                               color="secondary"
                            >
