@@ -27,11 +27,11 @@ import UniversitySelect from "./UniversitySelect"
 import FieldOfStudySelect from "./FieldOfStudySelect"
 import LevelOfStudySelect from "./LevelOfStudySelect"
 import ResetFiltersIcon from "@mui/icons-material/RotateLeft"
-import { useUserDataTableContext } from "./UserDataTableProvider"
+import { useUserDataTable } from "./UserDataTableProvider"
 
-export type SortModel = {
+export type SortedTableColumn = {
    field: string
-   sort: OrderByDirection
+   direction: OrderByDirection
 }
 
 const styles = sxStyles({
@@ -109,16 +109,17 @@ const localization: Localization = {
 
 const UserLivestreamDataTable = () => {
    const { filters, documentPaths, converterFn, targetCollectionQuery } =
-      useUserDataTableContext()
+      useUserDataTable()
 
    const [rowsPerPage, setRowsPerPage] = useState(10)
-   const [sortModel, setSortModel] = useState<SortModel>(null)
+   const [sortedTableColumn, setSortedTableColumn] =
+      useState<SortedTableColumn>(null)
 
    const results = usePaginatedUsersCollection(
       targetCollectionQuery,
       documentPaths,
       rowsPerPage,
-      sortModel,
+      sortedTableColumn,
       filters
    )
 
@@ -249,16 +250,19 @@ const UserLivestreamDataTable = () => {
 
    const handleSortModelChange = useCallback(
       (columnIndex: number, orderDirection: "asc" | "desc"): void => {
+         // if columnIndex is -1, it means that the user clicked and toggled the sort off,
+         // so we need to reset the sortedTableColumn
          if (columnIndex === -1) {
-            setSortModel(null)
+            setSortedTableColumn(null)
             return
          }
+
          const targetPathKey = columns[columnIndex]
             .id as keyof typeof documentPaths
 
-         setSortModel({
+         setSortedTableColumn({
             field: targetPathKey,
-            sort: orderDirection,
+            direction: orderDirection,
          })
       },
       [columns]
@@ -285,7 +289,7 @@ const UserLivestreamDataTable = () => {
 
 type ToolbarProps = {}
 const Toolbar: FC<ToolbarProps> = () => {
-   const { filters, resetFilters } = useUserDataTableContext()
+   const { filters, resetFilters } = useUserDataTable()
 
    const filterActive = useMemo<boolean>(() => {
       return Boolean(
