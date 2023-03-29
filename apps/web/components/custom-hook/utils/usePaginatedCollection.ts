@@ -123,6 +123,7 @@ const usePaginatedCollection = <T = DocumentData>(
       result.data?.size,
    ])
 
+   // Reset the cursor pagination when the options change for better UX
    const reset = useCallback(() => {
       setCursor(0)
       setPrevNavigation(false)

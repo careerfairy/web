@@ -1,6 +1,5 @@
 import { prettyLocalizedDate } from "../../../../../helperFunctions/HelperFunctions"
-import { UserData } from "@careerfairy/shared-lib/users"
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import { UserDataEntry } from "./UserLivestreamDataTable"
 
 export const handleDownloadPDF = async (url: string, fileName: string) => {
    return fetch(url)
@@ -17,32 +16,7 @@ export const handleDownloadPDF = async (url: string, fileName: string) => {
       })
 }
 
-export const getFileName = (userData: UserData) =>
+export const getFileName = (userData: UserDataEntry) =>
    `${userData.firstName} ${userData.lastName} CV - ${prettyLocalizedDate(
       new Date()
    )}`
-
-/*
- * Some old UserLivestreamData documents have deprecated fields that are strings instead of objects.
- * This causes the table to crash, so we need to sanitize the data before rendering it.
- * */
-export const sanitizeUserLivestreamData = (
-   data: UserLivestreamData[]
-): UserLivestreamData[] => {
-   return (
-      data?.map((d) => ({
-         ...d,
-         user: {
-            ...d.user,
-            levelOfStudy:
-               typeof d.user.levelOfStudy === "string"
-                  ? null
-                  : d.user.levelOfStudy,
-            fieldOfStudy:
-               typeof d.user.fieldOfStudy === "string"
-                  ? null
-                  : d.user.fieldOfStudy,
-         },
-      })) ?? []
-   )
-}

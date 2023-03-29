@@ -1,42 +1,38 @@
 import usePaginatedCollection, {
    UsePaginatedCollection,
 } from "components/custom-hook/utils/usePaginatedCollection"
-import { FirestoreInstance } from "data/firebase/FirebaseInstance"
-import { collection, query, where, orderBy } from "firebase/firestore"
+import { orderBy, query, where } from "firebase/firestore"
 import { useMemo } from "react"
-import {
-   LivestreamUserAction,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
 import { SortModel } from "../../../common/table/UserLivestreamDataTable"
-import { QueryConstraint } from "@firebase/firestore"
+import { CollectionReference, QueryConstraint } from "@firebase/firestore"
 import { University } from "@careerfairy/shared-lib/universities"
 import {
    FieldOfStudy,
    LevelOfStudy,
 } from "@careerfairy/shared-lib/fieldOfStudy"
+import { DocumentPaths } from "../../../common/table/UserDataTableProvider"
 
 export type Filters = {
    selectedCountryCodes: string[]
    selectedUniversity: University
    selectedFieldOfStudy: FieldOfStudy
    selectedLevelOfStudy: LevelOfStudy
-   userType: LivestreamUserAction
 }
-const usePaginatedLivestreamUsers = (
-   livestreamId: string,
+const usePaginatedUsersCollection = (
+   targetCollectionRef: CollectionReference,
+   documentPaths: DocumentPaths,
    limit = 10,
    sortModel: SortModel,
    filters: Filters
 ) => {
    // @ts-ignore we're sorting by a nested field here
-   const options: UsePaginatedCollection<UserLivestreamData> = useMemo(() => {
+   const options: UsePaginatedCollection<unknown> = useMemo(() => {
       const constraints: QueryConstraint[] = []
 
       if (filters.selectedCountryCodes.length) {
          constraints.push(
             where(
-               "user.universityCountryCode",
+               documentPaths.userUniversityCountryCode,
                "in",
                filters.selectedCountryCodes
             )
@@ -45,19 +41,31 @@ const usePaginatedLivestreamUsers = (
 
       if (filters.selectedUniversity) {
          constraints.push(
-            where("user.university.code", "==", filters.selectedUniversity.id)
+            where(
+               documentPaths.userUniversityCode,
+               "==",
+               filters.selectedUniversity.id
+            )
          )
       }
 
       if (filters.selectedFieldOfStudy) {
          constraints.push(
-            where("user.fieldOfStudy.id", "==", filters.selectedFieldOfStudy.id)
+            where(
+               documentPaths.userFieldOfStudyId,
+               "==",
+               filters.selectedFieldOfStudy.id
+            )
          )
       }
 
       if (filters.selectedLevelOfStudy) {
          constraints.push(
-            where("user.levelOfStudy.id", "==", filters.selectedLevelOfStudy.id)
+            where(
+               documentPaths.userLevelOfStudyId,
+               "==",
+               filters.selectedLevelOfStudy.id
+            )
          )
       }
 
@@ -66,35 +74,35 @@ const usePaginatedLivestreamUsers = (
       }
 
       return {
-         query: query<UserLivestreamData>(
+         query: query<unknown>(
             // @ts-ignore
-            collection(
-               FirestoreInstance,
-               "livestreams",
-               livestreamId,
-               "userLivestreamData"
-            ),
+            targetCollectionRef,
             ...constraints
          ),
          limit,
          orderBy: {
-            field: `${filters.userType}.date`,
-            direction: "desc",
+            field: documentPaths.orderBy,
+            direction: documentPaths.orderDirection,
          },
          getTotalCount: true,
       }
    }, [
-      sortModel,
       filters.selectedCountryCodes,
       filters.selectedUniversity,
       filters.selectedFieldOfStudy,
       filters.selectedLevelOfStudy,
-      filters.userType,
-      livestreamId,
+      sortModel,
+      targetCollectionRef,
       limit,
+      documentPaths.orderBy,
+      documentPaths.orderDirection,
+      documentPaths.userUniversityCountryCode,
+      documentPaths.userUniversityCode,
+      documentPaths.userFieldOfStudyId,
+      documentPaths.userLevelOfStudyId,
    ])
 
-   return usePaginatedCollection<UserLivestreamData>(options)
+   return usePaginatedCollection<unknown>(options)
 }
 
-export default usePaginatedLivestreamUsers
+export default usePaginatedUsersCollection

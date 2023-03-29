@@ -1,18 +1,17 @@
 import { useCallback, useMemo, useState } from "react"
-import { UserData } from "@careerfairy/shared-lib/users"
 import { getFileName, handleDownloadPDF } from "./util"
 import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
 import { useCopyToClipboard } from "react-use"
+import { UserDataEntry } from "./UserLivestreamDataTable"
 
-export const useDownloadCV = (user: UserData) => {
+export const useDownloadCV = (user: UserDataEntry) => {
    const { errorNotification } = useSnackbarNotifications()
    const [downloading, setDownloading] = useState(false)
 
    const handleDownloadCV = useCallback(async () => {
       try {
          setDownloading(true)
-         await handleDownloadPDF(user.userResume, getFileName(user))
+         await handleDownloadPDF(user.resumeUrl, getFileName(user))
       } catch (e) {
          errorNotification(e, "Error downloading CV")
       } finally {
@@ -29,16 +28,16 @@ export const useDownloadCV = (user: UserData) => {
    )
 }
 
-export const useCopyEmails = (users: UserLivestreamData[]) => {
+export const useCopyEmails = (users: UserDataEntry[]) => {
    const { successNotification } = useSnackbarNotifications()
    const [_, copyToClipboard] = useCopyToClipboard()
 
    return useCallback(() => {
       const emailAddresses = users
-         .filter((data) => data.user.id)
-         .map((data) => data.user.id)
+         .filter((data) => data.email)
+         .map((data) => data.email)
          .join(",")
       copyToClipboard(emailAddresses)
-      successNotification("LinkedIn addresses have been copied!")
+      successNotification("Email addresses have been copied!")
    }, [copyToClipboard, successNotification, users])
 }

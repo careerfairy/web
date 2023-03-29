@@ -8,7 +8,7 @@ import { sxStyles } from "../../../../../../types/commonTypes"
 import useUniversitiesByCountryCodes from "../../../../../custom-hook/useUniversities"
 import { University } from "@careerfairy/shared-lib/universities"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
-import { useUserLivestreamDataTableContext } from "./UserLivestreamDataTableProvider"
+import { useUserDataTableContext } from "./UserDataTableProvider"
 
 const styles = sxStyles({
    root: {
@@ -35,7 +35,7 @@ const styles = sxStyles({
    },
 })
 const UniversitySelect = () => {
-   const { filters, setFilters } = useUserLivestreamDataTableContext()
+   const { filters, setFilters } = useUserDataTableContext()
 
    const universities = useUniversitiesByCountryCodes(
       filters.selectedCountryCodes

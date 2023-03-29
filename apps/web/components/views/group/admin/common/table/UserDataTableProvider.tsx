@@ -1,4 +1,4 @@
-import { Filters } from "../../analytics-new/live-stream/users/usePaginatedLivestreamUsers"
+import { Filters } from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
 import React, {
    createContext,
    FC,
@@ -9,7 +9,29 @@ import React, {
    useState,
 } from "react"
 import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
-import { LivestreamUserAction } from "@careerfairy/shared-lib/livestreams"
+import { DocumentData, CollectionReference } from "@firebase/firestore"
+import { UserDataEntry } from "./UserLivestreamDataTable"
+
+/*
+ * An object containing the paths to the fields in the document that we want to query
+ * Since this is a generic component, we need to pass in the paths to the fields we want to query and sort by
+ * */
+export type DocumentPaths = {
+   userEmail: string
+   userFieldOfStudyName: string
+   userFieldOfStudyId: string
+   userLevelOfStudyName: string
+   userLevelOfStudyId: string
+   userFirstName: string
+   userLastName: string
+   userUniversityCode: string
+   userUniversityName: string
+   userUniversityCountryCode: string
+   userResume: string
+   userLinkedIn: string
+   orderBy: string
+   orderDirection: "asc" | "desc"
+}
 
 type UserLivestreamDataTableContextValue = {
    countriesLookup: Record<string, string>
@@ -19,7 +41,9 @@ type UserLivestreamDataTableContextValue = {
    filters: Filters
    setFilters: React.Dispatch<React.SetStateAction<Filters>>
    resetFilters: () => void
-   livestreamId: string
+   documentPaths: DocumentPaths
+   targetCollectionQuery: CollectionReference<DocumentData>
+   converterFn: (doc: unknown) => UserDataEntry
 }
 const UserLivestreamDataTableContext =
    createContext<UserLivestreamDataTableContextValue>({
@@ -31,18 +55,35 @@ const UserLivestreamDataTableContext =
          selectedFieldOfStudy: null,
          selectedUniversity: null,
          selectedCountryCodes: [],
-         userType: "registered",
       },
       setFilters: () => {},
       resetFilters: () => {},
-      livestreamId: "",
+      documentPaths: {
+         userFieldOfStudyName: "",
+         userFieldOfStudyId: "",
+         userLevelOfStudyName: "",
+         userLevelOfStudyId: "",
+         userUniversityCode: "",
+         userUniversityCountryCode: "",
+         userUniversityName: "",
+         userFirstName: "",
+         userLastName: "",
+         orderBy: "",
+         orderDirection: "asc",
+         userLinkedIn: "",
+         userEmail: "",
+         userResume: "",
+      },
+      targetCollectionQuery: null,
+      converterFn: () => null,
    })
 
 type Props = {
    fieldsOfStudyLookup: Record<string, string>
    levelsOfStudyLookup: Record<string, string>
-   livestreamId: string
-   userType: LivestreamUserAction
+   documentPaths: DocumentPaths
+   targetCollectionQuery: CollectionReference<DocumentData>
+   converterFn: (doc: unknown) => UserDataEntry
 }
 
 const initialFilters: Filters = {
@@ -50,30 +91,26 @@ const initialFilters: Filters = {
    selectedLevelOfStudy: null,
    selectedUniversity: null,
    selectedCountryCodes: [],
-   userType: "registered",
 }
 
-const getInitialFilters = (userType: Filters["userType"]): Filters => ({
-   ...initialFilters,
-   userType,
-})
-const UserLivestreamDataTableProvider: FC<Props> = ({
+const UserDataTableProvider: FC<Props> = ({
    children,
-   livestreamId,
    fieldsOfStudyLookup,
    levelsOfStudyLookup,
-   userType,
+   documentPaths,
+   targetCollectionQuery,
+   converterFn,
 }) => {
-   const [filters, setFilters] = useState<Filters>(getInitialFilters(userType))
+   const [filters, setFilters] = useState<Filters>(initialFilters)
 
    const resetFilters = useCallback(() => {
-      setFilters(getInitialFilters(userType))
-   }, [userType])
+      setFilters(initialFilters)
+   }, [])
 
    useEffect(() => {
       // reset filters when livestreamId changes
       resetFilters()
-   }, [livestreamId, resetFilters])
+   }, [targetCollectionQuery, resetFilters])
 
    const value = useMemo<UserLivestreamDataTableContextValue>(
       () => ({
@@ -83,14 +120,18 @@ const UserLivestreamDataTableProvider: FC<Props> = ({
          levelsOfStudyLookup,
          countriesLookup: universityCountriesMap,
          resetFilters,
-         livestreamId,
+         documentPaths,
+         targetCollectionQuery,
+         converterFn,
       }),
       [
+         converterFn,
+         documentPaths,
          fieldsOfStudyLookup,
          filters,
          levelsOfStudyLookup,
-         livestreamId,
          resetFilters,
+         targetCollectionQuery,
       ]
    )
    return (
@@ -100,7 +141,7 @@ const UserLivestreamDataTableProvider: FC<Props> = ({
    )
 }
 
-export const useUserLivestreamDataTableContext = () => {
+export const useUserDataTableContext = () => {
    const context = useContext(UserLivestreamDataTableContext)
    if (!context) {
       throw new Error(
@@ -110,4 +151,4 @@ export const useUserLivestreamDataTableContext = () => {
    return context
 }
 
-export default UserLivestreamDataTableProvider
+export default UserDataTableProvider
