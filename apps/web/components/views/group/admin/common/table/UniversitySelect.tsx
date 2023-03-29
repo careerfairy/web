@@ -37,6 +37,7 @@ const styles = sxStyles({
 const UniversitySelect = () => {
    const { filters, setFilters } = useUserDataTable()
 
+   // Fetch universities based on selected country codes
    const universities = useUniversitiesByCountryCodes(
       filters.selectedCountryCodes
    )
