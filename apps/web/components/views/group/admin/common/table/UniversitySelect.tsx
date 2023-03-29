@@ -12,8 +12,7 @@ import { useUserDataTable } from "./UserDataTableProvider"
 
 const styles = sxStyles({
    root: {
-      minWidth: 400,
-      maxWidth: 400,
+      flex: 1,
    },
    optionRoot: {
       flex: 1,
@@ -68,7 +67,9 @@ const UniversitySelect = () => {
             <StyledTextField
                {...params}
                label={
-                  noCountrySelected ? "Select a country first" : "University"
+                  noCountrySelected
+                     ? "University (Select country first)"
+                     : "University"
                }
                variant="outlined"
                size="small"

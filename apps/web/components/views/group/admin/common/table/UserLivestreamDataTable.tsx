@@ -2,14 +2,14 @@ import React, { FC, ReactNode, useCallback, useMemo, useState } from "react"
 import MaterialTable, {
    Column,
    Localization,
-   MTablePagination,
    Options,
 } from "@material-table/core"
-import { OrderByDirection } from "@firebase/firestore"
+import { OrderByDirection, Query } from "@firebase/firestore"
 import {
    Box,
-   Button,
+   CircularProgress,
    Divider,
+   Grid,
    IconButton,
    Skeleton,
    TablePagination,
@@ -24,7 +24,12 @@ import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { LINKEDIN_COLOR } from "../../../../../util/colors"
 import DownloadIcon from "@mui/icons-material/CloudDownloadOutlined"
 import { LoadingButton } from "@mui/lab"
-import { useDownloadCV } from "./hooks"
+import {
+   useCopyAllEmails,
+   useDownloadAllCVs,
+   useDownloadCV,
+   useExportUsers,
+} from "./hooks"
 import { CountriesSelect } from "./CountriesSelect"
 import UniversitySelect from "./UniversitySelect"
 import FieldOfStudySelect from "./FieldOfStudySelect"
@@ -34,6 +39,7 @@ import CopyIcon from "@mui/icons-material/ContentCopy"
 import { useUserDataTable } from "./UserDataTableProvider"
 import ExportIcon from "@mui/icons-material/ListAltOutlined"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 
 export type SortedTableColumn = {
    field: string
@@ -42,9 +48,8 @@ export type SortedTableColumn = {
 
 const styles = sxStyles({
    root: {
+      width: "-webkit-fill-available",
       "& button": {},
-      minHeight: 300,
-      width: "100%",
       "& .MuiPaper-root": {
          boxShadow: "none",
       },
@@ -64,9 +69,6 @@ const styles = sxStyles({
          },
       },
    },
-   title: {
-      border: "2px solid red",
-   },
    linkedInIcon: {
       color: LINKEDIN_COLOR,
    },
@@ -77,7 +79,20 @@ const styles = sxStyles({
       borderBottom: (theme) => `1px solid ${theme.palette.divider}`,
       display: "flex",
       alignItems: "center",
+      overflow: "auto",
    },
+   gridRoot: (theme) => ({
+      p: 2,
+      pr: 0,
+      "& .MuiGrid-item": {
+         "&:not(:last-child)": {
+            borderRight: {
+               xl: `1px solid ${theme.palette.divider}`,
+               xs: "none",
+            },
+         },
+      },
+   }),
    skeletonFilter: {
       borderRadius: 2,
       flex: 0.3,
@@ -95,6 +110,7 @@ export type UserDataEntry = {
    lastName: string
    email: string
    universityCountryCode: string
+   universityCountryName: string
    universityName: string
    fieldOfStudy: string
    levelOfStudy: string
@@ -108,7 +124,6 @@ const baseOptions: Options<UserDataEntry> = {
    search: false,
    actionsColumnIndex: -1,
    emptyRowsWhenPaging: false, // to make page size fix in case of less data rows
-   paginationType: "stepped",
    toolbar: false,
    showFirstLastPageButtons: false,
 }
@@ -135,6 +150,13 @@ const UserLivestreamDataTable = () => {
       filters
    )
 
+   const emptyQuery = results.countQueryResponse?.count === 0
+
+   const data = useMemo(
+      () => results.data?.map(converterFn) || [],
+      [converterFn, results.data]
+   )
+
    const handlePageChange = useCallback(
       (newPage: number) => {
          if (newPage > results.page - 1) {
@@ -144,11 +166,6 @@ const UserLivestreamDataTable = () => {
          }
       },
       [results]
-   )
-
-   const data = useMemo(
-      () => results.data?.map(converterFn) || [],
-      [converterFn, results.data]
    )
 
    const options = useMemo<Options<UserDataEntry>>(
@@ -165,38 +182,46 @@ const UserLivestreamDataTable = () => {
             field: "firstName",
             title: "Full Name & Email",
             cellStyle: {
-               minWidth: 180,
+               minWidth: 270,
             },
             render: RenderFullNameAndEmailColumn,
             id: documentPaths.userFirstName,
+            sorting: false,
          },
          {
             field: "universityCountryCode",
             title: "Country",
+            sorting: false,
             lookup: universityCountriesMap,
             id: documentPaths.userUniversityCountryCode,
+            cellStyle: {
+               maxWidth: 100,
+            },
          },
          {
             field: "universityName",
             title: "University Name",
+            sorting: false,
             cellStyle: {
-               minWidth: 200,
+               minWidth: 260,
             },
             id: documentPaths.userUniversityName,
          },
          {
             title: "Field Of Study",
             field: "fieldOfStudy",
+            sorting: false,
             cellStyle: {
-               minWidth: 200,
+               minWidth: 100,
             },
             id: documentPaths.userFieldOfStudyName,
          },
          {
             title: "Level Of Study",
             field: "levelOfStudy",
+            sorting: false,
             cellStyle: {
-               minWidth: 100,
+               minWidth: 0,
             },
             id: documentPaths.userFieldOfStudyName,
          },
@@ -204,24 +229,25 @@ const UserLivestreamDataTable = () => {
             field: "resume",
             title: "CV",
             type: "boolean",
-            searchable: false,
             render: CVColumn,
             cellStyle: {
-               width: 300,
+               minWidth: 0,
             },
             id: documentPaths.userResume,
          },
          {
-            render: RowActions,
-            sorting: false,
-            export: false,
+            field: "linkedInUrl",
+            title: "LinkedIn",
+            type: "boolean",
+            render: LinkedInColumn,
+            cellStyle: {
+               minWidth: 0,
+            },
+            id: documentPaths.userResume,
          },
          {
             field: "email",
             title: "User Email",
-            cellStyle: {
-               minWidth: 150,
-            },
             hidden: true,
             id: documentPaths.userEmail,
          },
@@ -229,19 +255,12 @@ const UserLivestreamDataTable = () => {
             field: "firstName",
             title: "First Name",
             hidden: true,
-            cellStyle: {
-               minWidth: 150,
-            },
             id: documentPaths.userFirstName,
          },
          {
             hidden: true,
             field: "lastName",
             title: "Last Name",
-
-            cellStyle: {
-               minWidth: 150,
-            },
             id: documentPaths.userLastName,
          },
       ],
@@ -296,40 +315,12 @@ const UserLivestreamDataTable = () => {
             onOrderChange={handleSortModelChange}
             components={{
                Pagination: (props) => (
-                  <Stack
-                     overflow="auto"
-                     px={4}
-                     justifyContent="space-between"
-                     direction={{ xs: "column", sm: "row" }}
-                  >
-                     <Stack
-                        divider={<Divider orientation="vertical" flexItem />}
-                        overflow="auto"
-                        direction="row"
-                        alignItems="center"
-                        spacing={2}
-                        sx={styles.actionsWrapper}
-                     >
-                        <Typography variant="body1" fontWeight={"500"}>
-                           {results.countQueryResponse.count} talents found
-                        </Typography>
-                        <ResponsiveButton
-                           text="Export All Users"
-                           icon={<ExportIcon />}
-                        />
-                        <ResponsiveButton
-                           text="Download All CVs"
-                           icon={<DownloadIcon />}
-                        />
-                        <ResponsiveButton
-                           text="Copy All Emails"
-                           icon={<CopyIcon />}
-                        />
-                     </Stack>
-                     <span>
-                        <TablePagination {...props} />
-                     </span>
-                  </Stack>
+                  <Footer
+                     emptyQuery={emptyQuery}
+                     paginationProps={props}
+                     fullQuery={results.fullQuery}
+                     totalUsers={results.countQueryResponse.count}
+                  />
                ),
             }}
          />
@@ -337,21 +328,141 @@ const UserLivestreamDataTable = () => {
    )
 }
 
+type FooterProps = {
+   paginationProps: any
+   emptyQuery: boolean
+   fullQuery: Query
+   totalUsers: number
+}
+const Footer: FC<FooterProps> = ({
+   fullQuery,
+   paginationProps,
+   emptyQuery,
+   totalUsers,
+}) => {
+   const { converterFn, title } = useUserDataTable()
+
+   const { downloadingAllCVs, handleDownloadAllCVs } = useDownloadAllCVs(
+      fullQuery,
+      converterFn,
+      title
+   )
+   const { copyingEmails, handleCopyAllEmails } = useCopyAllEmails(
+      fullQuery,
+      converterFn
+   )
+
+   const {
+      exportingUsers,
+      csvDownloadData,
+      handleExportUsers,
+      handleCloseCsvDialog,
+   } = useExportUsers(fullQuery, converterFn, title)
+
+   return (
+      <>
+         <Stack
+            overflow="auto"
+            px={4}
+            justifyContent={"space-between"}
+            spacing={1}
+            direction={{
+               xs: "column",
+               xl: "row-reverse",
+            }}
+         >
+            <span>
+               <TablePagination {...paginationProps} />
+            </span>
+            <Stack
+               divider={<Divider orientation="vertical" flexItem />}
+               overflow="auto"
+               direction="row"
+               alignItems="center"
+               spacing={2}
+               sx={styles.actionsWrapper}
+            >
+               <Typography variant="body1" fontWeight={"500"}>
+                  {emptyQuery
+                     ? "No talents found"
+                     : `${totalUsers} talents found`}
+               </Typography>
+               <ResponsiveButton
+                  text="Export Users"
+                  disabled={emptyQuery}
+                  onClick={handleExportUsers}
+                  loading={exportingUsers}
+                  icon={<ExportIcon />}
+               />
+               <ResponsiveButton
+                  disabled={emptyQuery}
+                  text="Download CVs"
+                  onClick={handleDownloadAllCVs}
+                  loading={downloadingAllCVs}
+                  icon={<DownloadIcon />}
+               />
+               <ResponsiveButton
+                  disabled={emptyQuery}
+                  text="Copy Emails"
+                  onClick={handleCopyAllEmails}
+                  loading={copyingEmails}
+                  icon={<CopyIcon />}
+               />
+            </Stack>
+         </Stack>
+         {csvDownloadData ? (
+            <CSVDialogDownload
+               title={csvDownloadData.title.replace("_", " ")}
+               data={csvDownloadData.data}
+               filename={`${title}.csv`}
+               defaultOpen={!!csvDownloadData}
+               onClose={handleCloseCsvDialog}
+            />
+         ) : null}
+      </>
+   )
+}
+
 type ResponsiveButtonProps = {
    text: string
    icon: ReactNode
+   disabled?: boolean
+   loading?: boolean
+   onClick?: () => void
 }
-const ResponsiveButton: FC<ResponsiveButtonProps> = ({ text, icon }) => {
+const ResponsiveButton: FC<ResponsiveButtonProps> = ({
+   text,
+   icon,
+   loading,
+   disabled,
+   onClick,
+}) => {
    const isMobile = useIsMobile()
 
    return isMobile ? (
       <Tooltip title={text} placement="top" color="primary" arrow>
-         <IconButton>{icon}</IconButton>
+         <span>
+            <IconButton
+               color="primary"
+               onClick={onClick}
+               disabled={disabled || loading}
+            >
+               {loading ? <CircularProgress color="inherit" size={20} /> : icon}
+            </IconButton>
+         </span>
       </Tooltip>
    ) : (
-      <Button size="small" color="primary" variant="text" startIcon={icon}>
+      <LoadingButton
+         onClick={onClick}
+         size="small"
+         loading={loading}
+         disabled={disabled}
+         color="primary"
+         variant="text"
+         startIcon={icon}
+      >
          {text}
-      </Button>
+      </LoadingButton>
    )
 }
 
@@ -369,21 +480,23 @@ const Toolbar: FC = () => {
 
    return (
       <Box sx={styles.toolbar}>
-         <Stack
-            divider={<Divider orientation="vertical" flexItem />}
-            overflow="auto"
-            alignItems="center"
-            direction="row"
-            p={2}
-         >
-            <CountriesSelect />
-            <UniversitySelect />
-            <FieldOfStudySelect />
-            <LevelOfStudySelect />
-         </Stack>
+         <Grid sx={styles.gridRoot} spacing={1} container>
+            <Grid item xs={12} md={6} xl={3}>
+               <CountriesSelect />
+            </Grid>
+            <Grid item xs={12} md={6} xl={3}>
+               <UniversitySelect />
+            </Grid>
+            <Grid item xs={12} md={6} xl={3}>
+               <FieldOfStudySelect />
+            </Grid>
+            <Grid item xs={12} md={6} xl={3}>
+               <LevelOfStudySelect />
+            </Grid>
+         </Grid>
          <Box sx={{ flexGrow: 1 }} />
          <Tooltip title="Reset Filters">
-            <Box p={2}>
+            <Box p={2} pl={0}>
                <IconButton
                   onClick={resetFilters}
                   disabled={!filterActive}
@@ -412,12 +525,12 @@ const RenderFullNameAndEmailColumn = (rowData: UserDataEntry) => {
 }
 
 const CVColumn = (rowData: UserDataEntry) => {
-   const { handleDownloadCV, downloading } = useDownloadCV(rowData)
+   const { handleDownloadCV, downloadingPDF } = useDownloadCV(rowData)
 
    return rowData.resumeUrl ? (
       <Tooltip title={`Download CV for ${rowData.firstName}`}>
          <LoadingButton
-            loading={downloading}
+            loading={downloadingPDF}
             onClick={handleDownloadCV}
             sx={styles.tableButton}
             size="small"
@@ -430,34 +543,23 @@ const CVColumn = (rowData: UserDataEntry) => {
       </Tooltip>
    ) : null
 }
-
-const iconWidth = 40
-const RowActions = (rowData: UserDataEntry) => {
-   return (
-      <Stack alignItems="center" direction="row">
-         <Box width={iconWidth}>
-            {rowData.linkedInUrl ? (
-               <IconButton
-                  component="a"
-                  href={rowData.linkedInUrl}
-                  target="_blank"
-                  sx={styles.linkedInIcon}
-               >
-                  <LinkedInIcon />
-               </IconButton>
-            ) : null}
-         </Box>
-      </Stack>
-   )
+const LinkedInColumn = (rowData: UserDataEntry) => {
+   return rowData.linkedInUrl ? (
+      <IconButton
+         component="a"
+         href={rowData.linkedInUrl}
+         target="_blank"
+         sx={styles.linkedInIcon}
+      >
+         <LinkedInIcon />
+      </IconButton>
+   ) : null
 }
 
 const skeletonColumns: Column<UserDataEntry>[] = [
    {
       field: "firstName",
       title: "Full Name & Email",
-      cellStyle: {
-         minWidth: 180,
-      },
       render: RenderFullNameAndEmailColumn,
    },
    {
@@ -468,23 +570,14 @@ const skeletonColumns: Column<UserDataEntry>[] = [
    {
       field: "universityName",
       title: "University Name",
-      cellStyle: {
-         minWidth: 200,
-      },
    },
    {
       title: "Field Of Study",
       field: "fieldOfStudy",
-      cellStyle: {
-         minWidth: 200,
-      },
    },
    {
       title: "Level Of Study",
       field: "levelOfStudy",
-      cellStyle: {
-         minWidth: 100,
-      },
    },
    {
       field: "resume",
@@ -492,12 +585,6 @@ const skeletonColumns: Column<UserDataEntry>[] = [
       type: "boolean",
       searchable: false,
       render: CVColumn,
-      cellStyle: {
-         width: 300,
-      },
-   },
-   {
-      render: RowActions,
    },
 ]
 
