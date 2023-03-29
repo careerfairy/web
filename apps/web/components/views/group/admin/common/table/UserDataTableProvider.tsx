@@ -14,7 +14,8 @@ import { UserDataEntry } from "./UserLivestreamDataTable"
 
 /*
  * An object containing the paths to the fields in the document that we want to query
- * Since this is a generic component, we need to pass in the paths to the fields we want to query and sort by
+ * Since this is a generic component, we need to pass in the paths to the original document's fields
+ * so that we can sort/filter by them.
  * */
 export type DocumentPaths = {
    userEmail: string
@@ -42,7 +43,10 @@ type UserLivestreamDataTableContextValue = {
    setFilters: React.Dispatch<React.SetStateAction<Filters>>
    resetFilters: () => void
    documentPaths: DocumentPaths
-   targetCollectionQuery: CollectionReference<DocumentData>
+   targetCollectionQuery: CollectionReference
+   /*
+    * Function to convert the document from the collection to the normalized format we want to display in the table
+    * */
    converterFn: (doc: unknown) => UserDataEntry
 }
 const UserLivestreamDataTableContext =
@@ -141,11 +145,11 @@ const UserDataTableProvider: FC<Props> = ({
    )
 }
 
-export const useUserDataTableContext = () => {
+export const useUserDataTable = () => {
    const context = useContext(UserLivestreamDataTableContext)
    if (!context) {
       throw new Error(
-         "useUserLivestreamDataTableContext must be used within UserLivestreamDataTableContext"
+         "useUserDataTable must be used within UserLivestreamDataTableContext"
       )
    }
    return context

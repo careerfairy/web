@@ -3,7 +3,7 @@ import usePaginatedCollection, {
 } from "components/custom-hook/utils/usePaginatedCollection"
 import { orderBy, query, where } from "firebase/firestore"
 import { useMemo } from "react"
-import { SortModel } from "../../../common/table/UserLivestreamDataTable"
+import { SortedTableColumn } from "../../../common/table/UserLivestreamDataTable"
 import { CollectionReference, QueryConstraint } from "@firebase/firestore"
 import { University } from "@careerfairy/shared-lib/universities"
 import {
@@ -22,13 +22,14 @@ const usePaginatedUsersCollection = (
    targetCollectionRef: CollectionReference,
    documentPaths: DocumentPaths,
    limit = 10,
-   sortModel: SortModel,
+   sortedTableColumn: SortedTableColumn,
    filters: Filters
 ) => {
    // @ts-ignore we're sorting by a nested field here
    const options: UsePaginatedCollection<unknown> = useMemo(() => {
       const constraints: QueryConstraint[] = []
 
+      // If one or more countries are selected, we only want to show users from those countries
       if (filters.selectedCountryCodes.length) {
          constraints.push(
             where(
@@ -39,6 +40,7 @@ const usePaginatedUsersCollection = (
          )
       }
 
+      // If a university is selected, we only want to show users from that university
       if (filters.selectedUniversity) {
          constraints.push(
             where(
@@ -49,6 +51,7 @@ const usePaginatedUsersCollection = (
          )
       }
 
+      // If a field of study is selected, we only want to show users from that field of study
       if (filters.selectedFieldOfStudy) {
          constraints.push(
             where(
@@ -59,6 +62,7 @@ const usePaginatedUsersCollection = (
          )
       }
 
+      // If a level of study is selected, we only want to show users from that level of study
       if (filters.selectedLevelOfStudy) {
          constraints.push(
             where(
@@ -69,8 +73,11 @@ const usePaginatedUsersCollection = (
          )
       }
 
-      if (sortModel) {
-         constraints.push(orderBy(sortModel.field, sortModel.sort))
+      // If a table column is sorted, we want to sort the results by that column
+      if (sortedTableColumn) {
+         constraints.push(
+            orderBy(sortedTableColumn.field, sortedTableColumn.direction)
+         )
       }
 
       return {
@@ -91,7 +98,7 @@ const usePaginatedUsersCollection = (
       filters.selectedUniversity,
       filters.selectedFieldOfStudy,
       filters.selectedLevelOfStudy,
-      sortModel,
+      sortedTableColumn,
       targetCollectionRef,
       limit,
       documentPaths.orderBy,
