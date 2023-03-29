@@ -71,13 +71,13 @@ const userDataEntryColumnMapper: Record<keyof UserDataEntry, string> = {
    firstName: "First Name",
    lastName: "Last Name",
    email: "Email",
-   resumeUrl: "Resume URL",
-   linkedInUrl: "LinkedIn URL",
    fieldOfStudy: "Field of Study",
    levelOfStudy: "Level of Study",
-   universityCountryCode: "University Country Code",
-   universityCountryName: "University Country",
    universityName: "University Name",
+   universityCountryName: "University Country",
+   universityCountryCode: "University Country Code",
+   resumeUrl: "Resume URL",
+   linkedInUrl: "LinkedIn URL",
 }
 
 export const getCSVDialogData = (

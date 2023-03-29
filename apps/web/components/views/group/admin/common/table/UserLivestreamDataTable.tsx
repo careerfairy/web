@@ -176,6 +176,24 @@ const UserLivestreamDataTable = () => {
       [rowsPerPage]
    )
 
+   // When sorted by CV, change the title to "With CV" since the query filters out users without CV
+   const CVColumnTitle = useMemo<string>(() => {
+      let title = "CV"
+      if (sortedTableColumn?.field === documentPaths.userResume) {
+         title = "With CV"
+      }
+      return title
+   }, [sortedTableColumn, documentPaths.userResume])
+
+   // When sorted by LinkedIn, change the title to "With LinkedIn" since the query filters out users without LinkedIn
+   const linkedInColumnTitle = useMemo<string>(() => {
+      let title = "LinkedIn"
+      if (sortedTableColumn?.field === documentPaths.userLinkedIn) {
+         title = "With LinkedIn"
+      }
+      return title
+   }, [sortedTableColumn, documentPaths.userLinkedIn])
+
    const columns = useMemo<Column<UserDataEntry>[]>(
       () => [
          {
@@ -227,7 +245,7 @@ const UserLivestreamDataTable = () => {
          },
          {
             field: "resume",
-            title: "CV",
+            title: CVColumnTitle,
             type: "boolean",
             render: CVColumn,
             cellStyle: {
@@ -237,7 +255,7 @@ const UserLivestreamDataTable = () => {
          },
          {
             field: "linkedInUrl",
-            title: "LinkedIn",
+            title: linkedInColumnTitle,
             type: "boolean",
             render: LinkedInColumn,
             cellStyle: {
@@ -265,13 +283,15 @@ const UserLivestreamDataTable = () => {
          },
       ],
       [
-         documentPaths.userFieldOfStudyName,
          documentPaths.userFirstName,
-         documentPaths.userLastName,
          documentPaths.userUniversityCountryCode,
          documentPaths.userUniversityName,
+         documentPaths.userFieldOfStudyName,
          documentPaths.userResume,
          documentPaths.userEmail,
+         documentPaths.userLastName,
+         CVColumnTitle,
+         linkedInColumnTitle,
       ]
    )
 
