@@ -1,10 +1,13 @@
 import React, { FC, ReactNode, useCallback, useMemo, useState } from "react"
 import MaterialTable, {
    Column,
+   Components,
    Localization,
+   MaterialTableProps,
+   MTableAction,
    Options,
 } from "@material-table/core"
-import { OrderByDirection, Query } from "@firebase/firestore"
+import { Query } from "@firebase/firestore"
 import {
    Box,
    CircularProgress,
@@ -40,11 +43,6 @@ import { useUserDataTable } from "./UserDataTableProvider"
 import ExportIcon from "@mui/icons-material/ListAltOutlined"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
-
-export type SortedTableColumn = {
-   field: string
-   direction: OrderByDirection
-}
 
 const styles = sxStyles({
    root: {
@@ -126,11 +124,15 @@ const baseOptions: Options<UserDataEntry> = {
    emptyRowsWhenPaging: false, // to make page size fix in case of less data rows
    toolbar: false,
    showFirstLastPageButtons: false,
+   sorting: false,
 }
 
 const localization: Localization = {
    body: {
       emptyDataSourceMessage: "No users found",
+   },
+   header: {
+      actions: "",
    },
 }
 
@@ -139,14 +141,11 @@ const UserLivestreamDataTable = () => {
       useUserDataTable()
 
    const [rowsPerPage, setRowsPerPage] = useState(10)
-   const [sortedTableColumn, setSortedTableColumn] =
-      useState<SortedTableColumn>(null)
 
    const results = usePaginatedUsersCollection(
       targetCollectionQuery,
       documentPaths,
       rowsPerPage,
-      sortedTableColumn,
       filters
    )
 
@@ -176,147 +175,28 @@ const UserLivestreamDataTable = () => {
       [rowsPerPage]
    )
 
-   // When sorted by CV, change the title to "With CV" since the query filters out users without CV
-   const CVColumnTitle = useMemo<string>(() => {
-      let title = "CV"
-      if (sortedTableColumn?.field === documentPaths.userResume) {
-         title = "With CV"
-      }
-      return title
-   }, [sortedTableColumn, documentPaths.userResume])
-
-   // When sorted by LinkedIn, change the title to "With LinkedIn" since the query filters out users without LinkedIn
-   const linkedInColumnTitle = useMemo<string>(() => {
-      let title = "LinkedIn"
-      if (sortedTableColumn?.field === documentPaths.userLinkedIn) {
-         title = "With LinkedIn"
-      }
-      return title
-   }, [sortedTableColumn, documentPaths.userLinkedIn])
-
-   const columns = useMemo<Column<UserDataEntry>[]>(
-      () => [
-         {
-            field: "firstName",
-            title: "Full Name & Email",
-            cellStyle: {
-               minWidth: 270,
-            },
-            render: RenderFullNameAndEmailColumn,
-            id: documentPaths.userFirstName,
-            sorting: false,
-         },
-         {
-            field: "universityCountryCode",
-            title: "Country",
-            sorting: false,
-            lookup: universityCountriesMap,
-            id: documentPaths.userUniversityCountryCode,
-            cellStyle: {
-               maxWidth: 100,
-            },
-         },
-         {
-            field: "universityName",
-            title: "University Name",
-            sorting: false,
-            cellStyle: {
-               minWidth: 260,
-            },
-            id: documentPaths.userUniversityName,
-         },
-         {
-            title: "Field Of Study",
-            field: "fieldOfStudy",
-            sorting: false,
-            cellStyle: {
-               minWidth: 100,
-            },
-            id: documentPaths.userFieldOfStudyName,
-         },
-         {
-            title: "Level Of Study",
-            field: "levelOfStudy",
-            sorting: false,
-            cellStyle: {
-               minWidth: 0,
-            },
-            id: documentPaths.userFieldOfStudyName,
-         },
-         {
-            field: "resume",
-            title: CVColumnTitle,
-            type: "boolean",
-            render: CVColumn,
-            cellStyle: {
-               minWidth: 0,
-            },
-            id: documentPaths.userResume,
-         },
-         {
-            field: "linkedInUrl",
-            title: linkedInColumnTitle,
-            type: "boolean",
-            render: LinkedInColumn,
-            cellStyle: {
-               minWidth: 0,
-            },
-            id: documentPaths.userResume,
-         },
-         {
-            field: "email",
-            title: "User Email",
-            hidden: true,
-            id: documentPaths.userEmail,
-         },
-         {
-            field: "firstName",
-            title: "First Name",
-            hidden: true,
-            id: documentPaths.userFirstName,
-         },
-         {
-            hidden: true,
-            field: "lastName",
-            title: "Last Name",
-            id: documentPaths.userLastName,
-         },
-      ],
-      [
-         documentPaths.userFirstName,
-         documentPaths.userUniversityCountryCode,
-         documentPaths.userUniversityName,
-         documentPaths.userFieldOfStudyName,
-         documentPaths.userResume,
-         documentPaths.userEmail,
-         documentPaths.userLastName,
-         CVColumnTitle,
-         linkedInColumnTitle,
-      ]
-   )
-
    const handlePageSizeChange = useCallback((pageSize: number) => {
       setRowsPerPage(pageSize)
    }, [])
 
-   const handleSortModelChange = useCallback(
-      (columnIndex: number, orderDirection: "asc" | "desc"): void => {
-         // if columnIndex is -1, it means that the user clicked and toggled the sort off,
-         // so we need to reset the sortedTableColumn
-         if (columnIndex === -1) {
-            setSortedTableColumn(null)
-            return
-         }
-
-         const targetPathKey = columns[columnIndex]
-            .id as keyof typeof documentPaths
-
-         setSortedTableColumn({
-            field: targetPathKey,
-            direction: orderDirection,
-         })
-      },
-      [columns]
+   const customComponents = useMemo<Components>(
+      () => ({
+         Action: (props) => {
+            if (props.action.icon === "custom") {
+               return <CustomActions {...props.data} />
+            }
+            return <MTableAction {...props} />
+         },
+         Pagination: (props) => (
+            <Footer
+               emptyQuery={emptyQuery}
+               paginationProps={props}
+               fullQuery={results.fullQuery}
+               totalUsers={results.countQueryResponse.count}
+            />
+         ),
+      }),
+      [emptyQuery, results.countQueryResponse.count, results.fullQuery]
    )
 
    return (
@@ -328,25 +208,20 @@ const UserLivestreamDataTable = () => {
             columns={columns}
             localization={localization}
             options={options}
+            actions={actions}
             onRowsPerPageChange={handlePageSizeChange}
             totalCount={results.countQueryResponse.count ?? undefined}
             page={results.page - 1}
             onPageChange={handlePageChange}
-            onOrderChange={handleSortModelChange}
-            components={{
-               Pagination: (props) => (
-                  <Footer
-                     emptyQuery={emptyQuery}
-                     paginationProps={props}
-                     fullQuery={results.fullQuery}
-                     totalUsers={results.countQueryResponse.count}
-                  />
-               ),
-            }}
+            components={customComponents}
          />
       </Box>
    )
 }
+
+const actions: MaterialTableProps<UserDataEntry>["actions"] = [
+   { icon: "custom", onClick: () => {} },
+]
 
 type FooterProps = {
    paginationProps: any
@@ -360,7 +235,7 @@ const Footer: FC<FooterProps> = ({
    emptyQuery,
    totalUsers,
 }) => {
-   const { converterFn, title } = useUserDataTable()
+   const { converterFn, title, filters } = useUserDataTable()
 
    const { downloadingAllCVs, handleDownloadAllCVs } = useDownloadAllCVs(
       fullQuery,
@@ -379,6 +254,10 @@ const Footer: FC<FooterProps> = ({
       handleCloseCsvDialog,
    } = useExportUsers(fullQuery, converterFn, title)
 
+   const noFiltersActive = Object.values(filters).every(
+      (value) => (Array.isArray(value) && value.length === 0) || value === null
+   )
+
    return (
       <>
          <Stack
@@ -388,7 +267,7 @@ const Footer: FC<FooterProps> = ({
             spacing={1}
             direction={{
                xs: "column",
-               xl: "row-reverse",
+               lg: "row-reverse",
             }}
          >
             <span>
@@ -402,13 +281,13 @@ const Footer: FC<FooterProps> = ({
                spacing={2}
                sx={styles.actionsWrapper}
             >
-               <Typography variant="body1" fontWeight={"500"}>
-                  {emptyQuery
-                     ? "No talents found"
-                     : `${totalUsers} talents found`}
-               </Typography>
+               {noFiltersActive ? null : (
+                  <Typography variant="body1" fontWeight={"500"}>
+                     {totalUsers || 0} talent found
+                  </Typography>
+               )}
                <ResponsiveButton
-                  text="Export Talents"
+                  text="Export Talent"
                   disabled={emptyQuery}
                   onClick={handleExportUsers}
                   loading={exportingUsers}
@@ -443,6 +322,60 @@ const Footer: FC<FooterProps> = ({
    )
 }
 
+const CustomActions = (rowData: UserDataEntry) => {
+   const { handleDownloadCV, downloadingPDF } = useDownloadCV(rowData)
+
+   return (
+      <Stack direction="row" spacing={1} pr={1} alignItems="center">
+         <Tooltip
+            title={
+               rowData.resumeUrl ? `Download ${rowData.firstName}'s CV` : ""
+            }
+            placement="top"
+            color="primary"
+            arrow
+         >
+            <span>
+               <LoadingButton
+                  disabled={!rowData.resumeUrl}
+                  loading={downloadingPDF}
+                  onClick={handleDownloadCV}
+                  sx={styles.tableButton}
+                  size="small"
+                  color="secondary"
+                  variant="outlined"
+                  startIcon={<DownloadIcon />}
+               >
+                  CV
+               </LoadingButton>
+            </span>
+         </Tooltip>
+         <Tooltip
+            title={
+               rowData.linkedInUrl
+                  ? `Go to ${rowData.firstName}'s LinkedIn`
+                  : ""
+            }
+            placement="top"
+            color="primary"
+            arrow
+         >
+            <span>
+               <IconButton
+                  component="a"
+                  disabled={!rowData.linkedInUrl}
+                  href={rowData.linkedInUrl}
+                  target="_blank"
+                  sx={styles.linkedInIcon}
+               >
+                  <LinkedInIcon />
+               </IconButton>
+            </span>
+         </Tooltip>
+      </Stack>
+   )
+}
+
 type ResponsiveButtonProps = {
    text: string
    icon: ReactNode
@@ -450,6 +383,7 @@ type ResponsiveButtonProps = {
    loading?: boolean
    onClick?: () => void
 }
+
 const ResponsiveButton: FC<ResponsiveButtonProps> = ({
    text,
    icon,
@@ -544,67 +478,43 @@ const RenderFullNameAndEmailColumn = (rowData: UserDataEntry) => {
    )
 }
 
-const CVColumn = (rowData: UserDataEntry) => {
-   const { handleDownloadCV, downloadingPDF } = useDownloadCV(rowData)
-
-   return rowData.resumeUrl ? (
-      <Tooltip title={`Download CV for ${rowData.firstName}`}>
-         <LoadingButton
-            loading={downloadingPDF}
-            onClick={handleDownloadCV}
-            sx={styles.tableButton}
-            size="small"
-            color="secondary"
-            variant="outlined"
-            startIcon={<DownloadIcon />}
-         >
-            CV
-         </LoadingButton>
-      </Tooltip>
-   ) : null
-}
-const LinkedInColumn = (rowData: UserDataEntry) => {
-   return rowData.linkedInUrl ? (
-      <IconButton
-         component="a"
-         href={rowData.linkedInUrl}
-         target="_blank"
-         sx={styles.linkedInIcon}
-      >
-         <LinkedInIcon />
-      </IconButton>
-   ) : null
-}
-
-const skeletonColumns: Column<UserDataEntry>[] = [
+const columns: Column<UserDataEntry>[] = [
    {
       field: "firstName",
       title: "Full Name & Email",
+      cellStyle: {
+         minWidth: 270,
+      },
       render: RenderFullNameAndEmailColumn,
    },
    {
       field: "universityCountryCode",
       title: "Country",
       lookup: universityCountriesMap,
+      cellStyle: {
+         maxWidth: 100,
+      },
    },
    {
       field: "universityName",
       title: "University Name",
+      cellStyle: {
+         minWidth: 200,
+      },
    },
    {
       title: "Field Of Study",
       field: "fieldOfStudy",
+      cellStyle: {
+         minWidth: 50,
+      },
    },
    {
       title: "Level Of Study",
       field: "levelOfStudy",
-   },
-   {
-      field: "resume",
-      title: "CV",
-      type: "boolean",
-      searchable: false,
-      render: CVColumn,
+      cellStyle: {
+         minWidth: 30,
+      },
    },
 ]
 
@@ -626,7 +536,7 @@ export const TableSkeleton = () => {
             options={{ ...baseOptions, showEmptyDataSourceMessage: false }}
             isLoading
             localization={localization}
-            columns={skeletonColumns}
+            columns={columns}
          />
       </Box>
    )
