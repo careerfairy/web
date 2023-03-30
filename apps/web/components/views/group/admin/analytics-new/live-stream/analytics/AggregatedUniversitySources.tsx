@@ -26,7 +26,7 @@ const styles = sxStyles({
 
 const tabOptions = {
    Country: {
-      label: "University Country",
+      label: "Country",
    },
    FieldOfStudy: {
       label: "Field Of Study",
