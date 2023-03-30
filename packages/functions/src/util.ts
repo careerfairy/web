@@ -340,13 +340,14 @@ export const getDateString = (streamData: LivestreamEvent) => {
 
 export const formatLivestreamDateEmails = (
    userTimezone: string | undefined,
-   date: Date
+   date: Date,
+   dateTimeOptions: Intl.DateTimeFormatOptions = DateTime.DATETIME_FULL
 ) => {
    const luxonStartDate = DateTime.fromJSDate(date, {
       zone: userTimezone || "Europe/Zurich",
    })
 
-   let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+   let formattedDate = luxonStartDate.toLocaleString(dateTimeOptions)
    formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
 
    return formattedDate
