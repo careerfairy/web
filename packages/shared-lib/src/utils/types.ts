@@ -39,3 +39,10 @@ type FlattenObjectPathsHelper<T> = T extends Record<string, unknown>
 export type FlattenPaths<T> = FlattenObjectPathsHelper<{
    [K in keyof T]: T[K] // This is to convert Interfaces to mapped types
 }>
+
+export type Logger = {
+   debug: (...args: any[]) => void
+   info: (...args: any[]) => void
+   warn: (...args: any[]) => void
+   error: (...args: any[]) => void
+}

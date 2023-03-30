@@ -1,3 +1,5 @@
+import { Logger } from "@careerfairy/shared-lib/utils/types"
+
 /**
  * The outputted IDs of recommendations for the given {@link IdToRecommend}
  */
@@ -10,13 +12,6 @@ type MaxRecommendations = number
 
 export interface IRecommendationService {
    getRecommendations(limit?: MaxRecommendations): Promise<Recommendations>
-}
-
-export type Logger = {
-   debug: (...args: any[]) => void
-   info: (...args: any[]) => void
-   warn: (...args: any[]) => void
-   error: (...args: any[]) => void
 }
 
 export default class RecommendationServiceCore {
