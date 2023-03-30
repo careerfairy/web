@@ -338,21 +338,6 @@ export const getDateString = (streamData: LivestreamEvent) => {
    return dateString || ""
 }
 
-export const formatLivestreamDateEmails = (
-   userTimezone: string | undefined,
-   date: Date,
-   dateTimeOptions: Intl.DateTimeFormatOptions = DateTime.DATETIME_FULL
-) => {
-   const luxonStartDate = DateTime.fromJSDate(date, {
-      zone: userTimezone || "Europe/Zurich",
-   })
-
-   let formattedDate = luxonStartDate.toLocaleString(dateTimeOptions)
-   formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
-
-   return formattedDate
-}
-
 export const markStudentStatsInUse = (totalParticipants, groupData) => {
    return totalParticipants.map((student) => {
       // Only modify that stats in use prop when it hasn't been assigned yet

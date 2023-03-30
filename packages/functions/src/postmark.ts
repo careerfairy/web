@@ -40,7 +40,5 @@ export const postmarkWebhook = functions
          functions.logger.info("User unsubscribed field updated to", field)
       }
 
-      // We just need to send a 200 response for now
-      // Our current buttons only open an url, they don't need a response
       res.status(200).end()
    })
