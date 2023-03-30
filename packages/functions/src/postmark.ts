@@ -2,6 +2,10 @@ import config from "./config"
 import * as functions from "firebase-functions"
 import { userRepo } from "./api/repositories"
 
+/**
+ * This is the key that Postmark uses to authenticate the webhook
+ * Randomly created by us, we just need to confirm we receive it in the request
+ */
 const KEY = "3562ae82-0d74-4c27-98f6-1b92408c671c"
 
 /**
