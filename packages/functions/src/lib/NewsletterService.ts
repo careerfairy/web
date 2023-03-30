@@ -206,6 +206,6 @@ export class NewsletterService {
          }
       )
 
-      this.emailBuilder.send()
+      return this.emailBuilder.send()
    }
 }

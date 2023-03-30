@@ -57,7 +57,7 @@ export class NewsletterEmailBuilder {
          To: email,
          TemplateId: Number(process.env.POSTMARK_TEMPLATE_NEWSLETTER),
          TemplateModel: {
-            name: name,
+            name,
             header1,
             header2,
             livestreams1,
