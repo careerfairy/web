@@ -39,7 +39,7 @@ export const newsletter = functions
       await newsletterService.generateRecommendations()
       await newsletterService.populateUsers()
 
-      newsletterService.send()
+      await newsletterService.send()
 
       functions.logger.info("Newsletter sent")
    })
