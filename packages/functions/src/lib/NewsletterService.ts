@@ -2,7 +2,10 @@ import { convertDocArrayToDict } from "@careerfairy/shared-lib/BaseFirebaseRepos
 import { PublicGroup } from "@careerfairy/shared-lib/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IGroupFunctionsRepository } from "./GroupFunctionsRepository"
+import { NewsletterEmailBuilder } from "./NewsletterEmailBuilder"
 import { IRecommendationDataFetcher } from "./recommendation/services/DataFetcherRecommendations"
 import UserEventRecommendationService from "./recommendation/services/UserEventRecommendationService"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
@@ -49,7 +52,9 @@ export class NewsletterService {
    constructor(
       private readonly userRepo: IUserFunctionsRepository,
       private readonly groupRepo: IGroupFunctionsRepository,
-      private readonly dataLoader: IRecommendationDataFetcher
+      private readonly dataLoader: IRecommendationDataFetcher,
+      private readonly emailBuilder: NewsletterEmailBuilder,
+      private readonly logger: Logger
    ) {}
 
    /**
@@ -72,19 +77,27 @@ export class NewsletterService {
       this.futureLivestreams = futureLivestreams as LivestreamEvent[]
       this.pastLivestreams = pastLivestreams as LivestreamEvent[]
 
-      console.info(
+      this.futureLivestreams = this.futureLivestreams.filter((l) => {
+         // filter out livestreams before now, the bundle might have events for the same day
+         // already started/ended, also hide the hidden ones
+         return l.start.toDate().getTime() > Date.now() && !l.hidden
+      })
+
+      this.logger.info(
          "Total Users subscribed to the newsletter",
          subscribedUsers.length
       )
-      console.info("Total Future Livestreams fetched", futureLivestreams.length)
-      console.info("Total Past Livestreams fetched", pastLivestreams.length)
+      this.logger.info(
+         "Total Future Livestreams fetched",
+         futureLivestreams.length
+      )
+      this.logger.info("Total Past Livestreams fetched", pastLivestreams.length)
 
       return this
    }
 
    /**
-    * Generates the recommendations for each user
-    * Saves the results in the recommendations property
+    * Generates the recommendations for each user and populates the users object
     */
    async generateRecommendations() {
       for (const userId of Object.keys(this.subscribedUsers)) {
@@ -115,10 +128,17 @@ export class NewsletterService {
       return this
    }
 
+   /**
+    * Grabs all company followers, and populates the users object
+    * with the livestreams for each group the user is following
+    */
    async populateUsers() {
       const allCompanyFollowers =
          await this.groupRepo.getAllCompaniesFollowers()
-      console.info("Total company followers", allCompanyFollowers?.length ?? 0)
+      this.logger.info(
+         "Total company followers",
+         allCompanyFollowers?.length ?? 0
+      )
 
       if (!allCompanyFollowers) return
 
@@ -135,6 +155,7 @@ export class NewsletterService {
             continue
          }
 
+         // add the group livestreams to the user
          this.users[follower.user.id].followingCompanies[follower.groupId] = {
             livestreams: groupLivestreams,
             group: follower.group,
@@ -142,13 +163,49 @@ export class NewsletterService {
          followersWithGroupLivestreams++
       }
 
-      console.info(
+      this.logger.info(
          "Total Company Followers whose groups have future livestreams",
          followersWithGroupLivestreams++
       )
    }
 
    send() {
-      // get all following groups for all users
+      // counters
+      const usersWithoutMinimumRecommendedLivestreams = []
+
+      for (const userEmail of Object.keys(this.users)) {
+         const user = this.users[userEmail]
+
+         if (user.recommendedLivestreams.length < 3) {
+            // we need at least 3 recommended livestreams to send the newsletter
+            usersWithoutMinimumRecommendedLivestreams.push(userEmail)
+            continue
+         }
+
+         const name = this.subscribedUsers[userEmail]?.firstName ?? ""
+
+         const followingLivestreams = Object.values(user.followingCompanies)
+            .map((g) => g.livestreams)
+            .flat()
+            .sort(sortLivestreamsDesc)
+
+         this.emailBuilder.addRecipient(
+            userEmail,
+            name,
+            followingLivestreams,
+            user.recommendedLivestreams
+         )
+      }
+
+      this.logger.info(
+         "Total Users without minimum recommended livestreams",
+         usersWithoutMinimumRecommendedLivestreams.length,
+         {
+            // so that we can investigate later
+            ids: usersWithoutMinimumRecommendedLivestreams,
+         }
+      )
+
+      this.emailBuilder.send()
    }
 }
