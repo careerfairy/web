@@ -7,7 +7,6 @@ import MaterialTable, {
    MTableAction,
    Options,
 } from "@material-table/core"
-import { Query } from "@firebase/firestore"
 import {
    Box,
    CircularProgress,
@@ -130,7 +129,7 @@ const baseOptions: Options<UserDataEntry> = {
 
 const localization: Localization = {
    body: {
-      emptyDataSourceMessage: "No users found",
+      emptyDataSourceMessage: "No talent found",
    },
    header: {
       actions: "",
@@ -140,20 +139,17 @@ type TableProps = {
    emptyResultsMessage?: string
    hideToolbar?: boolean
 }
-const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage, hideToolbar }) => {
-   const {filters, converterFn, results, rowsPerPage, setRowsPerPage } =
-      useUserDataTable()
-
-   const filtersInactive = useMemo(
-       () =>
-           Object.values(filters).every(
-               (value) =>
-                   (Array.isArray(value) && value.length === 0) || value === null
-           ),
-       [filters]
-   )
-
-   const emptyQuery = results.countQueryResponse?.count === 0
+const UserLivestreamDataTable: FC<TableProps> = ({
+   emptyResultsMessage,
+   hideToolbar,
+}) => {
+   const {
+      converterFn,
+      results,
+      rowsPerPage,
+      setRowsPerPage,
+      noResultsWithoutFilters,
+   } = useUserDataTable()
 
    const data = useMemo(
       () => results.data?.map(converterFn) || [],
@@ -186,33 +182,9 @@ const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage, hideTool
       [setRowsPerPage]
    )
 
-   const customComponents = useMemo<Components>(
-      () => ({
-         Action: (props) => {
-            if (props.action.icon === "custom") {
-               return <CustomActions {...props.data} />
-            }
-            return <MTableAction {...props} />
-         },
-         Pagination: (props) => (
-            <Footer
-               emptyQuery={emptyQuery}
-               paginationProps={props}
-               fullQuery={results.fullQuery}
-               totalUsers={results.countQueryResponse.count}
-            />
-         ),
-      }),
-      [emptyQuery, results.countQueryResponse.count, results.fullQuery]
-   )
-
    // If no filters are active, and the query returns no results, we know that there are no users at all
    // So we show a message saying that
-   if (
-      filtersInactive &&
-      results.countQueryResponse?.count === 0 &&
-      !results.loading
-   ) {
+   if (noResultsWithoutFilters) {
       return <EmptyUsersView message={emptyResultsMessage} />
    }
 
@@ -240,27 +212,16 @@ const actions: MaterialTableProps<UserDataEntry>["actions"] = [
    { icon: "custom", onClick: () => {} },
 ]
 
-type FooterProps = {
-   paginationProps: any
-   emptyQuery: boolean
-   fullQuery: Query
-   totalUsers: number
-}
-const Footer: FC<FooterProps> = ({
-   fullQuery,
-   paginationProps,
-   emptyQuery,
-   totalUsers,
-}) => {
-   const { converterFn, title, filters } = useUserDataTable()
+const Footer = (paginationProps: any) => {
+   const { converterFn, title, results, filtersInactive } = useUserDataTable()
 
    const { downloadingAllCVs, handleDownloadAllCVs } = useDownloadAllCVs(
-      fullQuery,
+      results.fullQuery,
       converterFn,
       title
    )
    const { copyingEmails, handleCopyAllEmails } = useCopyAllEmails(
-      fullQuery,
+      results.fullQuery,
       converterFn
    )
 
@@ -269,11 +230,9 @@ const Footer: FC<FooterProps> = ({
       csvDownloadData,
       handleExportUsers,
       handleCloseCsvDialog,
-   } = useExportUsers(fullQuery, converterFn, title)
+   } = useExportUsers(results.fullQuery, converterFn, title)
 
-   const noFiltersActive = Object.values(filters).every(
-      (value) => (Array.isArray(value) && value.length === 0) || value === null
-   )
+   const disabled = results.countQueryResponse?.count === 0
 
    return (
       <>
@@ -298,27 +257,27 @@ const Footer: FC<FooterProps> = ({
                spacing={2}
                sx={styles.actionsWrapper}
             >
-               {noFiltersActive ? null : (
+               {filtersInactive ? null : (
                   <Typography variant="body1" fontWeight={"500"}>
-                     {totalUsers || 0} talent found
+                     {results.countQueryResponse?.count || 0} talent found
                   </Typography>
                )}
                <ResponsiveButton
                   text="Export Talent"
-                  disabled={emptyQuery}
+                  disabled={disabled}
                   onClick={handleExportUsers}
                   loading={exportingUsers}
                   icon={<ExportIcon />}
                />
                <ResponsiveButton
-                  disabled={emptyQuery}
+                  disabled={disabled}
                   text="Download CVs"
                   onClick={handleDownloadAllCVs}
                   loading={downloadingAllCVs}
                   icon={<DownloadIcon />}
                />
                <ResponsiveButton
-                  disabled={emptyQuery}
+                  disabled={disabled}
                   text="Copy Emails"
                   onClick={handleCopyAllEmails}
                   loading={copyingEmails}
@@ -534,6 +493,16 @@ const columns: Column<UserDataEntry>[] = [
       },
    },
 ]
+
+const customComponents: Components = {
+   Action: (props) => {
+      if (props.action.icon === "custom") {
+         return <CustomActions {...props.data} />
+      }
+      return <MTableAction {...props} />
+   },
+   Pagination: Footer,
+}
 
 export const TableSkeleton = () => {
    return (

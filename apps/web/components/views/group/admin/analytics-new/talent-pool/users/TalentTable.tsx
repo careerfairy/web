@@ -70,7 +70,10 @@ const DataTable = () => {
                <CustomToolbar />
             </Grid>
             <Grid item xs={12}>
-               <UserLivestreamDataTable hideToolbar />
+               <UserLivestreamDataTable
+                  hideToolbar
+                  emptyResultsMessage="Create a live stream to allow young talent to join your talent pool."
+               />
             </Grid>
          </Grid>
       </UserDataTableProvider>

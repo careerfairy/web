@@ -56,6 +56,18 @@ type UserLivestreamDataTableContextValue = {
     * Function to convert the document from the collection to the normalized format we want to display in the table
     * */
    converterFn: (doc: unknown) => UserDataEntry
+   /*
+    * If true, the table will show a message when there are no results without filters
+    */
+   noResultsWithoutFilters: boolean
+   /*
+    * If true, the table will show a message when there are no results with filters
+    * */
+   noResultsWithFilters: boolean
+   /*
+    *  Boolean to determine if all filters are inactive
+    * */
+   filtersInactive: boolean
 }
 const UserLivestreamDataTableContext =
    createContext<UserLivestreamDataTableContextValue>({
@@ -92,6 +104,9 @@ const UserLivestreamDataTableContext =
       results: null,
       rowsPerPage: 10,
       setRowsPerPage: () => {},
+      noResultsWithoutFilters: false,
+      noResultsWithFilters: false,
+      filtersInactive: false,
    })
 
 type Props = {
@@ -139,6 +154,31 @@ const UserDataTableProvider: FC<Props> = ({
       resetFilters()
    }, [targetCollectionQuery, resetFilters])
 
+   const filtersInactive = useMemo(
+      () =>
+         Object.values(filters).every(
+            (value) =>
+               (Array.isArray(value) && value.length === 0) || value === null
+         ),
+      [filters]
+   )
+
+   const noResultsWithoutFilters = useMemo(
+      () =>
+         filtersInactive &&
+         results.countQueryResponse?.count === 0 &&
+         !results.loading,
+      [filtersInactive, results.countQueryResponse?.count, results.loading]
+   )
+
+   const noResultsWithFilters = useMemo(
+      () =>
+         !filtersInactive &&
+         results.countQueryResponse?.count === 0 &&
+         !results.loading,
+      [filtersInactive, results.countQueryResponse?.count, results.loading]
+   )
+
    const value = useMemo<UserLivestreamDataTableContextValue>(
       () => ({
          filters,
@@ -154,13 +194,19 @@ const UserDataTableProvider: FC<Props> = ({
          setRowsPerPage,
          rowsPerPage,
          results,
+         noResultsWithoutFilters,
+         noResultsWithFilters,
+         filtersInactive,
       }),
       [
          converterFn,
          documentPaths,
          fieldsOfStudyLookup,
          filters,
+         filtersInactive,
          levelsOfStudyLookup,
+         noResultsWithFilters,
+         noResultsWithoutFilters,
          resetFilters,
          results,
          rowsPerPage,
