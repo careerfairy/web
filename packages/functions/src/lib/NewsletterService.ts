@@ -24,6 +24,9 @@ type UserLivestreams = {
    }
 }
 
+/**
+ * Gathers all the required data to build the newsletter
+ */
 export class NewsletterService {
    /**
     * The users that have subscribed to the newsletter

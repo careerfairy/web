@@ -7,6 +7,9 @@ import { TemplatedMessage } from "postmark"
 import { PostmarkEmailSender } from "../api/postmark"
 import { DateTime } from "luxon"
 
+/**
+ * Builds a newsletter email (templated) and sends it to the recipients
+ */
 export class NewsletterEmailBuilder {
    private readonly from = "CareerFairy <noreply@careerfairy.io>"
    private recipients: TemplatedMessage[] = []
