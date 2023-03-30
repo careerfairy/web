@@ -43,6 +43,7 @@ import { useUserDataTable } from "./UserDataTableProvider"
 import ExportIcon from "@mui/icons-material/ListAltOutlined"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
+import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -198,6 +199,10 @@ const UserLivestreamDataTable = () => {
       }),
       [emptyQuery, results.countQueryResponse.count, results.fullQuery]
    )
+
+   if (results.countQueryResponse?.count === 0) {
+      return <EmptyTalentProfilesView />
+   }
 
    return (
       <Box sx={styles.root}>
@@ -364,7 +369,7 @@ const CustomActions = (rowData: UserDataEntry) => {
                <IconButton
                   component="a"
                   disabled={!rowData.linkedInUrl}
-                  href={rowData.linkedInUrl}
+                  href={makeExternalLink(rowData.linkedInUrl)}
                   target="_blank"
                   sx={styles.linkedInIcon}
                >
@@ -538,6 +543,16 @@ export const TableSkeleton = () => {
             localization={localization}
             columns={columns}
          />
+      </Box>
+   )
+}
+
+const EmptyTalentProfilesView = () => {
+   return (
+      <Box width="100%" py={7}>
+         <Typography align="center" variant="h6">
+            Create a live stream to allow young talent to join your talent pool.
+         </Typography>
       </Box>
    )
 }

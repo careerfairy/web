@@ -21,7 +21,7 @@ const useClosestLivestreamStats = (
    groupId: string,
    shouldFetch: boolean
 ): Return => {
-   const { push } = useRouter()
+   const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
 
    const { isLoading, data: closestLivestreamId } = useSWR(
@@ -43,13 +43,13 @@ const useClosestLivestreamStats = (
       if (closestLivestreamId && shouldFetch) {
          setIsRedirecting(true)
 
-         push(
+         replace(
             `/group/${groupId}/admin/analytics/live-stream/${
                closestLivestreamId ?? ""
             }`
          ).then(() => setIsRedirecting(false))
       }
-   }, [closestLivestreamId, groupId, push, shouldFetch])
+   }, [closestLivestreamId, groupId, replace, shouldFetch])
 
    return {
       isLoading: isLoading || isRedirecting,
