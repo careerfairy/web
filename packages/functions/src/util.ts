@@ -338,6 +338,20 @@ export const getDateString = (streamData: LivestreamEvent) => {
    return dateString || ""
 }
 
+export const formatLivestreamDateEmails = (
+   userTimezone: string | undefined,
+   date: Date
+) => {
+   const luxonStartDate = DateTime.fromJSDate(date, {
+      zone: userTimezone || "Europe/Zurich",
+   })
+
+   let formattedDate = luxonStartDate.toLocaleString(DateTime.DATETIME_FULL)
+   formattedDate = dateFormatOffset(formattedDate) // add parentheses to offset
+
+   return formattedDate
+}
+
 export const markStudentStatsInUse = (totalParticipants, groupData) => {
    return totalParticipants.map((student) => {
       // Only modify that stats in use prop when it hasn't been assigned yet
@@ -404,6 +418,10 @@ export const isLocalEnvironment = () => {
       process.env.NODE_ENV === "development" ||
       process.env.NODE_ENV === "test"
    )
+}
+
+export const isTestEnvironment = () => {
+   return process.env.NODE_ENV === "test"
 }
 
 export const logAxiosError = (error: any) => {
