@@ -15,7 +15,7 @@ export const postmarkWebhook = functions
          return
       }
 
-      functions.logger.info("Postmark Webhook", {
+      functions.logger.info("Postmark Webhook Body", {
          body: req.body,
       })
 
@@ -23,9 +23,11 @@ export const postmarkWebhook = functions
          req.body?.RecordType === "SubscriptionChange" &&
          req.body?.Recipient
       ) {
+         const field = Boolean(req.body?.SuppressSending)
          await userRepo.updateAdditionalInformation(req.body.Recipient, {
-            unsubscribed: Boolean(req.body?.SuppressSending),
+            unsubscribed: field,
          })
+         functions.logger.info("User unsubscribed field updated to", field)
       }
 
       // We just need to send a 200 response for now
