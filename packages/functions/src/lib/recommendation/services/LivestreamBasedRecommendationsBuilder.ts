@@ -21,7 +21,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
       )
 
       if (mostCommonInterestIds.length) {
-         this.promises.push(
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnInterests(
                mostCommonInterestIds,
                this.limit
@@ -39,7 +39,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
       )
 
       if (mostCommonCountries.length) {
-         this.promises.push(
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCountriesOfInterest(
                mostCommonCountries,
                this.limit
@@ -57,7 +57,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
       )
 
       if (mostCommonIndustries.length) {
-         this.promises.push(
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnIndustries(
                mostCommonIndustries,
                this.limit
@@ -75,7 +75,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
       )
 
       if (mostCommonCompanySizes.length) {
-         this.promises.push(
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCompanySizes(
                mostCommonCompanySizes,
                this.limit
@@ -92,7 +92,7 @@ export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilde
       )
 
       if (mostCommonFieldsOfStudy.length) {
-         this.promises.push(
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnFieldOfStudies(
                mostCommonFieldsOfStudy,
                this.limit

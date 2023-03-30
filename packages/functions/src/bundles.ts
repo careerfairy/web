@@ -1,5 +1,6 @@
 import { getEarliestEventBufferTime } from "@careerfairy/shared-lib/livestreams"
-import { Bundle, generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { DateTime } from "luxon"
+import { Bundle } from "./lib/bundleGenerator"
 
 /**
  * Each bundle in this array will be a separate function named:
@@ -12,8 +13,8 @@ import { Bundle, generateFunctionsFromBundles } from "./lib/bundleGenerator"
  *
  * You'll need to deploy both the new function, and the new hosting config.
  */
-const bundles: Bundle[] = [
-   {
+export const bundles = {
+   allFutureLivestreams: {
       name: "allFutureLivestreams",
       cacheControl: "public, max-age=900", // 15min
       queries: {
@@ -24,6 +25,24 @@ const bundles: Bundle[] = [
                .where("test", "==", false),
       },
    },
-]
 
-module.exports = generateFunctionsFromBundles(bundles)
+   // Warning: may take ~20s to generate when not cached
+   pastYearLivestreams: {
+      name: "pastYearLivestreams",
+      cacheControl: "public, max-age=86400", // 1 day, this list is big
+      queries: {
+         "past-livestreams-query": (firestore) =>
+            firestore
+               .collection("livestreams")
+               .where(
+                  "start",
+                  ">",
+                  DateTime.local().minus({ year: 1 }).toJSDate()
+               )
+               .where("start", "<", new Date())
+               .where("test", "==", false),
+      },
+   },
+} satisfies { [key: string]: Bundle }
+
+export type BundleName = keyof typeof bundles

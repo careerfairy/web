@@ -31,5 +31,6 @@ module.exports = {
       "require-jsdoc": 0,
       "@typescript-eslint/ban-ts-ignore": "off",
       "@typescript-eslint/ban-ts-comment": "off",
+      "guard-for-in": "off",
    },
 }
