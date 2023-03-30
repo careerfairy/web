@@ -4,6 +4,12 @@ import { userRepo } from "./api/repositories"
 
 const KEY = "3562ae82-0d74-4c27-98f6-1b92408c671c"
 
+/**
+ * This function is called when there is a new event in Postmark that we're subscribed
+ *
+ * Currently, we only care about the SubscriptionChange event, which is triggered when
+ * a user unsubscribes from our emails. We need to update our database to reflect this
+ */
 export const postmarkWebhook = functions
    .region(config.region)
    .https.onRequest(async (req, res) => {
