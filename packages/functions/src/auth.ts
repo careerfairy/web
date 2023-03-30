@@ -50,6 +50,7 @@ export const createNewUserAccount_v4 = functions.https.onCall(
          gender = "",
          fieldOfStudy = null,
          levelOfStudy = null,
+         registrationUTMParams = {},
       } = userData
 
       console.log(
@@ -62,6 +63,11 @@ export const createNewUserAccount_v4 = functions.https.onCall(
             console.log(
                `Starting firestore account creation process for ${recipientEmail}`
             )
+
+            const registrationUTMsToSave =
+               Object.keys(registrationUTMParams).length > 0
+                  ? { registrationUTMParams }
+                  : {}
 
             await admin
                .firestore()
@@ -86,6 +92,7 @@ export const createNewUserAccount_v4 = functions.https.onCall(
                      lastActivityAt:
                         admin.firestore.FieldValue.serverTimestamp(),
                      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                     ...registrationUTMsToSave,
                   })
                )
                .then(async () => {

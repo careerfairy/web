@@ -1,4 +1,4 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, UTMParams } from "../commonTypes"
 import firebase from "firebase/compat/app"
 import {
    Group,
@@ -57,6 +57,7 @@ export interface UserData extends Identifiable {
    countriesOfInterest?: string[]
    regionsOfInterest?: string[]
    isLookingForJob?: boolean
+   registrationUTMParams?: UTMParams
 
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
