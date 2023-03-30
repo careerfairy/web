@@ -1,9 +1,8 @@
 import usePaginatedCollection, {
    UsePaginatedCollection,
 } from "components/custom-hook/utils/usePaginatedCollection"
-import { orderBy, query, where } from "firebase/firestore"
+import { query, where } from "firebase/firestore"
 import { useMemo } from "react"
-import { SortedTableColumn } from "../../../common/table/UserLivestreamDataTable"
 import { CollectionReference, QueryConstraint } from "@firebase/firestore"
 import { University } from "@careerfairy/shared-lib/universities"
 import {
@@ -22,7 +21,6 @@ const usePaginatedUsersCollection = (
    targetCollectionRef: CollectionReference,
    documentPaths: DocumentPaths,
    limit = 10,
-   sortedTableColumn: SortedTableColumn,
    filters: Filters
 ) => {
    // @ts-ignore we're sorting by a nested field here
@@ -73,13 +71,6 @@ const usePaginatedUsersCollection = (
          )
       }
 
-      // If a table column is sorted, we want to sort the results by that column
-      if (sortedTableColumn) {
-         constraints.push(
-            orderBy(sortedTableColumn.field, sortedTableColumn.direction)
-         )
-      }
-
       return {
          query: query<unknown>(
             // @ts-ignore
@@ -98,7 +89,6 @@ const usePaginatedUsersCollection = (
       filters.selectedUniversity,
       filters.selectedFieldOfStudy,
       filters.selectedLevelOfStudy,
-      sortedTableColumn,
       targetCollectionRef,
       limit,
       documentPaths.orderBy,
