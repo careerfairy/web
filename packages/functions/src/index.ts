@@ -44,6 +44,8 @@ import recommendation = require("./recommendation")
 import onWriteTriggers = require("./onWriteTriggers")
 import onCreateTriggers = require("./onCreateTriggers")
 import onDeleteTriggers = require("./onDeleteTriggers")
+import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { bundles } from "./bundles"
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -128,7 +130,7 @@ exports.sendEmailToStudentOfUniversityAndField =
 //
 // When adding new bundles, you probably also want to update the
 // Firebase Hosting mappings: npx firebase deploy --only hosting
-export * as bundle from "./bundles"
+exports.bundle = generateFunctionsFromBundles(bundles)
 
 // Algolia
 // exports.addToIndex = algolia.addToIndex

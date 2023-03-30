@@ -44,6 +44,13 @@ export type PastEventsOptions = {
    showHidden?: boolean
 }
 
+export type RegisteredEventsOptions = {
+   limit?: number
+   from?: Date
+   to?: Date
+   orderByDirection?: "asc" | "desc"
+}
+
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
 
@@ -54,8 +61,8 @@ export interface ILivestreamRepository {
 
    getRegisteredEvents(
       userEmail: string,
-      limit?: number
-   ): Promise<LivestreamEvent[] | null>
+      options?: RegisteredEventsOptions
+   ): Promise<LivestreamEvent[]>
 
    getRecommendEvents(
       userEmail: string,
@@ -536,19 +543,36 @@ export class FirebaseLivestreamRepository
 
    async getRegisteredEvents(
       userEmail: string,
-      limit?: number
-   ): Promise<LivestreamEvent[] | null> {
-      if (!userEmail) return null
+      options: RegisteredEventsOptions = {}
+   ): Promise<LivestreamEvent[]> {
       let livestreamRef = this.firestore
          .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
          .where("registeredUsers", "array-contains", userEmail)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
+
+      if (options.orderByDirection) {
+         livestreamRef = livestreamRef.orderBy(
+            "start",
+            options.orderByDirection
+         )
+      } else {
+         livestreamRef = livestreamRef.orderBy("start", "asc")
       }
+
+      if (options.from) {
+         livestreamRef = livestreamRef.where("start", ">", options.from)
+      }
+
+      if (options.to) {
+         livestreamRef = livestreamRef.where("start", "<", options.to)
+      }
+
+      if (options.limit) {
+         livestreamRef = livestreamRef.limit(options.limit)
+      }
+
       const snapshots = await livestreamRef.get()
+
       return this.mapLivestreamCollections(snapshots).get()
    }
 

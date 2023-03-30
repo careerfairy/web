@@ -27,17 +27,23 @@ export type Bundle = {
 /**
  * Generates a set of functions that will generate a bundle
  */
-export function generateFunctionsFromBundles(bundles: Bundle[]) {
+export function generateFunctionsFromBundles(bundles: Record<string, Bundle>) {
    const exports = {}
 
-   for (const bundle of bundles) {
-      exports[bundle.name] = functions
+   for (const bundleName in bundles) {
+      const bundle = bundles[bundleName]
+
+      exports[bundleName] = functions
          .region(config.region)
+         .runWith({
+            // big bundles, require more memory to generate them faster
+            memory: "512MB",
+         })
          .https.onRequest(async (_, res) => {
             const firestore = admin.firestore()
 
             // Build the bundle from the query results
-            const bundleCreator = firestore.bundle(bundle.name)
+            const bundleCreator = firestore.bundle(bundleName)
 
             // fetch the data queries in parallel
             const queriesPromises = Object.keys(bundle.queries).map(

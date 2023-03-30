@@ -1,18 +1,10 @@
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import {
-   getEarliestEventBufferTime,
-   LivestreamEvent,
-   UserParticipatingStats,
-} from "@careerfairy/shared-lib/livestreams"
-import { ILivestreamRepository } from "@careerfairy/shared-lib/livestreams/LivestreamRepository"
-import { mapFirestoreAdminSnapshots } from "../../../util"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
 } from "../util"
-
-// This only imports the types at compile time and not the actual library at runtime
-type FirebaseAdmin = typeof import("firebase-admin")
 
 type RankEventsArgs = {
    rankedLivestreams: RankedLivestreamEvent[]
@@ -28,27 +20,30 @@ type RankEventsArgs = {
  * update it to fetch the data from a data bundle
  */
 export class RankedLivestreamRepository {
-   private readonly firestore: ReturnType<FirebaseAdmin["firestore"]>
-   private totalDocumentReads = 0
-
    private readonly pointsPerInterestMatch = 1
    private readonly pointsPerCountryMatch = 3
    private readonly pointsPerFieldOfStudyMatch = 1
    private readonly pointsPerCompanyIndustryMatch = 2
    private readonly pointsPerCompanySizeMatch = 1
 
-   constructor(
-      firebaseAdmin: FirebaseAdmin,
-      private readonly livestreamRepo: ILivestreamRepository
-   ) {
-      this.firestore = firebaseAdmin.firestore()
+   private readonly livestreams: RankedLivestreamEvent[]
+
+   constructor(livestreams: LivestreamEvent[]) {
+      const filtered = livestreams
+         .filter((stream) => !stream.hidden)
+         .filter((stream) => !stream.test)
+
+      // sort in place asc
+      filtered.sort((a, b) => sortLivestreamsDesc(b, a))
+
+      this.livestreams = filtered.map(RankedLivestreamEvent.create)
    }
 
-   public async getEventsBasedOnFieldOfStudies(
+   public getEventsBasedOnFieldOfStudies(
       fieldOfStudies: FieldOfStudy[],
       limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const events = await this.getEventsFilteredByArrayField(
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
          "targetFieldsOfStudy",
          fieldOfStudies,
          limit
@@ -62,11 +57,11 @@ export class RankedLivestreamRepository {
       })
    }
 
-   public async getEventsBasedOnCountriesOfInterest(
+   public getEventsBasedOnCountriesOfInterest(
       countriesOfInterest: string[], // PT, CH, DE, etc.
       limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const events = await this.getEventsFilteredByArrayField(
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
          "companyCountries",
          countriesOfInterest,
          limit
@@ -80,11 +75,11 @@ export class RankedLivestreamRepository {
       })
    }
 
-   public async getEventsBasedOnIndustries(
+   public getEventsBasedOnIndustries(
       industries: string[],
       limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const events = await this.getEventsFilteredByArrayField(
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
          "companyIndustries",
          industries,
          limit
@@ -98,11 +93,11 @@ export class RankedLivestreamRepository {
       })
    }
 
-   public async getEventsBasedOnCompanySizes(
+   public getEventsBasedOnCompanySizes(
       sizes: string[],
       limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const events = await this.getEventsFilteredByArrayField(
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
          "companySizes",
          sizes,
          limit
@@ -116,11 +111,11 @@ export class RankedLivestreamRepository {
       })
    }
 
-   public async getEventsBasedOnInterests(
+   public getEventsBasedOnInterests(
       interestIds: string[],
       limit = 10
-   ): Promise<RankedLivestreamEvent[]> {
-      const events = await this.getEventsFilteredByArrayField(
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
          "interestsIds",
          interestIds,
          limit
@@ -134,83 +129,20 @@ export class RankedLivestreamRepository {
       })
    }
 
-   public async getMostRecentlyWatchedEvents(
-      userId: string,
-      limit: number
-   ): Promise<LivestreamEvent[]> {
-      // Get most recently watched event stats
-      const snaps = await this.firestore
-         .collectionGroup("participatingStats")
-         .where("id", "==", userId)
-         .orderBy("livestream.start", "desc")
-         .limit(limit)
-         .get()
-
-      const participatingStats =
-         mapFirestoreAdminSnapshots<UserParticipatingStats>(snaps)
-
-      // sort results by watch time
-      const sortedParticipatingStats = participatingStats.sort(
-         (a, b) => b.totalMinutes - a.totalMinutes
-      )
-
-      // Get the livestreams from the participating stats
-      const livestreamIds = sortedParticipatingStats
-         .map((stats) => stats.livestreamId)
-         .filter(Boolean)
-
-      if (!livestreamIds.length) {
-         return []
-      }
-
-      return this.livestreamRepo.getLivestreamsByIds(livestreamIds)
-   }
-
-   public totalReads(): number {
-      return this.totalDocumentReads
-   }
-
-   // TODO: this should be private
-   public addReads(count: number): void {
-      // empty results counts as 1 read for firestore
-      this.totalDocumentReads += count === 0 ? 1 : count
-   }
-
    private getEventsFilteredByArrayField(
       field: keyof LivestreamEvent,
       values: unknown[],
       limit: number
-   ): Promise<RankedLivestreamEvent[]> {
-      return this.getEvents(
-         (query) =>
-            query.where(field, "array-contains-any", values.slice(0, 10)),
-         limit
-      )
-   }
+   ): RankedLivestreamEvent[] {
+      return this.livestreams
+         .filter((stream) => {
+            const streamArrayField = stream.model[field]
+            if (!streamArrayField || !Array.isArray(streamArrayField))
+               return false
 
-   private async getEvents(
-      filterQuery: (
-         currentQuery: FirebaseFirestore.Query
-      ) => FirebaseFirestore.Query,
-      limit: number
-   ): Promise<RankedLivestreamEvent[]> {
-      let query = this.firestore
-         .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
-         .where("test", "==", false)
-         .where("hidden", "==", false)
-
-      query = filterQuery(query).orderBy("start", "asc").limit(limit)
-
-      const snapshots = await query.get()
-
-      this.addReads(snapshots.docs.length)
-
-      const events = mapFirestoreAdminSnapshots<LivestreamEvent>(snapshots).map(
-         RankedLivestreamEvent.create
-      )
-
-      return events
+            return streamArrayField.some((value) => values.includes(value))
+         })
+         .slice(0, limit)
    }
 
    private rankEvents({

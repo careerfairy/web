@@ -15,8 +15,8 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userInterests() {
       if (this.user.interestsIds?.length) {
-         this.promises.push(
-            // Fetch recommended events based on the user's interests
+         // Fetch recommended events based on the user's interests
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnInterests(
                this.user.interestsIds,
                this.limit
@@ -29,8 +29,8 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userFieldsOfStudy() {
       if (this.user.fieldOfStudy?.id) {
-         this.promises.push(
-            // Fetch recommended events based on the user's fields of study
+         // Fetch recommended events based on the user's fields of study
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnFieldOfStudies(
                [this.user.fieldOfStudy],
                this.limit
@@ -43,8 +43,8 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
    public userCountriesOfInterest() {
       if (this.user.countriesOfInterest?.length > 0) {
-         this.promises.push(
-            // Fetch the top recommended events based on the user's field of study
+         // Fetch the top recommended events based on the user's field of study
+         this.addResults(
             this.rankedLivestreamRepo.getEventsBasedOnCountriesOfInterest(
                this.user.countriesOfInterest,
                this.limit
