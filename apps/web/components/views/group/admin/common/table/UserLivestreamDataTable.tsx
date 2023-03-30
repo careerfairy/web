@@ -1,4 +1,4 @@
-import React, { FC, ReactNode, useCallback, useMemo, useState } from "react"
+import React, { FC, ReactNode, useCallback, useMemo } from "react"
 import MaterialTable, {
    Column,
    Components,
@@ -21,7 +21,6 @@ import {
 } from "@mui/material"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
-import usePaginatedUsersCollection from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
 import Stack from "@mui/material/Stack"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import { LINKEDIN_COLOR } from "../../../../../util/colors"
@@ -48,6 +47,7 @@ import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions
 const styles = sxStyles({
    root: {
       width: "-webkit-fill-available",
+      overflow: "hidden",
       "& button": {},
       "& .MuiPaper-root": {
          boxShadow: "none",
@@ -138,27 +138,19 @@ const localization: Localization = {
 }
 type TableProps = {
    emptyResultsMessage?: string
+   hideToolbar?: boolean
 }
-const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage }) => {
-   const { filters, documentPaths, converterFn, targetCollectionQuery } =
+const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage, hideToolbar }) => {
+   const {filters, converterFn, results, rowsPerPage, setRowsPerPage } =
       useUserDataTable()
 
-   const [rowsPerPage, setRowsPerPage] = useState(10)
-
-   const results = usePaginatedUsersCollection(
-      targetCollectionQuery,
-      documentPaths,
-      rowsPerPage,
-      filters
-   )
-
    const filtersInactive = useMemo(
-      () =>
-         Object.values(filters).every(
-            (value) =>
-               (Array.isArray(value) && value.length === 0) || value === null
-         ),
-      [filters]
+       () =>
+           Object.values(filters).every(
+               (value) =>
+                   (Array.isArray(value) && value.length === 0) || value === null
+           ),
+       [filters]
    )
 
    const emptyQuery = results.countQueryResponse?.count === 0
@@ -187,9 +179,12 @@ const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage }) => {
       [rowsPerPage]
    )
 
-   const handlePageSizeChange = useCallback((pageSize: number) => {
-      setRowsPerPage(pageSize)
-   }, [])
+   const handlePageSizeChange = useCallback(
+      (pageSize: number) => {
+         setRowsPerPage(pageSize)
+      },
+      [setRowsPerPage]
+   )
 
    const customComponents = useMemo<Components>(
       () => ({
@@ -223,7 +218,7 @@ const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage }) => {
 
    return (
       <Box sx={styles.root}>
-         <Toolbar />
+         {hideToolbar ? null : <Toolbar />}
          <MaterialTable
             data={data}
             isLoading={results.loading}

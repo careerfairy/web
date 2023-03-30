@@ -1,4 +1,6 @@
-import { Filters } from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
+import usePaginatedUsersCollection, {
+   Filters,
+} from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
 import React, {
    createContext,
    FC,
@@ -9,7 +11,7 @@ import React, {
    useState,
 } from "react"
 import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
-import { DocumentData, CollectionReference } from "@firebase/firestore"
+import { CollectionReference, Query } from "@firebase/firestore"
 import { UserDataEntry } from "./UserLivestreamDataTable"
 
 /*
@@ -45,8 +47,11 @@ type UserLivestreamDataTableContextValue = {
    filters: Filters
    setFilters: React.Dispatch<React.SetStateAction<Filters>>
    resetFilters: () => void
+   rowsPerPage: number
+   results: ReturnType<typeof usePaginatedUsersCollection>
+   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>
    documentPaths: DocumentPaths
-   targetCollectionQuery: CollectionReference
+   targetCollectionQuery: CollectionReference | Query
    /*
     * Function to convert the document from the collection to the normalized format we want to display in the table
     * */
@@ -84,13 +89,16 @@ const UserLivestreamDataTableContext =
       },
       targetCollectionQuery: null,
       converterFn: () => null,
+      results: null,
+      rowsPerPage: 10,
+      setRowsPerPage: () => {},
    })
 
 type Props = {
    fieldsOfStudyLookup: Record<string, string>
    levelsOfStudyLookup: Record<string, string>
    documentPaths: DocumentPaths
-   targetCollectionQuery: CollectionReference<DocumentData>
+   targetCollectionQuery: CollectionReference | Query
    converterFn: (doc: unknown) => UserDataEntry
    title: string
 }
@@ -117,6 +125,15 @@ const UserDataTableProvider: FC<Props> = ({
       setFilters(initialFilters)
    }, [])
 
+   const [rowsPerPage, setRowsPerPage] = useState(10)
+
+   const results = usePaginatedUsersCollection(
+      targetCollectionQuery,
+      documentPaths,
+      rowsPerPage,
+      filters
+   )
+
    useEffect(() => {
       // reset filters when livestreamId changes
       resetFilters()
@@ -134,6 +151,9 @@ const UserDataTableProvider: FC<Props> = ({
          targetCollectionQuery,
          converterFn,
          title,
+         setRowsPerPage,
+         rowsPerPage,
+         results,
       }),
       [
          converterFn,
@@ -142,10 +162,13 @@ const UserDataTableProvider: FC<Props> = ({
          filters,
          levelsOfStudyLookup,
          resetFilters,
+         results,
+         rowsPerPage,
          targetCollectionQuery,
          title,
       ]
    )
+
    return (
       <UserLivestreamDataTableContext.Provider value={value}>
          {children}
