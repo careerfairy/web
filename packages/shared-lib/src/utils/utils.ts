@@ -190,3 +190,11 @@ export const createLookup = <T extends Identifiable>(
       return acc
    }, {})
 }
+
+export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
+   const ellipsis = "..."
+   if (text.length <= maxLength) {
+      return text
+   }
+   return text.substring(0, maxLength - ellipsis.length) + ellipsis
+}

@@ -13,8 +13,8 @@ import { useAuth } from "../../../../HOCs/AuthProvider"
 import ChevronRight from "@mui/icons-material/ChevronRight"
 import { useFirebaseService } from "../../../../context/firebase/FirebaseServiceContext"
 import { getRelevantHosts } from "../../../../util/streamUtil"
-import { getSubstringWithEllipsis } from "../../../../util/SeoUtil"
 import Image from "next/image"
+import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 
 const styles = sxStyles({
    wrapper: {
