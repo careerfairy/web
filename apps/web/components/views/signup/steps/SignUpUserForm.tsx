@@ -39,6 +39,7 @@ import PasswordRepeat from "../userInformation/PasswordRepeat"
 import HelperHint from "../common/HelperHint"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import { userRepo } from "../../../../data/RepositoryInstances"
+import CookiesUtil from "../../../../util/CookiesUtil"
 
 const styles = sxStyles({
    submit: {
@@ -121,8 +122,13 @@ function SignUpUserForm() {
       setEmailSent(false)
       setGeneralLoading(true)
 
+      const valuesWithUtmParams = {
+         ...values,
+         registrationUTMParams: CookiesUtil.getUTMParams() ?? {},
+      }
+
       firebase
-         .createUserInAuthAndFirebase(values)
+         .createUserInAuthAndFirebase(valuesWithUtmParams)
          .then(() => {
             firebase
                .signInWithEmailAndPassword(values.email, values.password)
