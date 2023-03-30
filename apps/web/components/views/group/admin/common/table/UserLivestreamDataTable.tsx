@@ -136,8 +136,10 @@ const localization: Localization = {
       actions: "",
    },
 }
-
-const UserLivestreamDataTable = () => {
+type TableProps = {
+   emptyResultsMessage?: string
+}
+const UserLivestreamDataTable: FC<TableProps> = ({ emptyResultsMessage }) => {
    const { filters, documentPaths, converterFn, targetCollectionQuery } =
       useUserDataTable()
 
@@ -148,6 +150,15 @@ const UserLivestreamDataTable = () => {
       documentPaths,
       rowsPerPage,
       filters
+   )
+
+   const filtersInactive = useMemo(
+      () =>
+         Object.values(filters).every(
+            (value) =>
+               (Array.isArray(value) && value.length === 0) || value === null
+         ),
+      [filters]
    )
 
    const emptyQuery = results.countQueryResponse?.count === 0
@@ -200,8 +211,14 @@ const UserLivestreamDataTable = () => {
       [emptyQuery, results.countQueryResponse.count, results.fullQuery]
    )
 
-   if (results.countQueryResponse?.count === 0) {
-      return <EmptyTalentProfilesView />
+   // If no filters are active, and the query returns no results, we know that there are no users at all
+   // So we show a message saying that
+   if (
+      filtersInactive &&
+      results.countQueryResponse?.count === 0 &&
+      !results.loading
+   ) {
+      return <EmptyUsersView message={emptyResultsMessage} />
    }
 
    return (
@@ -547,11 +564,14 @@ export const TableSkeleton = () => {
    )
 }
 
-const EmptyTalentProfilesView = () => {
+type EmptyUsersViewProps = {
+   message?: string
+}
+const EmptyUsersView: FC<EmptyUsersViewProps> = ({ message = "No users" }) => {
    return (
       <Box width="100%" py={7}>
          <Typography align="center" variant="h6">
-            Create a live stream to allow young talent to join your talent pool.
+            {message}
          </Typography>
       </Box>
    )

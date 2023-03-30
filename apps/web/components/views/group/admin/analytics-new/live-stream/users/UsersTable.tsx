@@ -78,7 +78,7 @@ const DataTable = () => {
          converterFn={converterFn}
          title={getTitle(userType, currentStreamStats)}
       >
-         <UserLivestreamDataTable />
+         <UserLivestreamDataTable emptyResultsMessage="Create a live stream to collect analytics." />
       </UserDataTableProvider>
    )
 }

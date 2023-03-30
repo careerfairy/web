@@ -184,13 +184,13 @@ const QueryLivestreamStats = ({ livestreamId }: { livestreamId: string }) => {
 
    useEffect(() => {
       // If there are no stats or the query is still loading, we don't want to set the current stream stats
-      if (!stats?.length || !isLoaded) {
+      if (!isLoaded) {
          setCurrentStreamStats(undefined)
          return
       }
 
       // We only want the first result
-      setCurrentStreamStats(stats[0] || null)
+      setCurrentStreamStats(stats?.[0] || null)
 
       return () => {
          setCurrentStreamStats(undefined)
