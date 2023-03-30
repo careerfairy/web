@@ -47,6 +47,7 @@ import onDeleteTriggers = require("./onDeleteTriggers")
 import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
 import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
+import postmark = require("./postmark")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -123,6 +124,9 @@ exports.notifySlackWhenALivestreamStarts =
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent = livestreams.getLivestreamICalendarEvent
+
+// Postmark webhooks
+exports.postmarkWebhook = postmark.postmarkWebhook
 
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =
