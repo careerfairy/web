@@ -1,5 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Logger } from "../IRecommendationService"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { getMostCommonArrayValues, getMostCommonFieldsOfStudies } from "../util"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"

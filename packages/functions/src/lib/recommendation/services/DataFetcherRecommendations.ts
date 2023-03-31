@@ -21,7 +21,7 @@ export interface IRecommendationDataFetcher {
  *
  * Useful when generating the newsletters, generic data for all users
  */
-export class BundleDataFetcher implements IRecommendationDataFetcher {
+export class NewsletterDataFetcher implements IRecommendationDataFetcher {
    constructor(private readonly loader: BundleLoader) {}
 
    getUser(): Promise<UserData> {
@@ -38,16 +38,16 @@ export class BundleDataFetcher implements IRecommendationDataFetcher {
       return this.loader.getDocs<LivestreamEvent>("past-livestreams-query")
    }
 
-   static async create(): Promise<BundleDataFetcher> {
+   static async create(): Promise<NewsletterDataFetcher> {
       const loader = new BundleLoader()
 
       // fetch the bundles data from remote cdn
       await Promise.all([
-         loader.fetch("allFutureLivestreams"),
+         loader.fetch("futureLivestreamsNext15Days"),
          loader.fetch("pastYearLivestreams"),
       ])
 
-      return new BundleDataFetcher(loader)
+      return new NewsletterDataFetcher(loader)
    }
 }
 

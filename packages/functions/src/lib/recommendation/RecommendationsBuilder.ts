@@ -1,5 +1,5 @@
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Logger } from "./IRecommendationService"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,

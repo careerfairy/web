@@ -25,7 +25,10 @@ export default class UserEventRecommendationService
    constructor(
       private readonly user: UserData,
       private readonly futureLivestreams: LivestreamEvent[],
-      private readonly pastLivestreams: LivestreamEvent[]
+      private readonly pastLivestreams: LivestreamEvent[],
+      // control if the service should log debug info
+      // when generating the newsletter, we don't want to log
+      private debug: boolean = true
    ) {
       super(functions.logger)
    }
@@ -56,35 +59,39 @@ export default class UserEventRecommendationService
       const deDupedEvents = removeDuplicateDocuments(sortedResults)
 
       // Log some debug info
-      this.log.info("Metadata", {
-         userMetaData: {
-            userId: this.user?.id || "N/A",
-            userInterestIds: this.user?.interestsIds || [],
-            userFieldOfStudyId: this.user?.fieldOfStudy?.id || "N/A",
-            userCountriesOfInterest: this.user?.countriesOfInterest || [],
-         },
-         eventMetaData: deDupedEvents.map((e) => ({
-            id: e.id,
-            numPoints: e.points,
-            fieldsOfStudyIds: e.getFieldOfStudyIds(),
-            interestIds: e.getInterestIds(),
-            companyCountries: e.getCompanyCountries(),
-            companyIndustries: e.getCompanyIndustries(),
-            companySizes: e.getCompanySizes(),
-         })),
-      })
+      if (this.debug) {
+         this.log.info("Metadata", {
+            userMetaData: {
+               userId: this.user?.id || "N/A",
+               userInterestIds: this.user?.interestsIds || [],
+               userFieldOfStudyId: this.user?.fieldOfStudy?.id || "N/A",
+               userCountriesOfInterest: this.user?.countriesOfInterest || [],
+            },
+            eventMetaData: deDupedEvents.map((e) => ({
+               id: e.id,
+               numPoints: e.points,
+               fieldsOfStudyIds: e.getFieldOfStudyIds(),
+               interestIds: e.getInterestIds(),
+               companyCountries: e.getCompanyCountries(),
+               companyIndustries: e.getCompanyIndustries(),
+               companySizes: e.getCompanySizes(),
+            })),
+         })
+      }
 
       // Return the top {limit} events
       const recommendedIds = deDupedEvents
          .map((event) => event.id)
          .slice(0, limit)
 
-      this.log.info(
-         `Recommended event IDs for user ${this.user?.id}: ${recommendedIds}`,
-         {
-            serviceName: serviceName,
-         }
-      )
+      if (this.debug) {
+         this.log.info(
+            `Recommended event IDs for user ${this.user?.id}: ${recommendedIds}`,
+            {
+               serviceName: serviceName,
+            }
+         )
+      }
 
       return recommendedIds
    }
