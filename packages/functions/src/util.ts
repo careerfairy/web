@@ -158,7 +158,7 @@ export const generateNonAttendeesReminder = ({
 const getRegisteredUsersIntoChunks = (
    registeredUsers: unknown[],
    chunkSize: number
-): string[] => {
+): string[][] => {
    const registeredUsersChunks = []
 
    for (let i = 0; i < registeredUsers.length; i += chunkSize) {
@@ -404,6 +404,10 @@ export const isLocalEnvironment = () => {
       process.env.NODE_ENV === "development" ||
       process.env.NODE_ENV === "test"
    )
+}
+
+export const isTestEnvironment = () => {
+   return process.env.NODE_ENV === "test"
 }
 
 export const logAxiosError = (error: any) => {

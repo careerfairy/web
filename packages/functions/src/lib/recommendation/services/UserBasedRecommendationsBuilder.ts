@@ -1,5 +1,5 @@
 import { UserData } from "@careerfairy/shared-lib/users"
-import { Logger } from "../IRecommendationService"
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 

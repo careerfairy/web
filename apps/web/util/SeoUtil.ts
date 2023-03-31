@@ -3,6 +3,7 @@ import { SeoProps } from "../components/util/SEO"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import keywordExtractor from "keyword-extractor"
 import DateUtil from "./DateUtil"
+import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
 
 export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
    const streamDate = stream.startDate
@@ -47,13 +48,6 @@ export const getStreamMetaInfo = (stream: LivestreamEvent): SeoProps => {
    }
 }
 
-export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
-   const ellipsis = "..."
-   if (text.length <= maxLength) {
-      return text
-   }
-   return text.substring(0, maxLength - ellipsis.length) + ellipsis
-}
 const getStreamText = (stream: LivestreamEvent): string => {
    return `${stream.title || ""} ${stream.company || ""} ${
       stream.summary || ""
