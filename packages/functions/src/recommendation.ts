@@ -1,10 +1,12 @@
 import functions = require("firebase-functions")
 import { logAndThrow } from "./lib/validations"
 import { number } from "yup"
-import { userEventRecommendationService } from "./api/services"
 import { middlewares } from "./middlewares/middlewares"
 import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
+import { livestreamsRepo, userRepo } from "./api/repositories"
+import UserEventRecommendationService from "./lib/recommendation/services/UserEventRecommendationService"
+import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
 
 /**
  * Get Recommended Events
@@ -25,10 +27,15 @@ export const getRecommendedEvents = functions.https.onCall(
       ),
       async (data, context) => {
          try {
-            return await userEventRecommendationService.getRecommendations(
+            const dataFetcher = new UserDataFetcher(
                context.auth.token.email,
-               data.limit
+               livestreamsRepo,
+               userRepo
             )
+            const recomendationService =
+               await UserEventRecommendationService.create(dataFetcher)
+
+            return await recomendationService.getRecommendations(data.limit)
          } catch (error) {
             logAndThrow("Error in getting recommended events", {
                data,

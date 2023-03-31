@@ -7,7 +7,7 @@ import {
    generateNonAttendeesReminder,
    generateReminderEmailData,
    IGenerateEmailDataProps,
-   setHeaders,
+   setCORSHeaders,
 } from "./util"
 import { sendMessage } from "./api/mailgun"
 import { TemplatedMessage } from "postmark"
@@ -26,7 +26,7 @@ import { livestreamsRepo } from "./api/repositories"
 
 export const sendReminderEmailToRegistrants = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
 
       let registeredUsers = []
       admin
@@ -324,7 +324,7 @@ export const sendReminderToNonAttendees = functions
 export const sendReminderForNonAttendeesByStreamId = functions
    .region(config.region)
    .https.onRequest(async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
 
       if (livestreamId) {

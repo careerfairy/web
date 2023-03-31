@@ -83,7 +83,7 @@ const pages = {
          compact: "Groups",
          full: "Groups",
       },
-      component: Groups,
+      component: () => <Groups />,
    },
    "/profile/jobs": {
       title: {

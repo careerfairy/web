@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useCallback, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 
 // material-ui
@@ -14,8 +14,8 @@ import Tooltip from "@mui/material/Tooltip"
 import Stack from "@mui/material/Stack"
 import IconButton from "@mui/material/IconButton"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
-import ChangeGroupIcon from "@mui/icons-material/LoopOutlined"
 import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
+import { Repeat as SyncIcon } from "react-feather"
 
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
@@ -26,6 +26,7 @@ import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { useGroup } from "../index"
 import { alpha } from "@mui/material/styles"
+import ManageCompaniesDialog from "../../../components/views/profile/my-groups/ManageCompaniesDialog"
 
 const styles = sxStyles({
    root: {
@@ -61,14 +62,22 @@ const styles = sxStyles({
 })
 const UserAvatarWithDetails = () => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
-
-   const { userData, signOut, userPresenter } = useAuth()
-
+   const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { group } = useGroup()
-
    const isMobile = useIsMobile()
-
    const { push } = useRouter()
+
+   const [openManageCompaniesDialog, setOpenManageCompaniesDialog] =
+      useState(false)
+
+   const handleCloseManageCompaniesDialog = useCallback(() => {
+      setOpenManageCompaniesDialog(false)
+   }, [])
+
+   const showSwitchButton = useMemo(
+      () => userData?.isAdmin || Object.keys(adminGroups).length > 1,
+      [adminGroups, userData?.isAdmin]
+   )
 
    return (
       <>
@@ -123,13 +132,17 @@ const UserAvatarWithDetails = () => {
                My Profile
             </MenuItem>
             <Divider />
-            <MenuItem onClick={() => push("/profile/groups?type=admin")}>
-               <ListItemIcon>
-                  <ChangeGroupIcon fontSize="small" />
-               </ListItemIcon>
-               Switch Company
-            </MenuItem>
-            <Divider />
+            {showSwitchButton ? (
+               <>
+                  <MenuItem onClick={() => setOpenManageCompaniesDialog(true)}>
+                     <ListItemIcon>
+                        <SyncIcon size="1em" />
+                     </ListItemIcon>
+                     Switch Company
+                  </MenuItem>
+                  <Divider />
+               </>
+            ) : null}
             <MenuItem onClick={signOut}>
                <ListItemIcon>
                   <LogoutIcon fontSize="small" />
@@ -137,6 +150,12 @@ const UserAvatarWithDetails = () => {
                Logout
             </MenuItem>
          </Menu>
+         {openManageCompaniesDialog ? (
+            <ManageCompaniesDialog
+               open={openManageCompaniesDialog}
+               handleClose={handleCloseManageCompaniesDialog}
+            />
+         ) : null}
       </>
    )
 }

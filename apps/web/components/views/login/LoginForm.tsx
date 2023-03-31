@@ -2,7 +2,7 @@ import * as yup from "yup"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import { useRouter } from "next/router"
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { Formik, FormikValues } from "formik"
 import { FormikHelpers } from "formik/dist/types"
 import Container from "@mui/material/Container"
@@ -20,6 +20,7 @@ import Grid from "@mui/material/Grid"
 import Link from "next/link"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
+import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
 
 const styles = {
    box: {
@@ -72,8 +73,10 @@ interface LoginFormProps {
 
 const LogInForm = ({ groupAdmin }: LoginFormProps) => {
    const signupPagePath = groupAdmin ? "/signup-admin" : "/signup"
-   const { authenticatedUser, userData } = useAuth()
+   const { authenticatedUser, userData, adminGroups } = useAuth()
    const firebase = useFirebaseService()
+   const [openManageCompaniesDialog, setOpenManageCompaniesDialog] =
+      useState(false)
 
    const {
       query: { absolutePath },
@@ -96,7 +99,22 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                   : signupPagePath
             )
          } else {
-            void replace((absolutePath as string) || "/portal")
+            if (absolutePath) {
+               void replace(absolutePath as string)
+            } else if (
+               userData?.isAdmin ||
+               Object.keys(adminGroups).length > 1
+            ) {
+               // open manage company dialog
+               setOpenManageCompaniesDialog(true)
+            } else if (Object.keys(adminGroups).length === 1) {
+               // redirect to the group admin page
+               const groupId = Object.keys(adminGroups)[0]
+
+               void replace(`/group/${groupId}/admin`)
+            } else {
+               void replace("/portal")
+            }
          }
       }
    }, [
@@ -104,42 +122,48 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
       absolutePath,
       userData,
       firebase.auth?.currentUser?.emailVerified,
+      adminGroups,
    ])
 
-   const handleSubmit = async (
-      values: FormikValues,
-      helpers: FormikHelpers<FormikValues>
-   ) => {
-      try {
-         await firebase.signInWithEmailAndPassword(
-            values.email,
-            values.password
-         )
-         helpers.setErrors({})
-         dataLayerEvent("login_complete")
-      } catch (error) {
-         switch (error.code) {
-            case "auth/wrong-password":
-               return helpers.setFieldError(
-                  "submitError",
-                  "Your password or email is invalid."
-               )
-            case "auth/user-not-found":
-               return helpers.setFieldError(
-                  "submitError",
-                  "No account associated with this email address."
-               )
-            default:
-               helpers.setFieldError(
-                  "submitError",
-                  "An error occurred while logging in to your account."
-               )
-               errorLogAndNotify(error)
+   const handleSubmit = useCallback(
+      async (values: FormikValues, helpers: FormikHelpers<FormikValues>) => {
+         try {
+            await firebase.signInWithEmailAndPassword(
+               values.email,
+               values.password
+            )
+            helpers.setErrors({})
+            dataLayerEvent("login_complete")
+         } catch (error) {
+            switch (error.code) {
+               case "auth/wrong-password":
+                  return helpers.setFieldError(
+                     "submitError",
+                     "Your password or email is invalid."
+                  )
+               case "auth/user-not-found":
+                  return helpers.setFieldError(
+                     "submitError",
+                     "No account associated with this email address."
+                  )
+               default:
+                  helpers.setFieldError(
+                     "submitError",
+                     "An error occurred while logging in to your account."
+                  )
+                  errorLogAndNotify(error)
+            }
+            dataLayerEvent("login_failed")
          }
-         dataLayerEvent("login_failed")
-      }
-      helpers.setSubmitting(false)
-   }
+         helpers.setSubmitting(false)
+      },
+      [firebase]
+   )
+
+   const handleAdminCloseDialog = useCallback(() => {
+      setOpenManageCompaniesDialog(false)
+      void replace("/portal")
+   }, [replace])
 
    return (
       <>
@@ -237,9 +261,9 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                            fullWidth
                            disabled={isSubmitting}
                            endIcon={
-                              isSubmitting && (
+                              isSubmitting ? (
                                  <CircularProgress size={20} color="inherit" />
-                              )
+                              ) : null
                            }
                         >
                            Log in
@@ -283,6 +307,13 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                </Container>
             )}
          </Formik>
+         {openManageCompaniesDialog ? (
+            <ManageCompaniesDialog
+               open={openManageCompaniesDialog}
+               hideCloseDisabled={true}
+               handleClose={handleAdminCloseDialog}
+            />
+         ) : null}
       </>
    )
 }

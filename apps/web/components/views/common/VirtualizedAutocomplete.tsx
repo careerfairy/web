@@ -9,6 +9,10 @@ import Popper from "@mui/material/Popper"
 import { styled, useTheme } from "@mui/material/styles"
 import { ListChildComponentProps, VariableSizeList } from "react-window"
 import Typography from "@mui/material/Typography"
+import { SystemStyleObject } from "@mui/system"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
+import Box from "@mui/material/Box"
+import { useCallback } from "react"
 
 const LISTBOX_PADDING = 8 // px
 /*
@@ -55,12 +59,17 @@ function useResetCache(data: any) {
    return ref
 }
 
+type ListBoxProps = {
+   listBoxItemHeight?: number
+   listBoxSx?: SystemStyleObject<DefaultTheme>
+}
+type ListboxComponentProps = React.HTMLAttributes<HTMLElement> & ListBoxProps
 // Adapter for react-window
 const ListboxComponent = React.forwardRef<
    HTMLDivElement,
-   React.HTMLAttributes<HTMLElement>
+   ListboxComponentProps
 >(function ListboxComponent(props, ref) {
-   const { children, ...other } = props
+   const { children, listBoxSx, listBoxItemHeight, ...other } = props
    const itemData: React.ReactChild[] = []
    ;(children as React.ReactChild[]).forEach(
       (item: React.ReactChild & { children?: React.ReactChild[] }) => {
@@ -74,7 +83,7 @@ const ListboxComponent = React.forwardRef<
       noSsr: true,
    })
    const itemCount = itemData.length
-   const itemSize = smUp ? 36 : 48
+   const itemSize = listBoxItemHeight ? listBoxItemHeight : smUp ? 36 : 48
 
    const getChildSize = (child: React.ReactChild) => {
       if (child.hasOwnProperty("group")) {
@@ -94,7 +103,7 @@ const ListboxComponent = React.forwardRef<
    const gridRef = useResetCache(itemCount)
 
    return (
-      <div ref={ref}>
+      <Box sx={listBoxSx} ref={ref}>
          <OuterElementContext.Provider value={other}>
             <VariableSizeList
                itemData={itemData}
@@ -110,7 +119,7 @@ const ListboxComponent = React.forwardRef<
                {renderRow}
             </VariableSizeList>
          </OuterElementContext.Provider>
-      </div>
+      </Box>
    )
 })
 
@@ -124,21 +133,38 @@ const StyledPopper = styled(Popper)({
    },
 })
 
+type Props = {
+   listBoxCustomProps?: ListBoxProps
+}
 const VirtualizedAutocomplete = <
    T,
    Multiple extends boolean | undefined = undefined,
    DisableClearable extends boolean | undefined = undefined,
    FreeSolo extends boolean | undefined = undefined
 >({
+   listBoxCustomProps,
    ...rest
-}: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo>) => (
-   <Autocomplete
-      {...rest}
-      disableListWrap
-      PopperComponent={StyledPopper}
-      ListboxComponent={ListboxComponent}
-      // TODO: Post React 18 update - validate this conversion, look like a hidden bug
-      renderGroup={(params) => params as unknown as React.ReactNode}
-   />
-)
+}: AutocompleteProps<T, Multiple, DisableClearable, FreeSolo> & Props) => {
+   const renderListComponent = useCallback(
+      (props: React.HTMLAttributes<HTMLElement>) => (
+         <ListboxComponent
+            {...props}
+            listBoxItemHeight={listBoxCustomProps?.listBoxItemHeight}
+            listBoxSx={listBoxCustomProps?.listBoxSx}
+         />
+      ),
+      [listBoxCustomProps?.listBoxItemHeight, listBoxCustomProps?.listBoxSx]
+   )
+
+   return (
+      <Autocomplete
+         {...rest}
+         disableListWrap
+         PopperComponent={StyledPopper}
+         ListboxComponent={renderListComponent}
+         // TODO: Post React 18 update - validate this conversion, look like a hidden bug
+         renderGroup={(params) => params as unknown as React.ReactNode}
+      />
+   )
+}
 export default VirtualizedAutocomplete

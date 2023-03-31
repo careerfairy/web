@@ -3,7 +3,8 @@ import {
    LivestreamEvent,
    LivestreamPromotions,
    Speaker,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
+import { livestreamTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { DraftFormValues } from "../../views/draftStreamForm/DraftStreamForm"
 import { shouldUseEmulators } from "../../../util/CommonUtil"
 import { EMAIL_REGEX } from "components/util/constants"
@@ -101,6 +102,7 @@ export const buildLivestreamObject = (
       targetFieldsOfStudy: values.targetFieldsOfStudy,
       targetLevelsOfStudy: values.targetLevelsOfStudy,
       questionsDisabled: values.questionsDisabled,
+      triGrams: livestreamTriGrams(values.title, values.company),
    }
 }
 

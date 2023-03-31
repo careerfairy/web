@@ -1,4 +1,4 @@
-import { Identifiable } from "../commonTypes"
+import { Identifiable, UTMParams } from "../commonTypes"
 import firebase from "firebase/compat/app"
 import {
    Group,
@@ -57,6 +57,7 @@ export interface UserData extends Identifiable {
    countriesOfInterest?: string[]
    regionsOfInterest?: string[]
    isLookingForJob?: boolean
+   accountCreationUTMParams?: UTMParams
 
    // temporary to hide the jobs tabs from the user profile
    // should be removed in the future
@@ -78,8 +79,8 @@ export interface UserData extends Identifiable {
    /**
     * Last user activity on any device
     */
-   lastActivityAt: firebase.firestore.Timestamp
-   createdAt: firebase.firestore.Timestamp
+   lastActivityAt: Timestamp
+   createdAt: Timestamp
 }
 
 /*
@@ -129,12 +130,12 @@ export interface UserStats {
 export interface SavedRecruiter extends Identifiable {
    livestreamId: string
    userId: string
-   savedAt: firebase.firestore.Timestamp
+   savedAt: Timestamp
 
    livestreamDetails: {
       title: string
       company: string
-      start: firebase.firestore.Timestamp
+      start: Timestamp
       companyLogoUrl: string
    }
 
@@ -161,7 +162,7 @@ export interface TalentProfile extends Identifiable {
    userEmail: string
    user: UserData
    mostRecentLivestream: LivestreamEvent
-   joinedAt: firebase.firestore.Timestamp
+   joinedAt: Timestamp
 }
 
 /**
@@ -197,17 +198,17 @@ export type UserLivestreamGroupQuestionAnswers = Record<
 >
 
 export interface RegisteredStudent extends UserData {
-   dateRegistered: firebase.firestore.Timestamp
+   dateRegistered: Timestamp
    livestreamId: LivestreamEvent["id"]
 }
 
 export interface ParticipatingStudent extends UserData {
-   joined: firebase.firestore.Timestamp
+   joined: Timestamp
    livestreamId: LivestreamEvent["id"]
 }
 
 export interface TalentPoolStudent extends UserData {
-   dateJoinedTalentPool: firebase.firestore.Timestamp
+   dateJoinedTalentPool: Timestamp
    livestreamId: LivestreamEvent["id"]
 }
 
@@ -223,7 +224,7 @@ export type RegistrationStep = {
    userId: string
    steps: string[]
    totalSteps: number
-   updatedAt: firebase.firestore.Timestamp
+   updatedAt: Timestamp
 }
 
 export type UserDataAnalytics = {
@@ -237,11 +238,11 @@ export interface UserJobApplicationDocument extends Identifiable {
    groupId: string
    integrationId: string
    jobId: string
-   date: firebase.firestore.Timestamp
-   updatedAt: firebase.firestore.Timestamp
+   date: Timestamp
+   updatedAt: Timestamp
    job: Job // will be serialized to plain object
    livestream: LivestreamEventPublicData
-   rejectedAt?: firebase.firestore.Timestamp
+   rejectedAt?: Timestamp
    currentStage?: string
    rejectReason?: string
 }
@@ -347,4 +348,37 @@ export interface CompanyFollowed extends Identifiable {
 
    userId: string
    user: UserPublicData
+}
+
+/**
+ * User Activity document
+ * Used for analytics purposes
+ *
+ * Path /userData/{userId}/activities/{generatedId}
+ */
+export interface UserActivity extends Identifiable {
+   /**
+    * When doing collection group queries, we can filter by documents
+    * with this field to ignore other collections with the same name
+    */
+   collection: "userActivity"
+   userId: string
+   user: UserPublicData
+   date: Timestamp
+
+   /**
+    * Can be populated if the activity type is related to a
+    * livestream
+    */
+   relatedLivestreamId?: string
+
+   /**
+    * No real use atm for this field
+    */
+   type:
+      | "tokenRefresh" // every hour firebase auth should refresh the token
+      | "createdAt"
+      | "livestreamRegistration"
+      | "livestreamParticipation"
+      | "livestreamRecordingView"
 }

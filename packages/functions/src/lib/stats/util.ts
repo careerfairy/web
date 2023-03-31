@@ -54,5 +54,5 @@ export const addOperationWithNumberCheck = (
    }
 }
 
-const increment = (amount: number) =>
+export const increment = (amount: number) =>
    admin.firestore.FieldValue.increment(amount)

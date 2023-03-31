@@ -9,7 +9,7 @@ import {
    GroupQuestion,
 } from "@careerfairy/shared-lib/groups"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
-import { UserData } from "@careerfairy/shared-lib/users"
+import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { GroupATSAccount } from "@careerfairy/shared-lib/groups/GroupATSAccount"
 import { Change } from "firebase-functions"
@@ -97,12 +97,26 @@ export interface IGroupFunctionsRepository extends IGroupRepository {
       change: Change<DocumentSnapshot>,
       logger: FunctionsLogger
    ): Promise<void>
+
+   /**
+    * To generate the newsletter, we need to fetch all
+    * the associations between users and companies
+    */
+   getAllCompaniesFollowers(): Promise<CompanyFollowed[] | null>
 }
 
 export class GroupFunctionsRepository
    extends FirebaseGroupRepository
    implements IGroupFunctionsRepository
 {
+   async getAllCompaniesFollowers(): Promise<CompanyFollowed[] | null> {
+      const docs = await this.firestore
+         .collectionGroup("companiesUserFollows")
+         .get()
+
+      return mapFirestoreDocuments<CompanyFollowed, false>(docs)
+   }
+
    async checkIfUserIsGroupAdmin(
       groupId: string,
       userEmail: string

@@ -44,6 +44,10 @@ import recommendation = require("./recommendation")
 import onWriteTriggers = require("./onWriteTriggers")
 import onCreateTriggers = require("./onCreateTriggers")
 import onDeleteTriggers = require("./onDeleteTriggers")
+import { generateFunctionsFromBundles } from "./lib/bundleGenerator"
+import { bundles } from "./bundles"
+import newsletter = require("./newsletter")
+import postmark = require("./postmark")
 
 // load values from the .env file in this directory into process.env
 dotenv.config()
@@ -102,6 +106,8 @@ exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
 exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
 
+exports.newsletter = newsletter.newsletter
+
 // Livestreams
 exports.scheduleTestLivestreamDeletion =
    livestreams.scheduleTestLivestreamDeletion
@@ -119,9 +125,19 @@ exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
 exports.getLivestreamICalendarEvent = livestreams.getLivestreamICalendarEvent
 
+// Postmark webhooks
+exports.postmarkWebhook = postmark.postmarkWebhook
+
 // University Emails
 exports.sendEmailToStudentOfUniversityAndField =
    universityEmails.sendEmailToStudentOfUniversityAndField
+
+// Deploy each bundle as a separate function
+// npx firelink deploy --only functions:bundle-allFutureLivestreams
+//
+// When adding new bundles, you probably also want to update the
+// Firebase Hosting mappings: npx firebase deploy --only hosting
+exports.bundle = generateFunctionsFromBundles(bundles)
 
 // Algolia
 // exports.addToIndex = algolia.addToIndex
@@ -197,7 +213,7 @@ exports.periodicallyRemoveCachedDocument =
 exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v2 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v3 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
@@ -209,6 +225,7 @@ exports.onCreateLivestreamPopularityEvents =
    onCreateTriggers.onCreateLivestreamPopularityEvents
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
+exports.onCreateUserData = onCreateTriggers.onCreateUserData
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =

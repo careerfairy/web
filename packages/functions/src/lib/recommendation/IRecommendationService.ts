@@ -1,7 +1,4 @@
-/**
- * The ID of the element we wish to get recommendations for
- * */
-type IdToRecommend = string
+import { Logger } from "@careerfairy/shared-lib/utils/types"
 
 /**
  * The outputted IDs of recommendations for the given {@link IdToRecommend}
@@ -14,25 +11,13 @@ type Recommendations = string[]
 type MaxRecommendations = number
 
 export interface IRecommendationService {
-   getRecommendations(
-      id: IdToRecommend,
-      limit?: MaxRecommendations
-   ): Promise<Recommendations>
-}
-
-type Logger = {
-   debug: (...args: any[]) => void
-   info: (...args: any[]) => void
-   warn: (...args: any[]) => void
-   error: (...args: any[]) => void
+   getRecommendations(limit?: MaxRecommendations): Promise<Recommendations>
 }
 
 export default class RecommendationServiceCore {
-   public readonly serviceName: string
    protected log: Logger
 
-   constructor(serviceName: string, log: Logger) {
-      this.serviceName = serviceName
+   constructor(log: Logger) {
       this.log = log
    }
 }

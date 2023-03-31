@@ -1,12 +1,13 @@
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import {
+   Box,
    Button,
    Card,
    CardContent,
    CardHeader,
    Menu,
    MenuItem,
-   styled,
+   Pagination,
    SxProps,
    Theme,
    Tooltip,
@@ -15,14 +16,17 @@ import {
 } from "@mui/material"
 import { type Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
-import { useCallback, useState } from "react"
-import { ChevronDown } from "react-feather"
+import { FC, useCallback, useMemo, useState } from "react"
+import { ChevronDown, ChevronRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import { useMemo } from "react"
+import Link from "../../../common/Link"
+import { styled } from "@mui/material/styles"
 
 const styles = sxStyles({
    card: {
       width: "100%",
+      display: "flex",
+      flexDirection: "column",
    },
    dropdownButton: {
       color: "black",
@@ -45,12 +49,21 @@ const styles = sxStyles({
       marginRight: (theme) => theme.spacing(1),
       cursor: "pointer",
    },
+   subheaderLink: {
+      textDecoration: "none",
+      fontWeight: 600,
+   },
+   subheaderIcon: {
+      width: "18px",
+      marginLeft: "5px",
+      // offset the icon a little lower
+      marginTop: "1px",
+   },
 })
 
 type Props = {
-   title: React.ReactNode
+   title?: React.ReactNode
    subHeader?: React.ReactNode
-   children: React.ReactNode
    options?: OptionsProps["options"]
    optionsHandler?: OptionsProps["handler"]
    helpTooltip?: string
@@ -62,7 +75,7 @@ type Props = {
 /**
  * Card to be used on the Admin pages
  */
-const CardCustom = ({
+const CardCustom: FC<Props> = ({
    title,
    options,
    optionsHandler,
@@ -72,7 +85,7 @@ const CardCustom = ({
    sx,
    customAction,
    disableTypography = false,
-}: Props) => {
+}) => {
    const action = helpTooltip ? (
       <CustomWidthTooltip title={helpTooltip} arrow>
          <InfoOutlinedIcon />
@@ -166,6 +179,67 @@ const Options = ({ options, handler }: OptionsProps) => {
       </div>
    )
 }
+
+export const SubheaderLink = ({
+   link,
+   title,
+}: {
+   link: string
+   title: string
+}) => {
+   return (
+      <Link href={link} color="secondary" sx={styles.subheaderLink}>
+         <Box display="flex" alignItems="center" mt={1}>
+            <span>{title}</span>
+            <ChevronRight style={styles.subheaderIcon} />
+         </Box>
+      </Link>
+   )
+}
+
+export const StyledPagination = styled(Pagination)(({ theme }) => ({
+   "& .MuiPagination-ul li:last-child": {
+      display: "block",
+   },
+   "& .MuiPagination-ul li:last-child button::before": {
+      content: "'Next'",
+      marginRight: theme.spacing(1),
+      [theme.breakpoints.down("sm")]: {
+         marginRight: theme.spacing(0.1),
+         content: "''",
+      },
+   },
+   "& .MuiPagination-ul li:first-of-type": {
+      display: "block",
+   },
+   "& .MuiPagination-ul li:first-of-type button::after": {
+      content: "'Previous'",
+      marginLeft: theme.spacing(1),
+      [theme.breakpoints.down("sm")]: {
+         marginLeft: theme.spacing(0.1),
+         content: "''",
+      },
+   },
+   "& .MuiPagination-ul li button": {
+      fontWeight: 500,
+      padding: theme.spacing(1, 2),
+      [theme.breakpoints.down("sm")]: {
+         padding: 0,
+      },
+      "&.MuiPaginationItem-page": {
+         margin: theme.spacing(0, 0.5),
+         padding: 0,
+      },
+   },
+   "& .MuiPaginationItem-ellipsis": {
+      display: "none",
+   },
+   ".MuiPagination-ul": {
+      justifyContent: "end",
+   },
+   flex: "none",
+   marginTop: 0,
+})) as typeof Pagination
 
 const anchorOrigin = {
    vertical: "bottom",

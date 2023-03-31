@@ -456,17 +456,6 @@ class FirebaseService {
       })
    }
 
-   /**
-    * Update user lastActivityAt
-    * Uses the server timestamp to prevent the user from setting a custom date
-    */
-   updateUserLastActivity = (userEmail: string) => {
-      let ref = this.firestore.collection("userData").doc(userEmail)
-      return ref.update({
-         lastActivityAt: this.getServerTimestamp(),
-      })
-   }
-
    listenToGroups = (callback) => {
       let groupRefs = this.firestore
          .collection("careerCenterData")
