@@ -44,6 +44,11 @@ type UserLivestreamDataTableContextValue = {
     * The title of the table, will be used in the export file names
     * */
    title: string
+   /*
+    * The noun used to describe the user type, will be used by the table to display messages/labels/buttons
+    * Note: The noun should be lowercase and plural
+    * */
+   userType: string
    filters: Filters
    setFilters: React.Dispatch<React.SetStateAction<Filters>>
    resetFilters: () => void
@@ -74,6 +79,7 @@ const UserLivestreamDataTableContext =
       countriesLookup: universityCountriesMap,
       levelsOfStudyLookup: {},
       title: "",
+      userType: "",
       fieldsOfStudyLookup: {},
       filters: {
          selectedLevelOfStudy: null,
@@ -116,6 +122,7 @@ type Props = {
    targetCollectionQuery: CollectionReference | Query
    converterFn: (doc: unknown) => UserDataEntry
    title: string
+   userType: string
 }
 
 const initialFilters: Filters = {
@@ -133,6 +140,7 @@ const UserDataTableProvider: FC<Props> = ({
    targetCollectionQuery,
    converterFn,
    title,
+   userType,
 }) => {
    const [filters, setFilters] = useState<Filters>(initialFilters)
 
@@ -197,6 +205,7 @@ const UserDataTableProvider: FC<Props> = ({
          noResultsWithoutFilters,
          noResultsWithFilters,
          filtersInactive,
+         userType,
       }),
       [
          converterFn,
@@ -212,6 +221,7 @@ const UserDataTableProvider: FC<Props> = ({
          rowsPerPage,
          targetCollectionQuery,
          title,
+         userType,
       ]
    )
 
