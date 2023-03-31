@@ -16,6 +16,8 @@ import UserDataTableProvider, {
 } from "../../../common/table/UserDataTableProvider"
 import { collection } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
+import { universityCountryMap } from "@careerfairy/shared-lib/universities"
+import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 
 const UsersTable = () => {
    const { currentStreamStats, fieldsOfStudyLookup, levelsOfStudyLookup } =
@@ -61,7 +63,7 @@ const DataTable = () => {
          orderBy: `${getUserType(userType)}.date`,
          orderDirection: "desc",
          userEmail: "user.userEmail",
-         userResume: "user.resumeUrl",
+         userResume: "user.userResume",
          userLinkedIn: "user.linkedInUrl",
       }),
       [userType]
@@ -74,8 +76,9 @@ const DataTable = () => {
          documentPaths={documentPaths}
          targetCollectionQuery={collectionQuery}
          converterFn={converterFn}
+         title={getTitle(userType, currentStreamStats)}
       >
-         <UserLivestreamDataTable />
+         <UserLivestreamDataTable emptyResultsMessage="Create a live stream to collect analytics." />
       </UserDataTableProvider>
    )
 }
@@ -90,6 +93,8 @@ const converterFn = (doc: UserLivestreamData): UserDataEntry => ({
    levelOfStudy: doc.user.levelOfStudy?.name || "",
    linkedInUrl: doc.user.linkedinUrl || "",
    resumeUrl: doc.user.userResume || "",
+   universityCountryName:
+      universityCountryMap?.[doc.user.universityCountryCode] || "",
 })
 
 const getUserType = (userType: LivestreamUserType): LivestreamUserAction => {
@@ -100,6 +105,20 @@ const getUserType = (userType: LivestreamUserType): LivestreamUserAction => {
          return "registered"
       default:
          return "registered"
+   }
+}
+
+const getTitle = (
+   userType: LivestreamUserType,
+   stats: LiveStreamStats
+): string => {
+   switch (userType) {
+      case "participants":
+         return `Participants for ${stats.livestream.company}`
+      case "registrations":
+         return `Registrations for ${stats.livestream.company}`
+      default:
+         return `Registrations for ${stats.livestream.company}`
    }
 }
 

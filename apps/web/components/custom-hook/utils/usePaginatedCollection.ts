@@ -38,6 +38,10 @@ export interface PaginatedCollection<T = DocumentData> {
    error?: ObservableStatus<T>["error"]
    limit: number
    countQueryResponse?: CountQuery
+   /*
+    * The full query without pagination
+    * */
+   fullQuery: Query<T>
 }
 
 /**
@@ -68,13 +72,13 @@ const usePaginatedCollection = <T = DocumentData>(
       query(options.query, order, limit(internalLimit))
    )
 
-   const countQuery = useMemo(
+   const fullQuery = useMemo(
       () => query(options.query, order),
       [options.query, order]
    )
 
    const countQueryResponse = useCountQuery(
-      options.getTotalCount ? countQuery : null
+      options.getTotalCount ? fullQuery : null
    )
 
    const result = useFirestoreCollection(q, reactfireOptions)
@@ -153,6 +157,7 @@ const usePaginatedCollection = <T = DocumentData>(
       data,
       page: cursor + 1,
       countQueryResponse,
+      fullQuery,
    }
 }
 
