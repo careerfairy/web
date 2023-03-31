@@ -109,7 +109,11 @@ export const TalentPoolCard: FC<AggregationCardProps> = (props) => {
          title="Talent Pool"
          value={props.value}
          linkDescription={"Go to talent pool"}
-         link={`/group/${group.id}/admin/analytics/talent-pool?section=1`} // Should go to new talent pool page
+         link={
+            group.universityCode // Do not show talent pool link for university groups
+               ? undefined
+               : `/group/${group.id}/admin/analytics/talent-pool`
+         }
       />
    )
 }

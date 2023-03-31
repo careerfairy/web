@@ -9,6 +9,7 @@ import MaterialTable, {
 } from "@material-table/core"
 import {
    Box,
+   Button,
    CircularProgress,
    Divider,
    Grid,
@@ -42,6 +43,9 @@ import ExportIcon from "@mui/icons-material/ListAltOutlined"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { CSVDialogDownload } from "../../../../../custom-hook/useMetaDataActions"
 import { makeExternalLink } from "../../../../../helperFunctions/HelperFunctions"
+import Link from "../../../../common/Link"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import { capitalizeFirstLetter } from "../../../../../../util/CommonUtil"
 
 const styles = sxStyles({
    root: {
@@ -127,14 +131,6 @@ const baseOptions: Options<UserDataEntry> = {
    sorting: false,
 }
 
-const localization: Localization = {
-   body: {
-      emptyDataSourceMessage: "No talent found",
-   },
-   header: {
-      actions: "",
-   },
-}
 type TableProps = {
    emptyResultsMessage?: string
    hideToolbar?: boolean
@@ -149,6 +145,7 @@ const UserLivestreamDataTable: FC<TableProps> = ({
       rowsPerPage,
       setRowsPerPage,
       noResultsWithoutFilters,
+      userType,
    } = useUserDataTable()
 
    const data = useMemo(
@@ -173,6 +170,18 @@ const UserLivestreamDataTable: FC<TableProps> = ({
          pageSize: rowsPerPage,
       }),
       [rowsPerPage]
+   )
+
+   const localization = useMemo<Localization>(
+      () => ({
+         body: {
+            emptyDataSourceMessage: `No ${userType} found for the given filters`,
+         },
+         header: {
+            actions: "",
+         },
+      }),
+      [userType]
    )
 
    const handlePageSizeChange = useCallback(
@@ -213,7 +222,8 @@ const actions: MaterialTableProps<UserDataEntry>["actions"] = [
 ]
 
 const Footer = (paginationProps: any) => {
-   const { converterFn, title, results, filtersInactive } = useUserDataTable()
+   const { converterFn, title, results, filtersInactive, userType } =
+      useUserDataTable()
 
    const { downloadingAllCVs, handleDownloadAllCVs } = useDownloadAllCVs(
       results.fullQuery,
@@ -259,11 +269,11 @@ const Footer = (paginationProps: any) => {
             >
                {filtersInactive ? null : (
                   <Typography variant="body1" fontWeight={"500"}>
-                     {results.countQueryResponse?.count || 0} talent found
+                     {results.countQueryResponse?.count || 0} {userType} found
                   </Typography>
                )}
                <ResponsiveButton
-                  text="Export Talent"
+                  text={`Export ${capitalizeFirstLetter(userType)}`}
                   disabled={disabled}
                   onClick={handleExportUsers}
                   loading={exportingUsers}
@@ -521,9 +531,51 @@ export const TableSkeleton = () => {
             data={[]}
             options={{ ...baseOptions, showEmptyDataSourceMessage: false }}
             isLoading
-            localization={localization}
             columns={columns}
          />
+      </Box>
+   )
+}
+
+export const DataPrivacyTable: FC = () => {
+   const { group } = useGroup()
+   return (
+      <Box sx={styles.root}>
+         <Stack width="100%" direction="row" spacing={2} p={2}>
+            {Array.from({ length: 4 }).map((_, index) => (
+               <Skeleton
+                  variant="rectangular"
+                  sx={styles.skeletonFilter}
+                  animation={false}
+                  height={50}
+                  key={index}
+               />
+            ))}
+         </Stack>
+         <Stack
+            justifyContent="center"
+            alignItems="center"
+            width="100%"
+            spacing={2}
+            px={2}
+            py={7}
+         >
+            <Typography align="center" variant="h6">
+               Add a privacy policy notice to be able to see the registrations
+               details.
+            </Typography>
+            <span>
+               <Button
+                  component={Link}
+                  variant="outlined"
+                  size="large"
+                  color="secondary"
+                  href={`/group/${group.id}/admin/edit#privacy-policy`}
+               >
+                  ADD PRIVACY POLICY
+               </Button>
+            </span>
+         </Stack>
       </Box>
    )
 }
