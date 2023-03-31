@@ -9,6 +9,7 @@ import {
 import LivestreamSearchNav from "./search/LivestreamSearchNav"
 import AggregatedAnalytics from "./analytics/AggregatedAnalytics"
 import AggregatedUniversitySources from "./analytics/AggregatedUniversitySources"
+import UsersTable from "./users/UsersTable"
 
 const styles = sxStyles({
    gridItem: {
@@ -47,6 +48,9 @@ const PageContent = () => {
                      </Grid>
                      <Grid xs={12} item style={styles.gridItem}>
                         <AggregatedUniversitySources />
+                     </Grid>
+                     <Grid xs={12} item style={styles.gridItem}>
+                        <UsersTable />
                      </Grid>
                   </>
                )}
