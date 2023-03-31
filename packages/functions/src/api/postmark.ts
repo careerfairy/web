@@ -54,12 +54,8 @@ export class PostmarkEmailSender {
 }
 
 function postmarkStub() {
-   return new Proxy(
-      {},
-      {
-         get: () => {
-            return
-         },
-      }
-   )
+   return {
+      sendEmailWithTemplate: () => Promise.resolve(),
+      sendEmailBatchWithTemplates: () => Promise.resolve(),
+   }
 }
