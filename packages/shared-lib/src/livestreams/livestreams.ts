@@ -287,7 +287,8 @@ export interface LivestreamJobApplicationDetails extends JobIdentifier {
    job: Partial<Job>
 }
 
-export interface LivestreamRecordingDetails extends DocumentData {
+// Collection Path: livestreams/{livestreamId}/recordingStats/stats
+export interface LivestreamRecordingDetails extends Identifiable {
    livestreamId: string
    livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched?: number

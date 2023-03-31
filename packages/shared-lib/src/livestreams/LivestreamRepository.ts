@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { UserPublicData } from "../users"
 import BaseFirebaseRepository, {
+   createCompatGenericConverter,
    mapFirestoreDocuments,
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
@@ -226,6 +227,14 @@ export interface ILivestreamRepository {
       limit?: number,
       fromDate?: Date
    ): firebase.firestore.Query
+   getClosestFutureLivestreamStatsFromDate(
+      groupId: string,
+      fromDate?: Date
+   ): Promise<LiveStreamStats>
+   getClosestPastLivestreamStatsFromDate(
+      groupId: string,
+      fromDate?: Date
+   ): Promise<LiveStreamStats>
 
    getGroupDraftLivestreamsQuery(
       groupId: string,
@@ -274,6 +283,42 @@ export class FirebaseLivestreamRepository
          .where("groupIds", "array-contains", groupId)
          .limit(limit)
          .orderBy("start", "asc")
+   }
+
+   async getClosestFutureLivestreamStatsFromDate(
+      groupId: string,
+      fromDate = new Date()
+   ): Promise<LiveStreamStats> {
+      const snap = await this.firestore
+         .collectionGroup("stats")
+         .where("id", "==", "livestreamStats")
+         .where("livestream.groupIds", "array-contains", groupId)
+         .where("livestream.start", ">", fromDate)
+         .where("livestream.test", "==", false)
+         .withConverter(createCompatGenericConverter<LiveStreamStats>())
+         .orderBy("livestream.start", "asc")
+         .limit(1)
+         .get()
+
+      return snap.docs[0]?.data() || null
+   }
+
+   async getClosestPastLivestreamStatsFromDate(
+      groupId: string,
+      fromDate = new Date()
+   ): Promise<LiveStreamStats> {
+      const snap = await this.firestore
+         .collectionGroup("stats")
+         .where("id", "==", "livestreamStats")
+         .where("livestream.groupIds", "array-contains", groupId)
+         .where("livestream.start", "<", fromDate)
+         .where("livestream.test", "==", false)
+         .withConverter(createCompatGenericConverter<LiveStreamStats>())
+         .orderBy("livestream.start", "desc")
+         .limit(1)
+         .get()
+
+      return snap.docs[0]?.data() || null
    }
 
    async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
@@ -895,7 +940,7 @@ export class FirebaseLivestreamRepository
          .collection("recordingStats")
          .doc("stats")
 
-      const details: LivestreamRecordingDetails = {
+      const details: Omit<LivestreamRecordingDetails, "id"> = {
          livestreamId,
          livestreamStartDate: livestreamStartDate ?? null,
          minutesWatched: this.fieldValue.increment(minutesWatched) as any,
