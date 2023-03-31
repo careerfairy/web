@@ -9,13 +9,15 @@ import {
    startAfter,
 } from "@firebase/firestore"
 import { orderBy } from "firebase/firestore"
-import { useCallback, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { ObservableStatus, useFirestoreCollection } from "reactfire"
+import useCountQuery, { CountQuery } from "../useCountQuery"
 
 export interface UsePaginatedCollection<T> {
    query: Query<T>
    limit: number
    orderBy: OrderBy<T>
+   getTotalCount?: boolean
 }
 
 interface OrderBy<T> {
@@ -35,6 +37,7 @@ export interface PaginatedCollection<T = DocumentData> {
    data?: T[]
    error?: ObservableStatus<T>["error"]
    limit: number
+   countQueryResponse?: CountQuery
 }
 
 /**
@@ -55,13 +58,23 @@ const usePaginatedCollection = <T = DocumentData>(
    const [prevNavigation, setPrevNavigation] = useState(false) // track when the user navigates back
 
    // eslint-disable-next-line react/hook-use-state
-   const [order] = useState(
-      orderBy(options.orderBy.field, options.orderBy.direction)
+   const order = useMemo(
+      () => orderBy(options.orderBy.field, options.orderBy.direction),
+      [options.orderBy.direction, options.orderBy.field]
    )
 
    // eslint-disable-next-line react/hook-use-state
    const [q, setQuery] = useState(
       query(options.query, order, limit(internalLimit))
+   )
+
+   const countQuery = useMemo(
+      () => query(options.query, order),
+      [options.query, order]
+   )
+
+   const countQueryResponse = useCountQuery(
+      options.getTotalCount ? countQuery : null
    )
 
    const result = useFirestoreCollection(q, reactfireOptions)
@@ -110,6 +123,18 @@ const usePaginatedCollection = <T = DocumentData>(
       result.data?.size,
    ])
 
+   // Reset the cursor pagination when the options change for better UX
+   const reset = useCallback(() => {
+      setCursor(0)
+      setPrevNavigation(false)
+   }, [])
+
+   useEffect(() => {
+      // Update the query when the options change
+      setQuery(query(options.query, order, limit(internalLimit)))
+      reset()
+   }, [options.query, order, internalLimit, reset])
+
    // remove the extra element if required
    let data = result.data?.docs?.map((d) => d.data())
    if (data?.length > options.limit) {
@@ -127,6 +152,7 @@ const usePaginatedCollection = <T = DocumentData>(
       status: result.status,
       data,
       page: cursor + 1,
+      countQueryResponse,
    }
 }
 

@@ -8,7 +8,10 @@ import React, {
    useState,
 } from "react"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import {
+   FieldOfStudy,
+   LevelOfStudy,
+} from "@careerfairy/shared-lib/fieldOfStudy"
 import { useFirestoreCollection } from "../../../../../custom-hook/utils/useFirestoreCollection"
 import { createLookup } from "@careerfairy/shared-lib/utils"
 import { useRouter } from "next/router"
@@ -38,6 +41,7 @@ type ILivestreamAnalyticsPageContext = {
    userType: LivestreamUserType
    setUserType: Dispatch<SetStateAction<LivestreamUserType>>
    fieldsOfStudyLookup: Record<string, string>
+   levelsOfStudyLookup: Record<string, string>
    setCurrentStreamStats: Dispatch<
       SetStateAction<ILivestreamAnalyticsPageContext["currentStreamStats"]>
    >
@@ -50,6 +54,7 @@ const initialValues: ILivestreamAnalyticsPageContext = {
    currentStreamStats: undefined,
    userType: initialUserType,
    fieldsOfStudyLookup: {},
+   levelsOfStudyLookup: {},
    setCurrentStreamStats: () => {},
    setUserType: () => {},
 }
@@ -76,6 +81,15 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const { data: fieldsOfStudy } = useFirestoreCollection<FieldOfStudy>(
       "fieldsOfStudy",
       queryOptions
+   )
+   const { data: levelsOfStudy } = useFirestoreCollection<LevelOfStudy>(
+      "levelsOfStudy",
+      queryOptions
+   )
+
+   const levelsOfStudyLookup = useMemo(
+      () => createLookup(levelsOfStudy, "name"),
+      [levelsOfStudy]
    )
 
    const fieldsOfStudyLookup = useMemo(
@@ -111,12 +125,13 @@ export const LivestreamAnalyticsPageProvider = ({ children }) => {
    const value = useMemo<ILivestreamAnalyticsPageContext>(() => {
       return {
          fieldsOfStudyLookup,
+         levelsOfStudyLookup,
          currentStreamStats: stats, // Only return the current stream stats if we are on a /livestreamId page
          userType,
          setCurrentStreamStats,
          setUserType,
       }
-   }, [fieldsOfStudyLookup, stats, userType])
+   }, [fieldsOfStudyLookup, levelsOfStudyLookup, stats, userType])
 
    return (
       <LivestreamAnalyticsPageContext.Provider value={value}>
