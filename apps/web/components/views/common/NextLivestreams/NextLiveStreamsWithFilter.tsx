@@ -24,11 +24,17 @@ const getQueryVariables = (query) => {
    const languages = query.languages as string
    const interests = query.interests as string
    const jobCheck = query.jobCheck as string
+   const companyCountries = query.companyCountries as string
+   const companySizes = query.companySizes as string
+   const companyIndustries = query.companyIndustries as string
 
    return {
       languages: languages && languages.split(","),
       interests: interests && interests.split(","),
       jobCheck: jobCheck?.toLowerCase() === "true" || false,
+      companyCountries: companyCountries && companyCountries.split(","),
+      companySizes: companySizes && companySizes.split(","),
+      companyIndustries: companyIndustries && companyIndustries.split(","),
    }
 }
 
@@ -45,16 +51,23 @@ const NextLiveStreamsWithFilter = ({
    } = useTheme()
    const { query } = useRouter()
    const [value, setValue] = useState(initialTabValue || "upcomingEvents")
-   const { languages, interests, jobCheck } = useMemo(
-      () => getQueryVariables(query),
-      [query]
-   )
+   const {
+      languages,
+      interests,
+      jobCheck,
+      companyCountries,
+      companySizes,
+      companyIndustries,
+   } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
 
    const upcomingLivestreams = useListenToUpcomingStreams({
       languagesIds: languages,
       interestsIds: interests,
       jobCheck: jobCheck,
+      companyCountriesIds: companyCountries,
+      companySizes: companySizes,
+      companyIndustriesIds: companyIndustries,
    })
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 

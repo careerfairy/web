@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import {
    Box,
    Button,
    CircularProgress,
    Fade,
    Grid,
+   InputAdornment,
    Tab,
    Tabs,
    TextField,
@@ -25,6 +26,7 @@ import parse from "autosuggest-highlight/parse"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { UserAdminGroup } from "@careerfairy/shared-lib/dist/users"
+import { Search as FindIcon } from "react-feather"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -53,7 +55,13 @@ const adminTab = {
    value: "admin",
    href: "/profile/groups?type=admin",
 }
-const Groups = () => {
+
+type Props = {
+   isOnDialog?: boolean
+   containerRef?: React.RefObject<HTMLDivElement>
+}
+
+const Groups = ({ isOnDialog = false, containerRef }: Props) => {
    const classes = useStyles()
    const { userData, authenticatedUser, adminGroups } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
@@ -109,7 +117,8 @@ const Groups = () => {
    const [slicedFilteredGroups] = useInfiniteScrollClientWithHandlers(
       filteredGroups,
       9,
-      6
+      6,
+      containerRef
    )
 
    useEffect(() => {
@@ -136,7 +145,7 @@ const Groups = () => {
       })()
    }, [
       value,
-      userData.groupIds,
+      userData?.groupIds,
       userData?.isAdmin,
       authenticatedUser.email,
       errorNotification,
@@ -172,45 +181,60 @@ const Groups = () => {
    const addAdminTab = () => {
       setTabs([adminTab, ...initialTabs])
    }
-   // @ts-ignore
-   const existingGroupElements = slicedFilteredGroups.map((group) => (
-      <CurrentGroup
-         isAdmin={value === "admin"}
-         key={group.id}
-         group={group}
-         userData={userData}
-      />
-   ))
+
+   const existingGroupElements = useMemo(
+      () =>
+         slicedFilteredGroups.map((group) => (
+            <CurrentGroup
+               isAdmin={value === "admin"}
+               key={group.id}
+               group={group}
+               userData={userData}
+               // @ts-ignore
+               hideMenu={!!isOnDialog}
+            />
+         )),
+      [isOnDialog, slicedFilteredGroups, userData, value]
+   )
+
+   const showSearch = useMemo(
+      () => userData?.isAdmin || Object.keys(adminGroups || {}).length > 6,
+      [adminGroups, userData?.isAdmin]
+   )
 
    return (
-      <ContentCard>
-         <div className={classes.header}>
-            <Tabs
-               value={value || "joined"}
-               onChange={handleChange}
-               scrollButtons
-               allowScrollButtonsMobile
-               aria-label="group tabs"
-            >
-               {tabs.map(({ label, ...tab }) => (
-                  <Tab
-                     key={label}
-                     component={Link}
-                     label={<ContentCardTitle>{label}</ContentCardTitle>}
-                     shallow
-                     {...tab}
-                  />
-               ))}
-            </Tabs>
-         </div>
-         <Box>
-            <Highlights
-               handleSelectGroup={handleSelectGroup}
-               hideButton
-               key={value}
-               groups={groups}
-            />
-         </Box>
+      <ContentCard sx={isOnDialog ? { px: 0 } : null}>
+         {isOnDialog ? null : (
+            <div className={classes.header}>
+               <Tabs
+                  value={value || "joined"}
+                  onChange={handleChange}
+                  scrollButtons
+                  allowScrollButtonsMobile
+                  aria-label="group tabs"
+               >
+                  {tabs.map(({ label, ...tab }) => (
+                     <Tab
+                        key={label}
+                        component={Link}
+                        label={<ContentCardTitle>{label}</ContentCardTitle>}
+                        shallow
+                        {...tab}
+                     />
+                  ))}
+               </Tabs>
+            </div>
+         )}
+         {showSearch ? (
+            <Box>
+               <Highlights
+                  handleSelectGroup={handleSelectGroup}
+                  hideButton
+                  key={value}
+                  groups={groups}
+               />
+            </Box>
+         ) : null}
          {loading ? (
             <Box sx={{ p: 3, display: "flex", justifyContent: "center" }}>
                <CircularProgress />
@@ -266,11 +290,19 @@ export const Highlights = ({
                <TextField
                   {...params}
                   style={{ backgroundColor: "white", margin: 0 }}
-                  placeholder="Join some groups"
-                  label="Search"
+                  placeholder="Select company"
+                  label="Company name"
                   fullWidth
                   variant="outlined"
                   margin="normal"
+                  InputProps={{
+                     ...params.InputProps,
+                     startAdornment: (
+                        <InputAdornment position="start">
+                           <FindIcon color={"black"} />
+                        </InputAdornment>
+                     ),
+                  }}
                />
             )}
             renderOption={(props, option, { inputValue }) => {

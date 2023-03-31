@@ -117,9 +117,44 @@ const GroupNavList = () => {
          {
             id: "analytics",
             href: `/${baseHrefPath}/${group.id}/admin/analytics`,
-            pathname: `/${baseHrefPath}/${baseParam}/admin/analytics`,
             Icon: AnalyticsIcon,
             title: "Analytics",
+            childLinks: [
+               {
+                  id: "general",
+                  href: `/${baseHrefPath}/${group.id}/admin/analytics`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics`,
+                  title: "General",
+               },
+               ...(group.universityCode // Hide talent pool for universities
+                  ? []
+                  : [
+                       {
+                          id: "talent-pool",
+                          href: `/${baseHrefPath}/${group.id}/admin/analytics/talent-pool`,
+                          pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/talent-pool`,
+                          title: "Talent pool",
+                       },
+                    ]),
+               {
+                  id: "live-stream",
+                  href: `/${baseHrefPath}/${group.id}/admin/analytics/live-stream`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/live-stream/[[...livestreamId]]`,
+                  title: "Live stream analytics",
+               },
+               {
+                  id: "registration-sources",
+                  href: `/${baseHrefPath}/${group.id}/admin/analytics/registration-sources`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/registration-sources`,
+                  title: "Registration sources",
+               },
+               {
+                  id: "feedback",
+                  href: `/${baseHrefPath}/${group.id}/admin/analytics/feedback`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/feedback`,
+                  title: "Feedback",
+               },
+            ],
          },
       ]
 
@@ -136,10 +171,11 @@ const GroupNavList = () => {
 
       return links
    }, [
-      showCompanyPageCTA,
-      featureFlags.atsAdminPageFlag,
       group.id,
+      group.universityCode,
       group.atsAdminPageFlag,
+      featureFlags.atsAdminPageFlag,
+      showCompanyPageCTA,
       push,
    ])
 

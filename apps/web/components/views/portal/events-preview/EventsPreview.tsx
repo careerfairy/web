@@ -25,6 +25,7 @@ const styles = {
       "& .slick-slide": {
          "& > *": {
             display: "flex",
+            px: { xs: 1, lg: "unset" },
          },
       },
    },
@@ -99,7 +100,7 @@ const EventsPreview = ({
    }
    return (
       <>
-         {!hidePreview && (
+         {!hidePreview ? (
             <Box id={id}>
                <Box sx={styles.eventsHeader}>
                   {isOnMarketingLandingPage ? (
@@ -117,19 +118,19 @@ const EventsPreview = ({
                      <Heading>{title}</Heading>
                   )}
                   {events?.length >= limit &&
-                     !isOnMarketingLandingPage &&
-                     seeMoreLink && (
-                        <Link href={seeMoreLink}>
-                           <a>
-                              <Typography sx={styles.seeMoreText} color="grey">
-                                 See more
-                              </Typography>
-                           </a>
-                        </Link>
-                     )}
+                  !isOnMarketingLandingPage &&
+                  seeMoreLink ? (
+                     <Link href={seeMoreLink}>
+                        <a>
+                           <Typography sx={styles.seeMoreText} color="grey">
+                              See more
+                           </Typography>
+                        </a>
+                     </Link>
+                  ) : null}
                </Box>
                <Stack sx={styles.previewContent}>
-                  {isEmpty && (
+                  {isEmpty ? (
                      <EmptyMessageOverlay
                         message={
                            type === EventsTypes.myNext
@@ -148,7 +149,7 @@ const EventsPreview = ({
                         }
                         showButton={!isOnMarketingLandingPage}
                      />
-                  )}
+                  ) : null}
                   <CustomButtonCarousel
                      numChildren={numChildrenElements}
                      numSlides={numElements}
@@ -194,8 +195,8 @@ const EventsPreview = ({
                   </CustomButtonCarousel>
                </Stack>
             </Box>
-         )}
-         {joinGroupModalData && (
+         ) : null}
+         {joinGroupModalData ? (
             <RegistrationModal
                isRecommended={isRecommended}
                open={Boolean(joinGroupModalData)}
@@ -206,13 +207,13 @@ const EventsPreview = ({
                targetGroupId={joinGroupModalData?.targetGroupId}
                handleClose={handleCloseJoinModal}
             />
-         )}
-         {shareEventDialog && (
+         ) : null}
+         {shareEventDialog ? (
             <ShareLivestreamModal
                livestreamData={shareEventDialog}
                handleClose={handleShareEventDialogClose}
             />
-         )}
+         ) : null}
       </>
    )
 }

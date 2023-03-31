@@ -1,9 +1,5 @@
 import { admin } from "./firestoreAdmin"
 import {
-   FirebaseUserRepository,
-   IUserRepository,
-} from "@careerfairy/shared-lib/users/UserRepository"
-import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/fieldOfStudy/FieldOfStudyRepository"
@@ -27,13 +23,17 @@ import {
 } from "../lib/GroupFunctionsRepository"
 import { IATSRepository } from "../lib/IATSRepository"
 import { MergeATSRepository } from "../lib/merge/MergeATSRepository"
+import {
+   IUserFunctionsRepository,
+   UserFunctionsRepository,
+} from "../lib/UserFunctionsRepository"
 
 const firestoreInstance = admin.firestore() as any
 
 export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestoreInstance, admin.firestore.FieldValue)
 
-export const userRepo: IUserRepository = new FirebaseUserRepository(
+export const userRepo: IUserFunctionsRepository = new UserFunctionsRepository(
    firestoreInstance,
    admin.firestore.FieldValue,
    admin.firestore.Timestamp

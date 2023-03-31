@@ -85,7 +85,7 @@ export default {
       "userLivestreamData",
       "userReminders",
       "usersInPolicy",
-      "usersWhoClickedLink",
+      "recordingStats",
       "usersWhoClicked",
       "usersWhoDismissed",
       "videos",

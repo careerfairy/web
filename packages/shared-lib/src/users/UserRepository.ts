@@ -6,10 +6,12 @@ import {
    IUserReminder,
    RegistrationStep,
    SavedRecruiter,
+   UserActivity,
    UserATSDocument,
    UserATSRelations,
    UserData,
    UserJobApplicationDocument,
+   UserPublicData,
    UserReminderType,
 } from "./users"
 import firebase from "firebase/compat/app"
@@ -17,6 +19,7 @@ import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
 import { LivestreamEvent, pickPublicDataFromLivestream } from "../livestreams"
 import { Application } from "../ats/Application"
 import { FieldOfStudy } from "../fieldOfStudy"
+import { Create } from "../commonTypes"
 
 export interface IUserRepository {
    updateInterests(userEmail: string, interestsIds: string[]): Promise<void>
@@ -126,6 +129,17 @@ export interface IUserRepository {
       userEmail: string,
       limit: number
    ): firebase.firestore.Query<CompanyFollowed>
+
+   /**
+    * Creates a user activity document and updates his lastActivityAt field
+    */
+   createActivity(
+      user: UserPublicData,
+      type: UserActivity["type"],
+      shouldUpdateLastActivity?: boolean
+   ): Promise<void>
+
+   updateLastActivity(userId: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -138,6 +152,47 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async createActivity(
+      user: UserPublicData,
+      type: UserActivity["type"],
+      shouldUpdateLastActivity = true
+   ): Promise<void> {
+      const activityDoc: Create<UserActivity> = {
+         collection: "userActivity",
+         userId: user.id,
+         type,
+         date: this.fieldValue.serverTimestamp() as any,
+         user,
+      }
+
+      const promises: Promise<unknown>[] = [
+         // new activity entry
+         this.firestore
+            .collection("userData")
+            .doc(user.id)
+            .collection("activities")
+            .add(activityDoc),
+      ]
+
+      if (shouldUpdateLastActivity) {
+         // keep the userData lastActivityAt field up to date
+         promises.push(this.updateLastActivity(user.id))
+      }
+
+      await Promise.all(promises)
+   }
+
+   updateLastActivity(userId: string): Promise<void> {
+      const toUpdate: Pick<UserData, "lastActivityAt"> = {
+         lastActivityAt: this.fieldValue.serverTimestamp() as any,
+      }
+
+      return this.firestore
+         .collection("userData")
+         .doc(userId)
+         .set(toUpdate, { merge: true })
    }
 
    updateInterests(userEmail: string, interestIds: string[]): Promise<void> {

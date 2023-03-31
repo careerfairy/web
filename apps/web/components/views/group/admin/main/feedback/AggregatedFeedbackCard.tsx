@@ -21,7 +21,7 @@ import { useRouter } from "next/router"
 import { useCallback, useEffect, useState } from "react"
 import { ExternalLink } from "react-feather"
 import { sxStyles } from "types/commonTypes"
-import CardCustom from "../CardCustom"
+import CardCustom from "../../common/CardCustom"
 import useGroupLivestreamStats from "./useGroupLivestreamStats"
 
 const styles = sxStyles({
@@ -224,7 +224,7 @@ const FeedbackCardContent = ({
                         </TableCell>
                         <TableCell align="right" sx={{ paddingRight: 0 }}>
                            <Link
-                              href={`/group/${groupId}/admin/analytics?section=2&subsection=2&livestreamId=${row.livestream.id}`}
+                              href={`/group/${groupId}/admin/analytics/feedback`}
                               underline="none"
                               color="secondary"
                            >

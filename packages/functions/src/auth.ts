@@ -5,7 +5,7 @@ const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
 
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { generateReferralCode, setHeaders } from "./util"
+import { generateReferralCode, setCORSHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
@@ -50,6 +50,7 @@ export const createNewUserAccount_v4 = functions.https.onCall(
          gender = "",
          fieldOfStudy = null,
          levelOfStudy = null,
+         accountCreationUTMParams = {},
       } = userData
 
       console.log(
@@ -62,6 +63,11 @@ export const createNewUserAccount_v4 = functions.https.onCall(
             console.log(
                `Starting firestore account creation process for ${recipientEmail}`
             )
+
+            const registrationUTMsToSave =
+               Object.keys(accountCreationUTMParams).length > 0
+                  ? { accountCreationUTMParams }
+                  : {}
 
             await admin
                .firestore()
@@ -86,6 +92,7 @@ export const createNewUserAccount_v4 = functions.https.onCall(
                      lastActivityAt:
                         admin.firestore.FieldValue.serverTimestamp(),
                      createdAt: admin.firestore.FieldValue.serverTimestamp(),
+                     ...registrationUTMsToSave,
                   })
                )
                .then(async () => {
@@ -481,7 +488,7 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
 
 export const sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
    async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
 
       const recipientEmail = req.body.recipientEmail.toLowercase()
       const recipientFirstName = req.body.firstName
@@ -536,7 +543,7 @@ export const sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
 
 export const sendPostmarkEmailUserDataAndUniWithName =
    functions.https.onRequest(async (req, res) => {
-      setHeaders(req, res)
+      setCORSHeaders(req, res)
 
       const recipientEmail = req.body.recipientEmail
       const recipientFirstName = req.body.firstName
@@ -595,7 +602,7 @@ export const sendPostmarkEmailUserDataAndUniWithName =
    })
 
 export const updateFakeUser = functions.https.onRequest(async (req, res) => {
-   setHeaders(req, res)
+   setCORSHeaders(req, res)
 
    admin
       .auth()

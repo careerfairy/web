@@ -173,10 +173,16 @@ export interface LivestreamEvent extends Identifiable {
    companyCountries?: string[] // ["United States", "United Kingdom", "Canada", "Australia", "Other"]
 
    /**
-    * Flag to distinguish between a draft and a livetream
+    * Flag to distinguish between a draft and a livestream
     * (different collections), internal use
     */
    isDraft?: boolean
+
+   /**
+    * A map of all the trigrams from joining the livestream title
+    * and the company name. Used for full text search
+    */
+   triGrams: Record<string, true>
 }
 
 /**
@@ -269,7 +275,7 @@ export interface RecordingToken extends Identifiable {
 
 export interface RecordingStats extends Identifiable {
    livestreamId: string
-   livestreamStartDate: Date
+   livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched: number
    viewers: string[]
    views: number
@@ -281,7 +287,8 @@ export interface LivestreamJobApplicationDetails extends JobIdentifier {
    job: Partial<Job>
 }
 
-export interface LivestreamRecordingDetails extends DocumentData {
+// Collection Path: livestreams/{livestreamId}/recordingStats/stats
+export interface LivestreamRecordingDetails extends Identifiable {
    livestreamId: string
    livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched?: number

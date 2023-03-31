@@ -12,6 +12,7 @@ import { placeholderAvatar } from "../../../constants/images"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useCollection from "../../custom-hook/useCollection"
 import { userRepo } from "../../../data/RepositoryInstances"
+import BulletPoints from "../common/BulletPoints"
 
 const styles = sxStyles({
    root: {
@@ -23,26 +24,6 @@ const styles = sxStyles({
       py: 2,
       borderRadius: 3,
       border: "1px solid #EDE7FD",
-   },
-   list: {
-      listStyleType: "none",
-      pl: 0,
-   },
-   listItem: {
-      display: "list-item",
-      position: "relative",
-      paddingLeft: 3,
-      "&:not(:last-child)": {
-         mb: 1,
-      },
-      "&::before": {
-         content: "'\\2022'",
-         position: "absolute",
-         left: 0,
-         color: "primary.main",
-         fontSize: "2.5rem",
-         lineHeight: "1.3rem",
-      },
    },
    avatar: {
       bgcolor: "transparent",
@@ -153,20 +134,6 @@ export const SignUp = () => {
             </Grid>
          </Grid>
       </CTACard>
-   )
-}
-
-const BulletPoints = ({ points }: { points: string[] }) => {
-   return (
-      <Box sx={styles.list} component="ul">
-         {points.map((point) => (
-            <Box sx={styles.listItem} component="li" key={point}>
-               <Typography variant="body1" color="black">
-                  {point}
-               </Typography>
-            </Box>
-         ))}
-      </Box>
    )
 }
 

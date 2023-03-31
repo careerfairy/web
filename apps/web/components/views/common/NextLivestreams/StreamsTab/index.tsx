@@ -31,7 +31,10 @@ type Props = {
 const filtersToShow = [
    FilterEnum.languages,
    FilterEnum.interests,
-   FilterEnum.jobCheck,
+   // FilterEnum.jobCheck, TODO: Removed temporarily
+   FilterEnum.companyCountries,
+   FilterEnum.companySizes,
+   FilterEnum.companyIndustries,
 ]
 
 const StreamsTab = ({
@@ -105,13 +108,7 @@ const StreamsTab = ({
                   mt: 1,
                }}
             >
-               <Filter
-                  filtersToShow={[
-                     FilterEnum.languages,
-                     FilterEnum.interests,
-                     // FilterEnum.jobCheck, TODO: Removed temporarily
-                  ]}
-               />
+               <Filter filtersToShow={filtersToShow} />
             </Box>
          ) : null}
       </AppBar>

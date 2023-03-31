@@ -5,7 +5,6 @@ import Typography from "@mui/material/Typography"
 import Button from "@mui/material/Button"
 import { alpha, Theme } from "@mui/material/styles"
 import LanguageIcon from "@mui/icons-material/Language"
-import CheckIcon from "@mui/icons-material/CheckCircle"
 import {
    getMaxLineStyles,
    getResizedUrl,
@@ -18,11 +17,8 @@ import { useRouter } from "next/router"
 import Link from "components/views/common/Link"
 import { checkIfPast, getRelevantHosts } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"
-import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import Skeleton from "@mui/material/Skeleton"
 
-import { Chip, useMediaQuery } from "@mui/material"
-import DateAndShareDisplay from "./common/DateAndShareDisplay"
 import { Interest } from "../../../../types/interests"
 import EventSEOSchemaScriptTag from "../EventSEOSchemaScriptTag"
 import {
@@ -33,68 +29,96 @@ import { marketingSignUpFormId } from "../../../cms/constants"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 import { useMarketingLandingPage } from "../../../cms/landing-page/MarketingLandingPageProvider"
 import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestreamImpressions"
+import { placeholderBanner } from "../../../../constants/images"
+import DateUtil from "../../../../util/DateUtil"
+import CalendarIcon from "@mui/icons-material/CalendarToday"
+import ClockIcon from "@mui/icons-material/AccessTime"
+import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 
 const styles = {
    hideOnHoverContent: {
       position: "absolute",
-      inset: 0,
-      "& .MuiChip-root": {
-         boxShadow: 2,
-      },
-      padding: (theme) => theme.spacing(3),
+      paddingX: 2,
+      marginTop: "100px",
+      width: "100%",
+      display: "flex",
+      flexDirection: "row",
+      justifyContent: "space-between",
       transition: (theme: Theme) => theme.transitions.create(["opacity"]),
-      display: "flex",
-      flexWrap: "nowrap",
-      zIndex: 1,
-      "& > *": {
-         flex: 0.5,
-      },
    },
-   hostsWrapper: {
+   backgroundImageWrapper: {
       display: "flex",
-      alignItems: "flex-start",
-   },
-   backgroundImage: {
-      transition: (theme: Theme) =>
-         theme.transitions.create(["transform"], {
-            duration: theme.transitions.duration.standard,
-            easing: theme.transitions.easing.easeInOut,
-         }),
+      height: "40%",
+      width: "100%",
+      position: "relative",
+      transition: (theme: Theme) => theme.transitions.create(["transform"]),
+      opacity: 1.2,
+      backgroundImage: (theme) =>
+         `linear-gradient(0deg, ${alpha(
+            theme.palette.common.black,
+            0.2
+         )}, ${alpha(theme.palette.common.black, 0.1)})`,
    },
    backgroundImageLoader: {
       position: "absolute",
       inset: 0,
       height: "auto",
    },
+   flippedCardContent: {
+      position: "absolute",
+      opacity: "0",
+   },
+   contentWrapper: {
+      display: "flex",
+      width: "100%",
+      height: "60%",
+      flexDirection: "column",
+      padding: 2,
+      paddingTop: 5,
+      transition: (theme: Theme) => theme.transitions.create("transform"),
+      background: "white",
+   },
+   title: {
+      fontWeight: 700,
+      ...getMaxLineStyles(2),
+   },
+   summary: {
+      fontWeight: 500,
+      ...getMaxLineStyles(2),
+   },
    mainContentHoverStyles: {
       "&:hover, &:focus-within": {
-         "& .titleWrapper": {
-            transform: "translateY(0)",
+         "& .contentWrapper": {
+            transform: "translateY(-70%)",
+            padding: { xs: 3, md: 4 },
+            background: "unset",
+         },
+         "& .flippedCardContent": {
+            position: "unset",
+            opacity: "1",
+            display: "flex",
+            justifyContent: "center",
+            mt: 6,
          },
          "& .hideOnHoverContent": {
             opacity: 0,
          },
-         "& .backgroundImage": {
-            transform: "scale(1.1)",
+         "& .backgroundImageWrapper": {
+            position: "unset",
+            opacity: 0.1,
          },
          "& .title": (theme) => ({
             [theme.breakpoints.up("md")]: {
                ...getMaxLineStyles(2),
             },
          }),
+         "& .summary": {
+            ...getMaxLineStyles(3),
+            color: "text.primary",
+            marginTop: 1,
+         },
          "& .chipsWrapper": {
             display: "none",
-         },
-         "& .mainContent": {
-            opacity: 1,
-            "& > *:not(.titleWrapper)": {
-               opacity: 1,
-               transition: (theme: Theme) =>
-                  theme.transitions.create(["opacity"], {
-                     duration: theme.transitions.duration.standard,
-                     easing: theme.transitions.easing.easeInOut,
-                  }),
-            },
          },
          "&:after": {
             transform: "translateY(-50%)",
@@ -102,14 +126,16 @@ const styles = {
       },
    },
    mainAndLowerContentWrapper: {
-      borderRadius: (theme) => theme.spacing(0.2, 0.2, 1, 1),
+      borderRadius: (theme) => theme.spacing(2),
+      boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
       overflow: "hidden",
-      boxShadow: 2,
+      marginY: 2,
    },
    mainContentWrapper: {
       position: "relative",
-      height: (theme) => theme.spacing(32),
+      height: (theme) => theme.spacing(42),
       display: "flex",
+      flexDirection: "column",
       alignItems: "flex-end",
       overflow: "hidden",
       width: "100%",
@@ -129,57 +155,31 @@ const styles = {
             theme.transitions.create(["transform"], {
                duration: theme.transitions.duration.standard,
             }),
-         backgroundImage: (theme) =>
-            `linear-gradient(0deg, ${alpha(
-               theme.palette.common.black,
-               1
-            )}, ${alpha(theme.palette.common.black, 0.1)})`,
          transform: "translateY(0)",
       },
    },
-   mainContent: {
-      "& > *:not(& .titleWrapper)": {
-         opacity: 0,
-      },
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "center",
-      position: "absolute",
-      inset: 0,
-      width: "100%",
-      padding: { xs: 3, sm: 3 },
-      transition: (theme: Theme) =>
-         `transform ${theme.transitions.duration.complex}ms cubic-bezier(0.19, 1, 0.22, 1)`,
-      zIndex: 1,
-   },
-   titleWrapper: {
-      transition: (theme: Theme) => theme.transitions.create("transform"),
-      transform: "translateY(120px)",
-   },
-   title: {
-      fontWeight: 600,
-      ...getMaxLineStyles(2),
-      textShadow: (theme) => theme.darkTextShadow,
-   },
-   summary: {
-      ...getMaxLineStyles(3),
-      minHeight: 50,
-   },
    btn: {
-      flex: 1,
-   },
-   bottomLogoWrapper: {
-      display: "grid",
-      placeItems: "center",
-      flex: 0.2,
+      width: "40%",
    },
    companyAvatar: {
-      padding: 1.5,
+      padding: 1,
       backgroundColor: "white",
       boxShadow: 3,
       border: "none !important",
-      width: 130,
-      height: 80,
+      width: 110,
+      height: 60,
+      borderRadius: 3,
+   },
+   calendarDate: {
+      display: "flex",
+      flexDirection: "column",
+      textAlign: "center",
+      justifyContent: "center",
+      backgroundColor: "white",
+      boxShadow: 3,
+      border: "none !important",
+      width: 58,
+      height: 60,
       borderRadius: 3,
    },
    nextImageWrapper: {
@@ -209,7 +209,6 @@ const EventPreviewCard = ({
    index,
    location = ImpressionLocation.unknown,
 }: EventPreviewCardProps) => {
-   const mobile = useMediaQuery("(max-width:700px)")
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
    const ref = useTrackLivestreamImpressions({
@@ -221,8 +220,7 @@ const EventPreviewCard = ({
       disableTracking: isPlaceholderEvent,
    })
    const { query, push, pathname } = useRouter()
-   const getStartDate = () => event?.startDate || event?.start?.toDate?.()
-   const [eventInterests, setSetEventInterests] = useState([])
+   const [eventInterests, setEventInterests] = useState([])
    const firebase = useFirebaseService()
    const { authenticatedUser } = useAuth()
    const [hosts, setHosts] = useState(undefined)
@@ -233,13 +231,13 @@ const EventPreviewCard = ({
    const { formCompleted: marketingFormCompleted, setSelectedEventId } =
       useMarketingLandingPage()
 
-   const hasRegistered: boolean = useMemo(() => {
+   const hasRegistered = useMemo<boolean>(() => {
       if (loading) return false
 
       return Boolean(event?.registeredUsers?.includes(authenticatedUser?.email))
    }, [loading, event?.registeredUsers, authenticatedUser?.email])
 
-   const hasParticipated: boolean = useMemo(() => {
+   const hasParticipated = useMemo<boolean>(() => {
       if (loading) return false
 
       return Boolean(
@@ -247,13 +245,19 @@ const EventPreviewCard = ({
       )
    }, [loading, event?.participatingStudents, authenticatedUser?.email])
 
+   const hasJobsToApply = useMemo<boolean>(() => {
+      if (loading) return false
+
+      return Boolean(event?.jobs?.length)
+   }, [event?.jobs?.length, loading])
+
    const {
       query: { groupId },
    } = useRouter()
 
    useEffect(() => {
       if (!loading && interests) {
-         setSetEventInterests(
+         setEventInterests(
             interests.filter((interest) =>
                event?.interestsIds?.includes(interest.id)
             )
@@ -316,6 +320,22 @@ const EventPreviewCard = ({
       loading,
    ])
 
+   const startDate = useMemo<Date>(
+      () => event?.startDate || event?.start?.toDate?.(),
+      [event?.start, event?.startDate]
+   )
+   const getStartDay = useMemo<number>(() => {
+      return new Date(startDate).getDate()
+   }, [startDate])
+
+   const getStartMonth = useMemo<string>(() => {
+      return DateUtil.getMonth(new Date(startDate).getMonth())
+   }, [startDate])
+
+   const getStartHour = useMemo<string>(() => {
+      return DateUtil.eventPreviewHour(startDate)
+   }, [startDate])
+
    const handleShareClick = useCallback(() => {
       openShareDialog?.(event)
    }, [event, openShareDialog])
@@ -365,7 +385,7 @@ const EventPreviewCard = ({
       [event?.hasStarted, isPast]
    )
 
-   const renderButtons = useCallback(() => {
+   const renderFlippedCard = useCallback(() => {
       if (isLive) {
          return (
             <Button
@@ -384,49 +404,107 @@ const EventPreviewCard = ({
       }
 
       return (
-         <>
-            {onRegisterClick && !isPast && !isOnMarketingLandingPage && (
-               <Button
-                  sx={styles.btn}
-                  onClick={onClickRegister}
-                  variant={hasRegistered ? "outlined" : "contained"}
-                  color={hasRegistered ? "info" : "primary"}
-                  disabled={registering}
-                  size={"medium"}
-               >
-                  {hasRegistered
-                     ? "cancel"
-                     : mobile
-                     ? "attend"
-                     : "Attend Event"}
-               </Button>
-            )}
+         <Stack spacing={3} direction={"column"} width={"100%"}>
+            <Box
+               sx={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent:
+                     isPlaceholderEvent || isPast || isOnMarketingLandingPage
+                        ? "center"
+                        : "space-between",
+               }}
+            >
+               {onRegisterClick && !isPast && !isOnMarketingLandingPage ? (
+                  <Button
+                     sx={styles.btn}
+                     onClick={onClickRegister}
+                     variant={hasRegistered ? "outlined" : "contained"}
+                     color={hasRegistered ? "secondary" : "primary"}
+                     disabled={registering}
+                     size={"small"}
+                  >
+                     {hasRegistered ? "cancel" : "Attend"}
+                  </Button>
+               ) : null}
 
-            {!isPlaceholderEvent && (
-               <Button
-                  sx={styles.btn}
-                  component={Link}
-                  /* @ts-ignore */
-                  href={getHref()}
-                  variant={"contained"}
-                  color={"secondary"}
-                  size={"small"}
-                  onClick={handleDetailsClick}
+               {!isPlaceholderEvent ? (
+                  <Button
+                     sx={styles.btn}
+                     component={Link}
+                     /* @ts-ignore */
+                     href={getHref()}
+                     variant={"contained"}
+                     color={"secondary"}
+                     size={"small"}
+                     onClick={handleDetailsClick}
+                  >
+                     Details
+                  </Button>
+               ) : null}
+            </Box>
+
+            {isPlaceholderEvent ? null : (
+               <Box
+                  sx={{
+                     display: "flex",
+                     width: "100%",
+                     justifyContent: "center",
+                  }}
                >
-                  {mobile ? "details" : "see details"}
-               </Button>
+                  <Typography
+                     sx={{ textDecoration: "underline", cursor: "pointer" }}
+                     fontWeight={500}
+                     variant={"body1"}
+                     color={"text.primary"}
+                     onClick={
+                        isOnMarketingLandingPage ? null : handleShareClick
+                     }
+                  >
+                     Share
+                  </Typography>
+               </Box>
             )}
-         </>
+            <Box
+               sx={{ display: "flex", width: "100%", justifyContent: "center" }}
+            >
+               {isPlaceholderEvent ? (
+                  <Typography
+                     sx={{ mt: 6 }}
+                     variant={"body1"}
+                     color={"text.primary"}
+                  >
+                     Coming soon
+                  </Typography>
+               ) : (
+                  <Box sx={{ display: "flex" }}>
+                     <Typography
+                        sx={{ display: "flex", alignItems: "center" }}
+                        variant={"body1"}
+                        color={"text.primary"}
+                     >
+                        <CalendarIcon fontSize={"inherit"} sx={{ mr: 1 }} />
+                        {getStartDay} {getStartMonth}
+                        <ClockIcon fontSize={"inherit"} sx={{ ml: 2, mr: 1 }} />
+                        {getStartHour}
+                     </Typography>
+                  </Box>
+               )}
+            </Box>
+         </Stack>
       )
    }, [
       getHref,
+      getStartDay,
+      getStartHour,
+      getStartMonth,
       handleDetailsClick,
+      handleShareClick,
       hasRegistered,
       isLive,
       isOnMarketingLandingPage,
       isPast,
       isPlaceholderEvent,
-      mobile,
       onClickRegister,
       onRegisterClick,
       registering,
@@ -435,54 +513,92 @@ const EventPreviewCard = ({
    return (
       <>
          <Box ref={ref}>
-            <DateAndShareDisplay
-               startDate={getStartDate()}
-               loading={loading}
-               onShareClick={isOnMarketingLandingPage ? null : handleShareClick}
-               isPlaceholderEvent={isPlaceholderEvent}
-            />
-            <Box
-               sx={[
-                  styles.mainAndLowerContentWrapper,
-                  light && { borderRadius: 0 },
-               ]}
-            >
+            <Box sx={styles.mainAndLowerContentWrapper}>
                <Box
                   sx={[
                      styles.mainContentWrapper,
                      !loading && styles.mainContentHoverStyles,
                   ]}
                >
-                  {loading ? (
-                     <Skeleton
-                        animation={animation ?? "wave"}
-                        variant="rectangular"
-                        sx={styles.backgroundImageLoader}
-                     />
-                  ) : (
-                     <Box
-                        alt="Illustration"
-                        src={getResizedUrl(event?.backgroundImageUrl, "lg")}
-                        layout="fill"
-                        className="backgroundImage"
-                        sx={styles.backgroundImage}
-                        component={Image}
-                        priority
-                        objectFit="cover"
-                     />
-                  )}
+                  <Box
+                     className="backgroundImageWrapper"
+                     sx={styles.backgroundImageWrapper}
+                  >
+                     {loading ? (
+                        <Skeleton
+                           animation={animation ?? "wave"}
+                           variant="rectangular"
+                           sx={styles.backgroundImageLoader}
+                        />
+                     ) : (
+                        <>
+                           <Image
+                              alt="Illustration"
+                              src={
+                                 getResizedUrl(
+                                    event?.backgroundImageUrl,
+                                    "lg"
+                                 ) || placeholderBanner
+                              }
+                              layout="fill"
+                              priority
+                              objectFit="cover"
+                           />
+                        </>
+                     )}
+                  </Box>
+
+                  <EventPreviewCardChipLabels
+                     hasParticipated={hasParticipated}
+                     isPast={isPast}
+                     isLive={isLive}
+                     hasRegistered={hasRegistered}
+                     hasJobToApply={hasJobsToApply}
+                  />
+
                   <Box
                      className="hideOnHoverContent"
-                     sx={[styles.hideOnHoverContent]}
+                     sx={[styles.hideOnHoverContent, { zIndex: 1 }]}
                   >
-                     <Box sx={styles.hostsWrapper}>
+                     {isPlaceholderEvent ? null : (
+                        <Box sx={{ display: "flex" }}>
+                           {loading ? (
+                              <Skeleton
+                                 animation={animation ?? "wave"}
+                                 variant="rectangular"
+                                 sx={{ borderRadius: 3 }}
+                                 width={58}
+                                 height={60}
+                              />
+                           ) : (
+                              <Box sx={styles.calendarDate}>
+                                 <Typography
+                                    variant={"h5"}
+                                    color={"secondary"}
+                                    fontWeight={600}
+                                 >
+                                    {getStartDay}
+                                 </Typography>
+                                 <Typography
+                                    variant={"body1"}
+                                    color={"text.primary"}
+                                    fontWeight={500}
+                                 >
+                                    {getStartMonth}
+                                 </Typography>
+                              </Box>
+                           )}
+                        </Box>
+                     )}
+
+                     <Box sx={{ display: "flex" }}>
                         {loading ? (
                            <Skeleton
                               animation={animation ?? "wave"}
                               variant="rectangular"
                               sx={{ borderRadius: 3 }}
-                              width={130}
-                              height={80}
+                              width={110}
+                              height={60}
                            />
                         ) : (
                            <Avatar
@@ -505,54 +621,65 @@ const EventPreviewCard = ({
                            </Avatar>
                         )}
                      </Box>
-                     <Stack justifyContent="end" direction={"row"} spacing={2}>
-                        {loading ? (
-                           <>
-                              <Skeleton
-                                 animation={animation}
-                                 sx={styles.chipLoader}
-                              />
-                              <Skeleton
-                                 animation={animation}
-                                 sx={styles.chipLoader}
-                              />
-                           </>
-                        ) : (
-                           <ChipLabel
-                              hasParticipated={hasParticipated}
-                              isPast={isPast}
-                              isLive={isLive}
-                              hasRegistered={hasRegistered}
-                           />
-                        )}
-                     </Stack>
                   </Box>
-                  <Stack
-                     spacing={2}
-                     className="mainContent"
-                     sx={styles.mainContent}
-                  >
-                     <Box sx={styles.titleWrapper} className="titleWrapper">
+                  <Box className="contentWrapper" sx={styles.contentWrapper}>
+                     <Box sx={{ display: "flex" }}>
                         <Typography
-                           variant={"h6"}
-                           component="div"
-                           className="title"
+                           variant={"body1"}
+                           color="text.primary"
                            sx={styles.title}
                         >
                            {loading ? (
-                              <Skeleton animation={animation} />
+                              <Skeleton
+                                 animation={animation}
+                                 variant="rectangular"
+                                 sx={{ mt: 5, borderRadius: 3 }}
+                                 width={300}
+                                 height={16}
+                              />
                            ) : (
                               event?.title
                            )}
                         </Typography>
-                        <Stack
-                           alignItems={"center"}
-                           flexWrap="nowrap"
-                           sx={{ mt: 1 }}
-                           direction={"row"}
-                           spacing={1}
-                           className="chipsWrapper"
+                     </Box>
+
+                     <Box display={"flex"} mt={1}>
+                        <Typography
+                           variant={"body2"}
+                           color="text.secondary"
+                           sx={styles.summary}
+                           className="summary"
                         >
+                           {loading ? (
+                              <Skeleton
+                                 animation={animation}
+                                 variant="rectangular"
+                                 sx={{ borderRadius: 3 }}
+                                 width={300}
+                                 height={16}
+                              />
+                           ) : (
+                              event?.summary
+                           )}
+                        </Typography>
+                     </Box>
+
+                     <Box
+                        className="flippedCardContent"
+                        sx={styles.flippedCardContent}
+                     >
+                        {renderFlippedCard()}
+                     </Box>
+
+                     <Box
+                        className="chipsWrapper"
+                        sx={{
+                           display: "flex",
+                           height: "100%",
+                           alignItems: "end",
+                        }}
+                     >
+                        <Stack spacing={1} direction={"row"}>
                            {loading ? (
                               <>
                                  <Skeleton
@@ -566,14 +693,15 @@ const EventPreviewCard = ({
                               </>
                            ) : (
                               <>
-                                 {event?.language?.code && (
+                                 {event?.language?.code ? (
                                     <WhiteTagChip
                                        icon={<LanguageIcon />}
                                        variant="filled"
                                        tooltipText={`This event is in ${event?.language.name}`}
                                        label={event?.language.code.toUpperCase()}
+                                       sx={{ border: "1px solid black" }}
                                     />
-                                 )}
+                                 ) : null}
                                  {eventInterests.slice(0, 1).map((interest) => (
                                     <WhiteTagChip
                                        key={interest.id}
@@ -583,60 +711,27 @@ const EventPreviewCard = ({
                                              eventInterests.length > 2
                                                 ? "50%"
                                                 : "80%",
+                                          border: "1px solid black",
                                        }}
                                        label={interest.name}
                                     />
                                  ))}
-                                 {eventInterests.length > 2 && (
+                                 {eventInterests.length > 2 ? (
                                     <WhiteTagChip
-                                       variant="outlined"
+                                       variant="filled"
+                                       sx={{ border: "1px solid black" }}
                                        label={`+ ${eventInterests.length - 2}`}
                                     />
-                                 )}
+                                 ) : null}
                               </>
                            )}
                         </Stack>
                      </Box>
-                     {loading ? (
-                        <Box sx={{ height: 50 }} />
-                     ) : (
-                        <>
-                           <Typography sx={styles.summary}>
-                              {event?.summary}
-                           </Typography>
-                           <Stack spacing={1} direction="row">
-                              {renderButtons()}
-                           </Stack>
-                        </>
-                     )}
-                  </Stack>
+                  </Box>
                </Box>
             </Box>
          </Box>
-         {event && <EventSEOSchemaScriptTag event={event} />}
-      </>
-   )
-}
-
-const ChipLabel = ({ isLive, isPast, hasParticipated, hasRegistered }) => {
-   let ExtraChip = null
-
-   if (hasParticipated && isPast) {
-      ExtraChip = (
-         <Chip icon={<CheckIcon />} color="primary" label={"Attended"} />
-      )
-   }
-
-   if (hasRegistered && !isPast) {
-      ExtraChip = (
-         <Chip icon={<CheckIcon />} color="primary" label={"Booked!"} />
-      )
-   }
-
-   return (
-      <>
-         {isLive && <Chip icon={<LiveIcon />} color="error" label={"LIVE"} />}
-         {ExtraChip}
+         {event ? <EventSEOSchemaScriptTag event={event} /> : null}
       </>
    )
 }

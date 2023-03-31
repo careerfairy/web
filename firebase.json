@@ -11,6 +11,18 @@
    "firestore": {
       "rules": "firestore.rules"
    },
+   "hosting": {
+      "rewrites": [
+         {
+            "source": "/bundle-allFutureLivestreams",
+            "function": "bundle-allFutureLivestreams"
+         },
+         {
+            "source": "/bundle-pastYearLivestreams",
+            "function": "bundle-pastYearLivestreams"
+         }
+      ]
+   },
    "emulators": {
       "functions": {
          "port": 5001

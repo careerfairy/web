@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { UserPublicData } from "../users"
 import BaseFirebaseRepository, {
+   createCompatGenericConverter,
    mapFirestoreDocuments,
    removeDuplicateDocuments,
 } from "../BaseFirebaseRepository"
@@ -21,7 +22,7 @@ import {
 } from "./livestreams"
 import { FieldOfStudy } from "../fieldOfStudy"
 import { Job, JobIdentifier } from "../ats/Job"
-import { chunkArray } from "../utils"
+import { chunkArray, containsAny } from "../utils"
 import {
    createLiveStreamStatsDoc,
    LiveStreamStats,
@@ -44,6 +45,13 @@ export type PastEventsOptions = {
    showHidden?: boolean
 }
 
+export type RegisteredEventsOptions = {
+   limit?: number
+   from?: Date
+   to?: Date
+   orderByDirection?: "asc" | "desc"
+}
+
 export interface ILivestreamRepository {
    getUpcomingEvents(limit?: number): Promise<LivestreamEvent[] | null>
 
@@ -54,8 +62,8 @@ export interface ILivestreamRepository {
 
    getRegisteredEvents(
       userEmail: string,
-      limit?: number
-   ): Promise<LivestreamEvent[] | null>
+      options?: RegisteredEventsOptions
+   ): Promise<LivestreamEvent[]>
 
    getRecommendEvents(
       userEmail: string,
@@ -219,6 +227,14 @@ export interface ILivestreamRepository {
       limit?: number,
       fromDate?: Date
    ): firebase.firestore.Query
+   getClosestFutureLivestreamStatsFromDate(
+      groupId: string,
+      fromDate?: Date
+   ): Promise<LiveStreamStats>
+   getClosestPastLivestreamStatsFromDate(
+      groupId: string,
+      fromDate?: Date
+   ): Promise<LiveStreamStats>
 
    getGroupDraftLivestreamsQuery(
       groupId: string,
@@ -260,15 +276,49 @@ export class FirebaseLivestreamRepository
       limit = 1,
       fromDate = new Date()
    ): firebase.firestore.Query {
-      let query = this.firestore
+      return this.firestore
          .collection("livestreams")
          .where("start", ">", fromDate)
          .where("test", "==", false)
          .where("groupIds", "array-contains", groupId)
          .limit(limit)
          .orderBy("start", "asc")
+   }
 
-      return query
+   async getClosestFutureLivestreamStatsFromDate(
+      groupId: string,
+      fromDate = new Date()
+   ): Promise<LiveStreamStats> {
+      const snap = await this.firestore
+         .collectionGroup("stats")
+         .where("id", "==", "livestreamStats")
+         .where("livestream.groupIds", "array-contains", groupId)
+         .where("livestream.start", ">", fromDate)
+         .where("livestream.test", "==", false)
+         .withConverter(createCompatGenericConverter<LiveStreamStats>())
+         .orderBy("livestream.start", "asc")
+         .limit(1)
+         .get()
+
+      return snap.docs[0]?.data() || null
+   }
+
+   async getClosestPastLivestreamStatsFromDate(
+      groupId: string,
+      fromDate = new Date()
+   ): Promise<LiveStreamStats> {
+      const snap = await this.firestore
+         .collectionGroup("stats")
+         .where("id", "==", "livestreamStats")
+         .where("livestream.groupIds", "array-contains", groupId)
+         .where("livestream.start", "<", fromDate)
+         .where("livestream.test", "==", false)
+         .withConverter(createCompatGenericConverter<LiveStreamStats>())
+         .orderBy("livestream.start", "desc")
+         .limit(1)
+         .get()
+
+      return snap.docs[0]?.data() || null
    }
 
    async updateLiveStreamStats<T extends LivestreamStatsToUpdate>(
@@ -538,19 +588,36 @@ export class FirebaseLivestreamRepository
 
    async getRegisteredEvents(
       userEmail: string,
-      limit?: number
-   ): Promise<LivestreamEvent[] | null> {
-      if (!userEmail) return null
+      options: RegisteredEventsOptions = {}
+   ): Promise<LivestreamEvent[]> {
       let livestreamRef = this.firestore
          .collection("livestreams")
-         .where("start", ">", getEarliestEventBufferTime())
          .where("test", "==", false)
          .where("registeredUsers", "array-contains", userEmail)
-         .orderBy("start", "asc")
-      if (limit) {
-         livestreamRef = livestreamRef.limit(limit)
+
+      if (options.orderByDirection) {
+         livestreamRef = livestreamRef.orderBy(
+            "start",
+            options.orderByDirection
+         )
+      } else {
+         livestreamRef = livestreamRef.orderBy("start", "asc")
       }
+
+      if (options.from) {
+         livestreamRef = livestreamRef.where("start", ">", options.from)
+      }
+
+      if (options.to) {
+         livestreamRef = livestreamRef.where("start", "<", options.to)
+      }
+
+      if (options.limit) {
+         livestreamRef = livestreamRef.limit(options.limit)
+      }
+
       const snapshots = await livestreamRef.get()
+
       return this.mapLivestreamCollections(snapshots).get()
    }
 
@@ -625,6 +692,7 @@ export class FirebaseLivestreamRepository
          language: event.language || null,
          type: event.type || null,
          universities: event.universities || [],
+         triGrams: event.triGrams || {},
       }
    }
 
@@ -872,7 +940,7 @@ export class FirebaseLivestreamRepository
          .collection("recordingStats")
          .doc("stats")
 
-      const details: LivestreamRecordingDetails = {
+      const details: Omit<LivestreamRecordingDetails, "id"> = {
          livestreamId,
          livestreamStartDate: livestreamStartDate ?? null,
          minutesWatched: this.fieldValue.increment(minutesWatched) as any,
@@ -955,6 +1023,30 @@ export class LivestreamsDataParser {
       this.livestreams = this.livestreams?.filter(({ language }) =>
          languagesIds.includes(language.code)
       )
+      return this
+   }
+
+   filterByCompanyCountry(companyCountriesIds: string[]) {
+      this.livestreams = this.livestreams?.filter(({ companyCountries }) =>
+         containsAny(companyCountries, companyCountriesIds)
+      )
+
+      return this
+   }
+
+   filterByCompanyIndustry(companyIndustryIds: string[]) {
+      this.livestreams = this.livestreams?.filter(({ companyIndustries }) =>
+         containsAny(companyIndustries, companyIndustryIds)
+      )
+
+      return this
+   }
+
+   filterByCompanySize(companySize: string[]) {
+      this.livestreams = this.livestreams?.filter(({ companySizes }) =>
+         containsAny(companySizes, companySize)
+      )
+
       return this
    }
 

@@ -26,6 +26,7 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import LinkifyText from "../../../../../../util/LinkifyText"
 import { Identifiable } from "../../../../../../../types/commonTypes"
+import { createLookup } from "@careerfairy/shared-lib/utils"
 
 interface Props {
    currentUserDataSet: UserDataSet
@@ -40,15 +41,6 @@ interface Props {
    userTypes: UserType[]
 }
 
-const createLookup = <T extends Identifiable>(
-   array: T[],
-   propertyName: keyof T
-): Record<string, T[keyof T]> => {
-   return array.reduce((acc, curr) => {
-      acc[curr.id] = curr[propertyName]
-      return acc
-   }, {})
-}
 const UsersTable = ({
    fetchingStreams,
    userType,
