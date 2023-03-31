@@ -21,7 +21,7 @@ if (isTestEnvironment()) {
     * towards the monthly limit, so we mock the client in tests
     * https://postmarkapp.com/support/article/1256-what-is-a-sandboxed-message
     */
-   client = jest.mock("postmark") as any
+   client = postmarkStub() as any
    console.log("Using postmark mock")
 } else {
    client = new postmark.ServerClient(serverToken)
@@ -51,4 +51,15 @@ export class PostmarkEmailSender {
    static create() {
       return new PostmarkEmailSender(client)
    }
+}
+
+function postmarkStub() {
+   return new Proxy(
+      {},
+      {
+         get: () => {
+            return
+         },
+      }
+   )
 }
