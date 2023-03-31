@@ -126,12 +126,16 @@ const GroupNavList = () => {
                   pathname: `/${baseHrefPath}/${baseParam}/admin/analytics`,
                   title: "General",
                },
-               {
-                  id: "talent-pool",
-                  href: `/${baseHrefPath}/${group.id}/admin/analytics/talent-pool`,
-                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/talent-pool`,
-                  title: "Talent pool",
-               },
+               ...(group.universityCode // Hide talent pool for universities
+                  ? []
+                  : [
+                       {
+                          id: "talent-pool",
+                          href: `/${baseHrefPath}/${group.id}/admin/analytics/talent-pool`,
+                          pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/talent-pool`,
+                          title: "Talent pool",
+                       },
+                    ]),
                {
                   id: "live-stream",
                   href: `/${baseHrefPath}/${group.id}/admin/analytics/live-stream`,
@@ -167,10 +171,11 @@ const GroupNavList = () => {
 
       return links
    }, [
-      showCompanyPageCTA,
-      featureFlags.atsAdminPageFlag,
       group.id,
+      group.universityCode,
       group.atsAdminPageFlag,
+      featureFlags.atsAdminPageFlag,
+      showCompanyPageCTA,
       push,
    ])
 
