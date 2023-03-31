@@ -1,4 +1,6 @@
-import { Filters } from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
+import usePaginatedUsersCollection, {
+   Filters,
+} from "../../analytics-new/live-stream/users/usePaginatedUsersCollection"
 import React, {
    createContext,
    FC,
@@ -9,7 +11,7 @@ import React, {
    useState,
 } from "react"
 import { universityCountriesMap } from "../../../../../util/constants/universityCountries"
-import { DocumentData, CollectionReference } from "@firebase/firestore"
+import { CollectionReference, Query } from "@firebase/firestore"
 import { UserDataEntry } from "./UserLivestreamDataTable"
 
 /*
@@ -45,12 +47,27 @@ type UserLivestreamDataTableContextValue = {
    filters: Filters
    setFilters: React.Dispatch<React.SetStateAction<Filters>>
    resetFilters: () => void
+   rowsPerPage: number
+   results: ReturnType<typeof usePaginatedUsersCollection>
+   setRowsPerPage: React.Dispatch<React.SetStateAction<number>>
    documentPaths: DocumentPaths
-   targetCollectionQuery: CollectionReference
+   targetCollectionQuery: CollectionReference | Query
    /*
     * Function to convert the document from the collection to the normalized format we want to display in the table
     * */
    converterFn: (doc: unknown) => UserDataEntry
+   /*
+    * If true, the table will show a message when there are no results without filters
+    */
+   noResultsWithoutFilters: boolean
+   /*
+    * If true, the table will show a message when there are no results with filters
+    * */
+   noResultsWithFilters: boolean
+   /*
+    *  Boolean to determine if all filters are inactive
+    * */
+   filtersInactive: boolean
 }
 const UserLivestreamDataTableContext =
    createContext<UserLivestreamDataTableContextValue>({
@@ -84,13 +101,19 @@ const UserLivestreamDataTableContext =
       },
       targetCollectionQuery: null,
       converterFn: () => null,
+      results: null,
+      rowsPerPage: 10,
+      setRowsPerPage: () => {},
+      noResultsWithoutFilters: false,
+      noResultsWithFilters: false,
+      filtersInactive: false,
    })
 
 type Props = {
    fieldsOfStudyLookup: Record<string, string>
    levelsOfStudyLookup: Record<string, string>
    documentPaths: DocumentPaths
-   targetCollectionQuery: CollectionReference<DocumentData>
+   targetCollectionQuery: CollectionReference | Query
    converterFn: (doc: unknown) => UserDataEntry
    title: string
 }
@@ -117,10 +140,44 @@ const UserDataTableProvider: FC<Props> = ({
       setFilters(initialFilters)
    }, [])
 
+   const [rowsPerPage, setRowsPerPage] = useState(10)
+
+   const results = usePaginatedUsersCollection(
+      targetCollectionQuery,
+      documentPaths,
+      rowsPerPage,
+      filters
+   )
+
    useEffect(() => {
       // reset filters when livestreamId changes
       resetFilters()
    }, [targetCollectionQuery, resetFilters])
+
+   const filtersInactive = useMemo(
+      () =>
+         Object.values(filters).every(
+            (value) =>
+               (Array.isArray(value) && value.length === 0) || value === null
+         ),
+      [filters]
+   )
+
+   const noResultsWithoutFilters = useMemo(
+      () =>
+         filtersInactive &&
+         results.countQueryResponse?.count === 0 &&
+         !results.loading,
+      [filtersInactive, results.countQueryResponse?.count, results.loading]
+   )
+
+   const noResultsWithFilters = useMemo(
+      () =>
+         !filtersInactive &&
+         results.countQueryResponse?.count === 0 &&
+         !results.loading,
+      [filtersInactive, results.countQueryResponse?.count, results.loading]
+   )
 
    const value = useMemo<UserLivestreamDataTableContextValue>(
       () => ({
@@ -134,18 +191,30 @@ const UserDataTableProvider: FC<Props> = ({
          targetCollectionQuery,
          converterFn,
          title,
+         setRowsPerPage,
+         rowsPerPage,
+         results,
+         noResultsWithoutFilters,
+         noResultsWithFilters,
+         filtersInactive,
       }),
       [
          converterFn,
          documentPaths,
          fieldsOfStudyLookup,
          filters,
+         filtersInactive,
          levelsOfStudyLookup,
+         noResultsWithFilters,
+         noResultsWithoutFilters,
          resetFilters,
+         results,
+         rowsPerPage,
          targetCollectionQuery,
          title,
       ]
    )
+
    return (
       <UserLivestreamDataTableContext.Provider value={value}>
          {children}
