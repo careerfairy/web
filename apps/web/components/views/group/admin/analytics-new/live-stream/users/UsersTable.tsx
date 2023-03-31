@@ -4,6 +4,7 @@ import {
    useLivestreamsAnalyticsPageContext,
 } from "../LivestreamAnalyticsPageProvider"
 import UserLivestreamDataTable, {
+   DataPrivacyTable,
    TableSkeleton,
    UserDataEntry,
 } from "../../../common/table/UserLivestreamDataTable"
@@ -18,10 +19,29 @@ import { collection } from "firebase/firestore"
 import { FirestoreInstance } from "../../../../../../../data/firebase/FirebaseInstance"
 import { universityCountryMap } from "@careerfairy/shared-lib/universities"
 import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { useAuth } from "../../../../../../../HOCs/AuthProvider"
 
 const UsersTable = () => {
-   const { currentStreamStats, fieldsOfStudyLookup, levelsOfStudyLookup } =
-      useLivestreamsAnalyticsPageContext()
+   const { group } = useGroup()
+   const { userData } = useAuth()
+
+   const {
+      currentStreamStats,
+      fieldsOfStudyLookup,
+      levelsOfStudyLookup,
+      userType,
+   } = useLivestreamsAnalyticsPageContext()
+
+   // If the privacy policy is not active/set, show the data privacy table prompt and not the user data table
+   // for registrations, except for CF admins
+   if (
+      userType === "registrations" &&
+      !group.privacyPolicyActive &&
+      !userData?.isAdmin
+   ) {
+      return <DataPrivacyTable />
+   }
 
    if (!currentStreamStats || !fieldsOfStudyLookup || !levelsOfStudyLookup) {
       return <TableSkeleton />
@@ -77,6 +97,7 @@ const DataTable = () => {
          targetCollectionQuery={collectionQuery}
          converterFn={converterFn}
          title={getTitle(userType, currentStreamStats)}
+         userType={userType}
       >
          <UserLivestreamDataTable emptyResultsMessage="Create a live stream to collect analytics." />
       </UserDataTableProvider>

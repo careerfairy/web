@@ -64,6 +64,7 @@ const DataTable = () => {
          targetCollectionQuery={talentPoolQuery}
          converterFn={converterFn}
          title={`Talent Pool of ${group.universityName}`}
+         userType="talent"
       >
          <Grid container spacing={3}>
             <Grid item xs={12}>
