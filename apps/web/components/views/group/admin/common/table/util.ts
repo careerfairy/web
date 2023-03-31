@@ -5,7 +5,7 @@ export const handleDownloadPDF = async (url: string, fileName: string) => {
    return fetch(url)
       .then((resp) => resp.arrayBuffer())
       .then((resp) => {
-         // set the blog type to final pdf
+         // set the blob type to final pdf
          const file = new Blob([resp], { type: "application/pdf" })
          // process to auto download it
          const fileURL = URL.createObjectURL(file)
