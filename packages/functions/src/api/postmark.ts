@@ -41,8 +41,12 @@ export class PostmarkEmailSender {
       // max of 500 templates per batch
       // https://postmarkapp.com/developer/api/templates-api#send-batch-with-templates
       const chunks = chunkArray(templates, 500)
-      const promises = chunks.map((chunk) =>
-         this.client.sendEmailBatchWithTemplates(chunk, callback)
+      const promises = chunks.map((chunk, i) =>
+         this.client.sendEmailBatchWithTemplates(chunk, callback).then(() => {
+            console.log(
+               `Successfully sent batch ${i} with ${chunk.length} emails`
+            )
+         })
       )
 
       return Promise.all(promises)
