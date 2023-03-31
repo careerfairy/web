@@ -56,7 +56,7 @@ dotenv.config()
 dotenv.config()
 
 // Auth
-exports.createNewUserAccount_v4 = auth.createNewUserAccount_v4
+exports.createNewUserAccount_v5 = auth.createNewUserAccount_v5
 exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
