@@ -6,12 +6,11 @@ import Stack from "@mui/material/Stack"
 import UserTypeTabs from "./UserTypeTabs"
 import ExportPdfButton from "./ExportPDFButton"
 
-const spacing = 1
+const spacing = 3
 
 const styles = sxStyles({
    wrapper: {
       flex: 1,
-      p: spacing,
    },
    searchWrapper: {
       flex: 1,
@@ -23,7 +22,7 @@ const LivestreamSearchNav = () => {
    return (
       <Stack
          sx={styles.wrapper}
-         spacing={3}
+         spacing={spacing}
          direction={{ xs: "column", sm: "row" }}
          alignItems={{ xs: "stretch", sm: "center" }}
       >

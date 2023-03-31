@@ -16,7 +16,7 @@ import {
 } from "@mui/material"
 import { type Options } from "@sentry/types"
 import useMenuState from "components/custom-hook/useMenuState"
-import { useCallback, useMemo, useState } from "react"
+import { FC, useCallback, useMemo, useState } from "react"
 import { ChevronDown, ChevronRight } from "react-feather"
 import { sxStyles } from "types/commonTypes"
 import Link from "../../../common/Link"
@@ -62,9 +62,8 @@ const styles = sxStyles({
 })
 
 type Props = {
-   title: React.ReactNode
+   title?: React.ReactNode
    subHeader?: React.ReactNode
-   children: React.ReactNode
    options?: OptionsProps["options"]
    optionsHandler?: OptionsProps["handler"]
    helpTooltip?: string
@@ -76,7 +75,7 @@ type Props = {
 /**
  * Card to be used on the Admin pages
  */
-const CardCustom = ({
+const CardCustom: FC<Props> = ({
    title,
    options,
    optionsHandler,
@@ -86,7 +85,7 @@ const CardCustom = ({
    sx,
    customAction,
    disableTypography = false,
-}: Props) => {
+}) => {
    const action = helpTooltip ? (
       <CustomWidthTooltip title={helpTooltip} arrow>
          <InfoOutlinedIcon />
