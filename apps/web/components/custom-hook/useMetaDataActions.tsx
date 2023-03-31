@@ -158,11 +158,13 @@ export function useMetaDataActions({
 
 interface CSVDialogDownloadProps {
    title: string
-   data: any
+   data: CSVData
    filename: string
    defaultOpen?: boolean
    onClose?: () => void
 }
+
+export type CSVData = Record<string, string>[]
 
 export const CSVDialogDownload: FC<CSVDialogDownloadProps> = ({
    title,

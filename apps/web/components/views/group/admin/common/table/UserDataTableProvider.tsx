@@ -38,7 +38,10 @@ type UserLivestreamDataTableContextValue = {
    countriesLookup: Record<string, string>
    levelsOfStudyLookup: Record<string, string>
    fieldsOfStudyLookup: Record<string, string>
-
+   /*
+    * The title of the table, will be used in the export file names
+    * */
+   title: string
    filters: Filters
    setFilters: React.Dispatch<React.SetStateAction<Filters>>
    resetFilters: () => void
@@ -53,6 +56,7 @@ const UserLivestreamDataTableContext =
    createContext<UserLivestreamDataTableContextValue>({
       countriesLookup: universityCountriesMap,
       levelsOfStudyLookup: {},
+      title: "",
       fieldsOfStudyLookup: {},
       filters: {
          selectedLevelOfStudy: null,
@@ -88,6 +92,7 @@ type Props = {
    documentPaths: DocumentPaths
    targetCollectionQuery: CollectionReference<DocumentData>
    converterFn: (doc: unknown) => UserDataEntry
+   title: string
 }
 
 const initialFilters: Filters = {
@@ -104,6 +109,7 @@ const UserDataTableProvider: FC<Props> = ({
    documentPaths,
    targetCollectionQuery,
    converterFn,
+   title,
 }) => {
    const [filters, setFilters] = useState<Filters>(initialFilters)
 
@@ -127,6 +133,7 @@ const UserDataTableProvider: FC<Props> = ({
          documentPaths,
          targetCollectionQuery,
          converterFn,
+         title,
       }),
       [
          converterFn,
@@ -136,6 +143,7 @@ const UserDataTableProvider: FC<Props> = ({
          levelsOfStudyLookup,
          resetFilters,
          targetCollectionQuery,
+         title,
       ]
    )
    return (
