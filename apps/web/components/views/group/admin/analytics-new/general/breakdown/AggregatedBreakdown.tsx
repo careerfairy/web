@@ -1,13 +1,8 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
 import {
    LoadingSourcesProgress,
-   sortAndFilterAndCalculatePercentage,
-   SourceEntryArgs,
    SourcesProgress,
-   updateEntries,
 } from "../../../common/SourcesProgress"
-import { universityCountriesMap } from "../../../../../../util/constants/universityCountries"
 import { useAnalyticsPageContext } from "../GeneralPageProvider"
 import CardCustom, {
    StyledPagination,
@@ -18,7 +13,11 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Box } from "@mui/material"
 import { TabsComponent, TabsSkeleton } from "../../../common/Tabs"
-import { titleCase } from "../../../../../../../util/CommonUtil"
+import {
+   getBreakdowns,
+   getBreakdownsTitle,
+   getEmptySources,
+} from "../../../common/util"
 import useClientSidePagination from "../../../../../../custom-hook/utils/useClientSidePagination"
 
 const styles = sxStyles({
@@ -143,14 +142,8 @@ const AggregatedBreakdownChart = () => {
       [leftTabsValue, rightTabsValue, fieldsOfStudyLookup]
    )
 
-   const title = useMemo(() => {
-      const str =
-         `${rightTabOptions[rightTabsValue]} by ${leftTabOptions[leftTabsValue]}` as const
-      return titleCase(str)
-   }, [leftTabsValue, rightTabsValue])
-
    return (
-      <CardCustom sx={styles.root} title={title}>
+      <CardCustom sx={styles.root} title={getBreakdownsTitle(breakDownsKey)}>
          <Stack
             height={"100%"}
             justifyContent={"space-between"}
@@ -161,7 +154,7 @@ const AggregatedBreakdownChart = () => {
             <SourcesProgress
                sources={isEmpty ? emptySources : results}
                leftHeaderComponent={
-                  <Box pb={2} display="flex" justifyContent="flex-start">
+                  <Box display="flex" justifyContent="flex-start">
                      <TabsComponent
                         tabOptions={leftTabOptionsArray}
                         value={leftTabsValue}
@@ -243,120 +236,6 @@ const AggregatedBreakdownChartSkeleton = () => {
          </Stack>
       </CardCustom>
    )
-}
-
-/**
- * Get breakdowns for the given stats
- * @param stats - livestream stats array to get breakdowns from
- * @param fieldsOfStudyLookup - fields of study lookup object gotten from the firebase
- * @returns breakdowns object containing the breakdowns for the given stats based on the given fields of study , and the given countries
- * */
-const getBreakdowns = (
-   stats: LiveStreamStats[],
-   fieldsOfStudyLookup: Record<string, string>
-): {
-   participantsByCountry: SourceEntryArgs[]
-   registrationsByCountry: SourceEntryArgs[]
-   participantsByFieldOfStudy: SourceEntryArgs[]
-   registrationsByFieldOfStudy: SourceEntryArgs[]
-} => {
-   const countriesByParticipants: SourceEntryArgs[] = []
-   const countriesByRegistrations: SourceEntryArgs[] = []
-   const fieldsOfStudyByParticipants: SourceEntryArgs[] = []
-   const fieldsOfStudyByRegistrations: SourceEntryArgs[] = []
-
-   stats.forEach((stat) => {
-      const { fieldOfStudyStats, countryStats } = stat
-
-      Object.keys(universityCountriesMap ?? {}).forEach((countryCode) => {
-         const countryStat = countryStats?.[countryCode]
-         const countryName = universityCountriesMap[countryCode]
-         const numberOfParticipants = countryStat?.numberOfParticipants ?? 0
-         const numberOfRegistrations = countryStat?.numberOfRegistrations ?? 0
-
-         updateEntries(
-            countriesByParticipants,
-            countryName,
-            numberOfParticipants,
-            `Number of participants from ${countryName}`
-         )
-
-         updateEntries(
-            countriesByRegistrations,
-            countryName,
-            numberOfRegistrations,
-            `Number of registrations from ${countryName}`
-         )
-      })
-
-      Object.keys(fieldsOfStudyLookup ?? {}).forEach((fieldOfStudyId) => {
-         const fieldOfStudyStat = fieldOfStudyStats?.[fieldOfStudyId]
-         const fieldOfStudyName = fieldsOfStudyLookup[fieldOfStudyId]
-
-         const numberOfParticipants =
-            fieldOfStudyStat?.numberOfParticipants ?? 0
-         const numberOfRegistrations =
-            fieldOfStudyStat?.numberOfRegistrations ?? 0
-
-         updateEntries(
-            fieldsOfStudyByParticipants,
-            fieldOfStudyName,
-            numberOfParticipants,
-            `Number of participants with a background in ${fieldOfStudyName}`
-         )
-
-         updateEntries(
-            fieldsOfStudyByRegistrations,
-            fieldOfStudyName,
-            numberOfRegistrations,
-            `Number of registrations with a background in ${fieldOfStudyName}`
-         )
-      })
-   })
-
-   return {
-      participantsByCountry: sortAndFilterAndCalculatePercentage(
-         countriesByParticipants
-      ),
-      registrationsByCountry: sortAndFilterAndCalculatePercentage(
-         countriesByRegistrations
-      ),
-      participantsByFieldOfStudy: sortAndFilterAndCalculatePercentage(
-         fieldsOfStudyByParticipants
-      ),
-      registrationsByFieldOfStudy: sortAndFilterAndCalculatePercentage(
-         fieldsOfStudyByRegistrations
-      ),
-   }
-}
-
-/**
- * We need to create a list of empty sources to display in the chart depending on the breakdown type and the user type
- *  @param {LeftTabValue} breakdownType - breakdown type
- *  @param {RightTabValue} userType - user type
- *  @param {number} maxNumberOfSourcesToDisplay - max number of sources to display
- *  @param fieldsOfStudyLookup - fields of study lookup from the context/firestore
- *  @returns {Array} - list of empty sources
- * */
-const getEmptySources = (
-   breakdownType: LeftTabValue,
-   userType: RightTabValue,
-   maxNumberOfSourcesToDisplay: number,
-   fieldsOfStudyLookup: Record<string, string>
-): SourceEntryArgs[] => {
-   const targetLookup =
-      breakdownType === "Country" ? universityCountriesMap : fieldsOfStudyLookup
-
-   return Object.entries(targetLookup)
-      .slice(0, maxNumberOfSourcesToDisplay) // we only want to display the first x sources
-      .map(([key, value]) => ({
-         value: 0,
-         label: value,
-         id: key,
-         percent: 0,
-         help: `Number of ${userType} from ${value}`,
-         name: value,
-      }))
 }
 
 export default AggregatedBreakdown
