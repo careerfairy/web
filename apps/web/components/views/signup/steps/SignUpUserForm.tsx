@@ -124,7 +124,7 @@ function SignUpUserForm() {
 
       const valuesWithUtmParams = {
          ...values,
-         registrationUTMParams: CookiesUtil.getUTMParams() ?? {},
+         accountCreationUTMParams: CookiesUtil.getUTMParams() ?? {},
       }
 
       firebase

@@ -50,7 +50,7 @@ export const createNewUserAccount_v4 = functions.https.onCall(
          gender = "",
          fieldOfStudy = null,
          levelOfStudy = null,
-         registrationUTMParams = {},
+         accountCreationUTMParams = {},
       } = userData
 
       console.log(
@@ -65,8 +65,8 @@ export const createNewUserAccount_v4 = functions.https.onCall(
             )
 
             const registrationUTMsToSave =
-               Object.keys(registrationUTMParams).length > 0
-                  ? { registrationUTMParams }
+               Object.keys(accountCreationUTMParams).length > 0
+                  ? { accountCreationUTMParams }
                   : {}
 
             await admin

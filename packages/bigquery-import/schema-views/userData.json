@@ -111,7 +111,7 @@
                "type": "string"
             }
          ],
-         "name": "registrationUTMParams",
+         "name": "accountCreationUTMParams",
          "type": "map"
       }
    ]
