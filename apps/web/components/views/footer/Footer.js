@@ -90,7 +90,9 @@ function Footer(props) {
                            </Link>
                         </div>
                         <div>
-                           <a href="/companies">For Companies</a>
+                           <a href="https://companies.careerfairy.io">
+                              For Companies
+                           </a>
                         </div>
                         <div>
                            <a href="/career-center">For Career Centers</a>
