@@ -43,7 +43,7 @@ const Sources = (props: Props) => {
 
 const Loader = () => {
    return (
-      <Box>
+      <Box sx={{ width: "100%" }}>
          <CircularLoader sx={{ m: 3 }} />
          <Typography textAlign="center">
             Crunching the data and creating the visualizations for you..

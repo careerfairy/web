@@ -34,6 +34,7 @@ import DateUtil from "../../../../util/DateUtil"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import ClockIcon from "@mui/icons-material/AccessTime"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
+import useGradiantStyles from "../../../../materialUI/animations/gradiant"
 
 const styles = {
    hideOnHoverContent: {
@@ -158,6 +159,9 @@ const styles = {
          transform: "translateY(0)",
       },
    },
+   cardIsLive: {
+      marginY: 1.5,
+   },
    btn: {
       width: "40%",
    },
@@ -209,6 +213,7 @@ const EventPreviewCard = ({
    index,
    location = ImpressionLocation.unknown,
 }: EventPreviewCardProps) => {
+   const gradiantClasses = useGradiantStyles()
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
    const ref = useTrackLivestreamImpressions({
@@ -513,7 +518,13 @@ const EventPreviewCard = ({
    return (
       <>
          <Box ref={ref}>
-            <Box sx={styles.mainAndLowerContentWrapper}>
+            <Box
+               sx={[
+                  styles.mainAndLowerContentWrapper,
+                  isLive && styles.cardIsLive,
+               ]}
+               className={isLive ? gradiantClasses.animatedGradiant : ""}
+            >
                <Box
                   sx={[
                      styles.mainContentWrapper,
