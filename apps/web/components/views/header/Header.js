@@ -120,7 +120,7 @@ function Header(props) {
                   </li>
                )}
                <li>
-                  <Link href="/companies">
+                  <Link href="https://companies.careerfairy.io">
                      <a onClick={toggleSideBar}>Companies</a>
                   </Link>
                </li>
@@ -128,16 +128,6 @@ function Header(props) {
                   <Link href="/wishlist">
                      <a onClick={toggleSideBar}>Wishlist</a>
                   </Link>
-               </li>
-               <li>
-                  <a href="https://corporate.careerfairy.io/companies">
-                     For Companies
-                  </a>
-               </li>
-               <li>
-                  <a href="https://corporate.careerfairy.io/career-center">
-                     For Career Centers
-                  </a>
                </li>
                <li>
                   <Link href={authenticated ? "/profile" : "/login"}>
