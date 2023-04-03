@@ -34,9 +34,10 @@ import DateUtil from "../../../../util/DateUtil"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import ClockIcon from "@mui/icons-material/AccessTime"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
-import useGradiantStyles from "../../../../materialUI/animations/gradiant"
+import { sxStyles } from "../../../../types/commonTypes"
+import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
 
-const styles = {
+const styles = sxStyles({
    hideOnHoverContent: {
       position: "absolute",
       paddingX: 2,
@@ -161,6 +162,13 @@ const styles = {
    },
    cardIsLive: {
       marginY: 1.5,
+      background:
+         "linear-gradient(white, white) padding-box, linear-gradient(180deg, #e9911d, #dc2743 50%, #e9911d) border-box",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "100% 100%, 100% 200%",
+      backgroundPosition: "0 0, 0 100%",
+      border: "4px solid transparent",
+      animation: `${gradientAnimation} 1s infinite alternate`,
    },
    btn: {
       width: "40%",
@@ -196,7 +204,7 @@ const styles = {
       width: 50,
       borderRadius: 4,
    },
-} as const
+})
 
 const EventPreviewCard = ({
    event,
@@ -213,7 +221,6 @@ const EventPreviewCard = ({
    index,
    location = ImpressionLocation.unknown,
 }: EventPreviewCardProps) => {
-   const gradiantClasses = useGradiantStyles()
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
    const ref = useTrackLivestreamImpressions({
@@ -523,7 +530,6 @@ const EventPreviewCard = ({
                   styles.mainAndLowerContentWrapper,
                   isLive && styles.cardIsLive,
                ]}
-               className={isLive ? gradiantClasses.animatedGradiant : ""}
             >
                <Box
                   sx={[
