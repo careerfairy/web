@@ -8,7 +8,7 @@ const footerLinks = [
          },
          {
             label: "For Companies",
-            href: "/companies",
+            href: "https://companies.careerfairy.io",
          },
          {
             label: "For Career Centers",
