@@ -4,6 +4,7 @@ import {
    alternateStudentBackground,
    pillsBackgroundTransparent,
 } from "../../constants/images"
+import { keyframes } from "@mui/material/styles"
 
 const styles = {
    globalBackgroundStyles: {
@@ -120,3 +121,9 @@ export const PillsBackground = ({ ...props }) => {
       />
    )
 }
+
+export const gradientAnimation = keyframes({
+   "0%": { backgroundPosition: "0% 100%" },
+   "50%": { backgroundPosition: "100% 0%" },
+   "100%": { backgroundPosition: "0% 50%" },
+})
