@@ -38,9 +38,8 @@ const initialSecondaryLinks = [
       basePath: "/",
    },
    {
-      href: `/companies`,
+      href: `https://companies.careerfairy.io`,
       title: "For Companies",
-      basePath: "/companies",
    },
    {
       href: `/career-center`,
@@ -93,9 +92,8 @@ const authenticatedUserBottomLinks: PageLinkProps[] = [
       basePath: "/",
    },
    {
-      href: `/companies`,
+      href: `https://companies.careerfairy.io`,
       title: "For Companies",
-      basePath: "/companies",
    },
    {
       href: `/career-center`,
