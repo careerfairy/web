@@ -1,4 +1,4 @@
-import { Badge, Box, Chip } from "@mui/material"
+import { Badge, Box, Chip, Stack } from "@mui/material"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
 
@@ -38,45 +38,57 @@ const EventPreviewCardChipLabels = ({
    hasRegistered,
    hasJobToApply,
 }: Props) => {
-   let chipLabel
+   let leftChips = []
+   let rightChip
 
-   if (hasParticipated && isPast && !isLive) {
-      chipLabel = (
+   if (hasParticipated && isPast) {
+      rightChip = (
          <Chip icon={<CheckIcon />} color="primary" label={"Attended"} />
       )
    }
 
-   if (hasRegistered && !isPast && !isLive) {
-      chipLabel = (
+   if (hasRegistered && !isPast) {
+      rightChip = (
          <Chip icon={<CheckIcon />} color="primary" label={"Booked!"} />
       )
    }
 
    if (isLive) {
-      chipLabel = <Chip icon={<LiveIcon />} color="error" label={"LIVE"} />
+      leftChips.push(
+         <Chip
+            icon={<LiveIcon />}
+            color="error"
+            label={"LIVE"}
+            sx={{ width: { xs: "fit-content", md: "auto" } }}
+         />
+      )
    }
 
-   return chipLabel || hasJobToApply ? (
-      <Box className="hideOnHoverContent" sx={styles.wrapper}>
-         <Box>
-            {hasJobToApply ? (
-               <Chip
-                  deleteIcon={
-                     <Badge
-                        color="primary"
-                        variant="dot"
-                        overlap="circular"
-                        sx={styles.badge}
-                     />
-                  }
-                  sx={{ pr: 1 }}
-                  onDelete={() => {}}
-                  color={"info"}
-                  label={"Easy Apply"}
+   if (hasJobToApply) {
+      leftChips.push(
+         <Chip
+            deleteIcon={
+               <Badge
+                  color="primary"
+                  variant="dot"
+                  overlap="circular"
+                  sx={styles.badge}
                />
-            ) : null}
-         </Box>
-         <Box>{chipLabel}</Box>
+            }
+            sx={{ pr: 1 }}
+            onDelete={() => {}}
+            color={"info"}
+            label={"Easy Apply"}
+         />
+      )
+   }
+
+   return leftChips.length > 0 || rightChip ? (
+      <Box className="hideOnHoverContent" sx={styles.wrapper}>
+         <Stack spacing={1} direction={{ xs: "column", md: "row" }}>
+            {leftChips.map((chip) => chip)}
+         </Stack>
+         <Box>{rightChip}</Box>
       </Box>
    ) : null
 }
