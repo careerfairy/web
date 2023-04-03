@@ -406,7 +406,11 @@ const ViewerLayout = (props) => {
          screenSharerId={currentLivestream?.screenSharerId}
          streamMode={currentLivestream?.mode}
          isStreamer={handRaiseActive}
-         allowViewerToJoin={currentLivestream?.hasStarted || spyModeEnabled}
+         allowViewerToJoin={
+            currentLivestream?.hasStarted ||
+            currentLivestream?.test === true ||
+            spyModeEnabled
+         }
       >
          <RTMProvider
             livestreamId={livestreamId as string}
