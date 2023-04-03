@@ -48,9 +48,7 @@ const LandingHeader = (props) => {
                   </Link>
                </li>
                <li>
-                  <a href="https://corporate.careerfairy.io/companies">
-                     For Companies
-                  </a>
+                  <a href="https://companies.careerfairy.io/">For Companies</a>
                </li>
                <li>
                   <a href="https://corporate.careerfairy.io/career-center">
