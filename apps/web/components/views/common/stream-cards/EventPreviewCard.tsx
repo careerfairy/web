@@ -407,7 +407,6 @@ const EventPreviewCard = ({
          >
             {isLive ? (
                <Button
-                  sx={styles.btn}
                   component={Link}
                   /* @ts-ignore */
                   href={getHref()}
@@ -416,7 +415,7 @@ const EventPreviewCard = ({
                   size={"medium"}
                   onClick={handleDetailsClick}
                >
-                  Join event
+                  Join Stream
                </Button>
             ) : (
                <Box
