@@ -397,65 +397,67 @@ const EventPreviewCard = ({
       [event?.hasStarted, isPast]
    )
 
-   const renderFlippedCard = useCallback(() => {
-      if (isLive) {
-         return (
-            <Button
-               sx={styles.btn}
-               component={Link}
-               /* @ts-ignore */
-               href={getHref()}
-               variant={"contained"}
-               color={"primary"}
-               size={"medium"}
-               onClick={handleDetailsClick}
-            >
-               Join event
-            </Button>
-         )
-      }
+   const renderFlippedCard = useCallback(
+      () => (
+         <Stack
+            spacing={3}
+            direction={"column"}
+            alignItems={"center"}
+            width={"100%"}
+         >
+            {isLive ? (
+               <Button
+                  sx={styles.btn}
+                  component={Link}
+                  /* @ts-ignore */
+                  href={getHref()}
+                  variant={"contained"}
+                  color={"primary"}
+                  size={"medium"}
+                  onClick={handleDetailsClick}
+               >
+                  Join event
+               </Button>
+            ) : (
+               <Box
+                  sx={{
+                     display: "flex",
+                     width: "100%",
+                     justifyContent:
+                        isPlaceholderEvent || isPast || isOnMarketingLandingPage
+                           ? "center"
+                           : "space-between",
+                  }}
+               >
+                  {onRegisterClick && !isPast && !isOnMarketingLandingPage ? (
+                     <Button
+                        sx={styles.btn}
+                        onClick={onClickRegister}
+                        variant={hasRegistered ? "outlined" : "contained"}
+                        color={hasRegistered ? "secondary" : "primary"}
+                        disabled={registering}
+                        size={"small"}
+                     >
+                        {hasRegistered ? "cancel" : "Attend"}
+                     </Button>
+                  ) : null}
 
-      return (
-         <Stack spacing={3} direction={"column"} width={"100%"}>
-            <Box
-               sx={{
-                  display: "flex",
-                  width: "100%",
-                  justifyContent:
-                     isPlaceholderEvent || isPast || isOnMarketingLandingPage
-                        ? "center"
-                        : "space-between",
-               }}
-            >
-               {onRegisterClick && !isPast && !isOnMarketingLandingPage ? (
-                  <Button
-                     sx={styles.btn}
-                     onClick={onClickRegister}
-                     variant={hasRegistered ? "outlined" : "contained"}
-                     color={hasRegistered ? "secondary" : "primary"}
-                     disabled={registering}
-                     size={"small"}
-                  >
-                     {hasRegistered ? "cancel" : "Attend"}
-                  </Button>
-               ) : null}
-
-               {!isPlaceholderEvent ? (
-                  <Button
-                     sx={styles.btn}
-                     component={Link}
-                     /* @ts-ignore */
-                     href={getHref()}
-                     variant={"contained"}
-                     color={"secondary"}
-                     size={"small"}
-                     onClick={handleDetailsClick}
-                  >
-                     Details
-                  </Button>
-               ) : null}
-            </Box>
-
+                  {!isPlaceholderEvent ? (
+                     <Button
+                        sx={styles.btn}
+                        component={Link}
+                        /* @ts-ignore */
+                        href={getHref()}
+                        variant={"contained"}
+                        color={"secondary"}
+                        size={"small"}
+                        onClick={handleDetailsClick}
+                     >
+                        Details
+                     </Button>
+                  ) : null}
+               </Box>
+            )}
             {isPlaceholderEvent ? null : (
                <Box
                   sx={{
@@ -504,23 +506,24 @@ const EventPreviewCard = ({
                )}
             </Box>
          </Stack>
-      )
-   }, [
-      getHref,
-      getStartDay,
-      getStartHour,
-      getStartMonth,
-      handleDetailsClick,
-      handleShareClick,
-      hasRegistered,
-      isLive,
-      isOnMarketingLandingPage,
-      isPast,
-      isPlaceholderEvent,
-      onClickRegister,
-      onRegisterClick,
-      registering,
-   ])
+      ),
+      [
+         getHref,
+         getStartDay,
+         getStartHour,
+         getStartMonth,
+         handleDetailsClick,
+         handleShareClick,
+         hasRegistered,
+         isLive,
+         isOnMarketingLandingPage,
+         isPast,
+         isPlaceholderEvent,
+         onClickRegister,
+         onRegisterClick,
+         registering,
+      ]
+   )
 
    return (
       <>
