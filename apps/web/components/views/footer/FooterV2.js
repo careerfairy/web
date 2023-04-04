@@ -7,6 +7,7 @@ import Typography from "@mui/material/Typography"
 import Link from "next/link"
 import footerLinks from "./footerLinks"
 import icons from "./icons"
+import { getWindow } from "../../../util/PathUtils"
 
 const FooterV2 = ({
    background = undefined,
@@ -65,9 +66,20 @@ const FooterV2 = ({
                                  },
                               })}
                            >
-                              <Link href={href}>
-                                 <a>{label}</a>
-                              </Link>
+                              {href === "uc_settings" ? (
+                                 <a
+                                    style={{ cursor: "pointer" }}
+                                    onClick={() => {
+                                       getWindow()?.UC_UI?.showSecondLayer()
+                                    }}
+                                 >
+                                    {label}
+                                 </a>
+                              ) : (
+                                 <Link href={href}>
+                                    <a>{label}</a>
+                                 </Link>
+                              )}
                            </Box>
                         ))}
                      </Grid>
