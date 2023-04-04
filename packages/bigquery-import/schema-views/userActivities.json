@@ -1,0 +1,50 @@
+{
+   "fields": [
+      {
+         "fields": [
+            {
+               "name": "id",
+               "type": "string"
+            },
+            {
+               "name": "authId",
+               "type": "string"
+            },
+            {
+               "name": "firstName",
+               "type": "string"
+            },
+            {
+               "name": "lastName",
+               "type": "string"
+            },
+            {
+               "name": "badges",
+               "type": "stringified_map"
+            }
+         ],
+         "name": "user",
+         "type": "map"
+      },
+      {
+         "name": "userId",
+         "type": "string"
+      },
+      {
+         "name": "date",
+         "type": "timestamp"
+      },
+      {
+         "name": "relatedLivestreamId",
+         "type": "string"
+      },
+      {
+         "name": "type",
+         "type": "string"
+      },
+      {
+         "name": "collection",
+         "type": "string"
+      }
+   ]
+}
