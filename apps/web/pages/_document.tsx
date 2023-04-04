@@ -271,10 +271,9 @@ MyDocument.getInitialProps = async function (
 
 function shouldRunUsercentrics(ctx: DocumentContext) {
    // Don't run when developing / tests
-   // if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
-   //    return false
-   // }
-   //
+   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+      return false
+   }
 
    /**
     * Don't run on recording sessions & embedded pages
