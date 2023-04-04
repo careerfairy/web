@@ -49,7 +49,7 @@ const TermsAgreement = ({
                      <a>Terms & Conditions</a>
                   </Link>{" "}
                   and I have taken note of the{" "}
-                  <Link href="/privacy">
+                  <Link href="/data-protection">
                      <a>Data Protection Notice</a>
                   </Link>
                </Typography>
