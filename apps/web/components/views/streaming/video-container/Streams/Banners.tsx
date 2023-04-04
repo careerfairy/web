@@ -40,7 +40,7 @@ interface Props {
 const Banners = ({ presenter, handRaiseActive, isBottom, mobile }: Props) => {
    const { currentLivestream } = useCurrentStream()
    const {
-      query: { breakoutRoomId },
+      query: { breakoutRoomId, isRecordingWindow },
    } = useRouter()
 
    const [showBreakoutBanner, setShowBreakoutBanner] = useState(false)
@@ -61,10 +61,17 @@ const Banners = ({ presenter, handRaiseActive, isBottom, mobile }: Props) => {
             !presenter &&
                handRaiseActive &&
                !mobile &&
-               currentLivestream?.hasStarted
+               currentLivestream?.hasStarted &&
+               !isRecordingWindow
          )
       )
-   }, [presenter, handRaiseActive, mobile, currentLivestream?.hasStarted])
+   }, [
+      presenter,
+      handRaiseActive,
+      mobile,
+      currentLivestream?.hasStarted,
+      isRecordingWindow,
+   ])
 
    return (
       <div className={isBottom ? classes.bannerBottom : classes.bannerTop}>
