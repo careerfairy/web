@@ -21,6 +21,7 @@ import Link from "next/link"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import { errorLogAndNotify } from "util/CommonUtil"
 import ManageCompaniesDialog from "../profile/my-groups/ManageCompaniesDialog"
+import { BLACKLISTED_ABSOLUTE_PATHS } from "../../../constants/routes"
 
 const styles = {
    box: {
@@ -99,7 +100,11 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                   : signupPagePath
             )
          } else {
-            if (absolutePath) {
+            if (
+               absolutePath &&
+               !BLACKLISTED_ABSOLUTE_PATHS.includes(absolutePath as string)
+            ) {
+               // If there is an absolute path that is not blacklisted, then it should be redirected to that path
                void replace(absolutePath as string)
             } else if (
                userData?.isAdmin ||
@@ -112,6 +117,9 @@ const LogInForm = ({ groupAdmin }: LoginFormProps) => {
                const groupId = Object.keys(adminGroups)[0]
 
                void replace(`/group/${groupId}/admin`)
+            } else if (absolutePath) {
+               // It should only be redirected to the blacklisted absolute path as last resort
+               void replace(absolutePath as string)
             } else {
                void replace("/portal")
             }
