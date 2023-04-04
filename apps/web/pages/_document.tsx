@@ -17,6 +17,7 @@ interface DocumentProps extends DocumentInitialProps {
    shouldRunUsercentrics: boolean
    shouldRunGTM: boolean
    usercentricsPreviewMode: boolean
+   shouldSuppressUCBanner: boolean
 }
 
 export default function MyDocument(props: DocumentProps) {
@@ -43,6 +44,15 @@ export default function MyDocument(props: DocumentProps) {
                      async
                   ></script>
                </>
+            )}
+
+            {props.shouldSuppressUCBanner && (
+               <script
+                  type="application/javascript"
+                  dangerouslySetInnerHTML={{
+                     __html: `var UC_UI_SUPPRESS_CMP_DISPLAY=true;`,
+                  }}
+               ></script>
             )}
 
             {props.shouldRunUsercentrics && props.shouldRunGTM && (
@@ -255,14 +265,16 @@ MyDocument.getInitialProps = async function (
       shouldRunUsercentrics: shouldRunUsercentrics(ctx),
       shouldRunGTM: shouldRunGTM(ctx),
       usercentricsPreviewMode: Boolean(ctx.query.useUsercentricsDraftVersion),
+      shouldSuppressUCBanner: shouldSuppressUCBanner(ctx),
    }
 }
 
 function shouldRunUsercentrics(ctx: DocumentContext) {
    // Don't run when developing / tests
-   if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
-      return false
-   }
+   // if (process.env.NEXT_PUBLIC_FIREBASE_EMULATORS) {
+   //    return false
+   // }
+   //
 
    /**
     * Don't run on recording sessions & embedded pages
@@ -271,7 +283,25 @@ function shouldRunUsercentrics(ctx: DocumentContext) {
       return false
    }
 
+   /**
+    * Disable UC for certain paths
+    */
+   if (["/terms"].includes(ctx.pathname)) {
+      return false
+   }
+
    return true
+}
+
+/**
+ * Hide the UC banner for certain paths, but still run the UC scripts
+ */
+function shouldSuppressUCBanner(ctx: DocumentContext) {
+   if (["/data-protection"].includes(ctx.pathname)) {
+      return true
+   }
+
+   return false
 }
 
 function shouldRunGTM(ctx: DocumentContext) {
