@@ -341,7 +341,7 @@ const EventPreviewCard = ({
    }, [startDate])
 
    const getStartMonth = useMemo<string>(() => {
-      return DateUtil.getMonth(new Date(startDate).getMonth())
+      return DateUtil.getMonth(new Date(startDate).getMonth(), true)
    }, [startDate])
 
    const getStartHour = useMemo<string>(() => {
