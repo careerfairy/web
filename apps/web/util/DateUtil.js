@@ -168,32 +168,32 @@ export default class DateUtil {
       )
    }
 
-   static getMonth(JsDateMonth) {
+   static getMonth(JsDateMonth, isAbbreviated = false) {
       switch (JsDateMonth) {
          case 0:
-            return "January"
+            return isAbbreviated ? "JAN" : "January"
          case 1:
-            return "February"
+            return isAbbreviated ? "FEB" : "February"
          case 2:
-            return "March"
+            return isAbbreviated ? "MAR" : "March"
          case 3:
-            return "April"
+            return isAbbreviated ? "APR" : "April"
          case 4:
-            return "May"
+            return isAbbreviated ? "MAY" : "May"
          case 5:
-            return "June"
+            return isAbbreviated ? "JUN" : "June"
          case 6:
-            return "July"
+            return isAbbreviated ? "JUL" : "July"
          case 7:
-            return "August"
+            return isAbbreviated ? "AUG" : "August"
          case 8:
-            return "September"
+            return isAbbreviated ? "SEPT" : "September"
          case 9:
-            return "October"
+            return isAbbreviated ? "OCT" : "October"
          case 10:
-            return "November"
+            return isAbbreviated ? "NOV" : "November"
          case 11:
-            return "December"
+            return isAbbreviated ? "DEC" : "December"
          default:
             return ""
       }
