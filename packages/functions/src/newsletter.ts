@@ -1,3 +1,4 @@
+import { RuntimeOptions } from "firebase-functions"
 import functions = require("firebase-functions")
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
@@ -24,16 +25,21 @@ import { NewsletterDataFetcher } from "./lib/recommendation/services/DataFetcher
 let newsletterAlreadySent = false
 
 /**
+ * Newsletter functions runtime settings
+ */
+const runtimeSettings: RuntimeOptions = {
+   // may take a while
+   timeoutSeconds: 60 * 9,
+   // we may load lots of data into memory
+   memory: "512MB",
+}
+
+/**
  * Send a newsletter to all users every other tuesday
  */
 export const newsletter = functions
    .region(config.region)
-   .runWith({
-      // may take a while
-      timeoutSeconds: 60 * 9,
-      // we may load lots of data into memory
-      memory: "512MB",
-   })
+   .runWith(runtimeSettings)
    .pubsub.schedule("0 18 * * Tue") // every tuesday at 6pm
    .timeZone("Europe/Zurich")
    .onRun(async () => {
@@ -50,6 +56,7 @@ export const newsletter = functions
  */
 export const manualNewsletter = functions
    .region(config.region)
+   .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
       const receivedEmails = ((req.query.emails as string) ?? "")
          .split(",")

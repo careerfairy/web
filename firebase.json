@@ -23,7 +23,7 @@
          },
          {
             "source": "/bundle-futureLivestreamsNext15Days",
-            "function": "futureLivestreamsNext15Days"
+            "function": "bundle-futureLivestreamsNext15Days"
          }
       ]
    },
