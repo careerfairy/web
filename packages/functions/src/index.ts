@@ -107,6 +107,7 @@ exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
 
 exports.newsletter = newsletter.newsletter
+exports.manualNewsletter = newsletter.manualNewsletter
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =
