@@ -31,7 +31,7 @@ const runtimeSettings: RuntimeOptions = {
    // may take a while
    timeoutSeconds: 60 * 9,
    // we may load lots of data into memory
-   memory: "512MB",
+   memory: "2GB",
 }
 
 /**
@@ -58,6 +58,11 @@ export const manualNewsletter = functions
    .region(config.region)
    .runWith(runtimeSettings)
    .https.onRequest(async (req, res) => {
+      if (req.method !== "GET") {
+         res.status(400).send("Only GET requests are allowed")
+         return
+      }
+
       const receivedEmails = ((req.query.emails as string) ?? "")
          .split(",")
          .map((email) => email?.trim())
