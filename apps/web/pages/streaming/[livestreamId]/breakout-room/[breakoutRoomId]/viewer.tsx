@@ -2,7 +2,7 @@ import React from "react"
 import Head from "next/head"
 import dynamic from "next/dynamic"
 import StreamingLoader from "../../../../../components/views/loader/StreamingLoader"
-import { useCloseUsercentrics } from "components/custom-hook/consent/useCloseUsercentrics"
+import { GetServerSideProps } from "next"
 
 const ViewerLayout = dynamic(
    () => import("../../../../../layouts/ViewerLayout"),
@@ -17,8 +17,6 @@ const ViewerOverview = dynamic(
 )
 
 const ViewerPage = () => {
-   useCloseUsercentrics()
-
    return (
       <React.Fragment>
          <Head>
@@ -31,6 +29,17 @@ const ViewerPage = () => {
          </ViewerLayout>
       </React.Fragment>
    )
+}
+
+/**
+ * Force the page to be initially rendered on the server
+ *
+ * This is required to allow the _document.tsx to access the correct request
+ * context data (query string params) and disable Usercentrics for certain scenarios
+ * like the recording session
+ */
+export const getServerSideProps: GetServerSideProps = async () => {
+   return { props: {} }
 }
 
 export default ViewerPage
