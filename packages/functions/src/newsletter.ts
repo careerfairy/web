@@ -60,7 +60,10 @@ export const manualNewsletter = functions
    .https.onRequest(async (req, res) => {
       const receivedEmails = ((req.query.emails as string) ?? "")
          .split(",")
+         .map((email) => email?.trim())
          .filter(Boolean)
+
+      functions.logger.info("Received emails", receivedEmails)
 
       if (receivedEmails.length === 0) {
          res.status(400).send("No emails provided")
