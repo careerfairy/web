@@ -149,6 +149,11 @@ export class NewsletterService {
       for (const follower of allCompanyFollowers) {
          if (!follower.user.id) continue // no user email present?
 
+         if (!this.users[follower.user.id]) {
+            // this user is not subscribed to the newsletter
+            continue
+         }
+
          const groupLivestreams = this.futureLivestreams.filter((s) =>
             s.groupIds?.includes(follower.groupId)
          )
