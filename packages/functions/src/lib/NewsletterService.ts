@@ -149,6 +149,11 @@ export class NewsletterService {
       for (const follower of allCompanyFollowers) {
          if (!follower.user.id) continue // no user email present?
 
+         if (!this.users[follower.user.id]) {
+            // this user is not subscribed to the newsletter
+            continue
+         }
+
          const groupLivestreams = this.futureLivestreams.filter((s) =>
             s.groupIds?.includes(follower.groupId)
          )
@@ -172,11 +177,19 @@ export class NewsletterService {
       )
    }
 
-   send() {
+   /**
+    * Sends the newsletter to the subscribed users
+    *
+    * Possibility of overriding the users to send the newsletter to
+    * for testing purposes
+    */
+   send(overrideUsers?: string[]) {
+      const emails = overrideUsers ?? Object.keys(this.users)
+
       // counters
       const usersWithoutMinimumRecommendedLivestreams = []
 
-      for (const userEmail of Object.keys(this.users)) {
+      for (const userEmail of emails) {
          const user = this.users[userEmail]
 
          if (user.recommendedLivestreams.length < 3) {
