@@ -1,19 +1,19 @@
 import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { UserData } from "@careerfairy/shared-lib/users"
+import RecommendationServiceCore, {
+   IRecommendationService,
+} from "@careerfairy/shared-lib/recommendation/IRecommendationService"
 
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
-import { RankedLivestreamRepository } from "./services/RankedLivestreamRepository"
-import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
 import {
    handlePromisesAllSettled,
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "./util"
-import RecommendationServiceCore, {
-   IRecommendationService,
-} from "./IRecommendationService"
+} from "@careerfairy/shared-lib/recommendation/RankedLivestreamEvent"
+import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
+import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
+import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/services/RankedLivestreamRepository"
 
 /**
  * Best livestreams for a user based on their Metadata
@@ -58,7 +58,12 @@ export default class UserEventRecommendationService
          this.log.error
       )
 
-      return this.process(recommendedEvents, limit, this.user)
+      return this.process(
+         recommendedEvents,
+         limit,
+         this.futureLivestreams,
+         this.user
+      )
    }
 
    private async getRecommendedEventsBasedOnUserActions(
@@ -92,7 +97,6 @@ export default class UserEventRecommendationService
 
       const livestreamBasedRecommendations =
          new LivestreamBasedRecommendationsBuilder(
-            this.log,
             limit,
             livestreamsUserRegistered,
             new RankedLivestreamRepository(this.futureLivestreams)

@@ -1,10 +1,10 @@
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import { FieldOfStudy } from "../../fieldOfStudy"
+import { LivestreamEvent } from "../../livestreams"
+import { sortLivestreamsDesc } from "../../utils"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "../util"
+} from "../RankedLivestreamEvent"
 
 type RankEventsArgs = {
    rankedLivestreams: RankedLivestreamEvent[]
