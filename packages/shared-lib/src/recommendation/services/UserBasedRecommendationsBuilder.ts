@@ -1,16 +1,14 @@
-import { UserData } from "@careerfairy/shared-lib/users"
-import { Logger } from "@careerfairy/shared-lib/utils/types"
+import { UserData } from "../../users"
 import { RecommendationsBuilder } from "../RecommendationsBuilder"
 import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
 
 export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
    constructor(
-      log: Logger,
       limit: number,
       private readonly user: UserData,
       private readonly rankedLivestreamRepo: RankedLivestreamRepository
    ) {
-      super(log, limit)
+      super(limit)
    }
 
    public userInterests() {

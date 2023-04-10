@@ -1,7 +1,6 @@
-import functions = require("firebase-functions")
-import { UserData } from "@careerfairy/shared-lib/users"
-
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "../livestreams"
+import { UserData } from "../users"
+import { Logger } from "../utils/types"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "./IRecommendationService"
@@ -14,11 +13,12 @@ export default class ExistingDataRecommendationService
    implements IRecommendationService
 {
    constructor(
+      logger: Logger,
       private readonly user: UserData,
       private readonly livestreams: LivestreamEvent[],
       debug = true
    ) {
-      super(functions.logger, debug)
+      super(logger, debug)
    }
 
    /**
@@ -32,13 +32,20 @@ export default class ExistingDataRecommendationService
          limit
       )
 
-      return this.process(eventsBasedOnUser, limit, this.user)
+      return this.process(eventsBasedOnUser, limit, this.livestreams, this.user)
    }
 
    static create(
+      logger: Logger,
       user: UserData,
-      livestreams: LivestreamEvent[]
+      livestreams: LivestreamEvent[],
+      debug = false
    ): IRecommendationService {
-      return new ExistingDataRecommendationService(user, livestreams)
+      return new ExistingDataRecommendationService(
+         logger,
+         user,
+         livestreams,
+         debug
+      )
    }
 }
