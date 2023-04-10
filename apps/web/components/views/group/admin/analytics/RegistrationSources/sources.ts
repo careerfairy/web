@@ -17,9 +17,38 @@ export type RegistrationSource = {
  */
 export const VALID_SOURCES: RegistrationSource[] = [
    {
+      displayName: "Platform Registrations",
+      helpDescription:
+         "User registered through our platform not tied to any campaign.",
+      color: "#2B28BC",
+      // no utms present on the registration
+      match: (utms) => !utms,
+   },
+   {
+      displayName: "Platform User Promo",
+      helpDescription:
+         "User registered through a campaign inside our Platform.",
+      color: "#1ED0D0",
+      match: (utms) => {
+         const matchSource = /^careerfairy$/i.test(utms?.utm_source)
+         const matchMedium = /^email$/i.test(utms?.utm_medium)
+
+         return matchSource && matchMedium
+      },
+   },
+   {
+      displayName: "Social",
+      helpDescription:
+         "User registered through a social media ad (Facebook, Instagram, etc).",
+      color: "#00FF47",
+      match: matchAnyUtmParam(
+         /instagram|facebook|meta|twitter|linkedin|tiktok/i
+      ),
+   },
+   {
       displayName: "University Network Promo",
       helpDescription: "User registered through a university campaign.",
-      color: "#7431e2",
+      color: "#FF4D4D",
       match: (utms) => {
          const validSources = [
             // e.g unicc-ch-newsletter, unicc_ch_newsletter
@@ -33,41 +62,13 @@ export const VALID_SOURCES: RegistrationSource[] = [
          return matchSource && matchMedium
       },
    },
-   {
-      displayName: "Platform User Promo",
-      helpDescription:
-         "User registered through a campaign inside our Platform.",
-      color: "#FFC34F",
-      match: (utms) => {
-         const matchSource = /^careerfairy$/i.test(utms?.utm_source)
-         const matchMedium = /^email$/i.test(utms?.utm_medium)
 
-         return matchSource && matchMedium
-      },
-   },
-   {
-      displayName: "Social",
-      helpDescription:
-         "User registered through a social media ad (Facebook, Instagram, etc).",
-      color: "#4267B2",
-      match: matchAnyUtmParam(
-         /instagram|facebook|meta|twitter|linkedin|tiktok/i
-      ),
-   },
    {
       displayName: "Other",
       helpDescription: "User registered through an unknown campaign.",
-      color: "#98b134",
+      color: "#7D7AFF",
       // utms present but no source match
       match: (utms) => Boolean(utms),
-   },
-   {
-      displayName: "Platform Registrations",
-      helpDescription:
-         "User registered through our platform not tied to any campaign.",
-      color: "#00d2aa",
-      // no utms present on the registration
-      match: (utms) => !utms,
    },
 ]
 
