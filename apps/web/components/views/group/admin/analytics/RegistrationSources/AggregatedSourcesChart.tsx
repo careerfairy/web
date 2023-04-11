@@ -11,6 +11,7 @@ import React, { useCallback, useMemo, useState } from "react"
 import { RegistrationSource, VALID_SOURCES } from "./sources"
 import { StyledCheckbox } from "../../common/inputs"
 import { sxStyles } from "../../../../../../types/commonTypes"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
 
 type ISourceFilter = RegistrationSource & {
    active: boolean
@@ -19,12 +20,14 @@ type ISourceFilter = RegistrationSource & {
 const styles = sxStyles({
    chart: {
       display: "flex",
-      height: 350,
+      flexDirection: { xs: "column", sm: "row" },
+      height: { sm: 350 },
    },
    filterWrapper: {
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-around",
+      mt: { xs: 2, sm: 0 },
    },
    filterSection: {
       display: "flex",
@@ -35,6 +38,7 @@ const styles = sxStyles({
 
 const AggregatedSourcesChart = () => {
    const { utmData } = useUtmData()
+   const isMobile = useIsMobile()
 
    const [sourceFilters, setSourceFilters] = useState<ISourceFilter[]>(
       VALID_SOURCES.map((source) => ({
@@ -104,14 +108,16 @@ const AggregatedSourcesChart = () => {
             <Divider />
             <CardContent>
                <Box sx={styles.chart}>
-                  <Box width={"80%"}>
+                  <Box width={{ xs: "100%", sm: "80%" }}>
                      <Chart
                         stats={allSourcesAggregatedByDate}
                         filters={sourceFilters}
                      />
                   </Box>
-                  <Box width={"20%"} display={"flex"}>
-                     <Divider orientation="vertical" sx={{ mx: 2 }} />
+                  <Box width={{ xs: "100%", sm: "20%" }} display={"flex"}>
+                     {isMobile ? null : (
+                        <Divider orientation="vertical" sx={{ mx: 2 }} />
+                     )}
                      {renderSourceFilter()}
                   </Box>
                </Box>
@@ -184,12 +190,14 @@ const Chart = ({ stats, filters }: Props) => {
       }
 
       for (let entry of stats) {
+         // to validate which sources are active from the filter
          const isSourceActive =
             filters.find(
                (filter) => filter.displayName === entry.source.displayName
             )?.active || false
 
          if (isSourceActive) {
+            // only show the sources that are active on the filter
             tmp.datasets.push({
                label: entry.source.displayName,
                pointBackgroundColor: entry.source.color,
