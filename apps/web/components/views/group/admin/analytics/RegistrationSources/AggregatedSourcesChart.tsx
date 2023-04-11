@@ -1,16 +1,4 @@
-import {
-   Box,
-   Card,
-   CardContent,
-   CardHeader,
-   Divider,
-   Table,
-   TableBody,
-   TableCell,
-   TableHead,
-   TableRow,
-   Tooltip,
-} from "@mui/material"
+import { Box, Card, CardContent, Divider, Typography } from "@mui/material"
 import { Line } from "react-chartjs-2"
 import { useTheme } from "@mui/material/styles"
 import { useUtmData } from "./RegistrationSourcesContext"
@@ -19,99 +7,135 @@ import {
    rollupByDay,
    sourcesByDate,
 } from "./transformations"
-import { useCallback, useMemo, useState } from "react"
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
-import IconButton from "@mui/material/IconButton"
-import { VALID_SOURCES } from "./sources"
-import GenericDialog from "../../../../common/GenericDialog"
+import React, { useCallback, useMemo, useState } from "react"
+import { RegistrationSource, VALID_SOURCES } from "./sources"
+import { StyledCheckbox } from "../../common/inputs"
+import { sxStyles } from "../../../../../../types/commonTypes"
+
+type ISourceFilter = RegistrationSource & {
+   active: boolean
+}
+
+const styles = sxStyles({
+   chart: {
+      display: "flex",
+      height: 350,
+   },
+   filterWrapper: {
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "space-around",
+   },
+   filterSection: {
+      display: "flex",
+      cursor: "pointer",
+      alignItems: "center",
+   },
+})
 
 const AggregatedSourcesChart = () => {
    const { utmData } = useUtmData()
+
+   const [sourceFilters, setSourceFilters] = useState<ISourceFilter[]>(
+      VALID_SOURCES.map((source) => ({
+         ...source,
+         active: true,
+      }))
+   )
 
    const allSourcesAggregatedByDate = useMemo(() => {
       return sourcesByDate(utmData)
    }, [utmData])
 
-   const [showHelpDialog, setShowHelpDialog] = useState(false)
-   const onCloseHelpDialog = useCallback(() => {
-      setShowHelpDialog(false)
-   }, [])
+   const handleFilterClick = useCallback(
+      (source: ISourceFilter) => {
+         const indexToUpdate = sourceFilters.findIndex(
+            ({ displayName }) => displayName === source.displayName
+         )
+         const updatedSourceFilter = {
+            ...source,
+            active: !source.active,
+         }
+
+         setSourceFilters((prevSourceFilters) => [
+            ...prevSourceFilters.slice(0, indexToUpdate),
+            updatedSourceFilter,
+            ...prevSourceFilters.slice(indexToUpdate + 1),
+         ])
+      },
+      [sourceFilters]
+   )
+
+   const renderSourceFilter = useCallback(
+      () => (
+         <Box sx={styles.filterWrapper}>
+            {sourceFilters.map((source, index) => (
+               <>
+                  {index > 0 ? <Divider /> : null}
+                  <Box
+                     sx={styles.filterSection}
+                     key={source.displayName}
+                     onClick={() => handleFilterClick(source)}
+                  >
+                     <StyledCheckbox checked={source.active} />
+                     <Box>
+                        <Typography variant={"body1"} fontWeight={400}>
+                           {source.displayName}
+                        </Typography>
+                        <Box
+                           sx={{
+                              width: "36px",
+                              borderRadius: "6px",
+                              border: `2px solid ${source.color}`,
+                           }}
+                        />
+                     </Box>
+                  </Box>
+               </>
+            ))}
+         </Box>
+      ),
+      [handleFilterClick, sourceFilters]
+   )
 
    return (
       <>
          <Card>
-            <CardHeader
-               title="Registration Sources"
-               action={
-                  <Tooltip title="Sources Description">
-                     <IconButton
-                        aria-label="info"
-                        onClick={() => {
-                           setShowHelpDialog(true)
-                        }}
-                     >
-                        <InfoOutlinedIcon />
-                     </IconButton>
-                  </Tooltip>
-               }
-            />
             <Divider />
             <CardContent>
-               <Box
-                  display="flex"
-                  alignItems="center"
-                  justifyContent="center"
-                  height={200}
-               >
-                  <Chart stats={allSourcesAggregatedByDate} />
+               <Box sx={styles.chart}>
+                  <Box width={"80%"}>
+                     <Chart
+                        stats={allSourcesAggregatedByDate}
+                        filters={sourceFilters}
+                     />
+                  </Box>
+                  <Box width={"20%"} display={"flex"}>
+                     <Divider orientation="vertical" sx={{ mx: 2 }} />
+                     {renderSourceFilter()}
+                  </Box>
                </Box>
             </CardContent>
          </Card>
-         {showHelpDialog && (
-            <GenericDialog
-               onClose={onCloseHelpDialog}
-               title={"Sources Description"}
-            >
-               <HelpTable />
-            </GenericDialog>
-         )}
       </>
-   )
-}
-
-const HelpTable = () => {
-   return (
-      <Table>
-         <TableHead>
-            <TableRow>
-               <TableCell>Source Name</TableCell>
-               <TableCell>Description</TableCell>
-            </TableRow>
-         </TableHead>
-         <TableBody>
-            {VALID_SOURCES.map((source) => (
-               <TableRow key={source.displayName}>
-                  <TableCell>{source.displayName}</TableCell>
-                  <TableCell>{source.helpDescription}</TableCell>
-               </TableRow>
-            ))}
-         </TableBody>
-      </Table>
    )
 }
 
 type Props = {
    stats: RegistrationSourceWithDates[]
+   filters: ISourceFilter[]
 }
 
-const Chart = ({ stats }: Props) => {
+const Chart = ({ stats, filters }: Props) => {
    const theme = useTheme()
 
    const chartOptions = useMemo(() => {
       return {
          responsive: true,
          maintainAspectRatio: false,
-         legend: {},
+         legend: {
+            display: false,
+         },
          tooltips: {
             mode: "x",
          },
@@ -160,23 +184,30 @@ const Chart = ({ stats }: Props) => {
       }
 
       for (let entry of stats) {
-         tmp.datasets.push({
-            label: entry.source.displayName,
-            pointBackgroundColor: entry.source.color,
-            borderColor: entry.source.color,
-            fill: false,
-            borderWidth: 2,
-            data: rollupByDay(
-               entry.dates.map((date) => ({
-                  x: date,
-                  y: 1,
-               }))
-            ),
-         })
+         const isSourceActive =
+            filters.find(
+               (filter) => filter.displayName === entry.source.displayName
+            )?.active || false
+
+         if (isSourceActive) {
+            tmp.datasets.push({
+               label: entry.source.displayName,
+               pointBackgroundColor: entry.source.color,
+               borderColor: entry.source.color,
+               fill: false,
+               borderWidth: 2,
+               data: rollupByDay(
+                  entry.dates.map((date) => ({
+                     x: date,
+                     y: 1,
+                  }))
+               ),
+            })
+         }
       }
 
       return tmp
-   }, [stats])
+   }, [filters, stats])
 
    return <Line data={data} options={chartOptions} />
 }
