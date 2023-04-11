@@ -46,6 +46,7 @@ const LivestreamsTable = () => {
                toolbar: false,
                draggable: false,
                tableLayout: isMobile ? "auto" : "fixed",
+               emptyRowsWhenPaging: false,
             }}
          />
       </Card>
@@ -56,6 +57,7 @@ const columns = [
    {
       title: "Live stream title",
       field: "title",
+      width: "45%",
       headerStyle: { fontWeight: 600, fontSize: "13px", padding: "24px" },
       render: (rowData) => (
          <Typography ml={1} fontWeight={500}>
@@ -64,7 +66,7 @@ const columns = [
       ),
    },
    {
-      title: "Live stream title",
+      title: "Live stream date",
       field: "date",
       headerStyle: { fontWeight: 600, fontSize: "13px" },
       render: (rowData) => {
