@@ -140,7 +140,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
    function increasePdfPageNumber() {
       setGoingToNextPage(true)
       firebase
-         .increaseLivestreamPresentationPageNumber(livestreamId)
+         .increaseLivestreamPresentationPageNumber(livestreamId, 1)
          .then(() => {
             setGoingToNextPage(false)
          })
@@ -149,7 +149,7 @@ const LivestreamPdfViewer = ({ livestreamId, presenter, showMenu }) => {
    function decreasePdfPageNumber() {
       setGoingToPreviousPage(true)
       firebase
-         .decreaseLivestreamPresentationPageNumber(livestreamId)
+         .increaseLivestreamPresentationPageNumber(livestreamId, -1)
          .then(() => {
             setGoingToPreviousPage(false)
          })
