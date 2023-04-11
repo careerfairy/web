@@ -2190,21 +2190,17 @@ class FirebaseService {
          participated: null,
       }
 
-      const registrationPromises = [
-         livestreamRef.update({
-            // To be depreciated
-            registeredUsers: firebase.firestore.FieldValue.arrayUnion(
-               userData.userEmail
-            ),
-         }),
-         userLivestreamDataRef.set(data, { merge: true }),
-      ]
+      const batch = this.firestore.batch()
 
-      // these are the most important writes we need to do
-      // if they fail, let's throw to the parent caller
-      await Promise.all(registrationPromises)
+      batch.update(livestreamRef, {
+         // To be depreciated
+         registeredUsers: firebase.firestore.FieldValue.arrayUnion(
+            userData.userEmail
+         ),
+      })
 
-      const promises = []
+      batch.set(userLivestreamDataRef, data, { merge: true })
+
       for (const groupId of idsOfGroupsWithPolicies) {
          // to be depreciated
          let userInPolicyRef = this.firestore
@@ -2220,44 +2216,32 @@ class FirebaseService {
             .collection("authUsersInPolicy")
             .doc(userData.authId)
 
-         promises.push(
-            userInPolicyRef.set({
-               ...userData,
-               dateAgreed: this.getServerTimestamp(),
-            })
-         )
+         batch.set(userInPolicyRef, {
+            ...userData,
+            dateAgreed: this.getServerTimestamp(),
+         })
 
-         promises.push(
-            authUserInPolicyRef.set({
-               ...userData,
-               dateAgreed: this.getServerTimestamp(),
-            })
-         )
+         batch.set(authUserInPolicyRef, {
+            ...userData,
+            dateAgreed: this.getServerTimestamp(),
+         })
       }
 
       // Updates the user's questions and answers in the userData/userGroups subcollection
-      promises.push(
-         this.updateUserGroupQuestionAnswers(
-            userData.userEmail,
-            userQuestionsAndAnswersDict
-         )
+      this.updateUserGroupQuestionAnswers(
+         userData.userEmail,
+         userQuestionsAndAnswersDict,
+         batch
       )
 
-      // Optimistic registration, we fire all writes at the same time in parallel
-      // if any of them fails, we log the reason
-      const results = await Promise.allSettled(promises)
-      results.forEach((result) => {
-         if (result.status === "rejected") {
-            errorLogAndNotify(result.reason)
-         }
-      })
+      await batch.commit()
    }
 
    updateUserGroupQuestionAnswers = async (
       userEmail: string,
-      userQuestionsAndAnswersDict: UserLivestreamGroupQuestionAnswers
+      userQuestionsAndAnswersDict: UserLivestreamGroupQuestionAnswers,
+      batch: firebase.firestore.WriteBatch
    ) => {
-      const promises = []
       const userRef = this.firestore.collection("userData").doc(userEmail)
       Object.keys(userQuestionsAndAnswersDict).forEach((groupId) => {
          const userGroupDataRef = userRef.collection("userGroups").doc(groupId)
@@ -2265,22 +2249,19 @@ class FirebaseService {
             (questionId) => {
                const answerId = userQuestionsAndAnswersDict[groupId][questionId]
 
-               promises.push(
-                  userGroupDataRef.set(
-                     {
-                        groupId: groupId,
-                        questions: {
-                           [questionId]: answerId,
-                        },
-                     } as Partial<UserGroupData>,
-                     { merge: true }
-                  )
+               batch.set(
+                  userGroupDataRef,
+                  {
+                     groupId: groupId,
+                     questions: {
+                        [questionId]: answerId,
+                     },
+                  } as Partial<UserGroupData>,
+                  { merge: true }
                )
             }
          )
       })
-
-      await Promise.all(promises)
    }
 
    deregisterFromLivestream = async (
@@ -2299,24 +2280,20 @@ class FirebaseService {
 
       const userLivestreamDataDoc = await userLivestreamDataRef.get()
 
-      const promises = []
+      const batch = this.firestore.batch()
+
       if (userLivestreamDataDoc.exists) {
-         promises.push(
-            userLivestreamDataRef.update({
-               registered: null,
-               user: userData,
-            } as UserLivestreamData)
-         )
+         batch.update(userLivestreamDataRef, {
+            registered: null,
+            user: userData,
+         } as UserLivestreamData)
       }
 
-      promises.push(
-         livestreamRef.update({
-            registeredUsers:
-               firebase.firestore.FieldValue.arrayRemove(userEmail),
-         })
-      )
+      batch.update(livestreamRef, {
+         registeredUsers: firebase.firestore.FieldValue.arrayRemove(userEmail),
+      })
 
-      return Promise.all(promises)
+      await batch.commit()
    }
 
    joinCompanyTalentPool = (
@@ -2510,20 +2487,19 @@ class FirebaseService {
             }
          }
 
-         const promises = []
+         const batch = this.firestore.batch()
+
          // Set the user Participating data in the userLivestreamData collection
-         promises.push(participantsRef.set(data, { merge: true }))
+         batch.set(participantsRef, data, { merge: true })
 
          // Set the user's email in the participants array of the livestream document
-         promises.push(
-            streamRef.update({
-               participatingStudents: firebase.firestore.FieldValue.arrayUnion(
-                  userData.userEmail
-               ),
-            })
-         )
+         batch.update(streamRef, {
+            participatingStudents: firebase.firestore.FieldValue.arrayUnion(
+               userData.userEmail
+            ),
+         })
 
-         await Promise.all(promises)
+         await batch.commit()
       }
    }
 
