@@ -352,7 +352,7 @@ export function RegistrationContextProvider({
             if (livestream) {
                await registerToLivestream(
                   livestream.id,
-                  authenticatedUser,
+                  userData,
                   groupsWithPolicies,
                   userAnsweredLivestreamGroupQuestions,
                   {
