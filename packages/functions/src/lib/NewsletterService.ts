@@ -7,7 +7,7 @@ import { Logger } from "@careerfairy/shared-lib/utils/types"
 import { IGroupFunctionsRepository } from "./GroupFunctionsRepository"
 import { NewsletterEmailBuilder } from "./NewsletterEmailBuilder"
 import { IRecommendationDataFetcher } from "./recommendation/services/DataFetcherRecommendations"
-import UserEventRecommendationService from "./recommendation/services/UserEventRecommendationService"
+import UserEventRecommendationService from "./recommendation/UserEventRecommendationService"
 import { IUserFunctionsRepository } from "./UserFunctionsRepository"
 
 /**

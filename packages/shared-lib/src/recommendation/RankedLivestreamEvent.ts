@@ -1,5 +1,5 @@
-import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { FieldOfStudy } from "../fieldOfStudy"
+import { LivestreamEvent } from "../livestreams"
 
 export class RankedLivestreamEvent {
    public points: number

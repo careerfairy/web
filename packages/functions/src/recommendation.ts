@@ -5,8 +5,8 @@ import { middlewares } from "./middlewares/middlewares"
 import { cacheOnCallValues } from "./middlewares/cacheMiddleware"
 import { dataValidation, userAuthExists } from "./middlewares/validations"
 import { livestreamsRepo, userRepo } from "./api/repositories"
-import UserEventRecommendationService from "./lib/recommendation/services/UserEventRecommendationService"
 import { UserDataFetcher } from "./lib/recommendation/services/DataFetcherRecommendations"
+import UserEventRecommendationService from "./lib/recommendation/UserEventRecommendationService"
 
 /**
  * Get Recommended Events

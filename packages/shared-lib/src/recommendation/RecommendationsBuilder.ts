@@ -1,14 +1,13 @@
-import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
-import { Logger } from "@careerfairy/shared-lib/utils/types"
+import { removeDuplicateDocuments } from "../BaseFirebaseRepository"
 import {
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "./util"
+} from "./RankedLivestreamEvent"
 
 export class RecommendationsBuilder {
    protected results: RankedLivestreamEvent[] = []
 
-   constructor(protected readonly log: Logger, public limit: number) {}
+   constructor(public limit: number) {}
 
    protected addResults(livestreams: RankedLivestreamEvent[]) {
       this.results = this.results.concat(livestreams)
