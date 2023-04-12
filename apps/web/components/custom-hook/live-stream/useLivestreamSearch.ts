@@ -1,6 +1,6 @@
 import { useMemo, useState } from "react"
 import { limit, QueryConstraint } from "@firebase/firestore"
-import { collection, query, where } from "firebase/firestore"
+import { collection, orderBy, query, where } from "firebase/firestore"
 import { ngrams } from "@careerfairy/shared-lib/utils/search"
 import { useDebounce } from "react-use"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
@@ -57,6 +57,12 @@ export function useLivestreamSearch(
          where("test", "==", false),
          limit(maxResults),
       ]
+
+      // If there are no search constraints, we want to order the query by start date
+      // due to firestore limitations we can only order the query when there are no trigrams
+      if (searchConstraints.length === 0) {
+         constraints.push(orderBy("start", "desc"))
+      }
 
       return query(collection(FirestoreInstance, "livestreams"), ...constraints)
    }, [debouncedValue, additionalConstraints, maxResults])
