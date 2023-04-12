@@ -6,7 +6,7 @@ import GeneralLayout from "../layouts/GeneralLayout"
 import { useEffect } from "react"
 import { getWindow } from "../util/PathUtils"
 
-const PrivacyPolicy = () => {
+const DataProtection = () => {
    useEffect(() => {
       // Refresh Usercentrics Privacy UI
       // There is a race condition where this page loads after the UC script
@@ -17,7 +17,7 @@ const PrivacyPolicy = () => {
    return (
       <>
          <Head>
-            <title key="title">CareerFairy | Privacy Notice</title>
+            <title key="title">CareerFairy | Data Protection Notice</title>
          </Head>
          <GeneralLayout>
             <Container>
@@ -35,6 +35,14 @@ const TextContent = () => {
    return (
       <Box
          sx={{
+            fontSize: "1.1rem",
+            "> p": {
+               marginBottom: 4,
+            },
+            "div > p": {
+               marginBottom: 4,
+            },
+
             ol: {
                fontSize: 16,
             },
@@ -43,7 +51,7 @@ const TextContent = () => {
          <ol start={1}>
             <li>
                <b>
-                  <span>What is this Privacy Notice about? </span>
+                  <span>What is this Data Protection Notice about? </span>
                </b>
             </li>
          </ol>
@@ -79,8 +87,8 @@ const TextContent = () => {
          </p>
          <p>
             <span>
-               In this Privacy Notice, we describe what we do with your data
-               when you use{" "}
+               In this Data Protection Notice, we describe what we do with your
+               data when you use{" "}
             </span>
             <b>
                <span>careerfairy.io, careerfairy.com,</span>
@@ -96,8 +104,8 @@ const TextContent = () => {
             </span>
             <span>
                When appropriate we will provide a just-in-time notice to cover
-               any additional processing activities not mentioned in this
-               Privacy Notice.{" "}
+               any additional processing activities not mentioned in this Data
+               Protection Notice.{" "}
             </span>
             <span>
                In addition, we may inform you about the processing of your data
@@ -112,12 +120,12 @@ const TextContent = () => {
                that you are authorized to do so and that the relevant data is
                accurate. When you share data about others with us, you confirm
                that. Please make sure that these individuals have been informed
-               about this Privacy Notice.
+               about this Data Protection Notice.
             </span>
          </p>
          <p>
             <span>
-               This Privacy Notice is aligned with the EU General Data
+               This Data Protection Notice is aligned with the EU General Data
                Protection Regulation (&laquo;
             </span>
             <b>
@@ -162,8 +170,8 @@ const TextContent = () => {
                </b>
                <span>&raquo;) is the controller for the CareerFairy AG</span>
                <span>
-                  processing under this Privacy Notice, unless we tell you
-                  otherwise in an individual case, for example in additional
+                  processing under this Data Protection Notice, unless we tell
+                  you otherwise in an individual case, for example in additional
                   privacy notices, on a form or in a contract.&nbsp;
                </span>
             </p>
@@ -173,7 +181,7 @@ const TextContent = () => {
                your rights under Section 11 as follows:&nbsp;
             </p>
 
-            <p style={{ marginLeft: "40px" }}>
+            <p style={{ marginLeft: "40px", marginBottom: 0 }}>
                CareerFairy AG&nbsp;
                <br />
                Technoparkstrasse 1&nbsp;
@@ -185,7 +193,9 @@ const TextContent = () => {
                privacy@careerfairy.io&nbsp;
             </p>
 
-            <p>We have appointed the following additional positions:&nbsp;</p>
+            <p style={{ marginBottom: 0 }}>
+               We have appointed the following additional positions:&nbsp;
+            </p>
 
             <ul>
                <li>
@@ -196,7 +206,7 @@ const TextContent = () => {
                </li>
             </ul>
 
-            <p style={{ marginLeft: "40px" }}>
+            <p style={{ marginLeft: "40px", marginBottom: 0 }}>
                Priverion GmbH&nbsp;
                <br />
                Europaallee 41&nbsp;
@@ -206,7 +216,9 @@ const TextContent = () => {
                Switzerland&nbsp;
             </p>
 
-            <p style={{ marginLeft: "40px" }}>privacy@careerfairy.io&nbsp;</p>
+            <p style={{ marginLeft: "40px", marginBottom: 0 }}>
+               privacy@careerfairy.io&nbsp;
+            </p>
 
             <ul>
                <li>
@@ -1296,7 +1308,7 @@ const TextContent = () => {
             <ul>
                <li>
                   <p>
-                     <strong>Necessary cookies:</strong> Some cookies are
+                     <strong>Essential cookies:</strong> Some cookies are
                      necessary for the functioning of the website or for certain
                      features. For example, they ensure that you can move
                      between pages without losing information that was entered
@@ -1313,7 +1325,7 @@ const TextContent = () => {
                </li>
                <li>
                   <p>
-                     <strong>Performance cookies</strong>: In order to optimize
+                     <strong>Functional cookies</strong>: In order to optimize
                      our website and related offers and to better adapt them to
                      the needs of the users, we use cookies to record and
                      analyze the use of our website, potentially beyond one
@@ -1519,21 +1531,23 @@ const TextContent = () => {
             <ol start={14}>
                <li>
                   <p>
-                     <strong>Can we update this Privacy Notice ? &nbsp;</strong>
+                     <strong>
+                        Can we update this Data Protection Notice ? &nbsp;
+                     </strong>
                   </p>
                </li>
             </ol>
 
             <p>
-               This Privacy Notice is not part of a contract with you. We can
-               change this Privacy Notice at any time. The version published on
-               this website is the current version. &nbsp;
+               This Data Protection Notice is not part of a contract with you.
+               We can change this Data Protection Notice at any time. The
+               version published on this website is the current version. &nbsp;
             </p>
 
-            <p>Last updated: 01.2.2023 &nbsp;</p>
+            <p>Last updated: 04.04.2023 &nbsp;</p>
          </div>
       </Box>
    )
 }
 
-export default withFirebase(PrivacyPolicy)
+export default withFirebase(DataProtection)

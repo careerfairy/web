@@ -109,8 +109,8 @@ function Footer(props) {
                            </Link>
                         </div>
                         <div>
-                           <Link href="/privacy">
-                              <a>Privacy Policy</a>
+                           <Link href="/data-protection">
+                              <a>Data Protection Notice</a>
                            </Link>
                         </div>
                      </div>

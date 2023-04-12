@@ -44,7 +44,9 @@ function TermsAndConditions(props) {
                      email address, study subject, first name, university. You
                      must have agreed to these Terms and Conditions, including
                      the{" "}
-                     <a href="https://careerfairy.io/privacy">privacy policy</a>
+                     <a href="https://careerfairy.io/data-protection">
+                        Data Protection Notice
+                     </a>
                      , before you create an account with us. You must provide
                      accurate registration information to us and notify us, by
                      updating your account, if your information changes.
@@ -76,7 +78,9 @@ function TermsAndConditions(props) {
                   <p>
                      For detailed information about the steps we take to keep
                      your account secure, please refer to our{" "}
-                     <a href="https://careerfairy.io/privacy">privacy policy</a>
+                     <a href="https://careerfairy.io/data-protection">
+                        Data Protection Notice
+                     </a>
                      .
                   </p>
                   <h2>Account deletion</h2>
@@ -103,7 +107,9 @@ function TermsAndConditions(props) {
                   <p>
                      The CareerFairy Website uses cookies. For more details
                      about the way we use cookies, please read our{" "}
-                     <a href="https://careerfairy.io/privacy">privacy policy</a>
+                     <a href="https://careerfairy.io/data-protection">
+                        Data Protection Notice
+                     </a>
                      .
                   </p>
                   <h2>Intellectual property</h2>
@@ -245,7 +251,9 @@ function TermsAndConditions(props) {
                   <h2>Your Privacy</h2>
                   <p>
                      Please read our{" "}
-                     <a href="https://careerfairy.io/privacy">privacy policy</a>{" "}
+                     <a href="https://careerfairy.io/data-protection">
+                        Data Protection Notice
+                     </a>{" "}
                      which explains how we protect your privacy.
                   </p>
                   <h2>For companies</h2>
