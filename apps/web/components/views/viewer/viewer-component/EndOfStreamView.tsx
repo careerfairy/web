@@ -85,7 +85,7 @@ const EndOfStreamView = () => {
                </Box>
                <Box>
                   <Typography gutterBottom variant={"h6"} align={"center"}>
-                     Recommended livestreams for you
+                     Recommended live streams for you
                   </Typography>
                   <RecommendedEvents hideTitle />
                </Box>

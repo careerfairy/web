@@ -78,7 +78,8 @@ const styles = sxStyles({
       padding: 2,
       paddingTop: 5,
       transition: (theme: Theme) => theme.transitions.create("transform"),
-      background: "white",
+      background: (theme) =>
+         theme.palette.mode === "dark" ? "background.paper" : "white",
    },
    title: {
       fontWeight: 700,
@@ -600,7 +601,7 @@ const EventPreviewCard = ({
                                  </Typography>
                                  <Typography
                                     variant={"body1"}
-                                    color={"text.primary"}
+                                    color={"black"}
                                     fontWeight={500}
                                  >
                                     {getStartMonth}
