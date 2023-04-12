@@ -84,6 +84,21 @@ export const sortLivestreamsDesc = (
 }
 
 /**
+ * Sort by popularity if both livestreams have a popularity value
+ * Otherwise keeps the current order
+ */
+export const sortLivestreamsByPopularity = (
+   a: LivestreamEvent,
+   b: LivestreamEvent
+): number => {
+   if (Boolean(b.popularity) && Boolean(a.popularity)) {
+      return b.popularity - a.popularity
+   }
+
+   return 0
+}
+
+/**
  * To slugify any string
  */
 export const slugify = (text: string): string => {

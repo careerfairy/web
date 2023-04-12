@@ -1,23 +1,24 @@
 import functions = require("firebase-functions")
 import { removeDuplicateDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { UserData } from "@careerfairy/shared-lib/users"
-
 import RecommendationServiceCore, {
    IRecommendationService,
-} from "../IRecommendationService"
+} from "@careerfairy/shared-lib/recommendation/IRecommendationService"
+
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import {
    handlePromisesAllSettled,
    RankedLivestreamEvent,
    sortRankedLivestreamEventByPoints,
-} from "../util"
-import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
-import { UserBasedRecommendationsBuilder } from "./UserBasedRecommendationsBuilder"
-import { LivestreamBasedRecommendationsBuilder } from "./LivestreamBasedRecommendationsBuilder"
-import { IRecommendationDataFetcher } from "./DataFetcherRecommendations"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+} from "@careerfairy/shared-lib/recommendation/RankedLivestreamEvent"
+import { LivestreamBasedRecommendationsBuilder } from "./services/LivestreamBasedRecommendationsBuilder"
+import { IRecommendationDataFetcher } from "./services/DataFetcherRecommendations"
+import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/services/RankedLivestreamRepository"
 
-const serviceName = "user_event_recommendation_service"
-
+/**
+ * Best livestreams for a user based on their Metadata
+ * and recent past events
+ */
 export default class UserEventRecommendationService
    extends RecommendationServiceCore
    implements IRecommendationService
@@ -28,9 +29,9 @@ export default class UserEventRecommendationService
       private readonly pastLivestreams: LivestreamEvent[],
       // control if the service should log debug info
       // when generating the newsletter, we don't want to log
-      private debug: boolean = true
+      debug = true
    ) {
-      super(functions.logger)
+      super(functions.logger, debug)
    }
 
    async getRecommendations(limit = 10): Promise<string[]> {
@@ -38,10 +39,17 @@ export default class UserEventRecommendationService
 
       if (this.user) {
          // Fetch top {limit} recommended events based on the user's Metadata
-         promises.push(this.getRecommendedEventsBasedOnUserData(this.user, 10))
-
-         // Fetch top {limit} recommended events based on the user actions, e.g. the events they have attended
-         promises.push(this.getRecommendedEventsBasedOnUserActions(10))
+         promises.push(
+            Promise.resolve(
+               this.getRecommendedEventsBasedOnUserData(
+                  this.user,
+                  this.futureLivestreams,
+                  10
+               )
+            )
+         ),
+            // Fetch top {limit} recommended events based on the user actions, e.g. the events they have attended
+            promises.push(this.getRecommendedEventsBasedOnUserActions(10))
       }
 
       // Await all promises
@@ -50,68 +58,12 @@ export default class UserEventRecommendationService
          this.log.error
       )
 
-      // Sort the results by points
-      const sortedResults = sortRankedLivestreamEventByPoints(
-         recommendedEvents.flat()
-      )
-
-      // Remove duplicates (be sure to remove duplicates before sorting)
-      const deDupedEvents = removeDuplicateDocuments(sortedResults)
-
-      // Log some debug info
-      if (this.debug) {
-         this.log.info("Metadata", {
-            userMetaData: {
-               userId: this.user?.id || "N/A",
-               userInterestIds: this.user?.interestsIds || [],
-               userFieldOfStudyId: this.user?.fieldOfStudy?.id || "N/A",
-               userCountriesOfInterest: this.user?.countriesOfInterest || [],
-            },
-            eventMetaData: deDupedEvents.map((e) => ({
-               id: e.id,
-               numPoints: e.points,
-               fieldsOfStudyIds: e.getFieldOfStudyIds(),
-               interestIds: e.getInterestIds(),
-               companyCountries: e.getCompanyCountries(),
-               companyIndustries: e.getCompanyIndustries(),
-               companySizes: e.getCompanySizes(),
-            })),
-         })
-      }
-
-      // Return the top {limit} events
-      const recommendedIds = deDupedEvents
-         .map((event) => event.id)
-         .slice(0, limit)
-
-      if (this.debug) {
-         this.log.info(
-            `Recommended event IDs for user ${this.user?.id}: ${recommendedIds}`,
-            {
-               serviceName: serviceName,
-            }
-         )
-      }
-
-      return recommendedIds
-   }
-
-   private async getRecommendedEventsBasedOnUserData(
-      userData: UserData,
-      limit: number
-   ): Promise<RankedLivestreamEvent[]> {
-      const userRecommendationBuilder = new UserBasedRecommendationsBuilder(
-         this.log,
+      return this.process(
+         recommendedEvents,
          limit,
-         userData,
-         new RankedLivestreamRepository(this.futureLivestreams)
+         this.futureLivestreams,
+         this.user
       )
-
-      return userRecommendationBuilder
-         .userInterests()
-         .userFieldsOfStudy()
-         .userCountriesOfInterest()
-         .get()
    }
 
    private async getRecommendedEventsBasedOnUserActions(
@@ -138,11 +90,15 @@ export default class UserEventRecommendationService
    private async getRecommendedEventsBasedOnPreviousWatchedEvents(
       limit = 10
    ): Promise<RankedLivestreamEvent[]> {
+      // Get only the events the user has previously registered
+      const livestreamsUserRegistered = this.pastLivestreams.filter((s) =>
+         s.registeredUsers?.includes(this.user?.userEmail)
+      )
+
       const livestreamBasedRecommendations =
          new LivestreamBasedRecommendationsBuilder(
-            this.log,
             limit,
-            this.pastLivestreams,
+            livestreamsUserRegistered,
             new RankedLivestreamRepository(this.futureLivestreams)
          )
 

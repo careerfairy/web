@@ -1,17 +1,18 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Logger } from "@careerfairy/shared-lib/utils/types"
-import { RecommendationsBuilder } from "../RecommendationsBuilder"
-import { getMostCommonArrayValues, getMostCommonFieldsOfStudies } from "../util"
-import { RankedLivestreamRepository } from "./RankedLivestreamRepository"
+import {
+   getMostCommonArrayValues,
+   getMostCommonFieldsOfStudies,
+} from "@careerfairy/shared-lib/recommendation/RankedLivestreamEvent"
+import { RecommendationsBuilder } from "@careerfairy/shared-lib/recommendation/RecommendationsBuilder"
+import { RankedLivestreamRepository } from "@careerfairy/shared-lib/recommendation/services/RankedLivestreamRepository"
 
 export class LivestreamBasedRecommendationsBuilder extends RecommendationsBuilder {
    constructor(
-      log: Logger,
       limit: number,
       private readonly livestreams: LivestreamEvent[],
       private readonly rankedLivestreamRepo: RankedLivestreamRepository
    ) {
-      super(log, limit)
+      super(limit)
    }
 
    public mostCommonInterests() {
