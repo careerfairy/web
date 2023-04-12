@@ -24,8 +24,12 @@ const footerLinks = [
             href: "/terms",
          },
          {
-            label: "Privacy Policy",
-            href: "/privacy",
+            label: "Data Protection Notice",
+            href: "/data-protection",
+         },
+         {
+            label: "Data Protection Settings",
+            href: "uc_settings",
          },
       ],
    },
