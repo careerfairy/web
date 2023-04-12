@@ -3,7 +3,10 @@ import { StyledTextField } from "../../../common/inputs"
 import Autocomplete from "@mui/material/Autocomplete"
 import { Box, Card, Grid, Typography } from "@mui/material"
 import { where } from "firebase/firestore"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamEventPublicData,
+} from "@careerfairy/shared-lib/livestreams"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { useLivestreamSearch } from "../../../../../../custom-hook/live-stream/useLivestreamSearch"
 import { getParts } from "../../../../../../util/search"
@@ -14,6 +17,7 @@ import { sxStyles } from "../../../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import RenderParts from "../../../../../common/search/RenderParts"
+import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 
 const styles = sxStyles({
    root: {
@@ -40,6 +44,8 @@ const styles = sxStyles({
       },
    },
 })
+
+type LivestreamHit = LivestreamEvent | LivestreamEventPublicData
 const LivestreamSearch = () => {
    const { group } = useGroup()
    const { push } = useRouter()
@@ -60,12 +66,12 @@ const LivestreamSearch = () => {
       }
    )
 
-   const value = currentStreamStats?.livestream ?? null
+   const value: LivestreamHit = currentStreamStats?.livestream ?? null
 
    const renderOption = useCallback(
       (
          props: React.HTMLAttributes<HTMLLIElement>,
-         option: LivestreamEvent,
+         option: LivestreamHit,
          state: AutocompleteRenderOptionState
       ) => {
          const titleParts = getParts(option.title, inputValue)
@@ -102,7 +108,7 @@ const LivestreamSearch = () => {
 
    // Change only triggered/called when user selects an option
    const onChange = useCallback(
-      (event: any, newValue: LivestreamEvent | null) => {
+      (event: any, newValue: LivestreamHit | null) => {
          void push(
             `/group/${group.id}/admin/analytics/live-stream/${
                newValue?.id ?? ""
@@ -124,13 +130,24 @@ const LivestreamSearch = () => {
       []
    )
 
+   const sortedLivestreamHits = useMemo(() => {
+      const sortedHits: LivestreamHit[] = livestreamHits || []
+
+      if (value && !livestreamHits?.find((hit) => hit.id === value?.id)) {
+         // add current value to sortedHits array if it's not already in there
+         sortedHits.push(value)
+      }
+
+      return sortedHits.sort(sortLivestreamsDesc)
+   }, [livestreamHits, value])
+
    return (
       <Card sx={styles.root}>
          <Autocomplete
             id="livestream-search"
             fullWidth
             getOptionLabel={getOptionLabel}
-            options={livestreamHits ?? []}
+            options={sortedLivestreamHits}
             autoComplete
             disableClearable
             includeInputInList
@@ -160,10 +177,8 @@ const listBoxProps: React.ComponentProps<typeof Autocomplete>["ListboxProps"] =
       sx: styles.listBox,
    }
 
-const isOptionEqualToValue = (
-   option: LivestreamEvent,
-   value: LivestreamEvent
-) => option.id === value.id
+const isOptionEqualToValue = (option: LivestreamHit, value: LivestreamHit) =>
+   option.id === value.id
 
-const getOptionLabel = (option: LivestreamEvent) => option.title
+const getOptionLabel = (option: LivestreamHit) => option.title
 export default LivestreamSearch
