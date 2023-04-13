@@ -10,6 +10,7 @@ import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 type Options = {
    maxResults?: number
    debounceMs?: number
+   orderByDirection?: "asc" | "desc"
 }
 
 /**
@@ -27,12 +28,14 @@ export function useLivestreamSearch(
    options: Options = {
       maxResults: 5,
       debounceMs: 500,
+      orderByDirection: "desc",
    }
 ) {
    const [debouncedValue, setDebouncedValue] = useState("")
 
    const maxResults = options.maxResults || 5
    const debounceMs = options.debounceMs || 500
+   const orderByDirection = options.orderByDirection || "desc"
 
    useDebounce(
       () => {
@@ -61,11 +64,11 @@ export function useLivestreamSearch(
       // If there are no search constraints, we want to order the query by start date
       // due to firestore limitations we can only order the query when there are no trigrams
       if (searchConstraints.length === 0) {
-         constraints.push(orderBy("start", "desc"))
+         constraints.push(orderBy("start", orderByDirection))
       }
 
       return query(collection(FirestoreInstance, "livestreams"), ...constraints)
-   }, [debouncedValue, additionalConstraints, maxResults])
+   }, [debouncedValue, additionalConstraints, maxResults, orderByDirection])
 
    return useFirestoreCollection<LivestreamEvent>(livestreamQuery, {
       idField: "id",

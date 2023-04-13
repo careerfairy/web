@@ -1,22 +1,20 @@
-import React, { useCallback, useMemo, useState } from "react"
-import { StyledTextField } from "../../../common/inputs"
+import React, { FC, useCallback, useMemo, useState } from "react"
+import { StyledTextField } from "./inputs"
 import Autocomplete from "@mui/material/Autocomplete"
-import { Box, Card, Grid, Typography } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 import { where } from "firebase/firestore"
 import {
    LivestreamEvent,
    LivestreamEventPublicData,
 } from "@careerfairy/shared-lib/livestreams"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { useLivestreamSearch } from "../../../../../../custom-hook/live-stream/useLivestreamSearch"
-import { getParts } from "../../../../../../util/search"
-import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
-import { useRouter } from "next/router"
-import { prettyDate } from "../../../../../../helperFunctions/HelperFunctions"
-import { sxStyles } from "../../../../../../../types/commonTypes"
+import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
+import { useLivestreamSearch } from "../../../../custom-hook/live-stream/useLivestreamSearch"
+import { getParts } from "../../../../util/search"
+import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
+import { sxStyles } from "../../../../../types/commonTypes"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
-import RenderParts from "../../../../../common/search/RenderParts"
+import RenderParts from "../../../common/search/RenderParts"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 
 const styles = sxStyles({
@@ -45,12 +43,15 @@ const styles = sxStyles({
    },
 })
 
-type LivestreamHit = LivestreamEvent | LivestreamEventPublicData
-const LivestreamSearch = () => {
-   const { group } = useGroup()
-   const { push } = useRouter()
+export type LivestreamHit = LivestreamEvent | LivestreamEventPublicData
 
-   const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
+type Props = {
+   value: LivestreamHit
+   handleChange: (value: LivestreamHit | null) => void
+}
+const LivestreamSearch: FC<Props> = ({ value, handleChange }) => {
+   const { group } = useGroup()
+
    const [inputValue, setInputValue] = useState("")
 
    const additionalConstraints = useMemo(
@@ -65,8 +66,6 @@ const LivestreamSearch = () => {
          maxResults: 7,
       }
    )
-
-   const value: LivestreamHit = currentStreamStats?.livestream ?? null
 
    const renderOption = useCallback(
       (
@@ -109,15 +108,9 @@ const LivestreamSearch = () => {
    // Change only triggered/called when user selects an option
    const onChange = useCallback(
       (event: any, newValue: LivestreamHit | null) => {
-         void push(
-            `/group/${group.id}/admin/analytics/live-stream/${
-               newValue?.id ?? ""
-            }`,
-            undefined,
-            { shallow: true }
-         )
+         return handleChange(newValue)
       },
-      [group.id, push]
+      [handleChange]
    )
 
    const onInputChange = useCallback(
@@ -142,32 +135,31 @@ const LivestreamSearch = () => {
    }, [livestreamHits, value])
 
    return (
-      <Card sx={styles.root}>
-         <Autocomplete
-            id="livestream-search"
-            fullWidth
-            getOptionLabel={getOptionLabel}
-            options={sortedLivestreamHits}
-            autoComplete
-            disableClearable
-            includeInputInList
-            clearOnBlur
-            ListboxProps={listBoxProps}
-            value={value}
-            isOptionEqualToValue={isOptionEqualToValue}
-            noOptionsText="No livestreams found"
-            onChange={onChange}
-            onInputChange={onInputChange}
-            renderInput={(params) => (
-               <StyledTextField
-                  {...params}
-                  placeholder={"Search for livestreams"}
-                  fullWidth
-               />
-            )}
-            renderOption={renderOption}
-         />
-      </Card>
+      <Autocomplete
+         id="livestream-search"
+         fullWidth
+         getOptionLabel={getOptionLabel}
+         options={sortedLivestreamHits}
+         autoComplete
+         disableClearable
+         blurOnSelect
+         includeInputInList
+         clearOnBlur
+         ListboxProps={listBoxProps}
+         value={value}
+         isOptionEqualToValue={isOptionEqualToValue}
+         noOptionsText="No livestreams found"
+         onChange={onChange}
+         onInputChange={onInputChange}
+         renderInput={(params) => (
+            <StyledTextField
+               {...params}
+               placeholder={"Search for livestreams"}
+               fullWidth
+            />
+         )}
+         renderOption={renderOption}
+      />
    )
 }
 
