@@ -27,8 +27,7 @@ const getRandomInt = (max) => {
    }
 }
 
-// eslint-disable-next-line camelcase
-export const createNewUserAccount_v5 = functions.https.onCall(
+export const createNewUserAccount = functions.https.onCall(
    async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
