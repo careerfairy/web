@@ -1,5 +1,4 @@
 import React, { useMemo } from "react"
-import GeneralLayout from "layouts/GeneralLayout"
 import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
@@ -22,6 +21,7 @@ import DateUtil from "../util/DateUtil"
 import CookiesUtil from "../util/CookiesUtil"
 import { Box } from "@mui/material"
 import { mapFromServerSide } from "util/serverUtil"
+import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
 
 const PortalPage = ({
    highlights,
@@ -49,40 +49,42 @@ const PortalPage = ({
             }
             title={"CareerFairy | Portal"}
          />
-         <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
-            {recordedEvents?.length > 0 && (
-               <Box mb={4}>
-                  <RecordedEventsCarousel
-                     livestreams={mapFromServerSide(recordedEvents)}
-                  />
-               </Box>
-            )}
-            <Container disableGutters>
-               <WidgetsWrapper>
-                  {recordedEvents?.length === 0 && (
-                     <HighlightsCarousel
-                        showHighlights={showHighlights}
-                        serverSideHighlights={highlights}
+         <GenericDashboardLayout pageDisplayName={""}>
+            <>
+               {recordedEvents?.length > 0 && (
+                  <Box mb={4}>
+                     <RecordedEventsCarousel
+                        livestreams={mapFromServerSide(recordedEvents)}
                      />
-                  )}
-                  {hasInterests ? <RecommendedEvents limit={10} /> : null}
-                  <ComingUpNextEvents
-                     serverSideEvents={comingUpNext}
-                     limit={20}
-                  />
-                  <MyNextEvents limit={20} />
-                  <EventsPreview
-                     id={"past-events"}
-                     title={"PAST EVENTS"}
-                     type={EventsTypes.pastEvents}
-                     events={events}
-                     seeMoreLink={"/next-livestreams?type=pastEvents"}
-                     // No need to show loading as these events have already been queried server side
-                     loading={false}
-                  />
-               </WidgetsWrapper>
-            </Container>
-         </GeneralLayout>
+                  </Box>
+               )}
+               <Container disableGutters>
+                  <WidgetsWrapper>
+                     {recordedEvents?.length === 0 && (
+                        <HighlightsCarousel
+                           showHighlights={showHighlights}
+                           serverSideHighlights={highlights}
+                        />
+                     )}
+                     {hasInterests ? <RecommendedEvents limit={10} /> : null}
+                     <ComingUpNextEvents
+                        serverSideEvents={comingUpNext}
+                        limit={20}
+                     />
+                     <MyNextEvents limit={20} />
+                     <EventsPreview
+                        id={"past-events"}
+                        title={"PAST EVENTS"}
+                        type={EventsTypes.pastEvents}
+                        events={events}
+                        seeMoreLink={"/next-livestreams?type=pastEvents"}
+                        // No need to show loading as these events have already been queried server side
+                        loading={false}
+                     />
+                  </WidgetsWrapper>
+               </Container>
+            </>
+         </GenericDashboardLayout>
       </>
    )
 }
