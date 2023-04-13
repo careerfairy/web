@@ -17,7 +17,7 @@ import {
    EngageBadge,
 } from "@careerfairy/shared-lib/badges/EngageBadges"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { userRepo } from "src/api/repositories"
+import { userRepo } from "../api/repositories"
 
 /**
  * Applies user badges based on the userData document
