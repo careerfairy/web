@@ -31,6 +31,9 @@ const styles = sxStyles({
       display: "flex",
       justifyContent: "flex-end",
    },
+   noMarginTop: {
+      marginTop: "0px !important",
+   },
 })
 
 const FeedbackSearch: FC = () => {
@@ -68,6 +71,7 @@ const FeedbackSearch: FC = () => {
                <Divider
                   flexItem
                   orientation={isMobile ? "horizontal" : "vertical"}
+                  sx={isMobile ? styles.noMarginTop : undefined}
                />
             }
          >
@@ -77,7 +81,7 @@ const FeedbackSearch: FC = () => {
                value={null}
             />
             <StyledTextField
-               sx={styles.timeFrameSelect}
+               sx={[styles.timeFrameSelect, isMobile && styles.noMarginTop]}
                id="select-sort-direction"
                select
                SelectProps={SelectProps}
