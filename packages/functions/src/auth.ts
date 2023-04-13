@@ -15,6 +15,7 @@ import {
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import config from "./config"
+import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
@@ -89,6 +90,7 @@ export const createNewUserAccount_v5 = functions.https.onCall(
                      fieldOfStudy,
                      levelOfStudy,
                      isStudent: true,
+                     credits: INITIAL_CREDITS,
                      lastActivityAt:
                         admin.firestore.FieldValue.serverTimestamp(),
                      createdAt: admin.firestore.FieldValue.serverTimestamp(),

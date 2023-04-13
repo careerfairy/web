@@ -42,7 +42,11 @@ export interface UserData extends Identifiable {
    talentPools?: string[]
    validationPin: number
    interestsIds?: string[]
-   points?: number
+
+   // from the rewards/credit system
+   // negative or positive
+   credits?: number
+
    referralCode?: string
    referredBy?: {
       uid: string
