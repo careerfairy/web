@@ -2,6 +2,7 @@ import { admin } from "../api/firestoreAdmin"
 import { RewardActions, RewardDoc } from "@careerfairy/shared-lib/rewards"
 import pick = require("lodash/pick")
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { Create } from "@careerfairy/shared-lib/commonTypes"
 
 export const rewardCreateReferralSignUpLeader = (
    leaderId,
@@ -65,7 +66,7 @@ const rewardCreate = async (
    action: string,
    otherData: Partial<RewardDoc> = {}
 ) => {
-   const doc: RewardDoc = Object.assign(
+   const doc: Create<RewardDoc> = Object.assign(
       {
          action: action,
          seenByUser: false,

@@ -2,8 +2,10 @@ import { useAuth } from "./AuthProvider"
 import { useEffect } from "react"
 import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
-import { Reward } from "../types/reward"
-import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/dist/rewards"
+import {
+   getHumanStringDescriptionForAction,
+   RewardDoc,
+} from "@careerfairy/shared-lib/dist/rewards"
 
 const UserRewardsNotifications = ({ children }) => {
    const { userData } = useAuth()
@@ -23,7 +25,7 @@ const UserRewardsNotifications = ({ children }) => {
              */
             const groups = {}
             querySnapshot.forEach((doc) => {
-               let reward = doc.data() as Reward
+               let reward = doc.data() as RewardDoc
                if (groups[reward.action]) {
                   groups[reward.action].push(reward)
                } else {
