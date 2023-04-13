@@ -93,14 +93,8 @@ export function useLivestreamCsvData({
             }))
          })()
       }
-   }, [
-      targetStream,
-      groupQuestions,
-      userDataDictionary,
-      userType,
-      group,
-      groupPresenter,
-   ])
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [targetStream, groupQuestions, userType, group, groupPresenter])
 
    const action = useCallback(
       (rowData) => {
