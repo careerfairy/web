@@ -7,7 +7,7 @@ import { admin } from "./api/firestoreAdmin"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { generateReferralCode, setCORSHeaders } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
-import { groupRepo, marketingUsersRepo } from "./api/repositories"
+import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
 import {
    GroupDashboardInvite,
@@ -16,7 +16,7 @@ import {
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import config from "./config"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
-const { userGetByEmail, userUpdateFields } = require("./lib/user")
+const { userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
    const variable = Math.floor(Math.random() * Math.floor(max))
@@ -634,7 +634,7 @@ export const backfillUserData = functions.https.onCall(
          )
       }
 
-      const userData = await userGetByEmail(email)
+      const userData = await userRepo.getUserDataById(email)
       const dataToUpdate: Partial<UserData> = {}
 
       if (!userData.referralCode) {
