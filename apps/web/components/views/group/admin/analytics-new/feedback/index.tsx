@@ -1,7 +1,7 @@
 import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
 import { memo } from "react"
-import PaginatedFeedbacks from "./group-feedbacks/PaginatedFeedbacks"
+import PaginatedFeedbacks from "./livestream-feedbacks/PaginatedFeedbacks"
 import FeedbackSearch from "./search/FeedbackSearch"
 import { FeedbackPageProvider } from "./FeedbackPageProvider"
 
