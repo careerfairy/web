@@ -29,6 +29,16 @@ import Skeleton from "@mui/material/Skeleton"
 const MEDIA_HEIGHT = 90
 const styles = sxStyles({
    root: {},
+   actionArea: {
+      "& .illustration": {
+         transition: (theme) => theme.transitions.create("transform"),
+      },
+      "&:hover, &:focus": {
+         "& .illustration": {
+            transform: "scale(1.1)",
+         },
+      },
+   },
    media: {
       height: MEDIA_HEIGHT,
       position: "relative",
@@ -66,13 +76,14 @@ const FeedbackCard: FC<Props> = ({ stats, groupId }) => {
             href={`/group/${groupId}/admin/analytics/feedback/${stats.livestream.id}`}
             passHref
          >
-            <CardActionArea component="a">
+            <CardActionArea sx={styles.actionArea} component="a">
                <CardMedia sx={styles.media} title={stats.livestream.company}>
                   <Image
                      src={getResizedUrl(
                         stats.livestream.backgroundImageUrl || company_building,
                         "md"
                      )}
+                     className="illustration"
                      layout="fill"
                      alt={stats.livestream.company}
                      objectFit="cover"
