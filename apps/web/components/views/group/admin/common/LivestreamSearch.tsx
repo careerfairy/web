@@ -48,8 +48,13 @@ export type LivestreamHit = LivestreamEvent | LivestreamEventPublicData
 type Props = {
    value: LivestreamHit
    handleChange: (value: LivestreamHit | null) => void
+   orderByDirection?: "asc" | "desc"
 }
-const LivestreamSearch: FC<Props> = ({ value, handleChange }) => {
+const LivestreamSearch: FC<Props> = ({
+   value,
+   handleChange,
+   orderByDirection,
+}) => {
    const { group } = useGroup()
 
    const [inputValue, setInputValue] = useState("")
@@ -64,6 +69,7 @@ const LivestreamSearch: FC<Props> = ({ value, handleChange }) => {
       additionalConstraints,
       {
          maxResults: 7,
+         orderByDirection,
       }
    )
 
@@ -113,15 +119,9 @@ const LivestreamSearch: FC<Props> = ({ value, handleChange }) => {
       [handleChange]
    )
 
-   const onInputChange = useCallback(
-      (event: any, newInputValue: string, reason: string) => {
-         if (reason === "reset") {
-            return // don't update the input value when the user selects an option, better UX
-         }
-         setInputValue(newInputValue)
-      },
-      []
-   )
+   const onInputChange = useCallback((event: any, newInputValue: string) => {
+      setInputValue(newInputValue)
+   }, [])
 
    const sortedLivestreamHits = useMemo(() => {
       const sortedHits: LivestreamHit[] = livestreamHits || []
@@ -131,8 +131,14 @@ const LivestreamSearch: FC<Props> = ({ value, handleChange }) => {
          sortedHits.push(value)
       }
 
-      return sortedHits.sort(sortLivestreamsDesc)
-   }, [livestreamHits, value])
+      return sortedHits.sort((a, b) =>
+         sortLivestreamsDesc(
+            a as LivestreamEvent,
+            b as LivestreamEvent,
+            orderByDirection === "asc"
+         )
+      )
+   }, [livestreamHits, orderByDirection, value])
 
    return (
       <Autocomplete

@@ -1,62 +1,78 @@
 import React, {
    createContext,
+   Dispatch,
    FC,
    useCallback,
    useContext,
    useMemo,
    useState,
 } from "react"
-import { LiveStreamStats } from "@careerfairy/shared-lib/livestreams/stats"
+import { useRouter } from "next/router"
+import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
+import FeedbackDialog from "./FeedbackDialog"
+
+export const SORT_DIRECTIONS = {
+   Latest: "desc",
+   Oldest: "asc",
+} as const
 
 type IFeedbackPageContext = {
-   feedbackDialogProps: FeedbackDialogProps
-   handleOpenFeedbackDialog: (
-      livestreamId: string,
-      initialStatsData?: LiveStreamStats
-   ) => void
+   handleOpenFeedbackDialog: (livestreamId: string) => void
    handleCloseFeedbackDialog: () => void
+   sortDirection: keyof typeof SORT_DIRECTIONS
+   setSortDirection: Dispatch<IFeedbackPageContext["sortDirection"]>
 }
 
 const initialValues: IFeedbackPageContext = {
-   feedbackDialogProps: null,
    handleOpenFeedbackDialog: () => {},
    handleCloseFeedbackDialog: () => {},
+   sortDirection: "Latest",
+   setSortDirection: () => {},
 }
 
 const FeedbackPageContext = createContext<IFeedbackPageContext>(initialValues)
 
-type FeedbackDialogProps = {
-   livestreamId: string
-   initialStatsData?: LiveStreamStats
-} | null
-
 export const FeedbackPageProvider: FC = ({ children }) => {
-   const [feedbackDialogProps, setFeedbackDialogProps] =
-      useState<FeedbackDialogProps>(null)
+   const { group } = useGroup()
 
-   const handleOpenFeedbackDialog = (
-      id: string,
-      initialStatsData?: LiveStreamStats
-   ) => {
-      setFeedbackDialogProps({ livestreamId: id, initialStatsData })
-   }
+   const {
+      push,
+      query: { feedback },
+   } = useRouter()
+
+   const livestreamId = feedback?.[0]
+
+   const [sortDirection, setSortDirection] = useState(
+      initialValues.sortDirection
+   )
+
+   const handleOpenFeedbackDialog = useCallback(
+      (livestreamId: string) => {
+         void push(
+            `/group/${group.id}/admin/analytics/feedback/${livestreamId}`
+         )
+      },
+      [group.id, push]
+   )
 
    const handleCloseFeedbackDialog = useCallback(() => {
-      setFeedbackDialogProps(null)
-   }, [])
+      void push(`/group/${group.id}/admin/analytics/feedback`)
+   }, [group.id, push])
 
-   const value = useMemo(
+   const value = useMemo<IFeedbackPageContext>(
       () => ({
-         feedbackDialogProps,
          handleOpenFeedbackDialog,
          handleCloseFeedbackDialog,
+         sortDirection,
+         setSortDirection,
       }),
-      [feedbackDialogProps, handleCloseFeedbackDialog]
+      [handleCloseFeedbackDialog, handleOpenFeedbackDialog, sortDirection]
    )
 
    return (
       <FeedbackPageContext.Provider value={value}>
          {children}
+         {livestreamId ? <FeedbackDialog livestreamId={livestreamId} /> : null}
       </FeedbackPageContext.Provider>
    )
 }

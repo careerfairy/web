@@ -385,6 +385,8 @@ export type LivestreamEventPublicData = Partial<
       | "created"
       | "impressions"
       | "hasJobs"
+      | "backgroundImageUrl"
+      | "duration"
    >
 > & {
    id: LivestreamEvent["id"]

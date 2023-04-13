@@ -151,7 +151,7 @@ const GroupNavList = () => {
                {
                   id: "feedback",
                   href: `/${baseHrefPath}/${group.id}/admin/analytics/feedback`,
-                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/feedback`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/analytics/feedback/[[...feedback]]`,
                   title: "Feedback",
                },
             ],

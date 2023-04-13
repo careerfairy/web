@@ -1,12 +1,17 @@
 import React, { FC, useCallback } from "react"
-import { Card, Divider } from "@mui/material"
+import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import LivestreamSearch, {
    LivestreamHit,
 } from "../../../common/LivestreamSearch"
 import Stack from "@mui/material/Stack"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
-import { useFeedbackPageContext } from "../FeedbackPageProvider"
+import {
+   SORT_DIRECTIONS,
+   useFeedbackPageContext,
+} from "../FeedbackPageProvider"
+import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
+import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 
 const styles = sxStyles({
    root: {
@@ -16,15 +21,22 @@ const styles = sxStyles({
    stack: {
       flex: 1,
    },
+   timeFrameSelect: {
+      minWidth: {
+         sm: 350,
+      },
+      justifyContent: "center",
+   },
+   listIcon: {
+      display: "flex",
+      justifyContent: "flex-end",
+   },
 })
 
-type Props = {}
-
-const FeedbackSearch: FC<Props> = (props) => {
+const FeedbackSearch: FC = () => {
    const isMobile = useIsMobile()
-   const { feedbackDialogProps, handleOpenFeedbackDialog } =
+   const { setSortDirection, sortDirection, handleOpenFeedbackDialog } =
       useFeedbackPageContext()
-   console.log("-> feedbackDialogProps", feedbackDialogProps)
 
    const handleChange = useCallback(
       (hit: LivestreamHit | null) => {
@@ -33,6 +45,17 @@ const FeedbackSearch: FC<Props> = (props) => {
          }
       },
       [handleOpenFeedbackDialog]
+   )
+
+   const handleSortDirectionChange = useCallback(
+      (
+         event: React.ChangeEvent<{
+            value: unknown
+         }>
+      ) => {
+         setSortDirection(event.target.value as typeof sortDirection)
+      },
+      [setSortDirection]
    )
 
    return (
@@ -48,10 +71,38 @@ const FeedbackSearch: FC<Props> = (props) => {
                />
             }
          >
-            <LivestreamSearch handleChange={handleChange} value={null} />
+            <LivestreamSearch
+               orderByDirection={SORT_DIRECTIONS[sortDirection]}
+               handleChange={handleChange}
+               value={null}
+            />
+            <StyledTextField
+               sx={styles.timeFrameSelect}
+               id="select-sort-direction"
+               select
+               SelectProps={SelectProps}
+               value={sortDirection}
+               variant="outlined"
+               onChange={handleSortDirectionChange}
+            >
+               {Object.keys(SORT_DIRECTIONS).map((direction) => (
+                  <StyledMenuItem key={direction} value={direction}>
+                     <ListItemText primary={direction} />
+                     {sortDirection === direction ? (
+                        <ListItemIcon sx={styles.listIcon}>
+                           <CheckRoundedIcon fontSize="small" />
+                        </ListItemIcon>
+                     ) : null}
+                  </StyledMenuItem>
+               ))}
+            </StyledTextField>
          </Stack>
       </Card>
    )
+}
+
+const SelectProps = {
+   renderValue: (val) => val,
 }
 
 export default FeedbackSearch
