@@ -1,7 +1,7 @@
 import React, { FC, useCallback, useMemo, useState } from "react"
 import { StyledTextField } from "./inputs"
 import Autocomplete from "@mui/material/Autocomplete"
-import { Box, Grid, Typography } from "@mui/material"
+import { Box, Grid, InputAdornment, Typography } from "@mui/material"
 import { where } from "firebase/firestore"
 import {
    LivestreamEvent,
@@ -16,6 +16,7 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import RenderParts from "../../../common/search/RenderParts"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import { Search as FindIcon } from "react-feather"
 
 const styles = sxStyles({
    root: {
@@ -119,9 +120,16 @@ const LivestreamSearch: FC<Props> = ({
       [handleChange]
    )
 
-   const onInputChange = useCallback((event: any, newInputValue: string) => {
-      setInputValue(newInputValue)
-   }, [])
+   const onInputChange = useCallback(
+      (event: any, newInputValue: string, reason) => {
+         if (reason === "reset") {
+            setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
+            return
+         }
+         setInputValue(newInputValue)
+      },
+      []
+   )
 
    const sortedLivestreamHits = useMemo(() => {
       const sortedHits: LivestreamHit[] = livestreamHits || []
@@ -160,7 +168,15 @@ const LivestreamSearch: FC<Props> = ({
          renderInput={(params) => (
             <StyledTextField
                {...params}
-               placeholder={"Search for livestreams"}
+               InputProps={{
+                  ...params.InputProps,
+                  startAdornment: (
+                     <InputAdornment position="start">
+                        <FindIcon color={"black"} />
+                     </InputAdornment>
+                  ),
+               }}
+               placeholder={"Search live stream"}
                fullWidth
             />
          )}
