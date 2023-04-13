@@ -64,15 +64,17 @@ type Props = {
    children: React.ReactNode
    drawerContent: React.ReactNode
    headerContent: React.ReactNode
+   bottomNavContent?: JSX.Element
    drawerOpen: boolean
-   setDrawer: (open: boolean) => void
-   toggleDrawer: () => void
+   setDrawer?: (open: boolean) => void
+   toggleDrawer?: () => void
    bgColor?: string
 }
 const AdminGenericLayout: React.FC<Props> = ({
    children,
    drawerContent,
    headerContent,
+   bottomNavContent,
    drawerOpen,
    setDrawer,
    toggleDrawer,
@@ -80,10 +82,11 @@ const AdminGenericLayout: React.FC<Props> = ({
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
+   const isMobile = useIsMobile()
 
    useEffect(() => {
       // Dynamically set drawerOpen based on screen size
-      setDrawer(!matchDownLg)
+      setDrawer?.(!matchDownLg)
    }, [matchDownLg, setDrawer])
 
    return (
@@ -106,9 +109,17 @@ const AdminGenericLayout: React.FC<Props> = ({
                {headerContent}
             </HeaderComponent>
             {/* main content */}
-            <Box component={"main"} sx={styles.main}>
+            <Box
+               component={"main"}
+               sx={[
+                  styles.main,
+                  { mb: isMobile && bottomNavContent ? "50px" : "" },
+               ]}
+            >
                {children}
             </Box>
+            {/* Bottom navigation bar */}
+            {isMobile && bottomNavContent ? bottomNavContent : null}
          </Box>
       </Box>
    )
