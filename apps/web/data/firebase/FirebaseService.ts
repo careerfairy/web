@@ -59,6 +59,7 @@ import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/
 import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
+import { RewardAction } from "@careerfairy/shared-lib/dist/rewards"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -3069,7 +3070,7 @@ class FirebaseService {
       })
    }
 
-   rewardUserAction = async (action: string, livestreamId?: string) => {
+   rewardUserAction = async (action: RewardAction, livestreamId?: string) => {
       return this.functions.httpsCallable("rewardUserAction")({
          action,
          livestreamId,

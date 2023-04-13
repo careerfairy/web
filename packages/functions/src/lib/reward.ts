@@ -1,50 +1,49 @@
 import { admin } from "../api/firestoreAdmin"
-import { RewardActions, RewardDoc } from "@careerfairy/shared-lib/rewards"
-import pick = require("lodash/pick")
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { RewardAction, RewardDoc } from "@careerfairy/shared-lib/rewards"
+import {
+   LivestreamEvent,
+   pickPublicDataFromLivestream,
+} from "@careerfairy/shared-lib/livestreams"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
+import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
 
 export const rewardCreateReferralSignUpLeader = (
-   leaderId,
-   followerUserData
+   leaderId: string,
+   followerUserData: UserData
 ) => {
-   return rewardCreate(leaderId, RewardActions.REFERRAL_SIGNUP_LEADER, {
+   return rewardCreate(leaderId, "REFERRAL_SIGNUP_LEADER", {
       userId: followerUserData.id,
-      userData: pickDetailsFromUserData(followerUserData),
+      userData: pickPublicDataFromUser(followerUserData),
    })
 }
 
 export const rewardCreateReferralSignUpFollower = (
-   justRegisteredUserId,
-   leaderUserData
+   justRegisteredUserId: string,
+   leaderUserData: UserData
 ) => {
-   return rewardCreate(
-      justRegisteredUserId,
-      RewardActions.REFERRAL_SIGNUP_FOLLOWER,
-      {
-         userId: leaderUserData.id,
-         userData: pickDetailsFromUserData(leaderUserData),
-      }
-   )
+   return rewardCreate(justRegisteredUserId, "REFERRAL_SIGNUP_FOLLOWER", {
+      userId: leaderUserData.id,
+      userData: pickPublicDataFromUser(leaderUserData),
+   })
 }
 
 export const rewardCreateLivestream = (
-   userBeingRewardedId,
-   action,
-   relatedUserData,
-   relatedLivestreamData
+   userBeingRewardedId: string,
+   action: RewardAction,
+   relatedUserData: UserData,
+   relatedLivestreamData: LivestreamEvent
 ) => {
    return rewardCreate(userBeingRewardedId, action, {
       userId: relatedUserData.id,
       livestreamId: relatedLivestreamData.id,
-      userData: pickDetailsFromUserData(relatedUserData),
-      livestreamData: pickDetailsFromLivestreamData(relatedLivestreamData),
+      userData: pickPublicDataFromUser(relatedUserData),
+      livestreamData: pickPublicDataFromLivestream(relatedLivestreamData),
    })
 }
 
 export const rewardCreateUserAction = (
-   userBeingRewardedId,
-   action,
+   userBeingRewardedId: string,
+   action: RewardAction,
    relatedLivestreamData?: LivestreamEvent
 ) => {
    // do not send reward notifications for user actions
@@ -53,7 +52,7 @@ export const rewardCreateUserAction = (
 
    if (relatedLivestreamData) {
       otherData.livestreamId = relatedLivestreamData.id
-      otherData.livestreamData = pickDetailsFromLivestreamData(
+      otherData.livestreamData = pickPublicDataFromLivestream(
          relatedLivestreamData
       )
    }
@@ -62,8 +61,8 @@ export const rewardCreateUserAction = (
 }
 
 const rewardCreate = async (
-   rewardedUserId,
-   action: string,
+   rewardedUserId: string,
+   action: RewardAction,
    otherData: Partial<RewardDoc> = {}
 ) => {
    const doc: Create<RewardDoc> = Object.assign(
@@ -84,9 +83,9 @@ const rewardCreate = async (
 }
 
 export const rewardGetRelatedToLivestream = async (
-   userDataId,
-   livestreamId,
-   action
+   userDataId: string,
+   livestreamId: string,
+   action: RewardAction
 ) => {
    const querySnapshot = await admin
       .firestore()
@@ -103,18 +102,4 @@ export const rewardGetRelatedToLivestream = async (
    }
 
    return querySnapshot.docs[0].data()
-}
-
-const pickDetailsFromUserData = (userData) => {
-   return pick(userData, ["firstName", "lastName"])
-}
-
-export const pickDetailsFromLivestreamData = (livestreamData) => {
-   return pick(livestreamData, [
-      "title",
-      "summary",
-      "company",
-      "companyLogoUrl",
-      "start",
-   ])
 }

@@ -6,23 +6,6 @@ import {
 import { addMinutesDate, removeMinutesDate } from "../util"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
 
-export const livestreamGetById = async (id) => {
-   const documentSnap = await admin
-      .firestore()
-      .collection("livestreams")
-      .doc(id)
-      .get()
-
-   if (!documentSnap.exists) {
-      return null
-   }
-
-   return {
-      ...documentSnap.data(),
-      id: id,
-   }
-}
-
 export const livestreamGetSecureToken = async (id, breakoutRoomId?) => {
    let documentSnap: any = admin.firestore().collection("livestreams").doc(id)
 
