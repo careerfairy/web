@@ -1,6 +1,7 @@
 import firebase from "firebase/compat/app"
 import { Identifiable } from "../commonTypes"
 import { LivestreamEventPublicData } from "../livestreams"
+import { UserPublicData } from "../users"
 
 /**
  * When changing shared files, be sure to deploy both the webapp and the functions using this code
@@ -114,10 +115,7 @@ export interface RewardDoc extends Identifiable {
    // if the reward is related to a different user than the user owning the
    // these fields will be populated
    userId?: string
-   userData?: {
-      firstName: string
-      lastName: string
-   }
+   userData?: UserPublicData
 
    // credits to award the user
    // positive or negative
