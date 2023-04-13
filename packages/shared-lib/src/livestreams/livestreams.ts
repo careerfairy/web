@@ -487,6 +487,8 @@ export const pickPublicDataFromLivestream = (
       impressions: livestreamData.impressions ?? 0,
       created: livestreamData.created ?? null,
       hasJobs: livestreamData.hasJobs ?? false,
+      duration: livestreamData.duration ?? null,
+      backgroundImageUrl: livestreamData.backgroundImageUrl ?? null,
    }
 }
 
