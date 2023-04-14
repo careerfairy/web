@@ -1,6 +1,5 @@
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 import { SystemStyleObject } from "@mui/system"
-import { SxProps } from "@mui/material"
 
 /**
  * Every firebase document should have an ID
@@ -25,10 +24,6 @@ export function sxStyles<TObject extends SystemStyleObject<DefaultTheme>>(
    obj: TObject
 ): TObject {
    return obj
-}
-
-export function mergeStyles(sx: SxProps<DefaultTheme>) {
-   return [...(Array.isArray(sx) ? sx : [sx])]
 }
 
 /**
