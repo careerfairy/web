@@ -15,7 +15,7 @@ const PastLivestreamsPage = () => {
          <GenericDashboardLayout pageDisplayName={"Past live streams"}>
             <NextLiveStreamsWithFilter initialTabValue={"pastEvents"} />
          </GenericDashboardLayout>
-         <ScrollToTop />
+         <ScrollToTop hasBottomNavBar />
       </>
    )
 }
