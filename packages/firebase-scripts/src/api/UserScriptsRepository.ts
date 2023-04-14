@@ -4,16 +4,21 @@ import {
 } from "@careerfairy/shared-lib/dist/users/UserRepository"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
+import { DataWithRef } from "../util/types"
 
 export interface IUserScriptsRepository extends IUserRepository {
-   getAllUsers(withRef?: boolean): Promise<UserData[]>
+   getAllUsers<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, UserData>[]>
 }
 
 export class UserScriptsRepository
    extends FirebaseUserRepository
    implements IUserScriptsRepository
 {
-   async getAllUsers<T extends boolean>(withRef?: T): Promise<UserData[]> {
+   async getAllUsers<T extends boolean>(
+      withRef?: T
+   ): Promise<DataWithRef<T, UserData>[]> {
       const users = await this.firestore.collection("userData").get()
       return mapFirestoreDocuments<UserData, T>(users, withRef)
    }
