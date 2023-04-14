@@ -15,6 +15,7 @@ import {
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import config from "./config"
+import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
 const { userGetByEmail, userUpdateFields } = require("./lib/user")
 
 const getRandomInt = (max) => {
@@ -26,8 +27,7 @@ const getRandomInt = (max) => {
    }
 }
 
-// eslint-disable-next-line camelcase
-export const createNewUserAccount_v5 = functions.https.onCall(
+export const createNewUserAccount = functions.https.onCall(
    async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
@@ -89,6 +89,7 @@ export const createNewUserAccount_v5 = functions.https.onCall(
                      fieldOfStudy,
                      levelOfStudy,
                      isStudent: true,
+                     credits: INITIAL_CREDITS,
                      lastActivityAt:
                         admin.firestore.FieldValue.serverTimestamp(),
                      createdAt: admin.firestore.FieldValue.serverTimestamp(),

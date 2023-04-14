@@ -26,6 +26,11 @@ export const RewardActions = {
 
 export const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60 // 5 minutes
 
+/**
+ * Every new user should get 3 credits when creating an account
+ */
+export const INITIAL_CREDITS = 3
+
 export const getHumanStringDescriptionForAction = (action) => {
    switch (action) {
       case RewardActions.REFERRAL_SIGNUP_FOLLOWER:
