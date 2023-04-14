@@ -1,16 +1,20 @@
-import React from "react"
-import { LoadingButton } from "@mui/lab"
-import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
-import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
-import useSnackbarNotifications from "../../../../../../custom-hook/useSnackbarNotifications"
-import useDialogStateHandler from "../../../../../../custom-hook/useDialogStateHandler"
-import PdfReportDownloadDialog from "../../../events/PdfReportDownloadDialog"
-import usePDFReportData from "./usePDFReportData"
+import React, { FC } from "react"
+import LoadingButton, { LoadingButtonProps } from "@mui/lab/LoadingButton"
+import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
+import useDialogStateHandler from "../../../../custom-hook/useDialogStateHandler"
+import PdfReportDownloadDialog from "../events/PdfReportDownloadDialog"
+import usePDFReportData from "../analytics-new/live-stream/search/usePDFReportData"
 
-const ExportPdfButton = () => {
-   const { group } = useGroup()
+type ExportPdfButtonProps = LoadingButtonProps & {
+   groupId: string
+   livestreamId?: string
+}
+const ExportPdfButton: FC<ExportPdfButtonProps> = ({
+   livestreamId,
+   groupId,
+   ...props
+}) => {
    const { errorNotification } = useSnackbarNotifications()
-   const { currentStreamStats } = useLivestreamsAnalyticsPageContext()
 
    const [pdfDialogOpen, handleOpenPDFDialog, handleClosePDFDialog] =
       useDialogStateHandler()
@@ -19,7 +23,7 @@ const ExportPdfButton = () => {
       data: reportData,
       isFetching,
       fetchReportData,
-   } = usePDFReportData(group.id, currentStreamStats?.livestream?.id, {
+   } = usePDFReportData(groupId, livestreamId, {
       onError: errorNotification,
       onSuccess: () => handleOpenPDFDialog(),
    })
@@ -37,12 +41,11 @@ const ExportPdfButton = () => {
          <LoadingButton
             loading={isFetching}
             onClick={handleClick}
-            disabled={!currentStreamStats}
+            disabled={!livestreamId || !groupId}
             variant="outlined"
             color={"secondary"}
-         >
-            Export PDF
-         </LoadingButton>
+            {...props}
+         />
          <PdfReportDownloadDialog
             openDialog={pdfDialogOpen}
             onClose={handleClose}
