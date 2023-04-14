@@ -12,7 +12,6 @@ import GroupNavList from "../GroupDashboardLayout/GroupNavList"
 import { MainLogo } from "../../components/logos"
 import GenericNavList from "./GenericNavList"
 import { sxStyles } from "../../types/commonTypes"
-import useIsMobile from "../../components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    logoWrapper: {
@@ -27,12 +26,9 @@ const styles = sxStyles({
 
 const NavBar = () => {
    const { group } = useGroup()
-   const isMobile = useIsMobile()
 
    if (!group) {
-      return isMobile ? (
-         <Box> Bottom bar </Box>
-      ) : (
+      return (
          <Stack
             flex={1}
             alignItems={"center"}
