@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React, { useEffect, useState } from "react"
 import { Fab, Grow } from "@mui/material"
 import ScrollToTopIcon from "@mui/icons-material/ExpandLessRounded"
@@ -24,7 +23,13 @@ const styles = sxStyles({
    },
 })
 
-const ScrollToTop = ({ fontSize = "large", size }) => {
+type Props = {
+   fontSize?: "inherit" | "large" | "medium" | "small"
+   size?: "small" | "medium" | "large"
+   hasBottomNavBar?: boolean
+}
+
+const ScrollToTop = ({ fontSize = "large", size, hasBottomNavBar }: Props) => {
    const [showScroll, setShowScroll] = useState(false)
 
    useEffect(() => {
@@ -43,7 +48,7 @@ const ScrollToTop = ({ fontSize = "large", size }) => {
    return (
       <Grow in={showScroll}>
          <Fab
-            sx={styles.scrollTop}
+            sx={[styles.scrollTop, hasBottomNavBar ? { bottom: "75px" } : null]}
             onClick={scrollTop}
             color="primary"
             size={size}
@@ -53,11 +58,6 @@ const ScrollToTop = ({ fontSize = "large", size }) => {
          </Fab>
       </Grow>
    )
-}
-
-ScrollToTop.propTypes = {
-   fontSize: PropTypes.oneOf(["small", "medium", "large"]),
-   size: PropTypes.oneOf(["small", "medium", "large"]),
 }
 
 export default ScrollToTop
