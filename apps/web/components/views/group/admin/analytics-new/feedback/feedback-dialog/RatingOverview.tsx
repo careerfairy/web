@@ -15,7 +15,7 @@ type FeedbackAnswersContentProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
-export const FeedbackAnswersContent: FC<FeedbackAnswersContentProps> = ({
+export const RatingOverviewContent: FC<FeedbackAnswersContentProps> = ({
    livestreamStats,
    groupId,
 }) => {
@@ -26,7 +26,7 @@ type FeedbackAnswersTitleProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
-export const FeedbackAnswersTitle: FC<FeedbackAnswersTitleProps> = ({
+export const RatingOverviewTitle: FC<FeedbackAnswersTitleProps> = ({
    livestreamStats,
    groupId,
 }) => {

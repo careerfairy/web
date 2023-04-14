@@ -33,7 +33,7 @@ type FeedbacksProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
-const Feedbacks: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
+const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
    const isMobile = useIsMobile()
    const results = useFirestoreCollection<EventRating>(
       query(
@@ -104,7 +104,7 @@ const Feedbacks: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
       </Stack>
    )
 }
-export const FeedbacksSkeleton = () => {
+export const RatingsSkeleton = () => {
    return (
       <Stack maxWidth={920} spacing={2}>
          <Stack
@@ -141,4 +141,4 @@ export const FeedbacksSkeleton = () => {
    )
 }
 
-export default Feedbacks
+export default Ratings
