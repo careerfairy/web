@@ -13,8 +13,8 @@ import LoginButton from "../../../components/views/common/LoginButton"
 import GeneralHeader from "../../../components/views/header/GeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
-import UserProfileButton from "../../../components/views/common/topbar/UserProfileButton"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import UserAvatar from "../../GenericDashboardLayout/TopBar/UserAvatar"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -58,13 +58,15 @@ const TopBar = () => {
          <Box display="flex" alignItems="center">
             <Hidden lgDown>
                <MissingDataButton />
-               {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
-                  <div>
-                     <LoginButton />
-                  </div>
-               ) : (
-                  <UserProfileButton white />
-               )}
+               <Box ml={2}>
+                  {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
+                     <div>
+                        <LoginButton />
+                     </div>
+                  ) : (
+                     <UserAvatar />
+                  )}
+               </Box>
             </Hidden>
          </Box>
       </GeneralHeader>
