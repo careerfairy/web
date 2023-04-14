@@ -87,11 +87,11 @@ const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
                      <Box minWidth={195} width={195}>
                         <RatingWithLabel
                            average={
-                              livestreamStats.ratings[rating.id]
+                              livestreamStats.ratings?.[rating.id]
                                  ?.averageRating ?? 0
                            }
                            numberOfRatings={
-                              livestreamStats.ratings[rating.id]
+                              livestreamStats.ratings?.[rating.id]
                                  ?.numberOfRatings ?? 0
                            }
                            color={"primary.main"}

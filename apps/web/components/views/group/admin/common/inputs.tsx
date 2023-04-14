@@ -154,6 +154,7 @@ export const RatingWithLabel: FC<RatingWithLabelProps> = ({
             textAlign="center"
             color={color}
             variant="body1"
+            whiteSpace={"nowrap"}
          >
             {numberOfRatings} reviews
          </Typography>
