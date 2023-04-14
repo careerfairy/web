@@ -124,7 +124,9 @@ export const AverageRegistrationsPerStreamCard: FC<AggregationCardProps> = (
    <CardAnalytic title="Average registrations per stream" value={props.value} />
 )
 
-type RenderAsyncCountProps = ReturnType<typeof useCountQuery>
+type RenderAsyncCountProps = ReturnType<typeof useCountQuery> & {
+   loadingElement?: React.ReactNode
+}
 
 /**
  * Renders a count asynchronously.
@@ -140,9 +142,10 @@ export const RenderAsyncCount: FC<RenderAsyncCountProps> = ({
    count,
    error,
    loading,
+   loadingElement,
 }) => {
    if (loading) {
-      return <CircularProgress color="secondary" size={30} />
+      return loadingElement || <CircularProgress color="secondary" size={30} />
    }
 
    if (error) {

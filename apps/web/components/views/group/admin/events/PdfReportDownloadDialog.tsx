@@ -1,4 +1,3 @@
-import PropTypes from "prop-types"
 import React, { memo } from "react"
 import {
    Box,
@@ -17,7 +16,7 @@ import { useTheme } from "@mui/material/styles"
 import CloseIcon from "@mui/icons-material/Close"
 import { isMobile } from "react-device-detect"
 import { Alert, AlertTitle } from "@mui/material"
-import { PdfReportData } from "@careerfairy/shared-lib/dist/groups/pdf-report"
+import { PdfReportData } from "@careerfairy/shared-lib/groups/pdf-report"
 
 interface DialogContentProps {
    handleClose: () => void

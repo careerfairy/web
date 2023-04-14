@@ -9,7 +9,7 @@ import React, {
 } from "react"
 import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import FeedbackDialog from "./FeedbackDialog"
+import FeedbackDialog from "./feedback-dialog/FeedbackDialog"
 
 export const SORT_DIRECTIONS = {
    Latest: "desc",
@@ -41,6 +41,7 @@ export const FeedbackPageProvider: FC = ({ children }) => {
    } = useRouter()
 
    const livestreamId = feedback?.[0]
+   const feedbackQuestionId = feedback?.[2]
 
    const [sortDirection, setSortDirection] = useState(
       initialValues.sortDirection
@@ -72,7 +73,12 @@ export const FeedbackPageProvider: FC = ({ children }) => {
    return (
       <FeedbackPageContext.Provider value={value}>
          {children}
-         {livestreamId ? <FeedbackDialog livestreamId={livestreamId} /> : null}
+         {livestreamId ? (
+            <FeedbackDialog
+               livestreamId={livestreamId}
+               feedbackQuestionId={feedbackQuestionId}
+            />
+         ) : null}
       </FeedbackPageContext.Provider>
    )
 }
