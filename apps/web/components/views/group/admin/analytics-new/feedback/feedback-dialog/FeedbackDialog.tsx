@@ -5,9 +5,9 @@ import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { useFeedbackPageContext } from "../FeedbackPageProvider"
 import useIsMobile from "../../../../../../custom-hook/useIsMobile"
 import Title from "./Title"
-import { OverviewContent, OverviewTitle } from "./Overview"
+import { GeneralOverviewContent, GeneralOverviewTitle } from "./GeneralOverview"
 import SwipeableViews from "react-swipeable-views"
-import { FeedbackAnswersContent, FeedbackAnswersTitle } from "./FeedbackAnswers"
+import { RatingOverviewContent, RatingOverviewTitle } from "./RatingOverview"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { AnimatedTabPanel } from "../../../../../../../materialUI/GlobalPanels/GlobalPanels"
 
@@ -16,7 +16,6 @@ const styles = sxStyles({
       px: {
          mobile: 4.75,
       },
-      transition: (theme) => theme.transitions.create("all"),
    },
 })
 
@@ -25,12 +24,10 @@ type Props = {
    feedbackQuestionId?: string
 }
 
-const overviewKey = 0
-const feedbackAnswersKey = 1
+const generalOverviewKey = 0
+const ratingOverviewKey = 1
 
-type Value =
-   | typeof overviewKey // Overview
-   | typeof feedbackAnswersKey // Feedback
+type Value = typeof generalOverviewKey | typeof ratingOverviewKey
 
 const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
    const { handleCloseFeedbackDialog } = useFeedbackPageContext()
@@ -41,9 +38,9 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
 
    const value = useMemo<Value>(() => {
       if (feedbackQuestionId) {
-         return feedbackAnswersKey
+         return ratingOverviewKey
       }
-      return overviewKey
+      return generalOverviewKey
    }, [feedbackQuestionId])
 
    const livestreamStats = stats?.[0]
@@ -55,31 +52,26 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
          TransitionComponent={Slide}
          maxWidth="lg"
          fullWidth
-         PaperProps={{
-            sx: {
-               transition: (theme) => theme.transitions.create("all"),
-            },
-         }}
          fullScreen={isMobile}
       >
          <Title id="feedback-dialog-title" onClose={handleCloseFeedbackDialog}>
             <SwipeableViews index={value}>
                <AnimatedTabPanel
-                  key={overviewKey}
-                  value={overviewKey}
+                  key={generalOverviewKey}
+                  value={generalOverviewKey}
                   activeValue={value}
                >
-                  <OverviewTitle
+                  <GeneralOverviewTitle
                      groupId={group.id}
                      livestreamStats={livestreamStats}
                   />
                </AnimatedTabPanel>
                <AnimatedTabPanel
-                  key={feedbackAnswersKey}
-                  value={feedbackAnswersKey}
+                  key={ratingOverviewKey}
+                  value={ratingOverviewKey}
                   activeValue={value}
                >
-                  <FeedbackAnswersTitle
+                  <RatingOverviewTitle
                      livestreamStats={livestreamStats}
                      groupId={group.id}
                   />
@@ -89,21 +81,21 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
          <DialogContent sx={styles.content} dividers>
             <SwipeableViews index={value}>
                <AnimatedTabPanel
-                  key={overviewKey}
-                  value={overviewKey}
+                  key={generalOverviewKey}
+                  value={generalOverviewKey}
                   activeValue={value}
                >
-                  <OverviewContent
+                  <GeneralOverviewContent
                      groupId={group.id}
                      livestreamStats={livestreamStats}
                   />
                </AnimatedTabPanel>
                <AnimatedTabPanel
-                  key={feedbackAnswersKey}
-                  value={feedbackAnswersKey}
+                  key={ratingOverviewKey}
+                  value={ratingOverviewKey}
                   activeValue={value}
                >
-                  <FeedbackAnswersContent
+                  <RatingOverviewContent
                      groupId={group.id}
                      livestreamStats={livestreamStats}
                   />

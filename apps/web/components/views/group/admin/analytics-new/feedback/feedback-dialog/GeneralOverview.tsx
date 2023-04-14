@@ -1,5 +1,5 @@
 import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
-import Feedbacks, { FeedbacksSkeleton } from "./Feedbacks"
+import Ratings, { RatingsSkeleton } from "./Ratings"
 import Questions from "./Questions"
 import Polls, { PollsSkeleton } from "./Polls"
 import Stack from "@mui/material/Stack"
@@ -34,15 +34,15 @@ type OverviewContentProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
-export const OverviewContent: FC<OverviewContentProps> = ({
+export const GeneralOverviewContent: FC<OverviewContentProps> = ({
    livestreamStats,
    groupId,
 }) => {
    return (
       <Collapse in={true} timeout={500}>
          <Stack spacing={3}>
-            <SuspenseWithBoundary fallback={<FeedbacksSkeleton />}>
-               <Feedbacks groupId={groupId} livestreamStats={livestreamStats} />
+            <SuspenseWithBoundary fallback={<RatingsSkeleton />}>
+               <Ratings groupId={groupId} livestreamStats={livestreamStats} />
             </SuspenseWithBoundary>
             <Questions livestreamStats={livestreamStats} />
             <SuspenseWithBoundary fallback={<PollsSkeleton />}>
@@ -57,7 +57,7 @@ type OverviewTitleProps = {
    livestreamStats: LiveStreamStats
    groupId: string
 }
-export const OverviewTitle: FC<OverviewTitleProps> = ({
+export const GeneralOverviewTitle: FC<OverviewTitleProps> = ({
    livestreamStats,
    groupId,
 }) => {
