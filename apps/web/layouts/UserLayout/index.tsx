@@ -3,21 +3,16 @@ import Page, {
    PageChildrenWrapper,
    PageContentWrapper,
 } from "../../components/views/common/Page"
-import GenericHeader from "../../components/views/header/GenericHeader"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
 import { CircularProgress } from "@mui/material"
 import ScrollToTop from "../../components/views/common/ScrollToTop"
-import GeneralNavDrawer from "../../components/views/navbar/GeneralNavDrawer"
-import useIsDesktop from "../../components/custom-hook/useIsDesktop"
+import GenericDashboardLayout from "../GenericDashboardLayout"
 
-type Props = {}
-
-const UserLayout: FC<Props> = ({ children }) => {
-   const isDesktop = useIsDesktop()
-
+const UserLayout: FC = ({ children }) => {
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { push, asPath } = useRouter()
+
    useEffect(() => {
       if (isLoggedOut) {
          void push({
@@ -43,14 +38,14 @@ const UserLayout: FC<Props> = ({ children }) => {
    }
 
    return (
-      <Page backgroundColor={"white"}>
-         <GenericHeader position={"sticky"} />
-         <PageContentWrapper>
-            <GeneralNavDrawer isPersistent={isDesktop} />
-            <PageChildrenWrapper padding>{children}</PageChildrenWrapper>
-         </PageContentWrapper>
-         <ScrollToTop />
-      </Page>
+      <>
+         <GenericDashboardLayout pageDisplayName={""}>
+            <PageContentWrapper>
+               <PageChildrenWrapper>{children}</PageChildrenWrapper>
+            </PageContentWrapper>
+         </GenericDashboardLayout>
+         <ScrollToTop hasBottomNavBar />
+      </>
    )
 }
 
