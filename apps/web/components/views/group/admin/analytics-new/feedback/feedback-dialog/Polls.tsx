@@ -12,7 +12,6 @@ import { useFirestoreCollection } from "../../../../../../custom-hook/utils/useF
 import useCountQuery from "../../../../../../custom-hook/useCountQuery"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import { alpha } from "@mui/material/styles"
-import { RenderAsyncCount } from "../../../common/CardAnalytic"
 import Skeleton from "@mui/material/Skeleton"
 
 const styles = sxStyles({
@@ -148,7 +147,7 @@ const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
       <Grid sx={styles.gridItem} item xs={12} md={6} lg={4}>
          <Stack spacing={1} sx={styles.pollEntryRoot}>
             <Typography variant="body2">
-               <RenderAsyncCount loadingElement="..." {...res} /> votes
+               {res.loading ? "..." : res.count || 0} votes
             </Typography>
             <Typography variant="h6" fontWeight={600}>
                {poll.question}

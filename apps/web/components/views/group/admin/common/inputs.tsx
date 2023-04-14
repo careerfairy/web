@@ -10,7 +10,7 @@ import MenuItem, { menuItemClasses } from "@mui/material/MenuItem"
 import Rating, { RatingProps } from "@mui/material/Rating"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import React, { FC } from "react"
-import { mergeStyles, sxStyles } from "../../../../../types/commonTypes"
+import { sxStyles } from "../../../../../types/commonTypes"
 import StarRateRoundedIcon from "@mui/icons-material/StarRateRounded"
 import Stack from "@mui/material/Stack"
 import Skeleton from "@mui/material/Skeleton"
@@ -112,7 +112,7 @@ export const StyledRating: FC<RatingProps> = ({
             {
                color: color || "secondary.main",
             },
-            ...mergeStyles(sx),
+            ...(Array.isArray(sx) ? sx : [sx]),
          ]}
          icon={<StarRateRoundedIcon fontSize={size} />}
          emptyIcon={<StarRateRoundedIcon fontSize={size} />}
