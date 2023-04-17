@@ -283,7 +283,7 @@ const completeSuccessfulRegistration = async ({
       await page.waitForURL(`**${expectedPath}`, { timeout: 10000 })
    }
 
-   await expectSelector(page, `h6:has-text("NEXT LIVE STREAMS")`)
+   await expectSelector(page, `text="Live streams"`)
    await expectExactText(page, "Booked!")
 
    // confirm we can't register again
