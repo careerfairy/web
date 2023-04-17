@@ -4,6 +4,7 @@ import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
    getHumanStringDescriptionForAction,
+   RewardAction,
    RewardDoc,
 } from "@careerfairy/shared-lib/dist/rewards"
 
@@ -23,7 +24,7 @@ const UserRewardsNotifications = ({ children }) => {
              * a notification per reward (imagine the scenario where a user has invited a lot of other users for a
              * stream, next time opening the website he would receive a spam of notifications)
              */
-            const groups = {}
+            const groups: Partial<Record<RewardAction, RewardDoc[]>> = {}
             querySnapshot.forEach((doc) => {
                let reward = doc.data() as RewardDoc
                if (groups[reward.action]) {
@@ -35,8 +36,9 @@ const UserRewardsNotifications = ({ children }) => {
 
             // Show a notification
             for (let action in groups) {
-               const actionHumanString =
-                  getHumanStringDescriptionForAction(action)
+               const actionHumanString = getHumanStringDescriptionForAction(
+                  action as RewardAction
+               )
                const total = groups[action].length
                const rewardsPlural = total === 1 ? "reward" : "rewards"
                const notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`

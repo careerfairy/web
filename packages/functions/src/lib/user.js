@@ -1,20 +1,5 @@
 const { admin } = require("../api/firestoreAdmin")
 
-exports.userGetByReferralCode = async (referralCode) => {
-   let querySnapshot = await admin
-      .firestore()
-      .collection("userData")
-      .where("referralCode", "==", referralCode)
-      .limit(1)
-      .get()
-
-   if (querySnapshot.empty) {
-      return null
-   }
-
-   return querySnapshot.docs[0].data()
-}
-
 exports.userGetByEmail = async (email) => {
    let documentSnap = await admin
       .firestore()

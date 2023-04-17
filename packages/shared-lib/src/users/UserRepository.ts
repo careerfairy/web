@@ -140,6 +140,8 @@ export interface IUserRepository {
    ): Promise<void>
 
    updateLastActivity(userId: string): Promise<void>
+
+   getByReferralCode(referralCode: string): Promise<UserData | null>
 }
 
 export class FirebaseUserRepository
@@ -152,6 +154,21 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async getByReferralCode(referralCode: string): Promise<UserData | null> {
+      let snap = await this.firestore
+         .collection("userData")
+         .where("referralCode", "==", referralCode)
+         .limit(1)
+         .withConverter(createCompatGenericConverter<UserData>())
+         .get()
+
+      if (snap.empty) {
+         return null
+      }
+
+      return snap.docs[0].data()
    }
 
    async createActivity(
