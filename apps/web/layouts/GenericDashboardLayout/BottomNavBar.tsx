@@ -64,7 +64,7 @@ const BottomNavBar = ({ links }: Props) => {
                   disableRipple
                   sx={[styles.navLink, isActivePath && styles.activeNavLink]}
                >
-                  <Box sx={{}} component={Icon} />
+                  <Box component={Icon} />
 
                   <Typography
                      variant={"body1"}
