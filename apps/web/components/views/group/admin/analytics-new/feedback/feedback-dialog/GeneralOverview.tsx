@@ -75,7 +75,7 @@ export const GeneralOverviewTitle: FC<OverviewTitleProps> = ({
 
    const time = (
       <Typography sx={styles.time} color="text.secondary">
-         {DateUtil.eventPreviewDate(livestreamStats.livestream.start.toDate())}
+         {DateUtil.dateWithYear(livestreamStats.livestream.start.toDate())}
       </Typography>
    )
 
