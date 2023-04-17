@@ -11,10 +11,12 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { MainLogo } from "../../../components/logos"
 import React from "react"
+import { useGenericDashboard } from "../index"
 
 const styles = sxStyles({
    root: {
       display: "flex",
+      width: "100%",
       flex: 1,
       alignItems: "center",
       px: {
@@ -22,7 +24,7 @@ const styles = sxStyles({
          sm: 5,
       },
       py: {
-         xs: 0,
+         xs: 1,
          md: 3.2,
       },
    },
@@ -50,14 +52,19 @@ const styles = sxStyles({
 
 type Props = {
    title: string
+   bgColor?: string
 }
 
-const TopBar = ({ title }: Props) => {
+const TopBar = ({ title, bgColor }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
+   const { isOverBanner } = useGenericDashboard()
 
    return (
-      <Box sx={styles.root}>
+      <Box
+         bgcolor={isOverBanner ? null : bgColor || "#F7F8FC"}
+         sx={styles.root}
+      >
          <Box sx={styles.leftSection}>
             {isMobile ? (
                <MainLogo sx={{ maxWidth: "100%" }} />
