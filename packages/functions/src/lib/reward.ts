@@ -68,6 +68,11 @@ export const rewardCreateUserAction = (
  */
 
 export const rewardApply = async (reward: RewardDoc, userEmail: string) => {
+   // Apply credits to user
+   if (reward.credits) {
+      await rewardsRepo.applyCreditsToUser(userEmail, reward.credits)
+   }
+
    switch (reward.action) {
       /**
        * When a user (follower) signup using a referral code (leader)
