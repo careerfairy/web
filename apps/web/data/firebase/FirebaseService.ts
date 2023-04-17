@@ -3060,23 +3060,6 @@ class FirebaseService {
 
    // Rewards
 
-   rewardLivestreamAttendance = async (
-      livestreamId: string,
-      referralCode: string // invite from user owner of the referral code
-   ) => {
-      return this.functions.httpsCallable("rewardLivestreamAttendance")({
-         livestreamId,
-         referralCode,
-      })
-   }
-
-   rewardUserAction = async (action: RewardAction, livestreamId?: string) => {
-      return this.functions.httpsCallable("rewardUserAction")({
-         action,
-         livestreamId,
-      })
-   }
-
    rewardListenToUnSeenUserRewards = (
       userDataId,
       callback: (QuerySnapshot) => void

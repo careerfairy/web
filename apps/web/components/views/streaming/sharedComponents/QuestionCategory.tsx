@@ -53,6 +53,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import ConfirmDeleteModal from "../modal/ConfirmDeleteModal"
 import { StyledBox } from "../../../../materialUI/GlobalPanels/GlobalPanels"
 import Box from "@mui/material/Box"
+import { rewardService } from "data/firebase/RewardService"
 
 const styles = sxStyles({
    view: {
@@ -274,8 +275,8 @@ const QuestionCategory = ({
          })
 
          if (userData) {
-            firebase
-               .rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", mainStreamId)
+            rewardService
+               .userAction("LIVESTREAM_USER_ASKED_QUESTION", mainStreamId)
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
          }
