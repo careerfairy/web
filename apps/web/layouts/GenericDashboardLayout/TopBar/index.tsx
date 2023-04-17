@@ -12,6 +12,7 @@ import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { MainLogo } from "../../../components/logos"
 import React from "react"
 import { useGenericDashboard } from "../index"
+import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 
 const styles = sxStyles({
    root: {
@@ -83,6 +84,8 @@ const TopBar = ({ title, bgColor }: Props) => {
                md: 3,
             }}
          >
+            <MissingDataButton />
+
             {/* profile avatar */}
             {authenticatedUser.isLoaded && authenticatedUser.isEmpty ? (
                <div>
