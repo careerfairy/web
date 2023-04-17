@@ -1,5 +1,9 @@
 import { admin } from "../api/firestoreAdmin"
-import { RewardAction, RewardDoc } from "@careerfairy/shared-lib/rewards"
+import {
+   RewardAction,
+   RewardDoc,
+   REWARDS,
+} from "@careerfairy/shared-lib/rewards"
 import {
    LivestreamEvent,
    pickPublicDataFromLivestream,
@@ -70,6 +74,7 @@ const rewardCreate = async (
          action: action,
          seenByUser: false,
          createdAt: admin.firestore.FieldValue.serverTimestamp(),
+         credits: REWARDS[action]?.credits ?? 0,
       },
       otherData
    )
