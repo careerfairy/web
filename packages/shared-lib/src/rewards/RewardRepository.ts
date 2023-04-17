@@ -1,0 +1,83 @@
+import firebase from "firebase/compat/app"
+import BaseFirebaseRepository, {
+   createCompatGenericConverter,
+} from "../BaseFirebaseRepository"
+import { Create } from "../commonTypes"
+import { RewardAction, RewardDoc, REWARDS } from "./rewards"
+
+export interface IRewardRepository {
+   /**
+    * Creates a reward for a user
+    */
+   create(
+      rewardedUserId: string,
+      action: RewardAction,
+      otherData: Partial<RewardDoc>
+   ): Promise<void>
+
+   /**
+    * Get a reward that is related to a livestream
+    */
+   getRelatedToLivestream(
+      userDataId: string,
+      livestreamId: string,
+      action: RewardAction
+   ): Promise<RewardDoc | null>
+}
+
+export class FirebaseRewardRepository
+   extends BaseFirebaseRepository
+   implements IRewardRepository
+{
+   constructor(
+      readonly firestore: firebase.firestore.Firestore,
+      readonly fieldValue: typeof firebase.firestore.FieldValue,
+      readonly timestamp: typeof firebase.firestore.Timestamp
+   ) {
+      super()
+   }
+
+   async create(
+      rewardedUserId: string,
+      action: RewardAction,
+      otherData: Partial<RewardDoc> = {}
+   ): Promise<void> {
+      const doc: Create<RewardDoc> = Object.assign(
+         {
+            action: action,
+            seenByUser: false,
+            createdAt: this.fieldValue.serverTimestamp(),
+            credits: REWARDS[action]?.credits ?? 0,
+         },
+         otherData
+      )
+
+      await this.firestore
+         .collection("userData")
+         .doc(rewardedUserId)
+         .collection("rewards")
+         .add(doc)
+   }
+
+   async getRelatedToLivestream(
+      userDataId: string,
+      livestreamId: string,
+      action: RewardAction
+   ): Promise<RewardDoc | null> {
+      const querySnapshot = await this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("rewards")
+         .where("livestreamId", "==", livestreamId)
+         .where("action", "==", action)
+         .withConverter(createCompatGenericConverter<RewardDoc>())
+         .limit(1)
+         .get()
+
+      if (querySnapshot.empty) {
+         return null
+      }
+
+      return querySnapshot.docs[0].data()
+   }
+}

@@ -13,6 +13,7 @@ import {
    UserJobApplicationDocument,
    UserPublicData,
    UserReminderType,
+   UserStats,
 } from "./users"
 import firebase from "firebase/compat/app"
 import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
@@ -142,6 +143,12 @@ export interface IUserRepository {
    updateLastActivity(userId: string): Promise<void>
 
    getByReferralCode(referralCode: string): Promise<UserData | null>
+
+   incrementStat(
+      userDataId: string,
+      field: keyof UserStats,
+      amount?: number
+   ): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -154,6 +161,31 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async incrementStat(
+      userDataId: string,
+      field: keyof UserStats,
+      amount: number = 1
+   ) {
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("stats")
+         .doc("stats")
+
+      const doc = await docRef.get()
+
+      if (doc.exists) {
+         return docRef.update({
+            [field]: this.fieldValue.increment(amount),
+         })
+      } else {
+         return docRef.set({
+            userId: userDataId,
+            [field]: amount,
+         })
+      }
    }
 
    async getByReferralCode(referralCode: string): Promise<UserData | null> {
