@@ -7,7 +7,6 @@ import useStreamRef from "./useStreamRef"
 import { MAX_STREAM_DEFAULT_ACTIVE_HAND_RAISERS } from "constants/streams"
 import RootState from "store/reducers"
 import { HandRaise } from "types/handraise"
-import { RewardActions } from "@careerfairy/shared-lib/dist/rewards"
 
 const useHandRaiseState = () => {
    const { currentLivestream, handRaiseId, presenter } = useCurrentStream()
@@ -54,7 +53,7 @@ const useHandRaiseState = () => {
 
                   if (userData && state === "requested") {
                      rewardUserAction(
-                        RewardActions.LIVESTREAM_USER_HAND_RAISED,
+                        "LIVESTREAM_USER_HAND_RAISED",
                         mainStreamId
                      )
                         .then((_) => console.log("Rewarded Hand Raised"))
