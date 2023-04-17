@@ -36,6 +36,7 @@ const styles = sxStyles({
    },
    rating: {
       mt: "-6px !important",
+      ml: "-3px !important",
    },
 })
 

@@ -56,7 +56,7 @@ const Questions: FC<QuestionsProps> = ({ livestreamStats }) => {
    }
 
    return (
-      <Stack minHeight={410} spacing={2}>
+      <Stack spacing={2}>
          <Stack direction="row" alignItems="center" spacing={2}>
             <Typography variant="h5" fontWeight={600}>
                Questions
