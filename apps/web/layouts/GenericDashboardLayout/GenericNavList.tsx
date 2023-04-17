@@ -22,10 +22,12 @@ const GenericNavList = () => {
             pathname: `/portal`,
             Icon: HomeIcon,
             title: "Home page",
+            mobileTitle: "Home",
          },
          {
             id: "live-streams",
             title: "Live streams",
+            mobileTitle: "Live streams",
             Icon: LiveStreamsIcon,
             href: `/next-livestreams`,
             pathname: `/next-livestreams`,
@@ -33,6 +35,7 @@ const GenericNavList = () => {
          {
             id: "past-live-streams",
             title: "Past live streams",
+            mobileTitle: "Past streams",
             Icon: ClockIcon,
             href: `/past-livestreams`,
             pathname: `/past-livestreams`,
