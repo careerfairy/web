@@ -4,11 +4,11 @@ import {
    localStorageInvite,
    localStorageReferralCode,
 } from "../../constants/localStorageKeys"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
 import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { rewardService } from "data/firebase/RewardService"
 
 const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
    const { isLoggedIn } = useAuth()
@@ -22,7 +22,6 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
    const [alreadyRewarded, setAlreadyRewarded] = useSessionStorage(
       "livestreamAttendanceRewarded"
    )
-   const firebaseService = useFirebaseService()
 
    const mainStreamId = livestreamData?.parentLivestream
       ? livestreamData.parentLivestream?.id
@@ -87,8 +86,8 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
       setAlreadyRewarded(mainStreamId)
       setStarted(null)
 
-      firebaseService
-         .rewardUserAction("LIVESTREAM_USER_ATTENDED", mainStreamId)
+      rewardService
+         .userAction("LIVESTREAM_USER_ATTENDED", mainStreamId)
          .then(() => {
             console.log("User Attendance rewarded!")
          })
@@ -97,8 +96,8 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
          })
 
       if (isInvitation) {
-         firebaseService
-            .rewardLivestreamAttendance(mainStreamId, referralCode)
+         rewardService
+            .livestreamAttendance(mainStreamId, referralCode)
             .then(() => {
                console.log("Participation rewarded!")
             })
