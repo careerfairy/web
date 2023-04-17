@@ -49,7 +49,10 @@ const PortalPage = ({
             }
             title={"CareerFairy | Portal"}
          />
-         <GenericDashboardLayout pageDisplayName={""}>
+         <GenericDashboardLayout
+            pageDisplayName={""}
+            hasRecordings={recordedEvents?.length > 0}
+         >
             <>
                {recordedEvents?.length > 0 && (
                   <Box mb={4}>
