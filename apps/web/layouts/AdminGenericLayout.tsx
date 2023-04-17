@@ -9,6 +9,7 @@ import Drawer from "@mui/material/Drawer"
 import useIsMobile from "../components/custom-hook/useIsMobile"
 import { DRAWER_WIDTH, NICE_SCROLLBAR_STYLES } from "../constants/layout"
 import { sxStyles } from "../types/commonTypes"
+import { useGenericDashboard } from "./GenericDashboardLayout"
 
 const styles = sxStyles({
    root: {
@@ -55,6 +56,12 @@ const styles = sxStyles({
    },
    drawerWrapperClosed: {
       width: 0,
+   },
+   topBarOverBanner: {
+      backdropFilter: "none",
+   },
+   topBarFixed: {
+      position: "fixed",
    },
 })
 
@@ -165,13 +172,20 @@ type HeaderProps = {
    children: React.ReactNode
 }
 const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
+   const { isOverBanner, isPortalPage, hasRecordings } = useGenericDashboard()
+
    return (
       <AppBar
          enableColorOnDark
          position="sticky"
          color="inherit"
          elevation={0}
-         sx={[styles.appBar, drawerOpen && styles.animateWidth]}
+         sx={[
+            styles.appBar,
+            drawerOpen && styles.animateWidth,
+            isOverBanner && styles.topBarOverBanner,
+            isPortalPage && hasRecordings && styles.topBarFixed,
+         ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>
             {children}
