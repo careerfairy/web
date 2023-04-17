@@ -82,7 +82,7 @@ const MissingDataButton = ({
 
          return () => clearTimeout(timer)
       }
-   }, [switchInterval, missingFields, isModalOpen, isMobile])
+   }, [switchInterval, missingFields, isModalOpen])
 
    const handleModalOpen = () => {
       setIsModalOpen(true)
