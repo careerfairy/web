@@ -69,7 +69,7 @@ const TopBar = ({ title, bgColor }: Props) => {
             {isMobile ? (
                <MainLogo sx={{ maxWidth: "100%" }} />
             ) : (
-               <Typography fontWeight={600} sx={styles.title}>
+               <Typography variant={"h1"} fontWeight={600} sx={styles.title}>
                   {title}
                </Typography>
             )}
