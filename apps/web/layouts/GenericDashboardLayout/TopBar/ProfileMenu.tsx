@@ -6,7 +6,10 @@ import Tooltip from "@mui/material/Tooltip"
 import Stack from "@mui/material/Stack"
 import IconButton from "@mui/material/IconButton"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
-import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
+import StarOutlineIcon from "@mui/icons-material/StarOutline"
+import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined"
+import ContentPasteOutlinedIcon from "@mui/icons-material/ContentPasteOutlined"
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined"
 
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
@@ -15,6 +18,8 @@ import ColorizedAvatar from "../../../components/views/common/ColorizedAvatar"
 import useMenuState from "../../../components/custom-hook/useMenuState"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
 import { alpha } from "@mui/material/styles"
+import Divider from "@mui/material/Divider"
+import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
 
 const styles = sxStyles({
    root: {
@@ -49,8 +54,14 @@ const styles = sxStyles({
    companyText: {
       color: (theme) => alpha(theme.palette.text.secondary, 0.4),
    },
+   creditDetails: {
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "flex-start",
+      justifyContent: "center",
+   },
 })
-const UserAvatar = () => {
+const ProfileMenu = () => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
    const { userData, signOut, userPresenter } = useAuth()
    const { push } = useRouter()
@@ -89,7 +100,7 @@ const UserAvatar = () => {
             disableScrollLock={true}
          >
             <Stack spacing={2}>
-               <MenuItem sx={{ mb: 1 }}>
+               <MenuItem sx={{ mb: 1 }} onClick={() => push("/profile")}>
                   <ColorizedAvatar
                      lastName={userData?.lastName}
                      firstName={userData?.firstName}
@@ -118,11 +129,61 @@ const UserAvatar = () => {
                   </ListItemIcon>
                   Profile
                </MenuItem>
-               <MenuItem onClick={signOut}>
+               <MenuItem onClick={() => push("/profile/career-skills")}>
                   <ListItemIcon>
-                     <LogoutIcon fontSize="small" />
+                     <StarOutlineIcon fontSize="small" />
                   </ListItemIcon>
-                  Logout
+                  My career skills
+               </MenuItem>
+               <MenuItem onClick={() => push("/profile/referrals")}>
+                  <ListItemIcon>
+                     <PeopleOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  Referrals
+               </MenuItem>
+               <MenuItem onClick={() => push("/profile/saved-recruiters")}>
+                  <ListItemIcon>
+                     <ContentPasteOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  My Recruiters
+               </MenuItem>
+
+               <MenuItem
+                  sx={{ mb: 1, alignItems: "start" }}
+                  onClick={() => {
+                     //TODO: add logic to get more credits
+                  }}
+               >
+                  <ListItemIcon>
+                     <CareerCoinIcon />
+                  </ListItemIcon>
+                  <Box sx={styles.creditDetails}>
+                     <Box sx={{ display: "flex" }}>
+                        <Typography fontWeight={600} color={"primary"} mr={1}>
+                           {userData?.credits || 0}
+                        </Typography>
+                        <Typography fontWeight={400}>CareerCoins</Typography>
+                     </Box>
+                     <Typography
+                        color={"text.secondary"}
+                        variant={"body2"}
+                        sx={{ textDecoration: "underline" }}
+                     >
+                        Get more now
+                     </Typography>
+                  </Box>
+               </MenuItem>
+
+               <MenuItem onClick={signOut}>
+                  <Box display={"flex"}>
+                     <Divider />
+                     <Box>
+                        <ListItemIcon>
+                           <LogoutOutlinedIcon fontSize="small" />
+                        </ListItemIcon>
+                        Logout
+                     </Box>
+                  </Box>
                </MenuItem>
             </Stack>
          </Menu>
@@ -133,4 +194,4 @@ const UserAvatar = () => {
 const transformOrigin = { horizontal: "right", vertical: "top" } as const
 const anchorOrigin = { horizontal: "right", vertical: "bottom" } as const
 
-export default UserAvatar
+export default ProfileMenu
