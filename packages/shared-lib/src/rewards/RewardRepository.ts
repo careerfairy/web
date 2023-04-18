@@ -23,6 +23,8 @@ export interface IRewardRepository {
       livestreamId: string,
       action: RewardAction
    ): Promise<RewardDoc | null>
+
+   applyCreditsToUser(userEmail: string, credits: number): Promise<void>
 }
 
 export class FirebaseRewardRepository
@@ -79,5 +81,16 @@ export class FirebaseRewardRepository
       }
 
       return querySnapshot.docs[0].data()
+   }
+
+   async applyCreditsToUser(userEmail: string, credits: number): Promise<void> {
+      if (!credits) return // skip 0/null/undefined credits
+
+      await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .update({
+            credits: this.fieldValue.increment(credits),
+         })
    }
 }
