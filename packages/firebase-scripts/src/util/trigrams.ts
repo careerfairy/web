@@ -1,4 +1,5 @@
 import { SingleBar } from "cli-progress"
+import { TrigramsMethod } from "@careerfairy/shared-lib/dist/utils/search"
 import counterConstants from "../lib/Counter/constants"
 import Counter from "../lib/Counter"
 import { DocRef } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
@@ -10,8 +11,6 @@ type TrigramDocument = {
    id: string
    triGrams?: Record<string, true>
 } & DocRef
-
-type TrigramsMethod = (...fields: string[]) => Record<string, true>
 
 export const backfillTrigrams = async <TDoc extends TrigramDocument>(
    docs: TDoc[],
