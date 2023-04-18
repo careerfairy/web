@@ -26,9 +26,10 @@ type Props = {
    value: any
    tabsColor?: string
    hasFilter?: boolean
+   hideTabs?: boolean
 }
 
-const filtersToShow = [
+export const filtersToShow = [
    FilterEnum.languages,
    FilterEnum.interests,
    // FilterEnum.jobCheck, TODO: Removed temporarily
@@ -42,6 +43,7 @@ const StreamsTab = ({
    value,
    tabsColor,
    hasFilter = false,
+   hideTabs = false,
 }: Props) => {
    const showFilter = useMemo(() => {
       return hasFilter && value === "upcomingEvents"
@@ -66,26 +68,36 @@ const StreamsTab = ({
             aria-label="full width tabs example"
             sx={{ width: "100%", minWidth: "fit-content" }}
          >
-            <SimpleTab
-               sx={{
-                  ...styles.tab,
-                  color: tabsColor,
-                  minWidth: { xs: showFilter ? "40%" : "50%", sm: "200px" },
-               }}
-               label="Upcoming Events"
-               value="upcomingEvents"
-               index={0}
-            />
-            <SimpleTab
-               sx={{
-                  ...styles.tab,
-                  color: tabsColor,
-                  minWidth: { xs: showFilter ? "40%" : "50%", sm: "200px" },
-               }}
-               label="Past Events"
-               value="pastEvents"
-               index={1}
-            />
+            {hideTabs ? null : (
+               <>
+                  <SimpleTab
+                     sx={{
+                        ...styles.tab,
+                        color: tabsColor,
+                        minWidth: {
+                           xs: showFilter ? "40%" : "50%",
+                           sm: "200px",
+                        },
+                     }}
+                     label="Upcoming Events"
+                     value="upcomingEvents"
+                     index={0}
+                  />
+                  <SimpleTab
+                     sx={{
+                        ...styles.tab,
+                        color: tabsColor,
+                        minWidth: {
+                           xs: showFilter ? "40%" : "50%",
+                           sm: "200px",
+                        },
+                     }}
+                     label="Past Events"
+                     value="pastEvents"
+                     index={1}
+                  />
+               </>
+            )}
             {isMobile && showFilter ? (
                <Box
                   sx={{
