@@ -183,7 +183,7 @@ const CreateGroup = () => {
    const createCareerCenter = async () => {
       try {
          const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
-         const careerCenter: Omit<Group, "id" | "groupId"> = {
+         const careerCenter: Omit<Group, "id" | "groupId" | "triGrams"> = {
             universityName: baseGroupInfo.universityName,
             logoUrl: downloadURL,
             description: baseGroupInfo.description,
