@@ -48,6 +48,8 @@ export const normalizeAndRemoveNonAlphanumeric = (s: string): string =>
       .replace(/[\u0300-\u036f]/g, "") // remove accents https://stackoverflow.com/a/37511463
       .replace(/[^a-zA-Z0-9 ]/g, "") // remove non-alphanumeric characters (.,;:) etc
 
+export type TrigramsMethod = (...fields: string[]) => Record<string, true>
+
 /**
  * Generates a trigram map from a livestream event based on the it's title
  * and company name.
@@ -56,7 +58,7 @@ export const normalizeAndRemoveNonAlphanumeric = (s: string): string =>
  * or concatenate a new field, all the existing trigrams (on the documents)
  * will be out of date and a migration is required to update them.
  */
-export const livestreamTriGrams = (
+export const livestreamTriGrams: TrigramsMethod = (
    title: LivestreamEvent["title"],
    company: LivestreamEvent["company"]
 ): Record<string, true> => {
@@ -74,10 +76,11 @@ export const livestreamTriGrams = (
  *
  * Caution: same as above
  */
-export const groupTriGrams = (
-   universityName: Group["universityName"]
+export const groupTriGrams: TrigramsMethod = (
+   universityName: Group["universityName"],
+   description: Group["description"]
 ): Record<string, true> => {
-   const ngrams = triGrams([universityName])
+   const ngrams = triGrams([universityName, description])
 
    return ngrams.reduce((acc, triGram) => {
       acc[triGram] = true
