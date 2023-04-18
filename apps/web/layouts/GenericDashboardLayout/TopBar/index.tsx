@@ -5,7 +5,7 @@ import Stack from "@mui/material/Stack"
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
 import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunctions"
-import UserAvatar from "./UserAvatar"
+import ProfileMenu from "./ProfileMenu"
 import LoginButton from "../../../components/views/common/LoginButton"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
@@ -90,7 +90,7 @@ const TopBar = ({ title, bgColor }: Props) => {
                   <LoginButton />
                </div>
             ) : (
-               <UserAvatar />
+               <ProfileMenu />
             )}
          </Stack>
       </Box>
