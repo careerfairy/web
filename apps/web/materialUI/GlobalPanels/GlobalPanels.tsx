@@ -1,8 +1,7 @@
 import React, { FC } from "react"
 import * as PropTypes from "prop-types"
-import { Box, SxProps } from "@mui/material"
+import { Box, Grow, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
-import Collapse from "@mui/material/Collapse"
 
 type StyledBoxPanelProps = {
    hidden?: boolean
@@ -54,7 +53,7 @@ export const AnimatedTabPanel: FC<TabPanelProps> = (props) => {
    const { children, activeValue, value, ...other } = props
 
    return (
-      <Collapse
+      <Grow
          role="tabpanel"
          hidden={activeValue !== value}
          id={`simple-tabpanel-${value}`}
@@ -65,7 +64,7 @@ export const AnimatedTabPanel: FC<TabPanelProps> = (props) => {
          unmountOnExit
       >
          <Box>{children}</Box>
-      </Collapse>
+      </Grow>
    )
 }
 

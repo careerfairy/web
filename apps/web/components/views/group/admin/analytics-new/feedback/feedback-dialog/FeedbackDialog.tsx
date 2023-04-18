@@ -74,6 +74,7 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
                   <RatingOverviewTitle
                      livestreamStats={livestreamStats}
                      groupId={group.id}
+                     feedbackQuestionId={feedbackQuestionId}
                   />
                </AnimatedTabPanel>
             </SwipeableViews>
@@ -98,6 +99,7 @@ const FeedbackDialog: FC<Props> = ({ livestreamId, feedbackQuestionId }) => {
                   <RatingOverviewContent
                      groupId={group.id}
                      livestreamStats={livestreamStats}
+                     feedbackQuestionId={feedbackQuestionId}
                   />
                </AnimatedTabPanel>
             </SwipeableViews>
