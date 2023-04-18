@@ -197,9 +197,7 @@ export class GroupScriptsRepository
    }
 
    async getAllGroups<T extends boolean>(withRef?: T) {
-      const groups = await this.firestore
-         .collectionGroup("careerCenterData")
-         .get()
+      const groups = await this.firestore.collection("careerCenterData").get()
       return mapFirestoreDocuments<Group, T>(groups, withRef)
    }
 }
