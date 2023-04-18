@@ -169,9 +169,7 @@ exports.updateBreakoutRoomStatusOnWrite =
 exports.slackHandleInteractions = slack.slackHandleInteractions
 
 // Rewards
-exports.rewardApply = rewards.rewardApply
 exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
-exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
 exports.rewardUserAction = rewards.rewardUserAction
 exports.applyReferralCode = rewards.applyReferralCode
 
@@ -227,6 +225,8 @@ exports.onCreateLivestreamPopularityEvents =
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
 exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onCreateReward = onCreateTriggers.onCreateReward
+exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =

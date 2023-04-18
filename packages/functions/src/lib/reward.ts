@@ -1,17 +1,18 @@
-import { admin } from "../api/firestoreAdmin"
 import { RewardAction, RewardDoc } from "@careerfairy/shared-lib/rewards"
+import functions = require("firebase-functions")
 import {
    LivestreamEvent,
    pickPublicDataFromLivestream,
+   UserLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
-import { Create } from "@careerfairy/shared-lib/commonTypes"
 import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
+import { livestreamsRepo, rewardsRepo, userRepo } from "../api/repositories"
 
 export const rewardCreateReferralSignUpLeader = (
    leaderId: string,
    followerUserData: UserData
 ) => {
-   return rewardCreate(leaderId, "REFERRAL_SIGNUP_LEADER", {
+   return rewardsRepo.create(leaderId, "REFERRAL_SIGNUP_LEADER", {
       userId: followerUserData.id,
       userData: pickPublicDataFromUser(followerUserData),
    })
@@ -21,7 +22,7 @@ export const rewardCreateReferralSignUpFollower = (
    justRegisteredUserId: string,
    leaderUserData: UserData
 ) => {
-   return rewardCreate(justRegisteredUserId, "REFERRAL_SIGNUP_FOLLOWER", {
+   return rewardsRepo.create(justRegisteredUserId, "REFERRAL_SIGNUP_FOLLOWER", {
       userId: leaderUserData.id,
       userData: pickPublicDataFromUser(leaderUserData),
    })
@@ -33,7 +34,7 @@ export const rewardCreateLivestream = (
    relatedUserData: UserData,
    relatedLivestreamData: LivestreamEvent
 ) => {
-   return rewardCreate(userBeingRewardedId, action, {
+   return rewardsRepo.create(userBeingRewardedId, action, {
       userId: relatedUserData.id,
       livestreamId: relatedLivestreamData.id,
       userData: pickPublicDataFromUser(relatedUserData),
@@ -57,49 +58,150 @@ export const rewardCreateUserAction = (
       )
    }
 
-   return rewardCreate(userBeingRewardedId, action, otherData)
+   return rewardsRepo.create(userBeingRewardedId, action, otherData)
 }
 
-const rewardCreate = async (
-   rewardedUserId: string,
-   action: RewardAction,
-   otherData: Partial<RewardDoc> = {}
-) => {
-   const doc: Create<RewardDoc> = Object.assign(
-      {
-         action: action,
-         seenByUser: false,
-         createdAt: admin.firestore.FieldValue.serverTimestamp(),
-      },
-      otherData
-   )
+/**
+ * Every time there is a new reward document, apply the reward depending on the action
+ *
+ * Watch-out when creating new rewards on this function, make sure it doesn't enter in infinite loop
+ */
 
-   return admin
-      .firestore()
-      .collection("userData")
-      .doc(rewardedUserId)
-      .collection("rewards")
-      .add(doc)
+export const rewardApply = async (reward: RewardDoc, userEmail: string) => {
+   switch (reward.action) {
+      /**
+       * When a user (follower) signup using a referral code (leader)
+       */
+      case "REFERRAL_SIGNUP_FOLLOWER":
+         // Also reward the user owner of the referral code (leader)
+         await rewardCreateReferralSignUpLeader(
+            reward.userId, // leader id
+            await userRepo.getUserDataById(userEmail) // this follower data
+         )
+
+         break
+
+      /**
+       * When a user registers a livestream after being invited by someone (leader)
+       */
+      case "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER":
+         // Also reward the user (leader) that created the invite
+         await rewardCreateLivestream(
+            reward.userId, // leader id
+            "LIVESTREAM_REGISTER_COMPLETE_LEADER",
+            await userRepo.getUserDataById(userEmail), // this follower data
+            await livestreamsRepo.getById(reward.livestreamId)
+         )
+
+         break
+
+      /**
+       * When a user attends a livestream after being invited by someone (leader)
+       */
+      case "LIVESTREAM_INVITE_COMPLETE_FOLLOWER":
+         // Also reward the user (leader) that created the invite
+         await rewardCreateLivestream(
+            reward.userId, // leader id
+            "LIVESTREAM_INVITE_COMPLETE_LEADER",
+            await userRepo.getUserDataById(userEmail), // this follower data
+            await livestreamsRepo.getById(reward.livestreamId)
+         )
+
+         break
+
+      /**
+       * When a user (leader) referred someone with success (follower)
+       * The follower sign up using the leader referral code
+       */
+      case "REFERRAL_SIGNUP_LEADER":
+         // This user just won a new referral
+         await userRepo.incrementStat(userEmail, "referralsCount", 1)
+         break
+
+      /**
+       * When a user (leader) successfully invited another user (follower) to attend a livestream
+       */
+      case "LIVESTREAM_INVITE_COMPLETE_LEADER":
+         await userRepo.incrementStat(userEmail, "totalLivestreamInvites", 1)
+         break
+
+      /**
+       * User attended a livestream
+       */
+      case "LIVESTREAM_USER_ATTENDED":
+         await userRepo.incrementStat(userEmail, "totalLivestreamAttendances")
+         break
+
+      /**
+       * User asked a question for a livestream
+       */
+      case "LIVESTREAM_USER_ASKED_QUESTION":
+         await userRepo.incrementStat(userEmail, "totalQuestionsAsked")
+         break
+
+      /**
+       * User raised their hand for a livestream
+       */
+      case "LIVESTREAM_USER_HAND_RAISED":
+         await userRepo.incrementStat(userEmail, "totalHandRaises")
+         break
+   }
 }
 
-export const rewardGetRelatedToLivestream = async (
-   userDataId: string,
+/**
+ * When a user registers a livestream, reward the user and the one
+ * who invited them
+ */
+export const rewardLivestreamRegistrant = async (
+   documentData: UserLivestreamData,
    livestreamId: string,
-   action: RewardAction
+   userEmail: string
 ) => {
-   const querySnapshot = await admin
-      .firestore()
-      .collection("userData")
-      .doc(userDataId)
-      .collection("rewards")
-      .where("livestreamId", "==", livestreamId)
-      .where("action", "==", action)
-      .limit(1)
-      .get()
-
-   if (querySnapshot.empty) {
-      return null
+   if (
+      !documentData.registered.referral ||
+      !documentData.registered.referral.referralCode ||
+      !documentData.registered.referral.inviteLivestream
+   ) {
+      functions.logger.info("No referral information to reward.")
+      return
    }
 
-   return querySnapshot.docs[0].data()
+   if (documentData.registered.referral.inviteLivestream !== livestreamId) {
+      functions.logger.info("The invite wasn't for this event, ignoring.")
+      return
+   }
+
+   const userInviteOwner = await userRepo.getByReferralCode(
+      documentData.registered.referral.referralCode
+   )
+
+   if (!userInviteOwner || userInviteOwner.userEmail === userEmail) {
+      functions.logger.info(
+         "The user owner of the invite is the same attending or does not exist."
+      )
+      return
+   }
+
+   const registerReward = await rewardsRepo.getRelatedToLivestream(
+      documentData.id,
+      livestreamId,
+      "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER"
+   )
+
+   if (registerReward) {
+      functions.logger.info(
+         "The user has already been rewarded for this event registration."
+      )
+      return
+   }
+
+   await rewardCreateLivestream(
+      documentData.id,
+      "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER",
+      userInviteOwner,
+      await livestreamsRepo.getById(livestreamId)
+   )
+   functions.logger.info(
+      "Created a new reward for the livestream registration."
+   )
 }
