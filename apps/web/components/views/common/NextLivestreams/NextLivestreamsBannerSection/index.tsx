@@ -36,6 +36,7 @@ const NextLivestreamsBannerSection = ({
                handleChange={handleChange}
                value={value}
                hasFilter={true}
+               hideTabs={true}
             />
          </Container>
       </Section>

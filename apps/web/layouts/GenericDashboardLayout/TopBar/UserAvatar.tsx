@@ -86,6 +86,7 @@ const UserAvatar = () => {
             onClick={handleClose}
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
+            disableScrollLock={true}
          >
             <Stack spacing={2}>
                <MenuItem sx={{ mb: 1 }}>

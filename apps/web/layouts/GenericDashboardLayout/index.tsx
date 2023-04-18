@@ -42,6 +42,10 @@ const GenericDashboardLayout = ({
    const { pathname } = useRouter()
    const isPortalPage = useMemo(() => pathname === "/portal", [pathname])
 
+   // TODO: Needs to be updated after the new banner.
+   //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
+
+   // To have a different look & feel on header and topBar when hovering the portal page banner
    const [isOverBanner, setIsOverBanner] = useState<boolean>(
       isPortalPage && hasRecordings
    )
