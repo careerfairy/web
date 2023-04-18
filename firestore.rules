@@ -139,7 +139,7 @@ service cloud.firestore {
             }
 
             allow read: if true;
-            allow update: if isSignedInAndIsSameUser(userId) && protectedFieldsDidNotChange(["credits", "isAdmin"]);
+            allow update: if isSignedInAndIsSameUser(userId) && protectedFieldsDidNotChange(["credits", "isAdmin", "userEmail"]);
             allow create: if false; // only admin sdk can create users
             allow delete: if false;
         }
