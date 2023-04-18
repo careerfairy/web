@@ -1,183 +1,13 @@
 import functions = require("firebase-functions")
-import config from "./config"
 import {
-   userIncrementStat,
-   userIncrementField,
-   userUpdateFields,
-} from "./lib/user"
-import {
-   rewardCreateReferralSignUpLeader,
    rewardCreateLivestream,
-   rewardGetRelatedToLivestream,
    rewardCreateUserAction,
    rewardCreateReferralSignUpFollower,
 } from "./lib/reward"
-import {
-   LivestreamEvent,
-   UserLivestreamData,
-} from "@careerfairy/shared-lib/livestreams"
-import { livestreamsRepo, userRepo } from "./api/repositories"
-import {
-   RewardAction,
-   RewardDoc,
-   REWARDS,
-} from "@careerfairy/shared-lib/rewards"
-
-/**
- * Every time there is a new reward document, apply the reward depending on the action
- *
- * Watch-out when creating new rewards on this function, make sure it doesn't enter in infinite loop
- */
-export const rewardApply = functions
-   .region(config.region)
-   .firestore.document("userData/{userEmail}/rewards/{rewardId}")
-   .onCreate(async (snap, context) => {
-      const rewardDoc = snap.data() as RewardDoc
-      const email = context.params.userEmail
-
-      const action = rewardDoc.action as RewardAction
-      switch (action) {
-         /**
-          * When a user (follower) signup using a referral code (leader)
-          */
-         case "REFERRAL_SIGNUP_FOLLOWER":
-            // Also reward the user owner of the referral code (leader)
-            await rewardCreateReferralSignUpLeader(
-               rewardDoc.userId, // leader id
-               await userRepo.getUserDataById(email) // this follower data
-            )
-
-            break
-
-         /**
-          * When a user registers a livestream after being invited by someone (leader)
-          */
-         case "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER":
-            // Also reward the user (leader) that created the invite
-            await rewardCreateLivestream(
-               rewardDoc.userId, // leader id
-               "LIVESTREAM_REGISTER_COMPLETE_LEADER",
-               await userRepo.getUserDataById(email), // this follower data
-               await livestreamsRepo.getById(rewardDoc.livestreamId)
-            )
-
-            break
-
-         /**
-          * When a user attends a livestream after being invited by someone (leader)
-          */
-         case "LIVESTREAM_INVITE_COMPLETE_FOLLOWER":
-            // Also reward the user (leader) that created the invite
-            await rewardCreateLivestream(
-               rewardDoc.userId, // leader id
-               "LIVESTREAM_INVITE_COMPLETE_LEADER",
-               await userRepo.getUserDataById(email), // this follower data
-               await livestreamsRepo.getById(rewardDoc.livestreamId)
-            )
-
-            break
-
-         /**
-          * When a user (leader) referred someone with success (follower)
-          * The follower sign up using the leader referral code
-          */
-         case "REFERRAL_SIGNUP_LEADER":
-            // This user just won a new referral
-            await userIncrementField(email, "referralsCount", 1)
-            break
-
-         /**
-          * When a user (leader) successfully invited another user (follower) to attend a livestream
-          */
-         case "LIVESTREAM_INVITE_COMPLETE_LEADER":
-            await userIncrementField(email, "totalLivestreamInvites", 1)
-            break
-
-         /**
-          * User attended a livestream
-          */
-         case "LIVESTREAM_USER_ATTENDED":
-            await userIncrementStat(email, "totalLivestreamAttendances")
-            break
-
-         /**
-          * User asked a question for a livestream
-          */
-         case "LIVESTREAM_USER_ASKED_QUESTION":
-            await userIncrementStat(email, "totalQuestionsAsked")
-            break
-
-         /**
-          * User raised their hand for a livestream
-          */
-         case "LIVESTREAM_USER_HAND_RAISED":
-            await userIncrementStat(email, "totalHandRaises")
-            break
-      }
-   })
-
-export const rewardLivestreamRegistrant = functions
-   .region(config.region)
-   .firestore.document(
-      "livestreams/{livestreamId}/userLivestreamData/{userEmail}"
-   )
-   .onCreate(async (snap, context) => {
-      const documentData = { ...snap.data(), id: snap.id } as UserLivestreamData
-
-      if (
-         !documentData.registered.referral ||
-         !documentData.registered.referral.referralCode ||
-         !documentData.registered.referral.inviteLivestream
-      ) {
-         functions.logger.info("No referral information to reward.")
-         return
-      }
-
-      if (
-         documentData.registered.referral.inviteLivestream !==
-         context.params.livestreamId
-      ) {
-         functions.logger.info("The invite wasn't for this event, ignoring.")
-         return
-      }
-
-      const userInviteOwner = await userRepo.getByReferralCode(
-         documentData.registered.referral.referralCode
-      )
-
-      if (
-         !userInviteOwner ||
-         userInviteOwner.userEmail === context.params.userEmail
-      ) {
-         functions.logger.info(
-            "The user owner of the invite is the same attending or does not exist."
-         )
-         return
-      }
-
-      const registerReward = await rewardGetRelatedToLivestream(
-         documentData.id,
-         context.params.livestreamId,
-         "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER"
-      )
-
-      if (registerReward) {
-         functions.logger.info(
-            "The user has already been rewarded for this event registration."
-         )
-         return
-      }
-
-      await rewardCreateLivestream(
-         documentData.id,
-         "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER",
-         userInviteOwner,
-         await livestreamsRepo.getById(context.params.livestreamId)
-      )
-      functions.logger.info(
-         "Created a new reward for the livestream registration."
-      )
-   })
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { livestreamsRepo, rewardsRepo, userRepo } from "./api/repositories"
+import { RewardAction, REWARDS } from "@careerfairy/shared-lib/rewards"
+import { userUpdateFields } from "./lib/user"
 
 export const rewardLivestreamAttendance = functions.https.onCall(
    async (data, context) => {
@@ -223,7 +53,7 @@ export const rewardLivestreamAttendance = functions.https.onCall(
          true
       )
 
-      const invitationReward = await rewardGetRelatedToLivestream(
+      const invitationReward = await rewardsRepo.getRelatedToLivestream(
          userEmail,
          livestreamId,
          "LIVESTREAM_INVITE_COMPLETE_FOLLOWER"
@@ -468,7 +298,7 @@ async function validateDuplicatedReward(
    livestreamId: string,
    action: RewardAction
 ) {
-   const previousReward = await rewardGetRelatedToLivestream(
+   const previousReward = await rewardsRepo.getRelatedToLivestream(
       userEmail,
       livestreamId,
       action
