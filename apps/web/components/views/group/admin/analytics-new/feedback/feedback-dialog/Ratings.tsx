@@ -35,19 +35,7 @@ type FeedbacksProps = {
 }
 const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
    const isMobile = useIsMobile()
-   const results = useFirestoreCollection<EventRating>(
-      query(
-         collection(
-            FirestoreInstance,
-            "livestreams",
-            livestreamStats.livestream.id,
-            "rating"
-         )
-      ),
-      {
-         idField: "id",
-      }
-   )
+   const { data: ratings } = useLivestreamRatings(livestreamStats.livestream.id)
 
    return (
       <Stack maxWidth={920} spacing={2}>
@@ -63,7 +51,7 @@ const Ratings: FC<FeedbacksProps> = ({ livestreamStats, groupId }) => {
             />
          </Stack>
          <Stack spacing={2}>
-            {results.data.map((rating) => (
+            {ratings.map((rating) => (
                <Link
                   href={`/group/${groupId}/admin/analytics/feedback/${livestreamStats.livestream.id}/question/${rating.id}`}
                   key={rating.id}
@@ -141,4 +129,14 @@ export const RatingsSkeleton = () => {
    )
 }
 
+const useLivestreamRatings = (livestreamId: string) => {
+   return useFirestoreCollection<EventRating>(
+      query(
+         collection(FirestoreInstance, "livestreams", livestreamId, "rating")
+      ),
+      {
+         idField: "id",
+      }
+   )
+}
 export default Ratings

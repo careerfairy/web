@@ -75,23 +75,11 @@ type PollsProps = {
    livestreamStats: LiveStreamStats
 }
 const Polls: FC<PollsProps> = ({ livestreamStats }) => {
-   const results = useFirestoreCollection<LivestreamPoll>(
-      query(
-         collection(
-            FirestoreInstance,
-            "livestreams",
-            livestreamStats.livestream.id,
-            "polls"
-         ),
-         where("state", "!=", "upcoming"),
-         orderBy("state", "asc")
-      ),
-      {
-         idField: "id",
-      }
+   const { data: polls, status } = useLivestreamPolls(
+      livestreamStats.livestream.id
    )
 
-   if (results.status !== "loading" && results.data.length === 0) return null
+   if (status !== "loading" && polls.length === 0) return null
 
    return (
       <Stack spacing={2}>
@@ -102,7 +90,7 @@ const Polls: FC<PollsProps> = ({ livestreamStats }) => {
          </Stack>
          <Box>
             <Grid container spacing={2}>
-               {results.data.map((poll) => (
+               {polls.map((poll) => (
                   <PollEntry
                      key={poll.id}
                      poll={poll}
@@ -120,20 +108,9 @@ type PollEntryProps = {
    livestreamId: string
 }
 const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
-   const res = useCountQuery(
-      query(
-         collection(
-            FirestoreInstance,
-            "livestreams",
-            livestreamId,
-            "polls",
-            poll.id,
-            "voters"
-         )
-      )
-   )
+   const { count, loading } = usePollVotersCount(livestreamId, poll.id)
 
-   if (res.loading) {
+   if (loading) {
       return (
          <Grid sx={styles.gridItem} item xs={12} md={6} lg={4}>
             <PollSkeleton />
@@ -141,13 +118,13 @@ const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
       )
    }
 
-   if (!res.loading && res.count === 0) return null // no votes, so don't show
+   if (count === 0) return null // no votes, so don't show
 
    return (
       <Grid sx={styles.gridItem} item xs={12} md={6} lg={4}>
          <Stack spacing={1} sx={styles.pollEntryRoot}>
             <Typography variant="body2">
-               {res.loading ? "..." : res.count || 0} votes
+               {loading ? "..." : count || 0} votes
             </Typography>
             <Typography variant="h6" fontWeight={600}>
                {poll.question}
@@ -159,7 +136,7 @@ const PollEntry: FC<PollEntryProps> = ({ poll, livestreamId }) => {
                      pollOption={option}
                      pollId={poll.id}
                      livestreamId={livestreamId}
-                     totalVotes={res.count ?? 0}
+                     totalVotes={count ?? 0}
                   />
                ))}
             </Stack>
@@ -174,25 +151,14 @@ type PollOptionProps = {
    pollOption: LivestreamPoll["options"][number]
    totalVotes: number
 }
+
 const PollOption: FC<PollOptionProps> = ({
    pollOption,
    pollId,
    livestreamId,
    totalVotes,
 }) => {
-   const res = useCountQuery(
-      query(
-         collection(
-            FirestoreInstance,
-            "livestreams",
-            livestreamId,
-            "polls",
-            pollId,
-            "voters"
-         ),
-         where("optionId", "==", pollOption.id)
-      )
-   )
+   const { count } = usePollVotersCount(livestreamId, pollId, pollOption.id)
 
    return (
       <Box sx={styles.pollOptionRoot}>
@@ -204,7 +170,7 @@ const PollOption: FC<PollOptionProps> = ({
          >
             <Box sx={styles.pollCount}>
                <Typography variant="body2" fontWeight={600}>
-                  {res.count ?? 0}
+                  {count ?? 0}
                </Typography>
             </Box>
             <Typography fontSize="0.95rem" lineHeight="1.5rem" variant="body2">
@@ -214,7 +180,7 @@ const PollOption: FC<PollOptionProps> = ({
          <LinearProgress
             sx={styles.pollOptionProgress}
             variant="determinate"
-            value={res.count ? (res.count / totalVotes) * 100 : 0}
+            value={count ? (count / totalVotes) * 100 : 0}
          />
       </Box>
    )
@@ -260,6 +226,39 @@ const PollSkeleton = () => {
             ))}
          </Stack>
       </Stack>
+   )
+}
+
+const useLivestreamPolls = (livestreamId: string) => {
+   return useFirestoreCollection<LivestreamPoll>(
+      query(
+         collection(FirestoreInstance, "livestreams", livestreamId, "polls"),
+         where("state", "!=", "upcoming"),
+         orderBy("state", "asc")
+      ),
+      {
+         idField: "id",
+      }
+   )
+}
+
+const usePollVotersCount = (
+   livestreamId: string,
+   pollId: string,
+   optionId?: string
+) => {
+   return useCountQuery(
+      query(
+         collection(
+            FirestoreInstance,
+            "livestreams",
+            livestreamId,
+            "polls",
+            pollId,
+            "voters"
+         ),
+         optionId ? where("optionId", "==", optionId) : undefined
+      )
    )
 }
 
