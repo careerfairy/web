@@ -5,6 +5,8 @@ import { Button } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import Link from "../../../../../common/Link"
 import ArrowBackIosNewRoundedIcon from "@mui/icons-material/ArrowBackIosNewRounded"
+import { SuspenseWithBoundary } from "../../../../../../ErrorBoundary"
+import RatingAnswers, { RatingAnswersSkeleton } from "./RatingAnswers"
 
 const styles = sxStyles({
    goBackButton: {
@@ -14,12 +16,24 @@ const styles = sxStyles({
 type FeedbackAnswersContentProps = {
    livestreamStats: LiveStreamStats
    groupId: string
+   feedbackQuestionId: string
 }
 export const RatingOverviewContent: FC<FeedbackAnswersContentProps> = ({
    livestreamStats,
-   groupId,
+   feedbackQuestionId,
 }) => {
-   return <Stack spacing={3}>User feedback answers</Stack>
+   if (!feedbackQuestionId) return null
+
+   return (
+      <Stack spacing={3}>
+         <SuspenseWithBoundary fallback={<RatingAnswersSkeleton />}>
+            <RatingAnswers
+               livestreamStats={livestreamStats}
+               feedbackQuestionId={feedbackQuestionId}
+            />
+         </SuspenseWithBoundary>
+      </Stack>
+   )
 }
 
 type FeedbackAnswersTitleProps = {
