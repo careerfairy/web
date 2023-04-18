@@ -138,7 +138,7 @@ class FirebaseService {
       )
    }
    createGroup = async (args: {
-      group: Omit<Group, "id" | "groupId">
+      group: Omit<Group, "id" | "groupId" | "triGrams">
       groupQuestions?: GroupQuestion[]
    }) => {
       return this.functions.httpsCallable("createGroup")(args)
