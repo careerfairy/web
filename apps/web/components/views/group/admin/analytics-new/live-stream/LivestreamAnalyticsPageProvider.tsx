@@ -16,10 +16,8 @@ import { useFirestoreCollection } from "../../../../../custom-hook/utils/useFire
 import { createLookup } from "@careerfairy/shared-lib/utils"
 import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
-import { collectionGroup, query, where } from "firebase/firestore"
-import { FirestoreInstance } from "../../../../../../data/firebase/FirebaseInstance"
-import { limit } from "@firebase/firestore"
 import useClosestLivestreamStats from "./useClosestLivestreamStats"
+import useGroupLivestreamStat from "../../../../../custom-hook/live-stream/useGroupLivestreamStat"
 
 export const userTypes = [
    { value: "registrations", label: "Registrations" },
@@ -158,26 +156,13 @@ const QueryLivestreamStats = ({ livestreamId }: { livestreamId: string }) => {
    const { setCurrentStreamStats } = useLivestreamsAnalyticsPageContext()
    const { group } = useGroup()
 
-   const livestreamStatsQuery = useMemo(() => {
-      return query(
-         collectionGroup(FirestoreInstance, "stats"),
-         where("id", "==", "livestreamStats"),
-         where("livestream.groupIds", "array-contains", group.id),
-         where("livestream.id", "==", livestreamId),
-         limit(1) // we only want the first result
-      )
-   }, [group.id, livestreamId])
-
    /**
     * We only want to fetch the livestream stats in the livestream analytics page and
     *
     * */
-   const { status, data: stats } = useFirestoreCollection<LiveStreamStats>(
-      livestreamStatsQuery,
-      {
-         idField: "id",
-         suspense: false,
-      }
+   const { status, data: stats } = useGroupLivestreamStat(
+      group.id,
+      livestreamId
    )
 
    const isLoaded = status === "success"

@@ -385,6 +385,8 @@ export type LivestreamEventPublicData = Partial<
       | "created"
       | "impressions"
       | "hasJobs"
+      | "backgroundImageUrl"
+      | "duration"
    >
 > & {
    id: LivestreamEvent["id"]
@@ -485,6 +487,8 @@ export const pickPublicDataFromLivestream = (
       impressions: livestreamData.impressions ?? 0,
       created: livestreamData.created ?? null,
       hasJobs: livestreamData.hasJobs ?? false,
+      duration: livestreamData.duration ?? null,
+      backgroundImageUrl: livestreamData.backgroundImageUrl ?? null,
    }
 }
 

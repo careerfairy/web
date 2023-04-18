@@ -73,7 +73,7 @@ const securePaths = [
    "/group/[groupId]/admin/analytics/talent-pool",
    "/group/[groupId]/admin/analytics/live-stream",
    "/group/[groupId]/admin/analytics/live-stream/[[...livestreamId]]",
-   "/group/[groupId]/admin/analytics/feedback",
+   "/group/[groupId]/admin/analytics/feedback/[[...feedback]]",
    "/group/[groupId]/admin/analytics/registration-sources",
    "/group/[groupId]/admin/ats-integration",
    "/new-livestream",

@@ -29,7 +29,7 @@ export interface PaginatedCollection<T = DocumentData> {
    prevDisabled: boolean
    nextDisabled: boolean
    prev(): void
-   next(): Promise<void>
+   next(): void
    cursor: number
    page: number
    loading: boolean
@@ -103,7 +103,7 @@ const usePaginatedCollection = <T = DocumentData>(
       setPrevNavigation(true)
    }, [options.limit, options.query, order, prevDisabled, result.data?.docs])
 
-   const next = useCallback(async () => {
+   const next = useCallback(() => {
       const offset = result.data?.size === internalLimit ? 2 : 1
       const nextCursor = result.data?.docs[result.data?.size - offset]
       if (nextDisabled || !nextCursor) return
