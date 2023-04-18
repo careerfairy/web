@@ -59,3 +59,10 @@ export function getGlobalRatingAverage(statDoc: LiveStreamStats) {
 
    return avg / Object.keys(statDoc.ratings).length
 }
+
+export function getTotalNumberOfRatings(statDoc: LiveStreamStats): number {
+   return Object.values(statDoc.ratings || {}).reduce(
+      (total, rating) => total + rating.numberOfRatings,
+      0
+   )
+}
