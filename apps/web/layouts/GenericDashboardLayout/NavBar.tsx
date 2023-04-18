@@ -6,9 +6,6 @@ import Stack from "@mui/material/Stack"
 
 // project imports
 import BottomLinks from "../common/BottomLinks"
-import { useGroup } from "../GroupDashboardLayout"
-import EditGroupLogo from "../GroupDashboardLayout/EditGroupLogo"
-import GroupNavList from "../GroupDashboardLayout/GroupNavList"
 import { MainLogo } from "../../components/logos"
 import GenericNavList from "./GenericNavList"
 import { sxStyles } from "../../types/commonTypes"
@@ -25,31 +22,14 @@ const styles = sxStyles({
 })
 
 const NavBar = () => {
-   const { group } = useGroup()
-
-   if (!group) {
-      return (
-         <Stack
-            flex={1}
-            alignItems={"center"}
-            borderRight={"1px solid #EDE7FD"}
-         >
-            <Box sx={styles.logoWrapper}>
-               <MainLogo sx={{ maxWidth: "100%" }} />
-            </Box>
-            <GenericNavList />
-            <Box flexGrow={1} />
-            <BottomLinks hideMainLogo={true} />
-         </Stack>
-      )
-   }
-
    return (
       <Stack flex={1} alignItems={"center"} borderRight={"1px solid #EDE7FD"}>
-         <EditGroupLogo />
-         <GroupNavList />
+         <Box sx={styles.logoWrapper}>
+            <MainLogo sx={{ maxWidth: "100%" }} />
+         </Box>
+         <GenericNavList />
          <Box flexGrow={1} />
-         <BottomLinks />
+         <BottomLinks hideMainLogo={true} />
       </Stack>
    )
 }
