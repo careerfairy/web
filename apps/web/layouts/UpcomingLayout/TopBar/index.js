@@ -14,7 +14,7 @@ import GeneralHeader from "../../../components/views/header/GeneralHeader"
 import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
-import UserAvatar from "../../GenericDashboardLayout/TopBar/UserAvatar"
+import ProfileMenu from "../../GenericDashboardLayout/TopBar/ProfileMenu"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -64,7 +64,7 @@ const TopBar = () => {
                         <LoginButton />
                      </div>
                   ) : (
-                     <UserAvatar />
+                     <ProfileMenu />
                   )}
                </Box>
             </Hidden>
