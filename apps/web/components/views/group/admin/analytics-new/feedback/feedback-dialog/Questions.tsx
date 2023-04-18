@@ -17,28 +17,11 @@ import Skeleton from "@mui/material/Skeleton"
 type QuestionsProps = {
    livestreamStats: LiveStreamStats
 }
+
 const Questions: FC<QuestionsProps> = ({ livestreamStats }) => {
-   const isMobile = useIsMobile()
-   const options = useMemo<UsePaginatedCollection<LivestreamQuestion>>(
-      () => ({
-         query: query<LivestreamQuestion>(
-            // @ts-ignore
-            collection(
-               FirestoreInstance,
-               "livestreams",
-               livestreamStats.livestream.id,
-               "questions"
-            )
-         ),
-         limit: isMobile ? 3 : 6,
-         orderBy: {
-            field: "votes",
-            direction: "desc",
-         },
-      }),
-      [isMobile, livestreamStats.livestream.id]
+   const results = usePaginatedLivestreamQuestions(
+      livestreamStats.livestream.id
    )
-   const results = usePaginatedCollection<LivestreamQuestion>(options)
 
    const onPageChange = useCallback(
       (_, page: number) => {
@@ -77,9 +60,11 @@ const Questions: FC<QuestionsProps> = ({ livestreamStats }) => {
                      {question.title}
                   </Typography>
                   <Stack
+                     ml={"auto !important"}
                      direction="row"
                      alignItems="center"
                      justifyContent="flex-end"
+                     width={100}
                      spacing={1}
                   >
                      <NorthIcon color="primary" />
@@ -152,6 +137,31 @@ export const QuestionsSkeleton = () => {
          />
       </Stack>
    )
+}
+
+const usePaginatedLivestreamQuestions = (livestreamId: string) => {
+   const isMobile = useIsMobile()
+
+   const options = useMemo<UsePaginatedCollection<LivestreamQuestion>>(
+      () => ({
+         query: query<LivestreamQuestion>(
+            // @ts-ignore
+            collection(
+               FirestoreInstance,
+               "livestreams",
+               livestreamId,
+               "questions"
+            )
+         ),
+         limit: isMobile ? 3 : 6,
+         orderBy: {
+            field: "votes",
+            direction: "desc",
+         },
+      }),
+      [isMobile, livestreamId]
+   )
+   return usePaginatedCollection<LivestreamQuestion>(options)
 }
 
 export default Questions
