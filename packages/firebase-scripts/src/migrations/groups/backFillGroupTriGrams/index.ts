@@ -1,12 +1,12 @@
 import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 import Counter from "../../../lib/Counter"
-import { livestreamRepo } from "../../../repositories"
+import { groupRepo } from "../../../repositories"
 import { logAction } from "../../../util/logger"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
 import { firestore } from "../../../lib/firebase"
 import * as cliProgress from "cli-progress"
 import { DataWithRef } from "../../../util/types"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { backfillTrigrams } from "../../../util/trigrams"
 
 const counter = new Counter()
@@ -14,30 +14,30 @@ const bar = new cliProgress.SingleBar(
    {
       clearOnComplete: false,
       hideCursor: true,
-      ...getCLIBarOptions("Writing livestreams batch", "Writes"),
+      ...getCLIBarOptions("Writing groups batch", "Writes"),
    },
    cliProgress.Presets.shades_grey
 )
 
-let livestreams: DataWithRef<true, LivestreamEvent>[]
+type GroupWithRef = DataWithRef<true, Group>
+let groups: DataWithRef<true, Group>[]
 const bulkWriter = firestore.bulkWriter()
 
 export async function run() {
    try {
-      Counter.log("Fetching all livestreams")
-
-      livestreams = await logAction(
-         () => livestreamRepo.getAllLivestreams(false, true),
-         "Fetching all livestreams"
+      groups = await logAction(
+         () => groupRepo.getAllGroups(true),
+         "Fetching all groups"
       )
-      await backfillTrigrams<typeof livestreams[number]>(
-         livestreams,
-         ["title", "company"],
+
+      await backfillTrigrams<GroupWithRef>(
+         groups,
+         ["universityName", "description"],
          counter,
          bar,
          bulkWriter,
          groupTriGrams,
-         "livestreams"
+         "Groups"
       )
    } catch (error) {
       console.error(error)
