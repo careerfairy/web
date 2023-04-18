@@ -39,7 +39,7 @@ export const RatingAnswers: FC<FeedbackAnswersContentProps> = ({
                   spacing={1}
                >
                   <Typography fontWeight={600} variant="body1">
-                     {voter.id}
+                     {voter.id.split("@")[0]}
                   </Typography>
                   <StyledRating
                      value={normalizeRating(feedbackQuestion, voter)}
