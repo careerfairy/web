@@ -11,6 +11,7 @@ export const defaultTriggerRunTimeConfig: RuntimeOptions = {
     * */
    memory: "256MB",
 }
+
 export const handleSideEffects = (sideEffectPromises: Promise<unknown>[]) => {
    return Promise.allSettled(sideEffectPromises).then((results) => {
       results.forEach((result) => {
@@ -20,6 +21,7 @@ export const handleSideEffects = (sideEffectPromises: Promise<unknown>[]) => {
       })
    })
 }
+
 export const logStart = ({
    message,
    context,

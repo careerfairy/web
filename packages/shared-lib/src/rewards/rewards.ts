@@ -19,6 +19,17 @@ export const REWARD_LIVESTREAM_ATTENDANCE_SECONDS = 5 * 60 // 5 minutes
  */
 export const INITIAL_CREDITS = 3
 
+/**
+ * How many referrals required for giving the REFERRAL_FIRST_FRIENDS reward
+ * exclusive
+ */
+export const REFERRAL_FIRST_FRIENDS_NUM = 3
+
+/**
+ * How many credits to reward a user after the first 3 referrals
+ */
+export const REFERRAL_AFTER_FIRST_FRIENDS_CREDITS = 1
+
 // Types
 
 type Reward = {
@@ -42,36 +53,14 @@ type Reward = {
  * All Rewards objects
  */
 export const REWARDS = {
-   REFERRAL_SIGNUP_LEADER: {
-      name: "REFERRAL_SIGNUP_LEADER",
-      credits: 0,
-      humanStringDescription: "Referral SignUp Successful",
-   },
-   REFERRAL_SIGNUP_FOLLOWER: {
-      name: "REFERRAL_SIGNUP_FOLLOWER",
-      credits: 0,
-      humanStringDescription: "SignUp through a referral",
-   },
-   LIVESTREAM_REGISTER_COMPLETE_LEADER: {
-      name: "LIVESTREAM_REGISTER_COMPLETE_LEADER",
-      credits: 0,
-      humanStringDescription: "Registered an invited event",
-   },
-   LIVESTREAM_REGISTER_COMPLETE_FOLLOWER: {
-      name: "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER",
-      credits: 0,
-      humanStringDescription: "Event Registration Successful",
-   },
-   LIVESTREAM_INVITE_COMPLETE_FOLLOWER: {
-      name: "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
-      credits: 0,
-      humanStringDescription: "Attended an invited event",
-   },
-   LIVESTREAM_INVITE_COMPLETE_LEADER: {
-      // event attendance complete
-      name: "LIVESTREAM_INVITE_COMPLETE_LEADER",
-      credits: 0,
-      humanStringDescription: "Event Invitation Successful",
+   /**
+    * Rewards triggered by user actions
+    * These, require a cloud function to be triggered
+    */
+   USER_CV_UPLOAD: {
+      name: "USER_CV_UPLOAD",
+      credits: 1,
+      humanStringDescription: "You have uploaded your CV",
    },
    // User progression badges
    LIVESTREAM_USER_ATTENDED: {
@@ -89,6 +78,55 @@ export const REWARDS = {
       credits: 0,
       humanStringDescription:
          "You have raised your hand during a livestream event",
+   },
+   LIVESTREAM_INVITE_COMPLETE_FOLLOWER: {
+      name: "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
+      credits: 0,
+      humanStringDescription: "Attended an invited event",
+   },
+   // created when applying the referral code during signup
+   REFERRAL_SIGNUP_FOLLOWER: {
+      name: "REFERRAL_SIGNUP_FOLLOWER",
+      credits: 0,
+      humanStringDescription: "SignUp through a referral",
+   },
+
+   /**
+    * Rewards given by side effects
+    * We create these in the backend in reaction for some action
+    */
+   REFERRAL_SIGNUP_LEADER: {
+      name: "REFERRAL_SIGNUP_LEADER",
+      credits: 0,
+      humanStringDescription: "Referral SignUp Successful",
+   },
+   // REFERRAL_FIRST_FRIENDS_NUM friends have signed up
+   REFERRAL_FIRST_FRIENDS: {
+      name: "REFERRAL_FIRST_FRIENDS",
+      credits: 3,
+      humanStringDescription: `You have referred your first ${REFERRAL_FIRST_FRIENDS_NUM} friends`,
+   },
+   LIVESTREAM_REGISTER_COMPLETE_LEADER: {
+      name: "LIVESTREAM_REGISTER_COMPLETE_LEADER",
+      credits: 0,
+      humanStringDescription: "Registered an invited event",
+   },
+   // created when a userLivestreamData doc is created
+   LIVESTREAM_REGISTER_COMPLETE_FOLLOWER: {
+      name: "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER",
+      credits: 0,
+      humanStringDescription: "Event Registration Successful",
+   },
+   LIVESTREAM_INVITE_COMPLETE_LEADER: {
+      // event attendance complete
+      name: "LIVESTREAM_INVITE_COMPLETE_LEADER",
+      credits: 0,
+      humanStringDescription: "Event Invitation Successful",
+   },
+   LIVESTREAM_USER_FIRST_ATTENDED: {
+      name: "LIVESTREAM_USER_FIRST_ATTENDED",
+      credits: 1,
+      humanStringDescription: "You have attended your first live stream event",
    },
 } satisfies Record<string, Reward>
 

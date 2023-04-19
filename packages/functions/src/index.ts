@@ -219,6 +219,7 @@ exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
+exports.syncUserStats = onWriteTriggers.syncUserStats
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
