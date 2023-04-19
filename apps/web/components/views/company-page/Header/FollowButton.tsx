@@ -1,4 +1,4 @@
-import React, { FC } from "react"
+import React, { FC, useMemo } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { CompanyFollowed, UserData } from "@careerfairy/shared-lib/users"
 import FollowIcon from "@mui/icons-material/AddRounded"
@@ -12,7 +12,6 @@ import { Button, ButtonProps } from "@mui/material"
 import { useRouter } from "next/router"
 import Link from "../../common/Link"
 import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
-import { IColors } from "../../../../types/commonTypes"
 import { useMountedState } from "react-use"
 
 type Arguments = {
@@ -39,10 +38,8 @@ const toggleFollowCompany = (
 
 type Props = {
    group: Group
-   color?: Exclude<IColors, "inherit" | "action" | "disabled">
-   noIcon?: boolean
-}
-const AuthedFollowButton: FC<Props> = ({ group, color, noIcon }) => {
+} & Omit<ButtonProps, "onClick">
+const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
    const { userData, authenticatedUser } = useAuth()
    const { errorNotification, successNotification } = useSnackbarNotifications()
 
@@ -89,25 +86,23 @@ const AuthedFollowButton: FC<Props> = ({ group, color, noIcon }) => {
    return (
       <LoadingButton
          loading={isMutating || status === "loading"}
-         disabled={isMutating || status === "loading"}
+         disabled={isMutating || disabled || status === "loading"}
          onClick={handleClick}
          startIcon={
-            noIcon ? null : companyFollowedData ? (
+            companyFollowedData ? (
                <FollowedIcon fontSize={"small"} />
             ) : (
                <FollowIcon fontSize={"small"} />
             )
          }
-         {...buttonProps(color)}
+         {...buttonProps}
       >
          {companyFollowedData ? "Followed" : "Follow"}
       </LoadingButton>
    )
 }
 
-const NonAuthedFollowButton: FC<{
-   color?: Exclude<IColors, "inherit" | "action" | "disabled">
-}> = ({ color }) => {
+const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
    const { asPath } = useRouter()
    const isMounted = useMountedState()
 
@@ -121,27 +116,26 @@ const NonAuthedFollowButton: FC<{
             },
          }}
       >
-         <Button {...buttonProps(color)}>Follow</Button>
+         <Button {...buttonProps}>Follow</Button>
       </Link>
    )
 }
 
-const FollowButton: FC<Props> = ({
-   group,
-   color = "primary",
-   noIcon = false,
-}) => {
+const FollowButton: FC<Props> = ({ group, ...buttonProps }) => {
    const { isLoggedIn } = useAuth()
 
+   const mergedProps = useMemo(
+      () => Object.assign({}, defaultButtonProps, buttonProps),
+      [buttonProps]
+   )
+
    if (isLoggedIn) {
-      return <AuthedFollowButton group={group} color={color} noIcon={noIcon} />
+      return <AuthedFollowButton group={group} {...mergedProps} />
    }
-   return <NonAuthedFollowButton color={color} />
+   return <NonAuthedFollowButton {...mergedProps} />
 }
 
-const buttonProps = (
-   color: Exclude<IColors, "inherit" | "action" | "disabled">
-): ButtonProps => ({
+const defaultButtonProps: ButtonProps = {
    sx: {
       fontSize: {
          xs: "0.75rem",
@@ -150,7 +144,6 @@ const buttonProps = (
    },
    variant: "contained",
    size: "small",
-   color: color,
-})
+}
 
 export default FollowButton

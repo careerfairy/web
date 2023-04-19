@@ -65,7 +65,7 @@ export const FollowCompany = () => {
                </Typography>
                <BulletPoints points={followPoints} />
                <span>
-                  <FollowButton group={group} />
+                  <FollowButton color="primary" group={group} />
                </span>
             </Stack>
          </CTACard>

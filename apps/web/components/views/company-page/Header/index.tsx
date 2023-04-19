@@ -350,7 +350,9 @@ const ActionButtons = () => {
 
    return (
       <Stack spacing={1} direction={"row"}>
-         {showFollowButton ? <FollowButton group={group} /> : null}
+         {showFollowButton ? (
+            <FollowButton color="primary" group={group} />
+         ) : null}
          {showShareButton ? <ShareButton /> : null}
       </Stack>
    )

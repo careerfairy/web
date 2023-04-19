@@ -1,0 +1,285 @@
+import { FC } from "react"
+import { Group } from "@careerfairy/shared-lib/groups"
+import {
+   Box,
+   Card,
+   CardActionArea,
+   CardContent,
+   CardMedia,
+   Typography,
+} from "@mui/material"
+import { sxStyles } from "../../../types/commonTypes"
+import Image from "next/image"
+import {
+   getMaxLineStyles,
+   getResizedUrl,
+} from "../../helperFunctions/HelperFunctions"
+import Stack from "@mui/material/Stack"
+import {
+   CompanyCountryTag,
+   CompanyIndustryTag,
+   CompanySizeTag,
+} from "../common/company/company-tags"
+import { useInView } from "react-intersection-observer"
+import { collection, orderBy, query, where } from "firebase/firestore"
+import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import { limit } from "@firebase/firestore"
+import { useFirestoreCollection } from "../../custom-hook/utils/useFirestoreCollection"
+import Skeleton from "@mui/material/Skeleton"
+import { SuspenseWithBoundary } from "../../ErrorBoundary"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { alpha } from "@mui/material/styles"
+import FollowButton from "../company-page/Header/FollowButton"
+import Link from "../common/Link"
+import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+
+const LOGO_HEIGHT = 60
+const LOGO_WIDTH = 64
+
+const styles = sxStyles({
+   root: {
+      borderRadius: 2,
+      flex: 1,
+      display: "flex",
+      flexDirection: "column",
+      "& .illustration": {
+         transition: (theme) => theme.transitions.create("transform"),
+      },
+      "&:hover, &:focus": {
+         "& .illustration": {
+            transform: "scale(1.1)",
+         },
+      },
+   },
+   actionArea: {
+      color: "text.primary",
+      textDecoration: "none",
+   },
+   media: {
+      height: 120,
+      position: "relative",
+   },
+   content: {
+      px: 3,
+      flex: 1,
+      display: "flex",
+      position: "relative",
+      pt: 5,
+   },
+   companyName: {
+      ...getMaxLineStyles(1),
+   },
+   italic: {
+      fontStyle: "italic",
+   },
+   livestreamTitle: {
+      ...getMaxLineStyles(2),
+      height: 45,
+      color: "text.primary",
+   },
+   companyLogo: {
+      width: LOGO_WIDTH,
+      height: LOGO_HEIGHT,
+      border: (theme) =>
+         `1px solid ${alpha(theme.palette.secondary.main, 0.3)}`,
+      position: "absolute",
+      background: (theme) => theme.palette.background.paper,
+      borderRadius: 2,
+      p: 1,
+      top: -LOGO_HEIGHT / 2,
+   },
+   followButtonWrapper: {
+      position: "absolute",
+      top: "-15px",
+      right: (theme) => theme.spacing(3),
+   },
+   followButton: {
+      borderRadius: 1,
+      background: (theme) => theme.palette.background.paper,
+      py: 0.5,
+      px: 2.25,
+      "&:hover": {
+         background: (theme) => theme.palette.background.paper,
+      },
+      textTransform: "none",
+   },
+})
+
+type Props = {
+   company: Group
+}
+
+const CompanyCard: FC<Props> = ({ company }) => {
+   const [ref, inView] = useInView({
+      triggerOnce: true, // Only fetch the next livestreams when the card is in view
+   })
+
+   return (
+      <Card ref={ref} sx={[styles.root]}>
+         <CardActionArea
+            href={`/company/${companyNameSlugify(company.universityName)}`}
+            sx={styles.actionArea}
+            component={Link}
+         >
+            <CardMedia sx={styles.media} title={company.universityName}>
+               <Image
+                  src={getResizedUrl(company.bannerImageUrl, "md")}
+                  className="illustration"
+                  layout="fill"
+                  alt={company.universityName}
+                  objectFit="cover"
+               />
+            </CardMedia>
+            <CardContent sx={styles.content}>
+               <Box sx={styles.companyLogo}>
+                  <Image
+                     src={getResizedUrl(company.logoUrl, "sm")}
+                     width={64}
+                     height={60}
+                     alt={company.universityName}
+                     objectFit="contain"
+                  />
+               </Box>
+               <Box sx={styles.followButtonWrapper}>
+                  <FollowButton
+                     group={company}
+                     variant={"outlined"}
+                     color={"secondary"}
+                     size={"small"}
+                     sx={styles.followButton}
+                     startIcon={null}
+                  />
+               </Box>
+               <Stack flex={1} justifyContent="space-between" spacing={2}>
+                  <Typography
+                     sx={styles.companyName}
+                     variant="h6"
+                     fontWeight={600}
+                     whiteSpace="pre-line"
+                     component="h2"
+                  >
+                     {company.universityName}
+                  </Typography>
+                  <Stack spacing={1}>
+                     <CompanyCountryTag
+                        fontSize="1.07rem"
+                        text={company.companyCountry.name}
+                     />
+                     <CompanyIndustryTag
+                        fontSize="1.07rem"
+                        text={company.companyIndustry.name}
+                     />
+                     <CompanySizeTag
+                        fontSize="1.07rem"
+                        text={company.companySize}
+                     />
+                  </Stack>
+                  {inView ? (
+                     <SuspenseWithBoundary
+                        fallback={<UpcomingLivestreamSkeleton />}
+                     >
+                        <UpcomingLivestream
+                           groupName={company.universityName}
+                           groupId={company.id}
+                        />
+                     </SuspenseWithBoundary>
+                  ) : null}
+               </Stack>
+            </CardContent>
+         </CardActionArea>
+      </Card>
+   )
+}
+
+type UpcomingLivestreamProps = {
+   groupId: string
+   groupName: string
+}
+const UpcomingLivestream: FC<UpcomingLivestreamProps> = ({
+   groupId,
+   groupName,
+}) => {
+   const { data: livestreams } = useCompanyUpcomingLivestream(groupId)
+   const livestream = livestreams?.[0]
+
+   return (
+      <Box
+         component={livestream ? Link : "div"}
+         noLinkStyle
+         href={livestream ? `/upcoming-livestream/${livestream.id}` : undefined}
+         passHref
+         prefetch={false}
+      >
+         <Stack component="a" spacing={1}>
+            <LivestreamHeader>
+               {livestream ? "Upcoming Livestream" : "No Upcoming Livestream"}
+            </LivestreamHeader>
+
+            <LivestreamTitle italic={!livestream}>
+               {livestream
+                  ? livestream.title
+                  : `Follow ${groupName} to be notified about new live streams.`}
+            </LivestreamTitle>
+         </Stack>
+      </Box>
+   )
+}
+
+const UpcomingLivestreamSkeleton = () => {
+   return (
+      <Stack spacing={1}>
+         <LivestreamHeader>
+            <Skeleton variant="text" width={200} />
+         </LivestreamHeader>
+         <LivestreamTitle>
+            <Skeleton variant="text" />
+            <Skeleton variant="text" />
+         </LivestreamTitle>
+      </Stack>
+   )
+}
+
+const LivestreamHeader: FC = ({ children }) => (
+   <Typography
+      color="primary.main"
+      fontSize="0.931rem"
+      fontWeight={600}
+      component="h2"
+   >
+      {children}
+   </Typography>
+)
+const LivestreamTitle: FC<{
+   italic?: boolean
+}> = ({ children, italic }) => {
+   return (
+      <Typography
+         sx={[styles.livestreamTitle, italic && styles.italic]}
+         width="100%"
+         component="h2"
+         fontSize="1.07rem"
+         fontWeight={500}
+         whiteSpace="pre-line"
+      >
+         {children}
+      </Typography>
+   )
+}
+const now = new Date()
+
+const useCompanyUpcomingLivestream = (groupId: string) => {
+   const q = query<LivestreamEvent>(
+      // @ts-ignore
+      collection(FirestoreInstance, "livestreams"),
+      where("groupIds", "array-contains", groupId),
+      where("start", ">", now),
+      orderBy("start", "desc"),
+      limit(1)
+   )
+
+   return useFirestoreCollection<LivestreamEvent>(q, {
+      idField: "id",
+   })
+}
+
+export default CompanyCard
