@@ -8,7 +8,6 @@ import firebaseApp from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { HandRaiseState } from "types/handraise"
 import {
-   errorLogAndNotify,
    getQueryStringFromUrl,
    getReferralInformation,
    shouldUseEmulators,
@@ -60,6 +59,7 @@ import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
 import { RewardAction } from "@careerfairy/shared-lib/dist/rewards"
+import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -493,9 +493,26 @@ class FirebaseService {
       return ref.get()
    }
 
-   updateCareerCenter = (groupId, newCareerCenter) => {
-      let ref = this.firestore.collection("careerCenterData").doc(groupId)
-      return ref.update(newCareerCenter)
+   updateCareerCenter = (
+      currentGroup: Group,
+      newCareerCenter: Partial<Group>
+   ) => {
+      const updatedGroup = Object.assign({}, currentGroup, newCareerCenter) // We want to get the future state of the group
+
+      let ref = this.firestore
+         .collection("careerCenterData")
+         .doc(currentGroup.id)
+
+      // In the update function, we need to update the triGrams field with the help of the future state of the group
+      const toUpdate: Partial<Group> = {
+         ...newCareerCenter,
+         triGrams: groupTriGrams(
+            updatedGroup.universityName,
+            updatedGroup.description
+         ),
+      }
+
+      return ref.update(toUpdate)
    }
 
    deleteCareerCenterFromAllUsers = (careerCenterId) => {
@@ -2135,7 +2152,7 @@ class FirebaseService {
 
    /**
     * @param {string} livestreamId
-    * @param authenticatedUser
+    * @param userData
     * @param {*[]} groupsWithPolicies
     * @param userAnsweredLivestreamQuestions
     * @param options - {isRecommended: boolean}
