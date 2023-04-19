@@ -6,6 +6,7 @@ import useLivestreamRating from "./useLivestreamRating"
 import { Divider, Skeleton, Typography } from "@mui/material"
 import { StyledRating } from "../../../common/inputs"
 import { normalizeRating } from "@careerfairy/shared-lib/livestreams/ratings"
+import censorEmail from "../../../../../../util/censorEmail"
 
 type FeedbackAnswersContentProps = {
    livestreamStats: LiveStreamStats
@@ -31,15 +32,12 @@ export const RatingAnswers: FC<FeedbackAnswersContentProps> = ({
          {voters.map((voter) => (
             <Stack spacing={2} key={voter.id}>
                <Stack
-                  direction={{
-                     xs: "column",
-                     sm: "row",
-                  }}
+                  direction="row"
                   justifyContent="space-between"
                   spacing={1}
                >
                   <Typography fontWeight={600} variant="body1">
-                     {voter.id.split("@")[0]}
+                     {censorEmail(voter.id)}
                   </Typography>
                   <StyledRating
                      value={normalizeRating(feedbackQuestion, voter)}
