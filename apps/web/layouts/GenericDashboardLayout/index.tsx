@@ -3,15 +3,9 @@ import AdminGenericLayout from "../AdminGenericLayout"
 import TopBar from "./TopBar"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import GenericNavList from "./GenericNavList"
-import {
-   createContext,
-   useCallback,
-   useContext,
-   useEffect,
-   useMemo,
-   useState,
-} from "react"
+import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
 
 type IGenericDashboardContext = {
    isOverBanner: boolean
@@ -20,7 +14,7 @@ type IGenericDashboardContext = {
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
-   isOverBanner: true,
+   isOverBanner: false,
    isPortalPage: false,
    hasRecordings: false,
 })
@@ -41,6 +35,10 @@ const GenericDashboardLayout = ({
    const isMobile = useIsMobile()
    const { pathname } = useRouter()
    const isPortalPage = useMemo(() => pathname === "/portal", [pathname])
+   const isScrollingHoverTheBanner = useScrollTrigger({
+      threshold: 250,
+      disableHysteresis: true,
+   })
 
    // TODO: Needs to be updated after the new banner.
    //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
@@ -50,27 +48,11 @@ const GenericDashboardLayout = ({
       isPortalPage && hasRecordings
    )
 
-   const checkIfItsOverBanner = useCallback(() => {
-      if (!hasRecordings) {
-         return
-      }
-      if (isOverBanner && window.scrollY > 250) {
-         setIsOverBanner(false)
-      }
-      if (!isOverBanner && window.scrollY < 250) {
-         setIsOverBanner(true)
-      }
-   }, [hasRecordings, isOverBanner])
-
    useEffect(() => {
-      if (isPortalPage) {
-         window.addEventListener("scroll", checkIfItsOverBanner)
+      if (isPortalPage && hasRecordings) {
+         setIsOverBanner(!isScrollingHoverTheBanner)
       }
-
-      return () => {
-         window.removeEventListener("scroll", checkIfItsOverBanner)
-      }
-   }, [checkIfItsOverBanner, isPortalPage])
+   }, [isScrollingHoverTheBanner])
 
    const value = useMemo<IGenericDashboardContext>(
       () => ({ isOverBanner, isPortalPage, hasRecordings }),

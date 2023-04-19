@@ -29,7 +29,7 @@ type Props = {
    hideTabs?: boolean
 }
 
-export const filtersToShow = [
+const filtersToShow = [
    FilterEnum.languages,
    FilterEnum.interests,
    // FilterEnum.jobCheck, TODO: Removed temporarily
