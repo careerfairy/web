@@ -60,7 +60,7 @@ const Profile = ({ group, firebase, className, ...rest }) => {
             firebase,
             async (newUrl, fullPath) => {
                try {
-                  await firebase.updateCareerCenter(group.id, {
+                  await firebase.updateCareerCenter(group, {
                      logoUrl: newUrl,
                   })
                } catch (e) {

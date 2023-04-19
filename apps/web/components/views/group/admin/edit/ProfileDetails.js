@@ -28,7 +28,7 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
 
    const handleSubmitForm = async (values, { setStatus }) => {
       try {
-         await firebase.updateCareerCenter(group.id, {
+         await firebase.updateCareerCenter(group, {
             description: values.description,
             universityName: values.universityName,
             extraInfo: values.extraInfo,

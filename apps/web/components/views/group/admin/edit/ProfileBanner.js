@@ -94,8 +94,8 @@ const styles = {
    },
 }
 
-const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
-   const imageUrl = bannerImageUrl || placeholderBanner
+const ProfileBanner = ({ group }) => {
+   const imageUrl = group.bannerImageUrl || placeholderBanner
    const firebase = useFirebaseService()
    const [editData, setEditData] = useState({})
    const [removingLogo, setRemovingLogo] = useState(false)
@@ -114,7 +114,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
             firebase,
             async (newUrl) => {
                try {
-                  await firebase.updateCareerCenter(id, {
+                  await firebase.updateCareerCenter(group, {
                      bannerImageUrl: newUrl,
                   })
                   dispatch(
@@ -141,7 +141,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
       try {
          setFilePickerError("")
          setRemovingLogo(true)
-         await firebase.updateCareerCenter(id, {
+         await firebase.updateCareerCenter(group, {
             bannerImageUrl: "",
          })
       } catch (e) {
@@ -157,7 +157,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
             subheader={
                <>
                   Change the banner as seen on your{" "}
-                  <a target="_blank" href={`/next-livestreams/${id}`}>
+                  <a target="_blank" href={`/next-livestreams/${group.id}`}>
                      events
                   </a>{" "}
                   page. The optimal size is <b>2880x576px</b> at an aspect ratio
@@ -175,7 +175,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
                <Box
                   component="a"
                   target="_blank"
-                  href={`/next-livestreams/${id}`}
+                  href={`/next-livestreams/${group.id}`}
                   sx={styles.hoverOverlay}
                >
                   <Button
@@ -247,7 +247,7 @@ const ProfileBanner = ({ group: { bannerImageUrl, id } }) => {
             </Grow>
             <Grow
                unmountOnExit
-               in={Boolean(bannerImageUrl && !editData.fileObj)}
+               in={Boolean(group.bannerImageUrl && !editData.fileObj)}
             >
                <Button
                   sx={styles.saveButton}

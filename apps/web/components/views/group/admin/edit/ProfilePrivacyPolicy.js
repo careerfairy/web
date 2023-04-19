@@ -44,7 +44,7 @@ const ProfilePrivacyPolicy = ({ group, firebase, className, ...rest }) => {
    )
    const handleSubmitForm = async (values, { setStatus }) => {
       try {
-         await firebase.updateCareerCenter(group.id, {
+         await firebase.updateCareerCenter(group, {
             privacyPolicyUrl: values.privacyPolicyUrl,
             privacyPolicyActive: values.privacyPolicyActive,
          })
