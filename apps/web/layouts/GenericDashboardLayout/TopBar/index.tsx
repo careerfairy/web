@@ -24,10 +24,7 @@ const styles = sxStyles({
          xs: 2,
          sm: 5,
       },
-      py: {
-         xs: 1,
-         md: 3.2,
-      },
+      py: 1,
    },
    leftSection: {
       display: "flex",
