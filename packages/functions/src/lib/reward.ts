@@ -73,6 +73,7 @@ export const rewardApply = async (reward: RewardDoc, userEmail: string) => {
       await rewardsRepo.applyCreditsToUser(userEmail, reward.credits)
    }
 
+   // side effects depending on the reward action
    switch (reward.action) {
       /**
        * When a user (follower) signup using a referral code (leader)
@@ -187,10 +188,10 @@ export const rewardLivestreamRegistrant = async (
       return
    }
 
-   const registerReward = await rewardsRepo.getRelatedToLivestream(
+   const registerReward = await rewardsRepo.get(
       documentData.id,
-      livestreamId,
-      "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER"
+      "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER",
+      { livestreamId }
    )
 
    if (registerReward) {

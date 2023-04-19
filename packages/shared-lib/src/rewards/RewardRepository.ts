@@ -16,12 +16,12 @@ export interface IRewardRepository {
    ): Promise<void>
 
    /**
-    * Get a reward that is related to a livestream
+    * Get a reward
     */
-   getRelatedToLivestream(
+   get(
       userDataId: string,
-      livestreamId: string,
-      action: RewardAction
+      action: RewardAction,
+      filters?: RewardFilterFields
    ): Promise<RewardDoc | null>
 
    applyCreditsToUser(userEmail: string, credits: number): Promise<void>
@@ -61,17 +61,22 @@ export class FirebaseRewardRepository
          .add(doc)
    }
 
-   async getRelatedToLivestream(
+   async get(
       userDataId: string,
-      livestreamId: string,
-      action: RewardAction
+      action: RewardAction,
+      filters: RewardFilterFields = {}
    ): Promise<RewardDoc | null> {
-      const querySnapshot = await this.firestore
+      const query = this.firestore
          .collection("userData")
          .doc(userDataId)
          .collection("rewards")
-         .where("livestreamId", "==", livestreamId)
          .where("action", "==", action)
+
+      if (filters.livestreamId) {
+         query.where("livestreamId", "==", filters.livestreamId)
+      }
+
+      const querySnapshot = await query
          .withConverter(createCompatGenericConverter<RewardDoc>())
          .limit(1)
          .get()
@@ -94,3 +99,5 @@ export class FirebaseRewardRepository
          })
    }
 }
+
+export type RewardFilterFields = Pick<RewardDoc, "livestreamId">
