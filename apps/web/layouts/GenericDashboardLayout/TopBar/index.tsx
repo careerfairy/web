@@ -25,6 +25,7 @@ const styles = sxStyles({
          sm: 5,
       },
       py: 1,
+      minHeight: "70px",
    },
    leftSection: {
       display: "flex",
