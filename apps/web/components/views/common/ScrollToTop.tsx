@@ -48,7 +48,7 @@ const ScrollToTop = ({ fontSize = "large", size, hasBottomNavBar }: Props) => {
    return (
       <Grow in={showScroll}>
          <Fab
-            sx={[styles.scrollTop, hasBottomNavBar ? { bottom: "75px" } : null]}
+            sx={[styles.scrollTop, hasBottomNavBar ? { bottom: "90px" } : null]}
             onClick={scrollTop}
             color="primary"
             size={size}
