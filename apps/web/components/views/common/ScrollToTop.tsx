@@ -3,6 +3,7 @@ import { Fab, Grow } from "@mui/material"
 import ScrollToTopIcon from "@mui/icons-material/ExpandLessRounded"
 import { sxStyles } from "../../../types/commonTypes"
 import { scrollTop } from "../../../util/CommonUtil"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    scrollTop: {
@@ -31,6 +32,7 @@ type Props = {
 
 const ScrollToTop = ({ fontSize = "large", size, hasBottomNavBar }: Props) => {
    const [showScroll, setShowScroll] = useState(false)
+   const isMobile = useIsMobile()
 
    useEffect(() => {
       window.addEventListener("scroll", checkScrollTop)
@@ -48,7 +50,10 @@ const ScrollToTop = ({ fontSize = "large", size, hasBottomNavBar }: Props) => {
    return (
       <Grow in={showScroll}>
          <Fab
-            sx={[styles.scrollTop, hasBottomNavBar ? { bottom: "90px" } : null]}
+            sx={[
+               styles.scrollTop,
+               hasBottomNavBar && isMobile ? { bottom: "90px" } : null,
+            ]}
             onClick={scrollTop}
             color="primary"
             size={size}
