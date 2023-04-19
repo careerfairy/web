@@ -44,7 +44,11 @@ const StayUpToDateBanner = () => {
                      </Typography>
                   </Grid>
                   <Grid item>
-                     <FollowButton group={group} color={"secondary"} noIcon />
+                     <FollowButton
+                        group={group}
+                        color={"secondary"}
+                        startIcon={null}
+                     />
                   </Grid>
                </Grid>
             </Grid>
