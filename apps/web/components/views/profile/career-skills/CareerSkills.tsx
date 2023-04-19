@@ -200,7 +200,11 @@ const UnlockedRewardsAccordion = ({ badge }: { badge: Badge }) => {
    const unlockedRewards = currentUserBadgeLevel?.getAllRewards() ?? []
 
    return (
-      <Accordion elevation={0} disableGutters>
+      <Accordion
+         elevation={0}
+         disableGutters
+         sx={{ backgroundColor: "inherit" }}
+      >
          <AccordionSummary
             expandIcon={<ExpandMoreIcon color="secondary" />}
             aria-controls="unlockedRewards-content"
