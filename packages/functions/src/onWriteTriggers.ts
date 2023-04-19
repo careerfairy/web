@@ -7,6 +7,7 @@ import {
    defaultTriggerRunTimeConfig,
 } from "./lib/triggers/util"
 import config from "./config"
+import { rewardSideEffectsUserStats } from "./lib/reward"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -65,7 +66,7 @@ export const syncUserLivestreamData = functions
 export const syncLivestreamStats = functions
    .runWith(defaultTriggerRunTimeConfig)
    .region(config.region)
-   .firestore.document("livestreams/{livestreamId}/stats/livestreamStats") // Listens to a single document https://firebase.google.com/docs/functions/firestore-events#specific-documents
+   .firestore.document("livestreams/{livestreamId}/stats/livestreamStats")
    .onWrite(async (change, context) => {
       const changeTypes = getChangeTypes(change)
 
@@ -82,6 +83,29 @@ export const syncLivestreamStats = functions
       sideEffectPromises.push(
          groupRepo.addOperationsToGroupStats(change, functions.logger)
       )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const syncUserStats = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("userData/{userEmail}/stats/stats")
+   .onWrite(async (change, context) => {
+      const changeTypes = getChangeTypes(change)
+      const userEmail = context.params.userEmail
+
+      logStart({
+         changeTypes,
+         context,
+         message: "syncUserStatsOnWrite",
+      })
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for all livestreamStats changes
+      sideEffectPromises.push(rewardSideEffectsUserStats(userEmail, change))
 
       return handleSideEffects(sideEffectPromises)
    })

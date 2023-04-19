@@ -12,7 +12,7 @@ export interface IRewardRepository {
    create(
       rewardedUserId: string,
       action: RewardAction,
-      otherData: Partial<RewardDoc>
+      otherData?: Partial<RewardDoc>
    ): Promise<void>
 
    /**

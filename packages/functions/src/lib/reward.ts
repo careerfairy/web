@@ -1,4 +1,9 @@
-import { RewardAction, RewardDoc } from "@careerfairy/shared-lib/rewards"
+import {
+   REFERRAL_AFTER_FIRST_FRIENDS_CREDITS,
+   REFERRAL_FIRST_FRIENDS_NUM,
+   RewardAction,
+   RewardDoc,
+} from "@careerfairy/shared-lib/rewards"
 import functions = require("firebase-functions")
 import {
    LivestreamEvent,
@@ -7,6 +12,9 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
 import { livestreamsRepo, rewardsRepo, userRepo } from "../api/repositories"
+import type { Change } from "firebase-functions"
+import { firestore } from "firebase-admin"
+import DocumentSnapshot = firestore.DocumentSnapshot
 
 export const rewardCreateReferralSignUpLeader = (
    leaderId: string,
@@ -122,6 +130,10 @@ export const rewardApply = async (reward: RewardDoc, userEmail: string) => {
       case "REFERRAL_SIGNUP_LEADER":
          // This user just won a new referral
          await userRepo.incrementStat(userEmail, "referralsCount", 1)
+
+         // If the user has more than 3 referrals, give him a credit for each
+         // extra referral
+         await giveCreditsAfterFirstFriends(userEmail)
          break
 
       /**
@@ -210,4 +222,56 @@ export const rewardLivestreamRegistrant = async (
    functions.logger.info(
       "Created a new reward for the livestream registration."
    )
+}
+
+/**
+ * Attributes rewards to the user based on their stats
+ */
+export const rewardSideEffectsUserStats = async (
+   userEmail: string,
+   changes: Change<DocumentSnapshot>
+) => {
+   // reward the user for attending their first livestream
+   if (isFirstAttendance(changes)) {
+      await rewardsRepo.create(userEmail, "LIVESTREAM_USER_FIRST_ATTENDED")
+   }
+
+   // reward the user for referring their first friends
+   if (referredFirstFriends(changes)) {
+      await rewardsRepo.create(userEmail, "REFERRAL_FIRST_FRIENDS")
+   }
+}
+
+const isFirstAttendance = (changes: Change<DocumentSnapshot>) => {
+   const pastLivestreamAttendances = changes.before.get(
+      "totalLivestreamAttendances"
+   )
+   const currentLivestreamAttendances = changes.after.get(
+      "totalLivestreamAttendances"
+   )
+
+   return !pastLivestreamAttendances && currentLivestreamAttendances === 1
+}
+
+const referredFirstFriends = (changes: Change<DocumentSnapshot>) => {
+   const pastValue = changes.before.get("referralsCount")
+   const currentValue = changes.after.get("referralsCount")
+
+   return (
+      pastValue === REFERRAL_FIRST_FRIENDS_NUM - 1 &&
+      currentValue === REFERRAL_FIRST_FRIENDS_NUM
+   )
+}
+
+const giveCreditsAfterFirstFriends = async (userEmail: string) => {
+   const stats = await userRepo.getStats(userEmail)
+
+   // If the user has more than 3 referrals, give him a credit for each
+   // extra referral
+   if (stats?.referralsCount > REFERRAL_FIRST_FRIENDS_NUM) {
+      await rewardsRepo.applyCreditsToUser(
+         userEmail,
+         REFERRAL_AFTER_FIRST_FRIENDS_CREDITS
+      )
+   }
 }
