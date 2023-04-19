@@ -8,7 +8,7 @@ import React, {
 } from "react"
 import TopBar from "./TopBar"
 import AdminGenericLayout from "../AdminGenericLayout"
-import NavBar from "../GenericDashboardLayout/NavBar"
+import NavBar from "./NavBar"
 
 type IGroupDashboardState = {
    layout: {
