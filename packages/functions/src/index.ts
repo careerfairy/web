@@ -169,7 +169,8 @@ exports.updateBreakoutRoomStatusOnWrite =
 exports.slackHandleInteractions = slack.slackHandleInteractions
 
 // Rewards
-exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
+exports.rewardLivestreamInvitationComplete =
+   rewards.rewardLivestreamInvitationComplete
 exports.rewardUserAction = rewards.rewardUserAction
 exports.applyReferralCode = rewards.applyReferralCode
 
