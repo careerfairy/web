@@ -497,7 +497,8 @@ class FirebaseService {
       currentGroup: Group,
       newCareerCenter: Partial<Group>
    ) => {
-      const updatedGroup = Object.assign({}, currentGroup, newCareerCenter) // We want to get the future state of the group
+      // We want to get the future state of the group
+      const updatedGroup = Object.assign({}, currentGroup, newCareerCenter)
 
       let ref = this.firestore
          .collection("careerCenterData")
