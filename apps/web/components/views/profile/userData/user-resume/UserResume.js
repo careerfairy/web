@@ -9,7 +9,6 @@ import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 import UploadCvButton from "./UploadCvButton"
 import { rewardService } from "data/firebase/RewardService"
-import { errors } from "@playwright/test"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({
