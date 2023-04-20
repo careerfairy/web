@@ -136,14 +136,18 @@ const CompanyCard: FC<Props> = ({ company }) => {
                />
             </Box>
             <Box sx={styles.followButtonWrapper}>
-               <FollowButton
-                  group={company}
-                  variant={"outlined"}
-                  color={"secondary"}
-                  size={"small"}
-                  sx={styles.followButton}
-                  startIcon={null}
-               />
+               {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
+                  <FollowButton
+                     group={company}
+                     variant={"outlined"}
+                     color={"secondary"}
+                     size={"small"}
+                     sx={styles.followButton}
+                     startIcon={null}
+                  />
+               ) : (
+                  <Skeleton variant="rectangular" width={100} height={30} />
+               )}
             </Box>
             <Stack flex={1} justifyContent="space-between" spacing={2}>
                <Typography
