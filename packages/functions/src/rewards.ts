@@ -53,11 +53,10 @@ export const rewardLivestreamInvitationComplete = functions.https.onCall(
          )
       }
 
-      const livestreamDoc: any = await validateLivestreamEvent(
-         livestreamId,
-         userEmail,
-         true
-      )
+      const livestreamDoc: any = await validateLivestreamEvent(livestreamId, {
+         userMustBeRegistered: userEmail,
+         livestreamMustBeLive: true,
+      })
 
       validateDuplicatedReward(
          userEmail,
@@ -97,14 +96,13 @@ export const rewardUserAction = functions.https.onCall(
          )
       }
 
-      const flagsToCheck = {
-         livestreamMustBeLive: false,
-      }
+      const flagsToCheck: LivestreamValidationFlags = {}
 
       switch (action) {
          case "LIVESTREAM_USER_ATTENDED":
          case "LIVESTREAM_USER_ASKED_QUESTION":
          case "LIVESTREAM_USER_HAND_RAISED":
+         case "LIVESTREAM_RECORDING_BOUGHT":
             validateLivestreamIdExists(data.livestreamId)
 
             // this reward can only be created once per livestream
@@ -113,8 +111,13 @@ export const rewardUserAction = functions.https.onCall(
             })
 
             if (action === "LIVESTREAM_USER_ATTENDED") {
-               // The livestream should be live during action
+               // The livestream should be live during this action
                flagsToCheck.livestreamMustBeLive = true
+            }
+
+            if (action === "LIVESTREAM_RECORDING_BOUGHT") {
+               // The livestream can't have the deny recording flag set
+               flagsToCheck.recordingShouldBeAccessible = true
             }
 
             break
@@ -129,8 +132,7 @@ export const rewardUserAction = functions.https.onCall(
       if (data.livestreamId) {
          livestreamDoc = await validateLivestreamEvent(
             data.livestreamId,
-            userEmail,
-            flagsToCheck.livestreamMustBeLive
+            flagsToCheck
          )
       }
 
@@ -204,29 +206,34 @@ type ReferralData = {
    referralCode: string
 }
 
+type LivestreamValidationFlags = {
+   livestreamMustBeLive?: boolean
+   userMustBeRegistered?: string | undefined
+   recordingShouldBeAccessible?: boolean
+}
+
 // Validation functions, should throw exceptions
 
 /**
- * Validates if livestream exists, the user is registered, is live
+ * Validation logic related to the livestream
  *
  * Throws if a condition is not met
- *
- * @param livestreamId
- * @param userMustBeRegistered
- * @param livestreamMustBeLive
  */
 async function validateLivestreamEvent(
-   livestreamId: string,
-   userMustBeRegistered: string | null = null,
-   livestreamMustBeLive = false
+   livestream: string | LivestreamEvent,
+   flags: LivestreamValidationFlags
 ): Promise<LivestreamEvent> {
-   const livestreamDoc = (await livestreamsRepo.getById(
-      livestreamId
-   )) as LivestreamEvent
+   let livestreamDoc = typeof livestream === "string" ? null : livestream
+
+   if (!livestreamDoc) {
+      livestreamDoc = (await livestreamsRepo.getById(
+         livestream as string
+      )) as LivestreamEvent
+   }
 
    if (!livestreamDoc) {
       functions.logger.error("The livestream does not exist", {
-         livestreamId,
+         livestream,
       })
       throw new functions.https.HttpsError(
          "failed-precondition",
@@ -240,7 +247,7 @@ async function validateLivestreamEvent(
    }
 
    if (
-      livestreamMustBeLive &&
+      flags.livestreamMustBeLive &&
       (!livestreamDoc.hasStarted || livestreamDoc.hasEnded)
    ) {
       functions.logger.error("The livestream is not live or does not exist", {
@@ -253,15 +260,29 @@ async function validateLivestreamEvent(
    }
 
    if (
-      userMustBeRegistered &&
-      !livestreamDoc.registeredUsers?.includes(userMustBeRegistered)
+      flags.userMustBeRegistered &&
+      !livestreamDoc.registeredUsers?.includes(flags.userMustBeRegistered)
    ) {
       functions.logger.error(
          "The user is not registered in the livestream, someone trying to hack us?",
          {
-            userMustBeRegistered,
+            email: flags.userMustBeRegistered,
             livestreamDoc,
-            livestreamId,
+            livestream,
+         }
+      )
+      throw new functions.https.HttpsError(
+         "failed-precondition",
+         "Something wrong happened"
+      )
+   }
+
+   if (flags.recordingShouldBeAccessible && livestreamDoc.denyRecordingAccess) {
+      functions.logger.error(
+         "The livestream doesn't have the recoding accessible, buy action not granted",
+         {
+            livestreamDoc,
+            livestream,
          }
       )
       throw new functions.https.HttpsError(
