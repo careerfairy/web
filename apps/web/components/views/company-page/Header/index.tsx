@@ -75,7 +75,7 @@ const styles = sxStyles({
    },
    headerWrapperSticky: {
       position: "fixed",
-      top: 0,
+      top: 10,
       left: 0,
       zIndex: (theme) => theme.zIndex.appBar,
       width: "100%",
@@ -235,7 +235,11 @@ const Header = () => {
             {isSticky ? <ToolbarOffset /> : null}
 
             <Box display={"flex"}>
-               <Box bgcolor={isSticky ? "#EFF5F8" : "transparent"} flex={1} />
+               <Box
+                  minWidth={isSticky ? { xs: "unset", md: "300px" } : null}
+                  bgcolor={isSticky ? "#EFF5F8" : "transparent"}
+                  flex={1}
+               />
                <Container
                   disableGutters
                   maxWidth="lg"

@@ -171,7 +171,7 @@ const CompanyPageOverview = ({
 
    return (
       <CompanyPageContext.Provider value={contextValue}>
-         <Box bgcolor={"white"} height={"100%"} pb={5}>
+         <Box height={"100%"} pb={5}>
             {editMode ? <ProgressBanner /> : null}
             <Box mb={{ xs: 4, md: 10 }}>
                <Header />

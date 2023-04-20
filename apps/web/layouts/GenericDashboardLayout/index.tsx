@@ -6,6 +6,7 @@ import GenericNavList from "./GenericNavList"
 import { createContext, useContext, useEffect, useMemo, useState } from "react"
 import { useRouter } from "next/router"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
+import FooterV2 from "../../components/views/footer/FooterV2"
 
 type IGenericDashboardContext = {
    isOverBanner: boolean
@@ -69,6 +70,7 @@ const GenericDashboardLayout = ({
             drawerOpen={!isMobile}
          >
             {children}
+            <FooterV2 background={bgColor || "#F7F8FC"} />
          </AdminGenericLayout>
       </GenericDashboardContext.Provider>
    )
