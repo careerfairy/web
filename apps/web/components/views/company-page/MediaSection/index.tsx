@@ -23,7 +23,8 @@ const MediaSection = () => {
             }}
             p={3}
             spacing={3}
-            bgcolor={"background.default"}
+            bgcolor={"white"}
+            border={"1px solid #EDE7FD"}
          >
             <CompanyPhotos />
             <CompanyVideo />
