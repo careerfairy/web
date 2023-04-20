@@ -12,7 +12,7 @@ type Props = {
    text: string
    fontSize?: string
 }
-const CompanyTag: FC<Props> = ({ icon, text, fontSize }) => {
+const CompanyTag: FC<Props> = ({ icon, text, fontSize = "1rem" }) => {
    return (
       <Box display="flex" alignItems="center">
          {icon}
