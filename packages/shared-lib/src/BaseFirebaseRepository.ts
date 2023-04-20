@@ -2,7 +2,7 @@ import firebase from "firebase/compat/app"
 import { Identifiable } from "./commonTypes"
 import QuerySnapshot = firebase.firestore.QuerySnapshot
 type DocumentSnapshot = firebase.firestore.DocumentSnapshot
-import { FirestoreDataConverter } from "firebase/firestore"
+import { FirestoreDataConverter, QuerySnapshot as QS } from "firebase/firestore"
 
 /**
  * Utility methods for Firebase based repositories
@@ -68,7 +68,7 @@ export function convertDictToDocArray<T>(dict: Record<string, T>): T[] {
  * @param withRef
  */
 export function mapFirestoreDocuments<T, R extends boolean = false>(
-   documentSnapshot: QuerySnapshot,
+   documentSnapshot: QuerySnapshot | QS,
    withRef?: R
 ): (R extends true ? T & DocRef : T)[] | null {
    let docs = null

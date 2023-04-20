@@ -1,10 +1,13 @@
-import { FC } from "react"
+import { FC, useMemo } from "react"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { Grid } from "@mui/material"
-import useInfiniteCompanies from "./useInfiniteCompanies"
-import { useRouter } from "next/router"
+import useInfiniteCompanies, {
+   UseInfiniteCompanies,
+} from "./useInfiniteCompanies"
 import { sxStyles } from "../../../types/commonTypes"
-import CompanyCard from "./CompanyCard"
+import CompanyCard, { CompanyCardSkeleton } from "./CompanyCard"
+import { PAGE_SIZE } from "../../../pages/companies"
+import InfiniteScroll from "react-infinite-scroll-component"
 
 const styles = sxStyles({
    flexItem: {
@@ -17,34 +20,51 @@ type Props = {
 }
 
 const Companies: FC<Props> = ({ initialData }) => {
-   const {
-      query: { searchQuery },
-   } = useRouter()
-
-   const { data: companies } = useInfiniteCompanies(
-      10,
-      {
-         searchText: searchQuery as string,
-      },
-      initialData
+   const options = useMemo<UseInfiniteCompanies>(
+      () => ({
+         filters: {},
+         initialData,
+         limit: PAGE_SIZE,
+      }),
+      [initialData]
    )
 
+   const {
+      documents: companies,
+      getMore,
+      hasMore,
+      loading,
+   } = useInfiniteCompanies(options)
+
    return (
-      <Grid container spacing={2}>
-         {companies?.map((company) => (
-            <Grid
-               sx={styles.flexItem}
-               key={company.id}
-               item
-               xs={12}
-               sm={6}
-               lg={4}
-               xl={3}
-            >
-               <CompanyCard company={company} />
-            </Grid>
-         ))}
-      </Grid>
+      <InfiniteScroll
+         dataLength={companies.length}
+         hasMore={hasMore}
+         next={getMore}
+         loader={<></>}
+         style={{ overflow: "inherit" }}
+      >
+         <Grid container spacing={2}>
+            {companies?.map((company) => (
+               <Grid
+                  sx={styles.flexItem}
+                  key={company.id}
+                  item
+                  xs={12}
+                  sm={6}
+                  lg={4}
+                  xl={3}
+               >
+                  <CompanyCard company={company} />
+               </Grid>
+            ))}
+            {loading ? (
+               <Grid sx={styles.flexItem} item xs={12} sm={6} lg={4} xl={3}>
+                  <CompanyCardSkeleton />
+               </Grid>
+            ) : null}
+         </Grid>
+      </InfiniteScroll>
    )
 }
 
