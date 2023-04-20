@@ -10,7 +10,7 @@ import LoadingButton from "@mui/lab/LoadingButton"
 import FollowedIcon from "@mui/icons-material/CheckRounded"
 import { Button, ButtonProps } from "@mui/material"
 import { useRouter } from "next/router"
-import Link from "../../common/Link"
+import Link from "../Link"
 import { useFirestoreDocument } from "../../../custom-hook/utils/useFirestoreDocument"
 import { useMountedState } from "react-use"
 
