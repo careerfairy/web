@@ -128,6 +128,15 @@ export const REWARDS = {
       credits: 1,
       humanStringDescription: "You have attended your first live stream event",
    },
+
+   /**
+    * Rewards triggered by spending credits
+    */
+   LIVESTREAM_RECORDING_BOUGHT: {
+      name: "LIVESTREAM_RECORDING_BOUGHT",
+      credits: -1,
+      humanStringDescription: "You have bought access to the recording",
+   },
 } satisfies Record<string, Reward>
 
 export type RewardAction = keyof typeof REWARDS
