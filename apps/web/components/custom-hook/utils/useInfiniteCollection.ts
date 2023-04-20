@@ -3,7 +3,7 @@ import {
    getDocs,
    limit,
    Query,
-   query as firestoreQuery, // renamed
+   query as firestoreQuery,
    QueryDocumentSnapshot,
    startAfter,
    where,
@@ -23,14 +23,13 @@ export interface InfiniteCollection<T extends Identifiable> {
    getMore(): Promise<void>
    loading: boolean
    documents?: T[]
-   limit: number
    hasMore: boolean
    error?: Error
 }
 
 const useInfiniteCollection = <T extends Identifiable>({
-   query: initialQuery, // renamed
-   limit: initialLimit, // renamed
+   query: targetQuery,
+   limit: targetLimit,
    initialData = [],
 }: UseInfiniteCollection<T>): InfiniteCollection<T> => {
    const [docs, setDocs] = useState<T[]>(initialData)
@@ -46,15 +45,14 @@ const useInfiniteCollection = <T extends Identifiable>({
          setError(undefined)
          try {
             const nextQuery = firestoreQuery(
-               initialQuery,
-               limit(initialLimit),
+               targetQuery,
                ...(lastSnap ? [startAfter(lastSnap)] : [])
             )
             const snapshot = await getDocs(nextQuery)
             const fetchedDocs = snapshot.docs.map((doc) => doc.data())
 
             setDocs((prevDocs) => [...prevDocs, ...fetchedDocs])
-            setHasMore(fetchedDocs.length >= initialLimit)
+            setHasMore(fetchedDocs.length >= targetLimit)
             setLastDocumentSnapShot(snapshot.docs[snapshot.docs.length - 1])
          } catch (error) {
             setError(error)
@@ -62,7 +60,7 @@ const useInfiniteCollection = <T extends Identifiable>({
             setLoading(false)
          }
       },
-      [initialLimit, initialQuery]
+      [targetLimit, targetQuery]
    )
 
    const getMore = useCallback(async () => {
@@ -76,14 +74,18 @@ const useInfiniteCollection = <T extends Identifiable>({
       await fetchDocuments(lastDocumentSnapShot)
    }, [hasMore, docs, fetchDocuments, lastDocumentSnapShot])
 
-   const getInitialDataLastDoc = useCallback(async () => {
+   /*
+    * This method is used to get the last document snapshot from the initial data
+    * This is because in order to paginate a query, we need a document snapshot, not the doc data itself
+    * */
+   const getInitialDataLastDocSnapshot = useCallback(async () => {
       const lastDoc = initialData[initialData.length - 1]
       const id = lastDoc?.id
 
       if (!id) return
 
       // @ts-ignore
-      const collectionNameSegments = initialQuery._query.path
+      const collectionNameSegments = targetQuery._query.path
          .segments as string[]
 
       const collectionName =
@@ -97,23 +99,22 @@ const useInfiniteCollection = <T extends Identifiable>({
       )
       const lastSnap = docs.docs[0] || undefined
       setLastDocumentSnapShot(lastSnap)
-   }, [initialData, initialQuery])
+   }, [initialData, targetQuery])
 
    const hasInitialData = Boolean(initialData.length)
 
    useEffect(() => {
       if (hasInitialData) {
-         void getInitialDataLastDoc()
+         void getInitialDataLastDocSnapshot()
       } else {
          void fetchDocuments()
       }
-   }, [fetchDocuments, getInitialDataLastDoc, hasInitialData])
+   }, [fetchDocuments, getInitialDataLastDocSnapshot, hasInitialData])
 
    return {
       getMore,
       loading,
       documents: docs,
-      limit: initialLimit,
       hasMore,
       error,
    }
