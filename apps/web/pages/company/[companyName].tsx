@@ -1,5 +1,4 @@
 import React from "react"
-import DashboardHead from "../../layouts/GroupDashboardLayout/DashboardHead"
 import CompanyPageOverview from "../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
@@ -11,15 +10,14 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import GeneralLayout from "../../layouts/GeneralLayout"
-import FollowButton from "../../components/views/company-page/Header/FollowButton"
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
-import useIsMobile from "../../components/custom-hook/useIsMobile"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
+import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import SEO from "../../components/util/SEO"
 
 type TrackProps = {
    id: string
@@ -30,7 +28,6 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
 }) => {
-   const isMobile = useIsMobile()
    const { trackCompanyPageView } = useFirebaseService()
    const { universityName, id } = serverSideGroup
 
@@ -41,30 +38,27 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (
-      <GeneralLayout
-         viewRef={viewRef}
-         fullScreen
-         headerEndContent={
-            <>
-               {isMobile ? (
-                  <Box px={0.5}>
-                     <FollowButton group={serverSideGroup} />
-                  </Box>
-               ) : null}
-            </>
-         }
-      >
-         <DashboardHead title={`CareerFairy | ${universityName}`} />
-         <Box sx={{ backgroundColor: "white", minHeight: "100vh" }}>
-            <CompanyPageOverview
-               group={serverSideGroup}
-               upcomingLivestreams={mapFromServerSide(
-                  serverSideUpcomingLivestreams
-               )}
-               editMode={false}
-            />
-         </Box>
-      </GeneralLayout>
+      <>
+         <SEO
+            id={`CareerFairy | ${universityName}`}
+            title={`CareerFairy | ${universityName}`}
+         />
+
+         <GenericDashboardLayout pageDisplayName={""}>
+            <Box
+               sx={{ backgroundColor: "inherit", minHeight: "100vh" }}
+               ref={viewRef}
+            >
+               <CompanyPageOverview
+                  group={serverSideGroup}
+                  upcomingLivestreams={mapFromServerSide(
+                     serverSideUpcomingLivestreams
+                  )}
+                  editMode={false}
+               />
+            </Box>
+         </GenericDashboardLayout>
+      </>
    )
 }
 
