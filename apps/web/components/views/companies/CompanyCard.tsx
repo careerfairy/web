@@ -206,7 +206,7 @@ const UpcomingLivestream: FC<UpcomingLivestreamProps> = ({
    return (
       <Stack spacing={1}>
          <LivestreamHeader>
-            {livestream ? "Upcoming Livestream" : "No Upcoming Livestream"}
+            {livestream ? "Upcoming Live Stream" : "No Upcoming Live Stream"}
          </LivestreamHeader>
 
          <LivestreamTitle italic={!livestream}>
