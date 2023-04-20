@@ -327,7 +327,6 @@ const generateCompanyJsonLd = (company: Group) => {
          "@type": "PostalAddress",
          addressCountry: company.companyCountry.name,
       },
-      industry: company.companyIndustry.name,
       numberOfEmployees: company.companySize,
       slogan: company.description,
       identifier: {
