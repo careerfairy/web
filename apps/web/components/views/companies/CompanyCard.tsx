@@ -21,17 +21,13 @@ import {
    CompanySizeTag,
 } from "../common/company/company-tags"
 import { useInView } from "react-intersection-observer"
-import { collection, orderBy, query, where } from "firebase/firestore"
-import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { limit } from "@firebase/firestore"
-import { useFirestoreCollection } from "../../custom-hook/utils/useFirestoreCollection"
 import Skeleton from "@mui/material/Skeleton"
 import { SuspenseWithBoundary } from "../../ErrorBoundary"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { alpha } from "@mui/material/styles"
 import FollowButton from "../company-page/Header/FollowButton"
 import Link from "../common/Link"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
+import useCompanyUpcomingLivestream from "./useCompanyUpcomingLivestream"
 
 const LOGO_HEIGHT = 60
 const LOGO_WIDTH = 64
@@ -54,6 +50,8 @@ const styles = sxStyles({
    actionArea: {
       color: "text.primary",
       textDecoration: "none",
+      position: "absolute",
+      inset: 0,
    },
    media: {
       height: 120,
@@ -102,6 +100,7 @@ const styles = sxStyles({
          background: (theme) => theme.palette.background.paper,
       },
       textTransform: "none",
+      zIndex: 1,
    },
 })
 
@@ -116,77 +115,75 @@ const CompanyCard: FC<Props> = ({ company }) => {
 
    return (
       <Card ref={ref} sx={[styles.root]}>
-         <CardActionArea
-            href={`/company/${companyNameSlugify(company.universityName)}`}
-            sx={styles.actionArea}
-            component={Link}
-         >
-            <CardMedia sx={styles.media} title={company.universityName}>
+         <CardMedia sx={styles.media} title={company.universityName}>
+            <Image
+               src={getResizedUrl(company.bannerImageUrl, "md")}
+               className="illustration"
+               layout="fill"
+               alt={company.universityName}
+               objectFit="cover"
+            />
+            <LinkToCompanyPage companyName={company.universityName} />
+         </CardMedia>
+         <CardContent sx={styles.content}>
+            <Box sx={styles.companyLogo}>
                <Image
-                  src={getResizedUrl(company.bannerImageUrl, "md")}
-                  className="illustration"
-                  layout="fill"
+                  src={getResizedUrl(company.logoUrl, "sm")}
+                  width={64}
+                  height={60}
                   alt={company.universityName}
-                  objectFit="cover"
+                  objectFit="contain"
                />
-            </CardMedia>
-            <CardContent sx={styles.content}>
-               <Box sx={styles.companyLogo}>
-                  <Image
-                     src={getResizedUrl(company.logoUrl, "sm")}
-                     width={64}
-                     height={60}
-                     alt={company.universityName}
-                     objectFit="contain"
+            </Box>
+            <Box sx={styles.followButtonWrapper}>
+               <FollowButton
+                  group={company}
+                  variant={"outlined"}
+                  color={"secondary"}
+                  size={"small"}
+                  sx={styles.followButton}
+                  startIcon={null}
+               />
+            </Box>
+            <Stack flex={1} justifyContent="space-between" spacing={2}>
+               <Typography
+                  sx={styles.companyName}
+                  variant="h6"
+                  fontWeight={600}
+                  whiteSpace="pre-line"
+                  component="h2"
+               >
+                  {company.universityName}
+               </Typography>
+               <Stack spacing={1}>
+                  <CompanyCountryTag
+                     fontSize="1.07rem"
+                     text={company.companyCountry.name}
                   />
-               </Box>
-               <Box sx={styles.followButtonWrapper}>
-                  <FollowButton
-                     group={company}
-                     variant={"outlined"}
-                     color={"secondary"}
-                     size={"small"}
-                     sx={styles.followButton}
-                     startIcon={null}
+                  <CompanyIndustryTag
+                     fontSize="1.07rem"
+                     text={company.companyIndustry.name}
                   />
-               </Box>
-               <Stack flex={1} justifyContent="space-between" spacing={2}>
-                  <Typography
-                     sx={styles.companyName}
-                     variant="h6"
-                     fontWeight={600}
-                     whiteSpace="pre-line"
-                     component="h2"
-                  >
-                     {company.universityName}
-                  </Typography>
-                  <Stack spacing={1}>
-                     <CompanyCountryTag
-                        fontSize="1.07rem"
-                        text={company.companyCountry.name}
-                     />
-                     <CompanyIndustryTag
-                        fontSize="1.07rem"
-                        text={company.companyIndustry.name}
-                     />
-                     <CompanySizeTag
-                        fontSize="1.07rem"
-                        text={company.companySize}
-                     />
-                  </Stack>
-                  {inView ? (
-                     <SuspenseWithBoundary
-                        fallback={<UpcomingLivestreamSkeleton />}
-                     >
-                        <UpcomingLivestream
-                           groupName={company.universityName}
-                           groupId={company.id}
-                        />
-                     </SuspenseWithBoundary>
-                  ) : null}
+                  <CompanySizeTag
+                     fontSize="1.07rem"
+                     text={company.companySize}
+                  />
                </Stack>
-            </CardContent>
-         </CardActionArea>
+               {inView ? ( // Only fetch the next livestreams when the card is in view
+                  <SuspenseWithBoundary
+                     fallback={<UpcomingLivestreamSkeleton />}
+                  >
+                     <UpcomingLivestream
+                        groupName={company.universityName}
+                        groupId={company.id}
+                     />
+                  </SuspenseWithBoundary>
+               ) : (
+                  <UpcomingLivestreamSkeleton />
+               )}
+            </Stack>
+            <LinkToCompanyPage companyName={company.universityName} />
+         </CardContent>
       </Card>
    )
 }
@@ -203,25 +200,44 @@ const UpcomingLivestream: FC<UpcomingLivestreamProps> = ({
    const livestream = livestreams?.[0]
 
    return (
-      <Box
-         component={livestream ? Link : "div"}
-         noLinkStyle
-         href={livestream ? `/upcoming-livestream/${livestream.id}` : undefined}
-         passHref
-         prefetch={false}
-      >
-         <Stack component="a" spacing={1}>
-            <LivestreamHeader>
-               {livestream ? "Upcoming Livestream" : "No Upcoming Livestream"}
-            </LivestreamHeader>
+      <Stack spacing={1}>
+         <LivestreamHeader>
+            {livestream ? "Upcoming Livestream" : "No Upcoming Livestream"}
+         </LivestreamHeader>
 
-            <LivestreamTitle italic={!livestream}>
-               {livestream
-                  ? livestream.title
-                  : `Follow ${groupName} to be notified about new live streams.`}
-            </LivestreamTitle>
-         </Stack>
-      </Box>
+         <LivestreamTitle italic={!livestream}>
+            {livestream
+               ? livestream.title
+               : `Follow ${groupName} to be notified about new live streams.`}
+         </LivestreamTitle>
+      </Stack>
+   )
+}
+
+export const CompanyCardSkeleton: FC = () => {
+   return (
+      <Card sx={[styles.root]}>
+         <CardMedia sx={styles.media} title="Company Name">
+            <Skeleton variant="rectangular" width="100%" height="100%" />
+         </CardMedia>
+         <CardContent sx={styles.content}>
+            <Box sx={styles.companyLogo}>
+               <Skeleton variant="rectangular" width="100%" height="100%" />
+            </Box>
+            <Box sx={styles.followButtonWrapper}>
+               <Skeleton variant="rectangular" width={100} height={30} />
+            </Box>
+            <Stack flex={1} justifyContent="space-between" spacing={2}>
+               <Skeleton variant="text" width={200} />
+               <Stack spacing={1}>
+                  <Skeleton variant="text" width={100} />
+                  <Skeleton variant="text" width={100} />
+                  <Skeleton variant="text" width={100} />
+               </Stack>
+               <UpcomingLivestreamSkeleton />
+            </Stack>
+         </CardContent>
+      </Card>
    )
 }
 
@@ -249,6 +265,7 @@ const LivestreamHeader: FC = ({ children }) => (
       {children}
    </Typography>
 )
+
 const LivestreamTitle: FC<{
    italic?: boolean
 }> = ({ children, italic }) => {
@@ -265,21 +282,20 @@ const LivestreamTitle: FC<{
       </Typography>
    )
 }
-const now = new Date()
 
-const useCompanyUpcomingLivestream = (groupId: string) => {
-   const q = query<LivestreamEvent>(
-      // @ts-ignore
-      collection(FirestoreInstance, "livestreams"),
-      where("groupIds", "array-contains", groupId),
-      where("start", ">", now),
-      orderBy("start", "desc"),
-      limit(1)
+const LinkToCompanyPage: FC<{ companyName: string }> = ({
+   companyName,
+   children,
+}) => {
+   return (
+      <CardActionArea
+         href={`/company/${companyNameSlugify(companyName)}`}
+         sx={styles.actionArea}
+         component={Link}
+      >
+         {children}
+      </CardActionArea>
    )
-
-   return useFirestoreCollection<LivestreamEvent>(q, {
-      idField: "id",
-   })
 }
 
 export default CompanyCard

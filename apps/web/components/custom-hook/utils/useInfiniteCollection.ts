@@ -1,108 +1,119 @@
 import {
-   limit,
-   query,
-   Query,
-   startAfter,
+   documentId,
    getDocs,
-   OrderByDirection,
-   FirestoreDataConverter,
+   limit,
+   Query,
+   query as firestoreQuery, // renamed
+   QueryDocumentSnapshot,
+   startAfter,
+   where,
+   collection,
 } from "@firebase/firestore"
-import { orderBy } from "firebase/firestore"
-import { useCallback, useEffect, useMemo, useState } from "react"
-import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { useCallback, useEffect, useState } from "react"
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
+import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 
 export interface UseInfiniteCollection<T> {
    query: Query<T>
    limit: number
-   orderBy: OrderBy<T>
-   converterFn?: FirestoreDataConverter<T>
    initialData?: T[]
-}
-
-interface OrderBy<T> {
-   field: keyof T & string
-   direction: OrderByDirection
 }
 
 export interface InfiniteCollection<T extends Identifiable> {
    getMore(): Promise<void>
    loading: boolean
-   data?: T[]
+   documents?: T[]
    limit: number
    hasMore: boolean
    error?: Error
 }
 
-const useInfiniteCollection = <T extends Identifiable>(
-   options: UseInfiniteCollection<T>
-): InfiniteCollection<T> => {
-   const internalLimit = options.limit
-   const [docs, setDocs] = useState<T[]>(options.initialData || [])
+const useInfiniteCollection = <T extends Identifiable>({
+   query: initialQuery, // renamed
+   limit: initialLimit, // renamed
+   initialData = [],
+}: UseInfiniteCollection<T>): InfiniteCollection<T> => {
+   const [docs, setDocs] = useState<T[]>(initialData)
+   const [lastDocumentSnapShot, setLastDocumentSnapShot] =
+      useState<QueryDocumentSnapshot>()
    const [loading, setLoading] = useState(false)
    const [hasMore, setHasMore] = useState(true)
    const [error, setError] = useState<Error>()
 
-   const order = useMemo(
-      () => orderBy(options.orderBy.field, options.orderBy.direction),
-      [options.orderBy.direction, options.orderBy.field]
-   )
-
-   const [q, setQuery] = useState(
-      query(options.query, order, limit(internalLimit))
-   )
-
    const fetchDocuments = useCallback(
-      async (queryToFetch: Query<T>) => {
-         const converterFn = options.converterFn || createGenericConverter<T>()
-
+      async (lastSnap?: QueryDocumentSnapshot) => {
          setLoading(true)
          setError(undefined)
          try {
-            const snapshot = await getDocs(
-               queryToFetch.withConverter(converterFn)
+            const nextQuery = firestoreQuery(
+               initialQuery,
+               limit(initialLimit),
+               ...(lastSnap ? [startAfter(lastSnap)] : [])
             )
+            const snapshot = await getDocs(nextQuery)
             const fetchedDocs = snapshot.docs.map((doc) => doc.data())
+
             setDocs((prevDocs) => [...prevDocs, ...fetchedDocs])
-            setHasMore(fetchedDocs.length >= internalLimit)
+            setHasMore(fetchedDocs.length >= initialLimit)
+            setLastDocumentSnapShot(snapshot.docs[snapshot.docs.length - 1])
          } catch (error) {
             setError(error)
          } finally {
             setLoading(false)
          }
       },
-      [internalLimit, options.converterFn]
+      [initialLimit, initialQuery]
    )
 
    const getMore = useCallback(async () => {
       if (!hasMore) return
 
+      // Get the last document from the current documents.
       const lastDoc = docs[docs.length - 1]
 
       if (!lastDoc) return
 
-      const nextQuery = query(
-         options.query,
-         order,
-         limit(internalLimit),
-         startAfter(lastDoc)
-      )
+      await fetchDocuments(lastDocumentSnapShot)
+   }, [hasMore, docs, fetchDocuments, lastDocumentSnapShot])
 
-      await fetchDocuments(nextQuery)
-      setQuery(nextQuery)
-   }, [options.query, order, internalLimit, docs, fetchDocuments, hasMore])
+   const getInitialDataLastDoc = useCallback(async () => {
+      const lastDoc = initialData[initialData.length - 1]
+      const id = lastDoc?.id
+
+      if (!id) return
+
+      // @ts-ignore
+      const collectionNameSegments = initialQuery._query.path
+         .segments as string[]
+
+      const collectionName =
+         collectionNameSegments[collectionNameSegments.length - 1]
+
+      if (!collectionName) return
+
+      const collectionRef = collection(FirestoreInstance, collectionName)
+      const docs = await getDocs(
+         firestoreQuery(collectionRef, where(documentId(), "==", id), limit(1))
+      )
+      const lastSnap = docs.docs[0] || undefined
+      setLastDocumentSnapShot(lastSnap)
+   }, [initialData, initialQuery])
+
+   const hasInitialData = Boolean(initialData.length)
 
    useEffect(() => {
-      if (options.initialData) return
-
-      void fetchDocuments(q)
-   }, [q, fetchDocuments, options.initialData])
+      if (hasInitialData) {
+         void getInitialDataLastDoc()
+      } else {
+         void fetchDocuments()
+      }
+   }, [fetchDocuments, getInitialDataLastDoc, hasInitialData])
 
    return {
       getMore,
       loading,
-      data: docs,
-      limit: options.limit,
+      documents: docs,
+      limit: initialLimit,
       hasMore,
       error,
    }

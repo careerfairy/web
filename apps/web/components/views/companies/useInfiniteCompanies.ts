@@ -1,60 +1,61 @@
 import { useMemo } from "react"
-import { QueryConstraint } from "@firebase/firestore"
-import { collection, query, where } from "firebase/firestore"
+import { limit, Query, QueryConstraint } from "@firebase/firestore"
+import { collection, orderBy, query, where } from "firebase/firestore"
 import useInfiniteCollection, {
    UseInfiniteCollection,
 } from "../../custom-hook/utils/useInfiniteCollection"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
-import { ngrams } from "@careerfairy/shared-lib/utils/search"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 
+/**
+ * This is where you can add filters to the query as this hook grows
+ * */
 type Filters = {
-   searchText?: string
+   // industries?: string[]
+   // companySizes?: string[]
 }
 
-const useInfiniteCompanies = (
-   limit: number = 10,
-   filters: Filters = {},
+export type UseInfiniteCompanies = {
+   limit: number
+   filters: Filters
    initialData?: Group[]
-) => {
-   // @ts-ignore we're sorting by a nested field here
-   const options: UseInfiniteCollection<Group> = useMemo(
-      () => getQuery(limit, filters, initialData),
-      [limit, filters, initialData]
-   )
+}
+
+const useInfiniteCompanies = ({
+   filters,
+   initialData,
+   limit,
+}: UseInfiniteCompanies) => {
+   const options: UseInfiniteCollection<Group> = useMemo(() => {
+      return {
+         query: getInfiniteQuery(limit, filters),
+         limit,
+         initialData,
+      }
+   }, [limit, filters, initialData])
 
    return useInfiniteCollection<Group>(options)
 }
 
-export const getQuery = (
-   limit: number = 10,
-   filters: Filters = {},
-   initialData?: Group[]
-): UseInfiniteCollection<Group> => {
+export const getInfiniteQuery = (
+   pageSIze: number = 10,
+   filters: Filters = {}
+): Query<Group> => {
    const constraints: QueryConstraint[] = []
 
-   if (filters.searchText) {
-      const ngGrams = ngrams(filters.searchText, 3)
+   // if (filters.industries) {
+   //    constraints.push(
+   //       where("companyIndustry", "in", filters.industries)
+   //    )
 
-      ngGrams.forEach((name) =>
-         constraints.push(where(`triGrams.${name}`, "==", true))
-      )
-   }
-
-   return {
-      query: query(
-         collection(FirestoreInstance, "careerCenterData"),
-         where("publicProfile", "==", true),
-         ...constraints
-      ).withConverter(createGenericConverter<Group>()),
-      limit,
-      orderBy: {
-         field: "universityName",
-         direction: "asc",
-      },
-      initialData,
-   }
+   return query(
+      collection(FirestoreInstance, "careerCenterData"),
+      where("publicProfile", "==", true),
+      ...constraints,
+      limit(pageSIze),
+      orderBy("universityName", "asc")
+   ).withConverter(createGenericConverter<Group>())
 }
 
 export default useInfiniteCompanies
