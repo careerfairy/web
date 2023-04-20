@@ -11,6 +11,7 @@ import {
 import { sxStyles } from "../../../types/commonTypes"
 import Image from "next/image"
 import {
+   getBaseUrl,
    getMaxLineStyles,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
@@ -319,9 +320,12 @@ const generateCompanyJsonLd = (company: Group) => {
       "@context": "https://schema.org/",
       "@type": "Organization",
       name: company.universityName,
+      legalName: company.universityName,
       logo: company.logoUrl,
       image: [company.logoUrl, company.bannerImageUrl],
-      url: `/company/${companyNameSlugify(company.universityName)}`,
+      url: `${getBaseUrl()}/company/${companyNameSlugify(
+         company.universityName
+      )}`,
       description: `${company.description} - ${company.extraInfo}`,
       address: {
          "@type": "PostalAddress",
