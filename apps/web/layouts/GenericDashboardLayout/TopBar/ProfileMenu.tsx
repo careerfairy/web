@@ -20,6 +20,7 @@ import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunc
 import { alpha } from "@mui/material/styles"
 import Divider from "@mui/material/Divider"
 import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
+import { useMemo } from "react"
 
 const styles = sxStyles({
    ava: {
@@ -46,6 +47,8 @@ const styles = sxStyles({
    },
    companyText: {
       color: (theme) => alpha(theme.palette.text.secondary, 0.4),
+      display: "inline",
+      maxWidth: "200px",
    },
    creditDetails: {
       display: "flex",
@@ -58,6 +61,10 @@ const ProfileMenu = () => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
    const { userData, signOut, userPresenter } = useAuth()
    const { push } = useRouter()
+   const fieldOfStudyDisplayName = useMemo(
+      () => userPresenter?.getFieldOfStudyDisplayName(),
+      [userPresenter]
+   )
 
    if (!userData || !userData.id) {
       return null
@@ -99,22 +106,28 @@ const ProfileMenu = () => {
                      firstName={userData?.firstName}
                      sx={[styles.ava, { border: "none" }]}
                   />
-                  <Box sx={styles.details}>
-                     <Typography
-                        sx={styles.maxOneLine}
-                        variant={"h6"}
-                        fontWeight={500}
-                     >
-                        {userPresenter?.getDisplayName()}
-                     </Typography>
-                     <Typography
-                        sx={[styles.maxOneLine, styles.companyText]}
-                        color={"text.secondary"}
-                        variant={"subtitle1"}
-                     >
-                        {userPresenter?.getFieldOfStudyDisplayName()}
-                     </Typography>
-                  </Box>
+                  <Tooltip
+                     title={fieldOfStudyDisplayName}
+                     disableHoverListener={fieldOfStudyDisplayName.length <= 15}
+                  >
+                     <Box sx={styles.details}>
+                        <Typography
+                           sx={styles.maxOneLine}
+                           variant={"h6"}
+                           fontWeight={500}
+                        >
+                           {userPresenter?.getDisplayName()}
+                        </Typography>
+
+                        <Typography
+                           sx={[styles.maxOneLine, styles.companyText]}
+                           color={"text.secondary"}
+                           variant={"subtitle1"}
+                        >
+                           {fieldOfStudyDisplayName}
+                        </Typography>
+                     </Box>
+                  </Tooltip>
                </MenuItem>
                <MenuItem onClick={() => push("/profile")}>
                   <ListItemIcon>
