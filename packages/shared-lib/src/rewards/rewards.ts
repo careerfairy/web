@@ -52,7 +52,7 @@ type Reward = {
 /**
  * All Rewards objects
  */
-export const REWARDS = {
+export const REWARDS: Record<string, Reward> = {
    /**
     * Rewards triggered by user actions
     * These, require a cloud function to be triggered
@@ -137,7 +137,7 @@ export const REWARDS = {
       credits: -1,
       humanStringDescription: "You have bought access to the recording",
    },
-} satisfies Record<string, Reward>
+}
 
 export type RewardAction = keyof typeof REWARDS
 
