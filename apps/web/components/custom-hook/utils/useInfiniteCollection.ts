@@ -38,7 +38,7 @@ const useInfiniteCollection = <T extends Identifiable>(
    const [error, setError] = useState<Error>()
 
    const [initialDataLoaded, setInitialDataLoaded] = useState(
-      !options.initialData
+      !options.initialData // If there is no initial data, then we don't need to wait for it to load
    )
 
    const fetchDocuments = useCallback(
