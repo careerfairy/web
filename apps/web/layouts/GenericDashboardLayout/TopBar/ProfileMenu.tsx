@@ -22,13 +22,6 @@ import Divider from "@mui/material/Divider"
 import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
 
 const styles = sxStyles({
-   root: {
-      borderRadius: 6,
-   },
-   notificationBtn: {
-      color: "text.primary",
-      backgroundColor: "background.paper",
-   },
    ava: {
       width: {
          xs: 43,
@@ -127,25 +120,29 @@ const ProfileMenu = () => {
                   <ListItemIcon>
                      <PersonOutlineOutlinedIcon fontSize="small" />
                   </ListItemIcon>
-                  Profile
+                  <Typography color={"text.secondary"}>Profile</Typography>
                </MenuItem>
                <MenuItem onClick={() => push("/profile/career-skills")}>
                   <ListItemIcon>
                      <StarOutlineIcon fontSize="small" />
                   </ListItemIcon>
-                  My career skills
+                  <Typography color={"text.secondary"}>
+                     My career skills
+                  </Typography>
                </MenuItem>
                <MenuItem onClick={() => push("/profile/referrals")}>
                   <ListItemIcon>
                      <PeopleOutlinedIcon fontSize="small" />
                   </ListItemIcon>
-                  Referrals
+                  <Typography color={"text.secondary"}>Referrals</Typography>
                </MenuItem>
                <MenuItem onClick={() => push("/profile/saved-recruiters")}>
                   <ListItemIcon>
                      <ContentPasteOutlinedIcon fontSize="small" />
                   </ListItemIcon>
-                  My Recruiters
+                  <Typography color={"text.secondary"}>
+                     My Recruiters
+                  </Typography>
                </MenuItem>
 
                <MenuItem
@@ -159,10 +156,16 @@ const ProfileMenu = () => {
                   </ListItemIcon>
                   <Box sx={styles.creditDetails}>
                      <Box sx={{ display: "flex" }}>
-                        <Typography fontWeight={600} color={"primary"} mr={1}>
+                        <Typography
+                           fontWeight={600}
+                           color={"text.secondary"}
+                           mr={1}
+                        >
                            {userData?.credits || 0}
                         </Typography>
-                        <Typography fontWeight={400}>CareerCoins</Typography>
+                        <Typography color={"text.secondary"}>
+                           CareerCoins
+                        </Typography>
                      </Box>
                      <Typography
                         color={"text.secondary"}
@@ -174,16 +177,13 @@ const ProfileMenu = () => {
                   </Box>
                </MenuItem>
 
-               <MenuItem onClick={signOut}>
-                  <Box display={"flex"}>
-                     <Divider />
-                     <Box>
-                        <ListItemIcon>
-                           <LogoutOutlinedIcon fontSize="small" />
-                        </ListItemIcon>
-                        Logout
-                     </Box>
-                  </Box>
+               <Divider sx={{ width: "80%", alignSelf: "center" }} />
+
+               <MenuItem onClick={signOut} sx={{ marginTop: "0 !important" }}>
+                  <ListItemIcon>
+                     <LogoutOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  <Typography color={"text.secondary"}>Logout</Typography>
                </MenuItem>
             </Stack>
          </Menu>
