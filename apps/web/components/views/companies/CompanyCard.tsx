@@ -322,7 +322,7 @@ const generateCompanyJsonLd = (company: Group) => {
       logo: company.logoUrl,
       image: [company.logoUrl, company.bannerImageUrl],
       url: `/company/${companyNameSlugify(company.universityName)}`,
-      description: `${company.description}. ${company.extraInfo}`,
+      description: `${company.description} - ${company.extraInfo}`,
       address: {
          "@type": "PostalAddress",
          addressCountry: company.companyCountry.name,
