@@ -3,15 +3,13 @@ import React from "react"
 import SEO from "../../components/util/SEO"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import CompaniesPageOverview from "../../components/views/companies/CompaniesPageOverview"
-import {
-   GetServerSidePropsContext,
-   InferGetServerSidePropsType,
-   NextPage,
-} from "next"
-import { getQuery } from "../../components/views/companies/useInfiniteCompanies"
+import { InferGetServerSidePropsType, NextPage } from "next"
+import { getInfiniteQuery } from "../../components/views/companies/useInfiniteCompanies"
 import { getDocs } from "@firebase/firestore"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Group } from "@careerfairy/shared-lib/groups"
 
-const PAGE_SIZE = 6
+export const PAGE_SIZE = 12
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -30,20 +28,12 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
    )
 }
 
-export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-   const searchQuery = ctx.query.searchQuery as string
-
-   const { query } = getQuery(PAGE_SIZE, {
-      searchText: searchQuery,
-   })
-
-   const snaps = await getDocs(query)
-   const serverSideCompanies = snaps.docs.map((doc) => doc.data())
-   console.log("-> serverSideCompanies", serverSideCompanies)
+export const getServerSideProps = async () => {
+   const snaps = await getDocs(getInfiniteQuery(PAGE_SIZE))
 
    return {
       props: {
-         serverSideCompanies,
+         serverSideCompanies: mapFirestoreDocuments<Group>(snaps),
       },
    }
 }
