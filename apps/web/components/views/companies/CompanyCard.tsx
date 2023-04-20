@@ -188,6 +188,11 @@ const CompanyCard: FC<Props> = ({ company }) => {
             </Stack>
             <LinkToCompanyPage companyName={company.universityName} />
          </CardContent>
+         <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={generateCompanyJsonLd(company)}
+            key="company-jsonld"
+         />
       </Card>
    )
 }
@@ -300,6 +305,41 @@ const LinkToCompanyPage: FC<{ companyName: string }> = ({
          {children}
       </CardActionArea>
    )
+}
+
+/**
+ * Generates JSON-LD structured data for a company to improve SEO.
+ * The structured data is formatted according to the schema.org vocabulary.
+ *
+ * @param {Object} company - The company object containing company information.
+ * @returns {Object} - An object with a __html property containing the JSON-LD structured data as a string.
+ */
+const generateCompanyJsonLd = (company: Group) => {
+   const companyJsonLd = {
+      "@context": "https://schema.org/",
+      "@type": "Organization",
+      name: company.universityName,
+      logo: company.logoUrl,
+      image: [company.logoUrl, company.bannerImageUrl],
+      url: `/company/${companyNameSlugify(company.universityName)}`,
+      description: `${company.description}. ${company.extraInfo}`,
+      address: {
+         "@type": "PostalAddress",
+         addressCountry: company.companyCountry.name,
+      },
+      industry: company.companyIndustry.name,
+      numberOfEmployees: company.companySize,
+      slogan: company.description,
+      identifier: {
+         "@type": "PropertyValue",
+         name: "Company ID",
+         value: company.id,
+      },
+   }
+
+   return {
+      __html: JSON.stringify(companyJsonLd),
+   }
 }
 
 export default CompanyCard
