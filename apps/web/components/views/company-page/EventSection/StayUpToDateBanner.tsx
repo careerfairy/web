@@ -7,6 +7,7 @@ import FollowButton from "../Header/FollowButton"
 
 const styles = sxStyles({
    wrapper: {
+      backgroundColor: "white",
       border: "1px solid #EDE7FD",
       borderRadius: "12px",
       p: 4,
