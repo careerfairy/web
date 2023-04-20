@@ -37,6 +37,10 @@ const useInfiniteCollection = <T extends Identifiable>(
    const [hasMore, setHasMore] = useState(true)
    const [error, setError] = useState<Error>()
 
+   const [initialDataLoaded, setInitialDataLoaded] = useState(
+      !options.initialData
+   )
+
    const fetchDocuments = useCallback(
       async (lastSnap?: QueryDocumentSnapshot) => {
          setLoading(true)
@@ -62,7 +66,7 @@ const useInfiniteCollection = <T extends Identifiable>(
    )
 
    const getMore = useCallback(async () => {
-      if (!hasMore) return
+      if (!hasMore || !initialDataLoaded) return
 
       // Get the last document from the current documents.
       const lastDoc = docs[docs.length - 1]
@@ -70,7 +74,7 @@ const useInfiniteCollection = <T extends Identifiable>(
       if (!lastDoc) return
 
       await fetchDocuments(lastDocumentSnapShot)
-   }, [hasMore, docs, fetchDocuments, lastDocumentSnapShot])
+   }, [hasMore, initialDataLoaded, docs, fetchDocuments, lastDocumentSnapShot])
 
    /*
     * This method is used to get the last document snapshot from the initial data
@@ -98,6 +102,7 @@ const useInfiniteCollection = <T extends Identifiable>(
       )
       const lastSnap = docs.docs[0] || undefined
       setLastDocumentSnapShot(lastSnap)
+      setInitialDataLoaded(true) // Set initialDataLoaded to true here
    }, [options.initialData, options.query])
 
    const hasInitialData = Boolean(options.initialData.length)
