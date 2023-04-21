@@ -15,7 +15,7 @@ const CompaniesPage = () => {
          <GenericDashboardLayout pageDisplayName={"Companies"}>
             <Typography variant={"h5"}>Companies list</Typography>
          </GenericDashboardLayout>
-         <ScrollToTop />
+         <ScrollToTop hasBottomNavBar />
       </>
    )
 }
