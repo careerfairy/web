@@ -125,30 +125,35 @@ const UserAvatarWithDetails = () => {
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
          >
-            <MenuItem onClick={() => push("/profile")}>
-               <ListItemIcon>
-                  <PersonOutlineOutlinedIcon fontSize="small" />
-               </ListItemIcon>
-               My Profile
-            </MenuItem>
-            <Divider />
-            {showSwitchButton ? (
-               <>
-                  <MenuItem onClick={() => setOpenManageCompaniesDialog(true)}>
-                     <ListItemIcon>
-                        <SyncIcon size="1em" />
-                     </ListItemIcon>
-                     Switch Company
-                  </MenuItem>
-                  <Divider />
-               </>
-            ) : null}
-            <MenuItem onClick={signOut}>
-               <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
-               </ListItemIcon>
-               Logout
-            </MenuItem>
+            {[
+               <MenuItem onClick={() => push("/profile")} key="profile">
+                  <ListItemIcon>
+                     <PersonOutlineOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  My Profile
+               </MenuItem>,
+               <Divider key="divider1" />,
+               ...(showSwitchButton
+                  ? [
+                       <MenuItem
+                          onClick={() => setOpenManageCompaniesDialog(true)}
+                          key="switch-company"
+                       >
+                          <ListItemIcon>
+                             <SyncIcon size="1em" />
+                          </ListItemIcon>
+                          Switch Company
+                       </MenuItem>,
+                       <Divider key="divider2" />,
+                    ]
+                  : []),
+               <MenuItem onClick={signOut} key="logout">
+                  <ListItemIcon>
+                     <LogoutIcon fontSize="small" />
+                  </ListItemIcon>
+                  Logout
+               </MenuItem>,
+            ]}
          </Menu>
          {openManageCompaniesDialog ? (
             <ManageCompaniesDialog

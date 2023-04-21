@@ -82,7 +82,6 @@ const usePaginatedCollection = <T = DocumentData>(
    )
 
    const result = useFirestoreCollection(q, reactfireOptions)
-
    const prevDisabled = cursor === 0
    const nextDisabled =
       !prevNavigation && (result.data?.size ?? 0) < internalLimit
@@ -140,7 +139,7 @@ const usePaginatedCollection = <T = DocumentData>(
    }, [options.query, order, internalLimit, reset])
 
    // remove the extra element if required
-   let data = result.data?.docs?.map((d) => d.data())
+   let data = result.data?.docs?.map((d) => ({ ...d.data(), id: d.id }))
    if (data?.length > options.limit) {
       data = data?.slice(0, -1)
    }
