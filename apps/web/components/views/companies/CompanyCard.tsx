@@ -11,7 +11,6 @@ import {
 import { sxStyles } from "../../../types/commonTypes"
 import Image from "next/image"
 import {
-   getBaseUrl,
    getMaxLineStyles,
    getResizedUrl,
 } from "../../helperFunctions/HelperFunctions"
@@ -190,11 +189,11 @@ const CompanyCard: FC<Props> = ({ company }) => {
             </Stack>
             <LinkToCompanyPage companyName={company.universityName} />
          </CardContent>
-         <script
-            type="application/ld+json"
-            dangerouslySetInnerHTML={generateCompanyJsonLd(company)}
-            key="company-jsonld"
-         />
+         {/*<script*/}
+         {/*   type="application/ld+json"*/}
+         {/*   dangerouslySetInnerHTML={generateCompanyJsonLd(company)}*/}
+         {/*   key="company-jsonld"*/}
+         {/*/>*/}
       </Card>
    )
 }
@@ -309,41 +308,42 @@ const LinkToCompanyPage: FC<{ companyName: string }> = ({
    )
 }
 
-/**
- * Generates JSON-LD structured data for a company to improve SEO.
- * The structured data is formatted according to the schema.org vocabulary.
- *
- * @param {Object} company - The company object containing company information.
- * @returns {Object} - An object with a __html property containing the JSON-LD structured data as a string.
- */
-const generateCompanyJsonLd = (company: Group) => {
-   const companyJsonLd = {
-      "@context": "https://schema.org/",
-      "@type": "Organization",
-      name: company.universityName,
-      legalName: company.universityName,
-      logo: company.logoUrl,
-      image: [company.logoUrl, company.bannerImageUrl],
-      url: `${getBaseUrl()}/company/${companyNameSlugify(
-         company.universityName
-      )}`,
-      description: `${company.description} - ${company.extraInfo}`,
-      address: {
-         "@type": "PostalAddress",
-         addressCountry: company.companyCountry.name,
-      },
-      numberOfEmployees: company.companySize,
-      slogan: company.description,
-      identifier: {
-         "@type": "PropertyValue",
-         name: "Company ID",
-         value: company.id,
-      },
-   }
-
-   return {
-      __html: JSON.stringify(companyJsonLd),
-   }
-}
+// /**
+//  * Generates JSON-LD structured data for a company to improve SEO.
+//  * The structured data is formatted according to the schema.org vocabulary.
+//  * More info can be found here: https://schema.org/Organization
+//  *
+//  * @param {Object} company - The company object containing company information.
+//  * @returns {Object} - An object with a __html property containing the JSON-LD structured data as a string.
+//  */
+// const generateCompanyJsonLd = (company: Group) => {
+//    const companyJsonLd = {
+//       "@context": "https://schema.org/",
+//       "@type": "Organization",
+//       name: company.universityName,
+//       legalName: company.universityName,
+//       logo: company.logoUrl,
+//       image: [company.logoUrl, company.bannerImageUrl],
+//       url: `${getBaseUrl()}/company/${companyNameSlugify(
+//          company.universityName
+//       )}`,
+//       description: `${company.description} - ${company.extraInfo}`,
+//       address: {
+//          "@type": "PostalAddress",
+//          addressCountry: company.companyCountry.name,
+//       },
+//       numberOfEmployees: company.companySize,
+//       slogan: company.description,
+//       identifier: {
+//          "@type": "PropertyValue",
+//          name: "Company ID",
+//          value: company.id,
+//       },
+//    }
+//
+//    return {
+//       __html: JSON.stringify(companyJsonLd),
+//    }
+// }
 
 export default CompanyCard
