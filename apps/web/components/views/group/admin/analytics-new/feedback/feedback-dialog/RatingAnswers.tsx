@@ -30,25 +30,30 @@ export const RatingAnswers: FC<FeedbackAnswersContentProps> = ({
    return (
       <Stack divider={<Divider flexItem />} spacing={3}>
          {voters.map((voter) => (
-            <Stack spacing={2} key={voter.id}>
-               <Stack
-                  direction="row"
-                  justifyContent="space-between"
-                  spacing={1}
-               >
-                  <Typography fontWeight={600} variant="body1">
-                     {censorEmail(voter.id)}
-                  </Typography>
-                  <StyledRating
-                     value={normalizeRating(feedbackQuestion, voter)}
-                     readOnly
-                     color="primary.main"
-                  />
+            <>
+               <Stack spacing={2} key={voter.id}>
+                  <Stack
+                     direction="row"
+                     justifyContent="space-between"
+                     spacing={1}
+                  >
+                     <Typography fontWeight={600} variant="body1">
+                        {censorEmail(voter.id)}
+                     </Typography>
+                     <StyledRating
+                        value={normalizeRating(feedbackQuestion, voter)}
+                        readOnly
+                        color="primary.main"
+                     />
+                  </Stack>
+                  {voter.message ? (
+                     <Typography variant="body2">{voter.message}</Typography>
+                  ) : null}
                </Stack>
-               {voter.message ? (
-                  <Typography variant="body2">{voter.message}</Typography>
+               {voter.id === voters[voters.length - 1].id ? (
+                  <Divider flexItem />
                ) : null}
-            </Stack>
+            </>
          ))}
       </Stack>
    )
@@ -73,10 +78,7 @@ export const RatingAnswersSkeleton: FC = () => {
                   <StyledRating value={5} readOnly color="grey.500" />
                </Stack>
                <Typography variant="body2">
-                  <Skeleton
-                     variant="text"
-                     width={`calc(100% * ${Math.random() * (1 - 0.5) + 0.5})`}
-                  />
+                  <Skeleton variant="text" width={"90%"} />
                </Typography>
             </Stack>
          ))}
