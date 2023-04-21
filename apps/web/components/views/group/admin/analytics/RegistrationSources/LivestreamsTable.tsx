@@ -16,8 +16,11 @@ import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/fu
 import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { sourcesByLivestream, UTMsPercentage } from "./transformations"
-import { VALID_SOURCES } from "./sources"
+import {
+   sourcesByLivestream,
+   UTMsPercentage,
+} from "@careerfairy/shared-lib/livestreams/sources/transformations"
+import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
 
 const LivestreamsTable = () => {
    const { livestreams, utmData } = useUtmData()

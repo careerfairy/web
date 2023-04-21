@@ -6,9 +6,12 @@ import {
    RegistrationSourceWithDates,
    rollupByDay,
    sourcesByDate,
-} from "./transformations"
+} from "@careerfairy/shared-lib/livestreams/sources/transformations"
 import React, { useCallback, useMemo, useState } from "react"
-import { RegistrationSource, VALID_SOURCES } from "./sources"
+import {
+   RegistrationSource,
+   VALID_SOURCES,
+} from "@careerfairy/shared-lib/livestreams/sources/sources"
 import { StyledCheckbox } from "../../common/inputs"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
