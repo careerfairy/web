@@ -8,6 +8,8 @@ import { useDispatch } from "react-redux"
 import { withFirebase } from "context/firebase/FirebaseServiceContext"
 import ContentCardTitle from "../../../../../layouts/UserLayout/ContentCardTitle"
 import UploadCvButton from "./UploadCvButton"
+import { rewardService } from "data/firebase/RewardService"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const useStyles = makeStyles((theme) => ({
    cvContainer: {
@@ -100,6 +102,11 @@ const UserResume = ({
             function () {
                //Upload completed successfully, now we can get the download URL
                console.log("upload successful")
+
+               rewardService
+                  .userAction("USER_CV_UPLOAD")
+                  .catch(errorLogAndNotify)
+
                uploadTask.snapshot.ref
                   .getDownloadURL()
                   .then(function (downloadURL) {

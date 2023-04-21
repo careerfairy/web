@@ -8,8 +8,14 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { livestreamsRepo, rewardsRepo, userRepo } from "./api/repositories"
 import { RewardAction, REWARDS } from "@careerfairy/shared-lib/rewards"
 import { userUpdateFields } from "./lib/user"
+import { RewardFilterFields } from "@careerfairy/shared-lib/rewards/RewardRepository"
 
-export const rewardLivestreamAttendance = functions.https.onCall(
+/**
+ * Reward user for being invited to a livestream and participating
+ *
+ * The reward LIVESTREAM_USER_ATTENDED is also given to the user
+ */
+export const rewardLivestreamInvitationComplete = functions.https.onCall(
    async (data, context) => {
       const userEmail = context.auth?.token?.email
       const livestreamId = data.livestreamId
@@ -53,21 +59,11 @@ export const rewardLivestreamAttendance = functions.https.onCall(
          true
       )
 
-      const invitationReward = await rewardsRepo.getRelatedToLivestream(
+      validateDuplicatedReward(
          userEmail,
-         livestreamId,
-         "LIVESTREAM_INVITE_COMPLETE_FOLLOWER"
+         "LIVESTREAM_INVITE_COMPLETE_FOLLOWER",
+         { livestreamId }
       )
-
-      if (invitationReward) {
-         functions.logger.error(
-            "The user already received this award, ignoring"
-         )
-         throw new functions.https.HttpsError(
-            "failed-precondition",
-            "Duplicated" // client side can watch for duplicated errors
-         )
-      }
 
       // TODO: check for invitations on livestreamEmailInvites collection (when referralCode is missing)
 
@@ -112,13 +108,19 @@ export const rewardUserAction = functions.https.onCall(
             validateLivestreamIdExists(data.livestreamId)
 
             // this reward can only be created once per livestream
-            await validateDuplicatedReward(userEmail, data.livestreamId, action)
+            await validateDuplicatedReward(userEmail, action, {
+               livestreamId: data.livestreamId,
+            })
 
             if (action === "LIVESTREAM_USER_ATTENDED") {
                // The livestream should be live during action
                flagsToCheck.livestreamMustBeLive = true
             }
 
+            break
+         case "USER_CV_UPLOAD":
+            // this reward can only be created once per user
+            await validateDuplicatedReward(userEmail, action)
             break
       }
 
@@ -287,22 +289,13 @@ function validateLivestreamIdExists(livestreamId: string) {
 
 /**
  * Validate if the reward was already given to the user
- * Related to a livestream
- *
- * @param userEmail
- * @param livestreamId
- * @param action
  */
 async function validateDuplicatedReward(
    userEmail: string,
-   livestreamId: string,
-   action: RewardAction
+   action: RewardAction,
+   filters?: RewardFilterFields
 ) {
-   const previousReward = await rewardsRepo.getRelatedToLivestream(
-      userEmail,
-      livestreamId,
-      action
-   )
+   const previousReward = await rewardsRepo.get(userEmail, action, filters)
 
    if (previousReward) {
       functions.logger.error("The user already received this award, ignoring")

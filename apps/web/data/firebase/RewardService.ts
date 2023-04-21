@@ -18,7 +18,7 @@ export class RewardService {
    ) {
       return httpsCallable(
          this.functions,
-         "rewardLivestreamAttendance"
+         "rewardLivestreamInvitationComplete"
       )({
          livestreamId,
          referralCode,
