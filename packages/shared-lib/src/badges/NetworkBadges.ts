@@ -34,7 +34,7 @@ export const NetworkerBadgeLevel2: Badge = new Badge(
             calculateProgressForNumericField(userData?.referralsCount, 3),
       },
    ],
-   ["Save Recruiters during a livestream"]
+   ["3 CareerCoins", "Save Recruiters during a livestream"]
 )
 
 export const NetworkerBadgeLevel3: Badge = new Badge(
