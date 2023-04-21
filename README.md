@@ -65,7 +65,7 @@ npm run test
 -  End-To-End Tests with Playwright:
 
 ```sh
-npm run test:e2e-webapp
+npm §§
 # Run the end-to-end tests for the web app
 # using the functions, firestore and auth emulators
 ```
