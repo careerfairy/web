@@ -92,11 +92,18 @@ const FeedbackCard: FC<Props> = ({ stats, groupId }) => {
                <CardContent>
                   <Stack spacing={1}>
                      <Typography sx={styles.time} color="text.secondary">
-                        {DateUtil.eventPreviewDate(
-                           stats.livestream.start.toDate()
-                        )}
+                        {DateUtil.dateWithYear(stats.livestream.start.toDate())}
                      </Typography>
-                     <Tooltip title={stats.livestream.title}>
+                     <Tooltip
+                        enterDelay={500}
+                        placement="right-end"
+                        arrow
+                        title={
+                           stats.livestream.title.length > 85
+                              ? stats.livestream.title
+                              : ""
+                        }
+                     >
                         <Typography sx={styles.title} whiteSpace="pre-line">
                            {stats.livestream.title}
                         </Typography>

@@ -6,7 +6,7 @@ import LivestreamSearch, {
 } from "../../../common/LivestreamSearch"
 import Stack from "@mui/material/Stack"
 import UserTypeTabs from "./UserTypeTabs"
-import ExportPdfButton from "./ExportPDFButton"
+import ExportPdfButton from "../../../common/ExportPDFButton"
 import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
 import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
@@ -62,7 +62,12 @@ const LivestreamSearchNav = () => {
          </Box>
          <Stack minHeight={53} height="100%" direction="row" spacing={2}>
             <UserTypeTabs />
-            <ExportPdfButton />
+            <ExportPdfButton
+               livestreamId={currentStreamStats?.livestream?.id}
+               groupId={group.id}
+            >
+               Export PDF
+            </ExportPdfButton>
          </Stack>
       </Stack>
    )
