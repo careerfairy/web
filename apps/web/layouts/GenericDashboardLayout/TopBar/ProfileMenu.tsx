@@ -108,7 +108,11 @@ const ProfileMenu = () => {
                   />
                   <Tooltip
                      title={fieldOfStudyDisplayName}
-                     disableHoverListener={fieldOfStudyDisplayName.length <= 15}
+                     disableHoverListener={
+                        fieldOfStudyDisplayName
+                           ? fieldOfStudyDisplayName?.length <= 15
+                           : true
+                     }
                   >
                      <Box sx={styles.details}>
                         <Typography
