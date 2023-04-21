@@ -8,7 +8,7 @@ import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/fu
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/dist/utils"
-import { fixLivestreamRegistrationDates } from "./transformations"
+import { fixLivestreamRegistrationDates } from "@careerfairy/shared-lib/livestreams/sources/transformations"
 
 type IRegistrationSourcesContext = {
    utmData?: RegistrationSourcesResponseItem[]
