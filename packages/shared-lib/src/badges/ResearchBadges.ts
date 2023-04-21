@@ -21,7 +21,7 @@ export const ResearchBadge: Badge = new Badge(
             ),
       },
    ],
-   DEFAULT_REWARDS
+   ["1 CareerCoin", ...DEFAULT_REWARDS]
 )
 
 export const ResearchBadgeLevel2: Badge = new Badge(
