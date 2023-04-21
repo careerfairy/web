@@ -149,6 +149,8 @@ export interface IUserRepository {
       field: keyof UserStats,
       amount?: number
    ): Promise<void>
+
+   getStats(userDataId: string): Promise<UserStats>
 }
 
 export class FirebaseUserRepository
@@ -161,6 +163,21 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async getStats(userEmail: string): Promise<UserStats | null> {
+      let snap = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("stats")
+         .doc("stats")
+         .get()
+
+      if (!snap.exists) {
+         return null
+      }
+
+      return snap.data() as UserStats
    }
 
    async incrementStat(

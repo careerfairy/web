@@ -98,14 +98,12 @@ export const AddToCalendar = memo(
       const urls = useMemo(() => makeUrls(event), [event])
 
       const handleClick = useCallback((event) => {
+         dataLayerEvent("event_add_to_calendar")
          setAnchorEl(event.currentTarget)
       }, [])
+
       const handleClose = useCallback(() => {
          setAnchorEl(null)
-      }, [])
-
-      useEffect(() => {
-         dataLayerEvent("event_add_to_calendar")
       }, [])
 
       return (
