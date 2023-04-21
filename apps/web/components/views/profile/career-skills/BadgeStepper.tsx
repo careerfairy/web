@@ -25,6 +25,7 @@ import CheckIcon from "@mui/icons-material/Check"
 import CelebrationIcon from "@mui/icons-material/Celebration"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import useBadgeStepProgress from "../../../custom-hook/useBadgeStepProgress"
+import CareerCoinIcon from "components/views/common/CareerCoinIcon"
 
 const styles = createStyles({
    step: {
@@ -52,7 +53,11 @@ const styles = createStyles({
       width: "0.9em",
       height: "0.9em",
    },
-   listItemAvatar: { minWidth: "30px" },
+   listItemAvatar: {
+      minWidth: "30px",
+      paddingRight: "10px",
+      textAlign: "center",
+   },
    iconCurrent: {
       backgroundColor: (theme: DefaultTheme) =>
          alpha(theme.palette.secondary.main, 0.1),
@@ -168,18 +173,34 @@ export const LevelInformationPopupListItem = ({
    isComplete = false,
    isAchieved = false,
 }) => {
-   let Icon = isAchieved ? (
-      <CelebrationIcon color="primary" sx={styles.tooltipRequirementCheck} />
-   ) : (
+   let Icon: JSX.Element = (
       <CircleIcon color="primary" sx={styles.tooltipRequirementCircle} />
    )
+
+   const isCoin = description.includes("CareerCoin")
+   if (isCoin) {
+      Icon = <CareerCoinIcon />
+   }
+
+   if (isAchieved) {
+      Icon = (
+         <CelebrationIcon color="primary" sx={styles.tooltipRequirementCheck} />
+      )
+   }
 
    if (isComplete) {
       Icon = <CheckIcon color="primary" sx={styles.tooltipRequirementCheck} />
    }
 
    return (
-      <ListItem sx={{ paddingY: 0 }}>
+      <ListItem
+         sx={{ paddingY: 0 }}
+         secondaryAction={
+            (isComplete || isAchieved) && isCoin ? (
+               <CareerCoinIcon />
+            ) : undefined
+         }
+      >
          <ListItemAvatar sx={styles.listItemAvatar}>{Icon}</ListItemAvatar>
          <ListItemText primary={description} />
       </ListItem>
