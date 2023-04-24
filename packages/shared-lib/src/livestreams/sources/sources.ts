@@ -1,4 +1,4 @@
-import { UTMParams } from "@careerfairy/shared-lib/dist/commonTypes"
+import { UTMParams } from "../../commonTypes"
 
 export type RegistrationSource = {
    displayName: string

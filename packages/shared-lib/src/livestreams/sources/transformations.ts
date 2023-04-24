@@ -1,6 +1,6 @@
-import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
 import { RegistrationSource, VALID_SOURCES } from "./sources"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { RegistrationSourcesResponseItem } from "../../functions/groupAnalyticsTypes"
+import { LivestreamEvent } from "../livestreams"
 
 export type RegistrationSourceWithDates = {
    source: Omit<RegistrationSource, "match">
