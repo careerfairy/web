@@ -1,4 +1,4 @@
-import { Identifiable, OptionGroup } from "../commonTypes"
+import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
 import {
    UserData,
@@ -244,7 +244,7 @@ export interface UserLivestreamData extends Identifiable {
          referralCode: string
          inviteLivestream: string
       }
-      utm?: any
+      utm?: UTMParams
       referrer?: string
       isRecommended?: boolean
    }
