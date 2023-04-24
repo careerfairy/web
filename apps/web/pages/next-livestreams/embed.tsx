@@ -7,18 +7,11 @@ import EventsPreview, {
 } from "components/views/portal/events-preview/EventsPreview"
 import { useMemo } from "react"
 import { mapFromServerSide } from "util/serverUtil"
-import GlobalStyles from "@mui/material/GlobalStyles"
 
 const CARDS_NUM = 9
 
 {
    /* <iframe frameBorder="0" height="380" width="100%" src="http://www.careerfairy.io/next-livestreams/embed" title="Events"/> */
-}
-
-const styles = {
-   body: {
-      backgroundColor: "transparent",
-   },
 }
 
 const EmbeddedUpcomingLivestreamsPage = ({
@@ -29,18 +22,16 @@ const EmbeddedUpcomingLivestreamsPage = ({
    }, [serverSideUpcomingEvents])
 
    return (
-      <>
-         <GlobalStyles styles={styles} />
-         <EventsPreview
-            id={"upcoming-events"}
-            limit={CARDS_NUM}
-            type={EventsTypes.comingUp}
-            events={formatLivestreamsEvents(livestreamDocs)}
-            isEmbedded
-            // No need to show loading as these events have already been queried server side
-            loading={false}
-         />
-      </>
+      <EventsPreview
+         id={"upcoming-events"}
+         limit={CARDS_NUM}
+         title={"COMING UP NEXT"}
+         type={EventsTypes.comingUp}
+         events={formatLivestreamsEvents(livestreamDocs)}
+         isEmbedded
+         // No need to show loading as these events have already been queried server side
+         loading={false}
+      />
    )
 }
 
