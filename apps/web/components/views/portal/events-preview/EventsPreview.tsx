@@ -17,7 +17,7 @@ import CustomButtonCarousel from "../../common/carousels/CustomButtonCarousel"
 import {
    ImpressionLocation,
    LivestreamEvent,
-} from "@careerfairy/shared-lib/dist/livestreams"
+} from "@careerfairy/shared-lib/livestreams"
 import { MARKETING_LANDING_PAGE_PATH } from "../../../../constants/routes"
 
 const styles = {
@@ -56,6 +56,7 @@ const EventsPreview = ({
    id,
    isEmpty,
    isRecommended,
+   isEmbedded = false,
 }: EventsProps) => {
    const {
       query: { groupId },
@@ -102,33 +103,35 @@ const EventsPreview = ({
       <>
          {!hidePreview ? (
             <Box id={id}>
-               <Box sx={styles.eventsHeader}>
-                  {isOnMarketingLandingPage ? (
-                     <Heading
-                        sx={{
-                           opacity: "unset",
-                           color: "unset",
-                           fontWeight: 500,
-                        }}
-                        variant={"h2"}
-                     >
-                        {title}
-                     </Heading>
-                  ) : (
-                     <Heading>{title}</Heading>
-                  )}
-                  {events?.length >= limit &&
-                  !isOnMarketingLandingPage &&
-                  seeMoreLink ? (
-                     <Link href={seeMoreLink}>
-                        <a>
-                           <Typography sx={styles.seeMoreText} color="grey">
-                              See more
-                           </Typography>
-                        </a>
-                     </Link>
-                  ) : null}
-               </Box>
+               {!isEmbedded ? (
+                  <Box sx={styles.eventsHeader}>
+                     {isOnMarketingLandingPage ? (
+                        <Heading
+                           sx={{
+                              opacity: "unset",
+                              color: "unset",
+                              fontWeight: 500,
+                           }}
+                           variant={"h2"}
+                        >
+                           {title}
+                        </Heading>
+                     ) : (
+                        <Heading>{title}</Heading>
+                     )}
+                     {events?.length >= limit &&
+                     !isOnMarketingLandingPage &&
+                     seeMoreLink ? (
+                        <Link href={seeMoreLink}>
+                           <a>
+                              <Typography sx={styles.seeMoreText} color="grey">
+                                 See more
+                              </Typography>
+                           </a>
+                        </Link>
+                     ) : null}
+                  </Box>
+               ) : null}
                <Stack sx={styles.previewContent}>
                   {isEmpty ? (
                      <EmptyMessageOverlay
@@ -148,6 +151,7 @@ const EventsPreview = ({
                               : "/next-livestreams?type=pastEvents"
                         }
                         showButton={!isOnMarketingLandingPage}
+                        targetBlank={isEmbedded}
                      />
                   ) : null}
                   <CustomButtonCarousel
@@ -185,10 +189,13 @@ const EventsPreview = ({
                                    autoRegister
                                    location={getLocation(type)}
                                    openShareDialog={setShareEventDialog}
-                                   onRegisterClick={handleClickRegister}
+                                   onRegisterClick={
+                                      !isEmbedded && handleClickRegister
+                                   }
                                    key={event.id}
                                    event={event}
                                    isRecommended={isRecommended}
+                                   isEmbedded={isEmbedded}
                                 />
                              </Box>
                           ))}
@@ -196,7 +203,7 @@ const EventsPreview = ({
                </Stack>
             </Box>
          ) : null}
-         {joinGroupModalData ? (
+         {!isEmbedded && joinGroupModalData ? (
             <RegistrationModal
                isRecommended={isRecommended}
                open={Boolean(joinGroupModalData)}
@@ -208,7 +215,7 @@ const EventsPreview = ({
                handleClose={handleCloseJoinModal}
             />
          ) : null}
-         {shareEventDialog ? (
+         {!isEmbedded && shareEventDialog ? (
             <ShareLivestreamModal
                livestreamData={shareEventDialog}
                handleClose={handleShareEventDialogClose}
@@ -267,6 +274,7 @@ export interface EventsProps {
    id?: string
    isEmpty?: boolean
    isRecommended?: boolean
+   isEmbedded?: boolean
 }
 
 export default EventsPreview
