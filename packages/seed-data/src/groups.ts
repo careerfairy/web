@@ -14,16 +14,15 @@ class GroupFirebaseSeed implements GroupSeed {
       const batch = firestore.batch()
       const id = generateId()
       const universityName = faker.company.companyName() ?? "My university"
-      const description = faker.company.bs()
 
       let data: Group = {
          id,
          groupId: id,
-         description,
+         description: faker.company.bs(),
          logoUrl: faker.image.business(),
          test: false,
          universityName,
-         triGrams: groupTriGrams(universityName, description),
+         triGrams: groupTriGrams(universityName),
       }
 
       data = Object.assign(data, overrideFields)
