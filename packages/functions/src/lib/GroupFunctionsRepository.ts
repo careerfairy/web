@@ -302,10 +302,7 @@ export class GroupFunctionsRepository
          companyIndustry: group.companyIndustry || null,
          companySize: group.companySize || "",
          test: false,
-         triGrams: groupTriGrams(
-            group.universityName || "",
-            group.description || ""
-         ),
+         triGrams: groupTriGrams(group.universityName || ""),
       }
 
       batch.set(groupRef, newGroupData)

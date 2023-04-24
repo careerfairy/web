@@ -75,10 +75,9 @@ export const livestreamTriGrams = (
  * Caution: same as above
  */
 export const groupTriGrams = (
-   universityName: Group["universityName"],
-   description: Group["description"]
+   universityName: Group["universityName"]
 ): Record<string, true> => {
-   const ngrams = triGrams([universityName, description])
+   const ngrams = triGrams([universityName])
 
    return ngrams.reduce((acc, triGram) => {
       acc[triGram] = true

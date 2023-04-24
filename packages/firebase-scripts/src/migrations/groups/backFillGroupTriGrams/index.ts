@@ -32,7 +32,7 @@ export async function run() {
 
       await backfillTrigrams<GroupWithRef>(
          groups,
-         ["universityName", "description"],
+         ["universityName"],
          counter,
          bar,
          bulkWriter,
