@@ -507,10 +507,7 @@ class FirebaseService {
       // In the update function, we need to update the triGrams field with the help of the future state of the group
       const toUpdate: Partial<Group> = {
          ...newCareerCenter,
-         triGrams: groupTriGrams(
-            updatedGroup.universityName,
-            updatedGroup.description
-         ),
+         triGrams: groupTriGrams(updatedGroup.universityName),
       }
 
       return ref.update(toUpdate)
