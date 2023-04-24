@@ -221,6 +221,7 @@ const EventPreviewCard = ({
    totalElements,
    index,
    location = ImpressionLocation.unknown,
+   isEmbedded = false,
 }: EventPreviewCardProps) => {
    const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
@@ -415,6 +416,7 @@ const EventPreviewCard = ({
                   color={"primary"}
                   size={"medium"}
                   onClick={handleDetailsClick}
+                  target={isEmbedded ? "_blank" : "_self"}
                >
                   Join Stream
                </Button>
@@ -424,7 +426,10 @@ const EventPreviewCard = ({
                      display: "flex",
                      width: "100%",
                      justifyContent:
-                        isPlaceholderEvent || isPast || isOnMarketingLandingPage
+                        isPlaceholderEvent ||
+                        isPast ||
+                        isOnMarketingLandingPage ||
+                        isEmbedded
                            ? "center"
                            : "space-between",
                   }}
@@ -452,13 +457,14 @@ const EventPreviewCard = ({
                         color={"secondary"}
                         size={"small"}
                         onClick={handleDetailsClick}
+                        target={isEmbedded ? "_blank" : "_self"}
                      >
                         Details
                      </Button>
                   ) : null}
                </Box>
             )}
-            {isPlaceholderEvent ? null : (
+            {isPlaceholderEvent || isEmbedded ? null : (
                <Box
                   sx={{
                      display: "flex",
@@ -778,6 +784,7 @@ interface EventPreviewCardProps {
    // The total number of events in the list
    totalElements?: number
    location?: ImpressionLocation
+   isEmbedded?: boolean
 }
 
 export default EventPreviewCard

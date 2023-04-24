@@ -18,12 +18,14 @@ const styles = {
       fontWeight: 600,
    },
 } as const
+
 const EmptyMessageOverlay = ({
    message,
    buttonLink,
    buttonText,
    buttonOnClick,
    showButton = true,
+   targetBlank = false,
 }: Props) => {
    return (
       <Box sx={styles.stackOverlay}>
@@ -43,6 +45,7 @@ const EmptyMessageOverlay = ({
                   href={buttonLink}
                   variant="contained"
                   size="large"
+                  target={targetBlank ? "_blank" : "_self"}
                >
                   {buttonText}
                </Button>
@@ -58,5 +61,6 @@ interface Props {
    buttonLink: string
    buttonOnClick?: () => void
    showButton?: boolean
+   targetBlank?: boolean
 }
 export default EmptyMessageOverlay
