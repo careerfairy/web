@@ -64,6 +64,10 @@ const ThemeProviderWrapper = ({ children }) => {
    })
    const classes = useStyles()
 
+   if (pathname === "/next-livestreams/embed") {
+      theme.palette.background.default = "transparent"
+   }
+
    return (
       <ThemeContext.Provider
          value={{ toggleTheme, themeMode: theme.palette.mode }}
