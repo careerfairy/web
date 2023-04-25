@@ -70,10 +70,12 @@ const GenericDashboardLayout = ({
          >
             {children}
             <FooterV2 background={bgColor || "#F7F8FC"} />
-            <CreditsDialog
-               onClose={handleCloseCreditsDialog}
-               open={creditsDialogOpen}
-            />
+            {creditsDialogOpen ? (
+               <CreditsDialog
+                  onClose={handleCloseCreditsDialog}
+                  open={creditsDialogOpen}
+               />
+            ) : null}
          </AdminGenericLayout>
       </GenericDashboardContext.Provider>
    )

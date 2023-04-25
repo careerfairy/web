@@ -60,7 +60,6 @@ const CreditsDialog: FC<Props> = ({ onClose, open }) => {
          onClose={handleClose}
          maxWidth={"md"}
          fullWidth
-         keepMounted={false}
          TransitionComponent={Zoom}
       >
          <Content handleClose={handleClose} />
@@ -150,7 +149,7 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
 
 const LoadingView = () => (
    <Box
-      height="100%"
+      height={"315px"}
       display="flex"
       alignItems="center"
       justifyContent="center"
