@@ -8,7 +8,7 @@ import BaseDialogView, {
 import { useCreditsDialogContext } from "../CreditsDialog"
 import { company_building } from "../../../../constants/images"
 import Stack from "@mui/material/Stack"
-import Chip, { chipClasses } from "@mui/material/Chip"
+import Chip from "@mui/material/Chip"
 import { Box, Typography } from "@mui/material"
 import CompleteIcon from "@mui/icons-material/CheckCircleRounded"
 import GoToIcon from "@mui/icons-material/NavigateNextRounded"
@@ -17,12 +17,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 
 const styles = sxStyles({
-   completeIcon: {},
    congratsChip: {
-      [`.${chipClasses.deleteIcon}`]: {
-         color: (theme) => `${theme.palette.success.main} !important`,
-         cursor: "default",
-      },
       color: "text.secondary",
    },
    row: {

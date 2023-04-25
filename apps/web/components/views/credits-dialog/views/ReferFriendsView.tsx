@@ -41,14 +41,6 @@ const styles = sxStyles({
       alignItems: "flex-start",
       width: "100%",
    },
-   referTextField: {
-      border: "none",
-      "& input": {
-         "&::before": {
-            content: '""',
-         },
-      },
-   },
    socialButton: {
       backgroundColor: "grey.500",
       color: "white",
@@ -150,6 +142,7 @@ const SocialButtons = () => {
    const { userData } = useAuth()
 
    const referralLink = makeReferralUrl(userData?.id)
+
    const title = "CareerFairy - Find your dream job"
    const handleWhatsappShare = () => {
       dataLayerEvent("referral_share_whatsapp", {
@@ -168,6 +161,7 @@ const SocialButtons = () => {
          social: "linkedin",
       })
    }
+
    return (
       <Stack>
          <Typography

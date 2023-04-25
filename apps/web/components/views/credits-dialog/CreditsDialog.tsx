@@ -6,12 +6,12 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { Dialog, DialogContent, Zoom } from "@mui/material"
+import { Box, Dialog, DialogContent, Zoom } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
-import { SwipeablePanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
+import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { useRouter } from "next/router"
 import dynamic from "next/dynamic"
 import CircularProgress from "@mui/material/CircularProgress"
@@ -20,7 +20,7 @@ import GetMoreCreditsView from "./views/GetMoreCreditsView"
 
 // Dynamic import of ReferFriendsView since it uses react-share library
 const ReferFriendsView = dynamic(() => import("./views/ReferFriendsView"), {
-   loading: () => <CircularProgress />,
+   loading: () => <LoadingView />,
 })
 
 const styles = sxStyles({
@@ -101,7 +101,7 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
    }, [])
 
    const handleGoToNextLivestreams = useCallback(() => {
-      void push("/portal")
+      void push("/next-livestreams")
       handleClose()
    }, [handleClose, push])
 
@@ -133,20 +133,32 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
                index={value}
             >
                {views.map((view, idx) => (
-                  <SwipeablePanel
+                  <AnimatedTabPanel
                      sx={styles.fullHeight}
-                     index={idx}
                      key={idx}
                      value={idx}
+                     activeValue={value}
                   >
                      {view}
-                  </SwipeablePanel>
+                  </AnimatedTabPanel>
                ))}
             </SwipeableViews>
          </DialogContent>
       </DialogContext.Provider>
    )
 }
+
+const LoadingView = () => (
+   <Box
+      height="100%"
+      display="flex"
+      alignItems="center"
+      justifyContent="center"
+   >
+      <CircularProgress />
+   </Box>
+)
+
 type DialogContextType = {
    handleClose: () => void
    handleGoToCVView: () => void
