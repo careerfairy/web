@@ -198,7 +198,7 @@ const SocialButtons = () => {
             </TwitterShareButton>
             <LinkedinShareButton
                onClick={handleLinkedinShare}
-               url={referralLink} // Note: wont work on localhost as linkedin doesnt allow localhost
+               url={referralLink} // Note: won't work in dev as LinkedIn doesn't allow the localhost domain
             >
                <SocialButton icon={<LinkedInIcon fontSize="inherit" />} />
             </LinkedinShareButton>
