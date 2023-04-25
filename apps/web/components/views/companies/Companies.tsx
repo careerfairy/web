@@ -13,6 +13,9 @@ const styles = sxStyles({
    flexItem: {
       display: "flex",
    },
+   root: {
+      pb: 3,
+   },
 })
 
 type Props = {
@@ -44,7 +47,7 @@ const Companies: FC<Props> = ({ initialData }) => {
          loader={<></>}
          style={{ overflow: "inherit" }}
       >
-         <Grid container spacing={2}>
+         <Grid sx={styles.root} container spacing={2}>
             {companies?.map((company) => (
                <Grid
                   sx={styles.flexItem}
