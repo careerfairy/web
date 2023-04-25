@@ -1,7 +1,5 @@
 import React, { FC, useCallback, useMemo, useState } from "react"
-import { StyledTextField } from "./inputs"
-import Autocomplete from "@mui/material/Autocomplete"
-import { Box, Grid, InputAdornment, Typography } from "@mui/material"
+import { Box, Grid, Typography } from "@mui/material"
 import { where } from "firebase/firestore"
 import {
    LivestreamEvent,
@@ -16,6 +14,8 @@ import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { AutocompleteRenderOptionState } from "@mui/material/Autocomplete/Autocomplete"
 import RenderParts from "../../../common/search/RenderParts"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
+import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
+import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import { Search as FindIcon } from "react-feather"
 
 const styles = sxStyles({
@@ -60,19 +60,22 @@ const LivestreamSearch: FC<Props> = ({
 
    const [inputValue, setInputValue] = useState("")
 
-   const additionalConstraints = useMemo(
-      () => [where("groupIds", "array-contains", group.id)],
-      [group.id]
+   const options = useMemo<UseSearchOptions<LivestreamEvent>>(
+      () => ({
+         maxResults: 7,
+         additionalConstraints: [
+            where("groupIds", "array-contains", group.id),
+            where("test", "==", false),
+         ],
+         emptyOrderBy: {
+            field: "start",
+            direction: orderByDirection || "desc",
+         },
+      }),
+      [group.id, orderByDirection]
    )
 
-   const { data: livestreamHits } = useLivestreamSearch(
-      inputValue,
-      additionalConstraints,
-      {
-         maxResults: 7,
-         orderByDirection,
-      }
-   )
+   const { data: livestreamHits } = useLivestreamSearch(inputValue, options)
 
    const renderOption = useCallback(
       (
@@ -112,25 +115,6 @@ const LivestreamSearch: FC<Props> = ({
       [inputValue]
    )
 
-   // Change only triggered/called when user selects an option
-   const onChange = useCallback(
-      (event: any, newValue: LivestreamHit | null) => {
-         return handleChange(newValue)
-      },
-      [handleChange]
-   )
-
-   const onInputChange = useCallback(
-      (event: any, newInputValue: string, reason) => {
-         if (reason === "reset") {
-            setInputValue("") // reset input value when user clicks on clear button/esacpe/outside
-            return
-         }
-         setInputValue(newInputValue)
-      },
-      []
-   )
-
    const sortedLivestreamHits = useMemo(() => {
       const sortedHits: LivestreamHit[] = livestreamHits || []
 
@@ -149,47 +133,20 @@ const LivestreamSearch: FC<Props> = ({
    }, [livestreamHits, orderByDirection, value])
 
    return (
-      <Autocomplete
+      <AutocompleteSearch
          id="livestream-search"
-         fullWidth
-         getOptionLabel={getOptionLabel}
-         options={sortedLivestreamHits}
-         autoComplete
-         disableClearable
-         blurOnSelect
-         includeInputInList
-         clearOnBlur
-         ListboxProps={listBoxProps}
          value={value}
-         isOptionEqualToValue={isOptionEqualToValue}
-         noOptionsText="No livestreams found"
-         onChange={onChange}
-         onInputChange={onInputChange}
-         renderInput={(params) => (
-            <StyledTextField
-               {...params}
-               InputProps={{
-                  ...params.InputProps,
-                  startAdornment: (
-                     <InputAdornment position="start">
-                        <FindIcon color={"black"} />
-                     </InputAdornment>
-                  ),
-               }}
-               placeholder={"Search live stream"}
-               fullWidth
-            />
-         )}
+         inputValue={inputValue}
+         handleChange={handleChange}
+         options={sortedLivestreamHits}
          renderOption={renderOption}
+         isOptionEqualToValue={isOptionEqualToValue}
+         getOptionLabel={getOptionLabel}
+         inputStartIcon={<FindIcon />}
+         setInputValue={setInputValue}
       />
    )
 }
-
-const listBoxProps: React.ComponentProps<typeof Autocomplete>["ListboxProps"] =
-   {
-      // @ts-ignore
-      sx: styles.listBox,
-   }
 
 const isOptionEqualToValue = (option: LivestreamHit, value: LivestreamHit) =>
    option.id === value.id
