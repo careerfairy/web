@@ -1,10 +1,18 @@
 import ScrollToTop from "../../components/views/common/ScrollToTop"
 import React from "react"
-import { Typography } from "@mui/material"
 import SEO from "../../components/util/SEO"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import CompaniesPageOverview from "../../components/views/companies/CompaniesPageOverview"
+import { InferGetServerSidePropsType, NextPage } from "next"
+import { getInfiniteQuery } from "../../components/views/companies/useInfiniteCompanies"
+import { getDocs } from "@firebase/firestore"
+import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
+import { Group } from "@careerfairy/shared-lib/groups"
 
-const CompaniesPage = () => {
+export const PAGE_SIZE = 12
+
+type Props = InferGetServerSidePropsType<typeof getServerSideProps>
+const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
    return (
       <>
          <SEO
@@ -13,11 +21,21 @@ const CompaniesPage = () => {
             title={"CareerFairy | Companies"}
          />
          <GenericDashboardLayout pageDisplayName={"Companies"}>
-            <Typography variant={"h5"}>Companies list</Typography>
+            <CompaniesPageOverview serverSideCompanies={serverSideCompanies} />
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </>
    )
+}
+
+export const getServerSideProps = async () => {
+   const snaps = await getDocs(getInfiniteQuery(PAGE_SIZE))
+
+   return {
+      props: {
+         serverSideCompanies: mapFirestoreDocuments<Group>(snaps),
+      },
+   }
 }
 
 export default CompaniesPage
