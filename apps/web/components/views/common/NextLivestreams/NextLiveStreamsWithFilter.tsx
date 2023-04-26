@@ -154,8 +154,8 @@ const NextLiveStreamsWithFilter = ({
                   handleChange={handleSearch}
                   value={null}
                   endIcon={<FindIcon color={"black"} />}
-                  placeholder={"Search"}
                   additionalConstraints={additionalConstraints}
+                  searchWithTrigram
                />
             </Card>
          </Container>
