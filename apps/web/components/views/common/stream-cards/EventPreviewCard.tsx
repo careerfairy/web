@@ -106,6 +106,9 @@ const styles = sxStyles({
          "& .hideOnHoverContent": {
             opacity: 0,
          },
+         "& .hideOnHoverContent2": {
+            display: "none",
+         },
          "& .backgroundImageWrapper": {
             position: "unset",
             opacity: 0.1,
@@ -136,7 +139,7 @@ const styles = sxStyles({
    },
    mainContentWrapper: {
       position: "relative",
-      height: (theme) => theme.spacing(42),
+      height: (theme) => theme.spacing(43),
       display: "flex",
       flexDirection: "column",
       alignItems: "flex-end",
@@ -349,6 +352,11 @@ const EventPreviewCard = ({
    const getStartHour = useMemo<string>(() => {
       return DateUtil.eventPreviewHour(startDate)
    }, [startDate])
+
+   const getPastEventDate = useMemo<string>(
+      () => DateUtil.pastEventPreviewDate(startDate),
+      [startDate]
+   )
 
    const handleShareClick = useCallback(() => {
       openShareDialog?.(event)
@@ -586,7 +594,7 @@ const EventPreviewCard = ({
                      className="hideOnHoverContent"
                      sx={[styles.hideOnHoverContent, { zIndex: 1 }]}
                   >
-                     {isPlaceholderEvent ? null : (
+                     {isPlaceholderEvent || isPast ? null : (
                         <Box sx={{ display: "flex" }}>
                            {loading ? (
                               <Skeleton
@@ -648,7 +656,44 @@ const EventPreviewCard = ({
                         )}
                      </Box>
                   </Box>
-                  <Box className="contentWrapper" sx={styles.contentWrapper}>
+                  <Box
+                     className="contentWrapper"
+                     sx={[
+                        styles.contentWrapper,
+                        isPast ? { paddingTop: 4 } : null,
+                     ]}
+                  >
+                     {isPast ? (
+                        <Box
+                           className="hideOnHoverContent2"
+                           sx={{
+                              display: "flex",
+                              mb: 1,
+                              justifyContent: "space-between",
+                           }}
+                        >
+                           <Typography
+                              sx={{ display: "flex", alignItems: "center" }}
+                              fontSize={12}
+                              color={"text.secondary"}
+                           >
+                              <CalendarIcon
+                                 fontSize={"inherit"}
+                                 sx={{ mr: 0.5 }}
+                              />
+                              {getPastEventDate}
+                           </Typography>
+
+                           <Typography
+                              sx={{ display: "flex", alignItems: "center" }}
+                              fontSize={12}
+                              color={"text.secondary"}
+                           >
+                              {event.duration} min
+                           </Typography>
+                        </Box>
+                     ) : null}
+
                      <Box sx={{ display: "flex" }}>
                         <Typography
                            variant={"body1"}

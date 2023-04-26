@@ -109,7 +109,7 @@ const GroupStreams = ({
       (livestream, index, arr) => {
          if (livestream) {
             return (
-               <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
+               <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={3} item>
                   <Wrapper streamId={livestream.id}>
                      <EventPreviewCard
                         index={index}
@@ -175,7 +175,7 @@ const GroupStreams = ({
                )}
             </Grid>
          </Box>
-         {joinGroupModalData && (
+         {joinGroupModalData ? (
             <RegistrationModal
                open={Boolean(joinGroupModalData)}
                onFinish={handleCloseJoinModal}
@@ -185,7 +185,7 @@ const GroupStreams = ({
                targetGroupId={joinGroupModalData?.targetGroupId}
                handleClose={handleCloseJoinModal}
             />
-         )}
+         ) : null}
       </>
    )
 }

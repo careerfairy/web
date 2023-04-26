@@ -50,11 +50,19 @@ type Props = {
    value: LivestreamHit
    handleChange: (value: LivestreamHit | null) => void
    orderByDirection?: "asc" | "desc"
+   filterByGroup?: boolean
+   startIcon?: JSX.Element
+   endIcon?: JSX.Element
+   placeholder?: string
 }
 const LivestreamSearch: FC<Props> = ({
    value,
    handleChange,
    orderByDirection,
+   filterByGroup,
+   startIcon,
+   endIcon,
+   placeholder,
 }) => {
    const { group } = useGroup()
 
