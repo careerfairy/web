@@ -3,19 +3,17 @@ import AdminGenericLayout from "../AdminGenericLayout"
 import TopBar from "./TopBar"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import GenericNavList from "./GenericNavList"
-import { createContext, useContext, useEffect, useMemo, useState } from "react"
-import { useRouter } from "next/router"
-import useScrollTrigger from "@mui/material/useScrollTrigger"
+import { createContext, useContext, useMemo } from "react"
 import FooterV2 from "../../components/views/footer/FooterV2"
 
 type IGenericDashboardContext = {
-   isOverBanner: boolean
+   isOverPortalBanner: boolean
    isPortalPage: boolean
    hasRecordings: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
-   isOverBanner: false,
+   isOverPortalBanner: false,
    isPortalPage: false,
    hasRecordings: false,
 })
@@ -25,6 +23,8 @@ type Props = {
    pageDisplayName: string
    bgColor?: string
    hasRecordings?: boolean
+   isPortalPage?: boolean
+   isOverPortalBanner?: boolean
 }
 
 const GenericDashboardLayout = ({
@@ -32,32 +32,16 @@ const GenericDashboardLayout = ({
    pageDisplayName,
    bgColor,
    hasRecordings,
+   isPortalPage,
+   isOverPortalBanner,
 }: Props) => {
    const isMobile = useIsMobile()
-   const { pathname } = useRouter()
-   const isPortalPage = useMemo(() => pathname === "/portal", [pathname])
-   const isScrollingHoverTheBanner = useScrollTrigger({
-      threshold: 250,
-      disableHysteresis: true,
-   })
 
    // TODO: Needs to be updated after the new banner.
    //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
-
-   // To have a different look & feel on header and topBar when hovering the portal page banner
-   const [isOverBanner, setIsOverBanner] = useState<boolean>(
-      isPortalPage && hasRecordings
-   )
-
-   useEffect(() => {
-      if (isPortalPage && hasRecordings) {
-         setIsOverBanner(!isScrollingHoverTheBanner)
-      }
-   }, [isScrollingHoverTheBanner])
-
    const value = useMemo<IGenericDashboardContext>(
-      () => ({ isOverBanner, isPortalPage, hasRecordings }),
-      [hasRecordings, isOverBanner, isPortalPage]
+      () => ({ isOverPortalBanner, isPortalPage, hasRecordings }),
+      [hasRecordings, isOverPortalBanner, isPortalPage]
    )
 
    return (

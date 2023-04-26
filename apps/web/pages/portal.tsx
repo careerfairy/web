@@ -1,4 +1,4 @@
-import React, { useMemo } from "react"
+import React, { useEffect, useMemo, useState } from "react"
 import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
@@ -22,6 +22,7 @@ import CookiesUtil from "../util/CookiesUtil"
 import { Box } from "@mui/material"
 import { mapFromServerSide } from "util/serverUtil"
 import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
 
 const PortalPage = ({
    highlights,
@@ -31,6 +32,22 @@ const PortalPage = ({
    recordedEvents,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
+   const isScrollingHoverTheBanner = useScrollTrigger({
+      threshold: 250,
+      disableHysteresis: true,
+   })
+
+   // To have a different look & feel on header and topBar when hovering the portal page banner
+   const [isOverBanner, setIsOverBanner] = useState<boolean>(
+      recordedEvents?.length > 0
+   )
+
+   useEffect(() => {
+      if (recordedEvents?.length > 0) {
+         setIsOverBanner(!isScrollingHoverTheBanner)
+      }
+   }, [isScrollingHoverTheBanner])
+
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
@@ -52,6 +69,8 @@ const PortalPage = ({
          <GenericDashboardLayout
             pageDisplayName={""}
             hasRecordings={recordedEvents?.length > 0}
+            isPortalPage={true}
+            isOverPortalBanner={isOverBanner}
          >
             <>
                {recordedEvents?.length > 0 && (
