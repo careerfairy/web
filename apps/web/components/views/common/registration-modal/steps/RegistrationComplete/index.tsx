@@ -13,10 +13,10 @@ import { useRouter } from "next/router"
 import { StylesProps } from "../../../../../../types/commonTypes"
 import ReferralWidget from "../../../ReferralWidget"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
-import confetti from "canvas-confetti"
 import { PillsBackground } from "materialUI/GlobalBackground/GlobalBackGround"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import useEventSocials from "../../../../../custom-hook/useEventSocials"
+import { responsiveConfetti } from "../../../../../util/confetti"
 
 const styles: StylesProps = {
    root: {},
@@ -71,14 +71,7 @@ const RegistrationComplete = () => {
 
    useEffect(() => {
       if (!userStats?.hasRegisteredOnAnyLivestream) {
-         confetti({
-            particleCount: isMobile ? 500 : 1000,
-            spread: 120,
-            origin: { y: isMobile ? 0.9 : 0.7 },
-            decay: isMobile ? null : 0.93,
-            startVelocity: isMobile ? null : 45,
-            zIndex: 99999,
-         })
+         responsiveConfetti(isMobile)
       }
    }, [isMobile, userStats?.hasRegisteredOnAnyLivestream])
 

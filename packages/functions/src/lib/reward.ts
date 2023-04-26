@@ -3,6 +3,7 @@ import {
    REFERRAL_FIRST_FRIENDS_NUM,
    RewardAction,
    RewardDoc,
+   REWARDS,
 } from "@careerfairy/shared-lib/rewards"
 import functions = require("firebase-functions")
 import {
@@ -55,9 +56,14 @@ export const rewardCreateUserAction = (
    action: RewardAction,
    relatedLivestreamData?: LivestreamEvent
 ) => {
+   const shouldNotifyUser = Boolean(REWARDS[action]?.shouldNotifyUser)
+
    // do not send reward notifications for user actions
-   // by marking the reward as seen the user doesn't receive a notification
-   const otherData: Partial<RewardDoc> = { seenByUser: true }
+   // by marking the reward as seen, the user doesn't receive a notification
+   const otherData: Partial<RewardDoc> = {
+      // Used ternary for readability
+      seenByUser: shouldNotifyUser ? false : true,
+   }
 
    if (relatedLivestreamData) {
       otherData.livestreamId = relatedLivestreamData.id
