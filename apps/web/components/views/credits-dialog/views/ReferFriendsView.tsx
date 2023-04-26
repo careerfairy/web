@@ -44,6 +44,10 @@ const styles = sxStyles({
       color: "white",
       fontSize: "1.7rem",
    },
+   linkText: {
+      width: "100%",
+      maxWidth: 350,
+   },
 })
 
 const ReferFriendsView: FC = () => {
@@ -122,9 +126,9 @@ const CopyUserReferralLinkButton = () => {
             Your Referral Link
          </Typography>
          <Typography
+            sx={styles.linkText}
             whiteSpace="nowrap"
             variant="body1"
-            width="100%"
             overflow="hidden"
             color="text.secondary"
             textAlign="start"
