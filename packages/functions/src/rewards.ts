@@ -127,7 +127,7 @@ export const rewardUserAction = functions.https.onCall(
             break
       }
 
-      // user must be registered in the livestream event
+      // if the reward is related to a livestream, validate the livestream
       let livestreamDoc: LivestreamEvent
       if (data.livestreamId) {
          livestreamDoc = await validateLivestreamEvent(
