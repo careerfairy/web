@@ -12,6 +12,7 @@ import {
 } from "../FeedbackPageProvider"
 import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
+import { Search as FindIcon } from "react-feather"
 
 const styles = sxStyles({
    root: {
@@ -79,6 +80,8 @@ const FeedbackSearch: FC = () => {
                orderByDirection={SORT_DIRECTIONS[sortDirection]}
                handleChange={handleChange}
                value={null}
+               filterByGroup={true}
+               startIcon={<FindIcon color={"black"} />}
             />
             <StyledTextField
                sx={[styles.timeFrameSelect, isMobile && styles.noMarginTop]}

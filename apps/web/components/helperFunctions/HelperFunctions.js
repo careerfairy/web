@@ -116,7 +116,7 @@ export function getTimeFromNow(firebaseTimestamp) {
 }
 
 export const prettyDate = (firebaseTimestamp) => {
-   if (firebaseTimestamp) {
+   if (firebaseTimestamp && firebaseTimestamp.toDate?.()) {
       return dayjs(firebaseTimestamp.toDate()).format("LL LT")
    } else {
       return ""
