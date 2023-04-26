@@ -15,7 +15,7 @@ import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
 import React, { useCallback, useMemo } from "react"
 import { styled, useTheme } from "@mui/material/styles"
 import Stack from "@mui/material/Stack"
-import FollowButton from "./FollowButton"
+import FollowButton from "../../common/company/FollowButton"
 import ShareButton from "./ShareButton"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
 import useIsMobile from "../../../custom-hook/useIsMobile"
@@ -350,7 +350,9 @@ const ActionButtons = () => {
 
    return (
       <Stack spacing={1} direction={"row"}>
-         {showFollowButton ? <FollowButton group={group} /> : null}
+         {showFollowButton ? (
+            <FollowButton color="primary" group={group} />
+         ) : null}
          {showShareButton ? <ShareButton /> : null}
       </Stack>
    )

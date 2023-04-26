@@ -3,7 +3,7 @@ import { sxStyles } from "../../../../types/commonTypes"
 import React from "react"
 import Image from "next/image"
 import { useCompanyPage } from "../index"
-import FollowButton from "../Header/FollowButton"
+import FollowButton from "../../common/company/FollowButton"
 
 const styles = sxStyles({
    wrapper: {
@@ -44,7 +44,11 @@ const StayUpToDateBanner = () => {
                      </Typography>
                   </Grid>
                   <Grid item>
-                     <FollowButton group={group} color={"secondary"} noIcon />
+                     <FollowButton
+                        group={group}
+                        color={"secondary"}
+                        startIcon={null}
+                     />
                   </Grid>
                </Grid>
             </Grid>
