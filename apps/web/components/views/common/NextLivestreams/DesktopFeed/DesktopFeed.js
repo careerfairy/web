@@ -19,7 +19,7 @@ const DesktopFeed = ({
    return (
       <Grow in>
          <Container
-            maxWidth="lg"
+            maxWidth="xl"
             disableGutters
             sx={{ flex: 1, display: "flex" }}
          >

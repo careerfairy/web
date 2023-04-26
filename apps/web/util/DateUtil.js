@@ -51,6 +51,9 @@ export default class DateUtil {
    static getRatingDate(JSDate) {
       return dayjs(JSDate).format("D MMMM YYYY")
    }
+   static pastEventPreviewDate(JSDate) {
+      return dayjs(JSDate).format("DD/MM/YYYY")
+   }
 
    static getRelativeDate(JSDate) {
       const now = new Date()
