@@ -1,15 +1,17 @@
 import useListenToUpcomingStreams from "../../../../components/custom-hook/useListenToUpcomingStreams"
-import NextLivestreamsBannerSection from "../../../../components/views/common/NextLivestreams/NextLivestreamsBannerSection"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { useTheme } from "@mui/material/styles"
 import { StreamsSection } from "./StreamsSection"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useRouter } from "next/router"
-import { Grid, Typography } from "@mui/material"
+import { Card, Container, Grid, Typography } from "@mui/material"
 import Image from "next/image"
 import Link from "../../../../components/views/common/Link"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import { sxStyles } from "../../../../types/commonTypes"
+import { Search as FindIcon } from "react-feather"
+import LivestreamSearch, {
+   LivestreamHit,
+} from "../../group/admin/common/LivestreamSearch"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -17,6 +19,11 @@ const styles = sxStyles({
       margin: "0 auto",
       color: "rgb(130,130,130)",
       textAlign: "center",
+   },
+   root: {
+      flex: 1,
+      display: "flex",
+      marginX: { xs: 2, md: 3 },
    },
 })
 
@@ -44,13 +51,7 @@ type Props = {
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
 }: Props) => {
-   const {
-      palette: {
-         common: { white },
-      },
-   } = useTheme()
-   const { query } = useRouter()
-   const [value, setValue] = useState(initialTabValue || "upcomingEvents")
+   const { query, push } = useRouter()
    const {
       languages,
       interests,
@@ -73,7 +74,7 @@ const NextLiveStreamsWithFilter = ({
 
    useEffect(() => {
       // load past events when changing tabs
-      if (value === "pastEvents" && !pastLivestreams) {
+      if (initialTabValue === "pastEvents" && !pastLivestreams) {
          const sixMonthsAgo = new Date(
             new Date().setMonth(new Date().getMonth() - 6)
          )
@@ -84,13 +85,7 @@ const NextLiveStreamsWithFilter = ({
             })
             .catch(console.error)
       }
-   }, [value, pastLivestreams])
-
-   const handleChange = useCallback((event, newValue) => {
-      if (newValue) {
-         setValue(newValue)
-      }
-   }, [])
+   }, [initialTabValue, pastLivestreams])
 
    const renderNoResults = useCallback(() => {
       return (
@@ -122,22 +117,40 @@ const NextLiveStreamsWithFilter = ({
       )
    }, [isMobile])
 
+   const handleSearch = useCallback(
+      (hit: LivestreamHit | null) => {
+         void push(`/upcoming-livestream//${hit.id}`)
+      },
+      [push]
+   )
+
    return (
-      <React.Fragment>
-         <NextLivestreamsBannerSection
-            color={white}
-            handleChange={handleChange}
-            value={value}
-         />
+      <>
+         <Container
+            maxWidth="xl"
+            disableGutters
+            sx={{ flex: 1, display: "flex" }}
+         >
+            <Card sx={styles.root}>
+               <LivestreamSearch
+                  orderByDirection={"desc"}
+                  handleChange={handleSearch}
+                  value={null}
+                  endIcon={<FindIcon color={"black"} />}
+                  placeholder={"Search"}
+               />
+            </Card>
+         </Container>
+
          <StreamsSection
-            value={value}
+            value={initialTabValue}
             upcomingLivestreams={upcomingLivestreams}
             listenToUpcoming
             pastLivestreams={pastLivestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={renderNoResults()}
          />
-      </React.Fragment>
+      </>
    )
 }
 

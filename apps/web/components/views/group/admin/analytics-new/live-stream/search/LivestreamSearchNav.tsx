@@ -10,6 +10,7 @@ import ExportPdfButton from "./ExportPDFButton"
 import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPageProvider"
 import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { Search as FindIcon } from "react-feather"
 
 const spacing = 3
 
@@ -57,6 +58,8 @@ const LivestreamSearchNav = () => {
                <LivestreamSearch
                   handleChange={handleChange}
                   value={currentStreamStats?.livestream ?? null}
+                  filterByGroup={true}
+                  startIcon={<FindIcon color={"black"} />}
                />
             </Card>
          </Box>
