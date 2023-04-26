@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useMemo } from "react"
 import { Box, Card } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import LivestreamSearch, {
@@ -11,6 +11,7 @@ import { useLivestreamsAnalyticsPageContext } from "../LivestreamAnalyticsPagePr
 import { useRouter } from "next/router"
 import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
 import { Search as FindIcon } from "react-feather"
+import { where } from "firebase/firestore"
 
 const spacing = 3
 
@@ -46,6 +47,11 @@ const LivestreamSearchNav = () => {
       [group.id, push]
    )
 
+   const additionalConstraints = useMemo(
+      () => (group?.id ? [where("groupIds", "array-contains", group.id)] : []),
+      [group?.id]
+   )
+
    return (
       <Stack
          sx={styles.wrapper}
@@ -58,8 +64,8 @@ const LivestreamSearchNav = () => {
                <LivestreamSearch
                   handleChange={handleChange}
                   value={currentStreamStats?.livestream ?? null}
-                  filterByGroup={true}
                   startIcon={<FindIcon color={"black"} />}
+                  additionalConstraints={additionalConstraints}
                />
             </Card>
          </Box>

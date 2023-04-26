@@ -1,4 +1,4 @@
-import React, { FC, useCallback } from "react"
+import React, { FC, useCallback, useMemo } from "react"
 import { Card, Divider, ListItemIcon, ListItemText } from "@mui/material"
 import { sxStyles } from "../../../../../../../types/commonTypes"
 import LivestreamSearch, {
@@ -13,6 +13,8 @@ import {
 import { StyledMenuItem, StyledTextField } from "../../../common/inputs"
 import CheckRoundedIcon from "@mui/icons-material/CheckRounded"
 import { Search as FindIcon } from "react-feather"
+import { useGroup } from "../../../../../../../layouts/GroupDashboardLayout"
+import { where } from "firebase/firestore"
 
 const styles = sxStyles({
    root: {
@@ -39,6 +41,7 @@ const styles = sxStyles({
 
 const FeedbackSearch: FC = () => {
    const isMobile = useIsMobile()
+   const { group } = useGroup()
    const { setSortDirection, sortDirection, handleOpenFeedbackDialog } =
       useFeedbackPageContext()
 
@@ -62,6 +65,11 @@ const FeedbackSearch: FC = () => {
       [setSortDirection]
    )
 
+   const additionalConstraints = useMemo(
+      () => (group?.id ? [where("groupIds", "array-contains", group.id)] : []),
+      [group?.id]
+   )
+
    return (
       <Card sx={styles.root}>
          <Stack
@@ -80,8 +88,8 @@ const FeedbackSearch: FC = () => {
                orderByDirection={SORT_DIRECTIONS[sortDirection]}
                handleChange={handleChange}
                value={null}
-               filterByGroup={true}
                startIcon={<FindIcon color={"black"} />}
+               additionalConstraints={additionalConstraints}
             />
             <StyledTextField
                sx={[styles.timeFrameSelect, isMobile && styles.noMarginTop]}
