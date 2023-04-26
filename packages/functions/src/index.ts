@@ -171,7 +171,7 @@ exports.slackHandleInteractions = slack.slackHandleInteractions
 // Rewards
 exports.rewardLivestreamInvitationComplete =
    rewards.rewardLivestreamInvitationComplete
-exports.rewardUserAction = rewards.rewardUserAction
+exports.rewardUserAction_v2 = rewards.rewardUserAction
 exports.applyReferralCode = rewards.applyReferralCode
 
 // Ratings

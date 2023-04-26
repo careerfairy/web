@@ -58,7 +58,7 @@ export class RewardService {
    userAction(action: RewardAction, livestreamId?: string) {
       return httpsCallable(
          this.functions,
-         "rewardUserAction"
+         "rewardUserAction_v2"
       )({
          action,
          livestreamId,
