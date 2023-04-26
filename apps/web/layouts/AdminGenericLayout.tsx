@@ -172,7 +172,8 @@ type HeaderProps = {
    children: React.ReactNode
 }
 const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
-   const { isOverBanner, isPortalPage, hasRecordings } = useGenericDashboard()
+   const { isOverPortalBanner, isPortalPage, hasRecordings } =
+      useGenericDashboard()
 
    return (
       <AppBar
@@ -183,7 +184,7 @@ const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
          sx={[
             styles.appBar,
             drawerOpen && styles.animateWidth,
-            isOverBanner && styles.topBarOverBanner,
+            isOverPortalBanner && styles.topBarOverBanner,
             isPortalPage && hasRecordings && styles.topBarFixed,
          ]}
       >
