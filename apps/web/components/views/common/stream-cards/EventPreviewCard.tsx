@@ -106,7 +106,7 @@ const styles = sxStyles({
          "& .hideOnHoverContent": {
             opacity: 0,
          },
-         "& .hideOnHoverContent2": {
+         "& .hidePastDateOnHover": {
             display: "none",
          },
          "& .backgroundImageWrapper": {
@@ -659,7 +659,7 @@ const EventPreviewCard = ({
                   >
                      {isPast ? (
                         <Box
-                           className="hideOnHoverContent2"
+                           className="hidePastDateOnHover"
                            sx={{
                               display: "flex",
                               mb: 1,
