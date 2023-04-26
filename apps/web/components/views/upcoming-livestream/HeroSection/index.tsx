@@ -31,7 +31,6 @@ import RecordingPlayer from "../RecordingPlayer"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
-import { errorLogAndNotify } from "util/CommonUtil"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
