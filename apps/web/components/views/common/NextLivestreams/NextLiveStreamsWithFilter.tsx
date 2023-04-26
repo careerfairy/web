@@ -12,6 +12,8 @@ import { Search as FindIcon } from "react-feather"
 import LivestreamSearch, {
    LivestreamHit,
 } from "../../group/admin/common/LivestreamSearch"
+import { where } from "firebase/firestore"
+import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../data/constants/streamContants"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -61,6 +63,10 @@ const NextLiveStreamsWithFilter = ({
       companyIndustries,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
+   const arePastEvents = useMemo(
+      () => initialTabValue === "pastEvents",
+      [initialTabValue]
+   )
 
    const upcomingLivestreams = useListenToUpcomingStreams({
       languagesIds: languages,
@@ -74,7 +80,7 @@ const NextLiveStreamsWithFilter = ({
 
    useEffect(() => {
       // load past events when changing tabs
-      if (initialTabValue === "pastEvents" && !pastLivestreams) {
+      if (arePastEvents && !pastLivestreams) {
          const sixMonthsAgo = new Date(
             new Date().setMonth(new Date().getMonth() - 6)
          )
@@ -85,7 +91,7 @@ const NextLiveStreamsWithFilter = ({
             })
             .catch(console.error)
       }
-   }, [initialTabValue, pastLivestreams])
+   }, [arePastEvents, pastLivestreams])
 
    const renderNoResults = useCallback(() => {
       return (
@@ -124,6 +130,17 @@ const NextLiveStreamsWithFilter = ({
       [push]
    )
 
+   const additionalConstraints = useMemo(
+      () => [
+         where(
+            "start",
+            arePastEvents ? "<" : ">=",
+            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
+         ),
+      ],
+      [arePastEvents]
+   )
+
    return (
       <>
          <Container
@@ -133,11 +150,12 @@ const NextLiveStreamsWithFilter = ({
          >
             <Card sx={styles.root}>
                <LivestreamSearch
-                  orderByDirection={"desc"}
+                  orderByDirection={arePastEvents ? "desc" : "asc"}
                   handleChange={handleSearch}
                   value={null}
                   endIcon={<FindIcon color={"black"} />}
                   placeholder={"Search"}
+                  additionalConstraints={additionalConstraints}
                />
             </Card>
          </Container>
