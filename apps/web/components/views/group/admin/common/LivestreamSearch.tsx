@@ -5,7 +5,6 @@ import {
    LivestreamEvent,
    LivestreamEventPublicData,
 } from "@careerfairy/shared-lib/livestreams"
-import { useGroup } from "../../../../../layouts/GroupDashboardLayout"
 import { useLivestreamSearch } from "../../../../custom-hook/live-stream/useLivestreamSearch"
 import { getParts } from "../../../../util/search"
 import { prettyDate } from "../../../../helperFunctions/HelperFunctions"
@@ -16,7 +15,7 @@ import RenderParts from "../../../common/search/RenderParts"
 import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
-import { Search as FindIcon } from "react-feather"
+import { QueryConstraint } from "@firebase/firestore"
 
 const styles = sxStyles({
    root: {
@@ -52,8 +51,9 @@ type Props = {
    orderByDirection?: "asc" | "desc"
    startIcon?: JSX.Element
    endIcon?: JSX.Element
-   placeholder?: string
+   placeholderText?: string
    additionalConstraints?: QueryConstraint[]
+   searchWithTrigram?: boolean
 }
 const LivestreamSearch: FC<Props> = ({
    value,
@@ -61,26 +61,29 @@ const LivestreamSearch: FC<Props> = ({
    orderByDirection,
    startIcon,
    endIcon,
-   placeholder,
+   placeholderText,
+   searchWithTrigram,
    additionalConstraints = [] as QueryConstraint[],
 }) => {
-   const { group } = useGroup()
-
    const [inputValue, setInputValue] = useState("")
 
    const options = useMemo<UseSearchOptions<LivestreamEvent>>(
       () => ({
          maxResults: 7,
          additionalConstraints: [
-            where("groupIds", "array-contains", group.id),
+            ...additionalConstraints,
             where("test", "==", false),
          ],
-         emptyOrderBy: {
-            field: "start",
-            direction: orderByDirection || "desc",
-         },
+         ...(searchWithTrigram
+            ? null
+            : {
+                 emptyOrderBy: {
+                    field: "start",
+                    direction: orderByDirection || "desc",
+                 },
+              }),
       }),
-      [group.id, orderByDirection]
+      [additionalConstraints, orderByDirection, searchWithTrigram]
    )
 
    const { data: livestreamHits } = useLivestreamSearch(inputValue, options)
@@ -150,8 +153,11 @@ const LivestreamSearch: FC<Props> = ({
          renderOption={renderOption}
          isOptionEqualToValue={isOptionEqualToValue}
          getOptionLabel={getOptionLabel}
-         inputStartIcon={<FindIcon />}
+         inputStartIcon={startIcon}
          setInputValue={setInputValue}
+         placeholderText={placeholderText}
+         inputEndIcon={endIcon}
+         minCharacters={searchWithTrigram ? 3 : null}
       />
    )
 }
