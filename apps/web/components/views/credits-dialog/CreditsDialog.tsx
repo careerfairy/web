@@ -6,22 +6,16 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { Box, Dialog, DialogContent, Zoom } from "@mui/material"
+import { Dialog, DialogContent, Zoom } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { useRouter } from "next/router"
-import dynamic from "next/dynamic"
-import CircularProgress from "@mui/material/CircularProgress"
 import CVUploadView from "./views/CVUploadView"
 import GetMoreCreditsView from "./views/GetMoreCreditsView"
-
-// Dynamic import of ReferFriendsView since it uses react-share library
-const ReferFriendsView = dynamic(() => import("./views/ReferFriendsView"), {
-   loading: () => <LoadingView />,
-})
+import ReferFriendsView from "./views/ReferFriendsView"
 
 const styles = sxStyles({
    content: {
@@ -146,17 +140,6 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
       </DialogContext.Provider>
    )
 }
-
-const LoadingView = () => (
-   <Box
-      height={"315px"}
-      display="flex"
-      alignItems="center"
-      justifyContent="center"
-   >
-      <CircularProgress />
-   </Box>
-)
 
 type DialogContextType = {
    handleClose: () => void

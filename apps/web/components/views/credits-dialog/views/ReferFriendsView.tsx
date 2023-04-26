@@ -17,11 +17,9 @@ import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotificati
 import WhatsAppIcon from "@mui/icons-material/WhatsApp"
 import LinkedInIcon from "@mui/icons-material/LinkedIn"
 import TwitterIcon from "@mui/icons-material/Twitter"
-import {
-   LinkedinShareButton,
-   TwitterShareButton,
-   WhatsappShareButton,
-} from "react-share"
+import WhatsAppShare from "../../common/socials/WhatsAppShare"
+import LinkedInShare from "../../common/socials/LinkedInShare"
+import TwitterShare from "../../common/socials/TwitterShare"
 
 const styles = sxStyles({
    root: {
@@ -175,27 +173,27 @@ const SocialButtons = () => {
             Or share by
          </Typography>
          <Stack direction="row" spacing={2}>
-            <WhatsappShareButton
+            <WhatsAppShare
                url={referralLink}
                title={title}
                onClick={handleWhatsappShare}
-               separator=":: "
             >
                <SocialButton icon={<WhatsAppIcon fontSize="inherit" />} />
-            </WhatsappShareButton>
-            <TwitterShareButton
+            </WhatsAppShare>
+            <TwitterShare
                onClick={handleTwitterShare}
                url={referralLink}
                title={title}
             >
                <SocialButton icon={<TwitterIcon fontSize="inherit" />} />
-            </TwitterShareButton>
-            <LinkedinShareButton
+            </TwitterShare>
+            <LinkedInShare
                onClick={handleLinkedinShare}
+               title={title}
                url={referralLink} // Note: won't work in dev as LinkedIn doesn't allow the localhost domain
             >
                <SocialButton icon={<LinkedInIcon fontSize="inherit" />} />
-            </LinkedinShareButton>
+            </LinkedInShare>
          </Stack>
       </Stack>
    )
