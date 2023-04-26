@@ -57,11 +57,11 @@ type Props = {
 const TopBar = ({ title, bgColor }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
-   const { isOverBanner } = useGenericDashboard()
+   const { isOverPortalBanner } = useGenericDashboard()
 
    return (
       <Box
-         bgcolor={isOverBanner ? null : bgColor || "#F7F8FC"}
+         bgcolor={isOverPortalBanner ? null : bgColor || "#F7F8FC"}
          sx={styles.root}
       >
          <Box sx={styles.leftSection}>
