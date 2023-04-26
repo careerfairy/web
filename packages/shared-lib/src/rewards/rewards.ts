@@ -145,7 +145,7 @@ export const REWARDS: Record<string, Reward> = {
       credits: -1,
       humanStringDescription: "You have bought access to the recording",
    },
-}
+} as const
 
 export type RewardAction = keyof typeof REWARDS
 

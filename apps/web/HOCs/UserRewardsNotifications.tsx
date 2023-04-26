@@ -4,8 +4,8 @@ import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
    getHumanStringDescriptionForAction,
-   getCustomRewardMessageForAction,
    RewardAction,
+   getCustomRewardMessageForAction
    RewardDoc,
 } from "@careerfairy/shared-lib/dist/rewards"
 import RewardNotification from "../components/views/notifications/RewardNotification"
