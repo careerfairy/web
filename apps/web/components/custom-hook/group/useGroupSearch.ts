@@ -5,7 +5,7 @@ import useSearch, { UseSearchOptions } from "../utils/useSearch"
 import { Group } from "@careerfairy/shared-lib/groups"
 
 /**
- * A custom React hook used for performing searches of livestream events in Firestore.
+ * A custom React hook used for performing searches of groups in Firestore.
  *
  * @param {string} inputValue - The search string input by the user
  * @param {Options} options - Additional options to apply to the search
