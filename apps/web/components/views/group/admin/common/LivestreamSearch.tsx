@@ -16,6 +16,7 @@ import { sortLivestreamsDesc } from "@careerfairy/shared-lib/utils"
 import { UseSearchOptions } from "../../../../custom-hook/utils/useSearch"
 import AutocompleteSearch from "../../../common/AutocompleteSearch"
 import { QueryConstraint } from "@firebase/firestore"
+import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../../data/constants/streamContants"
 
 const styles = sxStyles({
    root: {
@@ -54,6 +55,7 @@ type Props = {
    placeholderText?: string
    additionalConstraints?: QueryConstraint[]
    searchWithTrigram?: boolean
+   hasPastEvents?: boolean
 }
 const LivestreamSearch: FC<Props> = ({
    value,
@@ -64,12 +66,19 @@ const LivestreamSearch: FC<Props> = ({
    placeholderText,
    searchWithTrigram,
    additionalConstraints = [] as QueryConstraint[],
+   hasPastEvents,
 }) => {
    const [inputValue, setInputValue] = useState("")
 
+   // When using trigrams in a search, it's necessary to obtain more results because the filtering can only be performed on the client-side.
+   // This ensures that we have some results to display to the user.
+   //
+   // When using trigrams in a search, we require a minimum number of characters in the search input
+   // to ensure that no emptyOrderBy option will be added
    const options = useMemo<UseSearchOptions<LivestreamEvent>>(
       () => ({
-         maxResults: 7,
+         maxResults: searchWithTrigram ? 20 : 7,
+         debounceMs: searchWithTrigram ? 1000 : null,
          additionalConstraints: [
             ...additionalConstraints,
             where("test", "==", false),
@@ -134,14 +143,35 @@ const LivestreamSearch: FC<Props> = ({
          sortedHits.push(value)
       }
 
-      return sortedHits.sort((a, b) =>
+      sortedHits.sort((a, b) =>
          sortLivestreamsDesc(
             a as LivestreamEvent,
             b as LivestreamEvent,
             orderByDirection === "asc"
          )
       )
-   }, [livestreamHits, orderByDirection, value])
+
+      if (searchWithTrigram) {
+         // When using trigrams in a search, is required to do the filtering on client side.
+         // In this case filter by start date
+         const currentTime = new Date(
+            Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS
+         )
+
+         return sortedHits.filter((hit) =>
+            hasPastEvents
+               ? hit.start?.toDate() < currentTime
+               : hit.start?.toDate() >= currentTime
+         )
+      }
+      return sortedHits
+   }, [
+      livestreamHits,
+      orderByDirection,
+      hasPastEvents,
+      searchWithTrigram,
+      value,
+   ])
 
    return (
       <AutocompleteSearch
