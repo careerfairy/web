@@ -40,7 +40,7 @@ interface ReportCompleteProps {
    id: string | number
 }
 
-const ReportComplete = forwardRef<HTMLDivElement, ReportCompleteProps>(
+const RewardNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
    ({ id, ...props }, ref) => {
       const isMobile = useIsMobile()
       const { closeSnackbar } = useSnackbar()
@@ -85,6 +85,6 @@ const ReportComplete = forwardRef<HTMLDivElement, ReportCompleteProps>(
    }
 )
 
-ReportComplete.displayName = "ReportComplete"
+RewardNotification.displayName = "RewardNotification"
 
-export default ReportComplete
+export default RewardNotification

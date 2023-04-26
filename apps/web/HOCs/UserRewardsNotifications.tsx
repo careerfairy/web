@@ -8,7 +8,7 @@ import {
    RewardAction,
    RewardDoc,
 } from "@careerfairy/shared-lib/dist/rewards"
-import ReportComplete from "../components/views/notifications/RewardComplete"
+import RewardNotification from "../components/views/notifications/RewardNotification"
 
 const UserRewardsNotifications = ({ children }) => {
    const { userData } = useAuth()
@@ -59,7 +59,7 @@ const UserRewardsNotifications = ({ children }) => {
                   preventDuplicate: false,
                   key: action,
                   content: (key, message) => (
-                     <ReportComplete id={key} message={message} />
+                     <RewardNotification id={key} message={message} />
                   ),
                })
             }
