@@ -74,4 +74,8 @@ export default class UserPresenter extends BasePresenter<UserData> {
       const filedOfStudy = this.model?.fieldOfStudy?.name
       return filedOfStudy ? `${filedOfStudy} Student` : null
    }
+
+   getResumePath() {
+      return `user_resume/${this.model.authId}.pdf`
+   }
 }

@@ -47,6 +47,11 @@ type Reward = {
     * Description that can be used in the UI
     */
    humanStringDescription: string
+
+   /**
+    * Whether the user should be notified about this reward
+    */
+   shouldNotifyUser?: boolean
 }
 
 /**
@@ -61,6 +66,7 @@ export const REWARDS: Record<string, Reward> = {
       name: "USER_CV_UPLOAD",
       credits: 1,
       humanStringDescription: "You have uploaded your CV",
+      shouldNotifyUser: true,
    },
    // User progression badges
    LIVESTREAM_USER_ATTENDED: {
@@ -104,6 +110,7 @@ export const REWARDS: Record<string, Reward> = {
    REFERRAL_FIRST_FRIENDS: {
       name: "REFERRAL_FIRST_FRIENDS",
       credits: 3,
+      shouldNotifyUser: true,
       humanStringDescription: `You have referred your first ${REFERRAL_FIRST_FRIENDS_NUM} friends`,
    },
    LIVESTREAM_REGISTER_COMPLETE_LEADER: {
@@ -127,6 +134,7 @@ export const REWARDS: Record<string, Reward> = {
       name: "LIVESTREAM_USER_FIRST_ATTENDED",
       credits: 1,
       humanStringDescription: "You have attended your first live stream event",
+      shouldNotifyUser: true,
    },
 
    /**
@@ -137,7 +145,7 @@ export const REWARDS: Record<string, Reward> = {
       credits: -1,
       humanStringDescription: "You have bought access to the recording",
    },
-}
+} as const
 
 export type RewardAction = keyof typeof REWARDS
 
@@ -147,6 +155,18 @@ export const getHumanStringDescriptionForAction = (action: RewardAction) => {
    }
 
    return action
+}
+
+export const getCustomRewardMessageForAction = (
+   action: RewardAction
+): string => {
+   switch (action) {
+      case "USER_CV_UPLOAD":
+         return `As a reward for uploading your CV you’ve received +${REWARDS[action].credits} CareerCoin to use inside our platform.`
+
+      default:
+         return ""
+   }
 }
 
 /**

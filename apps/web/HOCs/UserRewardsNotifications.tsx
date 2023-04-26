@@ -4,9 +4,11 @@ import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
    getHumanStringDescriptionForAction,
+   getCustomRewardMessageForAction,
    RewardAction,
    RewardDoc,
 } from "@careerfairy/shared-lib/dist/rewards"
+import ReportComplete from "../components/views/notifications/RewardComplete"
 
 const UserRewardsNotifications = ({ children }) => {
    const { userData } = useAuth()
@@ -39,12 +41,26 @@ const UserRewardsNotifications = ({ children }) => {
                const actionHumanString = getHumanStringDescriptionForAction(
                   action as RewardAction
                )
+
                const total = groups[action].length
-               const rewardsPlural = total === 1 ? "reward" : "rewards"
-               const notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`
+               const onlyOneReward = total === 1
+               const rewardsPlural = onlyOneReward ? "reward" : "rewards"
+               let notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`
+
+               if (onlyOneReward) {
+                  const customMessage = getCustomRewardMessageForAction(action)
+                  if (customMessage) {
+                     notification = customMessage
+                  }
+               }
+
                enqueueSnackbar(notification, {
                   variant: "success",
                   preventDuplicate: false,
+                  key: action,
+                  content: (key, message) => (
+                     <ReportComplete id={key} message={message} />
+                  ),
                })
             }
 
@@ -62,6 +78,7 @@ const UserRewardsNotifications = ({ children }) => {
             }
          }
       )
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData?.id])
 
    return children

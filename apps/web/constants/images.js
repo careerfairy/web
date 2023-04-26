@@ -108,3 +108,6 @@ export const videoImagePlaceholder =
 
 export const placeholderAvatar =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/placeholders%2Fplacholder-avatar.png?alt=media&token=9437e9ee-722f-41dc-981e-b123f901b244"
+
+export const careerCoinsBackgroundImage =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/illustration-images%2FCareerCoins-background-image.png?alt=media&token=f42c7d72-63ee-4f15-957e-d827c47236ad"
