@@ -1,4 +1,3 @@
-// eslint-disable-next-line react/jsx-no-leaked-render
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
 import {
    Alert,
@@ -21,8 +20,9 @@ import ShareOutlined from "@mui/icons-material/ShareOutlined"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { streamIsOld } from "../../../../util/CommonUtil"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
+import { sxStyles } from "types/commonTypes"
 
-const styles = {
+const styles = sxStyles({
    countDownWrapper: {
       flexWrap: "nowrap",
       display: "flex",
@@ -67,10 +67,10 @@ const styles = {
    divider: {
       margin: (theme) => theme.spacing(1, 0),
    },
-}
+})
 
 // eslint-disable-next-line react/display-name
-const TimerText = memo(({ time }) => {
+const TimerText = memo(({ time }: { time: any }) => {
    const calculateTimeLeft = () => DateUtil.calculateTimeLeft(time)
 
    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
@@ -159,7 +159,7 @@ const CountDown = ({
                         <Tooltip arrow placement="top" title={"Share Event"}>
                            <IconButton
                               sx={styles.addToCalendarIconBtn}
-                              variant="outlined"
+                              // variant="outlined"
                               size="large"
                               onClick={() => setShareEventDialog(stream)}
                            >
@@ -181,7 +181,7 @@ const CountDown = ({
                               <IconButton
                                  onClick={handleClick}
                                  sx={styles.addToCalendarIconBtn}
-                                 variant="outlined"
+                                 // variant="outlined"
                                  size="large"
                               >
                                  <CalendarIcon />
