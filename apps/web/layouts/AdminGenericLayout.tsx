@@ -33,6 +33,7 @@ const styles = sxStyles({
    appBar: {
       bgcolor: "transparent",
       backdropFilter: "blur(8px)",
+      zIndex: 9999,
    },
    toolbar: {
       backgroundColor: "none",
