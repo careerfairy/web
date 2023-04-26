@@ -21,6 +21,8 @@ import ShareLivestreamModal from "../../common/ShareLivestreamModal"
 import { streamIsOld } from "../../../../util/CommonUtil"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { sxStyles } from "types/commonTypes"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { useAuth } from "HOCs/AuthProvider"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -96,20 +98,42 @@ const TimerText = memo(({ time }: { time: any }) => {
       </Box>
    )
 })
+
 const mobileSpacing = 1
 const desktopSpacing = 2
+
+type CountDownProps = {
+   time: string
+   disabled: boolean
+   onRegisterClick: () => void
+   stream: LivestreamEvent
+   streamAboutToStart: boolean
+   isPastEvent: boolean
+   registered: boolean
+}
+
 const CountDown = ({
    time,
-   registerButtonLabel,
    disabled,
    onRegisterClick,
    registered,
    stream,
    streamAboutToStart,
-}) => {
+   isPastEvent,
+}: CountDownProps) => {
    const {
       query: { livestreamId, groupId },
    } = useRouter()
+
+   const { authenticatedUser } = useAuth()
+
+   const participated = useMemo(() => {
+      return Boolean(
+         authenticatedUser &&
+            stream?.participatingStudents?.includes(authenticatedUser.email)
+      )
+   }, [stream, authenticatedUser])
+
    const event = useMemo(() => {
       const linkToStream = `https://careerfairy.io/upcoming-livestream/${livestreamId}${
          groupId ? `?groupId=${groupId}` : ""
@@ -130,6 +154,36 @@ const CountDown = ({
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null)
    }, [setShareEventDialog])
+
+   const registerButtonLabel = useMemo(() => {
+      if (participated && isPastEvent) return "You attended this event"
+
+      if (isPastEvent) return "The event is over"
+
+      if (registered) return "You're booked"
+
+      if (
+         stream.maxRegistrants &&
+         stream.maxRegistrants > 0 &&
+         stream.registeredUsers &&
+         stream.maxRegistrants <= stream.registeredUsers.length
+      ) {
+         return "No spots left"
+      }
+
+      if (authenticatedUser) {
+         return "Attend Event"
+      }
+
+      return "Join to attend"
+   }, [
+      participated,
+      isPastEvent,
+      registered,
+      stream.maxRegistrants,
+      stream.registeredUsers,
+      authenticatedUser,
+   ])
 
    return (
       <>

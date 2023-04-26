@@ -24,6 +24,13 @@ export const useRecordingAccess = (
          recordingSid
       )
    )
+
+   return {
+      showRecording:
+         userHasAccessToRecordingThroughRegistering || userHasBoughtRecording,
+      userHasBoughtRecording,
+      userHasAccessToRecordingThroughRegistering,
+   }
 }
 
 export default useRecordingAccess

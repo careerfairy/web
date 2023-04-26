@@ -28,10 +28,10 @@ import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import RecordingPlayer from "../RecordingPlayer"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
+import useRecordingAccess from "./useRecordingAccess"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    if (showBigVideoPlayer) {
@@ -188,24 +188,25 @@ const styles = {
 
 const HeroSection = ({
    backgroundImage,
-   registerButtonLabel,
    onRegisterClick,
    disabled,
    registered,
    stream,
+   streamPresenter,
    hosts,
    numberOfSpotsRemaining,
    eventInterests,
    streamAboutToStart,
    streamLanguage,
    showScrollButton = false,
-   showRecording = false,
    recordingSid = null,
+   isPastEvent,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const smallVerticalScreen = useMediaQuery("(max-height:700px)") && !isMobile
    const { userData } = useAuth()
+   const { showRecording } = useRecordingAccess(streamPresenter, recordingSid)
    const {
       timeWatched: minutesWatched,
       startCounting,
@@ -268,7 +269,7 @@ const HeroSection = ({
                handlePlay={handleRecordingPlay}
                handlePause={pauseCounting}
                handleClosePlayer={handleCloseRecordingPlayer}
-               stream={LivestreamPresenter.createFromDocument(stream)}
+               stream={streamPresenter}
                showBigVideoPlayer={showBigVideoPlayer}
                recordingSid={recordingSid}
                handlePreviewPlay={handlePreviewPlay}
@@ -302,13 +303,13 @@ const HeroSection = ({
                <Box sx={styles.timerWrapper}>
                   <Paper sx={styles.countdown}>
                      <CountDown
-                        registerButtonLabel={registerButtonLabel}
                         time={stream.start?.toDate?.() || null}
                         stream={stream}
                         streamAboutToStart={streamAboutToStart}
                         onRegisterClick={onRegisterClick}
                         disabled={disabled}
                         registered={registered}
+                        isPastEvent={isPastEvent}
                      />
                      {stream?.jobs?.length > 0 && (
                         <EnsureUserIsLoggedIn>
@@ -327,15 +328,7 @@ const HeroSection = ({
             )}
          </Grid>
       ),
-      [
-         disabled,
-         hosts,
-         onRegisterClick,
-         registerButtonLabel,
-         registered,
-         stream,
-         streamAboutToStart,
-      ]
+      [disabled, hosts, onRegisterClick, registered, stream, streamAboutToStart]
    )
 
    const renderHostedByInfo = useCallback(

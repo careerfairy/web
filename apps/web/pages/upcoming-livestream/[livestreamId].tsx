@@ -118,13 +118,6 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       )
    }, [stream, authenticatedUser])
 
-   const participated = useMemo(() => {
-      return Boolean(
-         authenticatedUser &&
-            stream?.participatingStudents?.includes(authenticatedUser.email)
-      )
-   }, [stream, authenticatedUser])
-
    const handleCloseJoinModal = useCallback(
       () => setJoinGroupModalData(undefined),
       []
@@ -474,20 +467,6 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       await startRegistrationProcess(true)
    }, [startRegistrationProcess])
 
-   /**
-    * Show recording if user is registered, the event is in the past, the event was recorded and did not pass the { MAX_DAYS_TO_SHOW_RECORDING }
-    */
-   const showRecording = useMemo(
-      () =>
-         Boolean(
-            streamPresenter.isAbleToShowRecording(
-               authenticatedUser?.email,
-               recordingSid
-            )
-         ),
-      [authenticatedUser?.email, recordingSid, streamPresenter]
-   )
-
    return (
       <>
          <UpcomingLayout viewRef={viewRef}>
@@ -496,9 +475,9 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
             <HeroSection
                backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
                stream={stream}
+               streamPresenter={streamPresenter}
                eventInterests={eventInterests}
                streamAboutToStart={streamAboutToStart}
-               registerButtonLabel={registerButtonLabel}
                disabled={isRegistrationDisabled}
                registered={registered}
                streamLanguage={streamLanguage}
@@ -506,8 +485,8 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                hosts={filteredGroups}
                onRegisterClick={handleRegisterClick}
                showScrollButton={true}
-               showRecording={showRecording}
                recordingSid={recordingSid}
+               isPastEvent={isPastEvent}
             />
             <Navigation
                aboutRef={aboutRef}
