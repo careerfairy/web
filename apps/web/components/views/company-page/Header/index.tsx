@@ -75,7 +75,7 @@ const styles = sxStyles({
    },
    headerWrapperSticky: {
       position: "fixed",
-      top: 5,
+      top: { xs: 5, md: 15 },
       left: 0,
       zIndex: (theme) => theme.zIndex.appBar,
       width: "100%",
