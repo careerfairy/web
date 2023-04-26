@@ -12,8 +12,6 @@ import { Search as FindIcon } from "react-feather"
 import LivestreamSearch, {
    LivestreamHit,
 } from "../../group/admin/common/LivestreamSearch"
-import { where } from "firebase/firestore"
-import { FORTY_FIVE_MINUTES_IN_MILLISECONDS } from "../../../../data/constants/streamContants"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -63,7 +61,7 @@ const NextLiveStreamsWithFilter = ({
       companyIndustries,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
-   const arePastEvents = useMemo(
+   const hasPastEvents = useMemo(
       () => initialTabValue === "pastEvents",
       [initialTabValue]
    )
@@ -80,7 +78,7 @@ const NextLiveStreamsWithFilter = ({
 
    useEffect(() => {
       // load past events when changing tabs
-      if (arePastEvents && !pastLivestreams) {
+      if (hasPastEvents && !pastLivestreams) {
          const sixMonthsAgo = new Date(
             new Date().setMonth(new Date().getMonth() - 6)
          )
@@ -91,7 +89,7 @@ const NextLiveStreamsWithFilter = ({
             })
             .catch(console.error)
       }
-   }, [arePastEvents, pastLivestreams])
+   }, [hasPastEvents, pastLivestreams])
 
    const renderNoResults = useCallback(() => {
       return (
@@ -123,22 +121,12 @@ const NextLiveStreamsWithFilter = ({
       )
    }, [isMobile])
 
+   // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
       (hit: LivestreamHit | null) => {
          void push(`/upcoming-livestream//${hit.id}`)
       },
       [push]
-   )
-
-   const additionalConstraints = useMemo(
-      () => [
-         where(
-            "start",
-            arePastEvents ? "<" : ">=",
-            new Date(Date.now() - FORTY_FIVE_MINUTES_IN_MILLISECONDS)
-         ),
-      ],
-      [arePastEvents]
    )
 
    return (
@@ -150,12 +138,12 @@ const NextLiveStreamsWithFilter = ({
          >
             <Card sx={styles.root}>
                <LivestreamSearch
-                  orderByDirection={arePastEvents ? "desc" : "asc"}
+                  orderByDirection={hasPastEvents ? "desc" : "asc"}
                   handleChange={handleSearch}
                   value={null}
                   endIcon={<FindIcon color={"black"} />}
-                  additionalConstraints={additionalConstraints}
                   searchWithTrigram
+                  hasPastEvents={hasPastEvents}
                />
             </Card>
          </Container>
