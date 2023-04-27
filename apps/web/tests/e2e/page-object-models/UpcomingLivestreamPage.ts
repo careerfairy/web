@@ -3,12 +3,14 @@ import { CommonPage } from "./CommonPage"
 
 export default class UpcomingLivestreamPage extends CommonPage {
    public readonly buttonEventOver: Locator
+   public readonly buttonPastEventNoLogin: Locator
    public readonly buttonAlreadyBooked: Locator
 
    constructor(page: Page) {
       super(page)
 
       this.buttonEventOver = this.exactText("The event is over")
+      this.buttonPastEventNoLogin = this.exactText("Sign Up to Watch")
       this.buttonAlreadyBooked = this.text("You're booked")
    }
 
