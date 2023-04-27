@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getServerSideStream } from "../../util/serverUtil"
+import {
+   getServerSideStream,
+   getServerSideUserStats,
+   getUserTokenFromCookie,
+} from "../../util/serverUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -32,14 +36,14 @@ import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
-import {
-   LivestreamEvent,
-   RecordingToken,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { omit } from "lodash"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { GetServerSidePropsContext } from "next"
+import { UserStats } from "@careerfairy/shared-lib/users"
+import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
 
 type TrackProps = {
    id: string
@@ -47,7 +51,11 @@ type TrackProps = {
    extraData: LivestreamEvent
 }
 
-const UpcomingLivestreamPage = ({ serverStream }) => {
+const UpcomingLivestreamPage = ({
+   serverStream,
+   userEmail,
+   userStatsPlain,
+}) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
@@ -76,6 +84,7 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
    const [stream, setStream] = useState(
       LivestreamPresenter.parseDocument(serverStream, fromDate)
    )
+
    const streamPresenter = useMemo(
       () => LivestreamPresenter.createFromDocument(stream),
       [stream]
@@ -94,7 +103,18 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 
    const [unfilteredGroups, setUnfilteredGroups] = useState<Group[]>([])
 
-   const { authenticatedUser, userData, isLoggedOut, isLoggedIn } = useAuth()
+   const { authenticatedUser, userData, userStats, isLoggedOut, isLoggedIn } =
+      useAuth()
+
+   const updatedStats = useMemo(() => {
+      return userStats ? userStats : userStatsPlain
+   }, [userStatsPlain, userStats])
+
+   const { showRecording, userHasBoughtRecording } = useRecordingAccess(
+      userEmail,
+      streamPresenter,
+      updatedStats
+   )
 
    const companyGroupData = useMemo<Group | null>(() => {
       const companyGroups = unfilteredGroups?.filter(
@@ -485,6 +505,9 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
                onRegisterClick={handleRegisterClick}
                showScrollButton={true}
                isPastEvent={isPastEvent}
+               showRecording={showRecording}
+               userHasBoughtRecording={userHasBoughtRecording}
+               userIsLoggedIn={Boolean(userEmail)}
             />
             <Navigation
                aboutRef={aboutRef}
@@ -579,14 +602,28 @@ const UpcomingLivestreamPage = ({ serverStream }) => {
 export async function getServerSideProps({
    params: { livestreamId },
    query: { groupId },
-}) {
-   const serverStream = await getServerSideStream(livestreamId)
+   req,
+}: GetServerSidePropsContext) {
+   const token = getUserTokenFromCookie({ req })
+
+   const serverStream = await getServerSideStream(livestreamId as string)
 
    if (serverStream) {
+      let userStats: UserStats = null
+      if (token?.email) {
+         userStats = await getServerSideUserStats(token.email)
+      }
+
       return {
          props: {
             serverStream: serializeLivestream(serverStream),
             groupId: groupId || null,
+            // allows the client side to know in the first render if the user
+            // has bought access to the recording or not
+            userStatsPlain: userStats || null,
+            // improve UX by allowing the client side to know beforehand the
+            // user was signed in before fetching the firestore auth data
+            userEmail: token?.email ?? null,
          }, // will be passed to the page component as props
       }
    } else {
@@ -600,7 +637,6 @@ const serializeLivestream = (stream: LivestreamEvent): object => {
    const serverSideStream = LivestreamPresenter.serializeDocument(stream)
 
    return omit(serverSideStream, [
-      "registeredUsers",
       "talentPool",
       "participatingStudents",
       "participants",
