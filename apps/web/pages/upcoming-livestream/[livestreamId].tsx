@@ -31,7 +31,6 @@ import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchem
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import {
    LivestreamEvent,
@@ -48,7 +47,7 @@ type TrackProps = {
    extraData: LivestreamEvent
 }
 
-const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
+const UpcomingLivestreamPage = ({ serverStream }) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
@@ -485,7 +484,6 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                hosts={filteredGroups}
                onRegisterClick={handleRegisterClick}
                showScrollButton={true}
-               recordingSid={recordingSid}
                isPastEvent={isPastEvent}
             />
             <Navigation
@@ -585,20 +583,10 @@ export async function getServerSideProps({
    const serverStream = await getServerSideStream(livestreamId)
 
    if (serverStream) {
-      const streamPresenter =
-         LivestreamPresenter.createFromDocument(serverStream)
-      let streamRecordingToken: RecordingToken
-
-      if (new Date() <= streamPresenter.recordingAccessTimeLeft()) {
-         streamRecordingToken =
-            await livestreamRepo.getLivestreamRecordingToken(livestreamId)
-      }
-
       return {
          props: {
             serverStream: serializeLivestream(serverStream),
             groupId: groupId || null,
-            recordingSid: streamRecordingToken?.sid || null,
          }, // will be passed to the page component as props
       }
    } else {

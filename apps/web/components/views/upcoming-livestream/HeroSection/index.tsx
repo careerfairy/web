@@ -32,6 +32,7 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
 import useRecordingAccess from "./useRecordingAccess"
+import { errorLogAndNotify } from "util/CommonUtil"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    if (showBigVideoPlayer) {
@@ -44,6 +45,7 @@ const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    }
    return "auto"
 }
+
 const styles = {
    root: (theme, smallVerticalScreen, showBigVideoPlayer) => ({
       minHeight: getMinHeight(smallVerticalScreen, showBigVideoPlayer),
@@ -199,14 +201,18 @@ const HeroSection = ({
    streamAboutToStart,
    streamLanguage,
    showScrollButton = false,
-   recordingSid = null,
    isPastEvent,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const smallVerticalScreen = useMediaQuery("(max-height:700px)") && !isMobile
    const { userData } = useAuth()
-   const { showRecording } = useRecordingAccess(streamPresenter, recordingSid)
+   const [recordingSid, setRecordingSid] = useState(null)
+   const { showRecording, userHasBoughtRecording } = useRecordingAccess(
+      streamPresenter,
+      recordingSid
+   )
+
    const {
       timeWatched: minutesWatched,
       startCounting,
@@ -227,6 +233,20 @@ const HeroSection = ({
          })
       }
    }, [minutesWatched])
+
+   useEffect(() => {
+      // fetch the recordingSid if the recording is available
+      // we need to fetch it on the client because the user might
+      // buy access to the recording after the page is loaded
+      if (showRecording && !recordingSid) {
+         livestreamRepo
+            .getLivestreamRecordingToken(stream.id)
+            .then((doc) => {
+               setRecordingSid(doc.sid)
+            })
+            .catch(errorLogAndNotify)
+      }
+   }, [recordingSid, showRecording, stream.id])
 
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
@@ -266,6 +286,7 @@ const HeroSection = ({
       () => (
          <Box pt={1}>
             <RecordingPlayer
+               boughtAccess={userHasBoughtRecording}
                handlePlay={handleRecordingPlay}
                handlePause={pauseCounting}
                handleClosePlayer={handleCloseRecordingPlayer}
@@ -277,13 +298,14 @@ const HeroSection = ({
          </Box>
       ),
       [
+         streamPresenter,
+         userHasBoughtRecording,
          handleCloseRecordingPlayer,
          handlePreviewPlay,
          handleRecordingPlay,
          pauseCounting,
          recordingSid,
          showBigVideoPlayer,
-         stream,
       ]
    )
 
@@ -328,7 +350,15 @@ const HeroSection = ({
             )}
          </Grid>
       ),
-      [disabled, hosts, onRegisterClick, registered, stream, streamAboutToStart]
+      [
+         isPastEvent,
+         disabled,
+         hosts,
+         onRegisterClick,
+         registered,
+         stream,
+         streamAboutToStart,
+      ]
    )
 
    const renderHostedByInfo = useCallback(
