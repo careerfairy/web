@@ -131,7 +131,8 @@ service cloud.firestore {
             }
 
             match /stats/stats {
-                allow read, write: if isSignedInAndIsSameUser(userId);
+                allow read: if true; // not ideal, but we need to allow SSR to read this in the mean time
+                allow write: if isSignedInAndIsSameUser(userId);
             }
 
             match /userReminders/{reminderIdentifier} {

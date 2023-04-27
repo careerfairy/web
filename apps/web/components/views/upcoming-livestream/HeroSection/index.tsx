@@ -31,7 +31,6 @@ import RecordingPlayer from "../RecordingPlayer"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
-import useRecordingAccess from "./useRecordingAccess"
 import { errorLogAndNotify } from "util/CommonUtil"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
@@ -202,16 +201,15 @@ const HeroSection = ({
    streamLanguage,
    showScrollButton = false,
    isPastEvent,
+   showRecording = false,
+   userHasBoughtRecording = false,
+   userIsLoggedIn = false,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const smallVerticalScreen = useMediaQuery("(max-height:700px)") && !isMobile
    const { userData } = useAuth()
    const [recordingSid, setRecordingSid] = useState(null)
-   const { showRecording, userHasBoughtRecording } = useRecordingAccess(
-      streamPresenter,
-      recordingSid
-   )
 
    const {
       timeWatched: minutesWatched,
@@ -332,6 +330,7 @@ const HeroSection = ({
                         disabled={disabled}
                         registered={registered}
                         isPastEvent={isPastEvent}
+                        userIsLoggedIn={userIsLoggedIn}
                      />
                      {stream?.jobs?.length > 0 && (
                         <EnsureUserIsLoggedIn>

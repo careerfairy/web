@@ -8,6 +8,7 @@ import {
    Grid,
    Hidden,
    IconButton,
+   Skeleton,
    Tooltip,
    Typography,
 } from "@mui/material"
@@ -116,6 +117,7 @@ type CountDownProps = {
    streamAboutToStart: boolean
    isPastEvent: boolean
    registered: boolean
+   userIsLoggedIn: boolean
 }
 
 const CountDown = ({
@@ -126,6 +128,7 @@ const CountDown = ({
    stream,
    streamAboutToStart,
    isPastEvent,
+   userIsLoggedIn,
 }: CountDownProps) => {
    const {
       query: { livestreamId, groupId },
@@ -165,6 +168,12 @@ const CountDown = ({
                   label="You attended this event"
                />
             )
+         }
+
+         // we know from the server side data the user is signed in
+         // but we're still loading the user on the client side
+         if (userIsLoggedIn && (!isLoggedIn || !userData)) {
+            return <Skeleton variant="text" animation="wave" height={60} />
          }
 
          if (!isLoggedIn) {
@@ -339,9 +348,6 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
       setIsLoading(true)
       rewardService
          .buyRecordingAccess(livestreamId)
-         .then(() => {
-            console.log("bought with success")
-         })
          .catch(errorNotification)
          .finally(() => setIsLoading(false))
    }

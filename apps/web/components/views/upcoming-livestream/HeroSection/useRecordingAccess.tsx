@@ -1,28 +1,22 @@
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { UserStats } from "@careerfairy/shared-lib/users"
 import { rewardService } from "data/firebase/RewardService"
-import { useAuth } from "HOCs/AuthProvider"
-import { useMemo } from "react"
 
 /**
  * Check if the user has access to a livestream recording
  */
 export const useRecordingAccess = (
+   userEmail: string | null,
    streamPresenter: LivestreamPresenter,
-   recordingSid: string
+   userStats: UserStats | null
 ) => {
-   const { userStats, authenticatedUser } = useAuth()
-
    const userHasBoughtRecording = rewardService.canAccessRecording(
       userStats,
       streamPresenter.id
    )
 
    const userHasAccessToRecordingThroughRegistering = Boolean(
-      streamPresenter.isAbleToShowRecording(
-         authenticatedUser?.email,
-         recordingSid
-      )
+      streamPresenter.isAbleToShowRecording(userEmail)
    )
 
    return {
