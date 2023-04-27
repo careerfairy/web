@@ -48,7 +48,9 @@ const UserRewardsNotifications = ({ children }) => {
                let notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`
 
                if (onlyOneReward) {
-                  const customMessage = getCustomRewardMessageForAction(action)
+                  const customMessage = getCustomRewardMessageForAction(
+                     action as RewardAction
+                  )
                   if (customMessage) {
                      notification = customMessage
                   }
