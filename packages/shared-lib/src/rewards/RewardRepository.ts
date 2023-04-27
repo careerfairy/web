@@ -66,14 +66,14 @@ export class FirebaseRewardRepository
       action: RewardAction,
       filters: RewardFilterFields = {}
    ): Promise<RewardDoc | null> {
-      const query = this.firestore
+      let query = this.firestore
          .collection("userData")
          .doc(userDataId)
          .collection("rewards")
          .where("action", "==", action)
 
       if (filters.livestreamId) {
-         query.where("livestreamId", "==", filters.livestreamId)
+         query = query.where("livestreamId", "==", filters.livestreamId)
       }
 
       const querySnapshot = await query
