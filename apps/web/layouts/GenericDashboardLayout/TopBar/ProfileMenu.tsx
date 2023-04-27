@@ -20,7 +20,7 @@ import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunc
 import { alpha } from "@mui/material/styles"
 import Divider from "@mui/material/Divider"
 import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
-import { useMemo } from "react"
+import { useCallback, useMemo } from "react"
 import { useGenericDashboard } from "../index"
 
 const styles = sxStyles({
@@ -61,12 +61,22 @@ const styles = sxStyles({
 const ProfileMenu = () => {
    const { handleOpenCreditsDialog } = useGenericDashboard()
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
-   const { userData, signOut, userPresenter } = useAuth()
+   const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { push } = useRouter()
    const fieldOfStudyDisplayName = useMemo(
       () => userPresenter?.getFieldOfStudyDisplayName(),
       [userPresenter]
    )
+
+   const handleProfileClick = useCallback(() => {
+      if (Object.keys(adminGroups).length) {
+         const groupId = Object.keys(adminGroups)[0]
+
+         void push(`/group/${groupId}/admin/profile`)
+      }
+
+      void push("/profile")
+   }, [adminGroups, push])
 
    if (!userData || !userData.id) {
       return null
@@ -84,6 +94,7 @@ const ProfileMenu = () => {
                   aria-expanded={open ? "true" : undefined}
                >
                   <ColorizedAvatar
+                     imageUrl={userData?.avatar}
                      lastName={userData?.lastName}
                      firstName={userData?.firstName}
                      sx={styles.ava}
@@ -102,8 +113,9 @@ const ProfileMenu = () => {
             disableScrollLock={true}
          >
             <Stack spacing={2}>
-               <MenuItem sx={{ mb: 1 }} onClick={() => push("/profile")}>
+               <MenuItem sx={{ mb: 1 }} onClick={handleProfileClick}>
                   <ColorizedAvatar
+                     imageUrl={userData?.avatar}
                      lastName={userData?.lastName}
                      firstName={userData?.firstName}
                      sx={[styles.ava, { border: "none" }]}
@@ -135,7 +147,7 @@ const ProfileMenu = () => {
                      </Box>
                   </Tooltip>
                </MenuItem>
-               <MenuItem onClick={() => push("/profile")}>
+               <MenuItem onClick={handleProfileClick}>
                   <ListItemIcon>
                      <PersonOutlineOutlinedIcon fontSize="small" />
                   </ListItemIcon>

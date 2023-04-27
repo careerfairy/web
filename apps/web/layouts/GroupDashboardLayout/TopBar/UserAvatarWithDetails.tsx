@@ -91,6 +91,7 @@ const UserAvatarWithDetails = () => {
                   aria-expanded={open ? "true" : undefined}
                >
                   <ColorizedAvatar
+                     imageUrl={userData?.avatar}
                      lastName={userData?.lastName}
                      firstName={userData?.firstName}
                      sx={styles.ava}
@@ -126,7 +127,10 @@ const UserAvatarWithDetails = () => {
             anchorOrigin={anchorOrigin}
          >
             {[
-               <MenuItem onClick={() => push("/profile")} key="profile">
+               <MenuItem
+                  onClick={() => push(`/group/${group.id}/admin/profile`)}
+                  key="profile"
+               >
                   <ListItemIcon>
                      <PersonOutlineOutlinedIcon fontSize="small" />
                   </ListItemIcon>
