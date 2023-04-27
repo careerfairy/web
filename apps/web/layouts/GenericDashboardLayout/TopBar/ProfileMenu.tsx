@@ -72,7 +72,7 @@ const ProfileMenu = () => {
       if (Object.keys(adminGroups).length) {
          const groupId = Object.keys(adminGroups)[0]
 
-         void push(`/group/${groupId}/admin/profile`)
+         return push(`/group/${groupId}/admin/profile`)
       }
 
       void push("/profile")
