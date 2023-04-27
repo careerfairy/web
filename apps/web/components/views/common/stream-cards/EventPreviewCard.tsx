@@ -376,10 +376,9 @@ const EventPreviewCard = ({
       }
       return {
          pathname: `/upcoming-livestream/[livestreamId]`,
-         // when an event has jobs and is in the past, we show a button for the
-         // user apply in the countdown area, we don't want the user to auto scroll to the
-         // about section in that case
-         hash: isPast && !event?.jobs?.length && "#about",
+         // only if the event doesn't allow the access to the recording we'll want to scroll down to
+         // livestream details, otherwise let the user see the option to access/buy the recording
+         hash: isPast && event.denyRecordingAccess && "#about",
          query: {
             livestreamId: event?.id,
             ...(event?.groupIds?.includes(groupId as string) && { groupId }),
