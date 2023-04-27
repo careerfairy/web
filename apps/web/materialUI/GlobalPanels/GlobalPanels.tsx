@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 import * as PropTypes from "prop-types"
-import { Box, Grow, SxProps } from "@mui/material"
+import { Box, Grow, SxProps, Fade } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 type StyledBoxPanelProps = {
@@ -60,8 +60,8 @@ export const AnimatedTabPanel: FC<TabPanelProps> = (props) => {
          aria-labelledby={`simple-tab-${value}`}
          {...other}
          in={activeValue === value}
-         timeout="auto"
          unmountOnExit
+         appear={false}
       >
          <Box>{children}</Box>
       </Grow>
