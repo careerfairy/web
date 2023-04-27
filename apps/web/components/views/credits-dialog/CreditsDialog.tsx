@@ -6,7 +6,7 @@ import React, {
    useMemo,
    useState,
 } from "react"
-import { Dialog, DialogContent, Zoom } from "@mui/material"
+import { Dialog, DialogContent, Slide } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
@@ -16,6 +16,8 @@ import { useRouter } from "next/router"
 import CVUploadView from "./views/CVUploadView"
 import GetMoreCreditsView from "./views/GetMoreCreditsView"
 import ReferFriendsView from "./views/ReferFriendsView"
+import SwipeableDrawer from "@mui/material/SwipeableDrawer"
+import { TransitionProps } from "@mui/material/transitions"
 
 const styles = sxStyles({
    content: {
@@ -33,6 +35,11 @@ const styles = sxStyles({
          height: "100%",
       },
    },
+   almostFullHeight: (theme) => ({
+      height: "calc(100% - 64px)",
+      borderTopLeftRadius: `${theme.spacing(2)} !important`,
+      borderTopRightRadius: `${theme.spacing(2)} !important`,
+   }),
 })
 
 type Props = {
@@ -47,14 +54,34 @@ const CreditsDialog: FC<Props> = ({ onClose, open }) => {
       onClose()
    }, [onClose])
 
+   if (isMobile) {
+      return (
+         <SwipeableDrawer
+            anchor="bottom"
+            open={open}
+            PaperProps={{
+               sx: styles.almostFullHeight,
+            }}
+            onClose={handleClose}
+            onOpen={() => {}}
+            disableSwipeToOpen
+            ModalProps={{
+               keepMounted: false, // Does not mount the children when drawer is closed
+            }}
+         >
+            <Content handleClose={handleClose} />
+         </SwipeableDrawer>
+      )
+   }
+
    return (
       <Dialog
-         fullScreen={isMobile}
          open={open}
          onClose={handleClose}
          maxWidth={"md"}
          fullWidth
-         TransitionComponent={Zoom}
+         TransitionComponent={Transition}
+         keepMounted={false} // Does not mount the children when dialog is closed
       >
          <Content handleClose={handleClose} />
       </Dialog>
@@ -138,6 +165,19 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
       </DialogContext.Provider>
    )
 }
+
+const Transition = React.forwardRef(function Transition(
+   props: TransitionProps & {
+      children: React.ReactElement<any, any>
+   },
+   ref: React.Ref<unknown>
+) {
+   return (
+      <Slide direction="up" ref={ref} {...props}>
+         {props.children}
+      </Slide>
+   )
+})
 
 type DialogContextType = {
    handleClose: () => void
