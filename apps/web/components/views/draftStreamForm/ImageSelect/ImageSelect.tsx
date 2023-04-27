@@ -171,7 +171,10 @@ const ImageSelect = ({
                </Button>
             </Box>
          )}
-         <Collapse in={Boolean(filePickerError)}>
+         <Collapse
+            in={Boolean(filePickerError)}
+            sx={{ textAlignLast: "center" }}
+         >
             <FormHelperText error>{filePickerError}</FormHelperText>
          </Collapse>
       </>
@@ -268,7 +271,7 @@ const ImageSelect = ({
                   </Box>
                )}
 
-               {resolution && (
+               {resolution ? (
                   <Box mb={2}>
                      <Typography
                         fontSize="12px"
@@ -281,7 +284,7 @@ const ImageSelect = ({
                         {resolution}
                      </Typography>
                   </Box>
-               )}
+               ) : null}
             </Box>
             <Collapse in={Boolean(filePickerError)} sx={{ ml: 2 }}>
                <FormHelperText error>{filePickerError}</FormHelperText>
