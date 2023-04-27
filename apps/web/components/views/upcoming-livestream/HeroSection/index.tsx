@@ -32,6 +32,7 @@ import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
 import { errorLogAndNotify } from "util/CommonUtil"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    if (showBigVideoPlayer) {
@@ -210,6 +211,7 @@ const HeroSection = ({
    const smallVerticalScreen = useMediaQuery("(max-height:700px)") && !isMobile
    const { userData } = useAuth()
    const [recordingSid, setRecordingSid] = useState(null)
+   const { errorNotification } = useSnackbarNotifications()
 
    const {
       timeWatched: minutesWatched,
@@ -240,11 +242,14 @@ const HeroSection = ({
          livestreamRepo
             .getLivestreamRecordingToken(stream.id)
             .then((doc) => {
+               if (!doc?.sid) {
+                  throw new Error("No recording sid found")
+               }
                setRecordingSid(doc.sid)
             })
-            .catch(errorLogAndNotify)
+            .catch(errorNotification)
       }
-   }, [recordingSid, showRecording, stream.id])
+   }, [errorNotification, recordingSid, showRecording, stream.id])
 
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
