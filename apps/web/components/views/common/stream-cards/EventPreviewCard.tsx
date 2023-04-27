@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import React, {
+   forwardRef,
+   useCallback,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
@@ -211,67 +217,73 @@ const styles = sxStyles({
    },
 })
 
-const EventPreviewCard = ({
-   event,
-   loading,
-   light,
-   onRegisterClick,
-   registering,
-   interests,
-   animation,
-   autoRegister,
-   openShareDialog,
-   isRecommended,
-   totalElements,
-   index,
-   location = ImpressionLocation.unknown,
-   isEmbedded = false,
-}: EventPreviewCardProps) => {
-   const isPlaceholderEvent = event?.id.includes("placeholderEvent")
+const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
+   (
+      {
+         event,
+         loading,
+         light,
+         onRegisterClick,
+         registering,
+         interests,
+         animation,
+         autoRegister,
+         openShareDialog,
+         isRecommended,
+         totalElements,
+         index,
+         location = ImpressionLocation.unknown,
+      isEmbedded = false,
+}: EventPreviewCardProps,
+      ref
+   ) => {
+      const isPlaceholderEvent = event?.id.includes("placeholderEvent")
 
-   const ref = useTrackLivestreamImpressions({
-      event,
-      isRecommended,
-      positionInResults: index,
-      numberOfResults: totalElements,
-      location,
-      disableTracking: isPlaceholderEvent,
-   })
-   const { query, push, pathname } = useRouter()
-   const [eventInterests, setEventInterests] = useState([])
-   const firebase = useFirebaseService()
-   const { authenticatedUser } = useAuth()
-   const [hosts, setHosts] = useState(undefined)
-   const [isPast, setIsPast] = useState(checkIfPast(event))
-   const isOnMarketingLandingPage = pathname.includes(
-      MARKETING_LANDING_PAGE_PATH
-   )
-   const { formCompleted: marketingFormCompleted, setSelectedEventId } =
-      useMarketingLandingPage()
-
-   const hasRegistered = useMemo<boolean>(() => {
-      if (loading) return false
-
-      return Boolean(event?.registeredUsers?.includes(authenticatedUser?.email))
-   }, [loading, event?.registeredUsers, authenticatedUser?.email])
-
-   const hasParticipated = useMemo<boolean>(() => {
-      if (loading) return false
-
-      return Boolean(
-         event?.participatingStudents?.includes(authenticatedUser?.email)
+      const trackImpressionsRef = useTrackLivestreamImpressions({
+         event,
+         isRecommended,
+         positionInResults: index,
+         numberOfResults: totalElements,
+         location,
+         disableTracking: isPlaceholderEvent,
+      })
+      const { query, push, pathname } = useRouter()
+      const [eventInterests, setEventInterests] = useState([])
+      const firebase = useFirebaseService()
+      const { authenticatedUser } = useAuth()
+      const [hosts, setHosts] = useState(undefined)
+      const [isPast, setIsPast] = useState(checkIfPast(event))
+      const isOnMarketingLandingPage = pathname.includes(
+         MARKETING_LANDING_PAGE_PATH
       )
-   }, [loading, event?.participatingStudents, authenticatedUser?.email])
+      const { formCompleted: marketingFormCompleted, setSelectedEventId } =
+         useMarketingLandingPage()
 
-   const hasJobsToApply = useMemo<boolean>(() => {
-      if (loading) return false
+      const hasRegistered = useMemo<boolean>(() => {
+         if (loading) return false
 
-      return Boolean(event?.jobs?.length)
-   }, [event?.jobs?.length, loading])
+         return Boolean(
+            event?.registeredUsers?.includes(authenticatedUser?.email)
+         )
+      }, [loading, event?.registeredUsers, authenticatedUser?.email])
 
-   const {
-      query: { groupId },
-   } = useRouter()
+      const hasParticipated = useMemo<boolean>(() => {
+         if (loading) return false
+
+         return Boolean(
+            event?.participatingStudents?.includes(authenticatedUser?.email)
+         )
+      }, [loading, event?.participatingStudents, authenticatedUser?.email])
+
+      const hasJobsToApply = useMemo<boolean>(() => {
+         if (loading) return false
+
+         return Boolean(event?.jobs?.length)
+      }, [event?.jobs?.length, loading])
+
+      const {
+         query: { groupId },
+      } = useRouter()
 
    const getRecordingAvailableDays = useMemo<number | null>(() => {
       if (isPast) {
@@ -296,76 +308,76 @@ const EventPreviewCard = ({
       }
    }, [event?.interestsIds, loading, interests])
 
-   useEffect(() => {
-      if (!light && !loading) {
-         ;(async function getHosts() {
-            const newHosts = await firebase.getCareerCentersByGroupId(
-               event?.groupIds || []
-            )
+      useEffect(() => {
+         if (!light && !loading) {
+            ;(async function getHosts() {
+               const newHosts = await firebase.getCareerCentersByGroupId(
+                  event?.groupIds || []
+               )
 
-            setHosts(
-               newHosts.length
-                  ? getRelevantHosts(groupId as string, event, newHosts)
-                  : null
-            )
-         })()
-      }
-   }, [event, firebase, groupId, light, loading])
+               setHosts(
+                  newHosts.length
+                     ? getRelevantHosts(groupId as string, event, newHosts)
+                     : null
+               )
+            })()
+         }
+      }, [event, firebase, groupId, light, loading])
 
-   useEffect(() => {
-      if (!loading) {
-         setIsPast(checkIfPast(event))
-      }
-   }, [event?.start, loading])
+      useEffect(() => {
+         if (!loading) {
+            setIsPast(checkIfPast(event))
+         }
+      }, [event?.start, loading])
 
-   useEffect(() => {
-      if (
-         !loading &&
-         autoRegister &&
-         query.register &&
-         query.register === event?.id &&
-         hosts?.length &&
-         !event?.registeredUsers?.includes(authenticatedUser.email)
-      ) {
-         ;(async function handleAutoRegister() {
-            const newQuery = { ...query }
-            if (newQuery.register) {
-               delete newQuery.register
-            }
-            await push({
-               pathname: pathname,
-               query: {
-                  ...newQuery,
-               },
-            })
-            onClickRegister()
-         })()
-      }
-   }, [
-      query.register,
-      event?.id,
-      hosts,
-      event?.registeredUsers,
-      authenticatedUser.email,
-      autoRegister,
-      loading,
-   ])
+      useEffect(() => {
+         if (
+            !loading &&
+            autoRegister &&
+            query.register &&
+            query.register === event?.id &&
+            hosts?.length &&
+            !event?.registeredUsers?.includes(authenticatedUser.email)
+         ) {
+            ;(async function handleAutoRegister() {
+               const newQuery = { ...query }
+               if (newQuery.register) {
+                  delete newQuery.register
+               }
+               await push({
+                  pathname: pathname,
+                  query: {
+                     ...newQuery,
+                  },
+               })
+               onClickRegister()
+            })()
+         }
+      }, [
+         query.register,
+         event?.id,
+         hosts,
+         event?.registeredUsers,
+         authenticatedUser.email,
+         autoRegister,
+         loading,
+      ])
 
-   const startDate = useMemo<Date>(
-      () => event?.startDate || event?.start?.toDate?.(),
-      [event?.start, event?.startDate]
-   )
-   const getStartDay = useMemo<number>(() => {
-      return new Date(startDate).getDate()
-   }, [startDate])
+      const startDate = useMemo<Date>(
+         () => event?.startDate || event?.start?.toDate?.(),
+         [event?.start, event?.startDate]
+      )
+      const getStartDay = useMemo<number>(() => {
+         return new Date(startDate).getDate()
+      }, [startDate])
 
-   const getStartMonth = useMemo<string>(() => {
-      return DateUtil.getMonth(new Date(startDate).getMonth(), true)
-   }, [startDate])
+      const getStartMonth = useMemo<string>(() => {
+         return DateUtil.getMonth(new Date(startDate).getMonth(), true)
+      }, [startDate])
 
-   const getStartHour = useMemo<string>(() => {
-      return DateUtil.eventPreviewHour(startDate)
-   }, [startDate])
+      const getStartHour = useMemo<string>(() => {
+         return DateUtil.eventPreviewHour(startDate)
+      }, [startDate])
 
    const getPastEventDate = useMemo<string>(
       () => DateUtil.pastEventPreviewDate(startDate),
@@ -376,9 +388,9 @@ const EventPreviewCard = ({
       openShareDialog?.(event)
    }, [event, openShareDialog])
 
-   const onClickRegister = useCallback(() => {
-      onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
-   }, [event, hasRegistered, hosts, onRegisterClick])
+      const onClickRegister = useCallback(() => {
+         onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
+      }, [event, hasRegistered, hosts, onRegisterClick])
 
    const getHref = useCallback(() => {
       if (
@@ -409,64 +421,65 @@ const EventPreviewCard = ({
       marketingFormCompleted,
    ])
 
-   const handleDetailsClick = useCallback(() => {
-      if (isOnMarketingLandingPage) {
-         setSelectedEventId(event?.id)
-      }
-   }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
+      const handleDetailsClick = useCallback(() => {
+         if (isOnMarketingLandingPage) {
+            setSelectedEventId(event?.id)
+         }
+      }, [event?.id, isOnMarketingLandingPage, setSelectedEventId])
 
-   const isLive = useMemo(
-      () => event?.hasStarted && !isPast,
-      [event?.hasStarted, isPast]
-   )
+      const isLive = useMemo(
+         () => event?.hasStarted && !isPast,
+         [event?.hasStarted, isPast]
+      )
 
-   const renderFlippedCard = useCallback(
-      () => (
-         <Stack
-            spacing={3}
-            direction={"column"}
-            alignItems={"center"}
-            width={"100%"}
-         >
-            {isLive ? (
-               <Button
-                  component={Link}
-                  /* @ts-ignore */
-                  href={getHref()}
-                  variant={"contained"}
-                  color={"primary"}
-                  size={"medium"}
-                  onClick={handleDetailsClick}
-                  target={isEmbedded ? "_blank" : "_self"}
-               >
-                  Join Stream
-               </Button>
-            ) : (
-               <Box
-                  sx={{
-                     display: "flex",
-                     width: "100%",
-                     justifyContent:
-                        isPlaceholderEvent ||
-                        isPast ||
-                        isOnMarketingLandingPage ||
+      const renderFlippedCard = useCallback(
+         () => (
+            <Stack
+               spacing={3}
+               direction={"column"}
+               alignItems={"center"}
+               width={"100%"}
+            >
+               {isLive ? (
+                  <Button
+                     component={Link}
+                     /* @ts-ignore */
+                     href={getHref()}
+                     variant={"contained"}
+                     color={"primary"}
+                     size={"medium"}
+                     onClick={handleDetailsClick}
+                  target={isEmbedded ? "_blank" : "_self"}>
+                     Join Stream
+                  </Button>
+               ) : (
+                  <Box
+                     sx={{
+                        display: "flex",
+                        width: "100%",
+                        justifyContent:
+                           isPlaceholderEvent ||
+                           isPast ||
+                           isOnMarketingLandingPage||
                         isEmbedded
-                           ? "center"
-                           : "space-between",
-                  }}
-               >
-                  {onRegisterClick && !isPast && !isOnMarketingLandingPage ? (
-                     <Button
-                        sx={styles.btn}
-                        onClick={onClickRegister}
-                        variant={hasRegistered ? "outlined" : "contained"}
-                        color={hasRegistered ? "secondary" : "primary"}
-                        disabled={registering}
-                        size={"small"}
-                     >
-                        {hasRegistered ? "cancel" : "Attend"}
-                     </Button>
-                  ) : null}
+                              ? "center"
+                              : "space-between",
+                     }}
+                  >
+                     {onRegisterClick &&
+                     !isPast &&
+                     !isOnMarketingLandingPage ? (
+                        <Button
+                           sx={styles.btn}
+                           onClick={onClickRegister}
+                           variant={hasRegistered ? "outlined" : "contained"}
+                           color={hasRegistered ? "secondary" : "primary"}
+                           disabled={registering}
+                           size={"small"}
+                        >
+                           {hasRegistered ? "cancel" : "Attend"}
+                        </Button>
+                     ) : null}
 
                   {!isPlaceholderEvent ? (
                      <Button
@@ -561,48 +574,49 @@ const EventPreviewCard = ({
       ]
    )
 
-   return (
-      <>
-         <Box ref={ref}>
-            <Box
-               sx={[
-                  styles.mainAndLowerContentWrapper,
-                  isLive && styles.cardIsLive,
-               ]}
-            >
+      return (
+         <>
+            <Box ref={trackImpressionsRef}>
                <Box
+                  ref={ref}
                   sx={[
-                     styles.mainContentWrapper,
-                     !loading && styles.mainContentHoverStyles,
+                     styles.mainAndLowerContentWrapper,
+                     isLive && styles.cardIsLive,
                   ]}
                >
                   <Box
-                     className="backgroundImageWrapper"
-                     sx={styles.backgroundImageWrapper}
+                     sx={[
+                        styles.mainContentWrapper,
+                        !loading && styles.mainContentHoverStyles,
+                     ]}
                   >
-                     {loading ? (
-                        <Skeleton
-                           animation={animation ?? "wave"}
-                           variant="rectangular"
-                           sx={styles.backgroundImageLoader}
-                        />
-                     ) : (
-                        <>
-                           <Image
-                              alt="Illustration"
-                              src={
-                                 getResizedUrl(
-                                    event?.backgroundImageUrl,
-                                    "lg"
-                                 ) || placeholderBanner
-                              }
-                              layout="fill"
-                              priority
-                              objectFit="cover"
+                     <Box
+                        className="backgroundImageWrapper"
+                        sx={styles.backgroundImageWrapper}
+                     >
+                        {loading ? (
+                           <Skeleton
+                              animation={animation ?? "wave"}
+                              variant="rectangular"
+                              sx={styles.backgroundImageLoader}
                            />
-                        </>
-                     )}
-                  </Box>
+                        ) : (
+                           <>
+                              <Image
+                                 alt="Illustration"
+                                 src={
+                                    getResizedUrl(
+                                       event?.backgroundImageUrl,
+                                       "lg"
+                                    ) || placeholderBanner
+                                 }
+                                 layout="fill"
+                                 priority
+                                 objectFit="cover"
+                              />
+                           </>
+                        )}
+                     </Box>
 
                   <EventPreviewCardChipLabels
                      hasParticipated={hasParticipated}
@@ -737,98 +751,103 @@ const EventPreviewCard = ({
                         </Typography>
                      </Box>
 
-                     <Box display={"flex"} mt={1}>
-                        <Typography
-                           variant={"body2"}
-                           color="text.secondary"
-                           sx={styles.summary}
-                           className="summary"
+                        <Box display={"flex"} mt={1}>
+                           <Typography
+                              variant={"body2"}
+                              color="text.secondary"
+                              sx={styles.summary}
+                              className="summary"
+                           >
+                              {loading ? (
+                                 <Skeleton
+                                    animation={animation}
+                                    variant="rectangular"
+                                    sx={{ borderRadius: 3 }}
+                                    width={300}
+                                    height={16}
+                                 />
+                              ) : (
+                                 event?.summary
+                              )}
+                           </Typography>
+                        </Box>
+
+                        <Box
+                           className="flippedCardContent"
+                           sx={styles.flippedCardContent}
                         >
-                           {loading ? (
-                              <Skeleton
-                                 animation={animation}
-                                 variant="rectangular"
-                                 sx={{ borderRadius: 3 }}
-                                 width={300}
-                                 height={16}
-                              />
-                           ) : (
-                              event?.summary
-                           )}
-                        </Typography>
-                     </Box>
+                           {renderFlippedCard()}
+                        </Box>
 
-                     <Box
-                        className="flippedCardContent"
-                        sx={styles.flippedCardContent}
-                     >
-                        {renderFlippedCard()}
-                     </Box>
-
-                     <Box
-                        className="chipsWrapper"
-                        sx={{
-                           display: "flex",
-                           height: "100%",
-                           alignItems: "end",
-                        }}
-                     >
-                        <Stack spacing={1} direction={"row"}>
-                           {loading ? (
-                              <>
-                                 <Skeleton
-                                    animation={animation}
-                                    sx={styles.chipLoader}
-                                 />
-                                 <Skeleton
-                                    animation={animation}
-                                    sx={styles.chipLoader}
-                                 />
-                              </>
-                           ) : (
-                              <>
-                                 {event?.language?.code ? (
-                                    <WhiteTagChip
-                                       icon={<LanguageIcon />}
-                                       variant="filled"
-                                       tooltipText={`This event is in ${event?.language.name}`}
-                                       label={event?.language.code.toUpperCase()}
-                                       sx={{ border: "1px solid black" }}
+                        <Box
+                           className="chipsWrapper"
+                           sx={{
+                              display: "flex",
+                              height: "100%",
+                              alignItems: "end",
+                           }}
+                        >
+                           <Stack spacing={1} direction={"row"}>
+                              {loading ? (
+                                 <>
+                                    <Skeleton
+                                       animation={animation}
+                                       sx={styles.chipLoader}
                                     />
-                                 ) : null}
-                                 {eventInterests.slice(0, 1).map((interest) => (
-                                    <WhiteTagChip
-                                       key={interest.id}
-                                       variant="filled"
-                                       sx={{
-                                          maxWidth:
-                                             eventInterests.length > 2
-                                                ? "50%"
-                                                : "80%",
-                                          border: "1px solid black",
-                                       }}
-                                       label={interest.name}
+                                    <Skeleton
+                                       animation={animation}
+                                       sx={styles.chipLoader}
                                     />
-                                 ))}
-                                 {eventInterests.length > 2 ? (
-                                    <WhiteTagChip
-                                       variant="filled"
-                                       sx={{ border: "1px solid black" }}
-                                       label={`+ ${eventInterests.length - 2}`}
-                                    />
-                                 ) : null}
-                              </>
-                           )}
-                        </Stack>
+                                 </>
+                              ) : (
+                                 <>
+                                    {event?.language?.code ? (
+                                       <WhiteTagChip
+                                          icon={<LanguageIcon />}
+                                          variant="filled"
+                                          tooltipText={`This event is in ${event?.language.name}`}
+                                          label={event?.language.code.toUpperCase()}
+                                          sx={{ border: "1px solid black" }}
+                                       />
+                                    ) : null}
+                                    {eventInterests
+                                       .slice(0, 1)
+                                       .map((interest) => (
+                                          <WhiteTagChip
+                                             key={interest.id}
+                                             variant="filled"
+                                             sx={{
+                                                maxWidth:
+                                                   eventInterests.length > 2
+                                                      ? "50%"
+                                                      : "80%",
+                                                border: "1px solid black",
+                                             }}
+                                             label={interest.name}
+                                          />
+                                       ))}
+                                    {eventInterests.length > 2 ? (
+                                       <WhiteTagChip
+                                          variant="filled"
+                                          sx={{ border: "1px solid black" }}
+                                          label={`+ ${
+                                             eventInterests.length - 2
+                                          }`}
+                                       />
+                                    ) : null}
+                                 </>
+                              )}
+                           </Stack>
+                        </Box>
                      </Box>
                   </Box>
                </Box>
             </Box>
-         </Box>
-         {event ? <EventSEOSchemaScriptTag event={event} /> : null}
-      </>
-   )
-}
+            {event ? <EventSEOSchemaScriptTag event={event} /> : null}
+         </>
+      )
+   }
+)
 
 interface EventPreviewCardProps {
    event?: LivestreamEvent
@@ -852,7 +871,10 @@ interface EventPreviewCardProps {
    // The total number of events in the list
    totalElements?: number
    location?: ImpressionLocation
+   ref?: React.Ref<HTMLDivElement>
    isEmbedded?: boolean
 }
+
+EventPreviewCard.displayName = "EventPreviewCard"
 
 export default EventPreviewCard
