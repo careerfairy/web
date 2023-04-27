@@ -30,15 +30,13 @@ export class NewsletterEmailBuilder {
 
       const follow = followingLivestreams
          ?.slice(0, 5)
-         ?.map(this.mapLivestreamToTemplate)
+         ?.map((l) => this.mapLivestreamToTemplate(l, "follow"))
 
-      const recommended = recommendedLivestreams
-         ?.slice(0, 3)
-         ?.map(this.mapLivestreamToTemplate)
-         .map((l) => {
-            l.title = getSubstringWithEllipsis(l.title, 60)
-            return l
-         })
+      const recommended = recommendedLivestreams?.slice(0, 3)?.map((l) => {
+         const template = this.mapLivestreamToTemplate(l, "recommended")
+         template.title = getSubstringWithEllipsis(l.title, 60)
+         return template
+      })
 
       let livestreams1 = follow // rows
       let livestreams2 = recommended // bottom columns
@@ -82,7 +80,10 @@ export class NewsletterEmailBuilder {
       })
    }
 
-   private mapLivestreamToTemplate(livestream: LivestreamEvent) {
+   private mapLivestreamToTemplate(
+      livestream: LivestreamEvent,
+      eventType: LivestreamType
+   ): TemplateData {
       const link = `https://www.careerfairy.io/upcoming-livestream/${livestream.id}`
       const date = DateTime.fromJSDate(livestream.start.toDate())
 
@@ -94,7 +95,18 @@ export class NewsletterEmailBuilder {
          link: addUtmTagsToLink({
             link,
             campaign: "newsletter",
+            content: eventType,
          }),
       }
    }
 }
+
+type TemplateData = {
+   date: string
+   image: string
+   link: string
+   description: string
+   title: string
+}
+
+type LivestreamType = "follow" | "recommended"
