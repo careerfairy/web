@@ -23,6 +23,8 @@ export interface UserData extends Identifiable {
    lastName: string
    fieldOfStudy?: FieldOfStudy
    levelOfStudy?: LevelOfStudy
+   position?: string
+   avatar?: string
    university: {
       code: string
       name: string

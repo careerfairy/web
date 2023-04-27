@@ -562,6 +562,10 @@ export class FirebaseUserRepository
          referredBy,
          fieldOfStudy,
          unsubscribed,
+         avatar,
+         position,
+         firstName,
+         lastName,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -582,6 +586,10 @@ export class FirebaseUserRepository
          fieldOfStudy !== undefined ? { fieldOfStudy } : {}
       const unsubscribedToUpdate =
          unsubscribed !== undefined ? { unsubscribed } : {}
+      const avatarToUpdate = avatar ? { avatar } : {}
+      const positionToUpdate = position ? { position } : {}
+      const firstNameToUpdate = firstName ? { firstName } : {}
+      const lastNameToUpdate = lastName ? { lastName } : {}
 
       const toUpdate = {
          ...genderToUpdate,
@@ -594,6 +602,10 @@ export class FirebaseUserRepository
          ...referredByToUpdate,
          ...fieldOfStudyToUpdate,
          ...unsubscribedToUpdate,
+         ...avatarToUpdate,
+         ...positionToUpdate,
+         ...firstNameToUpdate,
+         ...lastNameToUpdate,
       }
 
       return userRef.update(toUpdate)
