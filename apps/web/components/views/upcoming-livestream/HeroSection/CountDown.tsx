@@ -30,6 +30,7 @@ import { maybePluralize } from "components/helperFunctions/HelperFunctions"
 import { rewardService } from "data/firebase/RewardService"
 import LoadingButton from "@mui/lab/LoadingButton"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
+import CareerCoinIcon from "components/views/common/CareerCoinIcon"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -165,7 +166,11 @@ const CountDown = ({
                   onRegisterClick={onRegisterClick}
                   disabled={disabled}
                   registered={registered}
-                  label="You attended this event"
+                  label={
+                     registered
+                        ? "You attended this event"
+                        : "Recording Not Available"
+                  }
                />
             )
          }
@@ -234,6 +239,8 @@ const CountDown = ({
          />
       )
    }, [
+      userData,
+      userIsLoggedIn,
       isPastEvent,
       registered,
       stream.maxRegistrants,
@@ -244,7 +251,6 @@ const CountDown = ({
       onRegisterClick,
       disabled,
       isLoggedIn,
-      userData?.credits,
    ])
 
    return (
@@ -319,7 +325,7 @@ const SignUpToWatchButton = ({ onRegisterClick }) => {
          <Button
             id="register-button"
             color="primary"
-            sx={{ color: "text.primary" }}
+            sx={{ color: "text.primary", boxShadow: "none" }}
             variant={"contained"}
             fullWidth
             onClick={onRegisterClick}
@@ -357,7 +363,7 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
          <LoadingButton
             id="register-button"
             color="primary"
-            sx={{ color: "text.primary" }}
+            sx={{ color: "text.primary", boxShadow: "none" }}
             variant={"contained"}
             fullWidth
             onClick={handleClick}
@@ -365,7 +371,7 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
             loading={isLoading}
             data-testid="livestream-registration-button"
             size="large"
-            endIcon={<LockOpenIcon />}
+            endIcon={isLoading ? undefined : <CareerCoinIcon />}
          >
             Unlock Live Stream Recording
          </LoadingButton>
@@ -388,14 +394,16 @@ const NotEnoughCreditsButton = () => {
       <>
          <Button
             id="register-button"
-            color="secondary"
+            color="black"
             // sx={{ color: "text.primary" }}
+            sx={{ boxShadow: "none" }}
             variant={"contained"}
             fullWidth
             onClick={handleClick}
             disableElevation
             data-testid="livestream-registration-button"
             size="large"
+            endIcon={<CareerCoinIcon />}
          >
             Not Enough Credits
          </Button>
@@ -414,6 +422,7 @@ const RegisterButton = ({ disabled, onRegisterClick, registered, label }) => {
          id="register-button"
          color={registered ? "secondary" : "primary"}
          variant={"contained"}
+         sx={{ boxShadow: "none", color: "text.primary" }}
          fullWidth
          startIcon={registered ? <CheckIcon /> : null}
          disabled={disabled || registered}
