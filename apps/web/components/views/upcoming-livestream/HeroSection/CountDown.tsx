@@ -31,6 +31,7 @@ import { rewardService } from "data/firebase/RewardService"
 import LoadingButton from "@mui/lab/LoadingButton"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
+import { useUpcomingLayout } from "layouts/UpcomingLayout"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -182,7 +183,7 @@ const CountDown = ({
          }
 
          if (!isLoggedIn) {
-            return <SignUpToWatchButton onRegisterClick={onRegisterClick} />
+            return <SignUpToWatchButton />
          }
 
          if (!userData?.credits) {
@@ -319,7 +320,9 @@ const CountDown = ({
    )
 }
 
-const SignUpToWatchButton = ({ onRegisterClick }) => {
+const SignUpToWatchButton = () => {
+   const { asPath } = useRouter()
+
    return (
       <>
          <Button
@@ -328,7 +331,8 @@ const SignUpToWatchButton = ({ onRegisterClick }) => {
             sx={{ color: "text.primary", boxShadow: "none" }}
             variant={"contained"}
             fullWidth
-            onClick={onRegisterClick}
+            href={`/signup?absolutePath=${asPath}`}
+            component={Link}
             disableElevation
             data-testid="livestream-registration-button"
             size="large"
@@ -337,7 +341,7 @@ const SignUpToWatchButton = ({ onRegisterClick }) => {
          </Button>
          <Typography sx={{ textAlign: "center", marginTop: 2 }}>
             Already have an account?{" "}
-            <Link color="text.primary" onClick={onRegisterClick} href="#">
+            <Link color="text.primary" href={`/login?absolutePath=${asPath}`}>
                Log In
             </Link>
          </Typography>
@@ -384,10 +388,11 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
 }
 
 const NotEnoughCreditsButton = () => {
+   const { handleOpenCreditsDialog } = useUpcomingLayout()
    const handleClick = (e: React.SyntheticEvent) => {
       e.preventDefault()
 
-      // should trigger the buy credits modal
+      handleOpenCreditsDialog()
    }
 
    return (
