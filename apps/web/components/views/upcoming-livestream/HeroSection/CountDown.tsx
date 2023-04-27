@@ -23,6 +23,12 @@ import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
+import Link from "components/views/common/Link"
+import LockOpenIcon from "@mui/icons-material/LockOpen"
+import { maybePluralize } from "components/helperFunctions/HelperFunctions"
+import { rewardService } from "data/firebase/RewardService"
+import LoadingButton from "@mui/lab/LoadingButton"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -125,14 +131,7 @@ const CountDown = ({
       query: { livestreamId, groupId },
    } = useRouter()
 
-   const { authenticatedUser } = useAuth()
-
-   const participated = useMemo(() => {
-      return Boolean(
-         authenticatedUser &&
-            stream?.participatingStudents?.includes(authenticatedUser.email)
-      )
-   }, [stream, authenticatedUser])
+   const { authenticatedUser, userData, isLoggedIn } = useAuth()
 
    const event = useMemo(() => {
       const linkToStream = `https://careerfairy.io/upcoming-livestream/${livestreamId}${
@@ -155,12 +154,40 @@ const CountDown = ({
       setShareEventDialog(null)
    }, [setShareEventDialog])
 
-   const registerButtonLabel = useMemo(() => {
-      if (participated && isPastEvent) return "You attended this event"
+   const registerComponent = useMemo(() => {
+      if (isPastEvent) {
+         if (stream.denyRecordingAccess) {
+            return (
+               <RegisterButton
+                  onRegisterClick={onRegisterClick}
+                  disabled={disabled}
+                  registered={registered}
+                  label="You attended this event"
+               />
+            )
+         }
 
-      if (isPastEvent) return "The event is over"
+         if (!isLoggedIn) {
+            return <SignUpToWatchButton onRegisterClick={onRegisterClick} />
+         }
 
-      if (registered) return "You're booked"
+         if (!userData?.credits) {
+            return <NotEnoughCreditsButton />
+         }
+
+         return <BuyRecordingButton livestreamId={stream.id} />
+      }
+
+      if (registered) {
+         return (
+            <RegisterButton
+               onRegisterClick={onRegisterClick}
+               disabled={disabled}
+               registered={registered}
+               label="You're booked"
+            />
+         )
+      }
 
       if (
          stream.maxRegistrants &&
@@ -168,21 +195,47 @@ const CountDown = ({
          stream.registeredUsers &&
          stream.maxRegistrants <= stream.registeredUsers.length
       ) {
-         return "No spots left"
+         return (
+            <RegisterButton
+               onRegisterClick={onRegisterClick}
+               disabled={disabled}
+               registered={registered}
+               label="No spots left"
+            />
+         )
       }
 
       if (authenticatedUser) {
-         return "Attend Event"
+         return (
+            <RegisterButton
+               onRegisterClick={onRegisterClick}
+               disabled={disabled}
+               registered={registered}
+               label="Attend Event"
+            />
+         )
       }
 
-      return "Join to attend"
+      return (
+         <RegisterButton
+            onRegisterClick={onRegisterClick}
+            disabled={disabled}
+            registered={registered}
+            label="Join to attend"
+         />
+      )
    }, [
-      participated,
       isPastEvent,
       registered,
       stream.maxRegistrants,
       stream.registeredUsers,
+      stream.denyRecordingAccess,
+      stream.id,
       authenticatedUser,
+      onRegisterClick,
+      disabled,
+      isLoggedIn,
+      userData?.credits,
    ])
 
    return (
@@ -206,43 +259,18 @@ const CountDown = ({
                </Collapse>
                <Box sx={styles.dateTimeWrapper}>
                   <Typography align="left" sx={styles.dateTime} variant="h6">
-                     {DateUtil.getUpcomingDate(time)}
+                     {isPastEvent && !stream.denyRecordingAccess
+                        ? `Release Date: ${DateUtil.getRatingDate(time)}`
+                        : DateUtil.getUpcomingDate(time)}
                   </Typography>
                   <Hidden smDown>
-                     <Box mr={1}>
-                        <Tooltip arrow placement="top" title={"Share Event"}>
-                           <IconButton
-                              sx={styles.addToCalendarIconBtn}
-                              // variant="outlined"
-                              size="large"
-                              onClick={() => setShareEventDialog(stream)}
-                           >
-                              <ShareOutlined />
-                           </IconButton>
-                        </Tooltip>
-                     </Box>
-
-                     <AddToCalendar
-                        event={event}
-                        filename={`${stream.company}-event`}
-                     >
-                        {(handleClick) => (
-                           <Tooltip
-                              arrow
-                              placement="top"
-                              title={"Add to calendar"}
-                           >
-                              <IconButton
-                                 onClick={handleClick}
-                                 sx={styles.addToCalendarIconBtn}
-                                 // variant="outlined"
-                                 size="large"
-                              >
-                                 <CalendarIcon />
-                              </IconButton>
-                           </Tooltip>
-                        )}
-                     </AddToCalendar>
+                     {streamIsOld(stream.start) ? null : (
+                        <MobileActions
+                           event={event}
+                           setShareEventDialog={setShareEventDialog}
+                           stream={stream}
+                        />
+                     )}
                   </Hidden>
                </Box>
                <Divider sx={styles.divider} />
@@ -250,70 +278,16 @@ const CountDown = ({
                <TimerText time={time} />
             </Grid>
             <Grid item xs={12}>
-               <Button
-                  id="register-button"
-                  color={registered ? "secondary" : "primary"}
-                  variant={"contained"}
-                  fullWidth
-                  startIcon={registered && <CheckIcon />}
-                  disabled={disabled || registered}
-                  onClick={onRegisterClick}
-                  disableElevation
-                  data-testid="livestream-registration-button"
-                  size="large"
-               >
-                  {registerButtonLabel}
-               </Button>
+               {registerComponent}
             </Grid>
             <Hidden smUp>
                <Grid item xs={12}>
-                  {streamIsOld(stream.start) ? (
-                     ""
-                  ) : (
-                     <>
-                        <Box
-                           sx={{
-                              mb: { xs: mobileSpacing, md: desktopSpacing },
-                           }}
-                        >
-                           <Tooltip arrow placement="top" title={"Share Event"}>
-                              <Button
-                                 onClick={() => setShareEventDialog(stream)}
-                                 variant="outlined"
-                                 fullWidth
-                                 size="large"
-                                 sx={styles.addToCalendarBtn}
-                                 startIcon={<ShareOutlined />}
-                              >
-                                 Share Event
-                              </Button>
-                           </Tooltip>
-                        </Box>
-
-                        <AddToCalendar
-                           event={event}
-                           filename={`${stream.company}-event`}
-                        >
-                           {(handleClick) => (
-                              <Tooltip
-                                 arrow
-                                 placement="top"
-                                 title={"Add to calendar"}
-                              >
-                                 <Button
-                                    onClick={handleClick}
-                                    variant="outlined"
-                                    fullWidth
-                                    size="large"
-                                    sx={styles.addToCalendarBtn}
-                                    startIcon={<CalendarIcon />}
-                                 >
-                                    ADD TO CALENDAR
-                                 </Button>
-                              </Tooltip>
-                           )}
-                        </AddToCalendar>
-                     </>
+                  {streamIsOld(stream.start) ? null : (
+                     <DesktopActions
+                        event={event}
+                        setShareEventDialog={setShareEventDialog}
+                        stream={stream}
+                     />
                   )}
                </Grid>
             </Hidden>
@@ -326,6 +300,197 @@ const CountDown = ({
          ) : (
             ""
          )}
+      </>
+   )
+}
+
+const SignUpToWatchButton = ({ onRegisterClick }) => {
+   return (
+      <>
+         <Button
+            id="register-button"
+            color="primary"
+            sx={{ color: "text.primary" }}
+            variant={"contained"}
+            fullWidth
+            onClick={onRegisterClick}
+            disableElevation
+            data-testid="livestream-registration-button"
+            size="large"
+         >
+            Sign Up to Watch
+         </Button>
+         <Typography sx={{ textAlign: "center", marginTop: 2 }}>
+            Already have an account?{" "}
+            <Link color="text.primary" onClick={onRegisterClick} href="#">
+               Log In
+            </Link>
+         </Typography>
+      </>
+   )
+}
+
+const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
+   const { userData } = useAuth()
+   const [isLoading, setIsLoading] = useState(false)
+   const { errorNotification } = useSnackbarNotifications()
+
+   const handleClick = () => {
+      setIsLoading(true)
+      rewardService
+         .buyRecordingAccess(livestreamId)
+         .then(() => {
+            console.log("bought with success")
+         })
+         .catch(errorNotification)
+         .finally(() => setIsLoading(false))
+   }
+
+   return (
+      <>
+         <LoadingButton
+            id="register-button"
+            color="primary"
+            sx={{ color: "text.primary" }}
+            variant={"contained"}
+            fullWidth
+            onClick={handleClick}
+            disableElevation
+            loading={isLoading}
+            data-testid="livestream-registration-button"
+            size="large"
+            endIcon={<LockOpenIcon />}
+         >
+            Unlock Live Stream Recording
+         </LoadingButton>
+         <Typography sx={{ textAlign: "center", marginTop: 2 }}>
+            You have {userData.credits}{" "}
+            {maybePluralize(userData.credits, "credit")} left
+         </Typography>
+      </>
+   )
+}
+
+const NotEnoughCreditsButton = () => {
+   const handleClick = (e: React.SyntheticEvent) => {
+      e.preventDefault()
+
+      // should trigger the buy credits modal
+   }
+
+   return (
+      <>
+         <Button
+            id="register-button"
+            color="secondary"
+            // sx={{ color: "text.primary" }}
+            variant={"contained"}
+            fullWidth
+            onClick={handleClick}
+            disableElevation
+            data-testid="livestream-registration-button"
+            size="large"
+         >
+            Not Enough Credits
+         </Button>
+         <Typography sx={{ textAlign: "center", marginTop: 2 }}>
+            <Link sx={{ color: "text.primary" }} onClick={handleClick} href="#">
+               Get more credits
+            </Link>
+         </Typography>
+      </>
+   )
+}
+
+const RegisterButton = ({ disabled, onRegisterClick, registered, label }) => {
+   return (
+      <Button
+         id="register-button"
+         color={registered ? "secondary" : "primary"}
+         variant={"contained"}
+         fullWidth
+         startIcon={registered ? <CheckIcon /> : null}
+         disabled={disabled || registered}
+         onClick={onRegisterClick}
+         disableElevation
+         data-testid="livestream-registration-button"
+         size="large"
+      >
+         {label}
+      </Button>
+   )
+}
+
+const DesktopActions = ({ event, setShareEventDialog, stream }) => {
+   return (
+      <>
+         <Box
+            sx={{
+               mb: { xs: mobileSpacing, md: desktopSpacing },
+            }}
+         >
+            <Tooltip arrow placement="top" title={"Share Event"}>
+               <Button
+                  onClick={() => setShareEventDialog(stream)}
+                  variant="outlined"
+                  fullWidth
+                  size="large"
+                  sx={styles.addToCalendarBtn}
+                  startIcon={<ShareOutlined />}
+               >
+                  Share Event
+               </Button>
+            </Tooltip>
+         </Box>
+
+         <AddToCalendar event={event} filename={`${stream.company}-event`}>
+            {(handleClick) => (
+               <Tooltip arrow placement="top" title={"Add to calendar"}>
+                  <Button
+                     onClick={handleClick}
+                     variant="outlined"
+                     fullWidth
+                     size="large"
+                     sx={styles.addToCalendarBtn}
+                     startIcon={<CalendarIcon />}
+                  >
+                     ADD TO CALENDAR
+                  </Button>
+               </Tooltip>
+            )}
+         </AddToCalendar>
+      </>
+   )
+}
+
+const MobileActions = ({ setShareEventDialog, stream, event }) => {
+   return (
+      <>
+         <Box mr={1}>
+            <Tooltip arrow placement="top" title={"Share Event"}>
+               <IconButton
+                  sx={styles.addToCalendarIconBtn}
+                  size="large"
+                  onClick={() => setShareEventDialog(stream)}
+               >
+                  <ShareOutlined />
+               </IconButton>
+            </Tooltip>
+         </Box>
+
+         <AddToCalendar event={event} filename={`${stream.company}-event`}>
+            {(handleClick) => (
+               <Tooltip arrow placement="top" title={"Add to calendar"}>
+                  <IconButton
+                     onClick={handleClick}
+                     sx={styles.addToCalendarIconBtn}
+                     size="large"
+                  >
+                     <CalendarIcon />
+                  </IconButton>
+               </Tooltip>
+            )}
+         </AddToCalendar>
       </>
    )
 }
