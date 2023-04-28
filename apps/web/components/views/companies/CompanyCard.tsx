@@ -167,7 +167,10 @@ const CompanyCard: FC<Props> = ({ company }) => {
                   />
                   <CompanyIndustryTag
                      fontSize="1.07rem"
-                     text={company.companyIndustry.name}
+                     // TODO-GS: beautify this
+                     text={company.companyIndustries
+                        .map(({ name }) => name)
+                        .join(", ")}
                   />
                   <CompanySizeTag
                      fontSize="1.07rem"

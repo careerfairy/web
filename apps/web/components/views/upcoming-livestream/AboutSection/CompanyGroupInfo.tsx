@@ -62,9 +62,12 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
                      text={companyGroupData.companyCountry.name}
                   />
                ) : null}
-               {companyGroupData.companyIndustry ? (
+               {companyGroupData.companyIndustries.length ? (
                   <CompanyIndustryTag
-                     text={companyGroupData.companyIndustry.name}
+                     // TODO-GS: beautify this
+                     text={companyGroupData.companyIndustries
+                        .map(({ name }) => name)
+                        .join(", ")}
                   />
                ) : null}
                {companyGroupData.companySize ? (

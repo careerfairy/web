@@ -27,10 +27,10 @@ export const getMetaDataFromEventHosts = (eventHosts: Group[]): MetaData => {
             ]
          }
 
-         if (group.companyIndustry?.id) {
+         if (group.companyIndustries?.length) {
             acc.companyIndustries = [
                ...acc.companyIndustries,
-               group.companyIndustry.id,
+               ...group.companyIndustries.map(({ id }) => id),
             ]
          }
 

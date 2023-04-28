@@ -48,11 +48,11 @@ const AboutSection = () => {
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
 
-   const { companyCountry, companyIndustry, companySize, extraInfo } = group
+   const { companyCountry, companyIndustries, companySize, extraInfo } = group
 
    const showIcons = useMemo(
-      () => companySize || companyIndustry?.name || companyCountry?.name,
-      [companyCountry?.name, companyIndustry?.name, companySize]
+      () => companySize || companyIndustries?.length || companyCountry?.name,
+      [companyCountry?.name, companyIndustries?.length, companySize]
    )
 
    const renderIcons = useCallback(
@@ -67,11 +67,12 @@ const AboutSection = () => {
                </Box>
             ) : null}
 
-            {companyIndustry?.name ? (
+            {companyIndustries?.length ? (
                <Box sx={styles.icon}>
                   <TagIcon size={20} />
                   <Typography variant="body1" color="black" ml={1}>
-                     {companyIndustry.name}
+                     {/*TODO-GS: beautify this*/}
+                     {companyIndustries.map(({ name }) => name).join(", ")}
                   </Typography>
                </Box>
             ) : null}
@@ -86,7 +87,7 @@ const AboutSection = () => {
             ) : null}
          </Box>
       ),
-      [companyCountry?.name, companyIndustry?.name, companySize]
+      [companyCountry.name, companyIndustries, companySize]
    )
 
    return (
