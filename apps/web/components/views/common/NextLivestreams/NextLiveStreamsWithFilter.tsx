@@ -3,7 +3,7 @@ import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { StreamsSection } from "./StreamsSection"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useRouter } from "next/router"
-import { Card, Container, Grid, Typography } from "@mui/material"
+import { Box, Card, Container, Grid, Typography } from "@mui/material"
 import Image from "next/image"
 import Link from "../../../../components/views/common/Link"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
@@ -12,6 +12,8 @@ import { Search as FindIcon } from "react-feather"
 import LivestreamSearch, {
    LivestreamHit,
 } from "../../group/admin/common/LivestreamSearch"
+import Filter, { FilterEnum } from "../filter/Filter"
+import { wishListBorderRadius } from "../../../../constants/pages"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -25,7 +27,23 @@ const styles = sxStyles({
       display: "flex",
       marginX: { xs: 2, md: 3 },
    },
+   search: {
+      flex: 1,
+   },
+   filter: {
+      ml: { xs: 2, md: 4 },
+      backgroundColor: "white",
+      borderRadius: wishListBorderRadius,
+   },
 })
+
+const filtersToShow = [
+   FilterEnum.languages,
+   FilterEnum.interests,
+   FilterEnum.companyCountries,
+   FilterEnum.companySizes,
+   FilterEnum.companyIndustries,
+]
 
 const getQueryVariables = (query) => {
    const languages = query.languages as string
@@ -136,16 +154,23 @@ const NextLiveStreamsWithFilter = ({
             disableGutters
             sx={{ flex: 1, display: "flex" }}
          >
-            <Card sx={styles.root}>
-               <LivestreamSearch
-                  orderByDirection={hasPastEvents ? "desc" : "asc"}
-                  handleChange={handleSearch}
-                  value={null}
-                  endIcon={<FindIcon color={"black"} />}
-                  searchWithTrigram
-                  hasPastEvents={hasPastEvents}
-               />
-            </Card>
+            <Box sx={styles.root}>
+               <Card sx={styles.search}>
+                  <LivestreamSearch
+                     orderByDirection={hasPastEvents ? "desc" : "asc"}
+                     handleChange={handleSearch}
+                     value={null}
+                     endIcon={<FindIcon color={"black"} />}
+                     searchWithTrigram
+                     hasPastEvents={hasPastEvents}
+                  />
+               </Card>
+               {hasPastEvents ? null : (
+                  <Box sx={styles.filter}>
+                     <Filter filtersToShow={filtersToShow} />
+                  </Box>
+               )}
+            </Box>
          </Container>
 
          <StreamsSection
