@@ -274,11 +274,18 @@ const HeroSection = ({
          livestreamId: stream.id,
          userId: userData.userEmail,
          livestreamStartDate: stream.start,
+         usedCredits: Boolean(userHasBoughtRecording),
       })
 
       // play recording
       handleRecordingPlay()
-   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
+   }, [
+      handleRecordingPlay,
+      stream?.id,
+      stream?.start,
+      userData?.userEmail,
+      userHasBoughtRecording,
+   ])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
