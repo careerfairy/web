@@ -36,6 +36,7 @@ import ClockIcon from "@mui/icons-material/AccessTime"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 import { sxStyles } from "../../../../types/commonTypes"
 import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 
 const styles = sxStyles({
    hideOnHoverContent: {
@@ -272,6 +273,19 @@ const EventPreviewCard = ({
       query: { groupId },
    } = useRouter()
 
+   const getRecordingAvailableDays = useMemo<number | null>(() => {
+      if (isPast) {
+         const timeLeft = DateUtil.calculateTimeLeft(
+            LivestreamPresenter.createFromDocument(
+               event
+            ).recordingAccessTimeLeft()
+         )
+         return timeLeft?.Days
+      }
+
+      return null
+   }, [event, isPast])
+
    useEffect(() => {
       if (!loading && interests) {
          setEventInterests(
@@ -493,32 +507,41 @@ const EventPreviewCard = ({
                   </Typography>
                </Box>
             )}
-            <Box
-               sx={{ display: "flex", width: "100%", justifyContent: "center" }}
-            >
-               {isPlaceholderEvent ? (
-                  <Typography
-                     sx={{ mt: 6 }}
-                     variant={"body1"}
-                     color={"text.primary"}
-                  >
-                     Coming soon
-                  </Typography>
-               ) : (
-                  <Box sx={{ display: "flex" }}>
+            {isPast ? null : (
+               <Box
+                  sx={{
+                     display: "flex",
+                     width: "100%",
+                     justifyContent: "center",
+                  }}
+               >
+                  {isPlaceholderEvent ? (
                      <Typography
-                        sx={{ display: "flex", alignItems: "center" }}
+                        sx={{ mt: 6 }}
                         variant={"body1"}
                         color={"text.primary"}
                      >
-                        <CalendarIcon fontSize={"inherit"} sx={{ mr: 1 }} />
-                        {getStartDay} {getStartMonth}
-                        <ClockIcon fontSize={"inherit"} sx={{ ml: 2, mr: 1 }} />
-                        {getStartHour}
+                        Coming soon
                      </Typography>
-                  </Box>
-               )}
-            </Box>
+                  ) : (
+                     <Box sx={{ display: "flex" }}>
+                        <Typography
+                           sx={{ display: "flex", alignItems: "center" }}
+                           variant={"body1"}
+                           color={"text.primary"}
+                        >
+                           <CalendarIcon fontSize={"inherit"} sx={{ mr: 1 }} />
+                           {getStartDay} {getStartMonth}
+                           <ClockIcon
+                              fontSize={"inherit"}
+                              sx={{ ml: 2, mr: 1 }}
+                           />
+                           {getStartHour}
+                        </Typography>
+                     </Box>
+                  )}
+               </Box>
+            )}
          </Stack>
       ),
       [
@@ -588,6 +611,7 @@ const EventPreviewCard = ({
                      isLive={isLive}
                      hasRegistered={hasRegistered}
                      hasJobToApply={hasJobsToApply}
+                     recordingAvailableDays={getRecordingAvailableDays}
                   />
 
                   <Box
