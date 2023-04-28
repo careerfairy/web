@@ -43,7 +43,7 @@ export type BaseGroupInfo = {
    university?: GroupedUniversity
    isUniversity?: boolean
    companySize?: string
-   companyIndustry?: OptionGroup
+   companyIndustries?: OptionGroup[]
    companyCountry?: OptionGroup
    isATSEnabled?: boolean
 }
@@ -193,7 +193,7 @@ const CreateGroup = () => {
             }),
             atsAdminPageFlag: baseGroupInfo.isATSEnabled,
             companyCountry: baseGroupInfo.companyCountry,
-            companyIndustry: baseGroupInfo.companyIndustry,
+            companyIndustries: baseGroupInfo.companyIndustries,
             companySize: baseGroupInfo.companySize,
          }
 
