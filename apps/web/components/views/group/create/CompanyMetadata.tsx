@@ -8,6 +8,9 @@ import {
    CompanySizesCodes,
 } from "../../../../constants/forms"
 import { Autocomplete, Box, Collapse, TextField } from "@mui/material"
+import MultiListSelect from "../../common/MultiListSelect"
+import { multiListSelectMapValueFn } from "../../signup/utils"
+import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 
 type Props = {
    handleChange: (event) => void
@@ -70,35 +73,31 @@ const CompanyMetadata = ({
          </Box>
 
          <Box width={horizontalDirection ? "30%" : "100%"}>
-            <Autocomplete
-               id={"companyIndustry"}
-               options={CompanyIndustryValues}
-               defaultValue={values.companyIndustry}
-               getOptionLabel={(option) => option.name || ""}
-               value={values.companyIndustry}
-               disableClearable
-               onChange={(event, newValue) =>
-                  handleSelect("companyIndustry", newValue)
-               }
-               renderInput={(params) => (
-                  <TextField
-                     {...params}
-                     label={`Company industry${inputsRequired ? " *" : ""}`}
-                     variant="outlined"
-                     fullWidth
-                     error={Boolean(
-                        errors.companyIndustry && touched.companyIndustry
-                     )}
-                     onBlur={handleBlur}
-                     disabled={isSubmitting}
-                  />
-               )}
+            <MultiListSelect
+               inputName={"companyIndustries"}
+               isCheckbox
+               limit={3}
+               selectedItems={values.companyIndustries}
+               allValues={CompanyIndustryValues}
+               setFieldValue={(name: string, selectedOption: OptionGroup[]) => {
+                  handleSelect(name, selectedOption)
+               }}
+               inputProps={{
+                  label: `Company industries${inputsRequired ? " *" : ""}`,
+               }}
+               getValueFn={multiListSelectMapValueFn}
+               chipProps={{
+                  color: "primary",
+               }}
             />
+
             <Collapse
-               in={Boolean(errors.companyIndustry && touched.companyIndustry)}
+               in={Boolean(
+                  errors.companyIndustries && touched.companyIndustries
+               )}
                style={{ color: "red" }}
             >
-               {errors.companyIndustry}
+               {errors.companyIndustries}
             </Collapse>
          </Box>
 

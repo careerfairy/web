@@ -30,7 +30,7 @@ export interface Group extends Identifiable {
     * Metadata for the group
     * */
    companyCountry?: GroupOption
-   companyIndustry?: GroupOption
+   companyIndustries?: GroupOption[]
    companySize?: string
 
    /*

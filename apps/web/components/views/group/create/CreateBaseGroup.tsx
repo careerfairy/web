@@ -31,7 +31,7 @@ import { scrollTop } from "../../../../util/CommonUtil"
 const placeholder =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/group-logos%2Fplaceholder.png?alt=media&token=242adbfc-8ebb-4221-94ad-064224dca266"
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
    root: {
       paddingTop: "50px",
       paddingBottom: "50px",
@@ -129,13 +129,13 @@ const CreateBaseGroup = ({
          university: baseGroupInfo.university || null,
          isUniversity: baseGroupInfo.isUniversity || false,
          companySize: baseGroupInfo.companySize || "",
-         companyIndustry: baseGroupInfo.companyIndustry || null,
+         companyIndustries: baseGroupInfo.companyIndustries || null,
          companyCountry: baseGroupInfo.companyCountry || null,
          isATSEnabled: baseGroupInfo.isATSEnabled || false,
       }),
       [
          baseGroupInfo.companyCountry,
-         baseGroupInfo.companyIndustry,
+         baseGroupInfo.companyIndustries,
          baseGroupInfo.companySize,
          baseGroupInfo.description,
          baseGroupInfo.isATSEnabled,
@@ -158,7 +158,7 @@ const CreateBaseGroup = ({
             isUniversity: values.isUniversity,
             university: values.university,
             companySize: values.companySize,
-            companyIndustry: values.companyIndustry,
+            companyIndustries: values.companyIndustries,
             companyCountry: values.companyCountry,
             isATSEnabled: values.isATSEnabled,
          }
