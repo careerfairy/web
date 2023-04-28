@@ -28,12 +28,12 @@ const AboutDialog = ({ handleClose }: Props) => {
       () => ({
          extraInfo: group.extraInfo || "",
          companySize: group.companySize || "",
-         companyIndustry: group.companyIndustry || null,
+         companyIndustries: group.companyIndustries || null,
          companyCountry: group.companyCountry || null,
       }),
       [
          group.companyCountry,
-         group.companyIndustry,
+         group.companyIndustries,
          group.companySize,
          group.extraInfo,
       ]
@@ -45,7 +45,7 @@ const AboutDialog = ({ handleClose }: Props) => {
             await groupRepo.updateGroupMetadata(group.id, {
                extraInfo: values.extraInfo,
                companyCountry: values.companyCountry,
-               companyIndustry: values.companyIndustry,
+               companyIndustries: values.companyIndustries,
                companySize: values.companySize,
             })
             handleClose()
@@ -150,7 +150,7 @@ const schema = yup.object().shape({
       .required("Please describe your company")
       .min(10, `Must be at least 10 characters`),
    companySize: yup.string().required("Please add the company size"),
-   companyIndustry: yup
+   companyIndustries: yup
       .object()
       .nullable()
       .shape({

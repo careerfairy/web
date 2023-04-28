@@ -299,7 +299,7 @@ export class GroupFunctionsRepository
          universityCode: group.universityCode || "",
          atsAdminPageFlag: group.atsAdminPageFlag || false,
          companyCountry: group.companyCountry || null,
-         companyIndustry: group.companyIndustry || null,
+         companyIndustries: group.companyIndustries || [],
          companySize: group.companySize || "",
          test: false,
          triGrams: groupTriGrams(group.universityName || ""),
