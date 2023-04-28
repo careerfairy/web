@@ -1,5 +1,4 @@
 import React, { useEffect, useMemo, useState } from "react"
-import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents"
@@ -8,28 +7,26 @@ import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import SEO from "../components/util/SEO"
-import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
+import { livestreamRepo } from "../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
 import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import RecordedEventsCarousel from "../components/views/portal/recorded-events/RecordedEventsCarousel"
+import ContentCarousel from "../components/views/portal/content-carousel/ContentCarousel"
 import DateUtil from "../util/DateUtil"
 import { Box } from "@mui/material"
 import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
-import { mapFromServerSide } from "util/serverUtil"
-import { getUserTokenFromCookie } from "util/serverUtil"
+import { getUserTokenFromCookie, mapFromServerSide } from "util/serverUtil"
 
 const PortalPage = ({
-   highlights,
    comingUpNextEvents,
-   showHighlights,
    pastEvents,
    recordedEvents,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+   console.count("PortalPage")
    const { authenticatedUser, userData } = useAuth()
    const isScrollingHoverTheBanner = useScrollTrigger({
       threshold: 250,
@@ -55,6 +52,10 @@ const PortalPage = ({
       () => mapFromServerSide(comingUpNextEvents),
       [comingUpNextEvents]
    )
+   const registeredRecordedLivestreamsForUser = useMemo(
+      () => mapFromServerSide(recordedEvents),
+      [recordedEvents]
+   )
 
    return (
       <>
@@ -72,21 +73,23 @@ const PortalPage = ({
             isOverPortalBanner={isOverBanner}
          >
             <>
-               {recordedEvents?.length > 0 && (
-                  <Box mb={4}>
-                     <RecordedEventsCarousel
-                        livestreams={mapFromServerSide(recordedEvents)}
-                     />
-                  </Box>
-               )}
+               <Box position="relative" mb={4}>
+                  <ContentCarousel
+                     pastLivestreams={events}
+                     upcomingLivestreams={comingUpNext}
+                     registeredRecordedLivestreamsForUser={
+                        registeredRecordedLivestreamsForUser
+                     }
+                  />
+               </Box>
                <Container disableGutters>
                   <WidgetsWrapper>
-                     {recordedEvents?.length === 0 && (
-                        <HighlightsCarousel
-                           showHighlights={showHighlights}
-                           serverSideHighlights={highlights}
-                        />
-                     )}
+                     {/*{recordedEvents?.length === 0 && (*/}
+                     {/*   <HighlightsCarousel*/}
+                     {/*      showHighlights={showHighlights}*/}
+                     {/*      serverSideHighlights={highlights}*/}
+                     {/*   />*/}
+                     {/*)}*/}
                      {hasInterests ? <RecommendedEvents limit={10} /> : null}
                      <ComingUpNextEvents
                         serverSideEvents={comingUpNext}
@@ -117,8 +120,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
    const promises = []
    promises.push(
-      highlightRepo.shouldShowHighlightsCarousel(),
-      highlightRepo.getHighlights(5),
       livestreamRepo.getUpcomingEvents(20),
       livestreamRepo.getPastEventsFrom({
          fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
@@ -134,24 +135,19 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    }
    const results = await Promise.allSettled(promises)
 
-   const [
-      showHighlights,
-      highlights,
-      comingUpNextEvents,
-      pastEvents,
-      recordedEvents,
-   ] = results
+   const [comingUpNextEvents, pastEvents, recordedEvents] = results
       .filter((result) => result.status === "fulfilled")
       .map((result) => (result as PromiseFulfilledResult<any>).value)
 
+   console.log("-> token?.email", token?.email)
+   console.log("-> recordedEvents", recordedEvents?.length)
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
+   console.log("-> recordedEventsToShare", recordedEventsToShare?.length)
 
    return {
       props: {
-         showHighlights,
-         ...(highlights && { highlights }),
          ...(comingUpNextEvents && {
             comingUpNextEvents: comingUpNextEvents.map(
                LivestreamPresenter.serializeDocument
@@ -161,7 +157,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
          recordedEvents:
-            recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
+            // recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
             [],
       },
    }

@@ -4,6 +4,7 @@ import { Logger } from "../utils/types"
 import RecommendationServiceCore, {
    IRecommendationService,
 } from "./IRecommendationService"
+import { RankedLivestreamEvent } from "./RankedLivestreamEvent"
 
 /**
  * Sorts the best events for the given user from the received events
@@ -14,8 +15,8 @@ export default class ExistingDataRecommendationService
 {
    constructor(
       logger: Logger,
-      private readonly user: UserData,
       private readonly livestreams: LivestreamEvent[],
+      private readonly user?: UserData, // User could be undefined if the user is not logged in
       debug = true
    ) {
       super(logger, debug)
@@ -26,11 +27,14 @@ export default class ExistingDataRecommendationService
     * Does not actually fetch any data
     */
    async getRecommendations(limit = 10): Promise<string[]> {
-      const eventsBasedOnUser = this.getRecommendedEventsBasedOnUserData(
-         this.user,
-         this.livestreams,
-         limit
-      )
+      let eventsBasedOnUser: RankedLivestreamEvent[] = []
+      if (this.user) {
+         eventsBasedOnUser = this.getRecommendedEventsBasedOnUserData(
+            this.user,
+            this.livestreams,
+            limit
+         )
+      }
 
       return this.process(eventsBasedOnUser, limit, this.livestreams, this.user)
    }
@@ -43,8 +47,8 @@ export default class ExistingDataRecommendationService
    ): IRecommendationService {
       return new ExistingDataRecommendationService(
          logger,
-         user,
          livestreams,
+         user,
          debug
       )
    }
