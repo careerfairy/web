@@ -15,7 +15,7 @@ import Stack from "@mui/material/Stack"
 import IconButton from "@mui/material/IconButton"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
 import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
-import { Repeat as SyncIcon } from "react-feather"
+import { Home as HomeIcon, Repeat as SyncIcon } from "react-feather"
 
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
@@ -77,6 +77,11 @@ const UserAvatarWithDetails = () => {
    const showSwitchButton = useMemo(
       () => userData?.isAdmin || Object.keys(adminGroups).length > 1,
       [adminGroups, userData?.isAdmin]
+   )
+
+   const showPortalButton = useMemo(
+      () => userData?.isAdmin,
+      [userData?.isAdmin]
    )
 
    return (
@@ -147,6 +152,17 @@ const UserAvatarWithDetails = () => {
                              <SyncIcon size="1em" />
                           </ListItemIcon>
                           Switch Company
+                       </MenuItem>,
+                       <Divider key="divider2" />,
+                    ]
+                  : []),
+               ...(showPortalButton
+                  ? [
+                       <MenuItem onClick={() => push("/portal")} key="portal">
+                          <ListItemIcon>
+                             <HomeIcon size="1em" />
+                          </ListItemIcon>
+                          Portal
                        </MenuItem>,
                        <Divider key="divider2" />,
                     ]
