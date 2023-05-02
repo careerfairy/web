@@ -3,7 +3,6 @@ import { Box, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Image from "next/image"
 import { sxStyles } from "../../../../types/commonTypes"
-import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    info: {
@@ -28,14 +27,12 @@ const styles = sxStyles({
    title: {
       fontWeight: "bold",
       color: "white",
-      height: 70,
       maxWidth: {
          xs: "100%",
          md: "80%",
          lg: "60%",
       },
       whiteSpace: "pre-line",
-      ...getMaxLineStyles(3),
    },
    subtitle: {
       fontWeight: "400",
@@ -95,7 +92,7 @@ const Content: FC<ContentProps> = ({
                {subtitle}
             </Typography>
          </Stack>
-         {actionItem ? <Box mt={4}>{actionItem}</Box> : null}
+         {actionItem ? <Box mt={2}>{actionItem}</Box> : null}
       </Box>
    )
 }

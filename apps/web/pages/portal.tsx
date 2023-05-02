@@ -25,7 +25,7 @@ import {
    getUserTokenFromCookie,
    mapFromServerSide,
 } from "util/serverUtil"
-import getContent from "../components/views/portal/content-carousel/getContent"
+import getCarouselContent from "../components/views/portal/content-carousel/getCarouselContent"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -148,7 +148,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
 
-   const carouselContent = await getContent({
+   const carouselContent = await getCarouselContent({
       userData: userData,
       userStats: userStats,
       pastLivestreams: pastEvents || [],
@@ -167,11 +167,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
-         ...(recordedEventsToShare && {
-            recordedEvents: recordedEventsToShare?.map(
-               LivestreamPresenter.serializeDocument
-            ),
-         }),
+         recordedEvents:
+            recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
+            [],
          ...(carouselContent && {
             serializedCarouselContent: carouselContent?.map(
                LivestreamPresenter.serializeDocument
