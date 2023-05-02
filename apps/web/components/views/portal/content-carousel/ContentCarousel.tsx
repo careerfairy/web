@@ -1,16 +1,9 @@
-import { Box, ButtonProps, Container, Typography } from "@mui/material"
+import { Box, Container } from "@mui/material"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { sxStyles } from "../../../../types/commonTypes"
 import Image from "next/image"
 import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import React, {
-   FC,
-   ReactNode,
-   useCallback,
-   useEffect,
-   useMemo,
-   useState,
-} from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import { autoPlay } from "react-swipeable-views-utils"
 import SwipeableViews from "react-swipeable-views"
 import { darken, useTheme } from "@mui/material/styles"
@@ -18,20 +11,13 @@ import HighlightVideoDialog from "../HighlightVideoDialog"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
 import ContentCarouselPagination from "./ContentCarouselPagination"
-import DateUtil from "../../../../util/DateUtil"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import Button from "@mui/material/Button"
-import PlayIcon from "@mui/icons-material/PlayCircleOutline"
-import Stack from "@mui/material/Stack"
-import useContent, { Content, UseContent } from "./useContent"
-import useRecordingAccess from "../../upcoming-livestream/HeroSection/useRecordingAccess"
+import useContent, { UseContent } from "./useContent"
 import RegistrationModal from "../../common/registration-modal"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import Link from "../../common/Link"
-import useLivestreamHosts from "../../../custom-hook/live-stream/useLivestreamHosts"
-import useTraceUpdate from "../../../custom-hook/utils/useTraceUpdate"
+import LivestreamContent from "./LivestreamContent"
+import { ContentSkeleton } from "./Content"
 
 const styles = sxStyles({
    wrapper: {
@@ -57,70 +43,26 @@ const styles = sxStyles({
       justifyContent: "space-between",
       height: "100%",
    },
-   info: {
-      marginTop: 4,
-      display: "flex",
-      flexDirection: "column",
-   },
-   watchButton: {
-      paddingLeft: 0,
-
-      "&:hover": {
-         "& svg": {
-            border: (theme) => `5px solid ${theme.palette.primary.main}`,
-         },
-      },
-   },
    paginationWrapper: (theme) => ({
       mx: "auto",
       display: "flex",
       justifyContent: "center",
       position: "absolute",
       bottom: {
-         xs: theme.spacing(3.5),
+         xs: theme.spacing(2.5),
          sm: theme.spacing(2.75),
       },
       left: "50%",
       transform: "translateX(-50%)",
    }),
-   stepper: {
-      width: "35px",
-      height: "5px",
-      marginRight: "20px",
-      borderRadius: "30px",
-      backgroundColor: "#9999B1",
-      cursor: "pointer",
-   },
-   activeStepper: {
-      cursor: "unset",
-   },
-   icon: {},
-   blackText: {
-      color: "text.primary",
-   },
-   button: {
-      textTransform: "none",
-      py: 0.9,
-   },
-   logoWrapper: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      width: 88,
-      height: 48,
-      p: [1, 1.5],
-      backgroundColor: "white",
-      borderRadius: 1.5,
-   },
 })
 
 const CAROUSEL_SLIDE_DELAY = 10000
+const AutoPlaySwipeableViews = autoPlay(SwipeableViews)
 
 const ContentCarousel: FC<UseContent> = (props) => {
-   useTraceUpdate(props)
    const theme = useTheme()
    const { userData } = useAuth()
-   const AutoPlaySwipeableViews = autoPlay(SwipeableViews)
    const [activeStep, setActiveStep] = useState(0)
    const [videoUrl, setVideoUrl] = useState(null)
    const {
@@ -188,11 +130,14 @@ const ContentCarousel: FC<UseContent> = (props) => {
       resetMinutes()
    }, [resetMinutes])
 
+   if (loadingContent) {
+      return <ContentCarouselSkeleton />
+   }
+
    return (
       <>
          <AutoPlaySwipeableViews
-            // autoplay={!videoUrl} // do not auto scroll if video is being played
-            autoplay={false}
+            autoplay={!videoUrl || !!joinGroupModalData} // do not auto scroll if video is being played
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={activeStep}
             onChangeIndex={handleStepChange}
@@ -223,7 +168,7 @@ const ContentCarousel: FC<UseContent> = (props) => {
                   <Container disableGutters sx={styles.content}>
                      <LivestreamContent
                         handleBannerPlayRecording={handleBannerPlayRecording}
-                        livestream={contentItem}
+                        livestreamData={contentItem}
                         handleClickRegister={handleClickRegister}
                      />
                   </Container>
@@ -261,215 +206,14 @@ const ContentCarousel: FC<UseContent> = (props) => {
    )
 }
 
-type ContentProps = {
-   headerTitle: string
-   logoUrl?: string
-   title?: string
-   subtitle: string
-   actionItem?: React.ReactNode
-}
-
-type LivestreamContentProps = {
-   livestream: LivestreamEvent
-   handleBannerPlayRecording: (livestream: LivestreamEvent) => void
-   handleClickRegister: ReturnType<
-      typeof useRegistrationModal
-   >["handleClickRegister"]
-}
-const LivestreamContent: FC<LivestreamContentProps> = ({
-   livestream,
-   handleBannerPlayRecording,
-   handleClickRegister,
-}) => {
-   const hosts = useLivestreamHosts(livestream)
-   const { userStats, userData } = useAuth()
-
-   const livestreamPresenter = useMemo(
-      () => LivestreamPresenter.createFromDocument(livestream),
-      [livestream]
-   )
-
-   const {
-      userHasAccessToRecordingThroughRegistering,
-      userHasBoughtRecording,
-      showRecording,
-   } = useRecordingAccess(userData?.userEmail, livestreamPresenter, userStats)
-
-   const eventIsUpcoming = livestream.start.toDate() > new Date()
-
-   const headerTitle = useMemo(() => {
-      if (eventIsUpcoming) {
-         return "Coming Next!"
-      }
-
-      if (userHasAccessToRecordingThroughRegistering) {
-         return "What You've Missed"
-      }
-
-      return "Worth A Look!"
-   }, [eventIsUpcoming, userHasAccessToRecordingThroughRegistering])
-
-   const subtitle = useMemo(() => {
-      if (eventIsUpcoming) {
-         // Should return something like "Live on 17 April 2023"
-         return `Live on ${DateUtil.dateWithYear(livestream.start.toDate())}`
-      }
-
-      if (
-         !userHasBoughtRecording &&
-         userHasAccessToRecordingThroughRegistering
-      ) {
-         const timeLeft = DateUtil.calculateTimeLeft(
-            livestreamPresenter.recordingAccessTimeLeft()
-         )
-
-         return timeLeft?.Days === 0
-            ? "Last day to rewatch"
-            : `Recording available for ${timeLeft.Days} days`
-      }
-
-      return ""
-   }, [
-      eventIsUpcoming,
-      livestream.start,
-      livestreamPresenter,
-      userHasAccessToRecordingThroughRegistering,
-      userHasBoughtRecording,
-   ])
-
-   const actionItem = useMemo<ReactNode>(() => {
-      if (eventIsUpcoming) {
-         return (
-            <ContentButton
-               color={"secondary"}
-               onClick={() =>
-                  handleClickRegister(livestream, hosts[0]?.id, hosts, false)
-               }
-            >
-               Register to Live Stream
-            </ContentButton>
-         )
-      }
-
-      if (showRecording) {
-         return (
-            <ContentButton
-               color={"primary"}
-               onClick={() => handleBannerPlayRecording(livestream)}
-               endIcon={<PlayIcon sx={styles.icon} />}
-            >
-               Watch now
-            </ContentButton>
-         )
-      }
-
-      return (
-         <ContentButton
-            href={`upcoming-livestream/${livestream.id}`}
-            target={"_blank"}
-            color={"primary"}
-         >
-            Discover Recording
-         </ContentButton>
-      )
-   }, [
-      eventIsUpcoming,
-      handleBannerPlayRecording,
-      handleClickRegister,
-      hosts,
-      livestream,
-      showRecording,
-   ])
-
+const ContentCarouselSkeleton: FC = () => {
    return (
-      <Content
-         headerTitle={headerTitle}
-         title={livestream.title}
-         subtitle={subtitle}
-         logoUrl={getResizedUrl(livestream.companyLogoUrl, "lg")}
-         actionItem={actionItem}
-      />
-   )
-}
-const Content: FC<ContentProps> = ({
-   actionItem,
-   headerTitle,
-   logoUrl,
-   subtitle,
-   title,
-}) => {
-   return (
-      <Box sx={styles.info}>
-         <Stack spacing={1.5} mt={4}>
-            <Typography
-               variant={"h2"}
-               fontWeight="bold"
-               component="h1"
-               color={"white"}
-               gutterBottom
-            >
-               {headerTitle}
-            </Typography>
-            {logoUrl ? (
-               <Box sx={styles.logoWrapper} mt={2}>
-                  <Image
-                     objectFit="contain"
-                     quality={90}
-                     src={logoUrl}
-                     alt={title}
-                     width={200}
-                     height={100}
-                  />
-               </Box>
-            ) : null}
-            <Typography
-               variant={title.length > 95 ? "h5" : "h4"}
-               fontWeight="bold"
-               component="h2"
-               height="70px"
-               color={"white"}
-               maxWidth={{ xs: "100%", md: "80%", lg: "60%" }}
-            >
-               {title}
-            </Typography>
-            <Typography
-               variant={"h6"}
-               component="h2"
-               fontWeight={"400"}
-               color={"white"}
-               mt={1}
-            >
-               {subtitle}
-            </Typography>
-         </Stack>
-         {actionItem ? <Box mt={4}>{actionItem}</Box> : null}
+      <Box sx={styles.wrapper}>
+         <Box sx={[styles.wrapper, styles.image]} position={"absolute"} />
+         <Container disableGutters sx={styles.content}>
+            <ContentSkeleton />
+         </Container>
       </Box>
-   )
-}
-
-type WatchRecordingButtonProps = ButtonProps
-const ContentButton: FC<WatchRecordingButtonProps> = ({
-   onClick,
-   color = "primary",
-   href,
-   children,
-   ...props
-}) => {
-   return (
-      <Button
-         // @ts-ignore
-         component={href ? Link : undefined}
-         href={href}
-         onClick={onClick}
-         sx={styles.button}
-         variant={"contained"}
-         color={color}
-         disableRipple
-         size={"large"}
-         {...props}
-      >
-         {children}
-      </Button>
    )
 }
 

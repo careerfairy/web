@@ -117,8 +117,8 @@ const AuthProvider = ({ children }) => {
    )
    const prevUserData = usePreviousDistinct<UserData>(userData)
 
-   const userStats = useSelector(
-      ({ firestore }: RootState) => firestore.data["userStats"]
+   const userStats = useSelector(({ firestore }: RootState) =>
+      isLoggedOut ? null : firestore.data["userStats"]
    )
 
    useEffect(() => {

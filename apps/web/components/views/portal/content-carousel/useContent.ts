@@ -5,6 +5,7 @@ import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommend
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { errorLogAndNotify } from "../../../../util/CommonUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
+import { isLoaded } from "react-redux-firebase"
 
 export type UseContent = {
    pastLivestreams: LivestreamEvent[]
@@ -19,8 +20,7 @@ export type Content = {
 const useContent = (
    options: UseContent
 ): { loadingContent: boolean; content: LivestreamEvent[] } => {
-   const { userData, userStats } = useAuth()
-   const numberOfCredits = userData?.credits ?? 0
+   const { userData, userStats, authenticatedUser, isLoggedIn } = useAuth()
 
    const pastStreams = useMemo(() => {
       return filterStreamsForUnregisteredUsersAndNonBuyers(
@@ -28,6 +28,17 @@ const useContent = (
          userStats
       )
    }, [options.pastLivestreams, userStats])
+
+   const upcomingStreams = useMemo(() => {
+      if (!isLoggedIn) {
+         return options.upcomingLivestreams
+      }
+
+      // remove upcoming streams that are already registered
+      return options.upcomingLivestreams.filter((stream) => {
+         return !stream.registeredUsers?.includes(authenticatedUser?.email)
+      })
+   }, [isLoggedIn, options.upcomingLivestreams, authenticatedUser?.email])
 
    const {
       recommendedLivestreams: recommendedPastLivestreams,
@@ -37,9 +48,24 @@ const useContent = (
    const {
       recommendedLivestreams: recommendedUpcomingLivestreams,
       loading: loadingUpcoming,
-   } = useRecommendedStreams(options.upcomingLivestreams, userData)
+   } = useRecommendedStreams(upcomingStreams, userData)
+
+   const numberOfCredits = userData?.credits ?? 0
 
    return useMemo(() => {
+      const isLoading =
+         loadingPast ||
+         loadingUpcoming ||
+         !isLoaded(userStats) ||
+         !isLoaded(authenticatedUser)
+
+      if (isLoading) {
+         return {
+            loadingContent: true,
+            content: [],
+         }
+      }
+
       // Scenario selection
       const hasCredits = numberOfCredits > 0
       const numberOfRegisteredRecordings =
@@ -47,24 +73,25 @@ const useContent = (
       const hasRegisteredRecordings = numberOfRegisteredRecordings > 0
 
       let contentStreams: LivestreamEvent[] = []
-      console.log(
-         "-> options.registeredRecordedLivestreamsForUser",
-         options.registeredRecordedLivestreamsForUser
-      )
+
       if (hasCredits && !hasRegisteredRecordings) {
-         console.log("-> Scenario 1")
-         // Scenario 1
-         // User has at least 1 credit and no registered live stream recordings to watch
-         // Show 3 recommended past live stream recordings and 1 upcoming live stream
+         // console.log("-> Scenario 1")
+         /*
+          * Scenario 1
+          * User has at least 1 credit and no registered live stream recordings to watch
+          * Show 3 recommended past live stream recordings and 1 upcoming live stream
+          * */
          contentStreams = [
             ...recommendedPastLivestreams.slice(0, 3),
             ...recommendedUpcomingLivestreams.slice(0, 1),
          ]
       } else if (hasCredits && hasRegisteredRecordings) {
-         console.log("-> Scenario 2")
-         // Scenario 2
-         // User has at least 1 credit and at least 1 registered live stream recording to watch
-         // Show registered recordings, 1 upcoming live stream, and fill the rest with past live stream recordings up to a maximum of 5 cards in the carousel
+         // console.log("-> Scenario 2")
+         /*
+          * Scenario 2
+          * User has at least 1 credit and at least 1 registered live stream recording to watch
+          * Show registered recordings, 1 upcoming live stream, and fill the rest with past live stream recordings up to a maximum of 5 cards in the carousel
+          * */
          contentStreams = [
             ...options.registeredRecordedLivestreamsForUser,
             ...recommendedUpcomingLivestreams.slice(0, 1),
@@ -74,19 +101,23 @@ const useContent = (
             ),
          ]
       } else if (!hasCredits && !hasRegisteredRecordings) {
-         console.log("-> Scenario 3")
-         // Scenario 3
-         // User has 0 credits and no registered live stream recordings to watch
-         // Show 1 recommended past live stream recording (to nudge the user to get more credits) and 3 upcoming live streams
+         // console.log("-> Scenario 3")
+         /*
+          * Scenario 3
+          * User has 0 credits and no registered live stream recordings to watch
+          * Show 1 recommended past live stream recording (to nudge the user to get more credits) and 3 upcoming live streams
+          * */
          contentStreams = [
             ...recommendedPastLivestreams.slice(0, 1),
             ...recommendedUpcomingLivestreams.slice(0, 3),
          ]
       } else if (!hasCredits && hasRegisteredRecordings) {
-         console.log("-> Scenario 4")
-         // Scenario 4
-         // User has 0 credits and at least 1 registered live stream recording to watch
-         // Show registered recordings, 1 past live stream recording (to nudge the user to get more credits), and fill the rest with upcoming live stream recordings up to a maximum of 5 cards in the carousel
+         // console.log("-> Scenario 4")
+         /*
+          * Scenario 4
+          * User has 0 credits and at least 1 registered live stream recording to watch
+          * Show registered recordings, 1 past live stream recording (to nudge the user to get more credits), and fill the rest with upcoming live stream recordings up to a maximum of 5 cards in the carousel
+          * */
          contentStreams = [
             ...options.registeredRecordedLivestreamsForUser,
             ...recommendedPastLivestreams.slice(0, 1),
@@ -98,16 +129,18 @@ const useContent = (
       }
 
       return {
-         loadingContent: loadingPast || loadingUpcoming,
+         loadingContent: false,
          content: contentStreams,
       }
    }, [
+      authenticatedUser,
       loadingPast,
       loadingUpcoming,
       numberOfCredits,
       options.registeredRecordedLivestreamsForUser,
       recommendedPastLivestreams,
       recommendedUpcomingLivestreams,
+      userStats,
    ])
 }
 
@@ -139,7 +172,6 @@ const useRecommendedStreams = (
 
          setRecommendedLivestreams(newStreams)
       } catch (e) {
-         console.error(e)
          errorLogAndNotify(e, {
             message: "Error getting recommended streams from existing data",
             user: userData,

@@ -26,7 +26,6 @@ const PortalPage = ({
    pastEvents,
    recordedEvents,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
-   console.count("PortalPage")
    const { authenticatedUser, userData } = useAuth()
    const isScrollingHoverTheBanner = useScrollTrigger({
       threshold: 250,
@@ -139,12 +138,9 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       .filter((result) => result.status === "fulfilled")
       .map((result) => (result as PromiseFulfilledResult<any>).value)
 
-   console.log("-> token?.email", token?.email)
-   console.log("-> recordedEvents", recordedEvents?.length)
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
-   console.log("-> recordedEventsToShare", recordedEventsToShare?.length)
 
    return {
       props: {
@@ -156,9 +152,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
-         recordedEvents:
-            // recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
-            [],
+         ...(recordedEventsToShare && {
+            recordedEvents: recordedEventsToShare?.map(
+               LivestreamPresenter.serializeDocument
+            ),
+         }),
       },
    }
 }
