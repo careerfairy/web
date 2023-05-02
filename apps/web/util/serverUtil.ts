@@ -47,6 +47,25 @@ export const getServerSideUserStats = async (
    }
 }
 
+export const getServerSideUserData = async (
+   email: string
+): Promise<UserData> => {
+   if (!email) return null
+
+   // @ts-ignore
+   const snap = await store.firestore.get({
+      collection: "userData",
+      doc: email,
+      storeAs: "userData",
+   })
+
+   if (snap.exists) {
+      return snap.data() as UserData
+   } else {
+      return null
+   }
+}
+
 export const getServerSideGroup = async (groupId: string): Promise<Group> => {
    let serverSideGroup = {}
    // @ts-ignore
