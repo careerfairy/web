@@ -54,14 +54,12 @@ const PortalPage = ({
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
+
    const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
+
    const comingUpNext = useMemo(
       () => mapFromServerSide(comingUpNextEvents),
       [comingUpNextEvents]
-   )
-   const registeredRecordedLivestreamsForUser = useMemo(
-      () => mapFromServerSide(recordedEvents),
-      [recordedEvents]
    )
 
    const carouselContent = useMemo(() => {
@@ -92,12 +90,6 @@ const PortalPage = ({
                </Box>
                <Container disableGutters>
                   <WidgetsWrapper>
-                     {/*{recordedEvents?.length === 0 && (*/}
-                     {/*   <HighlightsCarousel*/}
-                     {/*      showHighlights={showHighlights}*/}
-                     {/*      serverSideHighlights={highlights}*/}
-                     {/*   />*/}
-                     {/*)}*/}
                      {hasInterests ? <RecommendedEvents limit={10} /> : null}
                      <ComingUpNextEvents
                         serverSideEvents={comingUpNext}

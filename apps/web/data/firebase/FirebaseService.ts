@@ -3131,18 +3131,18 @@ class FirebaseService {
 
       // Don't use the distributed counter for emulators
       if (shouldUseEmulators()) {
-         // const toUpdate: Pick<
-         //    LivestreamEvent,
-         //    "impressions" | "recommendedImpressions"
-         // > = {
-         //    impressions: firebase.firestore.FieldValue.increment(1) as any,
-         // }
-         // if (impressionData.isRecommended) {
-         //    toUpdate.recommendedImpressions =
-         //       firebase.firestore.FieldValue.increment(1) as any
-         // }
-         //
-         // return streamRef.update(toUpdate)
+         const toUpdate: Pick<
+            LivestreamEvent,
+            "impressions" | "recommendedImpressions"
+         > = {
+            impressions: firebase.firestore.FieldValue.increment(1) as any,
+         }
+         if (impressionData.isRecommended) {
+            toUpdate.recommendedImpressions =
+               firebase.firestore.FieldValue.increment(1) as any
+         }
+
+         return streamRef.update(toUpdate)
       } else {
          impressionsCounter.incrementBy(1).catch(console.error)
 

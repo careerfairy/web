@@ -29,7 +29,7 @@ export default class ExistingDataRecommendationService
    async getRecommendations(limit = 10): Promise<string[]> {
       let eventsBasedOnUser: RankedLivestreamEvent[] = []
       if (this.user) {
-         // If the user is logged in, we can use their data to recommend events
+         // If the user exists, we can use their data to recommend events
          eventsBasedOnUser = this.getRecommendedEventsBasedOnUserData(
             this.user,
             this.livestreams,
