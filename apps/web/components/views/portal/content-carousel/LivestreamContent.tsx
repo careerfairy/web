@@ -2,7 +2,6 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import React, { FC, ReactNode, useMemo } from "react"
 import useLivestreamHosts from "../../../custom-hook/live-stream/useLivestreamHosts"
-import { useAuth } from "../../../../HOCs/AuthProvider"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import useRecordingAccess from "../../upcoming-livestream/HeroSection/useRecordingAccess"
 import DateUtil from "../../../../util/DateUtil"
@@ -11,10 +10,12 @@ import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import ContentButton from "./ContentButton"
 import Content from "./Content"
 import useLivestream from "../../../custom-hook/live-stream/useLivestream"
+import { UserStats } from "@careerfairy/shared-lib/users"
 
 type LivestreamContentProps = {
    livestreamData: LivestreamEvent
    handleBannerPlayRecording: (livestream: LivestreamEvent) => void
+   userStats: UserStats
    handleClickRegister: ReturnType<
       typeof useRegistrationModal
    >["handleClickRegister"]
@@ -23,11 +24,11 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
    livestreamData,
    handleBannerPlayRecording,
    handleClickRegister,
+   userStats,
 }) => {
    const { data: livestream } = useLivestream(livestreamData.id, livestreamData)
 
    const hosts = useLivestreamHosts(livestream)
-   const { userStats, userData } = useAuth()
 
    const livestreamPresenter = useMemo(
       () => LivestreamPresenter.createFromDocument(livestream),
@@ -38,13 +39,16 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
       userHasAccessToRecordingThroughRegistering,
       userHasBoughtRecording,
       showRecording,
-   } = useRecordingAccess(userData?.userEmail, livestreamPresenter, userStats)
+   } = useRecordingAccess(userStats?.userId, livestreamPresenter, userStats)
 
-   const eventIsUpcoming = livestream.start.toDate() > new Date()
+   const eventIsUpcoming = useMemo(
+      () => !livestreamPresenter.isPast(),
+      [livestreamPresenter]
+   )
 
    const hasRegistered = useMemo(
-      () => livestreamPresenter.isUserRegistered(userData?.userEmail),
-      [livestreamPresenter, userData?.userEmail]
+      () => livestreamPresenter.isUserRegistered(userStats?.userId),
+      [livestreamPresenter, userStats?.userId]
    )
 
    const headerTitle = useMemo(() => {

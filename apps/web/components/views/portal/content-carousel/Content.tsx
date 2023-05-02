@@ -3,7 +3,7 @@ import { Box, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
 import Image from "next/image"
 import { sxStyles } from "../../../../types/commonTypes"
-import Skeleton from "@mui/material/Skeleton"
+import { getMaxLineStyles } from "../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    info: {
@@ -34,14 +34,13 @@ const styles = sxStyles({
          md: "80%",
          lg: "60%",
       },
+      whiteSpace: "pre-line",
+      ...getMaxLineStyles(3),
    },
    subtitle: {
       fontWeight: "400",
       color: "white",
       mt: 1,
-   },
-   buttonSkeleton: {
-      borderRadius: 5,
    },
 })
 
@@ -97,39 +96,6 @@ const Content: FC<ContentProps> = ({
             </Typography>
          </Stack>
          {actionItem ? <Box mt={4}>{actionItem}</Box> : null}
-      </Box>
-   )
-}
-
-export const ContentSkeleton: FC = () => {
-   return (
-      <Box sx={styles.info}>
-         <Stack spacing={1.5} mt={4}>
-            <Typography
-               variant={"h2"}
-               component="h1"
-               sx={styles.headerTitle}
-               gutterBottom
-            >
-               <Skeleton width="30%" />
-            </Typography>
-            <Box sx={styles.logoWrapper} mt={2}></Box>
-            <Typography
-               variant={"h4"}
-               fontWeight="bold"
-               component="h2"
-               sx={styles.title}
-            >
-               <Skeleton width="90%" />
-               <Skeleton width="25%" />
-            </Typography>
-            <Typography variant={"h6"} component="h2" sx={styles.subtitle}>
-               <Skeleton width="20%" />
-            </Typography>
-         </Stack>
-         <Box mt={4}>
-            <Skeleton sx={styles.buttonSkeleton} height={50} width={150} />
-         </Box>
       </Box>
    )
 }

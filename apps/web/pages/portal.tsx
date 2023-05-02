@@ -19,12 +19,20 @@ import DateUtil from "../util/DateUtil"
 import { Box } from "@mui/material"
 import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
-import { getUserTokenFromCookie, mapFromServerSide } from "util/serverUtil"
+import {
+   getServerSideUserData,
+   getServerSideUserStats,
+   getUserTokenFromCookie,
+   mapFromServerSide,
+} from "util/serverUtil"
+import getContent from "../components/views/portal/content-carousel/getContent"
 
 const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
    recordedEvents,
+   serializedCarouselContent,
+   serverUserStats,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
    const isScrollingHoverTheBanner = useScrollTrigger({
@@ -56,6 +64,10 @@ const PortalPage = ({
       [recordedEvents]
    )
 
+   const carouselContent = useMemo(() => {
+      return mapFromServerSide(serializedCarouselContent)
+   }, [serializedCarouselContent])
+
    return (
       <>
          <SEO
@@ -74,11 +86,8 @@ const PortalPage = ({
             <>
                <Box position="relative" mb={4}>
                   <ContentCarousel
-                     pastLivestreams={events}
-                     upcomingLivestreams={comingUpNext}
-                     registeredRecordedLivestreamsForUser={
-                        registeredRecordedLivestreamsForUser
-                     }
+                     content={carouselContent}
+                     serverUserStats={serverUserStats}
                   />
                </Box>
                <Container disableGutters>
@@ -129,21 +138,33 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    // only adds recording request if token has email
    if (token?.email) {
       promises.push(
-         livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days)
+         livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days),
+         getServerSideUserStats(token.email),
+         getServerSideUserData(token.email)
       )
    }
    const results = await Promise.allSettled(promises)
 
-   const [comingUpNextEvents, pastEvents, recordedEvents] = results
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => (result as PromiseFulfilledResult<any>).value)
+   const [comingUpNextEvents, pastEvents, recordedEvents, userStats, userData] =
+      results
+         .filter((result) => result.status === "fulfilled")
+         .map((result) => (result as PromiseFulfilledResult<any>).value)
 
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
 
+   const carouselContent = await getContent({
+      userData: userData,
+      userStats: userStats,
+      pastLivestreams: pastEvents || [],
+      upcomingLivestreams: comingUpNextEvents || [],
+      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
+   })
+
    return {
       props: {
+         serverUserStats: userStats || null,
          ...(comingUpNextEvents && {
             comingUpNextEvents: comingUpNextEvents.map(
                LivestreamPresenter.serializeDocument
@@ -154,6 +175,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          }),
          ...(recordedEventsToShare && {
             recordedEvents: recordedEventsToShare?.map(
+               LivestreamPresenter.serializeDocument
+            ),
+         }),
+         ...(carouselContent && {
+            serializedCarouselContent: carouselContent?.map(
                LivestreamPresenter.serializeDocument
             ),
          }),

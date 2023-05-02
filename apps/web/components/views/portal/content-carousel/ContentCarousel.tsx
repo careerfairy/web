@@ -13,11 +13,10 @@ import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/r
 import ContentCarouselPagination from "./ContentCarouselPagination"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
-import useContent, { UseContent } from "./useContent"
 import RegistrationModal from "../../common/registration-modal"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import LivestreamContent from "./LivestreamContent"
-import { ContentSkeleton } from "./Content"
+import { UserStats } from "@careerfairy/shared-lib/users"
 
 const styles = sxStyles({
    wrapper: {
@@ -60,9 +59,14 @@ const styles = sxStyles({
 const CAROUSEL_SLIDE_DELAY = 10000
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews)
 
-const ContentCarousel: FC<UseContent> = (props) => {
+type Props = {
+   content: LivestreamEvent[]
+   serverUserStats: UserStats
+}
+
+const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
    const theme = useTheme()
-   const { userData } = useAuth()
+   const { userData, userStats } = useAuth()
    const [activeStep, setActiveStep] = useState(0)
    const [videoUrl, setVideoUrl] = useState(null)
    const {
@@ -74,8 +78,6 @@ const ContentCarousel: FC<UseContent> = (props) => {
 
    const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
       useRegistrationModal()
-
-   const { content, loadingContent } = useContent(props)
 
    /**
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
@@ -130,14 +132,10 @@ const ContentCarousel: FC<UseContent> = (props) => {
       resetMinutes()
    }, [resetMinutes])
 
-   if (loadingContent) {
-      return <ContentCarouselSkeleton />
-   }
-
    return (
       <>
          <AutoPlaySwipeableViews
-            autoplay={!videoUrl || !!joinGroupModalData} // do not auto scroll if video is being played
+            autoplay={!videoUrl || !joinGroupModalData} // do not auto scroll if video is being played
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={activeStep}
             onChangeIndex={handleStepChange}
@@ -170,6 +168,7 @@ const ContentCarousel: FC<UseContent> = (props) => {
                         handleBannerPlayRecording={handleBannerPlayRecording}
                         livestreamData={contentItem}
                         handleClickRegister={handleClickRegister}
+                        userStats={userStats || serverUserStats}
                      />
                   </Container>
                </Box>
@@ -203,17 +202,6 @@ const ContentCarousel: FC<UseContent> = (props) => {
             />
          ) : null}
       </>
-   )
-}
-
-const ContentCarouselSkeleton: FC = () => {
-   return (
-      <Box sx={styles.wrapper}>
-         <Box sx={[styles.wrapper, styles.image]} position={"absolute"} />
-         <Container disableGutters sx={styles.content}>
-            <ContentSkeleton />
-         </Container>
-      </Box>
    )
 }
 
