@@ -5,7 +5,7 @@ import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
    getHumanStringDescriptionForAction,
    RewardAction,
-   getCustomRewardMessageForAction
+   getCustomRewardMessageForAction,
    RewardDoc,
 } from "@careerfairy/shared-lib/dist/rewards"
 import RewardNotification from "../components/views/notifications/RewardNotification"
