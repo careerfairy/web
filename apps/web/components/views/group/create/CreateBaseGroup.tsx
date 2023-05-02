@@ -129,7 +129,7 @@ const CreateBaseGroup = ({
          university: baseGroupInfo.university || null,
          isUniversity: baseGroupInfo.isUniversity || false,
          companySize: baseGroupInfo.companySize || "",
-         companyIndustries: baseGroupInfo.companyIndustries || null,
+         companyIndustries: baseGroupInfo.companyIndustries || [],
          companyCountry: baseGroupInfo.companyCountry || null,
          isATSEnabled: baseGroupInfo.isATSEnabled || false,
       }),
