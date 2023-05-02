@@ -11,7 +11,7 @@ export type GetContentOptions = {
    userStats?: UserStats
 }
 
-const getContent = async (
+const getCarouselContent = async (
    options: GetContentOptions
 ): Promise<LivestreamEvent[]> => {
    const pastStreams = filterStreamsForUnregisteredUsersAndNonBuyers(
@@ -131,4 +131,4 @@ const filterStreamsForUnregisteredUsersAndNonBuyers = (
    })
 }
 
-export default getContent
+export default getCarouselContent
