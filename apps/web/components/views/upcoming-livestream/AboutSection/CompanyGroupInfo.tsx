@@ -50,28 +50,32 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
             <Stack
                direction={{
                   xs: "column",
-                  sm: "row",
+                  md: "row",
                }}
                spacing={{
                   xs: 1,
-                  sm: 4,
+                  md: 4,
                }}
             >
                {companyGroupData.companyCountry ? (
                   <CompanyCountryTag
+                     fontSize={"1.07rem"}
                      text={companyGroupData.companyCountry.name}
                   />
                ) : null}
                {companyGroupData.companyIndustries.length ? (
                   <CompanyIndustryTag
-                     // TODO-GS: beautify this
+                     fontSize={"1.07rem"}
                      text={companyGroupData.companyIndustries
                         .map(({ name }) => name)
                         .join(", ")}
                   />
                ) : null}
                {companyGroupData.companySize ? (
-                  <CompanySizeTag text={companyGroupData.companySize} />
+                  <CompanySizeTag
+                     fontSize={"1.07rem"}
+                     text={companyGroupData.companySize}
+                  />
                ) : null}
             </Stack>
 
