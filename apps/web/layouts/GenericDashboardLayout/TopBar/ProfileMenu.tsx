@@ -21,6 +21,7 @@ import { alpha } from "@mui/material/styles"
 import Divider from "@mui/material/Divider"
 import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
 import { useMemo } from "react"
+import { useGenericDashboard } from "../index"
 
 const styles = sxStyles({
    ava: {
@@ -58,6 +59,7 @@ const styles = sxStyles({
    },
 })
 const ProfileMenu = () => {
+   const { handleOpenCreditsDialog } = useGenericDashboard()
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
    const { userData, signOut, userPresenter } = useAuth()
    const { push } = useRouter()
@@ -164,9 +166,7 @@ const ProfileMenu = () => {
 
                <MenuItem
                   sx={{ mb: 1, alignItems: "start" }}
-                  onClick={() => {
-                     //TODO: add logic to get more credits
-                  }}
+                  onClick={handleOpenCreditsDialog}
                >
                   <ListItemIcon>
                      <CareerCoinIcon />

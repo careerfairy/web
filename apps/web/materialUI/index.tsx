@@ -132,6 +132,9 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
             black,
             white,
          },
+         success: {
+            main: "#09D24D",
+         },
          primary: primary,
          grey: {
             main: grey[300],
