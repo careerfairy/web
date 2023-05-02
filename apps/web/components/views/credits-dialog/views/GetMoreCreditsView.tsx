@@ -61,17 +61,14 @@ const GetMoreCreditsView: FC = () => {
 const CreditsView = () => {
    const { userStats, userData } = useAuth()
 
-   const {
-      handleGoToCVView,
-      handleGoToReferFriendView,
-      handleGoToNextLivestreams,
-   } = useCreditsDialogContext()
+   const { handleGoToView, handleGoToNextLivestreams } =
+      useCreditsDialogContext()
 
    return (
       <Stack flex={1} spacing={3}>
          <CreditItem
             label="Upload your CV"
-            onClick={handleGoToCVView}
+            onClick={() => handleGoToView("CV")}
             completed={Boolean(userData?.userResume)}
             numCredits={1}
          />
@@ -83,7 +80,7 @@ const CreditsView = () => {
          />
          <CreditItem
             label="Refer to 3 friends"
-            onClick={handleGoToReferFriendView}
+            onClick={() => handleGoToView("REFER_FRIENDS")}
             completed={userStats?.referralsCount > 2}
             numCredits={3}
          />

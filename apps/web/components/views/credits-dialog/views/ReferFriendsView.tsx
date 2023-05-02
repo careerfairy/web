@@ -51,11 +51,11 @@ const styles = sxStyles({
 })
 
 const ReferFriendsView: FC = () => {
-   const { handleGoToGetMoreCreditsView } = useCreditsDialogContext()
+   const { handleGoToView } = useCreditsDialogContext()
 
    return (
       <BaseDialogView
-         handleBack={handleGoToGetMoreCreditsView}
+         handleBack={() => handleGoToView("GET_MORE_CREDITS")}
          leftContent={
             <LeftContent
                title={
