@@ -6,7 +6,7 @@ import BaseDialogView, {
    TitleText,
 } from "../BaseDialogView"
 import { useCreditsDialogContext } from "../CreditsDialog"
-import { company_building } from "../../../../constants/images"
+import { careerCoinsBackgroundImage } from "../../../../constants/images"
 import Stack from "@mui/material/Stack"
 import Chip from "@mui/material/Chip"
 import { Box, Typography } from "@mui/material"
@@ -15,6 +15,8 @@ import GoToIcon from "@mui/icons-material/NavigateNextRounded"
 import CareerCoinIcon from "../../common/CareerCoinIcon"
 import { sxStyles } from "../../../../types/commonTypes"
 import { useAuth } from "../../../../HOCs/AuthProvider"
+import { REWARDS } from "@careerfairy/shared-lib/rewards"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    congratsChip: {
@@ -34,7 +36,7 @@ const GetMoreCreditsView: FC = () => {
          handleClose={handleClose}
          leftContent={
             <LeftContent
-               backgroundImg={company_building}
+               backgroundImg={getResizedUrl(careerCoinsBackgroundImage, "lg")}
                title={
                   <TitleText color="white">
                      Get more{" "}
@@ -70,19 +72,19 @@ const CreditsView = () => {
             label="Upload your CV"
             onClick={() => handleGoToView("CV")}
             completed={Boolean(userData?.userResume)}
-            numCredits={1}
+            numCredits={REWARDS.USER_CV_UPLOAD.credits}
          />
          <CreditItem
             label="Attend first live stream"
             onClick={handleGoToNextLivestreams}
             completed={userStats?.totalLivestreamAttendances > 0}
-            numCredits={1}
+            numCredits={REWARDS.LIVESTREAM_USER_FIRST_ATTENDED.credits}
          />
          <CreditItem
             label="Refer to 3 friends"
             onClick={() => handleGoToView("REFER_FRIENDS")}
             completed={userStats?.referralsCount > 2}
-            numCredits={3}
+            numCredits={REWARDS.REFERRAL_FIRST_FRIENDS.credits}
          />
       </Stack>
    )
@@ -107,15 +109,23 @@ const CreditItem: FC<CreditItemProps> = ({
          justifyContent="space-between"
          alignItems="center"
          direction="row"
+         fontWeight={600}
       >
-         <Typography color={completed ? "text.secondary" : "text.primary"}>
+         <Typography
+            fontWeight={600}
+            color={completed ? "text.secondary" : "text.primary"}
+         >
             {label}
          </Typography>
          {completed ? (
             <Chip
                label={
                   <Stack spacing={1} direction="row" alignItems="center">
-                     <Typography variant="body2" color="text.secondary">
+                     <Typography
+                        fontWeight={600}
+                        variant="body2"
+                        color="text.secondary"
+                     >
                         Congrats
                      </Typography>
                      <CompleteIcon color="success" />
@@ -129,7 +139,9 @@ const CreditItem: FC<CreditItemProps> = ({
                   <Stack spacing={1.5} direction="row" alignItems="center">
                      <Box alignItems="center" display="flex">
                         <CareerCoinIcon />
-                        <Typography variant="body2">+ {numCredits}</Typography>
+                        <Typography fontWeight={600} variant="body2">
+                           + {numCredits}
+                        </Typography>
                      </Box>
                      <GoToIcon />
                   </Stack>
