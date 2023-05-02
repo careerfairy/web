@@ -160,19 +160,21 @@ const CountDown = ({
    }, [setShareEventDialog])
 
    const registerComponent = useMemo(() => {
+      const registerButton = (label: string) => (
+         <RegisterButton
+            onRegisterClick={onRegisterClick}
+            disabled={disabled}
+            registered={registered}
+            label={label}
+         />
+      )
+
       if (isPastEvent) {
          if (stream.denyRecordingAccess) {
-            return (
-               <RegisterButton
-                  onRegisterClick={onRegisterClick}
-                  disabled={disabled}
-                  registered={registered}
-                  label={
-                     registered
-                        ? "You attended this event"
-                        : "Recording Not Available"
-                  }
-               />
+            return registerButton(
+               registered
+                  ? "You attended this event"
+                  : "Recording Not Available"
             )
          }
 
@@ -194,14 +196,7 @@ const CountDown = ({
       }
 
       if (registered) {
-         return (
-            <RegisterButton
-               onRegisterClick={onRegisterClick}
-               disabled={disabled}
-               registered={registered}
-               label="You're booked"
-            />
-         )
+         return registerButton("You're booked")
       }
 
       if (
@@ -210,35 +205,14 @@ const CountDown = ({
          stream.registeredUsers &&
          stream.maxRegistrants <= stream.registeredUsers.length
       ) {
-         return (
-            <RegisterButton
-               onRegisterClick={onRegisterClick}
-               disabled={disabled}
-               registered={registered}
-               label="No spots left"
-            />
-         )
+         return registerButton("No spots left")
       }
 
       if (authenticatedUser) {
-         return (
-            <RegisterButton
-               onRegisterClick={onRegisterClick}
-               disabled={disabled}
-               registered={registered}
-               label="Attend Event"
-            />
-         )
+         return registerButton("Attend Event")
       }
 
-      return (
-         <RegisterButton
-            onRegisterClick={onRegisterClick}
-            disabled={disabled}
-            registered={registered}
-            label="Join to attend"
-         />
-      )
+      return registerButton("Join to attend")
    }, [
       userData,
       userIsLoggedIn,
