@@ -9,35 +9,31 @@ import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 
 type IGenericDashboardContext = {
-   isOverPortalBanner: boolean
    isPortalPage: boolean
-   hasRecordings: boolean
    handleOpenCreditsDialog: () => void
+   topBarFixed: boolean
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
-   isOverPortalBanner: false,
    isPortalPage: false,
-   hasRecordings: false,
    handleOpenCreditsDialog: () => {},
+   topBarFixed: false,
 })
 
 type Props = {
    children: JSX.Element
    pageDisplayName: string
    bgColor?: string
-   hasRecordings?: boolean
    isPortalPage?: boolean
-   isOverPortalBanner?: boolean
+   topBarFixed?: boolean
 }
 
 const GenericDashboardLayout = ({
    children,
    pageDisplayName,
    bgColor,
-   hasRecordings,
    isPortalPage,
-   isOverPortalBanner,
+   topBarFixed,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -51,12 +47,11 @@ const GenericDashboardLayout = ({
    //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
    const value = useMemo<IGenericDashboardContext>(
       () => ({
-         isOverPortalBanner,
          isPortalPage,
-         hasRecordings,
          handleOpenCreditsDialog,
+         topBarFixed: Boolean(topBarFixed),
       }),
-      [handleOpenCreditsDialog, hasRecordings, isOverPortalBanner, isPortalPage]
+      [handleOpenCreditsDialog, isPortalPage, topBarFixed]
    )
 
    return (

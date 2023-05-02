@@ -39,7 +39,7 @@ const UserLayout: FC = ({ children }) => {
 
    return (
       <>
-         <GenericDashboardLayout pageDisplayName={""}>
+         <GenericDashboardLayout bgColor="white" pageDisplayName={""}>
             <PageContentWrapper>
                <PageChildrenWrapper>{children}</PageChildrenWrapper>
             </PageContentWrapper>

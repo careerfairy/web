@@ -3,6 +3,7 @@ import React, { memo, useEffect } from "react"
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
 import Drawer from "@mui/material/Drawer"
 
 // project imports
@@ -22,6 +23,9 @@ const styles = sxStyles({
       flexDirection: "column",
       maxWidth: "fill-available",
    },
+   innerDesktop: {
+      width: `calc(100% - ${DRAWER_WIDTH}px)`,
+   },
    main: {
       flexGrow: 1,
       display: "flex",
@@ -33,6 +37,7 @@ const styles = sxStyles({
    appBar: {
       bgcolor: "transparent",
       backdropFilter: "blur(8px)",
+      transition: (theme) => theme.transitions.create("backdrop-filter"),
    },
    toolbar: {
       backgroundColor: "none",
@@ -57,7 +62,7 @@ const styles = sxStyles({
    drawerWrapperClosed: {
       width: 0,
    },
-   topBarOverBanner: {
+   noBackdrop: {
       backdropFilter: "none",
    },
    topBarFixed: {
@@ -110,7 +115,13 @@ const AdminGenericLayout: React.FC<Props> = ({
             {drawerContent}
          </DrawerComponent>
 
-         <Box sx={[styles.inner, styles.animateWidth]}>
+         <Box
+            sx={[
+               styles.inner,
+               styles.animateWidth,
+               !isMobile && drawerOpen && styles.innerDesktop,
+            ]}
+         >
             {/* header */}
             <HeaderComponent drawerOpen={drawerOpen}>
                {headerContent}
@@ -172,8 +183,11 @@ type HeaderProps = {
    children: React.ReactNode
 }
 const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
-   const { isOverPortalBanner, isPortalPage, hasRecordings } =
-      useGenericDashboard()
+   const { topBarFixed } = useGenericDashboard()
+   const isScrolling = useScrollTrigger({
+      disableHysteresis: true,
+      threshold: 10,
+   })
 
    return (
       <AppBar
@@ -184,8 +198,8 @@ const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
          sx={[
             styles.appBar,
             drawerOpen && styles.animateWidth,
-            isOverPortalBanner && styles.topBarOverBanner,
-            isPortalPage && hasRecordings && styles.topBarFixed,
+            !isScrolling && styles.noBackdrop,
+            topBarFixed && styles.topBarFixed,
          ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>
