@@ -103,7 +103,7 @@ export class CarouselContentService {
             ...recommendedUpcomingLivestreams.slice(0, 1),
             ...recommendedPastLivestreams.slice(
                0,
-               5 - numberOfRegisteredRecordings - 1
+               recommendedPastLivestreams.length - 1
             ),
          ]
       } else if (!hasCredits && !hasRegisteredRecordings) {
@@ -127,12 +127,12 @@ export class CarouselContentService {
             ...recommendedPastLivestreams.slice(0, 1),
             ...recommendedUpcomingLivestreams.slice(
                0,
-               5 - numberOfRegisteredRecordings - 1
+               recommendedUpcomingLivestreams.length - 1
             ),
          ]
       }
 
-      return contentStreams
+      return contentStreams.slice(0, 5) // Max 5 cards in carousel as per design
    }
 
    private async getRecommendedStreams(
