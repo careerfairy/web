@@ -131,6 +131,7 @@ export interface UserStats {
    hasRegisteredOnAnyLivestream?: boolean
    totalLivestreamInvites?: number
    referralsCount?: number
+   recordingsBought?: string[]
 }
 
 export interface SavedRecruiter extends Identifiable {

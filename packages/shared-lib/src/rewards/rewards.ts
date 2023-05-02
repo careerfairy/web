@@ -57,7 +57,7 @@ type Reward = {
 /**
  * All Rewards objects
  */
-export const REWARDS: Record<string, Reward> = {
+export const REWARDS: Record<RewardAction, Reward> = {
    /**
     * Rewards triggered by user actions
     * These, require a cloud function to be triggered
@@ -145,9 +145,23 @@ export const REWARDS: Record<string, Reward> = {
       credits: -1,
       humanStringDescription: "You have bought access to the recording",
    },
-}
+} as const
 
-export type RewardAction = keyof typeof REWARDS
+export type RewardAction =
+   | "LIVESTREAM_RECORDING_BOUGHT"
+   | "LIVESTREAM_USER_FIRST_ATTENDED"
+   | "LIVESTREAM_INVITE_COMPLETE_LEADER"
+   | "LIVESTREAM_REGISTER_COMPLETE_FOLLOWER"
+   | "LIVESTREAM_REGISTER_COMPLETE_LEADER"
+   | "REFERRAL_FIRST_FRIENDS"
+   | "REFERRAL_SIGNUP_LEADER"
+   | "REFERRAL_SIGNUP_FOLLOWER"
+   | "LIVESTREAM_INVITE_COMPLETE_FOLLOWER"
+   | "LIVESTREAM_INVITE_COMPLETE_FOLLOWER"
+   | "LIVESTREAM_USER_HAND_RAISED"
+   | "LIVESTREAM_USER_ASKED_QUESTION"
+   | "LIVESTREAM_USER_ATTENDED"
+   | "USER_CV_UPLOAD"
 
 export const getHumanStringDescriptionForAction = (action: RewardAction) => {
    if (REWARDS[action]) {

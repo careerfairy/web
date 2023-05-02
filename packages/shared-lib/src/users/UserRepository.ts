@@ -150,6 +150,12 @@ export interface IUserRepository {
       amount?: number
    ): Promise<void>
 
+   addToStatArray(
+      userDataId: string,
+      field: keyof UserStats,
+      value: string
+   ): Promise<void>
+
    getStats(userDataId: string): Promise<UserStats>
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
@@ -193,18 +199,33 @@ export class FirebaseUserRepository
          .collection("stats")
          .doc("stats")
 
-      const doc = await docRef.get()
-
-      if (doc.exists) {
-         return docRef.update({
-            [field]: this.fieldValue.increment(amount),
-         })
-      } else {
-         return docRef.set({
+      return docRef.set(
+         {
             userId: userDataId,
-            [field]: amount,
-         })
-      }
+            [field]: this.fieldValue.increment(amount),
+         },
+         { merge: true }
+      )
+   }
+
+   async addToStatArray(
+      userDataId: string,
+      field: keyof UserStats,
+      value: string
+   ) {
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("stats")
+         .doc("stats")
+
+      return docRef.set(
+         {
+            userId: userDataId,
+            [field]: this.fieldValue.arrayUnion(value),
+         },
+         { merge: true }
+      )
    }
 
    async getByReferralCode(referralCode: string): Promise<UserData | null> {

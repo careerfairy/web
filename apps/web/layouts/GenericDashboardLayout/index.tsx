@@ -79,6 +79,14 @@ const GenericDashboardLayout = ({
    )
 }
 
-export const useGenericDashboard = () => useContext(GenericDashboardContext)
+export const useGenericDashboard = () => {
+   const context = useContext(GenericDashboardContext)
+   if (context === undefined) {
+      throw new Error(
+         "useGenericDashboard must be used within a GenericDashboardContextProvider"
+      )
+   }
+   return context
+}
 
 export default GenericDashboardLayout

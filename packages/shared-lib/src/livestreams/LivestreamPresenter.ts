@@ -154,7 +154,7 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    recordingAccessTimeLeft(): Date {
-      const streamDate = this.start
+      const streamDate = new Date(this.start)
 
       const maxDateToShowRecording = streamDate
       maxDateToShowRecording.setDate(
@@ -164,15 +164,17 @@ export class LivestreamPresenter extends BaseModel {
       return maxDateToShowRecording
    }
    isUserRegistered(userEmail: string): boolean {
+      if (!userEmail) {
+         return false
+      }
       return this.registeredUsers.includes(userEmail)
    }
 
-   isAbleToShowRecording(userEmail: string, recordingSid: string): boolean {
+   isAbleToShowRecording(userEmail: string): boolean {
       return (
          this.isPast() &&
          this.isAbleToAccessRecording() &&
          this.isUserRegistered(userEmail) &&
-         recordingSid?.length > 0 &&
          new Date() <= this.recordingAccessTimeLeft()
       )
    }
@@ -184,7 +186,7 @@ export class LivestreamPresenter extends BaseModel {
     * are related to the parent livestream document
     */
    elapsedMinutesSinceStart(): number {
-      let start = this.start
+      let start = new Date(this.start)
       if (this.parentLivestream) {
          // breakout room support
          start = toDate(this["parentLivestream"].start)

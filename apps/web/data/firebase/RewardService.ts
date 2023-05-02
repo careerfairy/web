@@ -1,8 +1,9 @@
-import { RewardAction } from "@careerfairy/shared-lib/dist/rewards"
+import { RewardAction } from "@careerfairy/shared-lib/rewards"
 import {
    IRewardRepository,
    RewardFilterFields,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
+import { UserStats } from "@careerfairy/shared-lib/users"
 import { rewardsRepo } from "data/RepositoryInstances"
 import { Functions, httpsCallable } from "firebase/functions"
 import { FunctionsInstance } from "./FirebaseInstance"
@@ -28,12 +29,14 @@ export class RewardService {
    /**
     * Checks if the user has access to a livestream recording
     *
-    * The reward doc should exist for access
+    * The bought recordings should be on the user stats document
     */
-   canAccessRecording(userEmail: string, livestreamId: string) {
-      return this.canAccess(userEmail, "LIVESTREAM_RECORDING_BOUGHT", {
-         livestreamId,
-      })
+   canAccessRecording(userStats: UserStats, livestreamId: string) {
+      if (userStats?.recordingsBought?.includes(livestreamId)) {
+         return true
+      }
+
+      return false
    }
 
    /**

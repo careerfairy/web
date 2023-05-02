@@ -14,15 +14,14 @@ import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import nookies from "nookies"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import RecordedEventsCarousel from "../components/views/portal/recorded-events/RecordedEventsCarousel"
 import DateUtil from "../util/DateUtil"
-import CookiesUtil from "../util/CookiesUtil"
 import { Box } from "@mui/material"
-import { mapFromServerSide } from "util/serverUtil"
 import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
+import { mapFromServerSide } from "util/serverUtil"
+import { getUserTokenFromCookie } from "util/serverUtil"
 
 const PortalPage = ({
    highlights,
@@ -112,17 +111,7 @@ const PortalPage = ({
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-   const cookies = nookies.get(ctx)
-
-   let token: { email: string } | null = null
-   try {
-      token = CookiesUtil.parseJwt({
-         token: cookies.token,
-         isServerSide: true,
-      })
-   } catch (e) {
-      console.error("Failed to parse cookie.token", e, cookies.token)
-   }
+   const token = getUserTokenFromCookie(ctx)
 
    const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
 
