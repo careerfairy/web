@@ -5,17 +5,21 @@ import useIsMobile from "../../components/custom-hook/useIsMobile"
 import GenericNavList from "./GenericNavList"
 import { createContext, useContext, useMemo } from "react"
 import FooterV2 from "../../components/views/footer/FooterV2"
+import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
+import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 
 type IGenericDashboardContext = {
    isOverPortalBanner: boolean
    isPortalPage: boolean
    hasRecordings: boolean
+   handleOpenCreditsDialog: () => void
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
    isOverPortalBanner: false,
    isPortalPage: false,
    hasRecordings: false,
+   handleOpenCreditsDialog: () => {},
 })
 
 type Props = {
@@ -37,11 +41,22 @@ const GenericDashboardLayout = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
+   const [
+      creditsDialogOpen,
+      handleOpenCreditsDialog,
+      handleCloseCreditsDialog,
+   ] = useDialogStateHandler()
+
    // TODO: Needs to be updated after the new banner.
    //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
    const value = useMemo<IGenericDashboardContext>(
-      () => ({ isOverPortalBanner, isPortalPage, hasRecordings }),
-      [hasRecordings, isOverPortalBanner, isPortalPage]
+      () => ({
+         isOverPortalBanner,
+         isPortalPage,
+         hasRecordings,
+         handleOpenCreditsDialog,
+      }),
+      [handleOpenCreditsDialog, hasRecordings, isOverPortalBanner, isPortalPage]
    )
 
    return (
@@ -55,6 +70,12 @@ const GenericDashboardLayout = ({
          >
             {children}
             <FooterV2 background={bgColor || "#F7F8FC"} />
+            {creditsDialogOpen ? (
+               <CreditsDialog
+                  onClose={handleCloseCreditsDialog}
+                  open={creditsDialogOpen}
+               />
+            ) : null}
          </AdminGenericLayout>
       </GenericDashboardContext.Provider>
    )
