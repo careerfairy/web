@@ -23,7 +23,7 @@ const schema = yup.object().shape({
    firstName: signupSchema.firstName,
    lastName: signupSchema.lastName,
    linkedinUrl: signupSchema.linkedinUrl,
-   fieldOfStudy: signupSchema.fieldOfStudy,
+   fieldOfStudy: signupSchema.fieldOfStudyNotMandatory,
    position: signupSchema.position,
    avatar: signupSchema.avatar,
 })

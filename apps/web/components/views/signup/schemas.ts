@@ -48,7 +48,15 @@ export const signupSchema = {
          name: yup.string(),
       })
       .required("Please select a university"),
-   fieldOfStudy: yup.object().nullable().shape({
+   fieldOfStudy: yup
+      .object()
+      .nullable()
+      .shape({
+         id: yup.string(),
+         name: yup.string(),
+      })
+      .required("Please select a field of study"),
+   fieldOfStudyNotMandatory: yup.object().nullable().shape({
       id: yup.string(),
       name: yup.string(),
    }),
