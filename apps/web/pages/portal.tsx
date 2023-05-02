@@ -25,7 +25,7 @@ import {
    getUserTokenFromCookie,
    mapFromServerSide,
 } from "util/serverUtil"
-import getCarouselContent from "../components/views/portal/content-carousel/getCarouselContent"
+import CarouselContentService from "../components/views/portal/content-carousel/CarouselContentService"
 
 const PortalPage = ({
    comingUpNextEvents,
@@ -148,13 +148,15 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
 
-   const carouselContent = await getCarouselContent({
+   const carouselContentService = new CarouselContentService({
       userData: userData,
       userStats: userStats,
       pastLivestreams: pastEvents || [],
       upcomingLivestreams: comingUpNextEvents || [],
       registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
    })
+
+   const carouselContent = await carouselContentService.getCarouselContent()
 
    return {
       props: {
