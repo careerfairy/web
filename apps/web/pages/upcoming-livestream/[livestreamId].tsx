@@ -307,36 +307,6 @@ const UpcomingLivestreamPage = ({
       query?.utm_medium === "email" &&
       query?.utm_campaign === "newsletter"
 
-   const registerButtonLabel = useMemo(() => {
-      if (participated && isPastEvent) return "You attended this event"
-
-      if (isPastEvent) return "The event is over"
-
-      if (registered) return "You're booked"
-
-      if (
-         stream.maxRegistrants &&
-         stream.maxRegistrants > 0 &&
-         stream.registeredUsers &&
-         stream.maxRegistrants <= stream.registeredUsers.length
-      ) {
-         return "No spots left"
-      }
-
-      if (authenticatedUser) {
-         return "Attend Event"
-      }
-
-      return "Join to attend"
-   }, [
-      participated,
-      isPastEvent,
-      registered,
-      stream.maxRegistrants,
-      stream.registeredUsers,
-      authenticatedUser,
-   ])
-
    const isRegistrationDisabled = useMemo(() => {
       if (isPastEvent) return true
       //User should always be able to cancel registration
