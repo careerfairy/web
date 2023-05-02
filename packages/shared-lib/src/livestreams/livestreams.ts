@@ -292,7 +292,13 @@ export interface LivestreamRecordingDetails extends Identifiable {
    livestreamId: string
    livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched?: number
+
+   // all the recording viewers
    viewers: string[]
+
+   // recording viewers that bought access
+   // for analytics purposes
+   viewersThroughCredits?: string[]
    views: number
 }
 

@@ -31,7 +31,6 @@ import RecordingPlayer from "../RecordingPlayer"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
-import { errorLogAndNotify } from "util/CommonUtil"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
@@ -275,11 +274,18 @@ const HeroSection = ({
          livestreamId: stream.id,
          userId: userData.userEmail,
          livestreamStartDate: stream.start,
+         usedCredits: Boolean(userHasBoughtRecording),
       })
 
       // play recording
       handleRecordingPlay()
-   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
+   }, [
+      handleRecordingPlay,
+      stream?.id,
+      stream?.start,
+      userData?.userEmail,
+      userHasBoughtRecording,
+   ])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
