@@ -4,7 +4,6 @@ import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
    getHumanStringDescriptionForAction,
-   getCustomRewardMessageForAction,
    RewardAction,
    getCustomRewardMessageForAction,
    RewardDoc,

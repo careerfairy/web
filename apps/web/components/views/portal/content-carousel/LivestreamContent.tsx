@@ -26,13 +26,14 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
    handleClickRegister,
    userStats,
 }) => {
-   const { data: livestream } = useLivestream(livestreamData.id, livestreamData)
+   const { data } = useLivestream(livestreamData.id, livestreamData)
+   const livestream = data || livestreamData
 
    const hosts = useLivestreamHosts(livestream)
-
    const livestreamPresenter = useMemo(
-      () => LivestreamPresenter.createFromDocument(livestream),
-      [livestream]
+      () =>
+         LivestreamPresenter.createFromDocument(livestream || livestreamData),
+      [livestream, livestreamData]
    )
 
    const {
