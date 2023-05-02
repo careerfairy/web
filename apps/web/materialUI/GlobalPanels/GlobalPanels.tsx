@@ -60,8 +60,8 @@ export const AnimatedTabPanel: FC<TabPanelProps> = (props) => {
          aria-labelledby={`simple-tab-${value}`}
          {...other}
          in={activeValue === value}
-         timeout="auto"
          unmountOnExit
+         appear={false}
       >
          <Box>{children}</Box>
       </Grow>

@@ -151,6 +151,8 @@ export interface IUserRepository {
    ): Promise<void>
 
    getStats(userDataId: string): Promise<UserStats>
+
+   updateResume(userEmail: string, resumeUrl: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -691,6 +693,16 @@ export class FirebaseUserRepository
          .collection("companiesUserFollows")
          .withConverter(createCompatGenericConverter<CompanyFollowed>())
          .limit(limit)
+   }
+
+   updateResume(userEmail: string, resumeUrl: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+
+      const toUpdate: Pick<UserData, "userResume"> = {
+         userResume: resumeUrl,
+      }
+
+      return docRef.update(toUpdate)
    }
 }
 
