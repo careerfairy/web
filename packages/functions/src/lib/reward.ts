@@ -169,6 +169,17 @@ export const rewardApply = async (reward: RewardDoc, userEmail: string) => {
       case "LIVESTREAM_USER_HAND_RAISED":
          await userRepo.incrementStat(userEmail, "totalHandRaises")
          break
+
+      /**
+       * User bought a recording, add the recording id to the user's array of recordings bought
+       */
+      case "LIVESTREAM_RECORDING_BOUGHT":
+         await userRepo.addToStatArray(
+            userEmail,
+            "recordingsBought",
+            reward.livestreamId
+         )
+         break
    }
 }
 

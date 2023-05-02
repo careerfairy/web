@@ -1,5 +1,4 @@
-import PropTypes from "prop-types"
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
+import React, { memo, useCallback, useMemo, useState } from "react"
 import {
    Avatar,
    ListItemIcon,
@@ -92,44 +91,46 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
    )
 }
 
-export const AddToCalendar = memo(
-   ({ children, event, filename = "download" }) => {
-      const [anchorEl, setAnchorEl] = useState(null)
-      const urls = useMemo(() => makeUrls(event), [event])
-
-      const handleClick = useCallback((event) => {
-         dataLayerEvent("event_add_to_calendar")
-         setAnchorEl(event.currentTarget)
-      }, [])
-
-      const handleClose = useCallback(() => {
-         setAnchorEl(null)
-      }, [])
-
-      return (
-         <div>
-            <>
-               {children(handleClick)}
-               <Dropdown
-                  filename={filename}
-                  anchorEl={anchorEl}
-                  handleClose={handleClose}
-                  urls={urls}
-               />
-            </>
-         </div>
-      )
+type Props = {
+   children: (handler: (event: any) => void) => void
+   event: {
+      name: string
+      details: string
+      location: string
+      startsAt: string
+      endsAt: string
    }
-)
-
-AddToCalendar.propTypes = {
-   children: PropTypes.any.isRequired,
-   event: PropTypes.shape({
-      name: PropTypes.string,
-      details: PropTypes.string,
-      location: PropTypes.string,
-      startsAt: PropTypes.string,
-      endsAt: PropTypes.string,
-   }),
-   filename: PropTypes.string,
+   filename: string
 }
+
+export const AddToCalendar = memo(function AddToCalendar({
+   children,
+   event,
+   filename = "download",
+}: Props) {
+   const [anchorEl, setAnchorEl] = useState(null)
+   const urls = useMemo(() => makeUrls(event), [event])
+
+   const handleClick = useCallback((event) => {
+      dataLayerEvent("event_add_to_calendar")
+      setAnchorEl(event.currentTarget)
+   }, [])
+
+   const handleClose = useCallback(() => {
+      setAnchorEl(null)
+   }, [])
+
+   return (
+      <div>
+         <>
+            {children(handleClick)}
+            <Dropdown
+               filename={filename}
+               anchorEl={anchorEl}
+               handleClose={handleClose}
+               urls={urls}
+            />
+         </>
+      </div>
+   )
+})

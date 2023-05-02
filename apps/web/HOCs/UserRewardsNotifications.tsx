@@ -4,8 +4,8 @@ import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
 import {
    getHumanStringDescriptionForAction,
-   getCustomRewardMessageForAction,
    RewardAction,
+   getCustomRewardMessageForAction,
    RewardDoc,
 } from "@careerfairy/shared-lib/dist/rewards"
 import RewardNotification from "../components/views/notifications/RewardNotification"
@@ -48,7 +48,9 @@ const UserRewardsNotifications = ({ children }) => {
                let notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`
 
                if (onlyOneReward) {
-                  const customMessage = getCustomRewardMessageForAction(action)
+                  const customMessage = getCustomRewardMessageForAction(
+                     action as RewardAction
+                  )
                   if (customMessage) {
                      notification = customMessage
                   }

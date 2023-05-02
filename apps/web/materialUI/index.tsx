@@ -41,6 +41,7 @@ declare module "@mui/material/Button" {
    interface ButtonPropsColorOverrides {
       grey: true
       gold: true
+      black: true
    }
 }
 
@@ -69,12 +70,14 @@ declare module "@mui/material/styles" {
    interface Palette {
       navyBlue: PaletteColor
       gold: PaletteColor
+      black: PaletteColor
       tertiary: PaletteColor
    }
 
    interface PaletteOptions {
       navyBlue: PaletteColorOptions
       gold: PaletteColorOptions
+      black: PaletteColorOptions
       tertiary: PaletteColorOptions
    }
 
@@ -111,6 +114,13 @@ const gold: PaletteColorOptions = {
    contrastText: "#FFFFFF",
    dark: "#FFC34F",
    light: "#FFC34F",
+}
+
+const blackColors: PaletteColorOptions = {
+   main: tertiary.contrastText,
+   contrastText: primary.main,
+   dark: tertiary.contrastText,
+   light: tertiary.contrastText,
 }
 
 const black = "#000000"
@@ -169,6 +179,7 @@ export const rootThemeObj = (mode: PaletteMode): DefaultTheme =>
                     light: "#424242",
                  }),
          },
+         black: blackColors,
       },
       breakpoints: {
          values: {
@@ -477,6 +488,15 @@ const getComponents = (theme: DefaultTheme): Components => ({
             props: { color: "error", variant: "contained" },
             style: {
                boxShadow: theme.boxShadows.error_5_15_50,
+            },
+         },
+
+         {
+            props: { color: "black", variant: "contained" },
+            style: {
+               boxShadow: "none",
+               backgroundColor: theme.palette.text.primary,
+               color: theme.palette.primary.main,
             },
          },
       ],

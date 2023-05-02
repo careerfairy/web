@@ -1,5 +1,9 @@
 import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { getServerSideStream } from "../../util/serverUtil"
+import {
+   getServerSideStream,
+   getServerSideUserStats,
+   getUserTokenFromCookie,
+} from "../../util/serverUtil"
 import { getStreamMetaInfo } from "../../util/SeoUtil"
 import UpcomingLayout from "../../layouts/UpcomingLayout"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
@@ -31,16 +35,15 @@ import EventSEOSchemaScriptTag from "../../components/views/common/EventSEOSchem
 import { dataLayerLivestreamEvent } from "../../util/analyticsUtils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import FooterButton from "../../components/views/common/FooterButton"
-import { livestreamRepo } from "../../data/RepositoryInstances"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
-import {
-   LivestreamEvent,
-   RecordingToken,
-} from "@careerfairy/shared-lib/livestreams"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { omit } from "lodash"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
 import { Group } from "@careerfairy/shared-lib/groups"
+import { GetServerSidePropsContext } from "next"
+import { UserStats } from "@careerfairy/shared-lib/users"
+import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
 
 type TrackProps = {
    id: string
@@ -48,7 +51,11 @@ type TrackProps = {
    extraData: LivestreamEvent
 }
 
-const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
+const UpcomingLivestreamPage = ({
+   serverStream,
+   userEmail,
+   userStatsPlain,
+}) => {
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
@@ -77,6 +84,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
    const [stream, setStream] = useState(
       LivestreamPresenter.parseDocument(serverStream, fromDate)
    )
+
    const streamPresenter = useMemo(
       () => LivestreamPresenter.createFromDocument(stream),
       [stream]
@@ -95,7 +103,18 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
 
    const [unfilteredGroups, setUnfilteredGroups] = useState<Group[]>([])
 
-   const { authenticatedUser, userData, isLoggedOut, isLoggedIn } = useAuth()
+   const { authenticatedUser, userData, userStats, isLoggedOut, isLoggedIn } =
+      useAuth()
+
+   const updatedStats = useMemo(() => {
+      return userStats ? userStats : userStatsPlain
+   }, [userStatsPlain, userStats])
+
+   const { showRecording, userHasBoughtRecording } = useRecordingAccess(
+      userEmail,
+      streamPresenter,
+      updatedStats
+   )
 
    const companyGroupData = useMemo<Group | null>(() => {
       const companyGroups = unfilteredGroups?.filter(
@@ -115,13 +134,6 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       return Boolean(
          authenticatedUser &&
             stream?.registeredUsers?.includes(authenticatedUser.email)
-      )
-   }, [stream, authenticatedUser])
-
-   const participated = useMemo(() => {
-      return Boolean(
-         authenticatedUser &&
-            stream?.participatingStudents?.includes(authenticatedUser.email)
       )
    }, [stream, authenticatedUser])
 
@@ -295,36 +307,6 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       query?.utm_medium === "email" &&
       query?.utm_campaign === "newsletter"
 
-   const registerButtonLabel = useMemo(() => {
-      if (participated && isPastEvent) return "You attended this event"
-
-      if (isPastEvent) return "The event is over"
-
-      if (registered) return "You're booked"
-
-      if (
-         stream.maxRegistrants &&
-         stream.maxRegistrants > 0 &&
-         stream.registeredUsers &&
-         stream.maxRegistrants <= stream.registeredUsers.length
-      ) {
-         return "No spots left"
-      }
-
-      if (authenticatedUser) {
-         return "Attend Event"
-      }
-
-      return "Join to attend"
-   }, [
-      participated,
-      isPastEvent,
-      registered,
-      stream.maxRegistrants,
-      stream.registeredUsers,
-      authenticatedUser,
-   ])
-
    const isRegistrationDisabled = useMemo(() => {
       if (isPastEvent) return true
       //User should always be able to cancel registration
@@ -474,20 +456,6 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       await startRegistrationProcess(true)
    }, [startRegistrationProcess])
 
-   /**
-    * Show recording if user is registered, the event is in the past, the event was recorded and did not pass the { MAX_DAYS_TO_SHOW_RECORDING }
-    */
-   const showRecording = useMemo(
-      () =>
-         Boolean(
-            streamPresenter.isAbleToShowRecording(
-               authenticatedUser?.email,
-               recordingSid
-            )
-         ),
-      [authenticatedUser?.email, recordingSid, streamPresenter]
-   )
-
    return (
       <>
          <UpcomingLayout viewRef={viewRef}>
@@ -496,9 +464,9 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
             <HeroSection
                backgroundImage={getResizedUrl(stream.backgroundImageUrl, "lg")}
                stream={stream}
+               streamPresenter={streamPresenter}
                eventInterests={eventInterests}
                streamAboutToStart={streamAboutToStart}
-               registerButtonLabel={registerButtonLabel}
                disabled={isRegistrationDisabled}
                registered={registered}
                streamLanguage={streamLanguage}
@@ -506,8 +474,10 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                hosts={filteredGroups}
                onRegisterClick={handleRegisterClick}
                showScrollButton={true}
+               isPastEvent={isPastEvent}
                showRecording={showRecording}
-               recordingSid={recordingSid}
+               userHasBoughtRecording={userHasBoughtRecording}
+               userIsLoggedIn={Boolean(userEmail)}
             />
             <Navigation
                aboutRef={aboutRef}
@@ -602,24 +572,28 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
 export async function getServerSideProps({
    params: { livestreamId },
    query: { groupId },
-}) {
-   const serverStream = await getServerSideStream(livestreamId)
+   req,
+}: GetServerSidePropsContext) {
+   const token = getUserTokenFromCookie({ req })
+
+   const serverStream = await getServerSideStream(livestreamId as string)
 
    if (serverStream) {
-      const streamPresenter =
-         LivestreamPresenter.createFromDocument(serverStream)
-      let streamRecordingToken: RecordingToken
-
-      if (new Date() <= streamPresenter.recordingAccessTimeLeft()) {
-         streamRecordingToken =
-            await livestreamRepo.getLivestreamRecordingToken(livestreamId)
+      let userStats: UserStats = null
+      if (token?.email) {
+         userStats = await getServerSideUserStats(token.email)
       }
 
       return {
          props: {
             serverStream: serializeLivestream(serverStream),
             groupId: groupId || null,
-            recordingSid: streamRecordingToken?.sid || null,
+            // allows the client side to know in the first render if the user
+            // has bought access to the recording or not
+            userStatsPlain: userStats || null,
+            // improve UX by allowing the client side to know beforehand the
+            // user was signed in before fetching the firestore auth data
+            userEmail: token?.email ?? null,
          }, // will be passed to the page component as props
       }
    } else {
@@ -633,7 +607,6 @@ const serializeLivestream = (stream: LivestreamEvent): object => {
    const serverSideStream = LivestreamPresenter.serializeDocument(stream)
 
    return omit(serverSideStream, [
-      "registeredUsers",
       "talentPool",
       "participatingStudents",
       "participants",
