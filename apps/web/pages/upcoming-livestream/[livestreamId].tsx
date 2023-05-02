@@ -286,6 +286,15 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
       }
    }, [replace, stream?.hasStarted, stream?.id])
 
+   /**
+    * Mark this event registration as recommended if the user came from the
+    * careerfairy newsletter
+    */
+   const isRecommended =
+      query?.utm_source === "careerfairy" &&
+      query?.utm_medium === "email" &&
+      query?.utm_campaign === "newsletter"
+
    const registerButtonLabel = useMemo(() => {
       if (participated && isPastEvent) return "You attended this event"
 
@@ -577,6 +586,7 @@ const UpcomingLivestreamPage = ({ serverStream, recordingSid }) => {
                promptOtherEventsOnFinal
                livestream={joinGroupModalData?.livestream}
                groups={joinGroupModalData?.groups}
+               isRecommended={isRecommended ? true : undefined}
             />
          </UpcomingLayout>
          {mobile && !isRegistrationDisabled && !registered ? (
