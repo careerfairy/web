@@ -8,7 +8,7 @@ const useLivestreamHosts = (livestream: LivestreamEvent) => {
    const firebase = useFirebaseService()
 
    useEffect(() => {
-      if (livestream.groupIds?.length) {
+      if (livestream?.groupIds?.length) {
          ;(async function getHosts() {
             const newHosts = await firebase.getCareerCentersByGroupId(
                livestream.groupIds
@@ -17,7 +17,7 @@ const useLivestreamHosts = (livestream: LivestreamEvent) => {
             setHosts(newHosts)
          })()
       }
-   }, [firebase, livestream.groupIds])
+   }, [firebase, livestream?.groupIds])
 
    return hosts
 }
