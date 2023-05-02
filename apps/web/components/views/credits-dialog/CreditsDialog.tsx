@@ -71,6 +71,8 @@ const views = [
    <ReferFriendsView key={referFriendViewKey} />,
 ] as const
 
+type ViewStringKey = "GET_MORE_CREDITS" | "CV" | "REFER_FRIENDS"
+
 type ContentProps = {
    handleClose: () => void
 }
@@ -81,38 +83,34 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
 
    const [value, setValue] = useState(0)
 
-   const handleGoToGetMoreCreditsView = useCallback(() => {
-      setValue(getMoreCreditsViewKey)
-   }, [])
-
-   const handleGoToCVView = useCallback(() => {
-      setValue(cvViewKey)
-   }, [])
-
-   const handleGoToReferFriendView = useCallback(() => {
-      setValue(referFriendViewKey)
-   }, [])
-
    const handleGoToNextLivestreams = useCallback(() => {
       void push("/next-livestreams")
       handleClose()
    }, [handleClose, push])
 
+   const handleGoToView = useCallback((view: ViewStringKey) => {
+      switch (view) {
+         case "GET_MORE_CREDITS":
+            setValue(getMoreCreditsViewKey)
+            break
+         case "CV":
+            setValue(cvViewKey)
+            break
+         case "REFER_FRIENDS":
+            setValue(referFriendViewKey)
+            break
+         default:
+            throw new Error("Invalid view")
+      }
+   }, [])
+
    const contextValue = useMemo<DialogContextType>(
       () => ({
          handleClose,
-         handleGoToReferFriendView,
-         handleGoToCVView,
-         handleGoToGetMoreCreditsView,
          handleGoToNextLivestreams,
+         handleGoToView,
       }),
-      [
-         handleClose,
-         handleGoToCVView,
-         handleGoToGetMoreCreditsView,
-         handleGoToNextLivestreams,
-         handleGoToReferFriendView,
-      ]
+      [handleClose, handleGoToNextLivestreams, handleGoToView]
    )
 
    return (
@@ -143,18 +141,14 @@ const Content: FC<ContentProps> = ({ handleClose }) => {
 
 type DialogContextType = {
    handleClose: () => void
-   handleGoToCVView: () => void
    handleGoToNextLivestreams: () => void
-   handleGoToReferFriendView: () => void
-   handleGoToGetMoreCreditsView: () => void
+   handleGoToView: (view: ViewStringKey) => void
 }
 
 const DialogContext = createContext<DialogContextType>({
    handleClose: () => {},
-   handleGoToCVView: () => {},
    handleGoToNextLivestreams: () => {},
-   handleGoToReferFriendView: () => {},
-   handleGoToGetMoreCreditsView: () => {},
+   handleGoToView: () => {},
 })
 
 export const useCreditsDialogContext = () => {
