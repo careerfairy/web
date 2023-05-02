@@ -28,7 +28,7 @@ const AboutDialog = ({ handleClose }: Props) => {
       () => ({
          extraInfo: group.extraInfo || "",
          companySize: group.companySize || "",
-         companyIndustries: group.companyIndustries || null,
+         companyIndustries: group.companyIndustries || [],
          companyCountry: group.companyCountry || null,
       }),
       [
@@ -151,11 +151,13 @@ const schema = yup.object().shape({
       .min(10, `Must be at least 10 characters`),
    companySize: yup.string().required("Please add the company size"),
    companyIndustries: yup
-      .object()
-      .nullable()
-      .shape({
-         name: yup.string(),
-      })
+      .array()
+      .of(
+         yup.object().nullable().shape({
+            id: yup.string(),
+            name: yup.string(),
+         })
+      )
       .required("Please add the company industry"),
    companyCountry: yup
       .object()
