@@ -138,9 +138,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const results = await Promise.allSettled(promises)
 
    const [comingUpNextEvents, pastEvents, recordedEvents, userStats, userData] =
-      results
-         .filter((result) => result.status === "fulfilled")
-         .map((result) => (result as PromiseFulfilledResult<any>).value)
+      results.map((result) =>
+         result.status === "fulfilled"
+            ? (result as PromiseFulfilledResult<any>).value
+            : null
+      )
 
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
