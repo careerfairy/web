@@ -4,11 +4,11 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 
 const useLivestreamHosts = (livestream: LivestreamEvent) => {
-   const [hosts, setHosts] = useState<Group[]>([])
+   const [hosts, setHosts] = useState<Group[] | undefined>(undefined)
    const firebase = useFirebaseService()
 
    useEffect(() => {
-      if (livestream?.groupIds?.length) {
+      if (livestream.groupIds?.length) {
          ;(async function getHosts() {
             const newHosts = await firebase.getCareerCentersByGroupId(
                livestream.groupIds
@@ -16,8 +16,10 @@ const useLivestreamHosts = (livestream: LivestreamEvent) => {
 
             setHosts(newHosts)
          })()
+      } else {
+         setHosts([])
       }
-   }, [firebase, livestream?.groupIds])
+   }, [firebase, livestream.groupIds])
 
    return hosts
 }

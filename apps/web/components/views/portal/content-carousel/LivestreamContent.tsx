@@ -100,8 +100,8 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
                onClick={() =>
                   handleClickRegister(
                      livestream,
-                     hosts[0]?.id,
-                     hosts,
+                     hosts?.[0]?.id,
+                     hosts || [],
                      hasRegistered
                   )
                }
