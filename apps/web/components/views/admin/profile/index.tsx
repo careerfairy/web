@@ -4,12 +4,12 @@ import { Formik } from "formik"
 import React, { useCallback, useMemo } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import * as yup from "yup"
-import { URL_REGEX } from "components/util/constants"
-import { errorLogAndNotify } from "../../../../util/CommonUtil"
 import { userRepo } from "../../../../data/RepositoryInstances"
 import { UserData } from "@careerfairy/shared-lib/users"
 import PersonalInfo from "./PersonalInfo"
 import SocialInfo from "./SocialInfo"
+import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
+import { signupSchema } from "../../signup/schemas"
 
 const styles = sxStyles({
    root: {
@@ -20,25 +20,17 @@ const styles = sxStyles({
 })
 
 const schema = yup.object().shape({
-   firstName: yup
-      .string()
-      .required("The first name is required")
-      .max(50, "Cannot be longer than 50 characters"),
-   lastName: yup
-      .string()
-      .required("The last name is required")
-      .max(50, "Cannot be longer than 50 characters"),
-   linkedinUtl: yup.string().matches(URL_REGEX, "Please enter a valid URL"),
-   fieldOfStudy: yup.object().nullable().shape({
-      id: yup.string(),
-      name: yup.string(),
-   }),
-   position: yup.string().max(50, "Cannot be longer than 50 characters"),
-   avatar: yup.string(),
+   firstName: signupSchema.firstName,
+   lastName: signupSchema.lastName,
+   linkedinUrl: signupSchema.linkedinUrl,
+   fieldOfStudy: signupSchema.fieldOfStudy,
+   position: signupSchema.position,
+   avatar: signupSchema.avatar,
 })
 
 const Profile = () => {
    const { userData } = useAuth()
+   const { successNotification, errorNotification } = useSnackbarNotifications()
 
    const initialValues = useMemo<Partial<UserData>>(
       () => ({
@@ -68,11 +60,13 @@ const Profile = () => {
                userData.userEmail,
                values
             )
+
+            successNotification("Your data was updated successfully")
          } catch (e) {
-            errorLogAndNotify(e)
+            errorNotification(e, "Failed to updated your data")
          }
       },
-      [userData.userEmail]
+      [errorNotification, successNotification, userData.userEmail]
    )
 
    return (
