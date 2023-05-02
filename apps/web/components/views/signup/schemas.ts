@@ -1,3 +1,4 @@
+import { URL_REGEX } from "components/util/constants"
 import * as yup from "yup"
 import { possibleGenders } from "../../../constants/forms"
 
@@ -47,14 +48,10 @@ export const signupSchema = {
          name: yup.string(),
       })
       .required("Please select a university"),
-   fieldOfStudy: yup
-      .object()
-      .nullable()
-      .shape({
-         id: yup.string(),
-         name: yup.string(),
-      })
-      .required("Please select a field of study"),
+   fieldOfStudy: yup.object().nullable().shape({
+      id: yup.string(),
+      name: yup.string(),
+   }),
    levelOfStudy: yup
       .object()
       .nullable()
@@ -63,4 +60,7 @@ export const signupSchema = {
          name: yup.string(),
       })
       .required("Please select a level of study"),
+   linkedinUrl: yup.string().matches(URL_REGEX, "Please enter a valid URL"),
+   position: yup.string().max(50, "Cannot be longer than 50 characters"),
+   avatar: yup.string(),
 }
