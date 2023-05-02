@@ -28,13 +28,12 @@ const styles = sxStyles({
    },
    iconsWrapper: {
       display: "flex",
-      flexDirection: { xs: "column", md: "row" },
-      mt: 3,
+      flexDirection: "column",
+      mt: 2,
    },
-   icon: {
+   tag: {
       display: "flex",
-      ml: { md: 5 },
-      mt: { xs: 1, md: "unset" },
+      my: 1,
    },
 })
 
@@ -59,7 +58,7 @@ const AboutSection = () => {
       () => (
          <Box sx={styles.iconsWrapper}>
             {companyCountry?.name ? (
-               <Box display={"flex"}>
+               <Box sx={styles.tag}>
                   <MapPinIcon size={20} />
                   <Typography variant="body1" color="black" ml={1}>
                      {companyCountry.name}
@@ -68,17 +67,16 @@ const AboutSection = () => {
             ) : null}
 
             {companyIndustries?.length ? (
-               <Box sx={styles.icon}>
+               <Box sx={styles.tag}>
                   <TagIcon size={20} />
                   <Typography variant="body1" color="black" ml={1}>
-                     {/*TODO-GS: beautify this*/}
                      {companyIndustries.map(({ name }) => name).join(", ")}
                   </Typography>
                </Box>
             ) : null}
 
             {companySize ? (
-               <Box sx={styles.icon}>
+               <Box sx={styles.tag}>
                   <UsersIcon size={20} />
                   <Typography variant="body1" color="black" ml={1}>
                      {companySize}
