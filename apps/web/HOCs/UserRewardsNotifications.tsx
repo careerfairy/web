@@ -2,8 +2,13 @@ import { useAuth } from "./AuthProvider"
 import { useEffect } from "react"
 import { useSnackbar } from "notistack"
 import { useFirebaseService } from "../context/firebase/FirebaseServiceContext"
-import { Reward } from "../types/reward"
-import { getHumanStringDescriptionForAction } from "@careerfairy/shared-lib/dist/rewards"
+import {
+   getHumanStringDescriptionForAction,
+   getCustomRewardMessageForAction,
+   RewardAction,
+   RewardDoc,
+} from "@careerfairy/shared-lib/dist/rewards"
+import RewardNotification from "../components/views/notifications/RewardNotification"
 
 const UserRewardsNotifications = ({ children }) => {
    const { userData } = useAuth()
@@ -21,9 +26,9 @@ const UserRewardsNotifications = ({ children }) => {
              * a notification per reward (imagine the scenario where a user has invited a lot of other users for a
              * stream, next time opening the website he would receive a spam of notifications)
              */
-            const groups = {}
+            const groups: Partial<Record<RewardAction, RewardDoc[]>> = {}
             querySnapshot.forEach((doc) => {
-               let reward = doc.data() as Reward
+               let reward = doc.data() as RewardDoc
                if (groups[reward.action]) {
                   groups[reward.action].push(reward)
                } else {
@@ -33,14 +38,31 @@ const UserRewardsNotifications = ({ children }) => {
 
             // Show a notification
             for (let action in groups) {
-               const actionHumanString =
-                  getHumanStringDescriptionForAction(action)
+               const actionHumanString = getHumanStringDescriptionForAction(
+                  action as RewardAction
+               )
+
                const total = groups[action].length
-               const rewardsPlural = total === 1 ? "reward" : "rewards"
-               const notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`
+               const onlyOneReward = total === 1
+               const rewardsPlural = onlyOneReward ? "reward" : "rewards"
+               let notification = `You have received ${total} ${rewardsPlural} for ${actionHumanString}!`
+
+               if (onlyOneReward) {
+                  const customMessage = getCustomRewardMessageForAction(
+                     action as RewardAction
+                  )
+                  if (customMessage) {
+                     notification = customMessage
+                  }
+               }
+
                enqueueSnackbar(notification, {
                   variant: "success",
                   preventDuplicate: false,
+                  key: action,
+                  content: (key, message) => (
+                     <RewardNotification id={key} message={message} />
+                  ),
                })
             }
 
@@ -58,6 +80,7 @@ const UserRewardsNotifications = ({ children }) => {
             }
          }
       )
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [userData?.id])
 
    return children

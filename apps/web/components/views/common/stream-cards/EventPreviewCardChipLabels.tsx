@@ -1,4 +1,4 @@
-import { Badge, Box, Chip, Stack } from "@mui/material"
+import { Badge, Box, Chip, Stack, Typography } from "@mui/material"
 import LiveIcon from "@mui/icons-material/RadioButtonChecked"
 import CheckIcon from "@mui/icons-material/CheckCircle"
 
@@ -29,6 +29,7 @@ type Props = {
    isLive: boolean
    hasRegistered: boolean
    hasJobToApply: boolean
+   recordingAvailableDays?: number
 }
 
 const EventPreviewCardChipLabels = ({
@@ -37,6 +38,7 @@ const EventPreviewCardChipLabels = ({
    isLive,
    hasRegistered,
    hasJobToApply,
+   recordingAvailableDays,
 }: Props) => {
    let leftChips = []
    let rightChip
@@ -79,6 +81,39 @@ const EventPreviewCardChipLabels = ({
             onDelete={() => {}}
             color={"info"}
             label={"Easy Apply"}
+         />
+      )
+   }
+
+   if (recordingAvailableDays) {
+      let daysLeftMessage: JSX.Element
+
+      if (recordingAvailableDays === 1) {
+         daysLeftMessage = (
+            <Typography ml={0.5} fontWeight={500} color={"error"}>
+               1 Day
+            </Typography>
+         )
+      }
+
+      if (recordingAvailableDays > 1) {
+         daysLeftMessage = (
+            <Typography ml={0.5} fontWeight={500} color={"secondary"}>
+               {recordingAvailableDays} Days
+            </Typography>
+         )
+      }
+
+      leftChips.push(
+         <Chip
+            sx={{ pr: 1 }}
+            color={"info"}
+            label={
+               <Box display={"flex"}>
+                  <Typography fontWeight={500}>Available for</Typography>
+                  {daysLeftMessage}
+               </Box>
+            }
          />
       )
    }

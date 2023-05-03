@@ -1,6 +1,6 @@
 import React, { FC } from "react"
 import * as PropTypes from "prop-types"
-import { Box, SxProps } from "@mui/material"
+import { Box, Grow, SxProps } from "@mui/material"
 import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 type StyledBoxPanelProps = {
@@ -46,6 +46,25 @@ export const TabPanel: FC<TabPanelProps> = (props) => {
       >
          {activeValue === value && <Box>{children}</Box>}
       </div>
+   )
+}
+
+export const AnimatedTabPanel: FC<TabPanelProps> = (props) => {
+   const { children, activeValue, value, ...other } = props
+
+   return (
+      <Grow
+         role="tabpanel"
+         hidden={activeValue !== value}
+         id={`simple-tabpanel-${value}`}
+         aria-labelledby={`simple-tab-${value}`}
+         {...other}
+         in={activeValue === value}
+         unmountOnExit
+         appear={false}
+      >
+         <Box>{children}</Box>
+      </Grow>
    )
 }
 

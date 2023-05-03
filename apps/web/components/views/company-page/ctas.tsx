@@ -2,7 +2,7 @@ import React, { FC, useMemo } from "react"
 import { sxStyles } from "../../../types/commonTypes"
 import { Box, Button, Collapse, Grid, Paper, Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import FollowButton from "./Header/FollowButton"
+import FollowButton from "../common/company/FollowButton"
 import { useCompanyPage } from "./index"
 import { useRouter } from "next/router"
 import Link from "../common/Link"
@@ -65,7 +65,7 @@ export const FollowCompany = () => {
                </Typography>
                <BulletPoints points={followPoints} />
                <span>
-                  <FollowButton group={group} />
+                  <FollowButton color="primary" group={group} />
                </span>
             </Stack>
          </CTACard>

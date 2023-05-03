@@ -13,7 +13,7 @@ type Config = {
    limit: FirebaseInArrayLimit
 }
 
-const functionName = "getRecommendedEvents_v3"
+const functionName = "getRecommendedEvents_v4"
 const useRecommendedEvents = (
    config: Config = {
       limit: 10,

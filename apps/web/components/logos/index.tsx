@@ -1,7 +1,7 @@
 import React from "react"
-import Link from "next/link"
 import { Box, SxProps } from "@mui/material"
 import { styled, Theme } from "@mui/material/styles"
+import Link from "components/views/common/Link"
 
 const LogoImage = styled("img")({
    cursor: "pointer",
@@ -10,21 +10,20 @@ const LogoImage = styled("img")({
 })
 export const MainLogo = ({ white, className, sx }: MainLogoProps) => {
    return (
-      <Link href="/">
-         <Box
-            component="a"
-            sx={{
-               display: "flex",
-            }}
-         >
-            <LogoImage
-               alt="CareerFairy Logo"
-               src={white ? "/logo_white.svg" : "/logo_teal.svg"}
-               className={className}
-               sx={sx}
-            />
-         </Box>
-      </Link>
+      <Box
+         component={Link}
+         href="/"
+         sx={{
+            display: "flex",
+         }}
+      >
+         <LogoImage
+            alt="CareerFairy Logo"
+            src={white ? "/logo_white.svg" : "/logo_teal.svg"}
+            className={className}
+            sx={sx}
+         />
+      </Box>
    )
 }
 

@@ -4,6 +4,10 @@ import {
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/fieldOfStudy/FieldOfStudyRepository"
 import {
+   FirebaseRewardRepository,
+   IRewardRepository,
+} from "@careerfairy/shared-lib/rewards/RewardRepository"
+import {
    bigQueryClient,
    BigQueryRepository,
    IBigQueryRepository,
@@ -34,6 +38,12 @@ export const groupRepo: IGroupFunctionsRepository =
    new GroupFunctionsRepository(firestoreInstance, admin.firestore.FieldValue)
 
 export const userRepo: IUserFunctionsRepository = new UserFunctionsRepository(
+   firestoreInstance,
+   admin.firestore.FieldValue,
+   admin.firestore.Timestamp
+)
+
+export const rewardsRepo: IRewardRepository = new FirebaseRewardRepository(
    firestoreInstance,
    admin.firestore.FieldValue,
    admin.firestore.Timestamp

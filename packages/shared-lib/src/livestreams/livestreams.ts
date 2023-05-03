@@ -1,4 +1,4 @@
-import { Identifiable, OptionGroup } from "../commonTypes"
+import { Identifiable, OptionGroup, UTMParams } from "../commonTypes"
 import { Group, GroupQuestion } from "../groups"
 import {
    UserData,
@@ -244,7 +244,7 @@ export interface UserLivestreamData extends Identifiable {
          referralCode: string
          inviteLivestream: string
       }
-      utm?: any
+      utm?: UTMParams
       referrer?: string
       isRecommended?: boolean
    }
@@ -292,7 +292,13 @@ export interface LivestreamRecordingDetails extends Identifiable {
    livestreamId: string
    livestreamStartDate: firebase.firestore.Timestamp
    minutesWatched?: number
+
+   // all the recording viewers
    viewers: string[]
+
+   // recording viewers that bought access
+   // for analytics purposes
+   viewersThroughCredits?: string[]
    views: number
 }
 
@@ -385,6 +391,8 @@ export type LivestreamEventPublicData = Partial<
       | "created"
       | "impressions"
       | "hasJobs"
+      | "backgroundImageUrl"
+      | "duration"
    >
 > & {
    id: LivestreamEvent["id"]
@@ -417,7 +425,7 @@ export interface LivestreamQuestion extends Identifiable {
 export interface LivestreamPoll extends Identifiable {
    voters: string[]
    timestamp: firebase.firestore.Timestamp
-   state: "current" | "closed"
+   state: "current" | "closed" | "upcoming"
    question: string
    options: {
       id: string
@@ -485,6 +493,8 @@ export const pickPublicDataFromLivestream = (
       impressions: livestreamData.impressions ?? 0,
       created: livestreamData.created ?? null,
       hasJobs: livestreamData.hasJobs ?? false,
+      duration: livestreamData.duration ?? null,
+      backgroundImageUrl: livestreamData.backgroundImageUrl ?? null,
    }
 }
 

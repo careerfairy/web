@@ -8,7 +8,6 @@ import firebaseApp from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { HandRaiseState } from "types/handraise"
 import {
-   errorLogAndNotify,
    getQueryStringFromUrl,
    getReferralInformation,
    shouldUseEmulators,
@@ -59,6 +58,8 @@ import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/
 import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
+import { RewardAction } from "@careerfairy/shared-lib/dist/rewards"
+import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -117,7 +118,7 @@ class FirebaseService {
 
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v5"
+         "createNewUserAccount_v6"
       )
       return createUserInAuthAndFirebase({ userData })
    }
@@ -137,7 +138,7 @@ class FirebaseService {
       )
    }
    createGroup = async (args: {
-      group: Omit<Group, "id" | "groupId">
+      group: Omit<Group, "id" | "groupId" | "triGrams">
       groupQuestions?: GroupQuestion[]
    }) => {
       return this.functions.httpsCallable("createGroup")(args)
@@ -492,9 +493,24 @@ class FirebaseService {
       return ref.get()
    }
 
-   updateCareerCenter = (groupId, newCareerCenter) => {
-      let ref = this.firestore.collection("careerCenterData").doc(groupId)
-      return ref.update(newCareerCenter)
+   updateCareerCenter = (
+      currentGroup: Group,
+      newCareerCenter: Partial<Group>
+   ) => {
+      // We want to get the future state of the group
+      const updatedGroup = Object.assign({}, currentGroup, newCareerCenter)
+
+      let ref = this.firestore
+         .collection("careerCenterData")
+         .doc(currentGroup.id)
+
+      // In the update function, we need to update the triGrams field with the help of the future state of the group
+      const toUpdate: Partial<Group> = {
+         ...newCareerCenter,
+         triGrams: groupTriGrams(updatedGroup.universityName),
+      }
+
+      return ref.update(toUpdate)
    }
 
    deleteCareerCenterFromAllUsers = (careerCenterId) => {
@@ -2134,7 +2150,7 @@ class FirebaseService {
 
    /**
     * @param {string} livestreamId
-    * @param authenticatedUser
+    * @param userData
     * @param {*[]} groupsWithPolicies
     * @param userAnsweredLivestreamQuestions
     * @param options - {isRecommended: boolean}
@@ -3058,23 +3074,6 @@ class FirebaseService {
    }
 
    // Rewards
-
-   rewardLivestreamAttendance = async (
-      livestreamId: string,
-      referralCode: string // invite from user owner of the referral code
-   ) => {
-      return this.functions.httpsCallable("rewardLivestreamAttendance")({
-         livestreamId,
-         referralCode,
-      })
-   }
-
-   rewardUserAction = async (action: string, livestreamId?: string) => {
-      return this.functions.httpsCallable("rewardUserAction")({
-         action,
-         livestreamId,
-      })
-   }
 
    rewardListenToUnSeenUserRewards = (
       userDataId,

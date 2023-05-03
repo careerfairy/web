@@ -28,10 +28,10 @@ import { EnsureUserIsLoggedIn } from "../../../../HOCs/AuthSuspenseHelpers"
 import KeyboardDoubleArrowDownIcon from "@mui/icons-material/KeyboardDoubleArrowDown"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import RecordingPlayer from "../RecordingPlayer"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import useCountTime from "../../../custom-hook/useCountTime"
+import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 
 const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    if (showBigVideoPlayer) {
@@ -44,6 +44,7 @@ const getMinHeight = (smallVerticalScreen, showBigVideoPlayer) => {
    }
    return "auto"
 }
+
 const styles = {
    root: (theme, smallVerticalScreen, showBigVideoPlayer) => ({
       minHeight: getMinHeight(smallVerticalScreen, showBigVideoPlayer),
@@ -188,24 +189,29 @@ const styles = {
 
 const HeroSection = ({
    backgroundImage,
-   registerButtonLabel,
    onRegisterClick,
    disabled,
    registered,
    stream,
+   streamPresenter,
    hosts,
    numberOfSpotsRemaining,
    eventInterests,
    streamAboutToStart,
    streamLanguage,
    showScrollButton = false,
+   isPastEvent,
    showRecording = false,
-   recordingSid = null,
+   userHasBoughtRecording = false,
+   userIsLoggedIn = false,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
    const smallVerticalScreen = useMediaQuery("(max-height:700px)") && !isMobile
    const { userData } = useAuth()
+   const [recordingSid, setRecordingSid] = useState(null)
+   const { errorNotification } = useSnackbarNotifications()
+
    const {
       timeWatched: minutesWatched,
       startCounting,
@@ -226,6 +232,23 @@ const HeroSection = ({
          })
       }
    }, [minutesWatched])
+
+   useEffect(() => {
+      // fetch the recordingSid if the recording is available
+      // we need to fetch it on the client because the user might
+      // buy access to the recording after the page is loaded
+      if (showRecording && !recordingSid) {
+         livestreamRepo
+            .getLivestreamRecordingToken(stream.id)
+            .then((doc) => {
+               if (!doc?.sid) {
+                  throw new Error("No recording sid found")
+               }
+               setRecordingSid(doc.sid)
+            })
+            .catch(errorNotification)
+      }
+   }, [errorNotification, recordingSid, showRecording, stream.id])
 
    const renderTagsContainer = Boolean(
       stream.isFaceToFace ||
@@ -251,11 +274,18 @@ const HeroSection = ({
          livestreamId: stream.id,
          userId: userData.userEmail,
          livestreamStartDate: stream.start,
+         usedCredits: Boolean(userHasBoughtRecording),
       })
 
       // play recording
       handleRecordingPlay()
-   }, [handleRecordingPlay, stream?.id, stream?.start, userData?.userEmail])
+   }, [
+      handleRecordingPlay,
+      stream?.id,
+      stream?.start,
+      userData?.userEmail,
+      userHasBoughtRecording,
+   ])
 
    const handleCloseRecordingPlayer = useCallback(() => {
       setShowBigVideoPlayer(false)
@@ -265,10 +295,11 @@ const HeroSection = ({
       () => (
          <Box pt={1}>
             <RecordingPlayer
+               boughtAccess={userHasBoughtRecording}
                handlePlay={handleRecordingPlay}
                handlePause={pauseCounting}
                handleClosePlayer={handleCloseRecordingPlayer}
-               stream={LivestreamPresenter.createFromDocument(stream)}
+               stream={streamPresenter}
                showBigVideoPlayer={showBigVideoPlayer}
                recordingSid={recordingSid}
                handlePreviewPlay={handlePreviewPlay}
@@ -276,13 +307,14 @@ const HeroSection = ({
          </Box>
       ),
       [
+         streamPresenter,
+         userHasBoughtRecording,
          handleCloseRecordingPlayer,
          handlePreviewPlay,
          handleRecordingPlay,
          pauseCounting,
          recordingSid,
          showBigVideoPlayer,
-         stream,
       ]
    )
 
@@ -302,13 +334,14 @@ const HeroSection = ({
                <Box sx={styles.timerWrapper}>
                   <Paper sx={styles.countdown}>
                      <CountDown
-                        registerButtonLabel={registerButtonLabel}
                         time={stream.start?.toDate?.() || null}
                         stream={stream}
                         streamAboutToStart={streamAboutToStart}
                         onRegisterClick={onRegisterClick}
                         disabled={disabled}
                         registered={registered}
+                        isPastEvent={isPastEvent}
+                        userIsLoggedIn={userIsLoggedIn}
                      />
                      {stream?.jobs?.length > 0 && (
                         <EnsureUserIsLoggedIn>
@@ -328,10 +361,10 @@ const HeroSection = ({
          </Grid>
       ),
       [
+         isPastEvent,
          disabled,
          hosts,
          onRegisterClick,
-         registerButtonLabel,
          registered,
          stream,
          streamAboutToStart,

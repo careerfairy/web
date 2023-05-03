@@ -23,6 +23,8 @@ export interface UserData extends Identifiable {
    lastName: string
    fieldOfStudy?: FieldOfStudy
    levelOfStudy?: LevelOfStudy
+   position?: string
+   avatar?: string
    university: {
       code: string
       name: string
@@ -42,7 +44,11 @@ export interface UserData extends Identifiable {
    talentPools?: string[]
    validationPin: number
    interestsIds?: string[]
-   points?: number
+
+   // from the rewards/credit system
+   // negative or positive
+   credits?: number
+
    referralCode?: string
    referredBy?: {
       uid: string
@@ -125,6 +131,9 @@ export interface UserStats {
    totalQuestionsAsked?: number
    totalHandRaises?: number
    hasRegisteredOnAnyLivestream?: boolean
+   totalLivestreamInvites?: number
+   referralsCount?: number
+   recordingsBought?: string[]
 }
 
 export interface SavedRecruiter extends Identifiable {

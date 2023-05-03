@@ -1,11 +1,9 @@
 import MaterialTable from "@material-table/core"
-import React, { useMemo } from "react"
+import React, { useCallback, useMemo } from "react"
 import { useUtmData } from "./RegistrationSourcesContext"
 import Card from "@mui/material/Card"
 import { TableTitle } from "../../ats-integration/AccountJobs"
 import {
-   Avatar,
-   Box,
    LinearProgress,
    Table,
    TableBody,
@@ -15,14 +13,14 @@ import {
    Typography,
 } from "@mui/material"
 import { RegistrationSourcesResponseItem } from "@careerfairy/shared-lib/dist/functions/groupAnalyticsTypes"
-import {
-   getResizedUrl,
-   prettyDate,
-} from "../../../../../helperFunctions/HelperFunctions"
-import Link from "../../../../common/Link"
+import { prettyDate } from "../../../../../helperFunctions/HelperFunctions"
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { sourcesByLivestream, UTMsPercentage } from "./transformations"
+import {
+   sourcesByLivestream,
+   UTMsPercentage,
+} from "@careerfairy/shared-lib/livestreams/sources/transformations"
+import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
 
 const LivestreamsTable = () => {
    const { livestreams, utmData } = useUtmData()
@@ -33,68 +31,67 @@ const LivestreamsTable = () => {
       return livestreams.map((l) => ({ ...l, utmData }))
    }, [livestreams, utmData])
 
+   const rowOnClick = useCallback((event, rowData) => {
+      if (window) {
+         window.open(`/upcoming-livestream/${rowData.id}`, "_blank")
+      }
+   }, [])
+
    return (
       <Card>
-         <Box
-            sx={{
-               "& th:nth-of-type(4) > div": {
-                  justifyContent: "center",
-               },
+         <MaterialTable
+            // @ts-ignore
+            columns={columns}
+            onRowClick={rowOnClick}
+            data={rows}
+            title={<TableTitle title="Livestreams" />}
+            options={{
+               toolbar: false,
+               draggable: false,
+               tableLayout: isMobile ? "auto" : "fixed",
+               emptyRowsWhenPaging: false,
             }}
-         >
-            <MaterialTable
-               // @ts-ignore
-               columns={columns}
-               data={rows}
-               title={<TableTitle title="Livestreams" />}
-               options={
-                  isMobile
-                     ? undefined
-                     : {
-                          tableLayout: "fixed",
-                       }
-               }
-            />
-         </Box>
+         />
       </Card>
    )
 }
 
 const columns = [
    {
-      field: "backgroundImageUrl",
-      title: "Logo",
-      cellStyle: (backgroundImageUrl) => ({
-         padding: 0,
-         height: 70,
-         backgroundImage:
-            backgroundImageUrl &&
-            `url(${getResizedUrl(backgroundImageUrl, "xs")})`,
-         backgroundSize: "cover",
-         backgroundRepeat: "no-repeat",
-      }),
-      render: (rowData) => <Logo logoUrl={rowData.companyLogoUrl} />,
-   },
-   {
-      title: "Title",
+      title: "Live stream title",
       field: "title",
+      width: "45%",
+      headerStyle: { fontWeight: 600, fontSize: "13px", padding: "24px" },
       render: (rowData) => (
-         <Link href={`/upcoming-livestream/${rowData.id}`} target="_blank">
+         <Typography ml={1} fontWeight={500}>
             {rowData.title}
-         </Link>
+         </Typography>
       ),
    },
    {
+      title: "Live stream date",
       field: "date",
-      title: "Event Date",
+      headerStyle: { fontWeight: 600, fontSize: "13px" },
       render: (rowData) => {
-         return prettyDate(rowData.start)
+         return (
+            <Typography fontWeight={400}>
+               {prettyDate(rowData.start)}
+            </Typography>
+         )
       },
       type: "date",
    },
    {
       title: "Sources",
       width: "40%",
+      textAlign: "end",
+      headerStyle: {
+         fontWeight: 600,
+         fontSize: "13px",
+         paddingRight: "24px",
+         textAlign: "end",
+      },
+      sorting: false,
       render: (row) => {
          return <PercentageTable livestreamId={row.id} utmData={row.utmData} />
       },
@@ -120,7 +117,27 @@ const tableStyles = sxStyles({
 
 const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
    const stats = useMemo(() => {
-      return sourcesByLivestream(utmData, livestreamId)
+      const livestreamSources = sourcesByLivestream(utmData, livestreamId)
+
+      return VALID_SOURCES.map((source) => {
+         // We need to compare the livestream sources with the {VALID_SOURCES}, ensuring that we display all sources regardless of whether they have a value
+         const sourceIndex = livestreamSources.findIndex(
+            (livestreamSource) =>
+               livestreamSource.source.displayName === source.displayName
+         )
+
+         if (sourceIndex >= 0) {
+            // if source has value, use it
+            return livestreamSources[sourceIndex]
+         } else {
+            // if source has no value, create an empty one
+            return {
+               percent: 0,
+               total: 0,
+               source: source,
+            } as UTMsPercentage
+         }
+      })
    }, [livestreamId, utmData])
 
    return (
@@ -136,7 +153,8 @@ const PercentageTable = ({ livestreamId, utmData }: PercentageTablesProps) => {
                         <Typography
                            pr={2}
                            variant="body2"
-                           color="text.secondary"
+                           fontWeight={400}
+                           color="text.primary"
                         >
                            {entry.source.displayName}
                         </Typography>
@@ -180,47 +198,6 @@ const ProgressBar = ({ source }: { source: UTMsPercentage }) => {
             value={source.percent}
          />
       </Tooltip>
-   )
-}
-
-const Logo = ({ logoUrl }) => {
-   return (
-      <Box
-         display="flex"
-         justifyContent="center"
-         alignItems="center"
-         position="relative"
-         height="100%"
-         width="100%"
-         minWidth={160}
-      >
-         <Avatar
-            sx={{
-               width: "70%",
-               height: "70%",
-               maxHeight: 85,
-               boxShadow: 5,
-               background: "common.white",
-               "& img": {
-                  objectFit: "contain",
-                  maxWidth: "90%",
-                  maxHeight: "90%",
-               },
-               display: "flex",
-               borderRadius: (theme) => theme.spacing(0.5),
-               borderBottomRightRadius: (theme) => [
-                  theme.spacing(2.5),
-                  "!important",
-               ],
-               borderTopLeftRadius: (theme) => [
-                  theme.spacing(2.5),
-                  "!important",
-               ],
-            }}
-            variant="rounded"
-            src={getResizedUrl(logoUrl, "xs")}
-         />
-      </Box>
    )
 }
 

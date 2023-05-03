@@ -2,13 +2,15 @@ import React, { memo, useEffect } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
+import { alpha, useTheme } from "@mui/material/styles"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
 import Drawer from "@mui/material/Drawer"
 
 // project imports
 import useIsMobile from "../components/custom-hook/useIsMobile"
 import { DRAWER_WIDTH, NICE_SCROLLBAR_STYLES } from "../constants/layout"
 import { sxStyles } from "../types/commonTypes"
+import { useGenericDashboard } from "./GenericDashboardLayout"
 
 const styles = sxStyles({
    root: {
@@ -21,6 +23,9 @@ const styles = sxStyles({
       flexDirection: "column",
       maxWidth: "fill-available",
    },
+   innerDesktop: {
+      width: `calc(100% - ${DRAWER_WIDTH}px)`,
+   },
    main: {
       flexGrow: 1,
       display: "flex",
@@ -30,8 +35,13 @@ const styles = sxStyles({
       transition: (theme) => theme.transitions.create("width"),
    },
    appBar: {
-      bgcolor: "transparent",
       backdropFilter: "blur(8px)",
+      transition: (theme) =>
+         theme.transitions.create([
+            "backdrop-filter",
+            "background-color",
+            "width",
+         ]),
    },
    toolbar: {
       backgroundColor: "none",
@@ -56,6 +66,17 @@ const styles = sxStyles({
    drawerWrapperClosed: {
       width: 0,
    },
+   noBackdrop: {
+      backdropFilter: "none",
+      backgroundColor: "transparent",
+   },
+   topBarFixed: {
+      position: "fixed",
+   },
+   borderBottom: {
+      borderBottom: "2px solid rgba(0, 0, 0, 0.03)",
+      backdropFilter: "blur(8px)",
+   },
 })
 
 // ==============================|| MAIN LAYOUT ||============================== //
@@ -64,15 +85,17 @@ type Props = {
    children: React.ReactNode
    drawerContent: React.ReactNode
    headerContent: React.ReactNode
+   bottomNavContent?: JSX.Element
    drawerOpen: boolean
-   setDrawer: (open: boolean) => void
-   toggleDrawer: () => void
+   setDrawer?: (open: boolean) => void
+   toggleDrawer?: () => void
    bgColor?: string
 }
 const AdminGenericLayout: React.FC<Props> = ({
    children,
    drawerContent,
    headerContent,
+   bottomNavContent,
    drawerOpen,
    setDrawer,
    toggleDrawer,
@@ -80,10 +103,11 @@ const AdminGenericLayout: React.FC<Props> = ({
 }) => {
    const theme = useTheme()
    const matchDownLg = useMediaQuery(theme.breakpoints.down("lg"))
+   const isMobile = useIsMobile()
 
    useEffect(() => {
       // Dynamically set drawerOpen based on screen size
-      setDrawer(!matchDownLg)
+      setDrawer?.(!matchDownLg)
    }, [matchDownLg, setDrawer])
 
    return (
@@ -100,15 +124,27 @@ const AdminGenericLayout: React.FC<Props> = ({
             {drawerContent}
          </DrawerComponent>
 
-         <Box sx={[styles.inner, styles.animateWidth]}>
+         <Box
+            sx={[
+               styles.inner,
+               styles.animateWidth,
+               !isMobile && drawerOpen && styles.innerDesktop,
+            ]}
+         >
             {/* header */}
-            <HeaderComponent drawerOpen={drawerOpen}>
-               {headerContent}
-            </HeaderComponent>
+            <HeaderComponent>{headerContent}</HeaderComponent>
             {/* main content */}
-            <Box component={"main"} sx={styles.main}>
+            <Box
+               component={"main"}
+               sx={[
+                  styles.main,
+                  { mb: isMobile && bottomNavContent ? "50px" : "" },
+               ]}
+            >
                {children}
             </Box>
+            {/* Bottom navigation bar */}
+            {isMobile && bottomNavContent ? bottomNavContent : null}
          </Box>
       </Box>
    )
@@ -150,17 +186,34 @@ const DrawerComponent = ({
 }
 
 type HeaderProps = {
-   drawerOpen: boolean
    children: React.ReactNode
+   headerBgColor?: string
 }
-const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
+const HeaderComponent = ({
+   children,
+   headerBgColor = "#F7F8FC",
+}: HeaderProps) => {
+   const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
+
+   const isScrolling = useScrollTrigger({
+      disableHysteresis: true,
+      threshold: headerScrollThreshold,
+   })
+
    return (
       <AppBar
          enableColorOnDark
          position="sticky"
          color="inherit"
          elevation={0}
-         sx={[styles.appBar, drawerOpen && styles.animateWidth]}
+         sx={[
+            styles.appBar,
+            isScrolling ? styles.borderBottom : styles.noBackdrop,
+            topBarFixed && styles.topBarFixed,
+            isScrolling && {
+               backgroundColor: alpha(headerBgColor, 0.9),
+            },
+         ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>
             {children}

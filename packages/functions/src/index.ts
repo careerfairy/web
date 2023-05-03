@@ -56,7 +56,7 @@ dotenv.config()
 dotenv.config()
 
 // Auth
-exports.createNewUserAccount_v5 = auth.createNewUserAccount_v5
+exports.createNewUserAccount_v6 = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
@@ -107,6 +107,7 @@ exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
 
 exports.newsletter = newsletter.newsletter
+exports.manualNewsletter = newsletter.manualNewsletter
 
 // Livestreams
 exports.scheduleTestLivestreamDeletion =
@@ -168,9 +169,8 @@ exports.updateBreakoutRoomStatusOnWrite =
 exports.slackHandleInteractions = slack.slackHandleInteractions
 
 // Rewards
-exports.rewardApply = rewards.rewardApply
-exports.rewardLivestreamAttendance = rewards.rewardLivestreamAttendance
-exports.rewardLivestreamRegistrant = rewards.rewardLivestreamRegistrant
+exports.rewardLivestreamInvitationComplete =
+   rewards.rewardLivestreamInvitationComplete
 exports.rewardUserAction = rewards.rewardUserAction
 exports.applyReferralCode = rewards.applyReferralCode
 
@@ -213,12 +213,13 @@ exports.periodicallyRemoveCachedDocument =
 exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v3 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
 exports.syncUserLivestreamData = onWriteTriggers.syncUserLivestreamData
 exports.syncLivestreamStats = onWriteTriggers.syncLivestreamStats
+exports.syncUserStats = onWriteTriggers.syncUserStats
 
 // On Create Triggers for all collections
 exports.onCreateLivestreamPopularityEvents =
@@ -226,6 +227,8 @@ exports.onCreateLivestreamPopularityEvents =
 exports.onCreateLivestreamRatingAnswer =
    onCreateTriggers.onCreateLivestreamRatingAnswer
 exports.onCreateUserData = onCreateTriggers.onCreateUserData
+exports.onCreateReward = onCreateTriggers.onCreateReward
+exports.onCreateUserLivestreamData = onCreateTriggers.onCreateUserLivestreamData
 
 // On Delete Triggers for all collections
 exports.onDeleteLivestreamPopularityEvents =

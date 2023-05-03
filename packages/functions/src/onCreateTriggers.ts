@@ -6,8 +6,13 @@ import {
 import config from "./config"
 import { livestreamsRepo, userRepo } from "./api/repositories"
 import { PopularityEventData } from "@careerfairy/shared-lib/livestreams/popularity"
-import { EventRatingAnswer } from "@careerfairy/shared-lib/livestreams"
+import {
+   EventRatingAnswer,
+   UserLivestreamData,
+} from "@careerfairy/shared-lib/livestreams"
 import { pickPublicDataFromUser, UserData } from "@careerfairy/shared-lib/users"
+import { RewardDoc } from "@careerfairy/shared-lib/rewards"
+import { rewardApply, rewardLivestreamRegistrant } from "./lib/reward"
 
 export const onCreateLivestreamPopularityEvents = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -86,6 +91,55 @@ export const onCreateUserData = functions
             false // we already set the lastActivityDate when creating the doc
          )
       )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onCreateUserLivestreamData = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document(
+      "livestreams/{livestreamId}/userLivestreamData/{userEmail}"
+   )
+   .onCreate(async (snapshot, context) => {
+      functions.logger.info(context.params)
+
+      const livestreamId = context.params.livestreamId
+      const userEmail = context.params.userEmail
+      const doc: UserLivestreamData = {
+         ...(snapshot.data() as UserLivestreamData),
+         id: snapshot.id,
+      }
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for every new doc
+      sideEffectPromises.push(
+         rewardLivestreamRegistrant(doc, livestreamId, userEmail)
+      )
+
+      return handleSideEffects(sideEffectPromises)
+   })
+
+export const onCreateReward = functions
+   .runWith(defaultTriggerRunTimeConfig)
+   .region(config.region)
+   .firestore.document("userData/{userEmail}/rewards/{rewardId}")
+   .onCreate(async (snapshot, context) => {
+      functions.logger.info(context.params)
+
+      const email = context.params.userEmail
+      const rewardDoc: RewardDoc = {
+         ...(snapshot.data() as RewardDoc),
+         id: snapshot.id,
+      }
+
+      // An array of promise side effects to be executed in parallel
+      const sideEffectPromises: Promise<unknown>[] = []
+
+      // Run side effects for every new doc
+      sideEffectPromises.push(rewardApply(rewardDoc, email))
 
       return handleSideEffects(sideEffectPromises)
    })

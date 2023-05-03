@@ -21,7 +21,7 @@ export function totalPeopleReached(stats: GroupStats) {
    if (!stats) return 0
 
    const companyPageViews =
-      stats.generalStats.numberOfPeopleReachedCompanyPage ?? 0
+      stats.generalStats?.numberOfPeopleReachedCompanyPage ?? 0
 
    const totalReached =
       stats.generalStats.numberOfPeopleReached + companyPageViews

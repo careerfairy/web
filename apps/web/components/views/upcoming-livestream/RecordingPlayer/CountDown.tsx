@@ -1,7 +1,7 @@
 import { Typography } from "@mui/material"
 import React, { useEffect, useState } from "react"
 import DateUtil from "../../../../util/DateUtil"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 type Props = {
    stream: LivestreamPresenter

@@ -2,17 +2,17 @@ import React, { useMemo } from "react"
 import Box from "@mui/material/Box"
 import { Typography } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import {
-   ChevronRight as MoreIcon,
-   MapPin as CompanyLocationIcon,
-   Tag as CompanyIndustryIcon,
-   Users as CompanySizeIcon,
-} from "react-feather"
+import { ChevronRight as MoreIcon } from "react-feather"
 import Link from "../../common/Link"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { sxStyles } from "../../../../types/commonTypes"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
+import {
+   CompanyCountryTag,
+   CompanyIndustryTag,
+   CompanySizeTag,
+} from "../../common/company/company-tags"
 
 type Props = {
    companyGroupData: Group
@@ -50,28 +50,30 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
             <Stack
                direction={{
                   xs: "column",
-                  sm: "row",
+                  md: "row",
                }}
                spacing={{
                   xs: 1,
-                  sm: 4,
+                  md: 4,
                }}
             >
                {companyGroupData.companyCountry ? (
-                  <CompanyTag
-                     icon={<CompanyLocationIcon />}
+                  <CompanyCountryTag
+                     fontSize={"1.07rem"}
                      text={companyGroupData.companyCountry.name}
                   />
                ) : null}
-               {companyGroupData.companyIndustry ? (
-                  <CompanyTag
-                     icon={<CompanyIndustryIcon />}
-                     text={companyGroupData.companyIndustry.name}
+               {companyGroupData.companyIndustries?.length ? (
+                  <CompanyIndustryTag
+                     fontSize={"1.07rem"}
+                     text={companyGroupData.companyIndustries
+                        .map(({ name }) => name)
+                        .join(", ")}
                   />
                ) : null}
                {companyGroupData.companySize ? (
-                  <CompanyTag
-                     icon={<CompanySizeIcon />}
+                  <CompanySizeTag
+                     fontSize={"1.07rem"}
                      text={companyGroupData.companySize}
                   />
                ) : null}
@@ -108,17 +110,6 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
                </Box>
             ) : null}
          </Stack>
-      </Box>
-   )
-}
-
-const CompanyTag = ({ icon, text }: { icon: JSX.Element; text: string }) => {
-   return (
-      <Box display="flex" alignItems="center">
-         {icon}
-         <Typography variant="h6" ml={1.5}>
-            {text}
-         </Typography>
       </Box>
    )
 }

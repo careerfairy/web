@@ -18,21 +18,32 @@ const styles = sxStyles({
       maxWidth: "80%",
    },
 })
-const BottomLinks = () => {
+
+type Props = {
+   hideMainLogo?: boolean
+}
+
+const BottomLinks = ({ hideMainLogo }: Props) => {
    return (
       <Stack
          spacing={2}
          mb={3}
          justifyContent="center"
+         width={"100%"}
          divider={
             <Box px={5}>
                <Divider />
             </Box>
          }
       >
-         <Box px={5}>
-            <MainLogo sx={styles.logo} />
-         </Box>
+         {hideMainLogo ? (
+            <></>
+         ) : (
+            <Box px={5}>
+               <MainLogo sx={styles.logo} />
+            </Box>
+         )}
+
          <NavLink
             href={supportPageLink}
             id={"support-page"}

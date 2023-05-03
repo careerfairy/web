@@ -28,12 +28,12 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
 
    const handleSubmitForm = async (values, { setStatus }) => {
       try {
-         await firebase.updateCareerCenter(group.id, {
+         await firebase.updateCareerCenter(group, {
             description: values.description,
             universityName: values.universityName,
             extraInfo: values.extraInfo,
             companyCountry: values.companyCountry,
-            companyIndustry: values.companyIndustry,
+            companyIndustries: values.companyIndustries,
             companySize: values.companySize,
          })
          enqueueSnackbar("Your profile has been updated!", {
@@ -60,13 +60,13 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
          description: group.description || "",
          extraInfo: group.extraInfo || "",
          companySize: group.companySize || "",
-         companyIndustry: group.companyIndustry || null,
+         companyIndustries: group.companyIndustries || [],
          companyCountry: group.companyCountry || null,
          isATSEnabled: group.isATSEnabled || false,
       }),
       [
          group.companyCountry,
-         group.companyIndustry,
+         group.companyIndustries,
          group.companySize,
          group.description,
          group.extraInfo,

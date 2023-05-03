@@ -1,6 +1,4 @@
 import React, { useMemo } from "react"
-import GeneralLayout from "layouts/GeneralLayout"
-import HighlightsCarousel from "../components/views/portal/HighlightsCarousel"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents"
@@ -9,36 +7,47 @@ import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
 import { useAuth } from "../HOCs/AuthProvider"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
 import SEO from "../components/util/SEO"
-import { highlightRepo, livestreamRepo } from "../data/RepositoryInstances"
+import { livestreamRepo } from "../data/RepositoryInstances"
 import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
 import EventsPreview, {
    EventsTypes,
 } from "../components/views/portal/events-preview/EventsPreview"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import nookies from "nookies"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import RecordedEventsCarousel from "../components/views/portal/recorded-events/RecordedEventsCarousel"
+import ContentCarousel from "../components/views/portal/content-carousel/ContentCarousel"
 import DateUtil from "../util/DateUtil"
-import CookiesUtil from "../util/CookiesUtil"
 import { Box } from "@mui/material"
-import { mapFromServerSide } from "util/serverUtil"
+import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
+import {
+   getServerSideUserData,
+   getServerSideUserStats,
+   getUserTokenFromCookie,
+   mapFromServerSide,
+} from "util/serverUtil"
+import CarouselContentService from "../components/views/portal/content-carousel/CarouselContentService"
 
 const PortalPage = ({
-   highlights,
    comingUpNextEvents,
-   showHighlights,
    pastEvents,
-   recordedEvents,
+   serializedCarouselContent,
+   serverUserStats,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
+
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
    )
+
    const events = useMemo(() => mapFromServerSide(pastEvents), [pastEvents])
+
    const comingUpNext = useMemo(
       () => mapFromServerSide(comingUpNextEvents),
       [comingUpNextEvents]
    )
+
+   const carouselContent = useMemo(() => {
+      return mapFromServerSide(serializedCarouselContent)
+   }, [serializedCarouselContent])
 
    return (
       <>
@@ -49,63 +58,50 @@ const PortalPage = ({
             }
             title={"CareerFairy | Portal"}
          />
-         <GeneralLayout backgroundColor={"#FFF"} hideNavOnScroll fullScreen>
-            {recordedEvents?.length > 0 && (
-               <Box mb={4}>
-                  <RecordedEventsCarousel
-                     livestreams={mapFromServerSide(recordedEvents)}
+         <GenericDashboardLayout
+            pageDisplayName={""}
+            topBarFixed={carouselContent?.length > 0}
+            headerScrollThreshold={carouselContent?.length ? 250 : 10}
+         >
+            <>
+               <Box position="relative" mb={4}>
+                  <ContentCarousel
+                     content={carouselContent}
+                     serverUserStats={serverUserStats}
                   />
                </Box>
-            )}
-            <Container disableGutters>
-               <WidgetsWrapper>
-                  {recordedEvents?.length === 0 && (
-                     <HighlightsCarousel
-                        showHighlights={showHighlights}
-                        serverSideHighlights={highlights}
+               <Container disableGutters>
+                  <WidgetsWrapper>
+                     {hasInterests ? <RecommendedEvents limit={10} /> : null}
+                     <ComingUpNextEvents
+                        serverSideEvents={comingUpNext}
+                        limit={20}
                      />
-                  )}
-                  {hasInterests ? <RecommendedEvents limit={10} /> : null}
-                  <ComingUpNextEvents
-                     serverSideEvents={comingUpNext}
-                     limit={20}
-                  />
-                  <MyNextEvents limit={20} />
-                  <EventsPreview
-                     id={"past-events"}
-                     title={"PAST EVENTS"}
-                     type={EventsTypes.pastEvents}
-                     events={events}
-                     seeMoreLink={"/next-livestreams?type=pastEvents"}
-                     // No need to show loading as these events have already been queried server side
-                     loading={false}
-                  />
-               </WidgetsWrapper>
-            </Container>
-         </GeneralLayout>
+                     <MyNextEvents limit={20} />
+                     <EventsPreview
+                        id={"past-events"}
+                        title={"PAST EVENTS"}
+                        type={EventsTypes.pastEvents}
+                        events={events}
+                        seeMoreLink={"/next-livestreams?type=pastEvents"}
+                        // No need to show loading as these events have already been queried server side
+                        loading={false}
+                     />
+                  </WidgetsWrapper>
+               </Container>
+            </>
+         </GenericDashboardLayout>
       </>
    )
 }
 
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
-   const cookies = nookies.get(ctx)
-
-   let token: { email: string } | null = null
-   try {
-      token = CookiesUtil.parseJwt({
-         token: cookies.token,
-         isServerSide: true,
-      })
-   } catch (e) {
-      console.error("Failed to parse cookie.token", e, cookies.token)
-   }
+   const token = getUserTokenFromCookie(ctx)
 
    const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
 
    const promises = []
    promises.push(
-      highlightRepo.shouldShowHighlightsCarousel(),
-      highlightRepo.getHighlights(5),
       livestreamRepo.getUpcomingEvents(20),
       livestreamRepo.getPastEventsFrom({
          fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
@@ -116,29 +112,37 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    // only adds recording request if token has email
    if (token?.email) {
       promises.push(
-         livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days)
+         livestreamRepo.getRecordedEventsByUserId(token?.email, todayLess5Days),
+         getServerSideUserStats(token.email),
+         getServerSideUserData(token.email)
       )
    }
    const results = await Promise.allSettled(promises)
 
-   const [
-      showHighlights,
-      highlights,
-      comingUpNextEvents,
-      pastEvents,
-      recordedEvents,
-   ] = results
-      .filter((result) => result.status === "fulfilled")
-      .map((result) => (result as PromiseFulfilledResult<any>).value)
+   const [comingUpNextEvents, pastEvents, recordedEvents, userStats, userData] =
+      results.map((result) =>
+         result.status === "fulfilled"
+            ? (result as PromiseFulfilledResult<any>).value
+            : null
+      )
 
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
    )
 
+   const carouselContentService = new CarouselContentService({
+      userData: userData,
+      userStats: userStats,
+      pastLivestreams: pastEvents || [],
+      upcomingLivestreams: comingUpNextEvents || [],
+      registeredRecordedLivestreamsForUser: recordedEventsToShare || [],
+   })
+
+   const carouselContent = await carouselContentService.getCarouselContent()
+
    return {
       props: {
-         showHighlights,
-         ...(highlights && { highlights }),
+         serverUserStats: userStats || null,
          ...(comingUpNextEvents && {
             comingUpNextEvents: comingUpNextEvents.map(
                LivestreamPresenter.serializeDocument
@@ -147,9 +151,11 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
-         recordedEvents:
-            recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
-            [],
+         ...(carouselContent && {
+            serializedCarouselContent: carouselContent?.map(
+               LivestreamPresenter.serializeDocument
+            ),
+         }),
       },
    }
 }

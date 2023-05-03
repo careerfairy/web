@@ -1,11 +1,11 @@
 import { Box, Slide, Typography } from "@mui/material"
 import ReactPlayer from "react-player"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
-import React from "react"
+import React, { ReactNode } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
+import { downloadLinkWithDate } from "@careerfairy/shared-lib/livestreams/recordings"
 import useIsMobile from "../../../custom-hook/useIsMobile"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import BackToMainRoomIcon from "@mui/icons-material/ArrowBackIos"
 import CountDown from "./CountDown"
 
@@ -17,6 +17,7 @@ type Props = {
    handleClosePlayer?: () => void
    showBigVideoPlayer?: boolean
    recordingSid?: string
+   boughtAccess?: boolean
 }
 
 const styles = sxStyles({
@@ -56,6 +57,7 @@ const RecordingPlayer = ({
    handlePause,
    showBigVideoPlayer,
    recordingSid,
+   boughtAccess = false,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -81,14 +83,16 @@ const RecordingPlayer = ({
                      </Typography>
                   )}
 
-                  <Typography
-                     variant={isMobile ? "h4" : "h5"}
-                     mt={1}
-                     fontWeight={isMobile ? "bold" : "unset"}
-                  >
-                     Only <CountDown stream={stream} /> left to rewatch the live
-                     stream!
-                  </Typography>
+                  {!boughtAccess ? (
+                     <RecordingTitle isMobile={isMobile}>
+                        Only <CountDown stream={stream} /> left to rewatch the
+                        live stream!
+                     </RecordingTitle>
+                  ) : (
+                     <RecordingTitle isMobile={isMobile}>
+                        You bought access to this recording:
+                     </RecordingTitle>
+                  )}
                </Box>
             </Slide>
          )}
@@ -118,6 +122,24 @@ const RecordingPlayer = ({
             />
          </Box>
       </Box>
+   )
+}
+
+const RecordingTitle = ({
+   isMobile,
+   children,
+}: {
+   isMobile: boolean
+   children: ReactNode
+}) => {
+   return (
+      <Typography
+         variant={isMobile ? "h4" : "h5"}
+         mt={1}
+         fontWeight={isMobile ? "bold" : "unset"}
+      >
+         {children}
+      </Typography>
    )
 }
 

@@ -32,6 +32,11 @@ service cloud.firestore {
             return request.auth.token.adminGroups.keys().size() > 0 || isCFAdmin();
         }
 
+        function protectedFieldsDidNotChange(fields) {
+            return !request.resource.data.diff(resource.data).affectedKeys().hasAny(fields)
+        }
+
+
         //        function isLivestreamAdmin(livestreamId) {
         //            return isSignedIn() && request.auth.token.adminGroups != null && request.auth.token.adminGroups.keys().hasAny(get(/databases/$(database)/documents/livestreams/$(livestreamId)).data.groupIds);
         //        }
@@ -126,19 +131,16 @@ service cloud.firestore {
             }
 
             match /stats/stats {
-                allow read, write: if isSignedInAndIsSameUser(userId);
+                allow read: if true; // not ideal, but we need to allow SSR to read this in the mean time
+                allow write: if isSignedInAndIsSameUser(userId);
             }
 
             match /userReminders/{reminderIdentifier} {
                 allow read, write: if isSignedInAndIsSameUser(userId) || isCFAdmin();
             }
 
-            function preventUserFromSettingIsAdminField() {
-                return (request.resource.data.isAdmin == resource.data.isAdmin || !('isAdmin' in request.resource.data) || request.resource.data.isAdmin == false);
-            }
-
             allow read: if true;
-            allow update: if isSignedInAndIsSameUser(userId) && preventUserFromSettingIsAdminField();
+            allow update: if isSignedInAndIsSameUser(userId) && protectedFieldsDidNotChange(["credits", "isAdmin", "userEmail"]);
             allow create: if false; // only admin sdk can create users
             allow delete: if false;
         }

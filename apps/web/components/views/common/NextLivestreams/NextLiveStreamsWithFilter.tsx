@@ -1,15 +1,19 @@
 import useListenToUpcomingStreams from "../../../../components/custom-hook/useListenToUpcomingStreams"
-import NextLivestreamsBannerSection from "../../../../components/views/common/NextLivestreams/NextLivestreamsBannerSection"
 import React, { useCallback, useEffect, useMemo, useState } from "react"
-import { useTheme } from "@mui/material/styles"
 import { StreamsSection } from "./StreamsSection"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useRouter } from "next/router"
-import { Grid, Typography } from "@mui/material"
+import { Box, Card, Container, Grid, Typography } from "@mui/material"
 import Image from "next/image"
 import Link from "../../../../components/views/common/Link"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import { sxStyles } from "../../../../types/commonTypes"
+import { Search as FindIcon } from "react-feather"
+import LivestreamSearch, {
+   LivestreamHit,
+} from "../../group/admin/common/LivestreamSearch"
+import Filter, { FilterEnum } from "../filter/Filter"
+import { wishListBorderRadius } from "../../../../constants/pages"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -18,7 +22,28 @@ const styles = sxStyles({
       color: "rgb(130,130,130)",
       textAlign: "center",
    },
+   root: {
+      flex: 1,
+      display: "flex",
+      marginX: { xs: 2, md: 3 },
+   },
+   search: {
+      flex: 1,
+   },
+   filter: {
+      ml: { xs: 2, md: 4 },
+      backgroundColor: "white",
+      borderRadius: wishListBorderRadius,
+   },
 })
+
+const filtersToShow = [
+   FilterEnum.languages,
+   FilterEnum.interests,
+   FilterEnum.companyCountries,
+   FilterEnum.companySizes,
+   FilterEnum.companyIndustries,
+]
 
 const getQueryVariables = (query) => {
    const languages = query.languages as string
@@ -34,7 +59,8 @@ const getQueryVariables = (query) => {
       jobCheck: jobCheck?.toLowerCase() === "true" || false,
       companyCountries: companyCountries && companyCountries.split(","),
       companySizes: companySizes && companySizes.split(","),
-      companyIndustries: companyIndustries && companyIndustries.split(","),
+      companyIndustries:
+         companyIndustries?.length && companyIndustries.split(","),
    }
 }
 
@@ -44,13 +70,7 @@ type Props = {
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
 }: Props) => {
-   const {
-      palette: {
-         common: { white },
-      },
-   } = useTheme()
-   const { query } = useRouter()
-   const [value, setValue] = useState(initialTabValue || "upcomingEvents")
+   const { query, push } = useRouter()
    const {
       languages,
       interests,
@@ -60,6 +80,10 @@ const NextLiveStreamsWithFilter = ({
       companyIndustries,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
+   const hasPastEvents = useMemo(
+      () => initialTabValue === "pastEvents",
+      [initialTabValue]
+   )
 
    const upcomingLivestreams = useListenToUpcomingStreams({
       languagesIds: languages,
@@ -73,7 +97,7 @@ const NextLiveStreamsWithFilter = ({
 
    useEffect(() => {
       // load past events when changing tabs
-      if (value === "pastEvents" && !pastLivestreams) {
+      if (hasPastEvents && !pastLivestreams) {
          const sixMonthsAgo = new Date(
             new Date().setMonth(new Date().getMonth() - 6)
          )
@@ -84,13 +108,7 @@ const NextLiveStreamsWithFilter = ({
             })
             .catch(console.error)
       }
-   }, [value, pastLivestreams])
-
-   const handleChange = useCallback((event, newValue) => {
-      if (newValue) {
-         setValue(newValue)
-      }
-   }, [])
+   }, [hasPastEvents, pastLivestreams])
 
    const renderNoResults = useCallback(() => {
       return (
@@ -122,22 +140,49 @@ const NextLiveStreamsWithFilter = ({
       )
    }, [isMobile])
 
+   // Clicking on a search result will open the detail page for the corresponding stream
+   const handleSearch = useCallback(
+      (hit: LivestreamHit | null) => {
+         void push(`/upcoming-livestream/${hit.id}`)
+      },
+      [push]
+   )
+
    return (
-      <React.Fragment>
-         <NextLivestreamsBannerSection
-            color={white}
-            handleChange={handleChange}
-            value={value}
-         />
+      <>
+         <Container
+            maxWidth="xl"
+            disableGutters
+            sx={{ flex: 1, display: "flex" }}
+         >
+            <Box sx={styles.root}>
+               <Card sx={styles.search}>
+                  <LivestreamSearch
+                     orderByDirection={hasPastEvents ? "desc" : "asc"}
+                     handleChange={handleSearch}
+                     value={null}
+                     endIcon={<FindIcon color={"black"} />}
+                     searchWithTrigram
+                     hasPastEvents={hasPastEvents}
+                  />
+               </Card>
+               {hasPastEvents ? null : (
+                  <Box sx={styles.filter}>
+                     <Filter filtersToShow={filtersToShow} />
+                  </Box>
+               )}
+            </Box>
+         </Container>
+
          <StreamsSection
-            value={value}
+            value={initialTabValue}
             upcomingLivestreams={upcomingLivestreams}
             listenToUpcoming
             pastLivestreams={pastLivestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={renderNoResults()}
          />
-      </React.Fragment>
+      </>
    )
 }
 

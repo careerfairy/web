@@ -1,6 +1,5 @@
-import React, { useEffect } from "react"
+import React from "react"
 import makeStyles from "@mui/styles/makeStyles"
-import { forceCheck } from "react-lazyload"
 import { SwipeablePanel } from "../../../../../../materialUI/GlobalPanels/GlobalPanels"
 import { Container } from "@mui/material"
 import * as PropTypes from "prop-types"
@@ -19,9 +18,7 @@ const StreamsSwipeableView = ({
    value,
 }) => {
    const classes = useStyles()
-   useEffect(() => {
-      forceCheck()
-   }, [value])
+
    return (
       <Container className={classes.wrapper}>
          <SwipeablePanel value={value} index={"upcomingEvents"}>
