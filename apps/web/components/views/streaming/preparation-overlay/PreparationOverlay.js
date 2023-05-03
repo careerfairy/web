@@ -349,7 +349,10 @@ function PreparationOverlay({ livestream, streamerUuid, setStreamerReady }) {
                   "&:hover": {
                      backgroundColor: theme.palette.background.default,
                   },
-                  color: theme.palette.mode === "dark" ? "white" : "black",
+                  color:
+                     theme.palette.mode === "dark"
+                        ? "white !important"
+                        : "black !important",
                })}
                onClick={joinStream}
                disabled={loading}
