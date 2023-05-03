@@ -38,7 +38,10 @@ const CompanySearch: FC = () => {
    const options = useMemo<UseSearchOptions<Group>>(
       () => ({
          maxResults: 7,
-         additionalConstraints: [where("publicProfile", "==", true)],
+         additionalConstraints: [
+            where("publicProfile", "==", true),
+            where("test", "==", false),
+         ],
          emptyOrderBy: {
             field: "universityName",
             direction: "asc",

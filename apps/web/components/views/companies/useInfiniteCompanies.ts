@@ -52,6 +52,7 @@ export const getInfiniteQuery = (
    return query(
       collection(FirestoreInstance, "careerCenterData"),
       where("publicProfile", "==", true),
+      where("test", "==", false),
       ...constraints,
       limit(pageSIze),
       orderBy("universityName", "asc")

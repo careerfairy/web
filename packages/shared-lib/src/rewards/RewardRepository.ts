@@ -44,10 +44,12 @@ export class FirebaseRewardRepository
       action: RewardAction,
       otherData: Partial<RewardDoc> = {}
    ): Promise<void> {
+      const shouldNotifyUser = Boolean(REWARDS[action]?.shouldNotifyUser)
+
       const doc: Create<RewardDoc> = Object.assign(
          {
             action: action,
-            seenByUser: false,
+            seenByUser: shouldNotifyUser ? false : true,
             createdAt: this.fieldValue.serverTimestamp(),
             credits: REWARDS[action]?.credits ?? 0,
          },

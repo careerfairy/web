@@ -12,7 +12,6 @@ import {
 } from "next"
 import { mapFromServerSide } from "../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
 import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
@@ -73,9 +72,7 @@ export const getStaticProps: GetStaticProps<{
       const serverSideGroup = await groupRepo.getGroupByGroupName(companyName)
 
       if (serverSideGroup) {
-         const presenter = GroupPresenter.createFromDocument(serverSideGroup)
-
-         if (presenter.companyPageIsReady()) {
+         if (serverSideGroup.publicProfile) {
             const serverSideUpcomingLivestreams =
                await livestreamRepo.getEventsOfGroup(
                   serverSideGroup?.groupId,
