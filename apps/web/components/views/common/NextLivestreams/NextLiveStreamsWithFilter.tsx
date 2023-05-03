@@ -143,7 +143,7 @@ const NextLiveStreamsWithFilter = ({
    // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
       (hit: LivestreamHit | null) => {
-         void push(`/upcoming-livestream//${hit.id}`)
+         void push(`/upcoming-livestream/${hit.id}`)
       },
       [push]
    )

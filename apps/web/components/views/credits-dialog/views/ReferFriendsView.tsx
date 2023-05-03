@@ -95,7 +95,7 @@ const CopyUserReferralLinkButton = () => {
 
    const [state, copyReferralLinkToClipboard] = useCopyToClipboard()
 
-   const referralLink = makeReferralUrl(userData?.id)
+   const referralLink = makeReferralUrl(userData?.referralCode)
    const linkCopied = state.value === referralLink
 
    useEffect(() => {
@@ -143,7 +143,7 @@ const CopyUserReferralLinkButton = () => {
 const SocialButtons = () => {
    const { userData } = useAuth()
 
-   const referralLink = makeReferralUrl(userData?.id)
+   const referralLink = makeReferralUrl(userData?.referralCode)
 
    const title = "CareerFairy - Find your dream job"
    const handleWhatsappShare = () => {
