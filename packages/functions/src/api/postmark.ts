@@ -32,15 +32,17 @@ export class PostmarkEmailSender {
 
    /**
     * Send a batch of emails with templates
-    * Chunks the emails into batches of 500
+    * Chunks the emails into batches of 250
     */
    async sendEmailBatchWithTemplates(
       templates: postmark.TemplatedMessage[],
       callback?: Callback<MessageSendingResponse[]>
    ) {
-      // max of 500 templates per batch
+      // postmark api accepts a max of 500 templates per batch
       // https://postmarkapp.com/developer/api/templates-api#send-batch-with-templates
-      const chunks = chunkArray(templates, 500)
+      // but, using 500 might cause socket hang up errors
+      // https://github.com/ActiveCampaign/postmark.js/issues/109#issuecomment-1223873949
+      const chunks = chunkArray(templates, 250)
       const promises = chunks.map((chunk, i) =>
          this.client.sendEmailBatchWithTemplates(chunk, callback).then(() => {
             console.log(
