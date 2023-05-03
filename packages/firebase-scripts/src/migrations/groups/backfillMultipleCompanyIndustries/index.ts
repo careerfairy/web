@@ -6,7 +6,7 @@ import { Group, GroupOption } from "@careerfairy/shared-lib/dist/groups"
 import { logAction } from "../../../util/logger"
 import * as cliProgress from "cli-progress"
 import { DataWithRef } from "../../../util/types"
-import { BulkWriter } from "firebase-admin/firestore"
+import { BulkWriter, FieldValue } from "firebase-admin/firestore"
 import counterConstants from "../../../lib/Counter/constants"
 import {
    handleBulkWriterError,
@@ -14,6 +14,7 @@ import {
    loopProgressBar,
 } from "../../../util/bulkWriter"
 
+const WRITE_BATCH = 50
 const counter = new Counter()
 const bar = new cliProgress.SingleBar(
    {
@@ -34,11 +35,10 @@ export async function run() {
          "Fetching all groups"
       )
 
-      Counter.log(`Fetching all Groups`)
       counter.addToReadCount(groups.length)
       bar.start(groups.length, 0)
 
-      await updateDocuments(groups, counter, bulkWriter)
+      await updateDocuments(counter, bulkWriter)
 
       await bulkWriter.close()
       bar.stop()
@@ -50,15 +50,12 @@ export async function run() {
    }
 }
 
-const updateDocuments = (
-   groups: Group[],
-   counter: Counter,
-   bulkWriter: BulkWriter
-) => {
+const updateDocuments = async (counter: Counter, bulkWriter: BulkWriter) => {
    counter.setCustomCount(counterConstants.totalNumDocs, groups.length)
    loopProgressBar.start(groups.length, 0)
 
-   groups.forEach((group, index) => {
+   let index = 0
+   for (const group of groups) {
       counter.setCustomCount(counterConstants.currentDocIndex, index)
       loopProgressBar.update(index + 1)
 
@@ -70,22 +67,27 @@ const updateDocuments = (
       }
 
       const updatedGroup = {
-         ...group,
          companyIndustries: newCompanyIndustries,
+         companyIndustry: FieldValue.delete(),
       }
 
       delete updatedGroup["companyIndustry"]
 
-      const groupRef = firestore.collection(`careerCenterData`).doc(group.id)
-
       bulkWriter
-         .set(groupRef, updatedGroup)
+         .update(group._ref as any, updatedGroup)
          .then(() => handleBulkWriterSuccess(counter))
          .catch((e) => handleBulkWriterError(e, counter))
 
       counter.writeIncrement()
       counter.customCountIncrement(counterConstants.numSuccessfulWrites)
-   })
 
+      if (index % WRITE_BATCH === 0) {
+         await bulkWriter.flush()
+      }
+
+      index++
+   }
+
+   await bulkWriter.flush()
    loopProgressBar.stop()
 }
