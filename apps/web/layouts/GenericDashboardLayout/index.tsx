@@ -12,12 +12,14 @@ type IGenericDashboardContext = {
    isPortalPage: boolean
    handleOpenCreditsDialog: () => void
    topBarFixed: boolean
+   headerScrollThreshold: number // The number of pixels the user has to scroll before the header is hidden. Default is 10
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
    isPortalPage: false,
    handleOpenCreditsDialog: () => {},
    topBarFixed: false,
+   headerScrollThreshold: 10,
 })
 
 type Props = {
@@ -26,6 +28,7 @@ type Props = {
    bgColor?: string
    isPortalPage?: boolean
    topBarFixed?: boolean
+   headerScrollThreshold?: number // The number of pixels the user has to scroll before the header is hidden
 }
 
 const GenericDashboardLayout = ({
@@ -34,6 +37,7 @@ const GenericDashboardLayout = ({
    bgColor,
    isPortalPage,
    topBarFixed,
+   headerScrollThreshold = 10,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -49,9 +53,15 @@ const GenericDashboardLayout = ({
       () => ({
          isPortalPage,
          handleOpenCreditsDialog,
+         headerScrollThreshold,
          topBarFixed: Boolean(topBarFixed),
       }),
-      [handleOpenCreditsDialog, isPortalPage, topBarFixed]
+      [
+         handleOpenCreditsDialog,
+         headerScrollThreshold,
+         isPortalPage,
+         topBarFixed,
+      ]
    )
 
    return (

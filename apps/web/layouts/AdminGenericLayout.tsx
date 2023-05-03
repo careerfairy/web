@@ -2,7 +2,7 @@ import React, { memo, useEffect } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
+import { alpha, useTheme } from "@mui/material/styles"
 import useScrollTrigger from "@mui/material/useScrollTrigger"
 import Drawer from "@mui/material/Drawer"
 
@@ -35,9 +35,13 @@ const styles = sxStyles({
       transition: (theme) => theme.transitions.create("width"),
    },
    appBar: {
-      bgcolor: "transparent",
       backdropFilter: "blur(8px)",
-      transition: (theme) => theme.transitions.create("backdrop-filter"),
+      transition: (theme) =>
+         theme.transitions.create([
+            "backdrop-filter",
+            "background-color",
+            "width",
+         ]),
    },
    toolbar: {
       backgroundColor: "none",
@@ -64,9 +68,14 @@ const styles = sxStyles({
    },
    noBackdrop: {
       backdropFilter: "none",
+      backgroundColor: "transparent",
    },
    topBarFixed: {
       position: "fixed",
+   },
+   borderBottom: {
+      borderBottom: "2px solid rgba(0, 0, 0, 0.03)",
+      backdropFilter: "blur(8px)",
    },
 })
 
@@ -123,9 +132,7 @@ const AdminGenericLayout: React.FC<Props> = ({
             ]}
          >
             {/* header */}
-            <HeaderComponent drawerOpen={drawerOpen}>
-               {headerContent}
-            </HeaderComponent>
+            <HeaderComponent>{headerContent}</HeaderComponent>
             {/* main content */}
             <Box
                component={"main"}
@@ -179,14 +186,18 @@ const DrawerComponent = ({
 }
 
 type HeaderProps = {
-   drawerOpen: boolean
    children: React.ReactNode
+   headerBgColor?: string
 }
-const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
-   const { topBarFixed } = useGenericDashboard()
+const HeaderComponent = ({
+   children,
+   headerBgColor = "#F7F8FC",
+}: HeaderProps) => {
+   const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
+
    const isScrolling = useScrollTrigger({
       disableHysteresis: true,
-      threshold: 10,
+      threshold: headerScrollThreshold,
    })
 
    return (
@@ -197,9 +208,11 @@ const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
          elevation={0}
          sx={[
             styles.appBar,
-            drawerOpen && styles.animateWidth,
-            !isScrolling && styles.noBackdrop,
+            isScrolling ? styles.borderBottom : styles.noBackdrop,
             topBarFixed && styles.topBarFixed,
+            isScrolling && {
+               backgroundColor: alpha(headerBgColor, 0.9),
+            },
          ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>

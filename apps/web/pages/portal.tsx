@@ -61,6 +61,7 @@ const PortalPage = ({
          <GenericDashboardLayout
             pageDisplayName={""}
             topBarFixed={carouselContent?.length > 0}
+            headerScrollThreshold={250}
          >
             <>
                <Box position="relative" mb={4}>
