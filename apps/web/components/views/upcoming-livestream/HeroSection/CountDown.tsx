@@ -355,7 +355,7 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
          </LoadingButton>
          <Typography sx={{ textAlign: "center", marginTop: 2 }}>
             You have {userData.credits}{" "}
-            {maybePluralize(userData.credits, "credit")} left
+            {maybePluralize(userData.credits, "CareerCoin")} left
          </Typography>
       </>
    )
