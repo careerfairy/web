@@ -70,7 +70,12 @@ const GenericDashboardLayout = ({
       <GenericDashboardContext.Provider value={value}>
          <AdminGenericLayout
             bgColor={bgColor || "#F7F8FC"}
-            headerContent={<TopBar title={pageDisplayName} />}
+            headerContent={
+               <TopBar
+                  handleOpenCreditsDialog={handleOpenCreditsDialog}
+                  title={pageDisplayName}
+               />
+            }
             drawerContent={<NavBar />}
             bottomNavContent={<GenericNavList />}
             drawerOpen={!isMobile}
