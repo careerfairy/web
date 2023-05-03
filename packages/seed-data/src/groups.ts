@@ -3,6 +3,7 @@ import { faker } from "@faker-js/faker"
 import { firestore } from "./lib/firebase"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { generateId } from "./utils/utils"
+import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -12,13 +13,16 @@ class GroupFirebaseSeed implements GroupSeed {
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
       const batch = firestore.batch()
       const id = generateId()
+      const universityName = faker.company.companyName() ?? "My university"
+
       let data: Group = {
          id,
          groupId: id,
          description: faker.company.bs(),
          logoUrl: faker.image.business(),
          test: false,
-         universityName: faker.company.companyName() ?? "My university",
+         universityName,
+         triGrams: groupTriGrams(universityName),
       }
 
       data = Object.assign(data, overrideFields)

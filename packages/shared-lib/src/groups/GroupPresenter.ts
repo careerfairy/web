@@ -33,7 +33,7 @@ export class GroupPresenter {
       public readonly bannerImageUrl: string,
       public readonly extraInfo: string,
       public readonly companyCountry: GroupOption,
-      public readonly companyIndustry: GroupOption,
+      public readonly companyIndustries: GroupOption[],
       public readonly companySize: string,
       public readonly videos: GroupVideo[],
       public readonly photos: GroupPhoto[],
@@ -58,7 +58,7 @@ export class GroupPresenter {
          group.bannerImageUrl,
          group.extraInfo,
          group.companyCountry ?? null,
-         group.companyIndustry ?? null,
+         group.companyIndustries || [],
          group.companySize ?? null,
          group.videos || [],
          group.photos || [],
@@ -137,7 +137,7 @@ export class GroupPresenter {
                Boolean(
                   this.extraInfo &&
                      this.companySize &&
-                     this.companyIndustry &&
+                     this.companyIndustries.length &&
                      this.companyCountry
                ),
             isInitial: true,

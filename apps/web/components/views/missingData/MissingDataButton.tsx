@@ -8,6 +8,7 @@ import usePulseStyles from "../../../materialUI/Misc/pulse"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import UserDataModal, { missingDataFields } from "./UserDataModal"
 import { useLocalStorage } from "react-use"
+import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles = {
    containerIcon: {
@@ -25,12 +26,13 @@ const MissingDataButton = ({
    switchInterval = 15000, // 15s delay until a more intrusive button
 }: Props) => {
    const { authenticatedUser: user, userData, isLoggedOut } = useAuth()
+   const isMobile = useIsMobile()
    const pulseClasses = usePulseStyles()
    const buttonRef = useRef(null)
    const [missingFields, setMissingFields] = useState([])
    const [hidden, setHidden] = useState(true)
-   const [showLargeButton, setLargeButton] = useState(false)
-   const [isModalOpen, setModalOpen] = useState(false)
+   const [showLargeButton, setShowLargeButton] = useState(false)
+   const [isModalOpen, setIsModalOpen] = useState(false)
    const [dismissedAt, setDismissedAt, removeDismissedAt] = useLocalStorage(
       MISSING_DATA_KEY,
       null
@@ -72,7 +74,7 @@ const MissingDataButton = ({
       if (missingFields.length > 0 && !isModalOpen) {
          const timer = setTimeout(
             () => {
-               setLargeButton(true)
+               setShowLargeButton(true)
             },
             switchInterval,
             missingFields
@@ -83,30 +85,33 @@ const MissingDataButton = ({
    }, [switchInterval, missingFields, isModalOpen])
 
    const handleModalOpen = () => {
-      setModalOpen(true)
+      setIsModalOpen(true)
    }
 
-   const handleModalClose = useCallback((e, reason) => {
-      if (reason === undefined) {
-         // dismiss button click
-         setDismissedAt(Date.now())
-         setHidden(true)
-      }
+   const handleModalClose = useCallback(
+      (e, reason) => {
+         if (reason === undefined) {
+            // dismiss button click
+            setDismissedAt(Date.now())
+            setHidden(true)
+         }
 
-      if (reason === "end") {
-         // save button click (last step)
-         setHidden(true)
-      }
+         if (reason === "end") {
+            // save button click (last step)
+            setHidden(true)
+         }
 
-      setModalOpen(false)
-   }, [])
+         setIsModalOpen(false)
+      },
+      [setDismissedAt]
+   )
 
    if (hidden || isLoggedOut) return null
 
    return (
       <Box>
          <Tooltip title={`You have missing data in your profile`}>
-            {showLargeButton ? (
+            {showLargeButton && !isMobile ? (
                <Button
                   variant="contained"
                   size="medium"
@@ -134,13 +139,13 @@ const MissingDataButton = ({
             )}
          </Tooltip>
 
-         {isModalOpen && (
+         {isModalOpen ? (
             <UserDataModal
                handleModalClose={handleModalClose}
                isModalOpen={isModalOpen}
                missingFields={missingFields}
             />
-         )}
+         ) : null}
       </Box>
    )
 }

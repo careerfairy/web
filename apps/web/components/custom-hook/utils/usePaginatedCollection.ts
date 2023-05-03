@@ -29,7 +29,7 @@ export interface PaginatedCollection<T = DocumentData> {
    prevDisabled: boolean
    nextDisabled: boolean
    prev(): void
-   next(): Promise<void>
+   next(): void
    cursor: number
    page: number
    loading: boolean
@@ -82,7 +82,6 @@ const usePaginatedCollection = <T = DocumentData>(
    )
 
    const result = useFirestoreCollection(q, reactfireOptions)
-
    const prevDisabled = cursor === 0
    const nextDisabled =
       !prevNavigation && (result.data?.size ?? 0) < internalLimit
@@ -103,7 +102,7 @@ const usePaginatedCollection = <T = DocumentData>(
       setPrevNavigation(true)
    }, [options.limit, options.query, order, prevDisabled, result.data?.docs])
 
-   const next = useCallback(async () => {
+   const next = useCallback(() => {
       const offset = result.data?.size === internalLimit ? 2 : 1
       const nextCursor = result.data?.docs[result.data?.size - offset]
       if (nextDisabled || !nextCursor) return
@@ -140,7 +139,7 @@ const usePaginatedCollection = <T = DocumentData>(
    }, [options.query, order, internalLimit, reset])
 
    // remove the extra element if required
-   let data = result.data?.docs?.map((d) => d.data())
+   let data = result.data?.docs?.map((d) => ({ ...d.data(), id: d.id }))
    if (data?.length > options.limit) {
       data = data?.slice(0, -1)
    }

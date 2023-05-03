@@ -60,7 +60,7 @@ const AboutSection = ({
    const showCompanyPageData = Boolean(
       companyGroupData?.extraInfo ||
          (companyGroupData?.companyCountry &&
-            companyGroupData?.companyIndustry &&
+            companyGroupData?.companyIndustries?.length &&
             companyGroupData?.companySize)
    )
    return (
@@ -75,14 +75,14 @@ const AboutSection = ({
          backgroundColor={backgroundColor}
       >
          <SectionContainer>
-            {overheadText && (
+            {overheadText ? (
                <Fade fraction={forceReveal ? 0 : 0.2} bottom>
                   <Box marginBottom={2}>
                      <HighlightText text={overheadText} />
                   </Box>
                </Fade>
-            )}
-            {title && (
+            ) : null}
+            {title ? (
                <Fade fraction={forceReveal ? 0 : 0.2} bottom>
                   <SectionHeader
                      color={color}
@@ -92,7 +92,7 @@ const AboutSection = ({
                      titleSx={styles.title}
                   />
                </Fade>
-            )}
+            ) : null}
 
             {summary?.length ? (
                <Fade fraction={forceReveal ? 0 : 0.2} bottom>

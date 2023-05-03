@@ -1,6 +1,5 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react"
 import { Box, Grid, LinearProgress, Typography } from "@mui/material"
-import LazyLoad from "react-lazyload"
 import useInfiniteScrollClientWithHandlers from "../../../../custom-hook/useInfiniteScrollClientWithHandlers"
 import ShareLivestreamModal from "../../ShareLivestreamModal"
 import EventPreviewCard from "../../stream-cards/EventPreviewCard"
@@ -11,10 +10,11 @@ import { useInterests } from "../../../../custom-hook/useCollection"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { sxStyles } from "../../../../../types/commonTypes"
 import {
-   LivestreamEvent,
    ImpressionLocation,
+   LivestreamEvent,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { isEmptyObject } from "../../../../helperFunctions/HelperFunctions"
+import { InView } from "react-intersection-observer"
 
 const styles = sxStyles({
    emptyMessage: {
@@ -29,26 +29,6 @@ const styles = sxStyles({
       minHeight: "50vh",
    },
 })
-
-type WrapperProps = {
-   children: React.ReactNode
-   streamId: string
-}
-const Wrapper = ({ children, streamId }: WrapperProps) => {
-   return (
-      <LazyLoad
-         key={streamId}
-         style={{ width: "100%" }}
-         height={309}
-         debounce={100}
-         scroll
-         offset={600}
-         placeholder={<EventPreviewCard loading />}
-      >
-         {children}
-      </LazyLoad>
-   )
-}
 
 type GroupStreamsProps = {
    groupData: Group
@@ -109,19 +89,26 @@ const GroupStreams = ({
       (livestream, index, arr) => {
          if (livestream) {
             return (
-               <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={4} item>
-                  <Wrapper streamId={livestream.id}>
-                     <EventPreviewCard
-                        index={index}
-                        totalElements={arr.length}
-                        onRegisterClick={handleClickRegister}
-                        interests={existingInterests}
-                        autoRegister
-                        location={location}
-                        event={livestream}
-                        openShareDialog={setShareEventDialog}
-                     />
-                  </Wrapper>
+               <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={3} item>
+                  <InView triggerOnce>
+                     {({ inView, ref }) =>
+                        inView ? (
+                           <EventPreviewCard
+                              ref={ref}
+                              index={index}
+                              totalElements={arr.length}
+                              onRegisterClick={handleClickRegister}
+                              interests={existingInterests}
+                              autoRegister
+                              location={location}
+                              event={livestream}
+                              openShareDialog={setShareEventDialog}
+                           />
+                        ) : (
+                           <EventPreviewCard ref={ref} loading />
+                        )
+                     }
+                  </InView>
                </Grid>
             )
          }
@@ -175,7 +162,7 @@ const GroupStreams = ({
                )}
             </Grid>
          </Box>
-         {joinGroupModalData && (
+         {joinGroupModalData ? (
             <RegistrationModal
                open={Boolean(joinGroupModalData)}
                onFinish={handleCloseJoinModal}
@@ -185,7 +172,7 @@ const GroupStreams = ({
                targetGroupId={joinGroupModalData?.targetGroupId}
                handleClose={handleCloseJoinModal}
             />
-         )}
+         ) : null}
       </>
    )
 }

@@ -36,6 +36,7 @@ type UpdateRecordingStatsProps = {
    minutesWatched?: number
    userId?: string
    onlyIncrementMinutes?: boolean
+   usedCredits?: boolean
 }
 
 export type PastEventsOptions = {
@@ -209,6 +210,7 @@ export interface ILivestreamRepository {
       minutesWatched,
       userId,
       onlyIncrementMinutes,
+      usedCredits,
    }: UpdateRecordingStatsProps): Promise<void>
 
    getLivestreamRecordingTokenAndIncrementViewStat(
@@ -933,6 +935,7 @@ export class FirebaseLivestreamRepository
       minutesWatched = 0,
       userId,
       onlyIncrementMinutes = false,
+      usedCredits = false,
    }: UpdateRecordingStatsProps): Promise<void> {
       const docRef = this.firestore
          .collection("livestreams")
@@ -948,10 +951,19 @@ export class FirebaseLivestreamRepository
          views: this.fieldValue.increment(1) as any,
       }
 
+      if (usedCredits) {
+         // users that bought the recording are also stored in a separated
+         // array for analytics purposes
+         details.viewersThroughCredits = this.fieldValue.arrayUnion(
+            userId
+         ) as any
+      }
+
       // when we want only to increment the minutes watch of a specific recording
       if (onlyIncrementMinutes) {
          delete details.views
          delete details.viewers
+         delete details.viewersThroughCredits
          delete details.livestreamStartDate
       }
 

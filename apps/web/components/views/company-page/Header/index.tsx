@@ -15,7 +15,7 @@ import SimpleTab from "../../../../materialUI/GlobalTabs/SimpleTab"
 import React, { useCallback, useMemo } from "react"
 import { styled, useTheme } from "@mui/material/styles"
 import Stack from "@mui/material/Stack"
-import FollowButton from "./FollowButton"
+import FollowButton from "../../common/company/FollowButton"
 import ShareButton from "./ShareButton"
 import useElementIsAtTopOfPage from "../../../custom-hook/useElementIsAtTopOfPage"
 import useIsMobile from "../../../custom-hook/useIsMobile"
@@ -75,7 +75,7 @@ const styles = sxStyles({
    },
    headerWrapperSticky: {
       position: "fixed",
-      top: 0,
+      top: 5,
       left: 0,
       zIndex: (theme) => theme.zIndex.appBar,
       width: "100%",
@@ -235,7 +235,11 @@ const Header = () => {
             {isSticky ? <ToolbarOffset /> : null}
 
             <Box display={"flex"}>
-               <Box bgcolor={isSticky ? "#EFF5F8" : "transparent"} flex={1} />
+               <Box
+                  minWidth={isSticky ? { xs: "unset", md: "300px" } : null}
+                  bgcolor={isSticky ? "#EFF5F8" : "transparent"}
+                  flex={1}
+               />
                <Container
                   disableGutters
                   maxWidth="lg"
@@ -346,7 +350,9 @@ const ActionButtons = () => {
 
    return (
       <Stack spacing={1} direction={"row"}>
-         {showFollowButton ? <FollowButton group={group} /> : null}
+         {showFollowButton ? (
+            <FollowButton color="primary" group={group} />
+         ) : null}
          {showShareButton ? <ShareButton /> : null}
       </Stack>
    )

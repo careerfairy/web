@@ -4,14 +4,11 @@ import {
    localStorageInvite,
    localStorageReferralCode,
 } from "../../constants/localStorageKeys"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
-import {
-   REWARD_LIVESTREAM_ATTENDANCE_SECONDS,
-   RewardActions,
-} from "@careerfairy/shared-lib/dist/rewards"
+import { REWARD_LIVESTREAM_ATTENDANCE_SECONDS } from "@careerfairy/shared-lib/dist/rewards"
 import { useAuth } from "../../HOCs/AuthProvider"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { rewardService } from "data/firebase/RewardService"
 
 const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
    const { isLoggedIn } = useAuth()
@@ -25,7 +22,6 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
    const [alreadyRewarded, setAlreadyRewarded] = useSessionStorage(
       "livestreamAttendanceRewarded"
    )
-   const firebaseService = useFirebaseService()
 
    const mainStreamId = livestreamData?.parentLivestream
       ? livestreamData.parentLivestream?.id
@@ -86,13 +82,13 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
       mainStreamId,
    ])
 
-   const reward = (isInvitation) => {
+   const reward = (isInvitation: boolean) => {
       setAlreadyRewarded(mainStreamId)
       setStarted(null)
 
-      firebaseService
-         .rewardUserAction(RewardActions.LIVESTREAM_USER_ATTENDED, mainStreamId)
-         .then((r) => {
+      rewardService
+         .userAction("LIVESTREAM_USER_ATTENDED", mainStreamId)
+         .then(() => {
             console.log("User Attendance rewarded!")
          })
          .catch((e) => {
@@ -100,9 +96,9 @@ const useRewardLivestreamAttendance = (livestreamData: LivestreamEvent) => {
          })
 
       if (isInvitation) {
-         firebaseService
-            .rewardLivestreamAttendance(mainStreamId, referralCode)
-            .then((r) => {
+         rewardService
+            .livestreamAttendance(mainStreamId, referralCode)
+            .then(() => {
                console.log("Participation rewarded!")
             })
             .catch((e) => {

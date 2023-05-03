@@ -3,6 +3,9 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "data/firebase/FirebaseInstance"
 import { Group } from "@careerfairy/shared-lib/groups"
+import nookies from "nookies"
+import CookiesUtil from "./CookiesUtil"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -22,6 +25,45 @@ export const getServerSideStream = async (
       }
    }
    return serverSideStream
+}
+
+export const getServerSideUserStats = async (
+   email: string
+): Promise<UserStats> => {
+   if (!email) return null
+
+   // @ts-ignore
+   const snap = await store.firestore.get({
+      collection: "userData",
+      doc: email,
+      subcollections: [{ collection: "stats", doc: "stats" }],
+      storeAs: "userStats",
+   })
+
+   if (snap.exists) {
+      return snap.data() as UserStats
+   } else {
+      return null
+   }
+}
+
+export const getServerSideUserData = async (
+   email: string
+): Promise<UserData> => {
+   if (!email) return null
+
+   // @ts-ignore
+   const snap = await store.firestore.get({
+      collection: "userData",
+      doc: email,
+      storeAs: "userData",
+   })
+
+   if (snap.exists) {
+      return snap.data() as UserData
+   } else {
+      return null
+   }
 }
 
 export const getServerSideGroup = async (groupId: string): Promise<Group> => {
@@ -50,6 +92,24 @@ export const mapFromServerSide = (events: { [p: string]: any }[]) => {
    return events.map((e) =>
       LivestreamPresenter.parseDocument(e as any, fromDate)
    )
+}
+
+export const getUserTokenFromCookie = (
+   arg: Parameters<typeof nookies.get>[0]
+) => {
+   const cookies = nookies.get(arg)
+
+   let token: { email: string } | null = null
+   try {
+      token = CookiesUtil.parseJwt({
+         token: cookies.token,
+         isServerSide: true,
+      })
+
+      return token
+   } catch (e) {
+      console.error("Failed to parse cookie.token", e, cookies.token)
+   }
 }
 
 export const parseJwtServerSide = (token?: string) => {

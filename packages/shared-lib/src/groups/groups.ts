@@ -30,7 +30,7 @@ export interface Group extends Identifiable {
     * Metadata for the group
     * */
    companyCountry?: GroupOption
-   companyIndustry?: GroupOption
+   companyIndustries?: GroupOption[]
    companySize?: string
 
    /*
@@ -43,6 +43,13 @@ export interface Group extends Identifiable {
    videos?: GroupVideo[]
    publicProfile?: boolean
    testimonials?: Testimonial[]
+
+   /**
+    * A map of all the trigrams from joining the group universityName
+    * and the description. Used for full text search
+    */
+   triGrams: Record<string, true>
+
    /*
     * Deprecated
     * */

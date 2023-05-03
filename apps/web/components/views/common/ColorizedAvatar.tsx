@@ -34,12 +34,16 @@ const ColorizedAvatar = ({
 
    return (
       <Avatar
-         sx={[avaProps.sx, ...(Array.isArray(sx) ? sx : [sx])]}
+         sx={[
+            imageUrl ? null : avaProps.sx,
+            ...(Array.isArray(sx) ? sx : [sx]),
+         ]}
          {...rest}
-         children={loading ? "" : avaProps.children}
          alt={loading ? "" : `${firstName || ""} ${lastName || ""}`}
          src={imageUrl}
-      />
+      >
+         {loading ? "" : avaProps.children}
+      </Avatar>
    )
 }
 

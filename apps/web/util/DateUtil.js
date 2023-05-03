@@ -32,6 +32,10 @@ export default class DateUtil {
       return dayjs(JSDate).format("MMMM Do, HH:mm")
    }
 
+   static dateWithYear(JSDate) {
+      return dayjs(JSDate).format("LL LT") // October 21, 2019 10:00 AM
+   }
+
    static eventPreviewHour(JSDate) {
       return dayjs(JSDate).format("HH:mm")
    }
@@ -46,6 +50,9 @@ export default class DateUtil {
    }
    static getRatingDate(JSDate) {
       return dayjs(JSDate).format("D MMMM YYYY")
+   }
+   static pastEventPreviewDate(JSDate) {
+      return dayjs(JSDate).format("DD/MM/YYYY")
    }
 
    static getRelativeDate(JSDate) {

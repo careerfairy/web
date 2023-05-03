@@ -50,12 +50,14 @@ test("successful registration on a livestream event with no questions", async ({
    })
 })
 
-test("past event shouldn't be able to register", async ({ page }) => {
+test("past event without login should request the user to login to access the recording", async ({
+   page,
+}) => {
    const livestreamPage = new UpcomingLivestreamPage(page)
    const { livestream } = await setupData({}, {}, "createPast")
 
    await livestreamPage.open(livestream.id)
-   await expect(await livestreamPage.buttonEventOver).toBeDisabled()
+   await expect(livestreamPage.buttonPastEventNoLogin.isVisible()).toBeTruthy()
 })
 
 test("register to an event and fill out a question and join talent pool", async ({
@@ -283,7 +285,7 @@ const completeSuccessfulRegistration = async ({
       await page.waitForURL(`**${expectedPath}`, { timeout: 10000 })
    }
 
-   await expectSelector(page, `h6:has-text("NEXT LIVE STREAMS")`)
+   await expectSelector(page, `h1:has-text("Live streams")`)
    await expectExactText(page, "Booked!")
 
    // confirm we can't register again

@@ -1,6 +1,6 @@
+import { RewardDoc } from "@careerfairy/shared-lib/dist/rewards"
 import { collection, query, orderBy } from "firebase/firestore"
 import { useFirestore, useFirestoreCollectionData } from "reactfire"
-import { Reward } from "../../types/reward"
 
 /**
  * Fetch the rewards for a given user
@@ -16,7 +16,7 @@ const useUserRewards = (userId: string) => {
       orderBy("createdAt", "desc")
    )
 
-   return useFirestoreCollectionData<Reward>(collectionRef as any, {
+   return useFirestoreCollectionData<RewardDoc>(collectionRef as any, {
       idField: "id", // this field will be added to the firestore object
    })
 }

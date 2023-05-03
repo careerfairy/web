@@ -43,7 +43,7 @@ export type BaseGroupInfo = {
    university?: GroupedUniversity
    isUniversity?: boolean
    companySize?: string
-   companyIndustry?: OptionGroup
+   companyIndustries?: OptionGroup[]
    companyCountry?: OptionGroup
    isATSEnabled?: boolean
 }
@@ -183,7 +183,7 @@ const CreateGroup = () => {
    const createCareerCenter = async () => {
       try {
          const downloadURL = await uploadLogo(baseGroupInfo.logoFileObj)
-         const careerCenter: Omit<Group, "id" | "groupId"> = {
+         const careerCenter: Omit<Group, "id" | "groupId" | "triGrams"> = {
             universityName: baseGroupInfo.universityName,
             logoUrl: downloadURL,
             description: baseGroupInfo.description,
@@ -193,7 +193,7 @@ const CreateGroup = () => {
             }),
             atsAdminPageFlag: baseGroupInfo.isATSEnabled,
             companyCountry: baseGroupInfo.companyCountry,
-            companyIndustry: baseGroupInfo.companyIndustry,
+            companyIndustries: baseGroupInfo.companyIndustries,
             companySize: baseGroupInfo.companySize,
          }
 

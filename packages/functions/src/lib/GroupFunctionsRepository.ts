@@ -27,6 +27,7 @@ import type { FunctionsLogger } from "../util"
 import { admin } from "../api/firestoreAdmin"
 
 import DocumentSnapshot = firestore.DocumentSnapshot
+import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 
 export interface IGroupFunctionsRepository extends IGroupRepository {
    /**
@@ -298,9 +299,10 @@ export class GroupFunctionsRepository
          universityCode: group.universityCode || "",
          atsAdminPageFlag: group.atsAdminPageFlag || false,
          companyCountry: group.companyCountry || null,
-         companyIndustry: group.companyIndustry || null,
+         companyIndustries: group.companyIndustries || [],
          companySize: group.companySize || "",
          test: false,
+         triGrams: groupTriGrams(group.universityName || ""),
       }
 
       batch.set(groupRef, newGroupData)

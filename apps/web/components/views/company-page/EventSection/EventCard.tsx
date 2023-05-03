@@ -48,6 +48,7 @@ const styles = sxStyles({
       borderTop: "none",
       borderRadius: "0 0 12px 12px",
       p: 2,
+      backgroundColor: "white",
    },
    button: {
       display: "flex",

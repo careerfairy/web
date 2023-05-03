@@ -4,7 +4,7 @@ import {
    NetworkerBadgeLevel3,
 } from "@careerfairy/shared-lib/badges/NetworkBadges"
 import functions = require("firebase-functions")
-import { userGetByEmail, userUpdateFields } from "./user"
+import { userUpdateFields } from "./user"
 import {
    ResearchBadge,
    ResearchBadgeLevel2,
@@ -17,6 +17,7 @@ import {
    EngageBadge,
 } from "@careerfairy/shared-lib/badges/EngageBadges"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { userRepo } from "../api/repositories"
 
 /**
  * Applies user badges based on the userData document
@@ -70,7 +71,9 @@ export const handleUserStatsBadges = async (
    userDataId: string,
    newUserStats: UserStats
 ): Promise<void> => {
-   const userData: UserData = (await userGetByEmail(userDataId)) as UserData
+   const userData: UserData = (await userRepo.getUserDataById(
+      userDataId
+   )) as UserData
    const badges = userData.badges || []
    let newBadges
 

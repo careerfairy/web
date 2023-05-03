@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "../livestreams"
+import { Group } from "../groups"
 
 /**
  * Generates a ngram array from a string for a given n
@@ -60,6 +61,23 @@ export const livestreamTriGrams = (
    company: LivestreamEvent["company"]
 ): Record<string, true> => {
    const ngrams = triGrams([title, company])
+
+   return ngrams.reduce((acc, triGram) => {
+      acc[triGram] = true
+      return acc
+   }, {})
+}
+
+/**
+ * Generates a trigram map from a group based on the it's universityName
+ * and description.
+ *
+ * Caution: same as above
+ */
+export const groupTriGrams = (
+   universityName: Group["universityName"]
+): Record<string, true> => {
+   const ngrams = triGrams([universityName])
 
    return ngrams.reduce((acc, triGram) => {
       acc[triGram] = true

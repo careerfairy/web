@@ -13,6 +13,7 @@ import {
    UserJobApplicationDocument,
    UserPublicData,
    UserReminderType,
+   UserStats,
 } from "./users"
 import firebase from "firebase/compat/app"
 import { Job, JobIdentifier, PUBLIC_JOB_STATUSES } from "../ats/Job"
@@ -140,6 +141,24 @@ export interface IUserRepository {
    ): Promise<void>
 
    updateLastActivity(userId: string): Promise<void>
+
+   getByReferralCode(referralCode: string): Promise<UserData | null>
+
+   incrementStat(
+      userDataId: string,
+      field: keyof UserStats,
+      amount?: number
+   ): Promise<void>
+
+   addToStatArray(
+      userDataId: string,
+      field: keyof UserStats,
+      value: string
+   ): Promise<void>
+
+   getStats(userDataId: string): Promise<UserStats>
+
+   updateResume(userEmail: string, resumeUrl: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -152,6 +171,76 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async getStats(userEmail: string): Promise<UserStats | null> {
+      let snap = await this.firestore
+         .collection("userData")
+         .doc(userEmail)
+         .collection("stats")
+         .doc("stats")
+         .get()
+
+      if (!snap.exists) {
+         return null
+      }
+
+      return snap.data() as UserStats
+   }
+
+   async incrementStat(
+      userDataId: string,
+      field: keyof UserStats,
+      amount: number = 1
+   ) {
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("stats")
+         .doc("stats")
+
+      return docRef.set(
+         {
+            userId: userDataId,
+            [field]: this.fieldValue.increment(amount),
+         },
+         { merge: true }
+      )
+   }
+
+   async addToStatArray(
+      userDataId: string,
+      field: keyof UserStats,
+      value: string
+   ) {
+      const docRef = this.firestore
+         .collection("userData")
+         .doc(userDataId)
+         .collection("stats")
+         .doc("stats")
+
+      return docRef.set(
+         {
+            userId: userDataId,
+            [field]: this.fieldValue.arrayUnion(value),
+         },
+         { merge: true }
+      )
+   }
+
+   async getByReferralCode(referralCode: string): Promise<UserData | null> {
+      let snap = await this.firestore
+         .collection("userData")
+         .where("referralCode", "==", referralCode)
+         .limit(1)
+         .withConverter(createCompatGenericConverter<UserData>())
+         .get()
+
+      if (snap.empty) {
+         return null
+      }
+
+      return snap.docs[0].data()
    }
 
    async createActivity(
@@ -473,6 +562,10 @@ export class FirebaseUserRepository
          referredBy,
          fieldOfStudy,
          unsubscribed,
+         avatar,
+         position,
+         firstName,
+         lastName,
       } = fields
 
       const genderToUpdate = gender ? { gender } : {}
@@ -493,6 +586,10 @@ export class FirebaseUserRepository
          fieldOfStudy !== undefined ? { fieldOfStudy } : {}
       const unsubscribedToUpdate =
          unsubscribed !== undefined ? { unsubscribed } : {}
+      const avatarToUpdate = avatar ? { avatar } : {}
+      const positionToUpdate = position ? { position } : {}
+      const firstNameToUpdate = firstName ? { firstName } : {}
+      const lastNameToUpdate = lastName ? { lastName } : {}
 
       const toUpdate = {
          ...genderToUpdate,
@@ -505,6 +602,10 @@ export class FirebaseUserRepository
          ...referredByToUpdate,
          ...fieldOfStudyToUpdate,
          ...unsubscribedToUpdate,
+         ...avatarToUpdate,
+         ...positionToUpdate,
+         ...firstNameToUpdate,
+         ...lastNameToUpdate,
       }
 
       return userRef.update(toUpdate)
@@ -625,6 +726,16 @@ export class FirebaseUserRepository
          .collection("companiesUserFollows")
          .withConverter(createCompatGenericConverter<CompanyFollowed>())
          .limit(limit)
+   }
+
+   updateResume(userEmail: string, resumeUrl: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+
+      const toUpdate: Pick<UserData, "userResume"> = {
+         userResume: resumeUrl,
+      }
+
+      return docRef.update(toUpdate)
    }
 }
 

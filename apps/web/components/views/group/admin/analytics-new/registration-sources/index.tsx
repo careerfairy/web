@@ -1,6 +1,6 @@
 import { Container, Grid } from "@mui/material"
 import { Box } from "@mui/system"
-import React, { memo, useMemo } from "react"
+import React, { memo, useEffect, useMemo } from "react"
 import Sources from "../../analytics/RegistrationSources"
 import { useGroup } from "../../../../../../layouts/GroupDashboardLayout"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
@@ -20,7 +20,13 @@ const AnalyticsRegistrationSourcesPageContent = () => {
 
 const PageContent = () => {
    const { group } = useGroup()
-   const { livestreamStats } = useAnalyticsPageContext()
+   const { livestreamStats, setLivestreamStatsTimeFrame } =
+      useAnalyticsPageContext()
+
+   useEffect(() => {
+      // start with last 1 year as the default time frame
+      setLivestreamStatsTimeFrame("Last 1 year")
+   }, [])
 
    const isLoading = useMemo(
       () => livestreamStats === undefined,

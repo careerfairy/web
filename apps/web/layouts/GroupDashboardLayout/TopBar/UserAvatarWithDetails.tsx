@@ -15,7 +15,7 @@ import Stack from "@mui/material/Stack"
 import IconButton from "@mui/material/IconButton"
 import PersonOutlineOutlinedIcon from "@mui/icons-material/PersonOutlineOutlined"
 import LogoutIcon from "@mui/icons-material/PowerSettingsNewOutlined"
-import { Repeat as SyncIcon } from "react-feather"
+import { Home as HomeIcon, Repeat as SyncIcon } from "react-feather"
 
 // project imports
 import { sxStyles } from "../../../types/commonTypes"
@@ -79,6 +79,11 @@ const UserAvatarWithDetails = () => {
       [adminGroups, userData?.isAdmin]
    )
 
+   const showPortalButton = useMemo(
+      () => userData?.isAdmin,
+      [userData?.isAdmin]
+   )
+
    return (
       <>
          <Stack direction={"row"} spacing={1}>
@@ -91,6 +96,7 @@ const UserAvatarWithDetails = () => {
                   aria-expanded={open ? "true" : undefined}
                >
                   <ColorizedAvatar
+                     imageUrl={userData?.avatar}
                      lastName={userData?.lastName}
                      firstName={userData?.firstName}
                      sx={styles.ava}
@@ -125,30 +131,49 @@ const UserAvatarWithDetails = () => {
             transformOrigin={transformOrigin}
             anchorOrigin={anchorOrigin}
          >
-            <MenuItem onClick={() => push("/profile")}>
-               <ListItemIcon>
-                  <PersonOutlineOutlinedIcon fontSize="small" />
-               </ListItemIcon>
-               My Profile
-            </MenuItem>
-            <Divider />
-            {showSwitchButton ? (
-               <>
-                  <MenuItem onClick={() => setOpenManageCompaniesDialog(true)}>
-                     <ListItemIcon>
-                        <SyncIcon size="1em" />
-                     </ListItemIcon>
-                     Switch Company
-                  </MenuItem>
-                  <Divider />
-               </>
-            ) : null}
-            <MenuItem onClick={signOut}>
-               <ListItemIcon>
-                  <LogoutIcon fontSize="small" />
-               </ListItemIcon>
-               Logout
-            </MenuItem>
+            {[
+               <MenuItem
+                  onClick={() => push(`/group/${group.id}/admin/profile`)}
+                  key="profile"
+               >
+                  <ListItemIcon>
+                     <PersonOutlineOutlinedIcon fontSize="small" />
+                  </ListItemIcon>
+                  My Profile
+               </MenuItem>,
+               <Divider key="divider1" />,
+               ...(showSwitchButton
+                  ? [
+                       <MenuItem
+                          onClick={() => setOpenManageCompaniesDialog(true)}
+                          key="switch-company"
+                       >
+                          <ListItemIcon>
+                             <SyncIcon size="1em" />
+                          </ListItemIcon>
+                          Switch Company
+                       </MenuItem>,
+                       <Divider key="divider2" />,
+                    ]
+                  : []),
+               ...(showPortalButton
+                  ? [
+                       <MenuItem onClick={() => push("/portal")} key="portal">
+                          <ListItemIcon>
+                             <HomeIcon size="1em" />
+                          </ListItemIcon>
+                          Portal
+                       </MenuItem>,
+                       <Divider key="divider2" />,
+                    ]
+                  : []),
+               <MenuItem onClick={signOut} key="logout">
+                  <ListItemIcon>
+                     <LogoutIcon fontSize="small" />
+                  </ListItemIcon>
+                  Logout
+               </MenuItem>,
+            ]}
          </Menu>
          {openManageCompaniesDialog ? (
             <ManageCompaniesDialog

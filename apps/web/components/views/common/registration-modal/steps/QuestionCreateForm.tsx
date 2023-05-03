@@ -22,6 +22,7 @@ import {
 } from "../../../../../constants/forms"
 import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import { rewardService } from "data/firebase/RewardService"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -68,7 +69,7 @@ const QuestionCreateForm = () => {
       useContext(RegistrationContext)
    const classes = useStyles()
    const { replace } = useRouter()
-   const { putLivestreamQuestion, rewardUserAction } = useFirebaseService()
+   const { putLivestreamQuestion } = useFirebaseService()
    const { authenticatedUser, userData } = useAuth()
 
    const {
@@ -96,7 +97,8 @@ const QuestionCreateForm = () => {
             }
             await putLivestreamQuestion(livestream?.id, newQuestion)
 
-            rewardUserAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
+            rewardService
+               .userAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
                .then((_) => console.log("Rewarded Question Asked"))
                .catch(console.error)
 
