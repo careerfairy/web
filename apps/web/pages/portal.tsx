@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react"
+import React, { useMemo } from "react"
 import Container from "@mui/material/Container"
 import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
 import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents"
@@ -18,7 +18,6 @@ import ContentCarousel from "../components/views/portal/content-carousel/Content
 import DateUtil from "../util/DateUtil"
 import { Box } from "@mui/material"
 import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
-import useScrollTrigger from "@mui/material/useScrollTrigger"
 import {
    getServerSideUserData,
    getServerSideUserStats,
@@ -30,26 +29,10 @@ import CarouselContentService from "../components/views/portal/content-carousel/
 const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
-   recordedEvents,
    serializedCarouselContent,
    serverUserStats,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
-   const isScrollingHoverTheBanner = useScrollTrigger({
-      threshold: 250,
-      disableHysteresis: true,
-   })
-
-   // To have a different look & feel on header and topBar when hovering the portal page banner
-   const [isOverBanner, setIsOverBanner] = useState<boolean>(
-      recordedEvents?.length > 0
-   )
-
-   useEffect(() => {
-      if (recordedEvents?.length > 0) {
-         setIsOverBanner(!isScrollingHoverTheBanner)
-      }
-   }, [isScrollingHoverTheBanner])
 
    const hasInterests = Boolean(
       authenticatedUser.email || userData?.interestsIds
@@ -77,9 +60,8 @@ const PortalPage = ({
          />
          <GenericDashboardLayout
             pageDisplayName={""}
-            hasRecordings={recordedEvents?.length > 0}
-            isPortalPage={true}
-            isOverPortalBanner={isOverBanner}
+            topBarFixed={carouselContent?.length > 0}
+            headerScrollThreshold={carouselContent?.length ? 250 : 10}
          >
             <>
                <Box position="relative" mb={4}>
@@ -169,9 +151,6 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          ...(pastEvents && {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
-         recordedEvents:
-            recordedEventsToShare?.map(LivestreamPresenter.serializeDocument) ||
-            [],
          ...(carouselContent && {
             serializedCarouselContent: carouselContent?.map(
                LivestreamPresenter.serializeDocument
