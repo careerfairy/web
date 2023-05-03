@@ -412,7 +412,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
       }, [
          authenticatedUser.email,
-         event.denyRecordingAccess,
+         event?.denyRecordingAccess,
          event?.groupIds,
          event?.id,
          groupId,
