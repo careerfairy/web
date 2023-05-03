@@ -63,7 +63,7 @@ const CompanyGroupInfo = ({ companyGroupData }: Props) => {
                      text={companyGroupData.companyCountry.name}
                   />
                ) : null}
-               {companyGroupData.companyIndustries.length ? (
+               {companyGroupData.companyIndustries?.length ? (
                   <CompanyIndustryTag
                      fontSize={"1.07rem"}
                      text={companyGroupData.companyIndustries

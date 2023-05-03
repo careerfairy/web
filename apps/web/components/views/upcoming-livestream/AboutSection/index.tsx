@@ -60,7 +60,7 @@ const AboutSection = ({
    const showCompanyPageData = Boolean(
       companyGroupData?.extraInfo ||
          (companyGroupData?.companyCountry &&
-            companyGroupData?.companyIndustries.length &&
+            companyGroupData?.companyIndustries?.length &&
             companyGroupData?.companySize)
    )
    return (
