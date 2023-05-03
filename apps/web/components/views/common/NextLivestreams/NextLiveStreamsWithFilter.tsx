@@ -59,7 +59,8 @@ const getQueryVariables = (query) => {
       jobCheck: jobCheck?.toLowerCase() === "true" || false,
       companyCountries: companyCountries && companyCountries.split(","),
       companySizes: companySizes && companySizes.split(","),
-      companyIndustries: companyIndustries && companyIndustries.split(","),
+      companyIndustries:
+         companyIndustries?.length && companyIndustries.split(","),
    }
 }
 

@@ -168,7 +168,7 @@ const CompanyCard: FC<Props> = ({ company }) => {
                   <CompanyIndustryTag
                      fontSize="1.07rem"
                      text={company.companyIndustries
-                        .map(({ name }) => name)
+                        ?.map(({ name }) => name)
                         .join(", ")}
                   />
                   <CompanySizeTag
