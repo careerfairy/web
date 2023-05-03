@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.common.white,
    },
 }))
-const TopBar = () => {
+const TopBar = ({ handleOpenCreditsDialog }) => {
    const theme = useTheme()
    const classes = useStyles()
    const isMobile = useIsMobile()
@@ -64,7 +64,9 @@ const TopBar = () => {
                         <LoginButton />
                      </div>
                   ) : (
-                     <ProfileMenu />
+                     <ProfileMenu
+                        handleOpenCreditsDialog={handleOpenCreditsDialog}
+                     />
                   )}
                </Box>
             </Hidden>
@@ -77,6 +79,7 @@ TopBar.propTypes = {
    className: PropTypes.string,
    links: PropTypes.array,
    onMobileNavOpen: PropTypes.func,
+   handleOpenCreditsDialog: PropTypes.func,
 }
 
 TopBar.defaultProps = {
