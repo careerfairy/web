@@ -20,8 +20,7 @@ import { getMaxLineStyles } from "../../../components/helperFunctions/HelperFunc
 import { alpha } from "@mui/material/styles"
 import Divider from "@mui/material/Divider"
 import CareerCoinIcon from "../../../components/views/common/CareerCoinIcon"
-import { useCallback, useMemo } from "react"
-import { useGenericDashboard } from "../index"
+import { FC, useCallback, useMemo } from "react"
 
 const styles = sxStyles({
    ava: {
@@ -58,8 +57,11 @@ const styles = sxStyles({
       justifyContent: "center",
    },
 })
-const ProfileMenu = () => {
-   const { handleOpenCreditsDialog } = useGenericDashboard()
+
+type Props = {
+   handleOpenCreditsDialog: () => void
+}
+const ProfileMenu: FC<Props> = ({ handleOpenCreditsDialog }) => {
    const { handleClick, open, handleClose, anchorEl } = useMenuState()
    const { userData, signOut, userPresenter, adminGroups } = useAuth()
    const { push } = useRouter()

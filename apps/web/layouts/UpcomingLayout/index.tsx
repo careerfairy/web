@@ -36,7 +36,7 @@ const UpcomingLayout = ({ children, viewRef = undefined }) => {
    return (
       <UpcomingLayoutContext.Provider value={value}>
          <Page viewRef={viewRef}>
-            <TopBar />
+            <TopBar handleOpenCreditsDialog={handleOpenCreditsDialog} />
             <PageContentWrapper>
                <GeneralNavDrawer />
                <PageChildrenWrapper>{children}</PageChildrenWrapper>

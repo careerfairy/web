@@ -41,9 +41,10 @@ const styles = sxStyles({
 type Props = {
    title: string
    bgColor?: string
+   handleOpenCreditsDialog: () => void
 }
 
-const TopBar = ({ title, bgColor }: Props) => {
+const TopBar = ({ title, bgColor, handleOpenCreditsDialog }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
 
@@ -75,7 +76,7 @@ const TopBar = ({ title, bgColor }: Props) => {
                   <LoginButton />
                </div>
             ) : (
-               <ProfileMenu />
+               <ProfileMenu handleOpenCreditsDialog={handleOpenCreditsDialog} />
             )}
          </Stack>
       </Box>
