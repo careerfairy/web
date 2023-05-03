@@ -2,7 +2,8 @@ import React, { memo, useEffect } from "react"
 
 // material-ui
 import { AppBar, Box, Toolbar, useMediaQuery } from "@mui/material"
-import { useTheme } from "@mui/material/styles"
+import { alpha, useTheme } from "@mui/material/styles"
+import useScrollTrigger from "@mui/material/useScrollTrigger"
 import Drawer from "@mui/material/Drawer"
 
 // project imports
@@ -22,6 +23,9 @@ const styles = sxStyles({
       flexDirection: "column",
       maxWidth: "fill-available",
    },
+   innerDesktop: {
+      width: `calc(100% - ${DRAWER_WIDTH}px)`,
+   },
    main: {
       flexGrow: 1,
       display: "flex",
@@ -31,8 +35,13 @@ const styles = sxStyles({
       transition: (theme) => theme.transitions.create("width"),
    },
    appBar: {
-      bgcolor: "transparent",
       backdropFilter: "blur(8px)",
+      transition: (theme) =>
+         theme.transitions.create([
+            "backdrop-filter",
+            "background-color",
+            "width",
+         ]),
    },
    toolbar: {
       backgroundColor: "none",
@@ -57,11 +66,16 @@ const styles = sxStyles({
    drawerWrapperClosed: {
       width: 0,
    },
-   topBarOverBanner: {
+   noBackdrop: {
       backdropFilter: "none",
+      backgroundColor: "transparent",
    },
    topBarFixed: {
       position: "fixed",
+   },
+   borderBottom: {
+      borderBottom: "2px solid rgba(0, 0, 0, 0.03)",
+      backdropFilter: "blur(8px)",
    },
 })
 
@@ -110,11 +124,15 @@ const AdminGenericLayout: React.FC<Props> = ({
             {drawerContent}
          </DrawerComponent>
 
-         <Box sx={[styles.inner, styles.animateWidth]}>
+         <Box
+            sx={[
+               styles.inner,
+               styles.animateWidth,
+               !isMobile && drawerOpen && styles.innerDesktop,
+            ]}
+         >
             {/* header */}
-            <HeaderComponent drawerOpen={drawerOpen}>
-               {headerContent}
-            </HeaderComponent>
+            <HeaderComponent>{headerContent}</HeaderComponent>
             {/* main content */}
             <Box
                component={"main"}
@@ -168,12 +186,19 @@ const DrawerComponent = ({
 }
 
 type HeaderProps = {
-   drawerOpen: boolean
    children: React.ReactNode
+   headerBgColor?: string
 }
-const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
-   const { isOverPortalBanner, isPortalPage, hasRecordings } =
-      useGenericDashboard()
+const HeaderComponent = ({
+   children,
+   headerBgColor = "#F7F8FC",
+}: HeaderProps) => {
+   const { topBarFixed, headerScrollThreshold } = useGenericDashboard()
+
+   const isScrolling = useScrollTrigger({
+      disableHysteresis: true,
+      threshold: headerScrollThreshold,
+   })
 
    return (
       <AppBar
@@ -183,9 +208,11 @@ const HeaderComponent = ({ drawerOpen, children }: HeaderProps) => {
          elevation={0}
          sx={[
             styles.appBar,
-            drawerOpen && styles.animateWidth,
-            isOverPortalBanner && styles.topBarOverBanner,
-            isPortalPage && hasRecordings && styles.topBarFixed,
+            isScrolling ? styles.borderBottom : styles.noBackdrop,
+            topBarFixed && styles.topBarFixed,
+            isScrolling && {
+               backgroundColor: alpha(headerBgColor, 0.9),
+            },
          ]}
       >
          <Toolbar sx={styles.toolbar} disableGutters>

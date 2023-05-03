@@ -9,35 +9,37 @@ import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 
 type IGenericDashboardContext = {
-   isOverPortalBanner: boolean
    isPortalPage: boolean
-   hasRecordings: boolean
    handleOpenCreditsDialog: () => void
+   topBarFixed: boolean
+   // The number of pixels the user has to scroll before the header is hidden. Default is 10
+   headerScrollThreshold: number
 }
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
-   isOverPortalBanner: false,
    isPortalPage: false,
-   hasRecordings: false,
    handleOpenCreditsDialog: () => {},
+   topBarFixed: false,
+   headerScrollThreshold: 10,
 })
 
 type Props = {
    children: JSX.Element
    pageDisplayName: string
    bgColor?: string
-   hasRecordings?: boolean
    isPortalPage?: boolean
-   isOverPortalBanner?: boolean
+   topBarFixed?: boolean
+   // The number of pixels the user has to scroll before the header is hidden
+   headerScrollThreshold?: number
 }
 
 const GenericDashboardLayout = ({
    children,
    pageDisplayName,
    bgColor,
-   hasRecordings,
    isPortalPage,
-   isOverPortalBanner,
+   topBarFixed,
+   headerScrollThreshold = 10,
 }: Props) => {
    const isMobile = useIsMobile()
 
@@ -51,12 +53,17 @@ const GenericDashboardLayout = ({
    //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
    const value = useMemo<IGenericDashboardContext>(
       () => ({
-         isOverPortalBanner,
          isPortalPage,
-         hasRecordings,
          handleOpenCreditsDialog,
+         headerScrollThreshold,
+         topBarFixed: Boolean(topBarFixed),
       }),
-      [handleOpenCreditsDialog, hasRecordings, isOverPortalBanner, isPortalPage]
+      [
+         handleOpenCreditsDialog,
+         headerScrollThreshold,
+         isPortalPage,
+         topBarFixed,
+      ]
    )
 
    return (

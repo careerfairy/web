@@ -24,7 +24,10 @@ const CompanyTag: FC<Props> = ({ icon, text, fontSize = "1rem" }) => {
 }
 
 type CustomTagProps = Omit<Props, "icon">
-export const CompanyCountryTag: FC<CustomTagProps> = ({ text, fontSize }) => {
+export const CompanyCountryTag: FC<CustomTagProps> = ({
+   text,
+   fontSize = "1rem",
+}) => {
    return (
       <CompanyTag
          icon={<CompanyLocationIcon size={`calc(${fontSize} * 1.3)`} />}
@@ -34,7 +37,10 @@ export const CompanyCountryTag: FC<CustomTagProps> = ({ text, fontSize }) => {
    )
 }
 
-export const CompanyIndustryTag: FC<CustomTagProps> = ({ text, fontSize }) => {
+export const CompanyIndustryTag: FC<CustomTagProps> = ({
+   text,
+   fontSize = "1rem",
+}) => {
    return (
       <CompanyTag
          icon={<CompanyIndustryIcon size={`calc(${fontSize} * 1.3)`} />}
@@ -44,7 +50,10 @@ export const CompanyIndustryTag: FC<CustomTagProps> = ({ text, fontSize }) => {
    )
 }
 
-export const CompanySizeTag: FC<CustomTagProps> = ({ text, fontSize }) => {
+export const CompanySizeTag: FC<CustomTagProps> = ({
+   text,
+   fontSize = "1rem",
+}) => {
    return (
       <CompanyTag
          icon={<CompanySizeIcon size={`calc(${fontSize} * 1.3)`} />}

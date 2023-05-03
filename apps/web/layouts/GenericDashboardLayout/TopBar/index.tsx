@@ -11,7 +11,6 @@ import { useAuth } from "../../../HOCs/AuthProvider"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { MainLogo } from "../../../components/logos"
 import React from "react"
-import { useGenericDashboard } from "../index"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 
 const styles = sxStyles({
@@ -30,16 +29,6 @@ const styles = sxStyles({
    leftSection: {
       display: "flex",
    },
-   btnWrapper: {
-      display: "flex",
-      alignItems: "center",
-      justifyContent: "center",
-      mr: 1,
-   },
-   menuButton: {
-      borderRadius: 3,
-      overflow: "hidden",
-   },
    title: {
       fontSize: {
          xs: "1.2rem",
@@ -57,13 +46,9 @@ type Props = {
 const TopBar = ({ title, bgColor }: Props) => {
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
-   const { isOverPortalBanner } = useGenericDashboard()
 
    return (
-      <Box
-         bgcolor={isOverPortalBanner ? null : bgColor || "#F7F8FC"}
-         sx={styles.root}
-      >
+      <Box bgcolor={bgColor} sx={styles.root}>
          <Box sx={styles.leftSection}>
             {isMobile ? (
                <MainLogo sx={{ maxWidth: "100%" }} />
