@@ -384,11 +384,11 @@ const NotEnoughCreditsButton = () => {
             size="large"
             endIcon={<CareerCoinIcon />}
          >
-            Not Enough Credits
+            Not Enough CareerCoins
          </Button>
          <Typography sx={{ textAlign: "center", marginTop: 2 }}>
             <Link sx={{ color: "text.primary" }} onClick={handleClick} href="#">
-               Get more credits
+               Get more CareerCoins
             </Link>
          </Typography>
       </>
