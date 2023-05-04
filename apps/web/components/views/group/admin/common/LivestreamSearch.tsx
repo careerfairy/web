@@ -82,6 +82,7 @@ const LivestreamSearch: FC<Props> = ({
          additionalConstraints: [
             ...additionalConstraints,
             where("test", "==", false),
+            where("hidden", "==", false),
          ],
          ...(searchWithTrigram
             ? null
