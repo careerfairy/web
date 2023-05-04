@@ -85,7 +85,7 @@ const AboutSection = () => {
             ) : null}
          </Box>
       ),
-      [companyCountry.name, companyIndustries, companySize]
+      [companyCountry?.name, companyIndustries, companySize]
    )
 
    return (
