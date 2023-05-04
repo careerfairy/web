@@ -177,7 +177,6 @@ const LivestreamSearch: FC<Props> = ({
       <AutocompleteSearch
          id="livestream-search"
          value={value}
-         inputValue={inputValue}
          handleChange={handleChange}
          options={sortedLivestreamHits}
          renderOption={renderOption}
@@ -187,7 +186,6 @@ const LivestreamSearch: FC<Props> = ({
          setInputValue={setInputValue}
          placeholderText={placeholderText}
          inputEndIcon={endIcon}
-         minCharacters={searchWithTrigram ? 3 : null}
       />
    )
 }

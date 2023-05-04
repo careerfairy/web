@@ -5,7 +5,7 @@ import {
    QueryConstraint,
 } from "@firebase/firestore"
 import { orderBy, query, where } from "firebase/firestore"
-import { triGrams } from "@careerfairy/shared-lib/utils/search"
+import { searchTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { useDebounce } from "react-use"
 import { useFirestoreCollection } from "./useFirestoreCollection"
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
@@ -60,7 +60,7 @@ export function useSearch<T extends Identifiable>(
    const searchQuery = useMemo(() => {
       const searchConstraints: QueryConstraint[] = []
 
-      const ngGrams = triGrams(debouncedValue)
+      const ngGrams = searchTriGrams(debouncedValue)
 
       ngGrams.forEach((name) => {
          searchConstraints.push(where(`triGrams.${name}`, "==", true))
