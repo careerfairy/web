@@ -100,9 +100,7 @@ const CompanySearch: FC = () => {
       <Card sx={styles.root}>
          <AutocompleteSearch
             id="company-search"
-            minCharacters={3}
             loading={loading}
-            inputValue={inputValue}
             handleChange={handleChange}
             options={sortedGroups}
             renderOption={renderOption}

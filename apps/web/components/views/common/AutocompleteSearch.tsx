@@ -1,4 +1,4 @@
-import React, { FC, useCallback, useMemo } from "react"
+import React, { FC, useCallback } from "react"
 import Autocomplete, {
    AutocompleteRenderOptionState,
 } from "@mui/material/Autocomplete"
@@ -31,13 +31,11 @@ type AutocompleteSearchProps<TOption = unknown> = {
    isOptionEqualToValue: (option: TOption, value: TOption) => boolean
    getOptionLabel: (option: TOption) => string
    setInputValue: React.Dispatch<React.SetStateAction<string>>
-   inputValue: string
    loading?: boolean
    inputStartIcon?: React.ReactNode
    inputEndIcon?: React.ReactNode
    noOptionsText?: string
    placeholderText?: string
-   minCharacters?: number
 }
 
 const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
@@ -51,21 +49,10 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
    setInputValue,
    noOptionsText = "No options found",
    placeholderText = "Search",
-   minCharacters,
-   inputValue,
    inputStartIcon,
    inputEndIcon,
    loading,
 }) => {
-   const inputTooSmall = minCharacters && inputValue.length < minCharacters
-
-   const searchOptions = useMemo<T[]>(() => {
-      if (inputTooSmall) {
-         return []
-      }
-      return options
-   }, [inputTooSmall, options])
-
    const onChange = useCallback(
       (event: any, newValue: T | null) => {
          return handleChange(newValue)
@@ -90,21 +77,16 @@ const AutocompleteSearch: FC<AutocompleteSearchProps> = <T,>({
          fullWidth
          loading={loading}
          getOptionLabel={getOptionLabel}
-         options={searchOptions}
+         options={options}
          autoComplete
          disableClearable
-         forcePopupIcon={inputTooSmall ? false : undefined}
          blurOnSelect
          includeInputInList
          clearOnBlur
          ListboxProps={listBoxProps}
          value={value}
          isOptionEqualToValue={isOptionEqualToValue}
-         noOptionsText={
-            inputTooSmall
-               ? `Type at least ${minCharacters} characters`
-               : noOptionsText
-         }
+         noOptionsText={noOptionsText}
          onChange={onChange}
          onInputChange={onInputChange}
          renderInput={(params) => (
