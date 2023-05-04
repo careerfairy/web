@@ -113,6 +113,7 @@ const csp = {
       "https://vars.hotjar.com",
       "https://www.facebook.com",
       "https://www.youtube.com",
+      "https://app.usercentrics.eu",
    ],
    "font-src": [
       "'self'",

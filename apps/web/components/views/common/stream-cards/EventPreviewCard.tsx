@@ -250,7 +250,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const { query, push, pathname } = useRouter()
       const [eventInterests, setEventInterests] = useState([])
       const firebase = useFirebaseService()
-      const { authenticatedUser } = useAuth()
+      const { authenticatedUser, isLoggedIn } = useAuth()
       const [hosts, setHosts] = useState(undefined)
       const [isPast, setIsPast] = useState(checkIfPast(event))
       const isOnMarketingLandingPage = pathname.includes(
@@ -286,7 +286,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       } = useRouter()
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
-         if (isPast) {
+         if (isPast && isLoggedIn) {
             const timeLeft = DateUtil.calculateTimeLeft(
                LivestreamPresenter.createFromDocument(
                   event
@@ -296,7 +296,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
 
          return null
-      }, [event, isPast])
+      }, [event, isPast, isLoggedIn])
 
       useEffect(() => {
          if (!loading && interests) {
