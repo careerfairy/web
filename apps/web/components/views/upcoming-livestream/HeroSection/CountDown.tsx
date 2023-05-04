@@ -32,6 +32,7 @@ import LoadingButton from "@mui/lab/LoadingButton"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
 import { useUpcomingLayout } from "layouts/UpcomingLayout"
+import { getBuyCostForAction } from "@careerfairy/shared-lib/rewards"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -341,7 +342,7 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
          <LoadingButton
             id="register-button"
             color="primary"
-            sx={{ color: "text.primary", boxShadow: "none" }}
+            sx={{ color: "info.main", boxShadow: "none" }}
             variant={"contained"}
             fullWidth
             onClick={handleClick}
@@ -351,11 +352,18 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
             size="large"
             endIcon={isLoading ? undefined : <CareerCoinIcon />}
          >
-            Unlock Live Stream Recording
+            Unlock with &nbsp;{" "}
+            {getBuyCostForAction("LIVESTREAM_RECORDING_BOUGHT")}
          </LoadingButton>
-         <Typography sx={{ textAlign: "center", marginTop: 2 }}>
-            You have {userData.credits}{" "}
-            {maybePluralize(userData.credits, "CareerCoin")} left
+         <Typography
+            sx={{
+               textAlign: "center",
+               marginTop: 2,
+               display: "flex",
+               justifyContent: "center",
+            }}
+         >
+            You have {userData.credits} <CareerCoinIcon /> Left
          </Typography>
       </>
    )
