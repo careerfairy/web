@@ -183,6 +183,14 @@ export const getCustomRewardMessageForAction = (
    }
 }
 
+export const getBuyCostForAction = (action: RewardAction) => {
+   if (REWARDS[action]) {
+      return Math.abs(REWARDS[action].credits)
+   }
+
+   return 0
+}
+
 /**
  * Firestore Document
  *
