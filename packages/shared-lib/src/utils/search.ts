@@ -5,18 +5,9 @@ import { Group } from "../groups"
  * Generates a ngram array from a string for a given n
  * Will lowercase the characters and remove any non-alphanumeric characters
  */
-export const ngrams = (
-   str: string,
-   n: number,
-   withPadding?: boolean
-): string[] => {
+export const ngrams = (str: string, n: number): string[] => {
    const ngrams = new Set<string>()
-   let s1 = (str || "").toLowerCase()
-
-   if (withPadding && s1.length < n && s1.length > 0) {
-      // add padding if the string is shorter than n. eg: "a" -> "a  " as "a  " is valid trigram
-      s1 = s1 + " ".repeat(n - s1.length)
-   }
+   const s1 = (str || "").toLowerCase()
 
    for (let k = 0; k <= s1.length - n; k++) {
       ngrams.add(s1.substring(k, k + n))
@@ -31,13 +22,9 @@ export const ngrams = (
  * the first 500 characters before computing the trigrams.
  *
  * @param str A string or an array of strings to compute trigrams from.
- * @param forTextSearch If true, the trigrams will be padded with spaces if the length of the input string is less than 3, eg "a" -> "a  "
  * @returns An array of trigrams
  */
-export const triGrams = (
-   str: string | string[],
-   forTextSearch?: boolean
-): string[] => {
+export const triGrams = (str: string | string[]): string[] => {
    let text: string[] = Array.isArray(str) ? str : [str]
    let parsed = text
       .filter((i) => i)
@@ -46,17 +33,31 @@ export const triGrams = (
       .trim()
       .slice(0, 500)
 
-   return ngrams(parsed, 3, forTextSearch)
+   return ngrams(parsed, 3)
 }
 
 /**
  * Generates a trigram array from the search string with added padding if the length of the input string is less than 3.
  * These trigrams are used to match with the existing trigrams of livestream events and groups.
- * @param {string} str - The search string to compute trigrams for.
+ * @param {string} input - The search string to compute trigrams for.
  * @returns {string[]} An array of trigrams.
  */
-export const searchTriGrams = (str: string): string[] => {
-   return triGrams(str, true)
+export const searchTriGrams = (input: string): string[] => {
+   let searchInput = input
+
+   if (input.length < 3 && input.length > 0) {
+      // add padding if the string is shorter than n. eg: "a" -> "a  " as "a  " is valid trigram
+      searchInput = searchInput + " ".repeat(3 - input.length)
+   }
+
+   let text: string[] = [searchInput]
+   let parsed = text
+      .filter((i) => i)
+      .map(normalizeAndRemoveNonAlphanumeric)
+      .join(" ")
+      .slice(0, 500)
+
+   return ngrams(parsed, 3)
 }
 
 /**
