@@ -21,7 +21,6 @@
       "@careerfairy/shared-lib": "*",
       "@google-cloud/bigquery": "^6.0.2",
       "agora-access-token": "^2.0.4",
-      "algoliasearch": "^4.12.1",
       "axios": "^0.27.2",
       "dotenv": "^8.2.0",
       "firebase": "^9.18.0",

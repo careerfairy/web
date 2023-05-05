@@ -77,7 +77,7 @@ exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 
 // Backup
-exports.exportFirestoreBackup = backup.exportFirestoreBackup
+exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
 
 // Admin Functions
 exports.sendBasicTemplateEmail_v5 = admin.sendBasicTemplateEmail
@@ -139,14 +139,6 @@ exports.sendEmailToStudentOfUniversityAndField =
 // When adding new bundles, you probably also want to update the
 // Firebase Hosting mappings: npx firebase deploy --only hosting
 exports.bundle = generateFunctionsFromBundles(bundles)
-
-// Algolia
-// exports.addToIndex = algolia.addToIndex
-// exports.updateIndex = algolia.updateIndex
-// exports.deleteFromIndex = algolia.deleteFromIndex
-// exports.addToStreamIndex = algolia.addToStreamIndex
-// exports.updateStreamIndex = algolia.updateStreamIndex
-// exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
 
 // Analytics
 exports.updateUserDataAnalytcicsOnWrite =
