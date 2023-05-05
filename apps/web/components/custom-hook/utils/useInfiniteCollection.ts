@@ -1,17 +1,15 @@
 import {
-   documentId,
    getDocs,
-   limit,
    Query,
    query as firestoreQuery,
    QueryDocumentSnapshot,
    startAfter,
-   where,
    collection,
 } from "@firebase/firestore"
 import { useCallback, useEffect, useState } from "react"
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
+import { doc, getDoc } from "firebase/firestore"
 
 export interface UseInfiniteCollection<T> {
    query: Query<T>
@@ -97,11 +95,12 @@ const useInfiniteCollection = <T extends Identifiable>(
       if (!collectionName) return
 
       const collectionRef = collection(FirestoreInstance, collectionName)
-      const docs = await getDocs(
-         firestoreQuery(collectionRef, where(documentId(), "==", id), limit(1))
-      )
-      const lastSnap = docs.docs[0] || undefined
-      setLastDocumentSnapShot(lastSnap)
+      const docRef = doc(collectionRef, id)
+      const lastDocSnap = await getDoc(docRef)
+      if (lastDocSnap.exists()) {
+         // const lastSnap = docs.docs[0] || undefined
+         setLastDocumentSnapShot(lastDocSnap)
+      }
       setInitialDataLoaded(true) // Set initialDataLoaded to true here
    }, [options.initialData, options.query])
 
