@@ -137,6 +137,7 @@ export default class RecommendationServiceCore {
          .userInterests()
          .userFieldsOfStudy()
          .userCountriesOfInterest()
+         .userUniversityCountry()
          .get()
    }
 }
