@@ -36,7 +36,7 @@ const styles = sxStyles({
    },
    content: {
       position: "relative",
-      paddingX: { xs: 4, md: 2 },
+      paddingX: { xs: 2.62, md: 6.25 },
       display: "flex",
       flexDirection: "column",
       justifyContent: "space-between",
