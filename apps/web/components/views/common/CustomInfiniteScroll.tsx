@@ -17,13 +17,13 @@ const CustomInfiniteScroll = ({
    const loaderRef = useRef<HTMLDivElement | null>(null)
 
    useEffect(() => {
-      if (isLoadingMore) return
+      if (isLoadingMore || !hasMore) return
       const loaderNode = loaderRef.current
       const observer = new IntersectionObserver(
          (entries) => {
-            if (entries[0].isIntersecting && hasMore && !loading) {
+            if (entries[0].isIntersecting && !loading) {
                setIsLoadingMore(true)
-               next().then(() => setIsLoadingMore(false))
+               next().finally(() => setIsLoadingMore(false))
             }
          },
          { threshold: 1 }
