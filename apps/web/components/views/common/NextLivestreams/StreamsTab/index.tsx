@@ -52,24 +52,24 @@ const StreamsTab = ({
 
    return (
       <AppBar sx={styles.root} position="static" color="transparent">
-         <Tabs
-            value={value}
-            onChange={handleChange}
-            textColor="inherit"
-            TabIndicatorProps={
-               {
-                  sx: {
-                     ...styles.indicator,
-                     backgroundColor: tabsColor,
-                  },
-               } as any
-            }
-            variant={hasFilter ? "standard" : "fullWidth"}
-            aria-label="full width tabs example"
-            sx={{ width: "100%", minWidth: "fit-content" }}
-         >
-            {hideTabs ? null : (
-               <>
+         {hideTabs ? null : (
+            <>
+               <Tabs
+                  value={value}
+                  onChange={handleChange}
+                  textColor="inherit"
+                  TabIndicatorProps={
+                     {
+                        sx: {
+                           ...styles.indicator,
+                           backgroundColor: tabsColor,
+                        },
+                     } as any
+                  }
+                  variant={hasFilter ? "standard" : "fullWidth"}
+                  aria-label="full width tabs example"
+                  sx={{ width: "100%", minWidth: "fit-content" }}
+               >
                   <SimpleTab
                      sx={{
                         ...styles.tab,
@@ -96,21 +96,21 @@ const StreamsTab = ({
                      value="pastEvents"
                      index={1}
                   />
-               </>
-            )}
-            {isMobile && showFilter ? (
-               <Box
-                  sx={{
-                     display: "flex",
-                     width: "100%",
-                     justifyContent: "end",
-                     mt: 1,
-                  }}
-               >
-                  <Filter filtersToShow={filtersToShow} />
-               </Box>
-            ) : null}
-         </Tabs>
+               </Tabs>
+            </>
+         )}
+         {isMobile && showFilter ? (
+            <Box
+               sx={{
+                  display: "flex",
+                  width: "100%",
+                  justifyContent: "end",
+                  mt: 1,
+               }}
+            >
+               <Filter filtersToShow={filtersToShow} />
+            </Box>
+         ) : null}
          {!isMobile && showFilter ? (
             <Box
                sx={{
