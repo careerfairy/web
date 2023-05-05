@@ -25,6 +25,7 @@ export class RankedLivestreamRepository {
    private readonly pointsPerFieldOfStudyMatch = 1
    private readonly pointsPerCompanyIndustryMatch = 2
    private readonly pointsPerCompanySizeMatch = 1
+   private readonly pointsPerUniversityCountryMatch = 5
 
    private readonly livestreams: RankedLivestreamEvent[]
 
@@ -126,6 +127,24 @@ export class RankedLivestreamRepository {
          rankedLivestreams: events,
          targetUserIds: interestIds,
          targetLivestreamIdsGetter: (stream) => stream.getInterestIds(),
+      })
+   }
+
+   public getEventsBasedOnUniversityCountry(
+      universityCountryCode: string,
+      limit = 10
+   ): RankedLivestreamEvent[] {
+      const events = this.getEventsFilteredByArrayField(
+         "companyCountries",
+         [universityCountryCode],
+         limit
+      )
+
+      return this.rankEvents({
+         pointsPerMatch: this.pointsPerUniversityCountryMatch,
+         rankedLivestreams: events,
+         targetUserIds: [universityCountryCode],
+         targetLivestreamIdsGetter: (stream) => stream.getCompanyCountries(),
       })
    }
 
