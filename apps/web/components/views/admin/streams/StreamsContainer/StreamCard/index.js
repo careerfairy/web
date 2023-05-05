@@ -379,7 +379,7 @@ const StreamCard = ({ isUpcoming, stream }) => {
                            </ListItemAvatar>
                            <ListItemText
                               primary="Recording viewers"
-                              secondary={recordingStats.viewers.length}
+                              secondary={recordingStats.viewers?.length ?? 0}
                            />
                         </ListItem>
                         <ListItem>
