@@ -10,7 +10,7 @@ const styles = sxStyles({
    footer: {
       fontWeight: 700,
       fontSize: "1.3em",
-      margin: "40px 0 30px 0",
+      padding: "40px 0 30px 0",
       textAlign: "center",
       textTransform: "uppercase",
       letterSpacing: "0.4em",
