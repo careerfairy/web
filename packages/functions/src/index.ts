@@ -77,7 +77,7 @@ exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
 
 // Backup
-exports.exportFirestoreBackup = backup.exportFirestoreBackup
+exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
 
 // Admin Functions
 exports.sendBasicTemplateEmail_v5 = admin.sendBasicTemplateEmail
