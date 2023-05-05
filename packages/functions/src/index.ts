@@ -140,14 +140,6 @@ exports.sendEmailToStudentOfUniversityAndField =
 // Firebase Hosting mappings: npx firebase deploy --only hosting
 exports.bundle = generateFunctionsFromBundles(bundles)
 
-// Algolia
-// exports.addToIndex = algolia.addToIndex
-// exports.updateIndex = algolia.updateIndex
-// exports.deleteFromIndex = algolia.deleteFromIndex
-// exports.addToStreamIndex = algolia.addToStreamIndex
-// exports.updateStreamIndex = algolia.updateStreamIndex
-// exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
-
 // Analytics
 exports.updateUserDataAnalytcicsOnWrite =
    analytics.updateUserDataAnalyticsOnWrite
