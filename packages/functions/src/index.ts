@@ -79,22 +79,21 @@ exports.sendBasicTemplateEmail_eu = admin.sendBasicTemplateEmail
 exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
-exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
-exports.sendDraftApprovalRequestEmail_v2 =
+exports.sendDraftApprovalRequestEmail_eu =
    groupAdmin.sendDraftApprovalRequestEmail
-exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
-exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
-exports.joinGroupDashboard_v2 = groupAdmin.joinGroupDashboard_v2
-exports.deleteGroupAdminDashboardInvite =
-   groupAdmin.deleteGroupAdminDashboardInvite
-exports.createGroup = groupAdmin.createGroup
-exports.changeRole = groupAdmin.changeRole
-exports.kickFromDashboard_v2 = groupAdmin.kickFromDashboard_v2
+exports.sendNewlyPublishedEventEmail_eu =
+   groupAdmin.sendNewlyPublishedEventEmail
+exports.getLivestreamReportData_eu = groupAdmin.getLivestreamReportData
+exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
+exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
+exports.createGroup_eu = groupAdmin.createGroup
+exports.changeRole_eu = groupAdmin.changeRole
+exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
 // Reminders
 exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailAboutApplicationLink =
+exports.sendReminderEmailAboutApplicationLink_eu =
    reminders.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails = reminders.scheduleReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
