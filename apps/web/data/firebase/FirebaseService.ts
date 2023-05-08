@@ -3098,7 +3098,7 @@ class FirebaseService {
    }
 
    applyReferralCode = async (referralCode: string) => {
-      return await this.functions.httpsCallable("applyReferralCode")(
+      return await this.functions.httpsCallable("applyReferralCode_eu")(
          referralCode
       )
    }
