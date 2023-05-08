@@ -118,7 +118,7 @@ class FirebaseService {
 
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v6"
+         "createNewUserAccount_eu"
       )
       return createUserInAuthAndFirebase({ userData })
    }
@@ -133,7 +133,7 @@ class FirebaseService {
    }): Promise<{
       readonly data: Group
    }> => {
-      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount_eu")(
          args
       )
    }
@@ -171,7 +171,7 @@ class FirebaseService {
 
    validateUserEmailWithPin = async (userInfo) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin_v2"
+         "validateUserEmailWithPin_eu"
       )
       return validateUserEmailWithPin({ userInfo })
    }
@@ -180,7 +180,7 @@ class FirebaseService {
       redirectLink: string
    }) => {
       const sendPasswordResetEmail = this.functions.httpsCallable(
-         "sendPostmarkResetPasswordEmail_v2"
+         "sendPostmarkResetPasswordEmail_eu"
       )
       return sendPasswordResetEmail(data)
    }
@@ -189,7 +189,7 @@ class FirebaseService {
    }) => {
       const resendPostmarkEmailVerificationEmailWithPin =
          this.functions.httpsCallable(
-            "resendPostmarkEmailVerificationEmailWithPin_v2"
+            "resendPostmarkEmailVerificationEmailWithPin_eu"
          )
       return resendPostmarkEmailVerificationEmailWithPin(data)
    }
@@ -360,7 +360,7 @@ class FirebaseService {
    }
 
    deleteUserAccount = () => {
-      return this.functions.httpsCallable("deleteLoggedInUserAccount")()
+      return this.functions.httpsCallable("deleteLoggedInUserAccount_eu")()
    }
 
    // *** Auth API ***
@@ -3235,7 +3235,7 @@ class FirebaseService {
 
    // Backfill user data
    backfillUserData = async ({ timezone }) => {
-      return this.functions.httpsCallable("backfillUserData")({ timezone })
+      return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
    }
 
    // DB functions

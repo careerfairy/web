@@ -1,11 +1,7 @@
 import functions = require("firebase-functions")
-
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { client } = require("./api/postmark")
 import { admin } from "./api/firestoreAdmin"
-
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { generateReferralCode, setCORSHeaders } from "./util"
+import { generateReferralCode } from "./util"
 import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
@@ -16,19 +12,12 @@ import {
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import config from "./config"
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/rewards"
-const { userUpdateFields } = require("./lib/user")
+import { userUpdateFields } from "./lib/user"
+import { client } from "./api/postmark"
 
-const getRandomInt = (max) => {
-   const variable = Math.floor(Math.random() * Math.floor(max))
-   if (variable < 1000) {
-      return variable + 1000
-   } else {
-      return variable
-   }
-}
-
-export const createNewUserAccount = functions.https.onCall(
-   async (data, context) => {
+export const createNewUserAccount = functions
+   .region(config.region)
+   .https.onCall(async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
          throw new functions.https.HttpsError(
@@ -109,8 +98,9 @@ export const createNewUserAccount = functions.https.onCall(
                .then(async () => {
                   console.log(`Starting sending email for ${recipientEmail}`)
                   const email = {
-                     TemplateId:
-                        process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
+                     TemplateId: Number(
+                        process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION
+                     ),
                      From: "CareerFairy <noreply@careerfairy.io>",
                      To: recipientEmail,
                      TemplateModel: { pinCode: pinCode },
@@ -165,10 +155,10 @@ export const createNewUserAccount = functions.https.onCall(
             )
             throw new functions.https.HttpsError("internal", error)
          })
-   }
-)
-export const createNewGroupAdminUserAccount = functions.https.onCall(
-   async (data, context) => {
+   })
+export const createNewGroupAdminUserAccount = functions
+   .region(config.region)
+   .https.onCall(async (data, context) => {
       if (context.auth) {
          // Throwing an HttpsError so that the client gets the error details.
          throw new functions.https.HttpsError(
@@ -298,12 +288,12 @@ export const createNewGroupAdminUserAccount = functions.https.onCall(
          // Throw the original critical error
          throw new functions.https.HttpsError("internal", error)
       }
-   }
-)
+   })
 
 // eslint-disable-next-line camelcase
-export const resendPostmarkEmailVerificationEmailWithPin_v2 =
-   functions.https.onCall(async (data) => {
+export const resendPostmarkEmailVerificationEmailWithPin = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
       const recipientEmail = data.recipientEmail
       const pinCode = getRandomInt(9999)
 
@@ -314,7 +304,7 @@ export const resendPostmarkEmailVerificationEmailWithPin_v2 =
          .update({ validationPin: pinCode })
 
       const email = {
-         TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
+         TemplateId: Number(process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION),
          From: "CareerFairy <noreply@careerfairy.io>",
          To: recipientEmail,
          TemplateModel: { pinCode: pinCode },
@@ -327,14 +317,15 @@ export const resendPostmarkEmailVerificationEmailWithPin_v2 =
    })
 
 // eslint-disable-next-line camelcase
-export const validateUserEmailWithPin_v2 = functions
+export const validateUserEmailWithPin = functions
+   .region(config.region)
    .runWith({
       minInstances: 1,
    })
    .https.onCall(async (data) => {
       const recipientEmail = data.userInfo.recipientEmail
       const pinCode = data.userInfo.pinCode
-      let error
+      let error: any
 
       functions.logger.log(
          `Starting user email validation for ${recipientEmail}`
@@ -374,7 +365,9 @@ export const validateUserEmailWithPin_v2 = functions
                   `Starting sending welcome email to  ${recipientEmail}`
                )
                const email = {
-                  TemplateId: process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL,
+                  TemplateId: Number(
+                     process.env.POSTMARK_TEMPLATE_WELCOME_EMAIL
+                  ),
                   From: "CareerFairy <noreply@careerfairy.io>",
                   To: recipientEmail,
                   TemplateModel: {
@@ -433,8 +426,9 @@ export const validateUserEmailWithPin_v2 = functions
    })
 
 // eslint-disable-next-line camelcase
-export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
-   async (data) => {
+export const sendPostmarkResetPasswordEmail = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
       const recipientEmail = data?.recipientEmail?.trim()
 
       if (!recipientEmail) {
@@ -462,7 +456,7 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
             .generatePasswordResetLink(recipientEmail, actionCodeSettings)
 
          const email = {
-            TemplateId: process.env.POSTMARK_TEMPLATE_PASSWORD_RESET,
+            TemplateId: Number(process.env.POSTMARK_TEMPLATE_PASSWORD_RESET),
             From: "CareerFairy <noreply@careerfairy.io>",
             To: recipientEmail,
             TemplateModel: { action_url: addUtmTagsToLink({ link: link }) },
@@ -484,143 +478,11 @@ export const sendPostmarkResetPasswordEmail_v2 = functions.https.onCall(
          )
          // The client should not know if this request was successful or not, so we just log it on the server
       }
-   }
-)
-
-export const sendPostmarkEmailUserDataAndUni = functions.https.onRequest(
-   async (req, res) => {
-      setCORSHeaders(req, res)
-
-      const recipientEmail = req.body.recipientEmail.toLowercase()
-      const recipientFirstName = req.body.firstName
-      const recipientLastName = req.body.lastName
-      const recipientUniversity = req.body.universityCode
-      const recipientUniversityCountryCode = req.body.universityCountryCode
-      const pinCode = getRandomInt(9999)
-
-      admin
-         .firestore()
-         .collection("userData")
-         .doc(recipientEmail)
-         .set({
-            id: recipientEmail,
-            validationPin: pinCode,
-            firstName: recipientFirstName,
-            lastName: recipientLastName,
-            userEmail: recipientEmail,
-            universityCode: recipientUniversity,
-            universityCountryCode: recipientUniversityCountryCode,
-         })
-         .then(() => {
-            const email = {
-               TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
-               From: "CareerFairy <noreply@careerfairy.io>",
-               To: recipientEmail,
-               TemplateModel: { pinCode: pinCode },
-            }
-
-            return client.sendEmailWithTemplate(email).then(
-               (response) => {
-                  console.log(
-                     `Successfully sent PIN email to ${recipientEmail}`
-                  )
-                  res.sendStatus(200)
-               },
-               (error) => {
-                  console.error(
-                     `Error sending PIN email to ${recipientEmail}`,
-                     error
-                  )
-                  res.sendStatus(500)
-               }
-            )
-         })
-         .catch((error) => {
-            console.error(`Error creating user ${recipientEmail}`, error)
-            res.sendStatus(500)
-         })
-   }
-)
-
-export const sendPostmarkEmailUserDataAndUniWithName =
-   functions.https.onRequest(async (req, res) => {
-      setCORSHeaders(req, res)
-
-      const recipientEmail = req.body.recipientEmail
-      const recipientFirstName = req.body.firstName
-      const recipientLastName = req.body.lastName
-      const recipientUniversity = req.body.universityCode
-      const recipientUniversityName = req.body.universityName
-      const recipientUniversityCountryCode = req.body.universityCountryCode
-      const pinCode = getRandomInt(9999)
-
-      admin
-         .firestore()
-         .collection("userData")
-         .doc(recipientEmail)
-         .set({
-            id: recipientEmail,
-            validationPin: pinCode,
-            firstName: recipientFirstName,
-            lastName: recipientLastName,
-            userEmail: recipientEmail,
-            universityCode: recipientUniversity,
-            university: {
-               name: recipientUniversityName,
-               code: recipientUniversity,
-            },
-            universityName: recipientUniversityName,
-            universityCountryCode: recipientUniversityCountryCode,
-         })
-         .then(() => {
-            const email = {
-               TemplateId: process.env.POSTMARK_TEMPLATE_EMAIL_VERIFICATION,
-               From: "CareerFairy <noreply@careerfairy.io>",
-               To: recipientEmail,
-               TemplateModel: { pinCode: pinCode },
-            }
-
-            return client.sendEmailWithTemplate(email).then(
-               (response) => {
-                  console.log(
-                     `Successfully sent PIN email to ${recipientEmail}`
-                  )
-                  res.sendStatus(200)
-               },
-               (error) => {
-                  console.error(
-                     `Error sending PIN email to ${recipientEmail}`,
-                     error
-                  )
-                  res.sendStatus(500)
-               }
-            )
-         })
-         .catch((error) => {
-            console.error(`Error creating user ${recipientEmail}`, error)
-            res.sendStatus(500)
-         })
    })
 
-export const updateFakeUser = functions.https.onRequest(async (req, res) => {
-   setCORSHeaders(req, res)
-
-   admin
-      .auth()
-      .updateUser(req.body.uid, {
-         emailVerified: true,
-      })
-      .then(function (userRecord) {
-         // See the UserRecord reference doc for the contents of userRecord.
-         console.log("Successfully updated user", userRecord.toJSON())
-      })
-      .catch(function (error) {
-         console.log("Error updating user:", error)
-      })
-})
-
-export const backfillUserData = functions.https.onCall(
-   async ({ timezone }, context) => {
+export const backfillUserData = functions
+   .region(config.region)
+   .https.onCall(async ({ timezone }, context) => {
       const email = context?.auth?.token?.email
       functions.logger.debug(email, context?.auth)
 
@@ -655,8 +517,7 @@ export const backfillUserData = functions.https.onCall(
             dataToUpdate
          )
       }
-   }
-)
+   })
 
 export const onUserUpdate = functions
    .region(config.region)
@@ -688,8 +549,9 @@ export const onUserStatsUpdate = functions
       }
    })
 
-export const deleteLoggedInUserAccount = functions.https.onCall(
-   async (data, context) => {
+export const deleteLoggedInUserAccount = functions
+   .region(config.region)
+   .https.onCall(async (_, context) => {
       const { auth } = context
       const {
          token: { email: userEmail, uid: userId },
@@ -729,5 +591,13 @@ export const deleteLoggedInUserAccount = functions.https.onCall(
          )
          throw new functions.https.HttpsError(error.code, error.message)
       }
+   })
+
+const getRandomInt = (max: number) => {
+   const variable = Math.floor(Math.random() * Math.floor(max))
+   if (variable < 1000) {
+      return variable + 1000
+   } else {
+      return variable
    }
-)
+}

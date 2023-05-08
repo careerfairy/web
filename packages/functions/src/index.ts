@@ -56,21 +56,16 @@ dotenv.config()
 dotenv.config()
 
 // Auth
-exports.createNewUserAccount_v6 = auth.createNewUserAccount
-exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
+exports.createNewUserAccount_eu = auth.createNewUserAccount
+exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
-exports.backfillUserData = auth.backfillUserData
-exports.updateFakeUser = auth.updateFakeUser
-exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin_v2
-exports.sendPostmarkResetPasswordEmail_v2 =
-   auth.sendPostmarkResetPasswordEmail_v2
-exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
-exports.sendPostmarkEmailUserDataAndUniWithName =
-   auth.sendPostmarkEmailUserDataAndUniWithName
-exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
-   auth.resendPostmarkEmailVerificationEmailWithPin_v2
-exports.deleteLoggedInUserAccount = auth.deleteLoggedInUserAccount
+exports.backfillUserData_eu = auth.backfillUserData
+exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
+exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
+exports.resendPostmarkEmailVerificationEmailWithPin_eu =
+   auth.resendPostmarkEmailVerificationEmailWithPin
+exports.deleteLoggedInUserAccount_eu = auth.deleteLoggedInUserAccount
 
 // Agora
 exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
