@@ -91,14 +91,16 @@ class FirebaseService {
     */
 
    fetchAgoraRtcToken = async (data) => {
-      const fetchAgoraRtcToken =
-         this.functions.httpsCallable("fetchAgoraRtcToken")
+      const fetchAgoraRtcToken = this.functions.httpsCallable(
+         "fetchAgoraRtcToken_eu"
+      )
       return await fetchAgoraRtcToken(data)
    }
 
    fetchAgoraRtmToken = async (data) => {
-      const fetchAgoraRtmToken =
-         this.functions.httpsCallable("fetchAgoraRtmToken")
+      const fetchAgoraRtmToken = this.functions.httpsCallable(
+         "fetchAgoraRtmToken_eu"
+      )
       return await fetchAgoraRtmToken(data)
    }
 
