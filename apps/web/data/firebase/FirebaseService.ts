@@ -236,7 +236,7 @@ class FirebaseService {
       }
 
       const sendBasicTemplateEmail = this.functions.httpsCallable(
-         "sendBasicTemplateEmail_v5"
+         "sendBasicTemplateEmail_eu"
       )
 
       return sendBasicTemplateEmail(dataObj)
