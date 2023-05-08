@@ -9,14 +9,16 @@ import { livestreamsRepo, rewardsRepo, userRepo } from "./api/repositories"
 import { RewardAction, REWARDS } from "@careerfairy/shared-lib/rewards"
 import { userUpdateFields } from "./lib/user"
 import { RewardFilterFields } from "@careerfairy/shared-lib/rewards/RewardRepository"
+import config from "./config"
 
 /**
  * Reward user for being invited to a livestream and participating
  *
  * The reward LIVESTREAM_USER_ATTENDED is also given to the user
  */
-export const rewardLivestreamInvitationComplete = functions.https.onCall(
-   async (data, context) => {
+export const rewardLivestreamInvitationComplete = functions
+   .region(config.region)
+   .https.onCall(async (data, context) => {
       const userEmail = context.auth?.token?.email
       const livestreamId = data.livestreamId
       const referralCode = data.referralCode
@@ -76,8 +78,7 @@ export const rewardLivestreamInvitationComplete = functions.https.onCall(
       functions.logger.info(
          "Created a new reward for the livestream attendance"
       )
-   }
-)
+   })
 
 /**
  * Generic function to create a reward for a user progression action
@@ -146,8 +147,9 @@ export const rewardUserAction = functions.https.onCall(
  * Check if the referral code is valid and if the user has any, if yes, rewards the followed user
  * and adds the referral code on the current user
  */
-export const applyReferralCode = functions.https.onCall(
-   async (referralCode, context) => {
+export const applyReferralCode = functions
+   .region(config.region)
+   .https.onCall(async (referralCode, context) => {
       const userEmail = context.auth?.token?.email
 
       try {
@@ -197,8 +199,7 @@ export const applyReferralCode = functions.https.onCall(
          functions.logger.error(e)
          throw new Error(e)
       }
-   }
-)
+   })
 
 type ReferralData = {
    uid: string
