@@ -22,7 +22,7 @@ type RankEventsArgs = {
 export class RankedLivestreamRepository {
    private readonly pointsPerInterestMatch = 1
    private readonly pointsPerCountryMatch = 3
-   private readonly pointsPerFieldOfStudyMatch = 1
+   private readonly pointsPerFieldOfStudyMatch = 5
    private readonly pointsPerCompanyIndustryMatch = 2
    private readonly pointsPerCompanySizeMatch = 1
 
