@@ -316,7 +316,6 @@ export const resendPostmarkEmailVerificationEmailWithPin = functions
       }
    })
 
-// eslint-disable-next-line camelcase
 export const validateUserEmailWithPin = functions
    .region(config.region)
    .runWith({
@@ -425,7 +424,6 @@ export const validateUserEmailWithPin = functions
       return null
    })
 
-// eslint-disable-next-line camelcase
 export const sendPostmarkResetPasswordEmail = functions
    .region(config.region)
    .https.onCall(async (data) => {

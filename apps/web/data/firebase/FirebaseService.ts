@@ -143,7 +143,7 @@ class FirebaseService {
       group: Omit<Group, "id" | "groupId" | "triGrams">
       groupQuestions?: GroupQuestion[]
    }) => {
-      return this.functions.httpsCallable("createGroup")(args)
+      return this.functions.httpsCallable("createGroup_eu")(args)
    }
 
    changeRole = async (args: {
@@ -151,22 +151,22 @@ class FirebaseService {
       email: string
       newRole: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("changeRole")(args)
+      return this.functions.httpsCallable("changeRole_eu")(args)
    }
 
    kickFromDashboard = async (args: { groupId: string; email: string }) => {
-      return this.functions.httpsCallable("kickFromDashboard_v2")(args)
+      return this.functions.httpsCallable("kickFromDashboard_eu")(args)
    }
 
    sendNewlyPublishedEventEmail = async (emailData) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
-         "sendNewlyPublishedEventEmail"
+         "sendNewlyPublishedEventEmail_eu"
       )
       return sendNewlyPublishedEventEmail(emailData)
    }
    sendDraftApprovalRequestEmail = async (data) => {
       const sendDraftApprovalRequestEmail = this.functions.httpsCallable(
-         "sendDraftApprovalRequestEmail_v2"
+         "sendDraftApprovalRequestEmail_eu"
       )
       return sendDraftApprovalRequestEmail(data)
    }
@@ -198,7 +198,9 @@ class FirebaseService {
 
    sendReminderEmailAboutApplicationLink = async (data) => {
       const sendReminderEmailAboutApplicationLink =
-         this.functions.httpsCallable("sendReminderEmailAboutApplicationLink")
+         this.functions.httpsCallable(
+            "sendReminderEmailAboutApplicationLink_eu"
+         )
       return sendReminderEmailAboutApplicationLink(data)
    }
 
@@ -209,7 +211,7 @@ class FirebaseService {
       groupId: string
       role: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("sendDashboardInviteEmail_v2")(args)
+      return this.functions.httpsCallable("sendDashboardInviteEmail_eu")(args)
    }
 
    sendBasicTemplateEmail = async ({
@@ -255,7 +257,7 @@ class FirebaseService {
       data
    ): Promise<firebase.functions.HttpsCallableResult> => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData_v4"
+         "getLivestreamReportData_eu"
       )
       return handleGetLivestreamReportData(data)
    }
