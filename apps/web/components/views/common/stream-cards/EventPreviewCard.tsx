@@ -287,16 +287,21 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
          if (isPast && isLoggedIn) {
-            const timeLeft = DateUtil.calculateTimeLeft(
-               LivestreamPresenter.createFromDocument(
-                  event
-               ).recordingAccessTimeLeft()
-            )
-            return timeLeft?.Days
+            const presenterEvent = LivestreamPresenter.createFromDocument(event)
+
+            if (
+               presenterEvent.isAbleToShowRecording(authenticatedUser?.email)
+            ) {
+               const timeLeft = DateUtil.calculateTimeLeft(
+                  presenterEvent.recordingAccessTimeLeft()
+               )
+
+               return timeLeft?.Days + 1
+            }
          }
 
          return null
-      }, [event, isPast, isLoggedIn])
+      }, [isPast, isLoggedIn, event, authenticatedUser?.email])
 
       useEffect(() => {
          if (!loading && interests) {
