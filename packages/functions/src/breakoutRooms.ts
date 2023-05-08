@@ -1,8 +1,10 @@
-const functions = require("firebase-functions")
-const { admin } = require("./api/firestoreAdmin")
+import functions = require("firebase-functions")
+import { admin } from "./api/firestoreAdmin"
+import config from "./config"
 
-exports.updateBreakoutRoomStatusOnWrite = functions.firestore
-   .document("livestreams/{livestream}/breakoutRooms/{breakoutRoom}")
+export const updateBreakoutRoomStatusOnWrite = functions
+   .region(config.region)
+   .firestore.document("livestreams/{livestream}/breakoutRooms/{breakoutRoom}")
    .onWrite(async (change) => {
       try {
          const breakoutRoomId = change.after.id

@@ -101,7 +101,7 @@ exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
 exports.sendReminderEmailAboutApplicationLink =
    reminders.sendReminderEmailAboutApplicationLink
-exports.scheduleReminderEmails = reminders.scheduleReminderEmails
+exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
 exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
@@ -141,7 +141,7 @@ exports.sendEmailToStudentOfUniversityAndField =
 exports.bundle = generateFunctionsFromBundles(bundles)
 
 // Analytics
-exports.updateUserDataAnalytcicsOnWrite =
+exports.updateUserDataAnalytcicsOnWrite_eu =
    analytics.updateUserDataAnalyticsOnWrite
 
 // Recording
@@ -154,7 +154,7 @@ exports.checkForUnfinishedLivestreamsAndStopRecording =
    recording.checkForUnfinishedLivestreamsAndStopRecording
 
 // Breakout Rooms
-exports.updateBreakoutRoomStatusOnWrite =
+exports.updateBreakoutRoomStatusOnWrite_eu =
    breakoutRooms.updateBreakoutRoomStatusOnWrite
 
 // Slack Interaction Handler

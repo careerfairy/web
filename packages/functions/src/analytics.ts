@@ -1,9 +1,11 @@
-const functions = require("firebase-functions")
-const { admin } = require("./api/firestoreAdmin")
+import functions = require("firebase-functions")
+import { admin } from "./api/firestoreAdmin"
+import config from "./config"
 
-exports.updateUserDataAnalyticsOnWrite = functions.firestore
-   .document("userData/{userId}")
-   .onWrite(async (change, context) => {
+export const updateUserDataAnalyticsOnWrite = functions
+   .region(config.region)
+   .firestore.document("userData/{userId}")
+   .onWrite(async (change) => {
       const newValue = change.after.data()
       const previousValue = change.before.data()
       const oldUniCountryCode =
