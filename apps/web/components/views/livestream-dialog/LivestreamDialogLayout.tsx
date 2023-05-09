@@ -1,28 +1,38 @@
-import React, {
-   createContext,
-   FC,
-   useCallback,
-   useContext,
-   useMemo,
-} from "react"
+import React, { FC, useCallback, useMemo } from "react"
 import { useRouter } from "next/router"
-import LivestreamDialog from "./LivestreamDialog"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { fromDate } from "../../../data/firebase/FirebaseInstance"
 import SEO from "../../util/SEO"
 import { getStreamMetaInfo } from "../../../util/SeoUtil"
 import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
+import dynamic from "next/dynamic"
+
+const LivestreamDialog = dynamic(() => import("./LivestreamDialog"))
 
 type Props = {
    serverSideLivestream: { [p: string]: any } | null
 }
 
+type DialogPage = "details" | "register" | "job-details"
+const validDialogPages: DialogPage[] = ["details", "register", "job-details"]
+
+/**
+ * Renders the layout for the dialog that shows livestream information.
+ * It requires a serverSideLivestream prop that is used to populate the dialog.
+ * If none is provided, the dialog will not be rendered.
+ *
+ * @param {Props} props - The component's expected properties.
+ * @param {ReactNode} props.children - The children to render.
+ * @param {LivestreamEvent} props.serverSideLivestream - The livestream to show in the dialog.
+ */
 export const LivestreamDialogLayout: FC<Props> = ({
    children,
    serverSideLivestream,
 }) => {
-   const router = useRouter()
-   const livestreamParams = router.query.livestream
+   const { query, push, pathname } = useRouter()
+   const { livestream: livestreamParams } = query
+
+   const [pathType, livestreamId, dialogPage, jobId] = livestreamParams || []
 
    const dialogLivestream = useMemo(() => {
       if (!serverSideLivestream) return null
@@ -32,58 +42,47 @@ export const LivestreamDialogLayout: FC<Props> = ({
       )
    }, [serverSideLivestream])
 
-   const dialogOpen = useMemo(() => {
-      return (
-         livestreamParams?.[0] === "livestream" &&
-         dialogLivestream &&
-         livestreamParams?.[1] === dialogLivestream?.id
-      )
-   }, [livestreamParams, dialogLivestream])
-
-   const handleClose = useCallback(() => {
-      const basePath = router.asPath.split("/livestream")[0]
-      void router.push(basePath)
-   }, [router])
-
-   const contextValue = useMemo<ILivestreamDialogLayoutContext>(
-      () => ({
-         handleClose,
-      }),
-      [handleClose]
+   const dialogOpen = useMemo(
+      () => pathType === "livestream" && livestreamId === dialogLivestream?.id,
+      [pathType, livestreamId, dialogLivestream?.id]
    )
 
+   const page = useMemo<DialogPage>(() => {
+      if (validDialogPages.includes(dialogPage as DialogPage)) {
+         return dialogPage as DialogPage
+      }
+      return "details" // Fallback to details page.
+   }, [dialogPage])
+
+   const handleClose = useCallback(() => {
+      void push({
+         pathname,
+         query: {
+            ...query,
+            livestream: undefined,
+         },
+      })
+   }, [pathname, push, query])
+
    return (
-      <LayoutContext.Provider value={contextValue}>
+      <>
          {children}
          {dialogOpen ? (
             <>
                <LivestreamDialog
                   open={dialogOpen}
                   serverSideLivestream={dialogLivestream}
+                  jobId={jobId}
                   handleClose={handleClose}
+                  page={page}
                />
+               {/* Set SEO tags for the page. */}
                <SEO {...getStreamMetaInfo(dialogLivestream)} />
+
+               {/* Set schema tags for the event shown in the dialog. */}
                <EventSEOSchemaScriptTag event={dialogLivestream} />
             </>
          ) : null}
-      </LayoutContext.Provider>
+      </>
    )
 }
-
-type ILivestreamDialogLayoutContext = {
-   handleClose: () => void
-}
-
-export const useLivestreamDialogLayout = () => {
-   const context = useContext(LayoutContext)
-   if (!context) {
-      throw new Error(
-         "useLivestreamDialogLayout must be used within a LivestreamDialogLayoutProvider"
-      )
-   }
-   return context
-}
-
-const LayoutContext = createContext<ILivestreamDialogLayoutContext>({
-   handleClose: () => {},
-})
