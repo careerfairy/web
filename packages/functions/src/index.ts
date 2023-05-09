@@ -189,7 +189,7 @@ exports.periodicallyRemoveCachedDocument =
    cacheClear.periodicallyRemoveCachedDocument
 
 // Crisp
-exports.getCrispSignature = crisp.getCrispSignature
+// exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
 exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
