@@ -35,7 +35,7 @@ export class ATSService {
     */
    async getAllJobs(groupId: string, integrationId: string): Promise<Job[]> {
       const data = await this.firebaseFunctions.httpsCallable(
-         "fetchATSJobs_v2"
+         "fetchATSJobs_eu"
       )({
          groupId,
          integrationId,
@@ -74,7 +74,7 @@ export class ATSService {
       }
 
       const data = await this.firebaseFunctions.httpsCallable(
-         "fetchATSJobs_v2"
+         "fetchATSJobs_eu"
       )(params)
 
       let mappedData = data.data.results
@@ -105,7 +105,7 @@ export class ATSService {
       mergeExtraRequiredData?: MergeExtraRequiredData
    ): Promise<void> {
       const data = await this.firebaseFunctions.httpsCallable(
-         "candidateApplicationTest"
+         "candidateApplicationTest_eu"
       )({
          groupId,
          integrationId,
@@ -121,7 +121,7 @@ export class ATSService {
       integrationId: string
    ): Promise<MergeLinkTokenResponse> {
       const data = await this.firebaseFunctions.httpsCallable(
-         "mergeGenerateLinkToken"
+         "mergeGenerateLinkToken_eu"
       )({
          groupId,
          integrationId,
@@ -135,7 +135,7 @@ export class ATSService {
       integrationId: string,
       publicToken: string
    ): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("mergeGetAccountToken")({
+      await this.firebaseFunctions.httpsCallable("mergeGetAccountToken_eu")({
          groupId,
          integrationId,
          publicToken,
@@ -143,7 +143,7 @@ export class ATSService {
    }
 
    async removeAccount(groupId: string, integrationId: string): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("mergeRemoveAccount")({
+      await this.firebaseFunctions.httpsCallable("mergeRemoveAccount_eu")({
          groupId,
          integrationId,
       })
