@@ -121,10 +121,6 @@ exports.getLivestreamICalendarEvent_eu = livestreams.getLivestreamICalendarEvent
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
 
-// University Emails
-exports.sendEmailToStudentOfUniversityAndField =
-   universityEmails.sendEmailToStudentOfUniversityAndField
-
 // Deploy each bundle as a separate function
 // npx firelink deploy --only functions:bundle-allFutureLivestreams
 //
