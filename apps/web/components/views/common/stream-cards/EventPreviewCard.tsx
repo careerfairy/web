@@ -17,11 +17,10 @@ import {
 } from "components/helperFunctions/HelperFunctions"
 import WhiteTagChip from "../chips/TagChip"
 import Image from "next/image"
-import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import Avatar from "@mui/material/Avatar"
 import { useRouter } from "next/router"
-import Link from "components/views/common/Link"
-import { checkIfPast, getRelevantHosts } from "util/streamUtil"
+import Link, { LinkProps } from "components/views/common/Link"
+import { checkIfPast } from "util/streamUtil"
 import { useAuth } from "HOCs/AuthProvider"
 import Skeleton from "@mui/material/Skeleton"
 
@@ -38,7 +37,6 @@ import useTrackLivestreamImpressions from "../../../custom-hook/useTrackLivestre
 import { placeholderBanner } from "../../../../constants/images"
 import DateUtil from "../../../../util/DateUtil"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
-import ClockIcon from "@mui/icons-material/AccessTime"
 import EventPreviewCardChipLabels from "./EventPreviewCardChipLabels"
 import { sxStyles } from "../../../../types/commonTypes"
 import { gradientAnimation } from "../../../../materialUI/GlobalBackground/GlobalBackGround"
@@ -96,48 +94,6 @@ const styles = sxStyles({
       fontWeight: 500,
       ...getMaxLineStyles(2),
    },
-   mainContentHoverStyles: {
-      "&:hover, &:focus-within": {
-         "& .contentWrapper": {
-            transform: "translateY(-70%)",
-            padding: { xs: 3, md: 4 },
-            background: "unset",
-         },
-         "& .flippedCardContent": {
-            position: "unset",
-            opacity: "1",
-            display: "flex",
-            justifyContent: "center",
-            mt: 6,
-         },
-         "& .hideOnHoverContent": {
-            opacity: 0,
-         },
-         "& .hidePastDateOnHover": {
-            display: "none",
-         },
-         "& .backgroundImageWrapper": {
-            position: "unset",
-            opacity: 0.1,
-         },
-         "& .title": (theme) => ({
-            [theme.breakpoints.up("md")]: {
-               ...getMaxLineStyles(2),
-            },
-         }),
-         "& .summary": {
-            ...getMaxLineStyles(3),
-            color: "text.primary",
-            marginTop: 1,
-         },
-         "& .chipsWrapper": {
-            display: "none",
-         },
-         "&:after": {
-            transform: "translateY(-50%)",
-         },
-      },
-   },
    mainAndLowerContentWrapper: {
       borderRadius: (theme) => theme.spacing(2),
       boxShadow: "0px 2px 4px rgba(0, 0, 0, 0.25)",
@@ -184,6 +140,9 @@ const styles = sxStyles({
    btn: {
       width: "40%",
    },
+   detailsBtn: {
+      opacity: 0,
+   },
    companyAvatar: {
       padding: 1,
       backgroundColor: "white",
@@ -223,12 +182,8 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          event,
          loading,
          light,
-         onRegisterClick,
-         registering,
          interests,
          animation,
-         autoRegister,
-         openShareDialog,
          isRecommended,
          totalElements,
          index,
@@ -247,11 +202,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          location,
          disableTracking: isPlaceholderEvent,
       })
-      const { query, push, pathname } = useRouter()
+      const { query, pathname } = useRouter()
       const [eventInterests, setEventInterests] = useState([])
-      const firebase = useFirebaseService()
       const { authenticatedUser, isLoggedIn } = useAuth()
-      const [hosts, setHosts] = useState(undefined)
       const [isPast, setIsPast] = useState(checkIfPast(event))
       const isOnMarketingLandingPage = pathname.includes(
          MARKETING_LANDING_PAGE_PATH
@@ -309,59 +262,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [event?.interestsIds, loading, interests])
 
       useEffect(() => {
-         if (!light && !loading) {
-            ;(async function getHosts() {
-               const newHosts = await firebase.getCareerCentersByGroupId(
-                  event?.groupIds || []
-               )
-
-               setHosts(
-                  newHosts.length
-                     ? getRelevantHosts(groupId as string, event, newHosts)
-                     : null
-               )
-            })()
-         }
-      }, [event, firebase, groupId, light, loading])
-
-      useEffect(() => {
          if (!loading) {
             setIsPast(checkIfPast(event))
          }
       }, [event?.start, loading])
-
-      useEffect(() => {
-         if (
-            !loading &&
-            autoRegister &&
-            query.register &&
-            query.register === event?.id &&
-            hosts?.length &&
-            !event?.registeredUsers?.includes(authenticatedUser.email)
-         ) {
-            ;(async function handleAutoRegister() {
-               const newQuery = { ...query }
-               if (newQuery.register) {
-                  delete newQuery.register
-               }
-               await push({
-                  pathname: pathname,
-                  query: {
-                     ...newQuery,
-                  },
-               })
-               onClickRegister()
-            })()
-         }
-      }, [
-         query.register,
-         event?.id,
-         hosts,
-         event?.registeredUsers,
-         authenticatedUser.email,
-         autoRegister,
-         loading,
-      ])
 
       const startDate = useMemo<Date>(
          () => event?.startDate || event?.start?.toDate?.(),
@@ -375,22 +279,10 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          return DateUtil.getMonth(new Date(startDate).getMonth(), true)
       }, [startDate])
 
-      const getStartHour = useMemo<string>(() => {
-         return DateUtil.eventPreviewHour(startDate)
-      }, [startDate])
-
       const getPastEventDate = useMemo<string>(
          () => DateUtil.pastEventPreviewDate(startDate),
          [startDate]
       )
-
-      const handleShareClick = useCallback(() => {
-         openShareDialog?.(event)
-      }, [event, openShareDialog])
-
-      const onClickRegister = useCallback(() => {
-         onRegisterClick(event, hosts?.[0]?.id, hosts, hasRegistered)
-      }, [event, hasRegistered, hosts, onRegisterClick])
 
       const getHref = useCallback(() => {
          if (
@@ -432,156 +324,28 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          [event?.hasStarted, isPast]
       )
 
-      const renderFlippedCard = useCallback(
-         () => (
-            <Stack
-               spacing={3}
-               direction={"column"}
-               alignItems={"center"}
-               width={"100%"}
-            >
-               {isLive ? (
-                  <Button
-                     component={Link}
-                     /* @ts-ignore */
-                     href={getHref()}
-                     variant={"contained"}
-                     color={"primary"}
-                     size={"medium"}
-                     onClick={handleDetailsClick}
-                     target={isEmbedded ? "_blank" : "_self"}
-                  >
-                     Join Stream
-                  </Button>
-               ) : (
-                  <Box
-                     sx={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent:
-                           isPlaceholderEvent ||
-                           isPast ||
-                           isOnMarketingLandingPage ||
-                           isEmbedded
-                              ? "center"
-                              : "space-between",
-                     }}
-                  >
-                     {onRegisterClick &&
-                     !isPast &&
-                     !isOnMarketingLandingPage ? (
-                        <Button
-                           sx={styles.btn}
-                           onClick={onClickRegister}
-                           variant={hasRegistered ? "outlined" : "contained"}
-                           color={hasRegistered ? "secondary" : "primary"}
-                           disabled={registering}
-                           size={"small"}
-                        >
-                           {hasRegistered ? "cancel" : "Attend"}
-                        </Button>
-                     ) : null}
-
-                     {!isPlaceholderEvent ? (
-                        <Button
-                           sx={styles.btn}
-                           component={Link}
-                           /* @ts-ignore */
-                           href={getHref()}
-                           variant={"contained"}
-                           color={"secondary"}
-                           size={"small"}
-                           onClick={handleDetailsClick}
-                           target={isEmbedded ? "_blank" : "_self"}
-                        >
-                           Details
-                        </Button>
-                     ) : null}
-                  </Box>
-               )}
-               {isPlaceholderEvent || isEmbedded ? null : (
-                  <Box
-                     sx={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent: "center",
-                     }}
-                  >
-                     <Typography
-                        sx={{ textDecoration: "underline", cursor: "pointer" }}
-                        fontWeight={500}
-                        variant={"body1"}
-                        color={"text.primary"}
-                        onClick={
-                           isOnMarketingLandingPage ? null : handleShareClick
-                        }
-                     >
-                        Share
-                     </Typography>
-                  </Box>
-               )}
-               {isPast ? null : (
-                  <Box
-                     sx={{
-                        display: "flex",
-                        width: "100%",
-                        justifyContent: "center",
-                     }}
-                  >
-                     {isPlaceholderEvent ? (
-                        <Typography
-                           sx={{ mt: 6 }}
-                           variant={"body1"}
-                           color={"text.primary"}
-                        >
-                           Coming soon
-                        </Typography>
-                     ) : (
-                        <Box sx={{ display: "flex" }}>
-                           <Typography
-                              sx={{ display: "flex", alignItems: "center" }}
-                              variant={"body1"}
-                              color={"text.primary"}
-                           >
-                              <CalendarIcon
-                                 fontSize={"inherit"}
-                                 sx={{ mr: 1 }}
-                              />
-                              {getStartDay} {getStartMonth}
-                              <ClockIcon
-                                 fontSize={"inherit"}
-                                 sx={{ ml: 2, mr: 1 }}
-                              />
-                              {getStartHour}
-                           </Typography>
-                        </Box>
-                     )}
-                  </Box>
-               )}
-            </Stack>
-         ),
-         [
-            getHref,
-            getStartDay,
-            getStartHour,
-            getStartMonth,
-            handleDetailsClick,
-            handleShareClick,
-            hasRegistered,
-            isEmbedded,
-            isLive,
-            isOnMarketingLandingPage,
-            isPast,
-            isPlaceholderEvent,
-            onClickRegister,
-            onRegisterClick,
-            registering,
-         ]
+      const cardHref = useMemo<LinkProps["href"]>(
+         () =>
+            event?.id
+               ? {
+                    pathname: pathname,
+                    query: {
+                       ...query,
+                       livestream: ["livestream", event.id],
+                    },
+                 }
+               : undefined,
+         [event?.id, query, pathname]
       )
 
       return (
          <>
-            <Box ref={trackImpressionsRef}>
+            <Box
+               component={cardHref ? Link : "div"}
+               href={cardHref}
+               noLinkStyle
+               ref={trackImpressionsRef}
+            >
                <Box
                   ref={ref}
                   sx={[
@@ -589,12 +353,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      isLive && styles.cardIsLive,
                   ]}
                >
-                  <Box
-                     sx={[
-                        styles.mainContentWrapper,
-                        !loading && styles.mainContentHoverStyles,
-                     ]}
-                  >
+                  <Box sx={styles.mainContentWrapper}>
                      <Box
                         className="backgroundImageWrapper"
                         sx={styles.backgroundImageWrapper}
@@ -781,7 +540,21 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                            className="flippedCardContent"
                            sx={styles.flippedCardContent}
                         >
-                           {renderFlippedCard()}
+                           {!isPlaceholderEvent ? (
+                              <Button
+                                 sx={[styles.btn, styles.detailsBtn]}
+                                 component={Link}
+                                 /* @ts-ignore */
+                                 href={getHref()}
+                                 variant={"contained"}
+                                 color={"secondary"}
+                                 size={"small"}
+                                 onClick={handleDetailsClick}
+                                 target={isEmbedded ? "_blank" : "_self"}
+                              >
+                                 Details
+                              </Button>
+                           ) : null}
                         </Box>
 
                         <Box
@@ -858,16 +631,7 @@ interface EventPreviewCardProps {
    event?: LivestreamEvent
    loading?: boolean
    light?: boolean
-   registering?: boolean
-   autoRegister?: boolean
    interests?: Interest[]
-   openShareDialog?: React.Dispatch<React.SetStateAction<LivestreamEvent>>
-   onRegisterClick?: (
-      event: LivestreamEvent,
-      targetGroupId: string,
-      groups: any[],
-      hasRegistered: boolean
-   ) => any
    // Animate the loading animation, defaults to the "wave" prop
    animation?: false | "wave" | "pulse"
    isRecommended?: boolean

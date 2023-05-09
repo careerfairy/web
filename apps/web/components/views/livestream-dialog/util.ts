@@ -16,9 +16,7 @@ export const getLivestreamDialogData = async (
 
 export const withLivestreamDialogData = <
    TContext extends GetServerSidePropsContext
->(
-   foo
-) => {
+>() => {
    return async (ctx: TContext) => {
       return {
          props: {
