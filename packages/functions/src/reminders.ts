@@ -168,6 +168,7 @@ const ReminderRecordingNow: ReminderData = {
  * So we will be looking for streams that start on current date + {reminderDateDelay}
  */
 export const scheduleReminderEmails = functions
+   .region(config.region)
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
