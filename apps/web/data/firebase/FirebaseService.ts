@@ -291,7 +291,7 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v2"
+            "sendLivestreamRegistrationConfirmationEmail_eu"
          )
 
       const livestreamStartDate = livestream.start.toDate()
@@ -333,7 +333,7 @@ class FirebaseService {
    sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendPhysicalEventRegistrationConfirmationEmail"
+            "sendPhysicalEventRegistrationConfirmationEmail_eu"
          )
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
@@ -349,7 +349,7 @@ class FirebaseService {
    sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendHybridEventRegistrationConfirmationEmail"
+            "sendHybridEventRegistrationConfirmationEmail_eu"
          )
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
