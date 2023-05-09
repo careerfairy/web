@@ -59,6 +59,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
          pathname,
          query: {
             ...query,
+            // Remove the livestream query param that opened the dialog.
             livestream: undefined,
          },
       })
