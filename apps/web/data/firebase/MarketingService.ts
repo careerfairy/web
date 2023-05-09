@@ -1,4 +1,4 @@
-import firebaseInstance from "./FirebaseInstance"
+import { FunctionsInstance } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { MarketingUserCreationFields } from "@careerfairy/shared-lib/dist/marketing/MarketingUser"
 
@@ -12,8 +12,6 @@ export class MarketingService {
    }
 }
 
-export const marketingServiceInstance = new MarketingService(
-   firebaseInstance.functions()
-)
+export const marketingServiceInstance = new MarketingService(FunctionsInstance)
 
 export default MarketingService

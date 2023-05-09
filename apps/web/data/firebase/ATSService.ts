@@ -1,4 +1,7 @@
-import firebaseInstance, { FieldValue } from "./FirebaseInstance"
+import firebaseInstance, {
+   FieldValue,
+   FunctionsInstance,
+} from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { v4 as uuidv4 } from "uuid"
 import {
@@ -202,7 +205,7 @@ export class ATSService {
 }
 
 export const atsServiceInstance = new ATSService(
-   firebaseInstance.functions(),
+   FunctionsInstance,
    firebaseInstance.firestore()
 )
 

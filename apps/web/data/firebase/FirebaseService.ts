@@ -4,7 +4,7 @@ import {
    START_DATE_FOR_REPORTED_EVENTS,
 } from "../constants/streamContants"
 import DateUtil from "util/DateUtil"
-import firebaseApp from "./FirebaseInstance"
+import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { HandRaiseState } from "types/handraise"
 import {
@@ -73,7 +73,7 @@ class FirebaseService {
       this.auth = firebaseInstance.auth()
       this.firestore = firebaseInstance.firestore()
       this.storage = firebaseInstance.storage()
-      this.functions = firebaseInstance.functions()
+      this.functions = FunctionsInstance
    }
 
    getFirebaseTimestamp = (dateString) => {
