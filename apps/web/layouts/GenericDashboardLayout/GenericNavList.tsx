@@ -10,9 +10,11 @@ import ClockIcon from "@mui/icons-material/AccessTime"
 import NavList from "../common/NavList"
 import useIsMobile from "../../components/custom-hook/useIsMobile"
 import BottomNavBar from "./BottomNavBar"
+import { useAuth } from "../../HOCs/AuthProvider"
 
 const GenericNavList = () => {
    const isMobile = useIsMobile()
+   const { isLoggedIn } = useAuth()
 
    const navLinks = useMemo(() => {
       const links: INavLink[] = [
@@ -30,7 +32,24 @@ const GenericNavList = () => {
             mobileTitle: "Live streams",
             Icon: LiveStreamsIcon,
             href: `/next-livestreams`,
-            pathname: `/next-livestreams/[[...livestreamDialog]]`,
+            childLinks: [
+               {
+                  id: "next-live-streams",
+                  href: `/next-livestreams`,
+                  pathname: `/next-livestreams/[[...livestreamDialog]]`,
+                  title: "Next live streams",
+               },
+               ...(isLoggedIn
+                  ? [
+                       {
+                          id: "my-registrations",
+                          href: `/next-livestreams/my-registrations`,
+                          pathname: `/next-livestreams/my-registrations`,
+                          title: "My registrations",
+                       },
+                    ]
+                  : []),
+            ],
          },
          {
             id: "past-live-streams",
@@ -50,7 +69,7 @@ const GenericNavList = () => {
       ]
 
       return links
-   }, [])
+   }, [isLoggedIn])
 
    return isMobile ? (
       <BottomNavBar links={navLinks} />

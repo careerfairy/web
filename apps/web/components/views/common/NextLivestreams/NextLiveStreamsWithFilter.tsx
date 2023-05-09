@@ -4,7 +4,6 @@ import { StreamsSection } from "./StreamsSection"
 import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
-import Image from "next/image"
 import Link from "../../../../components/views/common/Link"
 import useIsMobile from "../../../../components/custom-hook/useIsMobile"
 import { sxStyles } from "../../../../types/commonTypes"
@@ -14,6 +13,7 @@ import LivestreamSearch, {
 } from "../../group/admin/common/LivestreamSearch"
 import Filter, { FilterEnum } from "../filter/Filter"
 import { wishListBorderRadius } from "../../../../constants/pages"
+import NoResultsMessage from "./NoResultsMessage"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -110,35 +110,26 @@ const NextLiveStreamsWithFilter = ({
       }
    }, [hasPastEvents, pastLivestreams])
 
-   const renderNoResults = useCallback(() => {
-      return (
-         <>
-            <Grid xs={12} mt={{ xs: 12, md: 20 }} textAlign="center" item>
-               <Image
-                  src="/empty-search.svg"
-                  width="600"
-                  height="300"
-                  alt="Empty search illustration"
-               />
-            </Grid>
-            <Grid xs={12} mt={4} mx={1} item>
+   const noResultsMessage = useMemo<JSX.Element>(
+      () => (
+         <Grid xs={12} mt={4} mx={1} item>
+            <Typography sx={styles.noResultsMessage} variant="h5">
+               {/* eslint-disable-next-line react/no-unescaped-entities */}
+               We didn't find any events matching your criteria. 😕{" "}
+               {isMobile ? (
+                  <Link href="/next-livestreams">clear all filters</Link>
+               ) : null}
+            </Typography>
+            {isMobile ? null : (
                <Typography sx={styles.noResultsMessage} variant="h5">
-                  {/* eslint-disable-next-line react/no-unescaped-entities */}
-                  We didn't find any events matching your criteria. 😕{" "}
-                  {isMobile ? (
-                     <Link href="/next-livestreams">clear all filters</Link>
-                  ) : null}
+                  Remove some filters or start anew by{" "}
+                  <Link href="/next-livestreams">clearing all filters</Link>.
                </Typography>
-               {isMobile ? null : (
-                  <Typography sx={styles.noResultsMessage} variant="h5">
-                     Remove some filters or start anew by{" "}
-                     <Link href="/next-livestreams">clearing all filters</Link>.
-                  </Typography>
-               )}
-            </Grid>
-         </>
-      )
-   }, [isMobile])
+            )}
+         </Grid>
+      ),
+      [isMobile]
+   )
 
    // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
@@ -180,7 +171,7 @@ const NextLiveStreamsWithFilter = ({
             listenToUpcoming
             pastLivestreams={pastLivestreams}
             minimumUpcomingStreams={0}
-            noResultsComponent={renderNoResults()}
+            noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />
       </>
    )
