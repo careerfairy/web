@@ -174,15 +174,15 @@ exports.fetchATSSyncStatus_eu = atsGroup.fetchATSSyncStatus
 exports.candidateApplicationTest_eu = atsGroup.candidateApplicationTest
 
 // User
-exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
-exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
-exports.updateUserJobApplications = atsUser.updateUserJobApplications
+exports.atsUserApplyToJob_eu = atsUser.atsUserApplyToJob
+exports.fetchLivestreamJobs_eu = atsUser.fetchLivestreamJobs
+exports.updateUserJobApplications_eu = atsUser.updateUserJobApplications
 
 // BigQuery
-exports.getBigQueryUsers_v3 = bigQuery.getBigQueryUsers_v3
+exports.getBigQueryUsers_eu = bigQuery.getBigQueryUsers
 
 // Group Analytics
-exports.getRegistrationSources_v2 = groupAnalytics.getRegistrationSources
+exports.getRegistrationSources_eu = groupAnalytics.getRegistrationSources
 
 // Clear cached documents
 exports.periodicallyRemoveCachedDocument =

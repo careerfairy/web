@@ -126,7 +126,7 @@ class FirebaseService {
    }
 
    getRegistrationSources = (args: GetRegistrationSourcesFnArgs) => {
-      const fn = this.functions.httpsCallable("getRegistrationSources_v2")
+      const fn = this.functions.httpsCallable("getRegistrationSources_eu")
       return fn(args)
    }
 

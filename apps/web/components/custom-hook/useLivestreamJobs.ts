@@ -18,7 +18,7 @@ const useLivestreamJobs = (
 
    const { data } = useSWR(
       [
-         "fetchLivestreamJobs",
+         "fetchLivestreamJobs_eu",
          {
             livestreamId,
             jobs,
