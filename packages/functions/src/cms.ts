@@ -1,8 +1,10 @@
 import functions = require("firebase-functions")
 import { isLocalEnvironment, logGraphqlErrorAndThrow } from "./util"
 import HygraphClient from "./api/hygraph"
+import config from "./config"
 
 export const syncFieldsOfStudyToHygraph = functions
+   .region(config.region)
    // Make the secret available to this function
    .runWith({ secrets: ["HYGRAPH_MUTATION_KEY"] })
    .firestore.document("fieldsOfStudy/{fieldOfStudyId}")
