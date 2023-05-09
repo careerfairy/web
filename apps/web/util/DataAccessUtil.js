@@ -4,7 +4,7 @@ export default class DataAccessUtil {
    static sendDashboardInvite(recipientEmail, userData, group, invite_link) {
       return axios({
          method: "post",
-         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail",
+         url: "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/sendDashboardInviteEmail_eu",
          data: {
             recipientEmail: recipientEmail,
             sender_first_name: userData.firstName,
@@ -24,7 +24,7 @@ export default class DataAccessUtil {
       // TODO Update the cloud function to send the sender an email of the draft they submitted
       return axios({
          method: "post",
-         url: "https://us-central1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail",
+         url: "https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/sendDraftApprovalRequestEmail_eu",
          data: {
             adminsInfo: adminsInfo,
             sender_name: senderName,
