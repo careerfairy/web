@@ -8,7 +8,7 @@ export class MarketingService {
    ) {}
 
    async create(data: MarketingUserCreationFields): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("createMarketingUser")(data)
+      await this.firebaseFunctions.httpsCallable("createMarketingUser_eu")(data)
    }
 }
 
