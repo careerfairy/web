@@ -25,6 +25,7 @@ import {
 import { UserATSRelations, UserData } from "@careerfairy/shared-lib/users"
 import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
+import config from "./config"
 
 /*
 |--------------------------------------------------------------------------
@@ -37,6 +38,7 @@ import { Job } from "@careerfairy/shared-lib/ats/Job"
  * We'll fetch a link_token from Merge that will be used to show the Merge Link dialog (ATS selector)
  */
 export const mergeGenerateLinkToken = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidation({
@@ -68,6 +70,7 @@ export const mergeGenerateLinkToken = functions
  * account token (that should be used when querying the merge data for that group)
  */
 export const mergeGetAccountToken = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidation<{ publicToken: string }>({
@@ -129,6 +132,7 @@ export const mergeGetAccountToken = functions
  * This is used to show the form fields for the ATS integration
  */
 export const mergeMetaEndpoint = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidationWithAccountToken<{
@@ -161,6 +165,7 @@ export const mergeMetaEndpoint = functions
  * Fetch Jobs
  */
 export const fetchATSJobs = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidationWithAccountToken<
@@ -205,6 +210,7 @@ export const fetchATSJobs = functions
    })
 
 export const candidateApplicationTest = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidationWithAccountToken<{
@@ -268,6 +274,7 @@ export const candidateApplicationTest = functions
  * Fetch Recruiters
  */
 export const fetchATSRecruiters = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData =
@@ -320,6 +327,7 @@ export const fetchATSRecruiters = functions
  * Sync Status for the multiple entities
  */
 export const fetchATSSyncStatus = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidationWithAccountToken({
@@ -347,6 +355,7 @@ export const fetchATSSyncStatus = functions
  * Remove a linked account from merge
  */
 export const mergeRemoveAccount = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data, context) => {
       const requestData = await atsRequestValidationWithAccountToken({

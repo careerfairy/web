@@ -18,7 +18,7 @@ const useGroupATSRecruiters = (
 
    const { data } = useSWR(
       [
-         "fetchATSRecruiters",
+         "fetchATSRecruiters_eu",
          {
             groupId,
             integrationId,

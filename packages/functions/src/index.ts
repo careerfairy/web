@@ -164,14 +164,14 @@ exports.createMarketingUser_eu = marketing.createMarketingUser
 
 // ATS
 // Group
-exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
-exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
-exports.mergeMetaEndpoint = atsGroup.mergeMetaEndpoint
-exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
-exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
-exports.fetchATSRecruiters = atsGroup.fetchATSRecruiters
-exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
-exports.candidateApplicationTest = atsGroup.candidateApplicationTest
+exports.mergeGenerateLinkToken_eu = atsGroup.mergeGenerateLinkToken
+exports.mergeGetAccountToken_eu = atsGroup.mergeGetAccountToken
+exports.mergeMetaEndpoint_eu = atsGroup.mergeMetaEndpoint
+exports.mergeRemoveAccount_eu = atsGroup.mergeRemoveAccount
+exports.fetchATSJobs_eu = atsGroup.fetchATSJobs
+exports.fetchATSRecruiters_eu = atsGroup.fetchATSRecruiters
+exports.fetchATSSyncStatus_eu = atsGroup.fetchATSSyncStatus
+exports.candidateApplicationTest_eu = atsGroup.candidateApplicationTest
 
 // User
 exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
