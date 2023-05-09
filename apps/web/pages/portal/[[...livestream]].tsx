@@ -1,36 +1,42 @@
 import React, { useMemo } from "react"
 import Container from "@mui/material/Container"
-import RecommendedEvents from "../components/views/portal/events-preview/RecommendedEvents"
-import ComingUpNextEvents from "../components/views/portal/events-preview/ComingUpNextEvents"
-import MyNextEvents from "../components/views/portal/events-preview/MyNextEvents"
-import WidgetsWrapper from "../components/views/portal/WidgetsWrapper"
-import { useAuth } from "../HOCs/AuthProvider"
+import RecommendedEvents from "../../components/views/portal/events-preview/RecommendedEvents"
+import ComingUpNextEvents from "../../components/views/portal/events-preview/ComingUpNextEvents"
+import MyNextEvents from "../../components/views/portal/events-preview/MyNextEvents"
+import WidgetsWrapper from "../../components/views/portal/WidgetsWrapper"
+import { useAuth } from "../../HOCs/AuthProvider"
 import { GetServerSidePropsContext, InferGetServerSidePropsType } from "next"
-import SEO from "../components/util/SEO"
-import { livestreamRepo } from "../data/RepositoryInstances"
-import { START_DATE_FOR_REPORTED_EVENTS } from "../data/constants/streamContants"
+import SEO from "../../components/util/SEO"
+import { livestreamRepo } from "../../data/RepositoryInstances"
+import { START_DATE_FOR_REPORTED_EVENTS } from "../../data/constants/streamContants"
 import EventsPreview, {
    EventsTypes,
-} from "../components/views/portal/events-preview/EventsPreview"
-import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
-import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import ContentCarousel from "../components/views/portal/content-carousel/ContentCarousel"
-import DateUtil from "../util/DateUtil"
+} from "../../components/views/portal/events-preview/EventsPreview"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import ContentCarousel from "../../components/views/portal/content-carousel/ContentCarousel"
+import DateUtil from "../../util/DateUtil"
 import { Box } from "@mui/material"
-import GenericDashboardLayout from "../layouts/GenericDashboardLayout"
+import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import {
    getServerSideUserData,
    getServerSideUserStats,
    getUserTokenFromCookie,
    mapFromServerSide,
-} from "util/serverUtil"
-import CarouselContentService from "../components/views/portal/content-carousel/CarouselContentService"
+} from "../../util/serverUtil"
+import CarouselContentService from "../../components/views/portal/content-carousel/CarouselContentService"
+
+import {
+   getLivestreamDialogData,
+   LivestreamDialogLayout,
+} from "../../components/views/livestream-dialog"
 
 const PortalPage = ({
    comingUpNextEvents,
    pastEvents,
    serializedCarouselContent,
    serverUserStats,
+   serverSideLivestream,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
 
@@ -50,7 +56,7 @@ const PortalPage = ({
    }, [serializedCarouselContent])
 
    return (
-      <>
+      <LivestreamDialogLayout serverSideLivestream={serverSideLivestream}>
          <SEO
             id={"CareerFairy | Portal"}
             description={
@@ -91,7 +97,7 @@ const PortalPage = ({
                </Container>
             </>
          </GenericDashboardLayout>
-      </>
+      </LivestreamDialogLayout>
    )
 }
 
@@ -106,7 +112,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       livestreamRepo.getPastEventsFrom({
          fromDate: new Date(START_DATE_FOR_REPORTED_EVENTS),
          limit: 6,
-      })
+      }),
+      getLivestreamDialogData(ctx)
    )
 
    // only adds recording request if token has email
@@ -117,14 +124,21 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
          getServerSideUserData(token.email)
       )
    }
+
    const results = await Promise.allSettled(promises)
 
-   const [comingUpNextEvents, pastEvents, recordedEvents, userStats, userData] =
-      results.map((result) =>
-         result.status === "fulfilled"
-            ? (result as PromiseFulfilledResult<any>).value
-            : null
-      )
+   const [
+      comingUpNextEvents,
+      pastEvents,
+      serverSideLivestream,
+      recordedEvents,
+      userStats,
+      userData,
+   ] = results.map((result) =>
+      result.status === "fulfilled"
+         ? (result as PromiseFulfilledResult<any>).value
+         : null
+   )
 
    const recordedEventsToShare = recordedEvents?.filter(
       (event: LivestreamEvent) => Boolean(event?.denyRecordingAccess) === false
@@ -156,6 +170,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
                LivestreamPresenter.serializeDocument
             ),
          }),
+         serverSideLivestream,
       },
    }
 }
