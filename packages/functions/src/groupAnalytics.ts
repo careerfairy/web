@@ -16,6 +16,7 @@ import {
    RegistrationSourcesResponseItem,
 } from "@careerfairy/shared-lib/functions/groupAnalyticsTypes"
 import { UserLivestreamData } from "@careerfairy/shared-lib/livestreams"
+import config from "./config"
 
 /*
 |--------------------------------------------------------------------------
@@ -30,53 +31,55 @@ const cache = (cacheKeyFn: CacheKeyOnCallFn) =>
 /**
  * Fetch Group Registration Sources Analytics
  */
-export const getRegistrationSources = functions.https.onCall(
-   middlewares(
-      dataValidation({
-         groupId: string().required(),
-         livestreamIds: array(string()).optional(),
-         fetchType: string()
-            .oneOf([...FETCH_TYPES])
-            .optional(),
-      }),
-      userShouldBeGroupAdmin(),
-      cache((data) => registrationSourcesCacheKey({ ...data })),
-      async (data) => {
-         const type: typeof FETCH_TYPES[number] = data.fetchType
+export const getRegistrationSources = functions
+   .region(config.region)
+   .https.onCall(
+      middlewares(
+         dataValidation({
+            groupId: string().required(),
+            livestreamIds: array(string()).optional(),
+            fetchType: string()
+               .oneOf([...FETCH_TYPES])
+               .optional(),
+         }),
+         userShouldBeGroupAdmin(),
+         cache((data) => registrationSourcesCacheKey({ ...data })),
+         async (data) => {
+            const type: typeof FETCH_TYPES[number] = data.fetchType
 
-         let userLivestreamData: UserLivestreamData[] = []
-         switch (type) {
-            case "ALL_LIVESTREAMS": {
-               const livestreams = await livestreamsRepo.getEventsOfGroup(
-                  data.groupId
-               )
-
-               userLivestreamData =
-                  await livestreamsRepo.getRegisteredUsersMultipleEvents(
-                     livestreams.map((l) => l.id)
+            let userLivestreamData: UserLivestreamData[] = []
+            switch (type) {
+               case "ALL_LIVESTREAMS": {
+                  const livestreams = await livestreamsRepo.getEventsOfGroup(
+                     data.groupId
                   )
 
-               break
+                  userLivestreamData =
+                     await livestreamsRepo.getRegisteredUsersMultipleEvents(
+                        livestreams.map((l) => l.id)
+                     )
+
+                  break
+               }
+
+               // fallback to livestreamIds
+               default:
+                  userLivestreamData =
+                     await livestreamsRepo.getRegisteredUsersMultipleEvents(
+                        data.livestreamIds
+                     )
             }
 
-            // fallback to livestreamIds
-            default:
-               userLivestreamData =
-                  await livestreamsRepo.getRegisteredUsersMultipleEvents(
-                     data.livestreamIds
-                  )
+            functions.logger.info(
+               `Fetched ${userLivestreamData.length} userLivestreamData docs`
+            )
+
+            // remove unwanted fields to save bandwidth
+            // (smaller responses are more likely to fit in cache due to the 1MB limit)
+            const stats: RegistrationSourcesResponseItem[] =
+               userLivestreamData.map(RegistrationSourcesResponseItem.serialize)
+
+            return stats
          }
-
-         functions.logger.info(
-            `Fetched ${userLivestreamData.length} userLivestreamData docs`
-         )
-
-         // remove unwanted fields to save bandwidth
-         // (smaller responses are more likely to fit in cache due to the 1MB limit)
-         const stats: RegistrationSourcesResponseItem[] =
-            userLivestreamData.map(RegistrationSourcesResponseItem.serialize)
-
-         return stats
-      }
+      )
    )
-)

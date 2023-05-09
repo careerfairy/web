@@ -150,14 +150,16 @@ export class ATSService {
    }
 
    async applyToAJob(livestreamId: string, jobId: string): Promise<any> {
-      return this.firebaseFunctions.httpsCallable("atsUserApplyToJob")({
+      return this.firebaseFunctions.httpsCallable("atsUserApplyToJob_eu")({
          livestreamId,
          jobId,
       })
    }
 
    async updateUserJobApplications(): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("updateUserJobApplications")()
+      await this.firebaseFunctions.httpsCallable(
+         "updateUserJobApplications_eu"
+      )()
    }
 
    async setFirstSyncComplete(
