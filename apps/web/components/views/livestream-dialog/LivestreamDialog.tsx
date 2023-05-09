@@ -93,7 +93,7 @@ const Content: FC<ContentProps> = ({
 }) => {
    const theme = useTheme()
 
-   const [value, setValue] = useState<number>(getValue(page))
+   const [value, setValue] = useState<number>(getInitialValue(page))
 
    const { data: livestream } = useLivestream(
       serverSideLivestream.id,
@@ -158,7 +158,7 @@ type DialogContextType = {
    jobId?: string // Only for job-details view
 }
 
-const getValue = (page: Props["page"]): number => {
+const getInitialValue = (page: Props["page"]): number => {
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
