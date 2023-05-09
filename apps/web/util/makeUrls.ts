@@ -96,7 +96,7 @@ export const makeUrls = function (event) {
 }
 
 export const makeLivestreamEventDetailsUrl = (livestreamId) => {
-   return `${getHost()}/upcoming-livestream/${livestreamId}`
+   return `${getHost()}/portal/livestream/${livestreamId}`
 }
 
 export const makeGroupCompanyPageUrl = (group: Group) => {
