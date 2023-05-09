@@ -16,6 +16,8 @@ export const firebaseConfig = {
    messagingSenderId: process.env.REACT_APP_FIREBASE_MESSAGING_SENDER_ID,
 }
 
+export const region = "europe-west1"
+
 /**
  * Create a custom firebase instance
  *
@@ -38,7 +40,7 @@ export const createFirebaseInstance = (
    if (shouldUseEmulators()) {
       app.auth().useEmulator("http://localhost:9099")
       app.firestore().useEmulator("localhost", 8080)
-      app.functions().useEmulator("localhost", 5001)
+      app.functions(region).useEmulator("localhost", 5001)
       app.storage().useEmulator("localhost", 9199)
       console.log("You're connected to the emulators!")
    }
@@ -71,7 +73,7 @@ const firebaseApp: firebase.app.App = createFirebaseInstance("[DEFAULT]")
 
 export const FirestoreInstance = firebaseApp.firestore()
 export const AuthInstance = firebaseApp.auth()
-export const FunctionsInstance = firebaseApp.functions()
+export const FunctionsInstance = firebaseApp.functions(region)
 
 export const FieldValue = firebase.firestore.FieldValue
 export const Timestamp = firebase.firestore.Timestamp
