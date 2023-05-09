@@ -83,8 +83,9 @@ export const rewardLivestreamInvitationComplete = functions
 /**
  * Generic function to create a reward for a user progression action
  */
-export const rewardUserAction = functions.https.onCall(
-   async (data, context) => {
+export const rewardUserAction = functions
+   .region(config.region)
+   .https.onCall(async (data, context) => {
       const userEmail = context.auth?.token?.email
       const action = data.action
 
@@ -140,8 +141,7 @@ export const rewardUserAction = functions.https.onCall(
       // all validations have passed, create the reward for the user
       await rewardCreateUserAction(userEmail, action, livestreamDoc)
       functions.logger.info("Created a new reward for the user action")
-   }
-)
+   })
 
 /**
  * Check if the referral code is valid and if the user has any, if yes, rewards the followed user

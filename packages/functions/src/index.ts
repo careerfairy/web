@@ -24,7 +24,6 @@ import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
 import reminders = require("./reminders")
 import livestreams = require("./livestreams")
-import universityEmails = require("./universityEmails")
 // import algolia = require("./algolia")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
@@ -128,21 +127,13 @@ exports.postmarkWebhook = postmark.postmarkWebhook
 // Firebase Hosting mappings: npx firebase deploy --only hosting
 exports.bundle = generateFunctionsFromBundles(bundles)
 
-// Algolia
-// exports.addToIndex = algolia.addToIndex
-// exports.updateIndex = algolia.updateIndex
-// exports.deleteFromIndex = algolia.deleteFromIndex
-// exports.addToStreamIndex = algolia.addToStreamIndex
-// exports.updateStreamIndex = algolia.updateStreamIndex
-// exports.deleteStreamFromIndex = algolia.deleteStreamFromIndex
-
 // Analytics
 exports.updateUserDataAnalytcicsOnWrite =
    analytics.updateUserDataAnalyticsOnWrite
 
 // Recording
-exports.startRecordingLivestream_v2 = recording.startRecordingLivestream
-exports.stopRecordingLivestream_v2 = recording.stopRecordingLivestream
+exports.startRecordingLivestream_eu = recording.startRecordingLivestream
+exports.stopRecordingLivestream_eu = recording.stopRecordingLivestream
 exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
 exports.automaticallyRecordLivestreamBreakoutRoom =
    recording.automaticallyRecordLivestreamBreakoutRoom
@@ -159,7 +150,7 @@ exports.slackHandleInteractions = slack.slackHandleInteractions
 // Rewards
 exports.rewardLivestreamInvitationComplete_eu =
    rewards.rewardLivestreamInvitationComplete
-exports.rewardUserAction = rewards.rewardUserAction
+exports.rewardUserAction_eu = rewards.rewardUserAction
 exports.applyReferralCode_eu = rewards.applyReferralCode
 
 // Ratings
@@ -169,7 +160,7 @@ exports.onUserRateWish = wishes.onUserRateWish
 exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
 
 // Marketing
-exports.createMarketingUser = marketing.createMarketingUser
+exports.createMarketingUser_eu = marketing.createMarketingUser
 
 // ATS
 // Group
