@@ -51,8 +51,7 @@ const GroupStreams = ({
    const {
       query: { groupId },
    } = useRouter()
-   const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
-      useRegistrationModal()
+   const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
    const { data: existingInterests } = useInterests()
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
    const searchedButNoResults = !searching && !livestreams?.length
@@ -97,12 +96,9 @@ const GroupStreams = ({
                               ref={ref}
                               index={index}
                               totalElements={arr.length}
-                              onRegisterClick={handleClickRegister}
                               interests={existingInterests}
-                              autoRegister
                               location={location}
                               event={livestream}
-                              openShareDialog={setShareEventDialog}
                            />
                         ) : (
                            <EventPreviewCard ref={ref} loading />
