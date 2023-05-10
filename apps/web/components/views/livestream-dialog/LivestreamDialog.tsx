@@ -21,6 +21,7 @@ import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { SlideUpTransition } from "../common/transitions"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 const styles = sxStyles({
    content: {
@@ -43,6 +44,9 @@ const styles = sxStyles({
       borderTopLeftRadius: `${theme.spacing(2)} !important`,
       borderTopRightRadius: `${theme.spacing(2)} !important`,
    }),
+   dialogPaper: {
+      borderRadius: 5,
+   },
 })
 
 type Props = {
@@ -67,7 +71,7 @@ type ViewKey = typeof views[number]["key"]
 
 const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
    const isMobile = useIsMobile()
-
+   console.count("LivestreamDialog")
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
@@ -77,9 +81,12 @@ const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
          open={open}
          onClose={onClose}
          TransitionComponent={SlideUpTransition}
-         maxWidth="lg"
+         maxWidth="md"
          fullWidth
          fullScreen={isMobile}
+         PaperProps={{
+            sx: styles.dialogPaper,
+         }}
       >
          <Content handleClose={onClose} {...rest} />
       </Dialog>
@@ -121,6 +128,9 @@ const Content: FC<ContentProps> = ({
          livestream,
          activeView: views[value].key,
          jobId,
+         livestreamPresenter: livestream
+            ? LivestreamPresenter.createFromDocument(livestream)
+            : null,
       }),
       [goToView, onClose, livestream, value, jobId]
    )
@@ -128,7 +138,6 @@ const Content: FC<ContentProps> = ({
    return (
       <DialogContext.Provider value={contextValue}>
          <DialogContent sx={styles.content}>
-            {livestream?.title}
             <SwipeableViews
                style={styles.swipeableViews}
                containerStyle={styles.swipeableViewsContainer}
@@ -160,6 +169,7 @@ type DialogContextType = {
     * Null -> no livestream
     * */
    livestream: LivestreamEvent | undefined | null
+   livestreamPresenter: LivestreamPresenter
    activeView: ViewKey
    jobId?: string // Only for job-details view
 }
@@ -179,6 +189,7 @@ const DialogContext = createContext<DialogContextType>({
    closeDialog: () => {},
    goToView: () => {},
    livestream: undefined,
+   livestreamPresenter: null,
    activeView: "livestream-details",
 })
 

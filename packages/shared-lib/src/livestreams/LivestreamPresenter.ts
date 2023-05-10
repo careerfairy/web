@@ -194,6 +194,19 @@ export class LivestreamPresenter extends BaseModel {
       return Math.floor((Date.now() - start?.getTime()) / 1000 / 60)
    }
 
+   /**
+    * Calculates the number of spots remaining for registration.
+    *
+    * @returns {number} The number of spots remaining.
+    */
+   getNumberOfSpotsRemaining(): number {
+      if (!this.maxRegistrants) return 0
+      else if (!this.registeredUsers) return this.maxRegistrants
+      else {
+         return this.maxRegistrants - this.registeredUsers.length
+      }
+   }
+
    static createFromDocument(livestream: LivestreamEvent) {
       return new LivestreamPresenter(
          livestream.id,
