@@ -333,6 +333,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             }
          }
 
+         // Fall back to the default portal link and open the event in a new tab
          return {
             href: {
                pathname: `/portal/[[...livestreamDialog]]`,
@@ -355,7 +356,12 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
       return (
          <>
-            <Link {...linkProps} shallow passHref scroll={false}>
+            <Link
+               {...linkProps}
+               shallow // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+               passHref
+               scroll={false} // Prevents the page from scrolling to the top when the link is clicked
+            >
                <CardActionArea
                   component={event ? "a" : "div"}
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
