@@ -15,8 +15,16 @@ import ScrollToTop from "components/views/common/ScrollToTop"
 import { placeholderBanner } from "../../../constants/images"
 import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
 import { livestreamRepo } from "../../../data/RepositoryInstances"
+import {
+   getLivestreamDialogData,
+   LivestreamDialogLayout,
+} from "../../../components/views/livestream-dialog"
 
-const GroupPage = ({ serverSideGroup, initialTabValue }) => {
+const GroupPage = ({
+   serverSideGroup,
+   initialTabValue,
+   serverSideLivestream,
+}) => {
    const {
       palette: {
          common: { white },
@@ -95,7 +103,7 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
    }, [])
 
    return (
-      <React.Fragment>
+      <LivestreamDialogLayout serverSideLivestream={serverSideLivestream}>
          <HeadWithMeta {...metaInfo} />
          <NextLivestreamsLayout currentGroup={currentGroup}>
             <div>
@@ -126,15 +134,12 @@ const GroupPage = ({ serverSideGroup, initialTabValue }) => {
             </div>
          </NextLivestreamsLayout>
          <ScrollToTop />
-      </React.Fragment>
+      </LivestreamDialogLayout>
    )
 }
 
-export async function getServerSideProps({
-   params: { groupId },
-   query: { type },
-}) {
-   const serverSideGroup = await getServerSideGroup(groupId)
+export async function getServerSideProps(ctx) {
+   const serverSideGroup = await getServerSideGroup(ctx.params.groupId)
 
    if (!serverSideGroup || Object.keys(serverSideGroup)?.length === 0) {
       return {
@@ -143,13 +148,14 @@ export async function getServerSideProps({
    }
 
    let initialTabValue = null
-   if (type === "upcomingEvents" || type === "pastEvents") {
-      initialTabValue = type
+   if (ctx.query.type === "upcomingEvents" || ctx.query.type === "pastEvents") {
+      initialTabValue = ctx.query.type
    }
    return {
       props: {
          serverSideGroup,
          initialTabValue,
+         serverSideLivestream: await getLivestreamDialogData(ctx),
       }, // will be passed to the page component as props
    }
 }

@@ -30,11 +30,11 @@ export const LivestreamDialogLayout: FC<Props> = ({
    serverSideLivestream,
 }) => {
    const { query, push, pathname } = useRouter()
-   const { livestream: livestreamParams } = query
+   const { livestreamDialog } = query
 
-   const [pathType, livestreamId, dialogPage, jobId] = livestreamParams || []
+   const [pathType, livestreamId, dialogPage, jobId] = livestreamDialog || []
 
-   const dialogLivestream = useMemo(() => {
+   const serverLivestream = useMemo(() => {
       if (!serverSideLivestream) return null
       return LivestreamPresenter.parseDocument(
          serverSideLivestream as any,
@@ -43,8 +43,8 @@ export const LivestreamDialogLayout: FC<Props> = ({
    }, [serverSideLivestream])
 
    const dialogOpen = useMemo(
-      () => pathType === "livestream" && livestreamId === dialogLivestream?.id,
-      [pathType, livestreamId, dialogLivestream?.id]
+      () => Boolean(pathType === "livestream" && livestreamId),
+      [pathType, livestreamId]
    )
 
    const page = useMemo<DialogPage>(() => {
@@ -55,14 +55,20 @@ export const LivestreamDialogLayout: FC<Props> = ({
    }, [dialogPage])
 
    const handleClose = useCallback(() => {
-      void push({
-         pathname,
-         query: {
-            ...query,
-            // Remove the livestream query param that opened the dialog.
-            livestream: undefined,
+      void push(
+         {
+            pathname,
+            query: {
+               ...query,
+               // Remove the livestream query param that opened the dialog.
+               livestreamDialog: undefined,
+            },
          },
-      })
+         undefined,
+         {
+            scroll: false,
+         }
+      )
    }, [pathname, push, query])
 
    return (
@@ -72,16 +78,21 @@ export const LivestreamDialogLayout: FC<Props> = ({
             <>
                <LivestreamDialog
                   open={dialogOpen}
-                  serverSideLivestream={dialogLivestream}
+                  serverSideLivestream={serverLivestream}
+                  livestreamId={livestreamId}
                   jobId={jobId}
                   handleClose={handleClose}
                   page={page}
                />
                {/* Set SEO tags for the page. */}
-               <SEO {...getStreamMetaInfo(dialogLivestream)} />
+               {serverLivestream ? (
+                  <SEO {...getStreamMetaInfo(serverLivestream)} />
+               ) : null}
 
                {/* Set schema tags for the event shown in the dialog. */}
-               <EventSEOSchemaScriptTag event={dialogLivestream} />
+               {serverLivestream ? (
+                  <EventSEOSchemaScriptTag event={serverLivestream} />
+               ) : null}
             </>
          ) : null}
       </>
