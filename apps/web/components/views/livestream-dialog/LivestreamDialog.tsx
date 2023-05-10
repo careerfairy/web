@@ -8,7 +8,7 @@ import {
 } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useLivestream from "../../custom-hook/live-stream/useLivestream"
-import { Dialog, DialogContent, Slide } from "@mui/material"
+import { Dialog, DialogContent } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import LivestreamDetailsView from "./views/LivestreamDetailsView"
 import RegisterDataConsentView from "./views/RegisterDataConsentView"
@@ -20,6 +20,7 @@ import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
+import { SlideUpTransition } from "../common/transitions"
 
 const styles = sxStyles({
    content: {
@@ -46,6 +47,7 @@ const styles = sxStyles({
 
 type Props = {
    serverSideLivestream: LivestreamEvent
+   livestreamId: string
    handleClose: () => void
    open: boolean
    page: "details" | "register" | "job-details"
@@ -74,7 +76,7 @@ const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
       <Dialog
          open={open}
          onClose={onClose}
-         TransitionComponent={Slide}
+         TransitionComponent={SlideUpTransition}
          maxWidth="lg"
          fullWidth
          fullScreen={isMobile}
@@ -90,14 +92,18 @@ const Content: FC<ContentProps> = ({
    serverSideLivestream,
    page = "details",
    jobId,
+   livestreamId,
 }) => {
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getInitialValue(page))
 
+   const hasInitialData =
+      serverSideLivestream && livestreamId === serverSideLivestream.id
+
    const { data: livestream } = useLivestream(
-      serverSideLivestream.id,
-      serverSideLivestream
+      livestreamId,
+      hasInitialData ? serverSideLivestream : undefined
    )
 
    const goToView = useCallback((view: ViewKey) => {

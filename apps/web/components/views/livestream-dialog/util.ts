@@ -5,7 +5,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 export const getLivestreamDialogData = async (
    ctx: GetServerSidePropsContext
 ): Promise<{ [p: string]: any } | null> => {
-   const livestreamPrams = (ctx.params.livestream as string[]) || []
+   const livestreamPrams = (ctx.params.livestreamDialog as string[]) || []
 
    if (livestreamPrams[0] === "livestream" && livestreamPrams[1]) {
       const stream = await getServerSideStream(livestreamPrams[1])
