@@ -67,6 +67,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
          undefined,
          {
             scroll: false,
+            shallow: true,
          }
       )
    }, [pathname, push, query])
