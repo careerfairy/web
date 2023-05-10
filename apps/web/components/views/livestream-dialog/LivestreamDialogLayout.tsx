@@ -66,8 +66,8 @@ export const LivestreamDialogLayout: FC<Props> = ({
          },
          undefined,
          {
-            scroll: false,
-            shallow: true,
+            scroll: false, // Prevent scrolling to top.
+            shallow: true, // Prevents GSSP/GSP/GIP from running again. https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
          }
       )
    }, [pathname, push, query])
