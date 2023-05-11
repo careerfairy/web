@@ -8,7 +8,12 @@ export class RankedLivestreamEvent {
    constructor(public model: LivestreamEvent) {
       this.model = model
       this.id = model.id
-      this.points = model?.popularity ? model.popularity / 120 : 1 // Divide popularity by the median value
+      // Divide popularity by the median value and ensure the minimum value is 1
+      this.points = model?.popularity
+         ? model.popularity / 120 < 1
+            ? 1
+            : model.popularity / 120
+         : 1
    }
 
    static create(livestream: LivestreamEvent) {
