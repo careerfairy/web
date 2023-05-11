@@ -22,6 +22,7 @@ import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { SlideUpTransition } from "../common/transitions"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { UserStats } from "@careerfairy/shared-lib/users"
 
 const styles = sxStyles({
    content: {
@@ -45,7 +46,9 @@ const styles = sxStyles({
       borderTopRightRadius: `${theme.spacing(2)} !important`,
    }),
    dialogPaper: {
-      borderRadius: 5,
+      borderRadius: {
+         md: 5,
+      },
       maxWidth: 915,
    },
 })
@@ -57,6 +60,8 @@ type Props = {
    open: boolean
    page: "details" | "register" | "job-details"
    jobId?: string
+   updatedStats: UserStats
+   serverUserEmail: string
 }
 
 const views = [
@@ -72,7 +77,6 @@ type ViewKey = typeof views[number]["key"]
 
 const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
    const isMobile = useIsMobile()
-   console.count("LivestreamDialog")
    const onClose = useCallback(() => {
       handleClose()
    }, [handleClose])
@@ -98,6 +102,8 @@ type ContentProps = Omit<Props, "open">
 const Content: FC<ContentProps> = ({
    handleClose,
    serverSideLivestream,
+   updatedStats,
+   serverUserEmail,
    page = "details",
    jobId,
    livestreamId,
@@ -132,8 +138,18 @@ const Content: FC<ContentProps> = ({
          livestreamPresenter: livestream
             ? LivestreamPresenter.createFromDocument(livestream)
             : null,
+         updatedStats,
+         serverUserEmail,
       }),
-      [goToView, onClose, livestream, value, jobId]
+      [
+         goToView,
+         onClose,
+         livestream,
+         value,
+         jobId,
+         updatedStats,
+         serverUserEmail,
+      ]
    )
 
    return (
@@ -173,6 +189,11 @@ type DialogContextType = {
    livestreamPresenter: LivestreamPresenter
    activeView: ViewKey
    jobId?: string // Only for job-details view
+   /*
+    * The user's stats, no stats we fallback to the server side stats
+    * */
+   updatedStats: UserStats
+   serverUserEmail: string
 }
 
 const getInitialValue = (page: Props["page"]): number => {
@@ -192,6 +213,9 @@ const DialogContext = createContext<DialogContextType>({
    livestream: undefined,
    livestreamPresenter: null,
    activeView: "livestream-details",
+   updatedStats: null,
+   serverUserEmail: null,
+   jobId: null,
 })
 
 export const useLiveStreamDialog = () => {

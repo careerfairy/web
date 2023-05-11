@@ -5,12 +5,10 @@ import useIsMobile from "../../components/custom-hook/useIsMobile"
 import GenericNavList from "./GenericNavList"
 import { createContext, useContext, useMemo } from "react"
 import FooterV2 from "../../components/views/footer/FooterV2"
-import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
-import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
+import CreditsDialogLayout from "../CreditsDialogLayout"
 
 type IGenericDashboardContext = {
    isPortalPage: boolean
-   handleOpenCreditsDialog: () => void
    topBarFixed: boolean
    // The number of pixels the user has to scroll before the header is hidden. Default is 10
    headerScrollThreshold: number
@@ -18,7 +16,6 @@ type IGenericDashboardContext = {
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
    isPortalPage: false,
-   handleOpenCreditsDialog: () => {},
    topBarFixed: false,
    headerScrollThreshold: 10,
 })
@@ -43,50 +40,31 @@ const GenericDashboardLayout = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
-   const [
-      creditsDialogOpen,
-      handleOpenCreditsDialog,
-      handleCloseCreditsDialog,
-   ] = useDialogStateHandler()
-
    // TODO: Needs to be updated after the new banner.
    //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
    const value = useMemo<IGenericDashboardContext>(
       () => ({
          isPortalPage,
-         handleOpenCreditsDialog,
          headerScrollThreshold,
          topBarFixed: Boolean(topBarFixed),
       }),
-      [
-         handleOpenCreditsDialog,
-         headerScrollThreshold,
-         isPortalPage,
-         topBarFixed,
-      ]
+      [headerScrollThreshold, isPortalPage, topBarFixed]
    )
 
    return (
       <GenericDashboardContext.Provider value={value}>
-         <AdminGenericLayout
-            bgColor={bgColor || "#F7F8FC"}
-            headerContent={
-               <TopBar
-                  handleOpenCreditsDialog={handleOpenCreditsDialog}
-                  title={pageDisplayName}
-               />
-            }
-            drawerContent={<NavBar />}
-            bottomNavContent={<GenericNavList />}
-            drawerOpen={!isMobile}
-         >
-            {children}
-            <FooterV2 background={bgColor || "#F7F8FC"} />
-            <CreditsDialog
-               onClose={handleCloseCreditsDialog}
-               open={creditsDialogOpen}
-            />
-         </AdminGenericLayout>
+         <CreditsDialogLayout>
+            <AdminGenericLayout
+               bgColor={bgColor || "#F7F8FC"}
+               headerContent={<TopBar title={pageDisplayName} />}
+               drawerContent={<NavBar />}
+               bottomNavContent={<GenericNavList />}
+               drawerOpen={!isMobile}
+            >
+               {children}
+               <FooterV2 background={bgColor || "#F7F8FC"} />
+            </AdminGenericLayout>
+         </CreditsDialogLayout>
       </GenericDashboardContext.Provider>
    )
 }

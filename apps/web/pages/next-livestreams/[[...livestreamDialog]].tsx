@@ -13,7 +13,7 @@ const NextLivestreamsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = (props) => {
    return (
-      <LivestreamDialogLayout serverSideLivestream={props.serverSideLivestream}>
+      <LivestreamDialogLayout livestreamDialogData={props.livestreamDialogData}>
          <SEO
             id={"CareerFairy | Upcoming Livestreams"}
             description={"CareerFairy | Upcoming Livestreams"}
