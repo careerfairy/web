@@ -46,6 +46,7 @@ const styles = sxStyles({
    }),
    dialogPaper: {
       borderRadius: 5,
+      maxWidth: 915,
    },
 })
 
