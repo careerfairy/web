@@ -7,32 +7,9 @@ import { setCORSHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 
-export const scheduleTestLivestreamDeletion = functions.pubsub
-   .schedule("every sunday 09:00")
-   .timeZone("Europe/Zurich")
-   .onRun(() => {
-      admin
-         .firestore()
-         .collection("livestreams")
-         .where("test", "==", true)
-         .get()
-         .then((querySnapshot) => {
-            console.log("querysnapshot size: " + querySnapshot.size)
-            querySnapshot.forEach((doc) => {
-               admin
-                  .firestore()
-                  .collection("livestreams")
-                  .doc(doc.id)
-                  .delete()
-                  .catch((e) => {
-                     console.log(e)
-                  })
-            })
-         })
-   })
-
-export const getLivestreamICalendarEvent = functions.https.onRequest(
-   async (req, res) => {
+export const getLivestreamICalendarEvent = functions
+   .region(config.region)
+   .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
       const livestreamId = req.query.eventId as string
 
@@ -83,12 +60,11 @@ export const getLivestreamICalendarEvent = functions.https.onRequest(
             res.sendStatus(500)
          }
       }
-   }
-)
+   })
 
-// eslint-disable-next-line camelcase
-export const sendLivestreamRegistrationConfirmationEmail_v2 =
-   functions.https.onCall(async (data) => {
+export const sendLivestreamRegistrationConfirmationEmail = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
       const email: any = {
          TemplateId:
             process.env.POSTMARK_TEMPLATE_LIVESTREAM_REGISTRATION_CONFIRMATION,
@@ -112,8 +88,8 @@ export const sendLivestreamRegistrationConfirmationEmail_v2 =
                content: data.livestream_title,
             }),
             calendar_event_i_calendar: isLocalEnvironment()
-               ? `http://localhost:5001/careerfairy-e1fd9/us-central1/getLivestreamICalendarEvent?eventId=${data.livestream_id}`
-               : `https://us-central1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent?eventId=${data.livestream_id}`,
+               ? `http://localhost:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_eu?eventId=${data.livestream_id}`
+               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_eu?eventId=${data.livestream_id}`,
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,
@@ -131,8 +107,9 @@ export const sendLivestreamRegistrationConfirmationEmail_v2 =
       )
    })
 
-export const sendPhysicalEventRegistrationConfirmationEmail =
-   functions.https.onCall(async (data) => {
+export const sendPhysicalEventRegistrationConfirmationEmail = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
       const email: any = {
          TemplateId: process.env.POSTMARK_TEMPLATE_F2F_EVENT_REGISTRATION,
          From: "CareerFairy <noreply@careerfairy.io>",
@@ -158,8 +135,9 @@ export const sendPhysicalEventRegistrationConfirmationEmail =
       )
    })
 
-export const sendHybridEventRegistrationConfirmationEmail =
-   functions.https.onCall(async (data) => {
+export const sendHybridEventRegistrationConfirmationEmail = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
       console.log("Starting")
       const email: any = {
          TemplateId:

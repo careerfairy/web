@@ -22,6 +22,7 @@ import { getATSTokens } from "./lib/groups"
 import { Application } from "@careerfairy/shared-lib/ats/Application"
 import { userSetHasJobApplications } from "./lib/user"
 import { createJobApplication } from "./lib/ats"
+import config from "./config"
 
 /*
 |--------------------------------------------------------------------------
@@ -36,6 +37,7 @@ import { createJobApplication } from "./lib/ats"
  * Possible to fetch the jobs by a livestreamId or jobs (LivestreamJobAssociation[]) array
  */
 export const fetchLivestreamJobs = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(async (data) => {
       let jobAssociationList = []
@@ -93,6 +95,7 @@ export const fetchLivestreamJobs = functions
  * User needs to be signed in to run this function
  */
 export const updateUserJobApplications = functions
+   .region(config.region)
    .runWith({ secrets: ["MERGE_ACCESS_KEY"] })
    .https.onCall(
       onCallWrapper(async (_, context) => {
@@ -171,6 +174,7 @@ export const updateUserJobApplications = functions
  * It will create the necessary entities on the Merge (Candidate, Application, etc.)
  */
 export const atsUserApplyToJob = functions
+   .region(config.region)
    .runWith({
       secrets: ["MERGE_ACCESS_KEY"],
    })
