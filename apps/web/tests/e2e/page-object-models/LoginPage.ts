@@ -64,15 +64,17 @@ export class LoginPage {
    /**
     * Utility method to login before running tests
     */
-   static async login(
-      page: Page,
-      options: LoginOptions = {
-         email: credentials.correctEmail,
-         password: credentials.defaultPassword,
-         waitForURL: "/portal",
-         loginPath: "/login",
-      }
-   ) {
+   static async login(page: Page, options?: LoginOptions) {
+      // defaults
+      options = Object.assign(
+         {
+            email: credentials.correctEmail,
+            password: credentials.defaultPassword,
+            waitForURL: "/portal",
+            loginPath: "/login",
+         },
+         options
+      )
       const handler = new LoginPage(page)
 
       await handler.open(options.loginPath)

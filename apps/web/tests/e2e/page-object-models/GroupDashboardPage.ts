@@ -31,4 +31,19 @@ export class GroupDashboardPage extends CommonPage {
          await backdrop.click()
       }
    }
+
+   public async goToCompanyPage() {
+      await this.goToPage("Company")
+   }
+
+   public async goToMembersPage() {
+      await this.goToPage("Team members")
+   }
+
+   private async goToPage(name: string) {
+      await Promise.all([
+         this.page.waitForNavigation(),
+         this.page.getByRole("link", { name }).click(),
+      ])
+   }
 }
