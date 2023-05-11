@@ -10,12 +10,11 @@ import { emailsToRemove } from "./misc/emailsToRemove"
 import functions = require("firebase-functions")
 import { object, string } from "yup"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import config from "./config"
+import { client } from "./api/postmark"
 
-/* eslint-disable @typescript-eslint/no-var-requires */
-const { client } = require("./api/postmark")
-
-/* eslint-disable camelcase */
 export const sendBasicTemplateEmail = functions
+   .region(config.region)
    .runWith({
       // when sending large batches, this function can take a while to finish
       timeoutSeconds: 300,
@@ -157,6 +156,7 @@ export const sendBasicTemplateEmail = functions
    })
 
 export const unsubscribeFromMarketingEmails = functions
+   .region(config.region)
    .runWith({
       secrets: ["SIGNATURE_SECRET"],
    })

@@ -4,7 +4,7 @@ import {
    START_DATE_FOR_REPORTED_EVENTS,
 } from "../constants/streamContants"
 import DateUtil from "util/DateUtil"
-import firebaseApp from "./FirebaseInstance"
+import firebaseApp, { FunctionsInstance } from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { HandRaiseState } from "types/handraise"
 import {
@@ -73,7 +73,7 @@ class FirebaseService {
       this.auth = firebaseInstance.auth()
       this.firestore = firebaseInstance.firestore()
       this.storage = firebaseInstance.storage()
-      this.functions = firebaseInstance.functions()
+      this.functions = FunctionsInstance
    }
 
    getFirebaseTimestamp = (dateString) => {
@@ -91,40 +91,42 @@ class FirebaseService {
     */
 
    fetchAgoraRtcToken = async (data) => {
-      const fetchAgoraRtcToken =
-         this.functions.httpsCallable("fetchAgoraRtcToken")
+      const fetchAgoraRtcToken = this.functions.httpsCallable(
+         "fetchAgoraRtcToken_eu"
+      )
       return await fetchAgoraRtcToken(data)
    }
 
    fetchAgoraRtmToken = async (data) => {
-      const fetchAgoraRtmToken =
-         this.functions.httpsCallable("fetchAgoraRtmToken")
+      const fetchAgoraRtmToken = this.functions.httpsCallable(
+         "fetchAgoraRtmToken_eu"
+      )
       return await fetchAgoraRtmToken(data)
    }
 
    startLivestreamRecording = async (data) => {
       const startLivestreamRecording = this.functions.httpsCallable(
-         "startRecordingLivestream_v2"
+         "startRecordingLivestream_eu"
       )
       return await startLivestreamRecording(data)
    }
 
    stopLivestreamRecording = async (data) => {
       const stopLivestreamRecording = this.functions.httpsCallable(
-         "stopRecordingLivestream_v2"
+         "stopRecordingLivestream_eu"
       )
       return await stopLivestreamRecording(data)
    }
 
    createUserInAuthAndFirebase = async (userData) => {
       const createUserInAuthAndFirebase = this.functions.httpsCallable(
-         "createNewUserAccount_v6"
+         "createNewUserAccount_eu"
       )
       return createUserInAuthAndFirebase({ userData })
    }
 
    getRegistrationSources = (args: GetRegistrationSourcesFnArgs) => {
-      const fn = this.functions.httpsCallable("getRegistrationSources_v2")
+      const fn = this.functions.httpsCallable("getRegistrationSources_eu")
       return fn(args)
    }
 
@@ -133,7 +135,7 @@ class FirebaseService {
    }): Promise<{
       readonly data: Group
    }> => {
-      return this.functions.httpsCallable("createNewGroupAdminUserAccount")(
+      return this.functions.httpsCallable("createNewGroupAdminUserAccount_eu")(
          args
       )
    }
@@ -141,7 +143,7 @@ class FirebaseService {
       group: Omit<Group, "id" | "groupId" | "triGrams">
       groupQuestions?: GroupQuestion[]
    }) => {
-      return this.functions.httpsCallable("createGroup")(args)
+      return this.functions.httpsCallable("createGroup_eu")(args)
    }
 
    changeRole = async (args: {
@@ -149,29 +151,29 @@ class FirebaseService {
       email: string
       newRole: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("changeRole")(args)
+      return this.functions.httpsCallable("changeRole_eu")(args)
    }
 
    kickFromDashboard = async (args: { groupId: string; email: string }) => {
-      return this.functions.httpsCallable("kickFromDashboard_v2")(args)
+      return this.functions.httpsCallable("kickFromDashboard_eu")(args)
    }
 
    sendNewlyPublishedEventEmail = async (emailData) => {
       const sendNewlyPublishedEventEmail = this.functions.httpsCallable(
-         "sendNewlyPublishedEventEmail"
+         "sendNewlyPublishedEventEmail_eu"
       )
       return sendNewlyPublishedEventEmail(emailData)
    }
    sendDraftApprovalRequestEmail = async (data) => {
       const sendDraftApprovalRequestEmail = this.functions.httpsCallable(
-         "sendDraftApprovalRequestEmail_v2"
+         "sendDraftApprovalRequestEmail_eu"
       )
       return sendDraftApprovalRequestEmail(data)
    }
 
    validateUserEmailWithPin = async (userInfo) => {
       const validateUserEmailWithPin = this.functions.httpsCallable(
-         "validateUserEmailWithPin_v2"
+         "validateUserEmailWithPin_eu"
       )
       return validateUserEmailWithPin({ userInfo })
    }
@@ -180,7 +182,7 @@ class FirebaseService {
       redirectLink: string
    }) => {
       const sendPasswordResetEmail = this.functions.httpsCallable(
-         "sendPostmarkResetPasswordEmail_v2"
+         "sendPostmarkResetPasswordEmail_eu"
       )
       return sendPasswordResetEmail(data)
    }
@@ -189,14 +191,16 @@ class FirebaseService {
    }) => {
       const resendPostmarkEmailVerificationEmailWithPin =
          this.functions.httpsCallable(
-            "resendPostmarkEmailVerificationEmailWithPin_v2"
+            "resendPostmarkEmailVerificationEmailWithPin_eu"
          )
       return resendPostmarkEmailVerificationEmailWithPin(data)
    }
 
    sendReminderEmailAboutApplicationLink = async (data) => {
       const sendReminderEmailAboutApplicationLink =
-         this.functions.httpsCallable("sendReminderEmailAboutApplicationLink")
+         this.functions.httpsCallable(
+            "sendReminderEmailAboutApplicationLink_eu"
+         )
       return sendReminderEmailAboutApplicationLink(data)
    }
 
@@ -207,7 +211,7 @@ class FirebaseService {
       groupId: string
       role: GROUP_DASHBOARD_ROLE
    }) => {
-      return this.functions.httpsCallable("sendDashboardInviteEmail_v2")(args)
+      return this.functions.httpsCallable("sendDashboardInviteEmail_eu")(args)
    }
 
    sendBasicTemplateEmail = async ({
@@ -234,7 +238,7 @@ class FirebaseService {
       }
 
       const sendBasicTemplateEmail = this.functions.httpsCallable(
-         "sendBasicTemplateEmail_v5"
+         "sendBasicTemplateEmail_eu"
       )
 
       return sendBasicTemplateEmail(dataObj)
@@ -253,7 +257,7 @@ class FirebaseService {
       data
    ): Promise<firebase.functions.HttpsCallableResult> => {
       const handleGetLivestreamReportData = this.functions.httpsCallable(
-         "getLivestreamReportData_v4"
+         "getLivestreamReportData_eu"
       )
       return handleGetLivestreamReportData(data)
    }
@@ -287,7 +291,7 @@ class FirebaseService {
    ) => {
       const sendLivestreamRegistrationConfirmationEmail =
          this.functions.httpsCallable(
-            "sendLivestreamRegistrationConfirmationEmail_v2"
+            "sendLivestreamRegistrationConfirmationEmail_eu"
          )
 
       const livestreamStartDate = livestream.start.toDate()
@@ -329,7 +333,7 @@ class FirebaseService {
    sendPhysicalEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendPhysicalEventRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendPhysicalEventRegistrationConfirmationEmail"
+            "sendPhysicalEventRegistrationConfirmationEmail_eu"
          )
       return sendPhysicalEventRegistrationConfirmation({
          recipientEmail: user.email,
@@ -345,7 +349,7 @@ class FirebaseService {
    sendHybridEventEmailRegistrationConfirmation = (user, userData, event) => {
       const sendHybridEventEmailRegistrationConfirmation =
          this.functions.httpsCallable(
-            "sendHybridEventRegistrationConfirmationEmail"
+            "sendHybridEventRegistrationConfirmationEmail_eu"
          )
       return sendHybridEventEmailRegistrationConfirmation({
          recipientEmail: user.email,
@@ -360,7 +364,7 @@ class FirebaseService {
    }
 
    deleteUserAccount = () => {
-      return this.functions.httpsCallable("deleteLoggedInUserAccount")()
+      return this.functions.httpsCallable("deleteLoggedInUserAccount_eu")()
    }
 
    // *** Auth API ***
@@ -3098,7 +3102,7 @@ class FirebaseService {
    }
 
    applyReferralCode = async (referralCode: string) => {
-      return await this.functions.httpsCallable("applyReferralCode")(
+      return await this.functions.httpsCallable("applyReferralCode_eu")(
          referralCode
       )
    }
@@ -3235,7 +3239,7 @@ class FirebaseService {
 
    // Backfill user data
    backfillUserData = async ({ timezone }) => {
-      return this.functions.httpsCallable("backfillUserData")({ timezone })
+      return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
    }
 
    // DB functions
