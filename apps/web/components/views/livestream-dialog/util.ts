@@ -1,15 +1,31 @@
 import { GetServerSidePropsContext } from "next"
-import { getServerSideStream } from "../../../util/serverUtil"
+import {
+   getServerSideStream,
+   getServerSideUserStats,
+   getUserTokenFromCookie,
+} from "../../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { LiveStreamDialogData } from "./LivestreamDialogLayout"
 
 export const getLivestreamDialogData = async (
    ctx: GetServerSidePropsContext
-): Promise<{ [p: string]: any } | null> => {
+): Promise<LiveStreamDialogData> => {
    const livestreamPrams = (ctx.params.livestreamDialog as string[]) || []
+   const token = getUserTokenFromCookie({ req: ctx.req })
 
    if (livestreamPrams[0] === "livestream" && livestreamPrams[1]) {
-      const stream = await getServerSideStream(livestreamPrams[1])
-      return stream ? LivestreamPresenter.serializeDocument(stream) : null
+      const [stream, serverSideUserStats] = await Promise.all([
+         getServerSideStream(livestreamPrams[1]),
+         getServerSideUserStats(token.email),
+      ])
+
+      return {
+         serverSideLivestream: stream
+            ? LivestreamPresenter.serializeDocument(stream)
+            : null,
+         serverSideUserEmail: token?.email ?? null,
+         serverSideUserStats,
+      }
    }
    return null
 }
@@ -20,7 +36,7 @@ export const withLivestreamDialogData = <
    return async (ctx: TContext) => {
       return {
          props: {
-            serverSideLivestream: await getLivestreamDialogData(ctx),
+            livestreamDialogData: await getLivestreamDialogData(ctx),
          },
       }
    }

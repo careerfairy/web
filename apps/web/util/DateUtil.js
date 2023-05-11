@@ -267,4 +267,9 @@ export default class DateUtil {
       )
       return `Live on ${formattedDate}` // Live on Monday, 12 Oct 2020 at 12:00 PM
    }
+
+   static formatPastDate(JSDate) {
+      const formattedDate = dayjs(JSDate).format("DD MMM YYYY")
+      return `Release date: ${formattedDate}` // Release date: 15 Dec 2022
+   }
 }

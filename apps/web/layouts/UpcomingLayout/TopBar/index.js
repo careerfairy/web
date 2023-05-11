@@ -1,5 +1,4 @@
 import React from "react"
-import PropTypes from "prop-types"
 import { Box, Hidden, IconButton } from "@mui/material"
 import MenuIcon from "@mui/icons-material/Menu"
 import { MainLogo } from "components/logos"
@@ -15,6 +14,7 @@ import NavLinks from "../../../components/views/header/NavLinks"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import ProfileMenu from "../../GenericDashboardLayout/TopBar/ProfileMenu"
+import { useCreditsDialog } from "../../CreditsDialogLayout"
 
 const useStyles = makeStyles((theme) => ({
    header: {
@@ -24,7 +24,8 @@ const useStyles = makeStyles((theme) => ({
       color: theme.palette.common.white,
    },
 }))
-const TopBar = ({ handleOpenCreditsDialog }) => {
+const TopBar = () => {
+   const { handleOpenCreditsDialog } = useCreditsDialog()
    const theme = useTheme()
    const classes = useStyles()
    const isMobile = useIsMobile()
@@ -73,16 +74,5 @@ const TopBar = ({ handleOpenCreditsDialog }) => {
          </Box>
       </GeneralHeader>
    )
-}
-
-TopBar.propTypes = {
-   className: PropTypes.string,
-   links: PropTypes.array,
-   onMobileNavOpen: PropTypes.func,
-   handleOpenCreditsDialog: PropTypes.func,
-}
-
-TopBar.defaultProps = {
-   links: [],
 }
 export default TopBar

@@ -42,6 +42,7 @@ declare module "@mui/material/Button" {
       grey: true
       gold: true
       black: true
+      navyBlue: true
    }
 }
 
@@ -497,6 +498,14 @@ const getComponents = (theme: DefaultTheme): Components => ({
                boxShadow: "none",
                backgroundColor: theme.palette.text.primary,
                color: theme.palette.primary.main,
+            },
+         },
+         {
+            props: { color: "navyBlue", variant: "contained" },
+            style: {
+               boxShadow: "none",
+               backgroundColor: theme.palette.navyBlue.main,
+               color: "#D5F6F1",
             },
          },
       ],

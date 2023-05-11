@@ -13,17 +13,19 @@ const PastLivestreamsPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
 > = (props) => {
    return (
-      <LivestreamDialogLayout serverSideLivestream={props.serverSideLivestream}>
-         <SEO
-            id={"CareerFairy | Past Livestreams"}
-            description={"Catch the past streams on CareerFairy."}
-            title={"CareerFairy | Past Livestreams"}
-         />
-         <GenericDashboardLayout pageDisplayName={"Past live streams"}>
+      <GenericDashboardLayout pageDisplayName={"Past live streams"}>
+         <LivestreamDialogLayout
+            livestreamDialogData={props.livestreamDialogData}
+         >
+            <SEO
+               id={"CareerFairy | Past Livestreams"}
+               description={"Catch the past streams on CareerFairy."}
+               title={"CareerFairy | Past Livestreams"}
+            />
             <NextLiveStreamsWithFilter initialTabValue={"pastEvents"} />
-         </GenericDashboardLayout>
-         <ScrollToTop hasBottomNavBar />
-      </LivestreamDialogLayout>
+            <ScrollToTop hasBottomNavBar />
+         </LivestreamDialogLayout>
+      </GenericDashboardLayout>
    )
 }
 
