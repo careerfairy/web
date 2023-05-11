@@ -12,6 +12,33 @@ import useIsMobile from "../../components/custom-hook/useIsMobile"
 import BottomNavBar from "./BottomNavBar"
 import { useAuth } from "../../HOCs/AuthProvider"
 
+export const MyRegistrationsPath: INavLink = {
+   id: "my-registrations",
+   href: `/next-livestreams/my-registrations`,
+   pathname: `/next-livestreams/my-registrations`,
+   title: "My registrations",
+}
+
+export const NextLivestreamsPath: INavLink = {
+   id: "next-live-streams",
+   href: `/next-livestreams`,
+   pathname: `/next-livestreams/[[...livestreamDialog]]`,
+   title: "Next live streams",
+}
+export const UnlockedContentPath: INavLink = {
+   id: "unlocked-content",
+   href: `/past-livestreams/unlocked-content`,
+   pathname: `/past-livestreams/unlocked-content`,
+   title: "Unlocked content",
+}
+
+export const PastLivestreamsPath: INavLink = {
+   id: "all-past-live-streams",
+   href: `/past-livestreams`,
+   pathname: `/past-livestreams/[[...livestreamDialog]]`,
+   title: "All past streams",
+}
+
 const GenericNavList = () => {
    const isMobile = useIsMobile()
    const { isLoggedIn } = useAuth()
@@ -33,22 +60,8 @@ const GenericNavList = () => {
             Icon: LiveStreamsIcon,
             href: `/next-livestreams`,
             childLinks: [
-               {
-                  id: "next-live-streams",
-                  href: `/next-livestreams`,
-                  pathname: `/next-livestreams/[[...livestreamDialog]]`,
-                  title: "Next live streams",
-               },
-               ...(isLoggedIn
-                  ? [
-                       {
-                          id: "my-registrations",
-                          href: `/next-livestreams/my-registrations`,
-                          pathname: `/next-livestreams/my-registrations`,
-                          title: "My registrations",
-                       },
-                    ]
-                  : []),
+               NextLivestreamsPath,
+               ...(isLoggedIn ? [MyRegistrationsPath] : []),
             ],
          },
          {
@@ -58,22 +71,8 @@ const GenericNavList = () => {
             Icon: ClockIcon,
             href: `/past-livestreams`,
             childLinks: [
-               {
-                  id: "all-past-live-streams",
-                  href: `/past-livestreams`,
-                  pathname: `/past-livestreams/[[...livestreamDialog]]`,
-                  title: "All past streams",
-               },
-               ...(isLoggedIn
-                  ? [
-                       {
-                          id: "my-registrations",
-                          href: `/past-livestreams/recordings`,
-                          pathname: `/past-livestreams/recordings`,
-                          title: "Unlocked content",
-                       },
-                    ]
-                  : []),
+               PastLivestreamsPath,
+               ...(isLoggedIn ? [UnlockedContentPath] : []),
             ],
          },
          {
