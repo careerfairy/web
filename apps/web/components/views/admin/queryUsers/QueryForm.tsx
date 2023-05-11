@@ -35,7 +35,7 @@ const QueryForm = () => {
       []
    )
    const { data: users, isValidating } = useSWR(
-      ["getBigQueryUsers_v3", options],
+      ["getBigQueryUsers_eu", options],
       fetcher,
       config
    )

@@ -40,7 +40,7 @@ const GroupInvitePage = ({ inviteId }: GroupInvitePageProps) => {
    const { error } = useSWR(
       isLoggedIn // only fetch if logged in
          ? [
-              "joinGroupDashboard_v2",
+              "joinGroupDashboard_eu",
               {
                  inviteId,
               },

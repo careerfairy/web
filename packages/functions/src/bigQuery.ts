@@ -2,13 +2,14 @@ import functions = require("firebase-functions")
 import { bigQueryRepo } from "./api/repositories"
 import { userIsSignedInAndIsCFAdmin } from "./lib/validations"
 import { BigQueryUserQueryOptions } from "@careerfairy/shared-lib/bigQuery/types"
+import config from "./config"
 
 /**
  * Get Users
  */
-// eslint-disable-next-line camelcase
-export const getBigQueryUsers_v3 = functions.https.onCall(
-   async (data: BigQueryUserQueryOptions, context) => {
+export const getBigQueryUsers = functions
+   .region(config.region)
+   .https.onCall(async (data: BigQueryUserQueryOptions, context) => {
       await userIsSignedInAndIsCFAdmin(context)
       try {
          return await bigQueryRepo.getUsers(
@@ -22,5 +23,4 @@ export const getBigQueryUsers_v3 = functions.https.onCall(
          functions.logger.error("ERROR in get big query users", e)
          throw new functions.https.HttpsError("unknown", e)
       }
-   }
-)
+   })

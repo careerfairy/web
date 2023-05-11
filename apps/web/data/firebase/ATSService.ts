@@ -1,4 +1,7 @@
-import firebaseInstance, { FieldValue } from "./FirebaseInstance"
+import firebaseInstance, {
+   FieldValue,
+   FunctionsInstance,
+} from "./FirebaseInstance"
 import firebase from "firebase/compat/app"
 import { v4 as uuidv4 } from "uuid"
 import {
@@ -35,7 +38,7 @@ export class ATSService {
     */
    async getAllJobs(groupId: string, integrationId: string): Promise<Job[]> {
       const data = await this.firebaseFunctions.httpsCallable(
-         "fetchATSJobs_v2"
+         "fetchATSJobs_eu"
       )({
          groupId,
          integrationId,
@@ -74,7 +77,7 @@ export class ATSService {
       }
 
       const data = await this.firebaseFunctions.httpsCallable(
-         "fetchATSJobs_v2"
+         "fetchATSJobs_eu"
       )(params)
 
       let mappedData = data.data.results
@@ -105,7 +108,7 @@ export class ATSService {
       mergeExtraRequiredData?: MergeExtraRequiredData
    ): Promise<void> {
       const data = await this.firebaseFunctions.httpsCallable(
-         "candidateApplicationTest"
+         "candidateApplicationTest_eu"
       )({
          groupId,
          integrationId,
@@ -121,7 +124,7 @@ export class ATSService {
       integrationId: string
    ): Promise<MergeLinkTokenResponse> {
       const data = await this.firebaseFunctions.httpsCallable(
-         "mergeGenerateLinkToken"
+         "mergeGenerateLinkToken_eu"
       )({
          groupId,
          integrationId,
@@ -135,7 +138,7 @@ export class ATSService {
       integrationId: string,
       publicToken: string
    ): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("mergeGetAccountToken")({
+      await this.firebaseFunctions.httpsCallable("mergeGetAccountToken_eu")({
          groupId,
          integrationId,
          publicToken,
@@ -143,21 +146,23 @@ export class ATSService {
    }
 
    async removeAccount(groupId: string, integrationId: string): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("mergeRemoveAccount")({
+      await this.firebaseFunctions.httpsCallable("mergeRemoveAccount_eu")({
          groupId,
          integrationId,
       })
    }
 
    async applyToAJob(livestreamId: string, jobId: string): Promise<any> {
-      return this.firebaseFunctions.httpsCallable("atsUserApplyToJob")({
+      return this.firebaseFunctions.httpsCallable("atsUserApplyToJob_eu")({
          livestreamId,
          jobId,
       })
    }
 
    async updateUserJobApplications(): Promise<void> {
-      await this.firebaseFunctions.httpsCallable("updateUserJobApplications")()
+      await this.firebaseFunctions.httpsCallable(
+         "updateUserJobApplications_eu"
+      )()
    }
 
    async setFirstSyncComplete(
@@ -200,7 +205,7 @@ export class ATSService {
 }
 
 export const atsServiceInstance = new ATSService(
-   firebaseInstance.functions(),
+   FunctionsInstance,
    firebaseInstance.firestore()
 )
 

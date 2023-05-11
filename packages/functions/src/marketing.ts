@@ -7,13 +7,15 @@ import {
 import { marketingUsersRepo, userRepo } from "./api/repositories"
 import { object, string } from "yup"
 import { MarketingUserCreationFields } from "@careerfairy/shared-lib/marketing/MarketingUser"
+import config from "./config"
 
 /**
  * Creates a user in the marketingUsers collection
  * This function should be called on the custom landing pages
  */
-export const createMarketingUser = functions.https.onCall(
-   async (data, context) => {
+export const createMarketingUser = functions
+   .region(config.region)
+   .https.onCall(async (data, context) => {
       // user shouldn't be signed in
       validateUserAuthNotExistent(context)
 
@@ -50,5 +52,4 @@ export const createMarketingUser = functions.https.onCall(
       // Schedule a marketing email to send later?
 
       return null
-   }
-)
+   })

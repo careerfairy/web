@@ -7,7 +7,7 @@ import useInfiniteCompanies, {
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard, { CompanyCardSkeleton } from "./CompanyCard"
 import { PAGE_SIZE } from "../../../pages/companies"
-import InfiniteScroll from "react-infinite-scroll-component"
+import CustomInfiniteScroll from "../common/CustomInfiniteScroll"
 
 const styles = sxStyles({
    flexItem: {
@@ -40,13 +40,7 @@ const Companies: FC<Props> = ({ initialData }) => {
    } = useInfiniteCompanies(options)
 
    return (
-      <InfiniteScroll
-         dataLength={companies.length}
-         hasMore={hasMore}
-         next={getMore}
-         loader={<></>}
-         style={{ overflow: "inherit" }}
-      >
+      <CustomInfiniteScroll hasMore={hasMore} next={getMore} loading={loading}>
          <Grid sx={styles.root} container spacing={2}>
             {companies?.map((company) => (
                <Grid
@@ -67,7 +61,7 @@ const Companies: FC<Props> = ({ initialData }) => {
                </Grid>
             ) : null}
          </Grid>
-      </InfiniteScroll>
+      </CustomInfiniteScroll>
    )
 }
 

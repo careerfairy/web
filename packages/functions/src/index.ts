@@ -24,7 +24,6 @@ import groupAdmin = require("./groupAdmin")
 import admin = require("./admin")
 import reminders = require("./reminders")
 import livestreams = require("./livestreams")
-import universityEmails = require("./universityEmails")
 // import algolia = require("./algolia")
 import analytics = require("./analytics")
 import breakoutRooms = require("./breakoutRooms")
@@ -39,7 +38,6 @@ import atsGroup = require("./atsGroup")
 import bigQuery = require("./bigQuery")
 import groupAnalytics = require("./groupAnalytics")
 import cacheClear = require("./cacheClear")
-import crisp = require("./crisp")
 import recommendation = require("./recommendation")
 import onWriteTriggers = require("./onWriteTriggers")
 import onCreateTriggers = require("./onCreateTriggers")
@@ -56,50 +54,44 @@ dotenv.config()
 dotenv.config()
 
 // Auth
-exports.createNewUserAccount_v6 = auth.createNewUserAccount
-exports.createNewGroupAdminUserAccount = auth.createNewGroupAdminUserAccount
+exports.createNewUserAccount_eu = auth.createNewUserAccount
+exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
 exports.onUserUpdate = auth.onUserUpdate
 exports.onUserStatsUpdate = auth.onUserStatsUpdate
-exports.backfillUserData = auth.backfillUserData
-exports.updateFakeUser = auth.updateFakeUser
-exports.validateUserEmailWithPin_v2 = auth.validateUserEmailWithPin_v2
-exports.sendPostmarkResetPasswordEmail_v2 =
-   auth.sendPostmarkResetPasswordEmail_v2
-exports.sendPostmarkEmailUserDataAndUni = auth.sendPostmarkEmailUserDataAndUni
-exports.sendPostmarkEmailUserDataAndUniWithName =
-   auth.sendPostmarkEmailUserDataAndUniWithName
-exports.resendPostmarkEmailVerificationEmailWithPin_v2 =
-   auth.resendPostmarkEmailVerificationEmailWithPin_v2
-exports.deleteLoggedInUserAccount = auth.deleteLoggedInUserAccount
+exports.backfillUserData_eu = auth.backfillUserData
+exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
+exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail
+exports.resendPostmarkEmailVerificationEmailWithPin_eu =
+   auth.resendPostmarkEmailVerificationEmailWithPin
+exports.deleteLoggedInUserAccount_eu = auth.deleteLoggedInUserAccount
 
 // Agora
-exports.fetchAgoraRtcToken = agora.fetchAgoraRtcToken
-exports.fetchAgoraRtmToken = agora.fetchAgoraRtmToken
+exports.fetchAgoraRtcToken_eu = agora.fetchAgoraRtcToken
+exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
 
 // Backup
 exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
 
 // Admin Functions
-exports.sendBasicTemplateEmail_v5 = admin.sendBasicTemplateEmail
-exports.unsubscribeFromMarketingEmails = admin.unsubscribeFromMarketingEmails
+exports.sendBasicTemplateEmail_eu = admin.sendBasicTemplateEmail
+exports.unsubscribeFromMarketingEmails_eu = admin.unsubscribeFromMarketingEmails
 
 // Group Admin
-exports.sendDashboardInviteEmail_v2 = groupAdmin.sendDashboardInviteEmail_v2
-exports.sendDraftApprovalRequestEmail_v2 =
+exports.sendDraftApprovalRequestEmail_eu =
    groupAdmin.sendDraftApprovalRequestEmail
-exports.sendNewlyPublishedEventEmail = groupAdmin.sendNewlyPublishedEventEmail
-exports.getLivestreamReportData_v4 = groupAdmin.getLivestreamReportData_v4
-exports.joinGroupDashboard_v2 = groupAdmin.joinGroupDashboard_v2
-exports.deleteGroupAdminDashboardInvite =
-   groupAdmin.deleteGroupAdminDashboardInvite
-exports.createGroup = groupAdmin.createGroup
-exports.changeRole = groupAdmin.changeRole
-exports.kickFromDashboard_v2 = groupAdmin.kickFromDashboard_v2
+exports.sendNewlyPublishedEventEmail_eu =
+   groupAdmin.sendNewlyPublishedEventEmail
+exports.getLivestreamReportData_eu = groupAdmin.getLivestreamReportData
+exports.sendDashboardInviteEmail_eu = groupAdmin.sendDashboardInviteEmail
+exports.joinGroupDashboard_eu = groupAdmin.joinGroupDashboard
+exports.createGroup_eu = groupAdmin.createGroup
+exports.changeRole_eu = groupAdmin.changeRole
+exports.kickFromDashboard_eu = groupAdmin.kickFromDashboard
 
 // Reminders
 exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
-exports.sendReminderEmailAboutApplicationLink =
+exports.sendReminderEmailAboutApplicationLink_eu =
    reminders.sendReminderEmailAboutApplicationLink
 exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
@@ -110,28 +102,22 @@ exports.newsletter = newsletter.newsletter
 exports.manualNewsletter = newsletter.manualNewsletter
 
 // Livestreams
-exports.scheduleTestLivestreamDeletion =
-   livestreams.scheduleTestLivestreamDeletion
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
-exports.sendLivestreamRegistrationConfirmationEmail_v2 =
-   livestreams.sendLivestreamRegistrationConfirmationEmail_v2
-exports.sendPhysicalEventRegistrationConfirmationEmail =
+exports.sendLivestreamRegistrationConfirmationEmail_eu =
+   livestreams.sendLivestreamRegistrationConfirmationEmail
+exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
-exports.sendHybridEventRegistrationConfirmationEmail =
+exports.sendHybridEventRegistrationConfirmationEmail_eu =
    livestreams.sendHybridEventRegistrationConfirmationEmail
 exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
-exports.getLivestreamICalendarEvent = livestreams.getLivestreamICalendarEvent
+exports.getLivestreamICalendarEvent_eu = livestreams.getLivestreamICalendarEvent
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
-
-// University Emails
-exports.sendEmailToStudentOfUniversityAndField =
-   universityEmails.sendEmailToStudentOfUniversityAndField
 
 // Deploy each bundle as a separate function
 // npx firelink deploy --only functions:bundle-allFutureLivestreams
@@ -145,8 +131,8 @@ exports.updateUserDataAnalytcicsOnWrite_eu =
    analytics.updateUserDataAnalyticsOnWrite
 
 // Recording
-exports.startRecordingLivestream_v2 = recording.startRecordingLivestream
-exports.stopRecordingLivestream_v2 = recording.stopRecordingLivestream
+exports.startRecordingLivestream_eu = recording.startRecordingLivestream
+exports.stopRecordingLivestream_eu = recording.stopRecordingLivestream
 exports.automaticallyRecordLivestream = recording.automaticallyRecordLivestream
 exports.automaticallyRecordLivestreamBreakoutRoom =
    recording.automaticallyRecordLivestreamBreakoutRoom
@@ -161,10 +147,10 @@ exports.updateBreakoutRoomStatusOnWrite_eu =
 exports.slackHandleInteractions = slack.slackHandleInteractions
 
 // Rewards
-exports.rewardLivestreamInvitationComplete =
+exports.rewardLivestreamInvitationComplete_eu =
    rewards.rewardLivestreamInvitationComplete
-exports.rewardUserAction = rewards.rewardUserAction
-exports.applyReferralCode = rewards.applyReferralCode
+exports.rewardUserAction_eu = rewards.rewardUserAction
+exports.applyReferralCode_eu = rewards.applyReferralCode
 
 // Ratings
 exports.onUserRateWish = wishes.onUserRateWish
@@ -173,39 +159,39 @@ exports.onUserRateWish = wishes.onUserRateWish
 exports.syncFieldsOfStudyToHygraph = cms.syncFieldsOfStudyToHygraph
 
 // Marketing
-exports.createMarketingUser = marketing.createMarketingUser
+exports.createMarketingUser_eu = marketing.createMarketingUser
 
 // ATS
 // Group
-exports.mergeGenerateLinkToken = atsGroup.mergeGenerateLinkToken
-exports.mergeGetAccountToken = atsGroup.mergeGetAccountToken
-exports.mergeMetaEndpoint = atsGroup.mergeMetaEndpoint
-exports.mergeRemoveAccount = atsGroup.mergeRemoveAccount
-exports.fetchATSJobs_v2 = atsGroup.fetchATSJobs
-exports.fetchATSRecruiters = atsGroup.fetchATSRecruiters
-exports.fetchATSSyncStatus = atsGroup.fetchATSSyncStatus
-exports.candidateApplicationTest = atsGroup.candidateApplicationTest
+exports.mergeGenerateLinkToken_eu = atsGroup.mergeGenerateLinkToken
+exports.mergeGetAccountToken_eu = atsGroup.mergeGetAccountToken
+exports.mergeMetaEndpoint_eu = atsGroup.mergeMetaEndpoint
+exports.mergeRemoveAccount_eu = atsGroup.mergeRemoveAccount
+exports.fetchATSJobs_eu = atsGroup.fetchATSJobs
+exports.fetchATSRecruiters_eu = atsGroup.fetchATSRecruiters
+exports.fetchATSSyncStatus_eu = atsGroup.fetchATSSyncStatus
+exports.candidateApplicationTest_eu = atsGroup.candidateApplicationTest
 
 // User
-exports.atsUserApplyToJob = atsUser.atsUserApplyToJob
-exports.fetchLivestreamJobs = atsUser.fetchLivestreamJobs
-exports.updateUserJobApplications = atsUser.updateUserJobApplications
+exports.atsUserApplyToJob_eu = atsUser.atsUserApplyToJob
+exports.fetchLivestreamJobs_eu = atsUser.fetchLivestreamJobs
+exports.updateUserJobApplications_eu = atsUser.updateUserJobApplications
 
 // BigQuery
-exports.getBigQueryUsers_v3 = bigQuery.getBigQueryUsers_v3
+exports.getBigQueryUsers_eu = bigQuery.getBigQueryUsers
 
 // Group Analytics
-exports.getRegistrationSources_v2 = groupAnalytics.getRegistrationSources
+exports.getRegistrationSources_eu = groupAnalytics.getRegistrationSources
 
 // Clear cached documents
 exports.periodicallyRemoveCachedDocument =
    cacheClear.periodicallyRemoveCachedDocument
 
 // Crisp
-exports.getCrispSignature = crisp.getCrispSignature
+// exports.getCrispSignature = crisp.getCrispSignature
 
 // Recommendations
-exports.getRecommendedEvents_v4 = recommendation.getRecommendedEvents
+exports.getRecommendedEvents_eu = recommendation.getRecommendedEvents
 
 // On Write Triggers for all collections
 exports.syncLivestreams = onWriteTriggers.syncLivestreams
