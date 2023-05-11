@@ -78,6 +78,8 @@ const securePaths = [
    "/group/[groupId]/admin/ats-integration",
    "/new-livestream",
    "/group/create",
+   "/next-livestreams/my-registrations",
+   "/past-livestreams/my-recordings",
 ]
 
 const adminPaths = ["/group/create", "/new-livestream"]
