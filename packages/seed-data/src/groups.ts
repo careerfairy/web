@@ -1,15 +1,44 @@
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+} from "@careerfairy/shared-lib/dist/groups"
 import { faker } from "@faker-js/faker"
-import { firestore } from "./lib/firebase"
+import { auth, firestore } from "./lib/firebase"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { generateId } from "./utils/utils"
 import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
+import { AdminGroupsClaim } from "@careerfairy/shared-lib/dist/users"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
+
+   addGroupAdmin(
+      authId: string,
+      groupId: string,
+      role?: GROUP_DASHBOARD_ROLE
+   ): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
+   /**
+    * Create custom admin claims for a user
+    */
+   async addGroupAdmin(
+      authId: string,
+      groupId: string,
+      role: GROUP_DASHBOARD_ROLE = GROUP_DASHBOARD_ROLE.MEMBER
+   ) {
+      const claim: AdminGroupsClaim = {
+         [groupId]: {
+            role,
+         },
+      }
+
+      await auth.setCustomUserClaims(authId, {
+         adminGroups: claim,
+      })
+   }
+
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
       const batch = firestore.batch()
       const id = generateId()
@@ -42,14 +71,17 @@ class GroupFirebaseSeed implements GroupSeed {
       return data
    }
 }
-const generateQuestionOption = (generatorFn) => ({
+
+type GeneratorFn = () => string
+
+const generateQuestionOption = (generatorFn: GeneratorFn) => ({
    id: generateId(),
    name: generatorFn(),
 })
 
 export const generateQuestion = (
-   name,
-   generatorFn
+   name: string,
+   generatorFn: GeneratorFn
 ): LivestreamGroupQuestion => ({
    id: generateId(),
    questionType: "custom",
@@ -63,6 +95,7 @@ export const generateQuestion = (
       return acc
    }, {}),
 })
+
 export const groupQuestions = [
    generateQuestion("Job Title", faker.name.jobTitle),
    generateQuestion("Job Type", faker.name.jobType),
