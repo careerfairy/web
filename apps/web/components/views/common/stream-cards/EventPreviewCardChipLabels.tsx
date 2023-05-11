@@ -121,7 +121,10 @@ const EventPreviewCardChipLabels = ({
    return leftChips.length > 0 || rightChip ? (
       <Box className="hideOnHoverContent" sx={styles.wrapper}>
          <Stack spacing={1} direction={{ xs: "column", md: "row" }}>
-            {leftChips.map((chip) => chip)}
+            {leftChips.map((chip, index) => ({
+               ...chip,
+               key: `chip-${index}`,
+            }))}
          </Stack>
          <Box>{rightChip}</Box>
       </Box>
