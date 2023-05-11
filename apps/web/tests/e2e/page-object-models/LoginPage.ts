@@ -1,7 +1,6 @@
 import { Locator, Page } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import { credentials } from "../../constants"
-import { UserData } from "@careerfairy/shared-lib/dist/users"
 
 export class LoginPage {
    readonly page: Page
@@ -42,8 +41,8 @@ export class LoginPage {
       return this.signupLink?.click()
    }
 
-   async open() {
-      await this.page.goto("/login")
+   async open(path: string = "/login") {
+      await this.page.goto(path)
    }
 
    async createUserAndLogin(options?: { emailVerified?: boolean }) {
@@ -64,24 +63,30 @@ export class LoginPage {
 
    /**
     * Utility method to login before running tests
-    * @param page
-    * @param extraUserData
     */
-   static async login(page: Page, extraUserData?: Partial<UserData>) {
+   static async login(
+      page: Page,
+      options: LoginOptions = {
+         email: credentials.correctEmail,
+         password: credentials.defaultPassword,
+         waitForURL: "/portal",
+         loginPath: "/login",
+      }
+   ) {
       const handler = new LoginPage(page)
 
-      const userData = await UserSeed.createUser(
-         credentials.correctEmail,
-         extraUserData
-      )
-
-      await handler.open()
+      await handler.open(options.loginPath)
       await handler.enterEmail(credentials.correctEmail)
       await handler.enterPassword(credentials.defaultPassword)
       await handler.clickLogin()
 
-      await page.waitForURL("/portal")
-
-      return userData
+      await page.waitForURL(options.waitForURL)
    }
+}
+
+type LoginOptions = {
+   email?: string
+   password?: string
+   waitForURL?: string
+   loginPath?: string
 }
