@@ -37,6 +37,8 @@ interface UserSeed {
    ): Promise<SavedRecruiter>
 
    createAuthUsersFromUserData(): Promise<void>
+
+   getUserDataAnalytics(email: string): Promise<UserDataAnalytics>
 }
 
 class UserFirebaseSeed implements UserSeed {
