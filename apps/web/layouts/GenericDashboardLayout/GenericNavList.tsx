@@ -57,7 +57,24 @@ const GenericNavList = () => {
             mobileTitle: "Past streams",
             Icon: ClockIcon,
             href: `/past-livestreams`,
-            pathname: `/past-livestreams/[[...livestreamDialog]]`,
+            childLinks: [
+               {
+                  id: "all-past-live-streams",
+                  href: `/past-livestreams`,
+                  pathname: `/past-livestreams/[[...livestreamDialog]]`,
+                  title: "All past streams",
+               },
+               ...(isLoggedIn
+                  ? [
+                       {
+                          id: "my-registrations",
+                          href: `/past-livestreams/recordings`,
+                          pathname: `/past-livestreams/recordings`,
+                          title: "Unlocked content",
+                       },
+                    ]
+                  : []),
+            ],
          },
          {
             id: "company",
