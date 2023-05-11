@@ -27,6 +27,8 @@ interface UserSeed {
       extraAuthData?: CreateRequest
    ): Promise<UserData>
 
+   updateUser(email: string, userData: Partial<UserData>): Promise<void>
+
    getUserData(email: string): Promise<UserData | null>
 
    deleteUser(email: string): Promise<any>
@@ -86,6 +88,10 @@ class UserFirebaseSeed implements UserSeed {
       await firestore.collection("userData").doc(email).set(userData)
 
       return userData
+   }
+
+   async updateUser(email: string, userData: Partial<UserData>): Promise<void> {
+      await firestore.collection("userData").doc(email).update(userData)
    }
 
    async deleteUser(email: string) {
