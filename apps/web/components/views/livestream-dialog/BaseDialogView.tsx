@@ -16,7 +16,10 @@ const responsiveBreakpoint = "md"
 
 const styles = sxStyles({
    root: {
-      p: 2.25,
+      p: {
+         xs: 1,
+         [responsiveBreakpoint]: 2.25,
+      },
    },
    topLeft: {
       position: "absolute",

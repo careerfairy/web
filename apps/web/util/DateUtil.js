@@ -260,4 +260,11 @@ export default class DateUtil {
 
       return result
    }
+
+   static formatLiveDate(JSDate) {
+      const formattedDate = dayjs(JSDate).format(
+         "dddd, DD MMM YYYY [at] h:mm A"
+      )
+      return `Live on ${formattedDate}` // Live on Monday, 12 Oct 2020 at 12:00 PM
+   }
 }
