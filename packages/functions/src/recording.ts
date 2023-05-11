@@ -64,18 +64,22 @@ export const automaticallyRecordLivestreamBreakoutRoom = functions
  *
  * Works for both livestreams and breakout rooms
  */
-export const startRecordingLivestream = functions.https.onCall(async (data) => {
-   await startRecording(data.streamId, data.token, data.breakoutRoomId)
-})
+export const startRecordingLivestream = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
+      await startRecording(data.streamId, data.token, data.breakoutRoomId)
+   })
 
 /**
  * Manually stop a recording
  *
  * Works for both livestreams and breakout rooms
  */
-export const stopRecordingLivestream = functions.https.onCall(async (data) => {
-   await stopRecording(data.streamId, data.token, data.breakoutRoomId)
-})
+export const stopRecordingLivestream = functions
+   .region(config.region)
+   .https.onCall(async (data) => {
+      await stopRecording(data.streamId, data.token, data.breakoutRoomId)
+   })
 
 // Business Logic
 

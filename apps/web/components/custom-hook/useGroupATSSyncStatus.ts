@@ -18,7 +18,7 @@ const useGroupATSSyncStatus = (
 
    const { data } = useSWR(
       [
-         "fetchATSSyncStatus",
+         "fetchATSSyncStatus_eu",
          {
             groupId,
             integrationId,

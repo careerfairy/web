@@ -24,8 +24,9 @@ import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { livestreamsRepo } from "./api/repositories"
 
-export const sendReminderEmailToRegistrants = functions.https.onRequest(
-   async (req, res) => {
+export const sendReminderEmailToRegistrants = functions
+   .region(config.region)
+   .https.onRequest(async (req, res) => {
       setCORSHeaders(req, res)
 
       let registeredUsers = []
@@ -56,7 +57,7 @@ export const sendReminderEmailToRegistrants = functions.https.onRequest(
             console.log(arraysOfTemplates.length)
             arraysOfTemplates.forEach((arrayOfTemplates) => {
                client.sendEmailBatchWithTemplates(arrayOfTemplates).then(
-                  (response) => {
+                  () => {
                      console.log(
                         `Successfully sent email to ${arrayOfTemplates.length}`
                      )
@@ -73,14 +74,11 @@ export const sendReminderEmailToRegistrants = functions.https.onRequest(
          .catch(() => {
             return res.status(400).send()
          })
-   }
-)
+   })
 
 export const sendReminderEmailAboutApplicationLink = functions
-   .runWith({
-      minInstances: 1,
-   })
-   .https.onCall(async (data, context) => {
+   .region(config.region)
+   .https.onCall(async (data) => {
       functions.logger.log("data", data)
       const email = {
          TemplateId: parseInt(

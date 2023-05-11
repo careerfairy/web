@@ -23,7 +23,7 @@ const useMergeMetaEndpoint = (
 
    const calls = useMemo(() => {
       return entity.map((entity) => [
-         "mergeMetaEndpoint",
+         "mergeMetaEndpoint_eu",
          {
             groupId,
             integrationId,
