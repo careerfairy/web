@@ -16,6 +16,10 @@ import { Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import DateUtil from "../../../util/DateUtil"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   UnlockedContentPath,
+   PastLivestreamsPath,
+} from "../../../layouts/GenericDashboardLayout/GenericNavList"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -26,7 +30,9 @@ const styles = sxStyles({
    },
 })
 
-const MyRecordings = ({
+const paths = [UnlockedContentPath, PastLivestreamsPath]
+
+const UnlockedContent = ({
    unlockedEvents,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const unlockedPastLivestreams = useMemo(
@@ -53,7 +59,10 @@ const MyRecordings = ({
             description={"CareerFairy | My recordings"}
             title={"CareerFairy | My recordings"}
          />
-         <GenericDashboardLayout pageDisplayName={"My recordings"}>
+         <GenericDashboardLayout
+            pageDisplayName={"My recordings"}
+            mobileDropdownPaths={paths}
+         >
             <StreamsSection
                value={"pastEvents"}
                pastLivestreams={unlockedPastLivestreams}
@@ -118,4 +127,4 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    }
 }
 
-export default MyRecordings
+export default UnlockedContent

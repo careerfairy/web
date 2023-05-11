@@ -86,6 +86,7 @@ type Props = {
    drawerContent: React.ReactNode
    headerContent: React.ReactNode
    bottomNavContent?: JSX.Element
+   dropdownNav?: JSX.Element
    drawerOpen: boolean
    setDrawer?: (open: boolean) => void
    toggleDrawer?: () => void
@@ -96,6 +97,7 @@ const AdminGenericLayout: React.FC<Props> = ({
    drawerContent,
    headerContent,
    bottomNavContent,
+   dropdownNav,
    drawerOpen,
    setDrawer,
    toggleDrawer,
@@ -133,6 +135,10 @@ const AdminGenericLayout: React.FC<Props> = ({
          >
             {/* header */}
             <HeaderComponent>{headerContent}</HeaderComponent>
+
+            {/* mobile dropdown navigation content*/}
+            {dropdownNav}
+
             {/* main content */}
             <Box
                component={"main"}

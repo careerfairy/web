@@ -6,9 +6,12 @@ import GenericNavList from "./GenericNavList"
 import { createContext, useContext, useMemo } from "react"
 import FooterV2 from "../../components/views/footer/FooterV2"
 import CreditsDialogLayout from "../CreditsDialogLayout"
+import DropdownNavigator from "./DropdownNavigator"
+import { INavLink } from "../types"
 
 type IGenericDashboardContext = {
    isPortalPage: boolean
+   handleOpenCreditsDialog: () => void
    topBarFixed: boolean
    // The number of pixels the user has to scroll before the header is hidden. Default is 10
    headerScrollThreshold: number
@@ -16,6 +19,7 @@ type IGenericDashboardContext = {
 
 const GenericDashboardContext = createContext<IGenericDashboardContext>({
    isPortalPage: false,
+   handleOpenCreditsDialog: () => {},
    topBarFixed: false,
    headerScrollThreshold: 10,
 })
@@ -40,15 +44,25 @@ const GenericDashboardLayout = ({
 }: Props) => {
    const isMobile = useIsMobile()
 
-   // TODO: Needs to be updated after the new banner.
-   //  Banner will be prominent on the Portal page so no need to validate if there's any recordings
+   const [
+      creditsDialogOpen,
+      handleOpenCreditsDialog,
+      handleCloseCreditsDialog,
+   ] = useDialogStateHandler()
+
    const value = useMemo<IGenericDashboardContext>(
       () => ({
          isPortalPage,
+         handleOpenCreditsDialog,
          headerScrollThreshold,
          topBarFixed: Boolean(topBarFixed),
       }),
-      [headerScrollThreshold, isPortalPage, topBarFixed]
+      [
+         handleOpenCreditsDialog,
+         headerScrollThreshold,
+         isPortalPage,
+         topBarFixed,
+      ]
    )
 
    return (
@@ -56,13 +70,22 @@ const GenericDashboardLayout = ({
          <CreditsDialogLayout>
             <AdminGenericLayout
                bgColor={bgColor || "#F7F8FC"}
-               headerContent={<TopBar title={pageDisplayName} />}
+               headerContent={
+                  <TopBar
+                     handleOpenCreditsDialog={handleOpenCreditsDialog}
+                     title={pageDisplayName}
+                  />
+               }
                drawerContent={<NavBar />}
                bottomNavContent={<GenericNavList />}
                drawerOpen={!isMobile}
             >
                {children}
                <FooterV2 background={bgColor || "#F7F8FC"} />
+               <CreditsDialog
+                  onClose={handleCloseCreditsDialog}
+                  open={creditsDialogOpen}
+               />
             </AdminGenericLayout>
          </CreditsDialogLayout>
       </GenericDashboardContext.Provider>
