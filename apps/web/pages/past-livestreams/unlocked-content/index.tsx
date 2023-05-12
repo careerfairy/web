@@ -55,12 +55,12 @@ const UnlockedContent = ({
    return (
       <>
          <SEO
-            id={"CareerFairy | My recordings"}
-            description={"CareerFairy | My recordings"}
-            title={"CareerFairy | My recordings"}
+            id={"CareerFairy | Unlocked content"}
+            description={"CareerFairy | Unlocked content"}
+            title={"CareerFairy | Unlocked content"}
          />
          <GenericDashboardLayout
-            pageDisplayName={"My recordings"}
+            pageDisplayName={"Unlocked content"}
             mobileDropdownPaths={paths}
          >
             <StreamsSection
