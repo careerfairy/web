@@ -14,3 +14,18 @@ export const SlideUpTransition = React.forwardRef(function SlideUpTransition(
       </Slide>
    )
 })
+
+export const SlideLeftTransition = React.forwardRef(
+   function SlideLeftTransition(
+      props: TransitionProps & {
+         children: React.ReactElement<any, any>
+      },
+      ref: React.Ref<unknown>
+   ) {
+      return (
+         <Slide direction="left" ref={ref} {...props}>
+            {props.children}
+         </Slide>
+      )
+   }
+)

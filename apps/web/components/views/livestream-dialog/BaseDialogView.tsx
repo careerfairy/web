@@ -1,16 +1,12 @@
-import { FC, ReactNode } from "react"
+import { FC, forwardRef, ReactNode } from "react"
 import Stack from "@mui/material/Stack"
 import { sxStyles } from "../../../types/commonTypes"
-import {
-   Box,
-   Container,
-   IconButton,
-   Typography,
-   TypographyProps,
-} from "@mui/material"
+import { Box, Container, IconButton } from "@mui/material"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import Image from "next/image"
+import useIsMobile from "../../custom-hook/useIsMobile"
+import { useLiveStreamDialog } from "./LivestreamDialog"
 
 const responsiveBreakpoint = "md"
 
@@ -34,10 +30,8 @@ const styles = sxStyles({
       padding: 1,
    },
    closeIcon: {
-      color: {
-         xs: "white",
-         [responsiveBreakpoint]: "text.primary",
-      },
+      color: "white",
+      fontSize: "24px",
    },
    heroContent: {
       color: "white",
@@ -52,6 +46,10 @@ const styles = sxStyles({
       overflow: "hidden",
       "& #background-image": {
          zIndex: -1,
+      },
+      minHeight: {
+         xs: 439,
+         [responsiveBreakpoint]: 0,
       },
    },
    heroContentContainer: {
@@ -116,80 +114,65 @@ const BaseDialogView: Props = ({
    )
 }
 
-type LeftContentProps = {
-   backgroundImg?: string
-}
-export const HeroContent: FC<LeftContentProps> = ({
-   backgroundImg,
-   children,
-}) => {
+const BackAndCloseButton: FC = () => {
+   const isMobile = useIsMobile()
+   const { handleBack } = useLiveStreamDialog()
+
+   if (isMobile) {
+      return (
+         <Box sx={styles.topLeft}>
+            <IconButton onClick={handleBack}>
+               <BackIcon sx={styles.closeIcon} />
+            </IconButton>
+         </Box>
+      )
+   }
+
    return (
-      <Box sx={styles.heroContent}>
-         <Container
-            disableGutters
-            sx={styles.heroContentContainer}
-            maxWidth={"md"}
-         >
-            {children}
-         </Container>
-         {backgroundImg ? (
-            <Image
-               alt={"background image"}
-               src={backgroundImg}
-               layout={"fill"}
-               objectFit={"cover"}
-               id={"background-image"}
-            />
-         ) : null}
-         <Box sx={styles.backgroundImgOverlay} />
+      <Box sx={styles.topRight}>
+         <IconButton onClick={handleBack}>
+            <CloseIcon sx={styles.closeIcon} />
+         </IconButton>
       </Box>
    )
 }
 
-type RightContentProps = {
-   backgroundColor?: string
+type LeftContentProps = {
+   backgroundImg?: string
+   children: ReactNode
 }
 
-// export const RightContent: FC<RightContentProps> = ({
-//    children,
-//    backgroundColor,
-// }) => {
-//    return (
-//       <Box
-//          sx={[
-//             styles.rightContent,
-//             styles.content,
-//             backgroundColor && {
-//                backgroundColor,
-//             },
-//          ]}
-//       >
-//          {children}
-//       </Box>
-//    )
-// }
+export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
+   function HeroContent({ backgroundImg, children }, ref) {
+      return (
+         <Box id="live-stream-dialog-hero" sx={styles.heroContent} ref={ref}>
+            <Container
+               disableGutters
+               sx={styles.heroContentContainer}
+               maxWidth={"md"}
+            >
+               {children}
+            </Container>
+            {backgroundImg ? (
+               <Image
+                  alt={"background image"}
+                  src={backgroundImg}
+                  layout={"fill"}
+                  objectFit={"cover"}
+                  id={"background-image"}
+               />
+            ) : null}
+            <Box sx={styles.backgroundImgOverlay} />
+            <BackAndCloseButton />
+         </Box>
+      )
+   }
+)
 
-export const TitleText: FC<TypographyProps> = (props) => {
-   return (
-      <Typography
-         variant="h3"
-         fontWeight={600}
-         position="relative"
-         sx={styles.title}
-         {...props}
-      />
-   )
-}
+type MainContentProps = {}
 
-export const SubHeaderText: FC<TypographyProps> = (props) => {
-   return (
-      <Typography
-         position="relative"
-         sx={styles.subheader}
-         variant={"body1"}
-         {...props}
-      />
-   )
+export const MainContent: FC<MainContentProps> = ({ children }) => {
+   return <Box sx={styles.mainContent}>{children}</Box>
 }
 
 export default BaseDialogView
