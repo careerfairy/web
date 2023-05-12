@@ -78,6 +78,14 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
    )
 }
 
+export const LivestreamTagsContainerSkeleton = () => {
+   return (
+      <Box sx={styles.tagsWrapper}>
+         <InterestSkeletons />
+      </Box>
+   )
+}
+
 type InterestChipsProps = {
    interestIds: string[]
 }
@@ -137,9 +145,24 @@ const useInterestsByIds = (ids: string[]) => {
 const InterestSkeletons: FC = () => {
    return (
       <>
-         <Skeleton sx={styles.chip} variant={"rectangular"} width={100} />
-         <Skeleton sx={styles.chip} variant={"rectangular"} width={150} />
-         <Skeleton sx={styles.chip} variant={"rectangular"} width={45} />
+         <Skeleton
+            sx={styles.chip}
+            variant={"rectangular"}
+            height={20}
+            width={100}
+         />
+         <Skeleton
+            sx={styles.chip}
+            variant={"rectangular"}
+            height={20}
+            width={150}
+         />
+         <Skeleton
+            sx={styles.chip}
+            variant={"rectangular"}
+            height={20}
+            width={45}
+         />
       </>
    )
 }

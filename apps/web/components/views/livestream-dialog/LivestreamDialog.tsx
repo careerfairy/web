@@ -20,13 +20,14 @@ import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
-import { SlideUpTransition } from "../common/transitions"
+import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 
 const styles = sxStyles({
    content: {
       p: 0,
+      display: "grid",
    },
    fullHeight: {
       height: "100%",
@@ -85,10 +86,13 @@ const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
       <Dialog
          open={open}
          onClose={onClose}
-         TransitionComponent={SlideUpTransition}
+         TransitionComponent={
+            isMobile ? SlideLeftTransition : SlideUpTransition
+         }
          maxWidth="md"
          fullWidth
          fullScreen={isMobile}
+         closeAfterTransition={true}
          PaperProps={{
             sx: styles.dialogPaper,
          }}
@@ -116,7 +120,7 @@ const Content: FC<ContentProps> = ({
       serverSideLivestream && livestreamId === serverSideLivestream.id
 
    const { data: livestream } = useLivestream(
-      livestreamId,
+      livestreamId || "-",
       hasInitialData ? serverSideLivestream : undefined
    )
 
@@ -128,12 +132,21 @@ const Content: FC<ContentProps> = ({
       handleClose()
    }, [handleClose])
 
+   const handleBack = useCallback(() => {
+      if (views[value].key === "livestream-details") {
+         onClose()
+      } else {
+         goToView("livestream-details")
+      }
+   }, [value, onClose, goToView])
+
    const contextValue = useMemo<DialogContextType>(
       () => ({
          goToView,
          closeDialog: onClose,
          livestream,
          activeView: views[value].key,
+         handleBack,
          jobId,
          livestreamPresenter: livestream
             ? LivestreamPresenter.createFromDocument(livestream)
@@ -146,6 +159,7 @@ const Content: FC<ContentProps> = ({
          onClose,
          livestream,
          value,
+         handleBack,
          jobId,
          updatedStats,
          serverUserEmail,
@@ -153,33 +167,36 @@ const Content: FC<ContentProps> = ({
    )
 
    return (
-      <DialogContext.Provider value={contextValue}>
+      <>
          <DialogContent sx={styles.content}>
-            <SwipeableViews
-               style={styles.swipeableViews}
-               containerStyle={styles.swipeableViewsContainer}
-               disabled
-               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-               index={value}
-            >
-               {views.map(({ key, component: View }, index) => (
-                  <AnimatedTabPanel
-                     sx={styles.fullHeight}
-                     key={key}
-                     value={index}
-                     activeValue={value}
-                  >
-                     <View />
-                  </AnimatedTabPanel>
-               ))}
-            </SwipeableViews>
+            <DialogContext.Provider value={contextValue}>
+               <SwipeableViews
+                  style={styles.swipeableViews}
+                  containerStyle={styles.swipeableViewsContainer}
+                  disabled
+                  axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+                  index={value}
+               >
+                  {views.map(({ key, component: View }, index) => (
+                     <AnimatedTabPanel
+                        sx={styles.fullHeight}
+                        key={key}
+                        value={index}
+                        activeValue={value}
+                     >
+                        <View />
+                     </AnimatedTabPanel>
+                  ))}
+               </SwipeableViews>
+            </DialogContext.Provider>
          </DialogContent>
-      </DialogContext.Provider>
+      </>
    )
 }
 
 type DialogContextType = {
    goToView: (view: ViewKey) => void
+   handleBack: () => void
    closeDialog: () => void
    /*
     * Undefined -> loading
@@ -209,6 +226,7 @@ const getInitialValue = (page: Props["page"]): number => {
 
 const DialogContext = createContext<DialogContextType>({
    closeDialog: () => {},
+   handleBack: () => {},
    goToView: () => {},
    livestream: undefined,
    livestreamPresenter: null,

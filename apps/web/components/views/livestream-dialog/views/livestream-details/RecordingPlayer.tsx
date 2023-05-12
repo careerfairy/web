@@ -1,4 +1,4 @@
-import { Box, Typography } from "@mui/material"
+import { Box, Skeleton, Typography } from "@mui/material"
 import ReactPlayer from "react-player"
 import PlayIcon from "@mui/icons-material/PlayArrowRounded"
 import React, { FC, useCallback, useEffect, useMemo, useState } from "react"
@@ -16,12 +16,8 @@ import useCountTime from "../../../../custom-hook/useCountTime"
 import { livestreamRepo } from "../../../../../data/RepositoryInstances"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
-
-type Props = {
-   stream: LivestreamEvent
-   livestreamPresenter: LivestreamPresenter
-   boughtAccess: boolean
-}
+import { alpha } from "@mui/material/styles"
+import CircularProgress from "@mui/material/CircularProgress"
 
 const styles = sxStyles({
    root: {
@@ -59,7 +55,11 @@ const styles = sxStyles({
          overflow: "hidden",
          boxShadow: (theme) => theme.boxShadows.dark_8_25_10,
       },
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
    },
+   playSkeleton: {},
    countDown: {
       position: "absolute",
       bottom: 0,
@@ -80,13 +80,43 @@ const styles = sxStyles({
          md: "1rem",
       },
    },
+   videoSkeleton: {
+      // light grey transparent background
+
+      backgroundColor: (theme) => alpha(theme.palette.common.white, 0.15),
+      position: "absolute",
+      inset: 0,
+   },
 })
+
+type Props = {
+   stream: LivestreamEvent
+   livestreamPresenter: LivestreamPresenter
+   boughtAccess: boolean
+}
 
 const RecordingPlayer: FC<Props> = (props) => {
    return (
-      <SuspenseWithBoundary fallback={<div>Loading...</div>}>
+      <SuspenseWithBoundary fallback={<PlayerSkeleton />}>
          <Player {...props} />
       </SuspenseWithBoundary>
+   )
+}
+
+export const PlayerSkeleton: FC = () => {
+   return (
+      <Box sx={styles.root}>
+         <Box sx={styles.playerWrapper}>
+            <CircularProgress color="info" sx={styles.playSkeleton} />
+            <Skeleton
+               sx={styles.videoSkeleton}
+               variant="rectangular"
+               animation="pulse"
+               width="100%"
+               height="100%"
+            />
+         </Box>
+      </Box>
    )
 }
 

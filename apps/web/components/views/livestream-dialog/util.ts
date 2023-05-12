@@ -6,26 +6,37 @@ import {
 } from "../../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LiveStreamDialogData } from "./LivestreamDialogLayout"
+import { errorLogAndNotify } from "../../../util/CommonUtil"
 
 export const getLivestreamDialogData = async (
    ctx: GetServerSidePropsContext
 ): Promise<LiveStreamDialogData> => {
-   const livestreamPrams = (ctx.params.livestreamDialog as string[]) || []
-   const token = getUserTokenFromCookie({ req: ctx.req })
+   try {
+      const livestreamPrams = (ctx.params.livestreamDialog as string[]) || []
+      const token = getUserTokenFromCookie({ req: ctx.req })
 
-   if (livestreamPrams[0] === "livestream" && livestreamPrams[1]) {
-      const [stream, serverSideUserStats] = await Promise.all([
-         getServerSideStream(livestreamPrams[1]),
-         getServerSideUserStats(token.email),
-      ])
+      if (livestreamPrams[0] === "livestream" && livestreamPrams[1]) {
+         const [stream, serverSideUserStats] = await Promise.all([
+            getServerSideStream(livestreamPrams[1]),
+            getServerSideUserStats(token.email),
+         ])
 
-      return {
-         serverSideLivestream: stream
-            ? LivestreamPresenter.serializeDocument(stream)
-            : null,
-         serverSideUserEmail: token?.email ?? null,
-         serverSideUserStats,
+         return {
+            serverSideLivestream: stream
+               ? LivestreamPresenter.serializeDocument(stream)
+               : null,
+            serverSideUserEmail: token?.email ?? null,
+            serverSideUserStats,
+         }
       }
+   } catch (e) {
+      errorLogAndNotify(e, {
+         message: "Error getting livestream dialog data",
+         context: "getLivestreamDialogData",
+         extra: {
+            ctx,
+         },
+      })
    }
    return null
 }

@@ -1,0 +1,169 @@
+import React, { FC } from "react"
+import { Skeleton, Typography } from "@mui/material"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import Link from "../../../../common/Link"
+import Box from "@mui/material/Box"
+import ActionButtonProvider, {
+   ActionButtonContextType,
+   useActionButtonContext,
+} from "./ActionButtonProvider"
+import styles from "./Styles"
+import SignUpToWatchButton from "./SignUpToWatchButton"
+import WatchNowButton from "./WatchNowButton"
+import BuyRecordingButton from "./BuyRecordingButton"
+import NotEnoughCreditsButton from "./NotEnoughCreditsButton"
+import RegisterButton from "./RegisterButton"
+
+const ActionButton: FC<ActionButtonContextType> = (props) => {
+   return (
+      <ActionButtonProvider {...props}>
+         <ButtonElement />
+      </ActionButtonProvider>
+   )
+}
+
+const ButtonElement: FC = () => {
+   const {
+      onRegisterClick,
+      livestreamPresenter,
+      userEmailFromServer,
+      isFloating,
+      canWatchRecording,
+   } = useActionButtonContext()
+
+   const { authenticatedUser, isLoggedIn, userData } = useAuth()
+   const registered = livestreamPresenter.isUserRegistered(
+      authenticatedUser.email
+   )
+   const registerButton = (
+      label: string,
+      options?: {
+         toolTip?: string
+      }
+   ) => (
+      <RegisterButton
+         onClick={onRegisterClick}
+         disabled={livestreamPresenter.isRegistrationDisabled(
+            authenticatedUser.email
+         )}
+         registered={registered}
+         label={label}
+         toolTip={options?.toolTip}
+         isFloating={isFloating}
+      />
+   )
+
+   if (livestreamPresenter.isPast()) {
+      if (livestreamPresenter.denyRecordingAccess) {
+         return registerButton(
+            registered ? "You attended this event" : "Recording Not Available",
+            {
+               toolTip: registered ? undefined : denyRecordingText,
+            }
+         )
+      }
+
+      // we know from the server side data the user is signed in
+      // but we're still loading the user on the client side
+      if (userEmailFromServer && (!isLoggedIn || !userData)) {
+         return (
+            <Skeleton
+               sx={[styles.btn]}
+               variant="text"
+               animation="wave"
+               height={60}
+            />
+         )
+      }
+
+      if (!isLoggedIn) {
+         return <SignUpToWatchButton />
+      }
+
+      if (!userData?.credits && !canWatchRecording) {
+         return <NotEnoughCreditsButton />
+      }
+
+      if (canWatchRecording) {
+         return <WatchNowButton />
+      }
+
+      return <BuyRecordingButton />
+   }
+
+   if (registered) {
+      return registerButton("You're registered")
+   }
+
+   if (livestreamPresenter.hasNoSpotsLeft()) {
+      return registerButton("No spots left")
+   }
+
+   if (authenticatedUser) {
+      return registerButton("Register to live stream")
+   }
+
+   return registerButton("Join to attend")
+}
+
+type LinkTextProps = {
+   onClick: (e: React.SyntheticEvent) => void
+   isFloating: boolean
+}
+
+export const LinkText: FC<LinkTextProps> = ({
+   children,
+   onClick,
+   isFloating,
+}) => {
+   return (
+      <Typography
+         sx={[styles.link, isFloating && styles.floatingLink]}
+         align="center"
+      >
+         <Link noLinkStyle onClick={onClick} scroll={false} href="#">
+            {children}
+         </Link>
+      </Typography>
+   )
+}
+
+type FloatingButtonProps = {
+   isFloating: boolean
+   disableMarginTop?: boolean
+}
+
+export const FloatingButtonWrapper: FC<FloatingButtonProps> = ({
+   isFloating,
+   disableMarginTop,
+   children,
+}) => {
+   return (
+      <Box
+         component="span"
+         sx={[
+            styles.btnWrapper,
+            isFloating && styles.floatingBtnWrapper,
+            disableMarginTop && styles.noMarginTop,
+         ]}
+      >
+         {children}
+      </Box>
+   )
+}
+
+export const ActionButtonSkeleton = () => {
+   return (
+      <Skeleton
+         sx={styles.actionButtonSkeleton}
+         variant="rectangular"
+         width="100%"
+         height={56}
+      />
+   )
+}
+
+const denyRecordingText =
+   "Unfortunately, the host company does not allow to share the recording of their live stream."
+
+export default ActionButton

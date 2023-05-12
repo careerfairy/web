@@ -23,7 +23,7 @@ const LivestreamTitle: FC<Props> = (props) => {
    return (
       <Typography
          align="center"
-         variant={"h2"}
+         variant={"h3"}
          component="h1"
          sx={styles.eventTitle}
       >

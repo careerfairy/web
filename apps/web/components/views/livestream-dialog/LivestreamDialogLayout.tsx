@@ -88,28 +88,24 @@ export const LivestreamDialogLayout: FC<Props> = ({
    return (
       <>
          {children}
-         {dialogOpen ? (
-            <>
-               <LivestreamDialog
-                  open={dialogOpen}
-                  updatedStats={updatedStats}
-                  serverUserEmail={livestreamDialogData?.serverSideUserEmail}
-                  serverSideLivestream={serverLivestream}
-                  livestreamId={livestreamId}
-                  jobId={jobId}
-                  handleClose={handleClose}
-                  page={page}
-               />
-               {/* Set SEO tags for the page. */}
-               {serverLivestream ? (
-                  <SEO {...getStreamMetaInfo(serverLivestream)} />
-               ) : null}
+         <LivestreamDialog
+            open={dialogOpen}
+            updatedStats={updatedStats}
+            serverUserEmail={livestreamDialogData?.serverSideUserEmail}
+            serverSideLivestream={serverLivestream}
+            livestreamId={livestreamId}
+            jobId={jobId}
+            handleClose={handleClose}
+            page={page}
+         />
+         {/* Set SEO tags for the page. */}
+         {serverLivestream ? (
+            <SEO {...getStreamMetaInfo(serverLivestream)} />
+         ) : null}
 
-               {/* Set schema tags for the event shown in the dialog. */}
-               {serverLivestream ? (
-                  <EventSEOSchemaScriptTag event={serverLivestream} />
-               ) : null}
-            </>
+         {/* Set schema tags for the event shown in the dialog. */}
+         {serverLivestream ? (
+            <EventSEOSchemaScriptTag event={serverLivestream} />
          ) : null}
       </>
    )
