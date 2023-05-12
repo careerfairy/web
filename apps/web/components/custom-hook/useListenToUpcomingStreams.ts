@@ -13,6 +13,8 @@ type Props = {
    companySizes?: string[]
    companyIndustriesIds?: string[]
    getHiddenEvents?: boolean
+   userEmail?: string
+   from?: Date
 }
 
 const useListenToUpcomingStreams = (props?: Props) => {
@@ -25,6 +27,8 @@ const useListenToUpcomingStreams = (props?: Props) => {
       companySizes,
       companyIndustriesIds,
       getHiddenEvents,
+      userEmail,
+      from,
    } = props
 
    const upcomingEventsQuery = useMemo(() => {
@@ -48,8 +52,23 @@ const useListenToUpcomingStreams = (props?: Props) => {
          query = query.where("hidden", "==", false)
       }
 
+      if (userEmail) {
+         query = query.where("registeredUsers", "array-contains", userEmail)
+      }
+
+      if (from) {
+         query = query.where("start", ">", from)
+      }
+
       return query
-   }, [filterByGroupId, getHiddenEvents, interestsIds, languagesIds])
+   }, [
+      filterByGroupId,
+      from,
+      getHiddenEvents,
+      interestsIds,
+      languagesIds,
+      userEmail,
+   ])
 
    let { data, isLoading } = useCollection<LivestreamEvent>(
       upcomingEventsQuery,
