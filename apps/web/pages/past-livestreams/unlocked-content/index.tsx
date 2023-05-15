@@ -20,6 +20,8 @@ import {
    UnlockedContentPath,
    PastLivestreamsPath,
 } from "../../../layouts/GenericDashboardLayout/GenericNavList"
+import Link from "../../../components/views/common/Link"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -35,6 +37,8 @@ const paths = [UnlockedContentPath, PastLivestreamsPath]
 const UnlockedContent = ({
    unlockedEvents,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
+   const isMobile = useIsMobile()
+
    const unlockedPastLivestreams = useMemo(
       () => mapFromServerSide(unlockedEvents),
       [unlockedEvents]
@@ -45,11 +49,13 @@ const UnlockedContent = ({
          <Grid xs={12} mt={4} mx={1} item>
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
-               Currently you don't have any recording 😕
+               {isMobile ? "You" : "Currently you"} don't have any unlocked
+               content 😕 <br />
+               Check them out <Link href="/past-livestreams">here</Link>
             </Typography>
          </Grid>
       ),
-      []
+      [isMobile]
    )
 
    return (
@@ -113,8 +119,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       return {
          props: {
             unlockedEvents: [
-               ...availableRecordings,
-               ...(boughtEvents.length ? boughtEvents : []),
+               ...(availableRecordings?.length ? availableRecordings : []),
+               ...(boughtEvents?.length ? boughtEvents : []),
             ].map(LivestreamPresenter.serializeDocument),
          },
       }
