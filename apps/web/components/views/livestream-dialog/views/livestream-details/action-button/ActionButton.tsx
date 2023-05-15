@@ -31,20 +31,17 @@ const ButtonElement: FC = () => {
       authenticatedUser.email
    )
 
-   const registerButton = (
-      label: string,
-      options?: {
-         toolTip?: string
-      }
-   ) => <RegisterButton label={label} toolTip={options?.toolTip} />
-
    if (livestreamPresenter.isPast()) {
       if (livestreamPresenter.denyRecordingAccess) {
-         return registerButton(
-            registered ? "You attended this event" : "Recording Not Available",
-            {
-               toolTip: registered ? undefined : denyRecordingText,
-            }
+         return (
+            <RegisterButton
+               label={
+                  registered
+                     ? "You attended this event"
+                     : "Recording Not Available"
+               }
+               toolTip={registered ? undefined : denyRecordingText}
+            />
          )
       }
 
@@ -70,18 +67,18 @@ const ButtonElement: FC = () => {
    }
 
    if (registered) {
-      return registerButton("You're registered")
+      return <RegisterButton label="You're registered" />
    }
 
    if (livestreamPresenter.hasNoSpotsLeft()) {
-      return registerButton("No spots left")
+      return <RegisterButton label="No spots left" />
    }
 
    if (authenticatedUser) {
-      return registerButton("Register to live stream")
+      return <RegisterButton label="Register to live stream" />
    }
 
-   return registerButton("Join to attend")
+   return <RegisterButton label="Join to attend" />
 }
 
 type LinkTextProps = {

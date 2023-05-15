@@ -248,7 +248,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [event?.jobs?.length, loading])
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
-         if (isPast && isLoggedIn) {
+         if (isPast && isLoggedIn && event) {
             const presenterEvent = LivestreamPresenter.createFromDocument(event)
 
             if (

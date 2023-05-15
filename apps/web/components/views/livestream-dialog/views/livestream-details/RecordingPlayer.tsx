@@ -25,8 +25,14 @@ const styles = sxStyles({
    },
    icon: {
       zIndex: 2,
-      width: "60px",
-      height: "60px",
+      width: {
+         xs: "45px",
+         md: "65px",
+      },
+      height: {
+         xs: "45px",
+         md: "65px",
+      },
       background: "rgba(33, 32, 32, 0.6)",
       border: "2px solid white",
       borderRadius: "50%",
@@ -67,16 +73,27 @@ const styles = sxStyles({
       py: 1,
       transform: "translateX(-50%)",
       left: "50%",
-      background: "rgba(95, 95, 95, 0.75)",
-      border: "2px solid white",
+      background: {
+         xs: "rgba(95, 95, 95, 0.85)",
+         md: "rgba(95, 95, 95, 0.75)",
+      },
+      borderColor: "white",
+      borderStyle: "solid",
+      borderWidth: {
+         xs: "1px",
+         md: "2px",
+      },
       borderRadius: 12,
-      mb: 1.6,
+      mb: {
+         xs: 0.75,
+         md: 1.625,
+      },
       width: "max-content",
    },
    recordingTitle: {
       fontWeight: 600,
       fontSize: {
-         xs: "0.8rem",
+         xs: "0.857rem",
          md: "1rem",
       },
    },

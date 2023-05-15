@@ -30,10 +30,7 @@ const SignUpToWatchButton: FC = () => {
          {isFloating ? null : (
             <Typography sx={{ textAlign: "center", marginTop: 2 }}>
                Already have an account?{" "}
-               <Link
-                  color="text.primary"
-                  href={`/login?absolutePath=${asPath}`}
-               >
+               <Link color="inherit" href={`/login?absolutePath=${asPath}`}>
                   Log In
                </Link>
             </Typography>
