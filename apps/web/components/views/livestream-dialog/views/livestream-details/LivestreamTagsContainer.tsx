@@ -6,7 +6,6 @@ import {
    LimitedRegistrationsBadge,
 } from "../../../common/NextLivestreams/GroupStreams/groupStreamCard/badges"
 import WhiteTagChip from "../../../common/chips/TagChip"
-import LanguageIcon from "@mui/icons-material/Language"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { sxStyles } from "../../../../../types/commonTypes"
 import Skeleton from "@mui/material/Skeleton"
@@ -65,9 +64,8 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
          {presenter.language ? (
             <WhiteTagChip
                sx={styles.chip}
-               icon={<LanguageIcon />}
                variant={"outlined"}
-               tooltipText={`This event is in ${presenter.language.name}`}
+               tooltipText={`This live stream is in ${presenter.language.name}`}
                label={presenter.language.name}
             />
          ) : null}

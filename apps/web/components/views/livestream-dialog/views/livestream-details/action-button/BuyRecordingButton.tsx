@@ -44,7 +44,7 @@ const BuyRecordingButton: FC = () => {
             {getBuyCostForAction("LIVESTREAM_RECORDING_BOUGHT")}
          </LoadingButton>
          <Typography sx={[styles.subButtonText, isFloating && styles.darkText]}>
-            You currently have {userData.credits} <CareerCoinIcon /> Left
+            You currently have {userData.credits} <CareerCoinIcon /> left
          </Typography>
       </FloatingButtonWrapper>
    )

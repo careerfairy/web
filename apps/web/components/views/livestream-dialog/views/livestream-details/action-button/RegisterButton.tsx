@@ -28,6 +28,8 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
       authenticatedUser.email
    )
 
+   const isPast = livestreamPresenter.isPast()
+
    const buttonDisabled = disabled || registered
 
    const handleClose = () => {
@@ -86,7 +88,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                {label}
             </Button>
          </Box>
-         {registered ? (
+         {registered && !isPast ? (
             <LinkText isFloating={isFloating} onClick={handleClick}>
                Cancel registration
             </LinkText>
