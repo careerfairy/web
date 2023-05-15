@@ -2,10 +2,13 @@ import React, { useCallback, useMemo } from "react"
 import {
    Button,
    Chip,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
    FormControl,
    FormControlLabel,
    IconProps,
-   Popover,
    SelectChangeEvent,
 } from "@mui/material"
 import Box from "@mui/material/Box"
@@ -15,7 +18,7 @@ import Typography from "@mui/material/Typography"
 import { useRouter } from "next/router"
 import { ResponsiveOption, ResponsiveSelect } from "../ResponsiveSelect"
 import { useInterests } from "../../../custom-hook/useCollection"
-import { StylesProps } from "../../../../types/commonTypes"
+import { sxStyles } from "../../../../types/commonTypes"
 import firebase from "firebase/compat/app"
 import { Wish } from "@careerfairy/shared-lib/dist/wishes"
 import DownIcon from "@mui/icons-material/ArrowDropDown"
@@ -33,36 +36,53 @@ import {
 import MultiListSelect from "../MultiListSelect"
 import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import Checkbox from "@mui/material/Checkbox"
-import { FilterEnum } from "./Filter"
-
-interface Props {
-   open: boolean
-   id: string
-   anchorEl: HTMLElement
-   handleClose: () => any
-   filtersToShow: FilterEnum[]
-}
+import { FilterEnum, useFilter } from "./Filter"
+import { Transition } from "../../credits-dialog/CreditsDialog"
+import CloseIcon from "@mui/icons-material/Close"
+import IconButton from "@mui/material/IconButton"
+import LoadingButton from "@mui/lab/LoadingButton"
+import { useTheme } from "@mui/material/styles"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 
 const UpIcon = (props: IconProps) => (
    // @ts-ignore
    <DownIcon {...props} style={{ transform: "rotate(180deg)" }} />
 )
 
-const styles: StylesProps = {
+const styles = sxStyles({
    paperRoot: {
       borderRadius: wishListBorderRadius,
       boxShadow: (theme) => theme.boxShadows.dark_12_13,
    },
    content: {
-      p: 2,
+      p: { xs: 1, md: 2 },
       minWidth: 200,
-      maxWidth: 500,
    },
-   header: {},
+   header: {
+      px: { xs: 2, md: 4 },
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+   },
+   actions: {
+      px: { xs: 2, md: 4 },
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+   },
    interestChip: {
       borderRadius: 1,
    },
-}
+   swipeableViews: {
+      height: "100%",
+   },
+   swipeableViewsContainer: {
+      height: "100%",
+      "& > *": {
+         height: "100%",
+      },
+   },
+})
 
 export type SortType = "dateAsc" | "dateDesc" | "upvotesAsc" | "upvotesDesc"
 
@@ -100,15 +120,15 @@ interface SelectProps {
    options: { value: SortType; label: string; descending: boolean }[]
 }
 
-const FilterMenu = ({
-   id,
-   open,
-   anchorEl,
-   handleClose,
-   filtersToShow,
-}: Props) => {
+type Props = {
+   open: boolean
+   handleClose: () => void
+}
+
+const FilterMenu = ({ open, handleClose }: Props) => {
    const { data: interests } = useInterests()
    const { pathname, push, query } = useRouter()
+   const { filtersToShow, numberOfResults } = useFilter()
 
    const mappedCompanySizesCodes = useMemo(
       (): OptionGroup[] =>
@@ -364,7 +384,7 @@ const FilterMenu = ({
    const renderSortBy = useCallback((): JSX.Element => {
       return (
          <div key="sort-select">
-            {selects.map((select, index) => (
+            {selects.map((select) => (
                <FormControl key={select.id} variant={"outlined"} fullWidth>
                   <Stack
                      direction={"row"}
@@ -381,16 +401,6 @@ const FilterMenu = ({
                      >
                         {select.label}
                      </Typography>
-                     {index === 0 && !!numberOfActiveFilters && (
-                        <Button
-                           onClick={handleClearQueries}
-                           variant={"text"}
-                           size={"small"}
-                           color={"secondary"}
-                        >
-                           Clear all ({numberOfActiveFilters})
-                        </Button>
-                     )}
                   </Stack>
 
                   <ResponsiveSelect
@@ -417,23 +427,16 @@ const FilterMenu = ({
             ))}
          </div>
       )
-   }, [handleClearQueries, numberOfActiveFilters, selects])
+   }, [selects])
 
    const renderLanguagesSelect = useCallback(() => {
       return (
-         <MultiListSelect
+         <MultiCheckboxSelect
             inputName={"languages"}
-            isCheckbox
             selectedItems={getSelectedLanguages()}
             allValues={languageOptionCodes}
             setFieldValue={handleChangeMultiSelect}
-            inputProps={{
-               placeholder: "Select languages",
-            }}
             getValueFn={multiListSelectMapValueFn}
-            chipProps={{
-               color: "primary",
-            }}
          />
       )
    }, [getSelectedLanguages, handleChangeMultiSelect])
@@ -556,7 +559,6 @@ const FilterMenu = ({
          let toShow: {
             title: string
             renderFn: () => JSX.Element
-            clearAllButton?: boolean
          }
 
          switch (filter) {
@@ -582,7 +584,6 @@ const FilterMenu = ({
                toShow = {
                   title: "Languages",
                   renderFn: renderLanguagesSelect,
-                  clearAllButton: true,
                }
                break
          }
@@ -607,23 +608,12 @@ const FilterMenu = ({
                   <Typography
                      htmlFor={`${toShow.title}-select`}
                      component={"label"}
-                     variant={"h6"}
+                     variant={"h5"}
+                     fontWeight={600}
                      id={`${toShow.title}-select-label`}
                   >
                      {toShow.title}
                   </Typography>
-
-                  {toShow.clearAllButton && !!numberOfActiveFilters ? (
-                     <Button
-                        onClick={handleClearQueries}
-                        variant={"text"}
-                        size={"small"}
-                        color={"secondary"}
-                        sx={{ p: 0 }}
-                     >
-                        Clear all
-                     </Button>
-                  ) : null}
                </Stack>
                <Box id={`${toShow.title}-select`} mt={1}>
                   {toShow.renderFn()}
@@ -632,8 +622,6 @@ const FilterMenu = ({
          )
       },
       [
-         handleClearQueries,
-         numberOfActiveFilters,
          renderCompanyCountrySelect,
          renderCompanyIndustrySelect,
          renderCompanySizeSelect,
@@ -641,9 +629,16 @@ const FilterMenu = ({
       ]
    )
 
+   const renderRecordedOnly = useCallback(() => {
+      return <div key={"cenas"}>Rendered Only filter</div>
+   }, [])
+
    const renderFilters = useCallback(
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
+            case FilterEnum.recordedOnly:
+               return renderRecordedOnly()
+
             case FilterEnum.interests:
                return renderInterests()
 
@@ -660,29 +655,72 @@ const FilterMenu = ({
                return renderAutoCompleteFilter(filter)
          }
       },
-      [renderAutoCompleteFilter, renderInterests, renderJobCheck, renderSortBy]
+      [
+         renderAutoCompleteFilter,
+         renderInterests,
+         renderJobCheck,
+         renderRecordedOnly,
+         renderSortBy,
+      ]
    )
+   const theme = useTheme()
 
    return (
-      <Popover
-         id={id}
+      <Dialog
          open={open}
-         anchorEl={anchorEl}
          onClose={handleClose}
-         anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
-         }}
-         transformOrigin={{
-            vertical: "top",
-            horizontal: "center",
-         }}
-         PaperProps={{ sx: styles.paperRoot }}
+         maxWidth={"md"}
+         fullWidth
+         TransitionComponent={Transition}
+         keepMounted={false} // Does not mount the children when dialog is closed
       >
-         <Stack sx={styles.content} spacing={2}>
-            {filtersToShow.map((filter) => renderFilters(filter))}
-         </Stack>
-      </Popover>
+         <DialogTitle sx={styles.header}>
+            <Typography fontWeight={600} fontSize={"24px"}>
+               Filters
+            </Typography>
+            <IconButton onClick={handleClose}>
+               <CloseIcon
+                  fontSize="large"
+                  color={"inherit"}
+                  sx={{ color: "text.primary" }}
+               />
+            </IconButton>
+         </DialogTitle>
+
+         <DialogContent sx={styles.content}>
+            <Stack sx={styles.content} spacing={2}>
+               {filtersToShow.map((filter) => renderFilters(filter))}
+            </Stack>
+         </DialogContent>
+
+         <DialogActions sx={styles.actions}>
+            <Button
+               onClick={handleClearQueries}
+               variant={"text"}
+               size={"small"}
+               sx={{
+                  color:
+                     numberOfActiveFilters > 0
+                        ? theme.palette.secondary.main
+                        : "text.secondary",
+               }}
+            >
+               Clear filters
+            </Button>
+            <LoadingButton
+               loading={numberOfActiveFilters > 0 && !numberOfResults}
+               color="primary"
+               variant={"contained"}
+               size={"small"}
+               onClick={handleClose}
+               sx={{ maxWidth: "120px", maxHeight: "40px" }}
+            >
+               {numberOfActiveFilters > 0
+                  ? `${numberOfResults} Results`
+                  : "All results"}
+            </LoadingButton>
+         </DialogActions>
+      </Dialog>
    )
 }
 
