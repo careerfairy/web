@@ -19,6 +19,10 @@
       {
          "name": "livestreamStartDate",
          "type": "timestamp"
+      },
+      {
+         "name": "viewersThroughCredits",
+         "type": "stringified_map"
       }
    ]
 }
