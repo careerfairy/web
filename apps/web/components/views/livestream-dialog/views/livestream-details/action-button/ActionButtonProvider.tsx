@@ -2,7 +2,7 @@ import React, { createContext, useContext, FC } from "react"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 export type ActionButtonContextType = {
-   onRegisterClick: () => void
+   onRegisterClick: (floating: boolean) => void
    livestreamPresenter: LivestreamPresenter
    userEmailFromServer: string
    isFloating?: boolean

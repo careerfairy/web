@@ -23,35 +23,20 @@ const ActionButton: FC<ActionButtonContextType> = (props) => {
 }
 
 const ButtonElement: FC = () => {
-   const {
-      onRegisterClick,
-      livestreamPresenter,
-      userEmailFromServer,
-      isFloating,
-      canWatchRecording,
-   } = useActionButtonContext()
+   const { livestreamPresenter, userEmailFromServer, canWatchRecording } =
+      useActionButtonContext()
 
    const { authenticatedUser, isLoggedIn, userData } = useAuth()
    const registered = livestreamPresenter.isUserRegistered(
       authenticatedUser.email
    )
+
    const registerButton = (
       label: string,
       options?: {
          toolTip?: string
       }
-   ) => (
-      <RegisterButton
-         onClick={onRegisterClick}
-         disabled={livestreamPresenter.isRegistrationDisabled(
-            authenticatedUser.email
-         )}
-         registered={registered}
-         label={label}
-         toolTip={options?.toolTip}
-         isFloating={isFloating}
-      />
-   )
+   ) => <RegisterButton label={label} toolTip={options?.toolTip} />
 
    if (livestreamPresenter.isPast()) {
       if (livestreamPresenter.denyRecordingAccess) {
@@ -66,14 +51,7 @@ const ButtonElement: FC = () => {
       // we know from the server side data the user is signed in
       // but we're still loading the user on the client side
       if (userEmailFromServer && (!isLoggedIn || !userData)) {
-         return (
-            <Skeleton
-               sx={[styles.btn]}
-               variant="text"
-               animation="wave"
-               height={60}
-            />
-         )
+         return <ActionButtonSkeleton />
       }
 
       if (!isLoggedIn) {
@@ -116,9 +94,14 @@ export const LinkText: FC<LinkTextProps> = ({
    onClick,
    isFloating,
 }) => {
+   const { forceDarkSubText } = useActionButtonContext()
+
    return (
       <Typography
-         sx={[styles.link, isFloating && styles.floatingLink]}
+         sx={[
+            styles.link,
+            (isFloating || forceDarkSubText) && styles.darkLinkColor,
+         ]}
          align="center"
       >
          <Link noLinkStyle onClick={onClick} scroll={false} href="#">
@@ -155,9 +138,8 @@ export const FloatingButtonWrapper: FC<FloatingButtonProps> = ({
 export const ActionButtonSkeleton = () => {
    return (
       <Skeleton
-         sx={styles.actionButtonSkeleton}
+         sx={[styles.actionButtonSkeleton, styles.btnWrapper]}
          variant="rectangular"
-         width="100%"
          height={56}
       />
    )

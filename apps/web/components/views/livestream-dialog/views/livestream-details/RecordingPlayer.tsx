@@ -81,8 +81,6 @@ const styles = sxStyles({
       },
    },
    videoSkeleton: {
-      // light grey transparent background
-
       backgroundColor: (theme) => alpha(theme.palette.common.white, 0.15),
       position: "absolute",
       inset: 0,

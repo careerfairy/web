@@ -1,29 +1,33 @@
-import React, { FC, useState } from "react"
+import React, { FC, useCallback, useState } from "react"
 import Box from "@mui/material/Box"
 import { Button, Tooltip } from "@mui/material"
 import styles from "./Styles"
 import CheckIcon from "@mui/icons-material/Check"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { FloatingButtonWrapper, LinkText } from "./ActionButton"
+import { useActionButtonContext } from "./ActionButtonProvider"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 
 type RegisterButtonProps = {
-   disabled: boolean
-   onClick: () => void
-   registered: boolean
    label: string
    toolTip?: string
-   isFloating?: boolean
 }
-const RegisterButton: FC<RegisterButtonProps> = ({
-   disabled,
-   onClick,
-   registered,
-   label,
-   toolTip,
-   isFloating,
-}) => {
+const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
+   const { authenticatedUser } = useAuth()
+   const { onRegisterClick, livestreamPresenter, isFloating } =
+      useActionButtonContext()
+
    // Must use controlled open state for Tooltip to work with disabled button
    const [open, setOpen] = useState(false)
+
+   const registered = livestreamPresenter.isUserRegistered(
+      authenticatedUser.email
+   )
+
+   const disabled = livestreamPresenter.isRegistrationDisabled(
+      authenticatedUser.email
+   )
+
    const buttonDisabled = disabled || registered
 
    const handleClose = () => {
@@ -33,6 +37,10 @@ const RegisterButton: FC<RegisterButtonProps> = ({
    const handleOpen = () => {
       toolTip && setOpen(true)
    }
+
+   const handleClick = useCallback(() => {
+      onRegisterClick(isFloating)
+   }, [onRegisterClick, isFloating])
 
    return (
       <FloatingButtonWrapper isFloating={isFloating}>
@@ -70,7 +78,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({
                   ) : null
                }
                disabled={buttonDisabled}
-               onClick={onClick}
+               onClick={handleClick}
                disableElevation
                data-testid="livestream-registration-button"
                size="large"
@@ -79,7 +87,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({
             </Button>
          </Box>
          {registered ? (
-            <LinkText isFloating={isFloating} onClick={onClick}>
+            <LinkText isFloating={isFloating} onClick={handleClick}>
                Cancel registration
             </LinkText>
          ) : null}

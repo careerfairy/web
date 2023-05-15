@@ -10,10 +10,7 @@ import LanguageIcon from "@mui/icons-material/Language"
 import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { sxStyles } from "../../../../../types/commonTypes"
 import Skeleton from "@mui/material/Skeleton"
-import { useFirestoreCollection } from "../../../../custom-hook/utils/useFirestoreCollection"
-import { collection, query, where } from "firebase/firestore"
-import { Interest } from "@careerfairy/shared-lib/interests"
-import { FirestoreInstance } from "../../../../../data/firebase/FirebaseInstance"
+import useInterestsByIds from "../../../../custom-hook/useInterestsByIds"
 
 const styles = sxStyles({
    tagsWrapper: {
@@ -41,6 +38,9 @@ const styles = sxStyles({
          px: 1,
          fontSize: "0.7rem",
       },
+   },
+   chipSkeleton: {
+      backgroundColor: "rgba(0, 0, 0, 0.11)",
    },
 })
 
@@ -71,9 +71,11 @@ const LivestreamTagsContainer: FC<LivestreamTagsContainerProps> = ({
                label={presenter.language.name}
             />
          ) : null}
-         <SuspenseWithBoundary fallback={<InterestSkeletons />}>
-            <InterestChips interestIds={presenter.interestsIds} />
-         </SuspenseWithBoundary>
+         {presenter.interestsIds.length > 0 ? (
+            <SuspenseWithBoundary fallback={<InterestSkeletons />}>
+               <InterestChips interestIds={presenter.interestsIds} />
+            </SuspenseWithBoundary>
+         ) : null}
       </Box>
    )
 }
@@ -127,38 +129,23 @@ const InterestChips: FC<InterestChipsProps> = ({ interestIds }) => {
    )
 }
 
-/**
- * Returns a collection of interests based on their IDs.
- * @param ids Array of interest IDs to be fetched (max 10).
- * @returns Firestore collection containing interests.
- * @remarks Firebase will throw an error with the "in" operator if the passed array is empty, which is why it defaults to ["-"] when no ids are passed.
- */
-const useInterestsByIds = (ids: string[]) => {
-   return useFirestoreCollection<Interest>(
-      query(
-         collection(FirestoreInstance, "interests"),
-         where("__name__", "in", ids?.length ? ids : ["-"])
-      )
-   )
-}
-
 const InterestSkeletons: FC = () => {
    return (
       <>
          <Skeleton
-            sx={styles.chip}
+            sx={[styles.chip, styles.chipSkeleton]}
             variant={"rectangular"}
             height={20}
             width={100}
          />
          <Skeleton
-            sx={styles.chip}
+            sx={[styles.chip, styles.chipSkeleton]}
             variant={"rectangular"}
             height={20}
             width={150}
          />
          <Skeleton
-            sx={styles.chip}
+            sx={[styles.chip, styles.chipSkeleton]}
             variant={"rectangular"}
             height={20}
             width={45}
