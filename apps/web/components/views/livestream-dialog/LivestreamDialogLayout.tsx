@@ -6,11 +6,19 @@ import SEO from "../../util/SEO"
 import { getStreamMetaInfo } from "../../../util/SeoUtil"
 import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
 import dynamic from "next/dynamic"
+import { UserStats } from "@careerfairy/shared-lib/users"
+import { useAuth } from "../../../HOCs/AuthProvider"
 
 const LivestreamDialog = dynamic(() => import("./LivestreamDialog"))
 
-type Props = {
+export type LiveStreamDialogData = {
    serverSideLivestream: { [p: string]: any } | null
+   serverSideUserStats: UserStats | null
+   serverSideUserEmail: string
+}
+
+type Props = {
+   livestreamDialogData?: LiveStreamDialogData
 }
 
 const validDialogPages = ["details", "register", "job-details"] as const
@@ -23,24 +31,29 @@ type DialogPage = typeof validDialogPages[number]
  *
  * @param {Props} props - The component's expected properties.
  * @param {ReactNode} props.children - The children to render.
- * @param {LivestreamEvent} props.serverSideLivestream - The livestream to show in the dialog.
+ * @param {Props["livestreamDialogData"]} props.livestreamDialogData - The data to populate the dialog with.
  */
 export const LivestreamDialogLayout: FC<Props> = ({
+   livestreamDialogData,
    children,
-   serverSideLivestream,
 }) => {
+   const { userStats } = useAuth()
    const { query, push, pathname } = useRouter()
    const { livestreamDialog } = query
 
    const [pathType, livestreamId, dialogPage] = livestreamDialog || []
 
+   const updatedStats = useMemo(() => {
+      return userStats ? userStats : livestreamDialogData?.serverSideUserStats
+   }, [livestreamDialogData?.serverSideUserStats, userStats])
+
    const serverLivestream = useMemo(() => {
-      if (!serverSideLivestream) return null
+      if (!livestreamDialogData?.serverSideLivestream) return null
       return LivestreamPresenter.parseDocument(
-         serverSideLivestream as any,
+         livestreamDialogData?.serverSideLivestream as any,
          fromDate
       )
-   }, [serverSideLivestream])
+   }, [livestreamDialogData?.serverSideLivestream])
 
    const dialogOpen = useMemo(
       () => Boolean(pathType === "livestream" && livestreamId),
@@ -75,25 +88,23 @@ export const LivestreamDialogLayout: FC<Props> = ({
    return (
       <>
          {children}
-         {dialogOpen ? (
-            <>
-               <LivestreamDialog
-                  open={dialogOpen}
-                  serverSideLivestream={serverLivestream}
-                  livestreamId={livestreamId}
-                  handleClose={handleClose}
-                  page={page}
-               />
-               {/* Set SEO tags for the page. */}
-               {serverLivestream ? (
-                  <SEO {...getStreamMetaInfo(serverLivestream)} />
-               ) : null}
+         <LivestreamDialog
+            open={dialogOpen}
+            updatedStats={updatedStats}
+            serverUserEmail={livestreamDialogData?.serverSideUserEmail}
+            serverSideLivestream={serverLivestream}
+            livestreamId={livestreamId}
+            handleClose={handleClose}
+            page={page}
+         />
+         {/* Set SEO tags for the page. */}
+         {serverLivestream ? (
+            <SEO {...getStreamMetaInfo(serverLivestream)} />
+         ) : null}
 
-               {/* Set schema tags for the event shown in the dialog. */}
-               {serverLivestream ? (
-                  <EventSEOSchemaScriptTag event={serverLivestream} />
-               ) : null}
-            </>
+         {/* Set schema tags for the event shown in the dialog. */}
+         {serverLivestream ? (
+            <EventSEOSchemaScriptTag event={serverLivestream} />
          ) : null}
       </>
    )

@@ -11,8 +11,8 @@ import {
 import { InferGetServerSidePropsType, NextPage } from "next"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
-const AllEventsPage: NextPage<Props> = ({ groupId, serverSideLivestream }) => (
-   <LivestreamDialogLayout serverSideLivestream={serverSideLivestream}>
+const AllEventsPage: NextPage<Props> = ({ groupId, livestreamDialogData }) => (
+   <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
       <GroupDashboardLayout
          pageDisplayName={"All Live Streams"}
          groupId={groupId}
@@ -30,7 +30,7 @@ export async function getServerSideProps(context) {
    return {
       props: {
          groupId,
-         serverSideLivestream: await getLivestreamDialogData(context),
+         livestreamDialogData: await getLivestreamDialogData(context),
       },
    }
 }
