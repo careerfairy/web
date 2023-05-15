@@ -36,7 +36,7 @@ const PortalPage = ({
    pastEvents,
    serializedCarouselContent,
    serverUserStats,
-   serverSideLivestream,
+   livestreamDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const { authenticatedUser, userData } = useAuth()
 
@@ -56,7 +56,7 @@ const PortalPage = ({
    }, [serializedCarouselContent])
 
    return (
-      <LivestreamDialogLayout serverSideLivestream={serverSideLivestream}>
+      <>
          <SEO
             id={"CareerFairy | Portal"}
             description={
@@ -69,35 +69,37 @@ const PortalPage = ({
             topBarFixed={carouselContent?.length > 0}
             headerScrollThreshold={carouselContent?.length ? 250 : 10}
          >
-            <>
-               <Box position="relative" mb={4}>
-                  <ContentCarousel
-                     content={carouselContent}
-                     serverUserStats={serverUserStats}
-                  />
-               </Box>
-               <Container disableGutters>
-                  <WidgetsWrapper>
-                     {hasInterests ? <RecommendedEvents limit={10} /> : null}
-                     <ComingUpNextEvents
-                        serverSideEvents={comingUpNext}
-                        limit={20}
+            <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
+               <>
+                  <Box position="relative" mb={4}>
+                     <ContentCarousel
+                        content={carouselContent}
+                        serverUserStats={serverUserStats}
                      />
-                     <MyNextEvents limit={20} />
-                     <EventsPreview
-                        id={"past-events"}
-                        title={"PAST EVENTS"}
-                        type={EventsTypes.pastEvents}
-                        events={events}
-                        seeMoreLink={"/next-livestreams?type=pastEvents"}
-                        // No need to show loading as these events have already been queried server side
-                        loading={false}
-                     />
-                  </WidgetsWrapper>
-               </Container>
-            </>
+                  </Box>
+                  <Container disableGutters>
+                     <WidgetsWrapper>
+                        {hasInterests ? <RecommendedEvents limit={10} /> : null}
+                        <ComingUpNextEvents
+                           serverSideEvents={comingUpNext}
+                           limit={20}
+                        />
+                        <MyNextEvents limit={20} />
+                        <EventsPreview
+                           id={"past-events"}
+                           title={"PAST EVENTS"}
+                           type={EventsTypes.pastEvents}
+                           events={events}
+                           seeMoreLink={"/next-livestreams?type=pastEvents"}
+                           // No need to show loading as these events have already been queried server side
+                           loading={false}
+                        />
+                     </WidgetsWrapper>
+                  </Container>
+               </>
+            </LivestreamDialogLayout>
          </GenericDashboardLayout>
-      </LivestreamDialogLayout>
+      </>
    )
 }
 
@@ -130,7 +132,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const [
       comingUpNextEvents,
       pastEvents,
-      serverSideLivestream,
+      livestreamDialogData,
       recordedEvents,
       userStats,
       userData,
@@ -170,7 +172,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
                LivestreamPresenter.serializeDocument
             ),
          }),
-         serverSideLivestream,
+         livestreamDialogData,
       },
    }
 }
