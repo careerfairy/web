@@ -19,6 +19,9 @@ const styles = sxStyles({
       width: "95%",
       mx: "auto !important",
    },
+   dividerSkeleton: {
+      borderColor: "rgba(0, 0, 0, 0.11)",
+   },
 
    // TimerText
    countDownWrapper: {
@@ -60,7 +63,10 @@ const CountDownTimer: FC<CountdownTimerProps> = ({ presenter }) => {
 
 export const CountdownTimerSkeleton = () => {
    return (
-      <Stack spacing={1} divider={<Divider sx={styles.divider} />}>
+      <Stack
+         spacing={1}
+         divider={<Divider sx={[styles.divider, styles.dividerSkeleton]} />}
+      >
          <Typography sx={styles.date} variant={"body1"} textAlign={"center"}>
             <Skeleton variant={"text"} />
          </Typography>

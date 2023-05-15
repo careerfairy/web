@@ -10,7 +10,9 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import { Dialog, DialogContent } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
-import LivestreamDetailsView from "./views/livestream-details/LivestreamDetailsView"
+import LivestreamDetailsView, {
+   LivestreamDetailsViewSkeleton,
+} from "./views/livestream-details/LivestreamDetailsView"
 import RegisterDataConsentView from "./views/data-consent/RegisterDataConsentView"
 import RegisterAskQuestionsView from "./views/ask-questions/RegisterAskQuestionsView"
 import RegisterJoinTalentPoolView from "./views/join-talent-pool/RegisterJoinTalentPoolView"
@@ -76,7 +78,12 @@ const views = [
 
 type ViewKey = typeof views[number]["key"]
 
-const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
+const LivestreamDialog: FC<Props> = ({
+   handleClose,
+   open,
+   livestreamId,
+   ...rest
+}) => {
    const isMobile = useIsMobile()
    const onClose = useCallback(() => {
       handleClose()
@@ -97,12 +104,23 @@ const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
             sx: styles.dialogPaper,
          }}
       >
-         <Content handleClose={onClose} {...rest} />
+         <DialogContent sx={styles.content}>
+            {livestreamId ? (
+               <Content
+                  handleClose={onClose}
+                  livestreamId={livestreamId}
+                  {...rest}
+               />
+            ) : (
+               <LivestreamDetailsViewSkeleton />
+            )}
+         </DialogContent>
       </Dialog>
    )
 }
 
 type ContentProps = Omit<Props, "open">
+
 const Content: FC<ContentProps> = ({
    handleClose,
    serverSideLivestream,
@@ -120,7 +138,7 @@ const Content: FC<ContentProps> = ({
       serverSideLivestream && livestreamId === serverSideLivestream.id
 
    const { data: livestream } = useLivestream(
-      livestreamId || "-",
+      livestreamId,
       hasInitialData ? serverSideLivestream : undefined
    )
 
@@ -168,28 +186,26 @@ const Content: FC<ContentProps> = ({
 
    return (
       <>
-         <DialogContent sx={styles.content}>
-            <DialogContext.Provider value={contextValue}>
-               <SwipeableViews
-                  style={styles.swipeableViews}
-                  containerStyle={styles.swipeableViewsContainer}
-                  disabled
-                  axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-                  index={value}
-               >
-                  {views.map(({ key, component: View }, index) => (
-                     <AnimatedTabPanel
-                        sx={styles.fullHeight}
-                        key={key}
-                        value={index}
-                        activeValue={value}
-                     >
-                        <View />
-                     </AnimatedTabPanel>
-                  ))}
-               </SwipeableViews>
-            </DialogContext.Provider>
-         </DialogContent>
+         <DialogContext.Provider value={contextValue}>
+            <SwipeableViews
+               style={styles.swipeableViews}
+               containerStyle={styles.swipeableViewsContainer}
+               disabled
+               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+               index={value}
+            >
+               {views.map(({ key, component: View }, index) => (
+                  <AnimatedTabPanel
+                     sx={styles.fullHeight}
+                     key={key}
+                     value={index}
+                     activeValue={value}
+                  >
+                     <View />
+                  </AnimatedTabPanel>
+               ))}
+            </SwipeableViews>
+         </DialogContext.Provider>
       </>
    )
 }

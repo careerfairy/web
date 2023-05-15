@@ -43,7 +43,7 @@ const styles = sxStyles({
    darkText: {
       color: "#464646",
    },
-   floatingLink: {
+   darkLinkColor: {
       "& a": {
          color: "#464646",
       },
@@ -69,7 +69,6 @@ const styles = sxStyles({
    btnWrapper: {
       width: "100%",
       maxWidth: 572,
-      // mt: "0px !important",
    },
    floatingBtnWrapper: {
       position: "fixed",

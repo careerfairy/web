@@ -51,73 +51,78 @@ const LivestreamDetailsView: FC = () => {
       updatedStats
    )
 
-   const handleRegisterClick = useCallback(async () => {
-      // Check if the user is already registered
-      try {
-         const isAlreadyRegistered = livestreamPresenter.isUserRegistered(
-            authenticatedUser.email || serverUserEmail
-         )
-
-         if (isAlreadyRegistered) {
-            await firebase.deregisterFromLivestream(livestream.id, userData)
-            recommendationServiceInstance.unRegisterEvent(
-               livestream.id,
-               userData.authId
-            )
-            dataLayerLivestreamEvent("event_registration_removed", livestream)
-         } else {
-            dataLayerLivestreamEvent(
-               `event_registration_started${
-                  isMobile ? "_from_footer_button" : ""
-               }`,
-               livestream
+   const handleRegisterClick = useCallback(
+      async (floating: boolean) => {
+         // Check if the user is already registered
+         try {
+            const isAlreadyRegistered = livestreamPresenter.isUserRegistered(
+               authenticatedUser.email || serverUserEmail
             )
 
-            if (isLoggedOut || !authenticatedUser?.emailVerified) {
+            if (isAlreadyRegistered) {
+               await firebase.deregisterFromLivestream(livestream.id, userData)
+               recommendationServiceInstance.unRegisterEvent(
+                  livestream.id,
+                  userData.authId
+               )
                dataLayerLivestreamEvent(
-                  "event_registration_started_login_required",
+                  "event_registration_removed",
                   livestream
                )
-               return push({
-                  pathname: `/login`,
-                  query: { absolutePath: asPath },
-               })
-            }
-
-            if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            } else {
                dataLayerLivestreamEvent(
-                  "event_registration_started_profile_incomplete",
+                  `event_registration_started${
+                     floating ? "_from_footer_button" : ""
+                  }`,
                   livestream
                )
-               return push({
-                  pathname: `/profile`,
-                  query: { absolutePath: asPath },
-               })
-            }
 
-            // Try to force show newsletter reminder
-            forceShowReminder(UserReminderType.NewsletterReminder)
-            goToView("register-data-consent")
+               if (isLoggedOut || !authenticatedUser?.emailVerified) {
+                  dataLayerLivestreamEvent(
+                     "event_registration_started_login_required",
+                     livestream
+                  )
+                  return push({
+                     pathname: `/login`,
+                     query: { absolutePath: asPath },
+                  })
+               }
+
+               if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+                  dataLayerLivestreamEvent(
+                     "event_registration_started_profile_incomplete",
+                     livestream
+                  )
+                  return push({
+                     pathname: `/profile`,
+                     query: { absolutePath: asPath },
+                  })
+               }
+
+               // Try to force show newsletter reminder
+               forceShowReminder(UserReminderType.NewsletterReminder)
+               goToView("register-data-consent")
+            }
+         } catch (e) {
+            errorNotification(e)
          }
-      } catch (e) {
-         errorNotification(e)
-      }
-   }, [
-      asPath,
-      authenticatedUser.email,
-      authenticatedUser?.emailVerified,
-      errorNotification,
-      firebase,
-      forceShowReminder,
-      goToView,
-      isMobile,
-      isLoggedOut,
-      livestream,
-      livestreamPresenter,
-      push,
-      serverUserEmail,
-      userData,
-   ])
+      },
+      [
+         asPath,
+         authenticatedUser.email,
+         authenticatedUser?.emailVerified,
+         errorNotification,
+         firebase,
+         forceShowReminder,
+         goToView,
+         isLoggedOut,
+         livestream,
+         livestreamPresenter,
+         push,
+         serverUserEmail,
+         userData,
+      ]
+   )
 
    if (!livestream) return <LivestreamDetailsViewSkeleton />
 
@@ -165,7 +170,7 @@ const LivestreamDetailsView: FC = () => {
    )
 }
 
-const LivestreamDetailsViewSkeleton = () => {
+export const LivestreamDetailsViewSkeleton = () => {
    return (
       <BaseDialogView
          heroContent={
@@ -189,7 +194,7 @@ const DummyMainContent: FC = () => {
       <MainContent>
          <Stack pt={2} spacing={2}>
             {/* For Demo Purposes */}
-            {Array.from({ length: 10 }).map((_, i) => (
+            {Array.from({ length: 15 }).map((_, i) => (
                <HostInfoSkeleton key={i} />
             ))}
          </Stack>
