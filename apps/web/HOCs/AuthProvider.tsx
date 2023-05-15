@@ -79,7 +79,7 @@ const securePaths = [
    "/new-livestream",
    "/group/create",
    "/next-livestreams/my-registrations",
-   "/past-livestreams/my-recordings",
+   "/past-livestreams/unlocked-content",
 ]
 
 const adminPaths = ["/group/create", "/new-livestream"]

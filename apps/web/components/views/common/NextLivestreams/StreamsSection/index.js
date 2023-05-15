@@ -53,6 +53,7 @@ export function StreamsSection({
                   isPastLivestreams
                   livestreams={pastLivestreams || []}
                   currentGroup={currentGroup}
+                  noResultsComponent={noResultsComponent}
                />
             ) : (
                <Box sx={styles.loaderWrapper}>

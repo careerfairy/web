@@ -12,6 +12,8 @@ import {
 } from "../../../layouts/GenericDashboardLayout/GenericNavList"
 import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import Link from "../../../components/views/common/Link"
+import useIsMobile from "../../../components/custom-hook/useIsMobile"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -24,6 +26,8 @@ const styles = sxStyles({
 const paths = [MyRegistrationsPath, NextLivestreamsPath]
 const MyRegistrations = () => {
    const { userData } = useAuth()
+   const isMobile = useIsMobile()
+
    const nowDate = useMemo(() => new Date(), [])
 
    const upcomingLivestreams = useListenToUpcomingStreams({
@@ -36,11 +40,13 @@ const MyRegistrations = () => {
          <Grid xs={12} mx={1} item>
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
-               Currently you don't have any upcoming events booked 😕
+               {isMobile ? "You" : "Currently you"} are not registered to any
+               live stream 😕 <br />
+               Check them out <Link href="/next-livestreams">here</Link>
             </Typography>
          </Grid>
       ),
-      []
+      [isMobile]
    )
 
    return (
