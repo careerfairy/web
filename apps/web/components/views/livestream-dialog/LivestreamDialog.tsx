@@ -185,28 +185,26 @@ const Content: FC<ContentProps> = ({
    )
 
    return (
-      <>
-         <DialogContext.Provider value={contextValue}>
-            <SwipeableViews
-               style={styles.swipeableViews}
-               containerStyle={styles.swipeableViewsContainer}
-               disabled
-               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-               index={value}
-            >
-               {views.map(({ key, component: View }, index) => (
-                  <AnimatedTabPanel
-                     sx={styles.fullHeight}
-                     key={key}
-                     value={index}
-                     activeValue={value}
-                  >
-                     <View />
-                  </AnimatedTabPanel>
-               ))}
-            </SwipeableViews>
-         </DialogContext.Provider>
-      </>
+      <DialogContext.Provider value={contextValue}>
+         <SwipeableViews
+            style={styles.swipeableViews}
+            containerStyle={styles.swipeableViewsContainer}
+            disabled
+            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+            index={value}
+         >
+            {views.map(({ key, component: View }, index) => (
+               <AnimatedTabPanel
+                  sx={styles.fullHeight}
+                  key={key}
+                  value={index}
+                  activeValue={value}
+               >
+                  <View />
+               </AnimatedTabPanel>
+            ))}
+         </SwipeableViews>
+      </DialogContext.Provider>
    )
 }
 
