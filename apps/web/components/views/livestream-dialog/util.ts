@@ -14,18 +14,19 @@ export const getLivestreamDialogData = async (
    try {
       const livestreamParams = (ctx.params.livestreamDialog as string[]) || []
       const token = getUserTokenFromCookie({ req: ctx.req })
+      const email = token?.email ?? null
 
       if (livestreamParams[0] === "livestream" && livestreamParams[1]) {
          const [stream, serverSideUserStats] = await Promise.all([
             getServerSideStream(livestreamParams[1]),
-            getServerSideUserStats(token.email),
+            getServerSideUserStats(email),
          ])
 
          return {
             serverSideLivestream: stream
                ? LivestreamPresenter.serializeDocument(stream)
                : null,
-            serverSideUserEmail: token?.email ?? null,
+            serverSideUserEmail: email,
             serverSideUserStats,
          }
       }

@@ -152,6 +152,27 @@ export class LivestreamPresenter extends BaseModel {
             )
       )
    }
+   isRegistrationDisabled(userEmail: string): boolean {
+      if (this.isPast()) return true
+      //User should always be able to cancel registration
+      if (this.isUserRegistered(userEmail)) return false
+      //Disable registration if max number of registrants is reached
+      if (this.maxRegistrants && this.maxRegistrants > 0) {
+         return this.registeredUsers
+            ? this.maxRegistrants <= this.registeredUsers.length
+            : false
+      }
+      return false
+   }
+
+   hasNoSpotsLeft(): boolean {
+      return Boolean(
+         this.maxRegistrants &&
+            this.maxRegistrants > 0 &&
+            this.registeredUsers &&
+            this.maxRegistrants <= this.registeredUsers.length
+      )
+   }
 
    recordingAccessTimeLeft(): Date {
       const streamDate = new Date(this.start)

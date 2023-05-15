@@ -34,6 +34,9 @@ const styles = sxStyles({
    swipeableViews: {
       height: "100%",
    },
+   slide: {
+      overflow: "overlay",
+   },
    swipeableViewsContainer: {
       height: "100%",
       "& > *": {
@@ -221,6 +224,7 @@ const Content: FC<ContentProps> = ({
          <SwipeableViews
             style={styles.swipeableViews}
             containerStyle={styles.swipeableViewsContainer}
+            slideStyle={styles.slide}
             disabled
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={value}
