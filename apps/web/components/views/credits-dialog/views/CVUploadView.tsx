@@ -110,7 +110,7 @@ const View = () => {
             const path = userPresenter.getResumePath()
             const url = await upload(file, path)
 
-            await userRepo.updateResume(userData.userEmail, url)
+            await userRepo.updateResume(userData?.userEmail, url)
             rewardService.userAction("USER_CV_UPLOAD").catch(errorLogAndNotify)
          } catch (error) {
             errorNotification("Error uploading CV")
@@ -128,7 +128,7 @@ const View = () => {
       [errorNotification]
    )
 
-   const cvUploaded = Boolean(userData.userResume)
+   const cvUploaded = Boolean(userData?.userResume)
 
    const isLoading = loading || uploading
 

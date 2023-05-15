@@ -467,8 +467,6 @@ const UpcomingLivestreamPage = ({
                streamPresenter={streamPresenter}
                eventInterests={eventInterests}
                streamAboutToStart={streamAboutToStart}
-               disabled={isRegistrationDisabled}
-               registered={registered}
                streamLanguage={streamLanguage}
                numberOfSpotsRemaining={numberOfSpotsRemaining}
                hosts={filteredGroups}
@@ -477,7 +475,7 @@ const UpcomingLivestreamPage = ({
                isPastEvent={isPastEvent}
                showRecording={showRecording}
                userHasBoughtRecording={userHasBoughtRecording}
-               userIsLoggedIn={Boolean(userEmail)}
+               userEmailFromServer={userEmail}
             />
             <Navigation
                aboutRef={aboutRef}

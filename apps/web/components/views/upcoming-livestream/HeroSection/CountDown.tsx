@@ -8,12 +8,10 @@ import {
    Grid,
    Hidden,
    IconButton,
-   Skeleton,
    Tooltip,
    Typography,
 } from "@mui/material"
 import DateUtil from "../../../../util/DateUtil"
-import CheckIcon from "@mui/icons-material/Check"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
 import { useRouter } from "next/router"
 import { AddToCalendar } from "../../common/AddToCalendar"
@@ -23,14 +21,8 @@ import { streamIsOld } from "../../../../util/CommonUtil"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { sxStyles } from "types/commonTypes"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { useAuth } from "HOCs/AuthProvider"
-import Link from "components/views/common/Link"
-import { rewardService } from "data/firebase/RewardService"
-import LoadingButton from "@mui/lab/LoadingButton"
-import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
-import CareerCoinIcon from "components/views/common/CareerCoinIcon"
-import { getBuyCostForAction } from "@careerfairy/shared-lib/rewards"
-import { useCreditsDialog } from "../../../../layouts/CreditsDialogLayout"
+import ActionButton from "../../livestream-dialog/views/livestream-details/action-button/ActionButton"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -112,30 +104,26 @@ const desktopSpacing = 2
 
 type CountDownProps = {
    time: string
-   disabled: boolean
    onRegisterClick: () => void
    stream: LivestreamEvent
+   streamPresenter: LivestreamPresenter
    streamAboutToStart: boolean
    isPastEvent: boolean
-   registered: boolean
-   userIsLoggedIn: boolean
+   userEmailFromServer: string
 }
 
 const CountDown = ({
    time,
-   disabled,
    onRegisterClick,
-   registered,
    stream,
    streamAboutToStart,
    isPastEvent,
-   userIsLoggedIn,
+   userEmailFromServer,
+   streamPresenter,
 }: CountDownProps) => {
    const {
       query: { livestreamId, groupId },
    } = useRouter()
-
-   const { authenticatedUser, userData, isLoggedIn } = useAuth()
 
    const event = useMemo(() => {
       const linkToStream = `https://careerfairy.io/upcoming-livestream/${livestreamId}${
@@ -157,75 +145,6 @@ const CountDown = ({
    const handleShareEventDialogClose = useCallback(() => {
       setShareEventDialog(null)
    }, [setShareEventDialog])
-
-   const registerComponent = useMemo(() => {
-      const registerButton = (label: string) => (
-         <RegisterButton
-            onRegisterClick={onRegisterClick}
-            disabled={disabled}
-            registered={registered}
-            label={label}
-         />
-      )
-
-      if (isPastEvent) {
-         if (stream.denyRecordingAccess) {
-            return registerButton(
-               registered
-                  ? "You attended this event"
-                  : "Recording Not Available"
-            )
-         }
-
-         // we know from the server side data the user is signed in
-         // but we're still loading the user on the client side
-         if (userIsLoggedIn && (!isLoggedIn || !userData)) {
-            return <Skeleton variant="text" animation="wave" height={60} />
-         }
-
-         if (!isLoggedIn) {
-            return <SignUpToWatchButton />
-         }
-
-         if (!userData?.credits) {
-            return <NotEnoughCreditsButton />
-         }
-
-         return <BuyRecordingButton livestreamId={stream.id} />
-      }
-
-      if (registered) {
-         return registerButton("You're booked")
-      }
-
-      if (
-         stream.maxRegistrants &&
-         stream.maxRegistrants > 0 &&
-         stream.registeredUsers &&
-         stream.maxRegistrants <= stream.registeredUsers.length
-      ) {
-         return registerButton("No spots left")
-      }
-
-      if (authenticatedUser) {
-         return registerButton("Attend Event")
-      }
-
-      return registerButton("Join to attend")
-   }, [
-      userData,
-      userIsLoggedIn,
-      isPastEvent,
-      registered,
-      stream.maxRegistrants,
-      stream.registeredUsers,
-      stream.denyRecordingAccess,
-      stream.id,
-      authenticatedUser,
-      onRegisterClick,
-      disabled,
-      isLoggedIn,
-   ])
 
    return (
       <>
@@ -267,7 +186,12 @@ const CountDown = ({
                <TimerText time={time} />
             </Grid>
             <Grid item xs={12}>
-               {registerComponent}
+               <ActionButton
+                  onRegisterClick={onRegisterClick}
+                  livestreamPresenter={streamPresenter}
+                  userEmailFromServer={userEmailFromServer}
+                  forceDarkSubText
+               />
             </Grid>
             <Hidden smUp>
                <Grid item xs={12}>
@@ -290,134 +214,6 @@ const CountDown = ({
             ""
          )}
       </>
-   )
-}
-
-const SignUpToWatchButton = () => {
-   const { asPath } = useRouter()
-
-   return (
-      <>
-         <Button
-            id="register-button"
-            color="primary"
-            sx={{ color: "text.primary", boxShadow: "none" }}
-            variant={"contained"}
-            fullWidth
-            href={`/signup?absolutePath=${asPath}`}
-            component={Link}
-            disableElevation
-            data-testid="livestream-registration-button"
-            size="large"
-         >
-            Sign Up to Watch
-         </Button>
-         <Typography sx={{ textAlign: "center", marginTop: 2 }}>
-            Already have an account?{" "}
-            <Link color="text.primary" href={`/login?absolutePath=${asPath}`}>
-               Log In
-            </Link>
-         </Typography>
-      </>
-   )
-}
-
-const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
-   const { userData } = useAuth()
-   const [isLoading, setIsLoading] = useState(false)
-   const { errorNotification } = useSnackbarNotifications()
-
-   const handleClick = () => {
-      setIsLoading(true)
-      rewardService
-         .buyRecordingAccess(livestreamId)
-         .catch(errorNotification)
-         .finally(() => setIsLoading(false))
-   }
-
-   return (
-      <>
-         <LoadingButton
-            id="register-button"
-            color="primary"
-            sx={{ color: "info.main", boxShadow: "none" }}
-            variant={"contained"}
-            fullWidth
-            onClick={handleClick}
-            disableElevation
-            loading={isLoading}
-            data-testid="livestream-registration-button"
-            size="large"
-            endIcon={isLoading ? undefined : <CareerCoinIcon />}
-         >
-            Unlock with &nbsp;{" "}
-            {getBuyCostForAction("LIVESTREAM_RECORDING_BOUGHT")}
-         </LoadingButton>
-         <Typography
-            sx={{
-               textAlign: "center",
-               marginTop: 2,
-               display: "flex",
-               justifyContent: "center",
-            }}
-         >
-            You have {userData.credits} <CareerCoinIcon /> Left
-         </Typography>
-      </>
-   )
-}
-
-const NotEnoughCreditsButton = () => {
-   const { handleOpenCreditsDialog } = useCreditsDialog()
-   const handleClick = (e: React.SyntheticEvent) => {
-      e.preventDefault()
-
-      handleOpenCreditsDialog()
-   }
-
-   return (
-      <>
-         <Button
-            id="register-button"
-            color="black"
-            // sx={{ color: "text.primary" }}
-            sx={{ boxShadow: "none" }}
-            variant={"contained"}
-            fullWidth
-            onClick={handleClick}
-            disableElevation
-            data-testid="livestream-registration-button"
-            size="large"
-            endIcon={<CareerCoinIcon />}
-         >
-            Not Enough CareerCoins
-         </Button>
-         <Typography sx={{ textAlign: "center", marginTop: 2 }}>
-            <Link sx={{ color: "text.primary" }} onClick={handleClick} href="#">
-               Get more CareerCoins
-            </Link>
-         </Typography>
-      </>
-   )
-}
-
-const RegisterButton = ({ disabled, onRegisterClick, registered, label }) => {
-   return (
-      <Button
-         id="register-button"
-         color={registered ? "secondary" : "primary"}
-         variant={"contained"}
-         sx={{ boxShadow: "none", color: "text.primary" }}
-         fullWidth
-         startIcon={registered ? <CheckIcon /> : null}
-         disabled={disabled || registered}
-         onClick={onRegisterClick}
-         disableElevation
-         data-testid="livestream-registration-button"
-         size="large"
-      >
-         {label}
-      </Button>
    )
 }
 

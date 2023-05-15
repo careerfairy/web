@@ -10,6 +10,7 @@ import * as actions from "./index"
 import CallToActionSnackbar from "../../components/views/streaming/sharedComponents/StreamNotifications/CallToActionSnackbar"
 import React from "react"
 import * as Sentry from "@sentry/nextjs"
+import CustomNotification from "../../components/views/notifications/CustomNotification"
 
 /**
  * Enqueue a snackbar managed in redux state.
@@ -78,7 +79,7 @@ export const sendGeneralError =
    }
 
 export const sendSuccessMessage =
-   (message = "Success") =>
+   (message = "Success", title) =>
    async (dispatch) => {
       dispatch(
          enqueueSnackbar({
@@ -87,6 +88,14 @@ export const sendSuccessMessage =
                variant: "success",
                preventDuplicate: true,
                key: message,
+               content: (key, message) => (
+                  <CustomNotification
+                     title={title}
+                     variant="success"
+                     id={key}
+                     message={message}
+                  />
+               ),
             },
          })
       )

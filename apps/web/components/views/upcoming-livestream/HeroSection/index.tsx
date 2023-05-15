@@ -190,8 +190,6 @@ const styles = {
 const HeroSection = ({
    backgroundImage,
    onRegisterClick,
-   disabled,
-   registered,
    stream,
    streamPresenter,
    hosts,
@@ -203,7 +201,7 @@ const HeroSection = ({
    isPastEvent,
    showRecording = false,
    userHasBoughtRecording = false,
-   userIsLoggedIn = false,
+   userEmailFromServer,
 }) => {
    const theme = useTheme()
    const isMobile = useIsMobile()
@@ -338,10 +336,9 @@ const HeroSection = ({
                         stream={stream}
                         streamAboutToStart={streamAboutToStart}
                         onRegisterClick={onRegisterClick}
-                        disabled={disabled}
-                        registered={registered}
                         isPastEvent={isPastEvent}
-                        userIsLoggedIn={userIsLoggedIn}
+                        userEmailFromServer={userEmailFromServer}
+                        streamPresenter={streamPresenter}
                      />
                      {stream?.jobs?.length > 0 && (
                         <EnsureUserIsLoggedIn>
@@ -361,13 +358,13 @@ const HeroSection = ({
          </Grid>
       ),
       [
-         isPastEvent,
-         disabled,
-         hosts,
-         onRegisterClick,
-         registered,
          stream,
          streamAboutToStart,
+         onRegisterClick,
+         isPastEvent,
+         userEmailFromServer,
+         streamPresenter,
+         hosts,
       ]
    )
 
