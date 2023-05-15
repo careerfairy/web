@@ -11,7 +11,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
 
       this.buttonEventOver = this.exactText("The event is over")
       this.buttonPastEventNoLogin = this.exactText("Sign Up to Watch")
-      this.buttonAlreadyBooked = this.text("You're booked")
+      this.buttonAlreadyBooked = this.text("You're registered")
    }
 
    /**
