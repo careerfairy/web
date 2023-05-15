@@ -39,6 +39,7 @@ const styles = sxStyles({
 })
 
 const filtersToShow = [
+   FilterEnum.recordedOnly,
    FilterEnum.languages,
    FilterEnum.interests,
    FilterEnum.companyCountries,
@@ -175,7 +176,14 @@ const NextLiveStreamsWithFilter = ({
                </Card>
                {hasPastEvents ? null : (
                   <Box sx={styles.filter}>
-                     <Filter filtersToShow={filtersToShow} />
+                     <Filter
+                        filtersToShow={filtersToShow}
+                        numberOfResults={
+                           initialTabValue === "upcomingEvents"
+                              ? upcomingLivestreams?.length
+                              : pastLivestreams?.length
+                        }
+                     />
                   </Box>
                )}
             </Box>
