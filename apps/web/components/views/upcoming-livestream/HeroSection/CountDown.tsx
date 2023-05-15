@@ -25,14 +25,12 @@ import { sxStyles } from "types/commonTypes"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import { useAuth } from "HOCs/AuthProvider"
 import Link from "components/views/common/Link"
-import LockOpenIcon from "@mui/icons-material/LockOpen"
-import { maybePluralize } from "components/helperFunctions/HelperFunctions"
 import { rewardService } from "data/firebase/RewardService"
 import LoadingButton from "@mui/lab/LoadingButton"
 import useSnackbarNotifications from "components/custom-hook/useSnackbarNotifications"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
-import { useUpcomingLayout } from "layouts/UpcomingLayout"
 import { getBuyCostForAction } from "@careerfairy/shared-lib/rewards"
+import { useCreditsDialog } from "../../../../layouts/CreditsDialogLayout"
 
 const styles = sxStyles({
    countDownWrapper: {
@@ -370,7 +368,7 @@ const BuyRecordingButton = ({ livestreamId }: { livestreamId: string }) => {
 }
 
 const NotEnoughCreditsButton = () => {
-   const { handleOpenCreditsDialog } = useUpcomingLayout()
+   const { handleOpenCreditsDialog } = useCreditsDialog()
    const handleClick = (e: React.SyntheticEvent) => {
       e.preventDefault()
 
