@@ -6,6 +6,8 @@ import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
 import { setCORSHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { DateTime } from "luxon"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)
@@ -23,10 +25,16 @@ export const getLivestreamICalendarEvent = functions
                .get()
 
             if (querySnapshot.exists) {
-               const livestream = querySnapshot.data()
+               const livestream = querySnapshot.data() as LivestreamEvent
+
+               const livestreamTimeZone = livestream.timezone || "Europe/Zurich"
 
                // create calendar event
-               const livestreamStartDate = livestream.start.toDate()
+               const livestreamStartDate = DateTime.fromJSDate(
+                  livestream.start.toDate(),
+                  { zone: livestreamTimeZone }
+               )
+
                const linkWithUTM = addUtmTagsToLink({
                   link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
                   campaign: "fromCalendarEvent",
@@ -35,11 +43,10 @@ export const getLivestreamICalendarEvent = functions
                const cal = ical({
                   events: [
                      {
-                        start: livestreamStartDate.toISOString(),
-                        end: new Date(
-                           livestreamStartDate.getTime() +
-                              (livestream.duration || 45) * 60 * 1000
-                        ).toISOString(),
+                        start: livestreamStartDate,
+                        end: livestreamStartDate.plus({
+                           minutes: livestream.duration || 45,
+                        }),
                         location: `${linkWithUTM}`,
                         summary: livestream.title,
                         description: "Join the event now!",
@@ -48,6 +55,7 @@ export const getLivestreamICalendarEvent = functions
                            email: "noreply@careerfairy.io",
                         },
                         url: linkWithUTM,
+                        timezone: livestreamTimeZone,
                      },
                   ],
                })
@@ -88,8 +96,8 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
                content: data.livestream_title,
             }),
             calendar_event_i_calendar: isLocalEnvironment()
-               ? `http://localhost:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_eu?eventId=${data.livestream_id}`
-               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_eu?eventId=${data.livestream_id}`,
+               ? `http://localhost:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_eu_v2?eventId=${data.livestream_id}`
+               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_eu_v2?eventId=${data.livestream_id}`,
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,
