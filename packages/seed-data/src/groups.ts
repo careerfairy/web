@@ -3,40 +3,51 @@ import {
    GROUP_DASHBOARD_ROLE,
 } from "@careerfairy/shared-lib/dist/groups"
 import { faker } from "@faker-js/faker"
-import { auth, firestore } from "./lib/firebase"
+import { auth, fieldValue, firestore } from "./lib/firebase"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { generateId } from "./utils/utils"
 import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
-import { AdminGroupsClaim } from "@careerfairy/shared-lib/dist/users"
+import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   FirebaseGroupRepository,
+   IGroupRepository,
+} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
 
    addGroupAdmin(
-      authId: string,
-      groupId: string,
+      user: UserData,
+      group: Group,
       role?: GROUP_DASHBOARD_ROLE
    ): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
+   private groupRepo: IGroupRepository
+
+   constructor() {
+      this.groupRepo = new FirebaseGroupRepository(firestore as any, fieldValue)
+   }
    /**
     * Create custom admin claims for a user
     */
    async addGroupAdmin(
-      authId: string,
-      groupId: string,
+      user: UserData,
+      group: Group,
       role: GROUP_DASHBOARD_ROLE = GROUP_DASHBOARD_ROLE.MEMBER
    ) {
       const claim: AdminGroupsClaim = {
-         [groupId]: {
+         [group.groupId]: {
             role,
          },
       }
 
-      await auth.setCustomUserClaims(authId, {
+      await auth.setCustomUserClaims(user.authId, {
          adminGroups: claim,
       })
+
+      await this.groupRepo.setGroupAdminRoleInFirestore(group, user, role)
    }
 
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {

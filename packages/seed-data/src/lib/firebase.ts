@@ -1,6 +1,6 @@
 import { App, initializeApp } from "firebase-admin/app"
 import { Auth, getAuth } from "firebase-admin/auth"
-import { Firestore, getFirestore } from "firebase-admin/firestore"
+import { Firestore, getFirestore, FieldValue } from "firebase-admin/firestore"
 
 export const projectId = "careerfairy-e1fd9"
 
@@ -17,3 +17,4 @@ const app: App = initializeApp({ projectId })
 
 export const auth: Auth = getAuth(app)
 export const firestore: Firestore = getFirestore(app)
+export const fieldValue = FieldValue
