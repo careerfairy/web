@@ -96,8 +96,8 @@ export const sendLivestreamRegistrationConfirmationEmail = functions
                content: data.livestream_title,
             }),
             calendar_event_i_calendar: isLocalEnvironment()
-               ? `http://localhost:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent?eventId=${data.livestream_id}`
-               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent?eventId=${data.livestream_id}`,
+               ? `http://localhost:5001/careerfairy-e1fd9/europe-west1/getLivestreamICalendarEvent_v2?eventId=${data.livestream_id}`
+               : `https://europe-west1-careerfairy-e1fd9.cloudfunctions.net/getLivestreamICalendarEvent_v2?eventId=${data.livestream_id}`,
             calendar_event_google: data.eventCalendarUrls.google,
             calendar_event_outlook: data.eventCalendarUrls.outlook,
             calendar_event_yahoo: data.eventCalendarUrls.yahoo,
