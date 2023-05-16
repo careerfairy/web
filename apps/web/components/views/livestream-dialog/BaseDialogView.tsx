@@ -93,7 +93,7 @@ const BaseDialogView: Props = ({
    handleBack,
 }) => {
    return (
-      <Stack sx={styles.root}>
+      <Stack spacing={4.75} sx={styles.root}>
          {heroContent}
          {mainContent}
          {handleClose ? (
