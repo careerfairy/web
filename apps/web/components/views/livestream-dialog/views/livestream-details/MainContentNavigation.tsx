@@ -1,28 +1,27 @@
-import {
-   FC,
-   ReactNode,
-   SyntheticEvent,
-   useEffect,
-   useMemo,
-   useRef,
-   useState,
-} from "react"
+import * as React from "react"
+import { FC, ReactNode, useEffect, useMemo, useState } from "react"
 import { useInView } from "react-intersection-observer"
 import Box from "@mui/material/Box"
 import Tabs from "@mui/material/Tabs"
 import Tab from "@mui/material/Tab"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { useDebounce } from "react-use"
-import debounce from "lodash.debounce"
 
 const styles = sxStyles({
    tabs: {
       position: "sticky",
       top: 0,
       zIndex: 1,
-      width: "100%",
+      "& .MuiTabs-scroller": {
+         bgcolor: "background.paper",
+         borderBottom: "1px solid #F0F0F0",
+      },
    },
    root: {},
+   tab: {
+      fontSize: "1rem",
+      fontWeight: 600,
+      color: "#000",
+   },
 })
 
 type InViewRef = ReturnType<typeof useInView>["0"]
@@ -36,90 +35,108 @@ type Props = {
    }) => ReactNode
 }
 
+type TabElement = {
+   value: string
+   label: string
+   entry: IntersectionObserverEntry
+   inView?: boolean
+}
+
 const MainContentNavigation: FC<Props> = ({ children }) => {
    const [value, setValue] = useState("jobs")
-   const [jobsRef, jobsInView, jobSection] = useInView({})
+   const [jobsRef, jobsInView, jobSection] = useInView()
    const [aboutLivestreamRef, aboutLivestreamsInView, aboutLivestreamSection] =
       useInView()
    const [aboutCompanyRef, aboutCompanyInView, aboutCompanySection] =
       useInView()
    const [questionsRef, questionsInView, questionsSection] = useInView()
-   console.log(
-      "=>(MainContentNavigation.tsx:44) questionsSection",
-      questionsSection
-   )
 
-   const tabClickRef = useRef(null) // create the ref
+   const tabs = useMemo<TabElement[]>(() => {
+      const newTabs: TabElement[] = []
 
-   // useEffect(() => {
-   //    if (!tabClickRef?.current) {
-   //       // check if the Tab was not clicked
-   //       let sectionRef: InViewRef | undefined
-   //
-   //       switch (value) {
-   //          case "jobs":
-   //             sectionRef = jobsRef
-   //             break
-   //          case "aboutLivestream":
-   //             sectionRef = aboutLivestreamRef
-   //             break
-   //          case "aboutCompany":
-   //             sectionRef = aboutCompanyRef
-   //             break
-   //          case "questions":
-   //             sectionRef = questionsRef
-   //             break
-   //          default:
-   //             break
-   //       }
-   //
-   //       if (sectionRef && sectionRef.current && !sectionRef.inView) {
-   //          sectionRef.current.scrollIntoView(scrollOptions)
-   //       }
-   //    }
-   //
-   //    tabClickRef.current = false
-   // }, [
-   //    value,
-   //    jobsInView,
-   //    aboutLivestreamsInView,
-   //    aboutCompanyInView,
-   //    questionsInView,
-   // ])
-
-   const handleChange2 = (_, newValue: string) => {
-      console.log("=>(MainContentNavigation.tsx:37) newValue", newValue)
-      setValue(newValue)
-
-      switch (newValue) {
-         case "jobs":
-            // scrollToElement(jobSection.target)
-            jobSection?.target.scrollIntoView(scrollOptions)
-            break
-         case "aboutLivestream":
-            // scrollToElement(aboutLivestreamSection.target)
-            aboutLivestreamSection?.target.scrollIntoView(scrollOptions)
-            break
-         case "aboutCompany":
-            scrollToElement(aboutCompanySection.target)
-            // aboutCompanySection?.target.scrollIntoView(scrollOptions)
-            break
-         case "questions":
-            scrollToElement(questionsSection.target)
-            // questionsSection.target.scrollIntoView(scrollOptions)
-            break
-         default:
-            break
+      if (jobSection) {
+         newTabs.push({
+            value: "jobs",
+            label: "Linked Jobs",
+            entry: jobSection,
+            inView: jobsInView,
+         })
       }
 
-      tabClickRef.current = true // set the variable to true when a Tab is clicked
+      if (aboutLivestreamSection) {
+         newTabs.push({
+            value: "aboutLivestream",
+            label: "About The Livestream",
+            entry: aboutLivestreamSection,
+            inView: aboutLivestreamsInView,
+         })
+      }
+
+      if (aboutCompanySection) {
+         newTabs.push({
+            value: "aboutCompany",
+            label: "About The Company",
+            entry: aboutCompanySection,
+            inView: aboutCompanyInView,
+         })
+      }
+
+      if (questionsSection) {
+         newTabs.push({
+            value: "questions",
+            label: "Questions",
+            entry: questionsSection,
+            inView: questionsInView,
+         })
+      }
+
+      return newTabs
+   }, [
+      jobSection,
+      aboutLivestreamSection,
+      aboutCompanySection,
+      questionsSection,
+      jobsInView,
+      aboutLivestreamsInView,
+      aboutCompanyInView,
+      questionsInView,
+   ])
+
+   // Create a mapping from tab values to section objects
+   const sectionRefs = useMemo(
+      () => ({
+         jobs: jobSection,
+         aboutLivestream: aboutLivestreamSection,
+         aboutCompany: aboutCompanySection,
+         questions: questionsSection,
+      }),
+      [
+         jobSection,
+         aboutLivestreamSection,
+         aboutCompanySection,
+         questionsSection,
+      ]
+   )
+
+   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
+      setValue(newValue)
+
+      // Scroll to the selected section
+      sectionRefs[newValue]?.target.scrollIntoView({
+         behavior: "auto",
+      })
    }
 
-   const handleChange = debounce((event, newValue) => {
-      setValue(newValue)
-   }, 700)
-
-   useEffect(() => {}, [value])
+   // Listen for changes in which section is in view, and update the tab value accordingly
+   useEffect(() => {
+      console.count("MainContentNavigation useEffect")
+      for (const tab of tabs) {
+         if (tab.inView) {
+            setValue(tab.value)
+            break
+         }
+      }
+   }, [tabs])
 
    return (
       <Box sx={styles.root}>
@@ -129,17 +146,19 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
             aria-label="content navigation tabs"
             sx={styles.tabs}
             centered
+            textColor="secondary"
+            indicatorColor="secondary"
          >
-            {jobSection ? <Tab value="jobs" label="Jobs" /> : null}
-            {aboutLivestreamSection ? (
-               <Tab value="aboutLivestream" label="About Livestream" />
-            ) : null}
-            {aboutCompanySection ? (
-               <Tab value="aboutCompany" label="About Company" />
-            ) : null}
-            {questionsSection ? (
-               <Tab value="questions" label="Questions" />
-            ) : null}
+            {tabs.map((tab) => (
+               <Tab
+                  sx={styles.tab}
+                  key={tab.value}
+                  value={tab.value}
+                  label={tab.label}
+                  id={`content-navigation-tab-${tab.value}`}
+                  aria-controls={`content-navigation-tabpanel-${tab.value}`}
+               />
+            ))}
          </Tabs>
          {children({
             jobsRef,
@@ -149,28 +168,6 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
          })}
       </Box>
    )
-}
-
-const tabsHeight = 48
-
-const scrollOptions: ScrollIntoViewOptions = {
-   behavior: "smooth",
-   block: "start",
-   inline: "nearest",
-   // Subtract the tabsHeight from the top offset
-   // to account for the height of the tabs
-}
-
-const scrollToElement = (element: Element | null) => {
-   if (element) {
-      const rect = element.getBoundingClientRect()
-      const top = rect.top + window.scrollY - tabsHeight
-
-      window.scrollTo({
-         top,
-         behavior: "auto",
-      })
-   }
 }
 
 export default MainContentNavigation
