@@ -104,7 +104,7 @@ exports.manualNewsletter = newsletter.manualNewsletter
 // Livestreams
 exports.setFirstCommentOfQuestionOnCreate =
    livestreams.setFirstCommentOfQuestionOnCreate
-exports.sendLivestreamRegistrationConfirmationEmail_eu_v2 =
+exports.sendLivestreamRegistrationConfirmationEmail_v2 =
    livestreams.sendLivestreamRegistrationConfirmationEmail
 exports.sendPhysicalEventRegistrationConfirmationEmail_eu =
    livestreams.sendPhysicalEventRegistrationConfirmationEmail
@@ -114,8 +114,7 @@ exports.notifySlackWhenALivestreamStarts =
    livestreams.notifySlackWhenALivestreamStarts
 exports.notifySlackWhenALivestreamIsCreated =
    livestreams.notifySlackWhenALivestreamIsCreated
-exports.getLivestreamICalendarEvent_eu_v2 =
-   livestreams.getLivestreamICalendarEvent
+exports.getLivestreamICalendarEvent_eu = livestreams.getLivestreamICalendarEvent
 
 // Postmark webhooks
 exports.postmarkWebhook = postmark.postmarkWebhook
