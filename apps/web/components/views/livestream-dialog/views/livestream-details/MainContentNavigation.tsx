@@ -1,6 +1,6 @@
 import * as React from "react"
 import { FC, ReactNode, useEffect, useMemo, useState } from "react"
-import { useInView } from "react-intersection-observer"
+import { IntersectionOptions, useInView } from "react-intersection-observer"
 import Box from "@mui/material/Box"
 import Tabs from "@mui/material/Tabs"
 import Tab from "@mui/material/Tab"
@@ -11,10 +11,8 @@ const styles = sxStyles({
       position: "sticky",
       top: 0,
       zIndex: 1,
-      "& .MuiTabs-scroller": {
-         bgcolor: "background.paper",
-         borderBottom: "1px solid #F0F0F0",
-      },
+      bgcolor: "background.paper",
+      borderBottom: "1px solid #F0F0F0",
    },
    root: {},
    tab: {
@@ -27,6 +25,7 @@ const styles = sxStyles({
 type InViewRef = ReturnType<typeof useInView>["0"]
 
 type Props = {
+   hasJobs: boolean
    children: (params: {
       jobsRef: InViewRef
       aboutLivestreamRef: InViewRef
@@ -38,18 +37,21 @@ type Props = {
 type TabElement = {
    value: string
    label: string
-   entry: IntersectionObserverEntry
-   inView?: boolean
+   inView: boolean
 }
 
-const MainContentNavigation: FC<Props> = ({ children }) => {
-   const [value, setValue] = useState("jobs")
-   const [jobsRef, jobsInView, jobSection] = useInView()
+const options: IntersectionOptions = {
+   threshold: 0.8,
+}
+
+const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
+   const [value, setValue] = useState(hasJobs ? "jobs" : "aboutLivestream")
+   const [jobsRef, jobsInView, jobSection] = useInView(options)
    const [aboutLivestreamRef, aboutLivestreamsInView, aboutLivestreamSection] =
-      useInView()
+      useInView(options)
    const [aboutCompanyRef, aboutCompanyInView, aboutCompanySection] =
-      useInView()
-   const [questionsRef, questionsInView, questionsSection] = useInView()
+      useInView(options)
+   const [questionsRef, questionsInView, questionsSection] = useInView(options)
 
    const tabs = useMemo<TabElement[]>(() => {
       const newTabs: TabElement[] = []
@@ -58,7 +60,6 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
          newTabs.push({
             value: "jobs",
             label: "Linked Jobs",
-            entry: jobSection,
             inView: jobsInView,
          })
       }
@@ -67,7 +68,6 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
          newTabs.push({
             value: "aboutLivestream",
             label: "About The Livestream",
-            entry: aboutLivestreamSection,
             inView: aboutLivestreamsInView,
          })
       }
@@ -76,7 +76,6 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
          newTabs.push({
             value: "aboutCompany",
             label: "About The Company",
-            entry: aboutCompanySection,
             inView: aboutCompanyInView,
          })
       }
@@ -85,7 +84,6 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
          newTabs.push({
             value: "questions",
             label: "Questions",
-            entry: questionsSection,
             inView: questionsInView,
          })
       }
@@ -121,22 +119,19 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
    const handleChange = (event: React.SyntheticEvent, newValue: string) => {
       setValue(newValue)
 
-      // Scroll to the selected section
       sectionRefs[newValue]?.target.scrollIntoView({
-         behavior: "auto",
+         behavior: "auto", // behavior: "smooth" does not work inside a dialog
       })
    }
 
-   // Listen for changes in which section is in view, and update the tab value accordingly
+   // Listen for changes in which section is in view as we scroll, and update the tab value accordingly
    useEffect(() => {
-      console.count("MainContentNavigation useEffect")
       for (const tab of tabs) {
          if (tab.inView) {
             setValue(tab.value)
-            break
          }
       }
-   }, [tabs])
+   }, [tabs, sectionRefs, value])
 
    return (
       <Box sx={styles.root}>
@@ -145,12 +140,15 @@ const MainContentNavigation: FC<Props> = ({ children }) => {
             onChange={handleChange}
             aria-label="content navigation tabs"
             sx={styles.tabs}
-            centered
             textColor="secondary"
             indicatorColor="secondary"
+            scrollButtons
+            allowScrollButtonsMobile
+            centered
          >
             {tabs.map((tab) => (
                <Tab
+                  onClick={() => handleChange(null, tab.value)}
                   sx={styles.tab}
                   key={tab.value}
                   value={tab.value}

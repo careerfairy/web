@@ -29,7 +29,7 @@ import AboutCompany from "./main-content/AboutCompany"
 import AboutLivestream from "./main-content/AboutLivestream"
 import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
-import NavBarOffsetElement from "./main-content/NavBarOffsetElement"
+import Section from "./main-content/Section"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -171,27 +171,32 @@ const LivestreamDetailsView: FC = () => {
          }
          mainContent={
             <MainContent>
-               <MainContentNavigation>
+               <MainContentNavigation hasJobs={livestream.jobs?.length > 0}>
                   {({
                      jobsRef,
                      aboutLivestreamRef,
                      aboutCompanyRef,
                      questionsRef,
                   }) => (
-                     <Stack>
-                        <NavBarOffsetElement ref={jobsRef}>
-                           <Jobs />
-                        </NavBarOffsetElement>
-                        <Speakers speakers={livestream.speakers} />
-                        <NavBarOffsetElement ref={aboutLivestreamRef}>
-                           <AboutLivestream />
-                        </NavBarOffsetElement>
-                        <NavBarOffsetElement ref={aboutCompanyRef}>
+                     <Stack px={2}>
+                        {livestream.jobs?.length > 0 ? (
+                           <Section navOffset={44} ref={jobsRef}>
+                              <Jobs />
+                           </Section>
+                        ) : null}
+                        <Section ref={aboutLivestreamRef}>
+                           {/* Speakers are part of the about live stream section */}
+                           <Speakers speakers={livestream.speakers} />
+                           <Section>
+                              <AboutLivestream />
+                           </Section>
+                        </Section>
+                        <Section ref={aboutCompanyRef}>
                            <AboutCompany />
-                        </NavBarOffsetElement>
-                        <NavBarOffsetElement ref={questionsRef}>
+                        </Section>
+                        <Section ref={questionsRef}>
                            <Questions />
-                        </NavBarOffsetElement>
+                        </Section>
                      </Stack>
                   )}
                </MainContentNavigation>
@@ -203,7 +208,7 @@ const LivestreamDetailsView: FC = () => {
 
 export const DummyContent: FC<{
    numberOfItems?: number
-}> = ({ numberOfItems = 15 }) => {
+}> = ({ numberOfItems = 5 }) => {
    return (
       <MainContent>
          <Stack pt={2} spacing={2}>
