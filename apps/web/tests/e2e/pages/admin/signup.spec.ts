@@ -70,8 +70,8 @@ async function setupData(overrideGroupDetails: Partial<Group> = {}) {
    const user = await UserSeed.createUser(credentials.correctEmail)
 
    await GroupSeed.addGroupAdmin(
-      user.authId,
-      group.id,
+      user,
+      group,
       // can't use GROUP_DASHBOARD_ROLE.OWNER, build fails
       "OWNER" as GROUP_DASHBOARD_ROLE
    )
