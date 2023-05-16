@@ -23,6 +23,12 @@ import { useUserReminders } from "../../../../../HOCs/UserReminderProvider"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import ShareButton from "./ShareButton"
 import { useInView } from "react-intersection-observer"
+import MainContentNavigation from "./MainContentNavigation"
+import Speakers from "./main-content/Speakers"
+import AboutCompany from "./main-content/AboutCompany"
+import AboutLivestream from "./main-content/AboutLivestream"
+import Jobs from "./main-content/Jobs"
+import Questions from "./main-content/Questions"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -162,17 +168,36 @@ const LivestreamDetailsView: FC = () => {
                </Stack>
             </HeroContent>
          }
-         mainContent={<DummyMainContent />}
+         mainContent={
+            <MainContentNavigation>
+               {({
+                  jobsRef,
+                  aboutLivestreamRef,
+                  aboutCompanyRef,
+                  questionsRef,
+               }) => (
+                  <Stack spacing={3}>
+                     <Jobs ref={jobsRef} />
+                     <Speakers speakers={livestream.speakers} />
+                     <AboutLivestream ref={aboutLivestreamRef} />
+                     <AboutCompany ref={aboutCompanyRef} />
+                     <Questions ref={questionsRef} />
+                  </Stack>
+               )}
+            </MainContentNavigation>
+         }
       />
    )
 }
 
-export const DummyMainContent: FC = () => {
+export const DummyContent: FC<{
+   numberOfItems?: number
+}> = ({ numberOfItems = 15 }) => {
    return (
       <MainContent>
          <Stack pt={2} spacing={2}>
             {/* For Demo Purposes */}
-            {Array.from({ length: 15 }).map((_, i) => (
+            {Array.from({ length: numberOfItems }).map((_, i) => (
                <HostInfoSkeleton key={i} />
             ))}
          </Stack>
