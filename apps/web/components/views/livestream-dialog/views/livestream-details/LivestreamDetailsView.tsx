@@ -29,6 +29,7 @@ import AboutCompany from "./main-content/AboutCompany"
 import AboutLivestream from "./main-content/AboutLivestream"
 import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
+import NavBarOffsetElement from "./main-content/NavBarOffsetElement"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -169,22 +170,32 @@ const LivestreamDetailsView: FC = () => {
             </HeroContent>
          }
          mainContent={
-            <MainContentNavigation>
-               {({
-                  jobsRef,
-                  aboutLivestreamRef,
-                  aboutCompanyRef,
-                  questionsRef,
-               }) => (
-                  <Stack spacing={3}>
-                     <Jobs ref={jobsRef} />
-                     <Speakers speakers={livestream.speakers} />
-                     <AboutLivestream ref={aboutLivestreamRef} />
-                     <AboutCompany ref={aboutCompanyRef} />
-                     <Questions ref={questionsRef} />
-                  </Stack>
-               )}
-            </MainContentNavigation>
+            <MainContent>
+               <MainContentNavigation>
+                  {({
+                     jobsRef,
+                     aboutLivestreamRef,
+                     aboutCompanyRef,
+                     questionsRef,
+                  }) => (
+                     <Stack>
+                        <NavBarOffsetElement ref={jobsRef}>
+                           <Jobs />
+                        </NavBarOffsetElement>
+                        <Speakers speakers={livestream.speakers} />
+                        <NavBarOffsetElement ref={aboutLivestreamRef}>
+                           <AboutLivestream />
+                        </NavBarOffsetElement>
+                        <NavBarOffsetElement ref={aboutCompanyRef}>
+                           <AboutCompany />
+                        </NavBarOffsetElement>
+                        <NavBarOffsetElement ref={questionsRef}>
+                           <Questions />
+                        </NavBarOffsetElement>
+                     </Stack>
+                  )}
+               </MainContentNavigation>
+            </MainContent>
          }
       />
    )
