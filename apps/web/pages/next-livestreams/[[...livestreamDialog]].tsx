@@ -6,7 +6,7 @@ import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
 import { InferGetServerSidePropsType, NextPage } from "next"
 import {
    LivestreamDialogLayout,
-   withLivestreamDialogData,
+   livestreamDialogSSP,
 } from "../../components/views/livestream-dialog"
 
 const NextLivestreamsPage: NextPage<
@@ -27,6 +27,6 @@ const NextLivestreamsPage: NextPage<
    )
 }
 
-export const getServerSideProps = withLivestreamDialogData()
+export const getServerSideProps = livestreamDialogSSP()
 
 export default NextLivestreamsPage

@@ -1,4 +1,5 @@
 import {
+   ComponentType,
    createContext,
    FC,
    useCallback,
@@ -10,17 +11,14 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useLivestream from "../../custom-hook/live-stream/useLivestream"
 import { Dialog, DialogContent } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
-import LivestreamDetailsView from "./views/livestream-details/LivestreamDetailsView"
-import RegisterDataConsentView from "./views/data-consent/RegisterDataConsentView"
-import RegisterAskQuestionsView from "./views/ask-questions/RegisterAskQuestionsView"
-import RegisterJoinTalentPoolView from "./views/join-talent-pool/RegisterJoinTalentPoolView"
-import RegisterSuccessView from "./views/register-success/RegisterSuccessView"
-import JobDetailsView from "./views/job-details/JobDetailsView"
 import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
 import { SlideUpTransition } from "../common/transitions"
+import dynamic from "next/dynamic"
+import CircularProgress from "@mui/material/CircularProgress"
+import { LoadableBaseOptions } from "next/dist/shared/lib/dynamic"
 
 const styles = sxStyles({
    content: {
@@ -51,19 +49,56 @@ type Props = {
    handleClose: () => void
    open: boolean
    page: "details" | "register" | "job-details"
-   jobId?: string
+}
+type ViewKey =
+   | "livestream-details"
+   | "register-data-consent"
+   | "register-ask-questions"
+   | "register-join-talent-pool"
+   | "register-success"
+   | "job-details"
+
+type ViewProps = {
+   key: ViewKey
+   viewPath: string
+   loadingComponent?: LoadableBaseOptions["loading"]
 }
 
-const views = [
-   { key: "livestream-details", component: LivestreamDetailsView },
-   { key: "register-data-consent", component: RegisterDataConsentView },
-   { key: "register-ask-questions", component: RegisterAskQuestionsView },
-   { key: "register-join-talent-pool", component: RegisterJoinTalentPoolView },
-   { key: "register-success", component: RegisterSuccessView },
-   { key: "job-details", component: JobDetailsView },
-] as const
+type View = {
+   key: ViewKey
+   component: ComponentType
+}
 
-type ViewKey = typeof views[number]["key"]
+const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
+   key,
+   component: dynamic(() => import(`./views/${viewPath}`), {
+      loading: loadingComponent || (() => <CircularProgress />),
+   }),
+})
+
+const views: View[] = [
+   createView({
+      key: "livestream-details",
+      viewPath: "livestream-details/LivestreamDetailsView",
+   }),
+   createView({
+      key: "register-data-consent",
+      viewPath: "data-consent/RegisterDataConsentView",
+   }),
+   createView({
+      key: "register-ask-questions",
+      viewPath: "ask-questions/RegisterAskQuestionsView",
+   }),
+   createView({
+      key: "register-join-talent-pool",
+      viewPath: "join-talent-pool/RegisterJoinTalentPoolView",
+   }),
+   createView({
+      key: "register-success",
+      viewPath: "register-success/RegisterSuccessView",
+   }),
+   createView({ key: "job-details", viewPath: "job-details/JobDetailsView" }),
+]
 
 const LivestreamDialog: FC<Props> = ({ handleClose, open, ...rest }) => {
    const isMobile = useIsMobile()
@@ -91,7 +126,6 @@ const Content: FC<ContentProps> = ({
    handleClose,
    serverSideLivestream,
    page = "details",
-   jobId,
    livestreamId,
 }) => {
    const theme = useTheme()
@@ -120,9 +154,8 @@ const Content: FC<ContentProps> = ({
          closeDialog: onClose,
          livestream,
          activeView: views[value].key,
-         jobId,
       }),
-      [goToView, onClose, livestream, value, jobId]
+      [goToView, onClose, livestream, value]
    )
 
    return (
@@ -161,7 +194,6 @@ type DialogContextType = {
     * */
    livestream: LivestreamEvent | undefined | null
    activeView: ViewKey
-   jobId?: string // Only for job-details view
 }
 
 const getInitialValue = (page: Props["page"]): number => {
