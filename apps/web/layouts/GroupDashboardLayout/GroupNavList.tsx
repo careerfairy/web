@@ -68,7 +68,7 @@ const GroupNavList = () => {
                {
                   id: "all-live-streams",
                   href: `/${baseHrefPath}/${group.id}/admin/events/all`,
-                  pathname: `/${baseHrefPath}/${baseParam}/admin/events/all`,
+                  pathname: `/${baseHrefPath}/${baseParam}/admin/events/all/[[...livestreamDialog]]`,
                   Icon: AllLiveStreamsIcon,
                   title: "All live streams on CareerFairy",
                },

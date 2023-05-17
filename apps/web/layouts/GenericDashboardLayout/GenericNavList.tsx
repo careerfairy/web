@@ -19,7 +19,7 @@ const GenericNavList = () => {
          {
             id: "home-page",
             href: `/portal`,
-            pathname: `/portal`,
+            pathname: `/portal/[[...livestreamDialog]]`,
             Icon: HomeIcon,
             title: "Home page",
             mobileTitle: "Home",
@@ -30,7 +30,7 @@ const GenericNavList = () => {
             mobileTitle: "Live streams",
             Icon: LiveStreamsIcon,
             href: `/next-livestreams`,
-            pathname: `/next-livestreams`,
+            pathname: `/next-livestreams/[[...livestreamDialog]]`,
          },
          {
             id: "past-live-streams",
@@ -38,7 +38,7 @@ const GenericNavList = () => {
             mobileTitle: "Past streams",
             Icon: ClockIcon,
             href: `/past-livestreams`,
-            pathname: `/past-livestreams`,
+            pathname: `/past-livestreams/[[...livestreamDialog]]`,
          },
          {
             id: "company",
