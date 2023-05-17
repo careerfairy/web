@@ -22,6 +22,7 @@
       "build:functions": "turbo run build --filter=@careerfairy/functions",
       "build:scripts": "turbo run build --filter=@careerfairy/firebase-scripts",
       "build:shared-lib": "turbo run build --filter=@careerfairy/shared-lib",
+      "build:seed-data": "turbo run build --filter=@careerfairy/seed-data",
       "build:fetch-firestore-data": "turbo run build --filter=@careerfairy/fetch-firestore-data",
       "build:webapp": "turbo run build --filter=@careerfairy/webapp",
       "lint:functions": "turbo run lint --filter=@careerfairy/functions",

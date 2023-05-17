@@ -3,6 +3,7 @@ import LivestreamSeed, {
    createLivestreamGroupQuestions,
 } from "@careerfairy/seed-data/dist/livestreams"
 import { LoginPage } from "../page-object-models/LoginPage"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 import {
    clearAuthData,
    clearFirestoreData,
@@ -13,6 +14,7 @@ import { sleep } from "../utils"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { credentials } from "../../constants"
 
 /**
  * Test Fixture
@@ -27,9 +29,11 @@ const test = base.extend<{
       await clearAuthData()
       await clearFirestoreData()
 
-      const user = await LoginPage.login(page)
+      const userData = await UserSeed.createUser(credentials.correctEmail)
 
-      await use(user)
+      await LoginPage.login(page)
+
+      await use(userData)
    },
    streamerPage: async ({ page, user, context }, use) => {
       const streamerPage = new StreamerPage(page)

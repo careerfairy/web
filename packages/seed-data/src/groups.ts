@@ -1,15 +1,55 @@
-import { Group } from "@careerfairy/shared-lib/dist/groups"
+import {
+   Group,
+   GROUP_DASHBOARD_ROLE,
+} from "@careerfairy/shared-lib/dist/groups"
 import { faker } from "@faker-js/faker"
-import { firestore } from "./lib/firebase"
+import { auth, fieldValue, firestore } from "./lib/firebase"
 import { LivestreamGroupQuestion } from "@careerfairy/shared-lib/dist/livestreams"
 import { generateId } from "./utils/utils"
 import { groupTriGrams } from "@careerfairy/shared-lib/dist/utils/search"
+import { AdminGroupsClaim, UserData } from "@careerfairy/shared-lib/dist/users"
+import {
+   FirebaseGroupRepository,
+   IGroupRepository,
+} from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
+
+   addGroupAdmin(
+      user: UserData,
+      group: Group,
+      role?: GROUP_DASHBOARD_ROLE
+   ): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
+   private groupRepo: IGroupRepository
+
+   constructor() {
+      this.groupRepo = new FirebaseGroupRepository(firestore as any, fieldValue)
+   }
+   /**
+    * Create custom admin claims for a user
+    */
+   async addGroupAdmin(
+      user: UserData,
+      group: Group,
+      role: GROUP_DASHBOARD_ROLE = GROUP_DASHBOARD_ROLE.MEMBER
+   ) {
+      const claim: AdminGroupsClaim = {
+         [group.groupId]: {
+            role,
+         },
+      }
+
+      await auth.setCustomUserClaims(user.authId, {
+         adminGroups: claim,
+      })
+
+      await this.groupRepo.setGroupAdminRoleInFirestore(group, user, role)
+   }
+
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
       const batch = firestore.batch()
       const id = generateId()
@@ -42,14 +82,17 @@ class GroupFirebaseSeed implements GroupSeed {
       return data
    }
 }
-const generateQuestionOption = (generatorFn) => ({
+
+type GeneratorFn = () => string
+
+const generateQuestionOption = (generatorFn: GeneratorFn) => ({
    id: generateId(),
    name: generatorFn(),
 })
 
 export const generateQuestion = (
-   name,
-   generatorFn
+   name: string,
+   generatorFn: GeneratorFn
 ): LivestreamGroupQuestion => ({
    id: generateId(),
    questionType: "custom",
@@ -63,6 +106,7 @@ export const generateQuestion = (
       return acc
    }, {}),
 })
+
 export const groupQuestions = [
    generateQuestion("Job Title", faker.name.jobTitle),
    generateQuestion("Job Type", faker.name.jobType),
