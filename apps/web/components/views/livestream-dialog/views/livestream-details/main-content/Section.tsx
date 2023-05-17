@@ -18,15 +18,7 @@ const Section = forwardRef<HTMLDivElement, Props>(function Section(
    ref
 ) {
    return (
-      <Box
-         sx={[
-            styles.root,
-            {
-               pt: `${navOffset}px`,
-            },
-         ]}
-         ref={ref}
-      >
+      <Box sx={styles.root} pt={`${navOffset}px`} ref={ref}>
          {children}
       </Box>
    )
