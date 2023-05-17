@@ -12,6 +12,7 @@ import useIsMobile from "../../../components/custom-hook/useIsMobile"
 import { MainLogo } from "../../../components/logos"
 import React from "react"
 import MissingDataButton from "../../../components/views/missingData/MissingDataButton"
+import { useCreditsDialog } from "../../CreditsDialogLayout"
 
 const styles = sxStyles({
    root: {
@@ -41,10 +42,11 @@ const styles = sxStyles({
 type Props = {
    title: string
    bgColor?: string
-   handleOpenCreditsDialog: () => void
 }
 
-const TopBar = ({ title, bgColor, handleOpenCreditsDialog }: Props) => {
+const TopBar = ({ title, bgColor }: Props) => {
+   const { handleOpenCreditsDialog } = useCreditsDialog()
+
    const { authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
 

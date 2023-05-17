@@ -23,7 +23,7 @@ import {
 const GroupPage = ({
    serverSideGroup,
    initialTabValue,
-   serverSideLivestream,
+   livestreamDialogData,
 }) => {
    const {
       palette: {
@@ -103,7 +103,7 @@ const GroupPage = ({
    }, [])
 
    return (
-      <LivestreamDialogLayout serverSideLivestream={serverSideLivestream}>
+      <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <HeadWithMeta {...metaInfo} />
          <NextLivestreamsLayout currentGroup={currentGroup}>
             <div>
@@ -151,11 +151,12 @@ export async function getServerSideProps(ctx) {
    if (ctx.query.type === "upcomingEvents" || ctx.query.type === "pastEvents") {
       initialTabValue = ctx.query.type
    }
+
    return {
       props: {
          serverSideGroup,
          initialTabValue,
-         serverSideLivestream: await getLivestreamDialogData(ctx),
+         livestreamDialogData: await getLivestreamDialogData(ctx),
       }, // will be passed to the page component as props
    }
 }

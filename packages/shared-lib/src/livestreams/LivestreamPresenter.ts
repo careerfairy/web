@@ -152,6 +152,27 @@ export class LivestreamPresenter extends BaseModel {
             )
       )
    }
+   isRegistrationDisabled(userEmail: string): boolean {
+      if (this.isPast()) return true
+      //User should always be able to cancel registration
+      if (this.isUserRegistered(userEmail)) return false
+      //Disable registration if max number of registrants is reached
+      if (this.maxRegistrants && this.maxRegistrants > 0) {
+         return this.registeredUsers
+            ? this.maxRegistrants <= this.registeredUsers.length
+            : false
+      }
+      return false
+   }
+
+   hasNoSpotsLeft(): boolean {
+      return Boolean(
+         this.maxRegistrants &&
+            this.maxRegistrants > 0 &&
+            this.registeredUsers &&
+            this.maxRegistrants <= this.registeredUsers.length
+      )
+   }
 
    recordingAccessTimeLeft(): Date {
       const streamDate = new Date(this.start)
@@ -192,6 +213,19 @@ export class LivestreamPresenter extends BaseModel {
          start = toDate(this["parentLivestream"].start)
       }
       return Math.floor((Date.now() - start?.getTime()) / 1000 / 60)
+   }
+
+   /**
+    * Calculates the number of spots remaining for registration.
+    *
+    * @returns {number} The number of spots remaining.
+    */
+   getNumberOfSpotsRemaining(): number {
+      if (!this.maxRegistrants) return 0
+      else if (!this.registeredUsers) return this.maxRegistrants
+      else {
+         return this.maxRegistrants - this.registeredUsers.length
+      }
    }
 
    static createFromDocument(livestream: LivestreamEvent) {
