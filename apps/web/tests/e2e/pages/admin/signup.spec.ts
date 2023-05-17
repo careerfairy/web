@@ -10,6 +10,7 @@ import {
    clearFirestoreData,
 } from "@careerfairy/seed-data/dist/emulators"
 import { sleep } from "../../utils"
+import ProfilePage from "../../page-object-models/ProfilePage"
 
 /**
  * Test Fixture
@@ -47,6 +48,18 @@ test.describe("Admin Signup", () => {
       // assert we're on the group dashboard
       expect(groupPage.topCreateLivestreamButton()).toBeVisible()
       await groupPage.assertMainPageHeader()
+   })
+
+   test("Group admin should have the group in the profile > groups page", async ({
+      groupPage,
+      group,
+   }) => {
+      const profilePage = new ProfilePage(groupPage.page)
+      await profilePage.openGroups()
+
+      expect(
+         groupPage.page.getByRole("heading", { name: group.universityName })
+      ).toBeVisible()
    })
 
    // test("Invite a user through the group team members page", async ({
