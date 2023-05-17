@@ -103,6 +103,7 @@ export const buildLivestreamObject = (
       targetLevelsOfStudy: values.targetLevelsOfStudy,
       questionsDisabled: values.questionsDisabled,
       triGrams: livestreamTriGrams(values.title, values.company),
+      denyRecordingAccess: false,
    }
 }
 
