@@ -1,6 +1,6 @@
 import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 import { Interest } from "@careerfairy/shared-lib/interests"
-import { collection, query, where } from "firebase/firestore"
+import { collection, documentId, query, where } from "firebase/firestore"
 import { FirestoreInstance } from "../../data/firebase/FirebaseInstance"
 
 /**
@@ -13,7 +13,7 @@ const useInterestsByIds = (ids: string[]) => {
    return useFirestoreCollection<Interest>(
       query(
          collection(FirestoreInstance, "interests"),
-         where("__name__", "in", ids)
+         where(documentId(), "in", ids)
       )
    )
 }
