@@ -56,6 +56,7 @@ type Props = {
    additionalConstraints?: QueryConstraint[]
    searchWithTrigram?: boolean
    hasPastEvents?: boolean
+   includeHiddenEvents?: boolean
 }
 const LivestreamSearch: FC<Props> = ({
    value,
@@ -67,6 +68,7 @@ const LivestreamSearch: FC<Props> = ({
    searchWithTrigram,
    additionalConstraints = [] as QueryConstraint[],
    hasPastEvents,
+   includeHiddenEvents,
 }) => {
    const [inputValue, setInputValue] = useState("")
 
@@ -82,7 +84,7 @@ const LivestreamSearch: FC<Props> = ({
          additionalConstraints: [
             ...additionalConstraints,
             where("test", "==", false),
-            where("hidden", "==", false),
+            ...(includeHiddenEvents ? [] : [where("hidden", "==", false)]),
          ],
          ...(searchWithTrigram
             ? null
@@ -93,7 +95,12 @@ const LivestreamSearch: FC<Props> = ({
                  },
               }),
       }),
-      [additionalConstraints, orderByDirection, searchWithTrigram]
+      [
+         additionalConstraints,
+         includeHiddenEvents,
+         orderByDirection,
+         searchWithTrigram,
+      ]
    )
 
    const { data: livestreamHits } = useLivestreamSearch(inputValue, options)
