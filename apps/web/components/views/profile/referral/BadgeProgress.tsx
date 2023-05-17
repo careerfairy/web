@@ -23,7 +23,7 @@ const BadgeProgress = () => {
    if (!networkerBadge) {
       nextBadge = NetworkerBadge
    }
-   const progress = nextBadge.progress(userData, userStats)
+   const progress = nextBadge.progress(userStats)
 
    return (
       <Grid container mt={2}>
