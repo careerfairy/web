@@ -22,7 +22,7 @@ const Section = forwardRef<HTMLDivElement, Props>(function Section(
          sx={[
             styles.root,
             {
-               pt: `calc(${navOffset}px)`,
+               pt: `${navOffset}px`,
             },
          ]}
          ref={ref}
