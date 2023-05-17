@@ -29,7 +29,7 @@ const FilterContext = createContext<IFilterContext>({
 
 type Props = {
    filtersToShow: FilterEnum[]
-   numberOfResults: number
+   numberOfResults?: number
 }
 
 const Filter = ({ filtersToShow, numberOfResults }: Props) => {
