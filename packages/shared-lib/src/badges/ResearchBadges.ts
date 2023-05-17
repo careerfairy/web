@@ -3,7 +3,7 @@ import {
    calculateProgressForNumericField,
    DEFAULT_REWARDS,
 } from "./badges"
-import { UserData, UserStats } from "../users"
+import { UserStats } from "../users"
 
 export const ResearchBadge: Badge = new Badge(
    "Research",
@@ -12,9 +12,9 @@ export const ResearchBadge: Badge = new Badge(
    [
       {
          description: "Attend 1 Livestream Event",
-         isComplete: (userData: UserData, userStats: UserStats) =>
+         isComplete: (userStats: UserStats) =>
             userStats?.totalLivestreamAttendances >= 1,
-         progress: (userData: UserData, userStats: UserStats) =>
+         progress: (userStats: UserStats) =>
             calculateProgressForNumericField(
                userStats?.totalLivestreamAttendances,
                1
@@ -31,9 +31,9 @@ export const ResearchBadgeLevel2: Badge = new Badge(
    [
       {
          description: "Attend 3 Livestream Events",
-         isComplete: (userData: UserData, userStats: UserStats) =>
+         isComplete: (userStats: UserStats) =>
             userStats?.totalLivestreamAttendances >= 3,
-         progress: (userData: UserData, userStats: UserStats) =>
+         progress: (userStats: UserStats) =>
             calculateProgressForNumericField(
                userStats?.totalLivestreamAttendances,
                3
@@ -50,9 +50,9 @@ export const ResearchBadgeLevel3: Badge = new Badge(
    [
       {
          description: "Attend 10 Livestream Events",
-         isComplete: (userData: UserData, userStats: UserStats) =>
+         isComplete: (userStats: UserStats) =>
             userStats?.totalLivestreamAttendances >= 10,
-         progress: (userData: UserData, userStats: UserStats) =>
+         progress: (userStats: UserStats) =>
             calculateProgressForNumericField(
                userStats?.totalLivestreamAttendances,
                10
