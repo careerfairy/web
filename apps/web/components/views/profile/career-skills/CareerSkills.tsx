@@ -248,14 +248,14 @@ const UnlockedRewardsAccordion = ({ badge }: { badge: Badge }) => {
 }
 
 const RequirementsForABadge = ({ badge }: { badge: Badge }) => {
-   const { userData, userStats } = useAuth()
+   const { userStats } = useAuth()
    return (
       <List disablePadding>
          {badge.requirements.map((requirement, index) => (
             <LevelInformationPopupListItem
                key={`context_reward_${index}`}
                description={requirement.description}
-               isComplete={requirement.isComplete(userData, userStats)}
+               isComplete={requirement.isComplete(userStats)}
             />
          ))}
       </List>

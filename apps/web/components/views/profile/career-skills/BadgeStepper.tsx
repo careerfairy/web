@@ -131,7 +131,7 @@ const LevelInformationPopup = ({
       badge.rewardsDescription.length > 0
          ? badge.rewardsDescription
          : ["A cool badge!"]
-   const { userData, userStats } = useAuth()
+   const { userStats } = useAuth()
 
    let rewardText = "You will be rewarded"
    if (isComplete) {
@@ -160,7 +160,7 @@ const LevelInformationPopup = ({
                <LevelInformationPopupListItem
                   key={`reward_${index}`}
                   description={requirement.description}
-                  isComplete={requirement.isComplete(userData, userStats)}
+                  isComplete={requirement.isComplete(userStats)}
                />
             ))}
          </List>
