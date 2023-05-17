@@ -55,6 +55,8 @@ const LivestreamDetailsView: FC = () => {
       updatedStats
    )
 
+   const hasJobs = !!livestream.jobs?.length
+
    const handleRegisterClick = useCallback(
       async (floating: boolean) => {
          // Check if the user is already registered
@@ -170,37 +172,35 @@ const LivestreamDetailsView: FC = () => {
             </HeroContent>
          }
          mainContent={
-            <MainContent>
-               <MainContentNavigation hasJobs={livestream.jobs?.length > 0}>
-                  {({
-                     jobsRef,
-                     aboutLivestreamRef,
-                     aboutCompanyRef,
-                     questionsRef,
-                  }) => (
-                     <Stack px={2}>
-                        {livestream.jobs?.length > 0 ? (
-                           <Section navOffset={44} ref={jobsRef}>
-                              <Jobs />
-                           </Section>
-                        ) : null}
-                        <Section ref={aboutLivestreamRef}>
-                           {/* Speakers are part of the about live stream section */}
-                           <Speakers speakers={livestream.speakers} />
-                           <Section>
-                              <AboutLivestream />
-                           </Section>
+            <MainContentNavigation hasJobs={hasJobs}>
+               {({
+                  jobsRef,
+                  aboutLivestreamRef,
+                  aboutCompanyRef,
+                  questionsRef,
+               }) => (
+                  <MainContent>
+                     {hasJobs ? (
+                        <Section navOffset={44} ref={jobsRef}>
+                           <Jobs />
                         </Section>
-                        <Section ref={aboutCompanyRef}>
-                           <AboutCompany />
+                     ) : null}
+                     <Section ref={aboutLivestreamRef}>
+                        {/* Speakers are part of the about live stream section */}
+                        <Speakers speakers={livestream.speakers} />
+                        <Section>
+                           <AboutLivestream />
                         </Section>
-                        <Section ref={questionsRef}>
-                           <Questions />
-                        </Section>
-                     </Stack>
-                  )}
-               </MainContentNavigation>
-            </MainContent>
+                     </Section>
+                     <Section ref={aboutCompanyRef}>
+                        <AboutCompany />
+                     </Section>
+                     <Section ref={questionsRef}>
+                        <Questions />
+                     </Section>
+                  </MainContent>
+               )}
+            </MainContentNavigation>
          }
       />
    )
