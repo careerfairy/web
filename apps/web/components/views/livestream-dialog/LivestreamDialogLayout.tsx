@@ -13,8 +13,8 @@ type Props = {
    serverSideLivestream: { [p: string]: any } | null
 }
 
-type DialogPage = "details" | "register" | "job-details"
-const validDialogPages: DialogPage[] = ["details", "register", "job-details"]
+const validDialogPages = ["details", "register", "job-details"] as const
+type DialogPage = typeof validDialogPages[number]
 
 /**
  * Renders the layout for the dialog that shows livestream information.
@@ -32,7 +32,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
    const { query, push, pathname } = useRouter()
    const { livestreamDialog } = query
 
-   const [pathType, livestreamId, dialogPage, jobId] = livestreamDialog || []
+   const [pathType, livestreamId, dialogPage] = livestreamDialog || []
 
    const serverLivestream = useMemo(() => {
       if (!serverSideLivestream) return null
@@ -81,7 +81,6 @@ export const LivestreamDialogLayout: FC<Props> = ({
                   open={dialogOpen}
                   serverSideLivestream={serverLivestream}
                   livestreamId={livestreamId}
-                  jobId={jobId}
                   handleClose={handleClose}
                   page={page}
                />
