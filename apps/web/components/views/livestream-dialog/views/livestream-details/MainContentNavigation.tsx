@@ -166,7 +166,6 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
                   label={tab.label}
                   id={`content-navigation-tab-${tab.value}`}
                   aria-controls={`content-navigation-tabpanel-${tab.value}`}
-                  wrapped={false}
                />
             ))}
          </Tabs>
