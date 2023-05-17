@@ -62,9 +62,19 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
 
    const tabs = useMemo<TabElement[]>(() => {
       const newTabs: TabElement[] = [
+         // If there are jobs, make sure they are first in the list
+         ...(hasJobs
+            ? [
+                 {
+                    value: "jobs",
+                    label: "Linked Jobs",
+                    inView: jobsInView,
+                 },
+              ]
+            : []),
          {
             value: "aboutLivestream",
-            label: "About The Livestream",
+            label: "About The Live Stream",
             inView: aboutLivestreamsInView,
          },
          {
@@ -78,15 +88,6 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
             inView: questionsInView,
          },
       ]
-
-      if (hasJobs) {
-         // If there are jobs, make sure they are first in the list
-         newTabs.unshift({
-            value: "jobs",
-            label: "Linked Jobs",
-            inView: jobsInView,
-         })
-      }
 
       return newTabs
    }, [

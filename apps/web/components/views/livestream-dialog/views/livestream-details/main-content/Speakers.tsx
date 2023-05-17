@@ -6,9 +6,12 @@ import SectionTitle from "./SectionTitle"
 import Stack from "@mui/material/Stack"
 import Image from "next/image"
 import { Typography } from "@mui/material"
+import { NICE_SCROLLBAR_STYLES } from "../../../../../../constants/layout"
 
 const styles = sxStyles({
-   root: {},
+   root: {
+      ...NICE_SCROLLBAR_STYLES,
+   },
    speakerAvatar: {
       "& .avatar": {
          borderRadius: "50%",
