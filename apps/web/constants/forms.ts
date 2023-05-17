@@ -1280,7 +1280,7 @@ export const countriesOptionCodes = [
    },
 ]
 
-export const countriesAndRegionsOptionCodes = [
+export const countriesAndRegionsOptionCodes: OptionGroup[] = [
    {
       id: "africa",
       name: "Africa",
@@ -1322,20 +1322,24 @@ export const countriesAndRegionsOptionCodes = [
       groupId: regionGroupId,
    },
    ...countriesOptionCodes,
-] as OptionGroup[]
+]
 
-export const languageOptionCodes = [
+export const languageOptionCodes: OptionGroup[] = [
+   {
+      id: "nl",
+      name: "Dutch",
+   },
    {
       id: "en",
       name: "English",
    },
    {
-      id: "de",
-      name: "German",
-   },
-   {
       id: "fr",
       name: "French",
+   },
+   {
+      id: "de",
+      name: "German",
    },
    {
       id: "it",
@@ -1345,17 +1349,9 @@ export const languageOptionCodes = [
       id: "es",
       name: "Spanish",
    },
-   {
-      id: "nl",
-      name: "Dutch",
-   },
-   {
-      id: "pt",
-      name: "Portuguese",
-   },
 ]
 
-export const channelOptionCodes = [
+export const channelOptionCodes: OptionGroup[] = [
    {
       id: "facebook",
       name: "Facebook",
@@ -1370,7 +1366,7 @@ export const channelOptionCodes = [
    },
 ]
 
-export const CompanySizesCodes = [
+export const CompanySizesCodes: DropdownItem[] = [
    {
       id: "1-20",
       value: "1-20",
@@ -1391,9 +1387,9 @@ export const CompanySizesCodes = [
       value: "1001+",
       label: "1001+ employees",
    },
-] as DropdownItem[]
+]
 
-export const CompanyIndustryValues = [
+export const CompanyIndustryValues: OptionGroup[] = [
    {
       id: "Accounting",
       name: "Accounting",
@@ -1530,9 +1526,97 @@ export const CompanyIndustryValues = [
       id: "VentureCapital&PrivateEquity",
       name: "Venture Capital & Private Equity",
    },
-] as OptionGroup[]
+]
 
-export const CompanyCountryValues = countriesOptionCodes.map((country) => ({
-   id: country.id,
-   name: country.name,
-})) as OptionGroup[]
+export const RelevantCompanyIndustryValues: OptionGroup[] = [
+   {
+      id: "Automotive",
+      name: "Automotive",
+   },
+   {
+      id: "Chemical",
+      name: "Chemical",
+   },
+   {
+      id: "Energy",
+      name: "Energy",
+   },
+   {
+      id: "Engineering",
+      name: "Engineering",
+   },
+   {
+      id: "Finance&Banking",
+      name: "Finance & Banking",
+   },
+   {
+      id: "FMCG",
+      name: "FMCG",
+   },
+   {
+      id: "Insurance",
+      name: "Insurance",
+   },
+   {
+      id: "ManagementConsulting",
+      name: "Management Consulting",
+   },
+   {
+      id: "Pharmaceutical",
+      name: "Pharmaceutical",
+   },
+   {
+      id: "PublicSector",
+      name: "Public Sector",
+   },
+   {
+      id: "Retail",
+      name: "Retail",
+   },
+   {
+      id: "Technology&IT",
+      name: "Technology & IT",
+   },
+]
+
+export const RelevantCompanyCountryValues: OptionGroup[] = [
+   {
+      id: "AT",
+      name: "Austria",
+   },
+   {
+      id: "FR",
+      name: "France",
+   },
+   {
+      id: "DE",
+      name: "Germany",
+   },
+   {
+      id: "NL",
+      name: "Netherlands",
+   },
+   {
+      id: "ES",
+      name: "Spain",
+   },
+   {
+      id: "CH",
+      name: "Switzerland",
+   },
+   {
+      id: "GB",
+      name: "United Kingdom",
+   },
+   {
+      id: "US",
+      name: "United States of America",
+   },
+]
+
+export const CompanyCountryValues: OptionGroup[] = countriesOptionCodes.map(
+   (country) => ({
+      id: country.id,
+      name: country.name,
+   })
+)
