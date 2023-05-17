@@ -51,17 +51,20 @@ const MultiCheckboxSelect = ({
    )
 
    const leftRowValues = useMemo(
-      () => allValues.slice(0, Math.round(allValues.length / 2)),
+      () => allValues.slice(0, allValues.length / 2),
       [allValues]
    )
    const rightValues = useMemo(
-      () => allValues.slice(allValues.length / 2 + 1),
+      () => allValues.slice(allValues.length / 2),
       [allValues]
    )
 
    return (
       <FormGroup key={inputName}>
-         <Stack direction={"row"} spacing={8}>
+         <Stack
+            direction={{ xs: "column", md: "row" }}
+            spacing={{ xs: 0, md: 8 }}
+         >
             <Box
                sx={{ display: "flex", flexDirection: "column", width: "100%" }}
             >
