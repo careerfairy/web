@@ -1,10 +1,12 @@
 import * as React from "react"
-import { FC, ReactNode, useEffect, useMemo, useState } from "react"
+import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from "react"
 import { IntersectionOptions, useInView } from "react-intersection-observer"
 import Box from "@mui/material/Box"
 import Tabs from "@mui/material/Tabs"
 import Tab from "@mui/material/Tab"
 import { sxStyles } from "../../../../../types/commonTypes"
+import { useTheme } from "@mui/material/styles"
+import { useMediaQuery } from "@mui/material"
 
 const styles = sxStyles({
    tabs: {
@@ -14,11 +16,11 @@ const styles = sxStyles({
       bgcolor: "background.paper",
       borderBottom: "1px solid #F0F0F0",
    },
-   root: {},
    tab: {
       fontSize: "1rem",
       fontWeight: 600,
       color: "#000",
+      textTransform: "none",
    },
 })
 
@@ -45,7 +47,12 @@ const options: IntersectionOptions = {
 }
 
 const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
+   const theme = useTheme()
+   const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
+
    const [value, setValue] = useState(hasJobs ? "jobs" : "aboutLivestream")
+   const [isManualTabChange, setIsManualTabChange] = useState(false)
+
    const [jobsRef, jobsInView, jobSection] = useInView(options)
    const [aboutLivestreamRef, aboutLivestreamsInView, aboutLivestreamSection] =
       useInView(options)
@@ -54,53 +61,42 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
    const [questionsRef, questionsInView, questionsSection] = useInView(options)
 
    const tabs = useMemo<TabElement[]>(() => {
-      const newTabs: TabElement[] = []
+      const newTabs: TabElement[] = [
+         {
+            value: "aboutLivestream",
+            label: "About The Livestream",
+            inView: aboutLivestreamsInView,
+         },
+         {
+            value: "aboutCompany",
+            label: "About The Company",
+            inView: aboutCompanyInView,
+         },
+         {
+            value: "questions",
+            label: "Questions",
+            inView: questionsInView,
+         },
+      ]
 
-      if (jobSection) {
-         newTabs.push({
+      if (hasJobs) {
+         // If there are jobs, make sure they are first in the list
+         newTabs.unshift({
             value: "jobs",
             label: "Linked Jobs",
             inView: jobsInView,
          })
       }
 
-      if (aboutLivestreamSection) {
-         newTabs.push({
-            value: "aboutLivestream",
-            label: "About The Livestream",
-            inView: aboutLivestreamsInView,
-         })
-      }
-
-      if (aboutCompanySection) {
-         newTabs.push({
-            value: "aboutCompany",
-            label: "About The Company",
-            inView: aboutCompanyInView,
-         })
-      }
-
-      if (questionsSection) {
-         newTabs.push({
-            value: "questions",
-            label: "Questions",
-            inView: questionsInView,
-         })
-      }
-
       return newTabs
    }, [
-      jobSection,
-      aboutLivestreamSection,
-      aboutCompanySection,
-      questionsSection,
-      jobsInView,
       aboutLivestreamsInView,
       aboutCompanyInView,
       questionsInView,
+      hasJobs,
+      jobsInView,
    ])
 
-   // Create a mapping from tab values to section objects
    const sectionRefs = useMemo(
       () => ({
          jobs: jobSection,
@@ -116,25 +112,39 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
       ]
    )
 
-   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
-      setValue(newValue)
+   const handleChange = useCallback(
+      (event: React.SyntheticEvent, newValue: string) => {
+         setIsManualTabChange(true)
+         setValue(newValue)
 
-      sectionRefs[newValue]?.target.scrollIntoView({
-         behavior: "auto", // behavior: "smooth" does not work inside a dialog
-      })
-   }
+         sectionRefs[newValue]?.target.scrollIntoView({
+            behavior: "smooth", // behavior: "smooth" does not work inside a dialog
+         })
+
+         // Disable the manual tab change flag after a delay
+         setTimeout(() => setIsManualTabChange(false), 1000)
+      },
+      [sectionRefs]
+   )
 
    // Listen for changes in which section is in view as we scroll, and update the tab value accordingly
    useEffect(() => {
+      if (isManualTabChange) {
+         // Do not update the tab value if we're in the middle of a manual tab change
+         return
+      }
+
       for (const tab of tabs) {
          if (tab.inView) {
             setValue(tab.value)
          }
       }
-   }, [tabs, sectionRefs, value])
+
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+   }, [tabs, isManualTabChange])
 
    return (
-      <Box sx={styles.root}>
+      <Box>
          <Tabs
             value={value}
             onChange={handleChange}
@@ -144,7 +154,8 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
             indicatorColor="secondary"
             scrollButtons
             allowScrollButtonsMobile
-            centered
+            centered={centeredNav}
+            variant={centeredNav ? "standard" : "scrollable"}
          >
             {tabs.map((tab) => (
                <Tab
@@ -155,6 +166,7 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
                   label={tab.label}
                   id={`content-navigation-tab-${tab.value}`}
                   aria-controls={`content-navigation-tabpanel-${tab.value}`}
+                  wrapped={false}
                />
             ))}
          </Tabs>

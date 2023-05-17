@@ -55,7 +55,9 @@ const styles = sxStyles({
    heroContentContainer: {
       zIndex: 1,
    },
-   mainContent: {},
+   mainContent: {
+      px: 2,
+   },
    backgroundImgOverlay: {
       position: "absolute",
       top: 0,
