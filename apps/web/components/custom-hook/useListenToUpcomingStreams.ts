@@ -3,6 +3,7 @@ import { useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 
 type Props = {
    filterByGroupId?: string
@@ -15,6 +16,8 @@ type Props = {
    getHiddenEvents?: boolean
    registeredUserEmail?: string
    from?: Date
+   fieldsOfStudy?: FieldOfStudy[]
+   recordedOnly?: boolean
 }
 
 const useListenToUpcomingStreams = (props?: Props) => {
@@ -29,6 +32,8 @@ const useListenToUpcomingStreams = (props?: Props) => {
       getHiddenEvents,
       registeredUserEmail,
       from,
+      fieldsOfStudy,
+      recordedOnly,
    } = props
 
    const upcomingEventsQuery = useMemo(() => {
@@ -64,14 +69,28 @@ const useListenToUpcomingStreams = (props?: Props) => {
          query = query.where("start", ">", from)
       }
 
+      if (fieldsOfStudy.length) {
+         query = query.where(
+            "targetFieldsOfStudy",
+            "array-contains-any",
+            fieldsOfStudy
+         )
+      }
+
+      if (recordedOnly) {
+         query = query.where("denyRecordingAccess", "==", false)
+      }
+
       return query
    }, [
+      fieldsOfStudy,
       filterByGroupId,
       from,
       getHiddenEvents,
       interestsIds,
       languagesIds,
       registeredUserEmail,
+      recordedOnly,
    ])
 
    let { data, isLoading } = useCollection<LivestreamEvent>(

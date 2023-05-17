@@ -14,6 +14,7 @@ import LivestreamSearch, {
 import Filter, { FilterEnum } from "../filter/Filter"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import NoResultsMessage from "./NoResultsMessage"
+import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import { buildDialogLink } from "../../livestream-dialog"
 
 const styles = sxStyles({
@@ -38,31 +39,20 @@ const styles = sxStyles({
    },
 })
 
-const filtersToShow = [
-   FilterEnum.recordedOnly,
-   FilterEnum.languages,
-   FilterEnum.interests,
-   FilterEnum.companyCountries,
-   FilterEnum.companySizes,
-   FilterEnum.companyIndustries,
-]
-
 const getQueryVariables = (query) => {
    const languages = query.languages as string
-   const interests = query.interests as string
-   const jobCheck = query.jobCheck as string
    const companyCountries = query.companyCountries as string
-   const companySizes = query.companySizes as string
    const companyIndustries = query.companyIndustries as string
+   const fieldsOfStudy = query.fieldsOfStudy as string
+   const recordedOnly = query.recordedOnly as string
 
    return {
       languages: languages && languages.split(","),
-      interests: interests && interests.split(","),
-      jobCheck: jobCheck?.toLowerCase() === "true" || false,
       companyCountries: companyCountries && companyCountries.split(","),
-      companySizes: companySizes && companySizes.split(","),
       companyIndustries:
          companyIndustries?.length && companyIndustries.split(","),
+      fieldsOfStudy: fieldsOfStudy?.length && fieldsOfStudy.split(","),
+      recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
    }
 }
 
@@ -74,13 +64,13 @@ const NextLiveStreamsWithFilter = ({
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const {
       languages,
-      interests,
-      jobCheck,
       companyCountries,
-      companySizes,
       companyIndustries,
+      recordedOnly,
+      fieldsOfStudy,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
    const hasPastEvents = useMemo(
@@ -88,13 +78,29 @@ const NextLiveStreamsWithFilter = ({
       [initialTabValue]
    )
 
+   const filtersToShow = useMemo(
+      () => [
+         hasPastEvents ? FilterEnum.recordedOnly : null,
+         FilterEnum.languages,
+         FilterEnum.companyCountries,
+         FilterEnum.companyIndustries,
+         FilterEnum.fieldsOfStudy,
+      ],
+      [hasPastEvents]
+   )
+
+   const mapFieldsOfStudy = useMemo(
+      () =>
+         allFieldsOfStudy?.filter((item) => fieldsOfStudy?.includes(item.id)),
+      [allFieldsOfStudy, fieldsOfStudy]
+   )
+
    const upcomingLivestreams = useListenToUpcomingStreams({
       languagesIds: languages,
-      interestsIds: interests,
-      jobCheck: jobCheck,
       companyCountriesIds: companyCountries,
-      companySizes: companySizes,
       companyIndustriesIds: companyIndustries,
+      fieldsOfStudy: mapFieldsOfStudy,
+      recordedOnly: recordedOnly,
    })
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
 

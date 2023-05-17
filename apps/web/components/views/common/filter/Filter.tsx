@@ -8,6 +8,7 @@ export enum FilterEnum {
    interests = "interests",
    jobCheck = "jobCheck",
    search = "search",
+   fieldsOfStudy = "fieldsOfStudy",
    companyCountries = "companyCountries",
    companySizes = "companySizes",
    companyIndustries = "companyIndustries",
@@ -44,7 +45,8 @@ const Filter = ({ filtersToShow, numberOfResults }: Props) => {
             query.companyCountries,
             query.companySizes,
             query.companyIndustries,
-            query.recordedOnly,
+            query.recordedOnly === "true" ? query.recordedOnly : null,
+            query.fieldsOfStudy,
          ].filter((value) => value).length,
       [query]
    )
