@@ -15,13 +15,13 @@ import { sxStyles } from "../../../types/commonTypes"
 import SwipeableViews from "react-swipeable-views"
 import { useTheme } from "@mui/material/styles"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
-import { SlideUpTransition } from "../common/transitions"
 import dynamic from "next/dynamic"
 import CircularProgress from "@mui/material/CircularProgress"
 import { LoadableBaseOptions } from "next/dist/shared/lib/dynamic"
 import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
+import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 
 const styles = sxStyles({
    content: {
@@ -96,6 +96,7 @@ const views: View[] = [
    createView({
       key: "livestream-details",
       viewPath: "livestream-details/LivestreamDetailsView",
+      loadingComponent: () => <LivestreamDetailsViewSkeleton />,
    }),
    createView({
       key: "register-data-consent",
@@ -282,7 +283,6 @@ const DialogContext = createContext<DialogContextType>({
    activeView: "livestream-details",
    updatedStats: null,
    serverUserEmail: null,
-   jobId: null,
 })
 
 export const useLiveStreamDialog = () => {
