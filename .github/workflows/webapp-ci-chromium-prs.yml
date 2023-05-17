@@ -113,8 +113,8 @@ jobs:
       strategy:
          fail-fast: false
          matrix:
-            shard: [1, 2, 3]
-            total: [3]
+            shard: [1, 2, 3, 4]
+            total: [4]
       runs-on: ubuntu-20.04
       timeout-minutes: 25
       steps:
