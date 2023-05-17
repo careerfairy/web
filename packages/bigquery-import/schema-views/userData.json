@@ -33,14 +33,6 @@
          "type": "stringified_map"
       },
       {
-         "name": "referralsCount",
-         "type": "number"
-      },
-      {
-         "name": "totalLivestreamInvites",
-         "type": "number"
-      },
-      {
          "name": "isAdmin",
          "type": "boolean"
       },
