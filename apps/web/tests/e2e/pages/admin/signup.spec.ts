@@ -9,8 +9,9 @@ import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/dist/emulators"
-import { sleep } from "../../utils"
+import { waitForData } from "../../utils"
 import ProfilePage from "../../page-object-models/ProfilePage"
+import { AdminSignupPage } from "../../page-object-models/AdminSignupPage"
 
 /**
  * Test Fixture
@@ -34,7 +35,6 @@ const test = base.extend<{
 
       const groupPage = new GroupDashboardPage(page, group)
 
-      await sleep(1000)
       await groupPage.clickBackdropIfPresent()
 
       await use(groupPage)
@@ -46,8 +46,7 @@ test.describe("Admin Signup", () => {
       groupPage,
    }) => {
       // assert we're on the group dashboard
-      expect(groupPage.topCreateLivestreamButton()).toBeVisible()
-      await groupPage.assertMainPageHeader()
+      await groupPage.assertGroupDashboardIsOpen()
    })
 
    test("Group admin should have the group in the profile > groups page", async ({
@@ -62,18 +61,89 @@ test.describe("Admin Signup", () => {
       ).toBeVisible()
    })
 
-   // test("Invite a user through the group team members page", async ({
-   //    groupPage,
-   // }) => {
+   test("Invite a new user through the group team members page to be group admin", async ({
+      groupPage,
+      group,
+      context,
+   }) => {
+      // create invite
+      await groupPage.goToCompanyPage()
+      await groupPage.goToMembersPage()
+      await groupPage.inviteGroupAdmin(creds.email)
 
-   //    await groupPage.goToCompanyPage()
-   //    await groupPage.goToMembersPage()
+      // confirm the invite works
+      const inviteDoc = await waitForData(() =>
+         GroupSeed.getInviteByEmail(creds.email)
+      )
 
-   // TODO: coming on stack 2
-   // })
+      // new browser context without any auth
+      const inviteContext = await context.browser().newContext()
+      const adminPage = new AdminSignupPage(await inviteContext.newPage())
 
-   // TODO: test, member can't invite others
+      // open invite link
+      await adminPage.openSignupInvite(inviteDoc.id)
+      await adminPage.assertSignUpHeader()
+
+      // fill sign up form & submit
+      await adminPage.signup(creds)
+
+      // confirm we're on the group dashboard
+      const newGroupPage = new GroupDashboardPage(adminPage.page, group)
+      await newGroupPage.clickBackdropIfPresent()
+      // assert we're on the group dashboard
+      await newGroupPage.assertGroupDashboardIsOpen()
+
+      // clear resources
+      await inviteContext.close()
+   })
+
+   test("Invite an existing user through the group team members page to be group admin", async ({
+      groupPage,
+      group,
+      context,
+   }) => {
+      // create the user we'll invite
+      const user = await UserSeed.createUser(creds.email)
+
+      // create invite
+      await groupPage.goToCompanyPage()
+      await groupPage.goToMembersPage()
+      await groupPage.inviteGroupAdmin(user.userEmail)
+
+      const inviteDoc = await waitForData(() =>
+         GroupSeed.getInviteByEmail(user.userEmail)
+      )
+
+      // new browser context without any auth
+      const inviteContext = await context.browser().newContext()
+      const adminPage = new AdminSignupPage(await inviteContext.newPage())
+
+      // open invite link and login
+      await adminPage.openSignInInvite(inviteDoc.id)
+      await adminPage.login({ email: user.userEmail, password: "password" })
+
+      // confirm we're on the group dashboard
+      const newGroupPage = new GroupDashboardPage(adminPage.page, group)
+      await newGroupPage.clickBackdropIfPresent()
+      // assert we're on the group dashboard
+      await newGroupPage.assertGroupDashboardIsOpen()
+
+      // a group member can't invite others, only the group owner..
+      await newGroupPage.goToCompanyPage()
+      await newGroupPage.goToMembersPage()
+      expect(newGroupPage.inviteMemberButton).not.toBeVisible()
+
+      // clear resources
+      await inviteContext.close()
+   })
 })
+
+const creds = {
+   firstName: "Ron",
+   lastName: "Swanson",
+   email: "ron@careerfairy.io",
+   password: "password123A",
+}
 
 async function setupData(overrideGroupDetails: Partial<Group> = {}) {
    const group = await GroupSeed.createGroup(
