@@ -66,6 +66,7 @@ const LivestreamSearchNav = () => {
                   value={currentStreamStats?.livestream ?? null}
                   startIcon={<FindIcon color={"black"} />}
                   additionalConstraints={additionalConstraints}
+                  includeHiddenEvents
                />
             </Card>
          </Box>

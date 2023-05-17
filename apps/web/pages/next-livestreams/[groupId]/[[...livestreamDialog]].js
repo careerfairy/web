@@ -55,6 +55,7 @@ const GroupPage = ({
 
    const upcomingLivestreams = useListenToUpcomingStreams({
       filterByGroupId: currentGroup.groupId,
+      getHiddenEvents: true,
    })
 
    const [pastLivestreams, setPastLivestreams] = useState(undefined)
