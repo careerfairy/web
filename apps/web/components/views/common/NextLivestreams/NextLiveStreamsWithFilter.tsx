@@ -1,7 +1,6 @@
-import useListenToUpcomingStreams from "../../../../components/custom-hook/useListenToUpcomingStreams"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import useListenToStreams from "../../../../components/custom-hook/useListenToStreams"
+import React, { useCallback, useMemo } from "react"
 import { StreamsSection } from "./StreamsSection"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
 import Link from "../../../../components/views/common/Link"
@@ -95,29 +94,14 @@ const NextLiveStreamsWithFilter = ({
       [allFieldsOfStudy, fieldsOfStudy]
    )
 
-   const upcomingLivestreams = useListenToUpcomingStreams({
+   const livestreams = useListenToStreams({
       languagesIds: languages,
       companyCountriesIds: companyCountries,
       companyIndustriesIds: companyIndustries,
       fieldsOfStudy: mapFieldsOfStudy,
       recordedOnly: recordedOnly,
+      listenToPastEvents: hasPastEvents,
    })
-   const [pastLivestreams, setPastLivestreams] = useState(undefined)
-
-   useEffect(() => {
-      // load past events when changing tabs
-      if (hasPastEvents && !pastLivestreams) {
-         const sixMonthsAgo = new Date(
-            new Date().setMonth(new Date().getMonth() - 6)
-         )
-         livestreamRepo
-            .getPastEventsFrom({ fromDate: sixMonthsAgo })
-            .then((data) => {
-               setPastLivestreams(data)
-            })
-            .catch(console.error)
-      }
-   }, [hasPastEvents, pastLivestreams])
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
@@ -180,26 +164,20 @@ const NextLiveStreamsWithFilter = ({
                      hasPastEvents={hasPastEvents}
                   />
                </Card>
-               {hasPastEvents ? null : (
-                  <Box sx={styles.filter}>
-                     <Filter
-                        filtersToShow={filtersToShow}
-                        numberOfResults={
-                           initialTabValue === "upcomingEvents"
-                              ? upcomingLivestreams?.length
-                              : pastLivestreams?.length
-                        }
-                     />
-                  </Box>
-               )}
+               <Box sx={styles.filter}>
+                  <Filter
+                     filtersToShow={filtersToShow}
+                     numberOfResults={livestreams?.length}
+                  />
+               </Box>
             </Box>
          </Container>
 
          <StreamsSection
             value={initialTabValue}
-            upcomingLivestreams={upcomingLivestreams}
+            upcomingLivestreams={livestreams}
             listenToUpcoming
-            pastLivestreams={pastLivestreams}
+            pastLivestreams={livestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />

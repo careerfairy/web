@@ -18,9 +18,10 @@ type Props = {
    from?: Date
    fieldsOfStudy?: FieldOfStudy[]
    recordedOnly?: boolean
+   listenToPastEvents?: boolean
 }
 
-const useListenToUpcomingStreams = (props?: Props) => {
+const useListenToStreams = (props?: Props) => {
    const {
       filterByGroupId,
       languagesIds,
@@ -34,10 +35,13 @@ const useListenToUpcomingStreams = (props?: Props) => {
       from,
       fieldsOfStudy,
       recordedOnly,
+      listenToPastEvents,
    } = props
 
-   const upcomingEventsQuery = useMemo(() => {
-      let query = livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
+   const eventsQuery = useMemo(() => {
+      let query = listenToPastEvents
+         ? livestreamRepo.pastEventsQuery()
+         : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
       if (filterByGroupId) {
          query = query.where("groupIds", "array-contains", filterByGroupId)
@@ -69,7 +73,7 @@ const useListenToUpcomingStreams = (props?: Props) => {
          query = query.where("start", ">", from)
       }
 
-      if (fieldsOfStudy.length) {
+      if (fieldsOfStudy?.length) {
          query = query.where(
             "targetFieldsOfStudy",
             "array-contains-any",
@@ -90,17 +94,19 @@ const useListenToUpcomingStreams = (props?: Props) => {
       interestsIds,
       languagesIds,
       registeredUserEmail,
+      listenToPastEvents,
       recordedOnly,
    ])
 
-   let { data, isLoading } = useCollection<LivestreamEvent>(
-      upcomingEventsQuery,
-      true
-   )
+   let { data, isLoading } = useCollection<LivestreamEvent>(eventsQuery, true)
 
    if (isLoading) return undefined
 
-   let res = new LivestreamsDataParser(data).filterByNotEndedEvents()
+   let res = new LivestreamsDataParser(data)
+
+   if (!listenToPastEvents) {
+      res = res.filterByNotEndedEvents()
+   }
 
    if (jobCheck) {
       res = res.filterByHasJobs()
@@ -128,4 +134,4 @@ const useListenToUpcomingStreams = (props?: Props) => {
    return res.complementaryFields().get()
 }
 
-export default useListenToUpcomingStreams
+export default useListenToStreams

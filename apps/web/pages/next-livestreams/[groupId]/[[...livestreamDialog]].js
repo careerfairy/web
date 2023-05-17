@@ -13,7 +13,7 @@ import { getServerSideGroup } from "util/serverUtil"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ScrollToTop from "components/views/common/ScrollToTop"
 import { placeholderBanner } from "../../../constants/images"
-import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
+import useListenToStreams from "../../../components/custom-hook/useListenToStreams"
 import { livestreamRepo } from "../../../data/RepositoryInstances"
 import {
    getLivestreamDialogData,
@@ -53,7 +53,7 @@ const GroupPage = ({
       },
    ])
 
-   const upcomingLivestreams = useListenToUpcomingStreams({
+   const upcomingLivestreams = useListenToStreams({
       filterByGroupId: currentGroup.groupId,
       getHiddenEvents: true,
    })
