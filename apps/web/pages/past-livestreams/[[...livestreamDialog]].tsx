@@ -3,10 +3,17 @@ import ScrollToTop from "../../components/views/common/ScrollToTop"
 import React from "react"
 import SEO from "../../components/util/SEO"
 import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
+import { InferGetServerSidePropsType, NextPage } from "next"
+import {
+   LivestreamDialogLayout,
+   livestreamDialogSSP,
+} from "../../components/views/livestream-dialog"
 
-const PastLivestreamsPage = () => {
+const PastLivestreamsPage: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = (props) => {
    return (
-      <>
+      <LivestreamDialogLayout serverSideLivestream={props.serverSideLivestream}>
          <SEO
             id={"CareerFairy | Past Livestreams"}
             description={"Catch the past streams on CareerFairy."}
@@ -16,8 +23,9 @@ const PastLivestreamsPage = () => {
             <NextLiveStreamsWithFilter initialTabValue={"pastEvents"} />
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
-      </>
+      </LivestreamDialogLayout>
    )
 }
 
+export const getServerSideProps = livestreamDialogSSP()
 export default PastLivestreamsPage
