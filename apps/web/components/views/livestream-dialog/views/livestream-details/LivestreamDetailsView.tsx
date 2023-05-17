@@ -3,11 +3,10 @@ import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import Stack from "@mui/material/Stack"
-import LivestreamTagsContainer, {
-   LivestreamTagsContainerSkeleton,
-} from "./LivestreamTagsContainer"
+import LivestreamTagsContainer from "./LivestreamTagsContainer"
 import HostInfo, { HostInfoSkeleton } from "./HostInfo"
-import LivestreamTitle, { LivestreamTitleSkeleton } from "./LivestreamTitle"
+import LivestreamTitle from "./LivestreamTitle"
+import LivestreamDetailsViewSkeleton from "./LivestreamDetailsViewSkeleton"
 
 const LivestreamDetailsView: FC = () => {
    const { livestream, livestreamPresenter } = useLiveStreamDialog()
@@ -39,24 +38,7 @@ const LivestreamDetailsView: FC = () => {
    )
 }
 
-export const LivestreamDetailsViewSkeleton = () => {
-   return (
-      <BaseDialogView
-         heroContent={
-            <HeroContent>
-               <Stack alignItems="center" justifyContent={"center"} spacing={2}>
-                  <HostInfoSkeleton />
-                  <LivestreamTitleSkeleton />
-                  <LivestreamTagsContainerSkeleton />
-               </Stack>
-            </HeroContent>
-         }
-         mainContent={<DummyMainContent />}
-      />
-   )
-}
-
-const DummyMainContent: FC = () => {
+export const DummyMainContent: FC = () => {
    return (
       <MainContent>
          <Stack pt={2} spacing={2}>
