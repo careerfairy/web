@@ -12,6 +12,8 @@ import { Home as HomeIcon, Radio as LiveStreamsIcon } from "react-feather"
 import ClockIcon from "@mui/icons-material/AccessTime"
 import DomainIcon from "@mui/icons-material/Domain"
 import { useAuth } from "../../HOCs/AuthProvider"
+import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
+import CreditsDialog from "../../components/views/credits-dialog/CreditsDialog"
 
 type IGenericDashboardContext = {
    isPortalPage: boolean
@@ -150,12 +152,7 @@ const GenericDashboardLayout = ({
          <CreditsDialogLayout>
             <AdminGenericLayout
                bgColor={bgColor || "#F7F8FC"}
-               headerContent={
-                  <TopBar
-                     handleOpenCreditsDialog={handleOpenCreditsDialog}
-                     title={pageDisplayName}
-                  />
-               }
+               headerContent={<TopBar title={pageDisplayName} />}
                drawerContent={<NavBar />}
                bottomNavContent={<GenericNavList />}
                drawerOpen={!isMobile}
