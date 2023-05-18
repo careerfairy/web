@@ -16,10 +16,6 @@ import { Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import DateUtil from "../../../util/DateUtil"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import {
-   UnlockedContentPath,
-   PastLivestreamsPath,
-} from "../../../layouts/GenericDashboardLayout/GenericNavList"
 import Link from "../../../components/views/common/Link"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
 
@@ -31,8 +27,6 @@ const styles = sxStyles({
       textAlign: "center",
    },
 })
-
-const paths = [UnlockedContentPath, PastLivestreamsPath]
 
 const UnlockedContent = ({
    unlockedEvents,
@@ -65,10 +59,7 @@ const UnlockedContent = ({
             description={"CareerFairy | Unlocked content"}
             title={"CareerFairy | Unlocked content"}
          />
-         <GenericDashboardLayout
-            pageDisplayName={"Unlocked content"}
-            mobileDropdownPaths={paths}
-         >
+         <GenericDashboardLayout pageDisplayName={"Unlocked content"}>
             <StreamsSection
                value={"pastEvents"}
                pastLivestreams={unlockedPastLivestreams}
