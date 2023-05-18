@@ -134,6 +134,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                   title: "Country",
                   renderFn: () => (
                      <CompanyCountrySelector
+                        key={FilterEnum.companyCountries}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
@@ -144,6 +145,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                   title: "Industry",
                   renderFn: () => (
                      <CompanyIndustrySelector
+                        key={FilterEnum.companyIndustries}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
@@ -154,6 +156,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                   title: "Company Size",
                   renderFn: () => (
                      <CompanySizeSelector
+                        key={FilterEnum.companySizes}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
@@ -163,7 +166,10 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                toShow = {
                   title: "Language",
                   renderFn: () => (
-                     <LanguageSelector handleChange={handleChangeMultiSelect} />
+                     <LanguageSelector
+                        key={FilterEnum.languages}
+                        handleChange={handleChangeMultiSelect}
+                     />
                   ),
                }
                break
@@ -172,6 +178,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                   title: "Field of study",
                   renderFn: () => (
                      <FieldsOfStudySelector
+                        key={FilterEnum.fieldsOfStudy}
                         handleChange={handleChangeMultiSelect}
                      />
                   ),
@@ -219,18 +226,21 @@ const FilterMenu = ({ open, handleClose }: Props) => {
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
             case FilterEnum.recordedOnly:
-               return <RecordedOnlyToggle />
+               return <RecordedOnlyToggle key={FilterEnum.recordedOnly} />
 
             case FilterEnum.interests:
                return (
-                  <InterestsSelector handleChange={handleChangeMultiSelect} />
+                  <InterestsSelector
+                     key={FilterEnum.interests}
+                     handleChange={handleChangeMultiSelect}
+                  />
                )
 
             case FilterEnum.jobCheck:
-               return <JobCheck />
+               return <JobCheck key={FilterEnum.jobCheck} />
 
             case FilterEnum.sortBy:
-               return <SortBySelector />
+               return <SortBySelector key={FilterEnum.sortBy} />
 
             case FilterEnum.languages:
             case FilterEnum.companyCountries:
