@@ -68,8 +68,8 @@ const BottomNavBar = ({ links }: Props) => {
                      label={isMobile ? mobileTitle || title : title}
                      sx={[
                         styles.navLink,
-                        isActivePath ||
-                           (isChildrenActive && styles.activeNavLink),
+                        (isActivePath || isChildrenActive) &&
+                           styles.activeNavLink,
                      ]}
                   />
                )
