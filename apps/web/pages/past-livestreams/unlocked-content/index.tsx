@@ -45,7 +45,10 @@ const UnlockedContent = ({
                {/* eslint-disable-next-line react/no-unescaped-entities */}
                {isMobile ? "You" : "Currently you"} don't have any unlocked
                content 😕 <br />
-               Check them out <Link href="/past-livestreams">here</Link>
+               {isMobile
+                  ? "Check them out"
+                  : "Check recording of past live streams"}{" "}
+               <Link href={"/past-livestreams"}>here</Link>
             </Typography>
          </Grid>
       ),
