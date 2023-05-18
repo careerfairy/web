@@ -23,13 +23,13 @@ const MyRegistrations = () => {
    const nowDate = useMemo(() => new Date(), [])
 
    const upcomingLivestreams = useListenToUpcomingStreams({
-      userEmail: userData?.userEmail,
+      registeredUserEmail: userData?.userEmail,
       from: nowDate,
    })
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
-         <Grid xs={12} mt={4} mx={1} item>
+         <Grid xs={12} mx={1} item>
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
                Currently you don't have any upcoming events booked 😕

@@ -9,11 +9,11 @@ type Props = {
 const NoResultsMessage = ({ message }: Props) => {
    return (
       <>
-         <Grid xs={12} mt={{ xs: 12, md: 20 }} textAlign="center" item>
+         <Grid xs={12} mt={{ xs: 12, md: 12 }} textAlign="center" item>
             <Image
                src="/empty-search.svg"
-               width="600"
-               height="300"
+               width="300"
+               height="200"
                alt="Empty search illustration"
             />
          </Grid>
