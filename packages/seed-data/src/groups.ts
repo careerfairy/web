@@ -12,6 +12,7 @@ import {
    FirebaseGroupRepository,
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
+import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -21,6 +22,8 @@ interface GroupSeed {
       group: Group,
       role?: GROUP_DASHBOARD_ROLE
    ): Promise<void>
+
+   getInviteByEmail(email: string): Promise<GroupDashboardInvite>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -29,6 +32,21 @@ class GroupFirebaseSeed implements GroupSeed {
    constructor() {
       this.groupRepo = new FirebaseGroupRepository(firestore as any, fieldValue)
    }
+
+   async getInviteByEmail(email: string): Promise<GroupDashboardInvite> {
+      const snap = await firestore
+         .collection("groupDashboardInvites")
+         .where("invitedEmail", "==", email)
+         .limit(1)
+         .get()
+
+      if (snap.empty) {
+         return null
+      }
+
+      return snap.docs[0].data() as GroupDashboardInvite
+   }
+
    /**
     * Create custom admin claims for a user
     */
