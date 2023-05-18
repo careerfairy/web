@@ -6,10 +6,6 @@ import { StreamsSection } from "components/views/common/NextLivestreams/StreamsS
 import { Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import NoResultsMessage from "../../../components/views/common/NextLivestreams/NoResultsMessage"
-import {
-   MyRegistrationsPath,
-   NextLivestreamsPath,
-} from "../../../layouts/GenericDashboardLayout/GenericNavList"
 import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Link from "../../../components/views/common/Link"
@@ -23,7 +19,7 @@ const styles = sxStyles({
       textAlign: "center",
    },
 })
-const paths = [MyRegistrationsPath, NextLivestreamsPath]
+
 const MyRegistrations = () => {
    const { userData } = useAuth()
    const isMobile = useIsMobile()
@@ -56,10 +52,7 @@ const MyRegistrations = () => {
             description={"CareerFairy | My Registrations"}
             title={"CareerFairy | My Registrations"}
          />
-         <GenericDashboardLayout
-            pageDisplayName={"My Registrations"}
-            mobileDropdownPaths={paths}
-         >
+         <GenericDashboardLayout pageDisplayName={"My Registrations"}>
             <StreamsSection
                value={"upcomingEvents"}
                upcomingLivestreams={upcomingLivestreams}

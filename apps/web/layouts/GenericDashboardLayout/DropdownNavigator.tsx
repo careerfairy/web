@@ -1,9 +1,10 @@
 import { Box, Typography } from "@mui/material"
 import { INavLink } from "../types"
 import { useRouter } from "next/router"
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { sxStyles } from "../../types/commonTypes"
 import { ChevronDown, ChevronUp } from "react-feather"
+import { useGenericDashboard } from "./index"
 
 const styles = sxStyles({
    root: {
@@ -43,18 +44,22 @@ const styles = sxStyles({
    },
 })
 
-type Props = {
-   paths?: INavLink[]
-}
-
-const DropdownNavigator = ({ paths }: Props) => {
+const DropdownNavigator = () => {
    const { pathname, push } = useRouter()
    const [isOpen, setIsOpen] = useState(false)
    const dropdownRef = useRef(null)
+   const { navLinks } = useGenericDashboard()
 
    const handleClick = useCallback(() => {
-      setIsOpen(!isOpen)
-   }, [isOpen])
+      setIsOpen((prevState) => !prevState)
+   }, [])
+
+   const paths = useMemo((): INavLink[] => {
+      const actualLink = navLinks.find((link) =>
+         link?.childLinks?.some((childLink) => childLink.pathname === pathname)
+      )
+      return actualLink ? actualLink.childLinks : []
+   }, [navLinks, pathname])
 
    useEffect(() => {
       // only add the event listener when the dropdown is opened
