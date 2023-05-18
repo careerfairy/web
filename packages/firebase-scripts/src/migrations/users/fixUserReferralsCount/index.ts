@@ -1,6 +1,6 @@
 import { UserData, UserStats } from "@careerfairy/shared-lib/dist/users"
 import * as cliProgress from "cli-progress"
-import { BulkWriter, FieldValue } from "firebase-admin/firestore"
+import { FieldValue } from "firebase-admin/firestore"
 import Counter from "../../../lib/Counter"
 import counterConstants from "../../../lib/Counter/constants"
 import { firestore } from "../../../lib/firebase"
@@ -21,19 +21,16 @@ const bar = new cliProgress.SingleBar(
 
 // cached globally
 let users: DataWithRef<true, UserData>[]
-let bulkWriter: BulkWriter
 
 /**
  * Run the migration
  */
 export async function run() {
-   bulkWriter = firestore.bulkWriter()
    users = await logAction(() => userRepo.getAllUsers(true), "Fetching users")
 
    bar.start(users.length * 2, 0) // * 2 because we might do 2 writes per user
    counter.addToReadCount(users.length)
 
-   let idx = 0
    for (const user of users) {
       const ref = user._ref
 
@@ -57,40 +54,33 @@ export async function run() {
       }
 
       if (Object.keys(userDataToUpdate).length > 0) {
-         bulkWriter
-            .update(ref as any, userDataToUpdate)
-            .then(() => {
-               counter.writeIncrement()
-            })
-            .catch((error) => {
-               console.error("bulkWriter.update failed", error)
-               counter.addToCustomCount(counterConstants.numFailedWrites, 1)
-            })
-            .finally(() => {
-               bar.increment()
-            })
+         // using a batch for the two writes to be atomic
+         // if any of them fail, we don't want to write the other
+         const batch = firestore.batch()
+
+         batch.update(ref as any, userDataToUpdate)
 
          const statsRef = ref.collection("stats").doc("stats")
-         bulkWriter
-            .update(statsRef as any, userStatsToUpdate)
-            .then(() => {
-               counter.writeIncrement()
-            })
-            .catch((error) => {
-               console.error("bulkWriter.update failed", error)
-               counter.addToCustomCount(counterConstants.numFailedWrites, 1)
-            })
-            .finally(() => {
-               bar.increment()
-            })
+         batch.set(statsRef as any, userStatsToUpdate, { merge: true })
 
-         if (++idx % 50 === 0) {
-            await bulkWriter.flush()
+         try {
+            await batch.commit()
+            counter.addToWriteCount(2)
+         } catch (error) {
+            console.error("batch failed", error, {
+               email: user.userEmail,
+               referralsCount: user["referralsCount"],
+               totalLivestreamInvites: user["totalLivestreamInvites"],
+            })
+            counter.addToCustomCount(counterConstants.numFailedWrites, 2)
          }
+      } else {
+         counter.addToCustomCount("userData without fields", 1)
       }
+
+      bar.increment(2)
    }
 
-   await bulkWriter.close()
    bar.stop()
    counter.print()
 }
