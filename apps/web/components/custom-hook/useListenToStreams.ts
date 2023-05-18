@@ -38,9 +38,14 @@ const useListenToStreams = (props?: Props) => {
       listenToPastEvents,
    } = props
 
+   const sixMonthsAgo = useMemo(
+      () => new Date(new Date().setMonth(new Date().getMonth() - 6)),
+      []
+   )
+
    const eventsQuery = useMemo(() => {
       let query = listenToPastEvents
-         ? livestreamRepo.pastEventsQuery()
+         ? livestreamRepo.getPastEventsFromQuery({ fromDate: sixMonthsAgo })
          : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
       if (filterByGroupId) {
@@ -96,6 +101,7 @@ const useListenToStreams = (props?: Props) => {
       registeredUserEmail,
       listenToPastEvents,
       recordedOnly,
+      sixMonthsAgo,
    ])
 
    let { data, isLoading } = useCollection<LivestreamEvent>(eventsQuery, true)
