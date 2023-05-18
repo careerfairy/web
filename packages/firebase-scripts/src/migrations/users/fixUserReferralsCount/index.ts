@@ -5,7 +5,7 @@ import Counter from "../../../lib/Counter"
 import counterConstants from "../../../lib/Counter/constants"
 import { firestore } from "../../../lib/firebase"
 import { userRepo } from "../../../repositories"
-import { logAction } from "../../../util/logger"
+import { logAction, logToFile } from "../../../util/logger"
 import { getCLIBarOptions } from "../../../util/misc"
 import { DataWithRef } from "../../../util/types"
 
@@ -67,7 +67,8 @@ export async function run() {
             await batch.commit()
             counter.addToWriteCount(2)
          } catch (error) {
-            console.error("batch failed", error, {
+            console.error("batch failed", error)
+            await logToFile("failedUsers.txt", {
                email: user.userEmail,
                referralsCount: user["referralsCount"],
                totalLivestreamInvites: user["totalLivestreamInvites"],
