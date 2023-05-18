@@ -6,7 +6,7 @@ import { StreamsSection } from "components/views/common/NextLivestreams/StreamsS
 import { Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import NoResultsMessage from "../../../components/views/common/NextLivestreams/NoResultsMessage"
-import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
+import useListenToStreams from "../../../components/custom-hook/useListenToStreams"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Link from "../../../components/views/common/Link"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
@@ -26,7 +26,7 @@ const MyRegistrations = () => {
 
    const nowDate = useMemo(() => new Date(), [])
 
-   const upcomingLivestreams = useListenToUpcomingStreams({
+   const upcomingLivestreams = useListenToStreams({
       registeredUserEmail: userData?.userEmail,
       from: nowDate,
    })

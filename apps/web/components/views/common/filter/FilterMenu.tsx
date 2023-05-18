@@ -17,7 +17,6 @@ import { sxStyles } from "../../../../types/commonTypes"
 import { mapOptions } from "../../signup/utils"
 import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { FilterEnum, useFilter } from "./Filter"
-import { Transition } from "../../credits-dialog/CreditsDialog"
 import CloseIcon from "@mui/icons-material/Close"
 import IconButton from "@mui/material/IconButton"
 import LoadingButton from "@mui/lab/LoadingButton"
@@ -30,6 +29,7 @@ import CompanyIndustrySelector from "./selectors/CompanyIndustrySelector"
 import CompanySizeSelector from "./selectors/CompanySizeSelector"
 import LanguageSelector from "./selectors/LanguageSelector"
 import FieldsOfStudySelector from "./selectors/FiledsOfStudySelector"
+import { SlideUpTransition } from "../transitions"
 
 const styles = sxStyles({
    paperRoot: {
@@ -259,7 +259,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
          onClose={handleClose}
          maxWidth={"md"}
          fullWidth
-         TransitionComponent={Transition}
+         TransitionComponent={SlideUpTransition}
          keepMounted={false} // Does not mount the children when dialog is closed
       >
          <DialogTitle sx={styles.header}>
