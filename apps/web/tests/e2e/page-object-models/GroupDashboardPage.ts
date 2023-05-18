@@ -6,12 +6,17 @@ import { sleep } from "../utils"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
+   public kickFromDashboard: Locator
 
    constructor(public readonly page: Page, protected readonly group: Group) {
       super(page)
 
       this.inviteMemberButton = this.page.getByRole("button", {
          name: "Invite a Member",
+      })
+
+      this.kickFromDashboard = this.page.getByRole("button", {
+         name: "Kick from dashboard",
       })
    }
 

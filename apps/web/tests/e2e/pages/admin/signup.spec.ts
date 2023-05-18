@@ -132,6 +132,8 @@ test.describe("Admin Signup", () => {
       await newGroupPage.goToCompanyPage()
       await newGroupPage.goToMembersPage()
       expect(newGroupPage.inviteMemberButton).not.toBeVisible()
+      // also can't kick others
+      expect(newGroupPage.kickFromDashboard).not.toBeVisible()
 
       // clear resources
       await inviteContext.close()
