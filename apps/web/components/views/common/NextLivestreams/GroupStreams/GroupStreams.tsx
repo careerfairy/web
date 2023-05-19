@@ -54,7 +54,10 @@ const GroupStreams = ({
    const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
    const { data: existingInterests } = useInterests()
    const [globalCardHighlighted, setGlobalCardHighlighted] = useState(false)
-   const searchedButNoResults = !searching && !livestreams?.length
+   const searchedButNoResults = useMemo(
+      () => !searching && !livestreams?.length,
+      [livestreams?.length, searching]
+   )
    const [slicedLivestreams] = useInfiniteScrollClientWithHandlers(
       livestreams,
       6,
@@ -84,31 +87,33 @@ const GroupStreams = ({
          : ImpressionLocation.nextLivestreamsGroup
    }, [groupData, isPastLivestreams])
 
-   const renderStreamCards = slicedLivestreams?.map(
-      (livestream, index, arr) => {
-         if (livestream) {
-            return (
-               <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={3} item>
-                  <InView triggerOnce>
-                     {({ inView, ref }) =>
-                        inView ? (
-                           <EventPreviewCard
-                              ref={ref}
-                              index={index}
-                              totalElements={arr.length}
-                              interests={existingInterests}
-                              location={location}
-                              event={livestream}
-                           />
-                        ) : (
-                           <EventPreviewCard ref={ref} loading />
-                        )
-                     }
-                  </InView>
-               </Grid>
-            )
-         }
-      }
+   const renderStreamCards = useMemo(
+      () =>
+         slicedLivestreams?.map((livestream, index, arr) => {
+            if (livestream) {
+               return (
+                  <Grid key={livestream.id} xs={12} sm={6} lg={4} xl={3} item>
+                     <InView triggerOnce>
+                        {({ inView, ref }) =>
+                           inView ? (
+                              <EventPreviewCard
+                                 ref={ref}
+                                 index={index}
+                                 totalElements={arr.length}
+                                 interests={existingInterests}
+                                 location={location}
+                                 event={livestream}
+                              />
+                           ) : (
+                              <EventPreviewCard ref={ref} loading />
+                           )
+                        }
+                     </InView>
+                  </Grid>
+               )
+            }
+         }),
+      [existingInterests, location, slicedLivestreams]
    )
 
    return (
