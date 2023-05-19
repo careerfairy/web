@@ -513,7 +513,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                                     fontSize={12}
                                     color={"text.secondary"}
                                  >
-                                    {event.duration} min
+                                    {event?.duration} min
                                  </Typography>
                               </Box>
                            ) : null}
