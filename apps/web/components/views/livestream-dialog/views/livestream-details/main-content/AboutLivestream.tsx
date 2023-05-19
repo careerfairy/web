@@ -15,37 +15,9 @@ const styles = sxStyles({
       fontSize: "1.285rem",
       whiteSpace: "pre-line",
    },
-   customBullet: {
-      listStyleType: "none",
-      paddingLeft: "1em",
-      position: "relative",
-   },
-   list: {
-      listStyleType: "none",
-      pl: 0,
-      mb: 0,
-   },
-   listItem: {
+   reasons: {
+      whiteSpace: "pre-line",
       fontSize: "1.1428rem",
-      display: "list-item",
-      position: "relative",
-      paddingLeft: 3,
-      "&:not(:last-child)": {
-         mb: 2.25,
-      },
-      "&::before": {
-         content: "''",
-         position: "absolute",
-         left: 0,
-         top: "0.36em",
-         width: 15,
-         height: 15,
-         borderRadius: "50%",
-         backgroundColor: "primary.main",
-         background: `url(/icons/themed-check.svg)`,
-         backgroundSize: "contain",
-         backgroundRepeat: "no-repeat",
-      },
    },
 })
 
@@ -78,11 +50,6 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
    const reasonsToJoinLivestream = presenter.reasonsToJoinLivestream.trim()
    const hasReasonsToJoinLivestream = Boolean(reasonsToJoinLivestream)
 
-   const reasonsList = reasonsToJoinLivestream.split("\n").map((reason) => {
-      // replace the first occurrence of "-" but exclude any subsequent occurrences
-      return reason.replace(/^-(?!.*-)/, "").trim()
-   })
-
    if (!hasReasonsToJoinLivestream) {
       return null
    }
@@ -90,15 +57,15 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
    return (
       <Box>
          <SectionTitle>Why should you join the Live Stream?</SectionTitle>
-         <Box sx={styles.list} component="ul">
-            {reasonsList.map((point) => (
-               <Box sx={styles.listItem} component="li" key={point}>
-                  <LinkifyText>
-                     <Typography fontSize="inherit">{point}</Typography>
-                  </LinkifyText>
-               </Box>
-            ))}
-         </Box>
+         <LinkifyText>
+            <Stack spacing={2.25}>
+               {reasonsToJoinLivestream.split("\n").map((reason) => (
+                  <Typography key={reason} sx={styles.reasons}>
+                     {reason}
+                  </Typography>
+               ))}
+            </Stack>
+         </LinkifyText>
       </Box>
    )
 }
