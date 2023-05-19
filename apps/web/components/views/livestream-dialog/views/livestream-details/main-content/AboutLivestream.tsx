@@ -6,6 +6,7 @@ import { Typography } from "@mui/material"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { sxStyles } from "../../../../../../types/commonTypes"
 import Stack from "@mui/material/Stack"
+import Skeleton from "@mui/material/Skeleton"
 
 const styles = sxStyles({
    companyName: {
@@ -66,6 +67,37 @@ const ReasonsToJoin: FC<ReasonToJoinProps> = ({ presenter }) => {
                ))}
             </Stack>
          </LinkifyText>
+      </Box>
+   )
+}
+
+export const AboutLivestreamSkeleton: FC = () => {
+   return (
+      <Box>
+         <SectionTitle>About the live stream</SectionTitle>
+         <Typography sx={styles.companyName} component="h3">
+            <Skeleton width={130} />
+         </Typography>
+         <Stack spacing={6}>
+            <Typography width="100%" sx={styles.summary}>
+               {Array.from({ length: 6 }).map((_, i) => (
+                  <Skeleton key={i} />
+               ))}
+               <Skeleton width="50%" />
+            </Typography>
+            <Box>
+               <SectionTitle>Why should you join the Live Stream?</SectionTitle>
+               <LinkifyText>
+                  <Stack spacing={2.25}>
+                     <Typography width="100%" sx={styles.reasons}>
+                        {Array.from({ length: 3 }).map((_, i) => (
+                           <Skeleton key={i} />
+                        ))}
+                     </Typography>
+                  </Stack>
+               </LinkifyText>
+            </Box>
+         </Stack>
       </Box>
    )
 }
