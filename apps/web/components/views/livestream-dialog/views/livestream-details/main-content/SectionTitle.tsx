@@ -7,7 +7,7 @@ const styles = sxStyles({
       fontSize: "1.428rem !important",
       fontWeight: 500,
       color: "#838383",
-      mb: 1.5,
+      mb: 2.25,
    },
 })
 
