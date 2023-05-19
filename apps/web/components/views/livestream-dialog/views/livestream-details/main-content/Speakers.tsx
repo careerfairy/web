@@ -9,6 +9,7 @@ import { Typography } from "@mui/material"
 import { NICE_SCROLLBAR_STYLES } from "../../../../../../constants/layout"
 import { speakerPlaceholder } from "../../../../../util/constants"
 import Skeleton from "@mui/material/Skeleton"
+import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
 
 const styles = sxStyles({
    root: {
@@ -69,7 +70,7 @@ const SpeakerAvatar: FC<SpeakerAvatarProps> = ({ speaker }) => {
                className="avatar"
                width={56}
                height={56}
-               src={speaker.avatar}
+               src={getResizedUrl(speaker.avatar, "lg") || speakerPlaceholder}
                objectFit="cover"
                alt={displayName}
             />
