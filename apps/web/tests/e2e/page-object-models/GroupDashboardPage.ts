@@ -63,7 +63,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public async assertGroupDashboardIsOpen() {
-      expect(this.topCreateLivestreamButton()).toBeVisible()
+      await expect(this.topCreateLivestreamButton()).toBeVisible()
       await this.assertMainPageHeader()
    }
 
