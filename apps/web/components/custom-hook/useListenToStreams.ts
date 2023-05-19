@@ -104,7 +104,10 @@ const useListenToStreams = (props?: Props) => {
       sixMonthsAgo,
    ])
 
-   let { data, isLoading } = useCollection<LivestreamEvent>(eventsQuery, true)
+   let { data, isLoading } = useCollection<LivestreamEvent>(
+      eventsQuery,
+      !listenToPastEvents
+   )
 
    if (isLoading) return undefined
 

@@ -110,13 +110,13 @@ const NextLiveStreamsWithFilter = ({
                {/* eslint-disable-next-line react/no-unescaped-entities */}
                We didn't find any events matching your criteria. 😕{" "}
                {isMobile ? (
-                  <Link href="/next-livestreams">clear all filters</Link>
+                  <Link href={"/next-livestreams"}>clear all filters</Link>
                ) : null}
             </Typography>
             {isMobile ? null : (
                <Typography sx={styles.noResultsMessage} variant="h5">
                   Remove some filters or start anew by{" "}
-                  <Link href="/next-livestreams">clearing all filters</Link>.
+                  <Link href={"/next-livestreams"}>clearing all filters</Link>.
                </Typography>
             )}
          </Grid>
