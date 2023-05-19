@@ -24,7 +24,7 @@ const styles = sxStyles({
    },
 })
 
-type InViewRef = ReturnType<typeof useInView>["0"]
+export type InViewRef = ReturnType<typeof useInView>["0"]
 
 type Props = {
    hasJobs: boolean
@@ -63,7 +63,7 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
    const tabs = useMemo<TabElement[]>(() => {
       const newTabs: TabElement[] = [
          // If there are jobs, make sure they are first in the list
-         ...(hasJobs
+         ...(jobSection
             ? [
                  {
                     value: "jobs",
@@ -77,11 +77,15 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
             label: "About The Live Stream",
             inView: aboutLivestreamsInView,
          },
-         {
-            value: "aboutCompany",
-            label: "About The Company",
-            inView: aboutCompanyInView,
-         },
+         ...(aboutCompanySection
+            ? [
+                 {
+                    value: "aboutCompany",
+                    label: "About The Company",
+                    inView: aboutCompanyInView,
+                 },
+              ]
+            : []),
          {
             value: "questions",
             label: "Questions",
@@ -91,11 +95,12 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
 
       return newTabs
    }, [
+      jobSection,
+      jobsInView,
       aboutLivestreamsInView,
+      aboutCompanySection,
       aboutCompanyInView,
       questionsInView,
-      hasJobs,
-      jobsInView,
    ])
 
    const sectionRefs = useMemo(

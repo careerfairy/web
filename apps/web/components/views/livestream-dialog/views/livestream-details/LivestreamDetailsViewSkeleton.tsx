@@ -1,11 +1,14 @@
-import BaseDialogView, { HeroContent } from "../../BaseDialogView"
+import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import Stack from "@mui/material/Stack"
 import { HostInfoSkeleton } from "./HostInfo"
 import { LivestreamTitleSkeleton } from "./LivestreamTitle"
 import { LivestreamTagsContainerSkeleton } from "./LivestreamTagsContainer"
-import { DummyContent } from "./LivestreamDetailsView"
 import { CountdownTimerSkeleton } from "./CountDownTimer"
 import { ActionButtonSkeleton } from "./action-button/ActionButton"
+import { SpeakersSkeleton } from "./main-content/Speakers"
+import { AboutLivestreamSkeleton } from "./main-content/AboutLivestream"
+import { AboutCompanySkeleton } from "./main-content/AboutCompany"
+import Section from "./main-content/Section"
 
 const LivestreamDetailsViewSkeleton = () => {
    return (
@@ -21,7 +24,19 @@ const LivestreamDetailsViewSkeleton = () => {
                </Stack>
             </HeroContent>
          }
-         mainContent={<DummyContent />}
+         mainContent={
+            <MainContent>
+               <Section>
+                  <SpeakersSkeleton />
+                  <Section>
+                     <AboutLivestreamSkeleton />
+                  </Section>
+               </Section>
+               <Section>
+                  <AboutCompanySkeleton />
+               </Section>
+            </MainContent>
+         }
       />
    )
 }

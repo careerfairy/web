@@ -192,9 +192,10 @@ const LivestreamDetailsView: FC = () => {
                            <AboutLivestream presenter={livestreamPresenter} />
                         </Section>
                      </Section>
-                     <Section ref={aboutCompanyRef}>
-                        <AboutCompany />
-                     </Section>
+                     <AboutCompany
+                        sectionRef={aboutCompanyRef}
+                        presenter={livestreamPresenter}
+                     />
                      <Section ref={questionsRef}>
                         <Questions />
                      </Section>
