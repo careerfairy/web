@@ -56,7 +56,7 @@ test.describe("Admin Signup", () => {
       const profilePage = new ProfilePage(groupPage.page)
       await profilePage.openGroups()
 
-      expect(
+      await expect(
          groupPage.page.getByRole("heading", { name: group.universityName })
       ).toBeVisible()
    })
@@ -131,9 +131,9 @@ test.describe("Admin Signup", () => {
       // a group member can't invite others, only the group owner..
       await newGroupPage.goToCompanyPage()
       await newGroupPage.goToMembersPage()
-      expect(newGroupPage.inviteMemberButton).not.toBeVisible()
+      await expect(newGroupPage.inviteMemberButton).not.toBeVisible()
       // also can't kick others
-      expect(newGroupPage.kickFromDashboard).not.toBeVisible()
+      await expect(newGroupPage.kickFromDashboard).not.toBeVisible()
 
       // clear resources
       await inviteContext.close()

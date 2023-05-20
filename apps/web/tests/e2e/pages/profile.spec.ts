@@ -50,7 +50,7 @@ test.describe("My Recruiters", () => {
       await profilePage.openMyRecruiters()
 
       // assertions
-      expect(
+      await expect(
          profilePage.page.getByRole("heading", {
             name: "You need to unlock the Research Level 2 badge to access this feature.",
          })
@@ -68,13 +68,13 @@ test.describe("My Recruiters", () => {
       await profilePage.openMyRecruiters()
 
       // assertions
-      expect(
+      await expect(
          profilePage.text(
             `${recruiter.streamerDetails.firstName} ${recruiter.streamerDetails.lastName}`
          )
       ).toBeVisible()
 
-      expect(profilePage.text("To the event page")).toBeVisible()
+      await expect(profilePage.text("To the event page")).toBeVisible()
    })
 
    test("Delete a saved recruiter", async ({ profilePage, user }) => {
