@@ -57,7 +57,9 @@ test("past event without login should request the user to login to access the re
    const { livestream } = await setupData({}, {}, "createPast")
 
    await livestreamPage.open(livestream.id)
-   await expect(livestreamPage.buttonPastEventNoLogin.isVisible()).toBeTruthy()
+   expect(await livestreamPage.buttonRegistration.textContent()).toBe(
+      "Sign Up to Watch"
+   )
 })
 
 test("register to an event and fill out a question and join talent pool", async ({
