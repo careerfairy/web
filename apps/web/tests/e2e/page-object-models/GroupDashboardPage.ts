@@ -20,6 +20,15 @@ export class GroupDashboardPage extends CommonPage {
       })
    }
 
+   /**
+    * Set some flags in local storage to prevent tooltips from showing up
+    */
+   async setLocalStorageKeys() {
+      await this.page.addInitScript(() => {
+         window.localStorage.setItem("has-seen-company-page-cta", "true")
+      })
+   }
+
    async open() {
       await this.page.goto(`/group/${this.group.id}/admin`)
    }
