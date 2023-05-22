@@ -1,5 +1,5 @@
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { FC, memo, useEffect, useState } from "react"
+import { FC, memo, useCallback, useEffect, useState } from "react"
 import Stack from "@mui/material/Stack"
 import { Divider } from "@mui/material"
 import Typography from "@mui/material/Typography"
@@ -93,17 +93,20 @@ const TimerTextSkeleton = () => {
 }
 
 const TimerText = memo(function TimerText({ time }: { time: Date }) {
-   const calculateTimeLeft = () => DateUtil.calculateTimeLeft(time)
+   const calculateTimeLeft = useCallback(
+      () => DateUtil.calculateTimeLeft(time),
+      [time]
+   )
 
    const [timeLeft, setTimeLeft] = useState(calculateTimeLeft())
 
    useEffect(() => {
-      const timeout = setTimeout(() => {
+      const interval = setInterval(() => {
          const newTimeLeft = calculateTimeLeft()
          setTimeLeft(newTimeLeft)
       }, 1000)
-      return () => clearTimeout(timeout)
-   })
+      return () => clearInterval(interval)
+   }, [calculateTimeLeft])
 
    if (isEmpty(timeLeft)) return null
 
