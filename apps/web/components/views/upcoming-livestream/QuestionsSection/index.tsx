@@ -140,6 +140,7 @@ const QuestionsSection = ({
                                  )}
                                  <Box sx={styles.questionsWrapper}>
                                     <QuestionsComponent
+                                       key={newlyCreatedQuestion?.id} // this is to force a rerender when a new question is added
                                        livestream={livestream}
                                        newlyCreatedQuestion={
                                           newlyCreatedQuestion

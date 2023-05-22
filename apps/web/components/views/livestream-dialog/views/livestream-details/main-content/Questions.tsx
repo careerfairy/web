@@ -99,16 +99,19 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
                }
             />
          ) : null}
-         {questions.map((question) => (
-            <Question
-               key={question.id}
-               livestream={livestream}
-               question={question}
-               handleClientToggleUpvoteQuestion={
-                  handleClientToggleUpvoteQuestion
-               }
-            />
-         ))}
+         {questions
+            .filter((q) => q.id !== newlyCreatedQuestion?.id)
+            .map((question) => (
+               <Question
+                  key={question.id}
+                  livestream={livestream}
+                  question={question}
+                  handleClientToggleUpvoteQuestion={
+                     handleClientToggleUpvoteQuestion
+                  }
+               />
+            ))}
+
          {loading ? (
             <>
                <QuestionSkeleton />
