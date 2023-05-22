@@ -47,17 +47,9 @@ import { bundles } from "./bundles"
 import newsletter = require("./newsletter")
 import postmark = require("./postmark")
 
-// load values from the .env file in this directory into process.env
-dotenv.config()
-
-// load values from the .env file in this directory into process.env
-dotenv.config()
-
 // Auth
 exports.createNewUserAccount_eu = auth.createNewUserAccount
 exports.createNewGroupAdminUserAccount_eu = auth.createNewGroupAdminUserAccount
-exports.onUserUpdate = auth.onUserUpdate
-exports.onUserStatsUpdate = auth.onUserStatsUpdate
 exports.backfillUserData_eu = auth.backfillUserData
 exports.validateUserEmailWithPin_eu = auth.validateUserEmailWithPin
 exports.sendPostmarkResetPasswordEmail_eu = auth.sendPostmarkResetPasswordEmail

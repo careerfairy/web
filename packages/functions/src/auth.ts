@@ -1,8 +1,7 @@
 import functions = require("firebase-functions")
 import { admin } from "./api/firestoreAdmin"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { generateReferralCode } from "./util"
-import { handleUserNetworkerBadges, handleUserStatsBadges } from "./lib/badge"
 import { groupRepo, marketingUsersRepo, userRepo } from "./api/repositories"
 import { logAndThrow } from "./lib/validations"
 import {
@@ -514,36 +513,6 @@ export const backfillUserData = functions
             "User updated with the following fields",
             dataToUpdate
          )
-      }
-   })
-
-export const onUserUpdate = functions
-   .region(config.region)
-   .firestore.document("userData/{userDataId}")
-   .onUpdate(async (change, context) => {
-      const previousValue = change.before.data() as UserData
-      const newValue = change.after.data() as UserData
-
-      try {
-         await handleUserNetworkerBadges(context.params.userDataId, newValue)
-      } catch (e) {
-         functions.logger.log(previousValue, newValue)
-         functions.logger.error("Failed to update user badges", e)
-      }
-   })
-
-export const onUserStatsUpdate = functions
-   .region(config.region)
-   .firestore.document("userData/{userDataId}/stats/stats")
-   .onUpdate(async (change, context) => {
-      const previousValue = change.before.data() as UserStats
-      const newValue = change.after.data() as UserStats
-
-      try {
-         await handleUserStatsBadges(context.params.userDataId, newValue)
-      } catch (e) {
-         functions.logger.log(previousValue, newValue)
-         functions.logger.error("Failed to update user badges", e)
       }
    })
 

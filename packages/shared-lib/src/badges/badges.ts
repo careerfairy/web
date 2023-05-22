@@ -1,4 +1,4 @@
-import { UserData, UserStats } from "../users"
+import { UserStats } from "../users"
 
 /**
  * Badges are a linked list to allow multiple levels per badge type
@@ -28,9 +28,9 @@ export class Badge {
    /**
     * Total average progress of all requirements
     */
-   progress(userData: UserData, userStats: UserStats): number {
+   progress(userStats: UserStats): number {
       const sum = this.requirements.reduce(
-         (acc, cur) => acc + cur.progress(userData, userStats),
+         (acc, cur) => acc + cur.progress(userStats),
          0
       )
       return Math.round(sum / this.requirements.length)
@@ -42,8 +42,8 @@ export class Badge {
     * @param userData
     * @param userStats
     */
-   isComplete(userData: UserData, userStats: UserStats): boolean {
-      return this.requirements.every((r) => r.isComplete(userData, userStats))
+   isComplete(userStats: UserStats): boolean {
+      return this.requirements.every((r) => r.isComplete(userStats))
    }
 
    /**
@@ -90,8 +90,8 @@ export class Badge {
 
 export interface Requirement {
    description: string
-   isComplete: (userData: UserData, userStats: UserStats) => boolean
-   progress: (userData: UserData, userStats: UserStats) => number
+   isComplete: (userStats: UserStats) => boolean
+   progress: (userStats: UserStats) => number
 }
 
 /**

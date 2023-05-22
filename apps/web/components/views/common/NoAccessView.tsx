@@ -28,7 +28,7 @@ const NoAccessView = ({ contextInfoMapKey }: Props) => {
       () => ContextInfoMap[contextInfoMapKey],
       [contextInfoMapKey]
    )
-   const { userStats, userData } = useAuth()
+   const { userStats } = useAuth()
 
    return (
       <>
@@ -77,7 +77,7 @@ const NoAccessView = ({ contextInfoMapKey }: Props) => {
                   {badgeRequired.requirements.map((r, i) => (
                      <ListItem key={i}>
                         <ListItemIcon sx={{ minWidth: "30px" }}>
-                           {r.isComplete(userData, userStats) ? (
+                           {r.isComplete(userStats) ? (
                               <CheckIcon color="success" />
                            ) : (
                               <RadioButtonUncheckedIcon />
