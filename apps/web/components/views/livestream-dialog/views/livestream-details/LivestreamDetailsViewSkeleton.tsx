@@ -4,6 +4,8 @@ import { HostInfoSkeleton } from "./HostInfo"
 import { LivestreamTitleSkeleton } from "./LivestreamTitle"
 import { LivestreamTagsContainerSkeleton } from "./LivestreamTagsContainer"
 import { DummyMainContent } from "./LivestreamDetailsView"
+import { CountdownTimerSkeleton } from "./CountDownTimer"
+import { ActionButtonSkeleton } from "./action-button/ActionButton"
 
 const LivestreamDetailsViewSkeleton = () => {
    return (
@@ -14,6 +16,8 @@ const LivestreamDetailsViewSkeleton = () => {
                   <HostInfoSkeleton />
                   <LivestreamTitleSkeleton />
                   <LivestreamTagsContainerSkeleton />
+                  <CountdownTimerSkeleton />
+                  <ActionButtonSkeleton />
                </Stack>
             </HeroContent>
          }

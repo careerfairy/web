@@ -1,5 +1,5 @@
-import { forwardRef, ReactNode, useCallback, useEffect } from "react"
-import { SnackbarContent, useSnackbar } from "notistack"
+import { forwardRef, ReactNode, useCallback } from "react"
+import { SnackbarContent, useSnackbar, VariantType } from "notistack"
 import Typography from "@mui/material/Typography"
 import Card from "@mui/material/Card"
 import CardActions from "@mui/material/CardActions"
@@ -8,8 +8,6 @@ import CloseIcon from "@mui/icons-material/Close"
 import { sxStyles } from "../../../types/commonTypes"
 import { Box } from "@mui/material"
 import Stack from "@mui/material/Stack"
-import { responsiveConfetti } from "../../util/confetti"
-import useIsMobile from "../../custom-hook/useIsMobile"
 
 const styles = sxStyles({
    root: {
@@ -37,18 +35,14 @@ const styles = sxStyles({
 
 interface ReportCompleteProps {
    message: string | ReactNode
+   title: string | ReactNode
    id: string | number
+   variant?: VariantType
 }
 
-const ReportComplete = forwardRef<HTMLDivElement, ReportCompleteProps>(
-   ({ id, ...props }, ref) => {
-      const isMobile = useIsMobile()
+const CustomNotification = forwardRef<HTMLDivElement, ReportCompleteProps>(
+   ({ id, variant, ...props }, ref) => {
       const { closeSnackbar } = useSnackbar()
-
-      useEffect(() => {
-         responsiveConfetti(isMobile)
-         // eslint-disable-next-line react-hooks/exhaustive-deps
-      }, [])
 
       const handleDismiss = useCallback(() => {
          closeSnackbar(id)
@@ -59,14 +53,16 @@ const ReportComplete = forwardRef<HTMLDivElement, ReportCompleteProps>(
             <Card sx={styles.card}>
                <CardActions sx={styles.actionRoot}>
                   <Stack spacing={1.5}>
-                     <Typography
-                        fontSize="1.42rem"
-                        fontWeight={700}
-                        variant="h4"
-                        color="primary.main"
-                     >
-                        Congratulations!
-                     </Typography>
+                     {props.title ? (
+                        <Typography
+                           fontSize="1.42rem"
+                           fontWeight={700}
+                           variant="h4"
+                           color={getColor(variant)}
+                        >
+                           {props.title}
+                        </Typography>
+                     ) : null}
                      <Typography variant="body1">{props.message}</Typography>
                   </Stack>
                   <Box sx={styles.icons}>
@@ -85,6 +81,21 @@ const ReportComplete = forwardRef<HTMLDivElement, ReportCompleteProps>(
    }
 )
 
-ReportComplete.displayName = "ReportComplete"
+const getColor = (variant: VariantType) => {
+   switch (variant) {
+      case "success":
+         return "success.main"
+      case "error":
+         return "error.main"
+      case "warning":
+         return "warning.main"
+      case "info":
+         return "info.main"
+      default:
+         return "text.primary"
+   }
+}
 
-export default ReportComplete
+CustomNotification.displayName = "Success"
+
+export default CustomNotification
