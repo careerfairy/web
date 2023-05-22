@@ -156,7 +156,9 @@ const JobSelector = ({
                selectedItems={selectedItems}
                onSelectItems={onSelectItems}
                allValues={allValues}
-               limit={1}
+               isCheckbox
+               // limit={1} // TODO: Bring back limit after ASUS event 23/05/2023
+               getValueFn={(value) => value.jobId}
                getKeyFn={(value) => value.jobId}
                inputProps={{
                   label: "Select Job",
