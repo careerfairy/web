@@ -136,13 +136,29 @@ export async function createJobApplication(
 
          relations["candidateId"] = candidate.id ?? null
 
-         const attachmentId = await atsRepository.candidateAddCVAttachment(
-            candidate.id,
-            userData,
-            {
-               extraRequiredData: atsAccount.extraRequiredData,
+         let attachmentId: string | null = null
+         try {
+            attachmentId = await atsRepository.candidateAddCVAttachment(
+               candidate.id,
+               userData,
+               {
+                  extraRequiredData: atsAccount.extraRequiredData,
+               }
+            )
+         } catch (e) {
+            console.error("Error adding CV attachment to candidate", e)
+
+            /**
+             * Fail if the integration is not Workable
+             *
+             * There seems to be an issue between Merge & Workable when creating the CV attachment
+             * as of 22/05/2023, we need to allow the candidate creation without the CV for the application to work
+             */
+            if (atsAccount.name?.toLowerCase() !== "workable") {
+               throw e
             }
-         )
+         }
+
          relations["cvAttachmentId"] = attachmentId ?? null
       } else {
          // candidate + cv attachment in the same request
