@@ -1,9 +1,10 @@
-import useCollection from "./useCollection"
 import { useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { useFirestoreCollection } from "./utils/useFirestoreCollection"
+import firebase from "firebase/compat/app"
 
 type Props = {
    filterByGroupId?: string
@@ -43,7 +44,7 @@ const useListenToStreams = (props?: Props) => {
       []
    )
 
-   const eventsQuery = useMemo(() => {
+   const eventsQuery = useMemo<firebase.firestore.Query>(() => {
       let query = listenToPastEvents
          ? livestreamRepo.getPastEventsFromQuery({ fromDate: sixMonthsAgo })
          : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
@@ -104,12 +105,11 @@ const useListenToStreams = (props?: Props) => {
       sixMonthsAgo,
    ])
 
-   let { data, isLoading } = useCollection<LivestreamEvent>(
-      eventsQuery,
-      !listenToPastEvents
-   )
+   let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {
+      suspense: false,
+   })
 
-   if (isLoading) return undefined
+   if (status === "loading") return undefined
 
    let res = new LivestreamsDataParser(data)
 
