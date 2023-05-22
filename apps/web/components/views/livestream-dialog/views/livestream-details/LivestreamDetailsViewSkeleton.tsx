@@ -8,6 +8,7 @@ import { ActionButtonSkeleton } from "./action-button/ActionButton"
 import { SpeakersSkeleton } from "./main-content/Speakers"
 import { AboutLivestreamSkeleton } from "./main-content/AboutLivestream"
 import { AboutCompanySkeleton } from "./main-content/AboutCompany"
+import { QuestionsSkeleton } from "./main-content/Questions"
 import Section from "./main-content/Section"
 
 const LivestreamDetailsViewSkeleton = () => {
@@ -34,6 +35,9 @@ const LivestreamDetailsViewSkeleton = () => {
                </Section>
                <Section>
                   <AboutCompanySkeleton />
+               </Section>
+               <Section>
+                  <QuestionsSkeleton />
                </Section>
             </MainContent>
          }
