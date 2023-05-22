@@ -55,9 +55,6 @@ export interface UserData extends Identifiable {
       name: string
       referralCode: string
    }
-   // need data migrations to be moved to the user stats doc
-   referralsCount?: number
-   totalLivestreamInvites?: number
    gender?: string
    spokenLanguages?: string[]
    countriesOfInterest?: string[]

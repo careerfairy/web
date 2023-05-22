@@ -3,7 +3,7 @@ import {
    calculateProgressForNumericField,
    DEFAULT_REWARDS,
 } from "./badges"
-import { UserData, UserStats } from "../users"
+import { UserStats } from "../users"
 
 export const NetworkerBadge: Badge = new Badge(
    "Networker",
@@ -12,10 +12,9 @@ export const NetworkerBadge: Badge = new Badge(
    [
       {
          description: "Refer 1 friend to the platform",
-         isComplete: (userData: UserData, userStats: UserStats) =>
-            userData?.referralsCount >= 1,
-         progress: (userData: UserData, userStats: UserStats) =>
-            calculateProgressForNumericField(userData?.referralsCount, 1),
+         isComplete: (userStats: UserStats) => userStats?.referralsCount >= 1,
+         progress: (userStats: UserStats) =>
+            calculateProgressForNumericField(userStats?.referralsCount, 1),
       },
    ],
    DEFAULT_REWARDS
@@ -28,10 +27,9 @@ export const NetworkerBadgeLevel2: Badge = new Badge(
    [
       {
          description: "Refer 3 friends to the platform",
-         isComplete: (userData: UserData, userStats: UserStats) =>
-            userData?.referralsCount >= 3,
-         progress: (userData: UserData, userStats: UserStats) =>
-            calculateProgressForNumericField(userData?.referralsCount, 3),
+         isComplete: (userStats: UserStats) => userStats?.referralsCount >= 3,
+         progress: (userStats: UserStats) =>
+            calculateProgressForNumericField(userStats?.referralsCount, 3),
       },
    ],
    ["3 CareerCoins", "Save Recruiters during a livestream"]
@@ -44,18 +42,17 @@ export const NetworkerBadgeLevel3: Badge = new Badge(
    [
       {
          description: "Refer 10 friends to the platform",
-         isComplete: (userData: UserData, userStats: UserStats) =>
-            userData?.referralsCount >= 10,
-         progress: (userData: UserData, userStats: UserStats) =>
-            calculateProgressForNumericField(userData?.referralsCount, 10),
+         isComplete: (userStats: UserStats) => userStats?.referralsCount >= 10,
+         progress: (userStats: UserStats) =>
+            calculateProgressForNumericField(userStats?.referralsCount, 10),
       },
       {
          description: "Invite 5 friends to events",
-         isComplete: (userData: UserData, userStats: UserStats) =>
-            userData?.totalLivestreamInvites >= 5,
-         progress: (userData: UserData, userStats: UserStats) =>
+         isComplete: (userStats: UserStats) =>
+            userStats?.totalLivestreamInvites >= 5,
+         progress: (userStats: UserStats) =>
             calculateProgressForNumericField(
-               userData?.totalLivestreamInvites,
+               userStats?.totalLivestreamInvites,
                5
             ),
       },
