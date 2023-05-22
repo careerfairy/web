@@ -40,6 +40,9 @@ const styles = sxStyles({
       borderTopLeftRadius: `${theme.spacing(2)} !important`,
       borderTopRightRadius: `${theme.spacing(2)} !important`,
    }),
+   drawerProps: {
+      zIndex: (theme) => theme.zIndex.modal + 1,
+   },
 })
 
 type Props = {
@@ -62,6 +65,7 @@ const CreditsDialog: FC<Props> = ({ onClose, open }) => {
             PaperProps={{
                sx: styles.almostFullHeight,
             }}
+            sx={styles.drawerProps}
             onClose={handleClose}
             onOpen={() => {}}
             disableSwipeToOpen

@@ -13,7 +13,7 @@ export default class UpcomingLivestreamPage extends CommonPage {
       this.buttonRegistration = this.page.getByTestId(
          "livestream-registration-button"
       )
-      this.buttonAlreadyBooked = this.text("You're booked")
+      this.buttonAlreadyBooked = this.text("You're registered")
    }
 
    /**

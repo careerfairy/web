@@ -59,7 +59,8 @@ const UpcomingLivestreamPage = ({
    const aboutRef = useRef(null)
    const speakersRef = useRef(null)
    const questionsRef = useRef(null)
-   const { trackDetailPageView } = useFirebaseService()
+   const { trackDetailPageView, deregisterFromLivestream } =
+      useFirebaseService()
 
    const handleTrack = ({ id, visitorId, extraData: stream }: TrackProps) => {
       if (stream) {
@@ -399,8 +400,21 @@ const UpcomingLivestreamPage = ({
    const handleRegisterClick = useCallback(() => {
       if (!registered) {
          return startRegistrationProcess()
+      } else {
+         recommendationServiceInstance.unRegisterEvent(
+            stream.id,
+            userData.authId
+         )
+         dataLayerLivestreamEvent("event_registration_removed", stream)
+         return deregisterFromLivestream(stream?.id, userData)
       }
-   }, [registered, startRegistrationProcess])
+   }, [
+      deregisterFromLivestream,
+      registered,
+      startRegistrationProcess,
+      stream,
+      userData,
+   ])
 
    const handleChangeQuestionSortType = useCallback((event, newSortType) => {
       if (newSortType !== null) {
@@ -467,8 +481,6 @@ const UpcomingLivestreamPage = ({
                streamPresenter={streamPresenter}
                eventInterests={eventInterests}
                streamAboutToStart={streamAboutToStart}
-               disabled={isRegistrationDisabled}
-               registered={registered}
                streamLanguage={streamLanguage}
                numberOfSpotsRemaining={numberOfSpotsRemaining}
                hosts={filteredGroups}
@@ -477,7 +489,7 @@ const UpcomingLivestreamPage = ({
                isPastEvent={isPastEvent}
                showRecording={showRecording}
                userHasBoughtRecording={userHasBoughtRecording}
-               userIsLoggedIn={Boolean(userEmail)}
+               userEmailFromServer={userEmail}
             />
             <Navigation
                aboutRef={aboutRef}
