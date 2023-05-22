@@ -52,4 +52,18 @@ export class UserBasedRecommendationsBuilder extends RecommendationsBuilder {
 
       return this
    }
+
+   public userUniversityCountry() {
+      if (this.user.universityCountryCode) {
+         // Fetch the top recommended events based on the user's university country code
+         this.addResults(
+            this.rankedLivestreamRepo.getEventsBasedOnUniversityCountry(
+               this.user.universityCountryCode,
+               this.limit
+            )
+         )
+      }
+
+      return this
+   }
 }
