@@ -8,6 +8,8 @@ import {
 } from "./lib/triggers/util"
 import config from "./config"
 import { rewardSideEffectsUserStats } from "./lib/reward"
+import { handleUserStatsBadges } from "./lib/badge"
+import { UserStats } from "@careerfairy/shared-lib/src/users"
 
 export const syncLivestreams = functions
    .runWith(defaultTriggerRunTimeConfig)
@@ -106,6 +108,9 @@ export const syncUserStats = functions
 
       // Run side effects for all livestreamStats changes
       sideEffectPromises.push(rewardSideEffectsUserStats(userEmail, change))
+      sideEffectPromises.push(
+         handleUserStatsBadges(userEmail, change.after.data() as UserStats)
+      )
 
       return handleSideEffects(sideEffectPromises)
    })
