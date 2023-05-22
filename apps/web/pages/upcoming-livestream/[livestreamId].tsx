@@ -19,7 +19,6 @@ import { useRouter } from "next/router"
 import RegistrationModal from "../../components/views/common/registration-modal"
 import AboutSection from "../../components/views/upcoming-livestream/AboutSection"
 import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection"
-import useInfiniteScrollServer from "../../components/custom-hook/useInfiniteScrollServer"
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection"
 import TalentPoolSection from "../../components/views/upcoming-livestream/TalentPoolSection"
 import { useTheme } from "@mui/material/styles"
@@ -96,9 +95,6 @@ const UpcomingLivestreamPage = ({
    const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
    const [filteredGroups, setFilteredGroups] = useState<Group[]>([])
    const [targetGroupId, setTargetGroupId] = useState("")
-   const [questionSortType, setQuestionSortType] = useState<
-      "timestamp" | "votes"
-   >("timestamp")
    const { data: totalInterests } = useInterests()
    const [eventInterests, setEventInterests] = useState([])
 
@@ -160,24 +156,8 @@ const UpcomingLivestreamPage = ({
       listenToScheduledLivestreamById,
       listenToCareerCenterById,
       getDetailLivestreamCareerCenters,
-      livestreamQuestionsQuery,
-      upvoteLivestreamQuestion,
       auth,
    } = useFirebaseService()
-
-   const questionsQuery = useMemo(() => {
-      // prevent an extra query for the questions if they are disabled
-      if (stream?.questionsDisabled) {
-         return null
-      }
-
-      return stream && livestreamQuestionsQuery(stream.id, questionSortType)
-   }, [stream, livestreamQuestionsQuery, questionSortType])
-
-   const handlers = useInfiniteScrollServer({
-      limit: 8,
-      query: questionsQuery,
-   })
 
    useEffect(() => {
       if (totalInterests) {
@@ -416,56 +396,6 @@ const UpcomingLivestreamPage = ({
       userData,
    ])
 
-   const handleChangeQuestionSortType = useCallback((event, newSortType) => {
-      if (newSortType !== null) {
-         setQuestionSortType(newSortType)
-      }
-   }, [])
-
-   const handleUpvote = useCallback(
-      async (question) => {
-         if (isLoggedOut) {
-            return push({
-               pathname: `/signup`,
-               query: { absolutePath: asPath },
-            })
-         }
-         try {
-            await upvoteLivestreamQuestion(
-               stream.id,
-               question,
-               authenticatedUser.email
-            )
-
-            recommendationServiceInstance.upvoteQuestion(stream, userData)
-
-            handlers.handleClientUpdate(question.id, {
-               votes: question.votes + 1 || 1,
-               emailOfVoters: question.emailOfVoters?.concat(
-                  authenticatedUser.email
-               ) || [authenticatedUser.email],
-            })
-         } catch (e) {}
-      },
-      [
-         asPath,
-         authenticatedUser.email,
-         handlers,
-         isLoggedOut,
-         push,
-         stream,
-         userData,
-         upvoteLivestreamQuestion,
-      ]
-   )
-
-   function hasVoted(question) {
-      if (!authenticatedUser || !question.emailOfVoters) {
-         return false
-      }
-      return question.emailOfVoters.indexOf(authenticatedUser.email) > -1
-   }
-
    const handleFooterAttendButtonClick = useCallback(async () => {
       await startRegistrationProcess(true)
    }, [startRegistrationProcess])
@@ -522,7 +452,6 @@ const UpcomingLivestreamPage = ({
             )}
 
             <QuestionsSection
-               // @ts-ignore
                livestream={stream}
                title={
                   isPastEvent
@@ -530,18 +459,9 @@ const UpcomingLivestreamPage = ({
                      : `Have any questions for the speakers?`
                }
                big
-               handleChangeQuestionSortType={handleChangeQuestionSortType}
-               getMore={handlers.getMore}
-               loadingInitialQuestions={handlers.loadingInitial}
-               hasVoted={hasVoted}
                sectionRef={questionsRef}
                isPastEvent={isPastEvent}
                sectionId="questions"
-               hasMore={handlers.hasMore}
-               reFetchQuestions={handlers.getInitialQuery}
-               handleUpvote={handleUpvote}
-               questions={handlers.docs}
-               questionSortType={questionSortType}
                questionsAreDisabled={stream.questionsDisabled}
             />
 
