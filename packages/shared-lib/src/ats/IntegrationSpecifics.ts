@@ -27,6 +27,10 @@ class GreenhouseIntegration extends DefaultIntegration {
    candidateCVAsANestedWrite = true
 }
 
+class WorkableIntegration extends DefaultIntegration {
+   candidateCVAsANestedWrite = true
+}
+
 /**
  * All integration specifics
  *
@@ -34,6 +38,7 @@ class GreenhouseIntegration extends DefaultIntegration {
  */
 const map: Record<string, IntegrationSpecifics> = {
    greenhouse: new GreenhouseIntegration(),
+   workable: new WorkableIntegration(),
    default: new DefaultIntegration(),
 }
 
