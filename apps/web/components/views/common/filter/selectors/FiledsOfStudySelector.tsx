@@ -70,7 +70,8 @@ const FieldsOfStudySelector = ({ handleChange }: Props) => {
             allValues={fieldsOfStudy}
             setFieldValue={handleChange}
             inputProps={{
-               placeholder: "Look for other fields od study",
+               placeholder: "Look for other fields of study",
+               sx: { mt: 2 },
             }}
             getValueFn={multiListSelectMapValueFn}
             chipProps={{

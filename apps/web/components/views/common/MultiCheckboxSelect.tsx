@@ -1,6 +1,7 @@
 import React, { Dispatch, memo, useCallback, useMemo } from "react"
 import {
    Checkbox,
+   CircularProgress,
    FormControlLabel,
    FormGroup,
    Stack,
@@ -59,7 +60,7 @@ const MultiCheckboxSelect = ({
       [allValues]
    )
 
-   return (
+   return allValues.length ? (
       <FormGroup key={inputName}>
          <Stack
             direction={{ xs: "column", md: "row" }}
@@ -107,6 +108,8 @@ const MultiCheckboxSelect = ({
             </Box>
          </Stack>
       </FormGroup>
+   ) : (
+      <CircularProgress />
    )
 }
 

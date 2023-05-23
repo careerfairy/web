@@ -42,6 +42,7 @@ const styles = sxStyles({
       height: "100%",
       maxWidth: "150px",
       fontSize: "15px",
+      textTransform: "none",
    },
    roundNumber: {
       fontWeight: 500,
