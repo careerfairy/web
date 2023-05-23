@@ -78,6 +78,7 @@ class GroupFirebaseSeed implements GroupSeed {
          groupId: id,
          description: faker.company.bs(),
          logoUrl: faker.image.business(),
+         bannerImageUrl: faker.image.business(),
          test: false,
          universityName,
          triGrams: groupTriGrams(universityName),
