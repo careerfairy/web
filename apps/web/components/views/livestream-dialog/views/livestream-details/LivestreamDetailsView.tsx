@@ -185,7 +185,7 @@ const LivestreamDetailsView: FC = () => {
                   <MainContent>
                      {hasJobs ? (
                         <Section navOffset={44} ref={jobsRef}>
-                           <Jobs />
+                           <Jobs presenter={livestreamPresenter} />
                         </Section>
                      ) : null}
                      <Section ref={aboutLivestreamRef}>
