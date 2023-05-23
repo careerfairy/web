@@ -228,6 +228,10 @@ export class LivestreamPresenter extends BaseModel {
       }
    }
 
+   hasJobs(): boolean {
+      return this.jobs && this.jobs.length > 0
+   }
+
    static createFromDocument(livestream: LivestreamEvent) {
       return new LivestreamPresenter(
          livestream.id,
