@@ -7,7 +7,6 @@ import { atsServiceInstance } from "../../../data/firebase/ATSService"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
 import useUserATSRelations from "../useUserATSRelations"
 import useSnackbarNotifications from "../useSnackbarNotifications"
-import useIsMobile from "../useIsMobile"
 
 type UseJobApply = {
    /**
@@ -37,7 +36,6 @@ const useJobApply = (
    handleAlreadyApply: (available: boolean) => void
 ): UseJobApply => {
    const atsRelations = useUserATSRelations(userData.id)
-   const isMobile = useIsMobile()
    const [isLoading, setIsLoading] = useState(false)
    const { successNotification, errorNotification } = useSnackbarNotifications()
 
