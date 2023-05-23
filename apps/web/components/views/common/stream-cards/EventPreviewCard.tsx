@@ -41,6 +41,10 @@ import { gradientAnimation } from "../../../../materialUI/GlobalBackground/Globa
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import Link, { LinkProps } from "next/link"
 import { CardActionArea } from "@mui/material"
+import {
+   buildDialogLink,
+   isOnlivestreamDialogPage,
+} from "../../livestream-dialog"
 
 const styles = sxStyles({
    hideOnHoverContent: {
@@ -210,14 +214,11 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          location,
          disableTracking: isPlaceholderEvent,
       })
-      const { query, pathname } = useRouter()
+      const router = useRouter()
+      const { pathname } = router
       const [eventInterests, setEventInterests] = useState([])
       const { authenticatedUser, isLoggedIn } = useAuth()
       const [isPast, setIsPast] = useState(checkIfPast(event))
-
-      const isOnLivestreamDialogPage = pathname.includes(
-         "[[...livestreamDialog]]"
-      )
 
       const isOnMarketingLandingPage = pathname.includes(
          MARKETING_LANDING_PAGE_PATH
@@ -315,18 +316,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                href: "",
             }
          }
-
-         if (isOnLivestreamDialogPage) {
-            return {
-               href: {
-                  pathname: pathname,
-                  query: {
-                     ...query,
-                     livestreamDialog: ["livestream", event.id],
-                  },
-               },
-            }
-         }
+         const eventLink = buildDialogLink(router, event.id)
 
          if (
             isOnMarketingLandingPage &&
@@ -340,23 +330,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
 
          // Fall back to the default portal link and open the event in a new tab
          return {
-            href: {
-               pathname: `/portal/[[...livestreamDialog]]`,
-               query: {
-                  ...query,
-                  livestreamDialog: ["livestream", event.id],
-               },
-            },
-            target: "_blank",
+            href: eventLink,
+            target: isOnlivestreamDialogPage(pathname) ? undefined : "_blank",
          }
       }, [
          authenticatedUser.email,
          event?.id,
-         isOnLivestreamDialogPage,
          isOnMarketingLandingPage,
          marketingFormCompleted,
          pathname,
-         query,
+         router,
       ])
 
       return (

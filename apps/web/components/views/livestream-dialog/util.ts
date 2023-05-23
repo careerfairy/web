@@ -7,6 +7,8 @@ import {
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LiveStreamDialogData } from "./LivestreamDialogLayout"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
+import { LinkProps } from "next/link"
+import { NextRouter } from "next/router"
 
 export const getLivestreamDialogData = async (
    ctx: GetServerSidePropsContext
@@ -51,5 +53,36 @@ export const livestreamDialogSSP = <
             livestreamDialogData: await getLivestreamDialogData(ctx),
          },
       }
+   }
+}
+
+export const LIVESTREAM_DIALOG_PATH = "[[...livestreamDialog]]"
+
+export const isOnlivestreamDialogPage = (routerPathname: string) => {
+   return routerPathname.includes(LIVESTREAM_DIALOG_PATH)
+}
+
+type ValidLink =
+   | ["livestream", string, "job-details", string]
+   | ["livestream", string]
+
+export const buildDialogLink = (
+   router: NextRouter,
+   livestreamId: string,
+   jobId: string = null
+): LinkProps["href"] => {
+   const isOnLivestreamDialogPage = isOnlivestreamDialogPage(router.pathname)
+   const query: ValidLink = jobId
+      ? ["livestream", livestreamId, "job-details", jobId]
+      : ["livestream", livestreamId]
+
+   return {
+      pathname: isOnLivestreamDialogPage
+         ? router.pathname
+         : `/portal/${LIVESTREAM_DIALOG_PATH}`,
+      query: {
+         ...router.query,
+         livestreamDialog: query,
+      },
    }
 }
