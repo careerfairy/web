@@ -108,7 +108,7 @@ const NextLiveStreamsWithFilter = ({
          <Grid xs={12} mt={4} mx={1} item>
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
-               We didn't find any events matching your criteria. 😕{" "}
+               We didn't find any live stream matching your criteria. 😕{" "}
                {isMobile ? (
                   <Link
                      href={
