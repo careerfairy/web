@@ -29,6 +29,13 @@ interface LivestreamSeed {
    ): Promise<LivestreamEventWithSubcollections>
 
    generateSecureToken(livestreamId: string): Promise<string>
+
+   /**
+    * Generate a random livestream event object
+    *
+    * Does not save to the database, used to fill forms
+    */
+   random(overrideFields?: Partial<LivestreamEvent>): Partial<LivestreamEvent>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
@@ -113,49 +120,22 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
          },
          () => faker.internet.email()
       )
+
       const groupId = uuidv4()
-      const title = faker.lorem.sentence()
-      const company = faker.company.companyName()
-      let data: LivestreamEvent = {
+
+      const data = this.random({
          author: {
             email: faker.internet.email(),
             groupId: groupId,
          },
-         backgroundImageUrl: faker.image.abstract(),
-         company,
-         companyId: uuidv4(),
-         companyLogoUrl: faker.image.business(),
-         created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
-         duration: faker.random.arrayElement([30, 60, 90, 120]),
-         groupIds: [groupId],
-         hidden: false,
-         id: uuidv4().replace(/-/g, ""),
-         language: {
-            code: faker.address.countryCode(),
-            name: faker.address.country(),
-         },
-         groupQuestionsMap: null,
-         lastUpdated: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          lastUpdatedAuthorInfo: {
             email: faker.internet.email(),
             groupId: groupId,
          },
          registeredUsers,
-         speakers: Array.from(
-            {
-               length: faker.datatype.number({ min: 1, max: 5 }),
-            },
-            generateSpeaker
-         ),
-         start: admin.firestore.Timestamp.fromDate(faker.date.soon()),
-         test: false,
-         title,
-         type: "upcoming",
-         universities: [],
-         triGrams: livestreamTriGrams(title, company),
-      }
-
-      data = Object.assign(data, overrideFields)
+         groupIds: [groupId],
+         ...overrideFields,
+      })
 
       await firestore.collection("livestreams").doc(data.id).set(data)
 
@@ -173,6 +153,45 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             value: token,
          })
       return token
+   }
+
+   random(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent {
+      const title = faker.lorem.sentence()
+      const company = faker.company.companyName()
+
+      let data: LivestreamEvent = {
+         backgroundImageUrl: faker.image.abstract(),
+         company,
+         companyId: uuidv4(),
+         companyLogoUrl: faker.image.business(),
+         duration: faker.random.arrayElement([30, 60, 90, 120]),
+         hidden: false,
+         id: uuidv4().replace(/-/g, ""),
+         language: {
+            code: faker.address.countryCode(),
+            name: faker.address.country(),
+         },
+         groupQuestionsMap: null,
+         speakers: Array.from(
+            {
+               length: faker.datatype.number({ min: 1, max: 5 }),
+            },
+            generateSpeaker
+         ),
+         start: admin.firestore.Timestamp.fromDate(faker.date.soon()),
+         lastUpdated: admin.firestore.Timestamp.fromDate(faker.date.recent()),
+         created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
+         test: false,
+         title,
+         type: "upcoming",
+         universities: [],
+         triGrams: livestreamTriGrams(title, company),
+      }
+
+      return {
+         ...data,
+         ...overrideFields,
+      }
    }
 }
 export const createLivestreamGroupQuestions = (groupId: string = uuidv4()) => {
