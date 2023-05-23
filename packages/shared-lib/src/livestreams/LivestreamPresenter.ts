@@ -233,6 +233,10 @@ export class LivestreamPresenter extends BaseModel {
       return this.jobs && this.jobs.length > 0
    }
 
+   getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
+      return this.jobs.find((job) => job.jobId === jobId) ?? null
+   }
+
    static createFromDocument(livestream: LivestreamEvent) {
       return new LivestreamPresenter(
          livestream.id,

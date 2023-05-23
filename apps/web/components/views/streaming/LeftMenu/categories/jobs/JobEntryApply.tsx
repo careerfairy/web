@@ -1,20 +1,13 @@
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import { Job } from "@careerfairy/shared-lib/dist/ats/Job"
 import Box from "@mui/material/Box"
-import {
-   userAlreadyAppliedForJob,
-   UserData,
-} from "@careerfairy/shared-lib/dist/users"
+import { UserData } from "@careerfairy/shared-lib/dist/users"
 import ContentCard from "../../../../../../layouts/UserLayout/ContentCard"
-import React, { useCallback, useEffect, useState } from "react"
-import { atsServiceInstance } from "../../../../../../data/firebase/ATSService"
-import useUserATSRelations from "../../../../../custom-hook/useUserATSRelations"
-import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
-import * as Sentry from "@sentry/nextjs"
+import React from "react"
 import LoadingButton from "@mui/lab/LoadingButton"
 import dynamic from "next/dynamic"
 import { Typography } from "@mui/material"
-import { dataLayerEvent } from "../../../../../../util/analyticsUtils"
+import useJobApply from "../../../../../custom-hook/ats/useJobApply"
 
 type Props = {
    job: Job
@@ -46,49 +39,14 @@ const JobEntryApply = ({
    handleAlreadyApply,
 }: Props) => {
    const { userData } = useAuth()
-   const atsRelations = useUserATSRelations(userData.id)
-   const [isLoading, setIsLoading] = useState(false)
-   const { successNotification, errorNotification } = useSnackbarNotifications()
 
-   // Confirm if user already applied to this job
-   useEffect(() => {
-      if (
-         atsRelations &&
-         userAlreadyAppliedForJob(atsRelations, job.id) &&
-         !isApplied
-      ) {
-         handleAlreadyApply(true)
-      }
-   }, [isApplied, atsRelations, job.id, handleAlreadyApply])
-
-   // Apply to the job
-   const onClickApply = useCallback(() => {
-      setIsLoading(true)
-      atsServiceInstance
-         .applyToAJob(livestreamId, job.id)
-         .then(() => {
-            handleAlreadyApply(true)
-            successNotification("You have successfully applied to the job!")
-         })
-         .catch((e) => {
-            console.error(e)
-            Sentry.captureException(e)
-            errorNotification("Sorry! Something failed, maybe try again later")
-         })
-         .finally(() => {
-            setIsLoading(false)
-            dataLayerEvent("livestream_job_application_complete", {
-               jobId: job?.id,
-               jobName: job?.name,
-            })
-         })
-   }, [
+   const { applyJob, isLoading } = useJobApply(
+      userData,
+      job,
       livestreamId,
-      job.id,
-      handleAlreadyApply,
-      successNotification,
-      errorNotification,
-   ])
+      isApplied,
+      handleAlreadyApply
+   )
 
    if (isApplied) {
       return (
@@ -115,7 +73,7 @@ const JobEntryApply = ({
             variant="contained"
             color="primary"
             size={"large"}
-            onClick={onClickApply}
+            onClick={applyJob}
             disabled={missingDataComponents.length > 0}
             sx={{ width: "195px" }}
          >

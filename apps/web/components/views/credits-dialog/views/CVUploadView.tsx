@@ -1,4 +1,4 @@
-import { FC, ReactNode, useCallback, useState } from "react"
+import { FC, ReactNode } from "react"
 import BaseDialogView, {
    LeftContent,
    RightContent,
@@ -12,14 +12,9 @@ import { Box, Typography } from "@mui/material"
 import Image from "next/image"
 import CircularProgress from "@mui/material/CircularProgress"
 import FileUploader from "../../common/FileUploader"
-import useFirebaseUpload from "../../../custom-hook/useFirebaseUpload"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import { userRepo } from "../../../../data/RepositoryInstances"
-import useSnackbarNotifications from "../../../custom-hook/useSnackbarNotifications"
 import { alpha } from "@mui/material/styles"
 import CheckIcon from "@mui/icons-material/Check"
-import { rewardService } from "../../../../data/firebase/RewardService"
-import { errorLogAndNotify } from "../../../../util/CommonUtil"
+import useUploadCV from "../../../custom-hook/user/useUploadCV"
 
 const styles = sxStyles({
    uploadZone: {
@@ -96,53 +91,19 @@ const CVUploadView: FC = () => {
 }
 
 const View = () => {
-   const { userPresenter, userData } = useAuth()
-   const { errorNotification } = useSnackbarNotifications()
-
-   const [loading, setLoading] = useState(false)
-   const [dragActive, setDragActive] = useState(false)
-   const [upload, progress, uploading] = useFirebaseUpload()
-
-   const handleUploadCV = useCallback(
-      async (file: File) => {
-         try {
-            setLoading(true)
-            const path = userPresenter.getResumePath()
-            const url = await upload(file, path)
-
-            await userRepo.updateResume(userData?.userEmail, url)
-            rewardService.userAction("USER_CV_UPLOAD").catch(errorLogAndNotify)
-         } catch (error) {
-            errorNotification("Error uploading CV")
-         } finally {
-            setLoading(false)
-         }
-      },
-      [upload, userPresenter, userData, errorNotification]
-   )
-
-   const handleError = useCallback(
-      (errorMsg: string) => {
-         errorNotification(errorMsg, errorMsg)
-      },
-      [errorNotification]
-   )
-
-   const cvUploaded = Boolean(userData?.userResume)
-
-   const isLoading = loading || uploading
+   const {
+      fileUploaderProps,
+      cvUploaded,
+      isLoading,
+      dragActive,
+      progress,
+      uploading,
+   } = useUploadCV()
 
    return (
       <Stack sx={styles.root} flex={1} spacing={3}>
          <FileUploader
-            onTypeError={handleError}
-            onSizeError={handleError}
-            types={["pdf"]}
-            multiple={false}
-            maxSize={10}
-            disabled={isLoading || cvUploaded}
-            onDraggingStateChange={setDragActive}
-            handleChange={handleUploadCV}
+            {...fileUploaderProps}
             sx={[
                styles.uploadZone,
                dragActive && styles.dragActive,

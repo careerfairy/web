@@ -65,16 +65,34 @@ export const isOnlivestreamDialogPage = (routerPathname: string) => {
 type ValidLink =
    | ["livestream", string, "job-details", string]
    | ["livestream", string]
+   | ["livestream", string, "register"]
 
-export const buildDialogLink = (
-   router: NextRouter,
-   livestreamId: string,
-   jobId: string = null
-): LinkProps["href"] => {
+type LinkType =
+   | { type: "livestreamDetails"; livestreamId: string }
+   | { type: "jobDetails"; livestreamId: string; jobId: string }
+   | { type: "registerToLivestream"; livestreamId: string }
+
+export const buildDialogLink = ({
+   router,
+   link,
+}: {
+   router: NextRouter
+   link: LinkType
+}): LinkProps["href"] => {
    const isOnLivestreamDialogPage = isOnlivestreamDialogPage(router.pathname)
-   const query: ValidLink = jobId
-      ? ["livestream", livestreamId, "job-details", jobId]
-      : ["livestream", livestreamId]
+   let query: ValidLink
+
+   switch (link.type) {
+      case "livestreamDetails":
+         query = ["livestream", link.livestreamId]
+         break
+      case "jobDetails":
+         query = ["livestream", link.livestreamId, "job-details", link.jobId]
+         break
+      case "registerToLivestream":
+         query = ["livestream", link.livestreamId, "register"]
+         break
+   }
 
    return {
       pathname: isOnLivestreamDialogPage

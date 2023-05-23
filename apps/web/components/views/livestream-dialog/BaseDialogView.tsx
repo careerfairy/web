@@ -5,8 +5,7 @@ import { Box, Container, IconButton } from "@mui/material"
 import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import Image from "next/image"
-import useIsMobile from "../../custom-hook/useIsMobile"
-import { useLiveStreamDialog } from "./LivestreamDialog"
+import { useMeasure } from "react-use"
 
 const responsiveBreakpoint = "md"
 
@@ -30,7 +29,6 @@ const styles = sxStyles({
       padding: 1,
    },
    closeIcon: {
-      color: "white",
       fontSize: "24px",
    },
    heroContent: {
@@ -76,6 +74,15 @@ const styles = sxStyles({
    subheader: {
       fontSize: "1.142rem",
    },
+   fixedBottomContent: {
+      position: "fixed",
+      bottom: 0,
+      width: "100%",
+      p: 2.5,
+      borderTop: "1px solid #F1F1F1",
+      bgcolor: "background.paper",
+      display: "flex",
+   },
 })
 
 type Props = FC<{
@@ -84,6 +91,7 @@ type Props = FC<{
     * */
    heroContent?: ReactNode
    mainContent?: ReactNode
+   fixedBottomContent?: ReactNode
    handleClose?: () => void
    handleBack?: () => void
 }>
@@ -91,49 +99,73 @@ type Props = FC<{
 const BaseDialogView: Props = ({
    heroContent,
    mainContent,
+   fixedBottomContent,
    handleClose,
    handleBack,
 }) => {
+   const [ref, { height }] = useMeasure()
+
    return (
-      <Stack spacing={4.75} sx={styles.root}>
-         {heroContent}
-         {mainContent}
-         {handleClose ? (
-            <Box sx={styles.topRight}>
-               <IconButton onClick={handleClose}>
-                  <CloseIcon sx={styles.closeIcon} />
-               </IconButton>
-            </Box>
+      <>
+         <Stack spacing={4.75} sx={styles.root}>
+            {heroContent}
+            {mainContent}
+            {handleClose ? (
+               <Box sx={styles.topRight}>
+                  <IconButton onClick={handleClose}>
+                     <CloseIcon color="inherit" sx={styles.closeIcon} />
+                  </IconButton>
+               </Box>
+            ) : null}
+            {handleBack ? (
+               <Box sx={styles.topLeft}>
+                  <IconButton onClick={handleBack}>
+                     <BackIcon color="inherit" />
+                  </IconButton>
+               </Box>
+            ) : null}
+         </Stack>
+         {fixedBottomContent ? (
+            <>
+               <FixedBottomContent ref={ref}>
+                  {fixedBottomContent}
+               </FixedBottomContent>
+               <Box height={`calc(${height}px + 40px)`} />
+            </>
          ) : null}
-         {handleBack ? (
-            <Box sx={styles.topLeft}>
-               <IconButton onClick={handleBack}>
-                  <BackIcon />
-               </IconButton>
-            </Box>
-         ) : null}
-      </Stack>
+      </>
    )
 }
 
-const BackAndCloseButton: FC = () => {
-   const isMobile = useIsMobile()
-   const { handleBack } = useLiveStreamDialog()
+type BackAndCloseButtonProps = {
+   onBackClick?: () => void
+   onBackPosition?: "top-left" | "top-right"
+   color?: string
+}
 
-   if (isMobile) {
+const BackAndCloseButton: FC<BackAndCloseButtonProps> = ({
+   onBackClick,
+   onBackPosition,
+   color,
+}) => {
+   const colorStyle = color ? { color } : {}
+
+   if (!onBackClick) return null
+
+   if (onBackPosition === "top-left") {
       return (
-         <Box sx={styles.topLeft}>
-            <IconButton onClick={handleBack}>
-               <BackIcon sx={styles.closeIcon} />
+         <Box color={color} sx={styles.topLeft}>
+            <IconButton onClick={onBackClick}>
+               <BackIcon sx={[styles.closeIcon, colorStyle]} />
             </IconButton>
          </Box>
       )
    }
 
    return (
-      <Box sx={styles.topRight}>
-         <IconButton onClick={handleBack}>
-            <CloseIcon sx={styles.closeIcon} />
+      <Box color={color} sx={styles.topRight}>
+         <IconButton onClick={onBackClick}>
+            <CloseIcon sx={[styles.closeIcon, colorStyle]} />
          </IconButton>
       </Box>
    )
@@ -142,10 +174,13 @@ const BackAndCloseButton: FC = () => {
 type LeftContentProps = {
    backgroundImg?: string
    children: ReactNode
-}
+} & BackAndCloseButtonProps
 
 export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
-   function HeroContent({ backgroundImg, children }, ref) {
+   function HeroContent(
+      { backgroundImg, children, onBackClick, onBackPosition },
+      ref
+   ) {
       return (
          <Box id="live-stream-dialog-hero" sx={styles.heroContent} ref={ref}>
             <Container
@@ -165,11 +200,29 @@ export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
                />
             ) : null}
             <Box sx={styles.backgroundImgOverlay} />
-            <BackAndCloseButton />
+            <BackAndCloseButton
+               onBackClick={onBackClick}
+               onBackPosition={onBackPosition}
+               color={"white"}
+            />
          </Box>
       )
    }
 )
+
+type FixedBottomContentProps = {
+   children: ReactNode
+}
+export const FixedBottomContent = forwardRef<
+   HTMLDivElement,
+   FixedBottomContentProps
+>(function FixedBottomContent({ children }, ref) {
+   return (
+      <Box ref={ref} sx={styles.fixedBottomContent}>
+         {children}
+      </Box>
+   )
+})
 
 type MainContentProps = {}
 
