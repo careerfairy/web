@@ -55,7 +55,7 @@ const LivestreamDetailsView: FC = () => {
       updatedStats
    )
 
-   const hasJobs = !!livestream?.jobs?.length
+   const hasJobs = livestreamPresenter?.hasJobs()
 
    const handleRegisterClick = useCallback(
       async (floating: boolean) => {
