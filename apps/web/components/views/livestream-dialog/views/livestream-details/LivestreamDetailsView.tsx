@@ -189,7 +189,7 @@ const LivestreamDetailsView: FC = () => {
                         {/* Speakers are part of the about live stream section */}
                         <Speakers speakers={livestream.speakers} />
                         <Section>
-                           <AboutLivestream />
+                           <AboutLivestream presenter={livestreamPresenter} />
                         </Section>
                      </Section>
                      <Section ref={aboutCompanyRef}>
