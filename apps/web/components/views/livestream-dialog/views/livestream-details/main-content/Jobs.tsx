@@ -87,7 +87,15 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    const router = useRouter()
 
    const jobLink = useMemo<LinkProps["href"]>(
-      () => buildDialogLink(router, presenter.id, job.jobId),
+      () =>
+         buildDialogLink({
+            router,
+            link: {
+               type: "jobDetails",
+               jobId: job.jobId,
+               livestreamId: presenter.id,
+            },
+         }),
       [router, presenter.id, job.jobId]
    )
 

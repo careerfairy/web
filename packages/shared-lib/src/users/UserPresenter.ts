@@ -78,4 +78,8 @@ export default class UserPresenter extends BasePresenter<UserData> {
    getResumePath() {
       return `user_resume/${this.model.authId}.pdf`
    }
+
+   hasResume() {
+      return Boolean(this.model.userResume?.length > 0)
+   }
 }

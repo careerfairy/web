@@ -23,6 +23,9 @@ import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
+import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
+import { useRouter } from "next/router"
+import { buildDialogLink } from "./util"
 
 const styles = sxStyles({
    content: {
@@ -84,6 +87,7 @@ type ViewProps = {
 type View = {
    key: ViewKey
    component: ComponentType
+   skeleton: LoadableBaseOptions["loading"]
 }
 
 const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
@@ -91,6 +95,7 @@ const createView = ({ key, viewPath, loadingComponent }: ViewProps): View => ({
    component: dynamic(() => import(`./views/${viewPath}`), {
       loading: loadingComponent || (() => <CircularProgress />),
    }),
+   skeleton: loadingComponent || (() => <CircularProgress />), // new
 })
 
 const views: View[] = [
@@ -115,7 +120,11 @@ const views: View[] = [
       key: "register-success",
       viewPath: "register-success/RegisterSuccessView",
    }),
-   createView({ key: "job-details", viewPath: "job-details/JobDetailsView" }),
+   createView({
+      key: "job-details",
+      viewPath: "job-details/JobDetailsView",
+      loadingComponent: () => <JobDetailsViewSkeleton />,
+   }),
 ]
 
 const LivestreamDialog: FC<Props> = ({
@@ -169,6 +178,9 @@ const Content: FC<ContentProps> = ({
    page = "details",
    livestreamId,
 }) => {
+   const router = useRouter()
+   const { push } = router
+
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getPageIndex(page))
@@ -181,9 +193,41 @@ const Content: FC<ContentProps> = ({
       hasInitialData ? serverSideLivestream : undefined
    )
 
-   const goToView = useCallback((view: ViewKey) => {
-      setValue(views.findIndex((v) => v.key === view))
-   }, [])
+   const goToView = useCallback(
+      (view: Exclude<ViewKey, "job-details">) => {
+         switch (view) {
+            case "livestream-details":
+               return void push(
+                  buildDialogLink({
+                     router,
+                     link: {
+                        type: "livestreamDetails",
+                        livestreamId,
+                     },
+                  }),
+                  undefined,
+                  routerOptions
+               )
+
+            case "register-data-consent":
+               return void push(
+                  buildDialogLink({
+                     router,
+                     link: {
+                        type: "registerToLivestream",
+                        livestreamId,
+                     },
+                  }),
+                  undefined,
+                  routerOptions
+               )
+
+            default:
+               setValue(views.findIndex((v) => v.key === view))
+         }
+      },
+      [livestreamId, push, router]
+   )
 
    const onClose = useCallback(() => {
       handleClose()
@@ -237,16 +281,18 @@ const Content: FC<ContentProps> = ({
             axis={theme.direction === "rtl" ? "x-reverse" : "x"}
             index={value}
          >
-            {views.map(({ key, component: View }, index) => (
-               <AnimatedTabPanel
-                  sx={styles.fullHeight}
-                  key={key}
-                  value={index}
-                  activeValue={value}
-               >
-                  <View />
-               </AnimatedTabPanel>
-            ))}
+            {views.map(
+               ({ key, component: View, skeleton: Skeleton }, index) => (
+                  <AnimatedTabPanel
+                     sx={styles.fullHeight}
+                     key={key}
+                     value={index}
+                     activeValue={value}
+                  >
+                     {livestream ? <View /> : Skeleton}
+                  </AnimatedTabPanel>
+               )
+            )}
          </SwipeableViews>
       </DialogContext.Provider>
    )
@@ -301,5 +347,10 @@ export const useLiveStreamDialog = () => {
    }
    return context
 }
+
+const routerOptions = {
+   shallow: true,
+   scroll: false,
+} as const
 
 export default LivestreamDialog
