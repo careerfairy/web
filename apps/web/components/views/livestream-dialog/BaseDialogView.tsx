@@ -55,7 +55,9 @@ const styles = sxStyles({
    heroContentContainer: {
       zIndex: 1,
    },
-   mainContent: {},
+   mainContent: {
+      px: 2,
+   },
    backgroundImgOverlay: {
       position: "absolute",
       top: 0,
@@ -93,7 +95,7 @@ const BaseDialogView: Props = ({
    handleBack,
 }) => {
    return (
-      <Stack sx={styles.root}>
+      <Stack spacing={4.75} sx={styles.root}>
          {heroContent}
          {mainContent}
          {handleClose ? (

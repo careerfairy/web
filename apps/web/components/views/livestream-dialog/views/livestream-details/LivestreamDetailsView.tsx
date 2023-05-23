@@ -23,6 +23,13 @@ import { useUserReminders } from "../../../../../HOCs/UserReminderProvider"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import ShareButton from "./ShareButton"
 import { useInView } from "react-intersection-observer"
+import MainContentNavigation from "./MainContentNavigation"
+import Speakers from "./main-content/Speakers"
+import AboutCompany from "./main-content/AboutCompany"
+import AboutLivestream from "./main-content/AboutLivestream"
+import Jobs from "./main-content/Jobs"
+import Questions from "./main-content/Questions"
+import Section from "./main-content/Section"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -47,6 +54,8 @@ const LivestreamDetailsView: FC = () => {
       livestreamPresenter,
       updatedStats
    )
+
+   const hasJobs = livestreamPresenter?.hasJobs()
 
    const handleRegisterClick = useCallback(
       async (floating: boolean) => {
@@ -162,17 +171,49 @@ const LivestreamDetailsView: FC = () => {
                </Stack>
             </HeroContent>
          }
-         mainContent={<DummyMainContent />}
+         mainContent={
+            <MainContentNavigation hasJobs={hasJobs}>
+               {({
+                  jobsRef,
+                  aboutLivestreamRef,
+                  aboutCompanyRef,
+                  questionsRef,
+               }) => (
+                  <MainContent>
+                     {hasJobs ? (
+                        <Section navOffset={44} ref={jobsRef}>
+                           <Jobs />
+                        </Section>
+                     ) : null}
+                     <Section ref={aboutLivestreamRef}>
+                        {/* Speakers are part of the about live stream section */}
+                        <Speakers speakers={livestream.speakers} />
+                        <Section>
+                           <AboutLivestream />
+                        </Section>
+                     </Section>
+                     <Section ref={aboutCompanyRef}>
+                        <AboutCompany />
+                     </Section>
+                     <Section ref={questionsRef}>
+                        <Questions />
+                     </Section>
+                  </MainContent>
+               )}
+            </MainContentNavigation>
+         }
       />
    )
 }
 
-export const DummyMainContent: FC = () => {
+export const DummyContent: FC<{
+   numberOfItems?: number
+}> = ({ numberOfItems = 5 }) => {
    return (
       <MainContent>
          <Stack pt={2} spacing={2}>
             {/* For Demo Purposes */}
-            {Array.from({ length: 15 }).map((_, i) => (
+            {Array.from({ length: numberOfItems }).map((_, i) => (
                <HostInfoSkeleton key={i} />
             ))}
          </Stack>
