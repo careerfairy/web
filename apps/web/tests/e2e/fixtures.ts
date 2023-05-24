@@ -13,17 +13,28 @@ import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import { Interest } from "@careerfairy/shared-lib/src/interests"
 
+type GroupAdminFixtureOptions = {
+   /**
+    * give the option for tests to not create a user
+    */
+   createUser?: boolean
+}
+
 /**
  * Group Admin Test Fixture
  *
  * Creates a group and a user (group owner) and signs in the user
  */
 export const groupAdminFixture = base.extend<{
+   options: GroupAdminFixtureOptions
    group: Group
    user: UserData
    groupPage: GroupDashboardPage
    interests: Interest[]
 }>({
+   options: {
+      createUser: true,
+   },
    group: async ({}, use) => {
       await clearAuthData()
       await clearFirestoreData()
@@ -31,16 +42,18 @@ export const groupAdminFixture = base.extend<{
       const group = await GroupSeed.createGroup()
       await use(group)
    },
-   user: async ({ group }, use) => {
-      const user = await UserSeed.createUser(credentials.correctEmail)
+   user: async ({ group, options }, use) => {
+      if (options.createUser === true) {
+         const user = await UserSeed.createUser(credentials.correctEmail)
 
-      await GroupSeed.addGroupAdmin(
-         user,
-         group,
-         "OWNER" as GROUP_DASHBOARD_ROLE
-      )
+         await GroupSeed.addGroupAdmin(
+            user,
+            group,
+            "OWNER" as GROUP_DASHBOARD_ROLE
+         )
 
-      await use(user)
+         await use(user)
+      }
    },
    interests: async ({}, use) => {
       const interests = await InterestSeed.createBasicInterests()
