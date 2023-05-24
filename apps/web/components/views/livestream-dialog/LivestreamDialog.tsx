@@ -197,6 +197,8 @@ const Content: FC<ContentProps> = ({
       }
    }, [value, onClose, goToView])
 
+   // Using useEffect to update the view based on 'page'.
+   // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
       setValue(getPageIndex(page))
    }, [goToView, page])
