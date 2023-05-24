@@ -4,6 +4,7 @@ import {
    FC,
    useCallback,
    useContext,
+   useEffect,
    useMemo,
    useState,
 } from "react"
@@ -170,7 +171,7 @@ const Content: FC<ContentProps> = ({
 }) => {
    const theme = useTheme()
 
-   const [value, setValue] = useState<number>(getInitialValue(page))
+   const [value, setValue] = useState<number>(getPageIndex(page))
 
    const hasInitialData =
       serverSideLivestream && livestreamId === serverSideLivestream.id
@@ -195,6 +196,12 @@ const Content: FC<ContentProps> = ({
          goToView("livestream-details")
       }
    }, [value, onClose, goToView])
+
+   // Using useEffect to update the view based on 'page'.
+   // This allows conditional navigation not covered by useMemo.
+   useEffect(() => {
+      setValue(getPageIndex(page))
+   }, [goToView, page])
 
    const contextValue = useMemo<DialogContextType>(
       () => ({
@@ -263,7 +270,7 @@ type DialogContextType = {
    serverUserEmail: string
 }
 
-const getInitialValue = (page: Props["page"]): number => {
+const getPageIndex = (page: Props["page"]): number => {
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
