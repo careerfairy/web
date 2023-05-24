@@ -159,6 +159,9 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       const title = faker.lorem.sentence()
       const company = faker.company.companyName()
 
+      const tomorrow = new Date()
+      tomorrow.setDate(tomorrow.getDate() + 1)
+
       let data: LivestreamEvent = {
          backgroundImageUrl: faker.image.abstract(),
          company,
@@ -180,7 +183,9 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
             },
             generateSpeaker
          ),
-         start: admin.firestore.Timestamp.fromDate(faker.date.soon()),
+         start: admin.firestore.Timestamp.fromDate(
+            faker.date.soon(15, tomorrow)
+         ), // 15 days from tomorrow
          lastUpdated: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          created: admin.firestore.Timestamp.fromDate(faker.date.recent()),
          test: false,
