@@ -117,7 +117,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       }
 
       if (!hasRegistered) {
-         // You can see the job details if you are registered
+         // You can't see the job details if you are not registered
          return true
       }
 
