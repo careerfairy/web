@@ -71,7 +71,9 @@ class GroupFirebaseSeed implements GroupSeed {
    async createGroup(overrideFields?: Partial<Group>): Promise<Group> {
       const batch = firestore.batch()
       const id = generateId()
-      const universityName = faker.company.companyName() ?? "My university"
+      const universityName =
+         faker.company.companyName().replace(/[^a-zA-Z\d ]/g, "") ??
+         "My university"
 
       let data: Group = {
          id,
