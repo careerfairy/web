@@ -16,8 +16,45 @@ test.describe("Group Admin Livestreams", () => {
       await groupPage.clickCreateDraft()
 
       // assert draft is visible
-      await groupPage.goToLivestreams()
-      await groupPage.clickDraftsTab()
+      const livestreamsPage = await groupPage.goToLivestreams()
+      await livestreamsPage.clickDraftsTab()
+      await livestreamsPage.assertTextIsVisible(livestream.title)
+   })
+
+   test("Publish a draft livestream and edit its title", async ({
+      groupPage,
+      interests,
+   }) => {
+      const livestream = LivestreamSeed.random({
+         interestsIds: [interests[0].id, interests[1].id],
+      })
+
+      // create draft
+      await groupPage.clickCreateNewLivestreamTop()
+      await groupPage.fillLivestreamForm(livestream)
+      await groupPage.clickCreateDraft()
+
+      // publish draft
+      const livestreamsPage = await groupPage.goToLivestreams()
+      await livestreamsPage.clickDraftsTab()
+      await livestreamsPage.launchEditModal()
+      await livestreamsPage.publish()
+      await livestreamsPage.clickUpcomingTab()
+
+      // assert livestream is published in the upcoming tab
+      await livestreamsPage.assertTextIsVisible(livestream.title)
+      await groupPage.open()
+      // should also be in the main page
       await groupPage.assertTextIsVisible(livestream.title)
+
+      // edit livestream title
+      const title = "Livestream New Title"
+      await groupPage.clickManageLivestream()
+      await groupPage.fillLivestreamForm({ title })
+      await groupPage.clickUpdate()
+
+      // new title should be visible
+      await groupPage.goToLivestreams()
+      await groupPage.assertTextIsVisible(title)
    })
 })
