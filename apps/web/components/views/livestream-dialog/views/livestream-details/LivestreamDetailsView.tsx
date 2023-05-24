@@ -39,6 +39,7 @@ const LivestreamDetailsView: FC = () => {
       updatedStats,
       serverUserEmail,
       goToView,
+      closeDialog,
    } = useLiveStreamDialog()
    const firebase = useFirebaseService()
    const { forceShowReminder } = useUserReminders()
@@ -56,7 +57,7 @@ const LivestreamDetailsView: FC = () => {
       updatedStats
    )
 
-   const hasJobs = livestreamPresenter?.hasJobs()
+   const hasJobs = livestreamPresenter.hasJobs()
 
    const isFloatingActionButton = isMobile || !heroInView
 
@@ -133,8 +134,6 @@ const LivestreamDetailsView: FC = () => {
       ]
    )
 
-   if (!livestream) return <LivestreamDetailsViewSkeleton />
-
    return (
       <BaseDialogView
          heroContent={
@@ -144,6 +143,8 @@ const LivestreamDetailsView: FC = () => {
                   livestream.backgroundImageUrl,
                   "lg"
                )}
+               onBackPosition={isMobile ? "top-left" : "top-right"}
+               onBackClick={closeDialog}
             >
                <ShareButton livestream={livestream} />
                <Stack

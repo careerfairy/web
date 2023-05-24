@@ -48,20 +48,6 @@ const styles = sxStyles({
          color: "#464646",
       },
    },
-   toolTip: {
-      [`& .${tooltipClasses.tooltip}`]: {
-         backgroundColor: "white",
-         color: "rgba(0, 0, 0, 0.87)",
-         fontSize: "0.92rem",
-         px: 1,
-         py: 1.5,
-         borderRadius: 2,
-         boxShadow: (theme) => theme.boxShadows.dark_8_25_10,
-      },
-      [`& .${tooltipClasses.arrow}`]: {
-         color: "white",
-      },
-   },
    successButton: {
       backgroundColor: (theme) => `${theme.palette.success.main} !important`,
       color: (theme) => `${theme.palette.common.white} !important`,

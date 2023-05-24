@@ -202,6 +202,17 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    /**
+    * Only allow users to apply to jobs outside the stream if the stream has started,
+    * and it has been at least 20 minutes since the stream started
+    * */
+   canApplyToJobsOutsideOfStream(): boolean {
+      const delay = 20 * 60 * 1000 // 20min
+      const start = new Date(this.start)
+
+      return Boolean(Date.now() - start.getTime() >= delay)
+   }
+
+   /**
     * Elapsed minutes since the livestream started
     *
     * If the model is a BreakoutRoom document, the elapsed minutes
@@ -231,6 +242,10 @@ export class LivestreamPresenter extends BaseModel {
 
    hasJobs(): boolean {
       return this.jobs && this.jobs.length > 0
+   }
+
+   getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
+      return this.jobs.find((job) => job.jobId === jobId) ?? null
    }
 
    static createFromDocument(livestream: LivestreamEvent) {

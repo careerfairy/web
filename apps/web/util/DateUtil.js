@@ -278,6 +278,6 @@ export default class DateUtil {
 
    static formatPastDate(JSDate) {
       const formattedDate = dayjs(JSDate).format("DD MMM YYYY")
-      return `Release date: ${formattedDate}` // Release date: 15 Dec 2022
+      return `Live streamed on: ${formattedDate}` // Release date: 15 Dec 2022
    }
 }

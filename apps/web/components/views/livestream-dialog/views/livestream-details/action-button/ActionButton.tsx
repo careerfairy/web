@@ -38,7 +38,7 @@ const ButtonElement: FC = () => {
             <RegisterButton
                label={
                   registered
-                     ? "You attended this event"
+                     ? "You attended this live stream"
                      : "Recording Not Available"
                }
                toolTip={registered ? undefined : denyRecordingText}
