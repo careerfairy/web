@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box"
 import { Typography } from "@mui/material"
-import React, { FC } from "react"
+import React, { FC, ReactNode } from "react"
 import {
    MapPin as CompanyLocationIcon,
    Tag as CompanyIndustryIcon,
@@ -9,7 +9,7 @@ import {
 
 type Props = {
    icon: JSX.Element
-   text: string
+   text: string | ReactNode
    fontSize?: string
 }
 const CompanyTag: FC<Props> = ({ icon, text, fontSize = "1rem" }) => {
