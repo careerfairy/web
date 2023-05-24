@@ -55,6 +55,10 @@ export default class DateUtil {
       return dayjs(JSDate).format("DD/MM/YYYY")
    }
 
+   static eventStartDate(JSDate) {
+      return dayjs(JSDate).format("DD/MM/YYYY HH:mm")
+   }
+
    static getRelativeDate(JSDate) {
       const now = new Date()
       return dayjs(JSDate).calendar(now, {

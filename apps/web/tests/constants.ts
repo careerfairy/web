@@ -41,4 +41,5 @@ export const correctRegistrationAnalyticsSteps = {
       "Thu Jul 14 2022 22:47:56 GMT+0100 (Western European Summer Time)\n",
    userId: "john@careerfairy.io",
 }
-//
+
+export const imageLogoPath = "tests/e2e/assets/logo.png"
