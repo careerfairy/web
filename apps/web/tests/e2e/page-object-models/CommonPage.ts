@@ -18,6 +18,15 @@ export class CommonPage {
       return expect(this[locatorFn](text)).toBeVisible()
    }
 
+   async clickAndUploadFiles(locator: Locator, files: string[] | string) {
+      const [fileChooser] = await Promise.all([
+         this.page.waitForEvent("filechooser"),
+         locator.click(),
+      ])
+
+      await fileChooser.setFiles(files)
+   }
+
    async resilientClick(
       locator: string,
       tries: number = 3,
