@@ -55,7 +55,7 @@ test.describe("Admin Signup", () => {
 
       // confirm we're on the group dashboard
       const newGroupPage = new GroupDashboardPage(adminPage.page, group)
-      await newGroupPage.clickBackdropIfPresent()
+      await newGroupPage.setLocalStorageKeys()
       // assert we're on the group dashboard
       await newGroupPage.assertGroupDashboardIsOpen()
 
@@ -90,7 +90,7 @@ test.describe("Admin Signup", () => {
 
       // confirm we're on the group dashboard
       const newGroupPage = new GroupDashboardPage(adminPage.page, group)
-      await newGroupPage.clickBackdropIfPresent()
+      await newGroupPage.setLocalStorageKeys()
       // assert we're on the group dashboard
       await newGroupPage.assertGroupDashboardIsOpen()
 

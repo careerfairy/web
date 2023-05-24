@@ -47,19 +47,6 @@ export class GroupDashboardPage extends CommonPage {
          .getByRole("button", { name: "Create New Live Stream" })
    }
 
-   /**
-    * Dismiss tooltips about new features
-    */
-   public async clickBackdropIfPresent() {
-      await sleep(1000)
-
-      const backdrop = this.page.locator(".MuiBackdrop-root")
-
-      if (await backdrop.isVisible()) {
-         await backdrop.click()
-      }
-   }
-
    public async goToCompanyPage() {
       await this.goToPage("Company")
    }
