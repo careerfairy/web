@@ -39,11 +39,11 @@ const styles = sxStyles({
    seeMoreBtn: {
       boxShadow: "none",
       textTransform: "none",
+      py: 1,
       width: {
          xs: "100%",
-         sm: 120,
+         sm: "max-content",
       },
-      py: 1,
    },
    buttonSkeleton: {
       borderRadius: 4,
@@ -86,6 +86,8 @@ type JobItemProps = {
 const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    const router = useRouter()
 
+   const isPast = presenter.isPast()
+
    const jobLink = useMemo<LinkProps["href"]>(
       () =>
          buildDialogLink({
@@ -122,6 +124,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
                <Button
                   component={Link}
                   shallow
+                  disabled={isPast}
                   scroll={false}
                   variant="contained"
                   disableElevation
@@ -131,7 +134,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
                   // @ts-ignore
                   href={jobLink}
                >
-                  See more
+                  {isPast ? "Details in live stream" : "See more"}
                </Button>
             </span>
          </Box>

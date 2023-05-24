@@ -1,5 +1,4 @@
 import { FC, useState } from "react"
-import Box from "@mui/material/Box"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import Button from "@mui/material/Button"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
@@ -13,7 +12,6 @@ import { SuspenseWithBoundary } from "../../../../../ErrorBoundary"
 import useJobApply from "../../../../../custom-hook/ats/useJobApply"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import CheckIcon from "@mui/icons-material/Check"
-import { useLiveStreamDialog } from "../../../LivestreamDialog"
 import useUploadCV from "../../../../../custom-hook/user/useUploadCV"
 import { alpha } from "@mui/material/styles"
 import FileUploader from "../../../../common/FileUploader"
@@ -27,9 +25,6 @@ const styles = sxStyles({
       fontSize: "1.214rem",
       fontWeight: 400,
       textTransform: "none",
-   },
-   goBackBtn: {
-      ml: "auto",
    },
    loadingBtn: {
       color: "transparent !important",
@@ -157,21 +152,6 @@ const ButtonSkeleton: FC = () => {
       >
          Hidden text
       </LoadingButton>
-   )
-}
-
-export const GoBackButton: FC = () => {
-   const { handleBack } = useLiveStreamDialog()
-
-   return (
-      <Button
-         variant="contained"
-         sx={[styles.goBackBtn, styles.btn]}
-         onClick={handleBack}
-         {...baseButtonProps}
-      >
-         Back
-      </Button>
    )
 }
 
