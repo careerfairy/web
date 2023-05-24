@@ -63,7 +63,7 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
    const tabs = useMemo<TabElement[]>(() => {
       const newTabs: TabElement[] = [
          // If there are jobs, make sure they are first in the list
-         ...(jobSection
+         ...(hasJobs
             ? [
                  {
                     value: "jobs",
@@ -95,12 +95,12 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
 
       return newTabs
    }, [
-      jobSection,
       jobsInView,
       aboutLivestreamsInView,
       aboutCompanySection,
       aboutCompanyInView,
       questionsInView,
+      hasJobs,
    ])
 
    const sectionRefs = useMemo(
