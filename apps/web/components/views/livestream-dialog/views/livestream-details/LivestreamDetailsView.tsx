@@ -30,6 +30,7 @@ import AboutLivestream from "./main-content/AboutLivestream"
 import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
+import Box from "@mui/material/Box"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -56,6 +57,8 @@ const LivestreamDetailsView: FC = () => {
    )
 
    const hasJobs = livestreamPresenter?.hasJobs()
+
+   const isFloatingActionButton = isMobile || !heroInView
 
    const handleRegisterClick = useCallback(
       async (floating: boolean) => {
@@ -164,7 +167,7 @@ const LivestreamDetailsView: FC = () => {
                      livestreamPresenter={livestreamPresenter}
                      onRegisterClick={handleRegisterClick}
                      canWatchRecording={showRecording}
-                     isFloating={isMobile || !heroInView}
+                     isFloating={isFloatingActionButton}
                      userEmailFromServer={serverUserEmail}
                      heroVisible={heroInView}
                   />
@@ -197,8 +200,9 @@ const LivestreamDetailsView: FC = () => {
                         presenter={livestreamPresenter}
                      />
                      <Section ref={questionsRef}>
-                        <Questions />
+                        <Questions livestream={livestream} />
                      </Section>
+                     {isFloatingActionButton ? <FloatingButtonOffset /> : null}
                   </MainContent>
                )}
             </MainContentNavigation>
@@ -206,6 +210,8 @@ const LivestreamDetailsView: FC = () => {
       />
    )
 }
+
+const FloatingButtonOffset = () => <Box height={90} />
 
 export const DummyContent: FC<{
    numberOfItems?: number

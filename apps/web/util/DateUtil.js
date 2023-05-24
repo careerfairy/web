@@ -67,6 +67,10 @@ export default class DateUtil {
       })
    }
 
+   static getTimeAgo(JSDate) {
+      return dayjs(JSDate).fromNow() // 2 hours ago, 2 days ago, 2 months ago, 2 years ago
+   }
+
    static getISODateTime(JSDate) {
       let year = JSDate.getFullYear()
       let month =

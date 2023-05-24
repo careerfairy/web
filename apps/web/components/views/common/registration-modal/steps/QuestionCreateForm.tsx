@@ -89,13 +89,12 @@ const QuestionCreateForm = () => {
             return replace("/signup")
          }
          try {
-            const newQuestion = {
+            await putLivestreamQuestion(livestream?.id, {
                title: values.questionTitle,
                votes: 0,
                type: "new",
                author: authenticatedUser.email,
-            }
-            await putLivestreamQuestion(livestream?.id, newQuestion)
+            })
 
             rewardService
                .userAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
@@ -166,9 +165,13 @@ const QuestionCreateForm = () => {
                      // @ts-ignore
                      maxLength="170"
                      error={
-                        touched.questionTitle && Boolean(errors.questionTitle)
+                        touched.questionTitle
+                           ? Boolean(errors.questionTitle)
+                           : null
                      }
-                     helperText={touched.questionTitle && errors.questionTitle}
+                     helperText={
+                        touched.questionTitle ? errors.questionTitle : null
+                     }
                      inputProps={{ maxLength: maxQuestionLength }}
                      fullWidth
                      onBlur={handleBlur}
