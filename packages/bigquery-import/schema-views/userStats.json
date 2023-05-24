@@ -1,0 +1,36 @@
+{
+   "fields": [
+      {
+         "name": "userId",
+         "type": "string"
+      },
+      {
+         "name": "totalLivestreamAttendances",
+         "type": "number"
+      },
+      {
+         "name": "totalQuestionsAsked",
+         "type": "number"
+      },
+      {
+         "name": "totalHandRaises",
+         "type": "number"
+      },
+      {
+         "name": "hasRegisteredOnAnyLivestream",
+         "type": "boolean"
+      },
+      {
+         "name": "totalLivestreamInvites",
+         "type": "number"
+      },
+      {
+         "name": "referralsCount",
+         "type": "number"
+      },
+      {
+         "name": "recordingsBought",
+         "type": "stringified_map"
+      }
+   ]
+}
