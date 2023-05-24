@@ -1,4 +1,4 @@
-import { FC, useMemo } from "react"
+import { FC, useCallback, useMemo } from "react"
 import Box from "@mui/material/Box"
 import SectionTitle from "./SectionTitle"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
@@ -14,6 +14,10 @@ import { LinkProps } from "next/dist/client/link"
 import { buildDialogLink } from "../../../util"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
+import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNotifications"
+import useIsMobile from "../../../../../custom-hook/useIsMobile"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import useRecordingAccess from "../../../../upcoming-livestream/HeroSection/useRecordingAccess"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -85,9 +89,34 @@ type JobItemProps = {
 }
 
 const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
+   const isMobile = useIsMobile()
    const router = useRouter()
+   const { successNotification } = useSnackbarNotifications()
+   const { authenticatedUser, userStats } = useAuth()
+
+   const { userHasBoughtRecording } = useRecordingAccess(
+      authenticatedUser.email,
+      presenter,
+      userStats
+   )
 
    const isPast = presenter.isPast()
+
+   const buttonDisabled = useMemo<boolean>(() => {
+      const isUpcoming = !isPast
+
+      if (isUpcoming) {
+         // You can't see the job details if the livestream is upcoming
+         return true
+      }
+
+      if (userHasBoughtRecording) {
+         // You can see the job details if you bought the recording
+         return false
+      }
+
+      return !presenter.canApplyToJobsOutsideOfStream()
+   }, [presenter, userHasBoughtRecording, isPast])
 
    const jobLink = useMemo<LinkProps["href"]>(
       () =>
@@ -101,6 +130,59 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
          }),
       [router, presenter.id, job.jobId]
    )
+
+   const copy = useMemo<{
+      title: string
+      description: string
+      toastTitle?: string
+   }>(() => {
+      const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
+
+      if (isPast) {
+         if (!hasRegistered && !userHasBoughtRecording) {
+            return {
+               title: "Job details not available",
+               description:
+                  "You cannot see the job details, since you did not attend this live stream",
+               toastTitle: "Not available",
+            }
+         }
+         if (!hasRegistered && userHasBoughtRecording) {
+            return {
+               title: "See more",
+               description:
+                  "Watch the recording to get access to the job details",
+               toastTitle: "Available",
+            }
+         }
+         if (hasRegistered) {
+            return {
+               title: "See more",
+               description:
+                  "You can see the job details because you attended the live stream",
+               toastTitle: "Available",
+            }
+         }
+      }
+
+      return {
+         title: "Details in live stream",
+         description: "The job details are presented during the live stream!",
+         toastTitle: "Available soon",
+      }
+   }, [presenter, authenticatedUser.email, isPast, userHasBoughtRecording])
+
+   const onClick = useCallback(() => {
+      if (buttonDisabled && isMobile) {
+         successNotification(copy.description, copy.toastTitle)
+      }
+   }, [
+      buttonDisabled,
+      isMobile,
+      successNotification,
+      copy.description,
+      copy.toastTitle,
+   ])
 
    return (
       <Stack
@@ -123,13 +205,13 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
          <Box sx={styles.jobActionWrapper}>
             <StyledToolTip
                placement="top"
-               title={isPast ? "" : "Details in live stream"}
+               title={buttonDisabled ? copy.description : ""}
             >
-               <span>
+               <span onClick={onClick}>
                   <Button
                      component={Link}
                      shallow
-                     disabled={!isPast}
+                     disabled={buttonDisabled}
                      scroll={false}
                      variant="contained"
                      disableElevation
@@ -139,7 +221,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
                      // @ts-ignore
                      href={jobLink}
                   >
-                     {isPast ? "See more" : "Details in live stream"}
+                     {copy.title}
                   </Button>
                </span>
             </StyledToolTip>

@@ -257,7 +257,6 @@ const FollowCompanyButton: FC<{
       <span>
          <FollowButton
             variant={"outlined"}
-            color={"secondary"}
             size={"small"}
             startIcon={null}
             sx={styles.followButton}
