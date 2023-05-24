@@ -14,6 +14,7 @@ import LivestreamSearch, {
 import Filter, { FilterEnum } from "../filter/Filter"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import NoResultsMessage from "./NoResultsMessage"
+import { buildDialogLink } from "../../livestream-dialog"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -70,7 +71,8 @@ type Props = {
 const NextLiveStreamsWithFilter = ({
    initialTabValue = "upcomingEvents",
 }: Props) => {
-   const { query, push } = useRouter()
+   const router = useRouter()
+   const { query, push } = router
    const {
       languages,
       interests,
@@ -134,9 +136,23 @@ const NextLiveStreamsWithFilter = ({
    // Clicking on a search result will open the detail page for the corresponding stream
    const handleSearch = useCallback(
       (hit: LivestreamHit | null) => {
-         void push(`/upcoming-livestream/${hit.id}`)
+         if (!hit) return
+         void push(
+            buildDialogLink({
+               router,
+               link: {
+                  type: "livestreamDetails",
+                  livestreamId: hit.id,
+               },
+            }),
+            undefined,
+            {
+               shallow: true,
+               scroll: false,
+            }
+         )
       },
-      [push]
+      [push, router]
    )
 
    return (

@@ -1,12 +1,13 @@
 import React, { FC, useCallback, useState } from "react"
 import Box from "@mui/material/Box"
-import { Button, Tooltip } from "@mui/material"
+import { Button } from "@mui/material"
 import styles from "./Styles"
 import CheckIcon from "@mui/icons-material/Check"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import { FloatingButtonWrapper, LinkText } from "./ActionButton"
 import { useActionButtonContext } from "./ActionButtonProvider"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
+import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
 
 type RegisterButtonProps = {
    label: string
@@ -62,11 +63,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                startIcon={registered ? <CheckIcon /> : null}
                endIcon={
                   toolTip ? (
-                     <Tooltip
-                        PopperProps={{
-                           // @ts-ignore
-                           sx: styles.toolTip,
-                        }}
+                     <StyledToolTip
                         arrow
                         open={open}
                         leaveDelay={1500}
@@ -76,7 +73,7 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
                         placement="top"
                      >
                         <InfoOutlinedIcon />
-                     </Tooltip>
+                     </StyledToolTip>
                   ) : null
                }
                disabled={buttonDisabled}

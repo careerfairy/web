@@ -316,7 +316,13 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                href: "",
             }
          }
-         const eventLink = buildDialogLink(router, event.id)
+         const eventLink = buildDialogLink({
+            router,
+            link: {
+               type: "livestreamDetails",
+               livestreamId: event.id,
+            },
+         })
 
          if (
             isOnMarketingLandingPage &&

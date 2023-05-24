@@ -78,15 +78,12 @@ const styles = sxStyles({
    },
    followButton: {
       borderRadius: 1,
-      background: (theme) => theme.palette.background.paper,
       py: 0.5,
       px: 2.25,
-      "&:hover": {
-         background: (theme) => theme.palette.background.paper,
-      },
       textTransform: "none",
       zIndex: 1,
       textDecoration: "none !important",
+      boxShadow: "none !important",
    },
    button: {
       borderRadius: 1,
@@ -103,7 +100,7 @@ const styles = sxStyles({
    companyCta: {
       fontSize: "1.142rem",
       fontWeight: "in",
-      color: "secondary.main",
+      color: "inherit",
       "&:hover": {
          mr: 1,
          transition: (theme) => theme.transitions.create("margin-right"),
@@ -215,7 +212,7 @@ const AboutCompanyComponent: FC<Props> = ({ presenter, sectionRef }) => {
                      )}`}
                      alignItems={"center"}
                      noLinkStyle
-                     color={"secondary.main"}
+                     color={"primary.main"}
                      fontWeight={500}
                      mt={2.687}
                   >
@@ -260,7 +257,6 @@ const FollowCompanyButton: FC<{
       <span>
          <FollowButton
             variant={"outlined"}
-            color={"secondary"}
             size={"small"}
             startIcon={null}
             sx={styles.followButton}

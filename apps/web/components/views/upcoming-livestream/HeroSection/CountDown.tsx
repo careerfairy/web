@@ -168,7 +168,7 @@ const CountDown = ({
                <Box sx={styles.dateTimeWrapper}>
                   <Typography align="left" sx={styles.dateTime} variant="h6">
                      {isPastEvent && !stream.denyRecordingAccess
-                        ? `Release Date: ${DateUtil.getRatingDate(time)}`
+                        ? `Live streamed on: ${DateUtil.getRatingDate(time)}`
                         : DateUtil.getUpcomingDate(time)}
                   </Typography>
                   <Hidden smDown>

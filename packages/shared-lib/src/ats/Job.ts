@@ -62,6 +62,18 @@ export class Job extends ATSModel {
       return this.hiringManagers?.[0]?.getName() || ""
    }
 
+   getLocation() {
+      return this.offices?.[0]?.location || ""
+   }
+
+   getDepartment() {
+      return this.departments?.[0]?.name || ""
+   }
+
+   isClosed() {
+      return this.status !== "OPEN"
+   }
+
    static createFromMerge(job: MergeJob) {
       return new Job(
          job.id,
