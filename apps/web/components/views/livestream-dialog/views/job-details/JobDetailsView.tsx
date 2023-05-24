@@ -12,6 +12,8 @@ import JobDescription from "./main-content/JobDescription"
 import Stack from "@mui/material/Stack"
 import JobCTAButton from "./main-content/JobCTAButton"
 import NotFoundView from "../common/NotFoundView"
+import { useAuth } from "../../../../../HOCs/AuthProvider"
+import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
 
 type Props = {
    jobId: string
@@ -19,7 +21,14 @@ type Props = {
 
 const JobDetailsView: FC = (props) => {
    const { query } = useRouter()
-   const { livestreamPresenter } = useLiveStreamDialog()
+   const { livestreamPresenter, updatedStats } = useLiveStreamDialog()
+   const { authenticatedUser } = useAuth()
+
+   const { userHasBoughtRecording } = useRecordingAccess(
+      authenticatedUser.email,
+      livestreamPresenter,
+      updatedStats
+   )
 
    const { livestreamDialog } = query
 
@@ -33,6 +42,18 @@ const JobDetailsView: FC = (props) => {
          <NotFoundView
             title="Details in live stream"
             description="The job details will be made available after the livestream."
+         />
+      )
+   }
+
+   if (
+      !livestreamPresenter.isUserRegistered(authenticatedUser.email) &&
+      !userHasBoughtRecording
+   ) {
+      return (
+         <NotFoundView
+            title="Job details not available"
+            description="You cannot see the job details, since you did not attend this live stream."
          />
       )
    }

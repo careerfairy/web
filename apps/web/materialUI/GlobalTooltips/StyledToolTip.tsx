@@ -3,7 +3,7 @@ import { TooltipProps } from "@mui/material/Tooltip"
 import { styled } from "@mui/styles"
 
 const StyledToolTip = styled(({ className, ...props }: TooltipProps) => (
-   <Tooltip {...props} classes={{ popper: className }}>
+   <Tooltip arrow {...props} classes={{ popper: className }}>
       {props.children}
    </Tooltip>
 ))(({ theme }) => ({

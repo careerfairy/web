@@ -139,8 +139,6 @@ const CompanyCard: FC<Props> = ({ company }) => {
                {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
                   <FollowButton
                      group={company}
-                     variant={"outlined"}
-                     color={"secondary"}
                      size={"small"}
                      sx={styles.followButton}
                      startIcon={null}
