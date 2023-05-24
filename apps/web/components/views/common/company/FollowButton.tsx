@@ -96,8 +96,9 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
             )
          }
          {...buttonProps}
+         variant={companyFollowedData ? "outlined" : "contained"}
       >
-         {companyFollowedData ? "Followed" : "Follow"}
+         {companyFollowedData ? "Following" : "Follow"}
       </LoadingButton>
    )
 }

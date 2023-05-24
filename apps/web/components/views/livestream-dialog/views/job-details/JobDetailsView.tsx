@@ -11,7 +11,7 @@ import JobDetailsViewSkeleton from "./JobDetailsViewSkeleton"
 import JobDescription from "./main-content/JobDescription"
 import Stack from "@mui/material/Stack"
 import JobCTAButton from "./main-content/JobCTAButton"
-import EmptyJobDetailsView from "./EmptyJobDetailsView"
+import NotFoundView from "../common/NotFoundView"
 
 type Props = {
    jobId: string
@@ -19,12 +19,23 @@ type Props = {
 
 const JobDetailsView: FC = (props) => {
    const { query } = useRouter()
+   const { livestreamPresenter } = useLiveStreamDialog()
 
    const { livestreamDialog } = query
 
    const [pathType, livestreamId, dialogPage, jobId] = livestreamDialog || []
 
    if (!jobId) return <JobDetailsViewSkeleton />
+
+   // If the livestream is in the past, we don't want to show or fetch the job details
+   if (!livestreamPresenter.isPast()) {
+      return (
+         <NotFoundView
+            title="Details in live stream"
+            description="The job details will be made available after the livestream."
+         />
+      )
+   }
 
    return (
       <SuspenseWithBoundary fallback={<JobDetailsViewSkeleton />}>
@@ -34,13 +45,17 @@ const JobDetailsView: FC = (props) => {
 }
 
 const JobDetails: FC<Props> = ({ jobId }) => {
-   const { livestream, livestreamPresenter, goToView, handleBack } =
-      useLiveStreamDialog()
+   const { livestream, livestreamPresenter, goToView } = useLiveStreamDialog()
 
    const job = useLivestreamJob(livestreamPresenter.getAssociatedJob(jobId))
 
    if (!job) {
-      return <EmptyJobDetailsView />
+      return (
+         <NotFoundView
+            title="Job not found"
+            description="The job you are looking for does not exist. It may have been deleted or closed or the link you followed may be broken."
+         />
+      )
    }
 
    return (

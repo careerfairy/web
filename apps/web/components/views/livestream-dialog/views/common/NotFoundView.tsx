@@ -2,19 +2,39 @@ import React, { FC } from "react"
 import BaseDialogView, { MainContent } from "../../BaseDialogView"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { GoBackButton } from "./main-content/JobCTAButton"
-import { sxStyles } from "../../../../../types/commonTypes"
 import Box from "@mui/material/Box"
 import Image from "next/image"
+import { useLiveStreamDialog } from "../../LivestreamDialog"
+import Button from "@mui/material/Button"
+import { sxStyles } from "../../../../../types/commonTypes"
 
-const EmptyJobDetailsView: FC = () => {
+const styles = sxStyles({
+   btn: {
+      boxShadow: "none",
+      py: 0.75,
+      px: 2.5,
+      fontSize: "1.214rem",
+      fontWeight: 400,
+      textTransform: "none",
+   },
+   goBackBtn: {
+      ml: "auto",
+   },
+})
+
+type EmptyJobDetailsViewProps = {
+   title: string
+   description: string
+}
+
+const NotFoundView: FC<EmptyJobDetailsViewProps> = ({ description, title }) => {
    return (
       <BaseDialogView
          mainContent={
             <MainContent>
                <Stack sx={{ mt: 3 }} spacing={3}>
                   <Typography variant="h4" textAlign="center" fontWeight="bold">
-                     Job not found
+                     {title}
                   </Typography>
                   <Box textAlign="center">
                      <Image
@@ -29,9 +49,7 @@ const EmptyJobDetailsView: FC = () => {
                      color="text.secondary"
                      textAlign="center"
                   >
-                     The job you are looking for does not exist. It may have
-                     been deleted or deleted or the link you followed may be
-                     broken.
+                     {description}
                   </Typography>
                </Stack>
             </MainContent>
@@ -41,4 +59,21 @@ const EmptyJobDetailsView: FC = () => {
    )
 }
 
-export default EmptyJobDetailsView
+export const GoBackButton: FC = () => {
+   const { handleBack } = useLiveStreamDialog()
+
+   return (
+      <Button
+         variant="contained"
+         sx={[styles.goBackBtn, styles.btn]}
+         onClick={handleBack}
+         color="primary"
+         disableElevation
+         size="small"
+      >
+         Back
+      </Button>
+   )
+}
+
+export default NotFoundView
