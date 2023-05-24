@@ -1,4 +1,4 @@
-import { Locator, Page } from "@playwright/test"
+import { FileChooser, Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CommonPage } from "./CommonPage"
@@ -7,10 +7,27 @@ import DateUtil from "../../../util/DateUtil"
 import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
+import { handleMultiSelect, sleep } from "../utils"
+
+const avatarPath = "./tests/e2e/upload/Avatar.png"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
    public kickFromDashboard: Locator
+   public companyInformationSummaryInput: Locator
+   public companyInformationLocationInput: Locator
+   public companyInformationSaveButton: Locator
+   public companyPageAboutSectionEditButton: Locator
+   public companyInformationIndustriesInput: Locator
+   public companyInformationSizeInput: Locator
+   public companyInformationAboutInput: Locator
+   public companyPageAboutSectionSaveButton: Locator
+   public companyPageTestimonialSectionEditButton: Locator
+   public companyPageTestimonialSectionTestimonialInput: Locator
+   public companyPageTestimonialSectionNameInput: Locator
+   public companyPageTestimonialSectionPositionInput: Locator
+   public companyPageTestimonialSectionSaveButton: Locator
+   public companyPageTestimonialSectionUploadAvatarButton: Locator
 
    constructor(public readonly page: Page, protected readonly group: Group) {
       super(page)
@@ -21,6 +38,56 @@ export class GroupDashboardPage extends CommonPage {
 
       this.kickFromDashboard = this.page.getByRole("button", {
          name: "Kick from dashboard",
+      })
+
+      this.companyInformationSummaryInput =
+         this.page.getByLabel("Group Summary *")
+
+      this.companyInformationLocationInput =
+         this.page.getByLabel("Company location")
+
+      this.companyInformationIndustriesInput =
+         this.page.getByLabel("Company industries")
+
+      this.companyInformationSizeInput = this.page.getByRole("button", {
+         name: "Company size *",
+      })
+
+      this.companyInformationAboutInput = this.page.getByLabel("About")
+
+      this.companyInformationSaveButton = this.page.locator(
+         "data-testid=profile-details-save-button"
+      )
+
+      this.companyPageAboutSectionEditButton = this.page.locator(
+         "data-testid=about-section-edit-button"
+      )
+
+      this.companyPageAboutSectionSaveButton = this.page.locator(
+         "data-testid=about-section-save-button"
+      )
+
+      this.companyPageTestimonialSectionEditButton = this.page.locator(
+         "data-testid=testimonial-section-edit-button"
+      )
+
+      this.companyPageTestimonialSectionTestimonialInput =
+         this.page.getByLabel("Testimonial")
+
+      this.companyPageTestimonialSectionNameInput = this.page.getByLabel("Name")
+
+      this.companyPageTestimonialSectionPositionInput =
+         this.page.getByLabel("Position")
+
+      this.companyPageTestimonialSectionSaveButton = this.page.locator(
+         "data-testid=testimonials-save-button"
+      )
+      this.companyPageTestimonialSectionUploadAvatarButton = this.page.locator(
+         "data-testid=image-selector-upload"
+      )
+
+      this.page.on("filechooser", async (fileChooser: FileChooser) => {
+         await fileChooser.setFiles(avatarPath)
       })
    }
 
@@ -69,6 +136,14 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    // Team Members page
+
+   public async goToCompanyPageAdmin() {
+      await this.goToPage("Company page")
+   }
+
+   public async goToPreviewCompanyPageAdmin(companyName: string) {
+      await this.page.goto(`/company/${companyName}`)
+   }
 
    public async inviteGroupAdmin(email: string) {
       await this.inviteMemberButton.click()
@@ -186,5 +261,94 @@ export class GroupDashboardPage extends CommonPage {
          this.page.waitForNavigation(),
          this.page.getByRole("link", { name }).click(),
       ])
+   }
+
+   /**
+    * Set some flags in local storage to prevent tooltips from showing up
+    */
+   async setLocalStorageKeys() {
+      await this.page.addInitScript(() => {
+         window.localStorage.setItem("has-seen-company-page-cta", "true")
+      })
+   }
+
+   async updateCompanySummary(summary: string) {
+      return this.companyInformationSummaryInput.fill(summary)
+   }
+
+   async updateCompanyLocation(country: string) {
+      return handleMultiSelect(
+         country,
+         this.companyInformationLocationInput,
+         this.page
+      )
+   }
+
+   async saveCompanyDetails() {
+      await this.companyInformationSaveButton.click()
+      return await sleep(1000)
+   }
+
+   async openAndFillAboutInformation() {
+      await this.companyPageAboutSectionEditButton.click()
+      await sleep(1000)
+
+      await this.companyInformationAboutInput.fill(
+         "CareerFairy is the only graduate career portal that gives graduates access to speak to companies before applying for a job. We find and share valuable insights about the job market, career choices and, most importantly, employers."
+      )
+      await handleMultiSelect(
+         "Switzerland",
+         this.companyInformationLocationInput,
+         this.page
+      )
+      await handleMultiSelect(
+         "Technology & IT",
+         this.companyInformationIndustriesInput,
+         this.page
+      )
+
+      await this.companyInformationSizeInput.click()
+      await this.page.getByRole("option", { name: "1-20 employees" }).click()
+
+      await this.companyPageAboutSectionSaveButton.click()
+      return await sleep(1000)
+   }
+
+   async openAndFillTestimonial() {
+      await this.companyPageTestimonialSectionEditButton.click()
+
+      await this.companyPageTestimonialSectionUploadAvatarButton.click()
+      await sleep(1000)
+
+      await this.companyPageTestimonialSectionTestimonialInput.fill(
+         "I am about to finish my Bachelor’s degree in Applied Linguistics at ZHAW. I wanted to start my professional career in an environment that values my ideas and ultimately helps students, like me, to make their first steps in their professional world."
+      )
+      await this.companyPageTestimonialSectionNameInput.fill("Fabian Doe")
+      await this.companyPageTestimonialSectionPositionInput.fill(
+         "Business Development Manager"
+      )
+      await this.companyPageTestimonialSectionSaveButton.click()
+   }
+
+   async addCompanyPhotos() {
+      await this.page.getByRole("button", { name: "ADD PHOTO" }).click()
+      await this.page.getByRole("button", { name: "ADD PHOTO" }).click()
+      await this.page.getByRole("button", { name: "ADD PHOTO" }).click()
+   }
+
+   async addCompanyVideo() {
+      await this.page.getByRole("button", { name: "ADD VIDEO" }).click()
+
+      await this.page
+         .getByPlaceholder("Enter the title of video")
+         .fill("this it the title")
+      await this.page
+         .getByPlaceholder("Enter the video description")
+         .fill("this is a description")
+      await this.page.getByLabel("Embed Video").check()
+      await this.page
+         .getByLabel("Paste video URL here")
+         .fill("https://www.youtube.com/")
+      await this.page.getByRole("button", { name: "Save & Close" }).click()
    }
 }

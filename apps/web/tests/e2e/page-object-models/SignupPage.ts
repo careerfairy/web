@@ -1,5 +1,5 @@
 import { expect, Locator, Page } from "@playwright/test"
-import { sleep } from "../utils"
+import { handleMultiSelect, sleep } from "../utils"
 import { CommonPage } from "./CommonPage"
 
 export class SignupPage extends CommonPage {
@@ -151,30 +151,29 @@ export class SignupPage extends CommonPage {
    }
 
    async selectUniversityCountry(country: string) {
-      return this.handleMultiSelect(country, this.universityCountrySelector)
+      return handleMultiSelect(
+         country,
+         this.universityCountrySelector,
+         this.page
+      )
    }
    async selectFieldOfStudy(fieldOfStudyName: string) {
-      return this.handleMultiSelect(fieldOfStudyName, this.fieldOfStudySelector)
+      return handleMultiSelect(
+         fieldOfStudyName,
+         this.fieldOfStudySelector,
+         this.page
+      )
    }
    async selectLevelOfStudy(levelOfStudyName: string) {
-      return this.handleMultiSelect(levelOfStudyName, this.levelOfStudySelector)
+      return handleMultiSelect(
+         levelOfStudyName,
+         this.levelOfStudySelector,
+         this.page
+      )
    }
 
    async selectUniversity(university: string) {
-      return this.handleMultiSelect(university, this.universitySelector)
-   }
-
-   async handleMultiSelect(stringToSelect: string, elementLocator: Locator) {
-      if (!stringToSelect) return
-      await elementLocator.click()
-      await elementLocator.focus()
-      await elementLocator.fill(stringToSelect)
-      // give time for the dropdown to update the suggestions
-      await sleep(250)
-      expect(await elementLocator.inputValue()).toBe(stringToSelect)
-      await this.page
-         .locator('div[role="presentation"]', { hasText: stringToSelect })
-         .click()
+      return handleMultiSelect(university, this.universitySelector, this.page)
    }
 
    async enterEmail(email?: string) {
