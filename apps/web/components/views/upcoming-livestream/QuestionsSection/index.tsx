@@ -1,14 +1,17 @@
-import React from "react"
+import React, { useState } from "react"
 import Section from "components/views/common/Section"
 import SectionContainer from "../../common/Section/Container"
 import SectionHeader from "../../common/SectionHeader"
 import Box from "@mui/material/Box"
 import Fade from "@stahl.luke/react-reveal/Fade"
 import CreateQuestion from "./CreateQuestion"
-import QuestionVotingContainer from "../../common/QuestionVotingContainer"
 import { Grid, Hidden } from "@mui/material"
 import { questionIcon } from "../../../../constants/svgs"
-import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
+import { QuestionsComponent } from "../../livestream-dialog/views/livestream-details/main-content/Questions"
 
 const styles = {
    header: {
@@ -42,6 +45,10 @@ const styles = {
          padding: (theme) => theme.spacing(2),
       },
    },
+   questionsWrapper: {
+      height: 400,
+      overflowY: "auto",
+   },
 }
 
 type Props = {
@@ -50,7 +57,6 @@ type Props = {
    backgroundImageClassName?: string
    backgroundImageOpacity?: number
    isPastEvent: boolean
-   reFetchQuestions: any
    livestream: LivestreamEvent
    big: boolean
    color?: string
@@ -59,27 +65,36 @@ type Props = {
    questionsAreDisabled: boolean
    sectionRef: any
    sectionId: string
-   questions: any
-   loadingInitialQuestions: any
-   hasVoted: any
-   hasMore: any
-   handleUpvote: any
-   questionSortType: any
-   getMore: any
-   handleChangeQuestionSortType: any
 }
 
-const QuestionsSection = (props: Props) => {
+const QuestionsSection = ({
+   backgroundColor,
+   backgroundImage,
+   backgroundImageClassName,
+   backgroundImageOpacity,
+   big,
+   color,
+   isPastEvent,
+   livestream,
+   questionsAreDisabled,
+   sectionId,
+   sectionRef,
+   subtitle,
+   title,
+}: Props) => {
+   const [newlyCreatedQuestion, setNewlyCreatedQuestion] =
+      useState<LivestreamQuestion | null>(null)
+
    return (
       <Section
-         big={props.big}
-         sectionRef={props.sectionRef}
-         sectionId={props.sectionId}
-         color={props.color}
-         backgroundImageClassName={props.backgroundImageClassName}
-         backgroundImage={props.backgroundImage}
-         backgroundImageOpacity={props.backgroundImageOpacity}
-         backgroundColor={props.backgroundColor}
+         big={big}
+         sectionRef={sectionRef}
+         sectionId={sectionId}
+         color={color}
+         backgroundImageClassName={backgroundImageClassName}
+         backgroundImage={backgroundImage}
+         backgroundImageOpacity={backgroundImageOpacity}
+         backgroundColor={backgroundColor}
       >
          <SectionContainer maxWidth="lg">
             <Grid spacing={2} container>
@@ -96,58 +111,42 @@ const QuestionsSection = (props: Props) => {
                   </Grid>
                </Hidden>
                <Grid item xs={12} md={8}>
-                  {props.title && (
+                  {title ? (
                      <Fade bottom>
                         <SectionHeader
-                           color={props.color}
+                           color={color}
                            sx={styles.header}
-                           title={props.title}
-                           subtitle={props.subtitle}
+                           title={title}
+                           subtitle={subtitle}
                            titleSx={styles.title}
                         />
                      </Fade>
-                  )}
+                  ) : null}
                   <Box marginTop={2} width="100%">
                      <Fade bottom>
                         <Box>
-                           {props.questionsAreDisabled ? (
+                           {questionsAreDisabled ? (
                               <Box py={6}>
                                  The Q&A feature has been disabled by the host
                                  for this live stream.
                               </Box>
                            ) : (
                               <>
-                                 {!props.isPastEvent && (
+                                 {!isPastEvent ? (
                                     <CreateQuestion
-                                       reFetchQuestions={props.reFetchQuestions}
-                                       livestream={props.livestream}
+                                       onQuestionAdded={setNewlyCreatedQuestion}
+                                       livestream={livestream}
                                     />
-                                 )}
-                                 {!!props.questions.length && (
-                                    // @ts-ignore
-                                    <QuestionVotingContainer
-                                       loadingInitialQuestions={
-                                          props.loadingInitialQuestions
-                                       }
-                                       votingDisabled={props.isPastEvent}
-                                       hasVoted={props.hasVoted}
-                                       hasMore={props.hasMore}
-                                       questionSortType={props.questionSortType}
-                                       handleUpvote={props.handleUpvote}
-                                       getMore={props.getMore}
-                                       containerHeight={
-                                          props.questions.length > 4
-                                             ? 400
-                                             : props.questions.length > 2
-                                             ? 300
-                                             : 170
-                                       }
-                                       questions={props.questions}
-                                       handleChangeQuestionSortType={
-                                          props.handleChangeQuestionSortType
+                                 ) : null}
+                                 <Box sx={styles.questionsWrapper}>
+                                    <QuestionsComponent
+                                       key={newlyCreatedQuestion?.id} // this is to force a rerender when a new question is added
+                                       livestream={livestream}
+                                       newlyCreatedQuestion={
+                                          newlyCreatedQuestion
                                        }
                                     />
-                                 )}
+                                 </Box>
                               </>
                            )}
                         </Box>
