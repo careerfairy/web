@@ -8,8 +8,15 @@ const JobDetailsViewSkeleton = () => {
    return (
       <BaseDialogView
          heroContent={
-            <HeroContent>
-               <Box height={185} />
+            <HeroContent noMinHeight>
+               <Box
+                  sx={{
+                     height: {
+                        xs: 100,
+                        md: 185,
+                     },
+                  }}
+               />
             </HeroContent>
          }
          mainContent={

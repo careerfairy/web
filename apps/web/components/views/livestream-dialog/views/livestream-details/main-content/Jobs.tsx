@@ -13,6 +13,7 @@ import { useRouter } from "next/router"
 import { LinkProps } from "next/dist/client/link"
 import { buildDialogLink } from "../../../util"
 import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import StyledToolTip from "../../../../../../materialUI/GlobalTooltips/StyledToolTip"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -120,23 +121,28 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             </Stack>
          </Stack>
          <Box sx={styles.jobActionWrapper}>
-            <span>
-               <Button
-                  component={Link}
-                  shallow
-                  disabled={isPast}
-                  scroll={false}
-                  variant="contained"
-                  disableElevation
-                  color="primary"
-                  size="small"
-                  sx={styles.seeMoreBtn}
-                  // @ts-ignore
-                  href={jobLink}
-               >
-                  {isPast ? "Details in live stream" : "See more"}
-               </Button>
-            </span>
+            <StyledToolTip
+               placement="top"
+               title={isPast ? "" : "Details in live stream"}
+            >
+               <span>
+                  <Button
+                     component={Link}
+                     shallow
+                     disabled={!isPast}
+                     scroll={false}
+                     variant="contained"
+                     disableElevation
+                     color="primary"
+                     size="small"
+                     sx={styles.seeMoreBtn}
+                     // @ts-ignore
+                     href={jobLink}
+                  >
+                     {isPast ? "See more" : "Details in live stream"}
+                  </Button>
+               </span>
+            </StyledToolTip>
          </Box>
       </Stack>
    )
