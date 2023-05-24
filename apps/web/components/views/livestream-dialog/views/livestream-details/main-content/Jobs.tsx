@@ -101,6 +101,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    )
 
    const isPast = presenter.isPast()
+   const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
 
    const buttonDisabled = useMemo<boolean>(() => {
       const isUpcoming = !isPast
@@ -115,8 +116,13 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
          return false
       }
 
+      if (!hasRegistered) {
+         // You can see the job details if you are registered
+         return true
+      }
+
       return !presenter.canApplyToJobsOutsideOfStream()
-   }, [presenter, userHasBoughtRecording, isPast])
+   }, [isPast, userHasBoughtRecording, hasRegistered, presenter])
 
    const jobLink = useMemo<LinkProps["href"]>(
       () =>
