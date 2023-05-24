@@ -1,41 +1,7 @@
-import { expect, test as base } from "@playwright/test"
-import { Group } from "@careerfairy/shared-lib/groups"
-import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
-import {
-   clearAuthData,
-   clearFirestoreData,
-} from "@careerfairy/seed-data/dist/emulators"
-import { LoginPage } from "../../page-object-models/LoginPage"
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
+import { expect } from "@playwright/test"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { sleep } from "../../utils"
-
-/**
- * Group Admin Test Fixture
- * Creates a group and a user (group owner) and logs in the user
- */
-
-const test = base.extend<{
-   group: Group
-   groupPage: GroupDashboardPage
-}>({
-   group: async ({}, use) => {
-      await clearAuthData()
-      await clearFirestoreData()
-
-      const group = await GroupSeed.createGroup()
-      await use(group)
-   },
-   groupPage: async ({ page, group }, use) => {
-      const groupPage = new GroupDashboardPage(page, group)
-      await groupPage.setLocalStorageKeys()
-
-      const newUrl = `/group/${group.id}/admin`
-      await LoginPage.login(page, { waitForURL: newUrl })
-
-      await use(groupPage)
-   },
-})
+import { groupAdminFixture as test } from "../../fixtures"
 
 test.describe("Company page", () => {
    test("Update company page description and location", async ({

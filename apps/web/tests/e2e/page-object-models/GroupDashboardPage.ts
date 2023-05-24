@@ -1,4 +1,4 @@
-import { FileChooser, Locator, Page } from "@playwright/test"
+import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CommonPage } from "./CommonPage"
@@ -9,25 +9,15 @@ import { imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { handleMultiSelect, sleep } from "../utils"
 
-const avatarPath = "./tests/e2e/upload/Avatar.png"
-
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
    public kickFromDashboard: Locator
    public companyInformationSummaryInput: Locator
    public companyInformationLocationInput: Locator
-   public companyInformationSaveButton: Locator
-   public companyPageAboutSectionEditButton: Locator
    public companyInformationIndustriesInput: Locator
    public companyInformationSizeInput: Locator
    public companyInformationAboutInput: Locator
-   public companyPageAboutSectionSaveButton: Locator
    public companyPageTestimonialSectionEditButton: Locator
-   public companyPageTestimonialSectionTestimonialInput: Locator
-   public companyPageTestimonialSectionNameInput: Locator
-   public companyPageTestimonialSectionPositionInput: Locator
-   public companyPageTestimonialSectionSaveButton: Locator
-   public companyPageTestimonialSectionUploadAvatarButton: Locator
 
    constructor(public readonly page: Page, protected readonly group: Group) {
       super(page)
@@ -55,40 +45,9 @@ export class GroupDashboardPage extends CommonPage {
 
       this.companyInformationAboutInput = this.page.getByLabel("About")
 
-      this.companyInformationSaveButton = this.page.locator(
-         "data-testid=profile-details-save-button"
-      )
-
-      this.companyPageAboutSectionEditButton = this.page.locator(
-         "data-testid=about-section-edit-button"
-      )
-
-      this.companyPageAboutSectionSaveButton = this.page.locator(
-         "data-testid=about-section-save-button"
-      )
-
       this.companyPageTestimonialSectionEditButton = this.page.locator(
          "data-testid=testimonial-section-edit-button"
       )
-
-      this.companyPageTestimonialSectionTestimonialInput =
-         this.page.getByLabel("Testimonial")
-
-      this.companyPageTestimonialSectionNameInput = this.page.getByLabel("Name")
-
-      this.companyPageTestimonialSectionPositionInput =
-         this.page.getByLabel("Position")
-
-      this.companyPageTestimonialSectionSaveButton = this.page.locator(
-         "data-testid=testimonials-save-button"
-      )
-      this.companyPageTestimonialSectionUploadAvatarButton = this.page.locator(
-         "data-testid=image-selector-upload"
-      )
-
-      this.page.on("filechooser", async (fileChooser: FileChooser) => {
-         await fileChooser.setFiles(avatarPath)
-      })
    }
 
    /**
@@ -256,20 +215,13 @@ export class GroupDashboardPage extends CommonPage {
       await this.page.getByRole("button", { name: "update and close" }).click()
    }
 
-   private async goToPage(name: "Company" | "Team members" | "Live streams") {
+   private async goToPage(
+      name: "Company" | "Team members" | "Live streams" | "Company page"
+   ) {
       await Promise.all([
          this.page.waitForNavigation(),
          this.page.getByRole("link", { name }).click(),
       ])
-   }
-
-   /**
-    * Set some flags in local storage to prevent tooltips from showing up
-    */
-   async setLocalStorageKeys() {
-      await this.page.addInitScript(() => {
-         window.localStorage.setItem("has-seen-company-page-cta", "true")
-      })
    }
 
    async updateCompanySummary(summary: string) {
@@ -285,12 +237,12 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async saveCompanyDetails() {
-      await this.companyInformationSaveButton.click()
+      await this.page.locator("data-testid=profile-details-save-button").click()
       return await sleep(1000)
    }
 
    async openAndFillAboutInformation() {
-      await this.companyPageAboutSectionEditButton.click()
+      await this.page.locator("data-testid=about-section-edit-button").click()
       await sleep(1000)
 
       await this.companyInformationAboutInput.fill(
@@ -310,30 +262,48 @@ export class GroupDashboardPage extends CommonPage {
       await this.companyInformationSizeInput.click()
       await this.page.getByRole("option", { name: "1-20 employees" }).click()
 
-      await this.companyPageAboutSectionSaveButton.click()
+      await this.page.locator("data-testid=about-section-save-button").click()
       return await sleep(1000)
    }
 
    async openAndFillTestimonial() {
       await this.companyPageTestimonialSectionEditButton.click()
 
-      await this.companyPageTestimonialSectionUploadAvatarButton.click()
+      // upload avatar
+      await this.clickAndUploadFiles(
+         this.page.locator("data-testid=image-selector-upload"),
+         imageLogoPath
+      )
       await sleep(1000)
 
-      await this.companyPageTestimonialSectionTestimonialInput.fill(
-         "I am about to finish my Bachelor’s degree in Applied Linguistics at ZHAW. I wanted to start my professional career in an environment that values my ideas and ultimately helps students, like me, to make their first steps in their professional world."
-      )
-      await this.companyPageTestimonialSectionNameInput.fill("Fabian Doe")
-      await this.companyPageTestimonialSectionPositionInput.fill(
-         "Business Development Manager"
-      )
-      await this.companyPageTestimonialSectionSaveButton.click()
+      await this.page
+         .getByLabel("Testimonial")
+         .fill(
+            "I am about to finish my Bachelor’s degree in Applied Linguistics at ZHAW. I wanted to start my professional career in an environment that values my ideas and ultimately helps students, like me, to make their first steps in their professional world."
+         )
+      await this.page.getByLabel("Name").fill("Fabian Doe")
+      await this.page
+         .getByLabel("Position")
+         .fill("Business Development Manager")
+      await this.page.locator("data-testid=testimonials-save-button").click()
    }
 
    async addCompanyPhotos() {
-      await this.page.getByRole("button", { name: "ADD PHOTO" }).click()
-      await this.page.getByRole("button", { name: "ADD PHOTO" }).click()
-      await this.page.getByRole("button", { name: "ADD PHOTO" }).click()
+      // upload 3 photos
+      await this.clickAndUploadFiles(
+         this.page.getByRole("button", { name: "ADD PHOTO" }),
+         imageLogoPath
+      )
+      await this.clickAndUploadFiles(
+         this.page.getByRole("button", { name: "ADD PHOTO" }),
+         imageLogoPath
+      )
+      await this.clickAndUploadFiles(
+         this.page.getByRole("button", { name: "ADD PHOTO" }),
+         imageLogoPath
+      )
+
+      await sleep(1000)
    }
 
    async addCompanyVideo() {
