@@ -71,26 +71,41 @@ const styles = sxStyles({
       maxWidth: 572,
    },
    floatingBtnWrapper: {
-      "@keyframes fadeIn": {
-         "0%": { opacity: 0 },
-         "25%": { opacity: 0.25 },
-         "50%": { opacity: 0.5 },
-         "75%": { opacity: 0.75 },
-         "100%": { opacity: 1 },
-      },
-      animation: "fadeIn 0.5s ease-in",
-      position: "fixed",
-      px: 2,
-      py: 2,
-      bottom: 0,
-      background:
-         "linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%)",
+      overflow: "hidden",
       borderRadius: [0, 0, 4, 4],
-      maxWidth: "none",
+      position: "fixed",
+      p: 2,
+      bottom: 0,
+      maxWidth: {
+         xs: "100%",
+         md: "minmax(100%, 572px)",
+      },
       width: "100%",
       display: "flex",
       alignItems: "center",
       flexDirection: "column",
+
+      "&::before": {
+         content: '""',
+         position: "absolute",
+         top: 0,
+         right: 0,
+         bottom: 0,
+         left: 0,
+         background: {
+            xs: "linear-gradient(180deg, rgba(255, 255, 255, 0) 0%, #FFFFFF 100%)",
+            md: `radial-gradient(circle at bottom, rgba(255, 255, 255, 1) 26%, rgba(255, 255, 255, 0) 87%)`,
+         },
+         borderRadius: [0, 0, 4, 4],
+         zIndex: -1,
+      },
+
+      "@keyframes fadeIn": {
+         from: { opacity: 0 },
+         to: { opacity: 1 },
+      },
+
+      animation: "fadeIn 0.5s ease-in",
    },
    noMarginTop: {
       mt: "0px !important",

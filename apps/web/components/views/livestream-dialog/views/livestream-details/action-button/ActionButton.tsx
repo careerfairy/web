@@ -26,9 +26,10 @@ const ButtonElement: FC = () => {
    const { livestreamPresenter, userEmailFromServer, canWatchRecording } =
       useActionButtonContext()
 
-   const { authenticatedUser, isLoggedIn, userData } = useAuth()
+   const { authenticatedUser, isLoggedIn, userData, isLoggedOut } = useAuth()
+
    const registered = livestreamPresenter.isUserRegistered(
-      authenticatedUser.email
+      authenticatedUser.email || userEmailFromServer
    )
 
    if (livestreamPresenter.isPast()) {
@@ -51,7 +52,7 @@ const ButtonElement: FC = () => {
          return <ActionButtonSkeleton />
       }
 
-      if (!isLoggedIn) {
+      if (!isLoggedIn || isLoggedOut) {
          return <SignUpToWatchButton />
       }
 
@@ -74,11 +75,11 @@ const ButtonElement: FC = () => {
       return <RegisterButton label="No spots left" />
    }
 
-   if (authenticatedUser) {
-      return <RegisterButton label="Register to live stream" />
+   if (livestreamPresenter.isLive()) {
+      return <RegisterButton label="Join to attend" />
    }
 
-   return <RegisterButton label="Join to attend" />
+   return <RegisterButton label="Register to live stream" />
 }
 
 type LinkTextProps = {

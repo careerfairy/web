@@ -84,7 +84,9 @@ const useInfiniteLivestreamQuestions = (
          switch (status) {
             case "upvoted":
                updateData = {
-                  emailOfVoters: [...emailOfVoters, authenticatedUser.email],
+                  emailOfVoters: [
+                     ...new Set([...emailOfVoters, authenticatedUser.email]),
+                  ],
                   votes: question.votes + 1,
                }
                break

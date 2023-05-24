@@ -132,12 +132,12 @@ const QuestionsSection = ({
                               </Box>
                            ) : (
                               <>
-                                 {!isPastEvent && (
+                                 {!isPastEvent ? (
                                     <CreateQuestion
                                        onQuestionAdded={setNewlyCreatedQuestion}
                                        livestream={livestream}
                                     />
-                                 )}
+                                 ) : null}
                                  <Box sx={styles.questionsWrapper}>
                                     <QuestionsComponent
                                        key={newlyCreatedQuestion?.id} // this is to force a rerender when a new question is added
