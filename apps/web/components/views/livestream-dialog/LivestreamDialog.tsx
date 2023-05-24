@@ -171,7 +171,7 @@ const Content: FC<ContentProps> = ({
 }) => {
    const theme = useTheme()
 
-   const [value, setValue] = useState<number>(getValue(page))
+   const [value, setValue] = useState<number>(getPageIndex(page))
 
    const hasInitialData =
       serverSideLivestream && livestreamId === serverSideLivestream.id
@@ -198,7 +198,7 @@ const Content: FC<ContentProps> = ({
    }, [value, onClose, goToView])
 
    useEffect(() => {
-      setValue(getValue(page))
+      setValue(getPageIndex(page))
    }, [goToView, page])
 
    const contextValue = useMemo<DialogContextType>(
@@ -268,7 +268,7 @@ type DialogContextType = {
    serverUserEmail: string
 }
 
-const getValue = (page: Props["page"]): number => {
+const getPageIndex = (page: Props["page"]): number => {
    switch (page) {
       case "details":
          return views.findIndex((view) => view.key === "livestream-details")
