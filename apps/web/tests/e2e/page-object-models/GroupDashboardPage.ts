@@ -168,7 +168,7 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    public async clickPublish() {
-      await this.page.getByRole("button", { name: "publish as stream" }).click()
+      await this.resilientClick("text=publish as stream")
    }
 
    public async clickManageLivestream() {
