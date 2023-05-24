@@ -50,6 +50,9 @@ const styles = sxStyles({
          [responsiveBreakpoint]: 0,
       },
    },
+   noMinHeight: {
+      minHeight: "0px !important",
+   },
    heroContentContainer: {
       zIndex: 1,
    },
@@ -174,15 +177,20 @@ const BackAndCloseButton: FC<BackAndCloseButtonProps> = ({
 type LeftContentProps = {
    backgroundImg?: string
    children: ReactNode
+   noMinHeight?: boolean
 } & BackAndCloseButtonProps
 
 export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
    function HeroContent(
-      { backgroundImg, children, onBackClick, onBackPosition },
+      { backgroundImg, children, onBackClick, onBackPosition, noMinHeight },
       ref
    ) {
       return (
-         <Box id="live-stream-dialog-hero" sx={styles.heroContent} ref={ref}>
+         <Box
+            id="live-stream-dialog-hero"
+            sx={[styles.heroContent, noMinHeight && styles.noMinHeight]}
+            ref={ref}
+         >
             <Container
                disableGutters
                sx={styles.heroContentContainer}

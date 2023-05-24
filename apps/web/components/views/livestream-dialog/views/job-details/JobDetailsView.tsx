@@ -68,8 +68,16 @@ const JobDetails: FC<Props> = ({ jobId }) => {
                )}
                onBackPosition={"top-left"}
                onBackClick={() => goToView("livestream-details")}
+               noMinHeight
             >
-               <Box height={185} />
+               <Box
+                  sx={{
+                     height: {
+                        xs: 100,
+                        md: 185,
+                     },
+                  }}
+               />
             </HeroContent>
          }
          mainContent={
