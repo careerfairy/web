@@ -2,11 +2,11 @@ import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CommonPage } from "./CommonPage"
-import { sleep } from "../utils"
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import DateUtil from "../../../util/DateUtil"
 import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { imageLogoPath } from "../../constants"
+import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -41,11 +41,18 @@ export class GroupDashboardPage extends CommonPage {
       return this.assertTextIsVisible("Main Page")
    }
 
+   public async assertGroupDashboardIsOpen() {
+      await expect(this.topCreateLivestreamButton()).toBeVisible()
+      await this.assertMainPageHeader()
+   }
+
    public topCreateLivestreamButton() {
       return this.page
          .getByRole("banner")
          .getByRole("button", { name: "Create New Live Stream" })
    }
+
+   // Navigation
 
    public async goToCompanyPage() {
       await this.goToPage("Company")
@@ -57,11 +64,11 @@ export class GroupDashboardPage extends CommonPage {
 
    public async goToLivestreams() {
       await this.goToPage("Live streams")
+
+      return new LivestreamsAdminPage(this)
    }
 
-   public async clickDraftsTab() {
-      await this.page.getByRole("tab", { name: "Drafts" }).click()
-   }
+   // Team Members page
 
    public async inviteGroupAdmin(email: string) {
       await this.inviteMemberButton.click()
@@ -70,10 +77,7 @@ export class GroupDashboardPage extends CommonPage {
       await this.page.getByRole("button", { name: "Send Invite" }).click()
    }
 
-   public async assertGroupDashboardIsOpen() {
-      await expect(this.topCreateLivestreamButton()).toBeVisible()
-      await this.assertMainPageHeader()
-   }
+   // Livestream Modal Form
 
    public async clickCreateNewLivestreamTop() {
       await this.page
@@ -85,7 +89,10 @@ export class GroupDashboardPage extends CommonPage {
    public async fillLivestreamForm(data: Partial<LivestreamEvent>) {
       const matchById = {
          "#title": () => data.title,
-         "#start": () => DateUtil.eventStartDate(data.start?.toDate?.()),
+         "#start": () =>
+            data.start
+               ? DateUtil.eventStartDate(data.start?.toDate?.())
+               : undefined,
          "input[name=duration]": () => data.duration?.toString(),
          "#summary": () => data.summary,
          "#reasonsToJoinLivestream": () => data.reasonsToJoinLivestream,
@@ -158,6 +165,20 @@ export class GroupDashboardPage extends CommonPage {
 
    public async clickCreateDraft() {
       await this.page.getByRole("button", { name: "Create draft" }).click()
+   }
+
+   public async clickPublish() {
+      await this.page.getByRole("button", { name: "publish as stream" }).click()
+   }
+
+   public async clickManageLivestream() {
+      await this.page
+         .getByRole("button", { name: "Manage your live stream" })
+         .click()
+   }
+
+   public async clickUpdate() {
+      await this.page.getByRole("button", { name: "update and close" }).click()
    }
 
    private async goToPage(name: "Company" | "Team members" | "Live streams") {
