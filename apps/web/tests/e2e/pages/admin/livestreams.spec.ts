@@ -1,60 +1,23 @@
-import {
-   clearAuthData,
-   clearFirestoreData,
-} from "@careerfairy/seed-data/dist/emulators"
-import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/src/groups"
-import { GroupDashboardPage } from "../../page-object-models/GroupDashboardPage"
-import { LoginPage } from "../../page-object-models/LoginPage"
-import { test as base, expect } from "@playwright/test"
-import { UserData } from "@careerfairy/shared-lib/src/users"
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import { credentials } from "../../../constants"
-
-/**
- * Test Fixture
- * Setup Pages and requirements
- */
-const test = base.extend<{
-   group: Group
-   user: UserData
-   groupPage: GroupDashboardPage
-}>({
-   group: async ({}, use) => {
-      await clearAuthData()
-      await clearFirestoreData()
-
-      const group = await GroupSeed.createGroup()
-      await use(group)
-   },
-   user: async ({ group }, use) => {
-      const user = await UserSeed.createUser(credentials.correctEmail)
-
-      await GroupSeed.addGroupAdmin(
-         user,
-         group,
-         "OWNER" as GROUP_DASHBOARD_ROLE
-      )
-
-      await use(user)
-   },
-   groupPage: async ({ page, user, group }, use) => {
-      const groupPage = new GroupDashboardPage(page, group)
-      await groupPage.setLocalStorageKeys()
-
-      const newUrl = `/group/${group.id}/admin`
-      await LoginPage.login(page, { waitForURL: newUrl })
-
-      await use(groupPage)
-   },
-})
+import { groupAdminFixture as test } from "../../fixtures"
+import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 
 test.describe("Group Admin Livestreams", () => {
    test("Create a draft livestream from the main page", async ({
       groupPage,
+      interests,
    }) => {
-      await groupPage.page.pause()
-      // assert we're on the group dashboard
-      await groupPage.assertGroupDashboardIsOpen()
+      const livestream = LivestreamSeed.random({
+         interestsIds: [interests[0].id, interests[1].id],
+      })
+
+      // create draft
+      await groupPage.clickCreateNewLivestreamTop()
+      await groupPage.fillLivestreamForm(livestream)
+      await groupPage.clickCreateDraft()
+
+      // assert draft is visible
+      await groupPage.goToLivestreams()
+      await groupPage.clickDraftsTab()
+      await groupPage.assertTextIsVisible(livestream.title)
    })
 })
