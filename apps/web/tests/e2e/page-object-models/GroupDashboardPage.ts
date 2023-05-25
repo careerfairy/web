@@ -100,6 +100,10 @@ export class GroupDashboardPage extends CommonPage {
       await this.goToPage("Company page")
    }
 
+   public async goToCompaniesPage() {
+      await this.page.goto(`/companies`)
+   }
+
    public async goToPreviewCompanyPageAdmin(companyName: string) {
       await this.page.goto(`/company/${companyName}`)
    }
@@ -329,6 +333,16 @@ export class GroupDashboardPage extends CommonPage {
    async expectFollowingCompanyButtonToBeVisible() {
       return expect(
          this.page.getByRole("button", { name: "Following" }).first()
+      ).toBeVisible()
+   }
+
+   async clickOnFollowOnCompaniesPage() {
+      await this.page.getByRole("button", { name: "Follow" }).click()
+   }
+
+   async expectFollowingButtonToBeVisibleOnCompanies() {
+      return expect(
+         this.page.getByRole("button", { name: "Following" })
       ).toBeVisible()
    }
 }

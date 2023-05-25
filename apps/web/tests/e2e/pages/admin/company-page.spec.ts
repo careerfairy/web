@@ -3,7 +3,7 @@ import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { sleep } from "../../utils"
 import { groupAdminFixture as test } from "../../fixtures"
 
-test.describe("Company page", () => {
+test.describe("Company page creation", () => {
    test("Update company page description and location", async ({
       groupPage,
    }) => {
@@ -59,6 +59,8 @@ test.describe("Company page", () => {
          groupPage.companyPageTestimonialSectionEditButton
       ).not.toBeVisible()
    })
+})
+test.describe("Company page follow", () => {
    test.use({ options: { completedGroup: true, createUser: true } })
    test("Follow company from a the dedicated company page", async ({
       groupPage,
@@ -77,5 +79,15 @@ test.describe("Company page", () => {
       await groupPage.clickOnHeaderFollowButton()
 
       await groupPage.expectFollowingCompanyButtonToBeVisible()
+   })
+   test("Follow company from companies page", async ({ groupPage }) => {
+      await groupPage.goToCompanyPage()
+      await groupPage.goToCompanyPageAdmin()
+      await sleep(1000)
+
+      await groupPage.goToCompaniesPage()
+      await groupPage.clickOnFollowOnCompaniesPage()
+
+      await groupPage.expectFollowingButtonToBeVisibleOnCompanies()
    })
 })
