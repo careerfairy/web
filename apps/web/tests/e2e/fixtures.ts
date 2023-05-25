@@ -12,12 +12,23 @@ import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import { Interest } from "@careerfairy/shared-lib/src/interests"
+import {
+   GroupOption,
+   GroupPhoto,
+   GroupVideo,
+   Testimonial,
+} from "@careerfairy/shared-lib/dist/groups"
+import { faker } from "@faker-js/faker"
 
 type GroupAdminFixtureOptions = {
    /**
     * give the option for tests to not create a user
     */
    createUser?: boolean
+   /**
+    * give the option to create a complete group
+    */
+   completedGroup?: boolean
 }
 
 /**
@@ -34,12 +45,55 @@ export const groupAdminFixture = base.extend<{
 }>({
    options: {
       createUser: true,
+      completedGroup: false,
    },
-   group: async ({}, use) => {
+   group: async ({ options }, use) => {
       await clearAuthData()
       await clearFirestoreData()
 
-      const group = await GroupSeed.createGroup()
+      const overrideFields: Partial<Group> = {
+         extraInfo: "extra info extra info",
+         companyCountry: { name: "portugal" } as GroupOption,
+         companyIndustries: [{ name: "accounting" }] as GroupOption[],
+         companySize: "1-20",
+         photos: [
+            {
+               id: faker.company.bs(),
+               url: faker.image.imageUrl(),
+            },
+            {
+               id: faker.company.bs(),
+               url: faker.image.imageUrl(),
+            },
+            {
+               id: faker.company.bs(),
+               url: faker.image.imageUrl(),
+            },
+         ] as GroupPhoto[],
+         videos: [
+            {
+               url: faker.image.imageUrl(),
+               title: faker.company.bs(),
+               description: faker.company.bs(),
+               isEmbedded: true,
+            },
+         ] as GroupVideo[],
+         testimonials: [
+            {
+               id: faker.company.bs(),
+               name: faker.company.companyName(),
+               position: faker.company.bs(),
+               testimonial: faker.company.bs(),
+               avatar: faker.image.imageUrl(),
+               groupId: faker.company.bs(),
+            },
+         ] as Testimonial[],
+      }
+
+      const group = options.completedGroup
+         ? await GroupSeed.createGroup(overrideFields)
+         : await GroupSeed.createGroup()
+
       await use(group)
    },
    user: async ({ group, options }, use) => {

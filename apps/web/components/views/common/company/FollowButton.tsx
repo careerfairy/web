@@ -85,6 +85,7 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
 
    return (
       <LoadingButton
+         id={"follow-button"}
          loading={isMutating || status === "loading"}
          disabled={isMutating || disabled || status === "loading"}
          onClick={handleClick}
