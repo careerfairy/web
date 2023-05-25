@@ -3,7 +3,7 @@ import { FirestoreInstance } from "data/firebase/FirebaseInstance"
 import { collection } from "firebase/firestore"
 import { ReactFireOptions, useFirestoreCollectionData } from "reactfire"
 import { Query } from "@firebase/firestore"
-import firebase from "firebase/compat"
+import type firebase from "firebase/compat"
 
 /**
  * Subscribe a Firestore collection for updates

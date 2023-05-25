@@ -77,6 +77,20 @@ const FilterMenu = ({ open, handleClose }: Props) => {
    const { pathname, push, query } = useRouter()
    const { filtersToShow, numberOfResults, numberOfActiveFilters } = useFilter()
 
+   const handleApplyFilter = useCallback(
+      ({ pathName, query }) => {
+         void push(
+            {
+               pathname: pathName,
+               query,
+            },
+            undefined,
+            { shallow: true }
+         )
+      },
+      [push]
+   )
+
    const handleChangeMultiSelect = useCallback(
       (name: string, selectedOption: OptionGroup[]) => {
          const options = mapOptions(selectedOption)
@@ -93,16 +107,9 @@ const FilterMenu = ({ open, handleClose }: Props) => {
             delete newQuery[name]
          }
 
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
+         handleApplyFilter({ pathName: pathname, query: newQuery })
       },
-      [pathname, push, query]
+      [handleApplyFilter, pathname, query]
    )
 
    const handleClearQueries = useCallback(() => {
@@ -226,7 +233,12 @@ const FilterMenu = ({ open, handleClose }: Props) => {
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
             case FilterEnum.recordedOnly:
-               return <RecordedOnlyToggle key={FilterEnum.recordedOnly} />
+               return (
+                  <RecordedOnlyToggle
+                     key={FilterEnum.recordedOnly}
+                     handleApplyFilter={handleApplyFilter}
+                  />
+               )
 
             case FilterEnum.interests:
                return (
@@ -237,10 +249,20 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                )
 
             case FilterEnum.jobCheck:
-               return <JobCheck key={FilterEnum.jobCheck} />
+               return (
+                  <JobCheck
+                     key={FilterEnum.jobCheck}
+                     handleApplyFilter={handleApplyFilter}
+                  />
+               )
 
             case FilterEnum.sortBy:
-               return <SortBySelector key={FilterEnum.sortBy} />
+               return (
+                  <SortBySelector
+                     key={FilterEnum.sortBy}
+                     handleApplyFilter={handleApplyFilter}
+                  />
+               )
 
             case FilterEnum.languages:
             case FilterEnum.companyCountries:
@@ -250,7 +272,7 @@ const FilterMenu = ({ open, handleClose }: Props) => {
                return renderAutoCompleteFilter(filter)
          }
       },
-      [handleChangeMultiSelect, renderAutoCompleteFilter]
+      [handleApplyFilter, handleChangeMultiSelect, renderAutoCompleteFilter]
    )
 
    return (

@@ -16,8 +16,12 @@ type SelectProps = {
    options: { value: SortType; label: string; descending: boolean }[]
 }
 
-const SortBySelector = () => {
-   const { pathname, push, query } = useRouter()
+type Props = {
+   handleApplyFilter: ({ pathName, query }) => void
+}
+
+const SortBySelector = ({ handleApplyFilter }: Props) => {
+   const { pathname, query } = useRouter()
 
    const handleQuery = useCallback(
       (queryParam: string, queryValue: string | string[]) => {
@@ -28,16 +32,10 @@ const SortBySelector = () => {
                : queryValue,
             page: 0,
          }
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
+
+         handleApplyFilter({ pathName: pathname, query: newQuery })
       },
-      [pathname, push, query]
+      [handleApplyFilter, pathname, query]
    )
 
    const selects = useMemo<SelectProps[]>(

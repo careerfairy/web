@@ -1,4 +1,4 @@
-import MultiCheckboxSelect from "../../MultiCheckboxSelect"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 import { CompanySizesCodes } from "../../../../../constants/forms"
 import {
    formatToOptionArray,

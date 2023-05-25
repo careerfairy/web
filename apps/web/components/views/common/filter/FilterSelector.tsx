@@ -68,7 +68,7 @@ const FilterSelector = () => {
       [filtersToShow]
    )
    const filterActive = Boolean(numberOfActiveFilters > 0)
-   const id = isFilterDialogOpen ? "wish-list-filter-popover" : undefined
+   const id = isFilterDialogOpen ? "live-stream-filter-popover" : undefined
 
    const [, cancelDebounce] = useDebounce(
       () => {
