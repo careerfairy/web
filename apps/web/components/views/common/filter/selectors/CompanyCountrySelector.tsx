@@ -6,7 +6,7 @@ import {
    formatToOptionArray,
    multiListSelectMapValueFn,
 } from "../../../signup/utils"
-import MultiCheckboxSelect from "../../MultiCheckboxSelect"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 import React, { useCallback } from "react"
 import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
 import { useRouter } from "next/router"

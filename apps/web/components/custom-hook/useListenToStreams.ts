@@ -5,6 +5,7 @@ import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/
 import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
 import { useFirestoreCollection } from "./utils/useFirestoreCollection"
 import firebase from "firebase/compat/app"
+import { TimeFrames } from "../views/group/admin/analytics-new/general/GeneralPageProvider"
 
 type Props = {
    filterByGroupId?: string
@@ -39,14 +40,11 @@ const useListenToStreams = (props?: Props) => {
       listenToPastEvents,
    } = props
 
-   const sixMonthsAgo = useMemo(
-      () => new Date(new Date().setMonth(new Date().getMonth() - 6)),
-      []
-   )
-
    const eventsQuery = useMemo<firebase.firestore.Query>(() => {
       let query = listenToPastEvents
-         ? livestreamRepo.getPastEventsFromQuery({ fromDate: sixMonthsAgo })
+         ? livestreamRepo.getPastEventsFromQuery({
+              fromDate: TimeFrames["Last 6 months"].start,
+           })
          : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
       if (filterByGroupId) {
@@ -102,7 +100,6 @@ const useListenToStreams = (props?: Props) => {
       registeredUserEmail,
       listenToPastEvents,
       recordedOnly,
-      sixMonthsAgo,
    ])
 
    let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {

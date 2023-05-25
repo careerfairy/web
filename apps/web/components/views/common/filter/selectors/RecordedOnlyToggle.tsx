@@ -5,8 +5,12 @@ import React, { useCallback, useMemo } from "react"
 import { styled } from "@mui/material/styles"
 import { useRouter } from "next/router"
 
-const RecordedOnlyToggle = () => {
-   const { pathname, push, query } = useRouter()
+type Props = {
+   handleApplyFilter: ({ pathName, query }) => void
+}
+
+const RecordedOnlyToggle = ({ handleApplyFilter }: Props) => {
+   const { pathname, query } = useRouter()
 
    const isRecordedCheck = useMemo(
       () => query?.recordedOnly === "true",
@@ -21,16 +25,9 @@ const RecordedOnlyToggle = () => {
             page: 0,
          }
 
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
+         handleApplyFilter({ pathName: pathname, query: newQuery })
       },
-      [pathname, push, query]
+      [handleApplyFilter, pathname, query]
    )
 
    return (

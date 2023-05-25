@@ -1,4 +1,4 @@
-import MultiCheckboxSelect from "../../MultiCheckboxSelect"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 import { languageOptionCodes } from "../../../../../constants/forms"
 import {
    formatToOptionArray,
