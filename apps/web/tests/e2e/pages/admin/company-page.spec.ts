@@ -59,4 +59,23 @@ test.describe("Company page", () => {
          groupPage.companyPageTestimonialSectionEditButton
       ).not.toBeVisible()
    })
+   test.use({ options: { completedGroup: true, createUser: true } })
+   test("Follow company from a the dedicated company page", async ({
+      groupPage,
+      group,
+   }) => {
+      await groupPage.goToCompanyPage()
+      await groupPage.goToCompanyPageAdmin()
+
+      await sleep(1000)
+
+      await groupPage.goToPreviewCompanyPageAdmin(
+         companyNameSlugify(group.universityName)
+      )
+
+      // click on follow button
+      await groupPage.clickOnHeaderFollowButton()
+
+      await groupPage.expectFollowingCompanyButtonToBeVisible()
+   })
 })

@@ -321,4 +321,14 @@ export class GroupDashboardPage extends CommonPage {
          .fill("https://www.youtube.com/")
       await this.page.getByRole("button", { name: "Save & Close" }).click()
    }
+
+   async clickOnHeaderFollowButton() {
+      await this.page.getByRole("button", { name: "Follow" }).first().click()
+   }
+
+   async expectFollowingCompanyButtonToBeVisible() {
+      return expect(
+         this.page.getByRole("button", { name: "Following" }).first()
+      ).toBeVisible()
+   }
 }
