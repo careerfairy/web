@@ -3,8 +3,12 @@ import { FormControlLabel } from "@mui/material"
 import React, { useCallback } from "react"
 import { useRouter } from "next/router"
 
-const JobCheck = () => {
-   const { pathname, push, query } = useRouter()
+type Props = {
+   handleApplyFilter: ({ pathName, query }) => void
+}
+
+const JobCheck = ({ handleApplyFilter }: Props) => {
+   const { pathname, query } = useRouter()
 
    const isJobChecked = useCallback(
       () => query?.jobCheck === "true",
@@ -27,16 +31,9 @@ const JobCheck = () => {
             delete newQuery?.["jobCheck"]
          }
 
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
+         handleApplyFilter({ pathName: pathname, query: newQuery })
       },
-      [pathname, push, query]
+      [handleApplyFilter, pathname, query]
    )
 
    return (

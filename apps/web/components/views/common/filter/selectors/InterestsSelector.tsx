@@ -1,6 +1,6 @@
 import { FormControl } from "@mui/material"
 import Typography from "@mui/material/Typography"
-import MultiCheckboxSelect from "../../MultiCheckboxSelect"
+import MultiCheckboxSelect from "../MultiCheckboxSelect"
 import {
    formatToOptionArray,
    multiListSelectMapValueFn,
