@@ -9,7 +9,7 @@ import { getDocs } from "@firebase/firestore"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Group } from "@careerfairy/shared-lib/groups"
 
-export const PAGE_SIZE = 12
+const PAGE_SIZE = 12
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {

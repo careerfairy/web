@@ -6,7 +6,6 @@ import useInfiniteCompanies, {
 } from "./useInfiniteCompanies"
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard, { CompanyCardSkeleton } from "./CompanyCard"
-import { PAGE_SIZE } from "../../../pages/companies"
 import CustomInfiniteScroll from "../common/CustomInfiniteScroll"
 
 const styles = sxStyles({
@@ -21,6 +20,8 @@ const styles = sxStyles({
 type Props = {
    initialData?: Group[]
 }
+
+const PAGE_SIZE = 12
 
 const Companies: FC<Props> = ({ initialData }) => {
    const options = useMemo<UseInfiniteCompanies>(
