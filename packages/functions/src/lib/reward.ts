@@ -193,9 +193,8 @@ export const rewardLivestreamRegistrant = async (
    userEmail: string
 ) => {
    if (
-      !documentData.registered.referral ||
-      !documentData.registered.referral.referralCode ||
-      !documentData.registered.referral.inviteLivestream
+      !documentData?.registered?.referral?.referralCode ||
+      !documentData?.registered?.referral?.inviteLivestream
    ) {
       functions.logger.info("No referral information to reward.")
       return

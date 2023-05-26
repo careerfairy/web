@@ -60,8 +60,8 @@ export function getReferralInformation() {
    try {
       if (typeof window !== "undefined") {
          return {
-            referralCode: LocalStorageUtil.getReferralCode(),
-            inviteLivestream: LocalStorageUtil.getInviteLivestream(),
+            referralCode: LocalStorageUtil.getReferralCode() ?? null,
+            inviteLivestream: LocalStorageUtil.getInviteLivestream() ?? null,
          }
       }
    } catch (e) {
