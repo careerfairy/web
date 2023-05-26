@@ -7,6 +7,7 @@ import useInfiniteCompanies, {
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard, { CompanyCardSkeleton } from "./CompanyCard"
 import CustomInfiniteScroll from "../common/CustomInfiniteScroll"
+import { COMPANIES_PAGE_SIZE } from "components/util/constants"
 
 const styles = sxStyles({
    flexItem: {
@@ -21,14 +22,12 @@ type Props = {
    initialData?: Group[]
 }
 
-const PAGE_SIZE = 12
-
 const Companies: FC<Props> = ({ initialData }) => {
    const options = useMemo<UseInfiniteCompanies>(
       () => ({
          filters: {},
          initialData,
-         limit: PAGE_SIZE,
+         limit: COMPANIES_PAGE_SIZE,
       }),
       [initialData]
    )
