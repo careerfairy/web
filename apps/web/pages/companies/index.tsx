@@ -8,8 +8,7 @@ import { getInfiniteQuery } from "../../components/views/companies/useInfiniteCo
 import { getDocs } from "@firebase/firestore"
 import { mapFirestoreDocuments } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { Group } from "@careerfairy/shared-lib/groups"
-
-const PAGE_SIZE = 12
+import { COMPANIES_PAGE_SIZE } from "components/util/constants"
 
 type Props = InferGetServerSidePropsType<typeof getServerSideProps>
 const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
@@ -29,7 +28,7 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
 }
 
 export const getServerSideProps = async () => {
-   const snaps = await getDocs(getInfiniteQuery(PAGE_SIZE))
+   const snaps = await getDocs(getInfiniteQuery(COMPANIES_PAGE_SIZE))
 
    return {
       props: {
