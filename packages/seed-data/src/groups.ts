@@ -24,6 +24,8 @@ interface GroupSeed {
    ): Promise<void>
 
    getInviteByEmail(email: string): Promise<GroupDashboardInvite>
+
+   getGroup(groupId: string): Promise<Group>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -101,6 +103,15 @@ class GroupFirebaseSeed implements GroupSeed {
       batch.set(groupRef, data)
       await batch.commit()
       return data
+   }
+
+   async getGroup(groupId: string): Promise<Group> {
+      const groupDoc = await firestore
+         .collection("careerCenterData")
+         .doc(groupId)
+         .get()
+
+      return groupDoc.exists ? (groupDoc.data() as Group) : null
    }
 }
 

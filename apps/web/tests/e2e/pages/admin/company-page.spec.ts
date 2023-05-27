@@ -2,10 +2,13 @@ import { expect } from "@playwright/test"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 import { sleep } from "../../utils"
 import { groupAdminFixture as test } from "../../fixtures"
+import GroupSeed from "@careerfairy/seed-data/dist/groups"
+import UserSeed from "@careerfairy/seed-data/dist/users"
 
 test.describe("Company page creation", () => {
    test("Update company page description and location", async ({
       groupPage,
+      group,
    }) => {
       const summary = "this is a test summary"
       const location = "Portugal"
@@ -27,6 +30,13 @@ test.describe("Company page creation", () => {
       await expect(groupPage.companyInformationLocationInput).toHaveValue(
          location
       )
+
+      // get updated group
+      const updatedGroup = await GroupSeed.getGroup(group.groupId)
+
+      // expect the group document has the fields updated
+      await expect(updatedGroup.extraInfo).toBe(summary)
+      await expect(updatedGroup.companyCountry.name).toBe(location)
    })
    test("Create add publish company page", async ({ groupPage, group }) => {
       await groupPage.goToCompanyPage()
@@ -54,6 +64,13 @@ test.describe("Company page creation", () => {
       await expect(
          groupPage.page.getByRole("heading", { name: group.universityName })
       ).toBeVisible()
+
+      // get updated group
+      const updatedGroup = await GroupSeed.getGroup(group.groupId)
+
+      // expect updated company to have all the fields required to be a public profile
+      expect(updatedGroup.publicProfile).toBeTruthy()
+
       // expects edit button to be hidden
       await expect(
          groupPage.companyPageTestimonialSectionEditButton
@@ -65,6 +82,7 @@ test.describe("Company page follow", () => {
    test("Follow company from a the dedicated company page", async ({
       groupPage,
       group,
+      user,
    }) => {
       await groupPage.goToCompanyPage()
       await groupPage.goToCompanyPageAdmin()
@@ -78,9 +96,21 @@ test.describe("Company page follow", () => {
       // click on follow button
       await groupPage.clickOnHeaderFollowButton()
 
-      await groupPage.expectFollowingCompanyButtonToBeVisible()
+      await sleep(1000)
+
+      // get user follow companies
+      const followedCompanies = await UserSeed.getUserFollowedCompanies(
+         user.userEmail
+      )
+
+      // expect group to be on the user companies follow list
+      expect(followedCompanies[0].groupId).toBe(group.groupId)
    })
-   test("Follow company from companies page", async ({ groupPage }) => {
+   test("Follow company from companies page", async ({
+      groupPage,
+      user,
+      group,
+   }) => {
       await groupPage.goToCompanyPage()
       await groupPage.goToCompanyPageAdmin()
       await sleep(1000)
@@ -88,6 +118,14 @@ test.describe("Company page follow", () => {
       await groupPage.goToCompaniesPage()
       await groupPage.clickOnFollowOnCompaniesPage()
 
-      await groupPage.expectFollowingButtonToBeVisibleOnCompanies()
+      await sleep(1000)
+
+      // get user followed companies
+      const followedCompanies = await UserSeed.getUserFollowedCompanies(
+         user.userEmail
+      )
+
+      // expect group to be on the follow list
+      expect(followedCompanies[0].groupId).toBe(group.groupId)
    })
 })

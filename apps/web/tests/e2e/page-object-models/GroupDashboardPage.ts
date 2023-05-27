@@ -330,19 +330,7 @@ export class GroupDashboardPage extends CommonPage {
       await this.page.getByRole("button", { name: "Follow" }).first().click()
    }
 
-   async expectFollowingCompanyButtonToBeVisible() {
-      return expect(
-         this.page.getByRole("button", { name: "Following" }).first()
-      ).toBeVisible()
-   }
-
    async clickOnFollowOnCompaniesPage() {
       await this.page.getByRole("button", { name: "Follow" }).click()
-   }
-
-   async expectFollowingButtonToBeVisibleOnCompanies() {
-      return expect(
-         this.page.getByRole("button", { name: "Following" })
-      ).toBeVisible()
    }
 }
