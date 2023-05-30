@@ -12,13 +12,13 @@ import * as actions from "store/actions"
 import { getServerSideGroup } from "util/serverUtil"
 import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import ScrollToTop from "components/views/common/ScrollToTop"
-import { placeholderBanner } from "../../../constants/images"
-import useListenToStreams from "../../../components/custom-hook/useListenToStreams"
-import { livestreamRepo } from "../../../data/RepositoryInstances"
+import { placeholderBanner } from "../../../../constants/images"
+import useListenToStreams from "../../../../components/custom-hook/useListenToStreams"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
-} from "../../../components/views/livestream-dialog"
+} from "../../../../components/views/livestream-dialog"
 
 const GroupPage = ({
    serverSideGroup,

@@ -35,7 +35,7 @@ const GenericDashboardContext = createContext<IGenericDashboardContext>({
 const MyRegistrationsPath: INavLink = {
    id: "my-registrations",
    href: `/next-livestreams/my-registrations`,
-   pathname: `/next-livestreams/my-registrations`,
+   pathname: `/next-livestreams/my-registrations/[[...livestreamDialog]]`,
    title: "My registrations",
 }
 
@@ -48,7 +48,7 @@ const NextLivestreamsPath: INavLink = {
 const UnlockedContentPath: INavLink = {
    id: "unlocked-content",
    href: `/past-livestreams/unlocked-content`,
-   pathname: `/past-livestreams/unlocked-content`,
+   pathname: `/past-livestreams/unlocked-content/[[...livestreamDialog]]`,
    title: "Unlocked content",
 }
 

@@ -18,6 +18,10 @@ import DateUtil from "../../../util/DateUtil"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import Link from "../../../components/views/common/Link"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import {
+   getLivestreamDialogData,
+   LivestreamDialogLayout,
+} from "../../../components/views/livestream-dialog"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -30,6 +34,7 @@ const styles = sxStyles({
 
 const UnlockedContent = ({
    unlockedEvents,
+   livestreamDialogData,
 }: InferGetServerSidePropsType<typeof getServerSideProps>) => {
    const isMobile = useIsMobile()
 
@@ -63,15 +68,17 @@ const UnlockedContent = ({
             title={"CareerFairy | Unlocked content"}
          />
          <GenericDashboardLayout pageDisplayName={"Unlocked content"}>
-            <StreamsSection
-               value={"pastEvents"}
-               pastLivestreams={unlockedPastLivestreams}
-               listenToUpcoming
-               minimumUpcomingStreams={0}
-               noResultsComponent={
-                  <NoResultsMessage message={noResultsMessage} />
-               }
-            />
+            <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
+               <StreamsSection
+                  value={"pastEvents"}
+                  pastLivestreams={unlockedPastLivestreams}
+                  listenToUpcoming
+                  minimumUpcomingStreams={0}
+                  noResultsComponent={
+                     <NoResultsMessage message={noResultsMessage} />
+                  }
+               />
+            </LivestreamDialogLayout>
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </>
@@ -80,11 +87,11 @@ const UnlockedContent = ({
 export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    const token = getUserTokenFromCookie(ctx)
 
-   const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
-   const promises = []
-
    // only do the logic if the token has email available
    if (token?.email) {
+      const todayLess5Days = DateUtil.addDaysToDate(new Date(), -5)
+      const promises: Promise<unknown>[] = [getLivestreamDialogData(ctx)]
+
       let boughtEvents: LivestreamEvent[] = []
 
       // get all the recorded events for a specific user
@@ -96,11 +103,12 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
 
       const results = await Promise.allSettled(promises)
 
-      const [availableRecordings, userStats] = results.map((result) =>
-         result.status === "fulfilled"
-            ? (result as PromiseFulfilledResult<any>).value
-            : null
-      )
+      const [livestreamDialogData, availableRecordings, userStats] =
+         results.map((result) =>
+            result.status === "fulfilled"
+               ? (result as PromiseFulfilledResult<any>).value
+               : null
+         )
 
       // get the livestreams each bought recording ids and get each livestream by ids
       if (userStats?.recordingsBought?.length) {
@@ -116,6 +124,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
                ...(availableRecordings?.length ? availableRecordings : []),
                ...(boughtEvents?.length ? boughtEvents : []),
             ].map(LivestreamPresenter.serializeDocument),
+            livestreamDialogData,
          },
       }
    }
@@ -123,6 +132,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
    return {
       props: {
          unlockedEvents: [],
+         livestreamDialogData: await getLivestreamDialogData(ctx),
       },
    }
 }
