@@ -44,19 +44,17 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       delete ctx.query.livestreamDialog // Remove the livestreamDialog query param
 
       const queryString = convertQueryParamsToString(ctx.query)
-      const redirectUrl = queryString
+      const destinationUrl = queryString
          ? `/next-livestreams/group/${firstParam}?${queryString}` // If there were query params, append them to the URL and forward them
          : `/next-livestreams/group/${firstParam}`
 
-      // Set the HTTP status code to 301 (Moved Permanently) This will now be cached by the browser for instant redirects in the future
-      res.statusCode = 301
-
-      // Update the Location header to point to the new URL
-      res.setHeader("Location", redirectUrl)
-      // End the response to ensure the redirect happens
-      res.end()
-      // Return empty props because we're redirecting and don't need to render the component
-      return { props: {} }
+      // Return a redirect object
+      return {
+         redirect: {
+            destination: destinationUrl,
+            permanent: false, // Permanent redirection
+         },
+      }
    }
 
    return {
