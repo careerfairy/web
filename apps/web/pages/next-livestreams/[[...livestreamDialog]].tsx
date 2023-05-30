@@ -52,7 +52,7 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
       return {
          redirect: {
             destination: destinationUrl,
-            permanent: false, // Permanent redirection
+            permanent: true, // Permanent redirection
          },
       }
    }
