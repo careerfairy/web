@@ -1,5 +1,3 @@
-import { expect, Locator, Page } from "@playwright/test"
-
 export const checkIfArraysAreEqual = (
    arr1: string[],
    arr2: string[]
@@ -41,21 +39,4 @@ export const waitForData = async <T>(
    }
 
    throw new Error("Max tries exceeded")
-}
-
-export const handleMultiSelect = async (
-   stringToSelect: string,
-   elementLocator: Locator,
-   page: Page
-) => {
-   if (!stringToSelect) return
-   await elementLocator.click()
-   await elementLocator.focus()
-   await elementLocator.fill(stringToSelect)
-   // give time for the dropdown to update the suggestions
-   await sleep(250)
-   expect(await elementLocator.inputValue()).toBe(stringToSelect)
-   await page
-      .locator('div[role="presentation"]', { hasText: stringToSelect })
-      .click()
 }
