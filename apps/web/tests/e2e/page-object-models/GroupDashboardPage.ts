@@ -1,13 +1,13 @@
 import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { CommonPage } from "./CommonPage"
+import { CommonPage, handleMultiSelect } from "./CommonPage"
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import DateUtil from "../../../util/DateUtil"
 import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
-import { handleMultiSelect, sleep } from "../utils"
+import { sleep } from "../utils"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator

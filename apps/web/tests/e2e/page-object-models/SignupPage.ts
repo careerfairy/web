@@ -1,6 +1,6 @@
 import { expect, Locator, Page } from "@playwright/test"
-import { handleMultiSelect, sleep } from "../utils"
-import { CommonPage } from "./CommonPage"
+import { sleep } from "../utils"
+import { CommonPage, handleMultiSelect } from "./CommonPage"
 
 export class SignupPage extends CommonPage {
    readonly page: Page
