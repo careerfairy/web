@@ -26,6 +26,11 @@ interface GroupSeed {
    getInviteByEmail(email: string): Promise<GroupDashboardInvite>
 
    getGroup(groupId: string): Promise<Group>
+
+   /**
+    * Generate with all the required fields for a complete company profile
+    * */
+   generateCompleteCompanyData(): Partial<Group>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -112,6 +117,49 @@ class GroupFirebaseSeed implements GroupSeed {
          .get()
 
       return groupDoc.exists ? (groupDoc.data() as Group) : null
+   }
+
+   generateCompleteCompanyData(): Partial<Group> {
+      return {
+         publicProfile: true,
+         extraInfo: "extra info extra info",
+         companyCountry: { name: "portugal", id: "pt" },
+         companyIndustries: [{ name: "accounting", id: "accounting" }],
+         companySize: "1-20",
+         photos: [
+            {
+               id: faker.company.bs(),
+               url: faker.image.imageUrl(),
+            },
+            {
+               id: faker.company.bs(),
+               url: faker.image.imageUrl(),
+            },
+            {
+               id: faker.company.bs(),
+               url: faker.image.imageUrl(),
+            },
+         ],
+         videos: [
+            {
+               url: faker.image.imageUrl(),
+               title: faker.company.bs(),
+               description: faker.company.bs(),
+               isEmbedded: true,
+               id: faker.company.bs(),
+            },
+         ],
+         testimonials: [
+            {
+               id: faker.company.bs(),
+               name: faker.company.companyName(),
+               position: faker.company.bs(),
+               testimonial: faker.company.bs(),
+               avatar: faker.image.imageUrl(),
+               groupId: faker.company.bs(),
+            },
+         ],
+      }
    }
 }
 
