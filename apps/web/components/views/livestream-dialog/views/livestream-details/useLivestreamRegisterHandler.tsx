@@ -22,57 +22,91 @@ export const useLivestreamRegisterHandler = () => {
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
 
+   /**
+    * Initiate the registration process
+    */
+   const initRegistrationProcess = useCallback(
+      (floating: boolean) => {
+         dataLayerLivestreamEvent("event_registration_started", livestream)
+
+         if (floating) {
+            dataLayerLivestreamEvent(
+               "event_registration_started_from_footer_button",
+               livestream
+            )
+         }
+
+         // User profile must be complete
+         if (!userData || !UserUtil.userProfileIsComplete(userData)) {
+            dataLayerLivestreamEvent(
+               "event_registration_started_profile_incomplete",
+               livestream
+            )
+
+            errorNotification(
+               "Incomplete profile",
+               "Please complete your profile before registering for this event"
+            )
+
+            return push({
+               pathname: `/profile`,
+               query: { absolutePath: asPath },
+            })
+         }
+
+         // Try to force show newsletter reminder
+         forceShowReminder(UserReminderType.NewsletterReminder)
+         goToView("register-data-consent")
+      },
+      [
+         asPath,
+         errorNotification,
+         forceShowReminder,
+         goToView,
+         livestream,
+         push,
+         userData,
+      ]
+   )
+
+   /**
+    * De-register from the livestream
+    */
+   const deRegisterLivestream = useCallback(async () => {
+      await firebase.deregisterFromLivestream(livestream.id, userData)
+      recommendationServiceInstance.unRegisterEvent(
+         livestream.id,
+         userData.authId
+      )
+      dataLayerLivestreamEvent("event_registration_removed", livestream)
+   }, [firebase, livestream, userData])
+
+   /**
+    * Handle the register button click
+    */
    const handleRegisterClick = useCallback(
       async (floating: boolean) => {
          // Check if the user is already registered
          try {
+            if (isLoggedOut || !authenticatedUser?.emailVerified) {
+               dataLayerLivestreamEvent(
+                  "event_registration_started_login_required",
+                  livestream
+               )
+               return push({
+                  pathname: `/login`,
+                  query: { absolutePath: asPath },
+               })
+            }
+
             const isAlreadyRegistered = livestreamPresenter.isUserRegistered(
                authenticatedUser.email || serverUserEmail
             )
 
             if (isAlreadyRegistered) {
-               await firebase.deregisterFromLivestream(livestream.id, userData)
-               recommendationServiceInstance.unRegisterEvent(
-                  livestream.id,
-                  userData.authId
-               )
-               dataLayerLivestreamEvent(
-                  "event_registration_removed",
-                  livestream
-               )
+               await deRegisterLivestream()
             } else {
-               dataLayerLivestreamEvent(
-                  `event_registration_started${
-                     floating ? "_from_footer_button" : ""
-                  }`,
-                  livestream
-               )
-
-               if (isLoggedOut || !authenticatedUser?.emailVerified) {
-                  dataLayerLivestreamEvent(
-                     "event_registration_started_login_required",
-                     livestream
-                  )
-                  return push({
-                     pathname: `/login`,
-                     query: { absolutePath: asPath },
-                  })
-               }
-
-               if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-                  dataLayerLivestreamEvent(
-                     "event_registration_started_profile_incomplete",
-                     livestream
-                  )
-                  return push({
-                     pathname: `/profile`,
-                     query: { absolutePath: asPath },
-                  })
-               }
-
-               // Try to force show newsletter reminder
-               forceShowReminder(UserReminderType.NewsletterReminder)
-               goToView("register-data-consent")
+               await initRegistrationProcess(floating)
             }
          } catch (e) {
             errorNotification(e)
@@ -82,16 +116,14 @@ export const useLivestreamRegisterHandler = () => {
          asPath,
          authenticatedUser.email,
          authenticatedUser?.emailVerified,
+         deRegisterLivestream,
          errorNotification,
-         firebase,
-         forceShowReminder,
-         goToView,
+         initRegistrationProcess,
          isLoggedOut,
          livestream,
          livestreamPresenter,
          push,
          serverUserEmail,
-         userData,
       ]
    )
 
