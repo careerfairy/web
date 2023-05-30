@@ -118,7 +118,11 @@ const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
             },
          }}
       >
-         <Button {...buttonProps} variant="contained">
+         <Button
+            {...buttonProps}
+            variant="contained"
+            data-testid="non-authed-follow-button"
+         >
             Follow
          </Button>
       </Link>

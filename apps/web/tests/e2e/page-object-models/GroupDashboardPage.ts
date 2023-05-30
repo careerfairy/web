@@ -18,6 +18,12 @@ export class GroupDashboardPage extends CommonPage {
    public companyInformationSizeInput: Locator
    public companyInformationAboutInput: Locator
    public companyPageTestimonialSectionEditButton: Locator
+   /*
+    * Follow button that can be found on the company B2C page or on the company cards at /companies
+    * */
+   public companyFollowButton: Locator
+   public companyUnfollowButton: Locator
+   public nonAuthedCompanyFollowButton: Locator
 
    constructor(public readonly page: Page, protected readonly group: Group) {
       super(page)
@@ -47,6 +53,20 @@ export class GroupDashboardPage extends CommonPage {
 
       this.companyPageTestimonialSectionEditButton = this.page.locator(
          "data-testid=testimonial-section-edit-button"
+      )
+
+      this.companyFollowButton = this.page.getByRole("button", {
+         name: "Follow",
+         disabled: false,
+      })
+
+      this.companyUnfollowButton = this.page.getByRole("button", {
+         name: "Following",
+         disabled: false,
+      })
+
+      this.nonAuthedCompanyFollowButton = this.page.getByTestId(
+         "non-authed-follow-button"
       )
    }
 
@@ -306,8 +326,6 @@ export class GroupDashboardPage extends CommonPage {
          this.page.getByRole("button", { name: "ADD PHOTO" }),
          imageLogoPath
       )
-
-      await sleep(1000)
    }
 
    async addCompanyVideo() {
@@ -327,10 +345,10 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    async clickOnHeaderFollowButton() {
-      await this.page.getByRole("button", { name: "Follow" }).first().click()
+      await this.companyFollowButton.first().click()
    }
 
    async clickOnFollowOnCompaniesPage() {
-      await this.page.getByRole("button", { name: "Follow" }).click()
+      await this.companyFollowButton.click()
    }
 }

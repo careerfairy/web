@@ -51,15 +51,20 @@ test.describe("Company page creation", () => {
       // fill required photos
       await groupPage.addCompanyPhotos()
 
+      // Ensure the toast is visible, it's a sign that the photos were added
+      await groupPage.assertTextIsVisible("Photos updated successfully")
+
       // add video
       await groupPage.addCompanyVideo()
 
-      await sleep(1000)
+      // Ensure the toast is visible, it's a sign that the video was added
+      await groupPage.assertTextIsVisible("Video added successfully")
 
       // go to preview company page
       await groupPage.goToPreviewCompanyPageAdmin(
          companyNameSlugify(group.universityName)
       )
+
       // expect company name to be on the preview page
       await expect(
          groupPage.page.getByRole("heading", { name: group.universityName })
@@ -87,8 +92,6 @@ test.describe("Company page follow", () => {
       await groupPage.goToCompanyPage()
       await groupPage.goToCompanyPageAdmin()
 
-      await sleep(1000)
-
       await groupPage.goToPreviewCompanyPageAdmin(
          companyNameSlugify(group.universityName)
       )
@@ -96,7 +99,7 @@ test.describe("Company page follow", () => {
       // click on follow button
       await groupPage.clickOnHeaderFollowButton()
 
-      await sleep(1000)
+      await expect(groupPage.companyUnfollowButton.first()).toBeVisible()
 
       // get user follow companies
       const followedCompanies = await UserSeed.getUserFollowedCompanies(
@@ -113,12 +116,12 @@ test.describe("Company page follow", () => {
    }) => {
       await groupPage.goToCompanyPage()
       await groupPage.goToCompanyPageAdmin()
-      await sleep(1000)
 
       await groupPage.goToCompaniesPage()
+
       await groupPage.clickOnFollowOnCompaniesPage()
 
-      await sleep(1000)
+      await expect(groupPage.companyUnfollowButton).toBeVisible()
 
       // get user followed companies
       const followedCompanies = await UserSeed.getUserFollowedCompanies(

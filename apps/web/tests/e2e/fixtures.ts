@@ -12,13 +12,6 @@ import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
 import { Interest } from "@careerfairy/shared-lib/src/interests"
-import {
-   GroupOption,
-   GroupPhoto,
-   GroupVideo,
-   Testimonial,
-} from "@careerfairy/shared-lib/dist/groups"
-import { faker } from "@faker-js/faker"
 
 type GroupAdminFixtureOptions = {
    /**
@@ -51,48 +44,13 @@ export const groupAdminFixture = base.extend<{
       await clearAuthData()
       await clearFirestoreData()
 
-      const overrideFields: Partial<Group> = {
-         extraInfo: "extra info extra info",
-         companyCountry: { name: "portugal" } as GroupOption,
-         companyIndustries: [{ name: "accounting" }] as GroupOption[],
-         companySize: "1-20",
-         photos: [
-            {
-               id: faker.company.bs(),
-               url: faker.image.imageUrl(),
-            },
-            {
-               id: faker.company.bs(),
-               url: faker.image.imageUrl(),
-            },
-            {
-               id: faker.company.bs(),
-               url: faker.image.imageUrl(),
-            },
-         ] as GroupPhoto[],
-         videos: [
-            {
-               url: faker.image.imageUrl(),
-               title: faker.company.bs(),
-               description: faker.company.bs(),
-               isEmbedded: true,
-            },
-         ] as GroupVideo[],
-         testimonials: [
-            {
-               id: faker.company.bs(),
-               name: faker.company.companyName(),
-               position: faker.company.bs(),
-               testimonial: faker.company.bs(),
-               avatar: faker.image.imageUrl(),
-               groupId: faker.company.bs(),
-            },
-         ] as Testimonial[],
+      let group: Group
+      if (options.completedGroup === true) {
+         const completeCompanyData = GroupSeed.generateCompleteCompanyData()
+         group = await GroupSeed.createGroup(completeCompanyData)
+      } else {
+         group = await GroupSeed.createGroup()
       }
-
-      const group = options.completedGroup
-         ? await GroupSeed.createGroup(overrideFields)
-         : await GroupSeed.createGroup()
 
       await use(group)
    },
