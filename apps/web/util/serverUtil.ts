@@ -6,6 +6,7 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import nookies from "nookies"
 import CookiesUtil from "./CookiesUtil"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import { ParsedUrlQuery } from "querystring"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -126,4 +127,21 @@ export const parseJwtServerSide = (token?: string) => {
    )
 
    return JSON.parse(jsonPayload)
+}
+
+/**
+ * Converts a ParsedUrlQuery object into a URL query string.
+ *
+ * @param {ParsedUrlQuery} query - A ParsedUrlQuery object.
+ * @returns {string} A URL query string.
+ *
+ * @example
+ * // Returns 'name=John&age=30'
+ * convertQueryParamsToString({ name: 'John', age: '30' })
+ */
+export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
+   const queryEntries: [string, string][] = Object.entries(query).map(
+      ([key, value]) => [key, String(value)]
+   )
+   return new URLSearchParams(queryEntries).toString()
 }
