@@ -9,7 +9,11 @@ import React, {
 import { useRouter } from "next/router"
 import dynamic from "next/dynamic"
 import { useSelector } from "react-redux"
-import { FirebaseReducer, useFirestoreConnect } from "react-redux-firebase"
+import {
+   FirebaseReducer,
+   isLoaded,
+   useFirestoreConnect,
+} from "react-redux-firebase"
 import RootState from "../store/reducers"
 import * as Sentry from "@sentry/nextjs"
 import nookies from "nookies"
@@ -41,7 +45,10 @@ type DefaultContext = {
    adminGroups?: AuthUserCustomClaims["adminGroups"]
    refetchClaims: () => Promise<void>
    signOut: () => Promise<void>
+   isLoadingAuth: boolean
+   isLoadingUserData: boolean
 }
+
 const AuthContext = createContext<DefaultContext>({
    authenticatedUser: undefined,
    userData: undefined,
@@ -52,6 +59,8 @@ const AuthContext = createContext<DefaultContext>({
    adminGroups: undefined,
    refetchClaims: () => Promise.resolve(),
    signOut: () => Promise.resolve(),
+   isLoadingAuth: true,
+   isLoadingUserData: true,
 })
 
 /**
@@ -257,6 +266,8 @@ const AuthProvider = ({ children }) => {
          adminGroups: claims?.adminGroups || {},
          refetchClaims,
          signOut: firebaseService.doSignOut,
+         isLoadingAuth: !isLoaded(auth),
+         isLoadingUserData: isLoggedOut ? false : Boolean(userData) === false,
       }),
       [
          auth,
