@@ -215,11 +215,6 @@ service cloud.firestore {
                 allow write: if isSignedIn();
             }
 
-            match /authUsersInPolicy/{authUser} {
-                allow read: if true;
-                allow write: if isSignedIn();
-            }
-
             match /companyPageViews/{visitorId} {
                 allow read; allow create;
             }
