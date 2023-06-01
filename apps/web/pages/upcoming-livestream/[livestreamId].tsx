@@ -102,10 +102,6 @@ const UpcomingLivestreamPage = ({
    const { authenticatedUser, userData, userStats, isLoggedOut, isLoggedIn } =
       useAuth()
 
-   useEffect(() => {
-      handleOpenDialog()
-   }, [handleOpenDialog])
-
    const updatedStats = useMemo(() => {
       return userStats ? userStats : userStatsPlain
    }, [userStatsPlain, userStats])
