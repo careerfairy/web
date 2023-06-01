@@ -1226,9 +1226,9 @@ class FirebaseService {
       })
    }
 
-   putLivestreamQuestion = async (
+   createLivestreamQuestion = async (
       livestreamId: string,
-      question: Create<Omit<LivestreamQuestion, "timestamp" | "badges">>
+      question: Pick<LivestreamQuestion, "displayName" | "author" | "title">
    ): Promise<LivestreamQuestion> => {
       const ref = this.firestore
          .collection("livestreams")
@@ -1238,9 +1238,14 @@ class FirebaseService {
 
       const newQuestion: LivestreamQuestion = {
          ...question,
-         timestamp: firebase.firestore.Timestamp.fromDate(new Date()),
+         timestamp: firebase.firestore.Timestamp.now(),
          id: ref.id,
          badges: [],
+         votes: 0,
+         type: "new",
+         emailOfVoters: [],
+         numberOfComments: 0,
+         firstComment: null,
       }
       await ref.set(newQuestion)
 
