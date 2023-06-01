@@ -22,7 +22,7 @@ import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
 import Box from "@mui/material/Box"
-import useLivestreamRegisterHandler from "./useLivestreamRegisterHandler"
+import useRegistrationHandler from "../../useRegistrationHandler"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -33,7 +33,7 @@ const LivestreamDetailsView: FC = () => {
       closeDialog,
    } = useLiveStreamDialog()
 
-   const handleRegisterClick = useLivestreamRegisterHandler()
+   const { handleRegisterClick } = useRegistrationHandler()
 
    const { authenticatedUser } = useAuth()
    const [heroRef, heroInView] = useInView()
@@ -129,20 +129,5 @@ const LivestreamDetailsView: FC = () => {
 }
 
 const FloatingButtonOffset = () => <Box height={90} />
-
-export const DummyContent: FC<{
-   numberOfItems?: number
-}> = ({ numberOfItems = 5 }) => {
-   return (
-      <MainContent>
-         <Stack pt={2} spacing={2}>
-            {/* For Demo Purposes */}
-            {Array.from({ length: numberOfItems }).map((_, i) => (
-               <HostInfoSkeleton key={i} />
-            ))}
-         </Stack>
-      </MainContent>
-   )
-}
 
 export default LivestreamDetailsView

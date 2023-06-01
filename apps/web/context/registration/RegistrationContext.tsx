@@ -202,6 +202,7 @@ export function RegistrationContextProvider({
                   await livestreamRepo.isUserRegisterOnAnyLivestream(
                      userData.authId
                   )
+               // TODO: replace this with a livestreamRegistrations counter field on the userStats
                await userRepo.updateUserHasRegisteredToAnyLivestreamEver(
                   userData.userEmail,
                   isUserRegisterOnAnyLivestream
