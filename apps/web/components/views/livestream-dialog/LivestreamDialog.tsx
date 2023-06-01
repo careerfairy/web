@@ -241,11 +241,16 @@ const Content: FC<ContentProps> = ({
                   routerOptions
                )
 
+            case "register-ask-questions":
+               if (livestream?.questionsDisabled) {
+                  view = "register-join-talent-pool"
+               }
+
             default:
                setValue(views.findIndex((v) => v.key === view))
          }
       },
-      [livestreamId, push, router]
+      [livestreamId, push, router, livestream?.questionsDisabled]
    )
 
    const onClose = useCallback(() => {
