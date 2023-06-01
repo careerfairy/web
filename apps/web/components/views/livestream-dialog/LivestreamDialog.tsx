@@ -1,11 +1,13 @@
 import {
    ComponentType,
    createContext,
+   Dispatch,
    FC,
    useCallback,
    useContext,
    useEffect,
    useMemo,
+   useReducer,
    useState,
 } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
@@ -26,6 +28,14 @@ import LivestreamDetailsViewSkeleton from "./views/livestream-details/Livestream
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import { useRouter } from "next/router"
 import { buildDialogLink } from "./util"
+import { Group } from "@careerfairy/shared-lib/src/groups"
+import {
+   RegistrationAction,
+   registrationInitialState,
+   registrationReducer,
+   RegistrationState,
+} from "./registrationReducer"
+import { isFromNewsletter } from "../../../util/PathUtils"
 
 const styles = sxStyles({
    content: {
@@ -107,6 +117,7 @@ const views: View[] = [
    createView({
       key: "register-data-consent",
       viewPath: "data-consent/RegisterDataConsentView",
+      // TODO: add loading component
    }),
    createView({
       key: "register-ask-questions",
@@ -179,7 +190,13 @@ const Content: FC<ContentProps> = ({
    livestreamId,
 }) => {
    const router = useRouter()
-   const { push } = router
+   const { push, query } = router
+
+   /**
+    * Mark this event registration as recommended if the user came from the
+    * careerfairy newsletter
+    */
+   const isRecommended = isFromNewsletter(query)
 
    const theme = useTheme()
 
@@ -247,6 +264,11 @@ const Content: FC<ContentProps> = ({
       setValue(getPageIndex(page))
    }, [goToView, page])
 
+   const [registrationState, registrationDispatch] = useReducer(
+      registrationReducer,
+      registrationInitialState
+   )
+
    const contextValue = useMemo<DialogContextType>(
       () => ({
          goToView,
@@ -259,6 +281,9 @@ const Content: FC<ContentProps> = ({
             : null,
          updatedStats,
          serverUserEmail,
+         isRecommended,
+         registrationState,
+         registrationDispatch,
       }),
       [
          goToView,
@@ -268,6 +293,9 @@ const Content: FC<ContentProps> = ({
          handleBack,
          updatedStats,
          serverUserEmail,
+         isRecommended,
+         registrationState,
+         registrationDispatch,
       ]
    )
 
@@ -314,6 +342,11 @@ type DialogContextType = {
     * */
    updatedStats: UserStats
    serverUserEmail: string
+
+   // registration flow data
+   isRecommended: boolean
+   registrationState: RegistrationState
+   registrationDispatch: Dispatch<RegistrationAction>
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -336,6 +369,9 @@ const DialogContext = createContext<DialogContextType>({
    activeView: "livestream-details",
    updatedStats: null,
    serverUserEmail: null,
+   isRecommended: false,
+   registrationState: registrationInitialState,
+   registrationDispatch: () => {},
 })
 
 export const useLiveStreamDialog = () => {
