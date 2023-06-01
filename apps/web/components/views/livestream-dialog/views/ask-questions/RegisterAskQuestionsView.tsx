@@ -1,4 +1,4 @@
-import { FC, useState } from "react"
+import { FC, useEffect, useState } from "react"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
@@ -21,6 +21,7 @@ import Button from "@mui/material/Button"
 import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import { LivestreamQuestion } from "@careerfairy/shared-lib/livestreams"
+import RegisterAskQuestionsViewSkeleton from "./RegisterAskQuestionsViewSkeleton"
 
 const styles = sxStyles({
    title: {
@@ -30,6 +31,7 @@ const styles = sxStyles({
          xs: "1.4285rem",
          sm: "2.571rem",
       },
+      maxWidth: 655,
    },
    logoWrapper: {
       p: 1,
@@ -82,13 +84,23 @@ const styles = sxStyles({
 type Props = {}
 
 const RegisterAskQuestionsView: FC<Props> = (props) => {
-   const { livestream, closeDialog } = useLiveStreamDialog()
+   const { livestream, goToView } = useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
    const [newlyCreatedQuestion, setNewlyCreatedQuestion] =
       useState<LivestreamQuestion>(null)
    const { createLivestreamQuestion } = useFirebaseService()
 
    const isMobile = useIsMobile()
+
+   useEffect(() => {
+      if (livestream.questionsDisabled) {
+         goToView("register-join-talent-pool")
+      }
+   }, [livestream.questionsDisabled, goToView])
+
+   if (livestream.questionsDisabled) {
+      return <RegisterAskQuestionsViewSkeleton />
+   }
 
    return (
       <BaseDialogView
@@ -98,8 +110,8 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                   livestream.backgroundImageUrl,
                   "lg"
                )}
-               onBackPosition={isMobile ? "top-left" : "top-right"}
-               onBackClick={closeDialog}
+               onBackPosition={"top-left"}
+               onBackClick={() => goToView("livestream-details")}
                noMinHeight
             >
                <Stack alignItems="center" spacing={1.75} pb={2}>
@@ -163,11 +175,6 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                               multiline
                               placeholder="Write your question"
                               error={errors.question && touched.question}
-                              helperText={
-                                 errors.question &&
-                                 touched.question &&
-                                 errors.question
-                              }
                            />
                            <Typography sx={styles.errorText}>
                               {errors.question &&
@@ -177,6 +184,7 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                            <LoadingButton
                               sx={styles.btn}
                               disabled={!isValid || !dirty || isSubmitting}
+                              loading={isSubmitting}
                               variant="contained"
                               disableElevation
                               size="small"
@@ -197,6 +205,8 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                   <QuestionsComponent
                      livestream={livestream}
                      newlyCreatedQuestion={newlyCreatedQuestion}
+                     infiniteScroll
+                     responsive
                   />
                </Stack>
             </MainContent>
@@ -208,6 +218,7 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                disableElevation
                size="small"
                fullWidth={isMobile}
+               onClick={() => goToView("register-join-talent-pool")}
                color="secondary"
             >
                Next

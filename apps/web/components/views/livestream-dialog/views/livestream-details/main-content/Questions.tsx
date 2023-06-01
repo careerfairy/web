@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react"
+import { FC, useCallback, useMemo } from "react"
 import Box from "@mui/material/Box"
 import SectionTitle from "./SectionTitle"
 import {
@@ -8,7 +8,7 @@ import {
 import Stack from "@mui/material/Stack"
 import useInfiniteLivestreamQuestions from "../../../../../custom-hook/live-stream/useInfiniteLivestreamQuestions"
 import { sxStyles } from "../../../../../../types/commonTypes"
-import { Typography } from "@mui/material"
+import { Grid, Typography } from "@mui/material"
 import ThumbUpIcon from "@mui/icons-material/ThumbUpOffAlt"
 import useLivestreamQuestionHandlers from "../../../../../custom-hook/live-stream/useLivestreamQuestionHandlers"
 import LoadingButton from "@mui/lab/LoadingButton"
@@ -16,6 +16,8 @@ import useCountQuery from "../../../../../custom-hook/useCountQuery"
 import DateUtil from "../../../../../../util/DateUtil"
 import { alpha } from "@mui/material/styles"
 import Skeleton from "@mui/material/Skeleton"
+import CustomInfiniteScroll from "../../../../common/CustomInfiniteScroll"
+import { useAuth } from "../../../../../../HOCs/AuthProvider"
 
 const styles = sxStyles({
    greyBorder: {
@@ -71,11 +73,15 @@ const Questions: FC<Props> = ({ livestream }) => {
 type QuestionsComponentProps = {
    newlyCreatedQuestion?: LivestreamQuestion
    livestream: LivestreamEvent
+   infiniteScroll?: boolean
+   responsive?: boolean
 }
 
 export const QuestionsComponent: FC<QuestionsComponentProps> = ({
    livestream,
    newlyCreatedQuestion,
+   infiniteScroll = false,
+   responsive,
 }) => {
    const {
       loading,
@@ -83,54 +89,105 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
       handleClientToggleUpvoteQuestion,
       hasMore,
       getAll,
+      getMore,
       query: questionsQuery,
    } = useInfiniteLivestreamQuestions(livestream.id)
 
    const { count } = useCountQuery(questionsQuery)
 
-   return (
-      <Stack sx={styles.questionsWrapper} spacing={1.25}>
-         {newlyCreatedQuestion ? (
-            <Question
-               livestream={livestream}
-               question={newlyCreatedQuestion}
-               handleClientToggleUpvoteQuestion={
-                  handleClientToggleUpvoteQuestion
-               }
-            />
-         ) : null}
-         {questions
-            .filter((q) => q.id !== newlyCreatedQuestion?.id)
-            .map((question) => (
-               <Question
-                  key={question.id}
-                  livestream={livestream}
-                  question={question}
-                  handleClientToggleUpvoteQuestion={
-                     handleClientToggleUpvoteQuestion
-                  }
-               />
-            ))}
+   const gridItemProps = useMemo(() => {
+      if (responsive) {
+         return {
+            xs: 12,
+            sm: 6,
+         }
+      }
+      return {
+         xs: 12,
+      }
+   }, [responsive])
 
-         {loading ? (
-            <>
-               <QuestionSkeleton />
-               <QuestionSkeleton />
-            </>
-         ) : null}
-         {hasMore ? (
-            <LoadingButton
-               sx={[styles.loadMoreButton, styles.btn, styles.greyBorder]}
-               disabled={loading}
-               onClick={getAll}
-               variant="outlined"
-               color="grey"
-               size="small"
-            >
-               Load all {count ?? ""} questions
-            </LoadingButton>
-         ) : null}
-      </Stack>
+   const Content = useMemo(
+      () => (
+         <Box>
+            <Grid sx={styles.questionsWrapper} container spacing={1.25}>
+               {newlyCreatedQuestion ? (
+                  <Grid item {...gridItemProps}>
+                     <Question
+                        livestream={livestream}
+                        question={newlyCreatedQuestion}
+                        handleClientToggleUpvoteQuestion={
+                           handleClientToggleUpvoteQuestion
+                        }
+                     />
+                  </Grid>
+               ) : null}
+               {questions
+                  .filter((q) => q.id !== newlyCreatedQuestion?.id)
+                  .map((question) => (
+                     <Grid key={question.id} item {...gridItemProps}>
+                        <Question
+                           livestream={livestream}
+                           question={question}
+                           handleClientToggleUpvoteQuestion={
+                              handleClientToggleUpvoteQuestion
+                           }
+                        />
+                     </Grid>
+                  ))}
+
+               {loading ? (
+                  <>
+                     <Grid item {...gridItemProps}>
+                        <QuestionSkeleton />
+                     </Grid>
+                     <Grid item {...gridItemProps}>
+                        <QuestionSkeleton />
+                     </Grid>
+                  </>
+               ) : null}
+               {!infiniteScroll && hasMore ? (
+                  <Grid item xs={12}>
+                     <LoadingButton
+                        sx={[
+                           styles.loadMoreButton,
+                           styles.btn,
+                           styles.greyBorder,
+                        ]}
+                        disabled={loading}
+                        onClick={getAll}
+                        fullWidth
+                        variant="outlined"
+                        color="grey"
+                        size="small"
+                     >
+                        Load all {count ?? ""} questions
+                     </LoadingButton>
+                  </Grid>
+               ) : null}
+            </Grid>
+         </Box>
+      ),
+      [
+         count,
+         getAll,
+         gridItemProps,
+         handleClientToggleUpvoteQuestion,
+         hasMore,
+         livestream,
+         loading,
+         newlyCreatedQuestion,
+         questions,
+         infiniteScroll,
+      ]
+   )
+
+   return infiniteScroll ? (
+      <CustomInfiniteScroll hasMore={hasMore} loading={loading} next={getMore}>
+         {Content}
+      </CustomInfiniteScroll>
+   ) : (
+      Content
    )
 }
 
@@ -147,6 +204,7 @@ const Question: FC<QuestionProps> = ({
    question,
    handleClientToggleUpvoteQuestion,
 }) => {
+   const { authenticatedUser } = useAuth()
    const { isUpvoting, hasUpvotedQuestion, toggleUpvoteQuestion } =
       useLivestreamQuestionHandlers()
 
@@ -175,7 +233,10 @@ const Question: FC<QuestionProps> = ({
             <LoadingButton
                loading={isUpvoting}
                onClick={handleClickUpvote}
-               disabled={hasUpvotedQuestion(question)}
+               disabled={
+                  hasUpvotedQuestion(question) ||
+                  question?.author === authenticatedUser?.email
+               }
                size="small"
                startIcon={<ThumbUpIcon />}
                variant="text"
@@ -223,7 +284,9 @@ const QuestionSkeleton: FC = () => {
 export const QuestionsSkeleton: FC = () => {
    return (
       <Box>
-         <SectionTitle>Upcoming questions</SectionTitle>
+         <SectionTitle>
+            <Skeleton width={120} />
+         </SectionTitle>
          <Stack sx={styles.questionsWrapper} spacing={1.25}>
             <QuestionSkeleton />
             <QuestionSkeleton />
