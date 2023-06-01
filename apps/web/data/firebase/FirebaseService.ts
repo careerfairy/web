@@ -2256,13 +2256,6 @@ class FirebaseService {
             .collection("usersInPolicy")
             .doc(userData.userEmail)
 
-         // to be used from now on
-         let authUserInPolicyRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("authUsersInPolicy")
-            .doc(userData.authId)
-
          batch.set(userInPolicyRef, {
             ...userData,
             dateAgreed: this.getServerTimestamp(),
