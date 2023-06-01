@@ -26,6 +26,7 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { UserStats } from "@careerfairy/shared-lib/users"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
+import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
 import { useRouter } from "next/router"
 import { buildDialogLink } from "./util"
 import { Group } from "@careerfairy/shared-lib/src/groups"
@@ -122,6 +123,7 @@ const views: View[] = [
    createView({
       key: "register-ask-questions",
       viewPath: "ask-questions/RegisterAskQuestionsView",
+      loadingComponent: () => <RegisterAskQuestionsViewSkeleton />,
    }),
    createView({
       key: "register-join-talent-pool",
