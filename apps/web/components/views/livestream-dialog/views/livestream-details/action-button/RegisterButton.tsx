@@ -14,7 +14,7 @@ type RegisterButtonProps = {
    toolTip?: string
 }
 const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, isLoadingUserData, isLoadingAuth } = useAuth()
    const { onRegisterClick, livestreamPresenter, isFloating } =
       useActionButtonContext()
 
@@ -42,8 +42,16 @@ const RegisterButton: FC<RegisterButtonProps> = ({ label, toolTip }) => {
    }
 
    const handleClick = useCallback(() => {
+      if (isLoadingUserData || isLoadingAuth) {
+         // only allow the user register action when the auth is fully loaded
+         // otherwise, the user might be redirected to login
+         // we could also make the button disabled, but the UI is already changing a
+         // lot when opening the dialog, 99.5% of the times the auth should be loaded
+         // when the user clicks the button.
+         return
+      }
       onRegisterClick(isFloating)
-   }, [onRegisterClick, isFloating])
+   }, [isLoadingUserData, isLoadingAuth, onRegisterClick, isFloating])
 
    return (
       <FloatingButtonWrapper isFloating={isFloating}>
