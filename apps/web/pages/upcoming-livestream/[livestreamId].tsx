@@ -16,7 +16,6 @@ import { useAuth } from "../../HOCs/AuthProvider"
 import { dateIsInUnder24Hours, streamIsOld } from "../../util/CommonUtil"
 import UserUtil from "../../data/util/UserUtil"
 import { useRouter } from "next/router"
-import RegistrationModal from "../../components/views/common/registration-modal"
 import AboutSection from "../../components/views/upcoming-livestream/AboutSection"
 import QuestionsSection from "../../components/views/upcoming-livestream/QuestionsSection"
 import SpeakersSection from "../../components/views/upcoming-livestream/SpeakersSection"
@@ -26,7 +25,6 @@ import ContactSection from "../../components/views/upcoming-livestream/ContactSe
 import Navigation from "../../components/views/upcoming-livestream/Navigation"
 import { useMediaQuery } from "@mui/material"
 import { languageCodesDict } from "../../components/helperFunctions/streamFormFunctions"
-import { getRelevantHosts } from "../../util/streamUtil"
 import { useInterests } from "../../components/custom-hook/useCollection"
 import ReferralSection from "../../components/views/upcoming-livestream/ReferralSection"
 import SEO from "../../components/util/SEO"
@@ -43,6 +41,9 @@ import { Group } from "@careerfairy/shared-lib/groups"
 import { GetServerSidePropsContext } from "next"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import useRecordingAccess from "components/views/upcoming-livestream/HeroSection/useRecordingAccess"
+import useRegistrationData from "../../components/views/livestream-dialog/views/registration/useRegistrationData"
+import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
+import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
 
 type TrackProps = {
    id: string
@@ -90,15 +91,13 @@ const UpcomingLivestreamPage = ({
       [stream]
    )
 
+   const { filteredGroups, unfilteredGroups } = useRegistrationData(stream)
+
    const { push, asPath, query, pathname, replace } = useRouter()
-   const [currentGroup, setCurrentGroup] = useState<Group>(null)
-   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
-   const [filteredGroups, setFilteredGroups] = useState<Group[]>([])
-   const [targetGroupId, setTargetGroupId] = useState("")
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
    const { data: totalInterests } = useInterests()
    const [eventInterests, setEventInterests] = useState([])
-
-   const [unfilteredGroups, setUnfilteredGroups] = useState<Group[]>([])
 
    const { authenticatedUser, userData, userStats, isLoggedOut, isLoggedIn } =
       useAuth()
@@ -134,30 +133,11 @@ const UpcomingLivestreamPage = ({
       )
    }, [stream, authenticatedUser])
 
-   const handleCloseJoinModal = useCallback(
-      () => setJoinGroupModalData(undefined),
-      []
-   )
-   const handleOpenJoinModal = useCallback(
-      () =>
-         setJoinGroupModalData({
-            groups: unfilteredGroups,
-            targetGroupId: targetGroupId,
-            livestream: stream,
-         }),
-      [targetGroupId, stream, unfilteredGroups]
-   )
-
    const [isPastEvent, setIsPastEvent] = useState(streamIsOld(stream?.start))
 
    const streamLanguage = languageCodesDict?.[stream?.language?.code]
 
-   const {
-      listenToScheduledLivestreamById,
-      listenToCareerCenterById,
-      getDetailLivestreamCareerCenters,
-      auth,
-   } = useFirebaseService()
+   const { listenToScheduledLivestreamById, auth } = useFirebaseService()
 
    useEffect(() => {
       if (totalInterests) {
@@ -196,46 +176,6 @@ const UpcomingLivestreamPage = ({
    }, [listenToScheduledLivestreamById, stream?.id])
 
    useEffect(() => {
-      if (query.groupId) {
-         const unsubscribe = listenToCareerCenterById(
-            query.groupId,
-            (querySnapshot) => {
-               setCurrentGroup({
-                  ...querySnapshot.data(),
-                  id: querySnapshot.id,
-               })
-            }
-         )
-         return () => unsubscribe()
-      }
-   }, [listenToCareerCenterById, query.groupId])
-
-   useEffect(() => {
-      if (stream?.groupIds?.length) {
-         getDetailLivestreamCareerCenters(stream.groupIds).then(
-            (querySnapshot) => {
-               const groupList = querySnapshot.docs.map((doc) => doc.data())
-               const filteredHosts = getRelevantHosts(
-                  currentGroup?.groupId,
-                  stream,
-                  groupList
-               )
-               setTargetGroupId(
-                  filteredHosts.length === 1 ? filteredHosts[0].id : ""
-               )
-               setFilteredGroups(filteredHosts)
-               setUnfilteredGroups(groupList)
-            }
-         )
-      }
-   }, [
-      stream?.groupIds,
-      currentGroup?.groupId,
-      stream,
-      getDetailLivestreamCareerCenters,
-   ])
-
-   useEffect(() => {
       ;(async function handleAutoRegister() {
          if (stream?.registeredUsers?.includes(authenticatedUser.email)) {
             if (stream?.hasStarted) {
@@ -257,10 +197,11 @@ const UpcomingLivestreamPage = ({
             unfilteredGroups.length &&
             !stream?.registeredUsers?.includes(authenticatedUser.email)
          ) {
-            handleOpenJoinModal()
+            handleOpenDialog()
          }
       })()
    }, [
+      handleOpenDialog,
       query?.register,
       stream?.id,
       stream?.hasStarted,
@@ -270,7 +211,6 @@ const UpcomingLivestreamPage = ({
       query,
       push,
       pathname,
-      handleOpenJoinModal,
    ])
 
    useEffect(() => {
@@ -278,15 +218,6 @@ const UpcomingLivestreamPage = ({
          replace?.(`/streaming/${stream.id}/viewer`)
       }
    }, [replace, stream?.hasStarted, stream?.id])
-
-   /**
-    * Mark this event registration as recommended if the user came from the
-    * careerfairy newsletter
-    */
-   const isRecommended =
-      query?.utm_source === "careerfairy" &&
-      query?.utm_medium === "email" &&
-      query?.utm_campaign === "newsletter"
 
    const isRegistrationDisabled = useMemo(() => {
       if (isPastEvent) return true
@@ -363,12 +294,12 @@ const UpcomingLivestreamPage = ({
             })
          }
 
-         handleOpenJoinModal()
+         handleOpenDialog()
       },
       [
          asPath,
          auth?.currentUser?.emailVerified,
-         handleOpenJoinModal,
+         handleOpenDialog,
          isLoggedOut,
          linkToStream,
          push,
@@ -481,14 +412,14 @@ const UpcomingLivestreamPage = ({
                backgroundColor={theme.palette.common.white}
                subtitle={"Any problem or question ? We want to hear from you"}
             />
-            <RegistrationModal
-               open={Boolean(joinGroupModalData)}
-               handleClose={handleCloseJoinModal}
-               onFinish={handleCloseJoinModal}
-               promptOtherEventsOnFinal
-               livestream={joinGroupModalData?.livestream}
-               groups={joinGroupModalData?.groups}
-               isRecommended={isRecommended ? true : undefined}
+            <LivestreamDialog
+               open={isDialogOpen}
+               updatedStats={updatedStats}
+               serverUserEmail={userEmail}
+               serverSideLivestream={stream}
+               livestreamId={stream.id}
+               handleClose={handleCloseDialog}
+               page={"register"}
             />
          </UpcomingLayout>
          {mobile && !isRegistrationDisabled && !registered ? (
