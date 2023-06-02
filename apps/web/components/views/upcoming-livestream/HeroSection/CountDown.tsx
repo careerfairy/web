@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useEffect, useMemo, useState } from "react"
+import React, { memo, useCallback, useEffect, useState } from "react"
 import {
    Alert,
    Box,
@@ -13,7 +13,6 @@ import {
 } from "@mui/material"
 import DateUtil from "../../../../util/DateUtil"
 import CalendarIcon from "@mui/icons-material/CalendarToday"
-import { useRouter } from "next/router"
 import { AddToCalendar } from "../../common/AddToCalendar"
 import ShareOutlined from "@mui/icons-material/ShareOutlined"
 import ShareLivestreamModal from "../../common/ShareLivestreamModal"
@@ -121,25 +120,6 @@ const CountDown = ({
    userEmailFromServer,
    streamPresenter,
 }: CountDownProps) => {
-   const {
-      query: { livestreamId, groupId },
-   } = useRouter()
-
-   const event = useMemo(() => {
-      const linkToStream = `https://careerfairy.io/upcoming-livestream/${livestreamId}${
-         groupId ? `?groupId=${groupId}` : ""
-      }`
-      return {
-         name: stream.title,
-         details: `Here is your Link: ${linkToStream}`,
-         location: "Hosted virtually on CareerFairy (link in the description)",
-         startsAt: new Date(time).toISOString(),
-         endsAt: new Date(
-            new Date(time).getTime() + (stream.duration || 45) * 60 * 1000
-         ).toISOString(),
-      }
-   }, [livestreamId, groupId, stream.title, stream.duration, time])
-
    const [shareEventDialog, setShareEventDialog] = useState(null)
 
    const handleShareEventDialogClose = useCallback(() => {
@@ -174,7 +154,6 @@ const CountDown = ({
                   <Hidden smDown>
                      {streamIsOld(stream.start) ? null : (
                         <MobileActions
-                           event={event}
                            setShareEventDialog={setShareEventDialog}
                            stream={stream}
                         />
@@ -197,7 +176,6 @@ const CountDown = ({
                <Grid item xs={12}>
                   {streamIsOld(stream.start) ? null : (
                      <DesktopActions
-                        event={event}
                         setShareEventDialog={setShareEventDialog}
                         stream={stream}
                      />
@@ -217,7 +195,7 @@ const CountDown = ({
    )
 }
 
-const DesktopActions = ({ event, setShareEventDialog, stream }) => {
+const DesktopActions = ({ setShareEventDialog, stream }) => {
    return (
       <>
          <Box
@@ -239,7 +217,7 @@ const DesktopActions = ({ event, setShareEventDialog, stream }) => {
             </Tooltip>
          </Box>
 
-         <AddToCalendar event={event} filename={`${stream.company}-event`}>
+         <AddToCalendar event={stream} filename={`${stream.company}-event`}>
             {(handleClick) => (
                <Tooltip arrow placement="top" title={"Add to calendar"}>
                   <Button
@@ -259,7 +237,7 @@ const DesktopActions = ({ event, setShareEventDialog, stream }) => {
    )
 }
 
-const MobileActions = ({ setShareEventDialog, stream, event }) => {
+const MobileActions = ({ setShareEventDialog, stream }) => {
    return (
       <>
          <Box mr={1}>
@@ -274,7 +252,7 @@ const MobileActions = ({ setShareEventDialog, stream, event }) => {
             </Tooltip>
          </Box>
 
-         <AddToCalendar event={event} filename={`${stream.company}-event`}>
+         <AddToCalendar event={stream} filename={`${stream.company}-event`}>
             {(handleClick) => (
                <Tooltip arrow placement="top" title={"Add to calendar"}>
                   <IconButton
