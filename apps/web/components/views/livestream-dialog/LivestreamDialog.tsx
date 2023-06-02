@@ -30,7 +30,6 @@ import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQ
 import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { useRouter } from "next/router"
 import { buildDialogLink } from "./util"
-import { Group } from "@careerfairy/shared-lib/src/groups"
 import {
    RegistrationAction,
    registrationInitialState,
@@ -38,6 +37,8 @@ import {
    RegistrationState,
 } from "./registrationReducer"
 import { isFromNewsletter } from "../../../util/PathUtils"
+import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
+import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
 
 const styles = sxStyles({
    content: {
@@ -82,7 +83,7 @@ type Props = {
    serverUserEmail: string
 }
 
-type ViewKey =
+export type ViewKey =
    | "livestream-details"
    | "register-data-consent"
    | "register-ask-questions"
@@ -119,7 +120,7 @@ const views: View[] = [
    createView({
       key: "register-data-consent",
       viewPath: "data-consent/RegisterDataConsentView",
-      // TODO: add loading component
+      loadingComponent: () => <RegisterDataConsentViewSkeleton />,
    }),
    createView({
       key: "register-ask-questions",
@@ -129,6 +130,7 @@ const views: View[] = [
    createView({
       key: "register-join-talent-pool",
       viewPath: "join-talent-pool/RegisterJoinTalentPoolView",
+      loadingComponent: () => <RegisterJoinTalentPoolViewSkeleton />,
    }),
    createView({
       key: "register-success",
