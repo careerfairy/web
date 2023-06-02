@@ -12,7 +12,7 @@ const styles = sxStyles({
    tabs: {
       position: "sticky",
       top: 0,
-      zIndex: 1,
+      zIndex: 2,
       bgcolor: "background.paper",
       borderBottom: "1px solid #F0F0F0",
    },

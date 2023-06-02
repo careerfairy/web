@@ -1,4 +1,4 @@
-import { FC, useCallback } from "react"
+import { FC } from "react"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
 import { useLiveStreamDialog } from "../../LivestreamDialog"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
@@ -7,20 +7,11 @@ import CountDownTimer from "./CountDownTimer"
 import LivestreamTagsContainer from "./LivestreamTagsContainer"
 import HostInfo, { HostInfoSkeleton } from "./HostInfo"
 import LivestreamTitle from "./LivestreamTitle"
-import LivestreamDetailsViewSkeleton from "./LivestreamDetailsViewSkeleton"
 import ActionButton from "./action-button/ActionButton"
 import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
 import RecordingPlayer from "./RecordingPlayer"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
-import { dataLayerLivestreamEvent } from "../../../../../util/analyticsUtils"
-import UserUtil from "../../../../../data/util/UserUtil"
-import { useRouter } from "next/router"
-import { useFirebaseService } from "../../../../../context/firebase/FirebaseServiceContext"
-import { recommendationServiceInstance } from "../../../../../data/firebase/RecommendationService"
-import { UserReminderType } from "@careerfairy/shared-lib/users"
-import { useUserReminders } from "../../../../../HOCs/UserReminderProvider"
-import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
 import ShareButton from "./ShareButton"
 import { useInView } from "react-intersection-observer"
 import MainContentNavigation from "./MainContentNavigation"
@@ -31,6 +22,7 @@ import Jobs from "./main-content/Jobs"
 import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
 import Box from "@mui/material/Box"
+import useRegistrationHandler from "../../useRegistrationHandler"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -38,15 +30,12 @@ const LivestreamDetailsView: FC = () => {
       livestreamPresenter,
       updatedStats,
       serverUserEmail,
-      goToView,
       closeDialog,
    } = useLiveStreamDialog()
-   const firebase = useFirebaseService()
-   const { forceShowReminder } = useUserReminders()
-   const { errorNotification } = useSnackbarNotifications()
 
-   const { authenticatedUser, isLoggedOut, userData } = useAuth()
-   const { push, asPath } = useRouter()
+   const { handleRegisterClick } = useRegistrationHandler()
+
+   const { authenticatedUser } = useAuth()
    const [heroRef, heroInView] = useInView()
 
    const isMobile = useIsMobile()
@@ -60,79 +49,6 @@ const LivestreamDetailsView: FC = () => {
    const hasJobs = livestreamPresenter.hasJobs()
 
    const isFloatingActionButton = isMobile || !heroInView
-
-   const handleRegisterClick = useCallback(
-      async (floating: boolean) => {
-         // Check if the user is already registered
-         try {
-            const isAlreadyRegistered = livestreamPresenter.isUserRegistered(
-               authenticatedUser.email || serverUserEmail
-            )
-
-            if (isAlreadyRegistered) {
-               await firebase.deregisterFromLivestream(livestream.id, userData)
-               recommendationServiceInstance.unRegisterEvent(
-                  livestream.id,
-                  userData.authId
-               )
-               dataLayerLivestreamEvent(
-                  "event_registration_removed",
-                  livestream
-               )
-            } else {
-               dataLayerLivestreamEvent(
-                  `event_registration_started${
-                     floating ? "_from_footer_button" : ""
-                  }`,
-                  livestream
-               )
-
-               if (isLoggedOut || !authenticatedUser?.emailVerified) {
-                  dataLayerLivestreamEvent(
-                     "event_registration_started_login_required",
-                     livestream
-                  )
-                  return push({
-                     pathname: `/login`,
-                     query: { absolutePath: asPath },
-                  })
-               }
-
-               if (!userData || !UserUtil.userProfileIsComplete(userData)) {
-                  dataLayerLivestreamEvent(
-                     "event_registration_started_profile_incomplete",
-                     livestream
-                  )
-                  return push({
-                     pathname: `/profile`,
-                     query: { absolutePath: asPath },
-                  })
-               }
-
-               // Try to force show newsletter reminder
-               forceShowReminder(UserReminderType.NewsletterReminder)
-               goToView("register-data-consent")
-            }
-         } catch (e) {
-            errorNotification(e)
-         }
-      },
-      [
-         asPath,
-         authenticatedUser.email,
-         authenticatedUser?.emailVerified,
-         errorNotification,
-         firebase,
-         forceShowReminder,
-         goToView,
-         isLoggedOut,
-         livestream,
-         livestreamPresenter,
-         push,
-         serverUserEmail,
-         userData,
-      ]
-   )
 
    return (
       <BaseDialogView
@@ -213,20 +129,5 @@ const LivestreamDetailsView: FC = () => {
 }
 
 const FloatingButtonOffset = () => <Box height={90} />
-
-export const DummyContent: FC<{
-   numberOfItems?: number
-}> = ({ numberOfItems = 5 }) => {
-   return (
-      <MainContent>
-         <Stack pt={2} spacing={2}>
-            {/* For Demo Purposes */}
-            {Array.from({ length: numberOfItems }).map((_, i) => (
-               <HostInfoSkeleton key={i} />
-            ))}
-         </Stack>
-      </MainContent>
-   )
-}
 
 export default LivestreamDetailsView
