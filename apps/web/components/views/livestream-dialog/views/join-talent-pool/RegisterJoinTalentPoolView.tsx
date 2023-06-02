@@ -115,6 +115,7 @@ const RegisterJoinTalentPoolView = () => {
 
                   <PrimarySecondaryButtons
                      loading={isJoiningTalentPool}
+                     secondaryText="Maybe later"
                      onClickPrimary={handleJoinTalentPool}
                      onClickSecondary={handleCancel}
                      primaryText="Join talent pool"
