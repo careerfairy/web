@@ -1,5 +1,5 @@
 import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/src/livestreams"
-import { Box, Button, Stack, Typography } from "@mui/material"
+import { Box, Button, CircularProgress, Stack, Typography } from "@mui/material"
 import { Form, Formik } from "formik"
 import { useCallback } from "react"
 import { useAuth } from "../../../../../HOCs/AuthProvider"
@@ -10,7 +10,7 @@ import { SuspenseWithBoundary } from "../../../../ErrorBoundary"
 import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import { validate } from "../../../common/registration-modal/steps/LivestreamGroupQuestionForm/util"
 import BaseDialogView, { HeroContent, MainContent } from "../../BaseDialogView"
-import { useLiveStreamDialog } from "../../LivestreamDialog"
+import { useLiveStreamDialog, ViewKey } from "../../LivestreamDialog"
 import RegistrationPreConditions from "../../RegistrationPreConditions"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import GroupConsentDataFetching from "./GroupConsentDataFetching"
@@ -66,6 +66,9 @@ const styles = sxStyles({
    },
 })
 
+const NEXT_VIEW: ViewKey = "register-ask-questions"
+const PREVIOUS_VIEW: ViewKey = "livestream-details"
+
 /**
  * UI for the user to answer the group questions and give consent
  */
@@ -77,8 +80,6 @@ const GroupQuestionsForm = () => {
    const { completeRegistrationProcess } = useRegistrationHandler()
    const { errorNotification } = useSnackbarNotifications()
 
-   console.log("here GroupQuestionsForm", registrationState)
-
    const handleSubmit = useCallback(
       async (values: LivestreamGroupQuestionsMap) => {
          completeRegistrationProcess(
@@ -89,7 +90,7 @@ const GroupQuestionsForm = () => {
             values
          )
             .then(() => {
-               goToView("register-ask-questions")
+               goToView(NEXT_VIEW)
             })
             .catch((e) => {
                errorNotification(e)
@@ -105,6 +106,10 @@ const GroupQuestionsForm = () => {
          userData,
       ]
    )
+
+   const goToPrevious = useCallback(() => {
+      goToView(PREVIOUS_VIEW)
+   }, [goToView])
 
    return (
       <Formik
@@ -137,7 +142,7 @@ const GroupQuestionsForm = () => {
                               "lg"
                            )}
                            onBackPosition={"top-left"}
-                           onBackClick={() => goToView("livestream-details")}
+                           onBackClick={goToPrevious}
                            noMinHeight
                         >
                            <Stack
@@ -167,6 +172,7 @@ const GroupQuestionsForm = () => {
                                     {Object.values(values).map(
                                        (groupQuestions) => (
                                           <LivestreamGroupQuestionsSelector
+                                             // @ts-ignore
                                              key={groupQuestions.groupId}
                                              errors={errors}
                                              touched={touched}
@@ -185,8 +191,13 @@ const GroupQuestionsForm = () => {
                                  />
                               ) : null}
 
-                              <Buttons
+                              <PrimarySecondaryButtons
                                  disabled={Object.keys(errors).length > 0}
+                                 primaryText={"Accept & Proceed"}
+                                 typeSubmit
+                                 onClickSecondary={() =>
+                                    goToView("livestream-details")
+                                 }
                               />
                            </Stack>
                         </MainContent>
@@ -214,7 +225,13 @@ const HostTitle = ({ companyName }: { companyName: string }) => {
    )
 }
 
-const HostImage = ({ imageUrl, alt }: { imageUrl: string; alt: string }) => {
+export const HostImage = ({
+   imageUrl,
+   alt,
+}: {
+   imageUrl: string
+   alt: string
+}) => {
    return (
       <Box sx={styles.logoWrapper}>
          <Image
@@ -256,31 +273,54 @@ const ConsentText = ({
    )
 }
 
-const Buttons = ({ disabled }: { disabled: boolean }) => {
-   const { goToView } = useLiveStreamDialog()
+type ButtonProps = {
+   disabled?: boolean
+   loading?: boolean
+   typeSubmit?: boolean
+   onClickPrimary?: () => void
+   onClickSecondary: () => void
+   primaryText: string
+   secondaryText?: string
+}
+
+export const PrimarySecondaryButtons = ({
+   disabled,
+   loading,
+   typeSubmit,
+   onClickPrimary,
+   onClickSecondary,
+   primaryText,
+   secondaryText = "Cancel",
+}: ButtonProps) => {
    return (
       <Stack direction="column" spacing={1}>
          <Button
-            disabled={disabled}
+            disabled={disabled || loading}
             sx={styles.btn}
-            type="submit"
+            type={typeSubmit ? "submit" : undefined}
+            onClick={onClickPrimary ? onClickPrimary : undefined}
             variant="contained"
             disableElevation
             size="small"
             color="secondary"
+            startIcon={
+               loading ? (
+                  <CircularProgress size={10} color="inherit" />
+               ) : undefined
+            }
          >
-            Accept & Proceed
+            {primaryText}
          </Button>
          <Button
-            // variant="text"
+            disabled={disabled || loading}
+            onClick={onClickSecondary}
             color="grey"
             disableRipple
             fullWidth={false}
             disableElevation
             sx={styles.btnCancel}
-            onClick={() => goToView("livestream-details")}
          >
-            Cancel
+            {secondaryText}
          </Button>
       </Stack>
    )
