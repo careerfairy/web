@@ -13,7 +13,6 @@ import makeStyles from "@mui/styles/makeStyles"
 import { RegistrationContext } from "context/registration/RegistrationContext"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import GroupLogo from "../../common/GroupLogo"
-import LivestreamGroupQuestionsSelector from "../../../../profile/LivestreamGroupQuestionsSelector"
 import Stack from "@mui/material/Stack"
 import { groupRepo } from "../../../../../../data/RepositoryInstances"
 import { LivestreamGroupQuestionsMap } from "@careerfairy/shared-lib/dist/livestreams"
@@ -22,6 +21,7 @@ import {
    checkIfUserHasAnsweredAllLivestreamGroupQuestions,
    validate,
 } from "./util"
+import LivestreamGroupQuestionsSelector from "../../../../livestream-dialog/views/data-consent/LivestreamGroupQuestionsSelector"
 
 const useStyles = makeStyles((theme) => ({
    actions: {
