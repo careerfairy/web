@@ -70,6 +70,7 @@ const styles = sxStyles({
          md: 5,
       },
       maxWidth: 915,
+      height: "100%",
    },
 })
 
