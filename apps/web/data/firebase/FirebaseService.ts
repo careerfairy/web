@@ -2265,11 +2265,6 @@ class FirebaseService {
             ...userData,
             dateAgreed: this.getServerTimestamp(),
          })
-
-         batch.set(authUserInPolicyRef, {
-            ...userData,
-            dateAgreed: this.getServerTimestamp(),
-         })
       }
 
       // Updates the user's questions and answers in the userData/userGroups subcollection
