@@ -27,6 +27,7 @@ import { UserStats } from "@careerfairy/shared-lib/users"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
 import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
+import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { useRouter } from "next/router"
 import { buildDialogLink } from "./util"
 import { Group } from "@careerfairy/shared-lib/src/groups"
@@ -132,6 +133,7 @@ const views: View[] = [
    createView({
       key: "register-success",
       viewPath: "register-success/RegisterSuccessView",
+      loadingComponent: () => <RegisterSuccessViewSkeleton />,
    }),
    createView({
       key: "job-details",
