@@ -43,7 +43,8 @@ const styles = sxStyles({
       mt: -13,
    },
    consentText: {
-      fontSize: 12,
+      fontSize: 16,
+      textAlign: "center",
    },
    btn: {
       boxShadow: "none",
@@ -110,6 +111,8 @@ const GroupQuestionsForm = () => {
    const goToPrevious = useCallback(() => {
       goToView(PREVIOUS_VIEW)
    }, [goToView])
+
+   const policiesToAccept = groupsWithPolicies?.length > 0
 
    return (
       <Formik
@@ -185,7 +188,7 @@ const GroupQuestionsForm = () => {
                                  </Stack>
                               ) : null}
 
-                              {groupsWithPolicies?.length ? (
+                              {policiesToAccept ? (
                                  <ConsentText
                                     groupsWithPolicies={groupsWithPolicies}
                                  />
@@ -193,7 +196,11 @@ const GroupQuestionsForm = () => {
 
                               <PrimarySecondaryButtons
                                  disabled={Object.keys(errors).length > 0}
-                                 primaryText={"Accept & Proceed"}
+                                 primaryText={
+                                    policiesToAccept
+                                       ? "Accept & Proceed"
+                                       : "Answer & Proceed"
+                                 }
                                  typeSubmit
                                  onClickSecondary={() =>
                                     goToView("livestream-details")
