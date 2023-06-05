@@ -13,15 +13,13 @@ import { useRouter } from "next/router"
  * @returns {null} Returns null. The hook does not return any values, its purpose is to perform side effects.
  */
 const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
-   const { authenticatedUser } = useAuth()
+   const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
    const isRedirecting = useRef(false)
 
    useEffect(() => {
-      if (isRedirecting.current || !livestreamPresenter) return
       if (
-         authenticatedUser &&
-         authenticatedUser.email &&
+         !isLoadingAuth &&
          livestreamPresenter.isLive() &&
          livestreamPresenter.isUserRegistered(authenticatedUser.email)
       ) {
@@ -36,6 +34,7 @@ const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
       livestreamPresenter?.isLive,
       livestreamPresenter?.id,
       authenticatedUser?.email,
+      isLoadingAuth,
    ])
 }
 

@@ -226,6 +226,11 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       const { formCompleted: marketingFormCompleted, setSelectedEventId } =
          useMarketingLandingPage()
 
+      const presenterEvent = useMemo(
+         () => (event ? LivestreamPresenter.createFromDocument(event) : null),
+         [event]
+      )
+
       const hasRegistered = useMemo<boolean>(() => {
          if (loading) return false
 
@@ -249,9 +254,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [event?.jobs?.length, loading])
 
       const getRecordingAvailableDays = useMemo<number | null>(() => {
-         if (isPast && isLoggedIn && event) {
-            const presenterEvent = LivestreamPresenter.createFromDocument(event)
-
+         if (isPast && isLoggedIn && presenterEvent) {
             if (
                presenterEvent.isAbleToShowRecording(authenticatedUser?.email)
             ) {
@@ -264,7 +267,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
 
          return null
-      }, [isPast, isLoggedIn, event, authenticatedUser?.email])
+      }, [isPast, isLoggedIn, authenticatedUser?.email, presenterEvent])
 
       useEffect(() => {
          if (!loading && interests) {
@@ -311,12 +314,11 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       )
 
       const linkProps = useMemo<LinkProps>(() => {
-         if (!event?.id) {
+         if (!presenterEvent?.id) {
             return {
                href: "",
             }
          }
-         const presenterEvent = LivestreamPresenter.createFromDocument(event)
 
          if (
             presenterEvent.isLive() &&
@@ -331,7 +333,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
             router,
             link: {
                type: "livestreamDetails",
-               livestreamId: event.id,
+               livestreamId: presenterEvent.id,
             },
          })
 
@@ -352,7 +354,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          }
       }, [
          authenticatedUser.email,
-         event?.id,
+         presenterEvent,
          isOnMarketingLandingPage,
          marketingFormCompleted,
          pathname,
