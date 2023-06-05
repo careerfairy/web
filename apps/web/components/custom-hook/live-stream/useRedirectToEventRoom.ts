@@ -26,7 +26,7 @@ const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
          livestreamPresenter?.isUserRegistered(authenticatedUser.email)
       ) {
          isRedirecting.current = true
-         void replace?.(livestreamPresenter?.getViewerEventRoomLink())
+         void replace(livestreamPresenter?.getViewerEventRoomLink())
       }
       return () => {
          isRedirecting.current = false
