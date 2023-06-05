@@ -30,13 +30,7 @@ const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
       return () => {
          isRedirecting.current = false
       }
-   }, [
-      replace,
-      livestreamPresenter?.isLive,
-      livestreamPresenter?.id,
-      authenticatedUser?.email,
-      isLoadingAuth,
-   ])
+   }, [replace, livestreamPresenter, authenticatedUser?.email, isLoadingAuth])
 }
 
 export default useRedirectToEventRoom
