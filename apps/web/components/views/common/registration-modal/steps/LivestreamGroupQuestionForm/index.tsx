@@ -21,7 +21,7 @@ import {
    checkIfUserHasAnsweredAllLivestreamGroupQuestions,
    validate,
 } from "./util"
-import LivestreamGroupQuestionsSelector from "../../../../livestream-dialog/views/data-consent/LivestreamGroupQuestionsSelector"
+import LivestreamGroupQuestionsSelector from "../../../../profile/LivestreamGroupQuestionsSelector"
 
 const useStyles = makeStyles((theme) => ({
    actions: {
