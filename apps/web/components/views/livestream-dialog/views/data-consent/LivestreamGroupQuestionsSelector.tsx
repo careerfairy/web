@@ -1,4 +1,4 @@
-import React, { Fragment, useCallback, useMemo, useState } from "react"
+import React, { Fragment, useCallback, useMemo } from "react"
 import {
    FormControl,
    FormHelperText,
@@ -93,6 +93,15 @@ const styles = sxStyles({
          marginRight: "20px",
          color: "black !important",
       },
+      ["& .MuiInputLabel-shrink"]: {
+         paddingLeft: "0 !important",
+         backgroundColor: "white",
+         left: "10px",
+         paddingX: "5px",
+      },
+      ["& legend"]: {
+         marginLeft: "15px",
+      },
    },
    menuItem: {
       paddingLeft: "40px",
@@ -122,31 +131,29 @@ const QuestionSelect = ({
    errorText,
 }: QuestionSelectProps) => {
    const isMobile = useIsMobile()
+
    const options = useMemo(() => {
       return convertDictToDocArray(question.options).sort(dynamicSort("name"))
    }, [question.options])
-   const [selected, setSelected] = useState(false)
 
    const handleChange = useCallback(
       (event: SelectChangeEvent) => {
-         console.log("here", event)
-
          setFieldValue(inputName, event.target.value)
-         setSelected(true)
       },
       [inputName, setFieldValue]
    )
 
    return (
       <FormControl fullWidth error={!!errorText} sx={styles.formControl}>
-         <InputLabel sx={styles.label} shrink={false} id={`${inputName}-label`}>
-            {selected ? "" : question.name}
+         <InputLabel sx={styles.label} id={`${inputName}-label`}>
+            {question.name}
          </InputLabel>
 
          <StyledSelect
             sx={styles.select}
             id={`${inputName}`}
             name={inputName}
+            label={question.name}
             onBlur={handleBlur}
             value={question.selectedOptionId || ""}
             onChange={handleChange}
@@ -154,6 +161,7 @@ const QuestionSelect = ({
             variant="outlined"
             IconComponent={ExpandMore}
          >
+            {isMobile ? <option value="" disabled></option> : null}
             {options.map((option) =>
                isMobile ? (
                   <option key={option.id} value={option.id}>
