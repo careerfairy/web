@@ -29,7 +29,7 @@ const styles = sxStyles({
       mt: -13,
    },
    joinText: {
-      fontSize: 12,
+      fontSize: 17,
       textAlign: "center",
    },
 })
