@@ -40,6 +40,7 @@ import { isFromNewsletter } from "../../../util/PathUtils"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
+import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 
 const styles = sxStyles({
    content: {
@@ -67,6 +68,7 @@ const styles = sxStyles({
       borderTopRightRadius: `${theme.spacing(2)} !important`,
    }),
    dialogPaper: {
+      ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,
       },
