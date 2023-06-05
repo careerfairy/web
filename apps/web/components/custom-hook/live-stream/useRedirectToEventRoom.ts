@@ -18,15 +18,15 @@ const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
    const isRedirecting = useRef(false)
 
    useEffect(() => {
-      if (isRedirecting.current) return
+      if (isRedirecting.current || !livestreamPresenter) return
       if (
          authenticatedUser &&
          authenticatedUser.email &&
-         livestreamPresenter?.isLive() &&
-         livestreamPresenter?.isUserRegistered(authenticatedUser.email)
+         livestreamPresenter.isLive() &&
+         livestreamPresenter.isUserRegistered(authenticatedUser.email)
       ) {
          isRedirecting.current = true
-         void replace(livestreamPresenter?.getViewerEventRoomLink())
+         void replace(livestreamPresenter.getViewerEventRoomLink())
       }
       return () => {
          isRedirecting.current = false
