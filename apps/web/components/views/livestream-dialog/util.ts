@@ -7,8 +7,9 @@ import {
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { LiveStreamDialogData } from "./LivestreamDialogLayout"
 import { errorLogAndNotify } from "../../../util/CommonUtil"
-import { LinkProps } from "next/link"
 import { NextRouter } from "next/router"
+import { UrlObject } from "url"
+import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
 
 export const getLivestreamDialogData = async (
    ctx: GetServerSidePropsContext
@@ -62,15 +63,30 @@ export const isOnlivestreamDialogPage = (routerPathname: string) => {
    return routerPathname.includes(LIVESTREAM_DIALOG_PATH)
 }
 
+type DialogPage = "/portal" | "/next-livestreams"
+
 type ValidLink =
    | ["livestream", string, "job-details", string]
    | ["livestream", string]
    | ["livestream", string, "register"]
 
 type LinkType =
-   | { type: "livestreamDetails"; livestreamId: string }
-   | { type: "jobDetails"; livestreamId: string; jobId: string }
-   | { type: "registerToLivestream"; livestreamId: string }
+   | {
+        type: "livestreamDetails"
+        livestreamId: string
+        targetPage?: DialogPage
+     }
+   | {
+        type: "jobDetails"
+        livestreamId: string
+        jobId: string
+        targetPage?: DialogPage
+     }
+   | {
+        type: "registerToLivestream"
+        livestreamId: string
+        targetPage?: DialogPage
+     }
 
 export const buildDialogLink = ({
    router,
@@ -78,9 +94,10 @@ export const buildDialogLink = ({
 }: {
    router: NextRouter
    link: LinkType
-}): LinkProps["href"] => {
+}): UrlObject => {
    const isOnLivestreamDialogPage = isOnlivestreamDialogPage(router.pathname)
    let query: ValidLink
+   const path: DialogPage = link.targetPage ?? "/portal"
 
    switch (link.type) {
       case "livestreamDetails":
@@ -97,10 +114,31 @@ export const buildDialogLink = ({
    return {
       pathname: isOnLivestreamDialogPage
          ? router.pathname
-         : `/portal/${LIVESTREAM_DIALOG_PATH}`,
+         : `${path}/${LIVESTREAM_DIALOG_PATH}`,
       query: {
          ...router.query,
          livestreamDialog: query,
       },
    }
+}
+
+export const buildExternalDialogLink = (link: LinkType): string => {
+   let pathDetail: string
+
+   switch (link.type) {
+      case "livestreamDetails":
+         pathDetail = `livestream/${link.livestreamId}`
+         break
+      case "jobDetails":
+         pathDetail = `livestream/${link.livestreamId}/job-details/${link.jobId}`
+         break
+      case "registerToLivestream":
+         pathDetail = `livestream/${link.livestreamId}/register`
+         break
+      default:
+         throw new Error("Invalid link type")
+   }
+
+   const baseUrl = getBaseUrl()
+   return `${baseUrl}${link.targetPage}/${pathDetail}`
 }

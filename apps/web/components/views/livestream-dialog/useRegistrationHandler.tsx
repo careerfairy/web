@@ -29,11 +29,13 @@ export default function useRegistrationHandler() {
    } = useLiveStreamDialog()
    const { push, asPath } = useRouter()
    const { forceShowReminder } = useUserReminders()
-   const firebase = useFirebaseService()
    const { authenticatedUser, isLoggedOut, userData } = useAuth()
    const { errorNotification } = useSnackbarNotifications()
-   const { registerToLivestream, sendRegistrationConfirmationEmail } =
-      useFirebaseService()
+   const {
+      registerToLivestream,
+      deregisterFromLivestream,
+      sendRegistrationConfirmationEmail,
+   } = useFirebaseService()
 
    /**
     * Initiate the registration process
@@ -86,13 +88,13 @@ export default function useRegistrationHandler() {
     * De-register from the livestream
     */
    const deRegisterLivestream = useCallback(async () => {
-      await firebase.deregisterFromLivestream(livestream.id, userData)
+      await deregisterFromLivestream(livestream.id, userData)
       recommendationServiceInstance.unRegisterEvent(
          livestream.id,
          userData.authId
       )
       dataLayerLivestreamEvent("event_registration_removed", livestream)
-   }, [firebase, livestream, userData])
+   }, [deregisterFromLivestream, livestream, userData])
 
    /**
     * Should be called when the auth object is loaded

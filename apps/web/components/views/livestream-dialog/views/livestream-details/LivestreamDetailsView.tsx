@@ -92,7 +92,10 @@ const LivestreamDetailsView: FC = () => {
             </HeroContent>
          }
          mainContent={
-            <MainContentNavigation hasJobs={hasJobs}>
+            <MainContentNavigation
+               questionsDisabled={Boolean(livestream.questionsDisabled)}
+               hasJobs={hasJobs}
+            >
                {({
                   jobsRef,
                   aboutLivestreamRef,
@@ -116,9 +119,11 @@ const LivestreamDetailsView: FC = () => {
                         sectionRef={aboutCompanyRef}
                         presenter={livestreamPresenter}
                      />
-                     <Section ref={questionsRef}>
-                        <Questions livestream={livestream} />
-                     </Section>
+                     {livestream.questionsDisabled ? null : (
+                        <Section ref={questionsRef}>
+                           <Questions livestream={livestream} />
+                        </Section>
+                     )}
                      {isFloatingActionButton ? <FloatingButtonOffset /> : null}
                   </MainContent>
                )}

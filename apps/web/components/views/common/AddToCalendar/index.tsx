@@ -15,6 +15,8 @@ import {
    yahooIcon,
 } from "../../../../constants/svgs"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
+import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { buildExternalDialogLink } from "../../livestream-dialog"
 
 const styles = {
    avatar: {
@@ -91,16 +93,41 @@ const Dropdown = ({ filename, handleClose, anchorEl, urls }) => {
    )
 }
 
+type EventProps = {
+   name: string
+   details: string
+   location: string
+   startsAt: string
+   endsAt: string
+}
+
 type Props = {
    children: (handler: (event: any) => void) => void
-   event: {
-      name: string
-      details: string
-      location: string
-      startsAt: string
-      endsAt: string
-   }
+   event: LivestreamEvent
    filename: string
+}
+
+export const createCalendarEvent = (
+   livestream: LivestreamEvent
+): EventProps => {
+   if (!livestream) return null
+
+   const time = livestream.start?.toDate?.() || null
+   const linkToStream = buildExternalDialogLink({
+      type: "livestreamDetails",
+      livestreamId: livestream.id,
+      targetPage: "/portal",
+   })
+
+   return {
+      name: livestream.title,
+      details: `Here is your Link: ${linkToStream}`,
+      location: "Hosted virtually on CareerFairy (link in the description)",
+      startsAt: new Date(time).toISOString(),
+      endsAt: new Date(
+         new Date(time).getTime() + (livestream.duration || 45) * 60 * 1000
+      ).toISOString(),
+   }
 }
 
 export const AddToCalendar = memo(function AddToCalendar({
@@ -109,7 +136,8 @@ export const AddToCalendar = memo(function AddToCalendar({
    filename = "download",
 }: Props) {
    const [anchorEl, setAnchorEl] = useState(null)
-   const urls = useMemo(() => makeUrls(event), [event])
+
+   const urls = useMemo(() => makeUrls(createCalendarEvent(event)), [event])
 
    const handleClick = useCallback((event) => {
       dataLayerEvent("event_add_to_calendar")
@@ -121,16 +149,14 @@ export const AddToCalendar = memo(function AddToCalendar({
    }, [])
 
    return (
-      <div>
-         <>
-            {children(handleClick)}
-            <Dropdown
-               filename={filename}
-               anchorEl={anchorEl}
-               handleClose={handleClose}
-               urls={urls}
-            />
-         </>
-      </div>
+      <>
+         {children(handleClick)}
+         <Dropdown
+            filename={filename}
+            anchorEl={anchorEl}
+            handleClose={handleClose}
+            urls={urls}
+         />
+      </>
    )
 })

@@ -44,6 +44,7 @@ import useRecordingAccess from "components/views/upcoming-livestream/HeroSection
 import useRegistrationData from "../../components/views/livestream-dialog/views/registration/useRegistrationData"
 import LivestreamDialog from "../../components/views/livestream-dialog/LivestreamDialog"
 import useDialogStateHandler from "../../components/custom-hook/useDialogStateHandler"
+import useRedirectToEventRoom from "../../components/custom-hook/live-stream/useRedirectToEventRoom"
 
 type TrackProps = {
    id: string
@@ -213,11 +214,7 @@ const UpcomingLivestreamPage = ({
       pathname,
    ])
 
-   useEffect(() => {
-      if (stream.hasStarted) {
-         replace?.(`/streaming/${stream.id}/viewer`)
-      }
-   }, [replace, stream?.hasStarted, stream?.id])
+   useRedirectToEventRoom(streamPresenter)
 
    const isRegistrationDisabled = useMemo(() => {
       if (isPastEvent) return true
@@ -396,14 +393,14 @@ const UpcomingLivestreamPage = ({
                questionsAreDisabled={stream.questionsDisabled}
             />
 
-            {!stream.hasNoTalentPool && (
-               <TalentPoolSection
-                  // @ts-ignore
-                  handleOpenJoinModal={handleOpenJoinModal}
-                  registered={registered}
-                  stream={stream}
-               />
-            )}
+            {/*{!stream.hasNoTalentPool && (*/}
+            {/*   <TalentPoolSection*/}
+            {/*      // @ts-ignore*/}
+            {/*      handleOpenJoinModal={handleOpenJoinModal}*/}
+            {/*      registered={registered}*/}
+            {/*      stream={stream}*/}
+            {/*   />*/}
+            {/*)}*/}
             <ReferralSection
                // @ts-ignore
                event={stream}

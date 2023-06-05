@@ -6,6 +6,8 @@ import BackIcon from "@mui/icons-material/ArrowBackIosNewRounded"
 import CloseIcon from "@mui/icons-material/CloseRounded"
 import Image from "next/image"
 import { useMeasure } from "react-use"
+import { SxProps } from "@mui/system"
+import { DefaultTheme } from "@mui/styles/defaultTheme"
 
 const responsiveBreakpoint = "md"
 
@@ -58,6 +60,7 @@ const styles = sxStyles({
    },
    mainContent: {
       px: 2,
+      position: "relative",
    },
    backgroundImgOverlay: {
       position: "absolute",
@@ -97,6 +100,7 @@ type Props = FC<{
    fixedBottomContent?: ReactNode
    handleClose?: () => void
    handleBack?: () => void
+   sx?: SxProps<DefaultTheme>
 }>
 
 const BaseDialogView: Props = ({
@@ -105,12 +109,16 @@ const BaseDialogView: Props = ({
    fixedBottomContent,
    handleClose,
    handleBack,
+   sx,
 }) => {
    const [ref, { height }] = useMeasure()
 
    return (
       <>
-         <Stack spacing={4.75} sx={styles.root}>
+         <Stack
+            spacing={4.75}
+            sx={[styles.root, ...(Array.isArray(sx) ? sx : [sx])]}
+         >
             {heroContent}
             {mainContent}
             {handleClose ? (
@@ -232,10 +240,26 @@ export const FixedBottomContent = forwardRef<
    )
 })
 
-type MainContentProps = {}
+type MainContentProps = {
+   sx?: SxProps<DefaultTheme>
+} & BackAndCloseButtonProps
 
-export const MainContent: FC<MainContentProps> = ({ children }) => {
-   return <Box sx={styles.mainContent}>{children}</Box>
+export const MainContent: FC<MainContentProps> = ({
+   children,
+   onBackClick,
+   onBackPosition,
+   sx,
+}) => {
+   return (
+      <Box sx={[styles.mainContent, ...(Array.isArray(sx) ? sx : [sx])]}>
+         {children}
+         <BackAndCloseButton
+            onBackClick={onBackClick}
+            onBackPosition={onBackPosition}
+            color={"black"}
+         />
+      </Box>
+   )
 }
 
 export default BaseDialogView

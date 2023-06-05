@@ -28,6 +28,7 @@ export type InViewRef = ReturnType<typeof useInView>["0"]
 
 type Props = {
    hasJobs: boolean
+   questionsDisabled: boolean
    children: (params: {
       jobsRef: InViewRef
       aboutLivestreamRef: InViewRef
@@ -46,7 +47,11 @@ const options: IntersectionOptions = {
    threshold: 0.8,
 }
 
-const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
+const MainContentNavigation: FC<Props> = ({
+   children,
+   hasJobs,
+   questionsDisabled,
+}) => {
    const theme = useTheme()
    const centeredNav = !useMediaQuery(theme.breakpoints.down("sm"))
 
@@ -86,11 +91,15 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
                  },
               ]
             : []),
-         {
-            value: "questions",
-            label: "Questions",
-            inView: questionsInView,
-         },
+         ...(questionsDisabled
+            ? []
+            : [
+                 {
+                    value: "questions",
+                    label: "Questions",
+                    inView: questionsInView,
+                 },
+              ]),
       ]
 
       return newTabs
@@ -101,6 +110,7 @@ const MainContentNavigation: FC<Props> = ({ children, hasJobs }) => {
       aboutCompanyInView,
       questionsInView,
       hasJobs,
+      questionsDisabled,
    ])
 
    const sectionRefs = useMemo(
