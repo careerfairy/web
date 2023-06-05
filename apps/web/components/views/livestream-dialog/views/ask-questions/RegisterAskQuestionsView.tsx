@@ -86,9 +86,11 @@ type Props = {}
 const RegisterAskQuestionsView: FC<Props> = (props) => {
    const { livestream, goToView } = useLiveStreamDialog()
    const { userPresenter, authenticatedUser } = useAuth()
-   const [newlyCreatedQuestion, setNewlyCreatedQuestion] =
-      useState<LivestreamQuestion>(null)
    const { createLivestreamQuestion } = useFirebaseService()
+
+   const [newlyCreatedQuestions, setNewlyCreatedQuestions] = useState<
+      LivestreamQuestion[]
+   >([])
 
    const isMobile = useIsMobile()
 
@@ -147,7 +149,10 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                         )
 
                         // set newly created question to be displayed at the top of the list
-                        setNewlyCreatedQuestion(newQuestion)
+                        setNewlyCreatedQuestions((prev) => [
+                           newQuestion,
+                           ...prev,
+                        ])
 
                         // reset form
                         helpers.resetForm()
@@ -204,7 +209,7 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                   </Typography>
                   <QuestionsComponent
                      livestream={livestream}
-                     newlyCreatedQuestion={newlyCreatedQuestion}
+                     userAddedQuestions={newlyCreatedQuestions}
                      infiniteScroll
                      responsive
                   />
