@@ -316,6 +316,17 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                href: "",
             }
          }
+         const presenterEvent = LivestreamPresenter.createFromDocument(event)
+
+         if (
+            presenterEvent.isLive() &&
+            presenterEvent.isUserRegistered(authenticatedUser.email)
+         ) {
+            return {
+               href: presenterEvent.getViewerEventRoomLink(),
+            }
+         }
+
          const eventLink = buildDialogLink({
             router,
             link: {
