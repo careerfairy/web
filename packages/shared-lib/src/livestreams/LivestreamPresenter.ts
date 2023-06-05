@@ -121,7 +121,7 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    isLive(): boolean {
-      return this.hasStarted && !this.hasEnded
+      return this.hasStarted && !this.hasEnded && !this.isPast()
    }
 
    isTest(): boolean {
@@ -246,6 +246,10 @@ export class LivestreamPresenter extends BaseModel {
 
    getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
       return this.jobs.find((job) => job.jobId === jobId) ?? null
+   }
+
+   getViewerEventRoomLink(): string {
+      return `/streaming/${this.id}/viewer`
    }
 
    static createFromDocument(livestream: LivestreamEvent) {
