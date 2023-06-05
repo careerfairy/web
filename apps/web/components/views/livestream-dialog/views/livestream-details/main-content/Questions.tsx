@@ -50,6 +50,12 @@ const styles = sxStyles({
       textTransform: "none",
       p: (theme) => `${theme.spacing(0.5)} ${theme.spacing(1)} !important`,
    },
+   upvotedButton: {
+      color: "primary.main",
+   },
+   nonUpvotedButton: {
+      color: "action.disabled",
+   },
    date: {
       fontSize: "0.857rem",
       color: (theme) => `${alpha(theme.palette.text.secondary, 0.4)}`,
@@ -71,7 +77,7 @@ const Questions: FC<Props> = ({ livestream }) => {
 }
 
 type QuestionsComponentProps = {
-   newlyCreatedQuestion?: LivestreamQuestion
+   userAddedQuestions?: LivestreamQuestion[]
    livestream: LivestreamEvent
    infiniteScroll?: boolean
    responsive?: boolean
@@ -79,7 +85,7 @@ type QuestionsComponentProps = {
 
 export const QuestionsComponent: FC<QuestionsComponentProps> = ({
    livestream,
-   newlyCreatedQuestion,
+   userAddedQuestions,
    infiniteScroll = false,
    responsive,
 }) => {
@@ -111,19 +117,28 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
       () => (
          <Box>
             <Grid sx={styles.questionsWrapper} container spacing={1.25}>
-               {newlyCreatedQuestion ? (
-                  <Grid item {...gridItemProps}>
-                     <Question
-                        livestream={livestream}
-                        question={newlyCreatedQuestion}
-                        handleClientToggleUpvoteQuestion={
-                           handleClientToggleUpvoteQuestion
-                        }
-                     />
-                  </Grid>
+               {userAddedQuestions?.length ? (
+                  <>
+                     {userAddedQuestions.map((question) => (
+                        <Grid key={question.id} item {...gridItemProps}>
+                           <Question
+                              livestream={livestream}
+                              question={question}
+                              handleClientToggleUpvoteQuestion={
+                                 handleClientToggleUpvoteQuestion
+                              }
+                           />
+                        </Grid>
+                     ))}
+                  </>
                ) : null}
                {questions
-                  .filter((q) => q.id !== newlyCreatedQuestion?.id)
+                  .filter(
+                     (q) =>
+                        !userAddedQuestions?.some(
+                           (userQuestion) => userQuestion.id === q.id
+                        )
+                  )
                   .map((question) => (
                      <Grid key={question.id} item {...gridItemProps}>
                         <Question
@@ -176,7 +191,7 @@ export const QuestionsComponent: FC<QuestionsComponentProps> = ({
          hasMore,
          livestream,
          loading,
-         newlyCreatedQuestion,
+         userAddedQuestions,
          questions,
          infiniteScroll,
       ]
@@ -220,6 +235,7 @@ const Question: FC<QuestionProps> = ({
          toggleUpvoteQuestion,
       ]
    )
+   const hasUpvoted = hasUpvotedQuestion(question)
 
    return (
       <Stack sx={[styles.questionItem, styles.greyBorder]} spacing={1}>
@@ -233,14 +249,16 @@ const Question: FC<QuestionProps> = ({
             <LoadingButton
                loading={isUpvoting}
                onClick={handleClickUpvote}
-               disabled={
-                  hasUpvotedQuestion(question) ||
-                  question?.author === authenticatedUser?.email
-               }
+               disabled={question?.author === authenticatedUser?.email}
                size="small"
                startIcon={<ThumbUpIcon />}
                variant="text"
-               sx={[styles.upvoteButton, styles.btn]}
+               color={hasUpvoted ? "primary" : "grey"}
+               sx={[
+                  hasUpvoted ? styles.upvotedButton : styles.nonUpvotedButton,
+                  styles.upvoteButton,
+                  styles.btn,
+               ]}
             >
                {`${question.votes || 0} likes`}
             </LoadingButton>

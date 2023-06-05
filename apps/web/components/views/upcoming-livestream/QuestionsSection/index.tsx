@@ -82,8 +82,13 @@ const QuestionsSection = ({
    subtitle,
    title,
 }: Props) => {
-   const [newlyCreatedQuestion, setNewlyCreatedQuestion] =
-      useState<LivestreamQuestion | null>(null)
+   const [newlyCreatedQuestions, setNewlyCreatedQuestions] = useState<
+      LivestreamQuestion[]
+   >([])
+
+   const onQuestionCreated = (question: LivestreamQuestion) => {
+      setNewlyCreatedQuestions((prev) => [...prev, question])
+   }
 
    return (
       <Section
@@ -134,16 +139,16 @@ const QuestionsSection = ({
                               <>
                                  {!isPastEvent ? (
                                     <CreateQuestion
-                                       onQuestionAdded={setNewlyCreatedQuestion}
+                                       onQuestionAdded={onQuestionCreated}
                                        livestream={livestream}
                                     />
                                  ) : null}
                                  <Box sx={styles.questionsWrapper}>
                                     <QuestionsComponent
-                                       key={newlyCreatedQuestion?.id} // this is to force a rerender when a new question is added
+                                       key={newlyCreatedQuestions?.length} // this is to force a rerender when a new question is added
                                        livestream={livestream}
-                                       newlyCreatedQuestion={
-                                          newlyCreatedQuestion
+                                       userAddedQuestions={
+                                          newlyCreatedQuestions
                                        }
                                     />
                                  </Box>
