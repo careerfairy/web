@@ -18,6 +18,10 @@ type GroupAdminFixtureOptions = {
     * give the option for tests to not create a user
     */
    createUser?: boolean
+   /**
+    * give the option to create a complete group
+    */
+   completedGroup?: boolean
 }
 
 /**
@@ -34,12 +38,20 @@ export const groupAdminFixture = base.extend<{
 }>({
    options: {
       createUser: true,
+      completedGroup: false,
    },
-   group: async ({}, use) => {
+   group: async ({ options }, use) => {
       await clearAuthData()
       await clearFirestoreData()
 
-      const group = await GroupSeed.createGroup()
+      let group: Group
+      if (options.completedGroup === true) {
+         const completeCompanyData = GroupSeed.generateCompleteCompanyData()
+         group = await GroupSeed.createGroup(completeCompanyData)
+      } else {
+         group = await GroupSeed.createGroup()
+      }
+
       await use(group)
    },
    user: async ({ group, options }, use) => {

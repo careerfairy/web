@@ -43,3 +43,8 @@ export const correctRegistrationAnalyticsSteps = {
 }
 
 export const imageLogoPath = "tests/e2e/assets/logo.png"
+
+export const correctCompany = {
+   industry: "Technology & IT",
+   location: "Switzerland",
+} as const
