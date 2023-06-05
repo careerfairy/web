@@ -5,7 +5,7 @@ import { CommonPage, handleMultiSelect } from "./CommonPage"
 import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
 import DateUtil from "../../../util/DateUtil"
 import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
-import { imageLogoPath } from "../../constants"
+import { correctCompany, imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
 
@@ -57,12 +57,12 @@ export class GroupDashboardPage extends CommonPage {
 
       this.companyFollowButton = this.page.getByRole("button", {
          name: "Follow",
-         disabled: false,
+         disabled: false, // This prevents playwright from clicking on the disabled follow button at it is disabled on first mount as it is suspensefuly fetching the following status.
       })
 
       this.companyUnfollowButton = this.page.getByRole("button", {
          name: "Following",
-         disabled: false,
+         disabled: false, // This prevents playwright from clicking on the disabled follow button at it is disabled on first mount as it is suspensefuly fetching the following status.
       })
 
       this.nonAuthedCompanyFollowButton = this.page.getByTestId(
@@ -273,12 +273,12 @@ export class GroupDashboardPage extends CommonPage {
          "CareerFairy is the only graduate career portal that gives graduates access to speak to companies before applying for a job. We find and share valuable insights about the job market, career choices and, most importantly, employers."
       )
       await handleMultiSelect(
-         "Switzerland",
+         correctCompany.location,
          this.companyInformationLocationInput,
          this.page
       )
       await handleMultiSelect(
-         "Technology & IT",
+         correctCompany.industry,
          this.companyInformationIndustriesInput,
          this.page
       )
