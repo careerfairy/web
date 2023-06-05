@@ -92,7 +92,7 @@ const QuestionCreateForm = () => {
             await createLivestreamQuestion(livestream?.id, {
                title: values.questionTitle,
                author: authenticatedUser.email,
-               displayName: userPresenter.getDisplayName(),
+               displayName: userPresenter?.getDisplayName?.() || null,
             })
 
             rewardService

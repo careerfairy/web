@@ -39,6 +39,7 @@ import {
 import { isFromNewsletter } from "../../../util/PathUtils"
 import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
 import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
+import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 
 const styles = sxStyles({
    content: {
@@ -281,6 +282,14 @@ const Content: FC<ContentProps> = ({
       registrationInitialState
    )
 
+   const livestreamPresenter = useMemo(
+      () =>
+         livestream ? LivestreamPresenter.createFromDocument(livestream) : null,
+      [livestream]
+   )
+
+   useRedirectToEventRoom(livestreamPresenter)
+
    const contextValue = useMemo<DialogContextType>(
       () => ({
          goToView,
@@ -288,9 +297,7 @@ const Content: FC<ContentProps> = ({
          livestream,
          activeView: views[value].key,
          handleBack,
-         livestreamPresenter: livestream
-            ? LivestreamPresenter.createFromDocument(livestream)
-            : null,
+         livestreamPresenter,
          updatedStats,
          serverUserEmail,
          isRecommended,

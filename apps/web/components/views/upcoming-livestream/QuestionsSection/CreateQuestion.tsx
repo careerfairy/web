@@ -16,6 +16,7 @@ import {
    LivestreamEvent,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = {
    root: {
@@ -30,7 +31,7 @@ type Props = {
 }
 const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
    const { createLivestreamQuestion } = useFirebaseService()
-   const { authenticatedUser, userData, userPresenter } = useAuth()
+   const { authenticatedUser, userData, userPresenter, isLoggedIn } = useAuth()
    const dispatch = useDispatch()
    const { replace, asPath } = useRouter()
    const {
@@ -46,7 +47,7 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
          questionTitle: "",
       },
       onSubmit: async (values, { resetForm, setFieldError }) => {
-         if (!authenticatedUser) {
+         if (!isLoggedIn) {
             return replace({
                pathname: "/signup",
                query: { absolutePath: asPath },
@@ -58,7 +59,7 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
                {
                   title: values.questionTitle,
                   author: authenticatedUser.email,
-                  displayName: userPresenter.getDisplayName(),
+                  displayName: userPresenter?.getDisplayName?.() || null,
                }
             )
 
@@ -75,6 +76,11 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
 
             recommendationServiceInstance.createdQuestion(livestream, userData)
          } catch (e) {
+            errorLogAndNotify(e, {
+               message: "There was an issue submitting the question",
+               livestreamId: livestream.id,
+               userId: authenticatedUser.uid,
+            })
             setFieldError(
                "questionTitle",
                "There was an issue submitting the question"
