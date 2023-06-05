@@ -85,6 +85,7 @@ const AuthedFollowButton: FC<Props> = ({ group, disabled, ...buttonProps }) => {
 
    return (
       <LoadingButton
+         id={"follow-button"}
          loading={isMutating || status === "loading"}
          disabled={isMutating || disabled || status === "loading"}
          onClick={handleClick}
@@ -117,7 +118,11 @@ const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
             },
          }}
       >
-         <Button {...buttonProps} variant="contained">
+         <Button
+            {...buttonProps}
+            variant="contained"
+            data-testid="non-authed-follow-button"
+         >
             Follow
          </Button>
       </Link>

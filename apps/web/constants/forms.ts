@@ -284,11 +284,6 @@ export const countriesOptionCodes = [
       groupId: countryGroupId,
    },
    {
-      id: "CD",
-      name: "Congo",
-      groupId: countryGroupId,
-   },
-   {
       id: "CG",
       name: "Congo",
       groupId: countryGroupId,

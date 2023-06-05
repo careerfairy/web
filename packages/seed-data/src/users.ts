@@ -5,6 +5,7 @@ import * as admin from "firebase-admin"
 
 import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
 import {
+   CompanyFollowed,
    SavedRecruiter,
    UserData,
    UserDataAnalytics,
@@ -41,6 +42,8 @@ interface UserSeed {
    createAuthUsersFromUserData(): Promise<void>
 
    getUserDataAnalytics(email: string): Promise<UserDataAnalytics>
+
+   getUserFollowedCompanies(email: string): Promise<CompanyFollowed[]>
 }
 
 class UserFirebaseSeed implements UserSeed {
@@ -202,6 +205,20 @@ class UserFirebaseSeed implements UserSeed {
       }
 
       return
+   }
+
+   async getUserFollowedCompanies(email: string): Promise<CompanyFollowed[]> {
+      const userCompaniesFollowsSnap = await firestore
+         .collection("userData")
+         .doc(email)
+         .collection("companiesUserFollows")
+         .get()
+
+      return userCompaniesFollowsSnap.empty
+         ? null
+         : (userCompaniesFollowsSnap.docs.map((doc) =>
+              doc.data()
+           ) as CompanyFollowed[])
    }
 }
 

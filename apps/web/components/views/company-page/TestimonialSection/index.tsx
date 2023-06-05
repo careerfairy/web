@@ -86,7 +86,11 @@ const TestimonialSection = () => {
                   Testimonial
                </Typography>
                {editMode ? (
-                  <IconButton color="secondary" onClick={handleOpenDialog}>
+                  <IconButton
+                     data-testid={"testimonial-section-edit-button"}
+                     color="secondary"
+                     onClick={handleOpenDialog}
+                  >
                      <Add fontSize={"large"} />
                   </IconButton>
                ) : (
