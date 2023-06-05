@@ -1,7 +1,6 @@
-import useListenToUpcomingStreams from "../../../../components/custom-hook/useListenToUpcomingStreams"
-import React, { useCallback, useEffect, useMemo, useState } from "react"
+import useListenToStreams from "../../../../components/custom-hook/useListenToStreams"
+import React, { useCallback, useMemo } from "react"
 import { StreamsSection } from "./StreamsSection"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { useRouter } from "next/router"
 import { Box, Card, Container, Grid, Typography } from "@mui/material"
 import Link from "../../../../components/views/common/Link"
@@ -14,6 +13,7 @@ import LivestreamSearch, {
 import Filter, { FilterEnum } from "../filter/Filter"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import NoResultsMessage from "./NoResultsMessage"
+import { useFieldsOfStudy } from "../../../custom-hook/useCollection"
 import { buildDialogLink } from "../../livestream-dialog"
 
 const styles = sxStyles({
@@ -38,30 +38,20 @@ const styles = sxStyles({
    },
 })
 
-const filtersToShow = [
-   FilterEnum.languages,
-   FilterEnum.interests,
-   FilterEnum.companyCountries,
-   FilterEnum.companySizes,
-   FilterEnum.companyIndustries,
-]
-
 const getQueryVariables = (query) => {
    const languages = query.languages as string
-   const interests = query.interests as string
-   const jobCheck = query.jobCheck as string
    const companyCountries = query.companyCountries as string
-   const companySizes = query.companySizes as string
    const companyIndustries = query.companyIndustries as string
+   const fieldsOfStudy = query.fieldsOfStudy as string
+   const recordedOnly = query.recordedOnly as string
 
    return {
       languages: languages && languages.split(","),
-      interests: interests && interests.split(","),
-      jobCheck: jobCheck?.toLowerCase() === "true" || false,
       companyCountries: companyCountries && companyCountries.split(","),
-      companySizes: companySizes && companySizes.split(","),
       companyIndustries:
          companyIndustries?.length && companyIndustries.split(","),
+      fieldsOfStudy: fieldsOfStudy?.length && fieldsOfStudy.split(","),
+      recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
    }
 }
 
@@ -73,13 +63,13 @@ const NextLiveStreamsWithFilter = ({
 }: Props) => {
    const router = useRouter()
    const { query, push } = router
+   const { data: allFieldsOfStudy } = useFieldsOfStudy()
    const {
       languages,
-      interests,
-      jobCheck,
       companyCountries,
-      companySizes,
       companyIndustries,
+      recordedOnly,
+      fieldsOfStudy,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
    const hasPastEvents = useMemo(
@@ -87,50 +77,68 @@ const NextLiveStreamsWithFilter = ({
       [initialTabValue]
    )
 
-   const upcomingLivestreams = useListenToUpcomingStreams({
-      languagesIds: languages,
-      interestsIds: interests,
-      jobCheck: jobCheck,
-      companyCountriesIds: companyCountries,
-      companySizes: companySizes,
-      companyIndustriesIds: companyIndustries,
-   })
-   const [pastLivestreams, setPastLivestreams] = useState(undefined)
+   const filtersToShow = useMemo(
+      () => [
+         hasPastEvents ? FilterEnum.recordedOnly : null,
+         FilterEnum.languages,
+         FilterEnum.companyCountries,
+         FilterEnum.companyIndustries,
+         FilterEnum.fieldsOfStudy,
+      ],
+      [hasPastEvents]
+   )
 
-   useEffect(() => {
-      // load past events when changing tabs
-      if (hasPastEvents && !pastLivestreams) {
-         const sixMonthsAgo = new Date(
-            new Date().setMonth(new Date().getMonth() - 6)
-         )
-         livestreamRepo
-            .getPastEventsFrom({ fromDate: sixMonthsAgo })
-            .then((data) => {
-               setPastLivestreams(data)
-            })
-            .catch(console.error)
-      }
-   }, [hasPastEvents, pastLivestreams])
+   const mapFieldsOfStudy = useMemo(
+      () =>
+         allFieldsOfStudy?.filter((item) => fieldsOfStudy?.includes(item.id)),
+      [allFieldsOfStudy, fieldsOfStudy]
+   )
+
+   const livestreams = useListenToStreams({
+      languagesIds: languages,
+      companyCountriesIds: companyCountries,
+      companyIndustriesIds: companyIndustries,
+      fieldsOfStudy: mapFieldsOfStudy,
+      recordedOnly: recordedOnly,
+      listenToPastEvents: hasPastEvents,
+   })
 
    const noResultsMessage = useMemo<JSX.Element>(
       () => (
          <Grid xs={12} mt={4} mx={1} item>
             <Typography sx={styles.noResultsMessage} variant="h5">
                {/* eslint-disable-next-line react/no-unescaped-entities */}
-               We didn't find any events matching your criteria. 😕{" "}
+               We didn't find any live stream matching your criteria. 😕{" "}
                {isMobile ? (
-                  <Link href="/next-livestreams">clear all filters</Link>
+                  <Link
+                     href={
+                        hasPastEvents
+                           ? "/past-livestreams"
+                           : "/next-livestreams"
+                     }
+                  >
+                     clear all filters
+                  </Link>
                ) : null}
             </Typography>
             {isMobile ? null : (
                <Typography sx={styles.noResultsMessage} variant="h5">
                   Remove some filters or start anew by{" "}
-                  <Link href="/next-livestreams">clearing all filters</Link>.
+                  <Link
+                     href={
+                        hasPastEvents
+                           ? "/past-livestreams"
+                           : "/next-livestreams"
+                     }
+                  >
+                     clearing all filters
+                  </Link>
+                  .
                </Typography>
             )}
          </Grid>
       ),
-      [isMobile]
+      [hasPastEvents, isMobile]
    )
 
    // Clicking on a search result will open the detail page for the corresponding stream
@@ -173,19 +181,20 @@ const NextLiveStreamsWithFilter = ({
                      hasPastEvents={hasPastEvents}
                   />
                </Card>
-               {hasPastEvents ? null : (
-                  <Box sx={styles.filter}>
-                     <Filter filtersToShow={filtersToShow} />
-                  </Box>
-               )}
+               <Box sx={styles.filter}>
+                  <Filter
+                     filtersToShow={filtersToShow}
+                     numberOfResults={livestreams?.length}
+                  />
+               </Box>
             </Box>
          </Container>
 
          <StreamsSection
             value={initialTabValue}
-            upcomingLivestreams={upcomingLivestreams}
+            upcomingLivestreams={livestreams}
             listenToUpcoming
-            pastLivestreams={pastLivestreams}
+            pastLivestreams={livestreams}
             minimumUpcomingStreams={0}
             noResultsComponent={<NoResultsMessage message={noResultsMessage} />}
          />

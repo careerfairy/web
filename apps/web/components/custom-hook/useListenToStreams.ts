@@ -1,8 +1,11 @@
-import useCollection from "./useCollection"
 import { useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { livestreamRepo } from "../../data/RepositoryInstances"
 import { LivestreamsDataParser } from "@careerfairy/shared-lib/dist/livestreams/LivestreamRepository"
+import { FieldOfStudy } from "@careerfairy/shared-lib/fieldOfStudy"
+import { useFirestoreCollection } from "./utils/useFirestoreCollection"
+import firebase from "firebase/compat/app"
+import { TimeFrames } from "../views/group/admin/analytics-new/general/GeneralPageProvider"
 
 type Props = {
    filterByGroupId?: string
@@ -15,9 +18,12 @@ type Props = {
    getHiddenEvents?: boolean
    registeredUserEmail?: string
    from?: Date
+   fieldsOfStudy?: FieldOfStudy[]
+   recordedOnly?: boolean
+   listenToPastEvents?: boolean
 }
 
-const useListenToUpcomingStreams = (props?: Props) => {
+const useListenToStreams = (props?: Props) => {
    const {
       filterByGroupId,
       languagesIds,
@@ -29,10 +35,17 @@ const useListenToUpcomingStreams = (props?: Props) => {
       getHiddenEvents,
       registeredUserEmail,
       from,
+      fieldsOfStudy,
+      recordedOnly,
+      listenToPastEvents,
    } = props
 
-   const upcomingEventsQuery = useMemo(() => {
-      let query = livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
+   const eventsQuery = useMemo<firebase.firestore.Query>(() => {
+      let query = listenToPastEvents
+         ? livestreamRepo.getPastEventsFromQuery({
+              fromDate: TimeFrames["Last 6 months"].start,
+           })
+         : livestreamRepo.upcomingEventsQuery(!!filterByGroupId)
 
       if (filterByGroupId) {
          query = query.where("groupIds", "array-contains", filterByGroupId)
@@ -64,24 +77,42 @@ const useListenToUpcomingStreams = (props?: Props) => {
          query = query.where("start", ">", from)
       }
 
+      if (fieldsOfStudy?.length) {
+         query = query.where(
+            "targetFieldsOfStudy",
+            "array-contains-any",
+            fieldsOfStudy
+         )
+      }
+
+      if (recordedOnly) {
+         query = query.where("denyRecordingAccess", "==", false)
+      }
+
       return query
    }, [
+      fieldsOfStudy,
       filterByGroupId,
       from,
       getHiddenEvents,
       interestsIds,
       languagesIds,
       registeredUserEmail,
+      listenToPastEvents,
+      recordedOnly,
    ])
 
-   let { data, isLoading } = useCollection<LivestreamEvent>(
-      upcomingEventsQuery,
-      true
-   )
+   let { data, status } = useFirestoreCollection<LivestreamEvent>(eventsQuery, {
+      suspense: false,
+   })
 
-   if (isLoading) return undefined
+   if (status === "loading") return undefined
 
-   let res = new LivestreamsDataParser(data).filterByNotEndedEvents()
+   let res = new LivestreamsDataParser(data)
+
+   if (!listenToPastEvents) {
+      res = res.filterByNotEndedEvents()
+   }
 
    if (jobCheck) {
       res = res.filterByHasJobs()
@@ -109,4 +140,4 @@ const useListenToUpcomingStreams = (props?: Props) => {
    return res.complementaryFields().get()
 }
 
-export default useListenToUpcomingStreams
+export default useListenToStreams
