@@ -18,6 +18,7 @@ const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
    const isRedirecting = useRef(false)
 
    useEffect(() => {
+      if (isRedirecting.current || !livestreamPresenter) return
       if (
          !isLoadingAuth &&
          livestreamPresenter.isLive() &&
