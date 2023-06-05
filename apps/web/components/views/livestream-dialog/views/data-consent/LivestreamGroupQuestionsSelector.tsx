@@ -21,7 +21,6 @@ import {
    FormikHelpers,
    FormikTouched,
 } from "formik"
-import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../types/commonTypes"
 import { ExpandMore } from "@mui/icons-material"
 
@@ -121,7 +120,6 @@ const QuestionSelect = ({
    handleBlur,
    errorText,
 }: QuestionSelectProps) => {
-   const isMobile = useIsMobile()
    const options = useMemo(() => {
       return convertDictToDocArray(question.options).sort(dynamicSort("name"))
    }, [question.options])
@@ -150,7 +148,6 @@ const QuestionSelect = ({
             onBlur={handleBlur}
             value={question.selectedOptionId || ""}
             onChange={handleChange}
-            native={isMobile}
             variant="outlined"
             IconComponent={ExpandMore}
          >
