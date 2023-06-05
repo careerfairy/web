@@ -143,7 +143,8 @@ const RegisterAskQuestionsView: FC<Props> = (props) => {
                            livestream.id,
                            {
                               title: values.question,
-                              displayName: userPresenter.getDisplayName(),
+                              displayName:
+                                 userPresenter?.getDisplayName?.() || null,
                               author: authenticatedUser.email,
                            }
                         )
