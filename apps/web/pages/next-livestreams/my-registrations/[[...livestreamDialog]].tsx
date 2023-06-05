@@ -6,10 +6,15 @@ import { StreamsSection } from "components/views/common/NextLivestreams/StreamsS
 import { Grid, Typography } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import NoResultsMessage from "../../../components/views/common/NextLivestreams/NoResultsMessage"
-import useListenToUpcomingStreams from "../../../components/custom-hook/useListenToUpcomingStreams"
+import useListenToStreams from "../../../components/custom-hook/useListenToStreams"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Link from "../../../components/views/common/Link"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import {
+   LivestreamDialogLayout,
+   livestreamDialogSSP,
+} from "../../../components/views/livestream-dialog"
+import { InferGetServerSidePropsType, NextPage } from "next"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -20,13 +25,15 @@ const styles = sxStyles({
    },
 })
 
-const MyRegistrations = () => {
+const MyRegistrations: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = (props) => {
    const { userData } = useAuth()
    const isMobile = useIsMobile()
 
    const nowDate = useMemo(() => new Date(), [])
 
-   const upcomingLivestreams = useListenToUpcomingStreams({
+   const upcomingLivestreams = useListenToStreams({
       registeredUserEmail: userData?.userEmail,
       from: nowDate,
    })
@@ -53,19 +60,25 @@ const MyRegistrations = () => {
             title={"CareerFairy | My Registrations"}
          />
          <GenericDashboardLayout pageDisplayName={"My Registrations"}>
-            <StreamsSection
-               value={"upcomingEvents"}
-               upcomingLivestreams={upcomingLivestreams}
-               listenToUpcoming
-               minimumUpcomingStreams={0}
-               noResultsComponent={
-                  <NoResultsMessage message={noResultsMessage} />
-               }
-            />
+            <LivestreamDialogLayout
+               livestreamDialogData={props.livestreamDialogData}
+            >
+               <StreamsSection
+                  value={"upcomingEvents"}
+                  upcomingLivestreams={upcomingLivestreams}
+                  listenToUpcoming
+                  minimumUpcomingStreams={0}
+                  noResultsComponent={
+                     <NoResultsMessage message={noResultsMessage} />
+                  }
+               />
+            </LivestreamDialogLayout>
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </>
    )
 }
+
+export const getServerSideProps = livestreamDialogSSP()
 
 export default MyRegistrations

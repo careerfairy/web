@@ -18,7 +18,7 @@ import { useFirestoreDocData } from "reactfire"
 import { doc } from "firebase/firestore"
 import { createGenericConverter } from "@careerfairy/shared-lib/BaseFirebaseRepository"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useListenToUpcomingStreams from "../../custom-hook/useListenToUpcomingStreams"
+import useListenToStreams from "../../custom-hook/useListenToStreams"
 import { GroupPresenter } from "@careerfairy/shared-lib/groups/GroupPresenter"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { groupRepo } from "../../../data/RepositoryInstances"
@@ -107,7 +107,7 @@ const CompanyPageOverview = ({
       initialData: group,
    })
 
-   const contextUpcomingLivestream = useListenToUpcomingStreams({
+   const contextUpcomingLivestream = useListenToStreams({
       filterByGroupId: group.groupId,
    })
 

@@ -6,8 +6,8 @@ import useInfiniteCompanies, {
 } from "./useInfiniteCompanies"
 import { sxStyles } from "../../../types/commonTypes"
 import CompanyCard, { CompanyCardSkeleton } from "./CompanyCard"
-import { PAGE_SIZE } from "../../../pages/companies"
 import CustomInfiniteScroll from "../common/CustomInfiniteScroll"
+import { COMPANIES_PAGE_SIZE } from "components/util/constants"
 
 const styles = sxStyles({
    flexItem: {
@@ -27,7 +27,7 @@ const Companies: FC<Props> = ({ initialData }) => {
       () => ({
          filters: {},
          initialData,
-         limit: PAGE_SIZE,
+         limit: COMPANIES_PAGE_SIZE,
       }),
       [initialData]
    )

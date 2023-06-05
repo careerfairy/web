@@ -3,12 +3,12 @@ import { getResizedUrl } from "components/helperFunctions/HelperFunctions"
 import { NEXT_LIVESTREAMS_PATH, PRODUCTION_BASE_URL } from "constants/routes"
 import HeadWithMeta from "components/page/HeadWithMeta"
 import { useTheme } from "@mui/material/styles"
-import ScrollToTop from "../../../components/views/common/ScrollToTop"
-import EmbedBannerSection from "../../../components/views/common/NextLivestreams/emebed/EmbedBannerSection"
-import StreamsSwipeableView from "../../../components/views/common/NextLivestreams/emebed/StreamsSwipeableView"
+import ScrollToTop from "../../../../components/views/common/ScrollToTop"
+import EmbedBannerSection from "../../../../components/views/common/NextLivestreams/emebed/EmbedBannerSection"
+import StreamsSwipeableView from "../../../../components/views/common/NextLivestreams/emebed/StreamsSwipeableView"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEventSerialized } from "@careerfairy/shared-lib/dist/livestreams"
-import { groupRepo, livestreamRepo } from "../../../data/RepositoryInstances"
+import { groupRepo, livestreamRepo } from "../../../../data/RepositoryInstances"
 
 {
    /*TODO Example link for embedding here
