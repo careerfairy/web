@@ -10,6 +10,11 @@ import useListenToStreams from "../../../components/custom-hook/useListenToStrea
 import { useAuth } from "../../../HOCs/AuthProvider"
 import Link from "../../../components/views/common/Link"
 import useIsMobile from "../../../components/custom-hook/useIsMobile"
+import {
+   LivestreamDialogLayout,
+   livestreamDialogSSP,
+} from "../../../components/views/livestream-dialog"
+import { InferGetServerSidePropsType, NextPage } from "next"
 
 const styles = sxStyles({
    noResultsMessage: {
@@ -20,7 +25,9 @@ const styles = sxStyles({
    },
 })
 
-const MyRegistrations = () => {
+const MyRegistrations: NextPage<
+   InferGetServerSidePropsType<typeof getServerSideProps>
+> = (props) => {
    const { userData } = useAuth()
    const isMobile = useIsMobile()
 
@@ -53,19 +60,25 @@ const MyRegistrations = () => {
             title={"CareerFairy | My Registrations"}
          />
          <GenericDashboardLayout pageDisplayName={"My Registrations"}>
-            <StreamsSection
-               value={"upcomingEvents"}
-               upcomingLivestreams={upcomingLivestreams}
-               listenToUpcoming
-               minimumUpcomingStreams={0}
-               noResultsComponent={
-                  <NoResultsMessage message={noResultsMessage} />
-               }
-            />
+            <LivestreamDialogLayout
+               livestreamDialogData={props.livestreamDialogData}
+            >
+               <StreamsSection
+                  value={"upcomingEvents"}
+                  upcomingLivestreams={upcomingLivestreams}
+                  listenToUpcoming
+                  minimumUpcomingStreams={0}
+                  noResultsComponent={
+                     <NoResultsMessage message={noResultsMessage} />
+                  }
+               />
+            </LivestreamDialogLayout>
          </GenericDashboardLayout>
          <ScrollToTop hasBottomNavBar />
       </>
    )
 }
+
+export const getServerSideProps = livestreamDialogSSP()
 
 export default MyRegistrations
