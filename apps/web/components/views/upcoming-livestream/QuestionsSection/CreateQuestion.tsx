@@ -16,6 +16,7 @@ import {
    LivestreamEvent,
    LivestreamQuestion,
 } from "@careerfairy/shared-lib/livestreams"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = {
    root: {
@@ -29,8 +30,8 @@ type Props = {
    onQuestionAdded: (question: LivestreamQuestion) => void
 }
 const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
-   const { putLivestreamQuestion } = useFirebaseService()
-   const { authenticatedUser, userData } = useAuth()
+   const { createLivestreamQuestion } = useFirebaseService()
+   const { authenticatedUser, userData, userPresenter, isLoggedIn } = useAuth()
    const dispatch = useDispatch()
    const { replace, asPath } = useRouter()
    const {
@@ -46,20 +47,19 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
          questionTitle: "",
       },
       onSubmit: async (values, { resetForm, setFieldError }) => {
-         if (!authenticatedUser) {
+         if (!isLoggedIn) {
             return replace({
                pathname: "/signup",
                query: { absolutePath: asPath },
             })
          }
          try {
-            const newlyCreatedQuestion = await putLivestreamQuestion(
+            const newlyCreatedQuestion = await createLivestreamQuestion(
                livestream.id,
                {
                   title: values.questionTitle,
-                  votes: 0,
-                  type: "new",
                   author: authenticatedUser.email,
+                  displayName: userPresenter?.getDisplayName?.() || null,
                }
             )
 
@@ -76,6 +76,11 @@ const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
 
             recommendationServiceInstance.createdQuestion(livestream, userData)
          } catch (e) {
+            errorLogAndNotify(e, {
+               message: "There was an issue submitting the question",
+               livestreamId: livestream.id,
+               userId: authenticatedUser.uid,
+            })
             setFieldError(
                "questionTitle",
                "There was an issue submitting the question"

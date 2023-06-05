@@ -69,8 +69,8 @@ const QuestionCreateForm = () => {
       useContext(RegistrationContext)
    const classes = useStyles()
    const { replace } = useRouter()
-   const { putLivestreamQuestion } = useFirebaseService()
-   const { authenticatedUser, userData } = useAuth()
+   const { createLivestreamQuestion } = useFirebaseService()
+   const { authenticatedUser, userData, userPresenter } = useAuth()
 
    const {
       handleChange,
@@ -89,11 +89,10 @@ const QuestionCreateForm = () => {
             return replace("/signup")
          }
          try {
-            await putLivestreamQuestion(livestream?.id, {
+            await createLivestreamQuestion(livestream?.id, {
                title: values.questionTitle,
-               votes: 0,
-               type: "new",
                author: authenticatedUser.email,
+               displayName: userPresenter?.getDisplayName?.() || null,
             })
 
             rewardService

@@ -26,9 +26,10 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import { UserStats } from "@careerfairy/shared-lib/users"
 import LivestreamDetailsViewSkeleton from "./views/livestream-details/LivestreamDetailsViewSkeleton"
 import JobDetailsViewSkeleton from "./views/job-details/JobDetailsViewSkeleton"
+import RegisterAskQuestionsViewSkeleton from "./views/ask-questions/RegisterAskQuestionsViewSkeleton"
+import RegisterSuccessViewSkeleton from "./views/register-success/RegisterSuccessViewSkeleton"
 import { useRouter } from "next/router"
 import { buildDialogLink } from "./util"
-import { Group } from "@careerfairy/shared-lib/src/groups"
 import {
    RegistrationAction,
    registrationInitialState,
@@ -36,6 +37,9 @@ import {
    RegistrationState,
 } from "./registrationReducer"
 import { isFromNewsletter } from "../../../util/PathUtils"
+import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataConsentViewSkeleton"
+import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
+import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 
 const styles = sxStyles({
    content: {
@@ -67,6 +71,7 @@ const styles = sxStyles({
          md: 5,
       },
       maxWidth: 915,
+      height: "100%",
    },
 })
 
@@ -80,7 +85,7 @@ type Props = {
    serverUserEmail: string
 }
 
-type ViewKey =
+export type ViewKey =
    | "livestream-details"
    | "register-data-consent"
    | "register-ask-questions"
@@ -117,19 +122,22 @@ const views: View[] = [
    createView({
       key: "register-data-consent",
       viewPath: "data-consent/RegisterDataConsentView",
-      // TODO: add loading component
+      loadingComponent: () => <RegisterDataConsentViewSkeleton />,
    }),
    createView({
       key: "register-ask-questions",
       viewPath: "ask-questions/RegisterAskQuestionsView",
+      loadingComponent: () => <RegisterAskQuestionsViewSkeleton />,
    }),
    createView({
       key: "register-join-talent-pool",
       viewPath: "join-talent-pool/RegisterJoinTalentPoolView",
+      loadingComponent: () => <RegisterJoinTalentPoolViewSkeleton />,
    }),
    createView({
       key: "register-success",
       viewPath: "register-success/RegisterSuccessView",
+      loadingComponent: () => <RegisterSuccessViewSkeleton />,
    }),
    createView({
       key: "job-details",
@@ -239,11 +247,16 @@ const Content: FC<ContentProps> = ({
                   routerOptions
                )
 
+            case "register-ask-questions":
+               if (livestream?.questionsDisabled) {
+                  view = "register-join-talent-pool"
+               }
+
             default:
                setValue(views.findIndex((v) => v.key === view))
          }
       },
-      [livestreamId, push, router]
+      [livestreamId, push, router, livestream?.questionsDisabled]
    )
 
    const onClose = useCallback(() => {
@@ -269,6 +282,14 @@ const Content: FC<ContentProps> = ({
       registrationInitialState
    )
 
+   const livestreamPresenter = useMemo(
+      () =>
+         livestream ? LivestreamPresenter.createFromDocument(livestream) : null,
+      [livestream]
+   )
+
+   useRedirectToEventRoom(livestreamPresenter)
+
    const contextValue = useMemo<DialogContextType>(
       () => ({
          goToView,
@@ -276,9 +297,7 @@ const Content: FC<ContentProps> = ({
          livestream,
          activeView: views[value].key,
          handleBack,
-         livestreamPresenter: livestream
-            ? LivestreamPresenter.createFromDocument(livestream)
-            : null,
+         livestreamPresenter,
          updatedStats,
          serverUserEmail,
          isRecommended,
