@@ -21,6 +21,7 @@ import { errorLogAndNotify } from "../../util/CommonUtil"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 import { RTMStatus } from "../../types/streaming"
 import { setSessionRTMFailedToJoin } from "store/actions/streamActions"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
 
 interface Props {
    children: JSX.Element
@@ -77,7 +78,8 @@ const RTMProvider = ({ livestreamId, children, roomId, userId }: Props) => {
          rtmClient.current.on("TokenExpired", () => {
             errorLogAndNotify(new Error("RTM TokenExpired")) // save this event on sentry
             if (typeof window !== "undefined") {
-               window.location.href = `${getBaseUrl()}/upcoming-livestream/${livestreamId}`
+               window.location.href =
+                  makeLivestreamEventDetailsUrl(livestreamId)
             }
          })
       } catch (error) {

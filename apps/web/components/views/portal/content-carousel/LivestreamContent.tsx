@@ -11,6 +11,7 @@ import ContentButton from "./ContentButton"
 import Content from "./Content"
 import useLivestream from "../../../custom-hook/live-stream/useLivestream"
 import { UserStats } from "@careerfairy/shared-lib/users"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
 
 type LivestreamContentProps = {
    livestreamData: LivestreamEvent
@@ -125,7 +126,7 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
 
       return (
          <ContentButton
-            href={`upcoming-livestream/${livestream.id}`}
+            href={makeLivestreamEventDetailsUrl(livestream.id)}
             target={"_blank"}
             color={"primary"}
          >
