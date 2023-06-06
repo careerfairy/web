@@ -20,6 +20,7 @@ import { firestore } from "firebase-admin"
 import DocumentSnapshot = firestore.DocumentSnapshot
 import { Group } from "@careerfairy/shared-lib/groups"
 import { UserData } from "@careerfairy/shared-lib/users"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 export const setCORSHeaders = (req: Request, res: Response): void => {
    res.set("Access-Control-Allow-Origin", "*")
@@ -33,10 +34,6 @@ export const setCORSHeaders = (req: Request, res: Response): void => {
       res.status(204).send("")
       return
    }
-}
-
-export const getStreamLink = (streamId: string) => {
-   return "https://www.careerfairy.io/upcoming-livestream/" + streamId
 }
 
 export type IGenerateEmailDataProps = {
@@ -206,7 +203,7 @@ const createRecipientVariables = (
 
       const upcomingStreamLink = externalEventLink
          ? externalEventLink
-         : getStreamLink(streamId)
+         : makeLivestreamEventDetailsUrl(streamId)
 
       const emailData = {
          timeMessage: timeMessage,
@@ -247,7 +244,7 @@ const createNonAttendeesEmailData = (
       const emailData = {
          firstName,
          recordingLink: addUtmTagsToLink({
-            link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
+            link: makeLivestreamEventDetailsUrl(livestreamId),
             campaign: "reminderForRecording",
             content: title,
          }),

@@ -11,10 +11,7 @@ import makeStyles from "@mui/styles/makeStyles"
 import Avatar from "@mui/material/Avatar"
 import Box from "@mui/material/Box"
 import CardMedia from "@mui/material/CardMedia"
-import {
-   getBaseUrl,
-   getResizedUrl,
-} from "../../../helperFunctions/HelperFunctions"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
 import {
    Button,
    Slide,
@@ -35,6 +32,10 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { Group } from "@careerfairy/shared-lib/dist/groups"
+import {
+   makeLivestreamEventDetailsUrl,
+   makeLivestreamGroupEventDetailsUrl,
+} from "@careerfairy/shared-lib/utils/urls"
 
 const useStyles = makeStyles((theme) => ({
    // @ts-ignore
@@ -364,13 +365,11 @@ const EmbedStreamCard = ({
    const handleMouseLeave = useCallback(() => setHovered(false), [])
 
    const getStreamLink = useCallback((groupId, streamId) => {
-      let link = getBaseUrl()
       if (groupId) {
-         link += `/upcoming-livestream/${streamId}?groupId=${groupId}`
+         return makeLivestreamGroupEventDetailsUrl(groupId, streamId)
       } else {
-         link += `/upcoming-livestream/${streamId}`
+         return makeLivestreamEventDetailsUrl(streamId)
       }
-      return link
    }, [])
 
    useEffect(() => {

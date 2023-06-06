@@ -1,7 +1,6 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import React, { FC, ReactNode, useMemo } from "react"
-import useLivestreamHosts from "../../../custom-hook/live-stream/useLivestreamHosts"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import useRecordingAccess from "../../upcoming-livestream/HeroSection/useRecordingAccess"
 import DateUtil from "../../../../util/DateUtil"
@@ -11,6 +10,8 @@ import ContentButton from "./ContentButton"
 import Content from "./Content"
 import useLivestream from "../../../custom-hook/live-stream/useLivestream"
 import { UserStats } from "@careerfairy/shared-lib/users"
+import { buildDialogLink } from "../../livestream-dialog"
+import { useRouter } from "next/router"
 
 type LivestreamContentProps = {
    livestreamData: LivestreamEvent
@@ -23,13 +24,12 @@ type LivestreamContentProps = {
 const LivestreamContent: FC<LivestreamContentProps> = ({
    livestreamData,
    handleBannerPlayRecording,
-   handleClickRegister,
    userStats,
 }) => {
+   const router = useRouter()
    const { data } = useLivestream(livestreamData.id, livestreamData)
    const livestream = data || livestreamData
 
-   const hosts = useLivestreamHosts(livestream)
    const livestreamPresenter = useMemo(
       () =>
          LivestreamPresenter.createFromDocument(livestream || livestreamData),
@@ -97,14 +97,15 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
          return (
             <ContentButton
                color={"secondary"}
-               onClick={() =>
-                  handleClickRegister(
-                     livestream,
-                     hosts?.[0]?.id,
-                     hosts || [],
-                     hasRegistered
-                  )
-               }
+               // @ts-ignore
+               href={buildDialogLink({
+                  router,
+                  link: {
+                     type: "registerToLivestream",
+                     livestreamId: livestream.id,
+                  },
+               })}
+               shallow
             >
                {hasRegistered ? "Registered" : "Register to Live Stream"}
             </ContentButton>
@@ -125,19 +126,25 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
 
       return (
          <ContentButton
-            href={`upcoming-livestream/${livestream.id}`}
-            target={"_blank"}
+            // @ts-ignore
+            href={buildDialogLink({
+               router,
+               link: {
+                  type: "livestreamDetails",
+                  livestreamId: livestream.id,
+               },
+            })}
+            shallow
             color={"primary"}
          >
             Discover Recording
          </ContentButton>
       )
    }, [
+      router,
       eventIsUpcoming,
       handleBannerPlayRecording,
-      handleClickRegister,
       hasRegistered,
-      hosts,
       livestream,
       showRecording,
    ])
