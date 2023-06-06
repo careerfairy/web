@@ -1,4 +1,4 @@
-import { GetServerSidePropsContext } from "next"
+import { GetServerSidePropsContext, GetStaticPropsContext } from "next"
 import {
    getServerSideStream,
    getServerSideUserStats,
@@ -12,12 +12,16 @@ import { UrlObject } from "url"
 import { getBaseUrl } from "../../helperFunctions/HelperFunctions"
 
 export const getLivestreamDialogData = async (
-   ctx: GetServerSidePropsContext
+   ctx: GetServerSidePropsContext | GetStaticPropsContext
 ): Promise<LiveStreamDialogData> => {
    try {
       const livestreamParams = (ctx.params.livestreamDialog as string[]) || []
-      const token = getUserTokenFromCookie({ req: ctx.req })
-      const email = token?.email ?? null
+      let email = null
+      if ("req" in ctx) {
+         // Check if ctx is GetServerSidePropsContext
+         const token = getUserTokenFromCookie({ req: ctx?.req })
+         email = token?.email ?? null
+      }
 
       if (livestreamParams[0] === "livestream" && livestreamParams[1]) {
          const [stream, serverSideUserStats] = await Promise.all([
