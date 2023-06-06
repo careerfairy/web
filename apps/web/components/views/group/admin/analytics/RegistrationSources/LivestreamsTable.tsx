@@ -21,6 +21,7 @@ import {
    UTMsPercentage,
 } from "@careerfairy/shared-lib/livestreams/sources/transformations"
 import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const LivestreamsTable = () => {
    const { livestreams, utmData } = useUtmData()
@@ -33,7 +34,7 @@ const LivestreamsTable = () => {
 
    const rowOnClick = useCallback((event, rowData) => {
       if (window) {
-         window.open(`/upcoming-livestream/${rowData.id}`, "_blank")
+         window.open(makeLivestreamEventDetailsUrl(rowData.id), "_blank")
       }
    }, [])
 

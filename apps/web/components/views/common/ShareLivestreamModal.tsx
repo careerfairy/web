@@ -1,9 +1,6 @@
 import { useSnackbar } from "notistack"
 import { useAuth } from "../../../HOCs/AuthProvider"
-import {
-   makeLivestreamEventDetailsInviteUrl,
-   makeLivestreamEventDetailsUrl,
-} from "../../../util/makeUrls"
+import { makeLivestreamEventDetailsInviteUrl } from "../../../util/makeUrls"
 import {
    copyStringToClipboard,
    getResizedUrl,
@@ -25,6 +22,7 @@ import React, { useEffect, useState } from "react"
 import { streamIsOld } from "../../../util/CommonUtil"
 import ReferralPrompt from "./ReferralPrompt"
 import { dataLayerEvent } from "../../../util/analyticsUtils"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const styles = {
    title: {

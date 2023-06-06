@@ -24,6 +24,7 @@ import useIsMobile from "../../custom-hook/useIsMobile"
 import CmsImage from "../image"
 import { useMarketingLandingPage } from "./MarketingLandingPageProvider"
 import CookiesUtil from "../../../util/CookiesUtil"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const styles = sxStyles({
    largeContainer: {
@@ -169,7 +170,9 @@ const MarketingForm = ({ setComplete, buttonProps, fieldsOfStudy }: Props) => {
 
                if (selectedEventId) {
                   void push({
-                     pathname: `/upcoming-livestream/${selectedEventId}`,
+                     pathname: makeLivestreamEventDetailsUrl(selectedEventId, {
+                        relative: true,
+                     }),
                   })
                }
             })
