@@ -6,6 +6,7 @@ import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
 import { setCORSHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { DateTime } from "luxon"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 
@@ -35,8 +36,9 @@ export const getLivestreamICalendarEvent = functions
                   { zone: livestreamTimeZone }
                )
 
+               const livestreamUrl = makeLivestreamEventDetailsUrl(livestreamId)
                const linkWithUTM = addUtmTagsToLink({
-                  link: `https://careerfairy.io/upcoming-livestream/${livestreamId}`,
+                  link: livestreamUrl,
                   campaign: "fromCalendarEvent",
                })
 
