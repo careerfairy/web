@@ -13,7 +13,7 @@ import { styles } from "../profileStyles"
 import ContentCardTitle from "../../../../layouts/UserLayout/ContentCardTitle"
 import { DefaultTheme } from "@mui/styles"
 import NoAccessView from "../../common/NoAccessView"
-import { Highlights_NoAccess } from "../../../../constants/contextInfoCareerSkills"
+import { My_Recruiters_NoAccess } from "../../../../constants/contextInfoCareerSkills"
 import { userRepo } from "../../../../data/RepositoryInstances"
 
 const MyRecruitersTab = () => {
@@ -36,12 +36,12 @@ const MyRecruitersTab = () => {
 
          <BrowseButton />
 
-         {userPresenter.canSaveRecruiters() && (
+         {!userPresenter.canSaveRecruiters() && (
             <RecruiterList userEmail={userPresenter.model.userEmail} />
          )}
 
          {!userPresenter.canSaveRecruiters() && (
-            <NoAccessView contextInfoMapKey={Highlights_NoAccess} />
+            <NoAccessView contextInfoMapKey={My_Recruiters_NoAccess} />
          )}
       </ContentCard>
    )

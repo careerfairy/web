@@ -35,7 +35,7 @@ import { Group } from "@careerfairy/shared-lib/dist/groups"
 import {
    makeLivestreamEventDetailsUrl,
    makeLivestreamGroupEventDetailsUrl,
-} from "@careerfairy/shared-lib/src/utils/urls"
+} from "@careerfairy/shared-lib/utils/urls"
 
 const useStyles = makeStyles((theme) => ({
    // @ts-ignore

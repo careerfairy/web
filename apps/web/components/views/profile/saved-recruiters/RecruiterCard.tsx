@@ -21,7 +21,7 @@ import Image from "next/image"
 import OpenInNewIcon from "@mui/icons-material/OpenInNew"
 import { sxStyles } from "../../../../types/commonTypes"
 import { userRepo } from "../../../../data/RepositoryInstances"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const styles = sxStyles({
    name: {
@@ -141,7 +141,8 @@ export const RecruiterCard = ({
                   <Box mt={2}>
                      <Link
                         href={makeLivestreamEventDetailsUrl(
-                           recruiter.livestreamId
+                           recruiter.livestreamId,
+                           { relative: true }
                         )}
                         color="secondary"
                         sx={{

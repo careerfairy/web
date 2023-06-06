@@ -31,7 +31,7 @@ import {
    LivestreamEvent,
 } from "@careerfairy/shared-lib/dist/livestreams"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const backgroundImageHeight = 200
 const cardBorderRadius = 6
@@ -487,7 +487,9 @@ const UpcomingLivestreamCard = ({
                            color="primary"
                            size="large"
                            component={Link}
-                           href={makeLivestreamEventDetailsUrl(livestream.id)}
+                           href={makeLivestreamEventDetailsUrl(livestream.id, {
+                              relative: true,
+                           })}
                            variant="outlined"
                            sx={styles.button}
                         >

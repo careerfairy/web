@@ -6,9 +6,9 @@ import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
 import { setCORSHeaders, isLocalEnvironment } from "./util"
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import { DateTime } from "luxon"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 export const getLivestreamICalendarEvent = functions
    .region(config.region)

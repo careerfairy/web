@@ -13,13 +13,37 @@ describe("should correctly generate urls", () => {
       expect(actualUrl).toEqual(expectedUrl)
    })
 
-   it("should return the correct URL with provided section", () => {
-      const livestreamId = "456"
-      const section = "custom"
-      const expectedUrl = `https://careerfairy.io/${section}/livestream/${livestreamId}`
-      const actualUrl = makeLivestreamEventDetailsUrl(livestreamId, section)
+   it("should return the correct URL with portal section, relative false and livestream ID", () => {
+      const livestreamId = "123"
+      const result = makeLivestreamEventDetailsUrl(livestreamId, {
+         relative: false,
+      })
+      expect(result).toBe(`${getHost()}/portal/livestream/123`)
+   })
 
-      expect(actualUrl).toEqual(expectedUrl)
+   it("should return the correct URL with portal section, relative true and livestream ID", () => {
+      const livestreamId = "123"
+      const result = makeLivestreamEventDetailsUrl(livestreamId, {
+         relative: true,
+      })
+      expect(result).toBe(`/portal/livestream/123`)
+   })
+
+   it("should return the correct URL with custom section and livestream ID", () => {
+      const livestreamId = "123"
+      const result = makeLivestreamEventDetailsUrl(livestreamId, {
+         section: "next-livestreams",
+         relative: true,
+      })
+      expect(result).toBe("/next-livestreams/livestream/123")
+   })
+
+   it("should return the correct URL with custom section, relative false and livestream ID", () => {
+      const livestreamId = "123"
+      const result = makeLivestreamEventDetailsUrl(livestreamId, {
+         section: "next-livestreams",
+      })
+      expect(result).toBe(`${getHost()}/next-livestreams/livestream/123`)
    })
 
    it("returns the correct URL with valid group input", () => {

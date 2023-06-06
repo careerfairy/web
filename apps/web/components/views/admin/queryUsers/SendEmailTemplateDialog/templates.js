@@ -4,7 +4,7 @@ import { basicEmailTemplate } from "constants/images"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useMemo } from "react"
 import { shouldUseEmulators } from "../../../../../util/CommonUtil"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const MAX_SUBJECT_LENGTH = 500
 const MAX_DISPLAY_TITLE_LENGTH = 1000

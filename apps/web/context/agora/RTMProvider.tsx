@@ -21,7 +21,7 @@ import { errorLogAndNotify } from "../../util/CommonUtil"
 import { getBaseUrl } from "../../components/helperFunctions/HelperFunctions"
 import { RTMStatus } from "../../types/streaming"
 import { setSessionRTMFailedToJoin } from "store/actions/streamActions"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 interface Props {
    children: JSX.Element
