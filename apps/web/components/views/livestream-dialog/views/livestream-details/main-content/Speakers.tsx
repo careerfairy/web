@@ -56,7 +56,7 @@ const Speakers: FC<Props> = ({ speakers }) => {
       <Box sx={styles.root}>
          <SectionTitle>Speakers</SectionTitle>
          <HorizontalScroll sx={styles.speakersWrapper}>
-            {[...speakers, ...speakers].map((speaker) => (
+            {speakers.map((speaker) => (
                <SpeakerAvatar key={speaker.id} speaker={speaker} />
             ))}
          </HorizontalScroll>
