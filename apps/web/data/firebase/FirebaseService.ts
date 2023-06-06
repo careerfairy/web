@@ -60,6 +60,7 @@ import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/s
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -295,7 +296,7 @@ class FirebaseService {
          )
 
       const livestreamStartDate = livestream.start.toDate()
-      const linkToLivestream = `https://careerfairy.io/upcoming-livestream/${livestream.id}`
+      const linkToLivestream = makeLivestreamEventDetailsUrl(livestream.id)
       const linkWithUTM = `${linkToLivestream}?utm_campaign=fromCalendarEvent`
 
       const calendarEvent = {
@@ -359,7 +360,7 @@ class FirebaseService {
          company_logo_url: event.companyLogoUrl,
          event_title: event.title,
          event_address: event.address,
-         livestream_link: `https://careerfairy.io/upcoming-livestream/${event.id}`,
+         livestream_link: makeLivestreamEventDetailsUrl(event.id),
       })
    }
 

@@ -28,3 +28,13 @@ export const makeLivestreamEventDetailsUrl = (
 ) => {
    return `${getHost()}/${section}/livestream/${livestreamId}`
 }
+
+/**
+ * Creates a deep link for a live stream details inside a group
+ */
+export const makeLivestreamGroupEventDetailsUrl = (
+   groupId: string,
+   livestreamId: string
+) => {
+   return `${getHost()}/next-livestreams/group/${groupId}/livestream/${livestreamId}`
+}
