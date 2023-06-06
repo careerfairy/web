@@ -60,7 +60,7 @@ import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/s
 import { EmoteMessage } from "context/agora/RTMContext"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
 import { Create } from "@careerfairy/shared-lib/commonTypes"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 class FirebaseService {
    public readonly app: firebase.app.App

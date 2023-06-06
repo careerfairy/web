@@ -19,14 +19,31 @@ export const getHost = (): string => {
    return mainProductionDomainWithProtocol
 }
 
+type OptionsMakeLivestreamEventUrl = {
+   section?: "portal" | "next-livestreams"
+   relative?: boolean
+}
+
 /**
  * Creates a deep link for a live stream details page / dialog
  */
 export const makeLivestreamEventDetailsUrl = (
    livestreamId: string,
-   section = "portal"
+   options: OptionsMakeLivestreamEventUrl = {}
 ) => {
-   return `${getHost()}/${section}/livestream/${livestreamId}`
+   options = {
+      section: "portal",
+      relative: false,
+      ...options,
+   }
+
+   let url: string = `/${options.section}/livestream/${livestreamId}`
+
+   if (options.relative === false) {
+      url = `${getHost()}${url}`
+   }
+
+   return url
 }
 
 /**

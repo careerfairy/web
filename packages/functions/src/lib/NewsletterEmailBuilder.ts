@@ -6,7 +6,7 @@ import {
 import { TemplatedMessage } from "postmark"
 import { PostmarkEmailSender } from "../api/postmark"
 import { DateTime } from "luxon"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 /**
  * Builds a newsletter email (templated) and sends it to the recipients

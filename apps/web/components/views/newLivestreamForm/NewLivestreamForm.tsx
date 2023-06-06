@@ -51,7 +51,7 @@ import FieldsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/F
 import LevelsOfStudyMultiSelector from "../draftStreamForm/TargetFieldsOfStudy/LevelsOfStudyMultiSelector"
 import Stack from "@mui/material/Stack"
 import Box from "@mui/material/Box"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const useStyles = makeStyles((theme) => ({
    root: {
@@ -344,7 +344,7 @@ const NewLivestreamForm = () => {
                `/next-livestreams?careerCenterId=${values.groupIds[0]}&livestreamId=${id}`
             )
          } else {
-            return push(makeLivestreamEventDetailsUrl(id))
+            return push(makeLivestreamEventDetailsUrl(id, { relative: true }))
          }
       } catch (e) {
          console.error(e)

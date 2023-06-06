@@ -1,4 +1,4 @@
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import axios, { AxiosPromise } from "axios"
 import { DateTime } from "luxon"
 

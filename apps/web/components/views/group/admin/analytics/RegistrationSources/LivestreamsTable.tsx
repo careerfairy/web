@@ -21,7 +21,7 @@ import {
    UTMsPercentage,
 } from "@careerfairy/shared-lib/livestreams/sources/transformations"
 import { VALID_SOURCES } from "@careerfairy/shared-lib/livestreams/sources/sources"
-import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/src/utils/urls"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const LivestreamsTable = () => {
    const { livestreams, utmData } = useUtmData()
