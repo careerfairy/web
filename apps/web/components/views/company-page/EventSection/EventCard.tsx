@@ -6,7 +6,7 @@ import React, { useCallback, useMemo } from "react"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
 import DateUtil from "../../../../util/DateUtil"
 import { useCompanyPage } from "../index"
-import Link from "../../common/Link"
+import Link from "next/link"
 import useIsMobile from "../../../custom-hook/useIsMobile"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { useAuth } from "../../../../HOCs/AuthProvider"
@@ -15,6 +15,8 @@ import { useFirebaseService } from "../../../../context/firebase/FirebaseService
 import { getRelevantHosts } from "../../../../util/streamUtil"
 import Image from "next/image"
 import { getSubstringWithEllipsis } from "@careerfairy/shared-lib/utils"
+import { buildDialogLink } from "../../livestream-dialog"
+import { useRouter } from "next/router"
 
 const styles = sxStyles({
    wrapper: {
@@ -64,7 +66,7 @@ const styles = sxStyles({
       py: 1,
    },
    detailsButton: {
-      p: 0,
+      px: 1,
    },
 })
 
@@ -80,6 +82,7 @@ type Props = {
 }
 
 const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
+   const router = useRouter()
    const { editMode, group } = useCompanyPage()
    const isMobile = useIsMobile()
    const { userData } = useAuth()
@@ -112,6 +115,18 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
    const cardTitle = useMemo(() => {
       return getSubstringWithEllipsis(event?.title, 30)
    }, [event?.title])
+
+   const linkProps = useMemo(
+      () =>
+         buildDialogLink({
+            router,
+            link: {
+               livestreamId: event?.id,
+               type: "livestreamDetails",
+            },
+         }),
+      [router, event?.id]
+   )
 
    return (
       <Box sx={styles.wrapper}>
@@ -155,17 +170,22 @@ const EventCard = ({ event, handleEditEvent, handleRegister }: Props) => {
                   </Box>
                ) : (
                   <Box sx={styles.buttonsWrapper}>
-                     <Button
-                        endIcon={<ChevronRight sx={{ mb: "2px" }} />}
-                        sx={styles.detailsButton}
-                        component={Link}
-                        href={`/upcoming-livestream/${event?.id}`}
-                        variant={"text"}
-                        color={"primary"}
-                        size={"small"}
+                     <Link
+                        href={linkProps}
+                        shallow // Prevents GSSP from running on designated page:https://nextjs.org/docs/pages/building-your-application/routing/linking-and-navigating#shallow-routing
+                        passHref
+                        scroll={false} // Prevents the page from scrolling to the top when the link is clicked
                      >
-                        {isMobile ? "details" : "see details"}
-                     </Button>
+                        <Button
+                           endIcon={<ChevronRight sx={{ mb: "2px" }} />}
+                           sx={styles.detailsButton}
+                           variant={"text"}
+                           color={"primary"}
+                           size={"small"}
+                        >
+                           {isMobile ? "details" : "see details"}
+                        </Button>
+                     </Link>
                      <Button
                         sx={styles.registerButton}
                         onClick={handleRegisterClick}
