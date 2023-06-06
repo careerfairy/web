@@ -4,6 +4,7 @@ import { basicEmailTemplate } from "constants/images"
 import { useFirebaseService } from "context/firebase/FirebaseServiceContext"
 import { useMemo } from "react"
 import { shouldUseEmulators } from "../../../../../util/CommonUtil"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 const MAX_SUBJECT_LENGTH = 500
 const MAX_DISPLAY_TITLE_LENGTH = 1000
@@ -55,9 +56,7 @@ const getInitialValues = (streamData) => ({
    eventStartDate: streamData.start?.toDate?.(),
    companyLogoUrl: streamData.companyLogoUrl || "",
    illustrationImageUrl: streamData.backgroundImageUrl || "",
-   eventUrl: streamData.id
-      ? `https://careerfairy.io/upcoming-livestream/${streamData.id}`
-      : "",
+   eventUrl: streamData.id ? makeLivestreamEventDetailsUrl(streamData.id) : "",
    summary: streamData.summary || "",
 })
 

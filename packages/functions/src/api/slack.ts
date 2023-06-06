@@ -1,8 +1,9 @@
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import axios, { AxiosPromise } from "axios"
 import { DateTime } from "luxon"
 
 export const notifyLivestreamStarting = (webhookUrl, livestreamObj) => {
-   const link = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
+   const link = makeLivestreamEventDetailsUrl(livestreamObj.id)
 
    const body = {
       Company: livestreamObj.company,
@@ -43,7 +44,7 @@ export const notifyLivestreamCreated = (
    livestreamObj
 ) => {
    const adminLink = `https://www.careerfairy.io/group/${livestreamObj.author?.groupId}/admin/events?eventId=${livestreamObj.id}`
-   const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
+   const eventLink = makeLivestreamEventDetailsUrl(livestreamObj.id)
 
    const body = {
       "Start Date": formatEventStartDate(livestreamObj.start.toDate()),
@@ -106,7 +107,7 @@ export const notifyLivestreamRecordingCreated = (
    livestreamObj,
    downloadLink
 ) => {
-   const eventLink = `https://www.careerfairy.io/upcoming-livestream/${livestreamObj.id}`
+   const eventLink = makeLivestreamEventDetailsUrl(livestreamObj.id)
 
    return generateRequest(webhookUrl, {
       blocks: [
