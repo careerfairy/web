@@ -1,5 +1,5 @@
 import { useMemo } from "react"
-import { Query, QueryConstraint } from "@firebase/firestore"
+import { limit, Query, QueryConstraint } from "@firebase/firestore"
 import { collection, orderBy, query, where } from "firebase/firestore"
 import useInfiniteCollection, {
    UseInfiniteCollection,
@@ -29,7 +29,8 @@ const useInfiniteCompanies = ({
 }: UseInfiniteCompanies) => {
    const options: UseInfiniteCollection<Group> = useMemo(() => {
       return {
-         ...getInfiniteQuery(limit, filters),
+         query: getInfiniteQuery(limit, filters),
+         limit,
          initialData,
       }
    }, [limit, filters, initialData])
@@ -40,10 +41,7 @@ const useInfiniteCompanies = ({
 export const getInfiniteQuery = (
    pageSIze: number = 10,
    filters: Filters = {}
-): {
-   query: Query<Group>
-   limit: number
-} => {
+): Query<Group> => {
    const constraints: QueryConstraint[] = []
 
    // if (filters.industries) {
@@ -51,16 +49,14 @@ export const getInfiniteQuery = (
    //       where("companyIndustry", "in", filters.industries)
    //    )
 
-   return {
-      query: query(
-         collection(FirestoreInstance, "careerCenterData"),
-         where("publicProfile", "==", true),
-         where("test", "==", false),
-         ...constraints,
-         orderBy("universityName", "asc")
-      ).withConverter(createGenericConverter<Group>()),
-      limit: pageSIze,
-   }
+   return query(
+      collection(FirestoreInstance, "careerCenterData"),
+      where("publicProfile", "==", true),
+      where("test", "==", false),
+      ...constraints,
+      limit(pageSIze),
+      orderBy("universityName", "asc")
+   ).withConverter(createGenericConverter<Group>())
 }
 
 export default useInfiniteCompanies
