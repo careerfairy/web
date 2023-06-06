@@ -12,11 +12,11 @@ export const useRecordingAccess = (
 ) => {
    const userHasBoughtRecording = rewardService.canAccessRecording(
       userStats,
-      streamPresenter.id
+      streamPresenter?.id
    )
 
    const userHasAccessToRecordingThroughRegistering = Boolean(
-      streamPresenter.isAbleToShowRecording(userEmail)
+      streamPresenter?.isAbleToShowRecording(userEmail)
    )
 
    return {

@@ -228,6 +228,7 @@ const TestimonialDialog = ({ handleClose, testimonialToEdit }: Props) => {
                   ))}
                   <Box display="flex" justifyContent="end" mt={4}>
                      <Button
+                        data-testid={"testimonials-save-button"}
                         type={"submit"}
                         variant="contained"
                         color="secondary"

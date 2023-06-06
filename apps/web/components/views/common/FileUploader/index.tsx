@@ -26,7 +26,7 @@ const styles = sxStyles({
  * and modified to fit our needs with better error handling and no styles, thanks Karim!
  * */
 
-type Props = {
+export type FileUploaderProps = {
    name?: string
    /*
     * ['png', 'jpeg', ...]
@@ -71,7 +71,9 @@ type Props = {
   }
  * @returns JSX Element
  */
-const FileUploader: React.FC<Props> = (props: Props): JSX.Element => {
+const FileUploader: React.FC<FileUploaderProps> = (
+   props: FileUploaderProps
+): JSX.Element => {
    const {
       name,
       types,

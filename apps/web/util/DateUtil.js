@@ -55,6 +55,10 @@ export default class DateUtil {
       return dayjs(JSDate).format("DD/MM/YYYY")
    }
 
+   static eventStartDate(JSDate) {
+      return dayjs(JSDate).format("DD/MM/YYYY HH:mm")
+   }
+
    static getRelativeDate(JSDate) {
       const now = new Date()
       return dayjs(JSDate).calendar(now, {
@@ -65,6 +69,10 @@ export default class DateUtil {
          lastWeek: "[Last] dddd[,] h:mm", // Last week ( Last Monday, 2:30 )
          sameElse: "DD.MM[,] h:mm A", // Everything else ( 17.10, 2:30 )
       })
+   }
+
+   static getTimeAgo(JSDate) {
+      return dayjs(JSDate).fromNow() // 2 hours ago, 2 days ago, 2 months ago, 2 years ago
    }
 
    static getISODateTime(JSDate) {
@@ -259,5 +267,17 @@ export default class DateUtil {
       result.setDate(date.getDate() + numberOfDays)
 
       return result
+   }
+
+   static formatLiveDate(JSDate) {
+      const formattedDate = dayjs(JSDate).format(
+         "dddd, DD MMM YYYY [at] h:mm A"
+      )
+      return `Live on ${formattedDate}` // Live on Monday, 12 Oct 2020 at 12:00 PM
+   }
+
+   static formatPastDate(JSDate) {
+      const formattedDate = dayjs(JSDate).format("DD MMM YYYY")
+      return `Live streamed on: ${formattedDate}` // Release date: 15 Dec 2022
    }
 }

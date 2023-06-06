@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useMediaQuery } from "@mui/material"
 import { useTheme } from "@mui/material/styles"
 import DesktopFeed from "./DesktopFeed/DesktopFeed"
@@ -27,31 +27,34 @@ const NextLivestreams = ({
       }
    }, [currentGroup])
 
-   const scrollToTop = () => {
+   const scrollToTop = useCallback(() => {
       window.scrollTo({
          top: 250,
          behavior: "smooth",
       })
-   }
+   }, [])
 
-   const handleToggleActive = (activeOptions, categoryId) => {
-      const newGroupData = {
-         ...groupData,
-         categories:
-            groupData.categories?.map((category) =>
-               category.id !== categoryId
-                  ? category
-                  : {
-                       ...category,
-                       options: category.options.map((option) => ({
-                          ...option,
-                          active: activeOptions.includes(option.id),
-                       })),
-                    }
-            ) || [],
-      }
-      setGroupData(newGroupData)
-   }
+   const handleToggleActive = useCallback(
+      (activeOptions, categoryId) => {
+         const newGroupData = {
+            ...groupData,
+            categories:
+               groupData.categories?.map((category) =>
+                  category.id !== categoryId
+                     ? category
+                     : {
+                          ...category,
+                          options: category.options.map((option) => ({
+                             ...option,
+                             active: activeOptions.includes(option.id),
+                          })),
+                       }
+               ) || [],
+         }
+         setGroupData(newGroupData)
+      },
+      [groupData]
+   )
 
    return mobile ? (
       <MobileFeed

@@ -1,10 +1,12 @@
 import functions = require("firebase-functions")
 import { admin } from "./api/firestoreAdmin"
+import config from "./config"
 
 const DAY_IN_SECONDS = 24 * 60 * 60
 
-export const periodicallyRemoveCachedDocument = functions.pubsub
-   .schedule("every 24 hours")
+export const periodicallyRemoveCachedDocument = functions
+   .region(config.region)
+   .pubsub.schedule("every 24 hours")
    .timeZone("Europe/Zurich")
    .onRun(async () => {
       const results = await Promise.allSettled([

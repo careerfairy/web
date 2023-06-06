@@ -62,7 +62,7 @@ exports.fetchAgoraRtcToken_eu = agora.fetchAgoraRtcToken
 exports.fetchAgoraRtmToken_eu = agora.fetchAgoraRtmToken
 
 // Backup
-exports.exportFirestoreBackup = backup.exportFirestoreBackup
+exports.exportFirestoreBackup_eu = backup.exportFirestoreBackup
 
 // Admin Functions
 exports.sendBasicTemplateEmail_eu = admin.sendBasicTemplateEmail
@@ -85,7 +85,7 @@ exports.sendReminderEmailToRegistrants =
    reminders.sendReminderEmailToRegistrants
 exports.sendReminderEmailAboutApplicationLink_eu =
    reminders.sendReminderEmailAboutApplicationLink
-exports.scheduleReminderEmails = reminders.scheduleReminderEmails
+exports.scheduleReminderEmails_eu = reminders.scheduleReminderEmails
 exports.sendReminderToNonAttendees = reminders.sendReminderToNonAttendees
 exports.sendReminderForNonAttendeesByStreamId =
    reminders.sendReminderForNonAttendeesByStreamId
@@ -119,7 +119,7 @@ exports.postmarkWebhook = postmark.postmarkWebhook
 exports.bundle = generateFunctionsFromBundles(bundles)
 
 // Analytics
-exports.updateUserDataAnalytcicsOnWrite =
+exports.updateUserDataAnalytcicsOnWrite_eu =
    analytics.updateUserDataAnalyticsOnWrite
 
 // Recording
@@ -132,7 +132,7 @@ exports.checkForUnfinishedLivestreamsAndStopRecording =
    recording.checkForUnfinishedLivestreamsAndStopRecording
 
 // Breakout Rooms
-exports.updateBreakoutRoomStatusOnWrite =
+exports.updateBreakoutRoomStatusOnWrite_eu =
    breakoutRooms.updateBreakoutRoomStatusOnWrite
 
 // Slack Interaction Handler

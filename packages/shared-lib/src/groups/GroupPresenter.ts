@@ -38,6 +38,7 @@ export class GroupPresenter {
       public readonly videos: GroupVideo[],
       public readonly photos: GroupPhoto[],
       public readonly testimonials: Testimonial[],
+      public readonly publicProfile: boolean,
       public readonly universityName?: string,
       public readonly universityCode?: string
    ) {}
@@ -63,6 +64,7 @@ export class GroupPresenter {
          group.videos || [],
          group.photos || [],
          group.testimonials || [],
+         group.publicProfile || false,
          group.universityName,
          group.universityCode
       )
@@ -117,6 +119,15 @@ export class GroupPresenter {
    companyPageIsFullyReady() {
       return this.getCompanyPageSteps().every((action) =>
          action.checkIsComplete()
+      )
+   }
+
+   hasMinimumData() {
+      return Boolean(
+         this.extraInfo ||
+            this.companyCountry ||
+            this.companyIndustries.length ||
+            this.companySize
       )
    }
 

@@ -62,8 +62,7 @@ const EventsPreview = ({
       query: { groupId },
       pathname,
    } = useRouter()
-   const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
-      useRegistrationModal()
+   const { joinGroupModalData, handleCloseJoinModal } = useRegistrationModal()
    const { data: existingInterests } = useInterests()
 
    const {
@@ -186,12 +185,7 @@ const EventsPreview = ({
                                    index={index}
                                    totalElements={arr.length}
                                    interests={existingInterests}
-                                   autoRegister
                                    location={getLocation(type)}
-                                   openShareDialog={setShareEventDialog}
-                                   onRegisterClick={
-                                      !isEmbedded && handleClickRegister
-                                   }
                                    key={event.id}
                                    event={event}
                                    isRecommended={isRecommended}

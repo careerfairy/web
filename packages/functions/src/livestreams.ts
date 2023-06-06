@@ -184,8 +184,11 @@ export const sendHybridEventRegistrationConfirmationEmail = functions
       )
    })
 
-export const setFirstCommentOfQuestionOnCreate = functions.firestore
-   .document("livestreams/{livestream}/questions/{question}/comments/{comment}")
+export const setFirstCommentOfQuestionOnCreate = functions
+   .region(config.region)
+   .firestore.document(
+      "livestreams/{livestream}/questions/{question}/comments/{comment}"
+   )
    .onCreate(async (commentSnap) => {
       try {
          const commentData = commentSnap.data()

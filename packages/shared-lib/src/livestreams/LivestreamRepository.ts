@@ -875,11 +875,34 @@ export class FirebaseLivestreamRepository
    }
 
    async getLivestreamsByIds(ids: string[]): Promise<LivestreamEvent[]> {
-      const snaps = await this.firestore
-         .collection("livestreams")
-         .where("id", "in", ids.slice(0, 10))
-         .get()
-      return mapFirestoreDocuments<LivestreamEvent>(snaps)
+      let chunks = chunkArray(ids, 10)
+      let promises = []
+
+      for (let chunk of chunks) {
+         promises.push(
+            this.firestore
+               .collection("livestreams")
+               .where("id", "in", chunk)
+               .get()
+               .then(mapFirestoreDocuments)
+         )
+      }
+
+      let responses = await Promise.allSettled(promises)
+
+      return responses
+         .filter((r) => {
+            if (r.status === "fulfilled") {
+               return true
+            } else {
+               // only log for debugging purposes
+               console.error("Promise failed", r)
+            }
+
+            return false
+         })
+         .map((r) => (r as PromiseFulfilledResult<LivestreamEvent[]>).value)
+         .flat()
    }
 
    async getLivestreamRecordingToken(

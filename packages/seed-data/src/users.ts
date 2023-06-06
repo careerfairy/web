@@ -5,6 +5,7 @@ import * as admin from "firebase-admin"
 
 import { capitalizeFirstLetter, getRandomInt } from "./utils/utils"
 import {
+   CompanyFollowed,
    SavedRecruiter,
    UserData,
    UserDataAnalytics,
@@ -27,6 +28,8 @@ interface UserSeed {
       extraAuthData?: CreateRequest
    ): Promise<UserData>
 
+   updateUser(email: string, userData: Partial<UserData>): Promise<void>
+
    getUserData(email: string): Promise<UserData | null>
 
    deleteUser(email: string): Promise<any>
@@ -37,6 +40,10 @@ interface UserSeed {
    ): Promise<SavedRecruiter>
 
    createAuthUsersFromUserData(): Promise<void>
+
+   getUserDataAnalytics(email: string): Promise<UserDataAnalytics>
+
+   getUserFollowedCompanies(email: string): Promise<CompanyFollowed[]>
 }
 
 class UserFirebaseSeed implements UserSeed {
@@ -84,6 +91,10 @@ class UserFirebaseSeed implements UserSeed {
       await firestore.collection("userData").doc(email).set(userData)
 
       return userData
+   }
+
+   async updateUser(email: string, userData: Partial<UserData>): Promise<void> {
+      await firestore.collection("userData").doc(email).update(userData)
    }
 
    async deleteUser(email: string) {
@@ -194,6 +205,20 @@ class UserFirebaseSeed implements UserSeed {
       }
 
       return
+   }
+
+   async getUserFollowedCompanies(email: string): Promise<CompanyFollowed[]> {
+      const userCompaniesFollowsSnap = await firestore
+         .collection("userData")
+         .doc(email)
+         .collection("companiesUserFollows")
+         .get()
+
+      return userCompaniesFollowsSnap.empty
+         ? null
+         : (userCompaniesFollowsSnap.docs.map((doc) =>
+              doc.data()
+           ) as CompanyFollowed[])
    }
 }
 

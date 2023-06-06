@@ -58,8 +58,8 @@ import { GetRegistrationSourcesFnArgs } from "@careerfairy/shared-lib/functions/
 import { clearFirestoreCache } from "../util/authUtil"
 import { getAValidGroupStatsUpdateField } from "@careerfairy/shared-lib/groups/stats"
 import { EmoteMessage } from "context/agora/RTMContext"
-import { RewardAction } from "@careerfairy/shared-lib/dist/rewards"
 import { groupTriGrams } from "@careerfairy/shared-lib/utils/search"
+import { Create } from "@careerfairy/shared-lib/commonTypes"
 
 class FirebaseService {
    public readonly app: firebase.app.App
@@ -1226,13 +1226,30 @@ class FirebaseService {
       })
    }
 
-   putLivestreamQuestion = (livestreamId, question) => {
-      question.timestamp = firebase.firestore.Timestamp.fromDate(new Date())
-      let ref = this.firestore
+   createLivestreamQuestion = async (
+      livestreamId: string,
+      question: Pick<LivestreamQuestion, "displayName" | "author" | "title">
+   ): Promise<LivestreamQuestion> => {
+      const ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("questions")
-      return ref.add(question)
+         .doc()
+
+      const newQuestion: LivestreamQuestion = {
+         ...question,
+         timestamp: firebase.firestore.Timestamp.now(),
+         id: ref.id,
+         badges: [],
+         votes: 0,
+         type: "new",
+         emailOfVoters: [],
+         numberOfComments: 0,
+         firstComment: null,
+      }
+      await ref.set(newQuestion)
+
+      return newQuestion
    }
 
    addLivestreamQuestion = (
@@ -1247,17 +1264,32 @@ class FirebaseService {
       return ref.add(addQuestionData)
    }
 
-   upvoteLivestreamQuestion = (livestreamId, question, userEmail) => {
+   upvoteLivestreamQuestion = async (
+      livestreamId: string,
+      question: LivestreamQuestion,
+      userEmail: string
+   ): Promise<"upvoted" | "downvoted"> => {
       let ref = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
          .collection("questions")
          .doc(question.id)
 
-      return ref.update({
+      const hasVoted = question.emailOfVoters?.includes(userEmail)
+
+      if (hasVoted) {
+         await ref.update({
+            votes: firebase.firestore.FieldValue.increment(-1),
+            emailOfVoters: firebase.firestore.FieldValue.arrayRemove(userEmail),
+         })
+         return "downvoted"
+      }
+
+      await ref.update({
          votes: firebase.firestore.FieldValue.increment(1),
          emailOfVoters: firebase.firestore.FieldValue.arrayUnion(userEmail),
       })
+      return "upvoted"
    }
 
    upvoteLivestreamQuestionWithRef = (streamRef, question, userEmail) => {
@@ -2229,19 +2261,7 @@ class FirebaseService {
             .collection("usersInPolicy")
             .doc(userData.userEmail)
 
-         // to be used from now on
-         let authUserInPolicyRef = this.firestore
-            .collection("careerCenterData")
-            .doc(groupId)
-            .collection("authUsersInPolicy")
-            .doc(userData.authId)
-
          batch.set(userInPolicyRef, {
-            ...userData,
-            dateAgreed: this.getServerTimestamp(),
-         })
-
-         batch.set(authUserInPolicyRef, {
             ...userData,
             dateAgreed: this.getServerTimestamp(),
          })
@@ -3135,18 +3155,19 @@ class FirebaseService {
 
       // Don't use the distributed counter for emulators
       if (shouldUseEmulators()) {
-         const toUpdate: Pick<
-            LivestreamEvent,
-            "impressions" | "recommendedImpressions"
-         > = {
-            impressions: firebase.firestore.FieldValue.increment(1) as any,
-         }
-         if (impressionData.isRecommended) {
-            toUpdate.recommendedImpressions =
-               firebase.firestore.FieldValue.increment(1) as any
-         }
-
-         return streamRef.update(toUpdate)
+         // TODO: Disabled for causing perfomance issues in development
+         // const toUpdate: Pick<
+         //    LivestreamEvent,
+         //    "impressions" | "recommendedImpressions"
+         // > = {
+         //    impressions: firebase.firestore.FieldValue.increment(1) as any,
+         // }
+         // if (impressionData.isRecommended) {
+         //    toUpdate.recommendedImpressions =
+         //       firebase.firestore.FieldValue.increment(1) as any
+         // }
+         //
+         // return streamRef.update(toUpdate)
       } else {
          impressionsCounter.incrementBy(1).catch(console.error)
 

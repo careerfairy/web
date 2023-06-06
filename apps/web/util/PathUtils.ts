@@ -1,3 +1,5 @@
+import { ParsedUrlQuery } from "querystring"
+
 /**
  * Check path is from an admin journey
  *  if no pathname provided, uses the window object
@@ -71,4 +73,15 @@ export const getWindow = () => {
    }
 
    return null
+}
+
+/**
+ * Check if the query params indicate that the user is coming from the newsletter
+ */
+export const isFromNewsletter = (query: ParsedUrlQuery) => {
+   return (
+      query?.utm_source === "careerfairy" &&
+      query?.utm_medium === "email" &&
+      query?.utm_campaign === "newsletter"
+   )
 }

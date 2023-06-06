@@ -11,8 +11,8 @@ const useSnackbarNotifications = () => {
    const dispatch = useDispatch()
 
    const successNotification = useCallback(
-      (message: string) => {
-         return dispatch(sendSuccessMessage(message))
+      (message: string, title?: string) => {
+         return dispatch(sendSuccessMessage(message, title))
       },
       [dispatch]
    )

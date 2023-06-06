@@ -1,230 +1,94 @@
-import React, { useCallback, useMemo } from "react"
+import React, { useCallback } from "react"
 import {
    Button,
-   Chip,
+   Dialog,
+   DialogActions,
+   DialogContent,
+   DialogTitle,
+   Divider,
    FormControl,
-   FormControlLabel,
-   IconProps,
-   Popover,
-   SelectChangeEvent,
 } from "@mui/material"
 import Box from "@mui/material/Box"
 import { wishListBorderRadius } from "../../../../constants/pages"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { useRouter } from "next/router"
-import { ResponsiveOption, ResponsiveSelect } from "../ResponsiveSelect"
-import { useInterests } from "../../../custom-hook/useCollection"
-import { StylesProps } from "../../../../types/commonTypes"
-import firebase from "firebase/compat/app"
-import { Wish } from "@careerfairy/shared-lib/dist/wishes"
-import DownIcon from "@mui/icons-material/ArrowDropDown"
-import {
-   CompanyCountryValues,
-   CompanyIndustryValues,
-   CompanySizesCodes,
-   languageOptionCodes,
-} from "../../../../constants/forms"
-import {
-   formatToOptionArray,
-   mapOptions,
-   multiListSelectMapValueFn,
-} from "../../signup/utils"
-import MultiListSelect from "../MultiListSelect"
+import { sxStyles } from "../../../../types/commonTypes"
+import { mapOptions } from "../../signup/utils"
 import { OptionGroup } from "@careerfairy/shared-lib/dist/commonTypes"
-import Checkbox from "@mui/material/Checkbox"
-import { FilterEnum } from "./Filter"
+import { FilterEnum, useFilter } from "./Filter"
+import CloseIcon from "@mui/icons-material/Close"
+import IconButton from "@mui/material/IconButton"
+import LoadingButton from "@mui/lab/LoadingButton"
+import JobCheck from "./selectors/JobCheck"
+import RecordedOnlyToggle from "./selectors/RecordedOnlyToggle"
+import SortBySelector from "./selectors/SortBySelector"
+import InterestsSelector from "./selectors/InterestsSelector"
+import CompanyCountrySelector from "./selectors/CompanyCountrySelector"
+import CompanyIndustrySelector from "./selectors/CompanyIndustrySelector"
+import CompanySizeSelector from "./selectors/CompanySizeSelector"
+import LanguageSelector from "./selectors/LanguageSelector"
+import FieldsOfStudySelector from "./selectors/FiledsOfStudySelector"
+import { SlideUpTransition } from "../transitions"
 
-interface Props {
-   open: boolean
-   id: string
-   anchorEl: HTMLElement
-   handleClose: () => any
-   filtersToShow: FilterEnum[]
-}
-
-const UpIcon = (props: IconProps) => (
-   // @ts-ignore
-   <DownIcon {...props} style={{ transform: "rotate(180deg)" }} />
-)
-
-const styles: StylesProps = {
+const styles = sxStyles({
    paperRoot: {
       borderRadius: wishListBorderRadius,
       boxShadow: (theme) => theme.boxShadows.dark_12_13,
    },
    content: {
-      p: 2,
+      p: { xs: 1, md: 2 },
       minWidth: 200,
-      maxWidth: 500,
    },
-   header: {},
+   header: {
+      px: { xs: 2, md: 4 },
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+   },
+   actions: {
+      px: { xs: 2, md: 4 },
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+   },
    interestChip: {
       borderRadius: 1,
    },
-}
+   swipeableViews: {
+      height: "100%",
+   },
+   swipeableViewsContainer: {
+      height: "100%",
+      "& > *": {
+         height: "100%",
+      },
+   },
+})
 
 export type SortType = "dateAsc" | "dateDesc" | "upvotesAsc" | "upvotesDesc"
 
-export const getFirebaseSortType = (
-   sortType: SortType
-): [
-   Wish["numberOfUpvotes"] | Wish["createdAt"],
-   firebase.firestore.OrderByDirection
-] => {
-   switch (sortType) {
-      case "dateAsc":
-         // @ts-ignore
-         return ["createdAt", "asc"]
-      case "dateDesc":
-         // @ts-ignore
-         return ["createdAt", "desc"]
-      case "upvotesAsc":
-         // @ts-ignore
-         return ["numberOfUpvotes", "asc"]
-      case "upvotesDesc":
-         // @ts-ignore
-         return ["numberOfUpvotes", "desc"]
-      default:
-         // @ts-ignore
-         return ["createdAt", "desc"]
-   }
+type Props = {
+   open: boolean
+   handleClose: () => void
 }
 
-interface SelectProps {
-   id: string
-   labelId: string
-   value: SortType
-   label: string
-   handleChange: (event: SelectChangeEvent<string>) => void
-   options: { value: SortType; label: string; descending: boolean }[]
-}
-
-const FilterMenu = ({
-   id,
-   open,
-   anchorEl,
-   handleClose,
-   filtersToShow,
-}: Props) => {
-   const { data: interests } = useInterests()
+const FilterMenu = ({ open, handleClose }: Props) => {
    const { pathname, push, query } = useRouter()
+   const { filtersToShow, numberOfResults, numberOfActiveFilters } = useFilter()
 
-   const mappedCompanySizesCodes = useMemo(
-      (): OptionGroup[] =>
-         CompanySizesCodes.map((size) => ({ id: size.id, name: size.label })),
-      []
-   )
-
-   const handleQuery = useCallback(
-      (queryParam: string, queryValue: string | string[]) => {
-         const newQuery = {
-            ...query,
-            [queryParam]: Array.isArray(queryValue)
-               ? queryValue.join(",")
-               : queryValue,
-            page: 0,
-         }
+   const handleApplyFilter = useCallback(
+      ({ pathName, query }) => {
          void push(
             {
-               pathname: pathname,
-               query: newQuery,
+               pathname: pathName,
+               query,
             },
             undefined,
             { shallow: true }
          )
       },
-      [pathname, push, query]
-   )
-
-   const selects = useMemo<SelectProps[]>(
-      () => [
-         {
-            id: "sort-select",
-            labelId: "sort-select-label",
-            // @ts-ignore
-            value: Array.isArray(query.sortType)
-               ? query.sortType[0]
-               : query.sortType,
-            label: "Sort by",
-            handleChange: (event) => {
-               handleQuery("sortType", event.target.value)
-            },
-            options: [
-               {
-                  value: "dateDesc",
-                  label: "Date Descending (Newest First)",
-                  descending: true,
-               },
-               {
-                  value: "dateAsc",
-                  label: "Date Ascending (Oldest First)",
-                  descending: false,
-               },
-               {
-                  value: "upvotesDesc",
-                  label: "Upvotes Descending (Most Upvoted First)",
-                  descending: true,
-               },
-               {
-                  value: "upvotesAsc",
-                  label: "Upvotes Ascending (Least Upvoted First)",
-                  descending: false,
-               },
-            ],
-         },
-      ],
-      [handleQuery, query.sortType]
-   )
-
-   const numberOfActiveFilters = useMemo(
-      () =>
-         [
-            query.interests,
-            query.sortType,
-            query.languages,
-            query.jobCheck,
-            query.companyCountries,
-            query.companySizes,
-            query.companyIndustries,
-         ].filter((value) => value).length,
-      [query]
-   )
-
-   const handleClickInterest = useCallback(
-      (interestName: string) => {
-         const currentInterests = Array.isArray(query.interests)
-            ? query.interests
-            : query.interests?.split(",") || []
-         const isInQuery = currentInterests.includes(interestName)
-
-         const newInterests = isInQuery
-            ? currentInterests
-                 .filter((interest) => interest !== interestName)
-                 .join(",")
-            : currentInterests.concat(interestName).join(",")
-
-         const newQuery = {
-            ...query,
-            interests: newInterests,
-            page: 0,
-         }
-
-         // if there´s no filter, no need to have an empty query param
-         if (newInterests.length === 0) {
-            delete newQuery.interests
-         }
-
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [pathname, push, query]
+      [push]
    )
 
    const handleChangeMultiSelect = useCallback(
@@ -243,44 +107,9 @@ const FilterMenu = ({
             delete newQuery[name]
          }
 
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
+         handleApplyFilter({ pathName: pathname, query: newQuery })
       },
-      [pathname, push, query]
-   )
-
-   const handleJobCheck = useCallback(
-      (event) => {
-         const checked = event.target.checked
-
-         const newQuery = {
-            ...query,
-            ["jobCheck"]: checked,
-            page: 0,
-         }
-
-         // if job check is false we don't want the filter to be applied
-         // no jobCheck = false on the url
-         if (!checked) {
-            delete newQuery?.["jobCheck"]
-         }
-
-         void push(
-            {
-               pathname: pathname,
-               query: newQuery,
-            },
-            undefined,
-            { shallow: true }
-         )
-      },
-      [pathname, push, query]
+      [handleApplyFilter, pathname, query]
    )
 
    const handleClearQueries = useCallback(() => {
@@ -299,290 +128,67 @@ const FilterMenu = ({
       return push({ pathname, query: newQuery }, undefined, { shallow: true })
    }, [pathname, push, filtersToShow, query])
 
-   const isSelected = useCallback(
-      (interestId) => query.interests?.includes(interestId),
-      [query.interests]
-   )
-
-   const isJobChecked = useCallback(
-      () => query?.jobCheck === "true",
-      [query.jobCheck]
-   )
-
-   const getSelectedLanguages = useCallback(() => {
-      const queryLanguages = query.languages as string
-      let selectedLanguages = []
-
-      if (queryLanguages) {
-         selectedLanguages = formatToOptionArray(
-            queryLanguages.split(","),
-            languageOptionCodes
-         )
-      }
-      return selectedLanguages
-   }, [query.languages])
-
-   const getSelectedCompanyIndustry = useCallback(() => {
-      const queryIndustries = query.companyIndustries as string
-      let selectedIndustries = []
-
-      if (queryIndustries) {
-         selectedIndustries = formatToOptionArray(
-            queryIndustries.split(","),
-            CompanyIndustryValues
-         )
-      }
-      return selectedIndustries
-   }, [query.companyIndustries])
-
-   const getSelectedCompanyCountry = useCallback((): OptionGroup[] => {
-      const queryCompanyCountry = query.companyCountries as string
-      let selectedCountry = []
-
-      if (queryCompanyCountry) {
-         selectedCountry = formatToOptionArray(
-            queryCompanyCountry.split(","),
-            CompanyCountryValues
-         )
-      }
-      return selectedCountry
-   }, [query.companyCountries])
-
-   const getSelectedCompanySize = useCallback((): OptionGroup[] => {
-      const queryCompanySize = query.companySizes as string
-      let selectedSize = []
-
-      if (queryCompanySize) {
-         selectedSize = formatToOptionArray(
-            queryCompanySize.split(","),
-            mappedCompanySizesCodes
-         )
-      }
-      return selectedSize
-   }, [mappedCompanySizesCodes, query.companySizes])
-
-   const renderSortBy = useCallback((): JSX.Element => {
-      return (
-         <div key="sort-select">
-            {selects.map((select, index) => (
-               <FormControl key={select.id} variant={"outlined"} fullWidth>
-                  <Stack
-                     direction={"row"}
-                     justifyContent={"space-between"}
-                     alignItems={"center"}
-                     spacing={2}
-                     sx={{ mb: 1, height: "35px" }}
-                  >
-                     <Typography
-                        htmlFor={select.id}
-                        component={"label"}
-                        variant={"h6"}
-                        id={select.labelId}
-                     >
-                        {select.label}
-                     </Typography>
-                     {index === 0 && !!numberOfActiveFilters && (
-                        <Button
-                           onClick={handleClearQueries}
-                           variant={"text"}
-                           size={"small"}
-                           color={"secondary"}
-                        >
-                           Clear all ({numberOfActiveFilters})
-                        </Button>
-                     )}
-                  </Stack>
-
-                  <ResponsiveSelect
-                     labelId={select.labelId}
-                     id={select.id}
-                     displayEmpty
-                     value={select.value || ""}
-                     onChange={select.handleChange}
-                  >
-                     <ResponsiveOption disabled value="">
-                        Select an option
-                     </ResponsiveOption>
-                     {select.options.map((option) => (
-                        <ResponsiveOption
-                           key={option.value}
-                           value={option.value}
-                           icon={option.descending ? <DownIcon /> : <UpIcon />}
-                        >
-                           {option.label}
-                        </ResponsiveOption>
-                     ))}
-                  </ResponsiveSelect>
-               </FormControl>
-            ))}
-         </div>
-      )
-   }, [handleClearQueries, numberOfActiveFilters, selects])
-
-   const renderLanguagesSelect = useCallback(() => {
-      return (
-         <MultiListSelect
-            inputName={"languages"}
-            isCheckbox
-            selectedItems={getSelectedLanguages()}
-            allValues={languageOptionCodes}
-            setFieldValue={handleChangeMultiSelect}
-            inputProps={{
-               placeholder: "Select languages",
-            }}
-            getValueFn={multiListSelectMapValueFn}
-            chipProps={{
-               color: "primary",
-            }}
-         />
-      )
-   }, [getSelectedLanguages, handleChangeMultiSelect])
-
-   const renderInterests = useCallback(() => {
-      if (interests.length > 0) {
-         return (
-            <FormControl key="tags-select" variant={"outlined"} fullWidth>
-               <Typography
-                  htmlFor="tags-select"
-                  component={"label"}
-                  variant={"h6"}
-                  id={"tags-select-label"}
-               >
-                  {"Tags"}
-               </Typography>
-               <Box id={"tags-select"}>
-                  {interests.map((interest) => (
-                     <Chip
-                        sx={styles.interestChip}
-                        onClick={() => handleClickInterest(interest.id)}
-                        color={isSelected(interest.id) ? "primary" : "default"}
-                        /*
-                           // @ts-ignore */
-                        variant={
-                           isSelected(interest.id) ? "contained" : "outlined"
-                        }
-                        stacked={"true"}
-                        label={interest.name}
-                        key={interest.id}
-                     />
-                  ))}
-               </Box>
-            </FormControl>
-         )
-      }
-   }, [handleClickInterest, interests, isSelected])
-
-   const renderJobCheck = useCallback(() => {
-      return (
-         <FormControlLabel
-            key="job-check"
-            control={
-               <Checkbox
-                  // @ts-ignore
-                  size="large"
-                  sx={{ pl: 0 }}
-                  checked={isJobChecked()}
-                  onChange={handleJobCheck}
-               />
-            }
-            label="Job opening available"
-         />
-      )
-   }, [handleJobCheck, isJobChecked])
-
-   const renderCompanyCountrySelect = useCallback(() => {
-      return (
-         <MultiListSelect
-            inputName={"companyCountries"}
-            isCheckbox
-            selectedItems={getSelectedCompanyCountry()}
-            allValues={CompanyCountryValues}
-            setFieldValue={handleChangeMultiSelect}
-            inputProps={{
-               placeholder: "Select company location",
-            }}
-            getValueFn={multiListSelectMapValueFn}
-            chipProps={{
-               color: "primary",
-            }}
-         />
-      )
-   }, [getSelectedCompanyCountry, handleChangeMultiSelect])
-
-   const renderCompanyIndustrySelect = useCallback(() => {
-      return (
-         <MultiListSelect
-            inputName={"companyIndustries"}
-            isCheckbox
-            selectedItems={getSelectedCompanyIndustry()}
-            allValues={CompanyIndustryValues}
-            setFieldValue={handleChangeMultiSelect}
-            inputProps={{
-               placeholder: "Select company industry",
-            }}
-            getValueFn={multiListSelectMapValueFn}
-            chipProps={{
-               color: "primary",
-            }}
-         />
-      )
-   }, [getSelectedCompanyIndustry, handleChangeMultiSelect])
-
-   const renderCompanySizeSelect = useCallback(() => {
-      return (
-         <MultiListSelect
-            inputName={"companySizes"}
-            isCheckbox
-            selectedItems={getSelectedCompanySize()}
-            allValues={mappedCompanySizesCodes}
-            setFieldValue={handleChangeMultiSelect}
-            inputProps={{
-               placeholder: "Select company size",
-            }}
-            getValueFn={multiListSelectMapValueFn}
-            chipProps={{
-               color: "primary",
-            }}
-         />
-      )
-   }, [
-      getSelectedCompanySize,
-      handleChangeMultiSelect,
-      mappedCompanySizesCodes,
-   ])
-
    const renderAutoCompleteFilter = useCallback(
       (filter: FilterEnum) => {
          let toShow: {
             title: string
             renderFn: () => JSX.Element
-            clearAllButton?: boolean
          }
 
          switch (filter) {
             case FilterEnum.companyCountries:
                toShow = {
-                  title: "Company Country",
-                  renderFn: renderCompanyCountrySelect,
+                  title: "Country",
+                  renderFn: () => (
+                     <CompanyCountrySelector
+                        key={FilterEnum.companyCountries}
+                        handleChange={handleChangeMultiSelect}
+                     />
+                  ),
                }
                break
             case FilterEnum.companyIndustries:
                toShow = {
-                  title: "Company Industry",
-                  renderFn: renderCompanyIndustrySelect,
+                  title: "Industry",
+                  renderFn: () => (
+                     <CompanyIndustrySelector
+                        key={FilterEnum.companyIndustries}
+                        handleChange={handleChangeMultiSelect}
+                     />
+                  ),
                }
                break
             case FilterEnum.companySizes:
                toShow = {
                   title: "Company Size",
-                  renderFn: renderCompanySizeSelect,
+                  renderFn: () => (
+                     <CompanySizeSelector
+                        key={FilterEnum.companySizes}
+                        handleChange={handleChangeMultiSelect}
+                     />
+                  ),
                }
                break
             case FilterEnum.languages:
                toShow = {
-                  title: "Languages",
-                  renderFn: renderLanguagesSelect,
-                  clearAllButton: true,
+                  title: "Language",
+                  renderFn: () => (
+                     <LanguageSelector
+                        key={FilterEnum.languages}
+                        handleChange={handleChangeMultiSelect}
+                     />
+                  ),
+               }
+               break
+            case FilterEnum.fieldsOfStudy:
+               toShow = {
+                  title: "Field of study",
+                  renderFn: () => (
+                     <FieldsOfStudySelector
+                        key={FilterEnum.fieldsOfStudy}
+                        handleChange={handleChangeMultiSelect}
+                     />
+                  ),
                }
                break
          }
@@ -607,23 +213,12 @@ const FilterMenu = ({
                   <Typography
                      htmlFor={`${toShow.title}-select`}
                      component={"label"}
-                     variant={"h6"}
+                     variant={"h5"}
+                     fontWeight={600}
                      id={`${toShow.title}-select-label`}
                   >
                      {toShow.title}
                   </Typography>
-
-                  {toShow.clearAllButton && !!numberOfActiveFilters ? (
-                     <Button
-                        onClick={handleClearQueries}
-                        variant={"text"}
-                        size={"small"}
-                        color={"secondary"}
-                        sx={{ p: 0 }}
-                     >
-                        Clear all
-                     </Button>
-                  ) : null}
                </Stack>
                <Box id={`${toShow.title}-select`} mt={1}>
                   {toShow.renderFn()}
@@ -631,58 +226,109 @@ const FilterMenu = ({
             </FormControl>
          )
       },
-      [
-         handleClearQueries,
-         numberOfActiveFilters,
-         renderCompanyCountrySelect,
-         renderCompanyIndustrySelect,
-         renderCompanySizeSelect,
-         renderLanguagesSelect,
-      ]
+      [handleChangeMultiSelect]
    )
 
    const renderFilters = useCallback(
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
+            case FilterEnum.recordedOnly:
+               return (
+                  <RecordedOnlyToggle
+                     key={FilterEnum.recordedOnly}
+                     handleApplyFilter={handleApplyFilter}
+                  />
+               )
+
             case FilterEnum.interests:
-               return renderInterests()
+               return (
+                  <InterestsSelector
+                     key={FilterEnum.interests}
+                     handleChange={handleChangeMultiSelect}
+                  />
+               )
 
             case FilterEnum.jobCheck:
-               return renderJobCheck()
+               return (
+                  <JobCheck
+                     key={FilterEnum.jobCheck}
+                     handleApplyFilter={handleApplyFilter}
+                  />
+               )
 
             case FilterEnum.sortBy:
-               return renderSortBy()
+               return (
+                  <SortBySelector
+                     key={FilterEnum.sortBy}
+                     handleApplyFilter={handleApplyFilter}
+                  />
+               )
 
             case FilterEnum.languages:
             case FilterEnum.companyCountries:
             case FilterEnum.companyIndustries:
             case FilterEnum.companySizes:
+            case FilterEnum.fieldsOfStudy:
                return renderAutoCompleteFilter(filter)
          }
       },
-      [renderAutoCompleteFilter, renderInterests, renderJobCheck, renderSortBy]
+      [handleApplyFilter, handleChangeMultiSelect, renderAutoCompleteFilter]
    )
 
    return (
-      <Popover
-         id={id}
+      <Dialog
          open={open}
-         anchorEl={anchorEl}
          onClose={handleClose}
-         anchorOrigin={{
-            vertical: "bottom",
-            horizontal: "center",
-         }}
-         transformOrigin={{
-            vertical: "top",
-            horizontal: "center",
-         }}
-         PaperProps={{ sx: styles.paperRoot }}
+         maxWidth={"md"}
+         fullWidth
+         TransitionComponent={SlideUpTransition}
+         keepMounted={false} // Does not mount the children when dialog is closed
       >
-         <Stack sx={styles.content} spacing={2}>
-            {filtersToShow.map((filter) => renderFilters(filter))}
-         </Stack>
-      </Popover>
+         <DialogTitle sx={styles.header}>
+            <Typography fontWeight={600} fontSize={"24px"}>
+               Filters
+            </Typography>
+            <IconButton onClick={handleClose}>
+               <CloseIcon
+                  fontSize="large"
+                  color={"inherit"}
+                  sx={{ color: "text.primary" }}
+               />
+            </IconButton>
+         </DialogTitle>
+
+         <DialogContent sx={styles.content}>
+            <Stack sx={styles.content} spacing={3} divider={<Divider />}>
+               {filtersToShow.map((filter) => renderFilters(filter))}
+            </Stack>
+         </DialogContent>
+
+         <DialogActions sx={styles.actions}>
+            <Button
+               onClick={handleClearQueries}
+               variant={"text"}
+               size={"small"}
+               color={"secondary"}
+               disabled={numberOfActiveFilters < 1}
+            >
+               Clear filters
+            </Button>
+            <LoadingButton
+               loading={
+                  numberOfActiveFilters > 0 && numberOfResults === undefined
+               }
+               color="primary"
+               variant={"contained"}
+               size={"small"}
+               onClick={handleClose}
+               sx={{ width: "130px", maxHeight: "40px" }}
+            >
+               {numberOfActiveFilters > 0
+                  ? `${numberOfResults} Results`
+                  : "All results"}
+            </LoadingButton>
+         </DialogActions>
+      </Dialog>
    )
 }
 
