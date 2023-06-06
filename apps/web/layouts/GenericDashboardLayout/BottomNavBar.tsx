@@ -51,20 +51,30 @@ const BottomNavBar = ({ links }: Props) => {
          sx={styles.wrapper}
          TabIndicatorProps={{ sx: { justifyContent: "space-around" } } as any}
       >
-         {links.map(({ id, href, Icon, title, mobileTitle, pathname }) => {
-            const isActivePath = pathname === routerPathname
+         {links.map(
+            ({ id, href, Icon, title, mobileTitle, pathname, childLinks }) => {
+               const isActivePath = pathname === routerPathname
+               const isChildrenActive = childLinks?.find(
+                  (childrenLink: INavLink) =>
+                     childrenLink.pathname === routerPathname
+               )
 
-            return (
-               <Tab
-                  key={id}
-                  icon={<Box component={Icon} />}
-                  component={Link}
-                  href={href}
-                  label={isMobile ? mobileTitle || title : title}
-                  sx={[styles.navLink, isActivePath && styles.activeNavLink]}
-               />
-            )
-         })}
+               return (
+                  <Tab
+                     key={id}
+                     icon={<Box component={Icon} />}
+                     component={Link}
+                     href={href}
+                     label={isMobile ? mobileTitle || title : title}
+                     sx={[
+                        styles.navLink,
+                        (isActivePath || isChildrenActive) &&
+                           styles.activeNavLink,
+                     ]}
+                  />
+               )
+            }
+         )}
       </Tabs>
    )
 }

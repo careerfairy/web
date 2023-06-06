@@ -5,8 +5,9 @@ import {
    QueryDocumentSnapshot,
    startAfter,
    collection,
+   limit,
 } from "@firebase/firestore"
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import { Identifiable } from "@careerfairy/shared-lib/commonTypes"
 import { FirestoreInstance } from "../../../data/firebase/FirebaseInstance"
 import { doc, getDoc } from "firebase/firestore"
@@ -23,6 +24,9 @@ export interface InfiniteCollection<T extends Identifiable> {
    documents?: T[]
    hasMore: boolean
    error?: Error
+   handleClientSideUpdate: (docId: string, updateData: Partial<T>) => void
+   getAll: () => Promise<void>
+   query: Query<T>
 }
 
 const useInfiniteCollection = <T extends Identifiable>(
@@ -36,7 +40,12 @@ const useInfiniteCollection = <T extends Identifiable>(
    const [error, setError] = useState<Error>()
 
    const [initialDataLoaded, setInitialDataLoaded] = useState(
-      !options.initialData // If there is no initial data, then we don't need to wait for it to load
+      !options.initialData?.length // If there is no initial data, then we don't need to wait for it to load
+   )
+
+   const queryWithLimit = useMemo(
+      () => firestoreQuery(options.query, limit(options.limit)),
+      [options.query, options.limit]
    )
 
    const fetchDocuments = useCallback(
@@ -45,7 +54,7 @@ const useInfiniteCollection = <T extends Identifiable>(
          setError(undefined)
          try {
             const nextQuery = firestoreQuery(
-               options.query,
+               queryWithLimit,
                ...(lastSnap ? [startAfter(lastSnap)] : [])
             )
             const snapshot = await getDocs(nextQuery)
@@ -60,7 +69,7 @@ const useInfiniteCollection = <T extends Identifiable>(
             setLoading(false)
          }
       },
-      [options.limit, options.query]
+      [options.limit, queryWithLimit]
    )
 
    const getMore = useCallback(async () => {
@@ -86,7 +95,7 @@ const useInfiniteCollection = <T extends Identifiable>(
       if (!id) return
 
       // @ts-ignore
-      const collectionNameSegments = options.query._query.path
+      const collectionNameSegments = queryWithLimit._query.path
          .segments as string[]
 
       const collectionName =
@@ -102,17 +111,50 @@ const useInfiniteCollection = <T extends Identifiable>(
          setLastDocumentSnapShot(lastDocSnap)
       }
       setInitialDataLoaded(true) // Set initialDataLoaded to true here
-   }, [options.initialData, options.query])
+   }, [options.initialData, queryWithLimit])
 
-   const hasInitialData = Boolean(options.initialData.length)
+   const getAll = useCallback(async () => {
+      // If the initial data has not been loaded, don't proceed.
+      if (!initialDataLoaded) return
+
+      setLoading(true)
+      setError(undefined)
+      try {
+         const snapshot = await getDocs(options.query)
+         const fetchedDocs = snapshot.docs.map((doc) => doc.data())
+
+         setDocs(fetchedDocs)
+         setHasMore(false)
+         setLastDocumentSnapShot(snapshot.docs[snapshot.docs.length - 1])
+      } catch (error) {
+         setError(error)
+      } finally {
+         setLoading(false)
+      }
+   }, [initialDataLoaded, options.query])
+
+   const handleClientSideUpdate = useCallback(
+      (docId: string, updateData: Partial<T>) => {
+         setDocs((prevDocs) =>
+            prevDocs.map((doc) =>
+               doc.id === docId ? { ...doc, ...updateData } : doc
+            )
+         )
+      },
+      []
+   )
+
+   const hasInitialData = Boolean(options.initialData?.length)
 
    useEffect(() => {
+      if (!hasMore) return
+
       if (hasInitialData) {
          void getInitialDataLastDocSnapshot()
       } else {
          void fetchDocuments()
       }
-   }, [fetchDocuments, getInitialDataLastDocSnapshot, hasInitialData])
+   }, [fetchDocuments, getInitialDataLastDocSnapshot, hasInitialData, hasMore])
 
    return {
       getMore,
@@ -120,6 +162,9 @@ const useInfiniteCollection = <T extends Identifiable>(
       documents: docs,
       hasMore,
       error,
+      handleClientSideUpdate,
+      getAll,
+      query: options.query,
    }
 }
 

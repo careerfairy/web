@@ -182,20 +182,15 @@ const SignupForm = () => {
             md: 10,
          }}
       >
-         <Grid item xs={6}>
-            <Typography variant="body2" color="textSecondary">
-               Step {currentStep + 1} of {steps.length}
-            </Typography>
-         </Grid>
-         <Grid item style={{ textAlign: "right" }} xs={6}>
-            {showBackButton && (
+         <Grid item style={{ textAlign: "right" }} xs={12}>
+            {showBackButton ? (
                <Button
                   data-testid={"user-registration-back-button"}
                   onClick={handlePrevious}
                >
                   Back
                </Button>
-            )}
+            ) : null}
 
             <LoadingButton
                variant="contained"

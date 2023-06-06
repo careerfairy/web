@@ -69,8 +69,8 @@ const QuestionCreateForm = () => {
       useContext(RegistrationContext)
    const classes = useStyles()
    const { replace } = useRouter()
-   const { putLivestreamQuestion } = useFirebaseService()
-   const { authenticatedUser, userData } = useAuth()
+   const { createLivestreamQuestion } = useFirebaseService()
+   const { authenticatedUser, userData, userPresenter } = useAuth()
 
    const {
       handleChange,
@@ -89,13 +89,11 @@ const QuestionCreateForm = () => {
             return replace("/signup")
          }
          try {
-            const newQuestion = {
+            await createLivestreamQuestion(livestream?.id, {
                title: values.questionTitle,
-               votes: 0,
-               type: "new",
                author: authenticatedUser.email,
-            }
-            await putLivestreamQuestion(livestream?.id, newQuestion)
+               displayName: userPresenter?.getDisplayName?.() || null,
+            })
 
             rewardService
                .userAction("LIVESTREAM_USER_ASKED_QUESTION", livestream?.id)
@@ -166,9 +164,13 @@ const QuestionCreateForm = () => {
                      // @ts-ignore
                      maxLength="170"
                      error={
-                        touched.questionTitle && Boolean(errors.questionTitle)
+                        touched.questionTitle
+                           ? Boolean(errors.questionTitle)
+                           : null
                      }
-                     helperText={touched.questionTitle && errors.questionTitle}
+                     helperText={
+                        touched.questionTitle ? errors.questionTitle : null
+                     }
                      inputProps={{ maxLength: maxQuestionLength }}
                      fullWidth
                      onBlur={handleBlur}

@@ -1,0 +1,1 @@
+export const MAX_QUERY_ARRAY_IN_LENGTH = 10

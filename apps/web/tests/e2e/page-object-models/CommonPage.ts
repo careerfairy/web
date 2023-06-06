@@ -18,6 +18,15 @@ export class CommonPage {
       return expect(this[locatorFn](text)).toBeVisible()
    }
 
+   async clickAndUploadFiles(locator: Locator, files: string[] | string) {
+      const [fileChooser] = await Promise.all([
+         this.page.waitForEvent("filechooser"),
+         locator.click(),
+      ])
+
+      await fileChooser.setFiles(files)
+   }
+
    async resilientClick(
       locator: string,
       tries: number = 3,
@@ -166,4 +175,27 @@ const promiseTimeout = (promise, timeoutInMilliseconds) => {
          }, timeoutInMilliseconds)
       }),
    ])
+}
+
+/**
+ * Select option from a MaterialUI Autocomplete multi-select input
+ * @param stringToSelect
+ * @param elementLocator
+ * @param page
+ */
+export const handleMultiSelect = async (
+   stringToSelect: string,
+   elementLocator: Locator,
+   page: Page
+) => {
+   if (!stringToSelect) return
+   await elementLocator.click()
+   await elementLocator.focus()
+   await elementLocator.fill(stringToSelect)
+   // give time for the dropdown to update the suggestions
+   await sleep(250)
+   expect(await elementLocator.inputValue()).toBe(stringToSelect)
+   await page
+      .locator('div[role="presentation"]', { hasText: stringToSelect })
+      .click()
 }

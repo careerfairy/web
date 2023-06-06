@@ -182,6 +182,7 @@ const ProfileDetails = ({ group, firebase, className, ...rest }) => {
                <Divider />
                <Box display="flex" justifyContent="flex-end" p={2}>
                   <Button
+                     data-testid={"profile-details-save-button"}
                      disabled={!dirty}
                      onClick={handleSubmit}
                      color="primary"

@@ -1,4 +1,4 @@
-import React from "react"
+import React, { FC } from "react"
 import { useAuth } from "../../../../HOCs/AuthProvider"
 import { useFormik } from "formik"
 import {
@@ -12,6 +12,11 @@ import { useDispatch } from "react-redux"
 import * as actions from "store/actions"
 import { dataLayerEvent } from "../../../../util/analyticsUtils"
 import { recommendationServiceInstance } from "data/firebase/RecommendationService"
+import {
+   LivestreamEvent,
+   LivestreamQuestion,
+} from "@careerfairy/shared-lib/livestreams"
+import { errorLogAndNotify } from "../../../../util/CommonUtil"
 
 const styles = {
    root: {
@@ -19,9 +24,14 @@ const styles = {
       padding: (theme) => theme.spacing(1, 2),
    },
 }
-const CreateQuestion = ({ livestream, reFetchQuestions }) => {
-   const { putLivestreamQuestion } = useFirebaseService()
-   const { authenticatedUser, userData } = useAuth()
+
+type Props = {
+   livestream: LivestreamEvent
+   onQuestionAdded: (question: LivestreamQuestion) => void
+}
+const CreateQuestion: FC<Props> = ({ livestream, onQuestionAdded }) => {
+   const { createLivestreamQuestion } = useFirebaseService()
+   const { authenticatedUser, userData, userPresenter, isLoggedIn } = useAuth()
    const dispatch = useDispatch()
    const { replace, asPath } = useRouter()
    const {
@@ -37,26 +47,28 @@ const CreateQuestion = ({ livestream, reFetchQuestions }) => {
          questionTitle: "",
       },
       onSubmit: async (values, { resetForm, setFieldError }) => {
-         if (!authenticatedUser) {
+         if (!isLoggedIn) {
             return replace({
                pathname: "/signup",
                query: { absolutePath: asPath },
             })
          }
          try {
-            const newQuestion = {
-               title: values.questionTitle,
-               votes: 0,
-               type: "new",
-               author: authenticatedUser.email,
-            }
-            await putLivestreamQuestion(livestream.id, newQuestion)
+            const newlyCreatedQuestion = await createLivestreamQuestion(
+               livestream.id,
+               {
+                  title: values.questionTitle,
+                  author: authenticatedUser.email,
+                  displayName: userPresenter?.getDisplayName?.() || null,
+               }
+            )
+
             dispatch(
                actions.sendSuccessMessage(
                   "Thanks, your question has successfully been submitted!"
                )
             )
-            reFetchQuestions()
+            onQuestionAdded(newlyCreatedQuestion)
             resetForm()
             dataLayerEvent("event_question_submit", {
                livestreamId: livestream.id,
@@ -64,6 +76,11 @@ const CreateQuestion = ({ livestream, reFetchQuestions }) => {
 
             recommendationServiceInstance.createdQuestion(livestream, userData)
          } catch (e) {
+            errorLogAndNotify(e, {
+               message: "There was an issue submitting the question",
+               livestreamId: livestream.id,
+               userId: authenticatedUser.uid,
+            })
             setFieldError(
                "questionTitle",
                "There was an issue submitting the question"
@@ -95,8 +112,8 @@ const CreateQuestion = ({ livestream, reFetchQuestions }) => {
             placeholder={"What would like to ask our speaker?"}
             // @ts-ignore
             maxLength="170"
-            error={touched.questionTitle && Boolean(errors.questionTitle)}
-            helperText={touched.questionTitle && errors.questionTitle}
+            error={touched.questionTitle ? Boolean(errors.questionTitle) : null}
+            helperText={touched.questionTitle ? errors.questionTitle : null}
             inputProps={{ maxLength: maxQuestionLength }}
             fullWidth
             onBlur={handleBlur}
@@ -118,7 +135,9 @@ const CreateQuestion = ({ livestream, reFetchQuestions }) => {
                color="primary"
                size="large"
                startIcon={
-                  isSubmitting && <CircularProgress size={10} color="inherit" />
+                  isSubmitting ? (
+                     <CircularProgress size={10} color="inherit" />
+                  ) : null
                }
                disabled={isSubmitting}
             >

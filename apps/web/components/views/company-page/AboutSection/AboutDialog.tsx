@@ -128,6 +128,7 @@ const AboutDialog = ({ handleClose }: Props) => {
                   </Stack>
                   <Box display="flex" justifyContent="end" mt={4}>
                      <Button
+                        data-testid={"about-section-save-button"}
                         type={"submit"}
                         variant="contained"
                         color="secondary"

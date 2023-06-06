@@ -45,19 +45,30 @@ const EventPreviewCardChipLabels = ({
 
    if (hasParticipated && isPast) {
       rightChip = (
-         <Chip icon={<CheckIcon />} color="primary" label={"Attended"} />
+         <Chip
+            key={"attend-chip"}
+            icon={<CheckIcon />}
+            color="primary"
+            label={"Attended"}
+         />
       )
    }
 
    if (hasRegistered && !isPast) {
       rightChip = (
-         <Chip icon={<CheckIcon />} color="primary" label={"Booked!"} />
+         <Chip
+            key={"booked-chip"}
+            icon={<CheckIcon />}
+            color="primary"
+            label={"Booked!"}
+         />
       )
    }
 
    if (isLive) {
       leftChips.push(
          <Chip
+            key={"live-chip"}
             icon={<LiveIcon />}
             color="error"
             label={"LIVE"}
@@ -69,6 +80,7 @@ const EventPreviewCardChipLabels = ({
    if (hasJobToApply) {
       leftChips.push(
          <Chip
+            key={"easy-apply-chip"}
             deleteIcon={
                <Badge
                   color="primary"
@@ -106,6 +118,7 @@ const EventPreviewCardChipLabels = ({
 
       leftChips.push(
          <Chip
+            key={"available-chip"}
             sx={{ pr: 1 }}
             color={"info"}
             label={
@@ -121,7 +134,10 @@ const EventPreviewCardChipLabels = ({
    return leftChips.length > 0 || rightChip ? (
       <Box className="hideOnHoverContent" sx={styles.wrapper}>
          <Stack spacing={1} direction={{ xs: "column", md: "row" }}>
-            {leftChips.map((chip) => chip)}
+            {leftChips.map((chip, index) => ({
+               ...chip,
+               key: `chip-${index}`,
+            }))}
          </Stack>
          <Box>{rightChip}</Box>
       </Box>

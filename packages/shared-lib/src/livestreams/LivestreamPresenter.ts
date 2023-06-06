@@ -34,6 +34,7 @@ export class LivestreamPresenter extends BaseModel {
       public readonly id: string,
       public readonly title: string,
       public readonly summary: string,
+      public readonly reasonsToJoinLivestream: string,
       public readonly backgroundImageUrl: string,
       public readonly company: string,
       public readonly companyId: string,
@@ -120,7 +121,7 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    isLive(): boolean {
-      return this.hasStarted && !this.hasEnded
+      return this.hasStarted && !this.hasEnded && !this.isPast()
    }
 
    isTest(): boolean {
@@ -152,6 +153,27 @@ export class LivestreamPresenter extends BaseModel {
             )
       )
    }
+   isRegistrationDisabled(userEmail: string): boolean {
+      if (this.isPast()) return true
+      //User should always be able to cancel registration
+      if (this.isUserRegistered(userEmail)) return false
+      //Disable registration if max number of registrants is reached
+      if (this.maxRegistrants && this.maxRegistrants > 0) {
+         return this.registeredUsers
+            ? this.maxRegistrants <= this.registeredUsers.length
+            : false
+      }
+      return false
+   }
+
+   hasNoSpotsLeft(): boolean {
+      return Boolean(
+         this.maxRegistrants &&
+            this.maxRegistrants > 0 &&
+            this.registeredUsers &&
+            this.maxRegistrants <= this.registeredUsers.length
+      )
+   }
 
    recordingAccessTimeLeft(): Date {
       const streamDate = new Date(this.start)
@@ -180,6 +202,17 @@ export class LivestreamPresenter extends BaseModel {
    }
 
    /**
+    * Only allow users to apply to jobs outside the stream if the stream has started,
+    * and it has been at least 20 minutes since the stream started
+    * */
+   canApplyToJobsOutsideOfStream(): boolean {
+      const delay = 20 * 60 * 1000 // 20min
+      const start = new Date(this.start)
+
+      return Boolean(Date.now() - start.getTime() >= delay)
+   }
+
+   /**
     * Elapsed minutes since the livestream started
     *
     * If the model is a BreakoutRoom document, the elapsed minutes
@@ -194,11 +227,37 @@ export class LivestreamPresenter extends BaseModel {
       return Math.floor((Date.now() - start?.getTime()) / 1000 / 60)
    }
 
+   /**
+    * Calculates the number of spots remaining for registration.
+    *
+    * @returns {number} The number of spots remaining.
+    */
+   getNumberOfSpotsRemaining(): number {
+      if (!this.maxRegistrants) return 0
+      else if (!this.registeredUsers) return this.maxRegistrants
+      else {
+         return this.maxRegistrants - this.registeredUsers.length
+      }
+   }
+
+   hasJobs(): boolean {
+      return this.jobs && this.jobs.length > 0
+   }
+
+   getAssociatedJob(jobId: string): LivestreamJobAssociation | null {
+      return this.jobs.find((job) => job.jobId === jobId) ?? null
+   }
+
+   getViewerEventRoomLink(): string {
+      return `/streaming/${this.id}/viewer`
+   }
+
    static createFromDocument(livestream: LivestreamEvent) {
       return new LivestreamPresenter(
          livestream.id,
          livestream.title,
          livestream.summary ?? "",
+         livestream.reasonsToJoinLivestream ?? "",
          livestream.backgroundImageUrl ?? "",
          livestream.company ?? "",
          livestream.companyId ?? "",
@@ -263,6 +322,7 @@ export class LivestreamPresenter extends BaseModel {
          livestream.id,
          livestream.title,
          livestream.summary,
+         livestream.reasonsToJoinLivestream,
          livestream.backgroundImageUrl,
          livestream.company,
          livestream.companyId,

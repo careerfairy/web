@@ -98,6 +98,7 @@ const AboutSection = () => {
                </Typography>
                {editMode ? (
                   <Button
+                     data-testid={"about-section-edit-button"}
                      startIcon={<EditIcon size={18} />}
                      variant="text"
                      color="primary"

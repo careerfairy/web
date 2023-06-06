@@ -159,6 +159,7 @@ const ImageSelect = ({
          {renderFilePicker(
             <Box sx={{ width: "100%", textAlign: buttonCentered && "center" }}>
                <Button
+                  data-testid={"image-selector-upload"}
                   startIcon={showIconButton ? <PublishIcon /> : null}
                   disabled={isSubmitting}
                   fullWidth={!buttonCentered}

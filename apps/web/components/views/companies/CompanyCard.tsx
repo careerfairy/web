@@ -90,15 +90,14 @@ const styles = sxStyles({
       position: "absolute",
       top: "-15px",
       right: (theme) => theme.spacing(3),
+      background: (theme) => theme.palette.background.paper,
+      borderRadius: 1.2,
    },
    followButton: {
       borderRadius: 1,
-      background: (theme) => theme.palette.background.paper,
       py: 0.5,
       px: 2.25,
-      "&:hover": {
-         background: (theme) => theme.palette.background.paper,
-      },
+      boxShadow: "none",
       textTransform: "none",
       zIndex: 1,
       textDecoration: "none !important",
@@ -140,8 +139,6 @@ const CompanyCard: FC<Props> = ({ company }) => {
                {inView ? ( // Only render the follow button when the card is in view, since it does a request to the server
                   <FollowButton
                      group={company}
-                     variant={"outlined"}
-                     color={"secondary"}
                      size={"small"}
                      sx={styles.followButton}
                      startIcon={null}

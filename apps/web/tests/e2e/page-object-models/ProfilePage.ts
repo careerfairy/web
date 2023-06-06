@@ -24,6 +24,10 @@ export default class ProfilePage extends CommonPage {
       return this.page.goto(`/profile`)
    }
 
+   openGroups() {
+      return this.resilientGoto(`/profile/groups`)
+   }
+
    openMyRecruiters() {
       return this.resilientGoto(`/profile/saved-recruiters`)
    }
