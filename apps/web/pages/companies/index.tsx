@@ -28,7 +28,7 @@ const CompaniesPage: NextPage<Props> = ({ serverSideCompanies }) => {
 }
 
 export const getServerSideProps = async () => {
-   const snaps = await getDocs(getInfiniteQuery(COMPANIES_PAGE_SIZE).query)
+   const snaps = await getDocs(getInfiniteQuery(COMPANIES_PAGE_SIZE))
 
    return {
       props: {
