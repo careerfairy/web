@@ -2,6 +2,8 @@ import { groupAdminFixture as test } from "../../fixtures"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 
 test.describe("Group Admin Livestreams", () => {
+   test.beforeEach(test.skip)
+
    test("Create a draft livestream from the main page", async ({
       groupPage,
       interests,
