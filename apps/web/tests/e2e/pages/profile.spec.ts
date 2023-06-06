@@ -52,7 +52,7 @@ test.describe("My Recruiters", () => {
       // assertions
       await expect(
          profilePage.page.getByRole("heading", {
-            name: "You need to unlock the Research Level 2 badge to access this feature.",
+            name: "You need to unlock the Networker Level 2 badge to access this feature.",
          })
       ).toBeVisible()
    })

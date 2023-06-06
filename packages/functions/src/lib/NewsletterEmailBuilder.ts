@@ -6,6 +6,7 @@ import {
 import { TemplatedMessage } from "postmark"
 import { PostmarkEmailSender } from "../api/postmark"
 import { DateTime } from "luxon"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 
 /**
  * Builds a newsletter email (templated) and sends it to the recipients
@@ -83,7 +84,7 @@ export class NewsletterEmailBuilder {
    }
 
    private mapLivestreamToTemplate(livestream: LivestreamEvent) {
-      const link = `https://www.careerfairy.io/upcoming-livestream/${livestream.id}`
+      const link = makeLivestreamEventDetailsUrl(livestream.id)
       const date = DateTime.fromJSDate(livestream.start.toDate())
 
       return {

@@ -1,5 +1,8 @@
-import { getHost } from "../constants/domains"
 import { queryInvite, queryReferralCode } from "../constants/queryStringParams"
+import {
+   getHost,
+   makeLivestreamEventDetailsUrl,
+} from "@careerfairy/shared-lib/utils/urls"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { companyNameSlugify } from "@careerfairy/shared-lib/utils"
 
@@ -93,10 +96,6 @@ export const makeUrls = function (event) {
       yahoo: makeYahooCalendarUrl(event),
       ics: makeICSCalendarUrl(event),
    }
-}
-
-export const makeLivestreamEventDetailsUrl = (livestreamId) => {
-   return `${getHost()}/portal/livestream/${livestreamId}`
 }
 
 export const makeGroupCompanyPageUrl = (group: Group) => {

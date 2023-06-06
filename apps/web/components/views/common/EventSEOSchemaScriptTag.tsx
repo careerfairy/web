@@ -1,4 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
+import { makeLivestreamEventDetailsUrl } from "@careerfairy/shared-lib/utils/urls"
 import React, { useMemo } from "react"
 import { Event } from "schema-dts"
 import {
@@ -25,7 +26,7 @@ const EventSEOSchemaScriptTag = ({ event }: EventSEOProps) => {
          eventName: event?.title,
          eventDescription: event?.summary,
          eventCompanyName: event?.company,
-         url: `https://www.careerfairy.io/upcoming-livestream/${event?.id}`,
+         url: makeLivestreamEventDetailsUrl(event?.id),
          duration: event?.duration || 60,
       }),
       [event]
