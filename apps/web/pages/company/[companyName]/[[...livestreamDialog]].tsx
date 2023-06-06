@@ -1,7 +1,7 @@
 import React from "react"
-import CompanyPageOverview from "../../components/views/company-page"
+import CompanyPageOverview from "../../../components/views/company-page"
 import { Group } from "@careerfairy/shared-lib/groups"
-import { groupRepo, livestreamRepo } from "../../data/RepositoryInstances"
+import { groupRepo, livestreamRepo } from "../../../data/RepositoryInstances"
 import { companyNameUnSlugify } from "@careerfairy/shared-lib/utils"
 import { Box } from "@mui/material"
 import {
@@ -10,13 +10,18 @@ import {
    InferGetStaticPropsType,
    NextPage,
 } from "next"
-import { mapFromServerSide } from "../../util/serverUtil"
+import { mapFromServerSide } from "../../../util/serverUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import useTrackPageView from "../../components/custom-hook/useTrackDetailPageView"
-import { useFirebaseService } from "../../context/firebase/FirebaseServiceContext"
+import useTrackPageView from "../../../components/custom-hook/useTrackDetailPageView"
+import { useFirebaseService } from "../../../context/firebase/FirebaseServiceContext"
 import * as Sentry from "@sentry/nextjs"
-import GenericDashboardLayout from "../../layouts/GenericDashboardLayout"
-import SEO from "../../components/util/SEO"
+import GenericDashboardLayout from "../../../layouts/GenericDashboardLayout"
+import SEO from "../../../components/util/SEO"
+import {
+   getLivestreamDialogData,
+   LiveStreamDialogData,
+   LivestreamDialogLayout,
+} from "../../../components/views/livestream-dialog"
 
 type TrackProps = {
    id: string
@@ -26,6 +31,7 @@ type TrackProps = {
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
+   livestreamDialogData,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
    const { universityName, id } = serverSideGroup
@@ -37,7 +43,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    }) as unknown as React.RefObject<HTMLDivElement>
 
    return (
-      <>
+      <LivestreamDialogLayout livestreamDialogData={livestreamDialogData}>
          <SEO
             id={`CareerFairy | ${universityName}`}
             title={`CareerFairy | ${universityName}`}
@@ -57,14 +63,16 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                />
             </Box>
          </GenericDashboardLayout>
-      </>
+      </LivestreamDialogLayout>
    )
 }
 
 export const getStaticProps: GetStaticProps<{
    serverSideGroup: Group
-   serverSideUpcomingLivestreams: any[]
-}> = async ({ params }) => {
+   serverSideUpcomingLivestreams: { [p: string]: any }[]
+   livestreamDialogData: LiveStreamDialogData
+}> = async (ctx) => {
+   const { params } = ctx
    const { companyName: companyNameSlug } = params
    const companyName = companyNameUnSlugify(companyNameSlug as string)
 
@@ -73,12 +81,28 @@ export const getStaticProps: GetStaticProps<{
 
       if (serverSideGroup) {
          if (serverSideGroup.publicProfile) {
-            const serverSideUpcomingLivestreams =
-               await livestreamRepo.getEventsOfGroup(
+            const results = await Promise.allSettled([
+               livestreamRepo.getEventsOfGroup(
                   serverSideGroup?.groupId,
                   "upcoming",
                   { limit: 10 }
-               )
+               ),
+               getLivestreamDialogData(ctx),
+            ])
+            const [
+               serverSideUpcomingLivestreamsResult,
+               livestreamDialogDataResult,
+            ] = results
+
+            const serverSideUpcomingLivestreams =
+               serverSideUpcomingLivestreamsResult.status === "fulfilled"
+                  ? serverSideUpcomingLivestreamsResult.value
+                  : []
+
+            const livestreamDialogData =
+               livestreamDialogDataResult.status === "fulfilled"
+                  ? livestreamDialogDataResult.value
+                  : null
 
             return {
                props: {
@@ -87,6 +111,7 @@ export const getStaticProps: GetStaticProps<{
                      serverSideUpcomingLivestreams?.map(
                         LivestreamPresenter.serializeDocument
                      ) || [],
+                  livestreamDialogData,
                },
                revalidate: 60,
             }
