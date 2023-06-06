@@ -36,7 +36,7 @@ const MyRecruitersTab = () => {
 
          <BrowseButton />
 
-         {!userPresenter.canSaveRecruiters() && (
+         {userPresenter.canSaveRecruiters() && (
             <RecruiterList userEmail={userPresenter.model.userEmail} />
          )}
 
