@@ -9,6 +9,7 @@ import { DataWithRef } from "../../../util/types"
 import { logAction } from "../../../util/logger"
 import { convertDocArrayToDict } from "@careerfairy/shared-lib/dist/BaseFirebaseRepository"
 import { getCLIBarOptions, throwMigrationError } from "../../../util/misc"
+import { DocumentData, DocumentReference } from "firebase-admin/firestore"
 const cliProgress = require("cli-progress")
 
 let allFutureLivestreams: Record<
@@ -104,12 +105,18 @@ export async function run() {
                   rating.appearAfter === overallRating.appearAfter &&
                   rating.hasText === overallRating.hasText
                ) {
-                  // delete rating
-                  batch.delete(rating._ref as any)
-                  counter.writeIncrement()
-                  counter.customCountIncrement("Deleted overall rating")
-                  counter.customCountIncrement("Deletions")
-                  continue
+                  const hasVotes = await checkIfRatingHasVotes(
+                     rating._ref as any
+                  )
+
+                  if (!hasVotes) {
+                     // Only delete rating if it has no votes, as some past livestreams may have had their dates changed
+                     batch.delete(rating._ref as any)
+                     counter.writeIncrement()
+                     counter.customCountIncrement("Deleted overall rating")
+                     counter.customCountIncrement("Deletions")
+                     continue
+                  }
                }
 
                if (
@@ -121,12 +128,20 @@ export async function run() {
                      rating.question
                   )
                ) {
-                  // delete rating
-                  batch.delete(rating._ref as any)
-                  counter.writeIncrement()
-                  counter.customCountIncrement("Deleted willApply rating")
-                  counter.customCountIncrement("Deletions")
-                  continue
+                  // Don't delete it rating has votes in voters subcollection
+
+                  const hasVotes = await checkIfRatingHasVotes(
+                     rating._ref as any
+                  )
+
+                  if (!hasVotes) {
+                     // Only delete rating if it has no votes, as some past livestreams may have had their dates changed
+                     batch.delete(rating._ref as any)
+                     counter.writeIncrement()
+                     counter.customCountIncrement("Deleted willApply rating")
+                     counter.customCountIncrement("Deletions")
+                     continue
+                  }
                }
             }
          }
@@ -171,4 +186,12 @@ export async function run() {
    } finally {
       counter.print()
    }
+}
+
+const checkIfRatingHasVotes = async (
+   ratingRef: DocumentReference<DocumentData>
+) => {
+   const voters = await ratingRef.collection("voters").limit(1).get()
+
+   return !voters.empty
 }
