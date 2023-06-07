@@ -10,6 +10,7 @@ import { NICE_SCROLLBAR_STYLES } from "../../../../../../constants/layout"
 import { speakerPlaceholder } from "../../../../../util/constants"
 import Skeleton from "@mui/material/Skeleton"
 import { getResizedUrl } from "../../../../../helperFunctions/HelperFunctions"
+import HorizontalScroll from "../../../../common/HorizontalScroll"
 
 const styles = sxStyles({
    root: {
@@ -32,6 +33,13 @@ const styles = sxStyles({
    speakersWrapper: {
       overflowX: "auto",
       flexWrap: "nowrap",
+      display: "flex",
+      flexDirection: "row",
+      "& > *": {
+         "&:not(:last-child)": {
+            mr: 3,
+         },
+      },
    },
 })
 
@@ -47,11 +55,11 @@ const Speakers: FC<Props> = ({ speakers }) => {
    return (
       <Box sx={styles.root}>
          <SectionTitle>Speakers</SectionTitle>
-         <Stack sx={styles.speakersWrapper} direction="row" spacing={3}>
+         <HorizontalScroll sx={styles.speakersWrapper}>
             {speakers.map((speaker) => (
                <SpeakerAvatar key={speaker.id} speaker={speaker} />
             ))}
-         </Stack>
+         </HorizontalScroll>
       </Box>
    )
 }
