@@ -55,6 +55,11 @@ export interface ILivestreamScriptsRepository extends ILivestreamRepository {
       withRef?: T
    ): Promise<DataWithRef<T, LivestreamEvent>[]>
 
+   getAllFutureLivestreams<T extends boolean>(
+      withTest?: boolean,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]>
+
    getAllLivestreamsWithUserLivestreamDataAfterRelease<T extends boolean>(
       withTest?: boolean,
       withRef?: T
@@ -189,6 +194,23 @@ export class LivestreamScriptsRepository
             .get()
       }
       return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+   }
+
+   async getAllFutureLivestreams<T extends boolean>(
+      withTest: boolean = false,
+      withRef?: T
+   ): Promise<DataWithRef<T, LivestreamEvent>[]> {
+      let ref = this.firestore
+         .collection("livestreams")
+         .where("start", ">=", new Date())
+
+      if (withTest) {
+         const snaps = await ref.get()
+         return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+      } else {
+         const snaps = await ref.where("test", "==", false).get()
+         return mapFirestoreDocuments<LivestreamEvent, T>(snaps, withRef)
+      }
    }
 
    async getAllLivestreamsWithUserLivestreamDataAfterRelease<T extends boolean>(
