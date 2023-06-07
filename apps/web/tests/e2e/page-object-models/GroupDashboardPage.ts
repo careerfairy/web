@@ -160,7 +160,8 @@ export class GroupDashboardPage extends CommonPage {
       for (const [id, value] of Object.entries(matchById)) {
          const val = value() // calculate the value
          if (val) {
-            await this.page.locator(id).fill(val)
+            // force because the input might be readonly (date picker)
+            await this.page.locator(id).fill(val, { force: true })
          }
       }
 
