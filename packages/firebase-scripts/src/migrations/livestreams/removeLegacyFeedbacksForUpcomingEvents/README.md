@@ -24,7 +24,7 @@ The script performs a cleanup operation, specifically targeting legacy feedback 
 
    -  `willApplyRating`: A rating asking if the user is more likely to apply thanks to the livestream.
 
-4. If the rating matches either of these structures, it gets queued for deletion.
+4. If the rating matches either of these structures, and has no responses, it gets queued for deletion.
 
 5. The deletion is performed in batches for efficiency. The batch size is currently set to 200, which has been found to work consistently.
 
