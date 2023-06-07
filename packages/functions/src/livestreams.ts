@@ -4,6 +4,7 @@ import { client } from "./api/postmark"
 import config from "./config"
 import { notifyLivestreamStarting, notifyLivestreamCreated } from "./api/slack"
 import { setCORSHeaders, isLocalEnvironment } from "./util"
+// @ts-ignore (required when building the project inside docker)
 import ical from "ical-generator"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { DateTime } from "luxon"
