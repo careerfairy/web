@@ -28,7 +28,6 @@ const styles = sxStyles({
       justifyContent: "end",
    },
    message: {
-      color: "black",
       fontWeight: 400,
    },
    subMessage: {
@@ -46,6 +45,9 @@ const styles = sxStyles({
       color: "black",
       fontWeight: 400,
       width: "fit-content",
+   },
+   root: {
+      color: ["text.primary", "!important"],
    },
 })
 
@@ -142,7 +144,11 @@ const NewsletterSnackbar = ({ isFirstReminder }: Props): JSX.Element => {
          <SnackbarContent
             style={{ backgroundColor: "white" }}
             message={
-               <Grid container maxWidth={isMobile ? "inherit" : "350px"}>
+               <Grid
+                  sx={styles.root}
+                  container
+                  maxWidth={isMobile ? "inherit" : "350px"}
+               >
                   <Grid xs={12} item sx={styles.closeBtnWrapper}>
                      <IconButton
                         aria-label="close"
