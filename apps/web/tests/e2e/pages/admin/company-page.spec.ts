@@ -83,6 +83,9 @@ test.describe("Company page creation", () => {
    })
 })
 test.describe("Company page follow", () => {
+   // Only run those tests on chromium
+   test.skip(({ browserName }) => browserName !== "chromium")
+
    test.use({ options: { completedGroup: true, createUser: true } })
    test("Follow company from a the dedicated company page", async ({
       groupPage,
