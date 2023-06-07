@@ -58,7 +58,7 @@ const styles = sxStyles({
    chatInputActive: {
       background: "white",
       "& .MuiInputBase-root": {
-         color: "black",
+         color: "black !important",
       },
    },
    questionContainer: {
