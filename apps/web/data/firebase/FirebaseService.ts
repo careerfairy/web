@@ -626,20 +626,6 @@ class FirebaseService {
                isSentimentRating: false,
                isForEnd: false,
             },
-            // TODO: Keep for future reference in case we want to perform a migration on these ratings
-            // {
-            //    question: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
-            //    id: "willApply",
-            //    appearAfter: 40,
-            //    isSentimentRating: true,
-            // },
-            // {
-            //    question:
-            //       "How would you rate this live stream experience? Any feedback you would like to share?",
-            //    id: "overall",
-            //    appearAfter: 45,
-            //    hasText: true,
-            // },
          ]
 
          let batch = this.firestore.batch()
