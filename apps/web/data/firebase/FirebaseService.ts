@@ -613,19 +613,19 @@ class FirebaseService {
                question: `How happy are you with the content shared by ${livestream.company}?`,
                id: "company",
                appearAfter: 30,
+               hasText: false,
+               noStars: false,
+               isSentimentRating: false,
+               isForEnd: false,
             },
             {
-               question: `Are you more likely to apply to ${livestream.company} thanks to this live stream?`,
-               id: "willApply",
+               question: `Help ${livestream.company} to improve: How can they make the experience more useful to you and other students?`,
                appearAfter: 40,
-               isSentimentRating: true,
-            },
-            {
-               question:
-                  "How would you rate this live stream experience? Any feedback you would like to share?",
-               id: "overall",
-               appearAfter: 45,
+               id: "companyFeedback",
                hasText: true,
+               noStars: true,
+               isSentimentRating: false,
+               isForEnd: false,
             },
          ]
 
@@ -2588,26 +2588,6 @@ class FirebaseService {
          },
          callback
       )
-   }
-
-   listenToLivestreamOverallRatings = (livestreamId, callback) => {
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("rating")
-         .doc("overall")
-         .collection("voters")
-      return ref.onSnapshot(callback)
-   }
-
-   listenToLivestreamContentRatings = (livestreamId, callback) => {
-      let ref = this.firestore
-         .collection("livestreams")
-         .doc(livestreamId)
-         .collection("rating")
-         .doc("company")
-         .collection("voters")
-      return ref.onSnapshot(callback)
    }
 
    // Analytics Queries
