@@ -5,7 +5,7 @@ import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import Stack from "@mui/material/Stack"
 import CountDownTimer from "./CountDownTimer"
 import LivestreamTagsContainer from "./LivestreamTagsContainer"
-import HostInfo, { HostInfoSkeleton } from "./HostInfo"
+import HostInfo from "./HostInfo"
 import LivestreamTitle from "./LivestreamTitle"
 import ActionButton from "./action-button/ActionButton"
 import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
@@ -23,6 +23,7 @@ import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
 import Box from "@mui/material/Box"
 import useRegistrationHandler from "../../useRegistrationHandler"
+import HeroTags from "./HeroTags"
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -62,6 +63,7 @@ const LivestreamDetailsView: FC = () => {
                onBackPosition={isMobile ? "top-left" : "top-right"}
                onBackClick={closeDialog}
             >
+               <HeroTags />
                <ShareButton livestream={livestream} />
                <Stack
                   alignItems="center"
