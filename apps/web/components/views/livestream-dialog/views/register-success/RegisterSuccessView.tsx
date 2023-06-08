@@ -16,6 +16,11 @@ const styles = sxStyles({
    fullHeight: {
       height: "100%",
    },
+   mainContentWrapper: {
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+   },
    mainContent: {
       display: "flex",
       flexDirection: "column",
@@ -78,7 +83,7 @@ const RegisterSuccessView: FC<Props> = () => {
          sx={styles.fullHeight}
          mainContent={
             <MainContent
-               sx={[styles.fullHeight]}
+               sx={[styles.fullHeight, styles.mainContentWrapper]}
                onBackClick={closeDialog}
                onBackPosition="top-right"
             >
