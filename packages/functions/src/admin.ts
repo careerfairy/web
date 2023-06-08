@@ -118,6 +118,7 @@ export const sendBasicTemplateEmail = functions
             }),
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "marketing email",
       }))
 
       const nestedArrayOfEmailTemplates = createNestedArrayOfTemplates(
