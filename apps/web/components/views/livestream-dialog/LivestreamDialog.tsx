@@ -41,6 +41,7 @@ import RegisterDataConsentViewSkeleton from "./views/data-consent/RegisterDataCo
 import RegisterJoinTalentPoolViewSkeleton from "./views/join-talent-pool/RegisterJoinTalentPoolViewSkeleton"
 import useRedirectToEventRoom from "../../custom-hook/live-stream/useRedirectToEventRoom"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
+import RedirectingView from "./views/common/RedirectingView"
 
 const styles = sxStyles({
    content: {
@@ -290,7 +291,7 @@ const Content: FC<ContentProps> = ({
       [livestream]
    )
 
-   useRedirectToEventRoom(livestreamPresenter)
+   const isRedirecting = useRedirectToEventRoom(livestreamPresenter)
 
    const contextValue = useMemo<DialogContextType>(
       () => ({
@@ -322,27 +323,31 @@ const Content: FC<ContentProps> = ({
 
    return (
       <DialogContext.Provider value={contextValue}>
-         <SwipeableViews
-            style={styles.swipeableViews}
-            containerStyle={styles.swipeableViewsContainer}
-            slideStyle={styles.slide}
-            disabled
-            axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-            index={value}
-         >
-            {views.map(
-               ({ key, component: View, skeleton: Skeleton }, index) => (
-                  <AnimatedTabPanel
-                     sx={styles.fullHeight}
-                     key={key}
-                     value={index}
-                     activeValue={value}
-                  >
-                     {livestream ? <View /> : Skeleton}
-                  </AnimatedTabPanel>
-               )
-            )}
-         </SwipeableViews>
+         {isRedirecting ? (
+            <RedirectingView />
+         ) : (
+            <SwipeableViews
+               style={styles.swipeableViews}
+               containerStyle={styles.swipeableViewsContainer}
+               slideStyle={styles.slide}
+               disabled
+               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+               index={value}
+            >
+               {views.map(
+                  ({ key, component: View, skeleton: Skeleton }, index) => (
+                     <AnimatedTabPanel
+                        sx={styles.fullHeight}
+                        key={key}
+                        value={index}
+                        activeValue={value}
+                     >
+                        {livestream ? <View /> : Skeleton}
+                     </AnimatedTabPanel>
+                  )
+               )}
+            </SwipeableViews>
+         )}
       </DialogContext.Provider>
    )
 }

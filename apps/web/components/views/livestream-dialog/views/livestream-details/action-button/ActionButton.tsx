@@ -76,7 +76,7 @@ const ButtonElement: FC = () => {
    }
 
    if (livestreamPresenter.isLive()) {
-      return <RegisterButton label="Join to attend" />
+      return <RegisterButton label="Join live stream" />
    }
 
    return <RegisterButton label="Register to live stream" />

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useEffect, useState } from "react"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { useAuth } from "../../../HOCs/AuthProvider"
 import { useRouter } from "next/router"
@@ -10,27 +10,33 @@ import { useRouter } from "next/router"
  * it will trigger a route change to send the user to the viewer page for that livestream event.
  *
  * @param {LivestreamPresenter} livestreamPresenter - The livestream presenter object.
- * @returns {null} Returns null. The hook does not return any values, its purpose is to perform side effects.
+ * @returns {boolean} - Whether or not the hook is currently redirecting.
  */
 const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
    const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
-   const isRedirecting = useRef(false)
+   const [isRedirecting, setIsRedirecting] = useState(false)
 
    useEffect(() => {
-      if (isRedirecting.current || !livestreamPresenter) return
+      if (isRedirecting || !livestreamPresenter) return
       if (
          !isLoadingAuth &&
          livestreamPresenter.isLive() &&
          livestreamPresenter.isUserRegistered(authenticatedUser.email)
       ) {
-         isRedirecting.current = true
-         void replace(livestreamPresenter.getViewerEventRoomLink())
+         setIsRedirecting(true)
+         void replace(livestreamPresenter.getViewerEventRoomLink()).finally(
+            () => {
+               setIsRedirecting(false)
+            }
+         )
       }
       return () => {
-         isRedirecting.current = false
+         setIsRedirecting(false)
       }
    }, [replace, livestreamPresenter, authenticatedUser?.email, isLoadingAuth])
+
+   return isRedirecting
 }
 
 export default useRedirectToEventRoom

@@ -186,17 +186,22 @@ type LeftContentProps = {
    backgroundImg?: string
    children: ReactNode
    noMinHeight?: boolean
+   sx?: SxProps<DefaultTheme>
 } & BackAndCloseButtonProps
 
 export const HeroContent = forwardRef<HTMLDivElement, LeftContentProps>(
    function HeroContent(
-      { backgroundImg, children, onBackClick, onBackPosition, noMinHeight },
+      { backgroundImg, children, onBackClick, onBackPosition, noMinHeight, sx },
       ref
    ) {
       return (
          <Box
             id="live-stream-dialog-hero"
-            sx={[styles.heroContent, noMinHeight && styles.noMinHeight]}
+            sx={[
+               styles.heroContent,
+               noMinHeight && styles.noMinHeight,
+               ...(Array.isArray(sx) ? sx : [sx]),
+            ]}
             ref={ref}
          >
             <Container
