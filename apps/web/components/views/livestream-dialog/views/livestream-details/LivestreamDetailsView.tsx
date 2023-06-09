@@ -5,7 +5,7 @@ import { getResizedUrl } from "../../../../helperFunctions/HelperFunctions"
 import Stack from "@mui/material/Stack"
 import CountDownTimer from "./CountDownTimer"
 import LivestreamTagsContainer from "./LivestreamTagsContainer"
-import HostInfo, { HostInfoSkeleton } from "./HostInfo"
+import HostInfo from "./HostInfo"
 import LivestreamTitle from "./LivestreamTitle"
 import ActionButton from "./action-button/ActionButton"
 import useRecordingAccess from "../../../upcoming-livestream/HeroSection/useRecordingAccess"
@@ -23,6 +23,22 @@ import Questions from "./main-content/Questions"
 import Section from "./main-content/Section"
 import Box from "@mui/material/Box"
 import useRegistrationHandler from "../../useRegistrationHandler"
+import HeroTags from "./HeroTags"
+import { sxStyles } from "types/commonTypes"
+import { gradientAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
+
+const styles = sxStyles({
+   liveHeroContent: {
+      background:
+         "linear-gradient(white, white) padding-box, linear-gradient(180deg, #e9911d, #dc2743 50%, #e9911d) border-box",
+      backgroundRepeat: "no-repeat",
+      backgroundSize: "100% 100%, 100% 200%",
+      backgroundPosition: "0 0, 0 100%",
+      border: "4px solid transparent",
+      animation: `${gradientAnimation} 1s infinite alternate`,
+      zIndex: 1,
+   },
+})
 
 const LivestreamDetailsView: FC = () => {
    const {
@@ -54,6 +70,7 @@ const LivestreamDetailsView: FC = () => {
       <BaseDialogView
          heroContent={
             <HeroContent
+               sx={[livestreamPresenter.isLive() && styles.liveHeroContent]}
                ref={heroRef}
                backgroundImg={getResizedUrl(
                   livestream.backgroundImageUrl,
@@ -62,6 +79,7 @@ const LivestreamDetailsView: FC = () => {
                onBackPosition={isMobile ? "top-left" : "top-right"}
                onBackClick={closeDialog}
             >
+               <HeroTags />
                <ShareButton livestream={livestream} />
                <Stack
                   alignItems="center"
