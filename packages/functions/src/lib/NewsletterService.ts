@@ -69,7 +69,7 @@ export class NewsletterService {
          this.userRepo.getSubscribedUsers(),
          this.dataLoader.getFutureLivestreams(),
          this.dataLoader.getPastLivestreams(),
-      ]
+      ] as const
 
       const [subscribedUsers, futureLivestreams, pastLivestreams] =
          await Promise.all(promises)
@@ -77,8 +77,8 @@ export class NewsletterService {
       this.subscribedUsers = convertDocArrayToDict(
          subscribedUsers as UserData[]
       )
-      this.futureLivestreams = futureLivestreams as LivestreamEvent[]
-      this.pastLivestreams = pastLivestreams as LivestreamEvent[]
+      this.futureLivestreams = futureLivestreams
+      this.pastLivestreams = pastLivestreams
 
       this.futureLivestreams = this.futureLivestreams.filter((l) => {
          // filter out livestreams before now, the bundle might have events for the same day

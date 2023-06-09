@@ -30,6 +30,7 @@ import { addOperations } from "./stats/livestream"
 import type { FunctionsLogger } from "../util"
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
+import { DateTime } from "luxon"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -47,6 +48,16 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
 
    getYesterdayLivestreams(): Promise<LivestreamEvent[]>
+
+   /**
+    * Checks if there are more than 'n' livestream events scheduled for the next 'days' days.
+    *
+    * @param {number} n - The number of livestreams to check for.
+    * @param {number} days - The number of days into the future to check for upcoming livestreams.
+    * @returns {Promise<boolean>} A promise that resolves to true if there are more than 'n' livestreams
+    *                            scheduled for the next 'days' days, otherwise false.
+    */
+   hasMoreThanNLivestreamsInNextNDays(n: number, days: number): Promise<boolean>
 
    syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
@@ -231,6 +242,23 @@ export class LivestreamFunctionsRepository
       }
 
       return []
+   }
+
+   async hasMoreThanNLivestreamsInNextNDays(
+      n: number,
+      days: number
+   ): Promise<boolean> {
+      const now = DateTime.now()
+      const futureDate = now.plus({ days })
+
+      const querySnapshot = await this.firestore
+         .collection("livestreams")
+         .where("start", ">", now.toJSDate())
+         .where("start", "<", futureDate.toJSDate())
+         .limit(n + 1) // we only need to know if there are more than n, so limit to n+1
+         .get()
+
+      return querySnapshot.size > n
    }
 
    async syncLiveStreamStatsWithLivestream(
