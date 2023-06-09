@@ -68,6 +68,7 @@ export class NewsletterEmailBuilder {
             livestreams2,
          },
          MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "newsletter",
       })
    }
 
