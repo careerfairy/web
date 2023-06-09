@@ -12,6 +12,7 @@ import { object, string } from "yup"
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import config from "./config"
 import { client } from "./api/postmark"
+import { type TemplatedMessage } from "postmark"
 
 export const sendBasicTemplateEmail = functions
    .region(config.region)
@@ -92,8 +93,8 @@ export const sendBasicTemplateEmail = functions
       // security instead of getting it from the client
       const templateIdentifier = templateId
 
-      const emailObjects = emailsArray.map((email) => ({
-         TemplateId: templateIdentifier,
+      const emailObjects: TemplatedMessage[] = emailsArray.map((email) => ({
+         TemplateId: Number(templateIdentifier),
          From: "CareerFairy <noreply@careerfairy.io>",
          To: email,
          TemplateModel: {
@@ -116,6 +117,8 @@ export const sendBasicTemplateEmail = functions
                ),
             }),
          },
+         MessageStream: process.env.POSTMARK_BROADCAST_STREAM,
+         Tag: "marketing email",
       }))
 
       const nestedArrayOfEmailTemplates = createNestedArrayOfTemplates(
