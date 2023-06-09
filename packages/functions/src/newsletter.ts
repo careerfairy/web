@@ -2,7 +2,7 @@ import { RuntimeOptions } from "firebase-functions"
 import functions = require("firebase-functions")
 import { DateTime } from "luxon"
 import { PostmarkEmailSender } from "./api/postmark"
-import { groupRepo, userRepo } from "./api/repositories"
+import { groupRepo, userRepo, livestreamsRepo } from "./api/repositories"
 import config from "./config"
 import { NewsletterEmailBuilder } from "./lib/NewsletterEmailBuilder"
 import { NewsletterService } from "./lib/NewsletterService"
@@ -43,7 +43,8 @@ export const newsletter = functions
    .pubsub.schedule("0 18 * * Tue") // every tuesday at 6pm
    .timeZone("Europe/Zurich")
    .onRun(async () => {
-      if (!shouldSendNewsletter()) {
+      const shouldSend = await shouldSendNewsletter()
+      if (!shouldSend) {
          functions.logger.info("Newsletter not sent")
          return
       }
@@ -117,7 +118,7 @@ async function sendNewsletter(overrideUsers?: string[]) {
 }
 
 /**
- * We only want to send the newsletter every other week
+ * We only want to send the newsletter every other week and if the number of livestreams within the next month is > 8
  *
  * The cron job syntax has a limitation and we can't specify every other week
  * on the function level. So we have to do it here.
@@ -127,9 +128,25 @@ async function sendNewsletter(overrideUsers?: string[]) {
  * or once in three weeks. But for now, this is not a big deal.
  *
  */
-function shouldSendNewsletter() {
+async function shouldSendNewsletter() {
    const now = DateTime.now()
    const weekNumber = now.weekNumber
+   const numberOfLivestreams = 8
+   const numberOfDays = 30
 
-   return weekNumber % 2 === 0
+   // Now we call our updated function with dynamic parameters.
+   // Here we are still checking for more than 8 livestreams in the next 30 days.
+   const hasMoreThanEightLivestreamsInNext30Days =
+      await livestreamsRepo.hasMoreThanNLivestreamsInNextNDays(
+         numberOfLivestreams,
+         numberOfDays
+      )
+
+   functions.logger.info(
+      `Has more than ${numberOfLivestreams} livestreams in next ${numberOfDays} days:`,
+      hasMoreThanEightLivestreamsInNext30Days
+   )
+   functions.logger.info("Week number", weekNumber)
+
+   return weekNumber % 2 === 0 && hasMoreThanEightLivestreamsInNext30Days
 }
