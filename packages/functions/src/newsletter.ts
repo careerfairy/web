@@ -131,12 +131,19 @@ async function sendNewsletter(overrideUsers?: string[]) {
 async function shouldSendNewsletter() {
    const now = DateTime.now()
    const weekNumber = now.weekNumber
+   const numberOfLivestreams = 8
+   const numberOfDays = 30
 
+   // Now we call our updated function with dynamic parameters.
+   // Here we are still checking for more than 8 livestreams in the next 30 days.
    const hasMoreThanEightLivestreamsInNext30Days =
-      await livestreamsRepo.hasMoreThanEightLivestreamsInNext30Days()
+      await livestreamsRepo.hasMoreThanNLivestreamsInNextNDays(
+         numberOfLivestreams,
+         numberOfDays
+      )
 
    functions.logger.info(
-      "Has more than 8 livestreams in next 30 days:",
+      `Has more than ${numberOfLivestreams} livestreams in next ${numberOfDays} days:`,
       hasMoreThanEightLivestreamsInNext30Days
    )
    functions.logger.info("Week number", weekNumber)

@@ -50,12 +50,14 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getYesterdayLivestreams(): Promise<LivestreamEvent[]>
 
    /**
-    * Checks if there are more than 8 livestream events scheduled for the next 30 days.
+    * Checks if there are more than 'n' livestream events scheduled for the next 'days' days.
     *
-    * @returns {Promise<boolean>} A promise that resolves to true if there are more than 8 livestreams
-    *                            scheduled for the next 30 days, otherwise false.
+    * @param {number} n - The number of livestreams to check for.
+    * @param {number} days - The number of days into the future to check for upcoming livestreams.
+    * @returns {Promise<boolean>} A promise that resolves to true if there are more than 'n' livestreams
+    *                            scheduled for the next 'days' days, otherwise false.
     */
-   hasMoreThanEightLivestreamsInNext30Days(): Promise<boolean>
+   hasMoreThanNLivestreamsInNextNDays(n: number, days: number): Promise<boolean>
 
    syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
@@ -242,18 +244,21 @@ export class LivestreamFunctionsRepository
       return []
    }
 
-   async hasMoreThanEightLivestreamsInNext30Days(): Promise<boolean> {
+   async hasMoreThanNLivestreamsInNextNDays(
+      n: number,
+      days: number
+   ): Promise<boolean> {
       const now = DateTime.now()
-      const nextMonth = now.plus({ days: 30 })
+      const futureDate = now.plus({ days })
 
       const querySnapshot = await this.firestore
          .collection("livestreams")
          .where("start", ">", now.toJSDate())
-         .where("start", "<", nextMonth.toJSDate())
-         .limit(9) // we only need to know if there are more than 8, so limit to 9
+         .where("start", "<", futureDate.toJSDate())
+         .limit(n + 1) // we only need to know if there are more than n, so limit to n+1
          .get()
 
-      return querySnapshot.size > 8
+      return querySnapshot.size > n
    }
 
    async syncLiveStreamStatsWithLivestream(
