@@ -30,6 +30,7 @@ import { addOperations } from "./stats/livestream"
 import type { FunctionsLogger } from "../util"
 import DocumentSnapshot = firestore.DocumentSnapshot
 import FieldValue = firestore.FieldValue
+import { DateTime } from "luxon"
 
 export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    /**
@@ -47,6 +48,14 @@ export interface ILivestreamFunctionsRepository extends ILivestreamRepository {
    getNonAttendees(livestreamId: string): Promise<UserLivestreamData[]>
 
    getYesterdayLivestreams(): Promise<LivestreamEvent[]>
+
+   /**
+    * Checks if there are more than 8 livestream events scheduled for the next 30 days.
+    *
+    * @returns {Promise<boolean>} A promise that resolves to true if there are more than 8 livestreams
+    *                            scheduled for the next 30 days, otherwise false.
+    */
+   hasMoreThanEightLivestreamsInNext30Days(): Promise<boolean>
 
    syncLiveStreamStatsWithLivestream(
       snapshotChange: Change<DocumentSnapshot>
@@ -231,6 +240,20 @@ export class LivestreamFunctionsRepository
       }
 
       return []
+   }
+
+   async hasMoreThanEightLivestreamsInNext30Days(): Promise<boolean> {
+      const now = DateTime.now()
+      const nextMonth = now.plus({ days: 30 })
+
+      const querySnapshot = await this.firestore
+         .collection("livestreams")
+         .where("start", ">", now.toJSDate())
+         .where("start", "<", nextMonth.toJSDate())
+         .limit(9) // we only need to know if there are more than 8, so limit to 9
+         .get()
+
+      return querySnapshot.size > 8
    }
 
    async syncLiveStreamStatsWithLivestream(
