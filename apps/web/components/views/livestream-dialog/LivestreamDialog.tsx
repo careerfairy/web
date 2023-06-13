@@ -90,8 +90,10 @@ type Props = {
     * The mode of operation for the dialog. Can be either "page" or "stand-alone".
     * In "page" mode, the entire page will navigate between views.
     * In "stand-alone" mode, only the view state of the dialog is updated, and the page remains static.
+    *
+    * Defaults to "page".
     */
-   mode: DialogContextType["mode"]
+   mode?: DialogContextType["mode"]
    onRegisterSuccess?: () => void
 }
 
@@ -159,6 +161,7 @@ const views: View[] = [
 const LivestreamDialog: FC<Props> = ({
    handleClose,
    open,
+   mode = "page",
    livestreamId,
    ...rest
 }) => {
@@ -207,7 +210,7 @@ const Content: FC<ContentProps> = ({
    onRegisterSuccess,
    page = "details",
    livestreamId,
-   mode = "page",
+   mode,
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -429,6 +432,8 @@ type DialogContextType = {
     * The mode of operation for the dialog. Can be either "page" or "stand-alone".
     * In "page" mode, the entire page will navigate between certain views.
     * In "stand-alone" mode, only the view state of the dialog is updated, and the page remains static.
+    *
+    * Defaults to "page".
     */
    mode: "page" | "stand-alone"
    /**
