@@ -12,9 +12,10 @@ import useLivestream from "../../../custom-hook/live-stream/useLivestream"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { buildDialogLink } from "../../livestream-dialog"
 import { useRouter } from "next/router"
+import { LivestreamEventWithType } from "./CarouselContentService"
 
 type LivestreamContentProps = {
-   livestreamData: LivestreamEvent
+   livestreamData: LivestreamEventWithType
    handleBannerPlayRecording: (livestream: LivestreamEvent) => void
    userStats: UserStats
    handleClickRegister: ReturnType<

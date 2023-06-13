@@ -16,7 +16,9 @@ import useCountTime from "../../../custom-hook/useCountTime"
 import RegistrationModal from "../../common/registration-modal"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import LivestreamContent from "./LivestreamContent"
+import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
 import { UserStats } from "@careerfairy/shared-lib/users"
+import { CarouselContent } from "./CarouselContentService"
 
 const styles = sxStyles({
    wrapper: {
@@ -60,7 +62,7 @@ const CAROUSEL_SLIDE_DELAY = 10000
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews)
 
 type Props = {
-   content: LivestreamEvent[]
+   content: CarouselContent[]
    serverUserStats: UserStats
 }
 
@@ -132,6 +134,8 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
       resetMinutes()
    }, [resetMinutes])
 
+   console.log("content", content)
+
    return (
       <>
          <AutoPlaySwipeableViews
@@ -146,33 +150,45 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             enableMouseEvents
             interval={CAROUSEL_SLIDE_DELAY}
          >
-            {content.map((contentItem) => (
-               <Box sx={styles.wrapper} key={contentItem.id}>
-                  <Box
-                     sx={[styles.wrapper, styles.image]}
-                     position={"absolute"}
-                  >
-                     <Image
-                        src={getResizedUrl(
-                           contentItem.backgroundImageUrl,
-                           "lg"
-                        )}
-                        alt={contentItem.title}
-                        layout="fill"
-                        objectFit="cover"
-                        quality={90}
-                     />
+            {content.map((contentItem, index) => {
+               // Check if contentItem is a CTASlide
+               if (contentItem.contentType === "CTASlide") {
+                  return (
+                     <Box sx={styles.wrapper} key={index}>
+                        <BuyCreditsCTAContent cta={contentItem} />
+                     </Box>
+                  )
+               }
+
+               // Default rendering for LivestreamEvent
+               return (
+                  <Box sx={styles.wrapper} key={contentItem.id}>
+                     <Box
+                        sx={[styles.wrapper, styles.image]}
+                        position={"absolute"}
+                     >
+                        <Image
+                           src={getResizedUrl(
+                              contentItem.backgroundImageUrl,
+                              "lg"
+                           )}
+                           alt={contentItem.title}
+                           layout="fill"
+                           objectFit="cover"
+                           quality={90}
+                        />
+                     </Box>
+                     <Container disableGutters sx={styles.content}>
+                        <LivestreamContent
+                           handleBannerPlayRecording={handleBannerPlayRecording}
+                           livestreamData={contentItem}
+                           handleClickRegister={handleClickRegister}
+                           userStats={userStats || serverUserStats}
+                        />
+                     </Container>
                   </Box>
-                  <Container disableGutters sx={styles.content}>
-                     <LivestreamContent
-                        handleBannerPlayRecording={handleBannerPlayRecording}
-                        livestreamData={contentItem}
-                        handleClickRegister={handleClickRegister}
-                        userStats={userStats || serverUserStats}
-                     />
-                  </Container>
-               </Box>
-            ))}
+               )
+            })}
          </AutoPlaySwipeableViews>
          {content.length > 1 && (
             <Box sx={styles.paginationWrapper}>

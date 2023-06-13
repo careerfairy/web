@@ -3,6 +3,8 @@ import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommend
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { rewardService } from "../../../../data/firebase/RewardService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/IRecommendationService"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import { mapFromServerSide } from "util/serverUtil"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -12,12 +14,18 @@ export type GetContentOptions = {
    userStats?: UserStats
 }
 
-export type CTABanner = {
-   type: "CTABanner"
-   // Add additional properties needed for the CTA banner here
+export type LivestreamEventWithType = LivestreamEvent & {
+   contentType: "LivestreamEvent"
+}
+export type CTASlide = {
+   contentType: "CTASlide"
+   // other fields
 }
 
-export type CarouselContent = LivestreamEvent | CTABanner
+export type CarouselContent = CTASlide | LivestreamEventWithType
+export type SerializedContent =
+   | CTASlide
+   | ({ [field: string]: any } & { contentType: "LivestreamEvent" })
 
 /**
  *
@@ -139,18 +147,23 @@ export class CarouselContentService {
          ]
       }
 
-      let carouselContent: CarouselContent[] = contentStreams.slice(0, 5) // Max 5 cards in carousel as per design
+      let content: CarouselContent[] = contentStreams.map((stream) => {
+         return {
+            ...stream,
+            contentType: "LivestreamEvent",
+         }
+      })
 
-      if (this.userHasNeverBoughtRecording()) {
-         carouselContent = [
+      if (this.userHasBoughtRecording()) {
+         content = [
             {
-               type: "CTABanner",
+               contentType: "CTASlide",
             },
-            ...carouselContent,
+            ...content,
          ]
       }
 
-      return carouselContent
+      return content
    }
 
    private async getRecommendedStreams(
@@ -164,8 +177,45 @@ export class CarouselContentService {
       })
    }
 
-   private userHasNeverBoughtRecording(): boolean {
-      return !this.options.userStats?.recordingsBought?.length
+   private userHasBoughtRecording(): boolean {
+      return Boolean(this.options.userStats?.recordingsBought?.length)
+   }
+
+   static serializeContent(content: CarouselContent[]): SerializedContent[] {
+      return content
+         .map((item) => {
+            switch (item.contentType) {
+               case "LivestreamEvent":
+                  return {
+                     ...LivestreamPresenter.serializeDocument(item),
+                     contentType: "LivestreamEvent" as const,
+                  }
+               case "CTASlide":
+                  return item
+               default:
+                  return null
+            }
+         })
+         .filter(Boolean)
+   }
+
+   static deserializeContent(content: SerializedContent[]): CarouselContent[] {
+      return content
+         .map((item) => {
+            switch (item.contentType) {
+               case "LivestreamEvent":
+                  const stream = mapFromServerSide([item])[0]
+                  return {
+                     ...stream,
+                     contentType: "LivestreamEvent" as const,
+                  }
+               case "CTASlide":
+                  return item
+               default:
+                  return null
+            }
+         })
+         .filter(Boolean)
    }
 }
 
