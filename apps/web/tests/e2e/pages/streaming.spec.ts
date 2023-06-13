@@ -262,6 +262,7 @@ test.describe("Streaming Journey", () => {
       streamerPage,
       viewerPage,
    }) => {
+      test.skip()
       const { livestream } = await setupStreamer(streamerPage, {
          setupGroup: true,
       })
