@@ -12,6 +12,13 @@ export type GetContentOptions = {
    userStats?: UserStats
 }
 
+export type CTABanner = {
+   type: "CTABanner"
+   // Add additional properties needed for the CTA banner here
+}
+
+export type CarouselContent = LivestreamEvent | CTABanner
+
 /**
  *
  * A service that provides a list of recommended livestream events for a carousel UI,
@@ -58,7 +65,7 @@ export class CarouselContentService {
       )
    }
 
-   public async getCarouselContent(): Promise<LivestreamEvent[]> {
+   public async getCarouselContent(): Promise<CarouselContent[]> {
       const [recommendedPastLivestreams, recommendedUpcomingLivestreams] =
          await Promise.all([
             this.getRecommendedStreams(
@@ -132,7 +139,18 @@ export class CarouselContentService {
          ]
       }
 
-      return contentStreams.slice(0, 5) // Max 5 cards in carousel as per design
+      let carouselContent: CarouselContent[] = contentStreams.slice(0, 5) // Max 5 cards in carousel as per design
+
+      if (this.userHasNeverBoughtRecording()) {
+         carouselContent = [
+            {
+               type: "CTABanner",
+            },
+            ...carouselContent,
+         ]
+      }
+
+      return carouselContent
    }
 
    private async getRecommendedStreams(
@@ -144,6 +162,10 @@ export class CarouselContentService {
       return ids.map((id) => {
          return livestreams.find((event) => event.id === id)
       })
+   }
+
+   private userHasNeverBoughtRecording(): boolean {
+      return !this.options.userStats?.recordingsBought?.length
    }
 }
 
