@@ -74,7 +74,8 @@ const PREVIOUS_VIEW: ViewKey = "livestream-details"
  * UI for the user to answer the group questions and give consent
  */
 const GroupQuestionsForm = () => {
-   const { livestream, goToView, registrationState } = useLiveStreamDialog()
+   const { livestream, goToView, registrationState, onRegisterSuccess } =
+      useLiveStreamDialog()
    const { userData, authenticatedUser } = useAuth()
    const isMobile = useIsMobile()
    const { groupsWithPolicies, answers } = registrationState
@@ -91,7 +92,7 @@ const GroupQuestionsForm = () => {
             values
          )
             .then(() => {
-               goToView(NEXT_VIEW)
+               onRegisterSuccess ? onRegisterSuccess() : goToView(NEXT_VIEW)
             })
             .catch((e) => {
                errorNotification(e)
@@ -145,7 +146,9 @@ const GroupQuestionsForm = () => {
                               "lg"
                            )}
                            onBackPosition={"top-left"}
-                           onBackClick={goToPrevious}
+                           onBackClick={
+                              onRegisterSuccess ? undefined : goToPrevious
+                           }
                            noMinHeight
                         >
                            <Stack
@@ -202,8 +205,10 @@ const GroupQuestionsForm = () => {
                                        : "Answer & Proceed"
                                  }
                                  typeSubmit
-                                 onClickSecondary={() =>
-                                    goToView("livestream-details")
+                                 onClickSecondary={
+                                    onRegisterSuccess
+                                       ? undefined
+                                       : () => goToView("livestream-details")
                                  }
                               />
                            </Stack>
@@ -318,17 +323,19 @@ export const PrimarySecondaryButtons = ({
          >
             {primaryText}
          </Button>
-         <Button
-            disabled={disabled || loading}
-            onClick={onClickSecondary}
-            color="grey"
-            disableRipple
-            fullWidth={false}
-            disableElevation
-            sx={styles.btnCancel}
-         >
-            {secondaryText}
-         </Button>
+         {onClickSecondary ? (
+            <Button
+               disabled={disabled || loading}
+               onClick={onClickSecondary}
+               color="grey"
+               disableRipple
+               fullWidth={false}
+               disableElevation
+               sx={styles.btnCancel}
+            >
+               {secondaryText}
+            </Button>
+         ) : null}
       </Stack>
    )
 }

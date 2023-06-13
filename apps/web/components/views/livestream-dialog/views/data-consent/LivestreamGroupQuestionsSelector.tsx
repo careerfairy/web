@@ -85,17 +85,14 @@ const styles = sxStyles({
    formControl: {
       ["& .MuiInputBase-root"]: {
          borderRadius: 30,
-         border: "1px solid #EFEFEF",
-         backgroundColor: "#FEFEFE",
          boxShadow: "none",
       },
       ["& .MuiSelect-iconOutlined"]: {
          marginRight: "20px",
-         color: "black !important",
+         color: ["text.primary", "!important"],
       },
       ["& .MuiInputLabel-shrink"]: {
          paddingLeft: "0 !important",
-         backgroundColor: "white",
          left: "10px",
          paddingX: "5px",
       },
@@ -108,7 +105,7 @@ const styles = sxStyles({
    },
    label: {
       paddingLeft: "30px",
-      color: "black !important",
+      color: ["text.primary", "!important"],
       fontSize: "16px !important",
    },
    errorText: {

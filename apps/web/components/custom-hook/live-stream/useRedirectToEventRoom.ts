@@ -10,15 +10,19 @@ import { useRouter } from "next/router"
  * it will trigger a route change to send the user to the viewer page for that livestream event.
  *
  * @param {LivestreamPresenter} livestreamPresenter - The livestream presenter object.
+ * @param {boolean} shouldRedirect - Whether or not the hook should redirect.
  * @returns {boolean} - Whether or not the hook is currently redirecting.
  */
-const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
+const useRedirectToEventRoom = (
+   livestreamPresenter: LivestreamPresenter,
+   shouldRedirect: boolean = true
+) => {
    const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
    const [isRedirecting, setIsRedirecting] = useState(false)
 
    useEffect(() => {
-      if (isRedirecting || !livestreamPresenter) return
+      if (isRedirecting || !livestreamPresenter || !shouldRedirect) return
       if (
          !isLoadingAuth &&
          livestreamPresenter.isLive() &&
@@ -34,7 +38,13 @@ const useRedirectToEventRoom = (livestreamPresenter?: LivestreamPresenter) => {
       return () => {
          setIsRedirecting(false)
       }
-   }, [replace, livestreamPresenter, authenticatedUser?.email, isLoadingAuth])
+   }, [
+      replace,
+      livestreamPresenter,
+      authenticatedUser?.email,
+      isLoadingAuth,
+      shouldRedirect,
+   ])
 
    return isRedirecting
 }

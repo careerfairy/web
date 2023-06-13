@@ -37,14 +37,9 @@ const RegistrationPreConditions = ({ children, skeleton }: Options) => {
          case "login_required":
             redirectToLogin()
             break
-
-         case "registered":
-            goToView("livestream-details")
-            break
       }
    }, [goToView, isAuthLoading, redirectToLogin, status])
-
-   if (isAuthLoading || status !== "can_register") {
+   if (isAuthLoading || status === "login_required") {
       // if the user can't register, there will be a navigation
       // continue showing the skeleton while that happens
       return skeleton ? <>{skeleton}</> : <LivestreamDetailsViewSkeleton />

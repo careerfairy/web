@@ -17,7 +17,6 @@ import useStreamConnect from "../../components/custom-hook/useStreamConnect"
 import useStreamRef from "../../components/custom-hook/useStreamRef"
 import { useDispatch, useSelector } from "react-redux"
 import * as actions from "store/actions"
-import ViewerGroupCategorySelectMenu from "../../components/views/viewer/ViewerGroupCategorySelectMenu"
 import RTMProvider from "context/agora/RTMProvider"
 import useStreamerActiveHandRaisesConnect from "../../components/custom-hook/useStreamerActiveHandRaisesConnect"
 import AgoraRTC from "agora-rtc-sdk-ng"
@@ -39,6 +38,8 @@ import GroupsUtil from "../../data/util/GroupsUtil"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/dist/livestreams/LivestreamPresenter"
 import { sxStyles } from "../../types/commonTypes"
 import RootState from "../../store/reducers"
+import LivestreamDialog from "components/views/livestream-dialog/LivestreamDialog"
+import useDialogStateHandler from "components/custom-hook/useDialogStateHandler"
 
 const styles = sxStyles({
    root: {
@@ -129,10 +130,10 @@ const ViewerLayout = (props) => {
       hasAnsweredLivestreamGroupQuestions,
       setHasAnsweredLivestreamGroupQuestions,
    ] = useState(false)
-   const [joinGroupModalData, setJoinGroupModalData] = useState(undefined)
-   const handleOpenJoinModal = ({ groups, livestream }) =>
-      setJoinGroupModalData({ groups, livestream })
-   const handleCloseJoinModal = () => setJoinGroupModalData(undefined)
+
+   const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
+      useDialogStateHandler()
+
    const currentLivestream = useStreamConnect()
    const handRaiseId =
       (currentLivestream?.test || currentLivestream?.openStream) &&
@@ -296,10 +297,7 @@ const ViewerLayout = (props) => {
                   !hasAgreedToAll // if the user has not agreed to all the policies
                ) {
                   // we show the registration modal
-                  handleOpenJoinModal({
-                     groups: livestreamGroups,
-                     livestream: currentLivestream,
-                  })
+                  handleOpenDialog()
                } else setHasAnsweredLivestreamGroupQuestions(true)
             }
          } catch (e) {
@@ -314,7 +312,7 @@ const ViewerLayout = (props) => {
 
    const onRegistrationQuestionsAnswered = useCallback(async () => {
       setHasAnsweredLivestreamGroupQuestions(true)
-      handleCloseJoinModal()
+      handleCloseDialog()
    }, [])
 
    useRewardLivestreamAttendance(currentLivestream)
@@ -389,11 +387,18 @@ const ViewerLayout = (props) => {
       return <Loader />
    }
 
-   if (joinGroupModalData) {
+   if (isDialogOpen) {
       return (
-         <ViewerGroupCategorySelectMenu
-            joinGroupModalData={joinGroupModalData}
-            onQuestionsAnswered={onRegistrationQuestionsAnswered}
+         <LivestreamDialog
+            open={isDialogOpen}
+            updatedStats={null}
+            serverUserEmail={null}
+            serverSideLivestream={currentLivestream}
+            livestreamId={currentLivestream.id}
+            handleClose={() => {}}
+            page={"register"}
+            mode="stand-alone"
+            onRegisterSuccess={onRegistrationQuestionsAnswered}
          />
       )
    }
