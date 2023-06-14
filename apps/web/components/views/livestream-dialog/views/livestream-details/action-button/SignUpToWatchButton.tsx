@@ -22,7 +22,7 @@ const SignUpToWatchButton: FC = () => {
             href={`/signup?absolutePath=${asPath}`}
             component={Link}
             disableElevation
-            data-testid="livestream-registration-button"
+            data-testid="livestream-signup-watch-button"
             size="large"
          >
             Sign Up to Watch
