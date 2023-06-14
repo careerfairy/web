@@ -22,6 +22,10 @@ import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
 } from "../../../components/views/livestream-dialog"
+import {
+   MAX_PAST_STREAMS,
+   MAX_UPCOMING_STREAMS,
+} from "components/views/company-page/EventSection"
 
 type TrackProps = {
    id: string
@@ -31,6 +35,7 @@ type TrackProps = {
 const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
    serverSideGroup,
    serverSideUpcomingLivestreams,
+   serverSidePastLivestreams,
    livestreamDialogData,
 }) => {
    const { trackCompanyPageView } = useFirebaseService()
@@ -59,6 +64,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
                   upcomingLivestreams={mapFromServerSide(
                      serverSideUpcomingLivestreams
                   )}
+                  pastLivestreams={mapFromServerSide(serverSidePastLivestreams)}
                   editMode={false}
                />
             </Box>
@@ -70,6 +76,7 @@ const CompanyPage: NextPage<InferGetStaticPropsType<typeof getStaticProps>> = ({
 export const getStaticProps: GetStaticProps<{
    serverSideGroup: Group
    serverSideUpcomingLivestreams: { [p: string]: any }[]
+   serverSidePastLivestreams: { [p: string]: any }[]
    livestreamDialogData: LiveStreamDialogData
 }> = async (ctx) => {
    const { params } = ctx
@@ -85,18 +92,29 @@ export const getStaticProps: GetStaticProps<{
                livestreamRepo.getEventsOfGroup(
                   serverSideGroup?.groupId,
                   "upcoming",
-                  { limit: 10 }
+                  { limit: MAX_UPCOMING_STREAMS + 1 } // fetch 10 + 1 to know if there are more
+               ),
+               livestreamRepo.getEventsOfGroup(
+                  serverSideGroup?.groupId,
+                  "past",
+                  { limit: MAX_PAST_STREAMS + 1 } // fetch 5 + 1 to know if there are more
                ),
                getLivestreamDialogData(ctx),
             ])
             const [
                serverSideUpcomingLivestreamsResult,
+               serverSidePastLivestreamsResult,
                livestreamDialogDataResult,
             ] = results
 
             const serverSideUpcomingLivestreams =
                serverSideUpcomingLivestreamsResult.status === "fulfilled"
                   ? serverSideUpcomingLivestreamsResult.value
+                  : []
+
+            const serverSidePastLivestreams =
+               serverSidePastLivestreamsResult.status === "fulfilled"
+                  ? serverSidePastLivestreamsResult.value
                   : []
 
             const livestreamDialogData =
@@ -109,6 +127,11 @@ export const getStaticProps: GetStaticProps<{
                   serverSideGroup,
                   serverSideUpcomingLivestreams:
                      serverSideUpcomingLivestreams?.map(
+                        LivestreamPresenter.serializeDocument
+                     ) || [],
+
+                  serverSidePastLivestreams:
+                     serverSidePastLivestreams?.map(
                         LivestreamPresenter.serializeDocument
                      ) || [],
                   livestreamDialogData,

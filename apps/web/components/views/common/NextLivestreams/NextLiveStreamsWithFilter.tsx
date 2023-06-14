@@ -44,6 +44,7 @@ const getQueryVariables = (query) => {
    const companyIndustries = query.companyIndustries as string
    const fieldsOfStudy = query.fieldsOfStudy as string
    const recordedOnly = query.recordedOnly as string
+   const companyId = query.companyId as string
 
    return {
       languages: languages && languages.split(","),
@@ -52,6 +53,7 @@ const getQueryVariables = (query) => {
          companyIndustries?.length && companyIndustries.split(","),
       fieldsOfStudy: fieldsOfStudy?.length && fieldsOfStudy.split(","),
       recordedOnly: recordedOnly?.toLowerCase() === "true" || false,
+      companyId,
    }
 }
 
@@ -70,6 +72,7 @@ const NextLiveStreamsWithFilter = ({
       companyIndustries,
       recordedOnly,
       fieldsOfStudy,
+      companyId,
    } = useMemo(() => getQueryVariables(query), [query])
    const isMobile = useIsMobile()
    const hasPastEvents = useMemo(
@@ -101,6 +104,7 @@ const NextLiveStreamsWithFilter = ({
       fieldsOfStudy: mapFieldsOfStudy,
       recordedOnly: recordedOnly,
       listenToPastEvents: hasPastEvents,
+      filterByGroupId: companyId,
    })
 
    const noResultsMessage = useMemo<JSX.Element>(

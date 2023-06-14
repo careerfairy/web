@@ -32,6 +32,7 @@ type Props = {
    group: Group
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
+   pastLivestreams: LivestreamEvent[]
 }
 
 export const TabValue = {
@@ -72,6 +73,7 @@ type ICompanyPageContext = {
    groupPresenter: GroupPresenter
    editMode: boolean
    upcomingLivestreams: LivestreamEvent[]
+   pastLivestreams: LivestreamEvent[]
    sectionRefs: SectionRefs
 }
 
@@ -92,6 +94,7 @@ const CompanyPageOverview = ({
    group,
    editMode,
    upcomingLivestreams,
+   pastLivestreams,
 }: Props) => {
    const { isLoggedIn, isLoggedOut } = useAuth()
 
@@ -109,6 +112,11 @@ const CompanyPageOverview = ({
 
    const contextUpcomingLivestream = useListenToStreams({
       filterByGroupId: group.groupId,
+   })
+
+   const contextPastLivestreams = useListenToStreams({
+      filterByGroupId: group.groupId,
+      listenToPastEvents: true,
    })
 
    const aboutSectionRef = useRef<HTMLElement>(null)
@@ -150,6 +158,7 @@ const CompanyPageOverview = ({
          groupPresenter: presenter,
          editMode,
          upcomingLivestreams: contextUpcomingLivestream || upcomingLivestreams,
+         pastLivestreams: contextPastLivestreams || pastLivestreams,
          sectionRefs: {
             aboutSectionRef,
             testimonialSectionRef,
@@ -163,6 +172,8 @@ const CompanyPageOverview = ({
          editMode,
          contextUpcomingLivestream,
          upcomingLivestreams,
+         contextPastLivestreams,
+         pastLivestreams,
       ]
    )
 

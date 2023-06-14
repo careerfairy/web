@@ -46,6 +46,8 @@ import {
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
 
+const bottomConentHeight = 50
+
 const styles = sxStyles({
    hideOnHoverContent: {
       position: "absolute",
@@ -201,6 +203,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          index,
          location = ImpressionLocation.unknown,
          isEmbedded = false,
+         bottomElement,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -581,8 +584,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               className="chipsWrapper"
                               sx={{
                                  display: "flex",
-                                 height: "100%",
+                                 height: 32,
                                  alignItems: "end",
+                                 mt: "auto",
                               }}
                            >
                               <Stack spacing={1} direction={"row"}>
@@ -638,6 +642,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               </Stack>
                            </Box>
                         </Box>
+                        {bottomElement ? (
+                           <Box
+                              bgcolor="background.paper"
+                              width="100%"
+                              display="flex"
+                              height={bottomConentHeight}
+                           >
+                              {bottomElement}
+                           </Box>
+                        ) : null}
                      </Box>
                   </Box>
                   {event ? <EventSEOSchemaScriptTag event={event} /> : null}
@@ -663,6 +677,7 @@ interface EventPreviewCardProps {
    location?: ImpressionLocation
    ref?: React.Ref<HTMLDivElement>
    isEmbedded?: boolean
+   bottomElement?: React.ReactNode
 }
 
 EventPreviewCard.displayName = "EventPreviewCard"
