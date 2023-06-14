@@ -10,7 +10,7 @@ import { useMediaQuery } from "@mui/material"
 
 type Props = {
    sliderRef: MutableRefObject<any>
-   children: JSX.Element[]
+   children: React.ReactNode
 }
 
 const styles = sxStyles({

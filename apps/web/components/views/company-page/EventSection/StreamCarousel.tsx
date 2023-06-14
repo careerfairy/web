@@ -91,12 +91,12 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
       }
 
       if (!isUpcoming && editMode) {
-         return "Below are your past live streams, these will be shown on your company page."
+         return "Here are the recordings of your previous live streams, which will be featured on your company page."
       }
 
       // !isUpcoming && !editMode
-      return "Here are the recordings of your previous live streams, which will be featured on your company page."
-   }, [isUpcoming, editMode])
+      return `Have you missed a live stream from ${group.universityName} Corporation? Don't worry, you can re-watch them all here.`
+   }, [isUpcoming, editMode, group.universityName])
 
    const link = useMemo(() => {
       const query = `companyId=${group.id}`
@@ -134,11 +134,13 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                         {description}
                      </Typography>
                   )}
-                  <Link href={link} passHref>
-                     <Box component="a" sx={styles.seeMoreLink}>
-                        See all
-                     </Box>
-                  </Link>
+                  {hasMore ? (
+                     <Link href={link} passHref>
+                        <Box component="a" sx={styles.seeMoreLink}>
+                           See all
+                        </Box>
+                     </Link>
+                  ) : null}
                   <Box ml={-0.75}>
                      <EventCarousel sliderRef={sliderRef}>
                         {streamsToShow.map((event) => (
