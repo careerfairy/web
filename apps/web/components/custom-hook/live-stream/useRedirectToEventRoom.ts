@@ -15,7 +15,7 @@ import { useRouter } from "next/router"
  */
 const useRedirectToEventRoom = (
    livestreamPresenter: LivestreamPresenter,
-   shouldRedirect: boolean
+   shouldRedirect: boolean = true
 ) => {
    const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
