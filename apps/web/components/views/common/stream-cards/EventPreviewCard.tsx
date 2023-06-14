@@ -374,6 +374,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                   sx={[event && styles.cursorPointer, styles.cardWrapper]}
                   ref={trackImpressionsRef}
                   onClick={handleDetailsClick}
+                  data-testid={`livestream-card-${event?.id}`}
                >
                   <Box
                      ref={ref}
