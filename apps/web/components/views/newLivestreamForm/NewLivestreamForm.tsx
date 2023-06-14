@@ -559,7 +559,11 @@ const NewLivestreamForm = () => {
                            <LocalizationProvider dateAdapter={AdapterDateFns}>
                               <DateTimePicker
                                  renderInput={(params) => (
-                                    <TextField fullWidth {...params} />
+                                    <TextField
+                                       id="start"
+                                       fullWidth
+                                       {...params}
+                                    />
                                  )}
                                  disabled={isSubmitting}
                                  label="Live Stream Start Date"
