@@ -82,6 +82,7 @@ const CompanyPageContext = createContext<ICompanyPageContext>({
    groupPresenter: null,
    editMode: false,
    upcomingLivestreams: [],
+   pastLivestreams: [],
    sectionRefs: {
       aboutSectionRef: null,
       eventSectionRef: null,
