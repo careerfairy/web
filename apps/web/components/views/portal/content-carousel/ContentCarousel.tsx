@@ -24,17 +24,6 @@ const styles = sxStyles({
       height: { xs: "55vh", md: "40vh" },
       minHeight: "470px",
    },
-   image: {
-      "&:after": {
-         position: "absolute",
-         height: "100%",
-         width: "100%",
-         content: '" "',
-         backgroundColor: (theme) => darken(theme.palette.navyBlue.main, 0.5),
-         opacity: 0.7,
-      },
-   },
-
    paginationWrapper: (theme) => ({
       mx: "auto",
       display: "flex",
