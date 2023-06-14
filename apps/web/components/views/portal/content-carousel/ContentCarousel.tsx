@@ -76,9 +76,11 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
     */
    useEffect(() => {
-      if (videoUrl && minutesWatched > 0) {
+      const active = content[activeStep]
+      const isLivestream = active?.contentType === "LivestreamEvent"
+      if (videoUrl && minutesWatched > 0 && isLivestream) {
          void livestreamRepo.updateRecordingStats({
-            livestreamId: content[activeStep].id,
+            livestreamId: active.id,
             minutesWatched: 1,
             onlyIncrementMinutes: true,
          })
