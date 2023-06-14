@@ -1,30 +1,28 @@
-import { Box, Container } from "@mui/material"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { sxStyles } from "../../../../types/commonTypes"
-import Image from "next/image"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import React, { FC, useCallback, useEffect, useState } from "react"
-import { autoPlay } from "react-swipeable-views-utils"
-import SwipeableViews from "react-swipeable-views"
-import { darken, useTheme } from "@mui/material/styles"
-import HighlightVideoDialog from "../HighlightVideoDialog"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
-import ContentCarouselPagination from "./ContentCarouselPagination"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import useCountTime from "../../../custom-hook/useCountTime"
-import RegistrationModal from "../../common/registration-modal"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import LivestreamContent from "./LivestreamContent"
-import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
 import { UserStats } from "@careerfairy/shared-lib/users"
+import { Box } from "@mui/material"
+import { darken, useTheme } from "@mui/material/styles"
+import { FC, useCallback, useEffect, useState } from "react"
+import SwipeableViews from "react-swipeable-views"
+import { autoPlay } from "react-swipeable-views-utils"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../types/commonTypes"
+import useCountTime from "../../../custom-hook/useCountTime"
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import RegistrationModal from "../../common/registration-modal"
+import HighlightVideoDialog from "../HighlightVideoDialog"
+import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
 import { CarouselContent } from "./CarouselContentService"
+import ContentCarouselPagination from "./ContentCarouselPagination"
+import LivestreamContent from "./LivestreamContent"
 
 const styles = sxStyles({
    wrapper: {
       width: "100%",
-      height: { xs: "50vh", md: "40vh" },
-      minHeight: "450px",
+      height: { xs: "55vh", md: "40vh" },
+      minHeight: "470px",
    },
    image: {
       "&:after": {
@@ -36,14 +34,7 @@ const styles = sxStyles({
          opacity: 0.7,
       },
    },
-   content: {
-      position: "relative",
-      paddingX: { xs: 2.62, md: 6.25 },
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-      height: "100%",
-   },
+
    paginationWrapper: (theme) => ({
       mx: "auto",
       display: "flex",
@@ -134,8 +125,6 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
       resetMinutes()
    }, [resetMinutes])
 
-   console.log("content", content)
-
    return (
       <>
          <AutoPlaySwipeableViews
@@ -163,29 +152,12 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
                // Default rendering for LivestreamEvent
                return (
                   <Box sx={styles.wrapper} key={contentItem.id}>
-                     <Box
-                        sx={[styles.wrapper, styles.image]}
-                        position={"absolute"}
-                     >
-                        <Image
-                           src={getResizedUrl(
-                              contentItem.backgroundImageUrl,
-                              "lg"
-                           )}
-                           alt={contentItem.title}
-                           layout="fill"
-                           objectFit="cover"
-                           quality={90}
-                        />
-                     </Box>
-                     <Container disableGutters sx={styles.content}>
-                        <LivestreamContent
-                           handleBannerPlayRecording={handleBannerPlayRecording}
-                           livestreamData={contentItem}
-                           handleClickRegister={handleClickRegister}
-                           userStats={userStats || serverUserStats}
-                        />
-                     </Container>
+                     <LivestreamContent
+                        handleBannerPlayRecording={handleBannerPlayRecording}
+                        livestreamData={contentItem}
+                        handleClickRegister={handleClickRegister}
+                        userStats={userStats || serverUserStats}
+                     />
                   </Box>
                )
             })}

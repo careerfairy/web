@@ -1,18 +1,22 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import React, { FC, ReactNode, useMemo } from "react"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import useRecordingAccess from "../../upcoming-livestream/HeroSection/useRecordingAccess"
-import DateUtil from "../../../../util/DateUtil"
-import PlayIcon from "@mui/icons-material/PlayCircleOutline"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import ContentButton from "./ContentButton"
-import Content from "./Content"
-import useLivestream from "../../../custom-hook/live-stream/useLivestream"
 import { UserStats } from "@careerfairy/shared-lib/users"
-import { buildDialogLink } from "../../livestream-dialog"
+import PlayIcon from "@mui/icons-material/PlayCircleOutline"
 import { useRouter } from "next/router"
+import { FC, ReactNode, useMemo } from "react"
+import DateUtil from "../../../../util/DateUtil"
+import useLivestream from "../../../custom-hook/live-stream/useLivestream"
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
+import { buildDialogLink } from "../../livestream-dialog"
+import useRecordingAccess from "../../upcoming-livestream/HeroSection/useRecordingAccess"
 import { LivestreamEventWithType } from "./CarouselContentService"
+import Content, {
+   ContentHeaderTitle,
+   ContentSubtitle,
+   ContentTitle,
+} from "./Content"
+import ContentButton from "./ContentButton"
 
 type LivestreamContentProps = {
    livestreamData: LivestreamEventWithType
@@ -152,11 +156,15 @@ const LivestreamContent: FC<LivestreamContentProps> = ({
 
    return (
       <Content
-         headerTitle={headerTitle}
-         title={livestream.title}
-         subtitle={subtitle}
+         headerTitle={
+            <ContentHeaderTitle color="white">{headerTitle}</ContentHeaderTitle>
+         }
+         title={<ContentTitle color="white">{livestream.title}</ContentTitle>}
+         subtitle={<ContentSubtitle color="white">{subtitle}</ContentSubtitle>}
          logoUrl={getResizedUrl(livestream.companyLogoUrl, "lg")}
          actionItem={actionItem}
+         backgroundImageAlt={livestream.company}
+         backgroundImageUrl={getResizedUrl(livestream.backgroundImageUrl, "lg")}
       />
    )
 }

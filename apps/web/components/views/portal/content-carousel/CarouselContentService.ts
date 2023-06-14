@@ -1,10 +1,10 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/ExistingDataRecommendationService"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { rewardService } from "../../../../data/firebase/RewardService"
-import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/IRecommendationService"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
+import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/ExistingDataRecommendationService"
+import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/IRecommendationService"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { mapFromServerSide } from "util/serverUtil"
+import { rewardService } from "../../../../data/firebase/RewardService"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -154,7 +154,8 @@ export class CarouselContentService {
          }
       })
 
-      if (this.userHasBoughtRecording()) {
+      // If the user has not bought the recording, add a CTASlide before the content
+      if (!this.userHasBoughtRecording()) {
          content = [
             {
                contentType: "CTASlide",
