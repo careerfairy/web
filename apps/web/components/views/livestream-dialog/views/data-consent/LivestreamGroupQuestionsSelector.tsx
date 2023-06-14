@@ -114,11 +114,12 @@ const styles = sxStyles({
 })
 
 const StyledSelect = styled(Select)(() => ({
+   fontSize: "16px !important",
    "& .MuiSelect-select": {
       paddingLeft: "40px",
       boxShadow: "none",
    },
-}))
+})) as unknown as typeof Select
 
 const QuestionSelect = ({
    inputName,
