@@ -15,7 +15,7 @@ import { useRouter } from "next/router"
  */
 const useRedirectToEventRoom = (
    livestreamPresenter: LivestreamPresenter,
-   shouldRedirect: boolean = true
+   shouldRedirect: boolean
 ) => {
    const { authenticatedUser, isLoadingAuth } = useAuth()
    const { replace } = useRouter()
@@ -38,10 +38,11 @@ const useRedirectToEventRoom = (
       return () => {
          setIsRedirecting(false)
       }
+      // eslint-disable-next-line react-hooks/exhaustive-deps
    }, [
       replace,
       livestreamPresenter,
-      authenticatedUser?.email,
+      authenticatedUser.email,
       isLoadingAuth,
       shouldRedirect,
    ])

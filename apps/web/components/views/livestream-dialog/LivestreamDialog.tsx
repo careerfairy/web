@@ -161,7 +161,6 @@ const views: View[] = [
 const LivestreamDialog: FC<Props> = ({
    handleClose,
    open,
-   mode = "page",
    livestreamId,
    ...rest
 }) => {
@@ -210,7 +209,7 @@ const Content: FC<ContentProps> = ({
    onRegisterSuccess,
    page = "details",
    livestreamId,
-   mode,
+   mode = "page",
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -234,11 +233,13 @@ const Content: FC<ContentProps> = ({
       hasInitialData ? serverSideLivestream : undefined
    )
 
+   const isPageMode = mode === "page"
+
    const goToView = useCallback(
       (view: Exclude<ViewKey, "job-details">) => {
          switch (view) {
             case "livestream-details":
-               if (mode === "page") {
+               if (isPageMode) {
                   return void push(
                      buildDialogLink({
                         router,
@@ -252,7 +253,7 @@ const Content: FC<ContentProps> = ({
                   )
                }
             case "register-data-consent":
-               if (mode === "page") {
+               if (isPageMode) {
                   return void push(
                      buildDialogLink({
                         router,
@@ -275,7 +276,7 @@ const Content: FC<ContentProps> = ({
                setValue(views.findIndex((v) => v.key === view))
          }
       },
-      [livestreamId, push, router, livestream?.questionsDisabled, mode]
+      [livestreamId, push, router, livestream?.questionsDisabled, isPageMode]
    )
 
    const goToJobDetails = useCallback(
@@ -298,7 +299,7 @@ const Content: FC<ContentProps> = ({
             setValue(views.findIndex((v) => v.key === "job-details"))
          }
       },
-      [push, router]
+      [livestreamId, mode, push, router]
    )
 
    const onClose = useCallback(() => {
@@ -359,11 +360,15 @@ const Content: FC<ContentProps> = ({
          livestream,
          value,
          handleBack,
+         livestreamPresenter,
          updatedStats,
          serverUserEmail,
          isRecommended,
          registrationState,
-         registrationDispatch,
+         jobId,
+         goToJobDetails,
+         mode,
+         onRegisterSuccess,
       ]
    )
 
@@ -403,12 +408,16 @@ type DialogContextType = {
    handleBack: () => void
    closeDialog: () => void
    /**
-    *The ID of a job associated with the livestream.
+    * The ID of a job associated with the livestream.
+    *
+    * Note: This property is only available in the "stand-alone" mode.
     */
    jobId: string | null
 
    /**
     * Method to navigate to the job details view.
+    *
+    * Note: This method is only works in the "stand-alone" mode.
     */
    goToJobDetails: (jobId: string) => void
    /*
