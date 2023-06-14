@@ -1,11 +1,12 @@
 import React, { MutableRefObject } from "react"
 import { sxStyles } from "../../../../types/commonTypes"
-import useIsMobile from "../../../custom-hook/useIsMobile"
 import Grid from "@mui/material/Grid"
 import Box from "@mui/material/Box"
 import Slider from "react-slick"
 import "slick-carousel/slick/slick.css"
 import "slick-carousel/slick/slick-theme.css"
+import { useTheme } from "@mui/styles"
+import { useMediaQuery } from "@mui/material"
 
 type Props = {
    sliderRef: MutableRefObject<any>
@@ -14,15 +15,18 @@ type Props = {
 
 const styles = sxStyles({
    carousel: {
+      "& .slick-track": {
+         display: "flex",
+      },
       "& .slick-slide": {
+         height: "inherit",
          "& > *": {
+            height: "100%",
             display: "flex",
          },
       },
    },
    notCentered: {
-      mt: 4,
-
       "& .slick-track": {
          mx: 0,
       },
@@ -30,7 +34,8 @@ const styles = sxStyles({
 })
 
 const EventCarousel = ({ sliderRef, children }: Props) => {
-   const isMobile = useIsMobile()
+   const theme = useTheme()
+   const isMobile = useMediaQuery(theme.breakpoints.down("lg")) // need to use this instead of useIsMobile() because of nested gid layout of company page
 
    const slidesToShow = isMobile ? 1 : 2
 
