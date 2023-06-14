@@ -147,12 +147,15 @@ export const ContentSubtitle = styled((props: TypographyProps) => (
 
 export const ContentHeaderTitle = styled((props: TypographyProps) => (
    <Typography variant={"h1"} {...props} />
-))(() => ({
+))(({ theme }) => ({
    fontWeight: 600,
    position: "relative",
-   fontSize: "3.6rem !important",
    display: "inline-block",
    mb: 0.5,
+   fontSize: "2.375rem",
+   [theme.breakpoints.up("md")]: {
+      fontSize: "3.6rem !important",
+   },
 })) as typeof Typography
 
 export const ContentTitle = styled((props: TypographyProps) => (
