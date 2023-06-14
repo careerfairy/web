@@ -2,9 +2,8 @@ import { groupAdminFixture as test } from "../../fixtures"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 
 test.describe("Group Admin Livestreams", () => {
-   test.beforeEach(async () => {
-      test.skip()
-   })
+   // Only run those tests on chromium
+   test.skip(({ browserName }) => browserName !== "chromium")
 
    test("Create a draft livestream from the main page", async ({
       groupPage,
