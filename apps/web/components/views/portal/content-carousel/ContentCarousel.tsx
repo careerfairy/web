@@ -1,46 +1,28 @@
-import { Box, Container } from "@mui/material"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
-import { sxStyles } from "../../../../types/commonTypes"
-import Image from "next/image"
-import { getResizedUrl } from "../../../helperFunctions/HelperFunctions"
-import React, { FC, useCallback, useEffect, useState } from "react"
-import { autoPlay } from "react-swipeable-views-utils"
-import SwipeableViews from "react-swipeable-views"
-import { darken, useTheme } from "@mui/material/styles"
-import HighlightVideoDialog from "../HighlightVideoDialog"
-import { livestreamRepo } from "../../../../data/RepositoryInstances"
 import { downloadLinkWithDate } from "@careerfairy/shared-lib/dist/livestreams/recordings"
-import ContentCarouselPagination from "./ContentCarouselPagination"
-import { useAuth } from "../../../../HOCs/AuthProvider"
-import useCountTime from "../../../custom-hook/useCountTime"
-import RegistrationModal from "../../common/registration-modal"
-import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
-import LivestreamContent from "./LivestreamContent"
 import { UserStats } from "@careerfairy/shared-lib/users"
+import { Box } from "@mui/material"
+import { darken, useTheme } from "@mui/material/styles"
+import { FC, useCallback, useEffect, useState } from "react"
+import SwipeableViews from "react-swipeable-views"
+import { autoPlay } from "react-swipeable-views-utils"
+import { useAuth } from "../../../../HOCs/AuthProvider"
+import { livestreamRepo } from "../../../../data/RepositoryInstances"
+import { sxStyles } from "../../../../types/commonTypes"
+import useCountTime from "../../../custom-hook/useCountTime"
+import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
+import RegistrationModal from "../../common/registration-modal"
+import HighlightVideoDialog from "../HighlightVideoDialog"
+import BuyCreditsCTAContent from "./BuyCreditsCTAContent"
+import { CarouselContent } from "./CarouselContentService"
+import ContentCarouselPagination from "./ContentCarouselPagination"
+import LivestreamContent from "./LivestreamContent"
 
 const styles = sxStyles({
    wrapper: {
       width: "100%",
-      height: { xs: "50vh", md: "40vh" },
-      minHeight: "450px",
-   },
-   image: {
-      "&:after": {
-         position: "absolute",
-         height: "100%",
-         width: "100%",
-         content: '" "',
-         backgroundColor: (theme) => darken(theme.palette.navyBlue.main, 0.5),
-         opacity: 0.7,
-      },
-   },
-   content: {
-      position: "relative",
-      paddingX: { xs: 2.62, md: 6.25 },
-      display: "flex",
-      flexDirection: "column",
-      justifyContent: "space-between",
-      height: "100%",
+      height: { xs: "55vh", md: "40vh" },
+      minHeight: "470px",
    },
    paginationWrapper: (theme) => ({
       mx: "auto",
@@ -60,7 +42,7 @@ const CAROUSEL_SLIDE_DELAY = 10000
 const AutoPlaySwipeableViews = autoPlay(SwipeableViews)
 
 type Props = {
-   content: LivestreamEvent[]
+   content: CarouselContent[]
    serverUserStats: UserStats
 }
 
@@ -83,9 +65,11 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
     * Each minute watched the field minutesWatched will be increased, and we need to increment it on our DB
     */
    useEffect(() => {
-      if (videoUrl && minutesWatched > 0) {
+      const active = content[activeStep]
+      const isLivestream = active?.contentType === "LivestreamEvent"
+      if (videoUrl && minutesWatched > 0 && isLivestream) {
          void livestreamRepo.updateRecordingStats({
-            livestreamId: content[activeStep].id,
+            livestreamId: active.id,
             minutesWatched: 1,
             onlyIncrementMinutes: true,
          })
@@ -146,33 +130,28 @@ const ContentCarousel: FC<Props> = ({ content, serverUserStats }) => {
             enableMouseEvents
             interval={CAROUSEL_SLIDE_DELAY}
          >
-            {content.map((contentItem) => (
-               <Box sx={styles.wrapper} key={contentItem.id}>
-                  <Box
-                     sx={[styles.wrapper, styles.image]}
-                     position={"absolute"}
-                  >
-                     <Image
-                        src={getResizedUrl(
-                           contentItem.backgroundImageUrl,
-                           "lg"
-                        )}
-                        alt={contentItem.title}
-                        layout="fill"
-                        objectFit="cover"
-                        quality={90}
-                     />
-                  </Box>
-                  <Container disableGutters sx={styles.content}>
+            {content.map((contentItem, index) => {
+               // Check if contentItem is a CTASlide
+               if (contentItem.contentType === "CTASlide") {
+                  return (
+                     <Box sx={styles.wrapper} key={index}>
+                        <BuyCreditsCTAContent cta={contentItem} />
+                     </Box>
+                  )
+               }
+
+               // Default rendering for LivestreamEvent
+               return (
+                  <Box sx={styles.wrapper} key={contentItem.id}>
                      <LivestreamContent
                         handleBannerPlayRecording={handleBannerPlayRecording}
                         livestreamData={contentItem}
                         handleClickRegister={handleClickRegister}
                         userStats={userStats || serverUserStats}
                      />
-                  </Container>
-               </Box>
-            ))}
+                  </Box>
+               )
+            })}
          </AutoPlaySwipeableViews>
          {content.length > 1 && (
             <Box sx={styles.paginationWrapper}>

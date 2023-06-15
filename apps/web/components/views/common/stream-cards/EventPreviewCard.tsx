@@ -298,7 +298,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
       }, [startDate])
 
       const getPastEventDate = useMemo<string>(
-         () => DateUtil.pastEventPreviewDate(startDate),
+         () => DateUtil.formatDateToString(startDate),
          [startDate]
       )
 

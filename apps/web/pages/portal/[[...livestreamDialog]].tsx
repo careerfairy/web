@@ -24,7 +24,9 @@ import {
    getUserTokenFromCookie,
    mapFromServerSide,
 } from "../../util/serverUtil"
-import CarouselContentService from "../../components/views/portal/content-carousel/CarouselContentService"
+import CarouselContentService, {
+   type CarouselContent,
+} from "../../components/views/portal/content-carousel/CarouselContentService"
 
 import {
    getLivestreamDialogData,
@@ -51,8 +53,10 @@ const PortalPage = ({
       [comingUpNextEvents]
    )
 
-   const carouselContent = useMemo(() => {
-      return mapFromServerSide(serializedCarouselContent)
+   const carouselContent = useMemo<CarouselContent[]>(() => {
+      return CarouselContentService.deserializeContent(
+         serializedCarouselContent
+      )
    }, [serializedCarouselContent])
 
    return (
@@ -168,9 +172,8 @@ export const getServerSideProps = async (ctx: GetServerSidePropsContext) => {
             pastEvents: pastEvents.map(LivestreamPresenter.serializeDocument),
          }),
          ...(carouselContent && {
-            serializedCarouselContent: carouselContent?.map(
-               LivestreamPresenter.serializeDocument
-            ),
+            serializedCarouselContent:
+               CarouselContentService.serializeContent(carouselContent),
          }),
          livestreamDialogData,
       },
