@@ -72,6 +72,9 @@ const styles = sxStyles({
             0.2
          )}, ${alpha(theme.palette.common.black, 0.1)})`,
    },
+   backgroundImageWrapperWithBottomContent: {
+      height: `calc(40% + ${bottomContentHeight / 2}px)`,
+   },
    backgroundImageLoader: {
       position: "absolute",
       inset: 0,
@@ -388,7 +391,11 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      <Box sx={styles.mainContentWrapper}>
                         <Box
                            className="backgroundImageWrapper"
-                           sx={styles.backgroundImageWrapper}
+                           sx={[
+                              styles.backgroundImageWrapper,
+                              bottomElement &&
+                                 styles.backgroundImageWrapperWithBottomContent,
+                           ]}
                         >
                            {loading ? (
                               <Skeleton

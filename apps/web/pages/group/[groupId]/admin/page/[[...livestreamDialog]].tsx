@@ -50,35 +50,42 @@ export const getServerSideProps: GetServerSideProps<{
    serverSidePastLivestreams: any[]
    livestreamDialogData: LiveStreamDialogData
 }> = async (context) => {
-   const { groupId } = context.params
+   try {
+      const { groupId } = context.params
 
-   const serverSideGroup = await getServerSideGroup(groupId as string)
+      const serverSideGroup = await getServerSideGroup(groupId as string)
 
-   if (!serverSideGroup || Object.keys(serverSideGroup)?.length === 0) {
+      if (!serverSideGroup || Object.keys(serverSideGroup)?.length === 0) {
+         return {
+            notFound: true,
+         }
+      }
+
+      const {
+         serverSideUpcomingLivestreams,
+         serverSidePastLivestreams,
+         livestreamDialogData,
+      } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, context)
+
+      return {
+         props: {
+            serverSideGroup,
+            serverSideUpcomingLivestreams:
+               serverSideUpcomingLivestreams?.map(
+                  LivestreamPresenter.serializeDocument
+               ) || [],
+            serverSidePastLivestreams:
+               serverSidePastLivestreams?.map(
+                  LivestreamPresenter.serializeDocument
+               ) || [],
+            livestreamDialogData,
+         },
+      }
+   } catch (e) {
+      console.error(e)
       return {
          notFound: true,
       }
-   }
-
-   const {
-      serverSideUpcomingLivestreams,
-      serverSidePastLivestreams,
-      livestreamDialogData,
-   } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, context)
-
-   return {
-      props: {
-         serverSideGroup,
-         serverSideUpcomingLivestreams:
-            serverSideUpcomingLivestreams?.map(
-               LivestreamPresenter.serializeDocument
-            ) || [],
-         serverSidePastLivestreams:
-            serverSidePastLivestreams?.map(
-               LivestreamPresenter.serializeDocument
-            ) || [],
-         livestreamDialogData,
-      },
    }
 }
 

@@ -156,10 +156,11 @@ const StreamCarousel: FC<StreamCarouselProps> = ({
                                           component="span"
                                           width="100%"
                                           px={1}
-                                          zIndex={10}
                                        >
                                           <Button
                                              variant="contained"
+                                             component="a"
+                                             href="#"
                                              color="primary"
                                              onClick={(e) => {
                                                 e.stopPropagation()
