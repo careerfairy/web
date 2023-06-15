@@ -5,6 +5,7 @@ import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/I
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
+import { getDayOfYear } from "@careerfairy/shared-lib/utils"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -155,7 +156,10 @@ export class CarouselContentService {
       })
 
       // If the user has not bought the recording, add a CTASlide before the content
-      if (!this.userHasBoughtRecording()) {
+      if (
+         !this.userHasBoughtRecording() &&
+         userShouldSeeCreditsCTABannerToday(this.options.userData)
+      ) {
          content = [
             {
                contentType: "CTASlide",
@@ -253,6 +257,36 @@ export const filterNonRegisteredStreams = (
       const hasRegistered = s.registeredUsers?.includes(userStats?.userId ?? "")
       return !hasRegistered
    })
+}
+
+const MAX_CREDITS_CTA_DISPLAY_COUNT = 5
+
+/**
+ * Determines whether the user should see the 'Buy Credits' CTA banner today.
+ *
+ * This function checks if the day is different from the last day the banner was displayed,
+ * and also checks that the number of times the banner has been displayed is less than
+ * the maximum allowed count.
+ *
+ * @param {UserData} userData - The user's data, including information about last display and count of banner displays.
+ * @returns {boolean} - Returns true if the user should see the banner today, false otherwise.
+ */
+export const userShouldSeeCreditsCTABannerToday = (
+   userData: UserData
+): boolean => {
+   const lastBannerDisplayDate =
+      userData?.lastTimeCreditCTABannerDisplayed?.toMillis() || 0
+
+   const today = getDayOfYear(new Date())
+   const lastBannerDisplayDay = getDayOfYear(new Date(lastBannerDisplayDate))
+
+   const numberOfCreditCTABannerDisplays =
+      userData?.numberOfCreditCTABannerDisplays || 0
+
+   return (
+      today !== lastBannerDisplayDay &&
+      numberOfCreditCTABannerDisplays < MAX_CREDITS_CTA_DISPLAY_COUNT
+   )
 }
 
 export default CarouselContentService

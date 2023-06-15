@@ -80,63 +80,73 @@ type ContentProps = {
    withBackgroundOverlay?: boolean
 }
 
-const Content: FC<ContentProps> = ({
-   actionItem,
-   headerTitle,
-   logoUrl,
-   subtitle,
-   title,
-   backgroundImageUrl,
-   backgroundImageAlt,
-   withBackgroundOverlay = true,
-}) => {
-   return (
-      <Fragment>
-         {backgroundImageUrl ? (
-            <Box
-               sx={[
-                  styles.wrapper,
-                  styles.image,
-                  withBackgroundOverlay && styles.backgroundOverlay,
-               ]}
-               position={"absolute"}
-            >
-               <Image
-                  src={backgroundImageUrl}
-                  alt={backgroundImageAlt}
-                  layout="fill"
-                  objectFit="cover"
-                  quality={90}
-               />
-            </Box>
-         ) : null}
-         <Container disableGutters sx={styles.content}>
-            <Box sx={styles.info}>
-               <Stack spacing={1.5} mt={4}>
-                  <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
-                  {logoUrl ? (
-                     <Box sx={styles.logoWrapper} mt={2}>
-                        <Image
-                           objectFit="contain"
-                           quality={90}
-                           src={logoUrl}
-                           alt={"company logo"}
-                           width={200}
-                           height={100}
-                        />
-                     </Box>
-                  ) : null}
-                  <ContentTitle sx={styles.title} component="h2">
-                     {title}
-                  </ContentTitle>
-                  <ContentSubtitle component="h3">{subtitle}</ContentSubtitle>
-               </Stack>
-               {actionItem ? <Box mt={2}>{actionItem}</Box> : null}
-            </Box>
-         </Container>
-      </Fragment>
-   )
-}
+const Content = React.forwardRef<HTMLDivElement, ContentProps>(
+   (
+      {
+         actionItem,
+         headerTitle,
+         logoUrl,
+         subtitle,
+         title,
+         backgroundImageUrl,
+         backgroundImageAlt,
+         withBackgroundOverlay = true,
+      },
+      ref
+   ) => {
+      return (
+         <Fragment>
+            {backgroundImageUrl ? (
+               <Box
+                  ref={ref}
+                  sx={[
+                     styles.wrapper,
+                     styles.image,
+                     withBackgroundOverlay && styles.backgroundOverlay,
+                  ]}
+                  position={"absolute"}
+               >
+                  <Image
+                     src={backgroundImageUrl}
+                     alt={backgroundImageAlt}
+                     layout="fill"
+                     objectFit="cover"
+                     quality={90}
+                  />
+               </Box>
+            ) : null}
+            <Container disableGutters sx={styles.content}>
+               <Box sx={styles.info}>
+                  <Stack spacing={1.5} mt={4}>
+                     <ContentHeaderTitle>{headerTitle}</ContentHeaderTitle>
+                     {logoUrl ? (
+                        <Box sx={styles.logoWrapper} mt={2}>
+                           <Image
+                              objectFit="contain"
+                              quality={90}
+                              src={logoUrl}
+                              alt={"company logo"}
+                              width={200}
+                              height={100}
+                           />
+                        </Box>
+                     ) : null}
+                     <ContentTitle sx={styles.title} component="h2">
+                        {title}
+                     </ContentTitle>
+                     <ContentSubtitle component="h3">
+                        {subtitle}
+                     </ContentSubtitle>
+                  </Stack>
+                  {actionItem ? <Box mt={2}>{actionItem}</Box> : null}
+               </Box>
+            </Container>
+         </Fragment>
+      )
+   }
+)
+
+Content.displayName = "Content"
 
 export const ContentSubtitle = styled((props: TypographyProps) => (
    <Typography variant={"h6"} {...props} />

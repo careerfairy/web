@@ -159,6 +159,15 @@ export interface IUserRepository {
    getStats(userDataId: string): Promise<UserStats>
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
+
+   /**
+    * Increments the counter for the number of times a user has seen the Career Coins Call-to-Action (CTA) banner,
+    * and updates the last time the user has seen the banner with the current server timestamp.
+    *
+    * @param {string} userEmail - The email of the user whose record is to be updated.
+    * @returns {Promise<void>} - A promise that resolves when the user data is successfully updated.
+    */
+   incrementUserHasSeenCreditsCTABanner(userEmail: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -714,6 +723,23 @@ export class FirebaseUserRepository
          },
          { merge: true }
       )
+   }
+
+   incrementUserHasSeenCreditsCTABanner(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+
+      const toUpdate: Pick<
+         UserData,
+         "lastTimeCreditCTABannerDisplayed" | "numberOfCreditCTABannerDisplays"
+      > = {
+         lastTimeCreditCTABannerDisplayed:
+            this.fieldValue.serverTimestamp() as any,
+         numberOfCreditCTABannerDisplays: this.fieldValue.increment(1) as any,
+      }
+
+      return docRef.set(toUpdate, {
+         merge: true,
+      })
    }
 
    getCompaniesUserFollowsQuery(

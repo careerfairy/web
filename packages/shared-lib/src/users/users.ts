@@ -84,6 +84,16 @@ export interface UserData extends Identifiable {
     */
    lastActivityAt: Timestamp
    createdAt: Timestamp
+
+   /**
+    * Total number of times the user has seen the credit CTA banner
+    * We only show it once per day up to a maximum of 5 times
+    */
+   numberOfCreditCTABannerDisplays?: number
+   /**
+    * The last time the user has seen the credit CTA banner
+    */
+   lastTimeCreditCTABannerDisplayed?: Timestamp
 }
 
 /*

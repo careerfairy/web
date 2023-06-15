@@ -1,10 +1,16 @@
 import { Box } from "@mui/material"
+import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
+import { userRepo } from "data/RepositoryInstances"
 import Image from "next/image"
 import { FC, Fragment } from "react"
+import { useInView } from "react-intersection-observer"
 import { sxStyles } from "types/commonTypes"
-import { CTASlide } from "./CarouselContentService"
+import {
+   CTASlide,
+   userShouldSeeCreditsCTABannerToday,
+} from "./CarouselContentService"
 import Content, { ContentHeaderTitle, ContentTitle } from "./Content"
 import ContentButton from "./ContentButton"
 
@@ -40,10 +46,31 @@ type Props = {
 
 const BuyCreditsCTAContent: FC<Props> = () => {
    const isMobile = useIsMobile()
+   const { userData, isLoadingAuth, isLoadingUserData } = useAuth()
+
+   const isAuthLoading = isLoadingAuth || isLoadingUserData
+
+   const { ref } = useInView({
+      skip: isAuthLoading || !userData?.userEmail, // Only start counting when user is logged in
+      triggerOnce: true,
+      onChange: (inView) => {
+         if (inView) {
+            const shouldIncrementBannerDisplayCount =
+               userShouldSeeCreditsCTABannerToday(userData)
+
+            if (shouldIncrementBannerDisplayCount) {
+               userRepo
+                  .incrementUserHasSeenCreditsCTABanner(userData.userEmail)
+                  .catch(console.error)
+            }
+         }
+      },
+   })
 
    return (
       <Fragment>
          <Content
+            ref={ref}
             headerTitle={
                <ContentHeaderTitle maxWidth={"60% !important"} color="black">
                   Introducing{" "}
