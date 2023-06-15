@@ -46,7 +46,7 @@ import {
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
 
-const bottomConentHeight = 50
+const bottomContentHeight = 50
 
 const styles = sxStyles({
    hideOnHoverContent: {
@@ -647,7 +647,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               bgcolor="background.paper"
                               width="100%"
                               display="flex"
-                              height={bottomConentHeight}
+                              height={bottomContentHeight}
                            >
                               {bottomElement}
                            </Box>
