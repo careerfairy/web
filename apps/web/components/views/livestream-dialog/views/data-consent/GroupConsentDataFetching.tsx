@@ -22,13 +22,19 @@ import RegisterDataConsentViewSkeleton from "./RegisterDataConsentViewSkeleton"
  * If not, it will render the children UI for the user to give consent/answer
  */
 const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
-   const { livestream, registrationState, registrationDispatch, goToView } =
-      useLiveStreamDialog()
+   const {
+      livestream,
+      registrationState,
+      registrationDispatch,
+      goToView,
+      onRegisterSuccess,
+   } = useLiveStreamDialog()
    const { authenticatedUser, userData, userStats } = useAuth()
    const { checkIfUserAgreedToGroupPolicy } = useFirebaseService()
    const { errorNotification } = useSnackbarNotifications()
    const { data: groups } = useGroupsByIds(livestream.groupIds)
-   const { completeRegistrationProcess } = useRegistrationHandler()
+   const { completeRegistrationProcess, registrationStatus } =
+      useRegistrationHandler()
 
    // check if user has answered all questions / given consent
    useEffect(() => {
@@ -62,22 +68,37 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
 
             const hasAnsweredAllQuestions =
                checkIfUserHasAnsweredAllLivestreamGroupQuestions(answers)
-
             if (hasAgreedToAll && hasAnsweredAllQuestions) {
-               // we have enough information to complete the registration
-               completeRegistrationProcess(
-                  userData,
-                  authenticatedUser,
-                  livestream,
-                  groupsWithPolicies,
-                  answers
-               )
-                  .then(() => {
-                     goToView("register-ask-questions")
-                  })
-                  .catch((e) => {
-                     errorNotification(e)
-                  })
+               switch (registrationStatus()) {
+                  case "can_register":
+                     // we have enough information to complete the registration
+                     completeRegistrationProcess(
+                        userData,
+                        authenticatedUser,
+                        livestream,
+                        groupsWithPolicies,
+                        answers
+                     )
+                        .then(() => {
+                           onRegisterSuccess
+                              ? onRegisterSuccess()
+                              : goToView("register-ask-questions")
+                        })
+                        .catch((e) => {
+                           errorNotification(e)
+                        })
+
+                     break
+                  case "registered":
+                     // user is already registered, so we can skip the registration process
+                     onRegisterSuccess
+                        ? onRegisterSuccess()
+                        : goToView("register-ask-questions")
+                     break
+
+                  default:
+                     break
+               }
             } else {
                registrationDispatch({
                   type: "set-loading-finished",
@@ -98,6 +119,7 @@ const GroupConsentDataFetching = ({ children }: { children: ReactNode }) => {
       livestream,
       registrationDispatch,
       userData,
+      registrationStatus,
    ])
 
    // mark user as registered to any livestream

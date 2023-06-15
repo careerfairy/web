@@ -21,7 +21,12 @@ type Props = {
 
 const JobDetailsView: FC = (props) => {
    const { query } = useRouter()
-   const { livestreamPresenter, updatedStats } = useLiveStreamDialog()
+   const {
+      livestreamPresenter,
+      updatedStats,
+      jobId: contextJobId,
+      mode,
+   } = useLiveStreamDialog()
    const { authenticatedUser } = useAuth()
 
    const { userHasBoughtRecording } = useRecordingAccess(
@@ -32,7 +37,10 @@ const JobDetailsView: FC = (props) => {
 
    const { livestreamDialog } = query
 
-   const [pathType, livestreamId, dialogPage, jobId] = livestreamDialog || []
+   const [pathType, livestreamId, dialogPage, queryJobId] =
+      livestreamDialog || []
+
+   const jobId = mode === "page" ? queryJobId : contextJobId // If the mode is page, we need to use the query param jobId o
 
    if (!jobId) return <JobDetailsViewSkeleton />
 
