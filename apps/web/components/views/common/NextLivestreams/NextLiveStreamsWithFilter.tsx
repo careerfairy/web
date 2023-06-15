@@ -82,13 +82,14 @@ const NextLiveStreamsWithFilter = ({
 
    const filtersToShow = useMemo(
       () => [
+         companyId ? FilterEnum.companyId : null,
          hasPastEvents ? FilterEnum.recordedOnly : null,
          FilterEnum.languages,
          FilterEnum.companyCountries,
          FilterEnum.companyIndustries,
          FilterEnum.fieldsOfStudy,
       ],
-      [hasPastEvents]
+      [companyId, hasPastEvents]
    )
 
    const mapFieldsOfStudy = useMemo(
