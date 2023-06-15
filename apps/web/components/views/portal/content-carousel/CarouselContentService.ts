@@ -1,8 +1,11 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
+import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/ExistingDataRecommendationService"
-import { UserData, UserStats } from "@careerfairy/shared-lib/users"
-import { rewardService } from "../../../../data/firebase/RewardService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/IRecommendationService"
+import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import DateUtil from "util/DateUtil"
+import { mapFromServerSide } from "util/serverUtil"
+import { rewardService } from "../../../../data/firebase/RewardService"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -11,6 +14,19 @@ export type GetContentOptions = {
    userData?: UserData
    userStats?: UserStats
 }
+
+export type LivestreamEventWithType = LivestreamEvent & {
+   contentType: "LivestreamEvent"
+}
+export type CTASlide = {
+   contentType: "CTASlide"
+   // other fields
+}
+
+export type CarouselContent = CTASlide | LivestreamEventWithType
+export type SerializedContent =
+   | CTASlide
+   | ({ [field: string]: any } & { contentType: "LivestreamEvent" })
 
 /**
  *
@@ -58,7 +74,7 @@ export class CarouselContentService {
       )
    }
 
-   public async getCarouselContent(): Promise<LivestreamEvent[]> {
+   public async getCarouselContent(): Promise<CarouselContent[]> {
       const [recommendedPastLivestreams, recommendedUpcomingLivestreams] =
          await Promise.all([
             this.getRecommendedStreams(
@@ -132,7 +148,27 @@ export class CarouselContentService {
          ]
       }
 
-      return contentStreams.slice(0, 5) // Max 5 cards in carousel as per design
+      let content: CarouselContent[] = contentStreams.map((stream) => {
+         return {
+            ...stream,
+            contentType: "LivestreamEvent",
+         }
+      })
+      const shouldSeeCreditsCTABanner = userShouldSeeCreditsCTABannerToday(
+         this.options.userData
+      )
+
+      // If the user has not bought the recording, add a CTASlide before the content
+      if (!this.userHasBoughtRecording() && shouldSeeCreditsCTABanner) {
+         content = [
+            {
+               contentType: "CTASlide",
+            },
+            ...content,
+         ]
+      }
+
+      return content
    }
 
    private async getRecommendedStreams(
@@ -144,6 +180,47 @@ export class CarouselContentService {
       return ids.map((id) => {
          return livestreams.find((event) => event.id === id)
       })
+   }
+
+   private userHasBoughtRecording(): boolean {
+      return Boolean(this.options.userStats?.recordingsBought?.length)
+   }
+
+   static serializeContent(content: CarouselContent[]): SerializedContent[] {
+      return content
+         .map((item) => {
+            switch (item.contentType) {
+               case "LivestreamEvent":
+                  return {
+                     ...LivestreamPresenter.serializeDocument(item),
+                     contentType: "LivestreamEvent" as const,
+                  }
+               case "CTASlide":
+                  return item
+               default:
+                  return null
+            }
+         })
+         .filter(Boolean)
+   }
+
+   static deserializeContent(content: SerializedContent[]): CarouselContent[] {
+      return content
+         .map((item) => {
+            switch (item.contentType) {
+               case "LivestreamEvent":
+                  const stream = mapFromServerSide([item])[0]
+                  return {
+                     ...stream,
+                     contentType: "LivestreamEvent" as const,
+                  }
+               case "CTASlide":
+                  return item
+               default:
+                  return null
+            }
+         })
+         .filter(Boolean)
    }
 }
 
@@ -180,6 +257,30 @@ export const filterNonRegisteredStreams = (
       const hasRegistered = s.registeredUsers?.includes(userStats?.userId ?? "")
       return !hasRegistered
    })
+}
+
+export const MAX_CREDITS_CTA_DISPLAY_COUNT = 5
+
+/**
+ * Determines whether the user should see the credits CTA (Call-to-Action) banner today.
+ *
+ * @param {UserData} userData - The user data containing the credits banner CTA dates.
+ * @returns {boolean} - `true` if the user should see the credits CTA banner today, `false` otherwise.
+ */
+const userShouldSeeCreditsCTABannerToday = (userData: UserData): boolean => {
+   const creditsBannerCTADates = userData?.creditsBannerCTADates || []
+   const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
+
+   const numberOfTimesBannerDisplayed = creditsBannerCTADates.length
+
+   const isBelowMaxDisplayCount =
+      numberOfTimesBannerDisplayed < MAX_CREDITS_CTA_DISPLAY_COUNT
+
+   const todayIsTheLastDisplayDate =
+      creditsBannerCTADates.includes(today) &&
+      numberOfTimesBannerDisplayed === MAX_CREDITS_CTA_DISPLAY_COUNT
+
+   return isBelowMaxDisplayCount || todayIsTheLastDisplayDate
 }
 
 export default CarouselContentService

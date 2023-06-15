@@ -3239,6 +3239,26 @@ class FirebaseService {
       }
    }
 
+   /**
+    * Increments the counter for the number of times a user has seen the Career Coins Call-to-Action (CTA) banner,
+    * and updates the last time the user has seen the banner with the current server timestamp.
+    *
+    * @param {string} userEmail - The email of the user whose record is to be updated.
+    * @returns {Promise<void>} - A promise that resolves when the user data is successfully updated.
+    */
+   addDateUserHasSeenCreditsCTABanner(userEmail: string): Promise<void> {
+      const docRef = this.firestore.collection("userData").doc(userEmail)
+      const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
+
+      const toUpdate: Pick<UserData, "creditsBannerCTADates"> = {
+         creditsBannerCTADates: firebase.firestore.FieldValue.arrayUnion(
+            today
+         ) as any,
+      }
+
+      return docRef.update(toUpdate)
+   }
+
    // Backfill user data
    backfillUserData = async ({ timezone }) => {
       return this.functions.httpsCallable("backfillUserData_eu")({ timezone })
