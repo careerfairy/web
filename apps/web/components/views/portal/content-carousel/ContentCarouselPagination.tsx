@@ -10,18 +10,20 @@ const styles = sxStyles({
    stepper: (theme) => ({
       borderRadius: "50%",
       mr: 2,
-      backgroundColor: alpha(theme.palette.common.white, 0.2),
+      backgroundColor: alpha("#B5B5B5", 0.3),
+
       cursor: "pointer",
       "&:hover": {
-         backgroundColor: alpha(theme.palette.common.white, 0.5),
+         backgroundColor: alpha("#B5B5B5", 0.5),
       },
       width: theme.spacing(2),
       height: theme.spacing(2),
       minWidth: theme.spacing(2),
       minHeight: theme.spacing(2),
+      border: "none",
    }),
    activeStepper: {
-      backgroundColor: "white !important",
+      backgroundColor: "#8D8D8D !important",
    },
 })
 

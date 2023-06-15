@@ -84,6 +84,11 @@ export interface UserData extends Identifiable {
     */
    lastActivityAt: Timestamp
    createdAt: Timestamp
+
+   /**
+    * Dates of days when the user has seen the credit CTA banner
+    */
+   creditsBannerCTADates?: string[]
 }
 
 /*
