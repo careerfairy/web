@@ -28,7 +28,7 @@ const baseHrefPath = "group"
 const baseParam = "[groupId]"
 
 // Declare pathnames here if you are using them in multiple places
-const companyPagePathName = `/${baseHrefPath}/${baseParam}/admin/page`
+const companyPagePathName = `/${baseHrefPath}/${baseParam}/admin/page/[[...livestreamDialog]]`
 
 const GroupNavList = () => {
    const { group, groupPresenter } = useGroup()
