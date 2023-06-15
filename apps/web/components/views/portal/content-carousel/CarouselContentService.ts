@@ -5,7 +5,7 @@ import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/I
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
-import { getDayOfYear } from "@careerfairy/shared-lib/utils"
+import DateUtil from "util/DateUtil"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -154,12 +154,12 @@ export class CarouselContentService {
             contentType: "LivestreamEvent",
          }
       })
+      const shouldSeeCreditsCTABanner = userShouldSeeCreditsCTABannerToday(
+         this.options.userData
+      )
 
       // If the user has not bought the recording, add a CTASlide before the content
-      if (
-         !this.userHasBoughtRecording() &&
-         userShouldSeeCreditsCTABannerToday(this.options.userData)
-      ) {
+      if (!this.userHasBoughtRecording() && shouldSeeCreditsCTABanner) {
          content = [
             {
                contentType: "CTASlide",
@@ -274,18 +274,12 @@ const MAX_CREDITS_CTA_DISPLAY_COUNT = 5
 export const userShouldSeeCreditsCTABannerToday = (
    userData: UserData
 ): boolean => {
-   const lastBannerDisplayDate =
-      userData?.lastTimeCreditCTABannerDisplayed?.toMillis() || 0
-
-   const today = getDayOfYear(new Date())
-   const lastBannerDisplayDay = getDayOfYear(new Date(lastBannerDisplayDate))
-
-   const numberOfCreditCTABannerDisplays =
-      userData?.numberOfCreditCTABannerDisplays || 0
+   const creditsBannerCTADates = userData?.creditsBannerCTADates || []
+   const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
 
    return (
-      today !== lastBannerDisplayDay &&
-      numberOfCreditCTABannerDisplays < MAX_CREDITS_CTA_DISPLAY_COUNT
+      !creditsBannerCTADates.includes(today) &&
+      creditsBannerCTADates.length < MAX_CREDITS_CTA_DISPLAY_COUNT
    )
 }
 

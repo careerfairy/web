@@ -51,7 +51,15 @@ export default class DateUtil {
    static getRatingDate(JSDate) {
       return dayjs(JSDate).format("D MMMM YYYY")
    }
-   static pastEventPreviewDate(JSDate) {
+
+   /**
+    * Transforms a JavaScript Date object into a string formatted as "DD/MM/YYYY"
+    * using the dayjs library.
+    *
+    * @param {Date} JSDate - The JavaScript Date object to be transformed.
+    * @return {string} - The resulting string formatted as "DD/MM/YYYY".
+    */
+   static formatDateToString(JSDate) {
       return dayjs(JSDate).format("DD/MM/YYYY")
    }
 

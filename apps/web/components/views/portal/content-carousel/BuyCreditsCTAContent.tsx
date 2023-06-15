@@ -2,7 +2,6 @@ import { Box } from "@mui/material"
 import { useAuth } from "HOCs/AuthProvider"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import CareerCoinIcon from "components/views/common/CareerCoinIcon"
-import { userRepo } from "data/RepositoryInstances"
 import Image from "next/image"
 import { FC, Fragment } from "react"
 import { useInView } from "react-intersection-observer"
@@ -13,6 +12,7 @@ import {
 } from "./CarouselContentService"
 import Content, { ContentHeaderTitle, ContentTitle } from "./Content"
 import ContentButton from "./ContentButton"
+import { firebaseServiceInstance } from "data/firebase/FirebaseService"
 
 const styles = sxStyles({
    centeredHeaderTitle: {
@@ -29,9 +29,7 @@ const styles = sxStyles({
          md: "50%",
       },
       height: "100%",
-      // border: "1px solid red",
       "& img": {
-         // objectPosition: "top 28px left 18px",
          objectPosition: {
             xs: "top 28px left 18px",
             md: "top 50% left 90px",
@@ -59,8 +57,8 @@ const BuyCreditsCTAContent: FC<Props> = () => {
                userShouldSeeCreditsCTABannerToday(userData)
 
             if (shouldIncrementBannerDisplayCount) {
-               userRepo
-                  .incrementUserHasSeenCreditsCTABanner(userData.userEmail)
+               firebaseServiceInstance
+                  .addDateUserHasSeenCreditsCTABanner(userData.userEmail)
                   .catch(console.error)
             }
          }

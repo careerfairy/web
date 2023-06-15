@@ -213,20 +213,3 @@ export const getSubstringWithEllipsis = (text: string, maxLength: number) => {
    }
    return text.substring(0, maxLength - ellipsis.length) + ellipsis
 }
-
-/**
- * Calculates the day of the year for a given date.
- *
- * @param {Date} date - The date to calculate the day of year for.
- * @returns {number} - The day of the year (1-365).
- */
-export const getDayOfYear = (date: Date): number => {
-   const start = new Date(date.getFullYear(), 0, 0)
-   const diff =
-      date.getTime() -
-      start.getTime() +
-      (start.getTimezoneOffset() - date.getTimezoneOffset()) * 60 * 1000
-   const oneDay = 1000 * 60 * 60 * 24
-   const day = Math.floor(diff / oneDay)
-   return day
-}
