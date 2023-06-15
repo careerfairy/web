@@ -18,6 +18,7 @@ import useSnackbarNotifications from "../../../../../custom-hook/useSnackbarNoti
 import useIsMobile from "../../../../../custom-hook/useIsMobile"
 import { useAuth } from "../../../../../../HOCs/AuthProvider"
 import useRecordingAccess from "../../../../upcoming-livestream/HeroSection/useRecordingAccess"
+import { useLiveStreamDialog } from "components/views/livestream-dialog/LivestreamDialog"
 
 const styles = sxStyles({
    jobItemRoot: {
@@ -93,6 +94,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
    const router = useRouter()
    const { successNotification } = useSnackbarNotifications()
    const { authenticatedUser, userStats } = useAuth()
+   const { mode, goToJobDetails } = useLiveStreamDialog()
 
    const { userHasBoughtRecording } = useRecordingAccess(
       authenticatedUser.email,
@@ -102,6 +104,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
 
    const isPast = presenter.isPast()
    const hasRegistered = presenter.isUserRegistered(authenticatedUser.email)
+   const isPageMode = mode === "page"
 
    const buttonDisabled = useMemo<boolean>(() => {
       const isUpcoming = !isPast
@@ -182,6 +185,10 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
       if (buttonDisabled && isMobile) {
          successNotification(copy.description, copy.toastTitle)
       }
+
+      if (!isPageMode) {
+         goToJobDetails(job.jobId)
+      }
    }, [
       buttonDisabled,
       isMobile,
@@ -215,7 +222,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
             >
                <span onClick={onClick}>
                   <Button
-                     component={Link}
+                     component={isPageMode ? Link : undefined}
                      shallow
                      disabled={buttonDisabled}
                      scroll={false}
@@ -225,7 +232,7 @@ const JobItem: FC<JobItemProps> = ({ job, presenter }) => {
                      size="small"
                      sx={styles.seeMoreBtn}
                      // @ts-ignore
-                     href={jobLink}
+                     href={isPageMode ? jobLink : undefined}
                   >
                      {copy.title}
                   </Button>
