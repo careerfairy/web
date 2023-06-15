@@ -76,7 +76,7 @@ const EventSection = () => {
             <StreamCarousel
                livestreams={upcomingLivestreams ?? []}
                type="upcoming"
-               title="Next Live Stream"
+               title="Next Live Streams"
                handleOpenEvent={handleOpenEvent}
                hasMore={upcomingHasMore}
             />
