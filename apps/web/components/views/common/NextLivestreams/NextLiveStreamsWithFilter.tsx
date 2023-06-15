@@ -105,6 +105,7 @@ const NextLiveStreamsWithFilter = ({
       recordedOnly: recordedOnly,
       listenToPastEvents: hasPastEvents,
       filterByGroupId: companyId,
+      getHiddenEvents: Boolean(companyId), // If we are filtering by company, we want to get all events, even if they are hidden
    })
 
    const noResultsMessage = useMemo<JSX.Element>(
