@@ -86,6 +86,15 @@ type Props = {
    page: "details" | "register" | "job-details"
    updatedStats: UserStats
    serverUserEmail: string
+   /**
+    * The mode of operation for the dialog. Can be either "page" or "stand-alone".
+    * In "page" mode, the entire page will navigate between views.
+    * In "stand-alone" mode, only the view state of the dialog is updated, and the page remains static.
+    *
+    * Defaults to "page".
+    */
+   mode?: DialogContextType["mode"]
+   onRegisterSuccess?: () => void
 }
 
 export type ViewKey =
@@ -197,8 +206,10 @@ const Content: FC<ContentProps> = ({
    serverSideLivestream,
    updatedStats,
    serverUserEmail,
+   onRegisterSuccess,
    page = "details",
    livestreamId,
+   mode = "page",
 }) => {
    const router = useRouter()
    const { push, query } = router
@@ -212,6 +223,7 @@ const Content: FC<ContentProps> = ({
    const theme = useTheme()
 
    const [value, setValue] = useState<number>(getPageIndex(page))
+   const [jobId, setJobId] = useState<string | null>(null)
 
    const hasInitialData =
       serverSideLivestream && livestreamId === serverSideLivestream.id
@@ -221,34 +233,39 @@ const Content: FC<ContentProps> = ({
       hasInitialData ? serverSideLivestream : undefined
    )
 
+   const isPageMode = mode === "page"
+
    const goToView = useCallback(
       (view: Exclude<ViewKey, "job-details">) => {
          switch (view) {
             case "livestream-details":
-               return void push(
-                  buildDialogLink({
-                     router,
-                     link: {
-                        type: "livestreamDetails",
-                        livestreamId,
-                     },
-                  }),
-                  undefined,
-                  routerOptions
-               )
-
+               if (isPageMode) {
+                  return void push(
+                     buildDialogLink({
+                        router,
+                        link: {
+                           type: "livestreamDetails",
+                           livestreamId,
+                        },
+                     }),
+                     undefined,
+                     routerOptions
+                  )
+               }
             case "register-data-consent":
-               return void push(
-                  buildDialogLink({
-                     router,
-                     link: {
-                        type: "registerToLivestream",
-                        livestreamId,
-                     },
-                  }),
-                  undefined,
-                  routerOptions
-               )
+               if (isPageMode) {
+                  return void push(
+                     buildDialogLink({
+                        router,
+                        link: {
+                           type: "registerToLivestream",
+                           livestreamId,
+                        },
+                     }),
+                     undefined,
+                     routerOptions
+                  )
+               }
 
             case "register-ask-questions":
                if (livestream?.questionsDisabled) {
@@ -259,7 +276,30 @@ const Content: FC<ContentProps> = ({
                setValue(views.findIndex((v) => v.key === view))
          }
       },
-      [livestreamId, push, router, livestream?.questionsDisabled]
+      [livestreamId, push, router, livestream?.questionsDisabled, isPageMode]
+   )
+
+   const goToJobDetails = useCallback(
+      (jobId: string) => {
+         if (mode === "page") {
+            push(
+               buildDialogLink({
+                  router,
+                  link: {
+                     jobId,
+                     livestreamId,
+                     type: "jobDetails",
+                  },
+               }),
+               undefined,
+               routerOptions
+            )
+         } else {
+            setJobId(jobId)
+            setValue(views.findIndex((v) => v.key === "job-details"))
+         }
+      },
+      [livestreamId, mode, push, router]
    )
 
    const onClose = useCallback(() => {
@@ -278,7 +318,7 @@ const Content: FC<ContentProps> = ({
    // This allows conditional navigation not covered by useMemo.
    useEffect(() => {
       setValue(getPageIndex(page))
-   }, [goToView, page])
+   }, [page])
 
    const [registrationState, registrationDispatch] = useReducer(
       registrationReducer,
@@ -291,7 +331,10 @@ const Content: FC<ContentProps> = ({
       [livestream]
    )
 
-   const isRedirecting = useRedirectToEventRoom(livestreamPresenter)
+   const isRedirecting = useRedirectToEventRoom(
+      livestreamPresenter,
+      mode === "page"
+   )
 
    const contextValue = useMemo<DialogContextType>(
       () => ({
@@ -306,6 +349,10 @@ const Content: FC<ContentProps> = ({
          isRecommended,
          registrationState,
          registrationDispatch,
+         jobId,
+         goToJobDetails,
+         mode,
+         onRegisterSuccess,
       }),
       [
          goToView,
@@ -313,11 +360,15 @@ const Content: FC<ContentProps> = ({
          livestream,
          value,
          handleBack,
+         livestreamPresenter,
          updatedStats,
          serverUserEmail,
          isRecommended,
          registrationState,
-         registrationDispatch,
+         jobId,
+         goToJobDetails,
+         mode,
+         onRegisterSuccess,
       ]
    )
 
@@ -356,6 +407,19 @@ type DialogContextType = {
    goToView: (view: ViewKey) => void
    handleBack: () => void
    closeDialog: () => void
+   /**
+    * The ID of a job associated with the livestream.
+    *
+    * Note: This property is only available in the "stand-alone" mode.
+    */
+   jobId: string | null
+
+   /**
+    * Method to navigate to the job details view.
+    *
+    * Note: This method is only works in the "stand-alone" mode.
+    */
+   goToJobDetails: (jobId: string) => void
    /*
     * Undefined -> loading
     * Null -> no livestream
@@ -373,6 +437,19 @@ type DialogContextType = {
    isRecommended: boolean
    registrationState: RegistrationState
    registrationDispatch: Dispatch<RegistrationAction>
+   /**
+    * The mode of operation for the dialog. Can be either "page" or "stand-alone".
+    * In "page" mode, the entire page will navigate between certain views.
+    * In "stand-alone" mode, only the view state of the dialog is updated, and the page remains static.
+    *
+    * Defaults to "page".
+    */
+   mode: "page" | "stand-alone"
+   /**
+    * Callback to be called when the user successfully registers for the livestream.
+    * This replaces the default behavior of going to the next view in the dialog.
+    */
+   onRegisterSuccess?: () => void
 }
 
 const getPageIndex = (page: Props["page"]): number => {
@@ -390,6 +467,8 @@ const DialogContext = createContext<DialogContextType>({
    closeDialog: () => {},
    handleBack: () => {},
    goToView: () => {},
+   jobId: null,
+   goToJobDetails: () => {},
    livestream: undefined,
    livestreamPresenter: null,
    activeView: "livestream-details",
@@ -398,6 +477,7 @@ const DialogContext = createContext<DialogContextType>({
    isRecommended: false,
    registrationState: registrationInitialState,
    registrationDispatch: () => {},
+   mode: "page",
 })
 
 export const useLiveStreamDialog = () => {
