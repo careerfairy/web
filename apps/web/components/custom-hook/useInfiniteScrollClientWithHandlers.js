@@ -33,7 +33,7 @@ const useInfiniteScrollClientWithHandlers = (
       const node = containerRef?.current || document.documentElement
       const bottom =
          Math.ceil(node.clientHeight + node.scrollTop) >=
-         node.scrollHeight * 0.5
+         node.scrollHeight * 0.4
       if (bottom && hasMore) {
          getMore()
       }
