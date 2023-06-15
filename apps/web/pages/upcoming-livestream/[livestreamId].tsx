@@ -417,6 +417,7 @@ const UpcomingLivestreamPage = ({
                livestreamId={stream.id}
                handleClose={handleCloseDialog}
                page={"register"}
+               mode="stand-alone"
             />
          </UpcomingLayout>
          {mobile && !isRegistrationDisabled && !registered ? (
