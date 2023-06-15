@@ -1,23 +1,18 @@
-import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
-import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
-import {
-   getServerSideGroup,
-   mapFromServerSide,
-} from "../../../../../util/serverUtil"
 import { Group } from "@careerfairy/shared-lib/groups"
-import CompanyPageOverview from "../../../../../components/views/company-page"
-import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
-import { livestreamRepo } from "../../../../../data/RepositoryInstances"
-import {
-   MAX_PAST_STREAMS,
-   MAX_UPCOMING_STREAMS,
-} from "components/views/company-page/EventSection"
 import {
    LiveStreamDialogData,
    LivestreamDialogLayout,
-   getLivestreamDialogData,
 } from "components/views/livestream-dialog"
+import { GetServerSideProps, InferGetServerSidePropsType, NextPage } from "next"
+import CompanyPageOverview from "../../../../../components/views/company-page"
+import GroupDashboardLayout from "../../../../../layouts/GroupDashboardLayout"
+import DashboardHead from "../../../../../layouts/GroupDashboardLayout/DashboardHead"
+import {
+   getLivestreamsAndDialogData,
+   getServerSideGroup,
+   mapFromServerSide,
+} from "../../../../../util/serverUtil"
 
 const CompanyPage: NextPage<
    InferGetServerSidePropsType<typeof getServerSideProps>
@@ -65,40 +60,11 @@ export const getServerSideProps: GetServerSideProps<{
       }
    }
 
-   const results = await Promise.allSettled([
-      livestreamRepo.getEventsOfGroup(
-         serverSideGroup?.groupId,
-         "upcoming",
-         { limit: MAX_UPCOMING_STREAMS + 1 } // fetch 10 + 1 to know if there are more
-      ),
-      livestreamRepo.getEventsOfGroup(
-         serverSideGroup?.groupId,
-         "past",
-         { limit: MAX_PAST_STREAMS + 1 } // fetch 5 + 1 to know if there are more
-      ),
-      getLivestreamDialogData(context),
-   ])
-
-   const [
-      serverSideUpcomingLivestreamsResult,
-      serverSidePastLivestreamsResult,
-      livestreamDialogDataResult,
-   ] = results
-
-   const serverSideUpcomingLivestreams =
-      serverSideUpcomingLivestreamsResult.status === "fulfilled"
-         ? serverSideUpcomingLivestreamsResult.value
-         : []
-
-   const serverSidePastLivestreams =
-      serverSidePastLivestreamsResult.status === "fulfilled"
-         ? serverSidePastLivestreamsResult.value
-         : []
-
-   const livestreamDialogData =
-      livestreamDialogDataResult.status === "fulfilled"
-         ? livestreamDialogDataResult.value
-         : null
+   const {
+      serverSideUpcomingLivestreams,
+      serverSidePastLivestreams,
+      livestreamDialogData,
+   } = await getLivestreamsAndDialogData(serverSideGroup?.groupId, context)
 
    return {
       props: {
