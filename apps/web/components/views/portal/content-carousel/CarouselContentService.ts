@@ -3,9 +3,9 @@ import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/Livestr
 import ExistingDataRecommendationService from "@careerfairy/shared-lib/recommendation/ExistingDataRecommendationService"
 import { IRecommendationService } from "@careerfairy/shared-lib/recommendation/IRecommendationService"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
+import DateUtil from "util/DateUtil"
 import { mapFromServerSide } from "util/serverUtil"
 import { rewardService } from "../../../../data/firebase/RewardService"
-import DateUtil from "util/DateUtil"
 
 export type GetContentOptions = {
    pastLivestreams: LivestreamEvent[]
@@ -259,28 +259,28 @@ export const filterNonRegisteredStreams = (
    })
 }
 
-const MAX_CREDITS_CTA_DISPLAY_COUNT = 5
+export const MAX_CREDITS_CTA_DISPLAY_COUNT = 5
 
 /**
- * Determines whether the user should see the 'Buy Credits' CTA banner today.
+ * Determines whether the user should see the credits CTA (Call-to-Action) banner today.
  *
- * This function checks if the day is different from the last day the banner was displayed,
- * and also checks that the number of times the banner has been displayed is less than
- * the maximum allowed count.
- *
- * @param {UserData} userData - The user's data, including information about last display and count of banner displays.
- * @returns {boolean} - Returns true if the user should see the banner today, false otherwise.
+ * @param {UserData} userData - The user data containing the credits banner CTA dates.
+ * @returns {boolean} - `true` if the user should see the credits CTA banner today, `false` otherwise.
  */
-export const userShouldSeeCreditsCTABannerToday = (
-   userData: UserData
-): boolean => {
+const userShouldSeeCreditsCTABannerToday = (userData: UserData): boolean => {
    const creditsBannerCTADates = userData?.creditsBannerCTADates || []
    const today = DateUtil.formatDateToString(new Date()) // formatDate should return a string formatted as "dd/mm/yyyy"
 
-   return (
-      !creditsBannerCTADates.includes(today) &&
-      creditsBannerCTADates.length < MAX_CREDITS_CTA_DISPLAY_COUNT
-   )
+   const numberOfTimesBannerDisplayed = creditsBannerCTADates.length
+
+   const isBelowMaxDisplayCount =
+      numberOfTimesBannerDisplayed < MAX_CREDITS_CTA_DISPLAY_COUNT
+
+   const todayIsTheLastDisplayDate =
+      creditsBannerCTADates.includes(today) &&
+      numberOfTimesBannerDisplayed === MAX_CREDITS_CTA_DISPLAY_COUNT
+
+   return isBelowMaxDisplayCount || todayIsTheLastDisplayDate
 }
 
 export default CarouselContentService
