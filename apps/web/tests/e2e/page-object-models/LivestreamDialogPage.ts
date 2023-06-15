@@ -2,8 +2,13 @@ import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Locator, Page, expect } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
 
+type CompleteLivestreamQuestionsViewOptions = {
+   questionToAsk?: string
+}
+
 export default class LivestreamDialogPage extends CommonPage {
    public cancelRegistrationButton: Locator
+   public registrationButton: Locator
 
    constructor(page: Page, public livestream: LivestreamEvent) {
       super(page)
@@ -11,6 +16,10 @@ export default class LivestreamDialogPage extends CommonPage {
       this.cancelRegistrationButton = page.getByRole("link", {
          name: "Cancel registration",
       })
+
+      this.registrationButton = page.getByTestId(
+         "livestream-registration-button"
+      )
    }
 
    async openDialog() {
@@ -30,28 +39,50 @@ export default class LivestreamDialogPage extends CommonPage {
     * Completes the registration process for a livestream
     * by going through all the views and filling out the required information
     */
-   async completeSuccessfulRegistration() {
+   async completeSuccessfulRegistration({
+      groupConsentRequired,
+      joinTalentPool,
+      questionsViewArgs,
+   }: {
+      groupConsentRequired?: boolean
+      joinTalentPool?: boolean
+      questionsViewArgs?: CompleteLivestreamQuestionsViewOptions
+   } = {}) {
       // register
-      await this.page.getByTestId("livestream-registration-button").click()
+      await this.registrationButton.click()
 
       // dialog views
-      await this.completeGroupConsentView()
-      await this.completeLivestreamQuestionsView()
-      await this.completeJoinTalentPoolView(false)
+      await this.completeGroupConsentView(groupConsentRequired ?? false)
+      await this.completeLivestreamQuestionsView(questionsViewArgs)
+      await this.completeJoinTalentPoolView(joinTalentPool ?? true)
       await this.completeRegistrationSuccessView()
    }
 
-   async completeGroupConsentView() {
+   async completeGroupConsentView(consentRequired: boolean = false) {
+      const answerButtonText = "Answer & Proceed"
+      const acceptButtonText = "Accept & Proceed"
+
       if (this.livestream.groupQuestionsMap) {
          await this.selectRandomCategoriesFromEvent(this.livestream)
+
+         let buttonText = answerButtonText
+         if (consentRequired) {
+            buttonText = acceptButtonText
+         }
+
+         await this.page.getByRole("button", { name: buttonText }).click()
+
+         return
       }
 
-      await this.page.getByRole("button", { name: "Answer & Proceed" }).click()
+      if (consentRequired) {
+         await this.page.getByRole("button", { name: acceptButtonText }).click()
+      }
    }
 
    async completeLivestreamQuestionsView({
       questionToAsk,
-   }: { questionToAsk?: string } = {}) {
+   }: CompleteLivestreamQuestionsViewOptions = {}) {
       if (questionToAsk) {
          await this.page
             .getByPlaceholder("Write your question")
@@ -84,5 +115,9 @@ export default class LivestreamDialogPage extends CommonPage {
 
    async closeDialog() {
       await this.page.getByTestId("livestream-dialog-close").click()
+   }
+
+   async cancelRegistrationClick() {
+      await this.cancelRegistrationButton.click()
    }
 }
