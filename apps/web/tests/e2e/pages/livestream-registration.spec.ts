@@ -11,7 +11,6 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { signedInFixture as test } from "../fixtures"
 import { LoginPage } from "../page-object-models/LoginPage"
-import { credentials } from "../../constants"
 
 test("successful registration on a livestream event from the portal page", async ({
    page,
@@ -162,9 +161,11 @@ test("register to an event without login, login and proceed with registration", 
    await page.waitForURL(`**/login?absolutePath**`)
 
    // create user and login
-   await UserSeed.createUser(credentials.correctEmail)
+   const email = "newuser@careerfairy.io"
+   await UserSeed.createUser(email)
    await LoginPage.login(page, {
       openPage: false,
+      email,
       waitForURL: `**/portal/livestream/${livestream.id}`,
    })
 
