@@ -82,8 +82,8 @@ export class LoginPage {
          await handler.open(options.loginPath)
       }
 
-      await handler.enterEmail(credentials.correctEmail)
-      await handler.enterPassword(credentials.defaultPassword)
+      await handler.enterEmail(options.email)
+      await handler.enterPassword(options.password)
       await handler.clickLogin()
 
       await page.waitForURL(options.waitForURL)
