@@ -1,23 +1,20 @@
 import { expect } from "@playwright/test"
 import UserSeed from "@careerfairy/seed-data/dist/users"
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
-import LivestreamSeed, {
-   createLivestreamGroupQuestions,
-} from "@careerfairy/seed-data/dist/livestreams"
 import { expectExactText } from "../utils/assertions"
-import { Group } from "@careerfairy/shared-lib/dist/groups"
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { UserData } from "@careerfairy/shared-lib/dist/users"
 import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { signedInFixture as test } from "../fixtures"
 import { LoginPage } from "../page-object-models/LoginPage"
+import { setupLivestreamData } from "../setupData"
+import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 
 test.describe("Livestream Registration Signed In", () => {
    test("successful registration on a livestream event from the portal page", async ({
       page,
       user,
    }) => {
-      const { livestream } = await setupData()
+      const { livestream } = await setupLivestreamData()
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       await livestreamDialogPage.openDialog()
@@ -50,7 +47,7 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupData(undefined, {
+      const { livestream } = await setupLivestreamData(undefined, {
          groupQuestionsMap: null,
       })
 
@@ -64,7 +61,7 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupData(
+      const { livestream } = await setupLivestreamData(
          {
             privacyPolicyActive: true,
             privacyPolicyUrl: "https://careerfairy.io",
@@ -86,7 +83,7 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupData({
+      const { livestream } = await setupLivestreamData({
          privacyPolicyActive: true,
          privacyPolicyUrl: "https://careerfairy.io",
       })
@@ -103,7 +100,7 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupData()
+      const { livestream } = await setupLivestreamData()
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       const question = "My useful question with 10 chars"
@@ -134,7 +131,7 @@ test.describe("Livestream Registration Signed In", () => {
       page,
       user,
    }) => {
-      const { livestream } = await setupData(
+      const { livestream } = await setupLivestreamData(
          {},
          { groupQuestionsMap: null },
          "createLive"
@@ -161,7 +158,7 @@ test.describe("Livestream Registration Signed Out", () => {
    test("past event without login should request the user to login to access the recording", async ({
       page,
    }) => {
-      const { livestream } = await setupData({}, {}, "createPast")
+      const { livestream } = await setupLivestreamData({}, {}, "createPast")
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       await page.goto("/past-livestreams")
@@ -177,7 +174,7 @@ test.describe("Livestream Registration Signed Out", () => {
    test("register to an event without login, login and proceed with registration", async ({
       page,
    }) => {
-      const { livestream } = await setupData()
+      const { livestream } = await setupLivestreamData()
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
       await page.goto("/portal")
@@ -203,32 +200,6 @@ test.describe("Livestream Registration Signed Out", () => {
       await expect(livestreamDialogPage.registrationButton).toBeVisible()
    })
 })
-
-async function setupData(
-   overrideGroupDetails: Partial<Group> = {},
-   overrideLivestreamDetails: Partial<LivestreamEvent> = {},
-   livestreamType: "create" | "createPast" | "createLive" = "create"
-) {
-   const group = await GroupSeed.createGroup(
-      Object.assign({}, overrideGroupDetails)
-   )
-
-   const groupQuestions = createLivestreamGroupQuestions(group.id)
-
-   const livestream = await LivestreamSeed[livestreamType](
-      Object.assign(
-         {
-            groupIds: [group.id],
-            groupQuestionsMap: {
-               [group.id]: groupQuestions,
-            },
-         },
-         overrideLivestreamDetails
-      )
-   )
-
-   return { group, livestream }
-}
 
 async function expectUserLivestreamDataCreated(
    user: UserData,
