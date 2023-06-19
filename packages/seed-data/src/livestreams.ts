@@ -54,6 +54,11 @@ interface LivestreamSeed {
    userData(
       options: SetupUserLivestreamDataOptions
    ): Promise<Partial<UserLivestreamData>>
+
+   /**
+    * Setup the required documents for the recording access
+    */
+   setRecordingSid(livestreamId: string): Promise<void>
 }
 
 class LivestreamFirebaseSeed implements LivestreamSeed {
@@ -222,6 +227,19 @@ class LivestreamFirebaseSeed implements LivestreamSeed {
       await firestore.collection("livestreams").doc(data.id).set(data)
 
       return data
+   }
+
+   async setRecordingSid(livestreamId: string) {
+      const livestreamRef = firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+
+      await livestreamRef.collection("recordingToken").doc("token").set(
+         {
+            sid: uuidv4(),
+         },
+         { merge: true }
+      )
    }
 
    async generateSecureToken(livestreamId: string): Promise<string> {
