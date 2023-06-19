@@ -1,5 +1,5 @@
-import { Group } from "@careerfairy/shared-lib/src/groups"
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import { Group } from "@careerfairy/shared-lib/dist/groups"
+import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import LivestreamSeed, {
    createLivestreamGroupQuestions,
