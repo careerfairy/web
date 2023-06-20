@@ -113,6 +113,7 @@ export interface MergeCandidate {
    urls?: MergeUrl[]
    applications?: MergeApplication[] | string[]
    attachments?: MergeAttachment[]
+   tags?: string[]
 }
 
 /**
