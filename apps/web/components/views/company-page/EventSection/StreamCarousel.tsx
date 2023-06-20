@@ -1,5 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import { Add } from "@mui/icons-material"
+import Add from "@mui/icons-material/Add"
 import { Box, Button, IconButton, Stack, Typography } from "@mui/material"
 import useIsMobile from "components/custom-hook/useIsMobile"
 import EventPreviewCard from "components/views/common/stream-cards/EventPreviewCard"
