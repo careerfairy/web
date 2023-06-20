@@ -39,8 +39,8 @@ import {
 } from "@careerfairy/shared-lib/ats/Functions"
 import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 
-const MERGE_DEFAULT_PAGE_SIZE = "100"
-const SOURCE = "CareerFairy"
+export const MERGE_DEFAULT_PAGE_SIZE = "100"
+export const SOURCE = "CareerFairy"
 export const TEST_CV =
    "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/development%2Fsample.pdf?alt=media&token=37d5f709-29e4-44d9-8400-f35629de64b6"
 
@@ -455,7 +455,9 @@ export interface ATSApplicationOptions extends ATSPaginationOptions {
    jobId?: string
 }
 
-const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
+export const createMergeCandidateFromUser = (
+   user: UserData
+): MergeCandidateModel => {
    const model: MergeCandidateModel = {
       first_name: user.firstName,
       last_name: user.lastName,
@@ -482,7 +484,9 @@ const createMergeCandidateFromUser = (user: UserData): MergeCandidateModel => {
    return model
 }
 
-function createMergeAttachmentObject(user: UserData): MergeAttachmentModel {
+export function createMergeAttachmentObject(
+   user: UserData
+): MergeAttachmentModel {
    return {
       /**
        * For Greenhouse its required to append the .pdf extension for the
@@ -494,7 +498,7 @@ function createMergeAttachmentObject(user: UserData): MergeAttachmentModel {
    }
 }
 
-function getResumeURL(resumeUrl: string): string {
+export function getResumeURL(resumeUrl: string): string {
    let res = resumeUrl
    // Merge doesn't accept localhost, replace with remote storage
    // merge will try to fetch the file and store in their systems
@@ -514,7 +518,7 @@ function getResumeURL(resumeUrl: string): string {
  *
  * @param e
  */
-const emptyResponseWhenNotFound = (e: AxiosError) => {
+export const emptyResponseWhenNotFound = (e: AxiosError) => {
    if (e?.response?.status === 404) {
       return {
          data: null,
@@ -524,25 +528,36 @@ const emptyResponseWhenNotFound = (e: AxiosError) => {
    throw e
 }
 
+interface MergeExtraRequiredData {
+   remote_user_id?: string
+   // Add more required fields if necessary
+}
+
+interface MergeModelBody<T> {
+   model: T
+   [key: string]: any
+}
+
 /**
  * Creates a Merge POST body object
  * It will include the extra required fields (e.g. remote_user_id) if existent
- * @param data
- * @param extraRequiredFields
+ * @param data The model data
+ * @param extraRequiredFields Optional extra required fields
+ * @returns The Merge POST body object
  */
-function createMergeModelBody(
-   data: any,
+export function createMergeModelBody<T>(
+   data: T,
    extraRequiredFields?: MergeExtraRequiredData
-) {
-   const body: any = {
+): MergeModelBody<T> {
+   const body: MergeModelBody<T> = {
       model: data,
-      ...extraRequiredFields,
+      ...(extraRequiredFields || {}),
    }
 
    return body
 }
 
-function sortMergeJobsDesc(a: MergeJob, b: MergeJob) {
+export function sortMergeJobsDesc(a: MergeJob, b: MergeJob) {
    if (!a.remote_updated_at || !b.remote_updated_at) return 0
 
    const aDate = new Date(a.remote_updated_at)
@@ -551,7 +566,7 @@ function sortMergeJobsDesc(a: MergeJob, b: MergeJob) {
    return bDate.getTime() - aDate.getTime()
 }
 
-function sortJobsDesc(a: Job, b: Job) {
+export function sortJobsDesc(a: Job, b: Job) {
    if (!a.updatedAt || !b.updatedAt) return 0
 
    return b.updatedAt?.getTime() - a.updatedAt?.getTime()
