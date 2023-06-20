@@ -130,12 +130,16 @@ const NonAuthedFollowButton: FC<ButtonProps> = ({ ...buttonProps }) => {
 }
 
 const FollowButton: FC<Props> = ({ group, ...buttonProps }) => {
-   const { isLoggedIn } = useAuth()
+   const { isLoggedIn, isLoadingAuth } = useAuth()
 
    const mergedProps = useMemo(
       () => Object.assign({}, defaultButtonProps, buttonProps),
       [buttonProps]
    )
+
+   if (isLoadingAuth) {
+      return null
+   }
 
    if (isLoggedIn) {
       return <AuthedFollowButton group={group} {...mergedProps} />
