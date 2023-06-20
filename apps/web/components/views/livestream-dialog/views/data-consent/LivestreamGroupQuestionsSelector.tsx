@@ -23,7 +23,7 @@ import {
 } from "formik"
 import useIsMobile from "../../../../custom-hook/useIsMobile"
 import { sxStyles } from "../../../../../types/commonTypes"
-import { ExpandMore } from "@mui/icons-material"
+import ExpandMore from "@mui/icons-material/ExpandMore"
 
 interface Props {
    groupQuestions: LivestreamGroupQuestions
