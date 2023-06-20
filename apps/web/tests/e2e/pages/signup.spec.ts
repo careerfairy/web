@@ -7,6 +7,7 @@ import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
 import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
 import { PortalPage } from "../page-object-models/PortalPage"
 import { LoginPage } from "../page-object-models/LoginPage"
+import { INITIAL_CREDITS } from "@careerfairy/shared-lib/dist/rewards"
 
 test.describe("Signup Page Functionality", () => {
    test.beforeAll(async () => {
@@ -105,6 +106,7 @@ test.describe("Signup Page Functionality", () => {
       expect(userDataSpokenLanguages).toBeFalsy()
       expect(userDataCountriesOfInterest).toBeFalsy()
       expect(userDataInterestsIds).toBeFalsy()
+      expect(userDataFromDb.credits).toBe(INITIAL_CREDITS)
    })
 
    test("It successfully go to validate email step without gender selected", async ({
