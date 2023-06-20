@@ -23,7 +23,18 @@ type Props = {
    listenToPastEvents?: boolean
 }
 
-const useListenToStreams = (props?: Props) => {
+/**
+ * React Hook for listening to Livestreams.
+ *
+ * This hook applies filtering logic to the livestreams collection based on the provided props.
+ * If a `filterByGroupId` prop is provided, the Firestore query will use an `array-contains` operation for `groupIds`,
+ * while other `array-contains` and `array-contains-any` operations will be conducted client-side.
+ * This approach is a workaround for the limitation that Firestore only allows one `array-contains` operation per query.
+ *
+ * @param {Props} props - The props that determine the Firestore query and client-side filters to apply.
+ * @return {LivestreamEvent[]} - The LivestreamEvents that match the provided props.
+ */
+const useListenToStreams = (props?: Props): LivestreamEvent[] => {
    const {
       filterByGroupId,
       languagesIds,
@@ -49,6 +60,30 @@ const useListenToStreams = (props?: Props) => {
 
       if (filterByGroupId) {
          query = query.where("groupIds", "array-contains", filterByGroupId)
+      } else {
+         if (interestsIds) {
+            query = query.where(
+               "interestsIds",
+               "array-contains-any",
+               interestsIds
+            )
+         }
+
+         if (registeredUserEmail) {
+            query = query.where(
+               "registeredUsers",
+               "array-contains",
+               registeredUserEmail
+            )
+         }
+
+         if (fieldsOfStudy?.length) {
+            query = query.where(
+               "targetFieldsOfStudy",
+               "array-contains-any",
+               fieldsOfStudy
+            )
+         }
       }
 
       // only do this query if no interests IDs
@@ -57,32 +92,12 @@ const useListenToStreams = (props?: Props) => {
          query = query.where("language.code", "in", languagesIds)
       }
 
-      if (interestsIds) {
-         query = query.where("interestsIds", "array-contains-any", interestsIds)
-      }
-
       if (!getHiddenEvents) {
          query = query.where("hidden", "==", false)
       }
 
-      if (registeredUserEmail) {
-         query = query.where(
-            "registeredUsers",
-            "array-contains",
-            registeredUserEmail
-         )
-      }
-
       if (from) {
          query = query.where("start", ">", from)
-      }
-
-      if (fieldsOfStudy?.length) {
-         query = query.where(
-            "targetFieldsOfStudy",
-            "array-contains-any",
-            fieldsOfStudy
-         )
       }
 
       if (recordedOnly) {
@@ -109,6 +124,24 @@ const useListenToStreams = (props?: Props) => {
    if (status === "loading") return undefined
 
    let res = new LivestreamsDataParser(data)
+
+   /**
+    * If a `filterByGroupId` is provided, conduct client-side filters for `interestsIds`, `registeredUsers`, and `targetFieldsOfStudy`.
+    * These filters are performed on the client-side due to Firestore's limitation of one `array-contains` operation per query.
+    */
+   if (filterByGroupId) {
+      if (interestsIds) {
+         res = res.filterByInterests(interestsIds) // Ensure this method exists in LivestreamsDataParser
+      }
+
+      if (registeredUserEmail) {
+         res = res.filterByRegisteredUser(registeredUserEmail) // Ensure this method exists in LivestreamsDataParser
+      }
+
+      if (fieldsOfStudy?.length) {
+         res = res.filterByTargetFieldsOfStudy(fieldsOfStudy) // Ensure this method exists in LivestreamsDataParser
+      }
+   }
 
    if (!listenToPastEvents) {
       res = res.filterByNotEndedEvents()
