@@ -1103,8 +1103,8 @@ export class LivestreamsDataParser {
 
    filterByTargetFieldsOfStudy(fieldsOfStudy: FieldOfStudy[]) {
       this.livestreams = this.livestreams?.filter(({ targetFieldsOfStudy }) => {
-         const targetIds = targetFieldsOfStudy.map((e) => e.id)
-         const ids = fieldsOfStudy.map((e) => e.id)
+         const targetIds = targetFieldsOfStudy?.map((e) => e.id) ?? []
+         const ids = fieldsOfStudy?.map((e) => e.id) ?? []
 
          return containsAny(targetIds, ids)
       })
