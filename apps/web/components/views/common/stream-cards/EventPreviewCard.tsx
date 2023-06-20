@@ -46,6 +46,8 @@ import {
    isOnlivestreamDialogPage,
 } from "../../livestream-dialog"
 
+const bottomContentHeight = 50
+
 const styles = sxStyles({
    hideOnHoverContent: {
       position: "absolute",
@@ -69,6 +71,9 @@ const styles = sxStyles({
             theme.palette.common.black,
             0.2
          )}, ${alpha(theme.palette.common.black, 0.1)})`,
+   },
+   backgroundImageWrapperWithBottomContent: {
+      height: `calc(40% + ${bottomContentHeight / 2}px)`,
    },
    backgroundImageLoader: {
       position: "absolute",
@@ -201,6 +206,7 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
          index,
          location = ImpressionLocation.unknown,
          isEmbedded = false,
+         bottomElement,
       }: EventPreviewCardProps,
       ref
    ) => {
@@ -385,7 +391,11 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                      <Box sx={styles.mainContentWrapper}>
                         <Box
                            className="backgroundImageWrapper"
-                           sx={styles.backgroundImageWrapper}
+                           sx={[
+                              styles.backgroundImageWrapper,
+                              bottomElement &&
+                                 styles.backgroundImageWrapperWithBottomContent,
+                           ]}
                         >
                            {loading ? (
                               <Skeleton
@@ -581,8 +591,9 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               className="chipsWrapper"
                               sx={{
                                  display: "flex",
-                                 height: "100%",
+                                 height: 32,
                                  alignItems: "end",
+                                 mt: "auto",
                               }}
                            >
                               <Stack spacing={1} direction={"row"}>
@@ -638,6 +649,16 @@ const EventPreviewCard = forwardRef<HTMLDivElement, EventPreviewCardProps>(
                               </Stack>
                            </Box>
                         </Box>
+                        {bottomElement ? (
+                           <Box
+                              bgcolor="background.paper"
+                              width="100%"
+                              display="flex"
+                              height={bottomContentHeight}
+                           >
+                              {bottomElement}
+                           </Box>
+                        ) : null}
                      </Box>
                   </Box>
                   {event ? <EventSEOSchemaScriptTag event={event} /> : null}
@@ -663,6 +684,7 @@ interface EventPreviewCardProps {
    location?: ImpressionLocation
    ref?: React.Ref<HTMLDivElement>
    isEmbedded?: boolean
+   bottomElement?: React.ReactNode
 }
 
 EventPreviewCard.displayName = "EventPreviewCard"
