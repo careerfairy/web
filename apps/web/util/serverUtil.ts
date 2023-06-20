@@ -7,6 +7,13 @@ import nookies from "nookies"
 import CookiesUtil from "./CookiesUtil"
 import { UserData, UserStats } from "@careerfairy/shared-lib/users"
 import { ParsedUrlQuery } from "querystring"
+import { GetServerSidePropsContext, GetStaticPathsContext } from "next"
+import {
+   MAX_PAST_STREAMS,
+   MAX_UPCOMING_STREAMS,
+} from "components/views/company-page/EventSection"
+import { livestreamRepo } from "data/RepositoryInstances"
+import { getLivestreamDialogData } from "components/views/livestream-dialog"
 
 export const getServerSideStream = async (
    livestreamId: string
@@ -144,4 +151,58 @@ export const convertQueryParamsToString = (query: ParsedUrlQuery): string => {
       ([key, value]) => [key, String(value)]
    )
    return new URLSearchParams(queryEntries).toString()
+}
+
+/**
+ * Fetches upcoming and past livestream events for a given group, and retrieves livestream dialog data.
+ *
+ * @param {string} groupId - The ID of the group to fetch livestream events for.
+ * @param {Object} context - The context object, usually provided by Next.js methods like getServerSideProps or getStaticProps.
+ * @returns {Promise<Object>} An object containing arrays of upcoming and past livestreams, and livestream dialog data.
+ *
+ * @example
+ *
+ * const { serverSideUpcomingLivestreams, serverSidePastLivestreams, livestreamDialogData } =
+ *    await getLivestreamsAndDialogData(serverSideGroup?.groupId, context);
+ */
+export const getLivestreamsAndDialogData = async (
+   groupId: string,
+   context: GetServerSidePropsContext | GetStaticPathsContext
+) => {
+   const results = await Promise.allSettled([
+      livestreamRepo.getEventsOfGroup(groupId, "upcoming", {
+         limit: MAX_UPCOMING_STREAMS + 1, // fetch 10 + 1 to know if there are more
+      }),
+      livestreamRepo.getEventsOfGroup(groupId, "past", {
+         limit: MAX_PAST_STREAMS + 1, // fetch 5 + 1 to know if there are more
+      }),
+      getLivestreamDialogData(context),
+   ])
+
+   const [
+      serverSideUpcomingLivestreamsResult,
+      serverSidePastLivestreamsResult,
+      livestreamDialogDataResult,
+   ] = results
+
+   const serverSideUpcomingLivestreams =
+      serverSideUpcomingLivestreamsResult.status === "fulfilled"
+         ? serverSideUpcomingLivestreamsResult.value
+         : []
+
+   const serverSidePastLivestreams =
+      serverSidePastLivestreamsResult.status === "fulfilled"
+         ? serverSidePastLivestreamsResult.value
+         : []
+
+   const livestreamDialogData =
+      livestreamDialogDataResult.status === "fulfilled"
+         ? livestreamDialogDataResult.value
+         : null
+
+   return {
+      serverSideUpcomingLivestreams,
+      serverSidePastLivestreams,
+      livestreamDialogData,
+   }
 }

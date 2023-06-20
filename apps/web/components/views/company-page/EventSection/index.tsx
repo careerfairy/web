@@ -1,21 +1,16 @@
-import { Box, Button, IconButton, Typography } from "@mui/material"
-import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
-import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
-import { SectionAnchor, TabValue, useCompanyPage } from "../"
-import React, { useCallback, useRef, useState } from "react"
-import { sxStyles } from "../../../../types/commonTypes"
-import Add from "@mui/icons-material/Add"
-import Link from "next/link"
-import EventCarousel from "./EventCarousel"
-import { ArrowLeft, ArrowRight } from "react-feather"
 import { LivestreamEvent } from "@careerfairy/shared-lib/livestreams"
-import EventCard from "./EventCard"
+import { Box, Stack } from "@mui/material"
+import NewStreamModal from "components/views/group/admin/events/NewStreamModal"
+import { useCallback, useState } from "react"
+import { useMountedState } from "react-use"
+import { SectionAnchor, TabValue, useCompanyPage } from "../"
+import { sxStyles } from "../../../../types/commonTypes"
+import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
+import useIsMobile from "../../../custom-hook/useIsMobile"
 import useRegistrationModal from "../../../custom-hook/useRegistrationModal"
 import RegistrationModal from "../../common/registration-modal"
-import useIsMobile from "../../../custom-hook/useIsMobile"
-import StayUpToDateBanner from "./StayUpToDateBanner"
-import useDialogStateHandler from "../../../custom-hook/useDialogStateHandler"
-import { useMountedState } from "react-use"
+import { StreamCreationProvider } from "../../draftStreamForm/StreamForm/StreamCreationProvider"
+import StreamCarousel from "./StreamCarousel"
 
 const styles = sxStyles({
    root: {
@@ -51,26 +46,14 @@ const EventSection = () => {
    const {
       group,
       upcomingLivestreams,
-      editMode,
+      pastLivestreams,
       sectionRefs: { eventSectionRef },
    } = useCompanyPage()
-   const { joinGroupModalData, handleCloseJoinModal, handleClickRegister } =
-      useRegistrationModal()
-   const isMobile = useIsMobile()
    const isMounted = useMountedState()
 
    const [isDialogOpen, handleOpenDialog, handleCloseDialog] =
       useDialogStateHandler()
    const [eventToEdit, setEventToEdit] = useState(null)
-   const sliderRef = useRef(null)
-
-   const handleNext = useCallback(() => {
-      sliderRef.current?.slickNext()
-   }, [])
-
-   const handlePrev = useCallback(() => {
-      sliderRef.current?.slickPrev()
-   }, [])
 
    const handleOpenEvent = useCallback(
       (event: LivestreamEvent) => {
@@ -80,91 +63,32 @@ const EventSection = () => {
       [handleOpenDialog]
    )
 
+   const upcomingHasMore = upcomingLivestreams?.length > MAX_UPCOMING_STREAMS
+   const pastHasMore = pastLivestreams?.length > MAX_PAST_STREAMS
+
    return isMounted() ? (
       <Box sx={styles.root}>
          <SectionAnchor
             ref={eventSectionRef}
             tabValue={TabValue.livesStreams}
          />
-         <Box sx={styles.titleSection}>
-            <Typography variant="h4" fontWeight={"600"} color="black">
-               Next Live Stream
-            </Typography>
-            {upcomingLivestreams?.length > 2 ? (
-               <Box>
-                  <IconButton
-                     color="inherit"
-                     sx={styles.arrowIcon}
-                     onClick={handlePrev}
-                  >
-                     <ArrowLeft fontSize={"large"} />
-                  </IconButton>
-                  <IconButton
-                     color="inherit"
-                     sx={styles.arrowIcon}
-                     onClick={handleNext}
-                  >
-                     <ArrowRight fontSize={"large"} />
-                  </IconButton>
-               </Box>
-            ) : null}
-         </Box>
-         <Box mt={2}>
-            {upcomingLivestreams?.length > 0 ? (
-               <Box>
-                  {isMobile ? null : (
-                     <Typography
-                        variant="h6"
-                        fontWeight={"400"}
-                        color="textSecondary"
-                     >
-                        {editMode
-                           ? "Below are your published live streams, these will be shown on your company page."
-                           : "Watch live streams. Discover new career ideas, interesting jobs, internships and programmes for students. Get hired."}
-                     </Typography>
-                  )}
-                  <Box>
-                     <EventCarousel sliderRef={sliderRef}>
-                        {upcomingLivestreams.map((event) => (
-                           <EventCard
-                              key={event.id}
-                              event={event}
-                              handleEditEvent={handleOpenEvent}
-                              handleRegister={handleClickRegister}
-                           />
-                        ))}
-                     </EventCarousel>
-                  </Box>
-               </Box>
-            ) : editMode ? (
-               <Link href={`/group/${group.id}/admin/events`}>
-                  <a>
-                     <Button color="secondary" sx={styles.addEvent}>
-                        <Box>
-                           <Add sx={{ height: "58px", width: "58px" }} />
-                           <Typography variant="subtitle2" color={"black"}>
-                              Create new live stream
-                           </Typography>
-                        </Box>
-                     </Button>
-                  </a>
-               </Link>
-            ) : (
-               <>
-                  <Typography
-                     variant="h6"
-                     fontWeight={"400"}
-                     color="textSecondary"
-                     mb={2}
-                  >
-                     Watch live streams. Discover new career ideas, interesting
-                     jobs, internships and programmes for students. Get hired.
-                  </Typography>
-                  <StayUpToDateBanner />
-               </>
-            )}
-         </Box>
+         <Stack spacing={8}>
+            <StreamCarousel
+               livestreams={upcomingLivestreams ?? []}
+               type="upcoming"
+               title="Next Live Streams"
+               handleOpenEvent={handleOpenEvent}
+               hasMore={upcomingHasMore}
+            />
 
+            <StreamCarousel
+               livestreams={pastLivestreams ?? []}
+               type="past"
+               title="Past Live Streams"
+               handleOpenEvent={handleOpenEvent}
+               hasMore={pastHasMore}
+            />
+         </Stack>
          {isDialogOpen ? (
             <StreamCreationProvider>
                <NewStreamModal
@@ -178,20 +102,11 @@ const EventSection = () => {
                />
             </StreamCreationProvider>
          ) : null}
-
-         {Boolean(joinGroupModalData) ? (
-            <RegistrationModal
-               open={Boolean(joinGroupModalData)}
-               onFinish={handleCloseJoinModal}
-               promptOtherEventsOnFinal={!group?.id}
-               livestream={joinGroupModalData?.livestream}
-               groups={joinGroupModalData?.groups}
-               targetGroupId={joinGroupModalData?.targetGroupId}
-               handleClose={handleCloseJoinModal}
-            />
-         ) : null}
       </Box>
    ) : null
 }
+
+export const MAX_UPCOMING_STREAMS = 10
+export const MAX_PAST_STREAMS = 5
 
 export default EventSection

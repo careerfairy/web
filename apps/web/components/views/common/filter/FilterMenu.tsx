@@ -30,6 +30,7 @@ import CompanySizeSelector from "./selectors/CompanySizeSelector"
 import LanguageSelector from "./selectors/LanguageSelector"
 import FieldsOfStudySelector from "./selectors/FiledsOfStudySelector"
 import { SlideUpTransition } from "../transitions"
+import ActiveCompanyFilter from "./selectors/ActiveCompanyFilter"
 
 const styles = sxStyles({
    paperRoot: {
@@ -232,6 +233,9 @@ const FilterMenu = ({ open, handleClose }: Props) => {
    const renderFilters = useCallback(
       (filter: FilterEnum): JSX.Element => {
          switch (filter) {
+            case FilterEnum.companyId:
+               return <ActiveCompanyFilter key={FilterEnum.companyId} />
+
             case FilterEnum.recordedOnly:
                return (
                   <RecordedOnlyToggle
