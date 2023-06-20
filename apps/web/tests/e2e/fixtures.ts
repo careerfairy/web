@@ -82,3 +82,24 @@ export const groupAdminFixture = base.extend<{
       await use(groupPage)
    },
 })
+
+/**
+ * Signed In Test Fixture
+ *
+ * Creates a user and signs in the user
+ * After login, the user should be on the /portal page
+ */
+export const signedInFixture = base.extend<{
+   user: UserData
+}>({
+   user: async ({ page }, use) => {
+      await clearAuthData()
+      await clearFirestoreData()
+
+      const userData = await UserSeed.createUser(credentials.correctEmail)
+
+      await LoginPage.login(page)
+
+      await use(userData)
+   },
+})

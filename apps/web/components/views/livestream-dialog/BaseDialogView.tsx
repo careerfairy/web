@@ -175,7 +175,10 @@ const BackAndCloseButton: FC<BackAndCloseButtonProps> = ({
 
    return (
       <Box color={color} sx={styles.topRight}>
-         <IconButton onClick={onBackClick}>
+         <IconButton
+            data-testid="livestream-dialog-close"
+            onClick={onBackClick}
+         >
             <CloseIcon sx={[styles.closeIcon, colorStyle]} />
          </IconButton>
       </Box>
