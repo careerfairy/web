@@ -1085,6 +1085,33 @@ export class LivestreamsDataParser {
       return this
    }
 
+   filterByInterests(ids: string[]) {
+      this.livestreams = this.livestreams?.filter(({ interestsIds }) =>
+         containsAny(interestsIds, ids)
+      )
+
+      return this
+   }
+
+   filterByRegisteredUser(userId: string) {
+      this.livestreams = this.livestreams?.filter(({ registeredUsers }) =>
+         registeredUsers.includes(userId)
+      )
+
+      return this
+   }
+
+   filterByTargetFieldsOfStudy(fieldsOfStudy: FieldOfStudy[]) {
+      this.livestreams = this.livestreams?.filter(({ targetFieldsOfStudy }) => {
+         const targetIds = targetFieldsOfStudy.map((e) => e.id)
+         const ids = fieldsOfStudy.map((e) => e.id)
+
+         return containsAny(targetIds, ids)
+      })
+
+      return this
+   }
+
    complementaryFields() {
       this.livestreams = this.livestreams?.map((e) => ({
          ...e,
