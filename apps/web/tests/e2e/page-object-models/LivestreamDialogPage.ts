@@ -9,6 +9,9 @@ type CompleteLivestreamQuestionsViewOptions = {
 export default class LivestreamDialogPage extends CommonPage {
    public cancelRegistrationButton: Locator
    public registrationButton: Locator
+   public notEnoughCreditsButton: Locator
+   public buyRecordingButton: Locator
+   public signUpToWatchButton: Locator
 
    constructor(page: Page, public livestream: LivestreamEvent) {
       super(page)
@@ -19,6 +22,18 @@ export default class LivestreamDialogPage extends CommonPage {
 
       this.registrationButton = page.getByTestId(
          "livestream-registration-button"
+      )
+
+      this.notEnoughCreditsButton = page.getByTestId(
+         "livestream-not-enough-credits-button"
+      )
+
+      this.buyRecordingButton = page.getByTestId(
+         "livestream-unlock-recording-button"
+      )
+
+      this.signUpToWatchButton = page.getByTestId(
+         "livestream-signup-watch-button"
       )
    }
 
@@ -119,5 +134,23 @@ export default class LivestreamDialogPage extends CommonPage {
 
    async cancelRegistrationClick() {
       await this.cancelRegistrationButton.click()
+   }
+
+   async assertRecordingVideoIsVisible(free: boolean = false) {
+      if (free) {
+         // Only 0d 23h 59min 47sec left to rewatch for free!
+         await expect(
+            this.page.getByText("left to rewatch for free!")
+         ).toBeVisible()
+      } else {
+         await expect(
+            this.page.getByText("You bought access to this recording")
+         ).toBeVisible()
+      }
+
+      // play button
+      await expect(
+         this.page.getByTestId("PlayArrowRoundedIcon").locator("path")
+      ).toBeVisible()
    }
 }
