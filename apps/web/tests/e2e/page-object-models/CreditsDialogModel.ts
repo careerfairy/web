@@ -7,6 +7,7 @@ export class CreditsDialogModel extends CommonPage {
    readonly backButton: Locator
    readonly uploadCVItem: Locator
    readonly attendFirstLivestreamItem: Locator
+   readonly referFirstFriends: Locator
    readonly itemButton: Locator
 
    constructor(page: Page) {
@@ -17,6 +18,10 @@ export class CreditsDialogModel extends CommonPage {
       this.attendFirstLivestreamItem = page.getByTestId(
          "credits-dialog-item-Attend first live stream"
       )
+      this.referFirstFriends = page.getByTestId(
+         "credits-dialog-item-Refer to 3 friends"
+      )
+
       this.itemButton = page.getByTestId(creditsItemButton)
    }
 

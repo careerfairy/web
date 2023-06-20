@@ -279,6 +279,13 @@ export class SignupPage extends CommonPage {
       await this.subscribeToEmails(formData.subscribeEmails ?? false)
    }
 
+   async fillReferralCode(referralCode: string) {
+      await Promise.all([
+         this.page.getByPlaceholder("Enter a Referral Code").fill(referralCode),
+         this.page.waitForResponse(`**/applyReferralCode_eu`),
+      ])
+   }
+
    async clickOnMultipleInterests(interests: string[]) {
       for (const interest of interests) {
          await this.clickOnInterest(interest)

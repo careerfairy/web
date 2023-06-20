@@ -84,6 +84,7 @@ class UserFirebaseSeed implements UserSeed {
             },
             universityCountryCode: "CH",
             unsubscribed: false,
+            referralCode: uuidv4(),
          },
          extraUserData
       ) as UserData
