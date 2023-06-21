@@ -136,6 +136,15 @@ export class CommonPage {
    public enterEvent() {
       return this.resilientClick("text=Enter event")
    }
+
+   public async openProfileMenu() {
+      await this.page.getByRole("button", { name: "Account settings" }).click()
+   }
+
+   public async openGetMoreCreditsDialog() {
+      await this.openProfileMenu()
+      await this.page.getByText("Get more now").click()
+   }
 }
 
 /**
