@@ -82,4 +82,10 @@ export default class UserPresenter extends BasePresenter<UserData> {
    hasResume() {
       return Boolean(this.model.userResume?.length > 0)
    }
+
+   shouldSeeWelcomeDialog() {
+      // undefined => old users that didn't have the field
+      // true => user has seen
+      return this.model.welcomeDialogComplete === false
+   }
 }
