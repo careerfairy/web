@@ -231,10 +231,20 @@ const moduleExports = {
          test: /\.svg$/,
          use: ["@svgr/webpack"],
       })
+
+      /**
+       * Override browserlist target config here instead of in package.json
+       *
+       * "maintained node versions" is not supported by storybook
+       * https://github.com/storybookjs/storybook/issues/15882
+       */
+      config.target = "browserlist:defaults, maintained node versions"
+
       // config.module.rules.push({
       //    test: /\.(woff(2)?|ttf)(\?v=\d+\.\d+\.\d+)?$/,
       //    loader: "file-loader",
       // });
+
       return config
    },
 }

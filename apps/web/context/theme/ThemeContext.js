@@ -22,14 +22,18 @@ const pathsReadyForDarkMode = [
 
 const initialTheme = responsiveFontSizes(brandedLightTheme)
 
-const ThemeProviderWrapper = ({ children }) => {
+const ThemeProviderWrapper = ({ children, overrideTheme }) => {
    const { pathname } = useRouter()
 
-   const [theme, setTheme] = useState(initialTheme)
+   const [theme, setTheme] = useState(
+      overrideTheme ? responsiveFontSizes(overrideTheme) : initialTheme
+   )
 
    useEffect(() => {
-      getThemeObj()
-   }, [pathname])
+      if (!overrideTheme) {
+         getThemeObj()
+      }
+   }, [pathname, overrideTheme])
 
    const toggleTheme = () => {
       const newTheme =
