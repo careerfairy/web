@@ -130,7 +130,13 @@ test.describe("Livestream Registration Signed In", () => {
    test("livestream has already started, confirm the redirection without any registration", async ({
       page,
       user,
+      browserName,
    }) => {
+      test.skip(
+         browserName === "webkit",
+         "Temporarily disabled on WebKit until Agora supports Webkit 16.x"
+      )
+
       const { livestream } = await setupLivestreamData(
          {},
          { groupQuestionsMap: null },

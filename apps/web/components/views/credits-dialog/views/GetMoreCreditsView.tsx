@@ -105,6 +105,7 @@ const CreditItem: FC<CreditItemProps> = ({
 }) => {
    return (
       <Stack
+         data-testid={`credits-dialog-item-${label}`}
          width="100%"
          justifyContent="space-between"
          alignItems="center"
@@ -135,6 +136,7 @@ const CreditItem: FC<CreditItemProps> = ({
             />
          ) : (
             <Chip
+               data-testid="credits-dialog-item-button"
                label={
                   <Stack spacing={1.5} direction="row" alignItems="center">
                      <Box alignItems="center" display="flex">

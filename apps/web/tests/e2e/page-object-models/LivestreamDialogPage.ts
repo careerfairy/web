@@ -37,7 +37,7 @@ export default class LivestreamDialogPage extends CommonPage {
       )
    }
 
-   async openDialog() {
+   async openDialog(waitForTitle: boolean = true) {
       await this.page
          .getByRole("link", {
             name: this.livestream.title,
@@ -45,9 +45,11 @@ export default class LivestreamDialogPage extends CommonPage {
          .first() // there might be multiple cards for the same livestream (recommended, upcoming)
          .click()
 
-      await expect(
-         this.page.getByRole("tab", { name: "About The Live Stream" })
-      ).toBeVisible()
+      if (waitForTitle) {
+         await expect(
+            this.page.getByRole("tab", { name: "About The Live Stream" })
+         ).toBeVisible()
+      }
    }
 
    /**
