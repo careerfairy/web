@@ -1,6 +1,5 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Locator, Page, expect } from "@playwright/test"
-import { boolean } from "yup/lib/locale"
 import { CommonPage } from "./CommonPage"
 
 type CompleteLivestreamQuestionsViewOptions = {
