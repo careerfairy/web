@@ -1,15 +1,30 @@
-import React, { createContext, useContext, useEffect, useState } from "react"
+import React, {
+   createContext,
+   ReactNode,
+   useCallback,
+   useContext,
+   useEffect,
+   useMemo,
+   useState,
+} from "react"
 import { brandedDarkTheme, brandedLightTheme } from "../../materialUI"
-import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles"
+import { responsiveFontSizes, Theme, ThemeProvider } from "@mui/material/styles"
 import { SnackbarProvider } from "notistack"
 import { useRouter } from "next/router"
-import { CssBaseline } from "@mui/material"
+import { CssBaseline, PaletteMode } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import { dataLayerEvent } from "../../util/analyticsUtils"
 
-// import { Button } from "@mui/material";
+type ThemeContextType = {
+   toggleTheme: () => void
+   themeMode: PaletteMode
+}
 
-const ThemeContext = createContext()
+const ThemeContext = createContext<ThemeContextType>({
+   toggleTheme: () => {},
+   themeMode: "light",
+})
+
 const pathsReadyForDarkMode = [
    "/streaming/[livestreamId]/joining-streamer",
    "/streaming/[livestreamId]/main-streamer",
@@ -22,43 +37,44 @@ const pathsReadyForDarkMode = [
 
 const initialTheme = responsiveFontSizes(brandedLightTheme)
 
-const ThemeProviderWrapper = ({ children, overrideTheme }) => {
+const ThemeProviderWrapper = ({
+   children,
+   overrideTheme,
+}: {
+   children: ReactNode
+   overrideTheme?: Theme
+}) => {
    const { pathname } = useRouter()
 
-   const [theme, setTheme] = useState(
-      overrideTheme ? responsiveFontSizes(overrideTheme) : initialTheme
-   )
+   const [theme, setTheme] = useState(overrideTheme ?? initialTheme)
 
+   // set theme for certain paths based on local storage
    useEffect(() => {
       if (!overrideTheme) {
-         getThemeObj()
+         let newThemeObj = { ...brandedLightTheme }
+         if (pathsReadyForDarkMode.includes(pathname)) {
+            const cachedThemeMode = localStorage.getItem("themeMode")
+            if (cachedThemeMode === "dark" || cachedThemeMode === "light") {
+               if (cachedThemeMode === "dark") {
+                  newThemeObj = brandedDarkTheme
+               } else {
+                  newThemeObj = brandedLightTheme
+               }
+            }
+         }
+
+         setTheme(responsiveFontSizes(newThemeObj))
       }
    }, [pathname, overrideTheme])
 
-   const toggleTheme = () => {
+   const toggleTheme = useCallback(() => {
       const newTheme =
          theme.palette.mode === "dark" ? brandedLightTheme : brandedDarkTheme
 
       localStorage.setItem("themeMode", newTheme.palette.mode)
       setTheme(responsiveFontSizes(newTheme))
       dataLayerEvent("toggle_theme")
-   }
-
-   const getThemeObj = () => {
-      let newThemeObj = { ...brandedLightTheme }
-      if (pathsReadyForDarkMode.includes(pathname)) {
-         const cachedThemeMode = localStorage.getItem("themeMode")
-         if (cachedThemeMode === "dark" || cachedThemeMode === "light") {
-            if (cachedThemeMode === "dark") {
-               newThemeObj = brandedDarkTheme
-            } else {
-               newThemeObj = brandedLightTheme
-            }
-         }
-      }
-
-      setTheme(responsiveFontSizes(newThemeObj))
-   }
+   }, [theme])
 
    const useStyles = makeStyles({
       info: {
@@ -66,16 +82,20 @@ const ThemeProviderWrapper = ({ children, overrideTheme }) => {
          color: `${theme.palette.text.primary} !important`,
       },
    })
+
    const classes = useStyles()
 
    if (pathname === "/next-livestreams/embed") {
       theme.palette.background.default = "transparent"
    }
 
+   const ctxValue = useMemo(
+      () => ({ toggleTheme, themeMode: theme.palette.mode }),
+      [theme.palette.mode, toggleTheme]
+   )
+
    return (
-      <ThemeContext.Provider
-         value={{ toggleTheme, themeMode: theme.palette.mode }}
-      >
+      <ThemeContext.Provider value={ctxValue}>
          <ThemeProvider theme={theme}>
             {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
             <CssBaseline />
@@ -84,14 +104,6 @@ const ThemeProviderWrapper = ({ children, overrideTheme }) => {
                maxSnack={5}
             >
                {children}
-               {/*<Button*/}
-               {/*   color="secondary"*/}
-               {/*   onClick={toggleTheme}*/}
-               {/*   variant="contained"*/}
-               {/*   style={{ position: "fixed", bottom: "5%", right: "5%" }}*/}
-               {/*>*/}
-               {/*   toggle*/}
-               {/*</Button>*/}
             </SnackbarProvider>
          </ThemeProvider>
       </ThemeContext.Provider>
