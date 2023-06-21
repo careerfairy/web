@@ -270,7 +270,7 @@ export type MergePaginatedResponse<T> = {
 
 export type MergeLinkTokenResponse = {
    link_token: string
-   integration_name: string
+   integration_name: string | null
 }
 
 export type MergeAccountTokenResponse = {
