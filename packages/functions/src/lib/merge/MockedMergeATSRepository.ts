@@ -1,36 +1,82 @@
+import { Application } from "@careerfairy/shared-lib/ats/Application"
 import { Candidate } from "@careerfairy/shared-lib/ats/Candidate"
 import {
    ATSPaginatedResults,
    ATSPaginationOptions,
+   RecruitersFilterOptions,
 } from "@careerfairy/shared-lib/ats/Functions"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
 import { Office } from "@careerfairy/shared-lib/ats/Office"
+import { Recruiter } from "@careerfairy/shared-lib/ats/Recruiter"
 import {
+   SyncStatus,
+   SyncStatusTypes,
+} from "@careerfairy/shared-lib/ats/SyncStatus"
+import {
+   MergeAccountTokenResponse,
    MergeApplication,
    MergeAttachment,
+   MergeAttachmentModel,
    MergeCandidate,
    MergeDepartment,
    MergeJob,
+   MergeLinkTokenResponse,
+   MergeMetaEntities,
+   MergeMetaResponse,
    MergeOffice,
    MergeRemoteUser,
+   MergeSyncStatus,
    MergeUserRole,
 } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
-import { CandidateCreationOptions, IATSRepository } from "../IATSRepository"
+import { UserData } from "@careerfairy/shared-lib/users"
+import {
+   ApplicationCreationOptions,
+   AttachmentCreationOptions,
+   CandidateCreationOptions,
+   IATSRepository,
+} from "../IATSRepository"
 import {
    SOURCE,
+   createMergeAttachmentObject,
    createMergeCandidateFromUser,
-   createMergeModelBody,
    sortJobsDesc,
 } from "./MergeATSRepository"
-import { UserData } from "@careerfairy/shared-lib/users"
+
+const MAX_NUM_ENTITIES = 1000 // Define the maximum number of entities to fetch
 
 export class MockedMergeATSRepository implements IATSRepository {
    private jobsDb: Record<string, Job>
    private candidatesDb: Record<string, Candidate>
+   private applicationsDb: Record<string, Application>
+
+   private syncStatusIndex = 0
+   private syncStatusStates = [
+      "SYNCING",
+      "PAUSED",
+      "DONE",
+   ] satisfies SyncStatusTypes[]
+
+   private mockSyncStatuses: MergeSyncStatus[] = [
+      { model_name: "Activity", model_id: "ActivityID" },
+      { model_name: "Application", model_id: "ApplicationID" },
+      { model_name: "Attachment", model_id: "AttachmentID" },
+      { model_name: "Candidate", model_id: "CandidateID" },
+      { model_name: "Department", model_id: "DepartmentID" },
+      { model_name: "EmailAddress", model_id: "EmailAddressID" },
+      { model_name: "Job", model_id: "JobID" },
+      { model_name: "JobInterviewStage", model_id: "JobInterviewStageID" },
+   ].map((model) => ({
+      ...model,
+      last_sync_start: new Date().toISOString(),
+      next_sync_start: new Date().toISOString(),
+      status: this.syncStatusStates[0],
+      is_initial_sync: true,
+   }))
 
    constructor() {
       this.jobsDb = {}
       this.candidatesDb = {}
+      this.applicationsDb = {}
 
       // create mock job #1
       const mergeJob1 = this.createMockMergeJob({
@@ -123,29 +169,60 @@ export class MockedMergeATSRepository implements IATSRepository {
    async getJobs(
       options?: ATSPaginationOptions
    ): Promise<ATSPaginatedResults<Job>> {
+      const cursor = options?.cursor ? Number(options.cursor) : 1
+      const pageSize = options?.pageSize ? Number(options.pageSize) : 7
+
       // Create mock data
-      const mockJobs: MergeJob[] = Array(20) // let's say we have 20 jobs in total
+      const mockJobs: MergeJob[] = Array(pageSize + 1)
          .fill(0)
-         .map((_, idx) => this.createMockMergeJob({ id: `${idx + 1}` }))
+         .map((_, idx) =>
+            this.createMockMergeJob({
+               id: `${cursor + idx}`,
+               name: `Job ${cursor + idx}`,
+               description: `Job description ${cursor + idx}`,
+            })
+         )
 
       // Convert to job instances and paginate
       const jobs = mockJobs.map(Job.createFromMerge)
-      return this.createPaginatedResults(jobs, options)
+      return this.createPaginatedResults(jobs, options, (job) => job.id)
    }
+
+   // private async getAllPages<T>(
+   //    getPage: (cursor?: string) => Promise<ATSPaginatedResults<T>>
+   // ): Promise<T[]> {
+   //    const items: T[] = []
+   //    let nextCursor: string | null = "1"
+
+   //    while (nextCursor) {
+   //       const page = await getPage(nextCursor)
+   //       items.push(...page.results)
+   //       nextCursor = page.next
+   //    }
+
+   //    return items
+   // }
 
    private async getAllPages<T>(
       getPage: (cursor?: string) => Promise<ATSPaginatedResults<T>>
    ): Promise<T[]> {
-      const items: T[] = []
+      const entities: T[] = []
       let nextCursor: string | null = "1"
+      let numEntitiesFetched = 0 // Track the number of entities fetched
 
-      while (nextCursor) {
+      while (nextCursor && numEntitiesFetched < MAX_NUM_ENTITIES) {
          const page = await getPage(nextCursor)
-         items.push(...page.results)
+         entities.push(...page.results)
+         numEntitiesFetched += page.results.length
+
+         if (numEntitiesFetched >= MAX_NUM_ENTITIES) {
+            break // Stop fetching if the maximum number of entities has been reached
+         }
+
          nextCursor = page.next
       }
 
-      return items
+      return entities
    }
 
    async getAllJobs(): Promise<Job[]> {
@@ -161,16 +238,46 @@ export class MockedMergeATSRepository implements IATSRepository {
       return mergeJob ? mergeJob : null
    }
 
+   // private createPaginatedResults<T>(
+   //    items: T[],
+   //    options?: ATSPaginationOptions
+   // ): ATSPaginatedResults<T> {
+   //    const pageSize = Number(options?.pageSize ?? 10)
+
+   //    const paginatedResults: ATSPaginatedResults<T> = {
+   //       next: items.length > pageSize ? "2" : null,
+   //       previous: options?.cursor ? "1" : null,
+   //       results: items.slice(0, pageSize),
+   //    }
+
+   //    return paginatedResults
+   // }
+
    private createPaginatedResults<T>(
       items: T[],
-      options?: ATSPaginationOptions
+      options: ATSPaginationOptions,
+      getIdentifier: (item: T) => string
    ): ATSPaginatedResults<T> {
-      const pageSize = Number(options?.pageSize ?? 10)
+      const pageSize = Number(options.pageSize ?? 10)
+      const cursor = options.cursor
 
+      let startIndex = 0
+      if (cursor) {
+         // Find the start index based on the cursor value
+         const startItemIndex = items.findIndex(
+            (item) => getIdentifier(item) === cursor
+         )
+         if (startItemIndex !== -1) {
+            startIndex = startItemIndex
+         }
+      }
+
+      const endIndex = Math.min(startIndex + pageSize, items.length)
       const paginatedResults: ATSPaginatedResults<T> = {
-         next: items.length > pageSize ? "2" : null,
-         previous: options?.cursor ? "1" : null,
-         results: items.slice(0, pageSize),
+         next:
+            endIndex < items.length ? getIdentifier(items[endIndex - 1]) : null,
+         previous: startIndex > 0 ? getIdentifier(items[startIndex - 1]) : null,
+         results: items.slice(startIndex, endIndex),
       }
 
       return paginatedResults
@@ -189,7 +296,11 @@ export class MockedMergeATSRepository implements IATSRepository {
          .map((_, idx) => this.createMockOffice(`${idx + 1}`))
 
       const offices = mockOffices.map(Office.createFromMerge)
-      return this.createPaginatedResults(offices, options)
+      return this.createPaginatedResults(
+         offices,
+         options,
+         (office) => office.id
+      )
    }
 
    private createMockApplication(
@@ -247,8 +358,8 @@ export class MockedMergeATSRepository implements IATSRepository {
          is_private: false,
          can_email: true,
          locations: ["New York", "San Francisco"],
-         applications: [this.createMockApplication()],
-         attachments: [this.createMockAttachment()],
+         applications: [],
+         attachments: [],
          email_addresses: [
             {
                email_address_type: "PERSONAL",
@@ -345,5 +456,236 @@ export class MockedMergeATSRepository implements IATSRepository {
       return this.candidatesDb[newCandidate.id]
    }
 
-   // ...other methods in the IATSRepository interface need to be implemented here as well
+   async candidateAddCVAttachment(
+      candidateId: string,
+      user: UserData,
+      options: AttachmentCreationOptions = {}
+   ) {
+      const candidate = await this.getCandidate(candidateId)
+
+      if (!candidate) {
+         throw new Error("Candidate not found")
+      }
+      const model: MergeAttachmentModel = createMergeAttachmentObject(user)
+
+      const newAttatchment = this.createMockAttachment({
+         id: "attachment-1",
+         remote_id: "remote-1",
+         file_name: model.file_name,
+         attachment_type: model.attachment_type,
+         candidate: this.createMockMergeCandidate(),
+         file_url: model.file_url,
+      })
+
+      candidate.attachments.push(newAttatchment)
+
+      return newAttatchment.id
+   }
+
+   /*
+      |--------------------------------------------------------------------------
+      | Applications
+      |--------------------------------------------------------------------------
+      */
+
+   async getApplications(
+      options?: ATSPaginationOptions
+   ): Promise<ATSPaginatedResults<Application>> {
+      const mockApplications: MergeApplication[] = Array(20)
+         .fill(0)
+         .map((_, idx) =>
+            this.createMockApplication({
+               id: `${idx + 1}`,
+            })
+         )
+
+      const applications = mockApplications.map(Application.createFromMerge)
+
+      return this.createPaginatedResults(applications, options, (app) => app.id)
+   }
+
+   async createApplication(
+      candidateId: string,
+      jobId: string,
+      _options?: ApplicationCreationOptions
+   ): Promise<string> {
+      const candidate = await this.getCandidate(candidateId)
+
+      if (!candidate) {
+         throw new Error("Candidate not found")
+      }
+
+      const job = await this.getJob(jobId)
+
+      if (!job) {
+         throw new Error("Job not found")
+      }
+
+      const newApplication = this.createMockApplication({
+         id: "application-1",
+         remote_id: "remote-1",
+         candidate: this.createMockMergeCandidate(),
+         job: this.createMockMergeJob(),
+         applied_at: new Date().toISOString(),
+         rejected_at: null,
+         source: "Job Board",
+         credited_to: "John Doe",
+         current_stage: {
+            id: "1",
+            remote_id: "1",
+            name: "Interview",
+            job: "Software Engineer",
+         },
+         reject_reason: null,
+      })
+
+      const application = Application.createFromMerge(newApplication)
+
+      if (typeof application === "string") {
+         // handle the case where application is a string
+         throw new Error(
+            "Application creation failed with message: " + application
+         )
+      }
+
+      candidate.applications.push(application as Application & string)
+
+      this.applicationsDb[application.id] = application
+
+      return newApplication.id
+   }
+
+   async getApplication(id: string): Promise<Application> {
+      const mergeApplication = this.applicationsDb[id]
+      return mergeApplication ? mergeApplication : null
+   }
+
+   /*
+      |--------------------------------------------------------------------------
+      | Sync Status & Others
+      |--------------------------------------------------------------------------
+      */
+
+   async getSyncStatus(): Promise<SyncStatus[]> {
+      const status: SyncStatusTypes =
+         this.syncStatusStates[this.syncStatusIndex]
+      this.syncStatusIndex =
+         (this.syncStatusIndex + 1) % this.syncStatusStates.length
+
+      this.mockSyncStatuses = this.mockSyncStatuses.map((model) => ({
+         ...model,
+         status,
+         is_initial_sync: status === "SYNCING",
+         last_sync_start: new Date().toISOString(),
+         next_sync_start: new Date().toISOString(),
+      }))
+
+      return this.mockSyncStatuses.map(SyncStatus.createFromMerge)
+   }
+
+   async createLinkToken(
+      _endUserOriginId: string,
+      _endUserOrganizationName: string,
+      _endUserEmailAddress: string,
+      _categories: string[] = ["ats"]
+   ): Promise<MergeLinkTokenResponse> {
+      return {
+         link_token: "GkBuD79fY1o6XQxJJGtvn2E1qXGQFsuG9X7XoZPqiX5nZ3kIwKHdwg",
+         integration_name: null,
+         magic_link_url: null,
+      }
+   }
+
+   async exchangeAccountToken(
+      publicToken: string
+   ): Promise<MergeAccountTokenResponse> {
+      return {
+         account_token: `mocked_account_token_${publicToken}`,
+         integration: {
+            name: "Greenhouse",
+            image: "mocked_image_url",
+            square_image: "mocked_square_image_url",
+            color: "mocked_color",
+            slug: "mocked_slug",
+         },
+      }
+   }
+
+   // Mock getRecruiters
+   async getRecruiters(
+      options?: RecruitersFilterOptions
+   ): Promise<ATSPaginatedResults<Recruiter>> {
+      // Create an array of mocked recruiters
+      const recruiters = Array(20)
+         .fill(null)
+         .map((_, idx) => this.createMockRecruiter({ id: `${idx}` }))
+
+      // Use your custom method to create paginated results
+      return this.createPaginatedResults(
+         recruiters,
+         options,
+         (recruiter) => recruiter.id
+      )
+   }
+
+   // Mock getMetaCreation
+   async getMetaCreation(model: MergeMetaEntities): Promise<MergeMetaResponse> {
+      // Simulated response, you might want to adjust it to suit your testing needs
+      return {
+         request_schema: {
+            type: "object",
+            required: [],
+            properties: {},
+         },
+         status: {
+            linked_account_status: "linked",
+            can_make_request: true,
+         },
+         has_conditional_params: false,
+         has_required_linked_account_params: false,
+      }
+   }
+
+   private createMockRecruiter(
+      overrides: Partial<MergeRemoteUser> = {}
+   ): Recruiter {
+      const defaultRecruiter: MergeRemoteUser = {
+         id: "1",
+         remote_id: "1",
+         first_name: "John",
+         last_name: "Doe",
+         email: "john.doe@example.com",
+         access_role: "ADMIN",
+         disabled: false,
+         remote_created_at: new Date().toISOString(),
+      }
+
+      return Recruiter.createFromMerge(
+         Object.assign(defaultRecruiter, overrides)
+      )
+   }
+
+   // Mock getAllRecruiters
+   async getAllRecruiters(): Promise<Recruiter[]> {
+      // Create an array of mocked recruiters
+      const users = Array(10)
+         .fill(null)
+         .map((_, idx) => this.createMockRecruiter({ id: `${idx}` }))
+
+      // Sort and return
+      users.sort((a, b) => {
+         if (b?.role?.includes("ADMIN")) {
+            return 1
+         }
+
+         return 0
+      })
+
+      return users
+   }
+
+   // Mock removeAccount
+   async removeAccount(): Promise<any> {
+      return { status: "success" }
+   }
 }

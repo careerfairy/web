@@ -528,11 +528,6 @@ export const emptyResponseWhenNotFound = (e: AxiosError) => {
    throw e
 }
 
-interface MergeExtraRequiredData {
-   remote_user_id?: string
-   // Add more required fields if necessary
-}
-
 interface MergeModelBody<T> {
    model: T
    [key: string]: any

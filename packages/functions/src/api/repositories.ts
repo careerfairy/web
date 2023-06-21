@@ -1,32 +1,32 @@
-import { admin } from "./firestoreAdmin"
 import {
    FirebaseFieldOfStudyRepository,
    IFieldOfStudyRepository,
 } from "@careerfairy/shared-lib/fieldOfStudy/FieldOfStudyRepository"
 import {
+   FirebaseMarketingUsersRepository,
+   IMarketingUsersRepository,
+} from "@careerfairy/shared-lib/marketing/MarketingRepo"
+import {
    FirebaseRewardRepository,
    IRewardRepository,
 } from "@careerfairy/shared-lib/rewards/RewardRepository"
+import {
+   ILivestreamFunctionsRepository,
+   LivestreamFunctionsRepository,
+} from "../lib/LivestreamFunctionsRepository"
 import {
    bigQueryClient,
    BigQueryRepository,
    IBigQueryRepository,
 } from "./bigQuery"
-import {
-   FirebaseMarketingUsersRepository,
-   IMarketingUsersRepository,
-} from "@careerfairy/shared-lib/marketing/MarketingRepo"
-import {
-   ILivestreamFunctionsRepository,
-   LivestreamFunctionsRepository,
-} from "../lib/LivestreamFunctionsRepository"
+import { admin } from "./firestoreAdmin"
 
+import { getATSRepository } from "../lib/merge/util"
 import {
    GroupFunctionsRepository,
    IGroupFunctionsRepository,
 } from "../lib/GroupFunctionsRepository"
 import { IATSRepository } from "../lib/IATSRepository"
-import { MergeATSRepository } from "../lib/merge/MergeATSRepository"
 import {
    IUserFunctionsRepository,
    UserFunctionsRepository,
@@ -62,7 +62,7 @@ export const atsRepo = (
    apiKey: string,
    accountToken: string
 ): IATSRepository => {
-   return new MergeATSRepository(apiKey, accountToken, admin.firestore as any)
+   return getATSRepository(apiKey, accountToken, admin.firestore as any)
 }
 
 export const marketingUsersRepo: IMarketingUsersRepository =
