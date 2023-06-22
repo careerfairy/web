@@ -1,25 +1,144 @@
-import { Locator } from "@playwright/test"
-import { CommonPage } from "../CommonPage"
+import { Locator, expect } from "@playwright/test"
+import { CommonPage, handleMultiSelect } from "../CommonPage"
 import { GroupDashboardPage } from "../GroupDashboardPage"
+import greenhouseResponse from "../../assets/greenhouseResponse.json"
+import linkInitiateResponse from "../../assets/mergeLinkInitiate.json"
 
 export class ATSAdminPage extends CommonPage {
-   public tableStatus: Locator
+   public testApplicationJobsSelect: Locator
 
    constructor(private readonly parent: GroupDashboardPage) {
       super(parent.page)
 
-      this.tableStatus = this.page.getByText(
-         "First Synchronization In Progress"
+      this.testApplicationJobsSelect = this.page.locator(
+         'input[name="application-test-jobs"]'
       )
    }
 
-   public async clickLinkAccountButton() {
+   public async linkAccount() {
       await this.page
          .getByRole("button", { name: "LINK ACCOUNT" })
          .first()
          .click()
    }
 
+   public async clickFinishButton() {
+      await this.page
+         .frameLocator("#merge-link-iframe")
+         .getByText("Finish")
+         .click()
+   }
+
+   public async checkJobsExistInTable(
+      jobs: {
+         name: string
+         description: string
+      }[]
+   ): Promise<void> {
+      await Promise.all(
+         jobs.map(async (job) => {
+            const jobRow = this.page
+               .locator(
+                  `//td[text()='${job.name}']/following-sibling::td/div[text()='${job.description}']`
+               )
+               .first()
+            return expect(jobRow).toBeVisible()
+         })
+      )
+   }
+
+   async mockATSInitiationRequest() {
+      await this.page.route(
+         "https://api.merge.dev/api/integrations/link/*/initiate",
+         async (route) => {
+            await route.fulfill({
+               status: 200,
+               body: JSON.stringify(linkInitiateResponse),
+            })
+         }
+      )
+   }
+
+   async mockLinkedAccountRequest() {
+      await this.page.route(
+         "https://api.merge.dev/api/integrations/linked-account",
+         async (route) => {
+            await route.fulfill({
+               status: 200,
+               body: JSON.stringify(greenhouseResponse),
+            })
+         }
+      )
+   }
+
+   async mockFetchATSSyncStatusRequest() {
+      const syncStatusResponse = this.buildInitialSyncStatuses()
+
+      let nextModelToFinishIndex = 0
+
+      await this.page.route("**/fetchATSSyncStatus_eu", async (route) => {
+         await route.fulfill({
+            status: 200,
+            body: JSON.stringify({ result: syncStatusResponse }),
+         })
+
+         // After each request, set around 50% of the remaining models to "DONE" state.
+         const steps = Math.ceil(
+            (syncStatusResponse.length - nextModelToFinishIndex) * 0.5
+         )
+         for (let i = 0; i < steps; i++) {
+            if (nextModelToFinishIndex < syncStatusResponse.length) {
+               syncStatusResponse[nextModelToFinishIndex].status = "DONE"
+               nextModelToFinishIndex++
+            }
+         }
+      })
+   }
+
+   private buildInitialSyncStatuses(): SyncStatusResponse[] {
+      const models = [
+         "Activity",
+         "Application",
+         "Attachment",
+         "Candidate",
+         "Department",
+         "EmailAddress",
+         "Job",
+         "JobInterviewStage",
+      ] as const
+
+      return models.map((model) => ({
+         hydrated: true,
+         id: `ats.${model}`,
+         model: model,
+         status: "SYNCING",
+         isInitialSync: true,
+         lastSync: Date.now(),
+         nextSync: Date.now() + 60 * 60 * 1000, // 1 hour from now
+      }))
+   }
+
+   public async startApplicationTest() {
+      await this.page.getByRole("button", { name: "Application Test" }).click()
+   }
+
+   public async selectJobForApplicationTest(jobName: string) {
+      await handleMultiSelect(
+         jobName,
+         this.testApplicationJobsSelect,
+         this.page
+      )
+   }
+
+   public async completeApplicationTest() {
+      await this.page.getByRole("button", { name: "Test" }).click()
+   }
+
+   /*
+      |--------------------------------------------------------------------------
+      | Merge Popup Methods
+      |--------------------------------------------------------------------------
+      */
    public async selectATS() {
       await this.page
          .frameLocator("#merge-link-iframe")
@@ -34,6 +153,12 @@ export class ATSAdminPage extends CommonPage {
          .fill(apiKey)
    }
 
+   public async finishAndCloseMergeDialog() {
+      await this.clickContinueButton() // First continue button
+      await this.clickContinueButton() // Second continue button
+      await this.clickFinishButton() //
+   }
+
    public async submitAPIKey() {
       await this.page
          .frameLocator("#merge-link-iframe")
@@ -41,34 +166,20 @@ export class ATSAdminPage extends CommonPage {
          .click()
    }
 
-   public async clickContinueButton() {
+   private async clickContinueButton() {
       await this.page
          .frameLocator("#merge-link-iframe")
          .getByRole("button", { name: "Continue" })
          .click()
    }
+}
 
-   public async clickFinishButton() {
-      await this.page
-         .frameLocator("#merge-link-iframe")
-         .getByText("Finish")
-         .click()
-   }
-
-   public async checkJobsExist(
-      jobs: { name: string; description: string }[]
-   ): Promise<boolean> {
-      for (const job of jobs) {
-         const jobExists = await this.page
-            .locator(
-               `//td[text()='${job.name}']/following-sibling::td/div[text()='${job.description}']`
-            )
-            .first()
-            .evaluate((element) => !!element)
-         if (!jobExists) {
-            return false
-         }
-      }
-      return true
-   }
+type SyncStatusResponse = {
+   hydrated: boolean
+   id: string
+   model: string
+   status: string
+   isInitialSync: boolean
+   lastSync: number
+   nextSync: number
 }

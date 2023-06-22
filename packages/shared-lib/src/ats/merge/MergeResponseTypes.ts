@@ -283,3 +283,7 @@ export type MergeAccountTokenResponse = {
       slug?: string
    }
 }
+
+export type MergeRemoveAccountResponse = {
+   status: string
+}

@@ -17,6 +17,7 @@ import {
    MergeOffice,
    MergePaginatedResponse,
    MergeRemoteUser,
+   MergeRemoveAccountResponse,
    MergeSyncStatus,
 } from "@careerfairy/shared-lib/ats/merge/MergeResponseTypes"
 import { Job } from "@careerfairy/shared-lib/ats/Job"
@@ -303,8 +304,10 @@ export class MergeATSRepository implements IATSRepository {
       return data
    }
 
-   async removeAccount() {
-      const { data } = await this.axios.post<any>("/delete-account")
+   async removeAccount(): Promise<MergeRemoveAccountResponse> {
+      const { data } = await this.axios.post<MergeRemoveAccountResponse>(
+         "/delete-account"
+      )
 
       return data
    }
@@ -369,15 +372,7 @@ export class MergeATSRepository implements IATSRepository {
       )
 
       // sort in place by Admins desc
-      users.sort((a, b) => {
-         if (b?.role?.includes("ADMIN")) {
-            return 1
-         }
-
-         return 0
-      })
-
-      return users
+      return users.sort(sortRecruitersDesc)
    }
 
    async getRecruiters(
@@ -565,4 +560,12 @@ export function sortJobsDesc(a: Job, b: Job) {
    if (!a.updatedAt || !b.updatedAt) return 0
 
    return b.updatedAt?.getTime() - a.updatedAt?.getTime()
+}
+
+export function sortRecruitersDesc(a: Recruiter, b: Recruiter) {
+   if (b?.role?.includes("ADMIN")) {
+      return 1
+   }
+
+   return 0
 }
