@@ -157,7 +157,11 @@ export class CommonPage {
  * @param cssSelector
  * @constructor
  */
-const materialSelectOption = async (page, newSelectedValue, cssSelector) => {
+export const materialSelectOption = async (
+   page: Page,
+   newSelectedValue: string,
+   cssSelector: string
+) => {
    return page.evaluate(
       ({ newSelectedValue, cssSelector }) => {
          let clickEvent = document.createEvent("MouseEvents")
