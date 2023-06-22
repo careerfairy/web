@@ -3,11 +3,13 @@ import { groupAdminFixture as test } from "../../fixtures"
 import { sleep } from "../../utils"
 
 test.describe("ATS Integration", () => {
-   test("Can successfully link account", async ({ groupPage }) => {
+   test("Can successfully link account & test application", async ({
+      groupPage,
+   }) => {
       const atsPage = await groupPage.goToATSPage()
 
       /**
-       * Setup all the route interceptors at the start
+       * Be sure to setup all the route interceptors at the start of
        */
       await Promise.all([
          atsPage.mockATSInitiationRequest(),

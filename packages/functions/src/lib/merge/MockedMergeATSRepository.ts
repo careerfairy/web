@@ -159,33 +159,7 @@ export class MockedMergeATSRepository implements IATSRepository {
       candidateId: string,
       jobId: string
    ): Promise<string> {
-      const candidate = await this.getCandidate(candidateId)
-
-      const job = await this.getJob(jobId)
-
-      const newApplication = createMockApplication({
-         id: "application-1",
-         remote_id: "remote-1",
-         candidate: createMockMergeCandidate({ id: candidate.id }),
-         job: createMockMergeJob({ id: job.id }),
-         applied_at: new Date().toISOString(),
-         rejected_at: null,
-         source: "Job Board",
-         credited_to: "John Doe",
-         current_stage: {
-            id: "1",
-            remote_id: "1",
-            name: "Interview",
-            job: "Software Engineer",
-         },
-         reject_reason: null,
-      })
-
-      const application = Application.createFromMerge(newApplication)
-
-      candidate.applications.push(application as Application & string)
-
-      return newApplication.id
+      return `application-candidate-${candidateId}-job-${jobId}`
    }
 
    async getApplication(id: string): Promise<Application> {
@@ -219,7 +193,6 @@ export class MockedMergeATSRepository implements IATSRepository {
       )
    }
 
-   // Mock getAllRecruiters
    async getAllRecruiters(): Promise<Recruiter[]> {
       const paginatedRecruiters = await this.createMockDataAndPaginate(
          createMockRecruiter,
@@ -236,6 +209,7 @@ export class MockedMergeATSRepository implements IATSRepository {
       |--------------------------------------------------------------------------
       */
 
+   // Only presentational, the sync status simulation is handled by play-wright
    async getSyncStatus(): Promise<SyncStatus[]> {
       return []
    }
