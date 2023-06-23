@@ -23,6 +23,11 @@ const MediaSection = () => {
             }}
             p={3}
             spacing={3}
+            mr={3}
+            ml={{
+               xs: 3,
+               md: 0,
+            }}
             bgcolor={"white"}
             border={"1px solid #EDE7FD"}
          >
