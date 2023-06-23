@@ -349,7 +349,7 @@ const ActionButtons = () => {
    const showShareButton = groupPresenter.companyPageIsReady()
 
    return (
-      <Stack spacing={1} direction={"row"}>
+      <Stack spacing={1} pr={3} direction={"row"}>
          {showFollowButton ? (
             <FollowButton color="primary" group={group} />
          ) : null}
