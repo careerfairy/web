@@ -1,11 +1,4 @@
-import {
-   ComponentType,
-   createContext,
-   FC,
-   useContext,
-   useMemo,
-   useState,
-} from "react"
+import { ComponentType, FC, useCallback, useState } from "react"
 import SwipeableViews from "react-swipeable-views"
 import { Dialog, DialogContent, useTheme } from "@mui/material"
 import useIsMobile from "../../custom-hook/useIsMobile"
@@ -14,6 +7,7 @@ import { SlideLeftTransition, SlideUpTransition } from "../common/transitions"
 import { NICE_SCROLLBAR_STYLES } from "../../../constants/layout"
 import VideoView from "./VideoView"
 import { AnimatedTabPanel } from "../../../materialUI/GlobalPanels/GlobalPanels"
+import WelcomeView from "./WelcomeView"
 
 const styles = sxStyles({
    dialogPaper: {
@@ -21,8 +15,8 @@ const styles = sxStyles({
       borderRadius: {
          md: 5,
       },
-      maxWidth: 915,
-      height: "100%",
+      overflow: "hidden",
+      backgroundColor: "transparent",
    },
    content: {
       p: 0,
@@ -31,23 +25,16 @@ const styles = sxStyles({
    slide: {
       overflow: "overlay",
    },
-   swipeableViewsContainer: {
-      height: "100%",
-      "& > *": {
-         height: "100%",
-      },
-   },
-   fullHeight: {
-      height: "100%",
-   },
-   swipeableViews: {
-      height: "100%",
-   },
+   swipeableViewsContainer: {},
+   fullHeight: {},
+   swipeableViews: {},
 })
 
 type Props = {
    handleClose: () => void
    open: boolean
+   fullScreen?: boolean
+   initialViewIndex?: number
 }
 
 type ViewKey = "video" | "welcome"
@@ -57,25 +44,32 @@ type View = {
    component: ComponentType
 }
 
-const views: View[] = [
-   {
-      key: "video",
-      component: () => <VideoView />,
-   },
-]
-
-const WelcomeDialog: FC<Props> = ({ handleClose, open }) => {
+const WelcomeDialog: FC<Props> = ({
+   handleClose,
+   open,
+   fullScreen,
+   initialViewIndex,
+}) => {
    const isMobile = useIsMobile()
-   const [activeView, setActiveView] = useState<ViewKey>("video")
-   const theme = useTheme()
-   const contextValue = useMemo<WelcomeDialogContextType>(
-      () => ({
-         activeView,
-         goToView: setActiveView,
-         closeDialog: handleClose,
-      }),
-      [activeView, handleClose]
+   const [activeViewIndex, setActiveViewIndex] = useState<number>(
+      initialViewIndex ?? 0
    )
+   const theme = useTheme()
+
+   const onVideoComplete = useCallback(() => {
+      setActiveViewIndex(1)
+   }, [])
+
+   const views: View[] = [
+      {
+         key: "video",
+         component: () => <VideoView onComplete={onVideoComplete} />,
+      },
+      {
+         key: "welcome",
+         component: () => <WelcomeView onClick={handleClose} />,
+      },
+   ]
 
    return (
       <Dialog
@@ -84,61 +78,36 @@ const WelcomeDialog: FC<Props> = ({ handleClose, open }) => {
          TransitionComponent={
             isMobile ? SlideLeftTransition : SlideUpTransition
          }
-         maxWidth="md"
          fullWidth
-         fullScreen={isMobile}
+         fullScreen={fullScreen}
          closeAfterTransition={true}
          PaperProps={{
             sx: styles.dialogPaper,
          }}
       >
          <DialogContent sx={styles.content}>
-            <WelcomeDialogContext.Provider value={contextValue}>
-               <SwipeableViews
-                  style={styles.swipeableViews}
-                  containerStyle={styles.swipeableViewsContainer}
-                  slideStyle={styles.slide}
-                  disabled
-                  axis={theme.direction === "rtl" ? "x-reverse" : "x"}
-                  index={activeView}
-               >
-                  {views.map(({ key, component: View }, index) => (
-                     <AnimatedTabPanel
-                        sx={styles.fullHeight}
-                        key={key}
-                        value={index}
-                        activeValue={activeView}
-                     >
-                        <View />
-                     </AnimatedTabPanel>
-                  ))}
-               </SwipeableViews>
-            </WelcomeDialogContext.Provider>
+            <SwipeableViews
+               style={styles.swipeableViews}
+               containerStyle={styles.swipeableViewsContainer}
+               slideStyle={styles.slide}
+               disabled
+               axis={theme.direction === "rtl" ? "x-reverse" : "x"}
+               index={activeViewIndex}
+            >
+               {views.map(({ key, component: View }, index) => (
+                  <AnimatedTabPanel
+                     sx={styles.fullHeight}
+                     key={key}
+                     value={index}
+                     activeValue={activeViewIndex}
+                  >
+                     <View />
+                  </AnimatedTabPanel>
+               ))}
+            </SwipeableViews>
          </DialogContent>
       </Dialog>
    )
-}
-
-type WelcomeDialogContextType = {
-   goToView: (view: ViewKey) => void
-   closeDialog: () => void
-   activeView: ViewKey
-}
-
-const WelcomeDialogContext = createContext<WelcomeDialogContextType>({
-   closeDialog: () => {},
-   goToView: () => {},
-   activeView: "video",
-})
-
-export const useWelcomeDialog = () => {
-   const context = useContext(WelcomeDialogContext)
-   if (!context) {
-      throw new Error(
-         "useWelcomeDialog must be used within a WelcomeDialogProvider"
-      )
-   }
-   return context
 }
 
 export default WelcomeDialog
