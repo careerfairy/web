@@ -8,6 +8,7 @@ import EventSEOSchemaScriptTag from "../common/EventSEOSchemaScriptTag"
 import dynamic from "next/dynamic"
 import { UserStats } from "@careerfairy/shared-lib/users"
 import { useAuth } from "../../../HOCs/AuthProvider"
+import { ParsedUrlQuery } from "querystring"
 
 const LivestreamDialog = dynamic(() => import("./LivestreamDialog"))
 
@@ -55,10 +56,7 @@ export const LivestreamDialogLayout: FC<Props> = ({
       )
    }, [livestreamDialogData?.serverSideLivestream])
 
-   const dialogOpen = useMemo(
-      () => Boolean(pathType === "livestream" && livestreamId),
-      [pathType, livestreamId]
-   )
+   const dialogOpen = useMemo(() => isLivestreamDialogOpen(query), [query])
 
    const page = useMemo<DialogPage>(() => {
       if (validDialogPages.includes(dialogPage as DialogPage)) {
@@ -108,4 +106,11 @@ export const LivestreamDialogLayout: FC<Props> = ({
          ) : null}
       </>
    )
+}
+
+export const isLivestreamDialogOpen = (query: ParsedUrlQuery) => {
+   const { livestreamDialog } = query
+   const [pathType, livestreamId] = livestreamDialog || []
+
+   return Boolean(pathType === "livestream" && livestreamId)
 }
