@@ -7,8 +7,13 @@ import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
 import { correctRegistrationAnalyticsSteps, credentials } from "../../constants"
 import { PortalPage } from "../page-object-models/PortalPage"
 import { LoginPage } from "../page-object-models/LoginPage"
+<<<<<<< HEAD
 import { INITIAL_CREDITS } from "@careerfairy/shared-lib/dist/rewards"
 import { setupUserSignUpData } from "../setupData"
+||||||| parent of c80502f1a (chore: refactor user required data)
+=======
+import { setupUserSignUpData } from "../setupData"
+>>>>>>> c80502f1a (chore: refactor user required data)
 
 test.describe("Signup Page Functionality", () => {
    test.beforeAll(async () => {
