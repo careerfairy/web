@@ -32,7 +32,7 @@ import {
    getLivestreamDialogData,
    LivestreamDialogLayout,
 } from "../../components/views/livestream-dialog"
-import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialog"
+import { WelcomeDialogContainer } from "../../components/views/welcome-dialog/WelcomeDialogContainer"
 
 const PortalPage = ({
    comingUpNextEvents,
