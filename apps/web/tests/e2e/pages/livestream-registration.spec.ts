@@ -194,7 +194,7 @@ test.describe("Livestream Registration Signed Out", () => {
       await page.waitForURL(`**/login?absolutePath**`)
 
       // create user and login
-      const email = "newuser@careerfairy.io"
+      const email = UserSeed.getRandomEmail()
       await UserSeed.createUser(email)
       await LoginPage.login(page, {
          openPage: false,
@@ -233,7 +233,7 @@ test.describe("Livestream Registration Signed Out", () => {
 
       // signup
       const signup = new SignupPage(page)
-      const email = "newuser@careerfairy.io"
+      const email = UserSeed.getRandomEmail()
       await signup.signupUser(email)
 
       // redirection to livestream should work
