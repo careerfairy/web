@@ -13,9 +13,6 @@ const styles = sxStyles({
    dialogPaper: {
       maxWidth: 915,
       ...NICE_SCROLLBAR_STYLES,
-      borderRadius: {
-         md: 5,
-      },
       overflow: "hidden",
       backgroundColor: "transparent",
    },
