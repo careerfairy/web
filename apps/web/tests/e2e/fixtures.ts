@@ -2,8 +2,8 @@ import {
    clearAuthData,
    clearFirestoreData,
 } from "@careerfairy/seed-data/dist/emulators"
-import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/src/groups"
-import { UserData } from "@careerfairy/shared-lib/src/users"
+import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
@@ -11,7 +11,7 @@ import { test as base } from "@playwright/test"
 import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import UserSeed from "@careerfairy/seed-data/dist/users"
 import InterestSeed from "@careerfairy/seed-data/dist/interests"
-import { Interest } from "@careerfairy/shared-lib/src/interests"
+import { Interest } from "@careerfairy/shared-lib/interests"
 
 type GroupAdminFixtureOptions = {
    /**
@@ -22,6 +22,10 @@ type GroupAdminFixtureOptions = {
     * give the option to create a complete group
     */
    completedGroup?: boolean
+   /**
+    * give the option to create a fully setup ATS group
+    * */
+   atsGroup?: boolean
 }
 
 /**
@@ -39,6 +43,7 @@ export const groupAdminFixture = base.extend<{
    options: {
       createUser: true,
       completedGroup: false,
+      atsGroup: false, // default ATS group option to false
    },
    group: async ({ options }, use) => {
       await clearAuthData()
@@ -50,6 +55,11 @@ export const groupAdminFixture = base.extend<{
          group = await GroupSeed.createGroup(completeCompanyData)
       } else {
          group = await GroupSeed.createGroup()
+      }
+
+      if (options.atsGroup) {
+         // Here add logic to setup ATS data for the group
+         await GroupSeed.setupATSForGroup(group)
       }
 
       await use(group)

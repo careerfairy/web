@@ -2,7 +2,10 @@ import { Locator, Page } from "@playwright/test"
 import { expect } from "@playwright/test"
 import { Group } from "@careerfairy/shared-lib/groups"
 import { CommonPage, handleMultiSelect } from "./CommonPage"
-import { LivestreamEvent } from "@careerfairy/shared-lib/src/livestreams"
+import {
+   LivestreamEvent,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
 import DateUtil from "../../../util/DateUtil"
 import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { correctCompany, imageLogoPath } from "../../constants"
@@ -179,6 +182,10 @@ export class GroupDashboardPage extends CommonPage {
       if (data.interestsIds?.length > 0) {
          await this.selectInterests(data.interestsIds)
       }
+
+      if (data.jobs?.length > 0) {
+         await this.selectJobs(data.jobs)
+      }
    }
 
    public async selectInterests(interests: string[]) {
@@ -188,6 +195,17 @@ export class GroupDashboardPage extends CommonPage {
 
       for (const interest of interests) {
          await this.page.getByTestId(`interestsIds_${interest}_option`).click()
+      }
+   }
+
+   /**
+    * Selects the jobs from the dropdown, currently you can only select one job
+    * */
+   public async selectJobs(jobs: LivestreamJobAssociation[]) {
+      await this.page.getByPlaceholder("Select one job").click()
+
+      for (const job of jobs) {
+         await this.page.getByTestId(`jobIds_${job.jobId}_option`).click()
       }
    }
 
