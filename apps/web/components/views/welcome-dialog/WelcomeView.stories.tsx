@@ -1,5 +1,4 @@
-import { Meta, StoryObj } from "@storybook/react"
-import WelcomeDialog from "./WelcomeDialog"
+import { StoryObj } from "@storybook/react"
 import WelcomeView from "./WelcomeView"
 
 export default {
