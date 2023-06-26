@@ -93,8 +93,13 @@ class UserFirebaseSeed implements UserSeed {
             },
             universityCountryCode: "CH",
             unsubscribed: false,
+<<<<<<< HEAD
             referralCode: uuidv4(),
             welcomeDialogComplete: true, // hidden
+||||||| parent of c80502f1a (chore: refactor user required data)
+=======
+            welcomeDialogComplete: true, // hidden
+>>>>>>> c80502f1a (chore: refactor user required data)
          },
          extraUserData
       ) as UserData
