@@ -38,7 +38,7 @@ test.describe("Welcome Dialog", () => {
       page,
    }) => {
       await setupUserSignUpData()
-      const email = "useremail@careerfairy.io"
+      const email = UserSeed.getRandomEmail()
       const { livestream } = await setupLivestreamData()
       const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
 
