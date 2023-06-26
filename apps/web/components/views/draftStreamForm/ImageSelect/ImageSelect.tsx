@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { FC, useCallback, useEffect, useState } from "react"
 import {
    Avatar,
    Box,
@@ -221,6 +221,7 @@ const ImageSelect = ({
                >
                   <img src={value} className={classes.image} alt={formName} />
                </Box>
+               <ResolutionInfo resolution={resolution} />
             </Box>
          )
       }
@@ -272,20 +273,7 @@ const ImageSelect = ({
                   </Box>
                )}
 
-               {resolution ? (
-                  <Box mb={2}>
-                     <Typography
-                        fontSize="12px"
-                        textAlign="center"
-                        color="text.secondary"
-                     >
-                        <strong style={{ fontWeight: 500 }}>
-                           Recommended Resolution:
-                        </strong>{" "}
-                        {resolution}
-                     </Typography>
-                  </Box>
-               ) : null}
+               <ResolutionInfo resolution={resolution} />
             </Box>
             <Collapse in={Boolean(filePickerError)} sx={{ ml: 2 }}>
                <FormHelperText error>{filePickerError}</FormHelperText>
@@ -295,6 +283,23 @@ const ImageSelect = ({
    }
 
    return isAvatar ? renderAvatar() : renderCard()
+}
+
+const ResolutionInfo: FC<{
+   resolution?: string
+}> = (props) => {
+   if (!props.resolution) {
+      return null
+   }
+
+   return (
+      <Box mb={2}>
+         <Typography fontSize="12px" textAlign="center" color="text.secondary">
+            <strong style={{ fontWeight: 500 }}>Recommended Resolution:</strong>{" "}
+            {props.resolution}
+         </Typography>
+      </Box>
+   )
 }
 
 export default ImageSelect
