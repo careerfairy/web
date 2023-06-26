@@ -27,7 +27,7 @@ import {
    serializeModels,
    serializePaginatedModels,
 } from "./util"
-import { nanoid } from "nanoid"
+import { DateTime } from "luxon"
 
 /*
 |--------------------------------------------------------------------------
@@ -244,12 +244,15 @@ export const candidateApplicationTest = functions
          // @ts-ignore Set the extra data received
          atsAccount.extraRequiredData = requestData.mergeExtraRequiredData
 
+         // Generate timestamp based unique identifier in the format yyyymmddHHMMSS (e.g., 20230626130555)
+         const timestamp = DateTime.utc().toFormat("yyyyMMddHHmmss")
+
          // Dummy candidate that we'll create
          const userData = {
             firstName: "User",
             lastName: "CareerFairy",
             userResume: TEST_CV,
-            userEmail: `application-test-${nanoid()}@careerfairy.io`,
+            userEmail: `application-test-${timestamp}@careerfairy.io`,
          } as UserData
 
          let relations: UserATSRelations = {}
