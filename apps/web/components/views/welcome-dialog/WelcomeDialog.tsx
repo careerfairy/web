@@ -24,6 +24,7 @@ import { isLivestreamDialogOpen } from "../livestream-dialog"
 
 const styles = sxStyles({
    dialogPaper: {
+      maxWidth: 915,
       ...NICE_SCROLLBAR_STYLES,
       borderRadius: {
          md: 5,
@@ -38,15 +39,11 @@ const styles = sxStyles({
    slide: {
       overflow: "overlay",
    },
-   swipeableViewsContainer: {},
-   fullHeight: {},
-   swipeableViews: {},
 })
 
 type Props = {
    handleClose: () => void
    open: boolean
-   fullScreen?: boolean
    initialViewIndex?: number
 }
 
@@ -57,12 +54,7 @@ type View = {
    component: ComponentType
 }
 
-const WelcomeDialog: FC<Props> = ({
-   handleClose,
-   open,
-   fullScreen,
-   initialViewIndex,
-}) => {
+const WelcomeDialog: FC<Props> = ({ handleClose, open, initialViewIndex }) => {
    const isMobile = useIsMobile()
    const [activeViewIndex, setActiveViewIndex] = useState<number>(
       initialViewIndex ?? 0
@@ -92,7 +84,6 @@ const WelcomeDialog: FC<Props> = ({
             isMobile ? SlideLeftTransition : SlideUpTransition
          }
          fullWidth
-         fullScreen={fullScreen}
          closeAfterTransition={true}
          PaperProps={{
             sx: styles.dialogPaper,
@@ -100,8 +91,6 @@ const WelcomeDialog: FC<Props> = ({
       >
          <DialogContent sx={styles.content}>
             <SwipeableViews
-               style={styles.swipeableViews}
-               containerStyle={styles.swipeableViewsContainer}
                slideStyle={styles.slide}
                disabled
                axis={theme.direction === "rtl" ? "x-reverse" : "x"}
@@ -109,7 +98,6 @@ const WelcomeDialog: FC<Props> = ({
             >
                {views.map(({ key, component: View }, index) => (
                   <AnimatedTabPanel
-                     sx={styles.fullHeight}
                      key={key}
                      value={index}
                      activeValue={activeViewIndex}

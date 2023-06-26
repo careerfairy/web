@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material"
+import { Box, Button } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import { useVideo } from "react-use"
 import useIsMobile from "../../custom-hook/useIsMobile"
@@ -15,7 +15,7 @@ const styles = sxStyles({
    },
 
    videoMobile: {
-      width: "90%",
+      width: "100%",
    },
 
    button: {
