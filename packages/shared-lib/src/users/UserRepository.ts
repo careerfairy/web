@@ -159,6 +159,8 @@ export interface IUserRepository {
    getStats(userDataId: string): Promise<UserStats>
 
    updateResume(userEmail: string, resumeUrl: string): Promise<void>
+
+   welcomeDialogComplete(userEmail: string): Promise<void>
 }
 
 export class FirebaseUserRepository
@@ -171,6 +173,14 @@ export class FirebaseUserRepository
       readonly timestamp: typeof firebase.firestore.Timestamp
    ) {
       super()
+   }
+
+   async welcomeDialogComplete(userEmail: string) {
+      const userRef = this.firestore.collection("userData").doc(userEmail)
+
+      await userRef.update({
+         welcomeDialogComplete: true,
+      })
    }
 
    async getStats(userEmail: string): Promise<UserStats | null> {
