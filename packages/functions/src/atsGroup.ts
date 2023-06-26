@@ -27,6 +27,7 @@ import {
    serializeModels,
    serializePaginatedModels,
 } from "./util"
+import { nanoid } from "nanoid"
 
 /*
 |--------------------------------------------------------------------------
@@ -248,7 +249,7 @@ export const candidateApplicationTest = functions
             firstName: "User",
             lastName: "CareerFairy",
             userResume: TEST_CV,
-            userEmail: "application-test@careerfairy.io",
+            userEmail: `application-test-${nanoid()}@careerfairy.io`,
          } as UserData
 
          let relations: UserATSRelations = {}
