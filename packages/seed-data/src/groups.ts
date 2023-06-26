@@ -13,6 +13,10 @@ import {
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import {
+   type GroupATSAccountDocument,
+   type GroupATSIntegrationTokensDocument,
+} from "@careerfairy/shared-lib/dist/groups"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -31,6 +35,11 @@ interface GroupSeed {
     * Generate with all the required fields for a complete company profile
     * */
    generateCompleteCompanyData(): Partial<Group>
+
+   /**
+    * Generate the full ATS data for a group
+    * */
+   setupATSForGroup(group: Group): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -161,6 +170,46 @@ class GroupFirebaseSeed implements GroupSeed {
             },
          ],
       }
+   }
+
+   async setupATSForGroup(group: Group): Promise<void> {
+      const groupId = group.id
+      const integrationId = "testIntegrationId" // replace with actual id
+
+      const atsMetadata: Partial<GroupATSAccountDocument> = {
+         groupId: groupId,
+         merge: {
+            end_user_origin_id: integrationId,
+            integration_name: "testIntegrationName",
+            image: "testImageURL",
+            square_image: "testSquareImageURL",
+            slug: "testSlug",
+            firstSyncCompletedAt: fieldValue.serverTimestamp() as any, // set to now
+            applicationTestCompletedAt: fieldValue.serverTimestamp() as any, // set to now
+            extraRequiredData: null,
+         },
+      }
+
+      const atsTokenData: Partial<GroupATSIntegrationTokensDocument> = {
+         groupId: groupId,
+         integrationId: integrationId,
+         merge: {
+            account_token: "testAccountToken",
+         },
+      }
+
+      await Promise.all([
+         this.groupRepo.createATSIntegration(
+            groupId,
+            integrationId,
+            atsMetadata
+         ),
+         this.groupRepo.saveATSIntegrationTokens(
+            groupId,
+            integrationId,
+            atsTokenData
+         ),
+      ])
    }
 }
 

@@ -1,6 +1,7 @@
 import { expectText } from "../../utils/assertions"
 import { groupAdminFixture as test } from "../../fixtures"
 import { expect } from "@playwright/test"
+import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
 
 test.describe("ATS Integration", () => {
    test("Can successfully link account & test application", async ({
@@ -45,7 +46,40 @@ test.describe("ATS Integration", () => {
          "Application was successful! You can now associate jobs to livestreams and start"
       )
    })
+
+   test.describe("ATS functionality", () => {
+      test.use({
+         options: { completedGroup: true, createUser: true, atsGroup: true },
+      })
+
+      test("Can link job to live stream", async ({
+         groupPage,
+         group,
+         user,
+         interests,
+      }) => {
+         const livestream = LivestreamSeed.random({
+            interestsIds: [interests[0].id, interests[1].id],
+            jobs: [
+               {
+                  groupId: group.id,
+                  integrationId: "testIntegrationId",
+                  jobId: "1",
+                  name: variables.jobs[0].name,
+               },
+            ],
+         })
+
+         // create draft
+         await groupPage.clickCreateNewLivestreamTop()
+         await groupPage.fillLivestreamForm(livestream)
+
+         await groupPage.clickCreateDraft()
+      })
+   })
 })
+
+test.describe("Group Admin Livestreams", () => {})
 
 const variables = {
    apiKey: "088ec780160bea9d7d3b23dca4966889-3",
