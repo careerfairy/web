@@ -12,6 +12,7 @@
       "test": "turbo run test",
       "clean": "turbo run clean",
       "start": "turbo run start --parallel",
+      "storybook": "cd apps/web && npm run storybook",
       "test:e2e-webapp": "cross-env NODE_ENV=test turbo run test:e2e-webapp --filter=@careerfairy/webapp --filter=@careerfairy/functions",
       "test:e2e-webapp-debug": "cross-env NODE_ENV=test turbo run test:e2e-webapp-debug --filter=@careerfairy/webapp --filter=@careerfairy/functions",
       "webapp:report": "npm run playwright:report -w @careerfairy/webapp",

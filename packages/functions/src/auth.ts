@@ -78,6 +78,7 @@ export const createNewUserAccount = functions
                      levelOfStudy,
                      isStudent: true,
                      credits: INITIAL_CREDITS,
+                     welcomeDialogComplete: false,
                      lastActivityAt:
                         admin.firestore.FieldValue.serverTimestamp(),
                      createdAt: admin.firestore.FieldValue.serverTimestamp(),

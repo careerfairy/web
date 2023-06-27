@@ -1,5 +1,9 @@
 {
-   "extends": ["next/core-web-vitals", "prettier"],
+   "extends": [
+      "next/core-web-vitals",
+      "prettier",
+      "plugin:storybook/recommended"
+   ],
    "rules": {
       "react/jsx-no-constructed-context-values": "warn",
       "react/jsx-no-leaked-render": "warn",
