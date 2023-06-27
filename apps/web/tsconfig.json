@@ -18,7 +18,8 @@
       "jsx": "preserve",
       "downlevelIteration": true,
       "paths": {
-         "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"]
+         "@careerfairy/shared-lib/*": ["../../packages/shared-lib/src/*"],
+         "@careerfairy/seed-data/*": ["../../packages/seed-data/src/*"]
       }
    },
    "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

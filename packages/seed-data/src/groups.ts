@@ -39,7 +39,7 @@ interface GroupSeed {
    /**
     * Generate the full ATS data for a group
     * */
-   setupATSForGroup(group: Group): Promise<void>
+   setupATSForGroup(group: Group, options?: SetupATSGroupOptions): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -172,7 +172,12 @@ class GroupFirebaseSeed implements GroupSeed {
       }
    }
 
-   async setupATSForGroup(group: Group): Promise<void> {
+   async setupATSForGroup(
+      group: Group,
+      options: SetupATSGroupOptions = {
+         needsApplicationTest: false,
+      }
+   ): Promise<void> {
       const groupId = group.id
       const integrationId = "testIntegrationId" // replace with actual id
 
@@ -188,6 +193,11 @@ class GroupFirebaseSeed implements GroupSeed {
             applicationTestCompletedAt: fieldValue.serverTimestamp() as any, // set to now
             extraRequiredData: null,
          },
+      }
+
+      if (options.needsApplicationTest) {
+         atsMetadata.merge.applicationTestCompletedAt = null
+         atsMetadata.merge.extraRequiredData = null
       }
 
       const atsTokenData: Partial<GroupATSIntegrationTokensDocument> = {
@@ -214,6 +224,13 @@ class GroupFirebaseSeed implements GroupSeed {
 }
 
 type GeneratorFn = () => string
+
+type SetupATSGroupOptions = {
+   /**
+    * Wether or not the application test should be completed
+    */
+   needsApplicationTest: boolean
+}
 
 const generateQuestionOption = (generatorFn: GeneratorFn) => ({
    id: generateId(),
