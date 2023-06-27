@@ -64,7 +64,7 @@ test.describe("ATS Integration", () => {
                {
                   groupId: group.id,
                   integrationId: "testIntegrationId",
-                  jobId: "1",
+                  jobId: variables.jobs[0].id,
                   name: variables.jobs[0].name,
                },
             ],
@@ -73,8 +73,14 @@ test.describe("ATS Integration", () => {
          // create draft
          await groupPage.clickCreateNewLivestreamTop()
          await groupPage.fillLivestreamForm(livestream)
-
          await groupPage.clickCreateDraft()
+
+         // publish draft
+         const livestreamsPage = await groupPage.goToLivestreams()
+         await livestreamsPage.clickDraftsTab()
+         await livestreamsPage.launchEditModal()
+         await livestreamsPage.publish()
+         await livestreamsPage.clickUpcomingTab()
       })
    })
 })
@@ -84,10 +90,10 @@ test.describe("Group Admin Livestreams", () => {})
 const variables = {
    apiKey: "088ec780160bea9d7d3b23dca4966889-3",
    jobs: [
-      { name: "Job 1", description: "Job description 1" },
-      { name: "Job 2", description: "Job description 2" },
-      { name: "Job 3", description: "Job description 3" },
-      { name: "Job 4", description: "Job description 4" },
-      { name: "Job 5", description: "Job description 5" },
+      { name: "Job 1", description: "Job description 1", id: "1" },
+      { name: "Job 2", description: "Job description 2", id: "2" },
+      { name: "Job 3", description: "Job description 3", id: "3" },
+      { name: "Job 4", description: "Job description 4", id: "4" },
+      { name: "Job 5", description: "Job description 5", id: "5" },
    ],
 }
