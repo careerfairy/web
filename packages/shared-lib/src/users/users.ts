@@ -89,6 +89,11 @@ export interface UserData extends Identifiable {
     * Dates of days when the user has seen the credit CTA banner
     */
    creditsBannerCTADates?: string[]
+
+   /**
+    * User has already seen the first onboarding video
+    */
+   welcomeDialogComplete?: boolean
 }
 
 /*
