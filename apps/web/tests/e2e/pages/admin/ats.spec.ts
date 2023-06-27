@@ -1,7 +1,8 @@
 import { expectText } from "../../utils/assertions"
 import { groupAdminFixture as test } from "../../fixtures"
 import { expect } from "@playwright/test"
-import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
+import LivestreamSeed from "@careerfairy/seed-data/livestreams"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 
 test.describe("ATS Integration", () => {
    test("Can successfully link account & test application", async ({
@@ -49,10 +50,42 @@ test.describe("ATS Integration", () => {
 
    test.describe("ATS functionality", () => {
       test.use({
-         options: { completedGroup: true, createUser: true, atsGroup: true },
+         options: {
+            completedGroup: true,
+            createUser: true,
+            atsGroupType: "NEEDS_APPLICATION_TEST",
+         },
       })
 
-      test("Can link job to live stream", async ({
+      test("Application test is required to link job", async ({
+         groupPage,
+         group,
+         user,
+         interests,
+      }) => {
+         // const livestream = LivestreamSeed.random({
+         //    interestsIds: [interests[0].id, interests[1].id],
+         // })
+
+         const jobs: LivestreamJobAssociation[] = [
+            {
+               groupId: group.id,
+               integrationId: "testIntegrationId",
+               jobId: variables.jobs[0].id,
+               name: variables.jobs[0].name,
+            },
+         ]
+
+         // open create draft dialog
+         await groupPage.clickCreateNewLivestreamTop()
+
+         await expectText(
+            groupPage.page,
+            `You need to complete the Application Test for testIntegrationName before you can associate Jobs to your Live Stream.`
+         )
+      })
+
+      test("Can associate job to livestream", async ({
          groupPage,
          group,
          user,
@@ -84,8 +117,6 @@ test.describe("ATS Integration", () => {
       })
    })
 })
-
-test.describe("Group Admin Livestreams", () => {})
 
 const variables = {
    apiKey: "088ec780160bea9d7d3b23dca4966889-3",
