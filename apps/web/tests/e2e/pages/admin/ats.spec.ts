@@ -2,7 +2,14 @@ import { expectText } from "../../utils/assertions"
 import { groupAdminFixture as test } from "../../fixtures"
 import { expect } from "@playwright/test"
 import LivestreamSeed from "@careerfairy/seed-data/livestreams"
-import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
+import GroupSeed from "@careerfairy/seed-data/groups"
+import LivestreamDialogPage from "../../page-object-models/LivestreamDialogPage"
+import { ViewerPage } from "../../page-object-models/StreamingPage"
+import {
+   LivestreamEvent,
+   LivestreamJobAssociation,
+} from "@careerfairy/shared-lib/livestreams"
+import { Group } from "@careerfairy/shared-lib/groups"
 
 test.describe("ATS Integration", () => {
    test("Can successfully link account & test application", async ({
@@ -47,74 +54,76 @@ test.describe("ATS Integration", () => {
          "Application was successful! You can now associate jobs to livestreams and start"
       )
    })
+})
 
-   test.describe("ATS functionality", () => {
-      test.use({
-         options: {
-            completedGroup: true,
-            createUser: true,
-            atsGroupType: "NEEDS_APPLICATION_TEST",
-         },
-      })
+test.describe("Needs Application Test", () => {
+   test.use({
+      options: {
+         atsGroupType: "NEEDS_APPLICATION_TEST",
+         createUser: true,
+      },
+   })
 
-      test("Application test is required to link job", async ({
-         groupPage,
-         group,
-         user,
-         interests,
-      }) => {
-         // const livestream = LivestreamSeed.random({
-         //    interestsIds: [interests[0].id, interests[1].id],
-         // })
+   test("Application test is required to link job", async ({
+      groupPage,
+      group,
+   }) => {
+      const jobs = [
+         generateJobAssociation(
+            group.id,
+            variables.jobs[0].id,
+            variables.jobs[0].name
+         ),
+      ]
+      // open create draft dialog
+      await groupPage.clickCreateNewLivestreamTop()
 
-         const jobs: LivestreamJobAssociation[] = [
-            {
-               groupId: group.id,
-               integrationId: "testIntegrationId",
-               jobId: variables.jobs[0].id,
-               name: variables.jobs[0].name,
-            },
-         ]
+      await expectText(
+         groupPage.page,
+         `You need to complete the Application Test for testIntegrationName before you can associate Jobs to your Live Stream.`
+      )
 
-         // open create draft dialog
-         await groupPage.clickCreateNewLivestreamTop()
+      // Make sure the application test is completed
+      await GroupSeed.completeCandidateTest(group)
 
-         await expectText(
-            groupPage.page,
-            `You need to complete the Application Test for testIntegrationName before you can associate Jobs to your Live Stream.`
-         )
-      })
+      // User should be able to select jobs now
+      await groupPage.selectJobs(jobs)
+   })
+})
 
-      test("Can associate job to livestream", async ({
-         groupPage,
-         group,
-         user,
-         interests,
-      }) => {
-         const livestream = LivestreamSeed.random({
-            interestsIds: [interests[0].id, interests[1].id],
-            jobs: [
-               {
-                  groupId: group.id,
-                  integrationId: "testIntegrationId",
-                  jobId: variables.jobs[0].id,
-                  name: variables.jobs[0].name,
-               },
-            ],
-         })
+test.describe("Complete", () => {
+   test.use({ options: { createUser: true, atsGroupType: "COMPLETE" } })
 
-         // create draft
-         await groupPage.clickCreateNewLivestreamTop()
-         await groupPage.fillLivestreamForm(livestream)
-         await groupPage.clickCreateDraft()
+   test("Can associate job to livestream", async ({
+      groupPage,
+      group,
+      page,
+   }) => {
+      const { livestream } = await setupData(group)
 
-         // publish draft
-         const livestreamsPage = await groupPage.goToLivestreams()
-         await livestreamsPage.clickDraftsTab()
-         await livestreamsPage.launchEditModal()
-         await livestreamsPage.publish()
-         await livestreamsPage.clickUpcomingTab()
-      })
+      // go to Dialog page
+      const livestreamDialogPage = new LivestreamDialogPage(
+         groupPage.page,
+         livestream
+      )
+      await livestreamDialogPage.page.goto("/portal")
+      await livestreamDialogPage.openDialog(false)
+      await livestreamDialogPage.assertJobsAreVisible(livestream.jobs)
+      await livestreamDialogPage.clickRegistrationButton()
+
+      await livestreamDialogPage.page.waitForURL(
+         `**/streaming/${livestream.id}/viewer`
+      )
+
+      const viewerPage = new ViewerPage(livestreamDialogPage.page)
+
+      // Use your new methods here
+      await viewerPage.clickJobsTab()
+      await viewerPage.clickJobButton(variables.jobs[0].name)
+      await viewerPage.clickUploadCvButton()
+      await viewerPage.uploadCv()
+      await viewerPage.clickApplyButton()
+      await viewerPage.assertJobApplyCongratsMessage()
    })
 })
 
@@ -127,4 +136,40 @@ const variables = {
       { name: "Job 4", description: "Job description 4", id: "4" },
       { name: "Job 5", description: "Job description 5", id: "5" },
    ],
+}
+
+async function setupData(group: Group) {
+   let overrideLivestreamDetails: Partial<LivestreamEvent> = {}
+
+   // associate the group with the livestream
+   overrideLivestreamDetails = {
+      groupIds: [group.id],
+      hasJobs: true,
+      jobs: [
+         generateJobAssociation(
+            group.id,
+            variables.jobs[0].id,
+            variables.jobs[0].name
+         ),
+      ],
+   }
+
+   const livestream = await LivestreamSeed.createLive(overrideLivestreamDetails)
+
+   const secureToken = await LivestreamSeed.generateSecureToken(livestream.id)
+
+   return { livestream, secureToken }
+}
+
+const generateJobAssociation = (
+   groupId: string,
+   jobId: string,
+   name: string
+): LivestreamJobAssociation => {
+   return {
+      integrationId: "testIntegrationId",
+      groupId,
+      jobId,
+      name,
+   }
 }

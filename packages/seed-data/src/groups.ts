@@ -40,6 +40,11 @@ interface GroupSeed {
     * Generate the full ATS data for a group
     * */
    setupATSForGroup(group: Group, options?: SetupATSGroupOptions): Promise<void>
+
+   /**
+    * Complete the candidate test for a group
+    */
+   completeCandidateTest(group: Group): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -179,7 +184,6 @@ class GroupFirebaseSeed implements GroupSeed {
       }
    ): Promise<void> {
       const groupId = group.id
-      const integrationId = "testIntegrationId" // replace with actual id
 
       const atsMetadata: Partial<GroupATSAccountDocument> = {
          groupId: groupId,
@@ -195,7 +199,7 @@ class GroupFirebaseSeed implements GroupSeed {
          },
       }
 
-      if (options.needsApplicationTest) {
+      if (options.needsApplicationTest === true) {
          atsMetadata.merge.applicationTestCompletedAt = null
          atsMetadata.merge.extraRequiredData = null
       }
@@ -220,6 +224,23 @@ class GroupFirebaseSeed implements GroupSeed {
             atsTokenData
          ),
       ])
+   }
+
+   async completeCandidateTest(group: Group) {
+      const docRef = firestore
+         .collection("careerCenterData")
+         .doc(group.id)
+         .collection("ats")
+         .doc(integrationId)
+
+      const toUpdate: Partial<GroupATSAccountDocument> = {}
+
+      // update a nested object property
+      toUpdate["merge.applicationTestCompletedAt"] =
+         fieldValue.serverTimestamp()
+      toUpdate["merge.extraRequiredData"] = null
+
+      await docRef.update(toUpdate)
    }
 }
 
@@ -259,6 +280,8 @@ export const groupQuestions = [
    generateQuestion("Job Type", faker.name.jobType),
    generateQuestion("Gender", faker.name.gender),
 ]
+
+const integrationId = "testIntegrationId"
 
 const instance: GroupSeed = new GroupFirebaseSeed()
 
