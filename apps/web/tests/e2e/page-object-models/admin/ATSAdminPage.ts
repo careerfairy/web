@@ -6,12 +6,17 @@ import linkInitiateResponse from "../../assets/mergeLinkInitiate.json"
 
 export class ATSAdminPage extends CommonPage {
    public testApplicationJobsSelect: Locator
+   public syncStatusHeader: Locator
 
    constructor(private readonly parent: GroupDashboardPage) {
       super(parent.page)
 
       this.testApplicationJobsSelect = this.page.locator(
          'input[name="application-test-jobs"]'
+      )
+
+      this.syncStatusHeader = this.page.getByText(
+         "First Synchronization In Progress"
       )
    }
 
@@ -74,7 +79,7 @@ export class ATSAdminPage extends CommonPage {
    async mockFetchATSSyncStatusRequest() {
       const syncStatusResponse = this.buildInitialSyncStatuses()
 
-      let nextModelToFinishIndex = 0
+      let requestCount = 0
 
       await this.page.route("**/fetchATSSyncStatus_eu", async (route) => {
          await route.fulfill({
@@ -82,14 +87,17 @@ export class ATSAdminPage extends CommonPage {
             body: JSON.stringify({ result: syncStatusResponse }),
          })
 
-         // After each request, set around 50% of the remaining models to "DONE" state.
-         const steps = Math.ceil(
-            (syncStatusResponse.length - nextModelToFinishIndex) * 0.5
-         )
-         for (let i = 0; i < steps; i++) {
-            if (nextModelToFinishIndex < syncStatusResponse.length) {
-               syncStatusResponse[nextModelToFinishIndex].status = "DONE"
-               nextModelToFinishIndex++
+         requestCount++
+         // On the first request, set half of the models to "DONE" state.
+         // On the second request, set all of the remaining models to "DONE" state.
+         const modelsToUpdate =
+            requestCount === 1
+               ? syncStatusResponse.length / 2
+               : syncStatusResponse.length
+
+         for (let i = 0; i < modelsToUpdate; i++) {
+            if (i < syncStatusResponse.length) {
+               syncStatusResponse[i].status = "DONE"
             }
          }
       })
