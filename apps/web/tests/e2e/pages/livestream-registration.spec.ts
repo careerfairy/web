@@ -6,8 +6,9 @@ import { UserData } from "@careerfairy/shared-lib/dist/users"
 import LivestreamDialogPage from "../page-object-models/LivestreamDialogPage"
 import { signedInFixture as test } from "../fixtures"
 import { LoginPage } from "../page-object-models/LoginPage"
-import { setupLivestreamData } from "../setupData"
+import { setupLivestreamData, setupUserSignUpData } from "../setupData"
 import LivestreamSeed from "@careerfairy/seed-data/dist/livestreams"
+import { SignupPage } from "../page-object-models/SignupPage"
 
 test.describe("Livestream Registration Signed In", () => {
    test("successful registration on a livestream event from the portal page", async ({
@@ -193,7 +194,7 @@ test.describe("Livestream Registration Signed Out", () => {
       await page.waitForURL(`**/login?absolutePath**`)
 
       // create user and login
-      const email = "newuser@careerfairy.io"
+      const email = UserSeed.getRandomEmail()
       await UserSeed.createUser(email)
       await LoginPage.login(page, {
          openPage: false,
@@ -203,7 +204,44 @@ test.describe("Livestream Registration Signed Out", () => {
 
       // livestream dialog should be open after redirect
       await expect(page.getByText(livestream.title).first()).toBeVisible()
-      await expect(livestreamDialogPage.registrationButton).toBeVisible()
+
+      // register click should go to the next step
+      await livestreamDialogPage.registrationButton.click()
+      await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
+   })
+
+   test("register to an event without login, create an account and proceed with registration", async ({
+      page,
+   }) => {
+      await setupUserSignUpData()
+
+      const { livestream } = await setupLivestreamData()
+      const livestreamDialogPage = new LivestreamDialogPage(page, livestream)
+
+      await page.goto("/portal")
+
+      // open dialog and try to register without login
+      await livestreamDialogPage.openDialog()
+      await livestreamDialogPage.registrationButton.click()
+
+      // redirection to login
+      await page.waitForURL(`**/login?absolutePath**`)
+
+      // click signup
+      const login = new LoginPage(page)
+      await login.clickSignupLinkLink()
+
+      // signup
+      const signup = new SignupPage(page)
+      const email = UserSeed.getRandomEmail()
+      await signup.signupUser(email)
+
+      // redirection to livestream should work
+      await page.waitForURL(`**/portal/livestream/${livestream.id}`)
+
+      // register click should go to the next step
+      await livestreamDialogPage.registrationButton.click()
+      await page.waitForURL(`**/portal/livestream/${livestream.id}/register`)
    })
 })
 

@@ -44,9 +44,18 @@ interface UserSeed {
    getUserDataAnalytics(email: string): Promise<UserDataAnalytics>
 
    getUserFollowedCompanies(email: string): Promise<CompanyFollowed[]>
+
+   /**
+    * Tests need different emails, re-use this package faker lib to generate them
+    */
+   getRandomEmail(): string
 }
 
 class UserFirebaseSeed implements UserSeed {
+   getRandomEmail(): string {
+      return faker.internet.email(null, null, "careerfairy.io").toLowerCase()
+   }
+
    /**
     * Creates a user on firebase auth (already verified) and a corresponding
     * userData document
@@ -85,6 +94,7 @@ class UserFirebaseSeed implements UserSeed {
             universityCountryCode: "CH",
             unsubscribed: false,
             referralCode: uuidv4(),
+            welcomeDialogComplete: true, // hidden
          },
          extraUserData
       ) as UserData
