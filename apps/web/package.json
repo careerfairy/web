@@ -121,9 +121,11 @@
    "devDependencies": {
       "@careerfairy/seed-data": "*",
       "@playwright/test": "^1.22.2",
+      "@storybook/addon-a11y": "^7.0.23",
       "@storybook/addon-essentials": "^7.0.22",
       "@storybook/addon-interactions": "^7.0.22",
       "@storybook/addon-links": "^7.0.22",
+      "@storybook/addon-storysource": "^7.0.23",
       "@storybook/blocks": "^7.0.22",
       "@storybook/nextjs": "^7.0.22",
       "@storybook/react": "^7.0.22",

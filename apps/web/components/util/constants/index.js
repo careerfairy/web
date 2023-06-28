@@ -44,3 +44,10 @@ export const COMPANY_DASHBOARD_INVITE = "COMPANY_DASHBOARD_INVITE"
 export const GROUP_DASHBOARD_INVITE = "GROUP_DASHBOARD_INVITE"
 
 export const COMPANIES_PAGE_SIZE = 12
+
+// Onboarding Video
+export const ONBOARDING_VIDEO_URL_DESKTOP =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/onboarding-video%2FOnboarding_desktop_final.mp4?alt=media&token=8242df0b-1e6b-4df8-bb29-63138c67637c"
+
+export const ONBOARDING_VIDEO_URL_MOBILE =
+   "https://firebasestorage.googleapis.com/v0/b/careerfairy-e1fd9.appspot.com/o/onboarding-video%2FOnboarding_mobile_final.mp4?alt=media&token=63c9914b-307a-4e23-ae6d-78550f69e707"
