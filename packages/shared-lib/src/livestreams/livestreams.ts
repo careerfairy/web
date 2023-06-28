@@ -37,10 +37,10 @@ export interface LivestreamEvent extends Identifiable {
    fieldOfStudyIds?: string[]
    isRecording?: boolean
    language?: LivestreamLanguage
-   hidden?: boolean
+   hidden: boolean
    talentPool?: string[]
    hasNoTalentPool?: boolean
-   test?: boolean
+   test: boolean
    title?: string
    type?: string
    start: firebase.firestore.Timestamp
