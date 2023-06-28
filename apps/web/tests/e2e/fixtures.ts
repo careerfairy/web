@@ -28,7 +28,7 @@ type GroupAdminFixtureOptions = {
     * - "NEEDS_APPLICATION_TEST" - creates an ATS group that needs a candidate application test
     *
     * */
-   atsGroupType?: "COMPLETE" | "NEEDS_APPLICATION_TEST"
+   atsGroupType?: "COMPLETE" | "NEEDS_APPLICATION_TEST" | "NONE"
 }
 
 /**
@@ -46,7 +46,7 @@ export const groupAdminFixture = base.extend<{
    options: {
       createUser: true,
       completedGroup: false,
-      atsGroupType: "COMPLETE", // default ATS group option to false
+      atsGroupType: "NONE",
    },
    group: async ({ options }, use) => {
       await clearAuthData()

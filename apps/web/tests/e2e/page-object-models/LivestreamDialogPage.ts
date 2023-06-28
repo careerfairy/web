@@ -1,6 +1,7 @@
 import { LivestreamEvent } from "@careerfairy/shared-lib/dist/livestreams"
 import { Locator, Page, expect } from "@playwright/test"
 import { CommonPage } from "./CommonPage"
+import { LivestreamJobAssociation } from "@careerfairy/shared-lib/livestreams"
 
 type CompleteLivestreamQuestionsViewOptions = {
    questionToAsk?: string
@@ -66,7 +67,7 @@ export default class LivestreamDialogPage extends CommonPage {
       questionsViewArgs?: CompleteLivestreamQuestionsViewOptions
    } = {}) {
       // register
-      await this.registrationButton.click()
+      await this.clickRegistrationButton()
 
       // dialog views
       await this.completeGroupConsentView(groupConsentRequired ?? false)
@@ -138,6 +139,10 @@ export default class LivestreamDialogPage extends CommonPage {
       await this.cancelRegistrationButton.click()
    }
 
+   async clickRegistrationButton() {
+      await this.registrationButton.click()
+   }
+
    async assertRecordingVideoIsVisible(free: boolean = false) {
       if (free) {
          // Only 0d 23h 59min 47sec left to rewatch for free!
@@ -154,5 +159,13 @@ export default class LivestreamDialogPage extends CommonPage {
       await expect(
          this.page.getByTestId("PlayArrowRoundedIcon").locator("path")
       ).toBeVisible()
+   }
+
+   public async assertJobsAreVisible(jobs: LivestreamJobAssociation[]) {
+      await Promise.all(
+         jobs.map(async (job) => {
+            await expect(this.page.getByText(job.name)).toBeVisible()
+         })
+      )
    }
 }
