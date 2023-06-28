@@ -4,6 +4,9 @@ import GroupSeed from "@careerfairy/seed-data/dist/groups"
 import LivestreamSeed, {
    createLivestreamGroupQuestions,
 } from "@careerfairy/seed-data/dist/livestreams"
+import UniversitiesSeed from "@careerfairy/seed-data/dist/universities"
+import InterestSeed from "@careerfairy/seed-data/dist/interests"
+import FieldsOfStudySeed from "@careerfairy/seed-data/dist/fieldsOfStudy"
 
 /**
  * Creates a livestream document with a group and group questions
@@ -32,4 +35,16 @@ export async function setupLivestreamData(
    )
 
    return { group, livestream }
+}
+
+/**
+ * Creates the necessary data required to successfully signup a user
+ */
+export async function setupUserSignUpData() {
+   await Promise.all([
+      InterestSeed.createBasicInterests(),
+      UniversitiesSeed.createBasicUniversities(),
+      FieldsOfStudySeed.createCollection("fieldsOfStudy"),
+      FieldsOfStudySeed.createCollection("levelsOfStudy"),
+   ])
 }
