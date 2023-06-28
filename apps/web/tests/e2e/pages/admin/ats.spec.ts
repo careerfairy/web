@@ -113,7 +113,7 @@ test.describe("Complete", () => {
 
       const viewerPage = new ViewerPage(livestreamDialogPage.page)
 
-      // Use your new methods here
+      // Viewer page flow
       await viewerPage.clickJobsTab()
       await viewerPage.clickJobButton(variables.jobs[0].name)
       await viewerPage.clickUploadCvButton()
