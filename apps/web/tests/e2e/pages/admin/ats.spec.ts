@@ -1,6 +1,6 @@
 import { expectText } from "../../utils/assertions"
 import { groupAdminFixture as test } from "../../fixtures"
-import { sleep } from "../../utils"
+import { expect } from "@playwright/test"
 
 test.describe("ATS Integration", () => {
    test("Can successfully link account & test application", async ({
@@ -27,10 +27,12 @@ test.describe("ATS Integration", () => {
       await atsPage.submitAPIKey()
       await atsPage.finishAndCloseMergeDialog()
 
-      await expectText(atsPage.page, "First Synchronization In Progress")
+      await expect(atsPage.syncStatusHeader).toBeVisible()
 
-      // Wait for the sync process to finish
-      await sleep(7000)
+      // Sync status header should disappear after syncing is complete
+      await expect(atsPage.syncStatusHeader).not.toBeVisible({
+         timeout: 7000,
+      })
 
       await atsPage.checkJobsExistInTable(variables.jobs)
 
