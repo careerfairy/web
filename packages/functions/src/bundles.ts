@@ -22,7 +22,8 @@ export const bundles = {
             firestore
                .collection("livestreams")
                .where("start", ">", getEarliestEventBufferTime())
-               .where("test", "==", false),
+               .where("test", "==", false)
+               .where("hidden", "==", false),
       },
    },
    futureLivestreamsNext15Days: {
@@ -38,7 +39,8 @@ export const bundles = {
                   "<",
                   DateTime.local().plus({ days: 15 }).toJSDate()
                )
-               .where("test", "==", false),
+               .where("test", "==", false)
+               .where("hidden", "==", false),
       },
    },
 
@@ -56,7 +58,8 @@ export const bundles = {
                   DateTime.local().minus({ year: 1 }).toJSDate()
                )
                .where("start", "<", new Date())
-               .where("test", "==", false),
+               .where("test", "==", false)
+               .where("hidden", "==", false),
       },
    },
 } satisfies { [key: string]: Bundle }
