@@ -1,5 +1,5 @@
 import VideoView from "./VideoView"
-import type { Meta, StoryObj } from "@storybook/react"
+import type { StoryObj } from "@storybook/react"
 
 export default {
    component: VideoView,

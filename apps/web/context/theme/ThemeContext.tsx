@@ -8,12 +8,13 @@ import React, {
    useState,
 } from "react"
 import { brandedDarkTheme, brandedLightTheme } from "../../materialUI"
-import { responsiveFontSizes, Theme, ThemeProvider } from "@mui/material/styles"
+import { responsiveFontSizes, ThemeProvider } from "@mui/material/styles"
 import { SnackbarProvider } from "notistack"
 import { useRouter } from "next/router"
 import { CssBaseline, PaletteMode } from "@mui/material"
 import makeStyles from "@mui/styles/makeStyles"
 import { dataLayerEvent } from "../../util/analyticsUtils"
+import { DefaultTheme } from "@mui/styles"
 
 type ThemeContextType = {
    toggleTheme: () => void
@@ -42,7 +43,7 @@ const ThemeProviderWrapper = ({
    overrideTheme,
 }: {
    children: ReactNode
-   overrideTheme?: Theme
+   overrideTheme?: DefaultTheme
 }) => {
    const { pathname } = useRouter()
 
