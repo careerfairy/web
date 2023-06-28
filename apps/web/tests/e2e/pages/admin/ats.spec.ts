@@ -94,11 +94,7 @@ test.describe("Needs Application Test", () => {
 test.describe("Complete", () => {
    test.use({ options: { createUser: true, atsGroupType: "COMPLETE" } })
 
-   test("Can associate job to livestream", async ({
-      groupPage,
-      group,
-      page,
-   }) => {
+   test("Can apply to job in-stream", async ({ groupPage, group }) => {
       const { livestream } = await setupData(group)
 
       // go to Dialog page
