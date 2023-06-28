@@ -7,6 +7,8 @@ const styles = sxStyles({
       borderRadius: 5,
       paddingX: 2,
       paddingY: 6,
+      maxWidth: 600,
+      margin: "auto",
    },
    welcome: {
       fontWeight: 700,

@@ -1,4 +1,4 @@
-import { Box, Button, Stack } from "@mui/material"
+import { Box, Button } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
 import { useVideo } from "react-use"
 import useIsMobile from "../../custom-hook/useIsMobile"
@@ -9,18 +9,21 @@ import {
 import { useCallback } from "react"
 
 const styles = sxStyles({
+   container: {
+      backgroundColor: "#FCFCFC",
+      padding: 1,
+      borderRadius: 5,
+   },
    video: {
       width: "100%",
-      borderRadius: 2,
+      borderRadius: 5,
    },
-
    videoMobile: {
-      width: "90%",
+      width: "100%",
    },
-
    button: {
       boxShadow: "none",
-      padding: "5px 15px",
+      padding: "0px 15px",
       textTransform: "none",
    },
 })
@@ -53,9 +56,9 @@ export const VideoView = ({ onComplete }: { onComplete: () => void }) => {
    )
 
    return (
-      <Box>
+      <Box sx={styles.container}>
          <Box textAlign="center">{video}</Box>
-         <Box textAlign={isMobile ? "center" : "right"} pb={1}>
+         <Box textAlign={isMobile ? "center" : "right"}>
             <Button
                size="small"
                sx={styles.button}
