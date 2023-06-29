@@ -17,7 +17,7 @@ import Card from "@mui/material/Card"
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined"
 import IconButton from "@mui/material/IconButton"
 import { SWRConfiguration } from "swr"
-import { SyncStatus } from "@careerfairy/shared-lib/dist/ats/SyncStatus"
+import { SyncStatus } from "@careerfairy/shared-lib/ats/SyncStatus"
 import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import { useEffect, useMemo } from "react"
 import useSnackbarNotifications from "../../../../custom-hook/useSnackbarNotifications"
@@ -40,7 +40,9 @@ const WaitForFirstSyncStatus = () => {
     * Show the loading models first
     */
    const sortedSyncStatus = useMemo(() => {
-      return [...syncStatus].sort((a, b) => (b.status === "DONE" ? -1 : 0))
+      return [...syncStatus].sort((a, b) =>
+         b.status === "DONE" || b.status === "PARTIALLY_SYNCED" ? -1 : 0
+      )
    }, [syncStatus])
 
    // mark the first sync complete
@@ -106,6 +108,13 @@ const SyncStatusRow = ({ data }: { data: SyncStatus }) => {
    switch (data.status) {
       case "DONE":
          status = <CheckCircleIcon color="success" />
+         break
+      case "PARTIALLY_SYNCED":
+         status = (
+            <Tooltip title="Some entities failed to sync.">
+               <CheckCircleIcon color="warning" />
+            </Tooltip>
+         )
          break
       case "SYNCING":
          status = <CircularProgress size={20} disableShrink />

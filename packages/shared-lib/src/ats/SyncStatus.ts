@@ -8,6 +8,7 @@ export type SyncStatusTypes =
    | "FAILED"
    | "PAUSED"
    | "SYNCING"
+   | "PARTIALLY_SYNCED" // Merge has failed to sync at least 1 field in this model, but some fields have successfully synced.
 
 /**
  * Linked Account synchronization status
