@@ -45,7 +45,7 @@ interface LivestreamSeed {
     *
     * Does not save to the database, used to fill forms
     */
-   random(overrideFields?: Partial<LivestreamEvent>): Partial<LivestreamEvent>
+   random(overrideFields?: Partial<LivestreamEvent>): LivestreamEvent
 
    /**
     * Make a user as registered/participated to the livestream
