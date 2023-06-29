@@ -1,17 +1,17 @@
 import {
    clearAuthData,
    clearFirestoreData,
-} from "@careerfairy/seed-data/dist/emulators"
-import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/src/groups"
-import { UserData } from "@careerfairy/shared-lib/src/users"
+} from "@careerfairy/seed-data/emulators"
+import { Group, GROUP_DASHBOARD_ROLE } from "@careerfairy/shared-lib/groups"
+import { UserData } from "@careerfairy/shared-lib/users"
 import { credentials } from "../constants"
 import { GroupDashboardPage } from "./page-object-models/GroupDashboardPage"
 import { LoginPage } from "./page-object-models/LoginPage"
 import { test as base } from "@playwright/test"
-import GroupSeed from "@careerfairy/seed-data/dist/groups"
-import UserSeed from "@careerfairy/seed-data/dist/users"
-import InterestSeed from "@careerfairy/seed-data/dist/interests"
-import { Interest } from "@careerfairy/shared-lib/src/interests"
+import GroupSeed from "@careerfairy/seed-data/groups"
+import UserSeed from "@careerfairy/seed-data/users"
+import InterestSeed from "@careerfairy/seed-data/interests"
+import { Interest } from "@careerfairy/shared-lib/interests"
 
 type GroupAdminFixtureOptions = {
    /**
@@ -22,6 +22,13 @@ type GroupAdminFixtureOptions = {
     * give the option to create a complete group
     */
    completedGroup?: boolean
+   /**
+    * Sets up the ATS integration for the group
+    * - "COMPLETE" - creates a completly snyced ATS group with the application test already done
+    * - "NEEDS_APPLICATION_TEST" - creates an ATS group that needs a candidate application test
+    *
+    * */
+   atsGroupType?: "COMPLETE" | "NEEDS_APPLICATION_TEST" | "NONE"
 }
 
 /**
@@ -39,6 +46,7 @@ export const groupAdminFixture = base.extend<{
    options: {
       createUser: true,
       completedGroup: false,
+      atsGroupType: "NONE",
    },
    group: async ({ options }, use) => {
       await clearAuthData()
@@ -50,6 +58,17 @@ export const groupAdminFixture = base.extend<{
          group = await GroupSeed.createGroup(completeCompanyData)
       } else {
          group = await GroupSeed.createGroup()
+      }
+
+      switch (options.atsGroupType) {
+         case "COMPLETE":
+            await GroupSeed.setupATSForGroup(group)
+            break
+         case "NEEDS_APPLICATION_TEST":
+            await GroupSeed.setupATSForGroup(group, {
+               needsApplicationTest: true,
+            })
+            break
       }
 
       await use(group)

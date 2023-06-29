@@ -13,6 +13,10 @@ import {
    IGroupRepository,
 } from "@careerfairy/shared-lib/dist/groups/GroupRepository"
 import { GroupDashboardInvite } from "@careerfairy/shared-lib/dist/groups/GroupDashboardInvite"
+import {
+   type GroupATSAccountDocument,
+   type GroupATSIntegrationTokensDocument,
+} from "@careerfairy/shared-lib/dist/groups"
 
 interface GroupSeed {
    createGroup(overrideFields?: Partial<Group>): Promise<Group>
@@ -31,6 +35,16 @@ interface GroupSeed {
     * Generate with all the required fields for a complete company profile
     * */
    generateCompleteCompanyData(): Partial<Group>
+
+   /**
+    * Generate the full ATS data for a group
+    * */
+   setupATSForGroup(group: Group, options?: SetupATSGroupOptions): Promise<void>
+
+   /**
+    * Complete the candidate test for a group
+    */
+   completeCandidateTest(group: Group): Promise<void>
 }
 
 class GroupFirebaseSeed implements GroupSeed {
@@ -162,9 +176,87 @@ class GroupFirebaseSeed implements GroupSeed {
          ],
       }
    }
+
+   async setupATSForGroup(
+      group: Group,
+      options: SetupATSGroupOptions = {
+         needsApplicationTest: false,
+      }
+   ): Promise<void> {
+      const groupId = group.id
+
+      const atsMetadata: GroupATSAccountDocument = {
+         groupId: groupId,
+         merge: {
+            end_user_origin_id: integrationId,
+            integration_name: "testIntegrationName",
+            image: "testImageURL",
+            square_image: "testSquareImageURL",
+            slug: "testSlug",
+            firstSyncCompletedAt: fieldValue.serverTimestamp() as any, // set to now
+            applicationTestCompletedAt: fieldValue.serverTimestamp() as any, // set to now
+            extraRequiredData: null,
+         },
+
+         createdAt: fieldValue.serverTimestamp() as any, // set to now
+         updatedAt: fieldValue.serverTimestamp() as any, // set to now
+         id: groupId,
+      }
+
+      if (options.needsApplicationTest === true) {
+         atsMetadata.merge.applicationTestCompletedAt = null
+         atsMetadata.merge.extraRequiredData = null
+      }
+
+      const atsTokenData: GroupATSIntegrationTokensDocument = {
+         groupId: groupId,
+         integrationId: integrationId,
+         merge: {
+            account_token: "testAccountToken",
+         },
+         id: "tokens",
+      }
+
+      await Promise.all([
+         this.groupRepo.createATSIntegration(
+            groupId,
+            integrationId,
+            atsMetadata
+         ),
+         this.groupRepo.saveATSIntegrationTokens(
+            groupId,
+            integrationId,
+            atsTokenData
+         ),
+      ])
+   }
+
+   async completeCandidateTest(group: Group) {
+      const docRef = firestore
+         .collection("careerCenterData")
+         .doc(group.id)
+         .collection("ats")
+         .doc(integrationId)
+
+      const toUpdate: Partial<GroupATSAccountDocument> = {}
+
+      // update a nested object property
+      toUpdate["merge.applicationTestCompletedAt"] =
+         fieldValue.serverTimestamp()
+      toUpdate["merge.extraRequiredData"] = null
+
+      await docRef.update(toUpdate)
+   }
 }
 
 type GeneratorFn = () => string
+
+type SetupATSGroupOptions = {
+   /**
+    * Wether or not the application test should be completed
+    */
+   needsApplicationTest: boolean
+}
 
 const generateQuestionOption = (generatorFn: GeneratorFn) => ({
    id: generateId(),
@@ -193,6 +285,8 @@ export const groupQuestions = [
    generateQuestion("Job Type", faker.name.jobType),
    generateQuestion("Gender", faker.name.gender),
 ]
+
+const integrationId = "testIntegrationId"
 
 const instance: GroupSeed = new GroupFirebaseSeed()
 

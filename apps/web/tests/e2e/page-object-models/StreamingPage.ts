@@ -1,5 +1,5 @@
 import { CommonPage } from "./CommonPage"
-import { streaming } from "../../constants"
+import { pdfSamplePath, streaming } from "../../constants"
 import { expect } from "@playwright/test"
 
 /**
@@ -298,5 +298,40 @@ export class ViewerPage extends StreamingPage {
          this.page.locator('[data-testid="breakout-room-banner-item"]').click(),
          this.page.waitForNavigation({ waitUntil: "commit" }),
       ])
+   }
+
+   public async clickJobsTab() {
+      return this.page.locator('[data-testid="streaming-Jobs"]').click()
+   }
+
+   public async clickJobButton(jobName: string) {
+      return this.page.getByRole("button", { name: jobName }).click()
+   }
+
+   public async clickUploadCvButton() {
+      return this.page
+         .getByRole("button", { name: "Upload New CV [.pdf]" })
+         .click()
+   }
+
+   public async uploadCv() {
+      return this.clickAndUploadFiles(
+         this.page.getByRole("button", {
+            name: "Upload New CV [.pdf]",
+         }),
+         pdfSamplePath
+      )
+   }
+
+   public async clickApplyButton() {
+      return this.page.getByRole("button", { name: "Apply Now" }).click()
+   }
+
+   public async assertJobApplyCongratsMessage() {
+      return expect(
+         this.page.getByRole("heading", {
+            name: "Congrats! You have already applied to this job!",
+         })
+      ).toBeVisible()
    }
 }
