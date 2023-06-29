@@ -59,7 +59,7 @@ export interface LivestreamEvent extends Identifiable {
    maxHandRaisers?: number
 
    /**
-    * THis property is used to determine if we should dispatch the feedback toasts during the event
+    * This property is used to determine if we should dispatch the feedback toasts during the event
     */
    hasNoRatings?: boolean
 
@@ -279,6 +279,24 @@ export interface RecordingStats extends Identifiable {
    minutesWatched: number
    viewers: string[]
    views: number
+}
+
+// Recording Stats for each user
+// The document is consists of the userId and the date rounded to the nearest hour
+// The minutesWatched is the sum of all the minutes watched in that hour
+// Path: /livestreams/{livestreamId}/recordingStatsUser/{userId}_{hourlyTimestamp}
+export interface RecordingStatsUser extends Identifiable {
+   /**
+    * In case there are collections with the same name
+    * differentiate between them
+    */
+   documentType: "recordingStatsUser"
+   livestreamId: string
+   livestreamStartDate?: firebase.firestore.Timestamp
+   userId: string
+   recordingBought?: boolean
+   minutesWatched: number
+   date: firebase.firestore.Timestamp
 }
 
 export interface LivestreamJobApplicationDetails extends JobIdentifier {
