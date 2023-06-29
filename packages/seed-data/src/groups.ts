@@ -185,7 +185,7 @@ class GroupFirebaseSeed implements GroupSeed {
    ): Promise<void> {
       const groupId = group.id
 
-      const atsMetadata: Partial<GroupATSAccountDocument> = {
+      const atsMetadata: GroupATSAccountDocument = {
          groupId: groupId,
          merge: {
             end_user_origin_id: integrationId,
@@ -197,6 +197,10 @@ class GroupFirebaseSeed implements GroupSeed {
             applicationTestCompletedAt: fieldValue.serverTimestamp() as any, // set to now
             extraRequiredData: null,
          },
+
+         createdAt: fieldValue.serverTimestamp() as any, // set to now
+         updatedAt: fieldValue.serverTimestamp() as any, // set to now
+         id: groupId,
       }
 
       if (options.needsApplicationTest === true) {
@@ -204,12 +208,13 @@ class GroupFirebaseSeed implements GroupSeed {
          atsMetadata.merge.extraRequiredData = null
       }
 
-      const atsTokenData: Partial<GroupATSIntegrationTokensDocument> = {
+      const atsTokenData: GroupATSIntegrationTokensDocument = {
          groupId: groupId,
          integrationId: integrationId,
          merge: {
             account_token: "testAccountToken",
          },
+         id: "tokens",
       }
 
       await Promise.all([

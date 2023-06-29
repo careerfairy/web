@@ -11,6 +11,24 @@ import {
 } from "@careerfairy/shared-lib/livestreams"
 import { Group } from "@careerfairy/shared-lib/groups"
 
+const testWithATSThatNeedsApplicationTest = test.extend({
+   options: async ({}, use) => {
+      await use({
+         createUser: true,
+         atsGroupType: "NEEDS_APPLICATION_TEST",
+      })
+   },
+})
+
+const testWithCompletlySetupATS = test.extend({
+   options: async ({}, use) => {
+      await use({
+         createUser: true,
+         atsGroupType: "COMPLETE",
+      })
+   },
+})
+
 test.describe("ATS Integration", () => {
    test("Can successfully link account & test application", async ({
       groupPage,
@@ -56,18 +74,9 @@ test.describe("ATS Integration", () => {
    })
 })
 
-test.describe("Needs Application Test", () => {
-   test.use({
-      options: {
-         atsGroupType: "NEEDS_APPLICATION_TEST",
-         createUser: true,
-      },
-   })
-
-   test("Application test is required to link job", async ({
-      groupPage,
-      group,
-   }) => {
+testWithATSThatNeedsApplicationTest(
+   "Application test is required to link job",
+   async ({ groupPage, group }) => {
       const jobs = [
          generateJobAssociation(
             group.id,
@@ -88,13 +97,12 @@ test.describe("Needs Application Test", () => {
 
       // User should be able to select jobs now
       await groupPage.selectJobs(jobs)
-   })
-})
+   }
+)
 
-test.describe("Complete", () => {
-   test.use({ options: { createUser: true, atsGroupType: "COMPLETE" } })
-
-   test("Can apply to job in-stream", async ({ groupPage, group }) => {
+testWithCompletlySetupATS(
+   "Can apply to job in-stream",
+   async ({ groupPage, group }) => {
       const { livestream } = await setupData(group)
 
       // go to Dialog page
@@ -120,8 +128,8 @@ test.describe("Complete", () => {
       await viewerPage.uploadCv()
       await viewerPage.clickApplyButton()
       await viewerPage.assertJobApplyCongratsMessage()
-   })
-})
+   }
+)
 
 const variables = {
    apiKey: "088ec780160bea9d7d3b23dca4966889-3",
