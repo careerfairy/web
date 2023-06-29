@@ -25,18 +25,11 @@ import Box from "@mui/material/Box"
 import useRegistrationHandler from "../../useRegistrationHandler"
 import HeroTags from "./HeroTags"
 import { sxStyles } from "types/commonTypes"
-import { gradientAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
+import { boxShadowAnimation } from "materialUI/GlobalBackground/GlobalBackGround"
 
 const styles = sxStyles({
    liveHeroContent: {
-      background:
-         "linear-gradient(white, white) padding-box, linear-gradient(180deg, #e9911d, #dc2743 50%, #e9911d) border-box",
-      backgroundRepeat: "no-repeat",
-      backgroundSize: "100% 100%, 100% 200%",
-      backgroundPosition: "0 0, 0 100%",
-      border: "4px solid transparent",
-      animation: `${gradientAnimation} 1s infinite alternate`,
-      zIndex: 1,
+      animation: `${boxShadowAnimation} 1s infinite alternate`,
    },
 })
 

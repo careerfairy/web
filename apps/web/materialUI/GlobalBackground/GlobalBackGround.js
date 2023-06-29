@@ -127,3 +127,9 @@ export const gradientAnimation = keyframes({
    "50%": { backgroundPosition: "100% 0%" },
    "100%": { backgroundPosition: "0% 50%" },
 })
+
+export const boxShadowAnimation = keyframes({
+   "0%": { boxShadow: "0px 0px 0px 4px #e9911d" },
+   "50%": { boxShadow: "0px 0px 0px 4px #dc2743" },
+   "100%": { boxShadow: "0px 0px 0px 4px #e9911d" },
+})
