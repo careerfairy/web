@@ -113,6 +113,7 @@ export interface MergeCandidate {
    urls?: MergeUrl[]
    applications?: MergeApplication[] | string[]
    attachments?: MergeAttachment[]
+   tags?: string[]
 }
 
 /**
@@ -269,7 +270,7 @@ export type MergePaginatedResponse<T> = {
 
 export type MergeLinkTokenResponse = {
    link_token: string
-   integration_name: string
+   integration_name: string | null
 }
 
 export type MergeAccountTokenResponse = {
@@ -281,4 +282,8 @@ export type MergeAccountTokenResponse = {
       color?: string
       slug?: string
    }
+}
+
+export type MergeRemoveAccountResponse = {
+   status: string
 }

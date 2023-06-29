@@ -8,6 +8,7 @@ import { Speaker } from "@careerfairy/shared-lib/dist/livestreams"
 import { correctCompany, imageLogoPath } from "../../constants"
 import { LivestreamsAdminPage } from "./admin/LivestreamsAdminPage"
 import { sleep } from "../utils"
+import { ATSAdminPage } from "./admin/ATSAdminPage"
 
 export class GroupDashboardPage extends CommonPage {
    public inviteMemberButton: Locator
@@ -112,6 +113,12 @@ export class GroupDashboardPage extends CommonPage {
       await this.goToPage("Live streams")
 
       return new LivestreamsAdminPage(this)
+   }
+
+   public async goToATSPage() {
+      await this.goToPage("ATS Integration")
+
+      return new ATSAdminPage(this)
    }
 
    // Team Members page
@@ -241,7 +248,12 @@ export class GroupDashboardPage extends CommonPage {
    }
 
    private async goToPage(
-      name: "Company" | "Team members" | "Live streams" | "Company page"
+      name:
+         | "Company"
+         | "Team members"
+         | "Live streams"
+         | "Company page"
+         | "ATS Integration"
    ) {
       await Promise.all([
          this.page.waitForNavigation(),

@@ -91,6 +91,7 @@ class GroupFirebaseSeed implements GroupSeed {
          test: false,
          universityName,
          triGrams: groupTriGrams(universityName),
+         atsAdminPageFlag: true,
       }
 
       data = Object.assign(data, overrideFields)
