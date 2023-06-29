@@ -1,12 +1,12 @@
 import { Box, Button } from "@mui/material"
 import { sxStyles } from "../../../types/commonTypes"
-import { useVideo } from "react-use"
 import useIsMobile from "../../custom-hook/useIsMobile"
 import {
    ONBOARDING_VIDEO_URL_DESKTOP,
    ONBOARDING_VIDEO_URL_MOBILE,
 } from "../../util/constants"
 import { useCallback } from "react"
+import ReactPlayer from "react-player"
 
 const styles = sxStyles({
    container: {
@@ -14,12 +14,11 @@ const styles = sxStyles({
       padding: 1,
       borderRadius: 5,
    },
-   video: {
-      width: "100%",
-      borderRadius: 5,
-   },
-   videoMobile: {
-      width: "100%",
+   videoContainer: {
+      paddingBottom: "4px",
+      "& video": {
+         borderRadius: 5,
+      },
    },
    button: {
       boxShadow: "none",
@@ -39,25 +38,20 @@ export const VideoView = ({ onComplete }: { onComplete: () => void }) => {
       onComplete()
    }, [onComplete])
 
-   const [video] = useVideo(
-      <Box
-         sx={[styles.video, isMobile && styles.videoMobile]}
-         webkit-playsInline
-         // @ts-ignore
-         webkitPlaysInline
-         playsInline
-         component="video"
-         controls
-         disablePictureInPicture={true}
-         src={videoUrl}
-         onEnded={onEnded}
-         controlsList="nodownload"
-      />
-   )
-
    return (
       <Box sx={styles.container}>
-         <Box textAlign="center">{video}</Box>
+         <Box textAlign="center" sx={styles.videoContainer}>
+            <ReactPlayer
+               width="100%"
+               height="100%"
+               playsinline
+               controls
+               url={videoUrl}
+               config={videoConfig}
+               playing={true}
+               onEnded={onEnded}
+            />
+         </Box>
          <Box textAlign={isMobile ? "center" : "right"}>
             <Button
                size="small"
@@ -71,6 +65,16 @@ export const VideoView = ({ onComplete }: { onComplete: () => void }) => {
          </Box>
       </Box>
    )
+}
+
+const videoConfig = {
+   file: {
+      attributes: {
+         controlsList: "nodownload noplaybackrate",
+         disablePictureInPicture: true,
+         playsInline: true,
+      },
+   },
 }
 
 export default VideoView
