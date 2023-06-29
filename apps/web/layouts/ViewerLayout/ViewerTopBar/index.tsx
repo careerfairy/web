@@ -105,6 +105,7 @@ const ViewerTopBar = ({
       Boolean(
          breakoutRoomsSelector(
             state.firestore.ordered[`Active BreakoutRooms of ${livestreamId}`]
+            // @ts-ignore
          )?.length
       )
    )
