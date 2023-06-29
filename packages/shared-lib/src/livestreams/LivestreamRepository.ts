@@ -962,15 +962,6 @@ export class FirebaseLivestreamRepository
       onlyIncrementMinutes = false,
       usedCredits = false,
    }: UpdateRecordingStatsProps): Promise<void> {
-      console.log("here updateRecordingStats", {
-         livestreamId,
-         livestreamStartDate,
-         minutesWatched,
-         userId,
-         onlyIncrementMinutes,
-         usedCredits,
-      })
-
       const promises = [
          // update global recordingStats/stats doc
          this.updateRecordingStatsDocument({
