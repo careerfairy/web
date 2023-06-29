@@ -15,6 +15,7 @@ const styles = sxStyles({
       borderRadius: 5,
    },
    videoContainer: {
+      paddingBottom: "4px",
       "& video": {
          borderRadius: 5,
       },
