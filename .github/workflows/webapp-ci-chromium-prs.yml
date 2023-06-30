@@ -141,7 +141,7 @@ jobs:
            env:
               SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
               NODE_ENV: test
-           run: npm run test:e2e-webapp -- -- --project=chromium --shard=${{matrix.shard}}/${{ matrix.total }}
+           run: npm run test:e2e-webapp -- --  --shard=${{matrix.shard}}/${{ matrix.total }}
 
          - name: Upload test results
            if: ${{ failure() }}
