@@ -227,9 +227,10 @@ const HeroSection = ({
             livestreamId: stream.id,
             minutesWatched: 1,
             onlyIncrementMinutes: true,
+            userId: userData?.userEmail,
          })
       }
-   }, [minutesWatched])
+   }, [minutesWatched, userData?.userEmail, stream.id])
 
    useEffect(() => {
       // fetch the recordingSid if the recording is available
