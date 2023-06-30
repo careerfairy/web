@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { admin } from "./api/firestoreAdmin"
+import { FieldValue } from "./api/firestoreAdmin"
 import config from "./config"
 
 export const updateBreakoutRoomStatusOnWrite = functions
@@ -29,8 +29,7 @@ export const updateBreakoutRoomStatusOnWrite = functions
          if (breakoutRoomAfter && breakoutRoomAfter.hasStarted) {
             await breakoutRoomSettingsRef.set(
                {
-                  openRooms:
-                     admin.firestore.FieldValue.arrayUnion(breakoutRoomId),
+                  openRooms: FieldValue.arrayUnion(breakoutRoomId),
                },
                { merge: true }
             )
@@ -40,8 +39,7 @@ export const updateBreakoutRoomStatusOnWrite = functions
          } else if (breakoutRoomAfter && !breakoutRoomAfter.hasStarted) {
             await breakoutRoomSettingsRef.set(
                {
-                  openRooms:
-                     admin.firestore.FieldValue.arrayRemove(breakoutRoomId),
+                  openRooms: FieldValue.arrayRemove(breakoutRoomId),
                },
                { merge: true }
             )

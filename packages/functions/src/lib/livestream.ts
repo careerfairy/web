@@ -1,13 +1,14 @@
-import { admin } from "../api/firestoreAdmin"
 import {
    LivestreamEvent,
    LiveStreamEventWithUsersLivestreamData,
 } from "@careerfairy/shared-lib/livestreams"
 import { addMinutesDate, removeMinutesDate } from "../util"
 import { MAX_RECORDING_HOURS } from "@careerfairy/shared-lib/livestreams/recordings"
+import { firestore } from "../api/firestoreAdmin"
+import { WriteBatch } from "firebase-admin/firestore"
 
 export const livestreamGetSecureToken = async (id, breakoutRoomId?) => {
-   let documentSnap: any = admin.firestore().collection("livestreams").doc(id)
+   let documentSnap: any = firestore.collection("livestreams").doc(id)
 
    if (breakoutRoomId) {
       documentSnap = documentSnap
@@ -31,7 +32,7 @@ export const livestreamGetRecordingToken = async (
    id,
    breakoutRoomId = null
 ) => {
-   let documentSnap: any = admin.firestore().collection("livestreams").doc(id)
+   let documentSnap: any = firestore.collection("livestreams").doc(id)
 
    if (breakoutRoomId) {
       documentSnap = documentSnap
@@ -56,7 +57,7 @@ export const livestreamUpdateRecordingToken = async (
    data,
    breakoutRoomId?
 ) => {
-   let ref = admin.firestore().collection("livestreams").doc(id)
+   let ref = firestore.collection("livestreams").doc(id)
 
    if (breakoutRoomId) {
       ref = ref.collection("breakoutRooms").doc(breakoutRoomId)
@@ -70,7 +71,7 @@ export const livestreamSetIsRecording = async (
    value = true,
    breakoutRoomId = null
 ) => {
-   let ref = admin.firestore().collection("livestreams").doc(id)
+   let ref = firestore.collection("livestreams").doc(id)
 
    if (breakoutRoomId) {
       ref = ref.collection("breakoutRooms").doc(breakoutRoomId)
@@ -89,8 +90,7 @@ export const getStreamsByDateWithRegisteredStudents = (
    filterStartDate: Date,
    filterEndDate: Date
 ): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
-   return admin
-      .firestore()
+   return firestore
       .collection("livestreams")
       .where("start", ">=", filterStartDate)
       .where("start", "<=", filterEndDate)
@@ -117,8 +117,7 @@ const addUsersDataOnStreams = async (
 ): Promise<LiveStreamEventWithUsersLivestreamData[]> => {
    const formattedStreams = []
    for (const stream of streams) {
-      const collection = await admin
-         .firestore()
+      const collection = await firestore
          .collection("livestreams")
          .doc(stream.id)
          .collection("userLivestreamData")
@@ -136,13 +135,13 @@ const addUsersDataOnStreams = async (
  * Update all the successfully sent reminders for each livestream
  */
 export const updateLiveStreamsWithEmailSent = (
-   batch: admin.firestore.WriteBatch,
+   batch: WriteBatch,
    emailsToSave
 ) => {
    Object.values(emailsToSave).forEach((email: any) => {
       const { streamId, reminderKey, chunks } = email
 
-      const ref = admin.firestore().collection("livestreams").doc(streamId)
+      const ref = firestore.collection("livestreams").doc(streamId)
 
       batch.update(ref, {
          [`reminderEmailsSent.${reminderKey}`]: chunks,
@@ -159,10 +158,9 @@ export const updateUnfinishedLivestreams = async () => {
       60 * MAX_RECORDING_HOURS
    )
 
-   const batch = admin.firestore().batch()
+   const batch = firestore.batch()
 
-   const collection = await admin
-      .firestore()
+   const collection = await firestore
       .collection("livestreams")
       .where("hasStarted", "==", true)
       .where("hasEnded", "==", false)

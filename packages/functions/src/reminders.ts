@@ -1,7 +1,6 @@
 import functions = require("firebase-functions")
 import config from "./config"
 import { client } from "./api/postmark"
-import { admin } from "./api/firestoreAdmin"
 import {
    addMinutesDate,
    generateNonAttendeesReminder,
@@ -23,6 +22,8 @@ import {
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { LivestreamPresenter } from "@careerfairy/shared-lib/livestreams/LivestreamPresenter"
 import { livestreamsRepo } from "./api/repositories"
+import { firestore } from "./api/firestoreAdmin"
+import { WriteBatch } from "firebase-admin/firestore"
 
 export const sendReminderEmailToRegistrants = functions
    .region(config.region)
@@ -30,8 +31,7 @@ export const sendReminderEmailToRegistrants = functions
       setCORSHeaders(req, res)
 
       let registeredUsers = []
-      admin
-         .firestore()
+      firestore
          .collection("livestreams")
          .doc(req.body.livestreamId)
          .get()
@@ -174,7 +174,7 @@ export const scheduleReminderEmails = functions
    .pubsub.schedule("every 15 minutes")
    .timeZone("Europe/Zurich")
    .onRun(() => {
-      const batch = admin.firestore().batch()
+      const batch = firestore.batch()
 
       const dateStart = addMinutesDate(new Date(), reminderDateDelay)
       const dateEndFor5Minutes = addMinutesDate(
@@ -379,7 +379,7 @@ export const sendReminderForNonAttendeesByStreamId = functions
  *
  */
 const handleReminder = async (
-   batch: admin.firestore.WriteBatch,
+   batch: WriteBatch,
    filterStartDate: Date,
    filterEndDate: Date,
    reminder: ReminderData
