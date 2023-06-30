@@ -1,4 +1,3 @@
-import { admin } from "../api/firestoreAdmin"
 import * as functions from "firebase-functions"
 import { https } from "firebase-functions"
 import { OnCallMiddleware } from "./middlewares"
@@ -8,6 +7,7 @@ import {
    CacheKey,
    generateCacheKey,
 } from "@careerfairy/shared-lib/functions/cache"
+import { firestore, Timestamp } from "../api/firestoreAdmin"
 
 /**
  * Function to extract the cache key from the request data/context
@@ -104,8 +104,7 @@ const getFirestoreCacheDocument = async (
    cacheNamespace: string,
    documentId: string
 ): Promise<CacheEntryDocument> => {
-   const documentSnap = await admin
-      .firestore()
+   const documentSnap = await firestore
       .collection(`cache/functions/${cacheNamespace}`)
       .doc(documentId)
       .get()
@@ -122,8 +121,7 @@ const upsertFirestoreCacheDocument = async (
    documentId: string,
    cacheEntry: CacheEntryDocument
 ): Promise<void> => {
-   const documentSnap = await admin
-      .firestore()
+   const documentSnap = await firestore
       .collection(`cache/functions/${cacheNamespace}`)
       .doc(documentId)
 
@@ -148,8 +146,8 @@ const createCacheEntry = async (
    return {
       key: cacheKey.hashed,
       plainKey: cacheKey.plain,
-      cachedAt: admin.firestore.Timestamp.now(),
-      expiresAt: admin.firestore.Timestamp.fromMillis(Date.now() + ttlMs),
+      cachedAt: Timestamp.now(),
+      expiresAt: Timestamp.fromMillis(Date.now() + ttlMs),
       data: compressedBuffer,
    }
 }

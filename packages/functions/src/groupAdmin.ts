@@ -24,7 +24,6 @@ import {
    onCallWrapper,
    partition,
 } from "./util"
-import { admin } from "./api/firestoreAdmin"
 import {
    logAndThrow,
    validateData,
@@ -36,12 +35,12 @@ import {
    WRONG_EMAIL_IN_INVITE_ERROR_MESSAGE,
 } from "@careerfairy/shared-lib/groups/GroupDashboardInvite"
 import { array, boolean, mixed, object, string } from "yup"
-import { auth } from "firebase-admin"
 import functions = require("firebase-functions")
-import UserRecord = auth.UserRecord
 import { addUtmTagsToLink } from "@careerfairy/shared-lib/utils"
 import { client } from "./api/postmark"
 import config from "./config"
+import { firestore, auth } from "./api/firestoreAdmin"
+import { UserRecord } from "firebase-admin/auth"
 
 export const sendDraftApprovalRequestEmail = functions
    .region(config.region)
@@ -193,20 +192,17 @@ export const getLivestreamReportData = functions
          )
       }
 
-      const groupSnap = await admin
-         .firestore()
+      const groupSnap = await firestore
          .collection("careerCenterData")
          .doc(targetGroupId)
          .get()
 
-      const streamSnap = await admin
-         .firestore()
+      const streamSnap = await firestore
          .collection("livestreams")
          .doc(targetStreamId)
          .get()
 
-      const userSnap = await admin
-         .firestore()
+      const userSnap = await firestore
          .collection("userData")
          .doc(userEmail)
          .get()
@@ -244,8 +240,7 @@ export const getLivestreamReportData = functions
          )
          const [talentPoolSnap, pollsSnap, iconsSnap, questionsSnap] =
             await Promise.all([
-               admin
-                  .firestore()
+               firestore
                   .collection("userData")
                   .where(
                      "talentPools",
@@ -506,7 +501,7 @@ export const sendDashboardInviteEmail = functions
          await validateUserIsGroupAdminOwnerRole(userEmail, groupId)
 
          // Check if the user exists in our platform, allow fail
-         const authUser = await auth()
+         const authUser = await auth
             .getUserByEmail(targetEmail)
             .catch(() => null)
 
@@ -719,7 +714,7 @@ export async function validateGroupDashboardInvite(
    }
 
    const group = await groupRepo.getGroupById(groupDashboardInvite.groupId)
-   const authUser = await admin.auth().getUserByEmail(currentUserEmail)
+   const authUser = await auth.getUserByEmail(currentUserEmail)
 
    const isAlreadyGroupMember = checkIfAuthUserHasGroupAdminRole(
       authUser,

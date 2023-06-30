@@ -1,5 +1,5 @@
 import functions = require("firebase-functions")
-import { admin } from "./api/firestoreAdmin"
+import { firestore } from "./api/firestoreAdmin"
 import config from "./config"
 
 const DAY_IN_SECONDS = 24 * 60 * 60
@@ -58,8 +58,7 @@ const removeExpiredCacheDocuments = (
 ) => {
    const pastDate = new Date(Date.now() - expireOlderThanSeconds * 1000)
 
-   return admin
-      .firestore()
+   return firestore
       .collection(collectionPath)
       .where("expiresAt", "<", pastDate)
       .get()
