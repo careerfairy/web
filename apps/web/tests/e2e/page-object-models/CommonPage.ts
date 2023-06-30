@@ -145,6 +145,24 @@ export class CommonPage {
       await this.openProfileMenu()
       await this.page.getByText("Get more now").click()
    }
+
+   /**
+    * Select option from a MaterialUI Autocomplete multi-select input
+    * @param stringToSelect
+    * @param elementLocator
+    * @param page
+    */
+   public handleMultiSelect = async (
+      stringToSelect: string,
+      elementLocator: Locator
+   ) => {
+      if (!stringToSelect) return
+
+      const locator = elementLocator.first()
+      await locator.click()
+
+      await this.page.getByRole("option", { name: stringToSelect }).click()
+   }
 }
 
 /**
@@ -179,39 +197,16 @@ export const materialSelectOption = async (
    )
 }
 
-const promiseTimeout = (promise, timeoutInMilliseconds) => {
+const promiseTimeout = (
+   promise: Promise<unknown>,
+   timeoutInMilliseconds: number
+) => {
    return Promise.race([
       promise,
-      new Promise(function (resolve, reject) {
+      new Promise(function (_, reject) {
          setTimeout(function () {
             reject("timeout")
          }, timeoutInMilliseconds)
       }),
    ])
-}
-
-/**
- * Select option from a MaterialUI Autocomplete multi-select input
- * @param stringToSelect
- * @param elementLocator
- * @param page
- */
-export const handleMultiSelect = async (
-   stringToSelect: string,
-   elementLocator: Locator,
-   page: Page
-) => {
-   if (!stringToSelect) return
-
-   const locator = elementLocator.first()
-
-   await locator.click()
-   await locator.focus()
-   await locator.fill(stringToSelect)
-   // give time for the dropdown to update the suggestions
-   await sleep(250)
-   expect(await locator.inputValue()).toBe(stringToSelect)
-   await page
-      .locator('div[role="presentation"]', { hasText: stringToSelect })
-      .click()
 }
