@@ -108,7 +108,7 @@ const CardCustom: FC<Props> = ({
    )
 
    return (
-      <Card sx={mergedSxProps}>
+      <Card data-testid="card-custom" sx={mergedSxProps}>
          <CardHeader
             sx={styles.cardHeader}
             title={title}
