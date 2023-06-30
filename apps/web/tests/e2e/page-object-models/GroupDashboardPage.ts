@@ -50,7 +50,7 @@ export class GroupDashboardPage extends CommonPage {
          name: "Company size *",
       })
 
-      this.companyInformationAboutInput = this.page.getByLabel("About")
+      this.companyInformationAboutInput = this.page.getByLabel("About *")
 
       this.companyPageTestimonialSectionEditButton = this.page.locator(
          "data-testid=testimonial-section-edit-button"
@@ -314,7 +314,7 @@ export class GroupDashboardPage extends CommonPage {
       await sleep(1000)
 
       await this.page
-         .getByLabel("Testimonial")
+         .getByPlaceholder("Say something about their story")
          .fill(
             "I am about to finish my Bachelor’s degree in Applied Linguistics at ZHAW. I wanted to start my professional career in an environment that values my ideas and ultimately helps students, like me, to make their first steps in their professional world."
          )
