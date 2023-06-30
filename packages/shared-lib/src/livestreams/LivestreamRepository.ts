@@ -16,6 +16,7 @@ import {
    LivestreamUserAction,
    NUMBER_OF_MS_FROM_STREAM_START_TO_BE_CONSIDERED_PAST,
    RecordingStats,
+   RecordingStatsUser,
    RecordingToken,
    UserLivestreamData,
    UserParticipatingStats,
@@ -29,6 +30,7 @@ import {
    LivestreamStatsToUpdate,
 } from "./stats"
 import { OrderByDirection } from "firebase/firestore"
+import { Create } from "../commonTypes"
 
 type UpdateRecordingStatsProps = {
    livestreamId: string
@@ -960,6 +962,79 @@ export class FirebaseLivestreamRepository
       onlyIncrementMinutes = false,
       usedCredits = false,
    }: UpdateRecordingStatsProps): Promise<void> {
+      const promises = [
+         // update global recordingStats/stats doc
+         this.updateRecordingStatsDocument({
+            livestreamId,
+            livestreamStartDate,
+            minutesWatched,
+            userId,
+            onlyIncrementMinutes,
+            usedCredits,
+         }),
+      ]
+
+      if (userId) {
+         // update individual user recording stats
+         promises.push(
+            this.updateUserRecordingStats({
+               userId,
+               livestreamId,
+               livestreamStartDate,
+               minutesWatched,
+               usedCredits,
+            })
+         )
+      }
+
+      await Promise.all(promises)
+   }
+
+   private async updateUserRecordingStats({
+      livestreamId,
+      livestreamStartDate,
+      minutesWatched,
+      userId,
+      usedCredits,
+   }: UpdateRecordingStatsProps) {
+      /**
+       * 1 document per hour per user views
+       * This is a balance to have a reduced number of documents and still
+       * be able to easily query this data
+       */
+      const nearesHourTimestamp = getNearestHourTimestamp()
+      const docId = `${userId}_${nearesHourTimestamp}`
+
+      const docRef = this.firestore
+         .collection("livestreams")
+         .doc(livestreamId)
+         .collection("recordingStatsUser")
+         .doc(docId)
+
+      const details: Create<RecordingStatsUser> = {
+         documentType: "recordingStatsUser",
+         livestreamId,
+         userId,
+         minutesWatched: this.fieldValue.increment(minutesWatched) as any,
+         recordingBought: usedCredits,
+         date: this.fieldValue.serverTimestamp() as any,
+      }
+
+      if (livestreamStartDate) {
+         details.livestreamStartDate = livestreamStartDate
+      }
+
+      return docRef.set(details, { merge: true })
+   }
+
+   private async updateRecordingStatsDocument({
+      livestreamId,
+      livestreamStartDate,
+      minutesWatched,
+      userId,
+      onlyIncrementMinutes,
+      usedCredits,
+   }: UpdateRecordingStatsProps) {
       const docRef = this.firestore
          .collection("livestreams")
          .doc(livestreamId)
@@ -1124,4 +1199,12 @@ export class LivestreamsDataParser {
    get() {
       return this.livestreams
    }
+}
+
+function getNearestHourTimestamp(date?: Date) {
+   const d = date ?? new Date()
+   d.setMinutes(d.getMinutes() + 30)
+   d.setMinutes(0, 0, 0)
+
+   return d.getTime()
 }
