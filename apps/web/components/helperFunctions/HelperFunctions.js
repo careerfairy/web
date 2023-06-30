@@ -161,6 +161,9 @@ export const isNotEmptyString = (myString) => {
 export const isServer = () => {
    return typeof window === "undefined"
 }
+
+export const isInIframe = isServer() ? false : window.self !== window.top
+
 export const convertCamelToSentence = (string) => {
    if (typeof string === "string" || string instanceof String) {
       return (
